@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	function showResault(order, num, obj) {
+		$(".main_ul li").click(function() {
+			$(this).addClass('selected') //为选中项添加高亮
+			.siblings().removeClass('selected')//去除其他项的高亮形式
+			.end();
+		});
+		$(".div_content").empty();
+		var div_iframe = "";
+		if (order == 1) {
+			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html"></iframe>';
+		} else if (order == 2) {
+			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/questionnaire.html"></iframe>';
+		} else if (order == 3) {
+			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/Customer_Feebdack.html"></iframe>';	
+		}
+		$(".div_content").append(div_iframe);
+	}
+</script>
+<style type="text/css">
+.main_ul li {
+	color: #308930;
+	padding: 0; /* 将默认的内边距去掉 */
+	margin: 0 0 0 80px;
+	float: left;
+}
+
+.selected {
+	background: #a0d0a0;
+}
+
+.div_search {
+	height: 5%;
+}
+
+.div_content {
+	height: 92%
+}
+
+.div_iframe {
+	width: 100%;
+	height: 880px;
+}
+</style>
+<title>购物车&支付页面问题统计</title>
+</head>
+<body>
+
+	<div>
+		<div class="div_search">
+			<ul class="main_ul">
+				<li class="selected"><a href="javascript:;" onclick="showResault(1)">用户使用问题反馈</a></li>
+				<li><a href="javascript:;" onclick="showResault(2)">搜索页问卷调查</a></li>
+				<li><a href="javascript:;" onclick="showResault(3)">注册&订阅用户信息收集</a></li>
+			</ul>
+		</div>
+		<br> <br>
+		<div class="div_content"></div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = function() {
+		$(".div_content").empty();
+		var div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html"></iframe>';
+		$(".div_content").append(div_iframe);
+	}
+</script>
+</html>

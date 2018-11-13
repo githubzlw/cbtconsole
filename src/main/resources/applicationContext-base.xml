@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <description>Spring公共配置 </description>
+    <!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+    <!-- 不扫描controller类 -->
+    <context:component-scan base-package="com">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties,classpath:jdbcdb.properties" ignore-unresolvable="true"/>
+    <!-- 文件上传 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="maxUploadSize" value="200000000" />
+    </bean>
+
+
+    <!-- 配置动态数据源 -->
+    <bean id="dataSource" class="com.cbt.common.dynamics.DynamicDataSource">
+        <!-- 通过key-value的形式来关联数据源 -->
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry value-ref="localDataSource" key="localDataSource"></entry>
+                <entry value-ref="dataSource127hop" key="dataSource127hop"></entry>
+                <entry value-ref="dataSource28hop" key="dataSource28hop"></entry>
+                <entry value-ref="dataSource28_corss" key="dataSource28_corss"></entry>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="localDataSource" />
+    </bean>
+
+    <!-- 默认的数据库连接池 -->
+    <bean id="localDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="30" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="300" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="3000" />
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="60000" />
+
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat,log4j" />
+
+        <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandonedTimeout" value="1800" /> <!-- 1800秒，也就是30分钟 -->
+        <property name="logAbandoned" value="true" /> <!-- 关闭abanded连接时输出错误日志 -->
+    </bean>
+
+    <!-- 数据库连接池 -->
+    <bean id="dataSource127hop" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="url" value="${jdbc.url127hop}" />
+        <property name="username" value="${jdbc.username127hop}" />
+        <property name="password" value="${jdbc.password127hop}" />
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="30" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="300" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="3000" />
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="60000" />
+
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testWhileIdle" value="true" />
+
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat,log4j" />
+
+        <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandonedTimeout" value="1800" /> <!-- 1800秒，也就是30分钟 -->
+        <property name="logAbandoned" value="true" /> <!-- 关闭abanded连接时输出错误日志 -->
+    </bean>
+    <bean id="dataSource28hop" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="url" value="${jdbc.url28hop}" />
+        <property name="username" value="${jdbc.userName28hop}" />
+        <property name="password" value="${jdbc.userPass28hop}" />
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="50" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="100" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="3000" />
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="60000" />
+
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testWhileIdle" value="true" />
+
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat,log4j" />
+
+        <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandonedTimeout" value="1800" /> <!-- 1800秒，也就是30分钟 -->
+        <property name="logAbandoned" value="true" /> <!-- 关闭abanded连接时输出错误日志 -->
+    </bean>
+    <bean id="dataSource28_corss" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="url" value="${jdbc.url28_cross}" />
+        <property name="username" value="${jdbc.userName28_cross}" />
+        <property name="password" value="${jdbc.userPass28_cross}" />
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="30" />
+        <property name="minIdle" value="10" />
+        <property name="maxActive" value="300" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="3000" />
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="60000" />
+
+        <property name="validationQuery" value="SELECT 1" />
+        <property name="testWhileIdle" value="true" />
+
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat,log4j" />
+
+        <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandonedTimeout" value="1800" /> <!-- 1800秒，也就是30分钟 -->
+        <property name="logAbandoned" value="true" /> <!-- 关闭abanded连接时输出错误日志 -->
+    </bean>
+    <!-- 配置sqlsessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"></property>
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="mapperLocations" value="classpath*:com/cbt/**/dao/*.xml"></property>
+        <!-- ,com/importExpress/mapper/*.xml -->
+        <!--<property name="plugins">
+            <array>
+                <bean class="com.cbt.website.interceptor.MybatisPlugin">
+                    <property name="properties">
+                        <value>
+                            localDataSource=${jdbc.url}
+                            dataSource127hop=${jdbc.url127hop}
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>-->
+    </bean>
+    <!-- 配置扫描包，加载mapper代理对象 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.cbt.*.dao,com.importExpress.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+    <!-- 扫描包加载service实现类 -->
+    <context:component-scan base-package="com.cbt.*.service,com.importExpress.service.impl"></context:component-scan>
+    <!-- 扫描加载所有ctrl类，注意controller的路径 -->
+    <context:component-scan base-package="com.cbt.**.ctrl, org.cbt.**.ctrl,com.importExpress.controller"></context:component-scan>
+
+    <!-- 扫描bean -->
+    <context:component-scan base-package="com.cbt.bean"></context:component-scan>
+    <!-- 扫描bean -->
+    <!-- 事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+   <!-- <bean id="druid-stat-interceptor"
+          class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+    </bean>
+
+    <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+          scope="prototype">
+        <property name="patterns">
+            <list>
+                <value>com.cbt.*</value>
+            </list>
+        </property>
+    </bean>
+    <aop:config>
+        <aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut" />
+    </aop:config>-->
+
+    <!-- 通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 传播行为 -->
+            <tx:method name="save*" propagation="REQUIRED" />
+            <tx:method name="insert*" propagation="REQUIRED" />
+            <tx:method name="add*" propagation="REQUIRED" />
+            <tx:method name="create*" propagation="REQUIRED" />
+            <tx:method name="delete*" propagation="REQUIRED" />
+            <tx:method name="update*" propagation="REQUIRED" />
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+        </tx:attributes>
+    </tx:advice>
+    <!-- 切面 -->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice"
+                     pointcut="execution(* com.cbt.service.*.*(..)) or execution(* com.importExpress.service.impl.*.*(..))" />
+    </aop:config>
+
+    <bean id="springcontextutil" class="com.cbt.util.SpringContextUtil" lazy-init="false"/>
+
+</beans>

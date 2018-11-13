@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>同款1688商品推荐</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<script type="text/javascript">
+	var isAddFlag = 0;
+	$(document).ready(function() {
+		closeDialog();
+		doQuery(0);
+	});
+
+	function switchChoose(obj, type) {
+		$(obj).siblings().removeClass("curren_btn");
+		$(obj).addClass("curren_btn");
+		$("#hide_type_flag").val(type);
+		doQuery(0);
+	}
+
+	function doQuery(addPage) {
+		var page = 1;
+		var totalPage = $("#total_page").text();
+		var type = $("#hide_type_flag").val();
+		if (addPage == 0) {
+			page = Number($("#page").val());
+		} else {
+			page = Number($("#curren_page").text()) + addPage;
+		}
+		if (page < 1) {
+			page = 1;
+		} else if (totalPage == 0) {
+			page = 1;
+		} else if (page > totalPage) {
+			page = totalPage;
+		}
+		$
+				.ajax({
+					type : 'POST',
+					url : '/cbtconsole/sameTypeGoods/queryForList',
+					data : {
+						type : type,
+						page : page
+					},
+					success : function(data) {
+						if (data.ok) {
+							$("#same_type_table tbody").empty();
+							var results = data.data;
+							var total = data.total;
+							$("#total_num").text(total);
+							$("#curren_page").text(page);
+							$("#total_page").text(Math.ceil(total / 20));
+							var content = "";
+							for (var i = 0; i < results.length; i++) {
+								content += '<tr>';
+								content += '<td align="center"><span>'
+										+ (i + 1)
+										+ '</span><br><input class="check_sty" type="checkbox" value="'
+										+ results[i].goodsPid
+										+ '" onclick="chooseBox(this)"/></td>';
+								content += '<td><a href="https://detail.1688.com/offer/' + results[i].goodsPid + '.html" target="_blank">';
+								if (results[i].goodsImg == null
+										|| results[i].goodsImg == "") {
+									content += '1688Url';
+								} else {
+									content += '<img style="max-width: 200px;max-height: 200px;" src="' + results[i].goodsImg + '" />';
+								}
+								content += '</a></td>';
+								content += '<td>产品名称：<a href="' + results[i].expressUrl + '" target="_blank">'
+										+ results[i].goodsName + '</a>';
+								content += '<br><br> <b>价格：</b>$&nbsp;&nbsp;<span>'
+										+ results[i].goodsPrice
+										+ '</span><br><b>最小定量：</b><span>'
+										+ results[i].minOrderNum
+										+ '</span></td>';
+								content += '<td align="center">'
+										+ results[i].aveWeight + ' KG</td>';
+
+								if (results[i].syncFlag == 1) {
+									content += '<td align="center"><span class="suc_sty">发布成功</span></td>';
+								} else if (results[i].syncFlag > 1) {
+									content += '<td align="center"><span class="err_sty">流程第4步,同步失败：<br>'
+											+ results[i].syncRemark
+											+ '</span></td>';
+								} else if (results[i].crawlFlag == 0) {
+									content += '<td align="center"><span class="err_sty">数据还未进行处理，请等待</span></td>';
+								} else if (results[i].crawlFlag == 1) {
+									content += '<td align="center"><span class="err_sty">流程第1步,正在抓取</span></td>';
+								} else if (results[i].crawlFlag > 2) {
+									content += '<td align="center"><span class="err_sty">流程第1步,抓取失败</span></td>';
+								} else if (results[i].clearFlag == 0) {
+									content += '<td align="center"><span class="err_sty">流程第2步,数据待清洗</span></td>';
+								} else if (results[i].valid == 0) {
+									content += '<td align="center"><span class="err_sty">流程第2步,数据清洗无效</span></td>';
+								} else if (results[i].imgDownFlag == 0) {
+									content += '<td align="center"><span class="err_sty">流程第3步,正在下载网络图片到服务器</span></td>';
+								} else if (results[i].imgDownFlag > 1) {
+									content += '<td align="center"><span class="err_sty">流程第3步,下载图片到本地失败</span></td>';
+								} else if (results[i].syncFlag == 0) {
+									content += '<td align="center"><span class="err_sty">流程第4步,待数据同步</span></td>';
+								}
+								content += '<td align="center"><span>'
+										+ results[i].successNum + '/'
+										+ results[i].totalNum
+										+ '</span>&nbsp;&nbsp;';
+								content += '<input type="button" class="show_btn" value="查看" onclick="openTypeGoods(\''
+										+ results[i].goodsPid + '\')" /></td>';
+								content += '<td align="center">'
+										+ results[i].adminName + '</td>';
+								content += '<td align="center">'
+										+ results[i].createTime + '</td>';
+								if (results[i].isOn > 0) {
+									content += '<td align="center"><span style="color:#5dec5d;">开启<span></td>';
+								} else {
+									content += '<td align="center"><span style="color:red;">关闭<span></td>';
+								}
+								content += '<td align="center">';
+								if (results[i].syncFlag == 1
+										|| results[i].syncFlag == 2) {
+									content += '<br><a href="/cbtconsole/editc/detalisEdit?pid='
+											+ results[i].goodsPid
+											+ '" target="_blank">编辑详情</a>';
+								}
+								content += '<br><br><input type="button" class="style_btn_litte" value="录入同款商品" onclick="enterGoods(1,\''
+										+ results[i].goodsPid
+										+ '\','
+										+ results[i].typeFlag
+										+ ','
+										+ results[i].aveWeight + ')" />';
+								content += '<br><br><br><input type="button" class="style_btn_delete" value="删除商品" onclick="deleteGoods('
+										+ results[i].goodsPid + ')"></td>';
+								content += '</tr>';
+							}
+							$("#same_type_table tbody").append(content);
+						} else {
+							$.messager.alert("提醒", data.message, "info");
+						}
+					},
+					error : function(res) {
+						$.messager.alert("提醒", "查询错误，请联系管理员", "error");
+					}
+				});
+	}
+
+	function chooseBox(obj) {
+		var is = $(obj).is(':checked');
+		if (is) {
+			$(obj).addClass("isChoose");
+			$(obj).parent().parent().addClass("checkBg");
+		} else {
+			$(obj).removeClass("isChoose");
+			$(obj).parent().parent().removeClass("checkBg");
+		}
+	}
+
+	function chooseAll(obj) {
+		var is = $(obj).is(':checked');
+		if (is) {
+			$(".check_sty").each(function() {
+				$(this).prop("checked", true);
+				$(this).addClass("isChoose");
+				$(this).parent().parent().addClass("checkBg");
+			});
+		} else {
+			$(".check_sty").each(function() {
+				$(this).removeAttr("checked");
+				$(this).removeClass("isChoose");
+				$(this).parent().parent().removeClass("checkBg");
+			});
+		}
+	}
+
+	function doSave() {
+		var urlIds = $("#url_ids").val();
+		var mainUrl = $("#main_url").val();
+		var type = $("#type_flag").val();
+		var aveWeight = $("#ave_weight").val();
+		if (type == "" || type == 0) {
+			$.messager.alert("提醒", '请选择分类', "info");
+			return false;
+		}
+		if (mainUrl == "" || mainUrl == null) {
+			$.messager.alert("提醒", '请输入主图URL', "info");
+			return false;
+		}
+		if (urlIds == "" || urlIds == null) {
+			$.messager.alert("提醒", '请输入同款URL', "info");
+			return false;
+		}
+		if (aveWeight == "" || aveWeight == null || aveWeight == "0") {
+			$.messager.alert("提醒", '请输入同款商品平均重量', "info");
+			return false;
+		}
+		var funStr = (isAddFlag == 1 ? "batchAddTypeGoods" : "batchAddAllGoods");
+		$.messager.progress({
+			title : '正在执行',
+			msg : '请等待...'
+		});
+		$.ajax({
+			type : "POST",
+			url : "/cbtconsole/sameTypeGoods/" + funStr,
+			data : {
+				urlIds : urlIds,
+				mainUrl : mainUrl,
+				type : type,
+				aveWeight : aveWeight
+			},
+			success : function(data) {
+				$.messager.progress('close');
+				if (data.ok) {
+					closeDialog();
+					showMessage('保存成功，请等待数据的处理！');
+					setTimeout(function() {
+						window.location.reload();
+					}, 1500);
+				} else {
+					$.messager.alert("提醒", '执行错误:' + data.message, "info");
+				}
+			},
+			error : function(res) {
+				$.messager.progress('close');
+				$.messager.alert("提醒", '保存错误，请联系管理员', "error");
+			}
+		});
+	}
+
+	function enterGoods(addFlag, pid, typeFlag, aveWeight) {
+		isAddFlag = addFlag;
+		if (addFlag == 1) {
+			$("#main_url")
+					.val("https://detail.1688.com/offer/" + pid + ".html");
+			$('#main_url').attr("disabled", true);
+			$('#ave_weight').attr("disabled", true);
+			$('#ave_weight').val(aveWeight);
+		} else {
+			$('#main_url').removeAttr("disabled");
+			$('#main_url').val("");
+			$('#ave_weight').removeAttr("disabled");
+			$('#ave_weight').val(0);
+		}
+		if (typeFlag > 0) {
+			$('#type_flag').val(typeFlag);
+			$('#type_flag').attr("disabled", true);
+		} else {
+			$('#type_flag').removeAttr("disabled");
+			$('#type_flag').val(1);
+		}
+
+		$('#enter_div_sty').dialog('open');
+	}
+
+	function closeDialog() {
+		$('#enter_div_sty').dialog('close');
+		$('#main_url').removeAttr("disabled");
+		$('#type_flag').removeAttr("disabled");
+		$("#form_enter")[0].reset();
+	}
+
+	function showMessage(msgStr) {
+		$.messager.show({
+			title : '提醒',
+			msg : msgStr,
+			timeout : 1500,
+			showType : 'slide',
+			style : {
+				right : '',
+				top : ($(window).height() * 0.35),
+				bottom : ''
+			}
+		});
+	}
+
+	function openTypeGoods(mainPid) {
+		if (mainPid != "") {
+			window.open("/cbtconsole/apa/sameType1688.html?mainPid=" + mainPid);
+		} else {
+			$.messager.alert("提醒", "获取pid失败", "error");
+		}
+
+	}
+
+	function useGoodsByState(state) {
+		var pids = "";
+		$(".check_sty").each(function() {
+			if ($(this).is(':checked')) {
+				pids += "," + $(this).val();
+			}
+		});
+		if (pids == "") {
+			showMessage("请选择需要执行的数据");
+			return false;
+		}
+		$.ajax({
+			type : "POST",
+			url : "/cbtconsole/sameTypeGoods/useGoodsByState",
+			data : {
+				pids : pids.substring(1),
+				state : state
+			},
+			success : function(data) {
+				$.messager.progress('close');
+				if (data.ok) {
+					showMessage('保存成功，即将刷新页面');
+					setTimeout(function() {
+						window.location.reload();
+					}, 1500);
+				} else {
+					$.messager.alert("提醒", '执行错误:' + data.message, "info");
+				}
+			},
+			error : function(res) {
+				$.messager.progress('close');
+				$.messager.alert("提醒", '保存错误，请联系管理员', "error");
+			}
+		});
+	}
+
+	function deleteGoods(mainPid) {
+		$.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function(rs) {
+			if (rs) {
+				$.messager.progress({
+					title : '正在执行',
+					msg : '请等待...'
+				});
+				$.ajax({
+					type : "POST",
+					url : "/cbtconsole/sameTypeGoods/deleteGoodsByMainPid",
+					data : {
+						mainPid : mainPid
+					},
+					success : function(data) {
+						$.messager.progress('close');
+						if (data.ok) {
+							showMessage('执行成功，页面即将刷新');
+							setTimeout(function() {
+								window.location.reload();
+							}, 1500);
+						} else {
+							$.messager.alert("提醒", '执行错误:' + data.message,
+									"info");
+						}
+					},
+					error : function(res) {
+						$.messager.progress('close');
+						$.messager.alert("提醒", '保存错误，请联系管理员', "error");
+					}
+				});
+			}
+		});
+
+	}
+</script>
+<style type="text/css">
+.style_left {
+	float: left;
+	width: 12%;
+}
+
+.style_right {
+	float: right;
+	width: 87%;
+}
+
+.style_btn {
+	width: 190px;
+	height: 117px;
+	background-color: #40bef5;
+	border-color: #ffffff;
+	font-size: 24px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.style_btn_litte {
+	width: 130px;
+	height: 38px;
+	background-color: #40bef5;
+	border-color: #ffffff;
+	font-size: 18px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.style_btn_delete {
+	width: 130px;
+	height: 38px;
+	background-color: red;
+	border-color: #ffffff;
+	font-size: 18px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.show_btn {
+	width: 80px;
+	height: 30px;
+	color: #ffffff;
+	background-color: #ff9800;
+	font-size: 14.0px;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	font-weight: normal;
+	font-style: normal;
+}
+
+.query_btn {
+	width: 80px;
+	height: 30px;
+	background-color: #40bef5;
+	border-color: #ffffff;
+	font-size: 18px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.enter_btn {
+	width: 140px;
+	height: 44px;
+	color: #ffffff;
+	background-color: #009688;
+	transform: rotate(0deg);
+	font-size: 14px;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	font-weight: normal;
+	font-style: normal;
+}
+
+.use_btn {
+	margin-left: 80px;
+	width: 80px;
+	height: 44px;
+	color: #ffffff;
+	background-color: #009688;
+	transform: rotate(0deg);
+	font-size: 14px;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	font-weight: normal;
+	font-style: normal;
+}
+
+.not_btn {
+	margin-left: 30px;
+	width: 80px;
+	height: 44px;
+	color: #ffffff;
+	background-color: red;
+	transform: rotate(0deg);
+	font-size: 14px;
+	border-radius: 4px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	font-weight: normal;
+	font-style: normal;
+}
+
+.curren_btn {
+	background-color: #3f51b5 !important;
+}
+
+#form_enter {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+#type_flag {
+	width: 888px;
+	height: 28px;
+}
+
+.err_sty {
+	color: red;
+}
+
+.suc_sty {
+	color: green;
+}
+
+.checkBg {
+	background-color: #b6f5b6;
+}
+
+.check_sty {
+	height: 24px;
+	width: 24px;
+}
+
+.check_sty_all {
+	height: 24px;
+	width: 24px;
+}
+</style>
+</head>
+<body>
+
+	<div id="enter_div_sty" class="easyui-dialog" title="新增同款商品"
+		data-options="modal:true"
+		style="width: 1022px; height: 639px; top: 165px;">
+		<form id="form_enter" action="#" onsubmit="return false">
+			<br> 选择分类：<select id="type_flag">
+				<option value="1">女装</option>
+				<option value="2">男装</option>
+				<option value="3">童装</option>
+				<option value="4">包包</option>
+				<option value="5">鞋子</option>
+			</select> <br> <br> 主图商品：<input id="main_url" value=""
+				style="width: 888px; height: 28px;" placeholder="请输入1688主图商品url" />
+			<br> <br> 平均重量：<input id="ave_weight" value=""
+				style="width: 888px; height: 28px;" placeholder="请输入同款商品的平均重量" /> <br>
+			<br> <span style="padding: 10px 0px 0px 300px; color: red;">*请输入1688同款url，用英文符号分号(<b>;</b>)隔开或者换行隔开
+			</span> <br> 同款商品：
+			<!-- <input id="url_ids" class="easyui-textbox"
+						style="width: 888px; height: 266px;"
+						data-options="multiline:true,prompt:'请输入1688同款商品url'" />	 -->
+			<textarea id="url_ids" style="width: 888px; height: 266px;"></textarea>
+			<br> <br>
+			<div style="text-align: center;">
+				<a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+					class="easyui-linkbutton" onclick="doSave()" style="width: 80px">生成</a>
+				<a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+					class="easyui-linkbutton" onclick="closeDialog()"
+					style="width: 80px">取消</a>
+			</div>
+
+		</form>
+	</div>
+
+
+	<div>
+
+		<div style="text-align: center;">
+			<h1>同款商品推荐</h1>
+		</div>
+		<br>
+		<div class="style_left">
+			<input type="hidden" id="hide_type_flag" value="0" /> <input
+				type="button" class="style_btn curren_btn" value="全部"
+				onclick="switchChoose(this,0)" /> <input type="button"
+				class="style_btn" value="女装" onclick="switchChoose(this,1)" /> <input
+				type="button" class="style_btn" value="男装"
+				onclick="switchChoose(this,2)" /> <input type="button"
+				class="style_btn" value="童装" onclick="switchChoose(this,3)" /> <input
+				type="button" class="style_btn" value="包包"
+				onclick="switchChoose(this,4)" /> <input type="button"
+				class="style_btn" value="鞋子" onclick="switchChoose(this,5)" />
+
+		</div>
+		<div class="style_right">
+			<input type="button" class="enter_btn" value="录入1688商品"
+				onclick="enterGoods(0,'')" /><input type="button" class="use_btn"
+				value="启用商品" onclick="useGoodsByState(1)" /> <input type="button"
+				class="not_btn" value="关闭商品" onclick="useGoodsByState(0)" /> <br>
+			<br>
+
+			<table id="same_type_table" border="1" cellpadding="0"
+				cellspacing="0" class="table">
+				<thead>
+					<tr align="center" bgcolor="#DAF3F5" style="height: 60px;">
+						<td style="width: 60px;">全选<input type="checkbox"
+							class="check_sty_all" onclick="chooseAll(this)" /></td>
+						<!-- <td style="width: 120px;">1688PID</td> -->
+						<td style="width: 200px;">1688图片</td>
+						<td style="width: 300px;">1688产品名称</td>
+						<td style="width: 150px;">设定平均重量</td>
+						<td style="width: 200px;">产品上传结果</td>
+						<td style="width: 200px;">同款商品（成功/总数）</td>
+						<td style="width: 100px;">录入人</td>
+						<td style="width: 180px;">录入时间</td>
+						<td style="width: 110px;">启用标识</td>
+						<td style="width: 240px;">操作</td>
+					</tr>
+				</thead>
+
+				<tbody>
+				</tbody>
+
+			</table>
+			<br>
+			<div>
+				<input type="hidden" id="totalpage" value="0"> 总条数:<span
+					id="total_num">0</span>条&nbsp;&nbsp; 分页数:<span>20</span>条/页&nbsp;&nbsp;&nbsp;&nbsp;
+				总页数:<span id="curren_page">1</span><em>/</em><span id="total_page">0</span>
+				页&nbsp;&nbsp; <input type="button" value="上一页" onclick="doQuery(-1)"
+					class="query_btn">&nbsp; <input type="button" value="下一页"
+					onclick="doQuery(1)" class="query_btn"> &nbsp;第<input
+					id="page" type="text" value="1" style="height: 26px;"> <input
+					type="button" value="查询" onclick="doQuery(0)" class="query_btn">
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

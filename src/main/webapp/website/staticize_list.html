@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>线上静态页列表</title>
+<script type='text/javascript'
+	src='http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js'></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+</head>
+<style>
+table tr td {
+	text-align: center;
+}
+</style>
+<body>
+	<div id="refresh_table">
+		<h4>
+			静态页查询临时数据: <span>查询中...</span> <a href="#">刷新</a> (预计60s)
+		</h4>
+	</div>
+	<div>
+		<div class="easyui-panel" style="padding: 5px; width: 320px;">
+			<ul class="easyui-tree">
+			</ul>
+		</div>
+		<div
+			style="padding: 5px; width: 400px; display: none; border: solid 1px #95B8E7; position: absolute; left: 330px; top: 64px;">
+			<table id="id_details">
+			</table>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	jQuery(function($) {
+		//页面加载完后的静态临时数据时间加载
+		function inidTime(flag) {
+			$.ajax({
+				type : "GET",
+				url : "/cbtconsole/queryuser/createstaticizeform.do?flag=" + flag,
+				dataType : "text",
+				success : function(msg) {
+					$("#refresh_table span").text(msg.substring(0, 16));
+					if (flag == 1) {
+						$("#refresh_table a").css("display", "contents");
+						createCateroryTree(0);
+						$("#id_details").empty();
+						$("#id_details").parent().css("display", "none");
+					}
+				}
+			});
+		}
+		inidTime(2);
+		//静态页列表
+		function doQueryList(catid) {
+			$
+					.ajax({
+						type : "GET",
+						url : "/cbtconsole/cutom/queryStaticizeList?catid="
+								+ catid,
+						data : "",
+						dataType : "json",
+						success : function(msg) {
+							$("#id_details").empty();
+							$("#id_details").parent().css("display", "block");
+							$("#id_details")
+									.append(
+											"<tr><th width=\"200px\">静态页地址</th><th>创建时间</th></tr>");
+							$.each(msg,
+									function(index, item) {
+										var goodsArr = item.split("@");
+										if (goodsArr != undefined
+												&& goodsArr.length == 3) {
+											$("#id_details").append(
+													"<tr><td><a href=\"" + goodsArr[2] 
+									+ "\" target=\"_blank\">"
+															+ goodsArr[0]
+															+ "</a></td><td>"
+															+ goodsArr[1]
+																	.substring(
+																			0,
+																			16)
+															+ "</td></tr>");
+										}
+									});
+
+						}
+					});
+		}
+		//静态页树
+		function createCateroryTree(nodeId) {
+			$('.easyui-tree')
+					.tree(
+							{
+								url : "/cbtconsole/cutom/queryStaticizeCategoryTree",
+								animate : true,
+								lines : true,
+								method : "post",
+								onClick : function(node) {
+									doQueryList(node.id);
+								},
+								onBeforeExpand : function(node) {
+									if (node.children.length == 0) {
+										showMessage('当前节点没有子节点');
+										return false;
+									}
+								},
+								onLoadSuccess : function(node, data) {
+									isQuery = 0;
+									$('.easyui-tree').find(
+											'.tree-node-selected').removeClass(
+											'tree-node-selected');
+									if (data.length > 0) {
+										if (nodeId == null || nodeId == ""
+												|| nodeId == "0") {
+											var nd = $('.easyui-tree').tree(
+													'find', data[0].id);
+											$('.easyui-tree').tree('select',
+													nd.target);
+										} else {
+											var clNode = $('.easyui-tree')
+													.tree('find', nodeId);
+											if (clNode) {
+												$('.easyui-tree')
+														.tree('select',
+																clNode.target);
+											}
+										}
+									}
+									$(".easyui-tree").show();
+								}
+							});
+		}
+		createCateroryTree(0);
+		//静态页刷新临时数据
+		$("#refresh_table a").click(function() {
+			$("#refresh_table span").text("刷新中...");
+			$("#refresh_table a").css("display", "none");
+			inidTime(1);
+		});
+	});
+</script>
+</html>

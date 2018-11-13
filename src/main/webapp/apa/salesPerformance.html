@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>人为编辑过的产品销售业绩</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+</head>
+<style type="text/css">
+.datagrid-htable {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 30px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+#oso_query_form {
+	font-size: 18px;
+}
+
+#button_style {
+	font-size: 18px;
+}
+
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.oso_rYear, .oso_rMonth, .but_color {
+	padding: 5px;
+	font-size: 14px
+}
+
+.oso_rYear, .oso_rMonth {
+	margin-right: 18px
+}
+
+#oso_top_toolbar {
+	padding: 20px 28px !important;
+}
+
+.datagrid-header .datagrid-cell span, .datagrid-cell,
+	.datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 14px;
+}
+</style>
+<script type="text/javascript">
+	$(function() {
+		setDatagrid();
+	});
+	function setDatagrid() {
+		$('#easyui-datagrid').datagrid({
+			title : '人为编辑过的产品销售业绩',
+			width : "100%",
+			fit : true,//自动补全 		
+			striped : true,//设置为true将交替显示行背景。
+			collapsible : true,//显示可折叠按钮
+			toolbar : "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+			url : '/cbtconsole/warehouse/salesPerformance',//url调用Action方法
+			loadMsg : '数据装载中......',
+			singleSelect : true,//为true时只能选择单行
+			fitColumns : true,//允许表格自动缩放，以适应父容器	
+			rownumbers : true,
+			pageSize : 50,//默认选择的分页是每页50行数据
+			pageList : [ 20, 50, 100 ],//可以选择的分页集合
+			pagination : true,//分页
+			style : {
+				padding : '8 8 10 8'
+			},
+			onLoadError : function() {
+				$.message.alert("提示信息", "获取数据信息失败");
+				return;
+			}
+		});
+	}
+
+	function doQuery(page) {
+        var goodsPid=$("#goodsPid").val();
+        $("#easyui-datagrid").datagrid("load", {
+            "page":page,
+            "days":goodsPid
+        });
+	}
+
+
+    function doReset(){
+        $("#goodsPid").val("");
+    }
+
+	function showMessage(message) {
+		$.messager.show({
+			title : '提醒',
+			msg : message,
+			timeout : 2000,
+			showType : 'slide',
+			style : {
+				right : '',
+				top : ($(window).height() * 0.15),
+				bottom : ''
+			}
+		});
+	}
+
+
+</script>
+<body>
+	<div id="top_toolbar" style="padding: 5px; height: auto">
+		<form id="query_form" action="#" onsubmit="return false;">
+				<input class="easyui-textbox" name="goodsPid" id="goodsPid"  style="width:300px"  data-options="label:'商品pid:'">
+			<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
+			<input class="but_color" type="button" value="重置" onclick="doReset()">
+		</form>
+	</div>
+	<table id="easyui-datagrid" style="width: 100%; height: 100%;" class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th data-options="field:'admName',width:'100px',align:'center'">负责人</th>
+				<th data-options="field:'pid',width:'100px',align:'center'">pid</th>
+				<th data-options="field:'presentations',width:'100px',align:'center'">产品在搜索结果中被呈现次数</th>
+				<th data-options="field:'openCount',width:'60px',align:'center'">产品页面被打开次数</th>
+				<th data-options="field:'addCarCount',width:'150px',align:'center'">产品被加购物车次数</th>
+				<th data-options="field:'buyCount',width:'60px',align:'center'">产品被购买次数</th>
+				<th data-options="field:'salesAmount',width:'60px',align:'center'">产生销售额</th>
+				<th data-options="field:'cancalCount',width:'60px',align:'center'">产品被取消次数</th>
+				<th data-options="field:'productCount',width:'100px',align:'center'">(截止到今天)人为编辑过的产品总数</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</body>
+</html>

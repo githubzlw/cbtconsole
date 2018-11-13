@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>每月平均汇率查询</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+</head>
+<style type="text/css">
+    .datagrid-htable {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .but_color {
+        background: #44a823;
+        width: 80px;
+        height: 30px;
+        border: 1px #aaa solid;
+        color: #fff;
+    }
+
+    #ext_query_form {
+        font-size: 18px;
+    }
+
+    .top_div_style span {
+        font-size: 16px !important;
+    }
+
+    .panel-title {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    #ext_rYear, #ext_rMonth, .but_color {
+        padding: 5px;
+        font-size: 14px
+    }
+
+    #ext_rYear, #ext_rMonth {
+        margin-right: 18px
+    }
+
+    #ext_top_toolbar {
+        padding: 20px 28px !important;
+    }
+
+    .datagrid-header .datagrid-cell span, .datagrid-cell,
+    .datagrid-cell-group, .datagrid-header-rownumber,
+    .datagrid-cell-rownumber {
+        font-size: 14px;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        setDatagrid();
+        var opts = $("#ext_easyui-datagrid").datagrid("options");
+        opts.url = "/cbtconsole/exchangeRate/queryMonthly";
+    });
+
+    function setDatagrid() {
+        $('#ext_easyui-datagrid').datagrid({
+            title: '每月平均汇率查询',
+            width: "100%",
+            fit: true,//自动补全
+            striped: true,//设置为true将交替显示行背景。
+            collapsible: true,//显示可折叠按钮
+            toolbar: "#ext_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+            url: '',//url调用Action方法
+            loadMsg: '数据装载中......',
+            singleSelect: true,//为true时只能选择单行
+            fitColumns: true,//允许表格自动缩放，以适应父容器
+            rownumbers: true,
+            style: {
+                padding: '8 8 10 8'
+            },
+            onLoadError: function () {
+                $.message.alert("提示信息", "获取数据信息失败");
+                return;
+            },
+            onLoadSuccess: function (data) {
+                if (!data.success) {
+                    showMessage(data.message);
+                }
+            }
+        });
+    }
+
+    function doOfsQuery() {
+        var year = $("#ext_rYear").val();
+        if (year == null || year == "" || year == "0" || year == "-1") {
+            showMessage('请选择年份');
+            return;
+        }
+        var month = $("#ext_rMonth").val();
+        $("#ext_easyui-datagrid").datagrid("load", {
+            "year": year,
+            "month": month
+        });
+    }
+
+    function doOfsReset() {
+        $("#ext_query_form")[0].reset();
+    }
+
+
+    function showMessage(message) {
+        $.messager.show({
+            title: '提醒',
+            msg: message,
+            timeout: 2000,
+            showType: 'slide',
+            style: {
+                right: '',
+                top: ($(window).height() * 0.15),
+                bottom: ''
+            }
+        });
+    }
+
+
+    function openNewWindow(url) {
+        var year = $("#ext_rYear").val();
+        var month = $("#ext_rMonth").val();
+        if (year == null || year == "" || year == "-1") {
+            showMessage("请选择年份");
+            return;
+        } else if (month == null || month == "" || month == "-1") {
+            showMessage("请选择月份");
+            return;
+        }
+        window.open(url + "?year=" + year + "&month=" + Number(month));
+    }
+
+    function doOfsSelectChange() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        var rMonth = mydate.getMonth();
+        var monthop = "<option  value=''>选择月份</option>";
+        $('#ext_rMonth').empty();
+        var selectYear = $('#ext_rYear').val();
+        if (selectYear == rYear) {
+            for (var i = 1; i <= rMonth + 1; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('#ext_rMonth').append(monthop);
+        } else if (selectYear < rYear) {
+            for (var i = 1; i <= 12; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('#ext_rMonth').append(monthop);
+        } else if (selectYear > rYear) {
+            $('#ext_rYear').val(rYear);
+            for (var i = 1; i <= rMonth + 1; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('#ext_rMonth').append(monthop);
+        }
+    }
+
+</script>
+<body>
+<div id="ext_top_toolbar" style="padding: 5px; height: auto">
+    <div>
+        <form id="ext_query_form" action="#" onsubmit="return false;">
+            <label for="ext_rYear">年份选择<font color="red">*</font>：
+            </label> <select name="year" id="ext_rYear" onchange="doOfsSelectChange()">
+            <option value='-1'>请选择</option>
+            <option value='2018'>2018</option>
+            <option value='2019'>2019</option>
+        </select><label for="ext_rMonth">月份选择： </label> <select name="month"
+                                                                id="ext_rMonth">
+            <option value='-1'>选择月份</option>
+        </select> <input class="but_color" type="button" value="查询"
+                         onclick="doOfsQuery()"> <input class="but_color"
+                                                        type="button" value="重置" onclick="doOfsReset()">
+        </form>
+        <br>
+        <div class="top_div_style">
+            <a
+                    href="javascript:openNewWindow('/cbtconsole/apa/exchangeRateDetails.html');"
+                    class="easyui-linkbutton"
+                    data-options="iconCls:'icon-search',plain:true">实时汇率详情</a>
+        </div>
+    </div>
+</div>
+<table id="ext_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'getTime',width:'50px',align:'center'">年月份</th>
+        <th data-options="field:'eurRate',width:'100px',align:'center'">EUR汇率</th>
+        <th data-options="field:'cadRate',width:'100px',align:'center'">CAD汇率</th>
+        <th data-options="field:'gbpRate',width:'100px',align:'center'">GBP汇率</th>
+        <th data-options="field:'audRate',width:'100px',align:'center'">AUD汇率</th>
+        <th data-options="field:'rmbRate',width:'100px',align:'center'">RMB汇率</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>

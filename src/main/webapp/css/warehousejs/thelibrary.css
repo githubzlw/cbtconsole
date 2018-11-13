@@ -1,0 +1,11 @@
+/*<link rel="stylesheet" href="${path}/css/warehousejs/thelibrary.css" type="text/css"> */
+#divcss1{
+    position: fixed;
+    top: 30%;
+    left: 25%;
+    background:#F8FFFF;
+    width:1300px;
+    height:350px;
+    display:none;
+    
+}

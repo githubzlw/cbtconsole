@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.BatchDiscountEmailMapper">
+
+	<resultMap id="batchDiscountEmailResultMap" type="com.cbt.warehouse.pojo.BatchDiscountEmail">
+		<id column="id" property="id" />
+		<result column="order_no" property="orderNo" />
+		<result column="user_id" property="userId" />
+		<result column="user_email" property="userEmail" />
+		<result column="product_amount" property="productAmount" />
+		<result column="product_category_num" property="productCategoryNum" />
+		<result column="batch_discount_num" property="batchDiscountNum" />
+		<result column="pay_time" property="payTime" />
+		<result column="shipment_time" property="shipmentTime" />
+		<result column="order_country" property="orderCountry" />
+		<result column="current_order_status" property="currentOrderStatus" />
+		<result column="admin_id" property="adminId" />
+		<result column="admin_name" property="adminName" />
+		<result column="flag" property="flag" />
+		<result column="send_time" property="sendTime" />
+		<result column="create_time" property="createTime" />
+		<result column="error_num" property="errorNum" />
+	</resultMap>
+
+	<resultMap id="batchDiscountEmailDetailsResultMap"
+		type="com.cbt.warehouse.pojo.BatchDiscountEmailDetails">
+		<id column="id" property="id" />
+		<result column="bt_ds_em_id" property="btDsEmId" />
+		<result column="goods_id" property="goodsId" />
+		<result column="goods_uuid" property="goodsUuid" />
+		<result column="goods_type" property="goodsType" />
+		<result column="goods_img" property="goodsImg" />
+		<result column="goods_import_url" property="goodsImportUrl" />
+		<result column="goods_url" property="goodsUrl" />
+		<result column="goods_price" property="goodsPrice" />
+		<result column="free_shipping_price" property="freeShippingPrice" />
+		<result column="goods_name" property="goodsName" />
+		<result column="order_number" property="orderNumber" />
+		<result column="od_dt_id" property="odDtId" />
+		<result column="create_time" property="createTime" />
+		<result column="valid" property="valid" />
+	</resultMap>
+
+	<resultMap id="batchDiscountPurchasPriceResultMap"
+		type="com.cbt.warehouse.pojo.BatchDiscountPurchasPrice">
+		<id column="id" property="id" />
+		<result column="goods_id" property="goodsId" />
+		<result column="goods_uuid" property="goodsUuid" />
+		<result column="min_quantify" property="minQuantify" />
+		<result column="max_quantify" property="maxQuantify" />
+		<result column="purchase_price" property="purchasePrice" />
+		<result column="discount_price" property="discountPrice" />
+		<result column="discount_amount" property="discountAmount" />
+		<result column="discount_rate" property="discountRate" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="admin_id" property="adminId" />
+		<result column="admin_name" property="adminName" />
+		<result column="valid" property="valid" />
+	</resultMap>
+
+	<sql id="batchDiscountEmailColumn">
+		id,order_no,user_id,user_email,product_amount,product_category_num,
+		batch_discount_num,pay_time,shipment_time,order_country,current_order_status,
+		admin_id,admin_name,flag,send_time,create_time,error_num
+	</sql>
+
+	<sql id="batchDiscountEmailDetailsColumn">
+		id,bt_ds_em_id,goods_id,goods_uuid,goods_type,goods_img,
+		goods_import_url,goods_url,goods_price,free_shipping_price,
+		goods_name,order_number,od_dt_id,create_time,valid
+	</sql>
+
+	<sql id="batchDiscountPurchasPriceColumn">
+		id,goods_id,goods_uuid,min_quantify,max_quantify,purchase_price,discount_price,
+		discount_amount,discount_rate,create_time,update_time,admin_id,admin_name,valid
+	</sql>
+
+	<select id="queryEmailList" resultMap="batchDiscountEmailResultMap">
+		select
+		<include refid="batchDiscountEmailColumn" />
+		from batch_discount_email
+		where 1=1
+		<if test="orderNo != null and orderNo != '' ">
+			and order_no = #{orderNo,jdbcType=VARCHAR}
+		</if>
+		<if test="adminId != 0 ">
+			and admin_id = #{adminId,jdbcType=INTEGER}
+		</if>
+		<if test="userId != 0 ">
+			and user_id = #{userId,jdbcType=INTEGER}
+		</if>
+		<if test="flag != null and flag != '' ">
+			and flag = #{flag,jdbcType=VARCHAR}
+		</if>
+		<if test="beginDate != null and beginDate != '' ">
+			and shipment_time &gt;= #{beginDate,jdbcType=VARCHAR}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and shipment_time &lt;= #{endDate,jdbcType=VARCHAR}
+		</if>
+		order by shipment_time desc
+		limit
+		#{stateNum,jdbcType=INTEGER},#{showNum,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryEmailListCount" resultType="java.lang.Integer">
+		select count(*)
+		from batch_discount_email
+		where 1=1
+		<if test="orderNo != null and orderNo != '' ">
+			and order_no = #{orderNo,jdbcType=VARCHAR}
+		</if>
+		<if test="adminId != 0 ">
+			and admin_id = #{adminId,jdbcType=INTEGER}
+		</if>
+		<if test="userId != 0 ">
+			and user_id = #{userId,jdbcType=INTEGER}
+		</if>
+		<if test="flag != null and flag != '' ">
+			and flag = #{flag,jdbcType=VARCHAR}
+		</if>
+		<if test="beginDate != null and beginDate != '' ">
+			and shipment_time &gt;= #{beginDate,jdbcType=VARCHAR}
+		</if>
+		<if test="endDate != null and endDate != '' ">
+			and shipment_time &lt;= #{endDate,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="queryEmailByOrderNo" resultMap="batchDiscountEmailResultMap">
+		select
+		<include refid="batchDiscountEmailColumn" />
+		from batch_discount_email
+		where 1=1 and order_no =
+		#{orderNo,jdbcType=VARCHAR}
+	</select>
+
+	<select id="queryDetailsList" resultMap="batchDiscountEmailDetailsResultMap">
+		select
+		<include refid="batchDiscountEmailDetailsColumn" />
+		from batch_discount_email_details
+		where 1=1 and
+		order_no=#{orderNo,jdbcType=VARCHAR}
+	</select>
+
+	<select id="queryPurchasPriceList" resultMap="batchDiscountPurchasPriceResultMap">
+		select
+		<include refid="batchDiscountPurchasPriceColumn" />
+		from batch_discount_purchase_price
+		where 1=1 and goods_id =
+		#{goodsId,jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateEmailFlagByOrderNo">
+		update batch_discount_email
+		set flag
+		=#{flag,jdbcType=VARCHAR}
+		where order_no=#{orderNo,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updatePurchasPrice" parameterType="com.cbt.warehouse.pojo.BatchDiscountPurchasPrice">
+		update batch_discount_purchase_price
+		<set>
+			<if test="discountPrice !=0 ">
+				discount_price = #{discountPrice,jdbcType=FLOAT},
+			</if>
+			<if test="discountAmount !=0 ">
+				discount_amount = #{discountAmount,jdbcType=FLOAT},
+			</if>
+			<if test="discountRate !=0 ">
+				discount_rate = #{discountRate,jdbcType=FLOAT},
+			</if>
+			admin_id = #{adminId,jdbcType=INTEGER},
+			admin_name =
+			#{adminName,jdbcType=VARCHAR},
+			update_time = SYSDATE()
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<insert id="insertEmail" parameterType="java.lang.String">
+		insert into
+		batch_discount_email(order_no,user_id,user_email,product_amount,pay_time,
+		shipment_time,order_country,current_order_status,admin_id,admin_name)
+		select
+		odif.order_no,odif.user_id,adus.useremail,odif.product_cost,odif.orderpaytime,
+		sppk.createtime,sppk.transportcountry,odif.state,adus.adminid,adus.admName
+		from orderinfo odif
+		left join admin_r_user adus on odif.user_id =
+		adus.userid
+		left join shipping_package sppk on odif.order_no =
+		sppk.orderid
+		where odif.order_no=#{orderNo,jdbcType=VARCHAR}
+	</insert>
+
+	<insert id="insertEmailDetails" parameterType="java.lang.String">
+		insert into
+		batch_discount_email_details(order_no,goods_id,goods_type,goods_img,goods_url,
+		goods_price,goods_name,order_number,od_dt_id)
+		select
+		oddt.orderid,oddt.goodsid,oddt.car_type,oddt.car_img,oddt.car_url,
+		cast(ifnull(oddt.goodsprice,0.00) as DECIMAL(11,2)) goods_price,
+		oddt.goodsname,oddt.yourorder,oddt.id as od_dt_id
+		from
+		order_details
+		oddt
+		where oddt.orderid=#{orderNo,jdbcType=VARCHAR} and oddt.state =1;
+	</insert>
+
+	<update id="buildRelationshipsByOrderNo" parameterType="java.lang.String">
+		update
+		batch_discount_email_details,batch_discount_email
+		set
+		batch_discount_email_details.bt_ds_em_id = batch_discount_email.id
+		where batch_discount_email_details.order_no =
+		batch_discount_email.order_no
+		and batch_discount_email.order_no =
+		#{orderNo,jdbcType=VARCHAR}
+	</update>
+
+	<insert id="insertPurchasPrice" parameterType="java.lang.String">
+		insert into
+		batch_discount_purchase_price(order_no,goods_id,goods_uuid,min_quantify,max_quantify,purchase_price)
+		select
+		pfpc.orderid,pfpc.goodsid,pfpc.uuid,pfpc.begin,pfpc.end,
+		cast(pfpc.price/(select exchange_rate from exchange_rate where country
+		='RMB') as DECIMAL(11,2)) purchase_price
+		from preferential_price pfpc
+		where pfpc.is_delete =0
+		and
+		pfpc.orderid=#{orderNo,jdbcType=VARCHAR}
+	</insert>
+
+
+	<update id="updateDefaultPurchasPrice">
+		update batch_discount_purchase_price
+		set
+		discount_price = purchase_price * 1.2
+		order_no=#{orderNo,jdbcType=VARCHAR}
+	</update>
+
+	<select id="checkIsPurchasPrice" parameterType="java.lang.String">
+		select
+		count(orderid) from preferential_price
+		where orderid
+		=#{orderNo,jdbcType=VARCHAR}
+	</select>
+
+	<update id="updatePurchasPriceValid">
+		update batch_discount_purchase_price
+		set valid = '1'
+		where order_no = #{orderNo,jdbcType=VARCHAR}
+		and goods_id =
+		#{goodsId,jdbcType=INTEGER}
+		and min_quantify =
+		#{minQuantify,jdbcType=INTEGER}
+		and max_quantify =
+		#{maxQuantify,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateEmailDetailsFreeShippingPrice">
+		update batch_discount_email_details
+		set
+		free_shipping_price = #{freeShippingPrice,jdbcType=FLOAT}
+		where
+		order_no = #{orderNo,jdbcType=VARCHAR}
+		and goods_id =
+		#{goodsId,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateEmailDetailsValid">
+		update batch_discount_email_details
+		set valid = '1'
+		where order_no = #{orderNo,jdbcType=VARCHAR}
+		and goods_id =
+		#{goodsId,jdbcType=INTEGER}
+	</update>
+
+	<update id="UpdateEmailDetailsDefaultValid">
+		update batch_discount_email_details
+		set valid = '0'
+		where order_no = #{orderNo,jdbcType=VARCHAR}
+	</update>
+
+	<update id="batchUpdateEmailDetailsValid" parameterType="java.util.List">
+		update batch_discount_email_details
+		set valid = '1'
+		where goods_id in
+		<foreach collection="list" index="index" item="ed_gd_id" open="("
+			close=")" separator=",">
+			#{ed_gd_id}
+		</foreach>
+
+	</update>
+
+	<update id="batchUpdatePurchasPrice" parameterType="java.util.List">
+
+		<foreach collection="list" item="pp" index="index" open=""
+			close="" separator=";">
+			update batch_discount_purchase_price
+			<set>
+				discount_price = #{pp.discountPrice,jdbcType=FLOAT},
+				discount_amount= #{pp.discountAmount,jdbcType=FLOAT},
+				discount_rate =#{pp.discountRate,jdbcType=FLOAT},
+				admin_id =
+				#{pp.adminId,jdbcType=INTEGER},
+				admin_name =
+				#{pp.adminName,jdbcType=VARCHAR},
+				update_time = SYSDATE()
+			</set>
+			where id= #{pp.id,jdbcType=INTEGER}
+		</foreach>
+
+	</update>
+
+</mapper>

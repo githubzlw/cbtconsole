@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.PurchaseReportMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.PurchaseReport" >
+  	<result column="years" property="years" jdbcType="INTEGER"/>
+    <result column="mon" property="mon" jdbcType="INTEGER" />
+    <result column="buyid" property="buyid" jdbcType="INTEGER" />
+    <result column="admName" property="admName" jdbcType="VARCHAR" />
+    <result column="num" property="num" jdbcType="INTEGER" />
+    <result column="je" property="je" jdbcType="DOUBLE" />
+  </resultMap>
+
+  <resultMap id="unpackPurchaseMap"  type="com.cbt.pojo.ReportUnpackPurchase">
+  	<result column="years" property="years" jdbcType="INTEGER"/>
+    <result column="mon" property="mon" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="num" property="num" jdbcType="INTEGER" />
+  </resultMap>
+  
+	<select id="selectPurchaseByDate" parameterType="java.util.List" resultMap="BaseResultMap">
+<!-- 		select years,mon,buyid,admuser.admName,count(*) num,cast(sum(je) as DECIMAL(11,2)) je from ( 
+		
+		select left(order_details.orderid,17) orderno,order_details.car_url,order_buy.buyid, year(order_buy.time) years, month(order_buy.time) mon, 
+		sum(ifnull(order_product_source.goods_p_price,0)*ifnull(order_product_source.buycount,0)) je , order_buy.time as createTime
+		from order_product_source,order_details , order_buy   
+		<![CDATA[
+		WHERE  order_buy.time>= #{startdate,jdbcType=VARCHAR} and  order_buy.time<= #{enddate,jdbcType=VARCHAR}
+		and order_product_source.orderid=order_details.orderid and order_details.goodsid=order_product_source.goodsid and order_details.state<2 
+		]]>
+		and order_details.orderid=order_buy.orderid
+		group by left(order_details.orderid,17),order_details.car_url,order_buy.buyid,mon  
+		) atable,admuser 
+		
+		where buyid not in(27,18) and atable.buyid=admuser.id
+		group by  mon,buyid,admuser.admName order by createTime desc -->
+		
+		<!-- select years,ny as mon, buyid,admuser.admName,count(*) num,cast(sum(je) as DECIMAL(11,2)) je,cast(getExchangeRMB(sum(saleje),'USD')  as DECIMAL(11,2)) saleje 
+			from 
+			(select 
+			   left(order_details.orderid,17) orderno,
+			   order_details.car_url,
+			   goods_distribution.admuserid buyid,
+			   year(goods_distribution.createtime) years,
+			   month(goods_distribution.createtime) ny,
+			   sum(ifnull(order_product_source.goods_p_price,0)*ifnull(order_product_source.buycount,0)) je,
+			   sum(ifnull(order_product_source.goods_price,0)*ifnull(order_product_source.usecount,0)) saleje 
+			from order_product_source,order_details , goods_distribution 
+			<![CDATA[  
+			WHERE  goods_distribution.createtime  BETWEEN #{startdate}   and #{enddate}  
+			and order_product_source.orderid=order_details.orderid and order_details.goodsid=order_product_source.goodsid and order_details.state<2 
+			]]>
+			and order_details.id=goods_distribution.odid
+			group by left(order_details.orderid,17),order_details.car_url,goods_distribution.admuserid,ny) atable,admuser 
+			where buyid not in(27,18) and atable.buyid=admuser.id
+			group by  ny,buyid,admuser.admName   -->
+<!-- 			
+select years,ny as mon, buyid,admuser.admName,count(*) num,cast(sum(je) as DECIMAL(11,2)) je,cast(getExchangeRMB(sum(saleje),'USD')  as DECIMAL(11,2)) saleje 
+				from 
+			(
+     select 
+			   order_details.car_url,
+         goods_distribution.admuserid buyid,
+			   year(goods_distribution.createtime) years,
+			   month(goods_distribution.createtime) ny,
+			   sum(ifnull(order_product_source.goods_p_price,0)*ifnull(order_product_source.buycount,0)) je,			   
+         sum(ifnull(order_product_source.goods_price,0)*ifnull(order_product_source.usecount,0)) saleje 
+			from order_product_source,order_details ,orderinfo ,goods_distribution
+			<![CDATA[  
+			WHERE   goods_distribution.createtime >= #{startdate} AND goods_distribution.createtime  <= #{enddate}  
+              and goods_distribution.odid=order_details.id 
+              and order_product_source.orderid=order_details.orderid and order_details.goodsid=order_product_source.goodsid
+              and orderinfo.state  > 0 and orderinfo.state < 6
+			        and order_details.state<2  and orderinfo.order_no=order_details.orderid  and order_details.purchase_state>0
+            ]]>
+              group by order_details.car_url
+		) atable,admuser 
+			where buyid not in(27,18) and atable.buyid=admuser.id
+			group by  ny,buyid,admuser.admName -->
+			
+			
+			
+select years,ny as mon, buyid,admuser.admName
+,count(*)  num,cast(sum(je) as DECIMAL(11,2)) je,cast(getExchangeRMB(sum(saleje),'USD')  as DECIMAL(11,2)) saleje from 
+(select left(order_details.orderid,17) orderno,order_details.car_url,goods_distribution.admuserid buyid,year(goods_distribution.createtime) years,month(goods_distribution.createtime) ny,sum(ifnull(order_product_source.goods_p_price,0)*ifnull(order_product_source.buycount,0)) je,sum(ifnull(order_product_source.goods_price,0)*ifnull(order_product_source.usecount,0)) saleje from order_product_source,order_details , 
+
+goods_distribution   
+<![CDATA[  
+WHERE  goods_distribution.createtime >= #{startdate} and goods_distribution.createtime <= #{enddate} 
+and order_product_source.orderid=order_details.orderid and order_details.goodsid=order_product_source.goodsid and order_details.state<2 
+]]>
+and order_details.id=goods_distribution.odid
+group by left(order_details.orderid,17),order_details.car_url,goods_distribution.admuserid,ny) atable,admuser 
+where buyid not in(27,18) and atable.buyid=admuser.id
+group by  ny,buyid,admuser.admName
+  
+	</select>
+	
+	<select id="selectUnpacking" parameterType="java.util.List" resultMap="unpackPurchaseMap">
+		select years,mon,username,count(*) num  from   (
+		select username,orderid,year(creatTime) years,month(creatTime) mon ,creatTime
+	     <![CDATA[
+		from  taobao_1688_order_history where creatTime>=#{startdate,jdbcType=VARCHAR} and creatTime<=#{enddate,jdbcType=VARCHAR}
+		]]>
+		group by  username,orderid,mon,itemid) atable 
+		group by username,mon order by mon,username
+	</select>
+	
+	<select id="selectPurchasePackage" parameterType="java.util.List" resultMap="unpackPurchaseMap">
+		select years,mon,username,count(*) num  from   (
+		select username,orderid,year(creatTime) years,month(creatTime) mon ,creatTime
+		<![CDATA[
+		from  taobao_1688_order_history where creatTime>=#{startdate,jdbcType=VARCHAR} and creatTime<=#{enddate,jdbcType=VARCHAR}
+		]]>
+		group by  username,orderid,mon) atable 
+		group by username,mon order by mon ,username
+	</select> 
+	
+	<select id="selectOutCount" parameterType="java.util.List" resultMap="unpackPurchaseMap">
+		<!-- select years,mon,count(*) num from  (
+		select order_fee.mergeOrders,year(create_time) years,month(create_time) mon ,create_time 
+		<![CDATA[
+		from  order_fee  where create_time>=#{startdate,jdbcType=VARCHAR} and create_time<=#{enddate,jdbcType=VARCHAR}
+		]]>
+		and weight is not null  group by order_fee.mergeOrders,  mon) atable group by mon order by create_time desc -->
+		
+		select years ,mon,count(*) num from 	(
+		select shipping_package.expressno,year(shipping_package.createtime) years,month(shipping_package.createtime) mon from  shipping_package  
+		<![CDATA[
+		where shipping_package.createtime>=#{startdate,jdbcType=VARCHAR} and createtime<=#{enddate,jdbcType=VARCHAR}  
+		]]>
+		group by shipping_package.expressno,  mon ) atable
+		group by mon
+	</select>
+	
+	<select id="noAvailableRateStatistics" resultType="java.lang.Float">
+		{call noAvailableRateStatistics(#{beginTime,jdbcType=VARCHAR,mode=IN},#{endTime,jdbcType=VARCHAR,mode=IN})}  
+	</select>
+	
+</mapper>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>销售客户关系管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
+
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/thelibrary.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.messager.js"></script>
+
+
+    <link rel="stylesheet" href="/cbtconsole/css/warehousejs/measure.css" type="text/css">
+    <!-- CSS goes in the document HEAD or added to your external stylesheet -->
+    <!--  -->
+    <script type="text/javascript">
+        var salerNameList = '{admusersList}';
+    </script>
+
+</head>
+<body style="background-color : #F4FFF4;" onclick="">
+<div align="center">
+    <div><h1>销售客户关系管理</h1></div>
+    <div id="msginfo"></div>
+    <br/><br/>
+    <!-- 扫描 -->
+    <div style="width: 800px">
+        <h4>查询销售名下目前有多少客户</h4>
+        <div>销售名字:
+            <span class="salerName" id="salerNameNum"></span>
+            <input type="button" value="查询当前销售下有多少个客户" onclick="queryTheNumCustomersUnderSaler()">
+            <div class="queryTheNumCustomersUnderSaler" style="display: none"> 数量：<span class="queryTheNumCustomersUnderSalerTow"></span></div>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div>
+        <table id="tabId" class="altrowstable" style="width: 800px">
+            <tr>
+                <td>老的销售名字</td>
+                <td>----------</td>
+                <td>新的销售名字</td>
+                <td>操作</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="salerNameOld">
+                        <div class="salerName"></div>
+                    </div>
+                </td>
+                <td></td>
+                <td>
+                    <div class="salerNameNew">
+                        <div class="salerName"></div>
+                    </div>
+                </td>
+                <td><input type="button" value="更新客户关系" onclick="updateSalerToCustomer()">
+                    <div class="updateNum" style="display: none"> 数量：<span class="updateNumTwo"></span></div></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    $(function () {
+            //异步请求所有的销售列表
+            $.ajax({
+                url:"../customerRelationshipManagement/queryAllSaler",
+                type:'POST',
+                data:{},
+                success:function(result){
+                    if(result != null){
+                        var json = eval(result);
+                        var head = "<select id=\"adminusersc\" name=\"adminuser\" style=\"width: 87px;\">";
+                        var foot = "</select>";
+                        var salerNameHtml = "";
+                        for (i=0;i<json.length;i++){
+                            salerNameHtml +="<option value="+json[i].id+">"+json[i].admname+"</option>";
+                        }
+                        salerNameHtml = head + salerNameHtml + foot;
+                        $('.salerName').html(salerNameHtml);
+                    }
+                }
+            });
+    });
+    function queryTheNumCustomersUnderSaler() {
+        var userid = $('#salerNameNum').find("#adminusersc").val();
+        $.ajax({
+            url:"../customerRelationshipManagement/queryTheNumCustomersUnderSaler",
+            type:'POST',
+            data:{
+                userId:userid
+            },
+            success:function(result){
+                if(result != null){
+                    $('.queryTheNumCustomersUnderSalerTow').html(result);
+                    $('.queryTheNumCustomersUnderSaler').show();
+                }
+            }
+        });
+    }
+    function updateSalerToCustomer() {
+        var salerOldId = $('.salerNameOld').find("#adminusersc").val();
+        var salerNewId = $('.salerNameNew').find("#adminusersc").val();
+        $.ajax({
+            url:"../customerRelationshipManagement/updateSalerToCustomer",
+            type:'POST',
+            data:{
+                salerOldId:salerOldId,
+                salerNewId:salerNewId
+            },
+            success:function(result){
+                if(result != null){
+                    $('.updateNumTwo').html(result);
+                    $('.updateNum').show();
+                }
+            }
+        });
+    }
+</script>
+</html>

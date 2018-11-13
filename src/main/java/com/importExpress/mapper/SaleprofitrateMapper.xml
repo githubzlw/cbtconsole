@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.SaleprofitrateMapper" >
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.Saleprofitrate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="goodid" property="goodid" jdbcType="VARCHAR" />
+    <result column="salesnum" property="salesnum" jdbcType="INTEGER" />
+    <result column="saleprice" property="saleprice" jdbcType="DECIMAL" />
+    <result column="sourceprice" property="sourceprice" jdbcType="DECIMAL" />
+    <result column="profitrate" property="profitrate" jdbcType="VARCHAR" />
+    <result column="creattime" property="creattime" jdbcType="TIMESTAMP" />
+    <result column="updatatime" property="updatatime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, userid, goodid, salesnum, saleprice, sourceprice, profitrate, creattime, updatatime
+  </sql>
+  
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.importExpress.pojo.SaleprofitrateExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from saleprofitrate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause} limit #{offset},#{pageSize}
+    </if>
+  </select>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from saleprofitrate
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from saleprofitrate
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.importExpress.pojo.SaleprofitrateExample" >
+    delete from saleprofitrate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.importExpress.pojo.Saleprofitrate" >
+    insert into saleprofitrate (id, userid, goodid, 
+      salesnum, saleprice, sourceprice, 
+      profitrate, creattime, updatatime
+      )
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{goodid,jdbcType=VARCHAR}, 
+      #{salesnum,jdbcType=INTEGER}, #{saleprice,jdbcType=DECIMAL}, #{sourceprice,jdbcType=DECIMAL}, 
+      #{profitrate,jdbcType=VARCHAR}, #{creattime,jdbcType=TIMESTAMP}, #{updatatime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.importExpress.pojo.Saleprofitrate" >
+    insert into saleprofitrate
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="goodid != null" >
+        goodid,
+      </if>
+      <if test="salesnum != null" >
+        salesnum,
+      </if>
+      <if test="saleprice != null" >
+        saleprice,
+      </if>
+      <if test="sourceprice != null" >
+        sourceprice,
+      </if>
+      <if test="profitrate != null" >
+        profitrate,
+      </if>
+        creattime,
+      <if test="updatatime != null" >
+        updatatime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="goodid != null" >
+        #{goodid,jdbcType=VARCHAR},
+      </if>
+      <if test="salesnum != null" >
+        #{salesnum,jdbcType=INTEGER},
+      </if>
+      <if test="saleprice != null" >
+        #{saleprice,jdbcType=DECIMAL},
+      </if>
+      <if test="sourceprice != null" >
+        #{sourceprice,jdbcType=DECIMAL},
+      </if>
+      <if test="profitrate != null" >
+        #{profitrate,jdbcType=VARCHAR},
+      </if>
+        now(),
+      <if test="updatatime != null" >
+        #{updatatime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.importExpress.pojo.SaleprofitrateExample" resultType="java.lang.Integer" >
+    select count(*) from saleprofitrate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update saleprofitrate
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null" >
+        userid = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.goodid != null" >
+        goodid = #{record.goodid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.salesnum != null" >
+        salesnum = #{record.salesnum,jdbcType=INTEGER},
+      </if>
+      <if test="record.saleprice != null" >
+        saleprice = #{record.saleprice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.sourceprice != null" >
+        sourceprice = #{record.sourceprice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.profitrate != null" >
+        profitrate = #{record.profitrate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creattime != null" >
+        creattime = #{record.creattime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updatatime != null" >
+        updatatime = #{record.updatatime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update saleprofitrate
+    set id = #{record.id,jdbcType=INTEGER},
+      userid = #{record.userid,jdbcType=INTEGER},
+      goodid = #{record.goodid,jdbcType=VARCHAR},
+      salesnum = #{record.salesnum,jdbcType=INTEGER},
+      saleprice = #{record.saleprice,jdbcType=DECIMAL},
+      sourceprice = #{record.sourceprice,jdbcType=DECIMAL},
+      profitrate = #{record.profitrate,jdbcType=VARCHAR},
+      creattime = #{record.creattime,jdbcType=TIMESTAMP},
+      updatatime = #{record.updatatime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.importExpress.pojo.Saleprofitrate" >
+    update saleprofitrate
+    <set >
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="goodid != null" >
+        goodid = #{goodid,jdbcType=VARCHAR},
+      </if>
+      <if test="salesnum != null" >
+        salesnum = #{salesnum,jdbcType=INTEGER},
+      </if>
+      <if test="saleprice != null" >
+        saleprice = #{saleprice,jdbcType=DECIMAL},
+      </if>
+      <if test="sourceprice != null" >
+        sourceprice = #{sourceprice,jdbcType=DECIMAL},
+      </if>
+      <if test="profitrate != null" >
+        profitrate = #{profitrate,jdbcType=VARCHAR},
+      </if>
+      <if test="creattime != null" >
+        creattime = #{creattime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatatime != null" >
+        updatatime = #{updatatime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.importExpress.pojo.Saleprofitrate" >
+    update saleprofitrate
+    set userid = #{userid,jdbcType=INTEGER},
+      goodid = #{goodid,jdbcType=VARCHAR},
+      salesnum = #{salesnum,jdbcType=INTEGER},
+      saleprice = #{saleprice,jdbcType=DECIMAL},
+      sourceprice = #{sourceprice,jdbcType=DECIMAL},
+      profitrate = #{profitrate,jdbcType=VARCHAR},
+      creattime = #{creattime,jdbcType=TIMESTAMP},
+      updatatime = #{updatatime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="getList" resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		 from saleprofitrate 
+		<if test="userId != null">
+			where	 userid = #{userId} 
+		</if>
+		order by id desc limit #{offset},#{pageSize} 
+	</select>
+</mapper>

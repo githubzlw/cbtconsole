@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.AliBeanchmarkingMapper">
+    <resultMap id="aliBenchmarkingResultMap" type="com.importExpress.pojo.AliBenchmarkingBean">
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="url" property="url"/>
+        <result column="ali_pid" property="aliPid"/>
+        <result column="ali_url" property="aliUrl"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="is_online" property="isOnline"/>
+        <result column="is_edited" property="isEdited"/>
+        <result column="create_time" property="createTime"/>
+        <result column="keyword" property="keyword"/>
+        <result column="image" property="image"/>
+        <result column="ali_image" property="aliImage"/>
+        <result column="wprice" property="wprice"/>
+        <result column="feeprice" property="feePrice"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
+        <result column="isBenchmark" property="isBenchmark"/>
+    </resultMap>
+
+    <resultMap id="aliStatisticResultMap" type="com.importExpress.pojo.AliBenchmarkingStatistic">
+        <result column="total_num" property="benchmarkingTotalNum"/>
+        <result column="online_num" property="onlineNum"/>
+        <result column="edited_num" property="editedNum"/>
+        <result column="free_num" property="freightFreeNum"/>
+        <result column="morder_num" property="moqNum"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="noBenchCount" property="noBenchmarksCount"></result>
+    </resultMap>
+
+    <resultMap id="keywordResultMap" type="com.importExpress.pojo.KeyWordBean">
+        <result column="keyword" property="keyword"/>
+        <result column="admin_id" property="adminId"/>
+    </resultMap>
+
+    <select id="queryAliBenchmarkingForList" resultMap="aliBenchmarkingResultMap"
+            parameterType="com.importExpress.pojo.AliBenchmarkingBean">
+        select ag.id,ag.pid,ag.url,ag.ali_pid,ag.ali_url,ag.admin_id,cbr.valid as is_online,
+        CONCAT(cbr.remotpath,cbr.custom_main_image) as image,cbr.ali_img as ali_image,
+        cbr.wprice,cbr.feeprice,cbr.is_sold_flag,cbr.isBenchmark,
+        DATE_FORMAT(ag.create_time,'%Y-%m-%d %h:%m:%s') as create_time,adm.admName as admin_name,ag.keyword
+        from ali_1688_goods_online ag INNER JOIN custom_benchmark_ready cbr on ag.pid = cbr.pid and ag.ali_pid =
+        cbr.ali_pid
+        left join admuser adm on ag.admin_id=adm.id
+        left join ali_image_thumb_download ai ON ai.ali_pid = cbr.ali_pid
+        where 1=1
+		
+        <if test="category !=null">
+            and catid1 in(SELECT category_id FROM 1688_category WHERE find_in_set(#{category}, path))
+        </if>
+        <if test="pid !=null">
+            and ag.pid = #{pid}
+        </if>
+        <if test="aliPid !=null">
+            and ag.ali_pid = #{aliPid}
+        </if>
+        <if test="adminId > 0">
+            and ag.admin_id = #{adminId}
+        </if>
+        <if test="adminId == 0">
+            and ag.admin_id > 0
+        </if>
+        <if test="isOnline > -1">
+            and cbr.valid = #{isOnline}
+        </if>
+        <if test="isEdited > 0">
+            and cbr.is_edited in('1','2')
+        </if>
+        <if test="isEdited == 0">
+            and cbr.is_edited = '0'
+        </if>
+        <if test="beginDate != null">
+            and date(ag.create_time) &gt;= date(#{beginDate})
+        </if>
+        <if test="endDate != null">
+            and date(ag.create_time) &lt;= date(#{endDate})
+        </if>
+        <if test="keyword != null">
+            and ag.keyword = #{keyword}
+        </if>
+        order by ag.create_time desc
+
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum};
+        </if>
+    </select>
+
+
+    <select id="queryAliBenchmarkingForListCount" parameterType="com.importExpress.pojo.AliBenchmarkingBean"
+            resultType="java.lang.Integer">
+        select count(0)
+        from ali_1688_goods_online ag,custom_benchmark_ready cbr
+        where 1=1 and ag.pid = cbr.pid and ag.ali_pid = cbr.ali_pid
+		<if test="category !=null">
+            and catid1 in(SELECT category_id FROM 1688_category WHERE find_in_set(#{category}, path))
+        </if>
+        <if test="pid !=null">
+            and ag.pid = #{pid}
+        </if>
+        <if test="aliPid !=null">
+            and ag.ali_pid = #{aliPid}
+        </if>
+        <if test="adminId > 0">
+            and ag.admin_id = #{adminId}
+        </if>
+        <if test="adminId == 0">
+            and ag.admin_id > 0
+        </if>
+        <if test="isOnline > -1">
+            and cbr.valid = #{isOnline}
+        </if>
+        <if test="isEdited > 0">
+            and cbr.is_edited in('1','2')
+        </if>
+        <if test="isEdited == 0">
+            and cbr.is_edited = '0'
+        </if>
+        <if test="beginDate != null">
+            and date(ag.create_time) &gt;= date(#{beginDate})
+        </if>
+        <if test="endDate != null">
+            and date(ag.create_time) &lt;= date(#{endDate})
+        </if>
+        <if test="keyword != null">
+            and ag.keyword = #{keyword}
+        </if>
+    </select>
+
+
+    <select id="queryAliBenchmarkingStatistic" resultMap="aliStatisticResultMap">
+        SELECT
+        aa.total_num,
+        ifnull(bb.online_num, 0) AS online_num,
+        ifnull(cc.edited_num, 0) AS edited_num,
+        ifnull(dd.free_num, 0) AS free_num,
+        ifnull(ee.morder_num, 0) AS morder_num,
+        ifnull(ff.noBenchCount,0) as noBenchCount,
+        aa.admin_id,
+        ff.admName AS admin_name
+        FROM
+        (
+        SELECT
+        count(0) AS total_num,
+        admin_id
+        FROM
+        ali_1688_goods_online
+        WHERE
+        admin_id > 0
+        <if test="beginDate != null ">
+            and create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and create_time &lt;= #{endDate}
+        </if>
+        GROUP BY
+        admin_id
+        ) aa
+        LEFT JOIN (
+        SELECT
+        count(0) AS online_num,
+        ago.admin_id
+        FROM
+        ali_1688_goods_online ago,
+        custom_benchmark_ready cbr
+        WHERE
+        ago.pid = cbr.pid
+        AND ago.ali_pid = cbr.ali_pid
+        AND ago.admin_id > 0
+        AND cbr.valid = 1
+        <if test="beginDate != null ">
+            and ago.create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and ago.create_time &lt;= #{endDate}
+        </if>
+        GROUP BY
+        ago.admin_id
+        ) bb ON aa.admin_id = bb.admin_id
+        LEFT JOIN (
+        SELECT
+        count(0) AS edited_num,
+        ago.admin_id
+        FROM
+        ali_1688_goods_online ago,
+        custom_goods_edit cbr
+        WHERE
+        ago.pid = cbr.pid
+        AND ago.admin_id > 0
+        <if test="beginDate != null ">
+            and ago.create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and ago.create_time &lt;= #{endDate}
+        </if>
+        GROUP BY
+        ago.admin_id
+        ) cc ON aa.admin_id = cc.admin_id
+        LEFT JOIN (
+        SELECT
+        count(0) AS free_num,
+        ago.admin_id
+        FROM
+        ali_1688_goods_online ago,
+        custom_benchmark_ready cbr
+        WHERE
+        ago.pid = cbr.pid
+        AND ago.ali_pid = cbr.ali_pid
+        AND ago.admin_id > 0
+        AND cbr.valid = 1
+        AND cbr.is_sold_flag > 0
+        <if test="beginDate != null ">
+            and ago.create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and ago.create_time &lt;= #{endDate}
+        </if>
+        GROUP BY
+        ago.admin_id
+        ) dd ON aa.admin_id = dd.admin_id
+        LEFT JOIN (
+        SELECT
+        count(0) AS morder_num,
+        ago.admin_id
+        FROM
+        ali_1688_goods_online ago,
+        custom_benchmark_ready cbr
+        WHERE
+        ago.pid = cbr.pid
+        AND ago.ali_pid = cbr.ali_pid
+        AND ago.admin_id > 0
+        AND cbr.morder > 1
+        <if test="beginDate != null ">
+            and ago.create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and ago.create_time &lt;= #{endDate}
+        </if>
+        GROUP BY
+        ago.admin_id
+        ) ee ON aa.admin_id = ee.admin_id
+        left join (
+        SELECT admin_id,COUNT(0) as noBenchCount FROM custom_benchmark_ready WHERE isBenchmark !=1 AND bm_flag!=1 AND valid=1 and admin_id>0
+        <if test="beginDate != null ">
+            and createtime &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null ">
+            and createtime &lt;= #{endDate}
+        </if>
+        GROUP BY admin_id
+        ) ff on aa.admin_id=ff.admin_id
+        LEFT JOIN admuser ff ON aa.admin_id = ff.id
+        <if test="admName != null">
+            where ff.admName=#{admName}
+        </if>
+    </select>
+
+    <select id="queryKeyWordListByAdminId" resultMap="keywordResultMap">
+        select keyword,admin_id from ali_1688_goods_online where 1=1
+        <if test=" adminId > 0">
+            and admin_id = #{adminId}
+        </if>
+        and ifnull(keyword,'') != ''
+        group by keyword
+        <if test=" limitNum > 0 ">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryKeyWordListByAdminIdCount" resultType="int">
+        select count(0) from (select keyword from ali_1688_goods_online where 1=1
+        <if test=" adminId > 0">
+            and admin_id = #{adminId}
+        </if>
+        and ifnull(keyword,'') != ''
+        group by keyword) a
+    </select>
+
+    <update id="updateGoodsFlag">
+        update custom_benchmark_ready
+        set is_edited = ''
+        <if test="benchmarkingFlag > 0">
+            ,isBenchmark=1,bm_flag=1
+        </if>
+        <if test="moq > 0">
+            ,morder = #{moq}
+        </if>
+        <if test="freeFlag > 0">
+            ,is_sold_flag = 1
+        </if>
+        where pid = #{pid}
+    </update>
+</mapper>

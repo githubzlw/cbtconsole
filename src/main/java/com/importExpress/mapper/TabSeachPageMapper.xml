@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.TabSeachPageMapper">
+	<resultMap type="com.importExpress.pojo.TabSeachPageBean" id="BaseResultMap">
+		<id column="id" property="id" />
+    	<result column="keyword" property="keyword" />
+    	<result column="keyword1" property="keyword1" />
+    	<result column="banner" property="banner" />
+    	<result column="filename" property="filename" />
+    	<result column="createtime" property="createtime" />
+    	<result column="isshow" property="isshow"/>
+    	<result column="sate" property="sate" />
+    	<result column="catid" property="catId" />
+    	<result column="pid" property="parentId" />
+	</resultMap>
+	
+	<resultMap type="com.importExpress.pojo.TabSeachPagesDetailBean" id="detailBaseResultMap">
+		<id column="id" property="id" />
+    	<result column="sid" property="sid" />
+    	<result column="name" property="name" />
+    	<result column="seach_url" property="seachUrl" />
+    	<result column="keyword" property="keyword" />
+    	<result column="catid" property="catid" />
+    	<result column="anti_words" property="antiWords" />
+    	<result column="category" property="category" />
+    	<result column="sort" property="sort" />
+    	<result column="banner_img_name" property="bannerImgName" />
+    	<result column="banner_name" property="bannerName" />
+    	<result column="banner_describe" property="bannerDescribe" />
+	</resultMap>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.TabSeachPageBean">
+		insert into tab_seach_pages(keyword,keyword1,banner,filename,createtime,sate,catid,pid)
+		values (#{keyword},#{keyword1},#{banner},#{filename},now(),0,#{catId},#{parentId})
+	</insert>
+	
+	<select id="list" resultMap="BaseResultMap">
+		select id,keyword,keyword1,banner,filename,createtime,sate,pid,isshow  
+		from tab_seach_pages where sate=0 and pid=#{id} order by createtime asc
+	</select>
+	
+	<update id="delete">
+		update tab_seach_pages set sate=1 where id=#{id}
+	</update>
+	<update id="move">
+		update tab_seach_pages set pid = -1 where pid=#{id}
+	</update>
+	<select id="get" resultMap="BaseResultMap">
+		select pid,id,keyword,keyword1,banner,filename,createtime,isshow,sate from tab_seach_pages
+		where id=#{id} limit 1
+	</select>
+	
+	<update id="update" parameterType="com.importExpress.pojo.TabSeachPageBean">
+		update tab_seach_pages set keyword=#{keyword},keyword1=#{keyword1},banner=#{banner},pid=#{parentId} where id=#{id}
+	</update>
+	
+	<select id="aliCategory" resultType="hashmap">
+		select category_id as cid,path, en_name as category,lv from 1688_category where lv &lt;= 5 and en_name !='' order by id asc
+	</select>
+	
+	<insert id="insertDetail" parameterType="com.importExpress.pojo.TabSeachPagesDetailBean">
+		insert into tab_seach_pages_details(sid,name,seach_url,keyword,catid,relateKeyWordUrl,anti_words,sort, banner_img_name, banner_img_url, banner_name, banner_describe)
+		values (#{sid},#{name},#{seachUrl},#{keyword},#{catid},#{relateKeyWordUrl},#{antiWords},#{sort},#{bannerImgName},#{bannerImgUrl},#{bannerName},#{bannerDescribe})
+	</insert>
+	
+	<select id="detailList" resultMap="detailBaseResultMap">
+		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.relateKeyWordUrl,a.anti_words,a.sort,b.en_name as category,
+			a.banner_img_name, a.banner_name, a.banner_describe
+		from tab_seach_pages_details a,1688_category b 
+		where a.catid=b.category_id and a.sate=0 and a.sid=#{sid} order by a.sort asc
+	</select>
+	
+	<update id="updateDetail" parameterType="com.importExpress.pojo.TabSeachPagesDetailBean">
+		update tab_seach_pages_details set name=#{name},catid=#{catid},relateKeyWordUrl=#{relateKeyWordUrl},seach_url=#{seachUrl},keyword=#{keyword},anti_words=#{antiWords},sort=#{sort} where id=#{id}
+	</update>
+	
+	<update id="deleteDetail">
+		update tab_seach_pages_details set sate=1 where id=#{id}
+	</update>
+	
+	<select id="getDetail" resultMap="detailBaseResultMap">
+		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.relateKeyWordUrl,a.anti_words,a.sort,b.en_name as category,
+			a.banner_img_name , a.banner_name , a.banner_describe 
+		from tab_seach_pages_details a,1688_category b
+		where a.catid=b.category_id and a.id=#{id} limit 1
+	</select>
+	
+	<select id="getWordsCount" resultType="int">
+		select count(id) from tab_seach_pages where keyword=#{keyword} and sate=0
+	</select>
+	
+	<select id="getWordsCount1" resultType="int">
+		select count(id) from tab_seach_pages where keyword=#{keyword} and id!=#{id} and sate=0
+	</select>
+	
+	<select id="getNameCount" resultType="int">
+		select count(id) from tab_seach_pages_details where name=#{name} and sid=#{sid} and sate=0
+	</select>
+	
+	<select id="getNameCount1" resultType="int">
+		select count(id) from tab_seach_pages_details where name=#{name} and sid=#{sid} and id!=#{id} and sate=0
+	</select>
+	
+	<select id="getCategoryId" resultType="java.lang.Integer">
+		select category_id from 1688_category where en_name = #{keyword}
+	</select>
+	<update id="updateIsshow">
+		update tab_seach_pages set isshow=#{isshow} where id=#{id}
+	</update>
+	
+	<!-- public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean); -->
+	<insert id="updateAuthorizedInfo" parameterType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
+		<choose>
+		    <when test="fileUrl == null">
+		        INSERT INTO alidata.shop_url_authorized_info 
+				(shop_id, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime) 
+				VALUES (#{shopId}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW()) 
+				ON DUPLICATE KEY UPDATE 
+				admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
+				end_time = #{endTime}, remark = #{remark}, valid= #{valid}, updatetime=NOW()
+		    </when>
+		    <otherwise>
+		        INSERT INTO alidata.shop_url_authorized_info 
+				(shop_id, file_name, file_url, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime) 
+				VALUES (#{shopId}, #{fileName}, #{fileUrl}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW()) 
+				ON DUPLICATE KEY UPDATE 
+				file_name = #{fileName}, file_url = #{fileUrl}, admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
+				end_time = #{endTime}, remark = #{remark}, valid= #{valid}, updatetime=NOW()
+		    </otherwise>
+		</choose>
+	</insert>
+	
+	<!-- public ShopUrlAuthorizedInfoPO queryAuthorizedInfo(@Param("shopId") String shopId); -->
+	<select id="queryAuthorizedInfo" resultType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
+		SELECT id, shop_id shopId, file_name fileName, file_url fileUrl, admin_id adminId, admuser,
+			start_time startTime, end_time endTime, remark, valid 
+		FROM alidata.shop_url_authorized_info
+		WHERE shop_id = #{shopId}
+	</select>
+	
+	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
+	<select id="queryStaticizeAll" resultMap="BaseResultMap">
+		select id,keyword from tab_seach_pages where isshow = 1
+	</select>
+	
+
+</mapper>

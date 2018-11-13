@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+<meta charset="utf-8">
+<!--   2018/09/11 14:22 -->
+<!--
+    	文件兼容性声明，表示使用最新的ie渲染模式  
+    -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--
+    	视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+    		width=device-width：视口宽度等于设备宽度。
+    		initial-scale=1   ：初始化缩放比，1:1
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+<title>对标商品数据查询</title>
+
+<!-- 这是bootStrap所需要的css文件 -->
+<link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!-- 
+   		条件注释,专门为ie浏览器设计的。
+   -->
+<!--[if lt IE 9]>
+	      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+<!-- 这是bootstrap所必要的jquery文件。 -->
+<script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+<!-- 这是bootstrap的js文件 -->
+<script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+<!-- 日期控件 -->
+<link href="/cbtconsole/css/bootstrap-datetimepicker.min.css"
+	rel="stylesheet" />
+<script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+<!--页面加载进度条-->
+<!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+<!--easyui-->
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<style type="text/css">
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 35px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+input, textarea, select, button {
+	font-size: 16px;
+	height: 28px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 16px;
+}
+
+.datagrid-header .datagrid-cell span, .panel-body {
+	font-size: 16px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	height: 28px;
+	line-height: 28px;
+	padding: 3px 5px;
+}
+
+#waring_id span {
+	color: red;
+	font-weight: bolder;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- 模态框（Modal） -->
+     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog" style="width: 76%;">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                     <h4 class="modal-title" id="myModalLabel">总量统计</h4>
+                 </div>
+                 <div class="modal-body" style="float: left;font-size: 13px;width: 100%;">
+                 	<h3>近似对标商品统计</h3>
+                 	总数: <span id="waring_id_no"></span>
+                 	<h3>对标商品统计</h3>
+					<table class="table table-striped table-hover" style="float: left;font-size: 13px;" id="waring_id">
+                            <!-- <tr><th width="25%">商品类型</th><th width="25%">0-总数</th><th width="25%">1-比ali便宜20%的优势对标商品</th><th width="25%">2-比ali贵10%的劣势对标商品</th></tr>
+							<tr><td>非人为对标软下架商品</td><td>39008</td><td>39008</td><td>39008</td></tr> -->
+                    </table>
+					
+                 </div>
+                 <div class="modal-footer">
+                 </div>
+             </div>
+             <!-- /.modal-content -->
+         </div>
+         <!-- /.modal -->
+     </div>
+
+	<script type="text/javascript">
+		function formatNum(val) {
+			return val < 10 ? "0" + val : val
+		}
+
+		$(function() {
+			//设置datagrid属性
+			$('#main-datagrid').datagrid({
+				//title: '复购率退款数商品查询',
+				width : "100%",
+				fit : true, //自动补全 
+				pageSize : 20, //默认选择的分页是每页20行数据
+				pageList : [ 10, 20, 30, 50, 100 ], //可以选择的分页集合
+				nowrap : true, //设置为true，当数据长度超出列宽时将会自动截取
+				striped : true, //设置为true将交替显示行背景。
+				collapsible : true, //显示可折叠按钮
+				toolbar : "#top_toolbar", //在添加 增添、删除、修改操作的按钮要用到这个
+				loadMsg : '数据装载中......',
+				singleSelect : true, //为true时只能选择单行
+				fitColumns : true, //允许表格自动缩放，以适应父容器
+				pagination : true, //分页
+				rownumbers : true,
+				style : {
+					padding : '8 8 10 8'
+				},
+				onLoadError : function() {
+					//$.message.alert("提示信息", "获取数据信息失败","info");
+					return;
+				}
+			});
+			//页面加载完成后获取总数
+			/* $('#main-datagrid').datagrid({"onLoadSuccess":function(data){
+				console.log(data.total);
+			}}); */
+			/*查询条件重置按钮*/
+			$("#date-range-reset").click(function() {
+				//初始化
+				$("#flag").val(0);
+				$("#bmFlag").val(0);
+				$("#valid").val(0);
+			});
+			/*下架商品范围内时间的条件查询*/
+			$("#date-range-search")
+					.click(
+							function() {
+								var flag = $("#flag").val()
+								var bmFlag = $("#bmFlag").val()
+								var valid = $("#valid").val()
+								// 页数
+								var pageSize = $("#main-datagrid").datagrid(
+										"options").pageSize;
+								var pageNumber = 1;
+								//查询对标商品
+								$("#main-datagrid").datagrid("options").url = "/cbtconsole/queryuser/querystandardgoodsformlist.do";
+								$('#main-datagrid').datagrid("load", {
+									rows : pageSize,
+									page : pageNumber,
+									valid : valid,
+									bmFlag : bmFlag,
+									flag : flag
+								});
+
+							});
+
+		});
+
+		/*时间格式化*/
+		function formatterData(value) {
+			if (value != null) {
+				var date = new Date(value);
+				return date.getFullYear() + '-'
+						+ formatNum(date.getMonth() + 1) + '-'
+						+ formatNum(date.getDate()) + ' '
+						+ formatNum(date.getHours()) + ':'
+						+ formatNum(date.getMinutes());
+			} else {
+				return "";
+			}
+		}
+		function formatterPid(value, row, index) {
+			if (row.pid != null) {
+				return '<a href="https://www.import-express.com/goodsinfo/-1' + row.pid + '.html" target=_blank>'
+						+ row.pid + '</a>'
+			}
+			return;
+		}
+		function formatterEdit(value, row, index) {
+			if (row.pid != null) {
+				return '<a href="/cbtconsole/editc/detalisEdit?pid=' + row.pid + '" target=_blank>编辑商品</a>'
+			}
+			return;
+		}
+		function formatterAliPid(value, row, index) {
+			if (row.pid != null) {
+				return '<a href="https://www.aliexpress.com/item/a/' + row.aliPid + '.html" target=_blank>'
+						+ row.aliPid + '</a>'
+			}
+			return;
+		}
+		function formatterFlag(value, row, index) {
+			if (row.flag != null) {
+				switch (row.flag) {
+				case 1:
+					return '优势';
+				case 2:
+					return '劣势';
+				default:
+					return '';
+				}
+			}
+			return '';
+		}
+		function formatterBmFlag(value, row, index) {
+			if (row.bmFlag != null) {
+				switch (row.bmFlag) {
+				case 1:
+					return '人为对标';
+				case 2:
+					return '非人为对标';
+				default:
+					return '';
+				}
+			}
+			return '';
+		}
+		function formatterValid(value, row, index) {
+			if (row.valid != null) {
+				switch (row.valid) {
+				case 1:
+					return '在线';
+				case 2:
+					return '软下架';
+				default:
+					return '';
+				}
+			}
+			return '';
+		}
+	</script>
+
+	<div id="top_toolbar" style="padding: 5px; height: auto">
+		<div>
+			<table>
+				<tr>
+					<td colspan="2">
+						<h3>对标商品数据查询</h3>
+						<a id="waring_id_btn"
+							style="position: absolute; top: 20px; right: 50px;">总量统计</a>
+					</td>
+				</tr>
+				<div style="clear: both"></div>
+				<tr height="30px">
+					<td align="center" style="width: 290px;"><span
+						style="float: left; line-height: 30px;">&nbsp;查询数据源(刷新需要60秒):
+							<a href="#" id="id_refresh">刷新</a>
+					</span></td>
+					<td align="center" style="width: 124px;"><span
+						style="float: left; line-height: 30px;">&nbsp;在线状态&nbsp;&nbsp;</span>
+					</td>
+					<td align="center" style="width: 124px;"><span
+						style="float: left; line-height: 30px;">&nbsp;人为对标&nbsp;&nbsp;</span>
+					</td>
+					<td align="center" style="width: 224px;"><span
+						style="float: left; line-height: 30px;">&nbsp;商品优劣势状态&nbsp;&nbsp;</span>
+					</td>
+					<td style="width: 100px;">
+						<!--重置按钮-->
+					</td>
+					<td style="width: 56px;">
+						<!--查询按钮-->
+					</td>
+				</tr>
+				<tr>
+					<td align="center"><span
+						style="float: left; line-height: 30px;">&nbsp;当前数据源最后刷新: <b
+							id="id_createtime"></b></span></td>
+					<!--运单状态-->
+					<td align="center"><select class="form-control" id="valid"
+						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="0">0-全部</option>
+							<option value="1">1-在线</option>
+							<option value="2">2-软下架</option>
+					</select></td>
+					<!--运单状态-->
+					<td align="center"><select class="form-control" id="bmFlag"
+						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="0">0-全部</option>
+							<option value="1">1-人为对标</option>
+							<option value="2">2-非人为对标</option>
+					</select></td>
+					<!--运单状态-->
+					<td align="center"><select class="form-control" id="flag"
+						style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="0">0-全部对标商品</option>
+							<option value="1">1-优势对标商品(比ali便宜20%)</option>
+							<option value="2">2-劣势对标商品(比ali贵10%)</option>
+					</select></td>
+					<!--查询按钮-->
+					<td align="center">
+						<button type="button" id="date-range-search"
+							class="btn btn-default"
+							style="height: 30px; width: 98px; text-align: center;">查询</button>
+					</td>
+					<!--重置按钮-->
+					<td align="center">
+						<button type="button" id="date-range-reset"
+							class="btn btn-default" style="height: 30px; text-align: left;">重置</button>
+					</td>
+					<td id="errMsg" style="color: royalblue;"></td>
+				</tr>
+			</table>
+
+		</div>
+
+	</div>
+
+	<table id="main-datagrid" firstLoad="false"
+		style="width: 100%; height: 100%" class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th
+					data-options="field:'pid',width:'120px',align:'center',formatter:formatterPid">pid(链接到线上)</th>
+				<th
+					data-options="field:'aliPid',width:'120px',align:'center',formatter:formatterAliPid">aliPid(链接到速卖通)</th>
+				<th
+					data-options="field:'valid',width:'100px',align:'center',formatter:formatterValid">在线状态</th>
+				<th
+					data-options="field:'bmFlag',width:'100px',align:'center',formatter:formatterBmFlag">人为对标</th>
+				<th
+					data-options="field:'flag',width:'100px',align:'center',formatter:formatterFlag">优劣势标记</th>
+				<th data-options="field:'rangePrice',width:'150px',align:'center'">区间价(rangePrice)</th>
+				<th data-options="field:'feeprice',width:'150px',align:'center'">免邮价(feeprice)</th>
+				<th data-options="field:'wprice',width:'150px',align:'center'">区间价(wprice)</th>
+				<th data-options="field:'aliPrice',width:'150px',align:'center'">ali价格(aliPrice)</th>
+				<th data-options="field:'edit',width:'150px',align:'center',formatter:formatterEdit">编辑</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+</body>
+
+<script type="text/javascript">
+	$(function() {
+		//页面加载时 初始化临时数据生成时间
+		function inidTime(url) {
+			$
+					.ajax({
+						type : "GET",
+						url : url,
+						dataType : "json",
+						success : function(msg) {
+							if (msg != null && msg != undefined) {
+								var waringtext = "<tr><th width=\"25%\">商品类型</th><th width=\"25%\">0-总数</th><th width=\"25%\">1-比ali便宜20%的优势对标商品</th><th width=\"25%\">2-比ali贵10%的劣势对标商品</th></tr>"
+										+ "<tr><td>全部对标商品</td><td>" + msg.total0 + "</td><td>" + msg.total1 + "</td><td>" + msg.total2 + "</td></tr>"
+										+ "<tr><td>人为对标在线商品</td><td>" + msg.total10 + "</td><td>" + msg.total11 + "</td><td>" + msg.total12 + "</td></tr>"
+										+ "<tr><td>人为对标软下架商品</td><td>" + msg.total20 + "</td><td>" + msg.total21 + "</td><td>" + msg.total22 + "</td></tr>"
+										+ "<tr><td>非人为对标在线商品</td><td>" + msg.total30 + "</td><td>" + msg.total31 + "</td><td>" + msg.total32 + "</td></tr>"
+										+ "<tr><td>非人为对标软下架商品</td><td>" + msg.total40 + "</td><td>" + msg.total41 + "</td><td>" + msg.total42 + "</td></tr>";
+								$("#waring_id").html(waringtext);
+								$("#waring_id_no").html(msg.total3);
+								$("#id_createtime").text(
+										formatterData(msg.createtime));
+							}
+						}
+					});
+		}
+		inidTime("/cbtconsole/queryuser/querystandardgoodsformcreatetime.do");
+		//数据源 刷新
+		$("#id_refresh").click(function() {
+			$("#id_createtime").text("数据刷新中...");
+			inidTime("/cbtconsole/queryuser/createstandardgoodsform.do");
+		});
+		//总量统计按钮
+		$("#waring_id_btn").click(function() {
+			$('#myModal').modal('show');
+		});
+	});
+</script>
+
+</html>

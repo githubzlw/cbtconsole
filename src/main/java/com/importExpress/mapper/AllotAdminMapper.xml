@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.AllotAdminMapper" >
+
+ 	<select id="exAdmin"   resultType="Integer">
+  	 	select id  from admin_r_user  where 
+  	 	<if test="userid != 0">
+  	 		userid=#{userid}
+  	 	</if>
+  	 	<if test="userid == 0">
+  	 		  useremail =#{useremail} 
+  	 	</if>
+  	 	limit 1
+  	 </select>
+  	 
+  	 <select id="seAdmin"   resultType="java.lang.String">
+  	 	select admName  from admuser  where 
+  	 	<if test="id != 0">
+  	 		id=#{id}
+  	 	</if>
+  	 	limit 1
+  	 </select>
+	 
+	 <insert id="addAdminSaler">
+	 	insert tab_admin_onedayallot(adminid) values(#{adminid})
+	 </insert>
+	  <insert id="allotAdminSaler">
+	 	insert admin_r_user(userid,useremail,adminid,createdate) values(#{userid},#{useremail},#{adminid},now())
+	 </insert>
+  	 <select id="getAllotAdmin"   resultType="Integer">
+  	 	select  adm.id from (select a.id,count(a.id)cou  from admuser  a left join  tab_admin_onedayallot o on o.adminid=a.id where  automatic=1 group by  o.adminid order by cou limit 1) adm
+  	 </select>
+  	 <select id="getAllotAdminPage"   resultType="Integer">
+  	 	select adminid from tab_admin_page page left join (select substring_index( view_url, '?' , 1) url,id,userid,sessionid  from behavior_record b 
+  	 	where   date(view_date_day) >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)  
+  	 	<if test="userId != 0">
+  	 	  and userid=#{userId} 
+  	 	 </if>
+  	 	   <if test="sessionId != null and sessionId != ''">
+  	 	  and sessionid=#{sessionId} 
+  	 	 </if>
+  	 	<if test="type == 1">
+  	 	  order by id 
+  	 	  </if>
+  	 	   <if test="type == 0">
+  	 	  	order by id desc
+  	 	  </if>
+  	 	  )bb on bb.url=page.url where bb.url is not null
+  	 	   limit 1
+  	 </select>
+</mapper>

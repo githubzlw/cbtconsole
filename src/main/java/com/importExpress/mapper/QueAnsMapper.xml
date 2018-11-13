@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.QueAnsMapper">
+	<resultMap id="BaseResultMap" type="com.importExpress.pojo.QueAns">
+		 <id column="questionid"  property="questionid" />
+	    <result column="userid"  property="userid" />
+	    <result column="pid"  property="pid" />
+	    <result column="pname"  property="pname" />
+	    <result column="purl"  property="purl" />
+	    <result column="create_time"  property="create_time" />
+	    <result column="question_content"  property="question_content" />
+	    <result column="reply_status"  property="reply_status" />
+	    <result column="reply_time"  property="reply_time" />
+	    <result column="reply_content"  property="reply_content" />
+	    <result column="reply_name"  property="reply_name" />
+	    <result column="isShow"  property="isShow" />
+	    <result column="spider_mincatid"  property="spider_mincatid" />
+	    <result column="shop_id"  property="shop_id" />
+	    <result column="c_shop_id"  property="c_shop_id" />
+        <result column="admName"  property="admName" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+    questionid, userid, pid, pname, purl, question_content, create_time, reply_status, 
+    reply_content, reply_time, reply_name, isShow
+  </sql>
+  
+  
+  <select id="findByQuery"  resultMap="BaseResultMap">
+	SELECT  IFNULL(ad.admName,'') AS admName,q.questionid,q.userid,q.pid,q.pname,q.purl,q.question_content,q.create_time,q.reply_status,
+	q.reply_content,q.reply_time,IFNULL(b.admName,'') AS reply_name,q.isShow,IFNULL(c.shop_id,'') as c_shop_id,q.shop_id
+	FROM question_answer q LEFT JOIN custom_benchmark_ready c ON q.pid=c.pid LEFT JOIN admuser b ON q.reply_name=b.id
+    left join admin_r_user a on q.userid=a.userid
+      left join admuser ad on a.adminid=ad.id
+	WHERE q.is_delete=0
+    
+    <if test="replyFlag != 0 ">
+        and q.reply_status=#{replyFlag}
+    </if>
+    <if test="goodsPid != null">
+        and q.pid=#{goodsPid}
+    </if>
+    <if test="goodsName != null">
+      and q.pname=#{goodsName}
+    </if>
+    <if test="adminId != 0">
+      and q.reply_name=#{adminId}
+    </if>
+    <if test="startdate != null">
+      and q.create_time &gt; #{startdate}
+      <!-- and to_day(q.create_time)&gt;to_day(#{startdate}) -->
+    </if>
+    <if test="enddate != null">
+      and q.create_time &lt; #{enddate}
+      <!-- and to_day(q.create_time)&lt;to_day(#{enddate}) -->
+    </if>
+    order by create_time desc limit #{page},60 
+  
+  </select>
+  <select id="getCountByQuery"  resultType="java.lang.Integer">
+   select count(1)
+    from question_answer where is_delete=0
+     <if test="replyFlag != 0">
+        and reply_status=#{replyFlag}
+    </if>
+    <if test="goodsPid != null">
+        and pid=#{goodsPid}
+    </if>
+    <if test="goodsName != null">
+      and pname=#{goodsName}
+    </if>
+    <if test="adminId != 0">
+      and reply_name=#{adminId}
+    </if>
+     <if test="startdate != null">
+      and create_time &gt; #{startdate}
+      <!-- and to_day(a.create_time)&gt;to_day(#{startdate}) -->
+    </if>
+    <if test="enddate != null">
+      and create_time &lt; #{enddate}
+      <!-- and to_day(a.create_time)&lt;to_day(#{enddate}) -->
+    </if>
+  </select>
+  
+  <update id="updateReplyContent" >
+    update question_answer set reply_content=#{rContent},reply_status=2,reply_name=#{adminId},reply_time=now(),shop_id=#{shop_id}
+    where questionid=#{qid}
+  </update>
+  <update id="updateRemark" >
+    update question_answer set is_review=#{isReview},review_remark=#{reviewRemark},update_time=now()
+    where id=#{qid}
+  </update>
+  <update id="changeIsShow">
+	 update question_answer set isShow=#{type} where questionid=#{pid}
+  </update>
+  <select id="getQueAnsinfo" resultType="com.importExpress.pojo.QueAns">
+	SELECT q.questionid,u.id,q.userid,q.question_content,q.reply_content,u.email,ad.email AS sale_email FROM question_answer q
+	INNER JOIN USER u ON q.userid=u.id
+	LEFT JOIN admuser ad ON q.reply_name=ad.id
+	WHERE q.questionid=${qid} 
+  </select>
+  <update id="influenceShop">
+    <if test="state == 1">
+        update question_answer set reply_status=2 where questionid=#{qid}
+    </if>
+     <if test="state == 2">
+         update question_answer set reply_status=1 where questionid=#{qid}
+     </if>
+     <if test="state == 3">
+         update question_answer set isShow=2 where questionid=#{qid}
+     </if>
+     <if test="state == 4">
+         update question_answer set isShow=1 where questionid=#{qid}
+     </if>
+  </update>
+    <update id="deleteQuestion">
+        update question_answer set is_delete=1 where questionid=#{qid}
+    </update>
+</mapper>

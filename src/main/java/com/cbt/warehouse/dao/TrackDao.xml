@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.TrackDao" >
+
+<resultMap id="baseResult" type="com.cbt.warehouse.pojo.TrankBean" >
+         <result column="id" property="id"/>
+         <result  column="orderid"  property="orderid"/>
+        <result column="company" property="company"/>
+        <result column="expressno" property="expressno"/>
+        <result column="createtime" property="createtime"/>
+        <result column="remarks" property="remarks" />
+        <result column="flag" property="flag" />
+        <result column="admName" property="admName" />
+        <result column="bz" property="bz"/>
+        <result  column ="adminid"  property="admId"/>
+    </resultMap>
+    
+    
+<insert id="saveTrackInfo"  parameterType="java.util.List">  
+	    insert into track(expressno,remarks,company,admName,createtime,flag)   
+	    values  
+	    <foreach collection="list" item="item" index="index" separator="," >  
+	        (#{item.expressno},#{item.remarks},#{item.company},#{item.admName},#{item.createtime},#{item.flag})  
+	    </foreach>  
+  </insert>  
+
+<select id="getAllJCEX"  resultMap="baseResult">
+       select sp.expressno,sp.remarks,sp.createtime ,ar.admName from shipping_package  sp 
+             INNER JOIN orderinfo oi on  sp.orderid = oi.order_no 
+             LEFT  JOIN admin_r_user ar on ar.userid = oi.user_id 
+        where  sp.transportcompany =#{company}   and sp.createtime &gt; #{senttimeBegin}
+        <if test="senttimeEnd!=null">
+         and  sp.createtime  &lt; #{senttimeEnd}    
+        </if>
+</select>
+
+<delete id="deleteInfoByJCEX">
+   delete  from track where company =#{company}
+</delete>
+
+<select id="selectByCompany" resultMap="baseResult">
+   select * from track where company = #{company}  order by id desc
+</select>
+
+<select id="selectByExpressnoAndCompany"  resultType="Integer">
+    select count(*)  from track where company = #{company}  and expressno = ${expressno}
+</select>
+
+
+<select id="selectByCompany1" resultMap="baseResult">
+   select * from track where company = #{company}  and expressno <![CDATA[<>'']]>
+   <if test="admName!=null">
+     and admName = #{admName}
+   </if>
+</select>
+
+<update id="saveBzByExpressnoAndCompany">
+   update track set bz = #{bz}  where  id = #{id}
+</update>
+
+	<delete id="deleteInfoList" >
+	  	 DELETE FROM track where id  in
+		 <foreach collection="list" item="item" index="index" separator="," >  
+	        #{item.id}
+	    </foreach> 
+</delete>
+
+
+<select id="getadmInfo"  resultType="String">
+  select admName from admuser where roleType= '1'
+</select>
+
+
+<select id="getAllTracks"  resultMap="baseResult">
+  select sp.expressno,sp.orderid,sp.transportcompany as company ,ar.adminid as adminid  from shipping_package  sp 
+             INNER JOIN orderinfo oi on  sp.orderid = oi.order_no 
+             LEFT  JOIN admin_r_user ar on ar.userid = oi.user_id 
+	    where sp.createtime <![CDATA[>]]>  #{createtime}  and  sp.expressno IS NOT NULL AND sp.expressno<![CDATA[<>]]>'' AND sp.expressno<![CDATA[<>]]>'0' 
+	    AND sp.expressno<![CDATA[<>]]>'1'
+	</select>
+	
+	
+	
+	<insert id="saveBugTrack"  parameterType="java.util.List">
+	    REPLACE  INTO   message_notification  
+	    (order_no,sender_id,send_type,send_content,link_url,create_time,reservation2)  
+	    VALUES  
+	    <foreach collection="list" index="index" item="item"  
+	        separator=",">  
+	        (#{item.order_no},#{item.sender_id},#{item.send_type},#{item.send_content},#{item.link_url},#{item.create_time},#{item.reservation2})  
+	    </foreach>  
+	</insert>
+	
+	<insert id="saveBugTrack1"  parameterType="java.util.List">
+	    REPLACE  INTO   message_notification  
+	    (order_no,sender_id,send_type,send_content,link_url,create_time,reservation2)  
+	    VALUES  
+	    <foreach collection="list" index="index" item="item"  
+	        separator=",">  
+	        (#{item.order_no},1,#{item.send_type},#{item.send_content},#{item.link_url},#{item.create_time},#{item.reservation2})  
+	    </foreach>  
+	</insert>
+	
+	<insert id="saveBugTrack2"  parameterType="java.util.List">
+	    REPLACE  INTO   message_notification  
+	    (order_no,sender_id,send_type,send_content,link_url,create_time,reservation2)  
+	    VALUES  
+	    <foreach collection="list" index="index" item="item"  
+	        separator=",">  
+	        (#{item.order_no},15,#{item.send_type},#{item.send_content},#{item.link_url},#{item.create_time},#{item.reservation2})  
+	    </foreach>  
+	</insert>
+	
+	
+	
+	<select id="selectTrackInfoByAdmId"  resultType="hashmap">
+	    select 
+	        id,order_no,send_content,link_url,is_read ,reservation3 
+	     from  message_notification
+	     where sender_id = #{id}  and  send_type = 10 
+	     <if test="readFlag !=null">
+	      and  is_read = #{readFlag} 
+	     </if>
+	     <if test="transportcompany!=null">
+	      and link_url  like CONCAT('%',#{transportcompany},'%') 
+	     </if>
+	     order by  is_read
+	     limit #{start} ,40
+	</select>
+	
+	
+	<select id="countSelectTrackInfoByAdmId"  resultType="Integer">
+	   select  count(*) as count  from  message_notification
+	   where sender_id = #{id}  and  send_type = 10 
+	     <if test="readFlag !=null">
+	      and  is_read = #{readFlag} 
+	     </if>
+	     <if test="transportcompany!=null">
+	      and link_url  like CONCAT('%',#{transportcompany},'%') 
+	     </if>
+	</select>
+	
+	
+	<update id="updateBzById">
+	
+	   update  message_notification  set  reservation3 = concat(ifnull(reservation3, ''),#{bz})   where  order_no  = #{expressno}
+	</update>
+	
+	<update id="updateReadFlag">
+	    update  message_notification  set is_read ='Y'  where   order_no =#{expressno}
+	</update>
+	
+</mapper>

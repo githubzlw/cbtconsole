@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>产品编辑日志</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #edit_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #edit_top_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .enter_btn {
+            width: 140px;
+            height: 30px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            var opts = $("#edit-easyui-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/editc/queryGoodsEditLog";
+            getAdminList();
+            praseParamByUrl();
+
+        });
+
+        function praseParamByUrl() {
+            var url = document.location.href;
+            var begin = url.indexOf("?");
+            if (begin != -1) {
+                var paramsStr = url.substring(begin + 1, url.length);
+                if (paramsStr) {
+                    var paramList = paramsStr.split("=");
+                    if (paramList.length == 2) {
+                        $("#query_pid").val(paramList[1]);
+                    }
+                }
+            }
+            doQuery();
+        }
+
+
+        function setDatagrid() {
+            $('#edit-easyui-datagrid').datagrid({
+                title: '产品编辑日志',
+                width: "100%",
+                height: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#edit_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '',//url调用Action方法
+                loadMsg: '数据装载中......',
+                nowrap:false,//自动换行
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function doQuery() {
+            var pid = $("#query_pid").val();
+            if (pid == null || pid == "") {
+                pid = "";
+            }
+            var adminId = $("#query_admin_id").val();
+            $("#edit-easyui-datagrid").datagrid("load", {
+                "pid": pid,
+                "adminId": adminId
+            });
+        }
+
+
+        function formatPid(val, row, index) {
+            return '<a target="_blank" href="https://detail.1688.com/offer/' + val + '.html">' + val + '</a>';
+        }
+
+        function formatWeight(val, row, index) {
+            if (val > 0) {
+                return "重量不合理";
+            } else {
+                return "";
+            }
+        }
+
+        function formatUgly(val, row, index) {
+            if (val > 0) {
+                return "难看";
+            } else {
+                return "";
+            }
+        }
+
+    </script>
+
+</head>
+<body>
+
+
+<div id="edit_top_toolbar" style="padding: 5px; height: auto">
+    <form id="edit_query_form" action="#" onsubmit="return false;">
+			<span> PID: <input type="text" id="query_pid"
+                               style="width: 200px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;<span> 编辑人: <select id="query_admin_id" style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+			</select></span>
+        &nbsp;&nbsp; <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="edit-easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'pid',width:'130px',formatter:formatPid">PID</th>
+        <th data-options="field:'old_title',align:'center',width:'300px'">原标题</th>
+        <th data-options="field:'new_title',align:'center',width:'300px'">新标题</th>
+        <th data-options="field:'weight_flag',align:'center',width:'100px',formatter:formatWeight">重量不合理标注</th>
+        <th data-options="field:'ugly_flag',align:'center',width:'90px',formatter:formatUgly">难看标注</th>
+        <th data-options="field:'admin_name',align:'center',width:'80px'">操作人</th>
+        <th data-options="field:'create_time',align:'center',width:'120px'">操作时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+</body>
+</html>

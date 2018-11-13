@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.CustomGoodsMapper">
+
+
+    <resultMap id="queryGoodsResultMap" type="com.cbt.bean.CustomGoodsPublish">
+        <id column="id" property="id"/>
+        <result column="keyword" property="keyword"/>
+        <result column="catid" property="catid"/>
+        <result column="catid1" property="catid1"/>
+        <result column="pid" property="pid"/>
+        <result column="enname" property="enname"/>
+        <result column="remotpath" property="remotpath"/>
+        <result column="localpath" property="localpath"/>
+        <result column="publishtime" property="publishtime"/>
+        <result column="admin_name" property="admin"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="updatetime" property="updatetime"/>
+        <result column="name" property="name"/>
+        <result column="img" property="img"/>
+        <result column="custom_main_image" property="showMainImage"/>
+        <result column="ali_pid" property="aliGoodsPid"/>
+        <result column="ali_name" property="aliGoodsName"/>
+        <result column="ali_img" property="aliGoodsImgUrl"/>
+        <result column="valid" property="valid"/>
+        <result column="goodsState" property="goodsState"/>
+        <result column="is_edited" property="isEdited"/>
+        <result column="isBenchmark" property="isBenchmark"/>
+        <result column="is_abnormal" property="isAbnormal"/>
+        <result column="bm_flag" property="bmFlag"/>
+        <result column="source_pro_flag" property="sourceProFlag"/>
+        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="priorityFlag" property="priorityFlag"/>
+        <result column="is_add_car_flag" property="addCarFlag"/>
+        <result column="source_used_flag" property="sourceUsedFlag"/>
+        <result column="ocr_match_flag" property="ocrMatchFlag"/>
+        <result column="rebid_flag" property="rebidFlag"/>
+        <result column="infringing_flag" property="infringingFlag"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="unsellableReason" property="unsellAbleReason"/>
+        <result column="off_reason" property="offReason"/>
+    </resultMap>
+
+
+    <resultMap id="editGoodsResultMap" type="com.cbt.bean.CustomGoodsPublish">
+        <result column="admin_name" property="admin"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="wholesale_price" property="wholesalePrice"/>
+        <result column="endetail" property="endetail"/>
+        <result column="eninfo" property="eninfo"/>
+        <result column="feeprice" property="feeprice"/>
+        <result column="fprice" property="fprice"/>
+        <result column="keyword" property="keyword"/>
+        <result column="localpath" property="localpath"/>
+        <result column="enname" property="enname"/>
+        <result column="range_price" property="rangePrice"/>
+        <result column="revise_weight" property="reviseWeight"/>
+        <result column="final_weight" property="finalWeight"/>
+        <result column="pid" property="pid"/>
+        <result column="price" property="price"/>
+        <result column="img" property="img"/>
+        <result column="custom_main_image" property="showMainImage"/>
+        <result column="sku" property="sku"/>
+        <result column="entype" property="entype"/>
+        <result column="remotpath" property="remotpath"/>
+        <result column="ocrSizeInfo1" property="ocrSizeInfo1"/>
+        <result column="ocrSizeInfo2" property="ocrSizeInfo2"/>
+        <result column="ocrSizeInfo3" property="ocrSizeInfo3"/>
+        <result column="wprice" property="wprice"/>
+        <result column="ali_pid" property="aliGoodsPid"/>
+        <result column="ali_price" property="aliGoodsPrice"/>
+        <result column="updatetime" property="updatetime"/>
+        <result column="valid" property="valid"/>
+        <result column="goodsState" property="goodsState"/>
+        <result column="is_edited" property="isEdited"/>
+        <result column="isBenchmark" property="isBenchmark"/>
+        <result column="is_abnormal" property="isAbnormal"/>
+        <result column="bm_flag" property="bmFlag"/>
+        <result column="source_pro_flag" property="sourceProFlag"/>
+        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="priorityFlag" property="priorityFlag"/>
+        <result column="is_add_car_flag" property="addCarFlag"/>
+        <result column="source_used_flag" property="sourceUsedFlag"/>
+        <result column="ocr_match_flag" property="ocrMatchFlag"/>
+        <result column="rebid_flag" property="rebidFlag"/>
+        <result column="infringing_flag" property="infringingFlag"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="publish_time" property="publishtime"/>
+        <result column="catid1" property="catid1"/>
+        <result column="infringing_flag" property="infringingFlag"/>
+        <result column="sellunit" property="sellUnit"/>
+        <result column="matchSource" property="matchSource"/>
+        <result column="edit_profit" property="editProfit"/>
+        <result column="lock_profit" property="lockProfit"/>
+        <result column="unsellableReason" property="unsellAbleReason"/>
+        <result column="off_reason" property="offReason"/>
+        <result column="valid" property="valid"/>
+    </resultMap>
+
+    <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
+        <id column="id" property="id"/>
+        <result column="cid" property="cid"/>
+        <result column="path" property="path"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="total" property="total"/>
+        <result column="lv" property="lv"/>
+    </resultMap>
+
+    <resultMap id="goodsEditResultMap" type="com.importExpress.pojo.GoodsEditBean">
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="old_title" property="old_title"/>
+        <result column="new_title" property="new_title"/>
+        <result column="admin_id" property="admin_id"/>
+        <result column="admin_name" property="admin_name"/>
+        <result column="weight_flag" property="weight_flag"/>
+        <result column="ugly_flag" property="ugly_flag"/>
+        <result column="benchmarking_flag" property="benchmarking_flag"/>
+        <result column="describe_good_flag" property="describe_good_flag"/>
+        <result column="never_off_flag" property="never_off_flag"/>
+        <result column="publish_flag" property="publish_flag"/>
+        <result column="create_time" property="create_time"/>
+        <result column="off_time" property="off_time"/>
+        <result column="publish_time" property="publish_time"/>
+        <result column="price_1688" property="price_1688"/>
+        <result column="search_num" property="search_num"/>
+        <result column="click_num" property="click_num"/>
+    </resultMap>
+
+
+    <resultMap id="goodsParseResultMap" type="com.importExpress.pojo.GoodsParseBean">
+        <result column="pid" property="pid"/>
+        <result column="ali_pid" property="ali_pid"/>
+        <result column="ali_price" property="ali_price"/>
+        <result column="ali_weight" property="ali_weight"/>
+        <result column="wholesale_price" property="wholesale_price"/>
+        <result column="weight" property="weight_1688"/>
+    </resultMap>
+
+    <insert id="insertPidIsEdited">
+        insert into custom_goods_edit(pid,shop_id,admin_id)
+        values(#{pid},#{shopId},#{adminId})
+    </insert>
+
+    <select id="checkIsEditedByPid" resultType="java.lang.Integer">
+        select count(0) from custom_goods_edit where pid = #{pid}
+    </select>
+
+    <update id="updatePidIsEdited" parameterType="com.importExpress.pojo.GoodsEditBean">
+        update custom_goods_edit
+        set admin_id =#{admin_id},update_count = update_count + 1
+        <if test="weight_flag > 0">
+            ,weight_flag = #{weight_flag}
+        </if>
+        <if test="ugly_flag > 0">
+            ,ugly_flag = #{ugly_flag}
+        </if>
+        <if test="benchmarking_flag > 0">
+            ,benchmarking_flag = #{benchmarking_flag}
+        </if>
+        <if test="describe_good_flag > 0">
+            ,describe_good_flag = #{describe_good_flag}
+        </if>
+        <if test="uniqueness_flag > 0">
+            ,uniqueness_flag = #{uniqueness_flag}
+        </if>
+        <if test="never_off_flag > 0">
+            ,never_off_flag = #{never_off_flag}
+        </if>
+        <if test="publish_flag > 0">
+            ,publish_flag = #{publish_flag}
+        </if>
+        <if test="is_edited > 0">
+            ,is_edited = #{is_edited}
+        </if>
+        <if test="publish_flag > 0">
+            ,publish_time = now()
+        </if>
+        <if test="off_flag > 0">
+            ,off_time = now()
+        </if>
+        <if test="weight_is_edit > 0">
+            ,weight_is_edit = #{weight_is_edit}
+        </if>
+        where pid = #{pid}
+    </update>
+
+    <select id="queryTypeinGoodsTotal" resultType="java.lang.Integer">
+        select count(0) from custom_benchmark_ready where admin_id = #{adminId}
+        <if test="valid == 0">
+            and valid = 1
+        </if>
+        <if test="valid > 0">
+            and valid = #{valid}
+        </if>
+    </select>
+
+    <select id="queryOnlineGoodsTotal" resultType="java.lang.Integer">
+        select count(0) from custom_benchmark_ready where 1=1
+        <if test="valid == 0">
+            and valid = 1
+        </if>
+        <if test="valid > 0">
+            and valid = #{valid}
+        </if>
+    </select>
+
+    <select id="queryIsEditOnlineGoodsTotal" resultType="java.lang.Integer">
+        select count(0) from custom_goods_edit cge,custom_benchmark_ready cbr
+        where cge.pid = cbr.pid and cge.admin_id = #{adminId}
+        and cge.is_edited > 0
+        <if test="valid == 0">
+            and cbr.valid = 1
+        </if>
+        <if test="valid > 0">
+            and cbr.valid = #{valid}
+        </if>
+    </select>
+
+    <update id="saveBenchmarking">
+        update custom_benchmark_ready set ali_pid = #{aliPid},ali_price = #{aliPrice},matchSource=4
+        where pid = #{pid}
+    </update>
+
+    <!-- List<String> queryStaticizeList(@Param("catid") String catid); -->
+    <select id="queryStaticizeList" resultType="String">
+        SELECT CONCAT(pid, '@', create_time, '@', item_static_file) url
+        FROM staticize_goods_html_sel
+        <if test="catid != 0">
+            WHERE catid1 IN (
+            SELECT
+            category_id
+            FROM
+            1688_category
+            WHERE
+            find_in_set(#{catid}, path)
+            )
+        </if>
+        <if test="catid == 0">
+            WHERE catid1 is not null
+        </if>
+    </select>
+
+    <insert id="insertIntoGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean">
+        insert into custom_goods_edited_log(pid,old_title,new_title,admin_id,weight_flag,ugly_flag,
+          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag)
+        values(#{pid},#{old_title},#{new_title},#{admin_id},#{weight_flag},#{ugly_flag},
+          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag})
+    </insert>
+
+    <select id="queryGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean" resultMap="goodsEditResultMap">
+        select a.id,a.pid,a.old_title,a.new_title,a.admin_id,b.admName as admin_name,a.weight_flag,a.ugly_flag,
+        a.benchmarking_flag,a.describe_good_flag,a.never_off_flag,a.publish_flag,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        from custom_goods_edited_log a left join admuser b
+        on a.admin_id = b.id
+        where 1=1
+        <if test="pid != null">
+            and pid =#{pid}
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id =#{admin_id}
+        </if>
+        order by create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryGoodsEditBeanCount" parameterType="com.importExpress.pojo.GoodsEditBean" resultType="java.lang.Integer">
+        select count(0)
+        from custom_goods_edited_log a left join admuser b
+        on a.admin_id = b.id
+        where 1=1
+        <if test="pid != null">
+            and pid =#{pid}
+        </if>
+        <if test="admin_id > 0">
+            and a.admin_id =#{admin_id}
+        </if>
+    </select>
+
+    <select id="queryForListByParam" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
+        select
+        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
+        ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
+        cbu.updatetime,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
+        ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,
+        cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        where 1=1
+        <if test="catid !=null">
+            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
+        </if>
+        <if test="sttime !=null">
+            and cge.publish_time &gt;= #{sttime}
+        </if>
+        <if test="edtime !=null">
+            and cge.publish_time &lt;= #{edtime}
+        </if>
+        <if test="state == 2">
+            and (cbu.valid = 0 or cbu.valid = 2)
+        </if>
+        <if test="state == 3 or state == 5">
+            and cbu.goodsstate = #{state}
+        </if>
+        <if test="state == 4">
+            and cbu.valid = 1
+        </if>
+        <if test="state == 6">
+            and cbu.valid = 2
+        </if>
+        <if test="adminId > 0">
+            and cge.admin_id = #{adminId}
+        </if>
+        <if test="isEdited > -1">
+            and cge.is_edited = #{isEdited}
+        </if>
+        <if test="isAbnormal > -1">
+            and cge.is_abnormal = #{isAbnormal}
+        </if>
+        <if test="isBenchmark == 1">
+            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+        </if>
+        <if test="isBenchmark > -1 and isBenchmark != 1">
+            and cbu.isBenchmark = #{isBenchmark}
+        </if>
+        <if test="weightCheck > -1">
+            and cge.weight_check = #{weightCheck}
+        </if>
+        <if test="bmFlag > 0">
+            and cbu.bm_flag = #{bmFlag}
+        </if>
+        <if test="sourceProFlag > 0">
+            and cbu.source_pro_flag = #{sourceProFlag}
+        </if>
+        <if test="soldFlag > 0">
+            and cbu.is_sold_flag = #{soldFlag}
+        </if>
+        <if test="priorityFlag > 0">
+            and cbu.priority_flag = #{priorityFlag}
+        </if>
+        <if test="addCarFlag > 0">
+            and cbu.is_add_car_flag = #{addCarFlag}
+        </if>
+        <if test="sourceUsedFlag > -1">
+            and cbu.source_used_flag = #{sourceUsedFlag}
+        </if>
+        <if test="ocrMatchFlag > 0">
+            and cbu.ocr_match_flag = #{ocrMatchFlag}
+        </if>
+        <if test="rebidFlag > 0">
+            and cge.rebid_flag = #{rebidFlag}
+        </if>
+        <if test="infringingFlag > -1">
+            and cge.infringing_flag = #{infringingFlag}
+        </if>
+
+        <if test="aliWeightBegin > 0">
+            and cbu.ali_price &gt;= #{aliWeightBegin}
+        </if>
+        <if test="aliWeightEnd > 0">
+            and cbu.ali_price &lt;= #{aliWeightEnd}
+        </if>
+        <if test="onlineTime != null">
+            and cge.publish_time &gt;= #{onlineTime}
+        </if>
+        <if test="offlineTime != null">
+            and cge.off_time &gt;= #{offlineTime}
+        </if>
+        <if test="editTime != null">
+            and cge.update_time &gt;= #{editTime}
+        </if>
+        <if test="weight1688Begin > 0">
+            and cbu.weight &gt;= #{weight1688Begin}
+        </if>
+        <if test="weight1688End > 0">
+            and cbu.weight &lt;= #{weight1688End}
+        </if>
+        <if test="price1688Begin > 0">
+            and cge.price_1688 &gt;= #{price1688Begin}
+        </if>
+        <if test="price1688End > 0">
+            and cge.price_1688 &lt;= #{price1688End}
+        </if>
+        <if test="isSort == 3">
+            and cge.click_num > 0
+        </if>
+
+        <if test="isSort == 1">
+            order by cge.search_num desc
+        </if>
+        <if test="isSort == 2">
+            order by cge.click_num desc
+        </if>
+        <if test="isSort == 3">
+            order by cge.click_num desc
+        </if>
+
+        limit #{page},40
+    </select>
+
+    <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
+        select count(0) from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        where 1=1
+        <if test="catid !=null">
+            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
+        </if>
+        <if test="sttime !=null">
+            and cge.publish_time &gt;= #{sttime}
+        </if>
+        <if test="edtime !=null">
+            and cge.publish_time &lt;= #{edtime}
+        </if>
+        <if test="state == 2">
+            and (cbu.valid = 0 or cbu.valid = 2)
+        </if>
+        <if test="state == 3 or state == 5">
+            and cbu.goodsstate = #{state}
+        </if>
+        <if test="state == 4">
+            and cbu.valid = 1
+        </if>
+        <if test="state == 6">
+            and cbu.valid = 2
+        </if>
+        <if test="adminId > 0">
+            and cge.admin_id = #{adminId}
+        </if>
+        <if test="isEdited > -1">
+            and cge.is_edited = #{isEdited}
+        </if>
+        <if test="isAbnormal > -1">
+            and cge.is_abnormal = #{isAbnormal}
+        </if>
+        <if test="isBenchmark == 1">
+            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+        </if>
+        <if test="isBenchmark > -1 and isBenchmark != 1">
+            and cbu.isBenchmark = #{isBenchmark}
+        </if>
+        <if test="weightCheck > -1">
+            and cge.weight_check = #{weightCheck}
+        </if>
+        <if test="bmFlag > 0">
+            and cbu.bm_flag = #{bmFlag}
+        </if>
+        <if test="sourceProFlag > 0">
+            and cbu.source_pro_flag = #{sourceProFlag}
+        </if>
+        <if test="soldFlag > 0">
+            and cbu.is_sold_flag = #{soldFlag}
+        </if>
+        <if test="priorityFlag > 0">
+            and cbu.priority_flag = #{priorityFlag}
+        </if>
+        <if test="addCarFlag > 0">
+            and cbu.is_add_car_flag = #{addCarFlag}
+        </if>
+        <if test="sourceUsedFlag > -1">
+            and cbu.source_used_flag = #{sourceUsedFlag}
+        </if>
+        <if test="ocrMatchFlag > 0">
+            and cbu.ocr_match_flag = #{ocrMatchFlag}
+        </if>
+        <if test="rebidFlag > 0">
+            and cge.rebid_flag = #{rebidFlag}
+        </if>
+        <if test="infringingFlag > -1">
+            and cge.infringing_flag = #{infringingFlag}
+        </if>
+        <if test="aliWeightBegin > 0">
+            and cbu.ali_price &gt;= #{aliWeightBegin}
+        </if>
+        <if test="aliWeightEnd > 0">
+            and cbu.ali_price &lt;= #{aliWeightEnd}
+        </if>
+        <if test="onlineTime != null">
+            and cge.publish_time &gt;= #{onlineTime}
+        </if>
+        <if test="offlineTime != null">
+            and cge.off_time &gt;= #{offlineTime}
+        </if>
+        <if test="editTime != null">
+            and cge.update_time &gt;= #{editTime}
+        </if>
+        <if test="weight1688Begin > 0">
+            and cbu.weight &gt;= #{weight1688Begin}
+        </if>
+        <if test="weight1688End > 0">
+            and cbu.weight &lt;= #{weight1688End}
+        </if>
+        <if test="price1688Begin > 0">
+            and cge.price_1688 &gt;= #{price1688Begin}
+        </if>
+        <if test="price1688End > 0">
+            and cge.price_1688 &lt;= #{price1688End}
+        </if>
+        <if test="isSort == 3">
+            and cge.click_num > 0
+        </if>
+    </select>
+
+    <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
+        select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,
+        path,lv from 1688_category where lv > 0) cat1688 left join
+        (select catid1,count(0) as total from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        where 1=1
+        <if test="catid !=null">
+            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
+        </if>
+        <if test="sttime !=null">
+            and cge.publish_time &gt;= #{sttime}
+        </if>
+        <if test="edtime !=null">
+            and cge.publish_time &lt;= #{edtime}
+        </if>
+        <if test="state == 2">
+            and (cbu.valid = 0 or cbu.valid = 2)
+        </if>
+        <if test="state == 3 or state == 5">
+            and cbu.goodsstate = #{state}
+        </if>
+        <if test="state == 4">
+            and cbu.valid = 1
+        </if>
+        <if test="state == 6">
+            and cbu.valid = 2
+        </if>
+        <if test="adminId > 0">
+            and cge.admin_id = #{adminId}
+        </if>
+        <if test="isEdited > -1">
+            and cge.is_edited = #{isEdited}
+        </if>
+        <if test="isAbnormal > -1">
+            and cge.is_abnormal = #{isAbnormal}
+        </if>
+        <if test="isBenchmark == 1">
+            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+        </if>
+        <if test="isBenchmark > -1 and isBenchmark != 1">
+            and cbu.isBenchmark = #{isBenchmark}
+        </if>
+        <if test="weightCheck > -1">
+            and cge.weight_check = #{weightCheck}
+        </if>
+        <if test="bmFlag > 0">
+            and cbu.bm_flag = #{bmFlag}
+        </if>
+        <if test="sourceProFlag > 0">
+            and cbu.source_pro_flag = #{sourceProFlag}
+        </if>
+        <if test="soldFlag > 0">
+            and cbu.is_sold_flag = #{soldFlag}
+        </if>
+        <if test="priorityFlag > 0">
+            and cbu.priority_flag = #{priorityFlag}
+        </if>
+        <if test="addCarFlag > 0">
+            and cbu.is_add_car_flag = #{addCarFlag}
+        </if>
+        <if test="sourceUsedFlag > -1">
+            and cbu.source_used_flag = #{sourceUsedFlag}
+        </if>
+        <if test="ocrMatchFlag > 0">
+            and cbu.ocr_match_flag = #{ocrMatchFlag}
+        </if>
+        <if test="rebidFlag > 0">
+            and cge.rebid_flag = #{rebidFlag}
+        </if>
+        <if test="infringingFlag > -1">
+            and cge.infringing_flag = #{infringingFlag}
+        </if>
+        <if test="aliWeightBegin > 0">
+            and cbu.ali_price &gt;= #{aliWeightBegin}
+        </if>
+        <if test="aliWeightEnd > 0">
+            and cbu.ali_price &lt;= #{aliWeightEnd}
+        </if>
+        <if test="onlineTime != null">
+            and cge.publish_time &gt;= #{onlineTime}
+        </if>
+        <if test="offlineTime != null">
+            and cge.off_time &gt;= #{offlineTime}
+        </if>
+        <if test="editTime != null">
+            and cge.update_time &gt;= #{editTime}
+        </if>
+        <if test="weight1688Begin > 0">
+            and cbu.weight &gt;= #{weight1688Begin}
+        </if>
+        <if test="weight1688End > 0">
+            and cbu.weight &lt;= #{weight1688End}
+        </if>
+        <if test="price1688Begin > 0">
+            and cge.price_1688 &gt;= #{price1688Begin}
+        </if>
+        <if test="price1688End > 0">
+            and cge.price_1688 &lt;= #{price1688End}
+        </if>
+        group by catid1
+        ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
+    </select>
+
+
+    <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
+        select cbu.pid,cbu.enname,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,
+        cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
+        cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
+        cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.updatetime,cbu.unsellableReason,
+        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,
+        ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
+        cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
+        ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
+        ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
+        ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
+        left join needfindsizechart cbn on cbn.pid=cbu.pid
+        where cbu.pid = #{pid}
+    </select>
+
+    <select id="queryMaxIdFromCustomGoods" resultType="java.lang.Integer">
+        select max(id) from custom_benchmark_ready where 1=1
+    </select>
+
+    <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
+        select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight
+        from custom_benchmark_ready
+        where id &gt;= #{minId} and id &lt;= #{maxId}
+    </select>
+
+    <update id="updateCustomGoodsStatistic" parameterType="com.importExpress.pojo.GoodsParseBean">
+        update custom_goods_edit a,custom_benchmark_ready b
+        set a.price_1688 = #{price_1688},
+        b.weight = #{weight_1688}
+        <if test="aliUpdate == 1">
+            ,b.ali_weight = #{ali_weight}
+        </if>
+        <if test="aliUpdate == 2">
+            ,b.ali_weight = #{ali_weight}
+            ,b.ali_price = #{ali_price}
+        </if>
+        where a.pid = b.pid and a.pid = #{pid}
+    </update>
+
+    <select id="checkIsExistsGoods" resultType="java.lang.Integer">
+        select count(0) from custom_goods_edit where pid = #{pid}
+    </select>
+
+    <insert id="insertCustomGoodsStatistic" parameterType="com.importExpress.pojo.GoodsParseBean">
+        insert into custom_goods_edit(pid)
+        values(#{pid})
+    </insert>
+
+    <update id="updateGoodsSearchNum">
+        update custom_goods_edit set search_num = (select count(0) from searchproductlog where MATCH(productShowIdList) AGAINST(#{pid}))
+        where pid = #{pid}
+    </update>
+
+    <update id="updateGoodsClickNum">
+        update custom_goods_edit a,(select pid,count(pid) as total from searchclickproductlog GROUP BY pid) b
+        set a.click_num = b.total where a.pid = b.pid
+    </update>
+
+
+    <update id="updateGoodsWeightByPid">
+        update custom_goods_edit a,custom_benchmark_ready b
+        set b.revise_weight=#{weight},b.final_weight=#{weight},a.weight_is_edit = 1
+        where a.pid = b.pid and  b.pid = #{pid}
+    </update>
+
+    <update id="updateGoodsDetailsByInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_goods_edit a,custom_benchmark_ready b
+        set b.enname = #{enname},b.img = #{img},b.endetail = #{endetail},
+        b.eninfo=#{eninfo},b.goodsstate=#{goodsState},b.keyword=#{keyword},a.admin_id = #{adminId},
+        bm_flag=1,a.update_count = a.update_count + 1
+        <if test="rangePrice != null">
+            ,b.range_price=#{rangePrice},b.sku=#{sku}
+        </if>
+        <if test="feeprice != null">
+            ,b.price=#{price},b.feeprice=#{feeprice}
+        </if>
+        <if test="wprice != null">
+            ,b.price=#{price},b.wprice=#{wprice}
+        </if>
+        <if test="type != null">
+            ,b.entype=#{type}
+        </if>
+        <if test="sellUnit != null">
+            ,b.sellunit=#{sellUnit}
+        </if>
+        where a.pid = b.pid and b.pid = #{pid}
+    </update>
+
+    <update id="editAndLockProfit">
+        update custom_goods_edit
+        set update_count = update_count + 1
+        <if test="type == 0">
+            ,edit_profit = #{editProfit}
+        </if>
+        <if test="type == 1">
+            ,lock_profit = 1
+        </if>
+        where pid = #{pid}
+    </update>
+
+</mapper>

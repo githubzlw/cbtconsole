@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.GeneralReportMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.GeneralReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="breport_id" property="breportId" jdbcType="INTEGER" />
+    <result column="breport_name" property="breportName" jdbcType="VARCHAR" />
+    <result column="report_year" property="reportYear" jdbcType="VARCHAR" />
+    <result column="report_month" property="reportMonth" jdbcType="VARCHAR" />
+    <result column="report_week" property="reportWeek" jdbcType="VARCHAR" />
+    <result column="report_day" property="reportDay" jdbcType="VARCHAR" />
+    <result column="create_opertor" property="createOpertor" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, breport_id, breport_name, report_year, report_month, report_week, report_day, 
+    create_opertor, create_date
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.pojo.GeneralReportExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from general_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from general_report
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from general_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.pojo.GeneralReportExample" >
+    delete from general_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.pojo.GeneralReport" >
+    insert into general_report ( breport_id, breport_name, 
+      report_year, report_month, report_week, 
+      report_day, create_opertor, create_date
+      )
+    values (#{breportId,jdbcType=INTEGER}, #{breportName,jdbcType=VARCHAR}, 
+      #{reportYear,jdbcType=VARCHAR}, #{reportMonth,jdbcType=VARCHAR}, #{reportWeek,jdbcType=VARCHAR}, 
+      #{reportDay,jdbcType=VARCHAR}, #{createOpertor,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective"  useGeneratedKeys="true" keyProperty="id"
+    parameterType="com.cbt.pojo.GeneralReport" >
+    insert into general_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="breportId != null" >
+        breport_id,
+      </if>
+      <if test="breportName != null" >
+        breport_name,
+      </if>
+      <if test="reportYear != null" >
+        report_year,
+      </if>
+      <if test="reportMonth != null" >
+        report_month,
+      </if>
+      <if test="reportWeek != null" >
+        report_week,
+      </if>
+      <if test="reportDay != null" >
+        report_day,
+      </if>
+      <if test="createOpertor != null" >
+        create_opertor,
+      </if>
+      <if test="1 != 2" >
+        create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="breportId != null" >
+        #{breportId,jdbcType=INTEGER},
+      </if>
+      <if test="breportName != null" >
+        #{breportName,jdbcType=VARCHAR},
+      </if>
+      <if test="reportYear != null" >
+        #{reportYear,jdbcType=VARCHAR},
+      </if>
+      <if test="reportMonth != null" >
+        #{reportMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="reportWeek != null" >
+        #{reportWeek,jdbcType=VARCHAR},
+      </if>
+      <if test="reportDay != null" >
+        #{reportDay,jdbcType=VARCHAR},
+      </if>
+      <if test="createOpertor != null" >
+        #{createOpertor,jdbcType=VARCHAR},
+      </if>
+      <if test="1 != 2" >
+       CURRENT_TIMESTAMP(),
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <select id="countByExample" parameterType="com.cbt.pojo.GeneralReportExample" resultType="java.lang.Integer" >
+    select count(*) from general_report
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update general_report
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.breportId != null" >
+        breport_id = #{record.breportId,jdbcType=INTEGER},
+      </if>
+      <if test="record.breportName != null" >
+        breport_name = #{record.breportName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reportYear != null" >
+        report_year = #{record.reportYear,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reportMonth != null" >
+        report_month = #{record.reportMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reportWeek != null" >
+        report_week = #{record.reportWeek,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reportDay != null" >
+        report_day = #{record.reportDay,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createOpertor != null" >
+        create_opertor = #{record.createOpertor,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createDate != null" >
+        create_date = #{record.createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update general_report
+    set id = #{record.id,jdbcType=INTEGER},
+      breport_id = #{record.breportId,jdbcType=INTEGER},
+      breport_name = #{record.breportName,jdbcType=VARCHAR},
+      report_year = #{record.reportYear,jdbcType=VARCHAR},
+      report_month = #{record.reportMonth,jdbcType=VARCHAR},
+      report_week = #{record.reportWeek,jdbcType=VARCHAR},
+      report_day = #{record.reportDay,jdbcType=VARCHAR},
+      create_opertor = #{record.createOpertor,jdbcType=VARCHAR},
+      create_date = #{record.createDate,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.GeneralReport" >
+    update general_report
+    <set >
+      <if test="breportId != null" >
+        breport_id = #{breportId,jdbcType=INTEGER},
+      </if>
+      <if test="breportName != null" >
+        breport_name = #{breportName,jdbcType=VARCHAR},
+      </if>
+      <if test="reportYear != null" >
+        report_year = #{reportYear,jdbcType=VARCHAR},
+      </if>
+      <if test="reportMonth != null" >
+        report_month = #{reportMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="reportWeek != null" >
+        report_week = #{reportWeek,jdbcType=VARCHAR},
+      </if>
+      <if test="reportDay != null" >
+        report_day = #{reportDay,jdbcType=VARCHAR},
+      </if>
+      <if test="createOpertor != null" >
+        create_opertor = #{createOpertor,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.pojo.GeneralReport" >
+    update general_report
+    set breport_id = #{breportId,jdbcType=INTEGER},
+      breport_name = #{breportName,jdbcType=VARCHAR},
+      report_year = #{reportYear,jdbcType=VARCHAR},
+      report_month = #{reportMonth,jdbcType=VARCHAR},
+      report_week = #{reportWeek,jdbcType=VARCHAR},
+      report_day = #{reportDay,jdbcType=VARCHAR},
+      create_opertor = #{createOpertor,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectBySelective" parameterType="com.cbt.pojo.GeneralReport"  resultType="com.cbt.pojo.GeneralReport">
+ 	
+    select 
+    <include refid="Base_Column_List" />
+    from general_report
+    where 1=1
+    <if test="breportId != null" >
+        and breport_id = #{breportId,jdbcType=INTEGER}
+    </if>
+	<if test="reportYear != null" >
+        and report_year = #{reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="reportMonth != null" >
+        and report_month = #{reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="reportWeek != null" >
+        and report_week = #{reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="reportDay != null" >
+        and report_day = #{reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="reportDay == null" >
+        and report_day is null
+    </if>
+  </select>
+  
+    <select id="selectExistExport" parameterType="com.cbt.pojo.GeneralReport" resultType="java.lang.Integer">
+  	select count(*) from general_report where report_year = #{reportYear,jdbcType=VARCHAR} and report_month = #{reportMonth,jdbcType=VARCHAR}
+  </select>
+  
+      <delete id="deleteReportDetailOrder" parameterType="com.cbt.pojo.GeneralReport" >
+    	delete from report_detail_order   where genral_report_id= 
+    	( SELECT id from general_report where report_year=#{reportYear,jdbcType=VARCHAR} and report_month =#{reportMonth,jdbcType=VARCHAR} and breport_id=#{breportId,jdbcType=INTEGER} )
+  </delete>
+  <insert id="insertOrderReport">
+    delete from order_classification_report where left(create_time,7)=#{time};
+    INSERT INTO order_classification_report(orderid,create_time,expressno,buyAmount,salesAmount,avgSalePrice,salesCount,buyCount,actualFreight,estimatedWeight,actualWeight,shippingType,proLossAmount,proLoss)
+    SELECT c.*,c.salesAmount-c.buyAmount-c.actualFreight AS proLossAmount,CAST((c.salesAmount-c.buyAmount-c.actualFreight)/c.salesAmount*100 AS DECIMAL(10,2)) AS proLoss FROM (
+    SELECT oi.order_no,oi.create_time,
+    IFNULL(GROUP_CONCAT(DISTINCT sp.expressno),'') AS expressno,
+    CAST(SUM(IFNULL(ops.goods_p_price*ops.buycount,0.00)) AS DECIMAL(10,2)) AS buyAmount,
+    CAST(SUM(od.goodsprice*od.yourorder*6.3) AS DECIMAL(10,2)) AS salesAmount,
+    CAST(SUM(od.goodsprice*od.yourorder*6.3)/SUM(od.yourorder) AS DECIMAL(10,2)) AS avgPrice,
+    SUM(od.yourorder) AS salesCount,SUM(ops.buycount) AS buyCount,IFNULL(s.totalprice,0.00) AS actualFreight,
+    IFNULL(sp.sweight,0.00) AS estimatedWeight,IFNULL(s.realWeight,0.00) AS actualWeight,
+    IF(LENGTH(sp.remarks)>22,'合并出货','正常出货') AS shippingType
+    FROM orderinfo oi
+    INNER JOIN USER u ON oi.user_id=u.id
+    INNER JOIN admin_r_user a ON u.id=a.userid
+    INNER JOIN order_details od ON od.orderid=oi.order_no AND od.state&lt;2
+    LEFT JOIN shipping_package sp ON sp.orderid=oi.order_no OR LOCATE(sp.remarks,oi.order_no)
+    LEFT JOIN shipment s ON sp.expressno=s.orderNo
+    LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+    WHERE a.admName&lt;>'testAdm' AND LEFT(oi.create_time,7)=#{time} AND LENGTH(oi.order_no)&lt;=18
+    AND oi.state>0 AND oi.state&lt;6
+    GROUP BY oi.order_no
+    ) c
+  </insert>
+</mapper>

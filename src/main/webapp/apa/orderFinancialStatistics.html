@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单及销售额对账报表</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+</head>
+<style type="text/css">
+.datagrid-htable {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 30px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+#ofs_query_form {
+	font-size: 18px;
+}
+
+.top_div_style span {
+	font-size: 16px !important;
+}
+
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+#ofs_rYear, #ofs_rMonth, .but_color {
+	padding: 5px;
+	font-size: 14px
+}
+
+#ofs_rYear, #ofs_rMonth {
+	margin-right: 18px
+}
+
+#ofs_top_toolbar {
+	padding: 20px 28px !important;
+}
+
+.datagrid-header .datagrid-cell span, .datagrid-cell,
+	.datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 14px;
+}
+</style>
+<script type="text/javascript">
+	$(function() {
+		setDatagrid();
+		var opts = $("#ofs_easyui-datagrid").datagrid("options");
+		opts.url = "/cbtconsole/basicStatistical/orderFinancial";
+	});
+	function setDatagrid() {
+		$('#ofs_easyui-datagrid').datagrid({
+			title : '订单及销售额对账报表(金额单位：USD，时间：电商网站系统时间)',
+			width : "100%",
+			fit : true,//自动补全 
+			striped : true,//设置为true将交替显示行背景。
+			collapsible : true,//显示可折叠按钮
+			toolbar : "#ofs_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+			url : '',//url调用Action方法
+			loadMsg : '数据装载中......',
+			singleSelect : true,//为true时只能选择单行
+			fitColumns : true,//允许表格自动缩放，以适应父容器
+			rownumbers : true,
+			style : {
+				padding : '8 8 10 8'
+			},
+			onLoadError : function() {
+				$.message.alert("提示信息", "获取数据信息失败");
+				return;
+			},
+			onLoadSuccess : function(data) {
+				if (!data.success) {
+					showMessage(data.message);
+				}
+			}
+		});
+	}
+
+	function doOfsQuery() {
+		var year = $("#ofs_rYear").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
+			return;
+		}
+		var month = $("#ofs_rMonth").val();
+		$("#ofs_easyui-datagrid").datagrid("load", {
+			"year" : year,
+			"month" : month
+		});
+	}
+
+	function doOfsReset() {
+		$("#ofs_query_form")[0].reset();
+	}
+
+	function exportOfsExcel() {
+		var year = $("#ofs_rYear").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
+			return;
+		}
+		var month = $("#ofs_rMonth").val();
+		window.location.href = "/cbtconsole/basicStatistical/exportOrderFinancialExcel?year="
+				+ year + "&month=" + month;
+		// window.location.href = "/cbtconsole/basicStatistical/exportPayPalRevenueExcel";
+		//window.location.href = "/cbtconsole/basicStatistical/exportTotalRefundExcel";
+
+	}
+
+	function showMessage(message) {
+		$.messager.show({
+			title : '提醒',
+			msg : message,
+			timeout : 2000,
+			showType : 'slide',
+			style : {
+				right : '',
+				top : ($(window).height() * 0.15),
+				bottom : ''
+			}
+		});
+	}
+
+	function doParentOpen(tabName, url) {
+		var year = $("#ofs_rYear").val();
+		var month = $("#ofs_rMonth").val();
+		if (year == null || year == "" || year == "-1") {
+			showMessage("请选择年份");
+			return;
+		} else if (month == null || month == "" || month == "-1") {
+			showMessage("请选择月份");
+			return;
+		}
+		parent.openToUrl(tabName, url + "?year=" + year + "&month=" + month
+				+ "&redom=0");
+	}
+
+
+	function openNewWindow(url) {
+		var year = $("#ofs_rYear").val();
+		var month = $("#ofs_rMonth").val();
+		if (year == null || year == "" || year == "-1") {
+			showMessage("请选择年份");
+			return;
+		} else if (month == null || month == "" || month == "-1") {
+			showMessage("请选择月份");
+			return;
+		}
+		window.open(url + "?year=" + year + "&month=" + Number(month));
+	}
+
+	function doOfsSelectChange() {
+		var mydate = new Date();
+		var rYear = mydate.getFullYear();
+		var rMonth = mydate.getMonth();
+		var monthop = "<option  value=''>选择月份</option>";
+		$('#ofs_rMonth').empty();
+		var selectYear = $('#ofs_rYear').val();
+		if (selectYear == rYear) {
+			for (var i = 1; i <= rMonth + 1; i++) {
+				if(i < 10){
+					monthop += "<option value='0"+i+"'>0" + i + "</oiption>";
+				}else{
+					monthop += "<option value='"+i+"'>" + i + "</oiption>";
+				}
+			}
+			$('#ofs_rMonth').append(monthop);
+		} else if (selectYear < rYear) {
+			for (var i = 1; i <= 12; i++) {
+				if(i < 10){
+					monthop += "<option value='0"+i+"'>0" + i + "</oiption>";
+				}else{
+					monthop += "<option value='"+i+"'>" + i + "</oiption>";
+				}	
+			}
+			$('#ofs_rMonth').append(monthop);
+		} else if (selectYear > rYear) {
+			$('#ofs_rYear').val(rYear);
+			for (var i = 1; i <= rMonth + 1; i++) {
+				if(i < 10){
+					monthop += "<option value='0"+i+"'>0" + i + "</oiption>";
+				}else{
+					monthop += "<option value='"+i+"'>" + i + "</oiption>";
+				}	
+			}
+			$('#ofs_rMonth').append(monthop);
+		}
+	}
+
+	//重新生成本月对账报表
+	function onloadOrderFinancialDate(){
+        var year = $("#ofs_rYear").val();
+        var month = $("#ofs_rMonth").val();
+        if (year == null || year == "" || year == "-1") {
+            showMessage("请选择年份");
+            return;
+        } else if (month == null || month == "" || month == "-1") {
+            showMessage("请选择月份");
+            return;
+        }
+        $.ajax({
+            type: "POST",//方法类型
+            dataType:'json',
+            url:'/cbtconsole/basicStatistical/onloadOrderFinancialDate',
+            data:{year:year,month:month},
+            dataType:"json",
+            success:function(data) {
+                if(data>0){
+                    showMessage("生成成功");
+                    $('#ofs_easyui-datagrid').datagrid('reload');
+                }else{
+                    showMessage("生成失败");
+                }
+            }
+        });
+	}
+</script>
+<body>
+	<div id="ofs_top_toolbar" style="padding: 5px; height: auto">
+		<div>
+			<form id="ofs_query_form" action="#" onsubmit="return false;">
+				<label for="ofs_rYear">年份选择<font color="red">*</font>：
+				</label> <select name="year" id="ofs_rYear" onchange="doOfsSelectChange()">
+					<option value='-1'>请选择</option>
+					<option value='2016'>2016</option>
+					<option value='2017'>2017</option>
+					<option value='2018'>2018</option>
+				</select><label for="ofs_rMonth">月份选择： </label> <select name="month"
+					id="ofs_rMonth">
+					<option value='-1'>选择月份</option>
+				</select> <input class="but_color" type="button" value="查询"
+					onclick="doOfsQuery()"> <input class="but_color"
+					type="button" value="重置" onclick="doOfsReset()"> <input
+					class="but_color" type="button" value="导出Excel"
+					onclick="exportOfsExcel()"><input
+					class="but_color" type="button"style="width:130px;" value="重新生成本月数据"
+					onclick="onloadOrderFinancialDate()">
+			</form>
+			<br>
+			<div class="top_div_style">
+				<a
+					href="javascript:openNewWindow('/cbtconsole/apa/orderSalesOrderInfo.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">实际销售额(R1)详情</a> <a
+					href="javascript:openNewWindow('/cbtconsole/apa/paypalRevenuePaypalInfo.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">系统PayPal收入(V)详情</a><a
+					href="javascript:openNewWindow('/cbtconsole/apa/wireTransferInfo.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">电汇付款(T)详情</a>
+				<a
+						href="javascript:openNewWindow('/cbtconsole/apa/stripePayInfo.html');"
+						class="easyui-linkbutton"
+						data-options="iconCls:'icon-search',plain:true">Stripe支付详情</a>
+				<a
+					href="javascript:openNewWindow('/cbtconsole/apa/balancePaymentInfo.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额支付(Q)详情</a> <a
+					href="javascript:openNewWindow('/cbtconsole/apa/customerBalanceInfo.html');" class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">新增加的余额之和(U)详情</a>
+				<a href="javascript:openNewWindow('/cbtconsole/apa/balanceCompensation.html');" class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额补偿详情</a> <a
+					href="javascript:openNewWindow('/cbtconsole/apa/orderCancel.html');" class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">订单取消(全部或部分)详情</a> <a
+					href="javascript:openNewWindow('/cbtconsole/apa/customerBalanceInfo.html');" class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额变更(期末-期初)详情</a> <a
+					href="javascript:openNewWindow('/cbtconsole/apa/balanceWithdrawalInfo.html');"
+					class="easyui-linkbutton"
+					data-options="iconCls:'icon-search',plain:true">余额提现(Z)详情</a>
+			</div>
+		</div>
+	</div>
+	<table id="ofs_easyui-datagrid" style="width: 100%; height: 100%;"
+		class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th data-options="field:'year',width:'50px'">年月份</th>
+				<!-- <th data-options="field:'month',width:'25px'">月份</th> -->
+				<th data-options="field:'orderSales',width:'100px'">实际销售额(R1)</th>
+				<th data-options="field:'financialSales',width:'100px'">财务销售额(R2)</th>
+				<th data-options="field:'payPalRevenue',width:'100px'">PayPal总收入(V)</th>
+				<th data-options="field:'tt_revenue',width:'100px'">TT总收入(T)</th>
+				<th data-options="field:'stripePay',width:'100px'">Stripe总收入</th>
+				<th data-options="field:'balancePayment',width:'100px'">余额支付(Q)</th>
+				<th data-options="field:'newAddBalance',width:'100px'">新增加的余额之和(U)</th>
+				<th data-options="field:'balanceCompensation',width:'100px'">余额补偿</th>
+				<th data-options="field:'payForBalance',width:'100px'">客户充值</th>
+				<th data-options="field:'overPaymentBalance',width:'100px'">客户多付</th>
+				<th data-options="field:'orderCancel',width:'100px'">订单取消(全部或部分)</th>
+				<th data-options="field:'balanceChanges',width:'100px'">余额变更(期末-期初)</th>
+				<th data-options="field:'balanceWithdrawal',width:'100px'">余额提现(Z)</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</body>
+</html>

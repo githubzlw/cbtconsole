@@ -1,0 +1,1540 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.ShopCarMarketingMapper">
+    <resultMap id="BaseResultMap" type="com.importExpress.pojo.ShopCarMarketing">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="goodsdata_id" property="goodsdataId" jdbcType="INTEGER"/>
+        <result column="userid" property="userid" jdbcType="INTEGER"/>
+        <result column="sessionid" property="sessionid" jdbcType="VARCHAR"/>
+        <result column="catid" property="catid" jdbcType="VARCHAR"/>
+        <result column="itemId" property="itemid" jdbcType="VARCHAR"/>
+        <result column="shopId" property="shopid" jdbcType="VARCHAR"/>
+        <result column="goods_url" property="goodsUrl" jdbcType="VARCHAR"/>
+        <result column="goods_title" property="goodsTitle" jdbcType="VARCHAR"/>
+        <result column="googs_seller" property="googsSeller" jdbcType="VARCHAR"/>
+        <result column="googs_img" property="googsImg" jdbcType="VARCHAR"/>
+        <result column="googs_price" property="googsPrice" jdbcType="VARCHAR"/>
+        <result column="googs_number" property="googsNumber" jdbcType="INTEGER"/>
+        <result column="googs_size" property="googsSize" jdbcType="VARCHAR"/>
+        <result column="googs_color" property="googsColor" jdbcType="VARCHAR"/>
+        <result column="freight" property="freight" jdbcType="DOUBLE"/>
+        <result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR"/>
+        <result column="norm_most" property="normMost" jdbcType="VARCHAR"/>
+        <result column="norm_least" property="normLeast" jdbcType="VARCHAR"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="datatime" property="datatime" jdbcType="TIMESTAMP"/>
+        <result column="flag" property="flag" jdbcType="INTEGER"/>
+        <result column="pWprice" property="pwprice" jdbcType="VARCHAR"/>
+        <result column="true_shipping" property="trueShipping" jdbcType="VARCHAR"/>
+        <result column="freight_free" property="freightFree" jdbcType="INTEGER"/>
+        <result column="width" property="width" jdbcType="VARCHAR"/>
+        <result column="seilUnit" property="seilunit" jdbcType="VARCHAR"/>
+        <result column="goodsUnit" property="goodsunit" jdbcType="VARCHAR"/>
+        <result column="bulk_volume" property="bulkVolume" jdbcType="VARCHAR"/>
+        <result column="total_weight" property="totalWeight" jdbcType="VARCHAR"/>
+        <result column="per_weight" property="perWeight" jdbcType="VARCHAR"/>
+        <result column="goods_email" property="goodsEmail" jdbcType="VARCHAR"/>
+        <result column="free_shopping_company" property="freeShoppingCompany" jdbcType="VARCHAR"/>
+        <result column="free_sc_days" property="freeScDays" jdbcType="VARCHAR"/>
+        <result column="preferential" property="preferential" jdbcType="VARCHAR"/>
+        <result column="deposit_rate" property="depositRate" jdbcType="INTEGER"/>
+        <result column="guid" property="guid" jdbcType="VARCHAR"/>
+        <result column="goods_type" property="goodsType" jdbcType="VARCHAR"/>
+        <result column="feeprice" property="feeprice" jdbcType="VARCHAR"/>
+        <result column="currency" property="currency" jdbcType="VARCHAR"/>
+        <result column="goods_class" property="goodsClass" jdbcType="INTEGER"/>
+        <result column="extra_freight" property="extraFreight" jdbcType="DOUBLE"/>
+        <result column="source_url" property="sourceUrl" jdbcType="INTEGER"/>
+        <result column="isshipping_promote" property="isshippingPromote" jdbcType="INTEGER"/>
+        <result column="method_feight" property="methodFeight" jdbcType="DOUBLE"/>
+        <result column="price1" property="price1" jdbcType="DOUBLE"/>
+        <result column="price2" property="price2" jdbcType="DOUBLE"/>
+        <result column="price3" property="price3" jdbcType="DOUBLE"/>
+        <result column="notfreeprice" property="notfreeprice" jdbcType="DOUBLE"/>
+        <result column="theproductfrieght" property="theproductfrieght" jdbcType="DOUBLE"/>
+        <result column="isvolume" property="isvolume" jdbcType="INTEGER"/>
+        <result column="freeprice" property="freeprice" jdbcType="DOUBLE"/>
+        <result column="firstprice" property="firstprice" jdbcType="DOUBLE"/>
+        <result column="firstnumber" property="firstnumber" jdbcType="INTEGER"/>
+        <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP"/>
+        <result column="addPrice" property="addprice" jdbcType="DOUBLE"/>
+        <result column="isFeight" property="isfeight" jdbcType="INTEGER"/>
+        <result column="isBattery" property="isbattery" jdbcType="INTEGER"/>
+        <result column="aliPosttime" property="aliposttime" jdbcType="VARCHAR"/>
+        <result column="price4" property="price4" jdbcType="DOUBLE"/>
+        <result column="goodsUrlMD5" property="goodsurlmd5" jdbcType="VARCHAR"/>
+        <result column="bizPriceDiscount" property="bizpricediscount" jdbcType="VARCHAR"/>
+        <result column="spiderPrice" property="spiderprice" jdbcType="DOUBLE"/>
+        <result column="priceListSize" property="pricelistsize" jdbcType="VARCHAR"/>
+        <result column="comparealiPrice" property="comparealiprice" jdbcType="VARCHAR"/>
+        <result column="group_buy_id" property="groupBuyId" jdbcType="INTEGER"/>
+        <result column="skuid_1688" property="skuid1688" jdbcType="VARCHAR"/>
+        <result column="isFreeShipProduct" property="isfreeshipproduct" jdbcType="INTEGER"/>
+        <result column="sampleFee" property="samplefee" jdbcType="DOUBLE"/>
+        <result column="sampleMoq" property="samplemoq" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, goodsdata_id, userid, sessionid, catid, itemId, shopId, goods_url, goods_title, 
+    googs_seller, googs_img, googs_price, googs_number, googs_size, googs_color, freight, 
+    delivery_time, norm_most, norm_least, state, remark, datatime, flag, pWprice, true_shipping, 
+    freight_free, width, seilUnit, goodsUnit, bulk_volume, total_weight, per_weight,
+    goods_email, free_shopping_company, free_sc_days, preferential, deposit_rate, guid, 
+    goods_type, feeprice, currency, goods_class, extra_freight, source_url, isshipping_promote, 
+    method_feight, price1, price2, price3, notfreeprice, theproductfrieght, isvolume, 
+    freeprice, firstprice, firstnumber, updatetime, addPrice, isFeight, isBattery, aliPosttime, 
+    price4, goodsUrlMD5, bizPriceDiscount, spiderPrice, priceListSize, comparealiPrice, 
+    group_buy_id, skuid_1688, isFreeShipProduct, sampleFee, sampleMoq
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.importExpress.pojo.ShopCarMarketingExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from shop_car_marketing
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from shop_car_marketing
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from shop_car_marketing
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.importExpress.pojo.ShopCarMarketingExample">
+        delete from shop_car_marketing
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.importExpress.pojo.ShopCarMarketing">
+    insert into shop_car_marketing (id, goodsdata_id, userid, 
+      sessionid, catid, itemId, 
+      shopId, goods_url, goods_title, 
+      googs_seller, googs_img, googs_price, 
+      googs_number, googs_size, googs_color, 
+      freight, delivery_time, norm_most, 
+      norm_least, state, remark, 
+      datatime, flag, pWprice, 
+      true_shipping, freight_free, width, 
+      seilUnit, goodsUnit,
+      bulk_volume, total_weight, per_weight, 
+      goods_email, free_shopping_company, free_sc_days, 
+      preferential, deposit_rate, guid, 
+      goods_type, feeprice, currency, 
+      goods_class, extra_freight, source_url, 
+      isshipping_promote, method_feight, price1, 
+      price2, price3, notfreeprice, 
+      theproductfrieght, isvolume, freeprice, 
+      firstprice, firstnumber, updatetime, 
+      addPrice, isFeight, isBattery, 
+      aliPosttime, price4, goodsUrlMD5, 
+      bizPriceDiscount, spiderPrice, priceListSize, 
+      comparealiPrice, group_buy_id, skuid_1688, 
+      isFreeShipProduct, sampleFee, sampleMoq
+      )
+    values (#{id,jdbcType=INTEGER}, #{goodsdataId,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, 
+      #{sessionid,jdbcType=VARCHAR}, #{catid,jdbcType=VARCHAR}, #{itemid,jdbcType=VARCHAR}, 
+      #{shopid,jdbcType=VARCHAR}, #{goodsUrl,jdbcType=VARCHAR}, #{goodsTitle,jdbcType=VARCHAR}, 
+      #{googsSeller,jdbcType=VARCHAR}, #{googsImg,jdbcType=VARCHAR}, #{googsPrice,jdbcType=VARCHAR}, 
+      #{googsNumber,jdbcType=INTEGER}, #{googsSize,jdbcType=VARCHAR}, #{googsColor,jdbcType=VARCHAR}, 
+      #{freight,jdbcType=DOUBLE}, #{deliveryTime,jdbcType=VARCHAR}, #{normMost,jdbcType=VARCHAR}, 
+      #{normLeast,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, 
+      #{datatime,jdbcType=TIMESTAMP}, #{flag,jdbcType=INTEGER}, #{pwprice,jdbcType=VARCHAR}, 
+      #{trueShipping,jdbcType=VARCHAR}, #{freightFree,jdbcType=INTEGER}, #{width,jdbcType=VARCHAR}, 
+      #{seilunit,jdbcType=VARCHAR}, #{goodsunit,jdbcType=VARCHAR},
+      #{bulkVolume,jdbcType=VARCHAR}, #{totalWeight,jdbcType=VARCHAR}, #{perWeight,jdbcType=VARCHAR}, 
+      #{goodsEmail,jdbcType=VARCHAR}, #{freeShoppingCompany,jdbcType=VARCHAR}, #{freeScDays,jdbcType=VARCHAR}, 
+      #{preferential,jdbcType=VARCHAR}, #{depositRate,jdbcType=INTEGER}, #{guid,jdbcType=VARCHAR}, 
+      #{goodsType,jdbcType=VARCHAR}, #{feeprice,jdbcType=VARCHAR}, #{currency,jdbcType=VARCHAR}, 
+      #{goodsClass,jdbcType=INTEGER}, #{extraFreight,jdbcType=DOUBLE}, #{sourceUrl,jdbcType=INTEGER}, 
+      #{isshippingPromote,jdbcType=INTEGER}, #{methodFeight,jdbcType=DOUBLE}, #{price1,jdbcType=DOUBLE}, 
+      #{price2,jdbcType=DOUBLE}, #{price3,jdbcType=DOUBLE}, #{notfreeprice,jdbcType=DOUBLE}, 
+      #{theproductfrieght,jdbcType=DOUBLE}, #{isvolume,jdbcType=INTEGER}, #{freeprice,jdbcType=DOUBLE}, 
+      #{firstprice,jdbcType=DOUBLE}, #{firstnumber,jdbcType=INTEGER}, #{updatetime,jdbcType=TIMESTAMP}, 
+      #{addprice,jdbcType=DOUBLE}, #{isfeight,jdbcType=INTEGER}, #{isbattery,jdbcType=INTEGER}, 
+      #{aliposttime,jdbcType=VARCHAR}, #{price4,jdbcType=DOUBLE}, #{goodsurlmd5,jdbcType=VARCHAR}, 
+      #{bizpricediscount,jdbcType=VARCHAR}, #{spiderprice,jdbcType=DOUBLE}, #{pricelistsize,jdbcType=VARCHAR}, 
+      #{comparealiprice,jdbcType=VARCHAR}, #{groupBuyId,jdbcType=INTEGER}, #{skuid1688,jdbcType=VARCHAR}, 
+      #{isfreeshipproduct,jdbcType=INTEGER}, #{samplefee,jdbcType=DOUBLE}, #{samplemoq,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.importExpress.pojo.ShopCarMarketing">
+        insert into shop_car_marketing
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="goodsdataId != null">
+                goodsdata_id,
+            </if>
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="sessionid != null">
+                sessionid,
+            </if>
+            <if test="catid != null">
+                catid,
+            </if>
+            <if test="itemid != null">
+                itemId,
+            </if>
+            <if test="shopid != null">
+                shopId,
+            </if>
+            <if test="goodsUrl != null">
+                goods_url,
+            </if>
+            <if test="goodsTitle != null">
+                goods_title,
+            </if>
+            <if test="googsSeller != null">
+                googs_seller,
+            </if>
+            <if test="googsImg != null">
+                googs_img,
+            </if>
+            <if test="googsPrice != null">
+                googs_price,
+            </if>
+            <if test="googsNumber != null">
+                googs_number,
+            </if>
+            <if test="googsSize != null">
+                googs_size,
+            </if>
+            <if test="googsColor != null">
+                googs_color,
+            </if>
+            <if test="freight != null">
+                freight,
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time,
+            </if>
+            <if test="normMost != null">
+                norm_most,
+            </if>
+            <if test="normLeast != null">
+                norm_least,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="datatime != null">
+                datatime,
+            </if>
+            <if test="flag != null">
+                flag,
+            </if>
+            <if test="pwprice != null">
+                pWprice,
+            </if>
+            <if test="trueShipping != null">
+                true_shipping,
+            </if>
+            <if test="freightFree != null">
+                freight_free,
+            </if>
+            <if test="width != null">
+                width,
+            </if>
+            <if test="seilunit != null">
+                seilUnit,
+            </if>
+            <if test="goodsunit != null">
+                goodsUnit,
+            </if>
+            <if test="bulkVolume != null">
+                bulk_volume,
+            </if>
+            <if test="totalWeight != null">
+                total_weight,
+            </if>
+            <if test="perWeight != null">
+                per_weight,
+            </if>
+            <if test="goodsEmail != null">
+                goods_email,
+            </if>
+            <if test="freeShoppingCompany != null">
+                free_shopping_company,
+            </if>
+            <if test="freeScDays != null">
+                free_sc_days,
+            </if>
+            <if test="preferential != null">
+                preferential,
+            </if>
+            <if test="depositRate != null">
+                deposit_rate,
+            </if>
+            <if test="guid != null">
+                guid,
+            </if>
+            <if test="goodsType != null">
+                goods_type,
+            </if>
+            <if test="feeprice != null">
+                feeprice,
+            </if>
+            <if test="currency != null">
+                currency,
+            </if>
+            <if test="goodsClass != null">
+                goods_class,
+            </if>
+            <if test="extraFreight != null">
+                extra_freight,
+            </if>
+            <if test="sourceUrl != null">
+                source_url,
+            </if>
+            <if test="isshippingPromote != null">
+                isshipping_promote,
+            </if>
+            <if test="methodFeight != null">
+                method_feight,
+            </if>
+            <if test="price1 != null">
+                price1,
+            </if>
+            <if test="price2 != null">
+                price2,
+            </if>
+            <if test="price3 != null">
+                price3,
+            </if>
+            <if test="notfreeprice != null">
+                notfreeprice,
+            </if>
+            <if test="theproductfrieght != null">
+                theproductfrieght,
+            </if>
+            <if test="isvolume != null">
+                isvolume,
+            </if>
+            <if test="freeprice != null">
+                freeprice,
+            </if>
+            <if test="firstprice != null">
+                firstprice,
+            </if>
+            <if test="firstnumber != null">
+                firstnumber,
+            </if>
+            <if test="updatetime != null">
+                updatetime,
+            </if>
+            <if test="addprice != null">
+                addPrice,
+            </if>
+            <if test="isfeight != null">
+                isFeight,
+            </if>
+            <if test="isbattery != null">
+                isBattery,
+            </if>
+            <if test="aliposttime != null">
+                aliPosttime,
+            </if>
+            <if test="price4 != null">
+                price4,
+            </if>
+            <if test="goodsurlmd5 != null">
+                goodsUrlMD5,
+            </if>
+            <if test="bizpricediscount != null">
+                bizPriceDiscount,
+            </if>
+            <if test="spiderprice != null">
+                spiderPrice,
+            </if>
+            <if test="pricelistsize != null">
+                priceListSize,
+            </if>
+            <if test="comparealiprice != null">
+                comparealiPrice,
+            </if>
+            <if test="groupBuyId != null">
+                group_buy_id,
+            </if>
+            <if test="skuid1688 != null">
+                skuid_1688,
+            </if>
+            <if test="isfreeshipproduct != null">
+                isFreeShipProduct,
+            </if>
+            <if test="samplefee != null">
+                sampleFee,
+            </if>
+            <if test="samplemoq != null">
+                sampleMoq,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="goodsdataId != null">
+                #{goodsdataId,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="sessionid != null">
+                #{sessionid,jdbcType=VARCHAR},
+            </if>
+            <if test="catid != null">
+                #{catid,jdbcType=VARCHAR},
+            </if>
+            <if test="itemid != null">
+                #{itemid,jdbcType=VARCHAR},
+            </if>
+            <if test="shopid != null">
+                #{shopid,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsUrl != null">
+                #{goodsUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsTitle != null">
+                #{goodsTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="googsSeller != null">
+                #{googsSeller,jdbcType=VARCHAR},
+            </if>
+            <if test="googsImg != null">
+                #{googsImg,jdbcType=VARCHAR},
+            </if>
+            <if test="googsPrice != null">
+                #{googsPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="googsNumber != null">
+                #{googsNumber,jdbcType=INTEGER},
+            </if>
+            <if test="googsSize != null">
+                #{googsSize,jdbcType=VARCHAR},
+            </if>
+            <if test="googsColor != null">
+                #{googsColor,jdbcType=VARCHAR},
+            </if>
+            <if test="freight != null">
+                #{freight,jdbcType=DOUBLE},
+            </if>
+            <if test="deliveryTime != null">
+                #{deliveryTime,jdbcType=VARCHAR},
+            </if>
+            <if test="normMost != null">
+                #{normMost,jdbcType=VARCHAR},
+            </if>
+            <if test="normLeast != null">
+                #{normLeast,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="datatime != null">
+                #{datatime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="flag != null">
+                #{flag,jdbcType=INTEGER},
+            </if>
+            <if test="pwprice != null">
+                #{pwprice,jdbcType=VARCHAR},
+            </if>
+            <if test="trueShipping != null">
+                #{trueShipping,jdbcType=VARCHAR},
+            </if>
+            <if test="freightFree != null">
+                #{freightFree,jdbcType=INTEGER},
+            </if>
+            <if test="width != null">
+                #{width,jdbcType=VARCHAR},
+            </if>
+            <if test="seilunit != null">
+                #{seilunit,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsunit != null">
+                #{goodsunit,jdbcType=VARCHAR},
+            </if>
+            <if test="bulkVolume != null">
+                #{bulkVolume,jdbcType=VARCHAR},
+            </if>
+            <if test="totalWeight != null">
+                #{totalWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="perWeight != null">
+                #{perWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsEmail != null">
+                #{goodsEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="freeShoppingCompany != null">
+                #{freeShoppingCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="freeScDays != null">
+                #{freeScDays,jdbcType=VARCHAR},
+            </if>
+            <if test="preferential != null">
+                #{preferential,jdbcType=VARCHAR},
+            </if>
+            <if test="depositRate != null">
+                #{depositRate,jdbcType=INTEGER},
+            </if>
+            <if test="guid != null">
+                #{guid,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsType != null">
+                #{goodsType,jdbcType=VARCHAR},
+            </if>
+            <if test="feeprice != null">
+                #{feeprice,jdbcType=VARCHAR},
+            </if>
+            <if test="currency != null">
+                #{currency,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsClass != null">
+                #{goodsClass,jdbcType=INTEGER},
+            </if>
+            <if test="extraFreight != null">
+                #{extraFreight,jdbcType=DOUBLE},
+            </if>
+            <if test="sourceUrl != null">
+                #{sourceUrl,jdbcType=INTEGER},
+            </if>
+            <if test="isshippingPromote != null">
+                #{isshippingPromote,jdbcType=INTEGER},
+            </if>
+            <if test="methodFeight != null">
+                #{methodFeight,jdbcType=DOUBLE},
+            </if>
+            <if test="price1 != null">
+                #{price1,jdbcType=DOUBLE},
+            </if>
+            <if test="price2 != null">
+                #{price2,jdbcType=DOUBLE},
+            </if>
+            <if test="price3 != null">
+                #{price3,jdbcType=DOUBLE},
+            </if>
+            <if test="notfreeprice != null">
+                #{notfreeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="theproductfrieght != null">
+                #{theproductfrieght,jdbcType=DOUBLE},
+            </if>
+            <if test="isvolume != null">
+                #{isvolume,jdbcType=INTEGER},
+            </if>
+            <if test="freeprice != null">
+                #{freeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="firstprice != null">
+                #{firstprice,jdbcType=DOUBLE},
+            </if>
+            <if test="firstnumber != null">
+                #{firstnumber,jdbcType=INTEGER},
+            </if>
+            <if test="updatetime != null">
+                #{updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addprice != null">
+                #{addprice,jdbcType=DOUBLE},
+            </if>
+            <if test="isfeight != null">
+                #{isfeight,jdbcType=INTEGER},
+            </if>
+            <if test="isbattery != null">
+                #{isbattery,jdbcType=INTEGER},
+            </if>
+            <if test="aliposttime != null">
+                #{aliposttime,jdbcType=VARCHAR},
+            </if>
+            <if test="price4 != null">
+                #{price4,jdbcType=DOUBLE},
+            </if>
+            <if test="goodsurlmd5 != null">
+                #{goodsurlmd5,jdbcType=VARCHAR},
+            </if>
+            <if test="bizpricediscount != null">
+                #{bizpricediscount,jdbcType=VARCHAR},
+            </if>
+            <if test="spiderprice != null">
+                #{spiderprice,jdbcType=DOUBLE},
+            </if>
+            <if test="pricelistsize != null">
+                #{pricelistsize,jdbcType=VARCHAR},
+            </if>
+            <if test="comparealiprice != null">
+                #{comparealiprice,jdbcType=VARCHAR},
+            </if>
+            <if test="groupBuyId != null">
+                #{groupBuyId,jdbcType=INTEGER},
+            </if>
+            <if test="skuid1688 != null">
+                #{skuid1688,jdbcType=VARCHAR},
+            </if>
+            <if test="isfreeshipproduct != null">
+                #{isfreeshipproduct,jdbcType=INTEGER},
+            </if>
+            <if test="samplefee != null">
+                #{samplefee,jdbcType=DOUBLE},
+            </if>
+            <if test="samplemoq != null">
+                #{samplemoq,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+
+    <insert id="insertShopCarBatch" parameterType="java.util.List">
+        insert into shop_car_marketing(goodsdata_id,userid,sessionid,catid,itemId,shopId,
+        goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,googs_size,
+        googs_color,freight,delivery_time,norm_most,norm_least,state,remark,datatime,flag,
+        pWprice,true_shipping,freight_free,width,seilUnit,goodsUnit,bulk_volume,total_weight,
+        per_weight,goods_email,free_shopping_company,free_sc_days,preferential,deposit_rate,
+        guid,goods_type,feeprice,currency,goods_class,extra_freight,source_url,isshipping_promote,
+        method_feight,price1,price2,price3,notfreeprice,theproductfrieght,isvolume,freeprice,
+        firstprice,firstnumber,updatetime,addPrice,isFeight,isBattery,aliPosttime,price4,goodsUrlMD5,
+        bizPriceDiscount,spiderPrice,priceListSize,comparealiPrice,group_buy_id,skuid_1688,isFreeShipProduct,
+        sampleFee,sampleMoq)
+        values
+        <foreach collection="list" item="shopCar" separator=",">
+            (#{shopCar.goodsdataId,jdbcType=INTEGER},#{shopCar.userid,jdbcType=INTEGER},#{shopCar.sessionid,jdbcType=VARCHAR},
+            #{shopCar.catid,jdbcType=VARCHAR},#{shopCar.itemid,jdbcType=VARCHAR},#{shopCar.shopid,jdbcType=VARCHAR},
+            #{shopCar.goodsUrl,jdbcType=VARCHAR},#{shopCar.goodsTitle,jdbcType=VARCHAR},#{shopCar.googsSeller,jdbcType=VARCHAR},
+            #{shopCar.googsImg,jdbcType=VARCHAR},#{shopCar.googsPrice,jdbcType=VARCHAR},
+            #{shopCar.googsNumber,jdbcType=INTEGER},#{shopCar.googsSize,jdbcType=VARCHAR},#{shopCar.googsColor,jdbcType=VARCHAR},
+            #{shopCar.freight,jdbcType=DOUBLE},#{shopCar.deliveryTime,jdbcType=VARCHAR},#{shopCar.normMost,jdbcType=VARCHAR},
+            #{shopCar.normLeast,jdbcType=VARCHAR},#{shopCar.state,jdbcType=INTEGER},
+            #{shopCar.remark,jdbcType=VARCHAR},#{shopCar.datatime,jdbcType=TIMESTAMP},#{shopCar.flag,jdbcType=INTEGER},
+            #{shopCar.pwprice,jdbcType=VARCHAR},#{shopCar.trueShipping,jdbcType=VARCHAR},#{shopCar.freightFree,jdbcType=INTEGER},
+            #{shopCar.width,jdbcType=VARCHAR},#{shopCar.seilunit,jdbcType=VARCHAR},#{shopCar.goodsunit,jdbcType=VARCHAR},
+            #{shopCar.bulkVolume,jdbcType=VARCHAR},#{shopCar.totalWeight,jdbcType=VARCHAR},#{shopCar.perWeight,jdbcType=VARCHAR},
+            #{shopCar.goodsEmail,jdbcType=VARCHAR},#{shopCar.freeShoppingCompany,jdbcType=VARCHAR},#{shopCar.freeScDays,jdbcType=VARCHAR},
+            #{shopCar.preferential,jdbcType=VARCHAR},#{shopCar.depositRate,jdbcType=INTEGER},#{shopCar.guid,jdbcType=VARCHAR},
+            #{shopCar.goodsType,jdbcType=VARCHAR},#{shopCar.feeprice,jdbcType=VARCHAR},#{shopCar.currency,jdbcType=VARCHAR},
+            #{shopCar.goodsClass,jdbcType=INTEGER},#{shopCar.extraFreight,jdbcType=DOUBLE},#{shopCar.sourceUrl,jdbcType=INTEGER},
+            #{shopCar.isshippingPromote,jdbcType=INTEGER},#{shopCar.methodFeight,jdbcType=DOUBLE},#{shopCar.price1,jdbcType=DOUBLE},
+            #{shopCar.price2,jdbcType=DOUBLE},#{shopCar.price3,jdbcType=DOUBLE},#{shopCar.notfreeprice,jdbcType=DOUBLE},
+            #{shopCar.theproductfrieght,jdbcType=DOUBLE},#{shopCar.isvolume,jdbcType=INTEGER},#{shopCar.freeprice,jdbcType=DOUBLE},
+            #{shopCar.firstprice,jdbcType=DOUBLE},#{shopCar.firstnumber,jdbcType=INTEGER},#{shopCar.updatetime,jdbcType=TIMESTAMP},
+            #{shopCar.addprice,jdbcType=DOUBLE},#{shopCar.isfeight,jdbcType=INTEGER},
+            #{shopCar.isbattery,jdbcType=INTEGER},#{shopCar.aliposttime,jdbcType=VARCHAR},#{shopCar.price4,jdbcType=DOUBLE},
+            #{shopCar.goodsurlmd5,jdbcType=VARCHAR},#{shopCar.bizpricediscount,jdbcType=VARCHAR},
+            #{shopCar.spiderprice,jdbcType=DOUBLE},#{shopCar.pricelistsize,jdbcType=VARCHAR},#{shopCar.comparealiprice,jdbcType=VARCHAR},
+            #{shopCar.groupBuyId,jdbcType=INTEGER},#{shopCar.skuid1688,jdbcType=VARCHAR},
+            #{shopCar.isfreeshipproduct,jdbcType=INTEGER},#{shopCar.samplefee,jdbcType=DOUBLE},#{shopCar.samplemoq,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <update id="updateShopCarBatch" parameterType="java.util.List">
+        <foreach collection="list" item="shopCar" separator=";">
+            update shop_car_marketing
+            <set>
+                <if test="shopCar.goodsdataId != null">
+                    goodsdata_id = #{shopCar.goodsdataId,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.userid != null">
+                    userid = #{shopCar.userid,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.sessionid != null">
+                    sessionid = #{shopCar.sessionid,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.catid != null">
+                    catid = #{shopCar.catid,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.itemid != null">
+                    itemId = #{shopCar.itemid,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.shopid != null">
+                    shopId = #{shopCar.shopid,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsUrl != null">
+                    goods_url = #{shopCar.goodsUrl,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsTitle != null">
+                    goods_title = #{shopCar.goodsTitle,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.googsSeller != null">
+                    googs_seller = #{shopCar.googsSeller,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.googsImg != null">
+                    googs_img = #{shopCar.googsImg,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.googsPrice != null">
+                    googs_price = #{shopCar.googsPrice,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.googsNumber != null">
+                    googs_number = #{shopCar.googsNumber,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.googsSize != null">
+                    googs_size = #{shopCar.googsSize,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.googsColor != null">
+                    googs_color = #{shopCar.googsColor,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.freight != null">
+                    freight = #{shopCar.freight,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.deliveryTime != null">
+                    delivery_time = #{shopCar.deliveryTime,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.normMost != null">
+                    norm_most = #{shopCar.normMost,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.normLeast != null">
+                    norm_least = #{shopCar.normLeast,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.state != null">
+                    state = #{shopCar.state,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.remark != null">
+                    remark = #{shopCar.remark,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.datatime != null">
+                    datatime = #{shopCar.datatime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="shopCar.flag != null">
+                    flag = #{shopCar.flag,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.pwprice != null">
+                    pWprice = #{shopCar.pwprice,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.trueShipping != null">
+                    true_shipping = #{shopCar.trueShipping,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.freightFree != null">
+                    freight_free = #{shopCar.freightFree,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.width != null">
+                    width = #{shopCar.width,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.seilunit != null">
+                    seilUnit = #{shopCar.seilunit,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsunit != null">
+                    goodsUnit = #{shopCar.goodsunit,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.bulkVolume != null">
+                    bulk_volume = #{shopCar.bulkVolume,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.totalWeight != null">
+                    total_weight = #{shopCar.totalWeight,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.perWeight != null">
+                    per_weight = #{shopCar.perWeight,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsEmail != null">
+                    goods_email = #{shopCar.goodsEmail,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.freeShoppingCompany != null">
+                    free_shopping_company = #{shopCar.freeShoppingCompany,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.freeScDays != null">
+                    free_sc_days = #{shopCar.freeScDays,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.preferential != null">
+                    preferential = #{shopCar.preferential,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.depositRate != null">
+                    deposit_rate = #{shopCar.depositRate,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.guid != null">
+                    guid = #{shopCar.guid,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsType != null">
+                    goods_type = #{shopCar.goodsType,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.feeprice != null">
+                    feeprice = #{shopCar.feeprice,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.currency != null">
+                    currency = #{shopCar.currency,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.goodsClass != null">
+                    goods_class = #{shopCar.goodsClass,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.extraFreight != null">
+                    extra_freight = #{shopCar.extraFreight,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.sourceUrl != null">
+                    source_url = #{shopCar.sourceUrl,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.isshippingPromote != null">
+                    isshipping_promote = #{shopCar.isshippingPromote,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.methodFeight != null">
+                    method_feight = #{shopCar.methodFeight,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.price1 != null and shopCar.price1 > 0">
+                    price1 = #{shopCar.price1,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.price2 != null">
+                    price2 = #{shopCar.price2,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.price3 != null">
+                    price3 = #{shopCar.price3,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.notfreeprice != null">
+                    notfreeprice = #{shopCar.notfreeprice,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.theproductfrieght != null">
+                    theproductfrieght = #{shopCar.theproductfrieght,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.isvolume != null">
+                    isvolume = #{shopCar.isvolume,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.freeprice != null">
+                    freeprice = #{shopCar.freeprice,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.firstprice != null">
+                    firstprice = #{shopCar.firstprice,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.firstnumber != null">
+                    firstnumber = #{shopCar.firstnumber,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.updatetime != null">
+                    updatetime = #{shopCar.updatetime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="shopCar.addprice != null">
+                    addPrice = #{shopCar.addprice,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.isfeight != null">
+                    isFeight = #{shopCar.isfeight,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.isbattery != null">
+                    isBattery = #{shopCar.isbattery,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.aliposttime != null">
+                    aliPosttime = #{shopCar.aliposttime,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.price4 != null">
+                    price4 = #{shopCar.price4,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.goodsurlmd5 != null">
+                    goodsUrlMD5 = #{shopCar.goodsurlmd5,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.bizpricediscount != null">
+                    bizPriceDiscount = #{shopCar.bizpricediscount,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.spiderprice != null">
+                    spiderPrice = #{shopCar.spiderprice,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.pricelistsize != null">
+                    priceListSize = #{shopCar.pricelistsize,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.comparealiprice != null">
+                    comparealiPrice = #{shopCar.comparealiprice,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.groupBuyId != null">
+                    group_buy_id = #{shopCar.groupBuyId,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.skuid1688 != null">
+                    skuid_1688 = #{shopCar.skuid1688,jdbcType=VARCHAR},
+                </if>
+                <if test="shopCar.isfreeshipproduct != null">
+                    isFreeShipProduct = #{shopCar.isfreeshipproduct,jdbcType=INTEGER},
+                </if>
+                <if test="shopCar.samplefee != null">
+                    sampleFee = #{shopCar.samplefee,jdbcType=DOUBLE},
+                </if>
+                <if test="shopCar.samplemoq != null">
+                    sampleMoq = #{shopCar.samplemoq,jdbcType=INTEGER},
+                </if>
+            </set>
+            where id = #{shopCar.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+    
+    <delete id="deleteShopCarBatch" parameterType="java.util.List">
+        delete from shop_car_marketing where id in
+        <foreach collection="list" item="shopCar" open="(" separator="," close=")">
+            #{shopCar.id,jdbcType=INTEGER}
+        </foreach>
+    </delete>
+
+    <select id="countByExample" parameterType="com.importExpress.pojo.ShopCarMarketingExample"
+            resultType="java.lang.Integer">
+        select count(*) from shop_car_marketing
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update shop_car_marketing
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.goodsdataId != null">
+                goodsdata_id = #{record.goodsdataId,jdbcType=INTEGER},
+            </if>
+            <if test="record.userid != null">
+                userid = #{record.userid,jdbcType=INTEGER},
+            </if>
+            <if test="record.sessionid != null">
+                sessionid = #{record.sessionid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.catid != null">
+                catid = #{record.catid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.itemid != null">
+                itemId = #{record.itemid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.shopid != null">
+                shopId = #{record.shopid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsUrl != null">
+                goods_url = #{record.goodsUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsTitle != null">
+                goods_title = #{record.goodsTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="record.googsSeller != null">
+                googs_seller = #{record.googsSeller,jdbcType=VARCHAR},
+            </if>
+            <if test="record.googsImg != null">
+                googs_img = #{record.googsImg,jdbcType=VARCHAR},
+            </if>
+            <if test="record.googsPrice != null">
+                googs_price = #{record.googsPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.googsNumber != null">
+                googs_number = #{record.googsNumber,jdbcType=INTEGER},
+            </if>
+            <if test="record.googsSize != null">
+                googs_size = #{record.googsSize,jdbcType=VARCHAR},
+            </if>
+            <if test="record.googsColor != null">
+                googs_color = #{record.googsColor,jdbcType=VARCHAR},
+            </if>
+            <if test="record.freight != null">
+                freight = #{record.freight,jdbcType=DOUBLE},
+            </if>
+            <if test="record.deliveryTime != null">
+                delivery_time = #{record.deliveryTime,jdbcType=VARCHAR},
+            </if>
+            <if test="record.normMost != null">
+                norm_most = #{record.normMost,jdbcType=VARCHAR},
+            </if>
+            <if test="record.normLeast != null">
+                norm_least = #{record.normLeast,jdbcType=VARCHAR},
+            </if>
+            <if test="record.state != null">
+                state = #{record.state,jdbcType=INTEGER},
+            </if>
+            <if test="record.remark != null">
+                remark = #{record.remark,jdbcType=VARCHAR},
+            </if>
+            <if test="record.datatime != null">
+                datatime = #{record.datatime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.flag != null">
+                flag = #{record.flag,jdbcType=INTEGER},
+            </if>
+            <if test="record.pwprice != null">
+                pWprice = #{record.pwprice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.trueShipping != null">
+                true_shipping = #{record.trueShipping,jdbcType=VARCHAR},
+            </if>
+            <if test="record.freightFree != null">
+                freight_free = #{record.freightFree,jdbcType=INTEGER},
+            </if>
+            <if test="record.width != null">
+                width = #{record.width,jdbcType=VARCHAR},
+            </if>
+            <if test="record.seilunit != null">
+                seilUnit = #{record.seilunit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsunit != null">
+                goodsUnit = #{record.goodsunit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.bulkVolume != null">
+                bulk_volume = #{record.bulkVolume,jdbcType=VARCHAR},
+            </if>
+            <if test="record.totalWeight != null">
+                total_weight = #{record.totalWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="record.perWeight != null">
+                per_weight = #{record.perWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsEmail != null">
+                goods_email = #{record.goodsEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="record.freeShoppingCompany != null">
+                free_shopping_company = #{record.freeShoppingCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="record.freeScDays != null">
+                free_sc_days = #{record.freeScDays,jdbcType=VARCHAR},
+            </if>
+            <if test="record.preferential != null">
+                preferential = #{record.preferential,jdbcType=VARCHAR},
+            </if>
+            <if test="record.depositRate != null">
+                deposit_rate = #{record.depositRate,jdbcType=INTEGER},
+            </if>
+            <if test="record.guid != null">
+                guid = #{record.guid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsType != null">
+                goods_type = #{record.goodsType,jdbcType=VARCHAR},
+            </if>
+            <if test="record.feeprice != null">
+                feeprice = #{record.feeprice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.currency != null">
+                currency = #{record.currency,jdbcType=VARCHAR},
+            </if>
+            <if test="record.goodsClass != null">
+                goods_class = #{record.goodsClass,jdbcType=INTEGER},
+            </if>
+            <if test="record.extraFreight != null">
+                extra_freight = #{record.extraFreight,jdbcType=DOUBLE},
+            </if>
+            <if test="record.sourceUrl != null">
+                source_url = #{record.sourceUrl,jdbcType=INTEGER},
+            </if>
+            <if test="record.isshippingPromote != null">
+                isshipping_promote = #{record.isshippingPromote,jdbcType=INTEGER},
+            </if>
+            <if test="record.methodFeight != null">
+                method_feight = #{record.methodFeight,jdbcType=DOUBLE},
+            </if>
+            <if test="record.price1 != null">
+                price1 = #{record.price1,jdbcType=DOUBLE},
+            </if>
+            <if test="record.price2 != null">
+                price2 = #{record.price2,jdbcType=DOUBLE},
+            </if>
+            <if test="record.price3 != null">
+                price3 = #{record.price3,jdbcType=DOUBLE},
+            </if>
+            <if test="record.notfreeprice != null">
+                notfreeprice = #{record.notfreeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="record.theproductfrieght != null">
+                theproductfrieght = #{record.theproductfrieght,jdbcType=DOUBLE},
+            </if>
+            <if test="record.isvolume != null">
+                isvolume = #{record.isvolume,jdbcType=INTEGER},
+            </if>
+            <if test="record.freeprice != null">
+                freeprice = #{record.freeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="record.firstprice != null">
+                firstprice = #{record.firstprice,jdbcType=DOUBLE},
+            </if>
+            <if test="record.firstnumber != null">
+                firstnumber = #{record.firstnumber,jdbcType=INTEGER},
+            </if>
+            <if test="record.updatetime != null">
+                updatetime = #{record.updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.addprice != null">
+                addPrice = #{record.addprice,jdbcType=DOUBLE},
+            </if>
+            <if test="record.isfeight != null">
+                isFeight = #{record.isfeight,jdbcType=INTEGER},
+            </if>
+            <if test="record.isbattery != null">
+                isBattery = #{record.isbattery,jdbcType=INTEGER},
+            </if>
+            <if test="record.aliposttime != null">
+                aliPosttime = #{record.aliposttime,jdbcType=VARCHAR},
+            </if>
+            <if test="record.price4 != null">
+                price4 = #{record.price4,jdbcType=DOUBLE},
+            </if>
+            <if test="record.goodsurlmd5 != null">
+                goodsUrlMD5 = #{record.goodsurlmd5,jdbcType=VARCHAR},
+            </if>
+            <if test="record.bizpricediscount != null">
+                bizPriceDiscount = #{record.bizpricediscount,jdbcType=VARCHAR},
+            </if>
+            <if test="record.spiderprice != null">
+                spiderPrice = #{record.spiderprice,jdbcType=DOUBLE},
+            </if>
+            <if test="record.pricelistsize != null">
+                priceListSize = #{record.pricelistsize,jdbcType=VARCHAR},
+            </if>
+            <if test="record.comparealiprice != null">
+                comparealiPrice = #{record.comparealiprice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.groupBuyId != null">
+                group_buy_id = #{record.groupBuyId,jdbcType=INTEGER},
+            </if>
+            <if test="record.skuid1688 != null">
+                skuid_1688 = #{record.skuid1688,jdbcType=VARCHAR},
+            </if>
+            <if test="record.isfreeshipproduct != null">
+                isFreeShipProduct = #{record.isfreeshipproduct,jdbcType=INTEGER},
+            </if>
+            <if test="record.samplefee != null">
+                sampleFee = #{record.samplefee,jdbcType=DOUBLE},
+            </if>
+            <if test="record.samplemoq != null">
+                sampleMoq = #{record.samplemoq,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update shop_car_marketing
+        set id = #{record.id,jdbcType=INTEGER},
+        goodsdata_id = #{record.goodsdataId,jdbcType=INTEGER},
+        userid = #{record.userid,jdbcType=INTEGER},
+        sessionid = #{record.sessionid,jdbcType=VARCHAR},
+        catid = #{record.catid,jdbcType=VARCHAR},
+        itemId = #{record.itemid,jdbcType=VARCHAR},
+        shopId = #{record.shopid,jdbcType=VARCHAR},
+        goods_url = #{record.goodsUrl,jdbcType=VARCHAR},
+        goods_title = #{record.goodsTitle,jdbcType=VARCHAR},
+        googs_seller = #{record.googsSeller,jdbcType=VARCHAR},
+        googs_img = #{record.googsImg,jdbcType=VARCHAR},
+        googs_price = #{record.googsPrice,jdbcType=VARCHAR},
+        googs_number = #{record.googsNumber,jdbcType=INTEGER},
+        googs_size = #{record.googsSize,jdbcType=VARCHAR},
+        googs_color = #{record.googsColor,jdbcType=VARCHAR},
+        freight = #{record.freight,jdbcType=DOUBLE},
+        delivery_time = #{record.deliveryTime,jdbcType=VARCHAR},
+        norm_most = #{record.normMost,jdbcType=VARCHAR},
+        norm_least = #{record.normLeast,jdbcType=VARCHAR},
+        state = #{record.state,jdbcType=INTEGER},
+        remark = #{record.remark,jdbcType=VARCHAR},
+        datatime = #{record.datatime,jdbcType=TIMESTAMP},
+        flag = #{record.flag,jdbcType=INTEGER},
+        pWprice = #{record.pwprice,jdbcType=VARCHAR},
+        true_shipping = #{record.trueShipping,jdbcType=VARCHAR},
+        freight_free = #{record.freightFree,jdbcType=INTEGER},
+        width = #{record.width,jdbcType=VARCHAR},
+        seilUnit = #{record.seilunit,jdbcType=VARCHAR},
+        goodsUnit = #{record.goodsunit,jdbcType=VARCHAR},
+        bulk_volume = #{record.bulkVolume,jdbcType=VARCHAR},
+        total_weight = #{record.totalWeight,jdbcType=VARCHAR},
+        per_weight = #{record.perWeight,jdbcType=VARCHAR},
+        goods_email = #{record.goodsEmail,jdbcType=VARCHAR},
+        free_shopping_company = #{record.freeShoppingCompany,jdbcType=VARCHAR},
+        free_sc_days = #{record.freeScDays,jdbcType=VARCHAR},
+        preferential = #{record.preferential,jdbcType=VARCHAR},
+        deposit_rate = #{record.depositRate,jdbcType=INTEGER},
+        guid = #{record.guid,jdbcType=VARCHAR},
+        goods_type = #{record.goodsType,jdbcType=VARCHAR},
+        feeprice = #{record.feeprice,jdbcType=VARCHAR},
+        currency = #{record.currency,jdbcType=VARCHAR},
+        goods_class = #{record.goodsClass,jdbcType=INTEGER},
+        extra_freight = #{record.extraFreight,jdbcType=DOUBLE},
+        source_url = #{record.sourceUrl,jdbcType=INTEGER},
+        isshipping_promote = #{record.isshippingPromote,jdbcType=INTEGER},
+        method_feight = #{record.methodFeight,jdbcType=DOUBLE},
+        price1 = #{record.price1,jdbcType=DOUBLE},
+        price2 = #{record.price2,jdbcType=DOUBLE},
+        price3 = #{record.price3,jdbcType=DOUBLE},
+        notfreeprice = #{record.notfreeprice,jdbcType=DOUBLE},
+        theproductfrieght = #{record.theproductfrieght,jdbcType=DOUBLE},
+        isvolume = #{record.isvolume,jdbcType=INTEGER},
+        freeprice = #{record.freeprice,jdbcType=DOUBLE},
+        firstprice = #{record.firstprice,jdbcType=DOUBLE},
+        firstnumber = #{record.firstnumber,jdbcType=INTEGER},
+        updatetime = #{record.updatetime,jdbcType=TIMESTAMP},
+        addPrice = #{record.addprice,jdbcType=DOUBLE},
+        isFeight = #{record.isfeight,jdbcType=INTEGER},
+        isBattery = #{record.isbattery,jdbcType=INTEGER},
+        aliPosttime = #{record.aliposttime,jdbcType=VARCHAR},
+        price4 = #{record.price4,jdbcType=DOUBLE},
+        goodsUrlMD5 = #{record.goodsurlmd5,jdbcType=VARCHAR},
+        bizPriceDiscount = #{record.bizpricediscount,jdbcType=VARCHAR},
+        spiderPrice = #{record.spiderprice,jdbcType=DOUBLE},
+        priceListSize = #{record.pricelistsize,jdbcType=VARCHAR},
+        comparealiPrice = #{record.comparealiprice,jdbcType=VARCHAR},
+        group_buy_id = #{record.groupBuyId,jdbcType=INTEGER},
+        skuid_1688 = #{record.skuid1688,jdbcType=VARCHAR},
+        isFreeShipProduct = #{record.isfreeshipproduct,jdbcType=INTEGER},
+        sampleFee = #{record.samplefee,jdbcType=DOUBLE},
+        sampleMoq = #{record.samplemoq,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.importExpress.pojo.ShopCarMarketing">
+        update shop_car_marketing
+        <set>
+            <if test="goodsdataId != null">
+                goodsdata_id = #{goodsdataId,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                userid = #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="sessionid != null">
+                sessionid = #{sessionid,jdbcType=VARCHAR},
+            </if>
+            <if test="catid != null">
+                catid = #{catid,jdbcType=VARCHAR},
+            </if>
+            <if test="itemid != null">
+                itemId = #{itemid,jdbcType=VARCHAR},
+            </if>
+            <if test="shopid != null">
+                shopId = #{shopid,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsUrl != null">
+                goods_url = #{goodsUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsTitle != null">
+                goods_title = #{goodsTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="googsSeller != null">
+                googs_seller = #{googsSeller,jdbcType=VARCHAR},
+            </if>
+            <if test="googsImg != null">
+                googs_img = #{googsImg,jdbcType=VARCHAR},
+            </if>
+            <if test="googsPrice != null">
+                googs_price = #{googsPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="googsNumber != null">
+                googs_number = #{googsNumber,jdbcType=INTEGER},
+            </if>
+            <if test="googsSize != null">
+                googs_size = #{googsSize,jdbcType=VARCHAR},
+            </if>
+            <if test="googsColor != null">
+                googs_color = #{googsColor,jdbcType=VARCHAR},
+            </if>
+            <if test="freight != null">
+                freight = #{freight,jdbcType=DOUBLE},
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time = #{deliveryTime,jdbcType=VARCHAR},
+            </if>
+            <if test="normMost != null">
+                norm_most = #{normMost,jdbcType=VARCHAR},
+            </if>
+            <if test="normLeast != null">
+                norm_least = #{normLeast,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="datatime != null">
+                datatime = #{datatime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="flag != null">
+                flag = #{flag,jdbcType=INTEGER},
+            </if>
+            <if test="pwprice != null">
+                pWprice = #{pwprice,jdbcType=VARCHAR},
+            </if>
+            <if test="trueShipping != null">
+                true_shipping = #{trueShipping,jdbcType=VARCHAR},
+            </if>
+            <if test="freightFree != null">
+                freight_free = #{freightFree,jdbcType=INTEGER},
+            </if>
+            <if test="width != null">
+                width = #{width,jdbcType=VARCHAR},
+            </if>
+            <if test="seilunit != null">
+                seilUnit = #{seilunit,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsunit != null">
+                goodsUnit = #{goodsunit,jdbcType=VARCHAR},
+            </if>
+            <if test="bulkVolume != null">
+                bulk_volume = #{bulkVolume,jdbcType=VARCHAR},
+            </if>
+            <if test="totalWeight != null">
+                total_weight = #{totalWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="perWeight != null">
+                per_weight = #{perWeight,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsEmail != null">
+                goods_email = #{goodsEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="freeShoppingCompany != null">
+                free_shopping_company = #{freeShoppingCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="freeScDays != null">
+                free_sc_days = #{freeScDays,jdbcType=VARCHAR},
+            </if>
+            <if test="preferential != null">
+                preferential = #{preferential,jdbcType=VARCHAR},
+            </if>
+            <if test="depositRate != null">
+                deposit_rate = #{depositRate,jdbcType=INTEGER},
+            </if>
+            <if test="guid != null">
+                guid = #{guid,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsType != null">
+                goods_type = #{goodsType,jdbcType=VARCHAR},
+            </if>
+            <if test="feeprice != null">
+                feeprice = #{feeprice,jdbcType=VARCHAR},
+            </if>
+            <if test="currency != null">
+                currency = #{currency,jdbcType=VARCHAR},
+            </if>
+            <if test="goodsClass != null">
+                goods_class = #{goodsClass,jdbcType=INTEGER},
+            </if>
+            <if test="extraFreight != null">
+                extra_freight = #{extraFreight,jdbcType=DOUBLE},
+            </if>
+            <if test="sourceUrl != null">
+                source_url = #{sourceUrl,jdbcType=INTEGER},
+            </if>
+            <if test="isshippingPromote != null">
+                isshipping_promote = #{isshippingPromote,jdbcType=INTEGER},
+            </if>
+            <if test="methodFeight != null">
+                method_feight = #{methodFeight,jdbcType=DOUBLE},
+            </if>
+            <if test="price1 != null">
+                price1 = #{price1,jdbcType=DOUBLE},
+            </if>
+            <if test="price2 != null">
+                price2 = #{price2,jdbcType=DOUBLE},
+            </if>
+            <if test="price3 != null">
+                price3 = #{price3,jdbcType=DOUBLE},
+            </if>
+            <if test="notfreeprice != null">
+                notfreeprice = #{notfreeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="theproductfrieght != null">
+                theproductfrieght = #{theproductfrieght,jdbcType=DOUBLE},
+            </if>
+            <if test="isvolume != null">
+                isvolume = #{isvolume,jdbcType=INTEGER},
+            </if>
+            <if test="freeprice != null">
+                freeprice = #{freeprice,jdbcType=DOUBLE},
+            </if>
+            <if test="firstprice != null">
+                firstprice = #{firstprice,jdbcType=DOUBLE},
+            </if>
+            <if test="firstnumber != null">
+                firstnumber = #{firstnumber,jdbcType=INTEGER},
+            </if>
+            <if test="updatetime != null">
+                updatetime = #{updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addprice != null">
+                addPrice = #{addprice,jdbcType=DOUBLE},
+            </if>
+            <if test="isfeight != null">
+                isFeight = #{isfeight,jdbcType=INTEGER},
+            </if>
+            <if test="isbattery != null">
+                isBattery = #{isbattery,jdbcType=INTEGER},
+            </if>
+            <if test="aliposttime != null">
+                aliPosttime = #{aliposttime,jdbcType=VARCHAR},
+            </if>
+            <if test="price4 != null">
+                price4 = #{price4,jdbcType=DOUBLE},
+            </if>
+            <if test="goodsurlmd5 != null">
+                goodsUrlMD5 = #{goodsurlmd5,jdbcType=VARCHAR},
+            </if>
+            <if test="bizpricediscount != null">
+                bizPriceDiscount = #{bizpricediscount,jdbcType=VARCHAR},
+            </if>
+            <if test="spiderprice != null">
+                spiderPrice = #{spiderprice,jdbcType=DOUBLE},
+            </if>
+            <if test="pricelistsize != null">
+                priceListSize = #{pricelistsize,jdbcType=VARCHAR},
+            </if>
+            <if test="comparealiprice != null">
+                comparealiPrice = #{comparealiprice,jdbcType=VARCHAR},
+            </if>
+            <if test="groupBuyId != null">
+                group_buy_id = #{groupBuyId,jdbcType=INTEGER},
+            </if>
+            <if test="skuid1688 != null">
+                skuid_1688 = #{skuid1688,jdbcType=VARCHAR},
+            </if>
+            <if test="isfreeshipproduct != null">
+                isFreeShipProduct = #{isfreeshipproduct,jdbcType=INTEGER},
+            </if>
+            <if test="samplefee != null">
+                sampleFee = #{samplefee,jdbcType=DOUBLE},
+            </if>
+            <if test="samplemoq != null">
+                sampleMoq = #{samplemoq,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.importExpress.pojo.ShopCarMarketing">
+    update shop_car_marketing
+    set goodsdata_id = #{goodsdataId,jdbcType=INTEGER},
+      userid = #{userid,jdbcType=INTEGER},
+      sessionid = #{sessionid,jdbcType=VARCHAR},
+      catid = #{catid,jdbcType=VARCHAR},
+      itemId = #{itemid,jdbcType=VARCHAR},
+      shopId = #{shopid,jdbcType=VARCHAR},
+      goods_url = #{goodsUrl,jdbcType=VARCHAR},
+      goods_title = #{goodsTitle,jdbcType=VARCHAR},
+      googs_seller = #{googsSeller,jdbcType=VARCHAR},
+      googs_img = #{googsImg,jdbcType=VARCHAR},
+      googs_price = #{googsPrice,jdbcType=VARCHAR},
+      googs_number = #{googsNumber,jdbcType=INTEGER},
+      googs_size = #{googsSize,jdbcType=VARCHAR},
+      googs_color = #{googsColor,jdbcType=VARCHAR},
+      freight = #{freight,jdbcType=DOUBLE},
+      delivery_time = #{deliveryTime,jdbcType=VARCHAR},
+      norm_most = #{normMost,jdbcType=VARCHAR},
+      norm_least = #{normLeast,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      datatime = #{datatime,jdbcType=TIMESTAMP},
+      flag = #{flag,jdbcType=INTEGER},
+      pWprice = #{pwprice,jdbcType=VARCHAR},
+      true_shipping = #{trueShipping,jdbcType=VARCHAR},
+      freight_free = #{freightFree,jdbcType=INTEGER},
+      width = #{width,jdbcType=VARCHAR},
+      seilUnit = #{seilunit,jdbcType=VARCHAR},
+      goodsUnit = #{goodsunit,jdbcType=VARCHAR},
+      bulk_volume = #{bulkVolume,jdbcType=VARCHAR},
+      total_weight = #{totalWeight,jdbcType=VARCHAR},
+      per_weight = #{perWeight,jdbcType=VARCHAR},
+      goods_email = #{goodsEmail,jdbcType=VARCHAR},
+      free_shopping_company = #{freeShoppingCompany,jdbcType=VARCHAR},
+      free_sc_days = #{freeScDays,jdbcType=VARCHAR},
+      preferential = #{preferential,jdbcType=VARCHAR},
+      deposit_rate = #{depositRate,jdbcType=INTEGER},
+      guid = #{guid,jdbcType=VARCHAR},
+      goods_type = #{goodsType,jdbcType=VARCHAR},
+      feeprice = #{feeprice,jdbcType=VARCHAR},
+      currency = #{currency,jdbcType=VARCHAR},
+      goods_class = #{goodsClass,jdbcType=INTEGER},
+      extra_freight = #{extraFreight,jdbcType=DOUBLE},
+      source_url = #{sourceUrl,jdbcType=INTEGER},
+      isshipping_promote = #{isshippingPromote,jdbcType=INTEGER},
+      method_feight = #{methodFeight,jdbcType=DOUBLE},
+      price1 = #{price1,jdbcType=DOUBLE},
+      price2 = #{price2,jdbcType=DOUBLE},
+      price3 = #{price3,jdbcType=DOUBLE},
+      notfreeprice = #{notfreeprice,jdbcType=DOUBLE},
+      theproductfrieght = #{theproductfrieght,jdbcType=DOUBLE},
+      isvolume = #{isvolume,jdbcType=INTEGER},
+      freeprice = #{freeprice,jdbcType=DOUBLE},
+      firstprice = #{firstprice,jdbcType=DOUBLE},
+      firstnumber = #{firstnumber,jdbcType=INTEGER},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      addPrice = #{addprice,jdbcType=DOUBLE},
+      isFeight = #{isfeight,jdbcType=INTEGER},
+      isBattery = #{isbattery,jdbcType=INTEGER},
+      aliPosttime = #{aliposttime,jdbcType=VARCHAR},
+      price4 = #{price4,jdbcType=DOUBLE},
+      goodsUrlMD5 = #{goodsurlmd5,jdbcType=VARCHAR},
+      bizPriceDiscount = #{bizpricediscount,jdbcType=VARCHAR},
+      spiderPrice = #{spiderprice,jdbcType=DOUBLE},
+      priceListSize = #{pricelistsize,jdbcType=VARCHAR},
+      comparealiPrice = #{comparealiprice,jdbcType=VARCHAR},
+      group_buy_id = #{groupBuyId,jdbcType=INTEGER},
+      skuid_1688 = #{skuid1688,jdbcType=VARCHAR},
+      isFreeShipProduct = #{isfreeshipproduct,jdbcType=INTEGER},
+      sampleFee = #{samplefee,jdbcType=DOUBLE},
+      sampleMoq = #{samplemoq,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+    <update id="updateGoodsCarPrice">
+    update shop_car_marketing set price1 = #{goodsPrice},googs_price = #{newPrice}
+    where id = #{goodsId} and userid = #{userId}
+  </update>
+
+    <delete id="deleteMarketingByUserId">
+    delete from shop_car_marketing where userid = #{userId}
+  </delete>
+
+</mapper>

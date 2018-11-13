@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>新统计报表</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+<script type="text/javascript">
+	$(function() {
+
+		$('#center_div').tabs({
+			border : false,
+			fit : true,
+			split:true
+		});
+		addTab('商品分类报表','/cbtconsole/StatisticalReport/categroyReport');
+
+	});
+
+	function addTab(subtitle, url) {
+		if (!$('#center_div').tabs('exists', subtitle)) {
+			$('#center_div').tabs('add', {
+				title : subtitle,
+				content : createFrame(url),
+				closable : true,
+				width : $('#mainPanle').width() - 10,
+				height : $('#mainPanle').height() - 26
+			});
+		} else {
+			$('#center_div').tabs('select', subtitle);
+		}
+	}
+
+	function createFrame(url) {
+		var s = '<iframe name="mainFrame" scrolling="auto" frameborder="0"  src="'
+				+ url + '" style="width:100%;height:100%;"></iframe>';
+		return s;
+	}
+</script>
+<style type="text/css">
+.menu-text{font-size:14px;}
+.panel-body{overflow-y: inherit;}
+</style>
+</head>
+<body class="easyui-layout">
+	<div id="west_div" data-options="region:'west',title:'统计菜单'"
+		style="width: 200px;">
+
+		<div id="mm_div" class="easyui-menu" data-options="inline:true"
+			style="width: 100%;">
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('商品分类报表','/cbtconsole/StatisticalReport/categroyReport')">商品分类报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('订单分类报表','/cbtconsole/StatisticalReport/orderReport')">订单分类报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('商品购买报表','/cbtconsole/StatisticalReport/orderReport1')">商品购买报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('销售统计报表','/cbtconsole/StatisticalReport/salesReport')">销售统计报表</div>		
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('采购统计报表','/cbtconsole/StatisticalReport/purchaseReport')">采购统计报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('拆包统计/采购包裹统计','/cbtconsole/StatisticalReport/UnpackPurchaseReport')">拆包统计/采购包裹统计</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('包裹出库统计','/cbtconsole/StatisticalReport/outPackageReport')">包裹出库统计</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('采购订单对账报表','/cbtconsole/StatisticalReport/taoBaoOrderReport')">采购订单对账报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('出入库明细统计报表','/cbtconsole/StatisticalReport/inOutDetailsReport')">出入库明细统计报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('商品库存统计报表','/cbtconsole/StatisticalReport/goodsInventoryReport')">商品库存统计报表</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('订单延迟发货统计','/cbtconsole/website/shipmentcount.jsp')">订单延迟发货统计</div>
+			<div data-options="iconCls:'icon-add'" onclick="javascript:addTab('无货率统计','/cbtconsole/StatisticalReport/noAvailableRateStatistics')">无货率统计</div>	
+		</div>
+	</div>
+	<div id="center_div" data-options="region:'center'"
+		style="padding: 5px; background: #eee;" class="easyui-tabs">
+	</div>
+</body>
+</html>

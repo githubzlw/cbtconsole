@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.feedback.dao.SubscribeEmailMapper">
+	<resultMap id="SubscribeEmailResultMap" type="com.cbt.feedback.bean.SubscribeEmail">
+		<id column="id" property="id" />
+		<result column="email" property="email" />
+		<result column="create_time" property="createTime" />
+		<result column="label" property="label" />
+	</resultMap>
+
+	<sql id="SubscribeEmailColumn">
+		id,email,create_time,label
+	</sql>
+
+	<select id="queryForList" resultMap="SubscribeEmailResultMap">
+		select
+		<include refid="SubscribeEmailColumn"></include>
+		from subscribe_email
+	</select>
+
+	<insert id="insertSubscribeEmail" parameterType="com.cbt.feedback.bean.SubscribeEmail">
+		insert into
+		subscribe_email(email,create_time)
+		values(#{email},#{createTime})
+	</insert>
+
+	<update id="updateSubscribeEmail" parameterType="com.cbt.feedback.bean.SubscribeEmail">
+		update subscribe_email
+		<set>
+			<if test="email !=null and email !=0">
+				email = #{email},
+			</if>
+			<if test="label !=null and label !=0">
+				label = #{label},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteSubscribeEmail" parameterType="java.lang.Integer">
+		delete from
+		subscribe_email
+		where id = #{id}
+	</delete>
+
+
+</mapper>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PayPal导入数据查询</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+</head>
+<style type="text/css">
+.datagrid-htable {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 30px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+#ppip_query_form {
+	font-size: 18px;
+}
+
+.top_div_style span {
+	font-size: 18px !important;
+}
+
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+#ppip_rYear, #ppip_rMonth, .but_color {
+	padding: 5px;
+	font-size: 14px
+}
+
+#ppip_rYear, #ppip_rMonth {
+	margin-right: 18px
+}
+
+#ppip_top_toolbar {
+	padding: 20px 28px !important;
+}
+
+.datagrid-header .datagrid-cell span, .datagrid-cell,
+	.datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 14px;
+}
+</style>
+<script type="text/javascript">
+	$(function() {
+		setDatagrid();
+		var opts = $("#ppip_easyui-datagrid").datagrid("options");
+		opts.url = "/cbtconsole/basicStatistical/orderFinancial";
+	});
+	function setDatagrid() {
+		$('#ppip_easyui-datagrid').datagrid({
+			title : '订单财务统计',
+			width : "100%",
+			fit : true,//自动补全 
+			striped : true,//设置为true将交替显示行背景。
+			collapsible : true,//显示可折叠按钮
+			toolbar : "#ppip_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+			url : '',//url调用Action方法
+			loadMsg : '数据装载中......',
+			singleSelect : true,//为true时只能选择单行
+			fitColumns : true,//允许表格自动缩放，以适应父容器
+			rownumbers : true,
+			style : {
+				padding : '8 8 10 8'
+			},
+			onLoadError : function() {
+				$.message.alert("提示信息", "获取数据信息失败");
+				return;
+			},
+			onLoadSuccess : function(data) {
+				if (!data.success) {
+					showMessage(data.message);
+				}
+			}
+		});
+	}
+
+	function doPpipQuery() {
+		var year = $("#ppip_rYear").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
+			return;
+		}
+		var month = $("#ppip_rMonth").val();
+		$("#ppip_easyui-datagrid").datagrid("load", {
+			"year" : year,
+			"month" : month
+		});
+	}
+
+	function doPpipReset() {
+		$("#ppip_query_form")[0].reset();
+	}
+
+	function exportPpipExcel() {
+		/* var year = $("#ppip_rYear").val();
+		if (year == null || year == "" || year == "0" || year == "-1") {
+			showMessage('请选择年份');
+			return;
+		}
+		var month = $("#ppip_rMonth").val();
+		window.location.href = "/cbtconsole/basicStatistical/exportOrderFinancialExcel?year="
+				+ year + "&month=" + month; */
+				//window.location.href = "/cbtconsole/basicStatistical/exportPayPalRevenueExcel";
+		window.location.href = "/cbtconsole/basicStatistical/exportTotalRefundExcel";
+		
+		
+	}
+
+	function showMessage(message) {
+		$.messager.show({
+			title : '提醒',
+			msg : message,
+			timeout : 2000,
+			showType : 'slide',
+			style : {
+				right : '',
+				top : ($(window).height() * 0.15),
+				bottom : ''
+			}
+		});
+	}
+
+	
+	function doPpipSelectChange(){
+		var mydate = new Date();
+		var rYear =mydate.getFullYear(); 
+		var rMonth = mydate.getMonth();
+		var monthop = "<option>选择月份</option>";
+		$('#ppip_rMonth').empty();
+		if($('#ppip_rYear').val() == rYear){
+			for(var i=1;i<=rMonth+1;i++){
+				monthop+="<option value='"+i+"'>"+i+"</oiption>";
+			}
+			$('#ppip_rMonth').append(monthop);
+		}else{
+			for(var i=1;i<=12;i++){
+				monthop+="<option value='"+i+"'>"+i+"</oiption>";
+			}
+			$('#ppip_rMonth').append(monthop);
+		}
+	}
+</script>
+<body>
+	<div id="ppip_top_toolbar" style="padding: 5px; height: auto">
+		<div>
+			<form id="ppip_query_form" action="#" onsubmit="return false;">
+				<label for="ppip_rYear">年份选择<font color="red">*</font>：
+				</label> <select name="year" id="ppip_rYear">
+				<option value='-1'>请选择</option>
+				<option value='2016'>2016</option>
+				<option value='2017'>2017</option>
+				</select><label for="ppip_rMonth">月份选择： </label> 
+				<select name="month" id="ppip_rMonth" onchange="doPpipSelectChange()">
+					<option value='-1'>选择月份</option>
+				</select> <input class="but_color" type="button" value="查询"
+					onclick="doPpipQuery()"> <input class="but_color" type="button"
+					value="重置" onclick="doPpipReset()"> <input class="but_color"
+					type="button" value="导出Excel" onclick="exportPpipExcel()">
+			</form>
+		</div>
+	</div>
+	<table id="ppip_easyui-datagrid" style="width: 100%; height: 100%;"
+		class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th data-options="field:'year',width:'50px'">年月份</th>
+				<!-- <th data-options="field:'month',width:'25px'">月份</th> -->
+				<th data-options="field:'orderSales',width:'100px'">本月实际销售额(R1)</th>
+				<th data-options="field:'payPalRevenue',width:'100px'">PayPal总收入(V)</th>
+				<th data-options="field:'notStartedOrderAmount',width:'100px'">未启动订单总金额(X)</th>
+				<th data-options="field:'orderFinishRefund',width:'100px'">本月订单完结后的退款(Y)</th>
+				<th data-options="field:'totalRefund',width:'100px'">本月PayPal总退款</th>
+				<th data-options="field:'balancePayment',width:'100px'">总余额支付(W)</th>
+				<th data-options="field:'balanceWithdrawal',width:'100px'">总余额提现(Z)</th>
+				<th data-options="field:'newBalance',width:'100px'">本月新增加的余额之和(U)</th>
+				<th data-options="field:'totalActualRefund',width:'100px'">本月PayPal实际总退款</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</body>
+</html>

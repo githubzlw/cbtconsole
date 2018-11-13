@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>规格翻译对照</title>
+<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+<script>
+	$(function() {
+		//填充一级的下拉框
+		$
+				.ajax({
+					type : 'POST',
+					async : false,
+					url : '../specification/queryAliCategoryByLvOne',
+					success : function(data) {
+						if (data.ok) {
+							var aliCategory = data.data;
+							var optionstring = "";
+							for (var i = 0; i < aliCategory.length; i++) {
+								optionstring += '<option value="' + aliCategory[i].cid + '">'
+										+ aliCategory[i].category + '</option>';
+							}
+							$("#selectLvOne").append(optionstring);
+						} else {
+							alert(data.message);
+						}
+					}
+				});
+
+		/* var menuYloc = $("#mappingDiv").offset().top + 100;
+		$(window).scroll(function() {
+			var offsetTop = menuYloc + $(window).scrollTop() + "px";
+			$("#mappingDiv").animate({
+				top : offsetTop
+			}, {
+				duration : 600,
+				queue : false
+			});
+		}); */
+
+	});
+
+	function lvChange(num) {
+		var cid = "";
+		var lv = 2;
+		var selectId = "";
+		switch (num) {
+		case 1:
+			cid = $("#selectLvOne").val();
+			lv = 2;
+			selectId = "#selectLvTwo";
+			break;
+		case 2:
+			cid = $("#selectLvTwo").val();
+			lv = 3;
+			selectId = "#selectLvThree";
+			break;
+		case 3:
+			cid = $("#selectLvThree").val();
+			lv = 4;
+			selectId = "#selectLvFour";
+			break;
+		case 4:
+			cid = $("#selectLvFour").val();
+			lv = 5;
+			selectId = "#selectLvFive";
+			break;
+		}
+		if (!(cid == null || cid == "")) {
+			$.ajax({
+				type : 'POST',
+				async : false,
+				url : '../specification/queryAliCategoryByCidAndLv',
+				data : {
+					cid : cid,
+					lv : lv
+				},
+				success : function(data) {
+					if (data.ok) {
+						var aliCategory = data.data;
+						var optionstring = "";
+						for (var i = 0; i < aliCategory.length; i++) {
+							optionstring += '<option value="' + aliCategory[i].cid + '">'
+									+ aliCategory[i].category + '</option>';
+						}
+						var pleaseSelect = '<option value="">请选择</option>';
+						$(selectId).empty();
+						$(selectId).append(pleaseSelect);
+						$(selectId).append(optionstring);
+						clearSelect(lv);
+					} else {
+						alert(data.message);
+					}
+				}
+			});
+		} else {
+			clearSelect(num);
+		}
+
+	}
+
+	function clearSelect(num) {
+		var pleaseSelect = '<option value="">请选择</option>';
+		if (num == 4) {
+			$("#selectLvFive").empty();
+			$("#selectLvFive").append(pleaseSelect);
+		} else if (num == 3) {
+			$("#selectLvFive").empty();
+			$("#selectLvFour").empty();
+			$("#selectLvFive").append(pleaseSelect);
+			$("#selectLvFour").append(pleaseSelect);
+		} else if (num == 2) {
+			$("#selectLvFive").empty();
+			$("#selectLvFour").empty();
+			$("#selectLvThree").empty();
+			$("#selectLvFive").append(pleaseSelect);
+			$("#selectLvFour").append(pleaseSelect);
+			$("#selectLvThree").append(pleaseSelect);
+		} else if (num == 1) {
+			$("#selectLvFive").empty();
+			$("#selectLvFour").empty();
+			$("#selectLvThree").empty();
+			$("#selectLvTwo").empty();
+			$("#selectLvFive").append(pleaseSelect);
+			$("#selectLvFour").append(pleaseSelect);
+			$("#selectLvThree").append(pleaseSelect);
+			$("#selectLvTwo").append(pleaseSelect);
+		}
+	}
+
+	function doQuery() {
+		var selectLvOne = $("#selectLvOne").val();
+		var selectLvTwo = $("#selectLvTwo").val();
+		var selectLvThree = $("#selectLvThree").val();
+		var selectLvFour = $("#selectLvFour").val();
+		var selectLvFive = $("#selectLvFive").val();
+		var optionValOne = $("#selectLvOne").find("option:selected").text();
+		var optionValTwo = $("#selectLvTwo").find("option:selected").text();
+		var optionValThree = $("#selectLvThree").find("option:selected").text();
+		var optionValFour = $("#selectLvFour").find("option:selected").text();
+		var optionValFive = $("#selectLvFive").find("option:selected").text();
+		if (!(selectLvFive == null || selectLvFive == "")) {
+			$("#translationLvFive").text("> " + optionValFive);
+			$("#translationLvFour").text("> " + optionValFour);
+			$("#translationLvThree").text("> " + optionValThree);
+			$("#translationLvTwo").text("> " + optionValTwo);
+			$("#translationLvOne").text("> " + optionValOne);
+			showTranslationTable(selectLvFive);
+		} else if (!(selectLvFour == null || selectLvFour == "")) {
+			$("#translationLvFour").text("> " + optionValFour);
+			$("#translationLvThree").text("> " + optionValThree);
+			$("#translationLvTwo").text("> " + optionValTwo);
+			$("#translationLvOne").text("> " + optionValOne);
+			showTranslationTable(selectLvFour);
+		} else if (!(selectLvThree == null || selectLvThree == "")) {
+			$("#translationLvThree").text("> " + optionValThree);
+			$("#translationLvTwo").text("> " + optionValTwo);
+			$("#translationLvOne").text("> " + optionValOne);
+			showTranslationTable(selectLvThree);
+		} else if (!(selectLvTwo == null || selectLvTwo == "")) {
+			$("#translationLvTwo").text("> " + optionValTwo);
+			$("#translationLvOne").text("> " + optionValOne);
+			showTranslationTable(selectLvTwo);
+		} else if (!(selectLvOne == null || selectLvOne == "")) {
+			$("#translationLvOne").text("> " + optionValOne);
+			showTranslationTable(selectLvOne);
+		} else {
+			alert("请选择规格级别!");
+		}
+	}
+
+	function showTranslationTable(cid) {
+		$("#translationCid").val(cid);
+		$("#mappingDiv").hide();
+		$.ajax({
+			async : false,
+			type : 'POST',
+			url : '../specification/queryTranslationByCid',
+			data : {
+				cid : cid
+			},
+			success : function(data) {
+				if (data.ok) {
+					var translations = data.data;
+					$("#translationTable tbody").empty();
+					if (translations.length > 0) {
+						var tbody = '';
+						for (var i = 0; i < translations.length; i++) {
+							var typeInt = parseInt(translations[i].type);
+							tbody += '<tr><td><input type="checkbox" class="check_style" id="' 
+									+ translations[i].id 
+									+ '" /></td><td>'
+									+ translations[i].id
+									+ '</td><td>'
+									+ (translations[i].enName == null ? ""
+											: translations[i].enName)
+									+ '</td><td>'
+									+ (translations[i].chName == null ? ""
+											: translations[i].chName)
+									+ '</td><td>'
+									+ (typeInt == 1 ? "选择区"
+											: typeInt == 2 ? "详情区" : "")
+									+ '</td><td style="text-align: center;">'
+									+ '<a href="#" class="tab_bj tank" onclick="editTranslation('
+									+ translations[i].id
+									+ ',\''
+									+ (translations[i].enName == null ? ""
+											: translations[i].enName)
+									+ '\',\''
+									+ (translations[i].chName == null ? ""
+											: translations[i].chName)
+									+ '\','
+									+ translations[i].type
+									+ ')">编辑</a><a href="#" class="tab_bj tank" onclick="deleteTransById('
+									+ translations[i].id
+									+ ',0)">删除</a>'
+									+ '<a href="#" class="tab_bj tank" onclick="showMappingByTransId('
+									+ cid
+									+ ','
+									+ translations[i].id
+									+ ',\''
+									+ translations[i].enName
+									+ '\',this)">查看属性</a></td></tr>';
+						}
+						$("#translationTable tbody").append(tbody);
+						addTranslationClass();
+					} else {
+						alert("当前无数据！");
+					}
+				} else {
+					alert(data.message);
+				}
+			}
+		});
+	}
+
+	function addTranslationClass() {
+		//隔行表色
+		$("#translationTable tbody tr:even").addClass("even");
+		$("#translationTable tbody tr:odd").addClass("odd");
+
+		/* $("#translationTable tbody tr").click(function() {
+			var isShow = $("#mappingDiv").is(":hidden");
+			
+			if (isShow) {
+				$(this).addClass('selected') //为选中项添加高亮
+				.siblings().removeClass('selected')//去除其他项的高亮形式
+				.end();
+			}
+
+		}); */
+		//滑动变色
+		$("#translationTable tbody tr").mouseover(function() {
+			$(this).addClass("se");
+		}).mouseout(function() {
+			$(this).removeClass("se");
+		});
+	}
+
+	function editTranslation(id, enName, chName, type) {
+		$("#translationId").val(id);
+		$("#translationEnName").val(enName);
+		$("#translationChName").val(chName);
+		if (type != null && type != 0) {
+			$("#translationType").val(type);
+		}
+		showTranslationEdit(2);
+	}
+
+	function showTranslationEdit(type) {
+		$("#translationEditType").val(type);
+		if (type == 1) {
+			$("#translationEnName").val("");
+			$("#translationChName").val("");
+		}
+		$(".black_bj").show();
+		$(".neir_1").show();
+	}
+
+	function batchTranslationDelete() {
+		var ids = "";
+		var offset = 0;
+		var arrTr = $("#translationTable tbody tr");
+		$(arrTr).each(function() {
+			var isChecked = $(this).find('td').eq(0).find('input');
+			if (isChecked.attr("checked") == "checked") {
+				ids += "," + isChecked.attr("id");
+				if (isChecked.offset().top > offset) {
+					offset = isChecked.offset().top;
+				}
+			}
+		});
+		if (ids == "") {
+			alert("获取ids失败，请确认是否选中！");
+		} else {
+			ids = ids.substring(1);
+			deleteTransById(ids, offset);
+		}
+
+	}
+
+	function closeTranslationEdit() {
+		$(".neir_1").hide();
+		$(".black_bj").hide();
+		$("#synSpcOtherCategories").attr("checked", false);
+	}
+
+	function saveTranslation() {
+
+		var isSyn = "N";
+		if ($("#synSpcOtherCategories").is(":checked")) {
+			if (confirm("确定要同步翻译吗？")) {
+				isSyn = "Y";
+			} else {
+				return;
+			}
+		}
+
+		var editType = $("#translationEditType").val();
+		var id = $("#translationId").val();
+		var enName = $("#translationEnName").val();
+		var chName = $("#translationChName").val();
+		var type = $("#translationType").val();
+		var productCategoryId = $("#translationCid").val();
+		if (productCategoryId == null || productCategoryId == "") {
+			alert("获取物品类别id失败，请重新选择物品类别,查询后新增或编辑！");
+			return;
+		}
+		if (enName == null || enName == "" || chName == null || chName == "") {
+			alert("请输入英文名或中文名!");
+			return;
+		}
+		if (type == null || type == "") {
+			alert("获取类别失败，请重新选择!");
+			return;
+		}
+		if (editType == 1) {
+			$.ajax({
+				type : 'POST',
+				async : false,
+				url : '../specification/insertTranslation',
+				data : {
+					id : id,
+					enName : enName,
+					chName : chName,
+					type : type,
+					productCategoryId : productCategoryId,
+					isSyn : isSyn
+				},
+				success : function(data) {
+					if (data.ok) {
+						//alert(data.message);
+						closeTranslationEdit();
+						doQuery();
+					} else {
+						alert(data.message);
+					}
+				}
+			});
+		} else if (editType == 2) {
+			if (!(id == null || id == "")) {
+				$.ajax({
+					type : 'POST',
+					async : false,
+					url : '../specification/updateTranslation',
+					data : {
+						id : id,
+						enName : enName,
+						chName : chName,
+						type : type,
+						productCategoryId : productCategoryId,
+						isSyn : isSyn
+					},
+					success : function(data) {
+						if (data.ok) {
+							//alert(data.message);
+							closeTranslationEdit();
+							doQuery();
+						} else {
+							alert(data.message);
+						}
+					}
+				});
+			} else {
+				alert("获取id失败，请重试!");
+				return;
+			}
+
+		}
+
+	}
+
+	function showMappingByTransId(cid, translationId, translationEnName, obj) {
+		if (obj != null) {
+			var trObj = $(obj).parent().parent();
+			if (trObj != null) {
+				$(trObj).addClass('selected') //为选中项添加高亮
+				.siblings().removeClass('selected')//去除其他项的高亮形式
+				.end();
+			}
+		}
+
+		var offset = $(".selected").offset().top;
+		var scrollTop = $(document).scrollTop();
+		if (offset > 0) {
+			$("#mappingDiv").css("position", "absolute");
+			$("#mappingDiv").css("right", "20px");
+			$("#mappingDiv").css("display", "block");
+			$("#mappingDiv").css("top", (offset + -98) + "px");
+			//$("#mappingDiv").css("top", (offset - 98) + "px");
+		}
+
+		showMappingTitle();
+		$("#mappingCid").val(cid);
+		$("#transToMappingId").val(translationId);
+		$("#transToMappingEnName").text("> " + translationEnName);
+		$("#transToMappingEditEnName").text("> " + translationEnName);
+		$.ajax({
+			type : 'POST',
+			async : false,
+			url : '../specification/queryMappingByTranslationId',
+			data : {
+				translationId : translationId
+			},
+			success : function(data) {
+				if (data.ok) {
+					showMappingTable(data.data);
+				} else {
+					alert(data.message);
+				}
+			}
+		});
+		//$(window).scrollTop(offset -98);
+		//$(document).scrollTop(offset + 98);
+		animateScroll(scrollTop);
+		return false;
+	}
+
+	function deleteTransById(ids, offset) {
+		var scrollTop = $(document).scrollTop();
+		if (confirm("是否删除？")) {
+			$.ajax({
+				type : 'POST',
+				async : false,
+				url : '../specification/deleteTranslationById',
+				data : {
+					translationIds : ids
+				},
+				success : function(data) {
+					if (data.ok) {
+						alert(data.message);
+						doQuery();
+					} else {
+						alert(data.message);
+					}
+				}
+			});
+		}
+		if (offset >= 0) {
+			if (offset > scrollTop) {
+				animateScroll(offset);
+			} else{
+				animateScroll(scrollTop);
+			}
+		}
+		return false;
+	}
+	
+	function animateScroll(top){
+		$("html,body").animate({
+			scrollTop : top
+		}, {
+			duration : 600,
+			queue : false
+		});
+	}
+
+	function showMappingTitle() {
+		var selectLvOne = $("#selectLvOne").val();
+		var selectLvTwo = $("#selectLvTwo").val();
+		var selectLvThree = $("#selectLvThree").val();
+		var selectLvFour = $("#selectLvFour").val();
+		var selectLvFive = $("#selectLvFive").val();
+		var optionValOne = $("#selectLvOne").find("option:selected").text();
+		var optionValTwo = $("#selectLvTwo").find("option:selected").text();
+		var optionValThree = $("#selectLvThree").find("option:selected").text();
+		var optionValFour = $("#selectLvFour").find("option:selected").text();
+		var optionValFive = $("#selectLvFive").find("option:selected").text();
+		if (!(selectLvFive == null || selectLvFive == "")) {
+			$("#mappingLvOne").text(optionValOne);
+			$("#mappingLvTwo").text("> " + optionValTwo);
+			$("#mappingLvThree").text("> " + optionValThree);
+			$("#mappingLvFour").text("> " + optionValFour);
+			$("#mappingLvFive").text("> " + optionValFive);
+			$("#mappingEditLvOne").text(optionValOne);
+			$("#mappingEditLvTwo").text("> " + optionValTwo);
+			$("#mappingEditLvThree").text("> " + optionValThree);
+			$("#mappingEditLvFour").text("> " + optionValFour);
+			$("#mappingEditLvFive").text("> " + optionValFive);
+		} else if (!(selectLvFour == null || selectLvFour == "")) {
+			$("#mappingLvOne").text(optionValOne);
+			$("#mappingLvTwo").text("> " + optionValTwo);
+			$("#mappingLvThree").text("> " + optionValThree);
+			$("#mappingLvFour").text("> " + optionValFour);
+			$("#mappingEditLvOne").text(optionValOne);
+			$("#mappingEditLvTwo").text("> " + optionValTwo);
+			$("#mappingEditLvThree").text("> " + optionValThree);
+			$("#mappingEditLvFour").text("> " + optionValFour);
+		} else if (!(selectLvThree == null || selectLvThree == "")) {
+			$("#mappingLvOne").text(optionValOne);
+			$("#mappingLvTwo").text("> " + optionValTwo);
+			$("#mappingLvThree").text("> " + optionValThree);
+			$("#mappingEditLvOne").text(optionValOne);
+			$("#mappingEditLvTwo").text("> " + optionValTwo);
+			$("#mappingEditLvThree").text("> " + optionValThree);
+		} else if (!(selectLvTwo == null || selectLvTwo == "")) {
+			$("#mappingLvOne").text(optionValOne);
+			$("#mappingLvTwo").text("> " + optionValTwo);
+			$("#mappingEditLvOne").text(optionValOne);
+			$("#mappingEditLvTwo").text("> " + optionValTwo);
+		} else if (!(selectLvOne == null || selectLvOne == "")) {
+			$("#mappingLvOne").text(optionValOne);
+			$("#mappingEditLvOne").text(optionValOne);
+		}
+	}
+
+	function showMappingTable(mappingData) {
+		$("#mappingTable tbody").empty();
+		if (mappingData.length > 0) {
+			var tbody = '';
+			for (var i = 0; i < mappingData.length; i++) {
+				tbody += '<tr><td><input type="checkbox" class="check_style" id="' 
+						+ mappingData[i].id 
+						+ '" /></td><td>'
+						+ mappingData[i].id
+						+ '</td><td>'
+						+ (mappingData[i].enName == null ? ""
+								: mappingData[i].enName)
+						+ '</td><td>'
+						+ (mappingData[i].chName == null ? ""
+								: mappingData[i].chName)
+						+ '</td><td style="text-align: center;">'
+						+ '<a href="#" class="tab_bj tank" onclick="editMapping('
+						+ mappingData[i].id
+						+ ',\''
+						+ (mappingData[i].enName == null ? ""
+								: mappingData[i].enName)
+						+ '\',\''
+						+ (mappingData[i].chName == null ? ""
+								: mappingData[i].chName)
+						+ '\')">编辑</a><a href="#" class="tab_bj tank" onclick="deleteMapping('
+						+ mappingData[i].id + ')">删除</a></td></tr>';
+			}
+			$("#mappingTable tbody").append(tbody);
+			addMappingClass();
+			$("#mappingDiv").show();
+		} else {
+			alert("当前无数据！");
+			$("#mappingDiv").show();
+		}
+	}
+
+	function addMappingClass() {
+		//隔行表色
+		$("#mappingTable tbody tr:even").addClass("even");
+		$("#mappingTable tbody tr:odd").addClass("odd");
+
+		$("#mappingTable tbody tr").click(function() {
+			$(this).addClass('selected') //为选中项添加高亮
+			.siblings().removeClass('selected')//去除其他项的高亮形式
+			.end();
+		});
+		//滑动变色
+		$("#mappingTable tbody tr").mouseover(function() {
+			$(this).addClass("se");
+		}).mouseout(function() {
+			$(this).removeClass("se");
+		});
+	}
+
+	function editMapping(id, enName, chName) {
+		$("#mappingId").val(id);
+		$("#mappingEnName").val(enName);
+		$("#mappingChName").val(chName);
+		showMappingEdit(2);
+	}
+
+	function showMappingEdit(type) {
+		$("#mappingEditType").val(type);
+		if (type == 1) {
+			$("#mappingEnName").val("");
+			$("#mappingChName").val("");
+		}
+		$(".neir_2").show();
+		$(".black_bj").show();
+	}
+
+	function batchMappingDelete() {
+		var ids = "";
+		var arrTr = $("#mappingTable tbody tr");
+		$(arrTr).each(function() {
+			var isChecked = $(this).find('td').eq(0).find('input');
+			if (isChecked.attr("checked") == "checked") {
+				ids += "," + isChecked.attr("id");
+			}
+		});
+		if (ids == "") {
+			alert("获取ids失败，请确认是否选中！");
+		} else {
+			ids = ids.substring(1);
+			deleteMapping(ids);
+		}
+	} 
+
+	function saveMapping() {
+
+		var isSyn = "N";
+		if ($("#synMappingOtherCategories").is(":checked")) {
+			if (confirm("确定要同步翻译吗？")) {
+				isSyn = "Y";
+			} else {
+				return;
+			}
+		}
+
+		var editType = $("#mappingEditType").val();
+		var id = $("#mappingId").val();
+		var enName = $("#mappingEnName").val();
+		var chName = $("#mappingChName").val();
+		var productCategoryId = $("#mappingCid").val();
+		var specificationId = $("#transToMappingId").val();
+		if (productCategoryId == null || productCategoryId == "") {
+			alert("获取物品类别id失败，请重新查询规格名！");
+			return;
+		}
+		if (specificationId == null || specificationId == "") {
+			alert("获取规格id失败，请重新查看规格属性！");
+			return;
+		}
+		if (enName == null || enName == "" || chName == null || chName == "") {
+			alert("请输入英文名或中文名!");
+			return;
+		}
+		if (editType == 1) {
+			$.ajax({
+				type : 'POST',
+				async : false,
+				url : '../specification/insertMapping',
+				data : {
+					id : id,
+					enName : enName,
+					chName : chName,
+					productCategoryId : productCategoryId,
+					specificationId : specificationId,
+					isSyn : isSyn
+				},
+				success : function(data) {
+					if (data.ok) {
+						//alert(data.message);
+						closeMappingEdit();
+						reQueryMapping();
+					} else {
+						alert(data.message);
+					}
+				}
+			});
+		} else if (editType == 2) {
+			if (!(id == null || id == "")) {
+				$.ajax({
+					type : 'POST',
+					async : false,
+					url : '../specification/updateMapping',
+					data : {
+						id : id,
+						enName : enName,
+						chName : chName,
+						productCategoryId : productCategoryId,
+						specificationId : specificationId,
+						isSyn : isSyn
+					},
+					success : function(data) {
+						if (data.ok) {
+							//alert(data.message);
+							closeMappingEdit();
+							reQueryMapping();
+						} else {
+							alert(data.message);
+						}
+					}
+				});
+			} else {
+				alert("获取id失败，请重试!");
+				return;
+			}
+
+		}
+
+	}
+
+	function reQueryMapping() {
+		var cid = $("#mappingCid").val();
+		var translationId = $("#transToMappingId").val();
+		var translationEnName = $("#transToMappingEditEnName").val();
+		showMappingByTransId(cid, translationId, translationEnName, null);
+	}
+
+	function closeMappingEdit() {
+		$(".neir_2").hide();
+		$(".black_bj").hide();
+		$("#synMappingOtherCategories").attr("checked", false);
+	}
+
+	function deleteMapping(mappingIds) {
+		if (confirm("是否删除？")) {
+			$.ajax({
+				type : 'POST',
+				async : false,
+				url : '../specification/deleteMapping',
+				data : {
+					ids : mappingIds
+				},
+				success : function(data) {
+					if (data.ok) {
+						alert(data.message);
+						reQueryMapping();
+					} else {
+						alert(data.message);
+					}
+				}
+			});
+		}
+		return false;
+
+	}
+	
+	function clearAll(type){
+		if(type == 1){
+			$("#translationTable tbody tr").each(function(){
+				var isChecked = $(this).find("td").eq(0).find("input[type='checkbox']").attr("checked");  
+				if(isChecked){
+					$(this).find("td").eq(0).find("input[type='checkbox']").removeAttr("checked"); 
+				}  
+			});
+		} else if(type == 2){
+			$("#mappingTable tbody tr").each(function(){
+				var isChecked = $(this).find("td").eq(0).find("input[type='checkbox']").attr("checked");  
+				if(isChecked){
+					$(this).find("td").eq(0).find("input[type='checkbox']").removeAttr("checked"); 
+				} 
+			});
+		}
+	}
+	
+	function selectAll(type){
+		if(type == 1){
+			$("#translationTable tbody tr").each(function(){
+				$(this).find("td").eq(0).find("input[type='checkbox']").attr("checked",'true');   
+			});
+		} else if(type == 2){
+			$("#mappingTable tbody tr").each(function(){
+				$(this).find("td").eq(0).find("input[type='checkbox']").attr("checked",'true');   
+			});
+		}
+	}
+</script>
+<style>
+.tab_ul {width: 90%;margin: auto;}
+.tab_ul ul {width: 100%;list-style: none;display: inline-block;padding: 0 0;margin: 10px;}
+.tab_ul ul li {float: left;padding: 5px 5px;}
+.tab_ul ul li select {width: 200px;padding: 2px 5px 5px;}
+.tab {margin: auto;width: 98%;}
+.tab1 {width: 55%;float: left;}
+.tab1_title {width: 100%;background: #e2e2e2;margin: 5px 0px;}
+.tab1 table {width: 100%;}
+.tab2 {width: 42%;}
+.tab2_title {width: 100%;background: #e2e2e2;margin: 5px 0px;}
+.tab2 table {width: 100%;}
+.tab_bj {margin: 0px 10px;}
+.tab_name {margin-left: 10px;margin-top: 45px;}
+.tab_name label {width: 100px;text-align: center;float: left;}
+.tab_name span {color: red;font-size: 16px;}
+.jul {float: right;margin: 0px 0px 0px 5px;}
+.baocun {background: #00b7ff;color: #fff;}
+.inp_bj {width: 100%;background: #e2e2e2;height: 40px;position: absolute;bottom: 0px;cursor: pointer;}
+.inp_bj span {width: 50%;float: left;text-align: center;height: 40px;line-height: 40px;}
+.black_bj {background: #000;opacity: 0.3;position: fixed;top: 0px;left: 0px;right: 0px;bottom: 0px;}
+.neir {width: 660px;height: 320px;position: fixed;background: #fff;border-radius: 5px;top: 35%;left: 35%;}
+.table_bg th {background: #b0b0b0;}
+.black_bj, .neir_1, .neir_2 {display: none;}
+.even {background-color: #fff;}
+.odd {background-color: #f8f8f8;}
+.selected {background-color: #f90;}
+.se {background-color: #099;}
+.but_color {background: #44a823;width: 80px;height: 26px;border: 1px #aaa solid;color: #fff;}
+.but_clear{background: #bf7530;width: 80px;height: 26px;border: 1px #aaa solid;color: #fff;}
+.but_del {background: #e72060;width: 80px;height: 26px;border: 1px #aaa solid;color: #fff;}
+#translationEnName, #translationChName, #mappingEnName, #mappingChName {width: 45%;height: 24px;}
+.check_style {height: 16px;width: 16px;}
+</style>
+
+</head>
+
+<body>
+	<div class="tab_ul">
+		<ul>
+			<li><span>一级</span> <select id="selectLvOne" name="selectLvOne"
+				onchange="lvChange(1)">
+					<option value="">请选择</option>
+			</select></li>
+			<li><span>二级</span> <select id="selectLvTwo" name="selectLvTwo"
+				onchange="lvChange(2)">
+					<option value="">请选择</option>
+			</select></li>
+			<li><span>三级</span> <select id="selectLvThree"
+				name="selectLvThree" onchange="lvChange(3)">
+					<option value="">请选择</option>
+			</select></li>
+			<li><span>四级</span> <select id="selectLvFour"
+				name="selectLvFour" onchange="lvChange(4)">
+					<option value="">请选择</option>
+			</select></li>
+			<li><span>五级</span> <select id="selectLvFive"
+				name="selectLvFive">
+					<option value="">请选择</option>
+			</select></li>
+			<li><button class="but_color" onclick="doQuery()">查询</button></li>
+		</ul>
+
+	</div>
+	<div class="tab">
+		<div class="tab1">
+			<p class="tab1_title">规格名称</p>
+			<input type="button" class="but_del jul" value="批量删除" onclick="batchTranslationDelete()"> 
+			<input type="button" class="but_color jul" value="增加" onclick="showTranslationEdit(1)">
+			<input class="but_clear jul" type="button" value="全清" onclick="clearAll(1)">
+			<input class="but_color jul" type="button" value="全选" onclick="selectAll(1)">
+			<table id="translationTable" class="table_bg" border="1px"
+				bordercolor="#ccc" cellspacing="0px"
+				style="border-collapse: collapse">
+				<thead>
+					<th style="width: 40px;">选择</th>
+					<th style="width: 60px;">ID</th>
+					<th style="width: 30%;">英文名</th>
+					<th style="width: 30%;">中文</th>
+					<th style="width: 70px;">类别</th>
+					<th style="width: 210px;">操作</th>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+			<div class="black_bj"></div>
+			<div class="neir_1 neir ">
+				<div class="tab_ul">
+					<p style="font-size: 16px;">
+						<span>规格名称</span> <span id="translationLvOne"></span> <span
+							id="translationLvTwo"></span> <span id="translationLvThree"></span>
+						<span id="translationLvFour"></span> <span id="translationLvFive"></span>
+					</p>
+				</div>
+				<div class="tab_name">
+					<input id="translationId" type="hidden" value=""> <input
+						id="translationCid" type="hidden" value=""> <input
+						id="translationEditType" type="hidden" value="">
+					<p>
+						<label>英文名:</label> <input id="translationEnName" type="text">
+						<span>*多个用英文逗号分开</span>
+					</p>
+					<p>
+						<label>中文:</label> <input id="translationChName" type="text">
+						<span>*多个用英文逗号分开</span>
+					<p>
+					<p>
+						<label>类型:</label><select id="translationType"
+							style="width: 100px; height: 26px;">
+							<option value="1">选择区</option>
+							<option value="2">详情区</option>
+						</select><span>*AliExpress页面物品展示地方为选择区，下面说明为详情区</span>
+					<p>
+					<p>
+						<label>同步:</label> <input id="synSpcOtherCategories"
+							type="checkbox" style="height: 20px; width: 30px;"> <span>*同步到其他类别的规格翻译</span>
+					<p>
+				</div>
+				<div class="inp_bj">
+					<span class="quxiao quxiao1" onclick="closeTranslationEdit()">取消</span><span
+						class="baocun" onclick="saveTranslation()">保存</span>
+				</div>
+			</div>
+		</div>
+		<!-- style="display: none;" -->
+		<div id="mappingDiv" class="tab2">
+			<p class="tab1_title">
+				<span id="mappingLvOne"></span> <span id="mappingLvTwo"></span> <span
+					id="mappingLvThree"></span> <span id="mappingLvFour"></span> <span
+					id="mappingLvFive"></span> <span id="transToMappingEnName"></span>
+				<span>> 规格属性</span>
+			</p>
+			<input type="button" class="but_del jul" value="批量删除" onclick="batchMappingDelete()"> 
+				<input class="but_color jul" type="button" value="增加" onclick="showMappingEdit(1)">
+				<input class="but_clear jul" type="button" value="全清" onclick="clearAll(2)">
+				<input class="but_color jul" type="button" value="全选" onclick="selectAll(2)">
+			<table id="mappingTable" border="1px" bordercolor="#ccc"
+				class="table_bg" cellspacing="0px" style="border-collapse: collapse">
+				<thead>
+					<th style="width: 45px;">选择</th>
+					<th style="width: 60px;">ID</th>
+					<th style="width: 33%;">英文名</th>
+					<th style="width: 33%;">中文</th>
+					<th style="width: 180px;">操作</th>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+			<div class="neir neir_2">
+				<div class="tab_ul">
+					<p class="tab1-title" style="font-size: 16px;">
+						<span id="mappingEditLvOne"></span> <span id="mappingEditLvTwo"></span>
+						<span id="mappingEditLvThree"></span> <span id="mappingEditLvFour"></span>
+						<span id="mappingEditLvFive"></span> <span
+							id="transToMappingEditEnName"></span> <span>> 规格属性</span>
+					</p>
+				</div>
+				<div class="tab_name">
+					<input id="mappingId" type="hidden" value=""> <input
+						id="mappingCid" type="hidden" value=""> <input
+						id="transToMappingId" type="hidden" value=""><input
+						id="mappingEditType" type="hidden" value="">
+					<p>
+						<label>英文名:</label> <input id="mappingEnName" type="text">
+						<span>*多个用英文逗号分开</span>
+					</p>
+					<p>
+						<label>中文:</label> <input id="mappingChName" type="text">
+						<span>*多个用英文逗号分开</span>
+					<p>
+					<p>
+						<label>同步:</label> <input id="synMappingOtherCategories"
+							type="checkbox" style="height: 20px; width: 30px;"> <span>*同步到其他类别的规格属性翻译</span>
+					<p>
+				</div>
+				<div class="inp_bj">
+					<span class="quxiao2" onclick="closeMappingEdit()">取消</span> <span
+						class="baocun" onclick="saveMapping()">保存</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = function() {
+		$("#mappingDiv").hide();
+		var url = document.location.href;
+		var begin = url.indexOf("?");
+		if (begin != -1) {
+			var cidStr = url.substring(begin + 1, url.length);
+			var cidLst = cidStr.split("=");
+			if (cidLst.length == 2) {
+				var cid = cidLst[1];
+				var locationNum = cid.lastIndexOf("#");
+				if (locationNum == cid.length - 1) {
+					cid = cid.substring(0, cid.length - 1);
+				}
+				$.ajax({
+					type : 'POST',
+					async : false,
+					url : '../specification/queryPathByCid',
+					data : {
+						cid : cid
+					},
+					success : function(data) {
+						if (data.ok) {
+							var pathStr = data.data;
+							var pathLst = pathStr.split(",");
+							if (pathLst.length == 5) {
+								$("#selectLvOne").val(pathLst[0]);
+								lvChange(1);
+								$("#selectLvTwo").val(pathLst[1]);
+								lvChange(2);
+								$("#selectLvThree").val(pathLst[2]);
+								lvChange(3);
+								$("#selectLvFour").val(pathLst[3]);
+								lvChange(4);
+								$("#selectLvFive").val(pathLst[4]);
+							} else if (pathLst.length == 4) {
+								$("#selectLvOne").val(pathLst[0]);
+								lvChange(1);
+								$("#selectLvTwo").val(pathLst[1]);
+								lvChange(2);
+								$("#selectLvThree").val(pathLst[2]);
+								lvChange(3);
+								$("#selectLvFour").val(pathLst[3]);
+								lvChange(4);
+							} else if (pathLst.length == 3) {
+								$("#selectLvOne").val(pathLst[0]);
+								lvChange(1);
+								$("#selectLvTwo").val(pathLst[1]);
+								lvChange(2);
+								$("#selectLvThree").val(pathLst[2]);
+								lvChange(3);
+							} else if (pathLst.length == 2) {
+								$("#selectLvOne").val(pathLst[0]);
+								lvChange(1);
+								$("#selectLvTwo").val(pathLst[1]);
+								lvChange(2);
+							} else if (pathLst.length == 1) {
+								$("#selectLvOne").val(pathLst[0]);
+								lvChange(1);
+							}
+							doQuery();
+
+						} else {
+							alert(data.message);
+						}
+					}
+				});
+			}
+
+		}
+	}
+</script>
+</html>

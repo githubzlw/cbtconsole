@@ -1,0 +1,2140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.TaoBaoOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.TaoBaoOrderInfo" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    <result column="totalprice" property="totalprice" jdbcType="VARCHAR" />
+    <result column="totalqty" property="totalqty" jdbcType="INTEGER" />
+    <result column="shipno" property="shipno" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="orderdate" property="orderdate" jdbcType="VARCHAR" />
+    <result column="orderstatus" property="orderstatus" jdbcType="VARCHAR" />
+    <result column="tbOr1688" property="tbOr1688" jdbcType="INTEGER" />
+    <result column="merchantorderid" property="merchantorderid" jdbcType="VARCHAR" />
+    <result column="paytreasureid" property="paytreasureid" jdbcType="VARCHAR" />
+    <result column="seller" property="seller" jdbcType="VARCHAR" />
+    <result column="creatTime" property="creatTime" jdbcType="VARCHAR" />
+    <result column="itemname" property="itemname" jdbcType="VARCHAR" />
+    <result column="imgurl" property="imgurl" jdbcType="VARCHAR" />
+    <result column="itemurl" property="itemurl" jdbcType="VARCHAR" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="itemqty" property="itemqty" jdbcType="VARCHAR" />
+    <result column="itemprice" property="itemprice" jdbcType="VARCHAR" />
+    <result column="opsid" property="opsid" jdbcType="INTEGER" />
+     <result column="iid" property="iid" jdbcType="INTEGER" />
+     <result column="opsorderid" property="opsorderid" jdbcType="VARCHAR" />
+     <result column="buycount" property="buycount" jdbcType="INTEGER" />
+      <result column="preferential" property="preferential" jdbcType="VARCHAR" />
+      <result column="paydata" property="paydata" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap type="com.cbt.Specification.bean.AliCategory" id="AliCategoryMap">
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="cid" property="cid" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="category" property="category" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <resultMap id="InoutResultMap" type="com.cbt.pojo.InOutDetailsInfo" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="goods_url" property="goods_url" jdbcType="VARCHAR" />
+    <result column="inGoodNum" property="inGoodNum" jdbcType="INTEGER" />
+    <result column="inGoodTime" property="inGoodTime" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="itemid" property="itemid" jdbcType="VARCHAR" />
+    <result column="barcode" property="barcode" jdbcType="VARCHAR" />
+    <result column="goodsName" property="goodsName" jdbcType="VARCHAR" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="itemPrice" property="itemPrice" jdbcType="VARCHAR" />
+    <result column="short_term" property="short_term" jdbcType="VARCHAR"/>
+   </resultMap>
+   
+   <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="goods_url" property="goods_url" jdbcType="VARCHAR" />
+    <result column="add_goods" property="add_goods" jdbcType="INTEGER" />
+    <result column="out_goods" property="out_goods" jdbcType="INTEGER" />
+    <result column="remaining" property="remaining" jdbcType="INTEGER" />
+    <result column="last_add_time" property="last_add_time" jdbcType="VARCHAR" />
+    <result column="last_out_time" property="last_out_time" jdbcType="VARCHAR" />
+    <result column="itemid" property="itemid" jdbcType="VARCHAR" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="good_name" property="good_name" jdbcType="VARCHAR" />
+    <result column="goodscatid" property="goodscatid" jdbcType="VARCHAR" />
+    <result column="inventory_amount" property="inventory_amount" jdbcType="INTEGER" />
+    <result column="car_img" property="car_img" jdbcType="VARCHAR" />
+    <result column="userName" property="userName" jdbcType="VARCHAR" />
+    <result column="goods_p_price" property="goods_p_price" jdbcType="VARCHAR" />
+    <result column="goodsprice" property="goodsprice" jdbcType="VARCHAR" />
+    <result column="flag" property="flag" jdbcType="INTEGER" />
+    <result column="new_inventory_amount" property="new_inventory_amount" jdbcType="INTEGER" />
+    <result column="new_barcode" property="new_barcode" jdbcType="VARCHAR" />
+    <result column="new_remaining" property="new_remaining" jdbcType="INTEGER" />
+    <result column="can_remaining" property="can_remaining" jdbcType="INTEGER" />
+    <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
+    <result column="onLine" property="onLine" jdbcType="VARCHAR" />
+     <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+   </resultMap>
+ 
+  <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
+     	SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
+       AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
+       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+      <if test="DeliveryDate==15">
+       <![CDATA[
+        and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
+        ]]>
+     </if>
+     <if test="DeliveryDate==30">
+       <![CDATA[
+      and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
+        ]]>
+     </if>
+     <if test="DeliveryDate==1">
+       and i.id is not null
+     </if>
+     <if test="orderstatus!=null">
+       and locate(#{orderstatus} ,t.orderstatus)
+     </if>
+     <if test="orderSource!=null">
+       and t.tbOr1688=#{orderSource}
+     </if>
+     <if test="orderdate!=null">
+        and t.orderdate > ADDDATE(CURDATE(),-#{orderdate})
+     </if>
+     <if test="startdate!=null">
+        and t.orderdate >=#{startdate}
+     </if>
+     <if test="enddate!=null">
+       <![CDATA[
+        and t.orderdate <=#{enddate}
+        ]]>
+     </if>
+     <if test="paystartdate!=null">
+        and t.paydata >=#{paystartdate}
+     </if>
+     <if test="payenddate!=null">
+       <![CDATA[
+        and t.paydata <=#{payenddate}
+        ]]>
+     </if>
+     <if test="orderdate!=null">
+        and t.orderdate > ADDDATE(CURDATE(),-#{orderdate})
+     </if>
+     <if test="procurementAccount!=null">
+       and t.username=#{procurementAccount}
+     </if>
+     <if test="start!=0">
+     <![CDATA[
+       and REPLACE(t.totalprice,',','')>#{start}
+       ]]>
+     </if>
+     <if test="end!=0">
+     <![CDATA[
+      AND REPLACE(t.totalprice,',','')<#{end}
+       ]]>
+     </if>
+     <if test="orderid!=null">
+        and t.orderid=#{orderid}
+     </if>
+     <if test="isCompany==1">
+       and ops.orderid is not null
+     </if>
+     <if test="isCompany==2">
+       and ops.orderid is null
+     </if>
+     <if test="myorderid!=null">
+        and ops.orderid=#{myorderid}
+     </if>
+     GROUP BY t.orderid 
+      <if test="page!=-1">
+      limit #{page},20
+      </if>
+  </select>
+  
+  <select id="selectAllCount" resultMap="BaseResultMap">
+     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
+    AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
+   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+      <if test="DeliveryDate==15">
+       <![CDATA[
+        and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
+        ]]>
+     </if>
+     <if test="DeliveryDate==30">
+       <![CDATA[
+      and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
+        ]]>
+     </if>
+     <if test="DeliveryDate==1">
+       and i.id is not null
+     </if>
+     <if test="orderstatus!=null">
+       and locate(#{orderstatus} ,t.orderstatus)
+     </if>
+     <if test="orderSource!=null">
+       and t.tbOr1688=#{orderSource}
+     </if>
+     <if test="orderdate!=null">
+        and t.orderdate > ADDDATE(CURDATE(),-#{orderdate})
+     </if>
+     <if test="procurementAccount!=null">
+       and t.username=#{procurementAccount}
+     </if>
+     <if test="startdate!=null">
+        and t.orderdate >=#{startdate}
+     </if>
+     <if test="enddate!=null">
+       <![CDATA[
+        and t.orderdate <=#{enddate}
+        ]]>
+     </if>
+     <if test="paystartdate!=null">
+        and t.paydata >=#{paystartdate}
+     </if>
+     <if test="payenddate!=null">
+       <![CDATA[
+        and t.paydata <=#{payenddate}
+        ]]>
+     </if>
+     <if test="start!=0">
+     <![CDATA[
+       and REPLACE(t.totalprice,',','')>#{start}
+       ]]>
+     </if>
+     <if test="end!=0">
+     <![CDATA[
+      AND REPLACE(t.totalprice,',','')<#{end}
+       ]]>
+     </if>
+     <if test="orderid!=null">
+        and t.orderid=#{orderid}
+     </if>
+     <if test="isCompany==1">
+       and ops.orderid is not null
+     </if>
+     <if test="isCompany==2">
+       and ops.orderid is null
+     </if>
+     <if test="myorderid!=null">
+        and ops.orderid=#{myorderid}
+     </if>
+     GROUP BY t.orderid
+  </select>
+  <select id="getTaoBaoOrderDetails" resultMap="BaseResultMap">
+    SELECT t.* ,COUNT(ops.id) as opsid FROM taobao_1688_order_history t left JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid
+    WHERE t.orderid=#{orderid} 
+    GROUP BY t.id
+  </select>
+  <select id="queryBuyCount" resultMap="BaseResultMap">
+       SELECT t.id as id,SUM(ops.buycount) as buycount FROM taobao_1688_order_history t LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 
+       t.orderid=#{torderid} AND ops.orderid in (${opsorderid}) GROUP BY t.id
+  </select>
+  
+  <select id="searchAliCategory" resultMap="AliCategoryMap">
+    <if test="type=='type1'">
+     	SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid
+    </if>
+    <if test="type=='type2'">
+    	SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',2),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND SUBSTRING_INDEX(ac.path, ',',1)=#{cid};
+    </if>
+    <if test="type=='type3'">
+        SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',3),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=2 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',2),',',-1)=#{cid};
+    </if>
+    <if test="type=='type4'">
+       SELECT DISTINCT a.cid AS cid,a.category AS category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',4),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=3 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',3),',',-1)=#{cid};
+    </if>
+    <if test="type=='type5'">
+       SELECT DISTINCT a.cid AS cid,a.category AS category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',5),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=4 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',4),',',-1)=#{cid};
+    </if>
+  </select>
+  
+  <select id="isStorage" resultType="java.lang.Integer">
+     SELECT goodid FROM id_relationtable WHERE tborderid=#{orderid}
+  </select>
+  <select id="associatedOrder" resultMap="BaseResultMap" >
+     	SELECT DISTINCT ops.orderid AS opsorderid,SUM(ops.buycount) AS buycount FROM order_product_source ops INNER JOIN id_relationtable ir ON ops.orderid=ir.orderid WHERE  ir.tborderid=#{orderid} GROUP BY ops.orderid 
+     	
+  </select>
+  
+  <select id="getIinOutDetails" resultMap="InoutResultMap">
+      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS TYPE,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
+      FROM goods_inventory_whj g INNER JOIN order_details od
+      ON g.orderid=od.orderid AND g.goodsid=od.goodsid
+      INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+      where 1=1
+      <if test="orderid != null">
+          and g.orderid=#{orderid}
+      </if>
+      <if test="goodsid != null">
+          and g.goodsid=#{goodsid}
+      </if>
+      <if test="startTime != null">
+          and g.createtime>=#{startTime}
+      </if>
+      <if test="endTime != null">
+          and g.createtime&lt;=#{endTime}
+      </if>
+      <if test="type != null">
+          and g.type=#{type}
+      </if>
+      order by g.id desc
+      limit ${page},20
+  </select>
+  <select id="getIinOutDetailsCount" resultMap="InoutResultMap">
+      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS TYPE,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,g.remark
+      FROM goods_inventory_whj g INNER JOIN order_details od
+      ON g.orderid=od.orderid AND g.goodsid=od.goodsid
+      INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+      where 1=1
+      <if test="orderid != null">
+          and g.orderid=#{orderid}
+      </if>
+      <if test="goodsid != null">
+          and g.goodsid=#{goodsid}
+      </if>
+      <if test="startTime != null">
+          and g.createtime>=#{startTime}
+      </if>
+      <if test="endTime != null">
+          and g.createtime&lt;=#{endTime}
+      </if>
+      <if test="type != null">
+          and g.type=#{type}
+      </if>
+  </select>
+  <select id="getIinOutInventory" resultMap="InventoryResultMap">
+    SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine,c.unsellableReason FROM inventory i
+      left join storage_outbound_details s on i.id=s.in_id and s.type=1
+      left join custom_benchmark_ready c on i.goods_pid=c.pid
+      where 1=1
+    and if(i.flag=1,i.new_remaining,i.remaining)>0
+     <if test="goodinfo!=null">
+       and LOCATE(#{goodinfo},i.good_name)
+     </if>
+     <if test="sku!=null">
+        and LOCATE(#{sku},i.sku)
+     </if>
+      <if test="barcode!=null">
+       and i.barcode=#{barcode}
+     </if>
+      <if test="valid!=null and valid !=2">
+          and c.valid=${valid}
+      </if>
+      <if test="valid  == 2">
+          and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
+      <if test="goods_pid!=null">
+          and i.goods_pid=#{goods_pid}
+      </if>
+     <if test="flag!=null">
+       and i.flag=#{flag}
+     </if>
+     <if test="scope==1">
+         <choose>
+         <when test="type == 'remaining'">
+              and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+         </when>
+         <otherwise>
+             and 1=1
+         </otherwise>
+       </choose>
+       
+     </if>
+       <if test="scope==2">
+       <choose>
+         <when test="type == 'remaining'">
+              and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+         </when>
+         <otherwise>
+             and 1=1
+         </otherwise>
+       </choose>
+     </if>
+     <if test="scope==3">
+        <choose>
+         <when test="type == 'remaining'">
+               <![CDATA[
+               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count}) 
+                ]]> 
+         </when>
+         <otherwise>
+             and 1=1
+         </otherwise>
+       </choose>
+     </if>
+     <if test="goodscatid!=null">
+        and i.goodscatid=#{goodscatid}
+     </if>
+     <if test="startdate!=null">
+        and i.updatetime>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and i.updatetime&lt;=#{enddate}
+     </if>
+    order by i.id desc,i.can_remaining desc 
+    <if test="page!=-1">
+     limit #{page},20
+    </if>
+  </select>
+  <select id="getIinOutInventoryCount" resultMap="InventoryResultMap">
+   SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine FROM inventory i left join storage_outbound_details s on i.id=s.in_id and s.type=1  left join custom_benchmark_ready c on i.goods_pid=c.pid where 1=1 and if(i.flag=1,i.new_remaining,i.remaining)>0
+     <if test="goodinfo!=null">
+       and LOCATE(#{goodinfo},i.good_name)
+     </if>
+     <if test="sku!=null">
+        and LOCATE(#{sku},i.sku)
+     </if>
+      <if test="barcode!=null">
+       and i.barcode=#{barcode}
+     </if>
+      <if test="goods_pid!=null">
+          and i.goods_pid=#{goods_pid}
+      </if>
+     <if test="flag!=null">
+       and i.flag=#{flag}
+     </if>
+      <if test="valid!=null">
+          and c.valid=${valid}
+      </if>
+    <if test="scope==1">
+         <choose>
+         <when test="type == 'remaining'">
+              and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining>#{count})
+         </when>
+         <otherwise>
+             and 1=1
+         </otherwise>
+       </choose>
+       
+     </if>
+       <if test="scope==2">
+       <choose>
+         <when test="type == 'remaining'">
+              and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+         </when>
+         <otherwise>
+             and 1=1
+         </otherwise>
+       </choose>
+     </if>
+     <if test="scope==3">
+        <choose>
+         <when test="type == 'remaining'">
+               <![CDATA[
+               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count}) 
+                ]]> 
+         </when>
+         <otherwise>
+             <![CDATA[
+              and 1=1
+               ]]> 
+         </otherwise>
+       </choose>
+     </if>
+     <if test="goodscatid!=null">
+        and i.goodscatid=#{goodscatid}
+     </if>
+          <if test="startdate!=null">
+        and i.updatetime>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and i.updatetime&lt;=#{enddate}
+     </if>
+  </select>
+  
+  <select id="selectStatus" resultType="String">
+     SELECT DISTINCT orderstatus FROM taobao_1688_order_history
+  </select>
+  
+  <select id="isExitBarcode" resultType="java.lang.Integer">
+   SELECT COUNT(id) FROM storage_location WHERE barcode=#{barcode}
+  </select>
+  <update id="updateSources">
+   <choose>
+     <when test="flag==1">
+        update inventory set new_remaining=#{new_remaining},can_remaining=#{new_remaining},updatetime=now(),barcode=#{new_barcode},new_inventory_amount=#{new_inventory_amount},flag=1,remark=#{remark} where
+         IFNULL(sku,'')=#{old_sku}
+        <if test="car_urlMD5 != null">
+          and car_urlMD5=#{car_urlMD5} 
+        </if>
+         and goods_pid=#{goods_pid} and barcode=#{old_barcode}
+     </when>
+     <otherwise>
+        update inventory set new_remaining=#{new_remaining},can_remaining=#{new_remaining},updatetime=now(),barcode=#{new_barcode},new_inventory_amount=#{new_inventory_amount},flag=1,remark=#{remark} where
+         IFNULL(sku,'')=#{old_sku}
+        <if test="car_urlMD5 != null">
+          and car_urlMD5=#{car_urlMD5} 
+        </if>
+        and goods_pid=#{goods_pid} and barcode=#{old_barcode}
+     </otherwise>
+   </choose>
+  </update>
+  <insert id="insertChangeBarcode">
+     insert into change_barcode (in_id,init_barcode) select #{id},#{old_barcode} FROM DUAL WHERE NOT EXISTS (SELECT * FROM change_barcode WHERE in_id=#{id})
+  </insert>
+  <insert id="updateSourcesLog">
+    INSERT INTO inventory_log_info (in_id,create_time,admName,old_inventory,new_inventroy,old_barcode,new_barcode,remark) VALUES 
+	(#{in_id},now(),#{name},#{old_remaining},#{new_remaining},#{old_barcode},#{new_barcode},#{remark})
+  </insert>
+  <select id="queryInId" resultMap="InventoryResultMap">
+       SELECT * FROM inventory WHERE goods_pid=#{goods_pid} AND IFNULL(sku,'')=#{old_sku} AND barcode=#{old_barcode}
+       <if test="car_urlMD5 != null">
+        AND car_urlMD5=#{car_urlMD5} 
+       </if>
+  </select>
+  <select id="getNewBarcode" resultType="String">
+     SELECT barcode FROM storage_location WHERE is_company=3
+  </select>
+  <select id="getSourceValidationForTb" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+		SELECT distinct t.id,ifnull(t.remark,'') as remark,t.tbOr1688,t.itemurl,t.itemqty,t.itemname,t.sku,t.orderid,t.shipno,t.orderstatus,t.paydata,t.username,
+		t.imgurl,t.itemid,t.orderdate,
+		(select count(id) from id_relationtable
+		where tborderid=t.orderid) as is_exit,(SELECT createtime FROM id_relationtable WHERE tborderid=t.orderid limit 1) AS in_time
+		FROM taobao_1688_order_history t
+
+		 WHERE t.orderdate between #{startdate} and #{enddate}
+		 <if test="account != null">
+             AND t.username in ${account}
+         </if>
+		 AND t.tbOr1688 IN ('0','1') AND LOCATE('退款',t.orderstatus)<![CDATA[<=0]]> AND LOCATE('关闭',t.orderstatus)<![CDATA[<=0]]> AND LOCATE('取消',t.orderstatus)<![CDATA[<=0]]>
+		ORDER BY t.orderdate desc LIMIT ${page},20
+  </select>
+    <select id="getOrderProductSource" resultType="com.cbt.bean.OrderProductSource">
+        SELECT DISTINCT orderid,goods_img_url as goodsImgUrl FROM order_product_source WHERE tb_1688_itemid=#{itemid}
+        AND ADDTIME<![CDATA[<]]>#{time} AND TIMESTAMPDIFF(DAY,ADDTIME,#{time})<![CDATA[<=]]>3 AND purchase_state IN (3,4,6,8)
+    </select>
+  <select id="getSourceValidationForTbCount" resultType="java.lang.Integer">
+		SELECT COUNT(DISTINCT t.id) FROM taobao_1688_order_history t  WHERE t.orderdate between #{startdate} and #{enddate}
+		<if test="account != null">
+            AND t.username in ${account}
+        </if>
+		AND t.tbOr1688 IN ('0','1') AND LOCATE('退款',t.orderstatus)<![CDATA[<=0]]> AND LOCATE('关闭',t.orderstatus)<![CDATA[<=0]]> AND LOCATE('取消',t.orderstatus)<![CDATA[<=0]]>
+  </select>
+  <select id="getSourceValidation" resultType="com.cbt.bean.OrderProductSource">
+      SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS confirmTime,od.car_img AS goodsImgUrl,GROUP_CONCAT(DISTINCT IFNULL(id.tborderid,'')) AS buyerOrderid
+      FROM goods_distribution g
+      INNER JOIN order_product_source ops ON g.orderid=ops.orderid
+      INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+      INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+      LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid AND id.is_replenishment=1
+      LEFT JOIN taobao_1688_order_history t ON t.orderid=id.tborderid AND t.itemid=ops.tb_1688_itemid
+      WHERE oi.state>0 AND oi.state<![CDATA[<]]>6 AND od.state<![CDATA[<]]>2
+      <if test="buyer != null">
+          AND g.admuserid=#{buyer} and ops.confirm_userid=#{buyer}
+      </if>
+      AND g.createtime BETWEEN #{startdate} and #{enddate}
+      GROUP BY ops.orderid,ops.goodsid
+      ORDER BY IF(id.tborderid=NULL,2,1)  DESC  LIMIT #{page},20;
+
+  </select>
+   <select id="getSourceValidationCount" resultType="java.lang.Integer">
+       select count(a.goodsid) from (
+       SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS
+       confirmTime,od.car_img AS goodsImgUrl,GROUP_CONCAT(DISTINCT IFNULL(id.tborderid,'')) AS buyerOrderid
+       FROM goods_distribution g
+       INNER JOIN order_product_source ops ON g.orderid=ops.orderid
+       INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+       INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+       LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid AND id.is_replenishment=1
+       LEFT JOIN taobao_1688_order_history t ON t.orderid=id.tborderid AND t.itemid=ops.tb_1688_itemid
+       WHERE oi.state>0 AND oi.state<![CDATA[<]]>6 AND od.state<![CDATA[<]]>2
+       <if test="buyer != null">
+           AND g.admuserid=#{buyer} and ops.confirm_userid=#{buyer}
+       </if>
+       AND g.createtime BETWEEN #{startdate} and #{enddate}
+       GROUP BY ops.orderid,ops.goodsid
+       ) a
+  </select>
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT ops.goodsid) FROM order_product_source ops
+      INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND ops.goodsid=g.goodsid
+      INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+      INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+      LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid
+      WHERE oi.state>0 AND oi.state<![CDATA[<]]>6 AND od.state<![CDATA[<]]>2
+      <if test="buyer != null">
+          AND g.admuserid=#{buyer}
+      </if>
+      AND ops.confirm_time BETWEEN #{startdate} and #{enddate}
+   </select>
+     <select id="getCounts" resultType="java.lang.Integer">
+       SELECT COUNT(DISTINCT id) FROM taobao_1688_order_history WHERE   orderdate
+       between #{startdate} and #{enddate} AND tbOr1688 IN ('0','1') AND LOCATE('退款',orderstatus)<![CDATA[<=0]]> AND LOCATE('关闭',orderstatus) <![CDATA[<=0]]>
+         <if test="account != null">
+           and  username in ${account}
+         </if>
+   </select>
+   <select id="getBuyerAmountByMouth" resultType="java.lang.String">
+     SELECT FORMAT(SUM(a.totalprice),2) FROM 
+     (SELECT DISTINCT orderid,REPLACE(totalprice,',','') AS totalprice FROM taobao_1688_order_history
+     WHERE orderdate between #{startdate} and #{enddate} AND tbOr1688 IN ('0','1') AND LOCATE('退款',orderstatus)<![CDATA[<=0]]> AND LOCATE('关闭',orderstatus)<![CDATA[<=0]]>
+     <if test="account != null">
+         AND username in ${account}
+     </if>
+     ) a
+   </select>
+   <select id="searchCoupusManagement" resultType="com.cbt.pojo.Coupons">
+     SELECT DISTINCT c.* FROM coupons c INNER JOIN coupon_subsidiary cs ON c.id=cs.coupons_id where 1=1 and c.is_delete=0 and cs.is_delete=0 
+     <if test="coupons_name!=null">
+       and c.coupons_name=#{coupons_name}
+     </if>
+     <if test="coupons_type!=null">
+       and c.coupons_type=#{coupons_type}
+     </if>
+     <if test="batch!=null">
+       and c.batch=#{batch}
+     </if>
+     <if test="disbursement!=null">
+       and c.disbursement=#{disbursement}
+     </if>
+     <if test="promo_code!=null">
+       and cs.promo_code=#{promo_code}
+     </if>
+     <if test="userid!=null">
+       and cs.userid=#{userid}
+     </if>
+     <if test="startdate!=null">
+       and c.createtime>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+       and c.createtime <![CDATA[ <=]]>#{enddate}
+     </if>
+     limit #{page},20
+   </select>
+   <select id="searchCoupusManagementCount" resultType="java.lang.Integer">
+     SELECT count(distinct c.id)  FROM coupons c INNER JOIN coupon_subsidiary cs ON c.id=cs.coupons_id where 1=1 and c.is_delete=0 and cs.is_delete=0 
+     <if test="coupons_name!=null">
+       and c.coupons_name=#{coupons_name}
+     </if>
+     <if test="coupons_type!=null">
+       and c.coupons_type=#{coupons_type}
+     </if>
+     <if test="batch!=null">
+       and c.batch=#{batch}
+     </if>
+     <if test="disbursement!=null">
+       and c.disbursement=#{disbursement}
+     </if>
+     <if test="promo_code!=null">
+       and cs.promo_code=#{promo_code}
+     </if>
+     <if test="userid!=null">
+       and cs.userid=#{userid}
+     </if>
+      <if test="startdate!=null">
+       and c.createtime>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+       and c.createtime <![CDATA[ <=]]>#{enddate}
+     </if>
+   </select>
+   <select id="queryOldBatch" resultType="java.lang.String">
+     SELECT ifnull(batch,'') FROM coupons WHERE LEFT(batch,8)=#{time} and is_delete=0 ORDER BY id DESC LIMIT 1
+   </select>   
+   <insert id="createCoupons">
+     insert into coupons(batch,coupons_name,coupons_type,denomination,total_circulation,total_amount,minimum_cons,validity_type,startdata,enddata,disbursement,createtime,create_adm,for_most,most_favorable,using_range) values(
+     #{batch},#{coupons_name},#{coupons_type},#{denomination},#{total_circulation},#{total_amount},#{minimum_cons},#{validity_type},#{startdata},#{enddata},#{disbursement},now(),#{create_adm},#{for_most},#{most_favorable},#{using_range})
+   </insert>
+   <insert id="createCouponSubsidiary" parameterType="list">
+  		 insert into coupon_subsidiary(batch,promo_code,disbursement,adm_name,coupons_id,createtime,validity_type,startdata,enddata) 
+  		values
+  		<foreach collection="list" item="item" index="index" separator="," >
+                   (#{list[${index}].batch},#{list[${index}].promo_code},#{list[${index}].disbursement},#{list[${index}].adm_name},#{list[${index}].coupons_id},now(),#{list[${index}].validity_type},#{list[${index}].startdata},#{list[${index}].enddata})
+  		</foreach>
+   </insert>
+   <update id="enable">
+     update coupons set is_enable=0 where id=#{id};
+     update coupon_subsidiary set is_enable=0 where coupons_id=#{id}
+   </update>
+   <select id="searchCoupusDetails" resultType="com.cbt.pojo.CouponSubsidiary">
+     SELECT cs.*,c.coupons_name,c.denomination,c.disbursement,c.coupons_type,c.validity_type,c.startdata,c.enddata FROM coupon_subsidiary cs INNER JOIN coupons c ON cs.coupons_id=c.id WHERE 1=1 and c.is_delete=0 and cs.is_delete=0 
+      and cs.coupons_id=#{coupons_id}
+      <if test="coupons_type!=nulll">
+        and c.coupons_type=#{coupons_type}
+      </if>
+      <if test="use_time!=nulll">
+        and cs.use_time=#{use_time}
+      </if>
+      <if test="get_time!=nulll">
+        and cs.get_time=#{get_time}
+      </if>
+      <if test="promo_code!=nulll">
+        and cs.promo_code=#{promo_code}
+      </if>
+      <if test="disbursement!=nulll">
+        and c.disbursement=#{disbursement}
+      </if>
+     limit #{page},20
+   </select>
+  <select id="searchCoupusDetailsCount" resultType="java.lang.Integer">
+  SELECT count(distinct cs.id) FROM coupon_subsidiary cs INNER JOIN coupons c ON cs.coupons_id=c.id WHERE 1=1 and c.is_delete=0 and cs.is_delete=0 
+   and cs.coupons_id=#{coupons_id}
+   <if test="coupons_type!=nulll">
+        and c.coupons_type=#{coupons_type}
+      </if>
+      <if test="use_time!=nulll">
+        and cs.use_time=#{use_time}
+      </if>
+      <if test="get_time!=nulll">
+        and cs.get_time=#{get_time}
+      </if>
+      <if test="promo_code!=nulll">
+        and cs.promo_code=#{promo_code}
+      </if>
+      <if test="disbursement!=nulll">
+        and c.disbursement=#{disbursement}
+      </if>
+  </select>
+  <select id="queryCouponsState" resultType="java.lang.Integer">
+   SELECT DISTINCT c.is_enable FROM coupons c INNER JOIN coupon_subsidiary cs ON c.id=cs.coupons_id WHERE cs.id=#{subsidiary_id} and c.is_delete=0 and cs.is_delete=0
+  </select>
+  <update id="enableForSubsidiary">
+     update coupon_subsidiary set is_enable=0 where id=#{id}
+  </update>
+  <select id="getCouponsId" resultType="java.lang.Integer">
+    select id from coupons where batch=#{batch} and is_delete=0
+  </select>
+  <select id="searchCoupusDetailsView" resultType="com.cbt.pojo.CouponSubsidiary">
+     SELECT cs.*,c.coupons_name,c.coupons_type,c.disbursement,c.validity_type,c.startdata,c.enddata,c.denomination,c.minimum_cons,c.using_range FROM coupon_subsidiary cs INNER JOIN coupons c ON cs.coupons_id=c.id WHERE 1=1 
+     and cs.id=#{id} and c.is_delete=0 and cs.is_delete=0
+  </select>
+  <update id="addCoupusDetailsView">
+    update coupon_subsidiary set startdata=#{startdate},enddata=#{enddate},userid=#{userid},user_name=#{user_name},remark=#{remark} where id=#{id}
+  </update>
+  <select id="getUserName" resultType="java.lang.String">
+    select name from user where id=#{id}
+  </select>
+  <update id="Allenable">
+   <if test="type == 1">
+     update coupons set is_enable=0 where id in ${ids};
+     update coupon_subsidiary set is_enable=0 where coupons_id in ${ids} 
+   </if>
+   <if test="type == 2">
+    update coupons set is_enable=1 where id in ${ids};
+     update coupon_subsidiary set is_enable=1 where coupons_id in ${ids} 
+   </if>
+  </update>
+  <update id="AllenableDetails">
+     <if test="type == 1">
+     update coupon_subsidiary set is_enable=0 where id in ${ids};
+   </if>
+   <if test="type == 2">
+     update coupon_subsidiary set is_enable=1 where id in ${ids} 
+   </if>
+  </update>
+  <delete id="delCoupons">
+    update  coupons set is_delete =1 where id=#{id};
+    update coupon_subsidiary set is_delete=1 where coupons_id=#{id}
+  </delete>
+  <select id="queryUsingRange" resultType="com.cbt.Specification.bean.AliCategory">
+     SELECT id,category FROM ali_category WHERE lv=1
+  </select>
+   <select id="queryUsingRangeForIds" resultType="java.lang.String">
+     SELECT GROUP_CONCAT(CONCAT(category)) FROM ali_category WHERE lv=1 and id in (${ids})
+  </select>
+  <select id="getTbOrderRemark" resultType="java.lang.String">
+     select remark from taobao_1688_order_history where id=#{id}
+  </select>
+  <update id="addTbOrderRemark">
+    update taobao_1688_order_history set remark=#{new_remark} where id=#{id}
+  </update>
+  <select id="findOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
+    select od.*,ops.goods_p_price from order_details od inner join order_product_source ops ON od.goodsid=ops.goodsid where od.goodsid=#{goodsid} limit 1
+  </select>
+  <insert id="inventoryEntry">
+     insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_amount,car_img,goods_pid,car_urlMD5,createtime,goods_p_price,remark,flag,updatetime,new_inventory_amount,new_remaining)
+     values (#{goods_url},#{count},#{count},#{goods_name},#{sku},#{in_barcode},(SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=#{goodscatid}),
+     #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
+  </insert>
+  <update id="updateInventory">
+     upate inventory 
+  </update>
+  <select id="buyReconciliationReport" resultType="com.cbt.pojo.BuyReconciliationPojo">
+    	select times,sum(beginBlance) as beginBlance,sum(endBlance) as endBlance,sum(transfer) as transfer,sum(payFreight) as payFreight,sum(ebayAmount) as ebayAmount,sum(materialsAmount) as materialsAmount,sum(zfbFright) as zfbFright,sum(grabAmount) as grabAmount,sum(normalAmount) as normalAmount,sum(cancelAmount) as cancelAmount,sum(noMatchingOrder) as noMatchingOrder,sum(noStorage) as noStorage,sum(lastMonth) as lastMonth,sum(forecastAmount) as forecastAmount,sum(actualAmount) as actualAmount,sum(inventory_amount) as inventory_amount,sum(sale_inventory) as sale_inventory,sum(order_sales) as order_sales,sum(balance_compensation) as balance_compensation,sum(orderFreight) as orderFreight from (
+    	SELECT left(datas,7) AS times,cast(beginBlance as decimal(10,2)) as beginBlance,cast(endBlance as decimal(10,2)) as endBlance,cast(transfer as decimal(10,2)) as transfer,cast(payFreight as decimal(10,2)) as payFreight,cast(ebayAmount as decimal(10,2)) as ebayAmount,cast(materialsAmount as decimal(10,2)) as materialsAmount,cast(ZfbFright as decimal(10,2)) as ZfbFright,0.00 as grabAmount,0.00 as normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM zfb_amount where datas>=#{startTime}
+		<if test="endTime!=null">
+		and datas<![CDATA[<=]]>#{endTime}
+		</if> GROUP BY year(datas),month(datas)
+		union
+<!-- 		 抓取金额 -->
+		SELECT LEFT(a.paydata,7) as times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,cast(SUM(a.totalprice) as decimal(10,2)) as grabAmount,0.00 as normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight  FROM (
+		SELECT DISTINCT orderid,totalprice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 and
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime}
+		</if>
+		AND tbOr1688 IN ('0','1','2','3')) a 
+		group by year(a.paydata),month(a.paydata)
+		union
+<!-- 		 对应正常订单金额 -->
+		SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
+		SELECT DISTINCT t.orderid,t.totalprice,t.paydata 
+		FROM taobao_1688_order_history t 
+		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
+		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		<if test="endTime!=null">
+		and t.paydata<![CDATA[<=]]>#{endTime}
+		</if>
+		 AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (1,2,3,4,5) 
+		) a group by year(a.paydata),month(a.paydata)
+		union
+<!-- 		 对应取消订单金额 -->
+		select LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 as normalAmount,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) AS cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from (
+		SELECT DISTINCT t.orderid,t.totalprice,t.paydata 
+		FROM taobao_1688_order_history t 
+		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
+		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime}
+		</if>
+		 AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (-1,6) ) a group by YEAR(a.paydata),MONTH(a.paydata)
+<!-- 		无货源匹配金额（肯定没有入库） -->
+		union
+		select LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 as normalAmount,0.00 AS cancelAmount,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from (
+		SELECT distinct orderid,totalPrice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		 AND tbOr1688 IN ('0','1','3') and orderid not in (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		 AND tbOr1688 IN ('0','1','2','3')
+		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
+		))a group by YEAR(a.paydata),MONTH(a.paydata)
+<!-- 		有货源匹配没有入库 -->
+		union
+		SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as ZfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
+		SELECT DISTINCT orderid,totalPrice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') 
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
+		)  
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
+		) AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3')
+		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
+		) )) a group by YEAR(a.paydata),MONTH(a.paydata)
+<!-- 		 对应上月订单金额 -->
+		 union
+		 SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
+		SELECT DISTINCT t.orderid,t.totalprice,t.paydata FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		<if test="endTime!=null">
+		and t.paydata<![CDATA[<=]]>#{endTime}
+		</if> 
+        AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{startTime} )a group by YEAR(a.paydata),MONTH(a.paydata)
+		union
+		<!-- 本月库存金额 -->
+		select LEFT(createtime,7) as times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,cast(SUM(IF(flag=1,new_inventory_amount,inventory_amount)) as decimal(10,2)) as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from inventory where createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}  
+		</if>
+		 group by year(createtime),month(createtime)
+		union
+		<!-- 本月销售出去的库存 -->
+		     SELECT LEFT(li.createtime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,0.00 as inventory_amount,cast(SUM(li.lock_remaining*func_get_split_string(i.goods_p_price,',',1)) as decimal(10,2)) AS sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM lock_inventory li INNER JOIN inventory i ON li.in_id=i.id WHERE li.flag=1 and li.is_use=1 and li.is_delete=0 and li.createtime>=#{startTime}
+		<if test="endTime!=null">
+		and li.createtime<![CDATA[<=]]>#{endTime}  
+		</if> 
+		GROUP BY YEAR(li.createtime),MONTH(li.createtime)   
+		union
+		<!-- 		 预估运费金额 -->
+		SELECT  LEFT(senttime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,cast(getExchangeRMB(SUM(sp.estimatefreight),'USD') as decimal(10,2)) as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM shipping_package sp INNER JOIN shipment s ON sp.expressno=s.orderNo WHERE senttime>=#{startTime}
+		<if test="endTime!=null">
+		and senttime<![CDATA[<=]]>#{endTime}  
+		</if>
+		 group by YEAR(senttime),MONTH(senttime)
+<!-- 		 实际运费 -->
+		union
+		select LEFT(senttime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,CAST(SUM(totalPrice) as DECIMAL(10,2))  as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from shipment where senttime>=#{startTime}
+		<if test="endTime!=null">
+		and senttime<![CDATA[<=]]>#{endTime}
+		</if> group by year(sentTime),month(sentTime)
+      <!-- 销售额R1-->
+        union
+      SELECT GROUP_CONCAT(statistics_year,'-',statistics_month) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,0.00 AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,cast(order_sales*6.3 as decimal(10,2)) as order_sales,cast(balance_compensation*6.3 as decimal(10,2)) as balance_compensation,0.00 as orderFreight FROM monthly_financial_statistics  where 1=1
+      <if test="endTime!=null">
+         and statistics_year=left(#{endTime},4) and statistics_month=subString(#{endTime},6,2)
+      </if>
+      GROUP BY statistics_year,statistics_month
+      union
+      <!-- 订单实际运费-->
+      SELECT LEFT(a.orderpaytime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,0.00 AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,cast(SUM(a.frightAmount) as decimal(10,2)) as orderFreight
+      FROM (
+      SELECT oi.order_no,sp.id,oi.orderpaytime,
+      IF(sp.actual_freight&lt;=0,IFNULL(s.totalprice,0.00),sp.actual_freight) AS frightAmount
+      FROM orderinfo oi
+      INNER JOIN USER u ON oi.user_id=u.id
+      inner JOIN shipping_package sp ON oi.order_no=sp.orderid OR (LOCATE(oi.order_no,sp.remarks)>0 AND LOCATE(oi.order_no,sp.orderid)&lt;=0)
+      INNER JOIN shipment s ON sp.expressno=s.orderNo
+      WHERE 1=1 AND oi.state between 1 and 5
+      <if test="endTime!=null">
+          AND DATE(oi.orderpaytime) &lt;=DATE(#{endTime})
+      </if>
+      AND DATE(oi.orderpaytime) >=DATE(#{startTime})
+      AND oi.user_id
+      IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%')
+      ) a
+      group by YEAR(a.orderpaytime),MONTH(a.orderpaytime)
+	  )tab WHERE times IS NOT NULL group by times
+  </select>
+  <select id="getZfuDate" resultType="com.cbt.pojo.ZfuDate">
+     select * from zfb_amount where datas=#{data}
+  </select>
+  <update id="addZfbData">
+     delete from zfb_amount where datas=#{date};
+     insert into zfb_amount (datas, beginBlance,endBlance,transfer,payFreight,ebayAmount,materialsAmount,zfbFright,cancelAmount) VALUES
+     (#{date},#{beginBlance},#{endBlance},#{transfer},#{payFreight},#{ebayAmount},#{materialsAmount},#{zfbFright},#{cancelAmount});
+  </update>
+  <select id="searchCancelGoodsInventory" resultType="com.cbt.pojo.CancelGoodsInventory">
+    select * from cancel_goods_inventory where 1=1 
+    <if test="state != 2">
+     and flag=#{state}
+    </if>
+    limit #{page},20;
+  </select>
+  <select id="searchCancelGoodsInventoryCount" resultType="INTEGER">
+    select count(id) from cancel_goods_inventory where 1=1 
+    <if test="state != 0">
+     and flag=#{state}
+    </if>
+  </select>
+  <update id="reductionInventory">
+    update cancel_goods_inventory set flag=1,dealtime=now(),username=#{username} where id=#{id};
+    <if test="i_flag == 1">
+      update inventory set new_remaining=new_remaining+#{inventory_qty},can_remaining=can_remaining+#{inventory_qty},new_inventory_amount=new_inventory_amount+#{amount} where id=#{i_id}
+    </if>
+    <if test="i_flag == 0">
+     update inventory set remaining=remaining+#{inventory_qty},can_remaining=can_remaining+#{inventory_qty},inventory_amount=inventory_amount+#{amount} where id=#{i_id}
+    </if>
+  </update>
+  <select id="orderSalesAmount" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+     	select times,sum(orderAmount) as orderAmount,sum(grabAmount) as grabAmount,sum(forecastAmount) as forecastAmount,(SUM(orderAmount)-sum(grabAmount)-sum(forecastAmount)) as forecastProfits,concat(cast((SUM(orderAmount)-sum(grabAmount)-sum(forecastAmount))/SUM(orderAmount)*100 as decimal(10,2)),'%') as forecastProfitsMargin from (
+		select CONCAT(YEAR(orderpaytime),'年',MONTH(orderpaytime),'月') as times,cast(getExchangeRMB(sum(pay_price),'USD') as decimal(10,2)) as orderAmount,0.00 as grabAmount,0.00 as forecastAmount from orderinfo where orderpaytime>=#{startTime} 
+		<if test="endTime!=null">
+		and orderpaytime<![CDATA[<=]]>#{endTime}  
+		</if> and state>0 and state<![CDATA[<]]>6 
+		and user_id  in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+         email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+       email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+       email NOT LIKE 'zhouxueyun%')
+		group by year(orderpaytime),month(orderpaytime)
+		union
+		SELECT concat(YEAR(a.paydata),'年',MONTH(a.paydata),'月') as times,0.00 as orderAmount,cast(SUM(a.totalprice) as decimal(10,2)) as grabAmount,0.00 as forecastAmount  FROM (
+		SELECT DISTINCT orderid,totalprice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 and
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime}  
+		</if>
+		AND tbOr1688 IN ('0','1','2','3')) a 
+		group by year(a.paydata),month(a.paydata)
+		union
+		SELECT CONCAT(YEAR(senttime),'年',MONTH(senttime),'月') AS times,0.00 as orderAmount,0.00 as grabAmount,cast(getExchangeRMB(SUM(sp.estimatefreight),'USD') as decimal(10,2)) as forecastAmount
+		FROM shipping_package sp INNER JOIN shipment s ON sp.expressno=s.orderNo WHERE senttime>=#{startTime} 
+		<if test="endTime!=null">
+		and senttime<![CDATA[<=]]>#{endTime}  
+		</if>
+		group by YEAR(senttime),MONTH(senttime)
+		)tab group by times
+  </select>
+  <select id="orderDetetailsSale" resultType="com.cbt.pojo.OrderDetetailsSalePojo">
+     	SELECT times,(SUM(payment_amount)+SUM(tt_amount)) AS totalSum,SUM(titalRefund) AS titalRefund,SUM(balancePrepaid) AS balancePrepaid,SUM(balancePayment) AS balancePayment,SUM(cancelBeforeOrderAmount) AS cancelBeforeOrderAmount,SUM(salesAmount) AS salesAmount FROM (
+		<!-- 每日退款 -->
+		SELECT CONCAT(YEAR(endtime),'-',MONTH(endtime),'-',DAY(endtime)) AS times,CAST(SUM(account) AS DECIMAL(11, 2)) AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM refund WHERE valid=1 AND STATUS =2 AND TYPE IN(0,1) AND 
+		 endtime>=#{startTime} 
+		 <if test="endTime!=null">
+		and endtime<![CDATA[<=]]>#{endTime}
+		</if>
+		 AND userid 
+		 IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(endtime),MONTH(endtime),DAY(endtime) ASC
+		UNION
+		
+		<!-- paypal收入-->
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment 
+		WHERE paystatus=1 AND paytype IN(0) AND  createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}
+		</if>
+		AND userid NOT IN(SELECT id FROM USER WHERE email LIKE 'test%' OR email LIKE '%qq.com' OR email LIKE '%163.com' OR email LIKE '%126.com'
+		OR email LIKE '%ww.com' OR NAME LIKE 'rlef%' OR email LIKE 't@%' OR email LIKE 't_@%'  OR email LIKE '%sina.com' 
+		OR email LIKE '%test%yahoo.com%' OR email LIKE '%test%hotmail.com%' OR email = 'yangyanyan4228@yahoo.com' OR id=1128)
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) ASC
+		UNION
+		
+		<!-- TT收入 -->
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment 
+		WHERE paystatus=1 AND paytype IN(1) AND  createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND userid  IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) ASC
+		union
+		<!-- 余额充值 -->
+		select concat(year(changetime),'-',month(changetime),'-',day(changetime)) as times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,cast(sum(cast(beforblance as decimal(10,2))-cast(changeblance as decimal(10,2))) as decimal(10,2)) as balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount from tab_blancechangelog where 
+		changetime>=#{startTime}
+		<if test="endTime!=null">
+		and changetime<![CDATA[<=]]>#{endTime}
+		</if>
+		 and beforblance>changeblance 
+		and userid  in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%')
+		group by year(changetime),month(changetime),day(changetime)
+		<!-- 余额支付 -->
+		UNION
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment
+		WHERE paystatus=1 AND paytype =2 AND createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}
+		</if>
+		AND userid  IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) ASC
+		
+		<!-- 销售额 -->
+		UNION
+		SELECT CONCAT(YEAR(orderpaytime),'-',MONTH(orderpaytime),'-',DAY(orderpaytime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,CAST(SUM(pay_price) AS DECIMAL(10,2)) AS salesAmount FROM orderinfo WHERE 
+		orderpaytime>=#{startTime}
+		<if test="endTime!=null">
+		and orderpaytime<![CDATA[<=]]>#{endTime} 
+		</if>
+		 AND state>0 AND state<![CDATA[<]]>6 
+		AND user_id NOT IN (SELECT id FROM USER  WHERE id=727 OR  email LIKE '%qq.com%' OR email LIKE '%163.com%' OR email LIKE '%123.com%'  OR email LIKE '%@sourcing-cn.com%'   OR email LIKE '%sina.com%' OR email LIKE '%16.com%')
+		GROUP BY YEAR(orderpaytime),MONTH(orderpaytime),DAY(orderpaytime) 
+		)tbl GROUP BY times limit #{page},30
+  </select>
+    <select id="orderDetetailsSaleCount" resultType="com.cbt.pojo.OrderDetetailsSalePojo">
+     	SELECT times,(SUM(payment_amount)+SUM(tt_amount)) AS totalSum,SUM(titalRefund) AS titalRefund,SUM(balancePrepaid) AS balancePrepaid,SUM(balancePayment) AS balancePayment,SUM(cancelBeforeOrderAmount) AS cancelBeforeOrderAmount,SUM(salesAmount) AS salesAmount FROM (
+		<!-- 每日退款 -->
+		SELECT CONCAT(YEAR(endtime),'-',MONTH(endtime),'-',DAY(endtime)) AS times,CAST(SUM(account) AS DECIMAL(11, 2)) AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM refund WHERE valid=1 AND STATUS =2 AND TYPE IN(0,1) AND 
+		 endtime >=#{startTime} 
+		 <if test="endTime!=null">
+		and endtime<![CDATA[<=]]>#{endTime}
+		</if>
+		 AND userid 
+		 IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(endtime),MONTH(endtime),DAY(endtime) 
+		UNION
+		
+		<!-- paypal收入-->
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment 
+		WHERE paystatus=1 AND paytype IN(0) AND  createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}
+		</if>
+		AND userid  IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) 
+		UNION
+		
+		<!-- TT收入 -->
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment 
+		WHERE paystatus=1 AND paytype IN(1) AND  createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}
+		</if>
+		AND userid  IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) 
+		union
+		<!-- 余额充值 -->
+		select concat(year(changetime),'-',month(changetime),'-',day(changetime)) as times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,cast(sum(cast(beforblance as decimal(10,2))-cast(changeblance as decimal(10,2))) as decimal(10,2)) as balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount from tab_blancechangelog where 
+		changetime>=#{startTime}
+		<if test="endTime!=null">
+		and changetime<![CDATA[<=]]>#{endTime} 
+		</if>
+		 and beforblance>changeblance 
+		and userid  in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		group by year(changetime),month(changetime),day(changetime)
+		<!-- 余额支付 -->
+		UNION
+		SELECT CONCAT(YEAR(createtime),'-',MONTH(createtime),'-',DAY(createtime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,CAST(SUM(payment_amount) AS DECIMAL(11, 2)) AS balancePayment,0.00 AS cancelBeforeOrderAmount,0.00 AS salesAmount FROM payment
+		WHERE paystatus=1 AND paytype =2 AND createtime>=#{startTime}
+		<if test="endTime!=null">
+		and createtime<![CDATA[<=]]>#{endTime}
+		</if>
+		AND userid  IN(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(createtime),MONTH(createtime),DAY(createtime) 
+		
+		<!-- 销售额 -->
+		UNION
+		SELECT CONCAT(YEAR(orderpaytime),'-',MONTH(orderpaytime),'-',DAY(orderpaytime)) AS times,0.00 AS titalRefund,0.00 AS payment_amount,0.00 AS tt_amount,0.00 AS balancePrepaid,0.00 AS balancePayment,0.00 AS cancelBeforeOrderAmount,CAST(SUM(pay_price) AS DECIMAL(10,2)) AS salesAmount FROM orderinfo WHERE 
+		orderpaytime>=#{startTime}
+		<if test="endTime!=null">
+		and orderpaytime<![CDATA[<=]]>#{endTime} 
+		</if>
+		 AND state>0 AND state<![CDATA[<]]>6 
+		AND user_id  IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%')
+		GROUP BY YEAR(orderpaytime),MONTH(orderpaytime),DAY(orderpaytime) 
+		)tbl GROUP BY times 
+  </select>
+  <select id="orderDetetailsSaleDetails" resultType="com.cbt.pojo.OrderDetetailsSalePojo">
+     select o.order_no,0.00 as originalAmount,0.00 as estimateBuyAmount,0.00 as estimateProfits,CAST(getExchangeRMB(o.pay_price,'USD') as decimal(10,2)) as orderactualAmount, cast(sum(ops.goods_p_price*ops.buycount) as decimal(10,2)) as orderActualBuyAmount,
+	CAST(getExchangeRMB(SUM(sp.estimatefreight)/count(ops.id),'USD') AS DECIMAL(10,2)) as estimateFright,CAST(SUM(ifnull(sp.totalprice,0.00))/count(ops.id) AS DECIMAL(10,2)) AS orderActualFright,ifnull(sp.shipmentno,'无') as shipmentno
+	 ,(CAST(getExchangeRMB(o.pay_price,'USD') as decimal(10,2))-CAST(SUM(ops.goods_p_price*ops.buycount) AS DECIMAL(10,2))-CAST(SUM(IFNULL(sp.totalprice,0.00))/COUNT(ops.id) AS DECIMAL(10,2))) as orderActualProfits
+	from orderinfo o 
+	left JOIN shipping_package sp ON o.order_no=sp.orderid
+	left join order_product_source ops on o.order_no=ops.orderid 	
+	where o.orderpaytime>=#{startTime} and o.orderpaytime<![CDATA[<=]]>#{endTime} and o.state>0 and o.state<![CDATA[<]]>6
+	<if test="orderid != null">
+	 and o.order_no=#{orderid}
+	</if>
+	and o.user_id  in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%') group by o.order_no
+	limit #{page},30
+  </select>
+  <select id="orderDetetailsSaleDetailsCount" resultType="com.cbt.pojo.OrderDetetailsSalePojo">
+     select o.order_no,0.00 as originalAmount,0.00 as estimateBuyAmount,0.00 as estimateProfits,CAST(getExchangeRMB(o.pay_price,'USD') as decimal(10,2)) as orderactualAmount, cast(sum(ops.goods_p_price*ops.buycount) as decimal(10,2)) as orderActualBuyAmount,
+	CAST(getExchangeRMB(SUM(sp.estimatefreight)/count(ops.id),'USD') AS DECIMAL(10,2)) as estimateFright,CAST(SUM(ifnull(sp.totalprice,0.00))/count(ops.id) AS DECIMAL(10,2)) AS orderActualFright,ifnull(sp.shipmentno,'无') as shipmentno
+	 ,(CAST(getExchangeRMB(o.pay_price,'USD') as decimal(10,2))-CAST(SUM(ops.goods_p_price*ops.buycount) AS DECIMAL(10,2))-CAST(SUM(IFNULL(sp.totalprice,0.00))/COUNT(ops.id) AS DECIMAL(10,2))) as orderActualProfits
+	from orderinfo o 
+	left JOIN shipping_package sp ON o.order_no=sp.orderid
+	left join order_product_source ops on o.order_no=ops.orderid 	
+	where o.orderpaytime>=#{startTime} and o.orderpaytime<![CDATA[<=]]>#{endTime} and o.state>0 and o.state<![CDATA[<]]>6
+	<if test="orderid != null">
+	 and o.order_no=#{orderid}
+	</if>
+	and o.user_id  in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%') group by o.order_no
+  </select>
+  <select id="getNoMatchingOrder" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+       SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime}
+		and paydata<![CDATA[<=]]>#{endTime}
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+		AND tbOr1688 IN ('0','1','3') and orderid not in (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime}
+		AND paydata<![CDATA[<=]]>#{endTime}
+		AND tbOr1688 IN ('0','1','2','3')
+		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+		) limit #{page},20
+  </select>
+    <select id="getNoMatchingOrderCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+     SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,imgurl,itemurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime}
+		and paydata<![CDATA[<=]]>#{endTime}
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+		AND tbOr1688 IN ('0','1','3') and orderid not in (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime}
+		AND paydata<![CDATA[<=]]>#{endTime}
+		AND tbOr1688 IN ('0','1','2','3')
+		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+		) 
+  </select>
+  <!-- 有货源匹配没有入库 -->
+  <select id="getNoStorage" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') 
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
+		)  
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
+		) AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3')
+		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
+		) )
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+		limit #{page},20
+  </select>
+    <select id="getNoStorageCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') 
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
+		)  
+		AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
+		) AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','3') AND orderid NOT IN (
+		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
+		paydata>=#{startTime} 
+		<if test="endTime!=null">
+		and paydata<![CDATA[<=]]>#{endTime} 
+		</if>
+		AND tbOr1688 IN ('0','1','2','3')
+		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
+		) )
+		<if test="userName != null">
+		  and username=#{userName}
+		</if>
+  </select>
+  <select id="getCancelAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username
+		FROM taobao_1688_order_history t 
+		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
+		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
+		 AND t.tbOr1688 IN ('0','1','2','3')
+		 <if test="userName != null">
+		  and t.username=#{userName}
+		</if>
+		AND oi.state IN (-1,6)  limit #{page},20
+  </select>
+    <select id="getCancelAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username
+		FROM taobao_1688_order_history t 
+		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
+		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
+		AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (-1,6) 
+		<if test="userName != null">
+		  and t.username=#{userName}
+		</if>
+  </select>
+  <select id="getLastAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
+        AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{endTime}
+		<if test="userName != null">
+		  and t.username=#{userName}
+		</if>
+		limit #{page},20
+  </select>
+  <select id="getLastAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+  		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
+        AND t.tbOr1688 IN ('0','1','2','3')
+		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{endTime}
+		<if test="userName != null">
+		  and t.username=#{userName}
+		</if>
+  </select>
+  <select id="getforecastAmount" resultType="com.cbt.warehouse.pojo.ShippingPackage">
+    SELECT sp.shipmentno,sp.orderid,sp.remarks,sp.createtime,s.sentTime,sp.sweight,s.realWeight,sp.svolume,sp.volumeweight,sp.transportcompany,sp.shippingtype,s.country,sp.expressno,
+      CAST(getExchangeRMB(sp.estimatefreight,'USD') AS DECIMAL(10,2)) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) as totalPrice,s.reMark
+	FROM shipping_package sp inner JOIN shipment s ON sp.expressno=s.orderNo WHERE s.senttime>=#{startTime} and s.senttime<![CDATA[<=]]>#{endTime}
+	<if test="orderid != null">
+	  and sp.orderid=#{orderid}
+	</if>
+	limit #{page},20
+  </select>
+  <select id="getforecastAmountCount" resultType="com.cbt.warehouse.pojo.ShippingPackage">
+    SELECT sp.shipmentno,sp.orderid,sp.remarks,sp.createtime,s.sentTime,sp.sweight,s.realWeight,sp.svolume,sp.volumeweight,sp.transportcompany,sp.shippingtype,s.country,sp.expressno,
+      CAST(getExchangeRMB(sp.estimatefreight,'USD') AS DECIMAL(10,2)) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) as totalPrice,s.reMark
+	FROM shipping_package sp inner JOIN shipment s ON sp.expressno=s.orderNo WHERE s.senttime>=#{startTime} and s.senttime<![CDATA[<=]]>#{endTime}
+	<if test="orderid != null">
+	  and sp.orderid=#{orderid}
+	</if>
+  </select>
+  <select id="getPayFreight" resultType="com.cbt.warehouse.pojo.Shipments">
+  select orderNo as orderno,sentTime as senttimes,country,transportCompany as transportcompany,transportType as transporttype,type,realWeight as realweight,bulkWeight as bulkweight,settleWeight as settleweight,totalPrice as totalprice
+  from shipment where senttime>=#{startTime} and senttime<![CDATA[<=]]>#{endTime}
+  <if test="orderid != null">
+   and orderNo=#{orderid}
+  </if>
+  limit #{page},20
+  </select>
+    <select id="getPayFreightCount" resultType="com.cbt.warehouse.pojo.Shipments">
+  select orderNo as orderno,sentTime as senttime,country,transportCompany as transportcompany,transportType as transporttype,type,realWeight as realweight,bulkWeight as bulkweight,settleWeight as settleweight,totalPrice as totalprice
+  from shipment where senttime>=#{startTime} and senttime<![CDATA[<=]]>#{endTime}
+  <if test="orderid != null">
+   and orderNo=#{orderid}
+  </if>
+  </select>
+  <update id="updateReply">
+     UPDATE taobao_1688_order_history SET operation_remark=CONCAT(IFNULL(operation_remark,''),'<![CDATA[</br>]]>',#{replyContent}) WHERE id=#{id}
+  </update>
+  <select id="getOperationRemark" resultType="java.lang.String">
+    select operation_remark from taobao_1688_order_history where id=#{id}
+  </select>
+  <insert id="inStorage">
+  <if test="type == 2">
+    insert into order_replenishment (orderid,goodsid,goods_p_url,buycount,tb_1688_itemid,createtime,rep_state,rep_type,purchase_state) values
+	(#{import_orderid},#{import_goodsid},#{tb_itemurl},#{tb_qty},#{tb_itemid},now(),1,1,4);
+  </if>
+    INSERT INTO id_relationtable (orderid,goodid,goodstatus,createtime,tborderid,shipno,username,userid,state,taobaospec,itemqty,is_replenishment,itemid) values
+	(#{import_orderid},#{import_goodsid},1,now(),#{tb_orderid},#{tb_shipno},#{username},#{userid},1,#{tb_sku},#{tb_qty},0,#{tb_itemid})
+  </insert>
+  <select id="getGrabNormalAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+     SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history 
+     WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1
+	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 IN ('0','1','2','3')
+	 <if test="userName != null">
+		  and username=#{userName}
+	</if>
+		limit #{page},20
+  </select>
+    <select id="getGrabNormalAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+     SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history 
+     WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1
+	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 IN ('0','1','2','3')
+	 <if test="userName != null">
+		  and username=#{userName}
+	</if>
+  </select>
+  <select id="getInventoryAmount" resultType="com.cbt.pojo.InventoryDetailsPojo">
+		SELECT id.good_name AS goodName ,id.sku AS car_type,id.car_img,id.goods_p_price AS inventory_price,IF(id.flag=1,id.new_remaining,id.remaining) AS inventory_acount,
+	   IF(id.flag=1,id.new_inventory_amount,id.inventory_amount) AS invetory_amount,id.barcode AS inventory_barcode,id.createtime
+		FROM inventory id
+		where id.createtime>=#{startTime} and id.createtime<![CDATA[<=]]>#{endTime}
+		limit #{page},20;
+  </select>
+    <select id="getInventoryAmountCount" resultType="com.cbt.pojo.InventoryDetailsPojo">
+  		SELECT id.good_name AS goodName ,id.sku AS car_type,id.car_img,id.goods_p_price AS inventory_price,IF(id.flag=1,id.new_remaining,id.remaining) AS inventory_acount,
+	   IF(id.flag=1,id.new_inventory_amount,id.inventory_amount) AS invetory_amount,id.barcode AS inventory_barcode,id.createtime
+		FROM inventory id  where id.createtime>=#{startTime} and id.createtime<![CDATA[<=]]>#{endTime}
+  </select>
+  <select id="getSaleInventory" resultType="com.cbt.pojo.InventoryDetailsPojo">
+  	select od.orderid,od.goodsid,od.car_img,od.car_type,li.lock_remaining,li.lock_inventory_amount,li.is_use,li.flag,li.is_delete,li.createtime
+  	from lock_inventory li
+  	inner join order_details od on li.od_id=od.id where
+      DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(li.createtime)  AND li.is_use=1 AND li.flag=1 AND li.is_delete=0
+	limit #{page},20;
+  </select>
+  <select id="getSaleInventoryCount" resultType="com.cbt.pojo.InventoryDetailsPojo">
+  	select od.orderid,od.goodsid,od.car_img,od.car_type,li.lock_remaining,li.lock_inventory_amount,li.is_use,li.flag,li.is_delete,li.createtime
+  	from lock_inventory li
+  	inner join order_details od on li.od_id=od.id where
+      DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(li.createtime)  AND li.is_use=1 AND li.flag=1 AND li.is_delete=0
+  </select>
+  <select id="getOfflinePaymentApplication" resultType="com.cbt.pojo.OfflinePaymentApplicationPojo">
+     SELECT op.id,op.orderid,op.goodsid,op.car_type,op.car_img,op.buycount,op.goods_p_price,op.flag,op.admName,op.applicantName,op.createtime,op.paydata,op.amount,op.off_remark,o.user_id as userid FROM offline_payment_application op inner join orderinfo o on op.orderid=o.order_no WHERE 1=1
+     <if test="state != 2">
+       and op.flag=#{state}
+     </if>
+     <if test="userName != null">
+      and op.applicantName=#{userName}
+     </if>
+     <if test="startTime != null">
+      and op.paydata>=#{startTime}
+     </if>
+      <if test="endTime != null">
+      and op.paydata<![CDATA[<=]]>#{endTime}
+     </if>
+      order by op.createtime desc
+     LIMIT #{page},20
+  </select>
+  <select id="getOfflinePaymentApplicationCount" resultType="com.cbt.pojo.OfflinePaymentApplicationPojo">
+    SELECT * FROM offline_payment_application WHERE 1=1
+    <if test="state != 2">
+       and flag=#{state}
+     </if>
+     <if test="userName != null">
+      and applicantName=#{userName}
+     </if>
+     <if test="startTime != null">
+      and paydata>=#{startTime}
+     </if>
+      <if test="endTime != null">
+      and paydata<![CDATA[<=]]>#{endTime}
+     </if>
+  </select>
+  <update id="ThroughReview">
+    update offline_payment_application set flag=1,paydata=now(),admName=#{admName} where id in (${id})
+  </update>
+  <select id="getAllBuyer" resultType="com.cbt.pojo.Admuser">
+    SELECT * FROM admuser WHERE roleType=2 AND status=1
+  </select>
+  <select id="getOrderQuery" resultType="com.cbt.bean.DataQueryBean">
+  	SELECT SUM(b.new_user) AS new_user,SUM(b.new_user_order) AS new_user_order,cast(SUM(b.new_user_order_cost) as decimal(10,2)) AS new_user_order_cost,SUM(b.new_user_address) AS new_user_address,SUM(b.old_user_order) AS old_user_order,SUM(b.new_user_goods_car) AS new_user_goods_car,sum(b.new_user_count) as new_user_count FROM (
+	<!--   新增注册用户  在该时间内注册用户-->
+	SELECT COUNT(u.id) AS new_user,0 AS new_user_order,0.00 AS new_user_order_cost,0 AS new_user_address,0 AS old_user_order,0 AS new_user_goods_car,0 as new_user_count  
+	FROM USER u INNER JOIN admin_r_user a ON u.id=a.userid 
+	WHERE u.createtime>=#{startTime} AND u.createtime&lt;#{endTime}
+	AND a.adminid&lt;>'18'
+	UNION
+	<!-- 新客户订单数量  在该时间段前没有下过单的用户，在该时间段内下单的数量-->
+	SELECT 0 AS new_user,COUNT(o.order_no) AS new_user_order,0.00 AS new_user_order_cost,0 AS new_user_address,0 AS old_user_order,0 AS new_user_goods_car,0 as new_user_count FROM orderinfo o INNER JOIN admin_r_user a ON o.user_id=a.userid 
+	WHERE o.orderpaytime>=#{startTime} AND o.orderpaytime&lt;#{endTime} AND state>0 AND state&lt;6
+	AND o.user_id NOT IN (SELECT DISTINCT user_id FROM orderinfo WHERE orderpaytime&lt;#{startTime} AND state>0 AND state&lt;6)
+	AND a.adminid&lt;>'18'
+	UNION
+	<!-- 新客户订单总金额-->
+	SELECT 0 AS new_user,0 AS new_user_order,ifnull(SUM(product_cost),0.00) AS new_user_order_cost,0 AS new_user_address,0 AS old_user_order,0 AS new_user_goods_car,0 as new_user_count FROM orderinfo WHERE user_id IN (
+	SELECT o.user_id FROM orderinfo o INNER JOIN admin_r_user a ON o.user_id=a.userid 
+	WHERE o.orderpaytime>=#{startTime} AND o.orderpaytime&lt;#{endTime} AND state>0 AND state&lt;6
+	AND o.user_id NOT IN (SELECT DISTINCT user_id FROM orderinfo WHERE orderpaytime&lt;#{startTime} AND state>0 AND state&lt;6)
+	AND a.adminid&lt;>'18')
+	UNION
+	<!-- 新用户 录入 地址的数量  在该时间段前没有录入 地址的数量，在该时间段内录入 地址的数量-->
+	SELECT 0 AS new_user,0 AS new_user_order,0.00 AS new_user_order_cost,COUNT(id) AS new_user_address,0 AS old_user_order,0 AS new_user_goods_car,0 as new_user_count FROM address WHERE createtime>=#{startTime} AND createtime&lt;#{endTime}
+	AND userid NOT IN (SELECT userid FROM address WHERE createtime&lt;#{startTime})
+	UNION
+	<!-- 老客户订单数量-->
+	SELECT 0 AS new_user,0 AS new_user_order,0.00 AS new_user_order_cost,0 AS new_user_address,COUNT(o.order_no) AS old_user_order,0 AS new_user_goods_car,0 as new_user_count FROM orderinfo o INNER JOIN admin_r_user a ON o.user_id=a.userid WHERE o.orderpaytime>=#{startTime} AND o.orderpaytime&lt;#{endTime} AND state>0 AND state&lt;6
+	AND o.user_id IN (SELECT DISTINCT user_id FROM orderinfo WHERE orderpaytime&lt;#{startTime} AND state>0 AND state&lt;6)
+	AND a.adminid&lt;>'18'
+	UNION
+	<!-- 新用户 购物车中 平均商品数量-->
+	SELECT 0 AS new_user,0 AS new_user_order,0.00 AS new_user_order_cost,0 AS new_user_address,0 AS old_user_order,COUNT(a.id) AS new_user_goods_car,0 as new_user_count FROM (
+	SELECT gc.* FROM goods_car gc INNER JOIN admin_r_user a ON gc.userid=a.userid WHERE gc.datatime>=#{startTime} AND gc.datatime&lt;#{endTime} AND a.adminid&lt;>'18'
+	AND gc.userid&lt;>'0' AND gc.userid NOT IN (SELECT userid FROM goods_car WHERE datatime&lt;#{startTime} AND userid&lt;>'0') GROUP BY gc.itemId,gc.goods_type
+	UNION
+	SELECT * FROM goods_car WHERE datatime>=#{startTime} AND datatime&lt;#{endTime}
+	AND userid='0' AND func_get_split_string(sessionid,'_',1) NOT IN
+	(SELECT DISTINCT sessionid FROM behavior_record WHERE ACTION='Add To Cart' AND view_date_time&lt;#{startTime}) GROUP BY itemId,goods_type) a
+	union
+	<!--  购物车中新用户数-->
+	SELECT 0 AS new_user,0 AS new_user_order,0.00 AS new_user_order_cost,0 AS new_user_address,0 AS old_user_order,0 as new_user_goods_car,COUNT(a.userid) AS new_user_count FROM (
+	SELECT distinct gc.userid FROM goods_car gc INNER JOIN admin_r_user a ON gc.userid=a.userid WHERE gc.datatime>=#{startTime} AND gc.datatime&lt;#{endTime} AND a.adminid&lt;>'18'
+	AND gc.userid&lt;>'0' AND gc.userid NOT IN (SELECT userid FROM goods_car WHERE datatime&lt;#{startTime} AND userid&lt;>'0') GROUP BY gc.itemId,gc.goods_type
+	UNION
+	SELECT distinct userid FROM goods_car WHERE datatime>=#{startTime} AND datatime&lt;#{endTime}
+	AND userid='0' AND func_get_split_string(sessionid,'_',1) NOT IN
+	(SELECT DISTINCT sessionid FROM behavior_record WHERE ACTION='Add To Cart' AND view_date_time&lt;#{startTime}) GROUP BY itemId,goods_type) a
+	) b
+  </select>
+  <delete id="deleteInventory">
+    INSERT INTO inventory_delete_details SELECT * FROM inventory WHERE id= ${id};
+    delete from inventory where id=${id};
+  </delete>
+  <select id="queryInById" resultType="com.cbt.pojo.Inventory">
+    select * from inventory where id=#{id}
+  </select>
+  <update id="updateIsStockFlag">
+    update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
+  </update>
+    <update id="updateIsStockFlag1">
+   update custom_benchmark_ready_newest set is_stock_flag=0 where pid=#{goods_pid};
+  </update>
+    <update id="updateIsStockFlag2">
+   update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
+  </update>
+  <select id="searchGoodsInventoryDeleteInfo" resultType="com.cbt.pojo.Inventory">
+ 	 SELECT ili.admName,ili.create_time,idd.* FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
+	WHERE ili.remark='库存删除' 
+	 <if test="barcode!=null">
+       and idd.barcode=#{barcode}
+     </if>
+      <if test="startdate!=null">
+        and ili.create_time>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and ili.create_time&lt;=#{enddate}
+     </if>
+     <if test="admName!=null">
+        and ili.admName=#{admName}
+     </if>
+      <if test="times != null">
+          and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(idd.createtime)
+      </if>
+	order by ili.id desc LIMIT ${page},20;
+  </select>
+    <select id="searchGoodsInventoryDeleteInfoCount" resultType="com.cbt.pojo.Inventory">
+  	SELECT ili.admName,ili.create_time,idd.* FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
+	WHERE ili.remark='库存删除' 
+		 <if test="barcode!=null">
+       and idd.barcode=#{barcode}
+     </if>
+      <if test="startdate!=null">
+        and ili.create_time>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and ili.create_time&lt;=#{enddate}
+     </if>
+          <if test="admName!=null">
+        and ili.admName=#{admName}
+     </if>
+        <if test="times != null">
+            and DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(idd.createtime)
+        </if>
+  </select>
+  <select id="searchGoodsInventoryUpdateInfo" resultType="com.cbt.pojo.Inventory">
+  	SELECT i.car_img,i.good_name,i.goods_url,i.goods_p_url,i.sku,i.goods_p_price,
+	ili.create_time as createtime,ili.admName,ili.old_inventory,ili.new_inventroy,ili.old_barcode,ili.new_barcode,IFNULL(ili.remark,'无') AS remark
+	FROM inventory_log_info ili INNER JOIN inventory i ON ili.in_id=i.id 
+	 <if test="barcode!=null">
+       and ili.old_barcode=#{barcode}
+     </if>
+      <if test="startdate!=null">
+        and ili.create_time>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and ili.create_time&lt;=#{enddate}
+     </if>
+          <if test="admName!=null">
+        and ili.admName=#{admName}
+     </if>
+	order by ili.create_time desc
+	limit ${page},20;
+  </select>
+  <update id="problem_inventory">
+    update inventory set flag=2 where id=${in_id}
+  </update>
+    <select id="searchGoodsInventoryUpdateInfoCount" resultType="com.cbt.pojo.Inventory">
+  	SELECT i.car_img,i.good_name,i.goods_url,i.goods_p_url,i.sku,i.goods_p_price,
+	ili.create_time as createtime,ili.admName,ili.old_inventory,ili.new_inventroy,ili.old_barcode,ili.new_barcode,IFNULL(ili.remark,'无') AS remark
+	FROM inventory_log_info ili INNER JOIN inventory i ON ili.in_id=i.id 
+		 <if test="barcode!=null">
+       and ili.old_barcode=#{barcode}
+     </if>
+      <if test="startdate!=null">
+        and ili.create_time>=#{startdate}
+     </if>
+     <if test="enddate!=null">
+        and ili.create_time&lt;=#{enddate}
+     </if>
+          <if test="admName!=null">
+        and ili.admName=#{admName}
+     </if>
+  </select>
+  <select id="StraightHairList" resultType="com.cbt.pojo.StraightHairPojo">
+    SELECT distinct od.goodsname,oi.user_id AS userid,od.orderid,od.goodsid,od.car_type AS sku,od.car_img AS img,
+    od.car_url,od.straight_time AS times,a.admName AS buyer,od.straight_flag AS state,
+    case when od.shipno='0' then '暂未发货' else od.shipno end as shipno,
+    (SELECT DISTINCT LOCATE('签收',shipstatus) FROM taobao_1688_order_history WHERE shipno=od.shipno) AS states,
+     CASE WHEN od.remark='' THEN '无备注' ELSE od.remark END AS remark 
+	FROM order_details od 
+	INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN goods_distribution g ON od.id=g.odid
+	INNER JOIN admuser ad ON g.admuserid=ad.id
+	WHERE od.straight_flag=2 AND oi.state>0 AND oi.state&lt;6 AND od.state&lt;2 
+<!-- 	AND a.adminid>'18' -->
+	<if test="admuserid != 1">
+		 and g.admuserid=#{admuserid} 
+	</if>
+	<if test="goods_pid != null">
+	  and od.goods_pid=#{goods_pid}
+	</if>
+	order by od.straight_time desc
+	limit ${page},20;
+  </select>
+    <select id="StraightHairListCount" resultType="com.cbt.pojo.StraightHairPojo">
+        SELECT distinct od.goodsname,oi.user_id AS userid,od.orderid,od.goodsid,od.car_type AS sku,od.car_img AS img,
+        od.car_url,od.straight_time AS times,a.admName AS buyer,od.straight_flag AS state,
+        case when od.shipno='0' then '暂未发货' else od.shipno end as shipno,
+        (SELECT DISTINCT LOCATE('签收',shipstatus) FROM taobao_1688_order_history WHERE shipno=od.shipno) AS states,
+        CASE WHEN od.remark='' THEN '无备注' ELSE od.remark END AS remark
+        FROM order_details od
+	INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN goods_distribution g ON od.id=g.odid
+	INNER JOIN admuser ad ON g.admuserid=ad.id
+	WHERE od.straight_flag=2 AND oi.state>0 AND oi.state&lt;6 AND od.state&lt;2 
+<!-- 	AND a.adminid>'18' -->
+	<if test="admuserid != 1">
+	and g.admuserid=#{admuserid} 
+	</if>
+	<if test="goods_pid != null">
+	  and od.goods_pid=#{goods_pid}
+	</if>
+  </select>
+  <insert id="recordLossInventory">
+    insert into lossInventory (in_id,new_remaining,old_remaining,loss_inventory,old_barcode,new_barcode,loss_amount,loss_price,createtime,admName) values
+    (#{in_id},#{new_remaining},#{old_remaining},#{loss_inventory},#{old_barcode},#{new_barcode},#{loss_amount},#{loss_price},now(),#{admName})
+  </insert>
+  <select id="searchLossInventory" resultType="com.cbt.pojo.LossInventoryPojo">
+    select l.*,i.car_img,i.goods_p_url,ifnull(i.remark,'无') as remark,i.sku from lossInventory l 
+    inner join inventory i on l.in_id=i.id
+    <if test="times != null">
+        where DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(l.createtime)
+    </if>
+    order by l.id desc
+    limit #{page},20;
+  </select>
+    <select id="searchLossInventoryCount" resultType="com.cbt.pojo.LossInventoryPojo">
+     select l.*,i.car_img,i.goods_p_url,ifnull(i.remark,'无') as remark,i.sku from lossInventory l 
+    inner join inventory i on l.in_id=i.id
+        <if test="times != null">
+            where DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= date(l.createtime)
+        </if>
+  </select>
+  <update id="straightShipnoEntry">
+    update order_details set shipno=#{shipno},remark=#{remark} where orderid=#{orderid} and goodsid=#{goodsid}
+  </update>
+  <select id="searchInventoryInOutDetails" resultType="com.cbt.pojo.StorageOutboundDetailsPojo">
+ 	SELECT id,orderid,goodsid,in_id,storage_count as counts,if(TYPE=1,'入库','出库') as types,createtime,admName,when_count,add_inventory FROM storage_outbound_details WHERE in_id=#{in_id} and is_delete=0
+	UNION
+	SELECT li.id,od.orderid,od.goodsid,li.in_id,li.lock_remaining AS counts ,'出库' AS types,li.createtime,'eric' AS admName,0 AS when_count,0 AS add_inventory
+	FROM lock_inventory li
+	INNER JOIN order_details od ON li.od_id=od.id WHERE li.flag=1 AND li.in_id=#{in_id} and li.is_delete=0
+<!--     SELECT * FROM storage_outbound_details WHERE in_id=#{in_id} -->
+    limit ${page},20
+  </select>
+    <select id="searchInventoryInOutDetailsCount" resultType="com.cbt.pojo.StorageOutboundDetailsPojo">
+     	SELECT id,orderid,goodsid,in_id,storage_count,TYPE,createtime,admName,when_count,add_inventory FROM storage_outbound_details WHERE in_id=#{in_id} and is_delete=0
+		UNION
+		SELECT li.id,od.orderid,od.goodsid,li.in_id,li.lock_remaining AS storage_count,2 AS TYPE,li.createtime,'eric' AS admName,0 AS when_count,0 AS add_inventory
+		FROM lock_inventory li
+		INNER JOIN order_details od ON li.od_id=od.id WHERE li.flag=1 AND li.in_id=#{in_id} and li.is_delete=0
+  </select>
+  <select id="getPayFailureOrder" resultType="com.cbt.pojo.PayFailureOrderPojo">
+  SELECT * FROM payment_failure where 1=1
+  <if test="startdate != null">
+   and createtime>=#{startdate}
+  </if>
+  <if test="startdate != null">
+   and createtime&lt;=#{enddate}
+  </if>
+  limit ${page},20;
+  </select>
+  <select id="getPayFailureOrderCount" resultType="com.cbt.pojo.PayFailureOrderPojo">
+  SELECT * FROM payment_failure where 1=1
+    <if test="startdate != null">
+   and createtime>=#{startdate}
+  </if>
+  <if test="startdate != null">
+   and createtime&lt;=#{enddate}
+  </if>
+  </select>
+  <select id="searchSampleProduct" resultType="com.cbt.bean.Orderinfo">
+     SELECT DISTINCT oi.order_no as orderNo,oi.details_number as detailsNumber,oi.create_time as deliveryTime,a.admName as actualLwh
+	FROM orderinfo oi 
+	INNER JOIN order_details od ON oi.order_no=od.orderid
+	LEFT JOIN goods_distribution g ON oi.order_no=g.orderid
+	LEFT JOIN admuser a ON g.admuserid=a.id
+	WHERE od.goods_pid IN (${pids}) AND oi.isDropshipOrder=3
+	limit ${page},20;
+  </select>
+    <select id="searchSampleProductCount" resultType="com.cbt.bean.Orderinfo">
+     SELECT DISTINCT oi.order_no as orderNo,oi.details_number as detailsNumber,oi.create_time as deliveryTime,a.admName as actualLwh
+	FROM orderinfo oi 
+	INNER JOIN order_details od ON oi.order_no=od.orderid
+	LEFT JOIN goods_distribution g ON oi.order_no=g.orderid
+	LEFT JOIN admuser a ON g.admuserid=a.id
+	WHERE od.goods_pid IN (${pids}) AND oi.isDropshipOrder=3
+  </select>
+    <select id="getTaoBaoNoInspection" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT DISTINCT t.* FROM taobao_1688_order_history t
+        WHERE 1=1
+        <if test="account != null">
+            AND t.username IN ${account}
+        </if>
+        AND  t.tbOr1688 IN ('0','1') AND LOCATE('退款',t.orderstatus)&lt;=0 AND LOCATE('关闭',t.orderstatus)&lt;=0
+        AND t.orderdate BETWEEN #{startdate} AND #{enddate}
+        AND t.orderid  NOT IN (
+        (
+        SELECT DISTINCT id.tborderid FROM goods_distribution g
+        INNER JOIN order_product_source ops ON g.orderid=ops.orderid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid AND id.is_replenishment=1
+        WHERE 1=1
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+            AND ops.confirm_userid=#{buyer}
+        </if>
+        AND g.createtime BETWEEN #{startdate} AND #{enddate}
+        AND oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        GROUP BY ops.orderid,ops.goodsid
+        )
+        )
+        order by t.orderdate desc
+        limit ${page},20;
+    </select>
+    <select id="getTaoBaoNoInspectionCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT DISTINCT t.* FROM taobao_1688_order_history t
+        WHERE 1=1
+        <if test="account != null">
+            AND t.username IN ${account}
+        </if>
+        AND  t.tbOr1688 IN ('0','1') AND LOCATE('退款',t.orderstatus)&lt;=0 AND LOCATE('关闭',t.orderstatus)&lt;=0
+        AND t.orderdate BETWEEN #{startdate} AND #{enddate}
+        AND t.orderid  NOT IN (
+        (
+        SELECT DISTINCT id.tborderid FROM goods_distribution g
+        INNER JOIN order_product_source ops ON g.orderid=ops.orderid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid AND id.is_replenishment=1
+        WHERE 1=1
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+            AND ops.confirm_userid=#{buyer}
+        </if>
+        AND g.createtime BETWEEN #{startdate} AND #{enddate}
+        AND oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        GROUP BY ops.orderid,ops.goodsid
+        )
+        )
+    </select>
+    <select id="getNopurchaseDistribution" resultType="com.cbt.bean.OrderProductSource">
+        SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS confirmTime,od.car_img AS goodsImgUrl
+        FROM order_product_source ops
+        INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND ops.goodsid=g.goodsid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid
+        WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+        </if>
+        AND ops.confirm_time BETWEEN #{startdate} AND #{enddate}  AND id.tborderid IS NULL
+        limit ${page},20;
+    </select>
+    <select id="getNopurchaseDistributionCount" resultType="com.cbt.bean.OrderProductSource">
+        SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS confirmTime,od.car_img AS goodsImgUrl
+        FROM order_product_source ops
+        INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND ops.goodsid=g.goodsid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        LEFT JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid
+        WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+        </if>
+        AND ops.confirm_time BETWEEN #{startdate} AND #{enddate}  AND id.tborderid IS NULL
+    </select>
+    <select id="getOneMathchMoreOrderInfo" resultType="com.cbt.bean.OrderProductSource">
+        SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS confirmTime,od.car_img AS goodsImgUrl,od.shipno,od.re_shipnos
+        FROM order_product_source ops
+        INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND ops.goodsid=g.goodsid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+        </if>
+        AND ops.confirm_time BETWEEN #{startdate} AND #{enddate} AND od.re_shipnos IS NOT NULL
+        ORDER BY ops.confirm_time  DESC  LIMIT 0,20;
+    </select>
+    <select id="getOneMathchMoreOrderInfoCount" resultType="com.cbt.bean.OrderProductSource">
+        SELECT DISTINCT ops.goodsid,ops.orderid,ops.confirm_userid AS confirmUserid,ops.confirm_time AS confirmTime,od.car_img AS goodsImgUrl
+        FROM order_product_source ops
+        INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND ops.goodsid=g.goodsid
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2
+        <if test="buyer != null">
+            AND g.admuserid=#{buyer}
+        </if>
+        AND ops.confirm_time BETWEEN #{startdate} AND #{enddate} AND od.re_shipnos IS NOT NULL
+    </select>
+    <select id="getBuyOrderId" resultType="java.lang.String">
+        select GROUP_CONCAT(distinct orderid) from taobao_1688_order_history where shipno in ${shipnos}
+    </select>
+    <update id="saveRemark">
+        UPDATE taobao_1688_order_history SET remark=CONCAT(IFNULL(remark,''),#{remarkContent}) WHERE id=${tb_id}
+    </update>
+    <select id="getAllBuyerOrderInfo" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT  DISTINCT orderid,case when tbOr1688=1 then '1688' when tbOr1688=0 then '淘宝' else '线下' end as tbOr1688,username,paytreasureid,orderdate,totalprice,orderstatus,ifnull(seller,'-') as seller
+        FROM taobao_1688_order_history WHERE tbOr1688 IN ('0','1')  and LOCATE('退款',orderstatus)&lt;=0 AND LOCATE('关闭',orderstatus)&lt;=0 and orderdate BETWEEN #{startdate} AND #{enddate}
+        <if test="account != null">
+            and username in (${account})
+        </if>
+        limit ${page},20;
+    </select>
+    <select id="getAllBuyerOrderInfoCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT  DISTINCT orderid,tbOr1688,username,paytreasureid,orderdate,totalprice,orderstatus
+        FROM taobao_1688_order_history WHERE tbOr1688 IN ('0','1')  and LOCATE('退款',orderstatus)&lt;=0 AND LOCATE('关闭',orderstatus)&lt;=0 and orderdate BETWEEN #{startdate} AND #{enddate}
+        <if test="account != null">
+            and username in (${account})
+        </if>
+    </select>
+    <select id="getUserProfitByMonth" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+        SELECT aa.*,bb.totalprice AS freight FROM (
+        SELECT LEFT(a.orderpaytime,7) AS times,a.id,a.email,a.grade,COUNT(a.order_no) AS orderCount,
+        CAST(SUM(a.pay_price*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
+        SUM((SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        AND od.state IN (0,1) WHERE od.orderid=a.order_no)) AS buyAmount,
+        SUM((SELECT  COUNT(DISTINCT goods_pid)*5  FROM  order_details WHERE state=1 AND orderid = a.order_no)) AS pid_amount,
+        SUM((SELECT SUM(IFNULL(estimatefreight,0)) FROM shipping_package sp  WHERE (a.order_no=sp.orderid OR
+        (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )))*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS estimateFreight,
+        SUM((SELECT SUM(IFNULL(totalprice,0)) FROM shipping_package sp    WHERE (a.order_no=sp.orderid OR
+        (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )))*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS totalPriceFreight,
+        SUM(CAST((SELECT SUM(IF(CAST(sweight AS DECIMAL(10,4))>CAST(volumeweight AS DECIMAL(10,4)),sweight,volumeweight)) FROM shipping_package sp WHERE
+        (a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )) AS DECIMAL(10,2))) AS ac_weight,
+        SUM(CAST((SELECT SUM(od_total_weight) FROM order_details WHERE orderid=a.order_no) AS DECIMAL(10,2))) AS es_weight
+        ,GROUP_CONCAT(a.order_no,'@',a.flag) AS orderids,SUM(a.actual_weight_estimate) AS custom_freight,sum(a.esBuyPrice) as esBuyPrice,
+        GROUP_CONCAT((SELECT GROUP_CONCAT(sp.expressno,'@',IF(CAST(sweight AS DECIMAL(10,2))>CAST(volumeweight AS DECIMAL(10,2)),sweight,volumeweight),'@',CAST(sp.estimatefreight*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS DECIMAL(10,2))) FROM shipping_package sp WHERE a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid))) AS shipnos
+        FROM (
+        SELECT oi.actual_weight_estimate,ifnull(ow.flag,0) as flag,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
+        FROM orderinfo oi
+        INNER JOIN USER u ON oi.user_id=u.id
+        INNER JOIN user_grade ug ON u.grade=ug.id
+        left join order_warning ow on oi.order_no=ow.orderNo
+        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
+        <if test="userId != null">
+            and oi.user_id=#{userId}
+        </if>
+        ) a GROUP BY a.id,LEFT(a.orderpaytime,7)
+        limit ${page},100
+        ) aa LEFT JOIN
+        (
+        SELECT a.user_id,SUM(a.totalprice) AS totalprice FROM (
+        SELECT oi.user_id,sp.expressno,IF(sp.actual_freight&lt;=0,IFNULL(s.totalprice,0.00),sp.actual_freight) AS totalprice
+        FROM shipping_package sp
+        INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no
+        INNER JOIN shipment s ON sp.expressno=s.orderNo
+        WHERE oi.state IN (1,2,3,4,5)
+        AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE  DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
+        GROUP BY  sp.expressno
+        ) a  GROUP BY a.user_id
+        ) bb ON aa.id=bb.user_id
+    </select>
+    <select id="getProfitSummaryData" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+        SELECT aa.*,bb.totalprice AS freight FROM (
+        SELECT LEFT(a.orderpaytime,7) AS times,a.id,a.email,a.grade,COUNT(a.order_no) AS orderCount,
+        CAST(SUM(a.pay_price*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
+        SUM((SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops
+        INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+        AND od.state IN (0,1) WHERE od.orderid=a.order_no)) AS buyAmount,
+        SUM((SELECT  COUNT(DISTINCT goods_pid)*5  FROM  order_details WHERE state=1 AND orderid = a.order_no)) AS pid_amount,
+        SUM((SELECT SUM(IFNULL(estimatefreight,0)) FROM shipping_package sp  WHERE (a.order_no=sp.orderid OR
+        (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )))*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS estimateFreight,
+        SUM((SELECT SUM(IFNULL(totalprice,0)) FROM shipping_package sp    WHERE (a.order_no=sp.orderid OR
+        (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )))*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS totalPriceFreight,
+        SUM(CAST((SELECT SUM(IF(CAST(sweight AS DECIMAL(10,4))>CAST(volumeweight AS DECIMAL(10,4)),sweight,volumeweight)) FROM shipping_package sp WHERE
+        (a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid) )) AS DECIMAL(10,2))) AS ac_weight,
+        SUM(CAST((SELECT SUM(od_total_weight) FROM order_details WHERE orderid=a.order_no) AS DECIMAL(10,2))) AS es_weight
+        ,GROUP_CONCAT(a.order_no) AS orderids,SUM(a.actual_weight_estimate) AS custom_freight,sum(a.esBuyPrice) as esBuyPrice,
+        GROUP_CONCAT((SELECT GROUP_CONCAT(sp.expressno,'@',IF(CAST(sweight AS DECIMAL(10,2))>CAST(volumeweight AS DECIMAL(10,2)),sweight,volumeweight),'@',CAST(sp.estimatefreight*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS DECIMAL(10,2))) FROM shipping_package sp WHERE a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid))) AS shipnos
+        FROM (
+        SELECT oi.actual_weight_estimate,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
+        FROM orderinfo oi
+        INNER JOIN USER u ON oi.user_id=u.id
+        INNER JOIN user_grade ug ON u.grade=ug.id
+        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
+        <if test="userId != null">
+            and oi.user_id=#{userId}
+        </if>
+        ) a GROUP BY a.id,LEFT(a.orderpaytime,7)
+        ) aa LEFT JOIN
+        (
+        SELECT a.user_id,SUM(a.totalprice) AS totalprice FROM (
+        SELECT oi.user_id,sp.expressno,IF(sp.actual_freight&lt;=0,IFNULL(s.totalprice,0.00),sp.actual_freight) AS totalprice
+        FROM shipping_package sp
+        INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no
+        INNER JOIN shipment s ON sp.expressno=s.orderNo
+        WHERE oi.state IN (1,2,3,4,5)
+        AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE  DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
+        GROUP BY  sp.expressno
+        ) a  GROUP BY a.user_id
+        ) bb ON aa.id=bb.user_id
+    </select>
+    <select id="getUserProfitByMonthCount" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+       SELECT LEFT(a.orderpaytime,7) AS times,a.id,a.email,a.grade,COUNT(a.order_no) AS orderCount
+        FROM (
+        SELECT oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
+        FROM orderinfo oi
+        INNER JOIN USER u ON oi.user_id=u.id
+        INNER JOIN user_grade ug ON u.grade=ug.id
+        WHERE 1=1 AND oi.state between 1 and 5 AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
+        <if test="userId != null">
+            and oi.user_id=#{userId}
+        </if>
+        ) a GROUP BY a.id,LEFT(a.orderpaytime,7)
+    </select>
+    <select id="getAllOrderNo" resultType="java.util.Map">
+        SELECT oi.order_no,oi.extra_freight,oi.product_cost,oi.mode_transport,if(oi.exchange_rate&lt;=0,6.3,oi.exchange_rate) as exchange_rate FROM orderinfo oi WHERE user_id=#{userId} AND
+        oi.state between 1 and 5 AND LEFT(oi.order_no,16)
+        IN(
+        SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE DATE(createtime) >= DATE(#{s_time}) AND DATE(createtime) &lt;= DATE(#{e_time})
+        )
+    </select>
+    <select id="getActualFreight" resultType="java.lang.String">
+        select sum(a.totalprice) from (
+        SELECT sp.expressno,IF(sp.actual_freight&lt;=0,IFNULL(s.totalprice,0.00),sp.actual_freight) AS totalprice,sp.actual_freight
+        FROM shipping_package sp
+        INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no OR (LOCATE(CONCAT(oi.order_no,','),sp.remarks)>0 AND sp.orderid!=oi.order_no)
+        inner join shipment s on sp.expressno=s.orderNo
+        WHERE oi.state IN (1,2,3,4,5) AND oi.user_id=#{userId}
+        AND LEFT(oi.order_no,16)
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE email
+        NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND email NOT LIKE '%@china-synergy%'
+        AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT
+        LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND email NOT LIKE 'zhouxueyun%') AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE DATE(createtime) >= DATE(#{s_time}) AND DATE(createtime) &lt;= DATE(#{e_time}))
+        GROUP BY  sp.expressno) a
+    </select>
+    <update id="updateOdState">
+        update order_details set state=1,checked=1 where orderid=#{orderid} and goodsid=#{goodsid}
+    </update>
+    <select id="getIdState" resultType="java.lang.Integer">
+        select count(id) from id_relationtable where tborderid=#{orderid} and is_delete=0
+    </select>
+    <select id="getInspectionResult" resultType="java.lang.String">
+         SELECT CONCAT(a.goodstatus,',',a.checked) FROM (
+         SELECT id.id,id.goodstatus,od.checked FROM id_relationtable id
+         INNER JOIN order_details od ON id.orderid=od.orderid AND od.goodsid=id.goodid
+         INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+         WHERE id.tborderid=#{orderid} AND ops.tb_1688_itemid=#{itemid}
+         UNION
+         SELECT id.id,id.goodstatus,od.checked FROM id_relationtable id
+         INNER JOIN order_details od ON id.orderid=od.orderid AND od.goodsid=id.goodid
+         INNER JOIN order_replenishment ore ON od.orderid=ore.orderid AND od.goodsid=ore.goodsid
+         WHERE id.tborderid=#{orderid} AND ore.tb_1688_itemid=#{itemid}
+         ) a
+         ORDER BY a.id DESC LIMIT 1
+    </select>
+    <delete id="deleteUserProfitByMonth">
+        delete from user_profit_data where times=#{time}
+    </delete>
+    <insert id="insertUserProfitBatch" parameterType="java.util.List">
+        insert into user_profit_data (times,userid,email,grade,orderCount,ac_weight,es_weight,salesAmount,buyAmount,freight,custom_freight,estimateFreight
+        ,forecastProfits,Profits,estimateProfit,esprofits,craetetime)
+        values
+        <foreach collection ="list" item="item" index= "index" separator =",">
+            (
+            #{item.times},#{item.id},#{item.email},#{item.grade},#{item.orderCount},#{item.ac_weight},#{item.es_weight},#{item.salesAmount},#{item.buyAmount},#{item.freight},
+            #{item.custom_freight},#{item.estimateFreight},
+            #{item.forecastProfits},#{item.Profits},#{item.estimateProfit},#{item.esprofits},now()
+            )
+        </foreach>
+    </insert>
+    <select id="getUserProfitByMonthData" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+        select * from user_profit_data where times=#{times}
+        <if test="userId != null">
+            and userid=#{userId}
+        </if>
+        limit ${page},20;
+    </select>
+    <select id="getUserProfitByMonthCountData" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+        select * from user_profit_data where times=#{times}
+        <if test="userId != null">
+            and userid=#{userId}
+        </if>
+    </select>
+    <select id="reviewManagerment" resultType="com.cbt.pojo.ReviewManage">
+      	SELECT distinct od.car_img,od.goodsname,g.id,g.car_type,g.order_no,IFNULL(od.goodsid,'') AS goodsid,g.user_id,g.user_name,g.country_id,g.goods_pid,g.comments_content,g.comments_time,g.show_flag,g.picPath FROM goods_comments_real g
+        LEFT JOIN order_details od ON g.oid=od.id where 1=1
+        <if test="goodsPid != null">
+            and g.goods_pid=#{goodsPid}
+        </if>
+        <if test="orderid != null">
+            and g.order_no=#{orderid}
+        </if>
+        <if test="userid != null">
+            and g.user_id=#{userid}
+        </if>
+        order by g.comments_time desc
+        LIMIT ${page},20
+    </select>
+    <select id="reviewManagermentCount" resultType="com.cbt.pojo.ReviewManage">
+      	SELECT distinct od.car_img,od.goodsname,g.id,g.car_type,g.order_no,IFNULL(od.goodsid,'') AS goodsid,g.user_id,g.user_name,g.country_id,g.goods_pid,g.comments_content,g.comments_time,g.show_flag,g.picPath FROM goods_comments_real g
+	    LEFT JOIN order_details od ON g.oid=od.id where 1=1
+        <if test="goodsPid != null">
+            and g.goods_pid=#{goodsPid}
+        </if>
+        <if test="orderid != null">
+            and g.order_no=#{orderid}
+        </if>
+        <if test="userid != null">
+            and g.user_id=#{userid}
+        </if>
+    </select>
+    <update id="setDisplay">
+        update goods_comments_real set show_flag=#{showFlag} where id=#{id}
+    </update>
+    <select id="getNoStorageDetails" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+    	SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,
+    	t.sku,t.orderdate,t.paydata,t.delivery_date,t.username FROM taobao_1688_order_history t
+		LEFT JOIN id_relationtable id ON t.orderid=id.tborderid
+		WHERE t.tbOr1688=1 AND LOCATE('退款',t.orderstatus)&lt;=0 AND LOCATE('关闭',t.orderstatus)&lt;=0 AND LOCATE('取消',t.orderstatus)&lt;=0
+		AND t.delivery_date !='' AND t.orderdate>='2018-07-01 00:00:00'  AND t.delivery_date&lt;=DATE_SUB(CURDATE(),INTERVAL 3 DAY)
+		AND id.id IS NULL
+        <if test="username != null">
+            and t.username=#{username}
+        </if>
+        <if test="orderNo != null">
+            and t.orderid=#{orderNo}
+        </if>
+        order by t.orderdate desc
+    </select>
+    <select id="getNoStorageDetailsCount" resultType="INTEGER">
+        SELECT COUNT(DISTINCT t.orderid) FROM taobao_1688_order_history t
+        LEFT JOIN id_relationtable id ON t.orderid=id.tborderid
+        WHERE t.tbOr1688=1 AND LOCATE('退款',t.orderstatus)&lt;=0 AND LOCATE('关闭',t.orderstatus)&lt;=0 AND LOCATE('取消',t.orderstatus)&lt;=0
+        AND t.delivery_date !='' AND t.orderdate>='2018-07-01 00:00:00'  AND t.delivery_date&lt;=DATE_SUB(CURDATE(),INTERVAL 3 DAY)
+        AND id.id IS NULL
+        <if test="username != null">
+            and t.username=#{username}
+        </if>
+        <if test="orderNo != null">
+            and t.orderid=#{orderNo}
+        </if>
+    </select>
+    <select id="getPidValidState"  resultType="hashmap">
+        SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
+    </select>
+</mapper>
+

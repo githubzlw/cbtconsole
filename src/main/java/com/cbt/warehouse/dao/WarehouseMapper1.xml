@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.IWarehouseDao1" >
+
+    <resultMap id="StorageLocationBeanResult" type="com.cbt.bean.StorageLocationBean" >
+        <result column="orderid" property="orderid"/>
+        <result column="createtime" property="createtime"/>
+        <result column="goodid" property="goodid"/>
+        <result column="picturepath" property="picturepath"/> 
+        <result column="position" property="position"/> 
+    </resultMap>
+    
+    
+
+    <resultMap id="PurchaseBeanResult" type="com.cbt.website.bean.PurchaseBean" >
+        <result column="userid" property="userid"/>
+        <result column="name" property="name"/>
+        <result column="orderid" property="orderid"/>
+        <result column="orderNo" property="orderNo"/>
+        <result column="ordertime" property="ordertime"/>
+        <result column="paytime" property="paytime"/>
+        <result column="deliveryTime" property="deliveryTime"/>
+        <result column="details_number" property="details_number"/>
+        <result column="purchase_number" property="purchase_number"/>
+        
+        
+        <association column="address" property="orderaddress" select="getAddressByOrderID2"/>
+    </resultMap>
+    
+     <resultMap id="OutIdBeanResult" type="com.cbt.website.bean.outIdBean" >
+        <result column="id" property="id"/>
+        <result column="email" property="email"/>
+    </resultMap>
+    
+	
+	<insert id="insertSp">
+	   insert  into shipping_package(shipmentno,orderid,remarks,createtime,sweight,svolume,volumeweight,sflag,transportcompany,shippingtype
+	   ,transportcountry,expressno,freight,estimatefreight,issendmail,settleWeight,totalPrice)
+	   select concat(shipmentno,'_1'),orderid,remarks,createtime,sweight,svolume,volumeweight,sflag,transportcompany,shippingtype
+	   ,transportcountry,expressno,freight,estimatefreight,issendmail,settleWeight,totalPrice from  shipping_package where shipmentno =#{shipmentno}  and sflag = 3
+	</insert>
+</mapper>

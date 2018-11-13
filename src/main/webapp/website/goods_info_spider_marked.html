@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+<meta charset="utf-8">
+<!--  2018/07/17 12:29 -->
+<!--
+    	文件兼容性声明，表示使用最新的ie渲染模式  
+    -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--
+    	视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+    		width=device-width：视口宽度等于设备宽度。
+    		initial-scale=1   ：初始化缩放比，1:1
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+<title>对标商品</title>
+
+<!-- 这是bootStrap所需要的css文件 -->
+<link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!-- 
+   		条件注释,专门为ie浏览器设计的。
+   -->
+<!--[if lt IE 9]>
+	      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+<!-- 这是bootstrap所必要的jquery文件。 -->
+<script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+<!-- 这是bootstrap的js文件 -->
+<script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+<!-- 日期控件 -->
+<link href="/cbtconsole/css/bootstrap-datetimepicker.min.css"
+	rel="stylesheet" />
+<script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+<!--页面加载进度条-->
+<!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+<!--easyui-->
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<style type="text/css">
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 35px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+input, textarea, select, button {
+	font-size: 16px;
+	height: 28px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 16px;
+}
+
+.datagrid-header .datagrid-cell span, .panel-body {
+	font-size: 16px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	height: 28px;
+	line-height: 28px;
+	padding: 3px 5px;
+}
+
+#table_details_list img {
+	width: 210px;
+}
+
+#table_details_list td {
+	text-align: left;
+	vertical-align: middle;
+}
+
+#table_details_list td span {
+	line-height: 30px;
+}
+
+.operation_marked {
+	border-top: 1px solid #CCC;
+	/* border-right: 1px solid #CCC; */
+}
+
+.operation_marked div {
+	float: left;
+	width: 98%;
+	height: 110px;
+	border-left: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	margin: 0;
+	vertical-align: middle;
+}
+
+.operation_marked div input, .operation_marked div span {
+	float: left;
+	line-height: 100px;
+	height: 30px;
+	margin-top: 34px;
+}
+</style>
+
+</head>
+
+<body>
+	<table class="table table-striped table-hover"
+		style="float: left; font-size: 13px;" id="table_details_list">
+		<!-- <tr>
+			<th width="6%">ID</th>
+			<th width="30%">1688主图</th>
+			<th width="30%">速卖通主图</th>
+			<th width="24%">操作</th>
+		</tr>
+		<tr>
+			<td>10</td>
+			<td><a target="_blank"
+				href="https://img.import-express.com/importcsvimg/coreimg1/35924678825/7511968253_1750381207.220x220.jpg">
+					<img
+					src="https://img.import-express.com/importcsvimg/coreimg1/35924678825/7511968253_1750381207.220x220.jpg" />
+			</a><br />
+			<span>[6-119 $ 0.51, 120-1199 $ 0.44, ≥1200 $ 0.36]</span>
+			</td>
+			<td><a target="_blank"
+				href="https://ae01.alicdn.com/kf/HTB1qGsboASWBuNjSszdq6zeSpXad/2017-New-Fashion-Retro-Punk-Boho-Bohemian-Round-Spiral-Hollow-Hoop-Earrings-Women-Ear-Jewelry-Gift.jpg">
+					<img
+					src="https://ae01.alicdn.com/kf/HTB1qGsboASWBuNjSszdq6zeSpXad/2017-New-Fashion-Retro-Punk-Boho-Bohemian-Round-Spiral-Hollow-Hoop-Earrings-Women-Ear-Jewelry-Gift.jpg" />
+			</a><br />
+			<span>$ 1.10</span>
+			</td>
+			<td>
+				<div class="operation_marked">
+					<div>
+						<input type="radio" name="marked" value="1"> <span>&nbsp;对标</span>
+						</input>
+					</div>
+					<dds
+					<div>
+						<input type="radio" name="marked" value="2"> <span>&nbsp;不对标</span>
+						</input>
+					</div>
+				</div>
+			</td>
+		</tr> -->
+	</table>
+	<div class="navbar navbar-fixed-bottom">
+       	<input type="button" style="float: right;margin-right: 100px" value="刷新" id="refresh_id"/>
+       	<input type="text" style="float: right;width: 50px" id="rows_id"/>
+       	<span style="float: right;background-color: #FFF;line-height: 27px;font-size: 18px;border: 1px solid #BBB;" id="total_id"></span>
+     </div>
+</body>
+
+<script type="text/javascript">
+	//获取url中参数
+	function getUrlParam(name) {
+	    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg); //匹配目标参数
+	    if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+	//组合显示网页内容
+	function getDetailsHtml(item) {
+		var temHtml = "<tr><td>" + item.id + "</td>\n" +
+        "<td><a target=\"_blank\"\n" +
+        "href=\"https://www.import-express.com/goodsinfo/-1" + item.pid + ".html\">\n" +
+        "<img\n" +
+        "src=\"" + item.imgPath + "\" />\n" +
+        "</a><br /><span>" + item.price + "</span></td>\n" +
+        "<td><a target=\"_blank\"\n" +
+        "href=\"https://www.import-express.com/goodsinfo/-1" + item.aliPid + ".html\">\n" +
+        "<img\n" +
+        "src=\"" + item.aliImgPath + "\" />\n" +
+        "</a><br /><span>$ " + item.aliPrice + "</span></td>\n" +
+        "<td>\n" +
+        "<div class=\"operation_marked\">\n" +
+        "<div>\n" +
+        "<input type=\"radio\" name=\"marked" + item.id + "\" value=\"1\"> <span>&nbsp;对标</span>\n" +
+        "</input>\n" +
+        "</div>\n" +
+        "<div>\n" +
+        "<input type=\"radio\" name=\"marked" + item.id + "\" value=\"2\"> <span>&nbsp;不对标</span>\n" +
+        "</input>\n" +
+        "</div>\n" +
+        "</div>\n" +
+        "</td></tr>";
+        return temHtml;
+	}
+	//更新标记
+	function updateMarkedById(id, marked) {
+		id = id.substr(6);
+		$.ajax({
+		   type: "GET",
+		   url: "/cbtconsole/queryuser/updatemarkedbyid.do?id=" + id + "&marked=" + marked,
+		   dataType:"json",
+		   success: function(msg){
+			   console.log(msg);
+		   }
+		});
+	}
+	//加载数据
+	function loadRows(rows, orderby) {
+		$.ajax({
+			type : "GET",
+			url : "/cbtconsole/queryuser/querymarkedlist.do?rows=" + rows + "&orderby=" + orderby,
+			dataType : "json",
+			success : function(msg) {
+				//清空之前数据
+				var $table_details_date = $("#table_details_list");
+				$table_details_date.empty();
+				//首行
+				$table_details_date.append("<tr>\n" +
+			            "<th width=\"10%\">ID</th>\n" +
+			            "<th width=\"22%\">商品1</th>\n" +
+			            "<th width=\"22%\">商品2</th>\n" +
+			            "<th width=\"24%\">操作</th>\n" +
+			            "</tr>");
+				//当前数据加载
+				var date = msg.date;
+				if (date != undefined && date.length > 0) {
+					$(date).each(function(index, item) {
+						$table_details_date.append(getDetailsHtml(item));
+					});
+				}
+				//剩余条数
+				$("#total_id").text("剩余条数: " + msg.total + ", 每页查询条数: ");
+				//操作单选按钮添加事件
+				$(".operation_marked div").click(function() {
+					var that = $(this).find("input").get(0);
+					that.checked = "checked";
+					//更新
+					updateMarkedById(that.name, that.value);
+				});
+				//单选框改变事件radio事件
+                /* $("input[type=radio]").change(function() {
+                	console.log(this);
+                }); */
+			}
+		});
+	}
+	jQuery(function($) {
+		//刷新页面时候加载数据
+		var rows = getUrlParam("rows");
+		var orderby = getUrlParam("orderby");
+		if (rows == undefined || rows == "") {
+			rows = 50;
+		}
+		if (orderby != undefined && orderby.toLocaleLowerCase() == 'desc'){
+			orderby = 'desc';
+		} else {
+			orderby = 'asc';
+		}
+		$("#rows_id").val(rows);
+		loadRows(rows, orderby);
+		//点击刷新时候刷新数据
+		$("#refresh_id").click(function() {
+			var rows = $("#rows_id").val();
+			var orderby = getUrlParam("orderby");
+			if (orderby != undefined && orderby.toLocaleLowerCase() == 'desc'){
+				orderby = 'desc';
+			} else {
+				orderby = 'asc';
+			}
+			if (rows == undefined || rows == "") {
+				rows = 50;
+			}
+			loadRows(rows, orderby);
+			//地址url修改
+			history.pushState(null,null,'goods_info_spider_marked.html?rows=' + rows + "&orderby=" + orderby);
+		});
+	});
+</script>
+
+</html>

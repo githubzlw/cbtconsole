@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.EmailStatisticsLogMapper">
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.EmailStatisticsLog">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="email_type" jdbcType="VARCHAR" property="emailType" />
+    <result column="email_statistics_log_id" jdbcType="VARCHAR" property="emailStatisticsLogId" />
+    <result column="send_email" jdbcType="VARCHAR" property="sendEmail" />
+    <result column="receive_email" jdbcType="VARCHAR" property="receiveEmail" />
+    <result column="send_status" jdbcType="VARCHAR" property="sendStatus" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="error_log" jdbcType="VARCHAR" property="errorLog" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="dense_email" jdbcType="VARCHAR" property="denseEmail" />
+    <result column="copy_email" jdbcType="VARCHAR" property="copyemail" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id,email_statistics_log_id, email_type, send_email,dense_email,copy_email,receive_email, send_status,order_no, title, error_log, create_date,content
+  </sql>
+  <insert id="addEmailStatisticsLog" parameterType="com.importExpress.pojo.EmailStatisticsLog">
+    insert into email_statistics_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="emailStatisticsLogId != null">
+        email_statistics_log_id,
+      </if>
+      <if test="emailType != null">
+        email_type,
+      </if>
+      <if test="sendEmail != null">
+        send_email,
+      </if>
+      <if test="receiveEmail != null">
+        receive_email,
+      </if>
+      <if test="sendStatus != null">
+         send_status,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="errorLog != null">
+        error_log,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="emailStatisticsLogId != null">
+        #{emailStatisticsLogId,jdbcType=VARCHAR},
+      </if>
+      <if test="emailType != null">
+        #{emailType,jdbcType=VARCHAR},
+      </if>
+      <if test="sendEmail != null">
+        #{sendEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveEmail != null">
+        #{receiveEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="sendStatus != null">
+        #{sendStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="errorLog != null">
+        #{errorLog,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateEmailStatisticsLog" parameterType="com.importExpress.pojo.EmailStatisticsLog">
+    update email_statistics_log
+    <set>
+      <if test="errorLog != null">
+        error_log = #{errorLog,jdbcType=VARCHAR},
+      </if>
+       <if test="sendStatus != null">
+        send_status = #{sendStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where email_statistics_log_id = #{emailStatisticsLogId,jdbcType=VARCHAR}
+  </update>
+  
+</mapper>

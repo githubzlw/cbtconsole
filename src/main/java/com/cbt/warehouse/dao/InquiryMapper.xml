@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.InquiryMapper" >
+	<!-- 保存询价表 -->
+	<insert id="saveInquiry" parameterType="com.cbt.bean.InquiryDetail">
+		insert inquiry(userid,payno,server_price,pay_state,createtime) values(#{userid},#{payno},#{server_price},#{pay_state},now())
+	</insert>
+	<!-- 查询询价表 -->
+	<select id="getInquiry" resultType="hashmap">
+		select inquiry_details.id detailid,inquiry.id inquiryId,pay_state,payno,createtime,goodsid,price,deliverytime,
+		inquiry_details.state,goods_url,googs_img,goods_title,googs_number,remark from inquiry,inquiry_details,
+		goods_car where inquiry.payno =inquiry_details.inquiryid and goods_car.id = inquiry_details.goodsid and inquiry.state=0 
+		<if test="userid != 0">
+			and inquiry.userid= #{userid}
+		</if>
+		<if test="userid != -1">
+			and inquiry_details.state= #{state}
+		</if>
+		order by payno desc
+	</select>
+	<!-- 查找询价表 -->
+	<select id="getInquiryByInquiryid" parameterType="String" resultType="hashmap">
+		select inquiry_details.id detailid,inquiry.userid,payno,createtime,goodsid,price,deliverytime,inquiry_details.state,goods_url,
+		googs_img,goods_title,googs_number,remark from inquiry,inquiry_details,goods_car where inquiry.payno =inquiry_details.inquiryid 
+		and inquiry.state=0 and goods_car.id = inquiry_details.goodsid and inquiry_details.inquiryid= #{inqId}
+	</select>
+	<!-- 修改询价表的付款状态 -->
+	<update id="upInquiryPay">
+		update inquiry set pay_state= #{state}  where payno = #{payno}
+	</update>
+	<!-- 保存询价详情表 -->
+	<insert id="saveInquiryDetail">
+		insert inquiry_details(goodsid ,inquiryid ) values
+		<foreach collection="goodsid" item="item" index="index" separator="," >
+	        (#{item},#{inquiryid})
+	    </foreach>
+	</insert>
+	<!-- 修改询价表状态：0-未询价，1-已询到价格，2-商品无效,3-用户不显示 id订单详情ID -->
+	<update id="upInquiryDetail">
+		update inquiry_details set state= #{state}  ,price= #{price} , deliverytime=now() where id = #{id}
+	</update>
+	<!-- 查询已回复询价状态 -->
+	<select id="getInquiryNumber" parameterType="Integer" resultType="Integer">
+		select count(inquiry_details.id) counts from inquiry_details,inquiry where inquiry.payno =inquiry_details.inquiryid and inquiry.state=0 and  userid= #{userid}
+	</select>
+	<!-- 修改询价表的删除状态 -->
+	<update id="delInquiry" parameterType="String">
+		update inquiry set state=1   where payno = #{payno}
+	</update>
+	<!-- 查找询价表 -->
+	<select id="getInquiryExist" parameterType="String" resultType="String">
+		select goodsid from inquiry_details where goodsid in
+		<foreach collection="goodsId" item="item" index="index" separator="," >
+	        (#{item})
+	    </foreach>
+	</select>
+	
+</mapper>

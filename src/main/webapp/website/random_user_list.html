@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>随机客户(已链接到线上)</title>
+<script type='text/javascript'
+	src='http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js'></script>
+</head>
+<style>
+	h5 {
+		font-size:16px;
+		line-height: 16px;
+		margin: 8px;
+	}
+table td {
+	text-align:center;
+}
+</style>
+<body>
+	<div id="message_id"><h5>购物车相关随机客户查询中...</h5></div>
+	<h5 id="message_id2">总消费金额1000$以上客户查询中...</h5>
+	<table id="date_id2">
+	</table>
+</body>
+<script type="text/javascript">
+	//获取url中参数
+	function getUrlParam(url,name) {
+	    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	    var r = url.substr(1).match(reg); //匹配目标参数
+	    if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+	function addTableData(tableId, item) {
+		console.log(getUrlParam(item, "time"));
+		console.log(getUrlParam(item, "password"));
+		$("#" + tableId).append("<tr><td>" + getUrlParam(item, "password") 
+				+ "</td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "").replace("https://www.import-express.com", "http://beta.importx.com") 
+				+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "") 
+				+ "\">跳转线上</a></td><td>" + getUrlParam(item, "time") + "</td></tr>");
+	}
+	jQuery(function($) {
+		$.ajax({
+			type : "GET",
+			url : "/cbtconsole/queryuser/randombypricelist.do?price=1000",
+			dataType : "json",
+			success : function(msg) {
+				if (msg.status) {
+					$("#message_id2").text("");
+					var date = msg.date;
+					if (date != null && date != undefined) {
+						$("#message_id2").text("总消费金额1000$以上客户(随机查询)");
+						$("#date_id2").empty();
+						$("#date_id2").append("<tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">总消费金额</th></tr>");
+						$(date).each(function(index, item) {
+							var userUrl = item.replace("&total=" + getUrlParam(item, "total"),"");
+							$("#date_id2").append("<tr><td>" + getUrlParam(item, "password") 
+									+ "</td><td><a target=\"_blank\" href=\"" + userUrl.replace("https://www.import-express.com", "http://beta.importx.com") 
+									+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"" + userUrl 
+									+ "\">跳转线上</a></td><td>" + parseInt(getUrlParam(item, "total")).toFixed(0) + "$</td></tr>");
+                        });
+					} else {
+						$("#message_id2").text("未查询到用户, 请刷新...");
+					}
+				} else {
+					$("#message_id2").text("查询出错, 请刷新...");
+				}
+			}
+		});
+		
+		$.ajax({
+			type : "GET",
+			url : "/cbtconsole/queryuser/randomlist.do",
+			dataType : "json",
+			success : function(msg) {
+				if (msg.status) {
+					$("#message_id").empty();
+					var date = msg.date;
+					if (date != null && date != undefined) {
+						if (date.length == 26) {
+							$("#message_id").append("<h5>DropShip用户</h5>")
+								.append("<table id=\"details_id_1\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>")
+								.append("<h5>一周之前的用户</h5>")
+								.append("<table id=\"details_id_2\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>")
+								.append("<h5>二周之前的用户</h5>")
+								.append("<table id=\"details_id_3\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>")
+								.append("<h5>一个月之前的用户</h5>")
+								.append("<table id=\"details_id_4\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>")
+								.append("<h5>三个月之前的用户</h5>")
+								.append("<table id=\"details_id_5\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>")
+								.append("<h5>半年之前的用户</h5>")
+								.append("<table id=\"details_id_6\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th><th width=\"260px\">购物车最后变更时间</th></tr></table>");
+							$(date).each(function(index, item) {
+								if (index < 1) {
+									addTableData("details_id_1", item);
+								} else if (index < 6) {
+									addTableData("details_id_2", item);
+								} else if (index < 11) {
+									addTableData("details_id_3", item);
+								} else if (index < 16) {
+									addTableData("details_id_4", item);
+								} else if (index < 21) {
+									addTableData("details_id_5", item);
+								} else {
+									addTableData("details_id_6", item);
+								}
+                            });
+						} else {
+							$("#message_id").append("<h5>购物车相关随机客户</h5><table id=\"details_id_0\"><tr><th width=\"390px\">用户名</th><th width=\"150px\">镜像服</th><th width=\"150px\">线上</th></tr></table>");
+							$(date).each(function(index, item) {
+								addTableData("details_id_0", item);
+                            });
+						}
+					} else {
+						$("#message_id").text("<h5>未查询到用户, 请刷新...<h5>");
+					}
+				} else {
+					$("#message_id").text("<h5>查询出错, 请刷新...<h5>");
+				}
+			}
+		});
+		
+	});
+</script>
+</html>

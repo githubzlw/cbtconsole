@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.SkuinfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.Skuinfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="skuCnName" property="skucnname" jdbcType="VARCHAR" />
+    <result column="skuEnName" property="skuenname" jdbcType="VARCHAR" />
+    <result column="statu" property="statu" jdbcType="INTEGER" />
+    <result column="productDirectory" property="productdirectory" jdbcType="VARCHAR" />
+    <result column="skuSum" property="skusum" jdbcType="INTEGER" />
+    <result column="shipped" property="shipped" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="VARCHAR" />
+    <result column="skuImgLink" property="skuimglink" jdbcType="VARCHAR" />
+    <result column="shipImgLink" property="shipimglink" jdbcType="VARCHAR" />
+    <result column="warehouse" property="warehouse" jdbcType="VARCHAR" />
+    <result column="unitCost" property="unitcost" jdbcType="DECIMAL" />
+    <result column="createTime" property="createtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, sku, skuCnName, skuEnName, statu, productDirectory, skuSum, shipped, weight, 
+    skuImgLink, shipImgLink, warehouse, unitCost, createTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.warehouse.pojo.SkuinfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from skuinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from skuinfo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from skuinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.warehouse.pojo.SkuinfoExample" >
+    delete from skuinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.warehouse.pojo.Skuinfo" >
+    insert into skuinfo (id, sku, skuCnName, 
+      skuEnName, statu, productDirectory, 
+      skuSum, shipped, weight, 
+      skuImgLink, shipImgLink, warehouse, 
+      unitCost, createTime)
+    values (#{id,jdbcType=INTEGER}, #{sku,jdbcType=VARCHAR}, #{skucnname,jdbcType=VARCHAR}, 
+      #{skuenname,jdbcType=VARCHAR}, #{statu,jdbcType=INTEGER}, #{productdirectory,jdbcType=VARCHAR}, 
+      #{skusum,jdbcType=INTEGER}, #{shipped,jdbcType=VARCHAR}, #{weight,jdbcType=VARCHAR}, 
+      #{skuimglink,jdbcType=VARCHAR}, #{shipimglink,jdbcType=VARCHAR}, #{warehouse,jdbcType=VARCHAR}, 
+      #{unitcost,jdbcType=DECIMAL}, #{createtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.warehouse.pojo.Skuinfo" >
+    insert into skuinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sku != null" >
+        sku,
+      </if>
+      <if test="skucnname != null" >
+        skuCnName,
+      </if>
+      <if test="skuenname != null" >
+        skuEnName,
+      </if>
+      <if test="statu != null" >
+        statu,
+      </if>
+      <if test="productdirectory != null" >
+        productDirectory,
+      </if>
+      <if test="skusum != null" >
+        skuSum,
+      </if>
+      <if test="shipped != null" >
+        shipped,
+      </if>
+      <if test="weight != null" >
+        weight,
+      </if>
+      <if test="skuimglink != null" >
+        skuImgLink,
+      </if>
+      <if test="shipimglink != null" >
+        shipImgLink,
+      </if>
+      <if test="warehouse != null" >
+        warehouse,
+      </if>
+      <if test="unitcost != null" >
+        unitCost,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sku != null" >
+        #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="skucnname != null" >
+        #{skucnname,jdbcType=VARCHAR},
+      </if>
+      <if test="skuenname != null" >
+        #{skuenname,jdbcType=VARCHAR},
+      </if>
+      <if test="statu != null" >
+        #{statu,jdbcType=INTEGER},
+      </if>
+      <if test="productdirectory != null" >
+        #{productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="skusum != null" >
+        #{skusum,jdbcType=INTEGER},
+      </if>
+      <if test="shipped != null" >
+        #{shipped,jdbcType=VARCHAR},
+      </if>
+      <if test="weight != null" >
+        #{weight,jdbcType=VARCHAR},
+      </if>
+      <if test="skuimglink != null" >
+        #{skuimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="shipimglink != null" >
+        #{shipimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouse != null" >
+        #{warehouse,jdbcType=VARCHAR},
+      </if>
+      <if test="unitcost != null" >
+        #{unitcost,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.warehouse.pojo.SkuinfoExample" resultType="java.lang.Integer" >
+    select count(*) from skuinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update skuinfo
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.sku != null" >
+        sku = #{record.sku,jdbcType=VARCHAR},
+      </if>
+      <if test="record.skucnname != null" >
+        skuCnName = #{record.skucnname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.skuenname != null" >
+        skuEnName = #{record.skuenname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.statu != null" >
+        statu = #{record.statu,jdbcType=INTEGER},
+      </if>
+      <if test="record.productdirectory != null" >
+        productDirectory = #{record.productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="record.skusum != null" >
+        skuSum = #{record.skusum,jdbcType=INTEGER},
+      </if>
+      <if test="record.shipped != null" >
+        shipped = #{record.shipped,jdbcType=VARCHAR},
+      </if>
+      <if test="record.weight != null" >
+        weight = #{record.weight,jdbcType=VARCHAR},
+      </if>
+      <if test="record.skuimglink != null" >
+        skuImgLink = #{record.skuimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shipimglink != null" >
+        shipImgLink = #{record.shipimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="record.warehouse != null" >
+        warehouse = #{record.warehouse,jdbcType=VARCHAR},
+      </if>
+      <if test="record.unitcost != null" >
+        unitCost = #{record.unitcost,jdbcType=DECIMAL},
+      </if>
+      <if test="record.createtime != null" >
+        createTime = #{record.createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update skuinfo
+    set id = #{record.id,jdbcType=INTEGER},
+      sku = #{record.sku,jdbcType=VARCHAR},
+      skuCnName = #{record.skucnname,jdbcType=VARCHAR},
+      skuEnName = #{record.skuenname,jdbcType=VARCHAR},
+      statu = #{record.statu,jdbcType=INTEGER},
+      productDirectory = #{record.productdirectory,jdbcType=VARCHAR},
+      skuSum = #{record.skusum,jdbcType=INTEGER},
+      shipped = #{record.shipped,jdbcType=VARCHAR},
+      weight = #{record.weight,jdbcType=VARCHAR},
+      skuImgLink = #{record.skuimglink,jdbcType=VARCHAR},
+      shipImgLink = #{record.shipimglink,jdbcType=VARCHAR},
+      warehouse = #{record.warehouse,jdbcType=VARCHAR},
+      unitCost = #{record.unitcost,jdbcType=DECIMAL},
+      createTime = #{record.createtime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.warehouse.pojo.Skuinfo" >
+    update skuinfo
+    <set >
+      <if test="sku != null" >
+        sku = #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="skucnname != null" >
+        skuCnName = #{skucnname,jdbcType=VARCHAR},
+      </if>
+      <if test="skuenname != null" >
+        skuEnName = #{skuenname,jdbcType=VARCHAR},
+      </if>
+      <if test="statu != null" >
+        statu = #{statu,jdbcType=INTEGER},
+      </if>
+      <if test="productdirectory != null" >
+        productDirectory = #{productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="skusum != null" >
+        skuSum = #{skusum,jdbcType=INTEGER},
+      </if>
+      <if test="shipped != null" >
+        shipped = #{shipped,jdbcType=VARCHAR},
+      </if>
+      <if test="weight != null" >
+        weight = #{weight,jdbcType=VARCHAR},
+      </if>
+      <if test="skuimglink != null" >
+        skuImgLink = #{skuimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="shipimglink != null" >
+        shipImgLink = #{shipimglink,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouse != null" >
+        warehouse = #{warehouse,jdbcType=VARCHAR},
+      </if>
+      <if test="unitcost != null" >
+        unitCost = #{unitcost,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.warehouse.pojo.Skuinfo" >
+    update skuinfo
+    set sku = #{sku,jdbcType=VARCHAR},
+      skuCnName = #{skucnname,jdbcType=VARCHAR},
+      skuEnName = #{skuenname,jdbcType=VARCHAR},
+      statu = #{statu,jdbcType=INTEGER},
+      productDirectory = #{productdirectory,jdbcType=VARCHAR},
+      skuSum = #{skusum,jdbcType=INTEGER},
+      shipped = #{shipped,jdbcType=VARCHAR},
+      weight = #{weight,jdbcType=VARCHAR},
+      skuImgLink = #{skuimglink,jdbcType=VARCHAR},
+      shipImgLink = #{shipimglink,jdbcType=VARCHAR},
+      warehouse = #{warehouse,jdbcType=VARCHAR},
+      unitCost = #{unitcost,jdbcType=DECIMAL},
+      createTime = #{createtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertSkuinfo">
+    insert into skuinfo (sku, skuCnName, 
+      skuEnName, statu, productDirectory, 
+      skuSum, shipped, weight, 
+      skuImgLink, shipImgLink, warehouse, 
+      unitCost, createTime) values 
+      <foreach collection="list" item="item" index="index" separator=",">
+       (#{item.sku,jdbcType=VARCHAR}, #{item.skucnname,jdbcType=VARCHAR}, 
+        #{item.skuenname,jdbcType=VARCHAR}, #{item.statu,jdbcType=INTEGER}, #{item.productdirectory,jdbcType=VARCHAR}, 
+        #{item.skusum,jdbcType=INTEGER}, #{item.shipped,jdbcType=VARCHAR}, #{item.weight,jdbcType=VARCHAR}, 
+        #{item.skuimglink,jdbcType=VARCHAR}, #{item.shipimglink,jdbcType=VARCHAR}, #{item.warehouse,jdbcType=VARCHAR}, 
+        #{item.unitcost,jdbcType=DECIMAL}, #{item.createtime,jdbcType=TIMESTAMP})
+      </foreach>
+  </insert>
+  
+  <select id="selectShipImgLinkBySKU" parameterType="com.cbt.warehouse.pojo.Skuinfo" resultMap="BaseResultMap">
+  	select * from skuinfo where sku = #{sku}
+  </select>
+
+</mapper>

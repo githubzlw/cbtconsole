@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>实时汇率详情</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+</head>
+<style type="text/css">
+    .datagrid-htable {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .but_color {
+        background: #44a823;
+        width: 80px;
+        height: 30px;
+        border: 1px #aaa solid;
+        color: #fff;
+    }
+
+    #ext_query_form {
+        font-size: 18px;
+    }
+
+    #button_style {
+        font-size: 18px;
+    }
+
+    .panel-title {
+        text-align: center;
+        height: 30px;
+        font-size: 24px;
+    }
+
+    .ext_rYear, .ext_rMonth, .but_color {
+        padding: 5px;
+        font-size: 14px
+    }
+
+    .ext_rYear, .ext_rMonth {
+        margin-right: 18px
+    }
+
+    #ext_top_toolbar {
+        padding: 20px 28px !important;
+    }
+
+    .datagrid-header .datagrid-cell span, .datagrid-cell,
+    .datagrid-cell-group, .datagrid-header-rownumber,
+    .datagrid-cell-rownumber {
+        font-size: 14px;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        setDatagrid();
+        var opts = $("#ext_easyui-datagrid").datagrid("options");
+        opts.url = "/cbtconsole/exchangeRate/queryExchangeRateDetails";
+    });
+
+    function setDatagrid() {
+        $('#ext_easyui-datagrid').datagrid({
+            title: '实时汇率详情',
+            width: "100%",
+            fit: true,//自动补全
+            striped: true,//设置为true将交替显示行背景。
+            collapsible: true,//显示可折叠按钮
+            toolbar: "#ext_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+            url: '',//url调用Action方法
+            loadMsg: '数据装载中......',
+            singleSelect: true,//为true时只能选择单行
+            fitColumns: true,//允许表格自动缩放，以适应父容器
+            rownumbers: true,
+            pageSize: 50,//默认选择的分页是每页50行数据
+            pageList: [20, 50, 100],//可以选择的分页集合
+            pagination: true,//分页
+            style: {
+                padding: '8 8 10 8'
+            },
+            onLoadError: function () {
+                $.message.alert("提示信息", "获取数据信息失败");
+                return;
+            },
+            onLoadSuccess: function (data) {
+                if (!data.success) {
+                    showMessage(data.message);
+                }
+            }
+        });
+    }
+
+    function showMessage(message) {
+        $.messager.show({
+            title: '提醒',
+            msg: message,
+            timeout: 2000,
+            showType: 'slide',
+            style: {
+                right: '',
+                top: ($(window).height() * 0.15),
+                bottom: ''
+            }
+        });
+    }
+
+    function doPrpQuery() {
+        var year = $(".ext_rYear").val();
+        if (year == null || year == "" || year == "0" || year == "-1") {
+            showMessage('请选择年份');
+            return;
+        }
+        var month = $(".ext_rMonth").val();
+        if (year == null || year == "" || year == "0" || year == "-1") {
+            showMessage('请选择月份');
+            return;
+        }
+        $("#ext_easyui-datagrid").datagrid("load", {
+            "year": year,
+            "month": month
+        });
+    }
+
+    function formatTime(val, row, index) {
+        if (val == null || val == "") {
+            return null;
+        } else {
+            var createTime = new Date(val);
+            if (createTime == null) {
+                return null;
+            } else {
+                return getFormatDate(createTime);
+            }
+        }
+    }
+
+    function getFormatDate(date) {
+        var seperator1 = "-";
+        var seperator2 = ":";
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        var hour = date.getHours();
+        var minute = date.getMinutes();
+        var seconds = date.getSeconds();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        if (hour >= 0 && hour <= 9) {
+            hour = "0" + hour;
+        }
+        if (minute >= 0 && minute <= 9) {
+            minute = "0" + minute;
+        }
+        if (seconds >= 0 && seconds <= 9) {
+            seconds = "0" + seconds;
+        }
+        return date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + hour + seperator2 + minute + seperator2 + seconds;
+    }
+
+
+    function doPrpSelectChange() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        var rMonth = mydate.getMonth();
+        var monthop = "";
+        $('.ext_rMonth').empty();
+        var selectYear = $('.ext_rYear').val();
+        if (selectYear == rYear) {
+            for (var i = 1; i <= rMonth + 1; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('.ext_rMonth').append(monthop);
+        } else if (selectYear < rYear) {
+            for (var i = 1; i <= 12; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('.ext_rMonth').append(monthop);
+        } else if (selectYear > rYear) {
+            $('.ext_rYear').val(rYear);
+            for (var i = 1; i <= rMonth + 1; i++) {
+                monthop += "<option value='" + i + "'>" + i + "</oiption>";
+            }
+            $('.ext_rMonth').append(monthop);
+        }
+    }
+
+    function exportPrpExcel() {
+        var year = $(".ext_rYear").val();
+        if (year == null || year == "" || year == "0" || year == "-1") {
+            showMessage('请选择年份');
+            return;
+        }
+        var month = $(".ext_rMonth").val();
+        if (year == null || year == "" || year == "0" || year == "-1") {
+            showMessage('请选择年份');
+            return;
+        }
+        window.location.href = "/cbtconsole/exchangeRate/exportExchangeRateDetailsExcel?year="
+            + year + "&month=" + month;
+    }
+</script>
+<body>
+<div id="ext_top_toolbar" style="padding: 5px; height: auto">
+    <form id="ext_query_form" action="#" onsubmit="return false;">
+        <label for="ext_rYear">年份选择<font color="red">*</font>：
+        </label> <select name="year" class="ext_rYear" onchange="doPrpSelectChange()">
+        <option value='2018'>2018</option>
+        <option value='2019'>2019</option>
+    </select><label for="ext_rMonth">月份选择<font color="red">*</font>：
+    </label> <select name="month" class="ext_rMonth">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+    </select> <input class="but_color" type="button" value="查询"
+                     onclick="doPrpQuery()"> <input class="but_color"
+                                                    type="button" value="重置" onclick="doPrpReset()"> <input
+            class="but_color" type="button" value="导出Excel"
+            onclick="exportPrpExcel()">
+    </form>
+</div>
+<table id="ext_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'createTime',width:'50px',align:'center',formatter:formatTime">创建时间</th>
+        <th data-options="field:'eurRate',width:'100px',align:'center'">EUR汇率</th>
+        <th data-options="field:'cadRate',width:'100px',align:'center'">CAD汇率</th>
+        <th data-options="field:'gbpRate',width:'100px',align:'center'">GBP汇率</th>
+        <th data-options="field:'audRate',width:'100px',align:'center'">AUD汇率</th>
+        <th data-options="field:'rmbRate',width:'100px',align:'center'">RMB汇率</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+<script type="text/javascript">
+    window.onload = function () {
+        var url = document.location.href;
+        var begin = url.indexOf("?");
+        if (begin != -1) {
+            var paramsStr = url.substring(begin + 1, url.length);
+            var paramLst = paramsStr.split("&");
+            if (paramLst.length > 0) {
+                var year = "";
+                var month = "";
+                for (var i = 0; i < paramLst.length; i++) {
+                    var sgParam = paramLst[i];
+                    sgParamLst = sgParam.split("=");
+                    if (sgParamLst.length == 2) {
+                        if (sgParamLst[0] == "year") {
+                            year = sgParamLst[1];
+                            if (!(year == null || year == "")) {
+                                $(".ext_rYear").val(sgParamLst[1]);
+                            }
+                            continue;
+                        } else if (sgParamLst[0] == "month") {
+                            month = sgParamLst[1];
+                            if (!(month == null || month == "")) {
+                                $(".ext_rMonth").val(sgParamLst[1]);
+                            }
+                            continue;
+                        }
+                    }
+                }
+                if (!(year == null || year == "" || year == "-1"
+                        || month == null || month == "" || month == "-1")) {
+                    doPrpQuery();
+                }
+            }
+        }
+    }
+</script>
+</html>

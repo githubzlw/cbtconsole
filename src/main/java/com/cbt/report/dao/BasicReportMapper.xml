@@ -1,0 +1,1158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.BasicReportMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.pojo.BasicReport">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="breport_name" property="breportName" jdbcType="VARCHAR" />
+		<result column="breport_type" property="breportType" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="orderFinancialResultMap" type="com.cbt.report.vo.OrderFinancialBean">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="statistics_year" property="year" jdbcType="VARCHAR" />
+		<result column="statistics_month" property="month" jdbcType="VARCHAR" />
+		<result column="order_sales" property="orderSales" jdbcType="FLOAT" />
+		<result column="financial_sales" property="financialSales"
+			jdbcType="FLOAT" />
+		<result column="paypal_revenue" property="payPalRevenue"
+			jdbcType="FLOAT" />
+		<result column="balance_payment" property="balancePayment"
+			jdbcType="FLOAT" />
+		<result column="stripe_pay" property="stripePay" jdbcType="FLOAT" />
+		<result column="new_add_balance" property="newAddBalance"
+			jdbcType="FLOAT" />
+		<result column="balance_compensation" property="balanceCompensation"
+			jdbcType="FLOAT" />
+		<result column="pay_for_balance" property="payForBalance"
+			jdbcType="FLOAT" />
+		<result column="over_payment_balance" property="overPaymentBalance"
+			jdbcType="FLOAT" />
+		<result column="order_cancel" property="orderCancel" jdbcType="FLOAT" />
+		<result column="balance_changes" property="balanceChanges"
+			jdbcType="FLOAT" />
+		<result column="balance_withdrawal" property="balanceWithdrawal"
+			jdbcType="FLOAT" />
+		<result column="tt_revenue" property="tt_revenue"
+				jdbcType="FLOAT" />
+	</resultMap>
+
+	<resultMap id="orderInfoResultMap" type="com.cbt.report.vo.OrderInfoBean">
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="pay_price" property="payPrice" jdbcType="FLOAT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="state" property="state" jdbcType="VARCHAR" />
+		<result column="orderpaytime" property="orderPayTime" jdbcType="TIMESTAMP" />
+		<result column="buyAmount" property="buyAmount" jdbcType="VARCHAR" />
+		<result column="frightAmount" property="frightAmount" jdbcType="VARCHAR" />
+		<result column="exchange_rate" property="exchange_rate" jdbcType="VARCHAR" />
+		<result column="estimatefreight" property="estimatefreight" jdbcType="FLOAT" />
+	</resultMap>
+
+	<resultMap id="payPalInfoResultMap" type="com.cbt.report.vo.PayPalInfoBean">
+		<result column="orderid" property="orderid" jdbcType="VARCHAR" />
+		<result column="userd" property="userId" jdbcType="INTEGER" />
+		<result column="payment_amount" property="paymentAmount"
+			jdbcType="FLOAT" />
+		<result column="payment_cc" property="paymentCc" jdbcType="VARCHAR" />
+		<result column="payflag" property="payFlag" jdbcType="VARCHAR" />
+		<result column="paytype" property="payType" jdbcType="VARCHAR" />
+		<result column="createtime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="paymentid" property="payNo" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="refundInfoResultMap" type="com.cbt.report.vo.RefundInfoBean">
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="pay_time" property="payTime" jdbcType="TIMESTAMP" />
+		<result column="pay_amount" property="payAmount" jdbcType="FLOAT" />
+		<result column="refund_time" property="refundTime" jdbcType="TIMESTAMP" />
+		<result column="refund_amount" property="refundAmount"
+			jdbcType="FLOAT" />
+	</resultMap>
+
+	<resultMap id="balanceChangeResultMap" type="com.cbt.report.vo.CustomerBalanceChangeBean">
+		<result column="userid" property="userId" jdbcType="INTEGER" />
+		<result column="current_balance" property="currentBalance"
+			jdbcType="FLOAT" />
+		<result column="change_balance" property="changeBalance"
+			jdbcType="FLOAT" />
+	</resultMap>
+
+	<resultMap id="balanceCompensationResultMap" type="com.cbt.report.vo.BalanceCompensation">
+		<result column="userid" property="userId" jdbcType="INTEGER" />
+		<result column="amount" property="amount" jdbcType="FLOAT" />
+	</resultMap>
+
+	<resultMap id="orderCancelResultMap" type="com.cbt.report.vo.OrderCancelBean">
+		<result column="userid" property="userId" jdbcType="INTEGER" />
+		<result column="amount" property="amount" jdbcType="FLOAT" />
+		<result column="remark_id" property="remarkId" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap id="editedProductProfitsResultMap" type="com.cbt.report.vo.EditedProductProfits">
+		<result column="pid" property="pid" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="admin_id" property="adminId" jdbcType="INTEGER" />	
+		<result column="admin_name" property="adminName" jdbcType="VARCHAR" />	
+		<result column="order_price" property="orderPrice" jdbcType="FLOAT" />
+		<result column="purchase_price" property="purchasePrice" jdbcType="FLOAT" />
+		<result column="intenet_freight" property="intenetFreight" jdbcType="FLOAT" />
+		<result column="gross_profit" property="grossProfit" jdbcType="FLOAT" />
+	</resultMap>
+
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" suffix=")" prefixOverrides="and">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach collection="criterion.value" item="listItem"
+										open="(" close=")" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, breport_name, breport_type
+	</sql>
+	<select id="selectByExample" resultMap="BaseResultMap"
+		parameterType="com.cbt.pojo.BasicReportExample">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from basic_report
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from basic_report
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		basic_report
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByExample" parameterType="com.cbt.pojo.BasicReportExample">
+		delete from basic_report
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.cbt.pojo.BasicReport">
+		insert into basic_report (id,
+		breport_name, breport_type
+		)
+		values (#{id,jdbcType=INTEGER},
+		#{breportName,jdbcType=VARCHAR},
+		#{breportType,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.cbt.pojo.BasicReport">
+		insert into basic_report
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="breportName != null">
+				breport_name,
+			</if>
+			<if test="breportType != null">
+				breport_type,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="breportName != null">
+				#{breportName,jdbcType=VARCHAR},
+			</if>
+			<if test="breportType != null">
+				#{breportType,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="com.cbt.pojo.BasicReportExample"
+		resultType="java.lang.Integer">
+		select count(*) from basic_report
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update basic_report
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=INTEGER},
+			</if>
+			<if test="record.breportName != null">
+				breport_name = #{record.breportName,jdbcType=VARCHAR},
+			</if>
+			<if test="record.breportType != null">
+				breport_type = #{record.breportType,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update basic_report
+		set id = #{record.id,jdbcType=INTEGER},
+		breport_name = #{record.breportName,jdbcType=VARCHAR},
+		breport_type =
+		#{record.breportType,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.BasicReport">
+		update basic_report
+		<set>
+			<if test="breportName != null">
+				breport_name = #{breportName,jdbcType=VARCHAR},
+			</if>
+			<if test="breportType != null">
+				breport_type = #{breportType,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.cbt.pojo.BasicReport">
+		update
+		basic_report
+		set breport_name = #{breportName,jdbcType=VARCHAR},
+		breport_type = #{breportType,jdbcType=VARCHAR}
+		where id =
+		#{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="queryOrderFinancial" resultMap="orderFinancialResultMap">
+		select
+		id,statistics_year,statistics_month,order_sales,financial_sales,paypal_revenue,
+        stripe_pay,balance_payment,new_add_balance,balance_compensation,pay_for_balance,
+		over_payment_balance,order_cancel,balance_changes,balance_withdrawal,tt_revenue
+		from monthly_financial_statistics
+		where 1=1 and statistics_year
+		=#{year,jdbcType=VARCHAR}
+		<if test="month !=null and month !='' ">
+			and statistics_month = #{month,jdbcType=VARCHAR}
+		</if>
+		order by statistics_month
+
+	</select>
+
+	<insert id="insertOrderFinancial">
+
+		insert into
+		monthly_financial_statistics(statistics_year,statistics_month,order_sales,paypal_revenue,not_started_order_amount,
+		total_refund,balance_payment,balance_withdrawal,new_add_balance)
+		select YEAR(#{beginDate,jdbcType=VARCHAR}) as statistics_year,
+		MONTH(#{beginDate,jdbcType=VARCHAR}) as statistics_month,
+		<!-- 本月实际销售额(R1) -->
+		(select cast(sum(pay_price) AS DECIMAL(11, 2)) from orderinfo
+		where 1=1
+		and state in(1,2,3,4,5) and date(orderpaytime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(orderpaytime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and user_id not in(select id
+		from user where email like 'test%' or email like '%qq.com' or email
+		like '%163.com' or email like '%126.com'
+		or email like '%ww.com' or
+		name like 'rlef%' or email like 't@%' or
+		email like 't_@%' or email
+		like '%sina.com'
+		 or email like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		AS order_sales,
+		<!-- 系统PayPal总收入(V) -->
+		(select cast(sum(payment_amount) AS DECIMAL(11, 2)) from payment
+		where
+		1=1 and paystatus=1 and paytype =0 and date(createtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(createtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not in(select id
+		from user where email like 'test%' or email like '%qq.com' or email
+		like '%163.com' or email like '%126.com'
+		or email like '%ww.com' or
+		name like 'rlef%' or email like 't@%' or
+		email like 't_@%' or email
+		like '%sina.com'
+		 or email like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		AS paypal_revenue,
+		<!-- 余额支付(Q) -->
+		(select cast(sum(payment_amount) AS DECIMAL(11, 2)) from payment
+		where
+		1=1 and paystatus=1 and paytype =2 and date(createtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(createtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not in(select id
+		from user where email like 'test%' or email like '%qq.com' or email
+		like '%163.com' or email like '%126.com'
+		or email like '%ww.com' or
+		name like 'rlef%' or email like 't@%' or
+		email like 't_@%' or email
+		like '%sina.com'
+		 or email like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		AS balance_payment,
+		<!-- 本月新增加的余额之和(U) -->
+		(select cast(sum(price) AS DECIMAL(11, 2)) from recharge_record where
+		1=1 and date(datatime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(datatime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not
+		in(select id from user where email like 'test%' or email like
+		'%qq.com' or email like '%163.com' or email like '%126.com'
+		or email
+		like '%ww.com' or name like 'rlef%' or email like 't@%' or
+		email like
+		't_@%' or email like '%sina.com'
+		 or
+		email like '%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com'
+		or id=1128))
+		AS new_add_balance,
+		<!-- 余额补偿 -->
+		(select cast(ifnull(sum(money),0) AS DECIMAL(11, 2)) from
+		additional_balance where valid=1 and state=1
+		and date(createtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(createtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not in(select id
+		from user where email like 'test%' or email like '%qq.com' or email
+		like '%163.com' or email like '%126.com'
+		or email like '%ww.com' or
+		name like 'rlef%' or email like 't@%' or
+		email like 't_@%' or email
+		like '%sina.com'  or email like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		AS balance_compensation,
+		<!-- 客户充值 pay_for_balance -->
+		(select cast(sum(payment_amount) AS DECIMAL(11, 2)) from payment where
+		1=1 and paystatus=1 and paytype =0
+		and length(orderid) =8
+		and
+		date(createtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(createtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not
+		in(select id
+		from user where email like 'test%' or email like '%qq.com'
+		or email
+		like '%163.com' or email like '%126.com'
+		or email like
+		'%ww.com' or name like 'rlef%' or email like 't@%' or
+		email like 't_@%'
+		or email like '%sina.com'  or email
+		like '%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or
+		id=1128))
+		AS pay_for_balance,
+		<!-- 多支付 -->
+		(select cast(ifnull(sum(price),0) as decimal(11,2)) as extra_pay from
+		recharge_record where type in(2,3) and usesign=0
+		and date(datatime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(datatime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not
+		in(select id
+		from user where email like 'test%' or email
+		like '%qq.com'
+		or email like
+		'%163.com' or email like '%126.com'
+		or email like
+		'%ww.com' or name like
+		'rlef%' or email like 't@%' or
+		email like 't_@%'
+		or email like
+		'%sina.com'  or email
+		like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or
+		id=1128))
+		AS over_payment_balance,
+		<!-- 订单取消(全部或部分) -->
+		(select cast(ifnull(sum(price),0) as decimal(11,2)) as extra_pay from
+		recharge_record where type in(1,5) and usesign=0
+		and date(datatime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(datatime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not
+		in(select id
+		from user where email like 'test%' or email
+		like '%qq.com'
+		or email like
+		'%163.com' or email like '%126.com'
+		or email like
+		'%ww.com' or name like
+		'rlef%' or email like 't@%' or
+		email like 't_@%'
+		or email like
+		'%sina.com' or email
+		like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or
+		id=1128)
+		and remark_id not in(select order_no from orderinfo where
+		date(create_time) &lt;=date(#{endDate,jdbcType=VARCHAR})
+		and
+		date(create_time) &gt;=date(#{beginDate,jdbcType=VARCHAR}) and state
+		=0))
+		AS order_cancel,
+		<!-- 总余额提现(Z) -->
+		(select cast(sum(account) AS DECIMAL(11, 2)) from refund where 1=1 and
+		valid=1 and status =2 and type=0 and endtime is not null
+		and
+		date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and date(endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid not in(select id
+		from user where email like 'test%' or email like '%qq.com' or email
+		like '%163.com' or email like '%126.com'
+		or email like '%ww.com' or
+		name like 'rlef%' or email like 't@%' or
+		email like 't_@%' or email
+		like '%sina.com' or email like
+		'%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		AS balance_withdrawal
+
+		from dual
+		where not exists(select statistics_month
+		from monthly_financial_statistics
+		where statistics_year
+		=YEAR(#{beginDate,jdbcType=VARCHAR}) and
+		statistics_month =
+		MONTH(#{beginDate,jdbcType=VARCHAR}))
+
+	</insert>
+
+	<select id="queryPaypalRefunds" resultMap="refundInfoResultMap">
+		select rf.orderid as order_no,rf.endtime as refund_time,rf.account as
+		refund_amount,
+		oi.orderpaytime as pay_time,
+		if((oi.state ='-1' or
+		oi.state ='6') and cast(oi.pay_price as
+		decimal(11,0))=0,ifnull((select price from recharge_record where
+		recharge_record.remark_id=rf.orderid limit 1),0),oi.pay_price) as
+		payAmount
+		from refund rf left join orderinfo oi on rf.orderid =
+		oi.order_no
+		where 1=1 and rf.valid=1 and rf.type =1 and rf.account >0
+		and rf.status=2
+		and date(rf.endtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(rf.endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and exists(select order_no
+		from orderinfo where orderinfo.order_no =
+		rf.orderid)
+		and rf.userid not
+		in(select id from user where email like 'test%' or
+		email like '%qq.com'
+		or email like '%163.com' or email like '%126.com'
+		or email like
+		'%ww.com' or name like 'rlef%' or email like 't@%' or
+		email like 't_@%'
+		or email like '%sina.com' or email
+		like '%test%hotmail.com%' or
+		email = 'yangyanyan4228@yahoo.com' or
+		id=1128)
+		order by rf.endtime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryPaypalRefundsCount" resultType="java.lang.Integer">
+		select count(*)
+		from refund
+		where 1=1 and valid=1 and type=1 and account >0 and
+		status=2
+		and date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(endtime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and
+		exists(select order_no from orderinfo where orderinfo.order_no =
+		refund.orderid)
+		and userid not in(select id from user where email like
+		'test%' or email
+		like '%qq.com' or email like '%163.com' or email like
+		'%126.com'
+		or email like '%ww.com' or name like 'rlef%' or email like
+		't@%' or
+		email like 't_@%' or email like '%sina.com' or email like '%test%hotmail.com%' or
+		email =
+		'yangyanyan4228@yahoo.com' or id=1128)
+	</select>
+
+
+	<!-- 插入退款记录数据 -->
+	<insert id="insertRefund" parameterType="com.cbt.refund.bean.RefundBean"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		refund(userid,appcount,account,apptime,currency,paypalname,type,orderid,
+		payid,sellerid,reasoncode,reasonnote,casetype,complainid)
+		values(#{userid},#{appcount},#{appcount},now(),#{currency},#{paypalname},#{type},#{orderid},
+		#{payid},#{sellerId},#{reasoncode},#{reasonnote},#{casetype},#{complainid})
+	</insert>
+
+
+	<select id="queryCustomerBalanceChange" resultMap="balanceChangeResultMap">
+
+		select btc.userid,btc.change_balance,us.available_m as current_balance
+		from (select userid ,cast(ifnull(sum(changeblance-beforblance),0) as
+		DECIMAL(11,2)) as
+		change_balance
+		from tab_blancechangelog where
+		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
+		not in(select id from `user` where email like
+		'test%' or
+		email like
+		'%qq.com' or email like '%163.com' or email like
+		'%126.com'
+		or email
+		like '%ww.com' or name like 'rlef%' or email like
+		't@%' or
+		email like
+		't_@%' or email like '%sina.com'
+		or
+		email like '%test%hotmail.com%' or
+		email =
+		'yangyanyan4228@yahoo.com' or
+		id=1128)
+		group by userid
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+		) btc left join (select id,available_m from `user`) us
+		on btc.userid =
+		us.id
+
+	</select>
+
+	<select id="queryCustomerBalancesChangeCount" resultType="java.lang.Integer">
+		select
+		count(*) from (select userid from tab_blancechangelog where
+		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
+		not in(select id from `user` where email like
+		'test%' or
+		email like
+		'%qq.com' or email like '%163.com' or email like
+		'%126.com'
+		or email
+		like '%ww.com' or name like 'rlef%' or email like
+		't@%' or
+		email like
+		't_@%' or email like '%sina.com' or
+		email like '%test%hotmail.com%' or
+		email =
+		'yangyanyan4228@yahoo.com' or
+		id=1128)
+		group by userid) tbc
+	</select>
+
+	<select id="queryOrderSales" resultMap="orderInfoResultMap">
+		select oi.exchange_rate,oi.order_no,oi.user_id,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email as userEmail
+		,(SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops 
+		INNER JOIN order_details od WHERE ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+		AND od.state IN (0,1) AND od.orderid=oi.order_no) as buyAmount,
+		(SELECT  COUNT(DISTINCT goods_pid)*5  FROM  order_details WHERE state&lt;2 AND orderid = oi.order_no) AS pid_amount,
+
+		(
+		SELECT SUM(DISTINCT s.actual_freight) FROM shipping_package sp INNER JOIN (
+		SELECT expressno,IF(actual_freight &lt;= 0,IFNULL(totalprice,0.00),actual_freight) AS actual_freight FROM shipping_package GROUP BY expressno) s
+		ON sp.expressno=s.expressno WHERE oi.order_no=sp.orderid OR (LOCATE(CONCAT(oi.order_no,','),sp.remarks)>0 AND '' != sp.orderid)
+		) AS frightAmount,
+
+		(SELECT GROUP_CONCAT(IFNULL(sp.expressno,'')) FROM shipping_package sp WHERE (oi.order_no=sp.orderid
+		OR (LOCATE(CONCAT(oi.order_no,','),sp.remarks)>0 AND oi.order_no&lt;>sp.orderid) )) AS expressNo
+		, (SELECT estimatefreight FROM shipping_package sp WHERE oi.order_no = sp.orderid) AS estimatefreight
+		from
+		orderinfo oi inner join user u on oi.user_id=u.id
+		where 1=1 and oi.state in(1,2,3,4,5)
+		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		order by oi.create_time
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+	</select>
+
+	<select id="queryOrderSalesCount" resultType="java.lang.Integer">
+		select count(oi.order_no)
+		from orderinfo oi
+		INNER JOIN USER u ON oi.user_id=u.id
+		LEFT JOIN shipping_package sp ON (oi.order_no=sp.orderid OR (LOCATE(oi.order_no,sp.remarks)>0 AND LOCATE(oi.order_no,sp.orderid)&lt;=0))
+		where 1=1 and oi.state in(1,2,3,4,5)
+		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+	</select>
+
+	<select id="queryPayPalRevenue" resultMap="payPalInfoResultMap">
+		select
+		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
+		from payment
+		where 1=1 and paystatus=1 and paytype =0 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		order by createtime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryPayPalRevenueCount" resultType="java.lang.Integer">
+		select count(*)
+		from payment
+		where 1=1 and paystatus=1 and paytype =0 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+	</select>
+
+
+	<select id="queryWireRevenue" resultMap="payPalInfoResultMap">
+		select
+		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
+		from payment
+		where 1=1 and paystatus=1 and paytype =1 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		order by createtime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryWireRevenueCount" resultType="java.lang.Integer">
+		select count(*)
+		from payment
+		where 1=1 and paystatus=1 and paytype =1 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+	</select>
+
+
+	<select id="queryBalancePayment" resultMap="payPalInfoResultMap">
+		select
+		orderid,userid,payment_amount,payment_cc,payflag,paytype,createtime
+		from payment
+		where 1=1 and paystatus=1 and paytype =2 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		order by createtime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryBalancePaymentCount" resultType="java.lang.Integer">
+		select
+		count(id) from payment
+		where 1=1 and paystatus=1 and paytype =2 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+	</select>
+
+	<select id="queryNotStartedOrderAmount" resultMap="orderInfoResultMap">
+		select
+		odif.order_no,odif.user_id,rf.account as
+		pay_price,odif.create_time,odif.state
+		from orderinfo odif
+		left join
+		(select orderid,account from refund
+		where orderid in(select order_no
+		from orderinfo
+		where not exists(select id from order_change where
+		order_change.orderNo=orderinfo.order_no)
+		and exists(select orderid from
+		refund where date(endtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and valid=1 and
+		status =2 and type in(0,1) and refund.orderid
+		=orderinfo.order_no ) and
+		state in(-1,6)
+		and user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%'))) rf
+		on rf.orderid =
+		odif.order_no
+		where odif.state in(-1,6)
+		and odif.order_no in(select
+		orderid from refund where date(endtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and valid=1 and status =2 and
+		type in(0,1))
+		and odif.user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		and not exists(select id from
+		order_change where
+		order_change.orderNo=odif.order_no)
+		order by
+		odif.create_time
+		limit
+		#{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryNotStartedOrderAmountCount" resultType="java.lang.Integer">
+		select
+		count(*) from orderinfo
+		where state in(-1,6)
+		and order_no in(select
+		orderid from refund where date(endtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and valid=1 and status =2 and
+		type in(0,1))
+		and odif.user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		and not exists(select id from
+		order_change where
+		order_change.orderNo=odif.order_no)
+	</select>
+
+	<select id="queryTotalRefund" resultMap="refundInfoResultMap">
+		select userid,orderid as
+		order_no,account as refund_amount,
+		date_sub(endtime,interval 8 HOUR) as
+		refund_time
+		from refund where 1=1 and valid=1 and status =2 and type
+		in(0,1)
+		and date_sub(endtime,interval 8 HOUR)
+		&lt;=#{endDate,jdbcType=VARCHAR} and
+		date_sub(endtime,interval 8 HOUR)
+		&gt;=#{beginDate,jdbcType=VARCHAR}
+		and userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		order by endtime
+		limit
+		#{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryTotalRefundCount" resultType="java.lang.Integer">
+		select count(id)
+		from refund where 1=1 and valid=1 and status =2 and type
+		in(0,1)
+		and
+		date_sub(endtime,interval 8 HOUR) &lt;=#{endDate,jdbcType=VARCHAR} and
+		date_sub(endtime,interval 8 HOUR) &gt;=#{beginDate,jdbcType=VARCHAR}
+		and userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+	</select>
+
+
+	<insert id="batchSavePayPalInfoByExcel" parameterType="java.util.List">
+		<foreach collection="list" item="ppif" index="index"
+				 separator=";">
+			insert into
+			paypal_import(occurrence_date,occurrence_time,time_zone,create_adminid,
+			customer_name,type,state,monetary_unit,total_amount,
+			service_charge,net_amount,sender_email,recipient_email,
+			transaction_number,delivery_address,address_state,item_name,
+			order_no,shipping_handling,insured_amount,business_tax,
+			option_1_name,option_1_value,option_2_name,option_2_value,
+			reference_trade_number,bill_number,custom_number,quantity,
+			receipt_number,balance,address_line_1,address_line_2,
+			town_city,province,postal_code,country,contact_phone_no,
+			theme,remark,country_code,influence_balance)
+			values
+			(#{ppif.occurrenceDate},#{ppif.occurrenceTime},#{ppif.timeZone},#{ppif.createAdminid},
+			#{ppif.customerName},#{ppif.type},#{ppif.state},#{ppif.monetaryUnit},#{ppif.totalAmount},
+			#{ppif.serviceCharge},#{ppif.netAmount},#{ppif.senderEmail},#{ppif.recipientEmail},
+			#{ppif.transactionNumber},#{ppif.deliveryAddress},#{ppif.addressState},#{ppif.itemName},
+			#{ppif.orderNo},#{ppif.shippingHandling},#{ppif.insuredAmount},#{ppif.businessTax},
+			#{ppif.option1Name},#{ppif.option1Value},#{ppif.option2Name},#{ppif.option2Value},
+			#{ppif.referenceTradeNumber},#{ppif.billNumber},#{ppif.customNumber},#{ppif.quantity},
+			#{ppif.receiptNumber},#{ppif.balance},#{ppif.addressLine1},#{ppif.addressLine2},
+			#{ppif.townCity},#{ppif.province},#{ppif.postalCode},#{ppif.country},#{ppif.contactPhoneNo},
+			#{ppif.theme},#{ppif.remark},#{ppif.countryCode},#{ppif.influenceBalance})
+		</foreach>
+	</insert>
+
+	<select id="queryBalanceCompensation" resultMap="balanceCompensationResultMap">
+
+		select userid ,cast(ifnull(sum(money),0) as
+		DECIMAL(11,2)) as
+		amount
+		from additional_balance where valid=1 and state=1 and
+		date(createtime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(createtime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
+		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		group by userid
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+
+	</select>
+
+	<select id="queryBalanceCompensationCount" resultType="java.lang.Integer">
+		select
+		count(*) from (select userid from additional_balance where
+		valid=1 and
+		state=1 and
+		date(createtime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(createtime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
+		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		group by userid) bcs
+	</select>
+
+
+	<select id="queryOrderCancel" resultMap="orderCancelResultMap">
+
+		select userid ,ifnull(price,0) as amount,remark_id,remark
+		from recharge_record where type in(1,5) and usesign=0 and
+		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+
+	</select>
+
+	<select id="queryOrderCancelCount" resultType="java.lang.Integer">
+		select
+		count(*)
+		from (select userid from recharge_record where type in(1,5) and
+		usesign=0 and
+		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
+		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))) bcs
+	</select>
+
+	<select id="queryBalanceWithdrawal" resultMap="refundInfoResultMap">
+		select
+		userid,cast(ifnull(sum(account),0) AS DECIMAL(11, 2)) as
+		refund_amount
+		from refund
+		where 1=1 and valid=1 and status =2 and type=0
+		and date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(endtime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid
+		in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		group by userid
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+	</select>
+
+	<select id="queryBalanceWithdrawalCount" resultType="java.lang.Integer">
+		select
+		count(*) from (select userid from refund
+		where 1=1 and valid=1 and
+		status =2 and type=0
+		and date(endtime)
+		&lt;=date(#{endDate,jdbcType=VARCHAR}) and
+		date(endtime)
+		&gt;=date(#{beginDate,jdbcType=VARCHAR})
+		and userid
+		in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		group by userid) rf
+	</select>
+
+	<select id="queryEditedProductProfits" resultMap="editedProductProfitsResultMap">
+
+		select gdad.pid,gd.user_id,gd.order_no,gd.create_time,gdad.admin_id,gdad.admName as admin_name,
+		cast(sum(gd.goodsprice * gd.yourorder * #{exchageRate}) as DECIMAL(11,3)) as order_price,
+		cast(sum(gd.goods_p_price * gd.buycount + 5) as DECIMAL(11,3)) as purchase_price,
+		cast(sum(gd.freight * #{exchageRate}) as DECIMAL(11,3)) as intenet_freight,
+		cast(sum(gd.goodsprice * gd.yourorder * #{exchageRate} - gd.goods_p_price * gd.buycount - 5 - gd.freight * #{exchageRate} ) as DECIMAL(11,3))
+		as gross_profit  from
+		(select cbr.pid,cbr.is_edited,cbr.admin_id,adu.admName from custom_benchmark_ready cbr INNER JOIN admuser adu
+		on cbr.admin_id =adu.id  where cbr.admin_id > 0
+		) gdad
+		INNER join
+		(select od.goods_pid,od.goodsprice,od.yourorder,oi.order_no,oi.create_time,
+		oi.user_id,ops.goods_p_price,ops.buycount,gc.freight
+		from order_details od
+		INNER join   orderinfo oi
+		on od.orderid = oi.order_no
+		INNER join order_product_source ops
+		on od.id = ops.od_id
+		INNER JOIN goods_car gc
+		on od.goodsid = gc.id
+		where 1=1 and (oi.create_time BETWEEN #{beginDate,jdbcType=VARCHAR}
+		and #{endDate,jdbcType=VARCHAR}) and oi.state in (1,2,3,4,5) and od.state in(0,1)
+		and oi.user_id
+		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		) gd
+		on gdad.pid = gd.goods_pid
+		where 1=1
+		group by gdad.pid
+		<if test="sorting > 0">
+			order by gross_profit desc
+		</if>
+		<if test="sorting == 0">
+			order by gross_profit
+		</if>
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+	</select>
+	
+	<select id="queryEditedProductProfitsCount" resultType="java.lang.Integer">
+		select count(1) from 
+		(select gdad.pid,gd.user_id,gd.order_no,gdad.admin_id,gdad.admName  from  
+		(select cbr.pid,cbr.is_edited,cbr.admin_id,adu.admName from custom_benchmark_ready cbr INNER JOIN admuser adu
+			on cbr.admin_id =adu.id  where cbr.admin_id > 0 
+		) gdad
+		INNER join 
+		(select od.goods_pid,od.goodsprice,od.yourorder,oi.order_no,oi.user_id,oi.create_time,ops.goods_p_price,ops.buycount,gc.freight
+		from order_details od
+		INNER join   orderinfo oi
+		on od.orderid = oi.order_no  
+		INNER join order_product_source ops
+		on od.id = ops.od_id
+		INNER JOIN goods_car gc 
+		on od.goodsid = gc.id
+		where 1=1 and (oi.create_time BETWEEN #{beginDate,jdbcType=VARCHAR} 
+		and #{endDate,jdbcType=VARCHAR}) and oi.state in (1,2,3,4,5) and od.state in(0,1)
+		and oi.user_id
+				 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%')
+		) gd
+		on gdad.pid = gd.goods_pid
+		where 1=1 
+		group by gdad.pid ) a
+	</select>
+	<select id="onloadOrderFinancialDate" resultType="java.lang.String">
+		call monthly_finance_statistics_fun(#{time});
+	</select>
+
+
+	<select id="queryStripPayInfo" resultMap="payPalInfoResultMap">
+		select
+		orderid,paymentid,userid,payment_amount,payment_cc,payflag,paytype,createtime
+		from payment
+		where 1=1 and paystatus=1 and paytype = 5 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid not in(select id from user where email  like 'test%' or   email  like '%ww.com' or  email  like '%qq.com%'
+		or  email  like '%163.com%' or
+		email  like '%126.com%'  or email  LIKE '%test%hotmail.com%' or email = 'yangyanyan4228@yahoo.com' or id=1128
+		or email  LIKE '%import-express.com%' or id=66  or email  LIKE '%test.com%'  or email  LIKE '%china-synergy.org%'
+		or email  LIKE '%asdf.com%' or email  LIKE '%11.com%'  or email  LIKE '%ww.ppp.com%' ) and payment.paystatus=1
+		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+		order by createtime
+		<if test="rows != 0">
+			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
+		</if>
+
+	</select>
+
+	<select id="queryStripPayInfoCount" resultType="java.lang.Integer">
+		select count(*)
+		from payment
+		where 1=1 and paystatus=1 and paytype = 5 and
+		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
+		where userid not in(select id from user where email  like 'test%' or   email  like '%ww.com' or  email  like '%qq.com%'
+		or  email  like '%163.com%' or
+		email  like '%126.com%'  or email  LIKE '%test%hotmail.com%' or email = 'yangyanyan4228@yahoo.com' or id=1128
+		or email  LIKE '%import-express.com%' or id=66  or email  LIKE '%test.com%'  or email  LIKE '%china-synergy.org%'
+		or email  LIKE '%asdf.com%' or email  LIKE '%11.com%'  or email  LIKE '%ww.ppp.com%' ) and payment.paystatus=1
+		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
+	</select>
+
+
+</mapper>

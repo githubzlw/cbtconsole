@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.ProblemFeedBackDao">
+
+	<resultMap type="com.cbt.warehouse.pojo.ProblemFeedBackBean" id="problemFeedBackResultMap">
+		<id column="id" property="id"/>
+		<result column="uid" property="uid"/>
+		<result column="email" property="email"/>
+		<result column="problem" property="problem"/>
+		<result column="type" property="type"/>
+		<result column="createtime" property="createtime"/>
+		<result column="admName" property="admName"/>
+		<result column="reply_content" property="reply_content"/>
+		<result column="reply_time" property="reply_time"/>
+	</resultMap>
+	
+	<sql id="all">
+		id,uid,email,problem,type,createtime
+	</sql>
+	
+	<select id="queryForList" resultMap="problemFeedBackResultMap">
+		select problem_report.id,problem_report.uid,problem_report.email,problem_report.problem,
+			problem_report.type,problem_report.createtime,admin_r_user.admName ,problem_report.reply_content,problem_report.reply_time
+			from problem_report,admin_r_user 
+			where problem_report.email = admin_r_user.useremail 
+			<if test="type!=0">
+				and type = #{type}
+			</if>
+			<if test="beginDate != null and beginDate !=''">
+				and date(createtime) &gt;= date(#{beginDate})
+			</if>
+			<if test="endDate != null and endDate !=''">
+				and date(createtime) &lt;= date(#{endDate})
+			</if>
+			<if test="is_report == 1">
+				and reply_content is not null and reply_content&lt;>''
+			</if>
+			<if test="is_report == 2">
+				and (reply_content is null or reply_content = '')
+			</if>
+			<if test="adminId != 0">
+				and admin_r_user.adminid =  #{adminId}
+			</if> 
+			order by createtime desc 
+			limit #{pageNo},20
+	</select>
+	
+	<select id="queryForAllList" resultMap="problemFeedBackResultMap">
+		select <include refid="all"></include> 
+		from problem_report 
+		where 1=1 
+		order by id desc 
+	</select>
+	
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(problem_report.id) from problem_report,admin_r_user 
+			where problem_report.email = admin_r_user.useremail 
+			<if test="type!=0">
+				and type = #{type}
+			</if>
+			<if test="beginDate != null and beginDate !=''">
+				and date(createtime) &gt;= date(#{beginDate})
+			</if>
+			<if test="endDate != null and endDate !=''">
+				and date(createtime) &lt;= date(#{endDate})
+			</if>
+			<if test="is_report == 1">
+				and reply_content is not null and reply_content&lt;>''
+			</if>
+			<if test="is_report == 2">
+				and (reply_content is null or reply_content = '')
+			</if>
+			<if test="adminId != 0">
+					and admin_r_user.adminid =  #{adminId}
+			</if> 
+	</select>
+	<select id="getReportProblem" resultType="com.cbt.warehouse.pojo.ProblemFeedBackBean">
+	   		SELECT p.id,u.id as userid,u.name as userName,u.email as userEmail,ad.email AS sale_email,p.problem AS qustion FROM problem_report p 
+			INNER JOIN admin_r_user a ON p.email=a.useremail
+			INNER JOIN USER u ON a.userid=u.id
+			INNER JOIN admuser ad ON a.adminid=ad.id
+			WHERE p.id=${report_id}
+	</select>
+</mapper>

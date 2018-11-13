@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+    <head>
+        <meta charset="utf-8"><!--  2018/07/17 12:29 -->
+        <!--
+    	文件兼容性声明，表示使用最新的ie渲染模式  
+    -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!--
+    	视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+    		width=device-width：视口宽度等于设备宽度。
+    		initial-scale=1   ：初始化缩放比，1:1
+    -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+        <title>订单物流查询</title>
+
+        <!-- 这是bootStrap所需要的css文件 -->
+        <link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!-- 
+   		条件注释,专门为ie浏览器设计的。
+   -->
+        <!--[if lt IE 9]>
+	      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+        <!-- 这是bootstrap所必要的jquery文件。 -->
+        <script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+        <!-- 这是bootstrap的js文件 -->
+        <script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+        <!-- 日期控件 -->
+        <link href="/cbtconsole/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+        <script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+        <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+        <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+        <!--页面加载进度条-->
+        <!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+        <!--easyui-->
+        <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+        <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+        <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+        <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+        <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+        <style type="text/css">
+            .panel-title {
+                text-align: center;
+                height: 30px;
+                font-size: 24px;
+            }
+            
+            .but_color {
+                background: #44a823;
+                width: 80px;
+                height: 35px;
+                border: 1px #aaa solid;
+                color: #fff;
+            }
+            
+            input,
+            textarea,
+            select,
+            button {
+                font-size: 16px;
+                height: 28px;
+            }
+            
+            .datagrid-cell,
+            .datagrid-cell-group,
+            .datagrid-header-rownumber,
+            .datagrid-cell-rownumber {
+                font-size: 16px;
+            }
+            
+            .datagrid-header .datagrid-cell span,
+            .panel-body {
+                font-size: 16px;
+            }
+            
+            .datagrid-cell,
+            .datagrid-cell-group,
+            .datagrid-header-rownumber,
+            .datagrid-cell-rownumber {
+                height: 28px;
+                line-height: 28px;
+                padding: 3px 5px;
+            }
+            
+            #waring_id span {
+				color: red;
+				font-weight: bolder;
+			}
+        </style>
+
+    </head>
+
+    <body>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 76%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">保存在本地的物流信息</h4>
+                    </div>
+                    <div class="modal-body" style="float: left;font-size: 13px;width: 100%;">
+                    	<h3>运单信息</h3>
+                    	<table class="table table-striped table-hover">
+                    		<tr>
+                    			<th width="50%">原物流信息</th>
+                    			<th width="50%">转单物流信息</th>
+                    		</tr>
+                    		<tr>
+                    			<td><span>运单号:&nbsp;&nbsp;</span><span id="modal_trackNo"></span></td>
+                    			<td><span>转单运单号:&nbsp;&nbsp;</span><span id="modal_forwardNo"></span></td>
+                    		</tr>
+                    		<tr>
+                    			<td><span>运输公司:&nbsp;&nbsp;</span><span id="modal_trackCompany"></span></td>
+                    			<td><span>转单运输公司:&nbsp;&nbsp;</span><span id="modal_forwardCompany"></span></td>
+                    		</tr>
+                    		<tr>
+                    			<td><span>物流获取来源:&nbsp;&nbsp;</span><br /><span id="modal_sourceType"></span></td>
+                    			<td><span>转单物流获取来源:&nbsp;&nbsp;</span><br /><span id="modal_forwardSourceType"></span></td>
+                    		</tr>
+                    	</table>
+                    	<span>物流抓取操作:</span>&nbsp;&nbsp;<a id="sync_track1" target="_blank">增量抓取(抓取并保存未保存物流)</a>&nbsp;&nbsp;<a id="sync_track2" target="_blank">完整抓取(清空已抓取的重新抓取一份)</a>
+                    	<h3>合并的物流信息</h3>
+                        <table class="table table-striped table-hover" style="float: left;font-size: 13px;" id="tab_track_details_list">
+                            <!--<tr><th width="22%">时间</th><th width="78%">状态</th></tr>
+							<tr><td>2018-04-13 00:00</td><td id="reason1">在上海虹桥</td></tr>
+							<tr><td>2018-04-13 00:02</td><td id="reason1">在上海虹桥2</td></tr>-->
+                        </table>
+
+                    </div>
+                    <div class="modal-footer">
+                        <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
+                        <!--<button type="button" class="btn btn-primary">提交更改</button>-->
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+		<!-- 模态框（Modal） 操作物流使用 -->
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width: 600px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">操作订单运单状态</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <span>&nbsp;&nbsp;运单号:&nbsp;&nbsp;</span><span id="modal_trackNo2"></span><br />
+                            <span style="float: left;line-height: 30px;">&nbsp;&nbsp;标记:&nbsp;&nbsp;</span>
+                            <input type="radio" name="trackState" value="2" checked="checked" style="float: left;height: 20px;" />
+                            <span style="float: left;line-height: 30px;">&nbsp;无标记&nbsp;&nbsp;</span>
+                            <input type="radio" name="trackState" value="7" style="float: left;height: 20px;" />
+                            <span style="float: left;line-height: 30px;">&nbsp;标记为非异常(不会出现在预警中)</span><br />
+                            <div style="clear:both"></div>
+                            <span>&nbsp;&nbsp;备注:</span><br />
+                            <textarea rows="60" cols="60" id="track_note" style="height: 150px;width: 566px;"></textarea><br />
+                            <input type="button" value="提交" id="myModal2_sub"><span id="myModal2_sub_message" style="color:red;"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            function formatNum(val) {
+                return val < 10 ? "0" + val : val
+            }
+            
+            $(function() {
+                //单选框radio事件
+                $('input[type=radio][name=timeRange]').change(function() {
+                    if(this.value == '1') {
+                        // 时间范围
+                        iniDatetime();
+                    } else if(this.value == '2') {
+                        // 全部时间
+                        document.getElementById("nowdate1").value = "";
+                        document.getElementById("nowdate2").value = "";
+                    }
+                });
+                //设置datagrid属性
+                $('#main-datagrid').datagrid({
+                    //title: '复购率退款数商品查询',
+                    width: "100%",
+                    fit: true, //自动补全 
+                    pageSize: 20, //默认选择的分页是每页20行数据
+                    pageList: [10, 20, 30, 50, 100], //可以选择的分页集合
+                    nowrap: true, //设置为true，当数据长度超出列宽时将会自动截取
+                    striped: true, //设置为true将交替显示行背景。
+                    collapsible: true, //显示可折叠按钮
+                    toolbar: "#top_toolbar", //在添加 增添、删除、修改操作的按钮要用到这个
+                    //				url: "/cbtconsole/tabtrackinfo/list.do",
+                    loadMsg: '数据装载中......',
+                    singleSelect: true, //为true时只能选择单行
+                    fitColumns: true, //允许表格自动缩放，以适应父容器
+                    pagination: true, //分页
+                    rownumbers: true,
+                    style: {
+                        padding: '8 8 10 8'
+                    },
+                    onLoadError: function() {
+                        //$.message.alert("提示信息", "获取数据信息失败","info");
+                        return;
+                    }
+                });
+                //运单或订单输入框事件
+                $("#orderOrTrackNo").focus(function() {
+                	$('input[type=radio][name=funChange]').get(0).checked = "checked";
+                    if($(this).val() == "输入运单号或订单号查询") {
+                        $(this).val('');
+                        $(this).css('color', '#222');
+                    }
+                });
+                //操作订单状态中radio事件
+            	/* $("#track_note").focus(function() {
+            		$('input[type=radio][name=trackState]').get(1).checked = "checked";
+                }); */
+                //运单状态获取焦点事件
+                $("#trackState").focus(function() {
+                	$('input[type=radio][name=funChange]').get(1).checked = "checked";
+                });
+                //运单预警获取焦点事件
+                $("#warning").focus(function() {
+                	$('input[type=radio][name=funChange]').get(2).checked = "checked";
+                });
+                //操作订单运单状态
+                $("#myModal2_sub").click(function() {
+                	var trackState = $('input[type=radio][name=trackState]:checked').val();
+                	var trackNote = $('#track_note').val();
+                	var trackNo = $('#modal_trackNo2').text();
+                	$.ajax({
+               		   type: "POST",
+               		   url: "/cbtconsole/tabtrackinfo/updatestate.do?trackNo=" + trackNo + "&trackNote=" + trackNote + "&trackState=" + trackState,
+               		   dataType:"text",
+               		   success: function(msg){
+               			   if("success" == msg){
+                        	   $('#myModal2_sub_message').text("修改成功!");
+               			   }
+               		   }
+               		});
+                });
+
+                //设置日期时间控件
+                function Datetime(dateId, nowdateId) {
+                    $(dateId).datetimepicker({
+                        language: 'zh-CN', //显示中文
+                        format: 'yyyy-mm-dd', //显示格式
+                        minView: "month", //设置只显示到月份
+                        initialDate: new Date(),
+                        autoclose: true, //选中自动关闭
+                        todayBtn: true, //显示今日按钮
+                        locale: moment.locale('zh-cn')
+                    });
+                }
+                Datetime('#datetimepicker1');
+                Datetime('#datetimepicker2');
+
+                function iniDatetime() {
+                    //时间选择框日期初始化
+                    var today = new Date();
+                    //                  today.setDate(today.getDate() - 1); //日期减1天
+                    var nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+                    //对日期格式进行处理
+                    var date = new Date(nowdate);
+                    var mon = date.getMonth() + 1;
+                    var day = date.getDate();
+                    var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+                    document.getElementById("nowdate2").value = mydate;
+                    today = new Date();
+                    today.setDate(today.getDate() - 60); //日期减60天
+                    nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+                    date = new Date(nowdate);
+                    mon = date.getMonth() + 1;
+                    day = date.getDate();
+                    mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+                    document.getElementById("nowdate1").value = mydate;
+                }
+                iniDatetime();
+
+                //获取url中的参数
+                //              function getUrlParam(name) {
+                //                  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+                //                  var r = window.location.search.substr(1).match(reg); //匹配目标参数
+                //                  if(r != null) return unescape(r[2]);
+                //                  return null; //返回参数值
+                //              }
+
+                /*查询条件重置按钮*/
+                $("#date-range-reset").click(function() {
+                    //初始化
+                    iniDatetime();
+                    $('input[type=radio][name=timeRange]').get(0).checked = "checked";
+                    $('input[type=radio][name=funChange]').get(2).checked = "checked";
+                    $("#orderOrTrackNo").val("输入运单号或订单号查询");
+                    $("#orderOrTrackNo").css("color","#C4C4C4");
+                    $("#trackState").val(0);
+                    $("#warning").val(0);
+                });
+                /*下架商品范围内时间的条件查询*/
+                $("#date-range-search").click(function() {
+                	var funChange = $('input[type=radio][name=funChange]:checked').val()
+                    //单个订单号或运单号查询
+                    if(funChange == 2) {
+                        var orderOrTrackNo = $("#orderOrTrackNo").val();
+                        //查询运单状态
+                        var trackState = $("#trackState").val();
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            orderOrTrackNo: orderOrTrackNo,
+                            funChange: funChange
+                        });
+                        return;
+                    }
+                    // 页数
+                    var pageSize = $("#main-datagrid").datagrid("options").pageSize;
+                    var pageNumber = 1;
+                    //获取起止时间
+                    var startDate = $("#nowdate1").val();
+                    var endDate = $("#nowdate2").val();
+                    //判断开始时间是否早于结束时间 并提示
+                    if((new Date(startDate)) > (new Date(endDate))) {
+                        /*开启错误提示*/
+                        $("#errMsg").text("开始时间应该不晚于结束时间。");
+                        //延时1.5s隐藏
+                        setTimeout(function() {
+                            $("#errMsg").text("");
+                        }, 1500);
+                        return;
+                    } else {
+                        $("#errMsg").text("");
+                    }
+                    //查询
+                    if(funChange == 0) {
+                        //查询运单状态
+                        var trackState = $("#trackState").val();
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            rows: pageSize,
+                            page: pageNumber,
+                            trackState: trackState,
+                            startDate: startDate,
+                            endDate: endDate,
+                            funChange: funChange
+                        });
+                    } else if(funChange == 1) {
+                        //查询运单预警
+                        var warning = $("#warning").val();
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            rows: pageSize,
+                            page: pageNumber,
+                            warning: warning,
+                            startDate: startDate,
+                            endDate: endDate,
+                            funChange: funChange
+                        });
+                    }
+
+                });
+
+            });
+
+            /* 单条运单操作 */
+            function formatterOperation(value, row, index) {
+            	if(row.trackNo != null) {
+	            	return '<a href="#" onclick="alert_modal2(\'' + row.trackNo + '\')">操作</a>';
+           		}
+           		return;
+            } 
+            /*时间格式化*/
+            function formatterData(value, row, index) {
+                if(value != null) {
+                    var date = new Date(value);
+                    return date.getFullYear() + '-' + formatNum(date.getMonth() + 1) + '-' + formatNum(date.getDate());
+                } else {
+                    return "";
+                }
+            } 
+            /*时间格式化2*/
+            function formatterData2(value, row, index) {
+                if(value != null) {
+                    var date = new Date(value);
+                    return date.getFullYear() + '-' + formatNum(date.getMonth() + 1) + '-' + formatNum(date.getDate()) + ' ' + formatNum(date.getHours()) + ':' + formatNum(date.getMinutes());
+                } else {
+                    return "";
+                }
+            }
+            /* 链接到订单 formatterOrderNo */
+            function formatterOrderNo(value, row, index) {
+                if(row.orderNo != null) {
+	            	return '<a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=' + row.orderNo + '" target=black>' + row.orderNo + '</a>'
+           		}
+           		return;
+            }
+            /*格式化数据获取来源 formatterSourceType*/
+//          function formatterSourceType(value, row, index) {
+////          	if(row.sourceType != null) {
+////                  var trackNoStr = "'" + row.trackNo + "'";
+////                  return '<a onclick="alert_modal(' + trackNoStr + ');">本地</a>'
+////              }
+//          	
+//              if(row.sourceType != null) {
+//              	var trackNoStr = "'" + row.trackNo + "'";
+//                  return '<a href="' + value + '" target=black>' + 原信息 + '</a>' + '<a onclick="alert_modal(' + trackNoStr + ');">本地</a>';
+//              }
+//              return;
+//          }
+            /*运单状态格式化 formatterTrackState 1-备货中；2-已发货；3-已签收；4-退回；5-异常(海关扣押等)；6-内部异常（运单异常，相关快递抓取方式未实现等）*/
+            function formatterTrackState(value, row, index) {
+                if(row.trackState != null) {
+                    switch(row.trackState) {
+                        case 3:
+                            return '已签收';
+                        case 4:
+                            return '退回';
+                        case 5:
+                            return '异常';
+                        case 6:
+                            return '内部异常';
+                        case 7:
+                            return '手动标记正常';
+                        default:
+                            return '已发货';
+                    }
+                }
+                return '已发货';
+            }
+            /*运单预警 formatterWarning*/
+           function formatterWarning(value, row, index) {
+           		//set集合保存结果
+           		var resSet = new Set();
+           		//查询常见问题
+                if(row.trackState != null) {
+                	if (row.trackState == 4) {
+                		resSet.add('退回');
+                	}
+                	if (row.trackState == 5) {
+                		resSet.add('异常');
+                	}
+                	if (row.trackState == 6) {
+                		resSet.add('内部异常');
+                	}
+                	if(row.trackState != 3 && row.trackState != 7) {
+                		//交期超时查询
+		                if(row.orderDeliverDate == null){
+		                	resSet.add('交期为空');
+		                } else if (new Date() > new Date(row.orderDeliverDate)){
+		                	resSet.add('交期超时');
+		                }
+		                //物流问题
+		                if(row.trackUpdate == undefined || row.updatDate == undefined){
+		                	var senttime = new Date(row.senttime);
+		                	var defDays = parseInt(new Date() - senttime) / 1000 / 3600 / 24;
+		                	if(defDays > 3){
+		                		resSet.add('无物流');
+		                	}
+		                } else {
+		                	var trackUpdate = new Date(row.trackUpdate);//最后一次运单变更时间
+		                	var updatDate = new Date(row.updatDate); //最后一次抓取时间
+		                	var defDays = parseInt(updatDate - trackUpdate) / 1000 / 3600 / 24;
+		                	if (defDays > 3) {
+		                		resSet.add('物流问题');
+		                	}
+		                }
+                	}
+                }
+                //数据格式转换  示例：退回,异常,内部异常
+                var resArr = new Array(resSet.size);
+                var i = 0;
+                resSet.forEach(function(item, sameItem, s) {
+                	resArr[i] = item;
+                	i++;
+				});
+				return resArr.join(",");
+            }
+            /*运单状态格式化 formatterTrackState 1-备货中；2-已发货；3-已签收；4-退回；5-异常(海关扣押等)*/
+            function formatterGrabState(value, row, index) {
+                if(row.grabState == 1) {
+                    return "不需要抓取";
+                } else {
+                    return "需要抓取";
+                }
+            }
+
+            function alert_modal(trackNo) {
+                var tab_track_details_list = $("#tab_track_details_list");
+                //初始化模态框数据
+                $("#modal_trackNo").text("");
+                $("#modal_sourceType").html("");
+                $("#modal_trackCompany").text("");
+                $("#modal_forwardNo").text("");
+                $("#modal_forwardSourceType").html("");
+                $("#modal_forwardCompany").text("");
+                tab_track_details_list.empty() //清空列表显示
+
+                //查询存储在本地的物流信息
+                $.ajax({
+                    type: "GET",
+                    url: "/cbtconsole/tabtrackinfo/querybytrackno.do?trackNo=" + trackNo,
+                    dataType: "json",
+                    success: function(msg) {
+                        //显示返回的数据到模态框
+                        $("#modal_trackNo").text(trackNo);
+                        $("#modal_sourceType").html('<a href="' + msg.sourceType + '" target=black>' + msg.sourceType + '</a>');
+                        $("#modal_trackCompany").text(msg.trackCompany);
+                        
+                        if(msg.forwardNo != undefined){
+	                        $("#modal_forwardNo").text(msg.forwardNo);
+	                    } else {
+	                    	$("#modal_forwardNo").text("暂无");
+	                    }
+                        if(msg.forwardSourceType != undefined){
+		                	$("#modal_forwardSourceType").html('<a href="' + msg.forwardSourceType + '" target=black>' + msg.forwardSourceType + '</a>');
+                        } else {
+                        	$("#modal_forwardSourceType").html("暂无");
+                        }
+                        if(msg.forwardCompany != undefined){
+		                	$("#modal_forwardCompany").text(msg.forwardCompany);
+		                } else {
+		                	$("#modal_forwardCompany").text("暂无");
+		                }
+
+                        tab_track_details_list.append($('<tr><th width="11%">时间</th><th width="40%">线上显示物流</th><th width="40%">抓取的源数据</th><th width="10%">获取来源</th></tr>')); //添加标题
+                        $(msg.tabTrackDetailsList).each(function(index, item) {
+                            var temDate = new Date(item.actionDate);
+                            var temDateStr = temDate.getFullYear() + '-' + formatNum(temDate.getMonth() + 1) + '-' + formatNum(temDate.getDate()) + ' ' + formatNum(temDate.getHours()) + ':' + formatNum(temDate.getMinutes());
+							var temFlag = "";
+							if(item.flag == 2){
+								temFlag = "转单运单";
+							} else if(item.flag == 3) {
+								temFlag = "手动添加";
+							} else if(item.flag == 4) {
+								temFlag = "历史运单";
+							} else {
+								temFlag = "原运单";
+							}
+                            var temHtml = "<tr><td>" +
+                                temDateStr +
+                                "</td><td>" +
+                                item.actionInfo +
+                                "</td><td>" +
+                                (item.actionInfoCn == undefined?"":item.actionInfoCn) +
+                                "</td><td>" +
+                                temFlag +
+                                "</td></tr>";
+                            $(temHtml).appendTo(tab_track_details_list);
+                        });
+                        //显示模态框
+                        $('#myModal').modal('show');
+                        //绑定物流抓取事件
+                        $('#sync_track1').click(function(){
+                        	$('#sync_track1').attr("href","http://192.168.1.48:18081/rest/patch/syntrackone.do?flag=0&trackNo=" 
+                        			+ trackNo + "&trackCom=" + encodeURI($("#modal_trackCompany").text()));
+                    	});
+                        $('#sync_track2').click(function(){
+                        	$('#sync_track2').attr("href","http://192.168.1.48:18081/rest/patch/syntrackone.do?flag=1&trackNo=" 
+                        			+ trackNo + "&trackCom=" + encodeURI($("#modal_trackCompany").text()));
+                    	});
+                    }
+                });
+            }
+            function alert_modal2(trackNo) {
+            	// 初始值
+            	$('#modal_trackNo2').text(trackNo);
+            	$('#myModal2_sub_message').text("");
+            	//初始化该订单之前修改记录
+            	$.ajax({
+           		   type: "GET",
+           		   url: "/cbtconsole/tabtrackinfo/querystatebytrackno.do?trackNo=" + trackNo,
+           		   data: "",
+           		   dataType:"json",
+           		   success: function(msg){
+           			   if(7 == msg.trackState){
+           				  $('input[type=radio][name=trackState]').get(1).checked = "checked";
+           			   } else {
+             			  $('input[type=radio][name=trackState]').get(0).checked = "checked";
+           			   }
+					   $('#track_note').val(msg.trackNote);
+           		   }
+           		});
+            	$('#myModal2').modal('show');
+            }
+            /*格式化本地物流数据查看 formatterSourceType*/
+            function formatterSourceType(value, row, index) {
+                if(row.sourceType != null) {
+                    var trackNoStr = "'" + row.trackNo + "'";
+                    return '<a onclick="alert_modal(' + trackNoStr + ');">本地</a><span>&nbsp;&nbsp;</span><a href="' + row.sourceType + '" target=black>原物流 </a>';
+                }
+                return;
+            }
+        </script>
+
+        <div id="top_toolbar" style="padding: 5px; height: auto">
+            <div>
+                <table>
+                    <tr>
+                        <td colspan="2">
+                            <h3>订单物流查询</h3>
+                            <div id="waring_id" style="position: absolute;top: 28px;right: 100px;">
+                            </div>
+                        </td>
+                    </tr>
+                    <div style="clear:both"></div>
+                    <tr height="30px">
+                        <td colspan="2" align="center" style="width: 154px;">
+                            <span style="float: left;line-height: 30px;">&nbsp;&nbsp;订单支付时间范围:&nbsp;&nbsp;</span>
+                            <input type="radio" name="timeRange" value="1" checked="checked" style="float: left;height: 20px;" />
+                            <span style="float: left;line-height: 30px;">&nbsp;范围&nbsp;&nbsp;</span>
+                            <input type="radio" name="timeRange" value="2" style="float: left;height: 20px;" />
+                            <span style="float: left;line-height: 30px;">&nbsp;全部</span>
+                        </td>
+                        <!--<td align="center" style="width: 154px;">订单支付结束时间</td>-->
+                        <td align="center" style="width: 204px;">
+                        	<input type="radio" name="funChange" value="2" style="float: left;height: 20px;" />
+                        	<span style="float: left;line-height: 30px;">&nbsp;运单/订单/转单查询&nbsp;&nbsp;</span>
+                        </td>
+                        <td align="center" style="width: 184px;">
+                        	<input type="radio" name="funChange" value="0" style="float: left;height: 20px;" />
+                        	<span style="float: left;line-height: 30px;">&nbsp;运单状态&nbsp;&nbsp;</span>
+                        </td>
+                        <td align="center" style="width: 184px;">
+                        	<input type="radio" name="funChange" value="1" checked="checked" style="float: left;height: 20px;" />
+                        	<span style="float: left;line-height: 30px;">&nbsp;运单预警&nbsp;&nbsp;</span>
+                        </td>
+                        <td style="width: 100px;"><!--重置按钮--></td>
+                        <td style="width: 56px;"><!--查询按钮--></td>
+                    </tr>
+                    <tr>
+                        <!--开始时间-->
+                        <td align="center">
+                            <a class='input-group date' id='datetimepicker1' style="float: left;">
+                                <input type='text' class="form-control" id='nowdate1' style="width: 100px; height: 30px;" />
+                                <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+			                <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                        </td>
+                        <!--结束时间-->
+                        <td align="center">
+                            <a class='input-group date' id='datetimepicker2' style="float: left;">
+                                <input type='text' class="form-control" id='nowdate2' style="width: 100px; height: 30px;" />
+                                <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+				                <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                        </td>
+                        <!--通过运单号或订单号查询(时间选择失效)-->
+                        <td align="center">
+                            <input type="text" name="" id="orderOrTrackNo" value="输入运单号或订单号查询" style="height: 28px;width: 200px;color: #C4C4C4;" />
+                        </td>
+                        <!--运单状态-->
+                        <td align="center">
+                            <select class="form-control" id="trackState" style="height: 30px;width: 180px;font-size: 14px;padding-top: 4px;padding-left: 4px;">
+                                <option value="0">0-全部</option>
+                                <option value="1">1-备货中</option>
+                                <option value="2">2-已发货</option>
+                                <option value="3">3-已签收</option>
+                                <option value="4">4-退回</option>
+                                <option value="5">5-异常(海关扣押等)</option>
+                                <option value="6">6-内部异常(运单异常等)</option>
+                                <option value="7">7-手动标记为正常</option>
+                            </select>
+                        </td>
+                        <!--运单预警-->
+                        <td align="center">
+                            <select class="form-control" id="warning" style="height: 30px;width: 180px;font-size: 14px;padding-top: 4px;padding-left: 4px;">
+                                <option value="0">0-全部预警运单</option>
+                                <option value="1">1-物流问题 或者 无物流 (未签收 并且 最后一次运单变更时间在3天前)</option>
+                                <option value="2">2-交期超时 (未签收 并且 过了订单的最晚交期)</option>
+                                <option value="4">4-退回</option>
+                                <option value="5">5-异常 (海关扣押等)</option>
+                                <option value="6">6-内部异常 (运单异常等)</option>
+                            </select>
+                        </td>
+                        <!--查询按钮-->
+                        <td align="center">
+                            <button type="button" id="date-range-search" class="btn btn-default" style="height: 30px;width: 98px;text-align: center;" >查询</button>
+                        </td>
+                        <!--重置按钮-->
+                        <td align="center">
+                            <button type="button" id="date-range-reset" class="btn btn-default" style="height: 30px;text-align: left;">重置</button>
+                        </td>
+                        <td id="errMsg" style="color: royalblue;"></td>
+                    </tr>
+                </table>
+
+            </div>
+
+        </div>
+
+        <table id="main-datagrid" firstLoad="false" style="width: 100%; height: 100%" class="easyui-datagrid">
+            <thead>
+                <tr>
+                    <th data-options="field:'id',width:'120px',align:'center'">用户id</th>
+                    <th data-options="field:'orderNo',width:'150px',align:'center',formatter:formatterOrderNo">主单号</th>
+                    <!--<th data-options="field:'orderList',width:'150px',align:'center'">合并订单列表</th>-->
+                    <th data-options="field:'trackNo',width:'150px',align:'center'">运单号</th>
+                    <th data-options="field:'trackCompany',width:'120px',align:'center'">物流公司</th>
+                    <th data-options="field:'forwardNo',width:'150px',align:'center'">转单号</th>
+                    <th data-options="field:'forwardCompany',width:'150px',align:'center'">转单物流公司</th>
+                    <th data-options="field:'trackState',width:'100px',align:'center',formatter:formatterTrackState">运单状态</th>
+                    <th data-options="field:'b',width:'200px',align:'center',formatter:formatterWarning">运单预警</th>
+                    <!--<th data-options="field:'packageNo',width:'150px',align:'center'">包裹号</th>-->
+                    <!--<th data-options="field:'trackAddress',width:'150px',align:'center'">寄件地址</th>-->
+                    <th data-options="field:'orderPaytime',width:'150px',align:'center',formatter:formatterData">支付时间</th>
+                    <th data-options="field:'senttime',width:'150px',align:'center',formatter:formatterData2">出货时间</th>
+                    <th data-options="field:'orderDeliverDate',width:'150px',align:'center',formatter:formatterData">最晚交期</th>
+                    <!--<th data-options="field:'trackUser',width:'150px',align:'center'">登陆人员</th>-->
+                    <!--<th data-options="field:'grabState',width:'100px',align:'center',formatter:formatterGrabState">抓取状态</th>-->
+                    <!--<th data-options="field:'addTime',width:'160px',align:'center',formatter:formatterData">录入时间</th>-->
+                    <th data-options="field:'trackUpdate',width:'160px',align:'center',formatter:formatterData">最后一次运单变更时间</th>
+                    <!--<th data-options="field:'updatDate',width:'160px',align:'center',formatter:formatterData">最后一次抓取时间</th>-->
+                    <th data-options="field:'deliveredTime',width:'160px',align:'center',formatter:formatterData">运单完成时间</th>
+                    <th data-options="field:'d',width:'160px',align:'center',formatter:formatterOperation"">操作</th>
+                    <th data-options="field:'sourceType',width:'150px',align:'center',formatter:formatterSourceType">物流信息</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+    </body>
+    
+    <script type="text/javascript">
+	    $(function(){
+	    	$.ajax({
+    		   type: "GET",
+    		   url: "/cbtconsole/tabtrackinfo/querywaringnum.do?startDate=" + $("#nowdate1").val() + "&endDate=" + $("#nowdate2").val(),
+    		   dataType:"json",
+    		   success: function(msg){
+    		     var waringtext = "最近<strong>60</strong>天预警信息 (0-总预警条数:<span>" + msg.waring0
+    		    		 + "</span>条; 1-物流问题:<span>" + msg.waring1
+    		    		 + "</span>条; 2-交期超时:<span>" + msg.waring2
+    		    		 + "</span>条; 4-退回:<span>" + msg.waring4
+    		    		 + "</span>条; 5-异常:<span>" + msg.waring5
+    		    		 + "</span>条; 6-内部异常:<span>" + msg.waring6
+    		    		 + "</span>条;)"
+    		     $("#waring_id").html(waringtext);
+    		   }
+    		});
+	    });
+    </script>
+
+</html>

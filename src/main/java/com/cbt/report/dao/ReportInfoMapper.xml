@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.ReportInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.ReportInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="breport_id" property="breportId" jdbcType="INTEGER" />
+    <result column="total_expenditure" property="totalExpenditure" jdbcType="DOUBLE" />
+    <result column="total_revenue" property="totalRevenue" jdbcType="DOUBLE" />
+    <result column="goods_count" property="goodsCount" jdbcType="INTEGER" />
+    <result column="average_price" property="averagePrice" jdbcType="DOUBLE" />
+    <result column="invalid_purchase_num" property="invalidPurchaseNum" jdbcType="INTEGER" />
+    <result column="profit_loss" property="profitLoss" jdbcType="DOUBLE" />
+    <result column="genral_report_id" property="genralReportId" jdbcType="INTEGER" />
+    <result column="categroy_num" property="categroyNum" jdbcType="INTEGER" />
+    <result column="order_num" property="orderNum" jdbcType="INTEGER" />
+    <result column="freight" property="freight" jdbcType="DOUBLE" />
+    <result column="packageFee" property="packageFee" jdbcType="DOUBLE" />
+    <result column="buyCount" property="buyCount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, breport_id, total_expenditure, total_revenue, goods_count, average_price, invalid_purchase_num, 
+    profit_loss, genral_report_id, categroy_num, order_num
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.pojo.ReportInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from report_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from report_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.pojo.ReportInfoExample" >
+    delete from report_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.pojo.ReportInfo" >
+    insert into report_info (id, breport_id, total_expenditure, 
+      total_revenue, goods_count, average_price, 
+      invalid_purchase_num, profit_loss, genral_report_id, 
+      categroy_num, order_num)
+    values (#{id,jdbcType=INTEGER}, #{breportId,jdbcType=INTEGER}, #{totalExpenditure,jdbcType=DOUBLE}, 
+      #{totalRevenue,jdbcType=DOUBLE}, #{goodsCount,jdbcType=INTEGER}, #{averagePrice,jdbcType=DOUBLE}, 
+      #{invalidPurchaseNum,jdbcType=INTEGER}, #{profitLoss,jdbcType=DOUBLE}, #{genralReportId,jdbcType=INTEGER}, 
+      #{categroyNum,jdbcType=INTEGER}, #{orderNum,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.pojo.ReportInfo" >
+    insert into report_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="breportId != null" >
+        breport_id,
+      </if>
+      <if test="totalExpenditure != null" >
+        total_expenditure,
+      </if>
+      <if test="totalRevenue != null" >
+        total_revenue,
+      </if>
+      <if test="goodsCount != null" >
+        goods_count,
+      </if>
+      <if test="averagePrice != null" >
+        average_price,
+      </if>
+      <if test="invalidPurchaseNum != null" >
+        invalid_purchase_num,
+      </if>
+      <if test="profitLoss != null" >
+        profit_loss,
+      </if>
+      <if test="genralReportId != null" >
+        genral_report_id,
+      </if>
+      <if test="categroyNum != null" >
+        categroy_num,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="freight != null" >
+        freight,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="breportId != null" >
+        #{breportId,jdbcType=INTEGER},
+      </if>
+      <if test="totalExpenditure != null" >
+        #{totalExpenditure,jdbcType=DOUBLE},
+      </if>
+      <if test="totalRevenue != null" >
+        #{totalRevenue,jdbcType=DOUBLE},
+      </if>
+      <if test="goodsCount != null" >
+        #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="averagePrice != null" >
+        #{averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="invalidPurchaseNum != null" >
+        #{invalidPurchaseNum,jdbcType=INTEGER},
+      </if>
+      <if test="profitLoss != null" >
+        #{profitLoss,jdbcType=DOUBLE},
+      </if>
+      <if test="genralReportId != null" >
+        #{genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="categroyNum != null" >
+        #{categroyNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=INTEGER},
+      </if>
+      <if test="freight != null" >
+        #{freight,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.pojo.ReportInfoExample" resultType="java.lang.Integer" >
+    select count(*) from report_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update report_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.breportId != null" >
+        breport_id = #{record.breportId,jdbcType=INTEGER},
+      </if>
+      <if test="record.totalExpenditure != null" >
+        total_expenditure = #{record.totalExpenditure,jdbcType=DOUBLE},
+      </if>
+      <if test="record.totalRevenue != null" >
+        total_revenue = #{record.totalRevenue,jdbcType=DOUBLE},
+      </if>
+      <if test="record.goodsCount != null" >
+        goods_count = #{record.goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.averagePrice != null" >
+        average_price = #{record.averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.invalidPurchaseNum != null" >
+        invalid_purchase_num = #{record.invalidPurchaseNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.profitLoss != null" >
+        profit_loss = #{record.profitLoss,jdbcType=DOUBLE},
+      </if>
+      <if test="record.genralReportId != null" >
+        genral_report_id = #{record.genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="record.categroyNum != null" >
+        categroy_num = #{record.categroyNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderNum != null" >
+        order_num = #{record.orderNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update report_info
+    set id = #{record.id,jdbcType=INTEGER},
+      breport_id = #{record.breportId,jdbcType=INTEGER},
+      total_expenditure = #{record.totalExpenditure,jdbcType=DOUBLE},
+      total_revenue = #{record.totalRevenue,jdbcType=DOUBLE},
+      goods_count = #{record.goodsCount,jdbcType=INTEGER},
+      average_price = #{record.averagePrice,jdbcType=DOUBLE},
+      invalid_purchase_num = #{record.invalidPurchaseNum,jdbcType=INTEGER},
+      profit_loss = #{record.profitLoss,jdbcType=DOUBLE},
+      genral_report_id = #{record.genralReportId,jdbcType=INTEGER},
+      categroy_num = #{record.categroyNum,jdbcType=INTEGER},
+      order_num = #{record.orderNum,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.ReportInfo" >
+    update report_info
+    <set >
+      <if test="breportId != null" >
+        breport_id = #{breportId,jdbcType=INTEGER},
+      </if>
+      <if test="totalExpenditure != null" >
+        total_expenditure = #{totalExpenditure,jdbcType=DOUBLE},
+      </if>
+      <if test="totalRevenue != null" >
+        total_revenue = #{totalRevenue,jdbcType=DOUBLE},
+      </if>
+      <if test="goodsCount != null" >
+        goods_count = #{goodsCount,jdbcType=INTEGER},
+      </if>
+      <if test="averagePrice != null" >
+        average_price = #{averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="invalidPurchaseNum != null" >
+        invalid_purchase_num = #{invalidPurchaseNum,jdbcType=INTEGER},
+      </if>
+      <if test="profitLoss != null" >
+        profit_loss = #{profitLoss,jdbcType=DOUBLE},
+      </if>
+      <if test="genralReportId != null" >
+        genral_report_id = #{genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="categroyNum != null" >
+        categroy_num = #{categroyNum,jdbcType=INTEGER},
+      </if>
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.pojo.ReportInfo" >
+    update report_info
+    set breport_id = #{breportId,jdbcType=INTEGER},
+      total_expenditure = #{totalExpenditure,jdbcType=DOUBLE},
+      total_revenue = #{totalRevenue,jdbcType=DOUBLE},
+      goods_count = #{goodsCount,jdbcType=INTEGER},
+      average_price = #{averagePrice,jdbcType=DOUBLE},
+      invalid_purchase_num = #{invalidPurchaseNum,jdbcType=INTEGER},
+      profit_loss = #{profitLoss,jdbcType=DOUBLE},
+      genral_report_id = #{genralReportId,jdbcType=INTEGER},
+      categroy_num = #{categroyNum,jdbcType=INTEGER},
+      order_num = #{orderNum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+   <!-- @author zlg 自定义 -->
+  <select id="selectByTime" parameterType="com.cbt.report.vo.StatisticalReportVo" resultMap="BaseResultMap" >
+	select count(DISTINCT orderid) orderNum,
+	count(usecount) goodsCount,
+	count(buycount) buyCount,
+	sum(goods_price) totalExpenditure,
+	sum(goods_p_price) totalRevenue,
+	count(DISTINCT category) categroyNum 
+	from
+	(select ops.od_id,ops.orderid,ops.goods_price,ops.usecount,ops.buycount,ac.category category
+	,ops.goods_p_price,ops.addtime 
+	from order_product_source ops,ali_category ac,goodsdata_expand_ex gee
+	where ops.goods_url =  gee.url and gee.catid1=ac.cid
+	and ops.addtime  between #{t.timeFrom,jdbcType=TIMESTAMP} AND #{t.timeTo,jdbcType=TIMESTAMP}
+	order by ops.addtime desc) tab
+  </select>
+  
+  <select id="selectOrderByTime" parameterType="com.cbt.report.vo.StatisticalReportVo" resultMap="BaseResultMap" >
+	select 
+        sum(acture_fee) freight,
+		sum(package_fee) packageFee,
+		count(orderid) orderNum,
+		sum(usecount) goodsCount,
+		sum(buycount1) buycount,
+		sum(goods_price) totalExpenditure,
+		sum(goods_p_price) totalRevenue
+ from
+(SELECT
+		acture_fee acture_fee,
+		package_fee package_fee,
+		orderid orderid,
+		count(usecount) usecount,
+		count(buycount) buycount1,
+		sum(goods_price) goods_price,
+		sum(goods_p_price) goods_p_price
+	FROM
+		(
+			SELECT
+				ops.orderid,
+				ops.goods_price,
+				ops.usecount,
+				ops.buycount,
+				ops.goods_p_price,
+				ops.addtime
+			FROM
+				order_product_source ops
+			WHERE
+				1 = 1
+             and ops.addtime  between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+		) tab,
+		order_fee of
+	WHERE
+		of.orderno = tab.orderid
+	GROUP BY
+		orderid) tt
+  </select>
+  
+  <select id="selectByGeneral" parameterType="com.cbt.pojo.GeneralReport"  resultType="com.cbt.pojo.ReportInfo">
+    select total_expenditure totalExpenditure,
+    total_revenue totalRevenue,
+    goods_count goodsCount,
+    average_price averagePrice,
+    profit_loss profitLoss,
+    categroy_num categroyNum,
+    order_num orderNum,
+    freight freight
+    FROM report_info ri,general_report gr
+	where ri.genral_report_id = gr.id
+	<if test="breportId != null" >
+        and gr.breport_id = #{breportId,jdbcType=INTEGER}
+    </if>
+	<if test="reportYear != null" >
+        and report_year = #{reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="reportMonth != null" >
+        and report_month = #{reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="reportWeek != null" >
+        and report_week = #{reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="reportDay != null" >
+        and report_day = #{reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="reportDay == null" >
+        and report_day is null
+    </if>
+  </select>
+  <select id="getCategoryReport" resultType="com.cbt.pojo.StatisticalReportPojo">
+  SELECT a.* FROM (
+  SELECT c.en_name,c.category_id,
+  CAST(SUM(od.yourorder*od.goodsprice)*6.3 AS DECIMAL(18,2)) AS salesAmount,
+  CAST(SUM(od.yourorder*od.goodsprice)*6.3/SUM(od.yourorder) AS DECIMAL(18,2)) AS avgSalesPrice,
+  CAST(sum(ops.buycount*ops.goods_p_price) AS DECIMAL(18,2)) AS buyAmount,
+  SUM(od.yourorder) AS salesCount,SUM(ops.buycount) AS buyCount,
+    CAST((SUM(od.yourorder*od.goodsprice)*6.3-sum(ops.buycount*ops.goods_p_price))/sum(od.yourorder*od.goodsprice)*6.3/100 AS DECIMAL(18,2))  AS   profitLoss
+  FROM order_details od
+  INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+  INNER JOIN 1688_category c ON od.goodscatid=c.category_id
+  left JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+  WHERE od.state&lt;2 AND oi.state>0 AND oi.state&lt;6 AND c.category_id&lt;>0
+    <if test="time != null">
+      and left(oi.create_time,7)=#{time}
+    </if>
+  GROUP BY od.goodscatid
+  ) a ORDER BY
+    <choose>
+      <when test="orderName == 'sales_volumes'">
+        a.salesCount
+      </when>
+      <when test="orderName == 'sales_price'">
+        a.salesAmount
+      </when>
+      <otherwise>
+        a.profitLoss
+      </otherwise>
+    </choose>
+  DESC
+  limit ${page},20;
+</select>
+  <select id="getCategoryReportCount" resultType="com.cbt.pojo.StatisticalReportPojo">
+    SELECT a.* FROM (
+    SELECT c.en_name,c.category_id,
+    CAST(SUM(od.yourorder*od.goodsprice)*6.3 AS DECIMAL(18,2)) AS salesAmount,
+    CAST(SUM(od.yourorder*od.goodsprice)*6.3/SUM(od.yourorder) AS DECIMAL(18,2)) AS avgSalesPrice,
+    CAST(sum(ops.buycount*ops.goods_p_price) AS DECIMAL(18,2)) AS buyAmount,
+    SUM(od.yourorder) AS salesCount,SUM(ops.buycount) AS buyCount,
+    CAST((SUM(od.yourorder*od.goodsprice)*6.3-sum(ops.buycount*ops.goods_p_price))/sum(od.yourorder*od.goodsprice)*6.3/100 AS DECIMAL(18,2))  AS   profitLoss
+    FROM order_details od
+    INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+    INNER JOIN 1688_category c ON od.goodscatid=c.category_id
+    left JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+    WHERE od.state&lt;2 AND oi.state>0 AND oi.state&lt;6 AND c.category_id&lt;>0
+    <if test="time != null">
+      and left(oi.create_time,7)=#{time}
+    </if>
+    GROUP BY od.goodscatid
+    ) a ORDER BY
+    <choose>
+      <when test="orderName == 'sales_volumes'">
+        a.salesCount
+      </when>
+      <when test="orderName == 'sales_price'">
+        a.salesAmount
+      </when>
+      <otherwise>
+        a.profitLoss
+      </otherwise>
+    </choose>
+    DESC
+  </select>
+  <select id="getAllCategoryReport" resultType="com.cbt.pojo.StatisticalReportPojo">
+    SELECT COUNT(a.category_id) AS cateAmount,SUM(a.buyAmount) AS buyAmount,SUM(salesAmount) AS salesAmount,SUM(salesCount) AS salesCount,CAST(SUM(salesAmount)/SUM(a.salesCount) AS DECIMAL(18,2)) AS avgSalesPrice,
+    CAST((SUM(salesAmount)-SUM(a.buyAmount))/SUM(salesAmount) AS DECIMAL(18,2)) AS profitLoss FROM (
+    SELECT c.en_name,c.category_id, CAST(SUM(od.yourorder*od.goodsprice)*6.3 AS DECIMAL(18,2)) AS salesAmount,
+    CAST(SUM(od.yourorder*od.goodsprice)*6.3/SUM(od.yourorder) AS DECIMAL(18,2)) AS avgSalesPrice, CAST(sum(ops.buycount*ops.goods_p_price) AS DECIMAL(18,2)) AS buyAmount,
+    SUM(od.yourorder) AS salesCount,SUM(ops.buycount) AS buyCount, CAST((SUM(od.yourorder*od.goodsprice)*6.3-sum(ops.buycount*ops.goods_p_price))/sum(od.yourorder*od.goodsprice)*6.3/100 AS DECIMAL(18,2)) AS profitLoss
+    FROM order_details od
+    INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+    INNER JOIN 1688_category c ON od.goodscatid=c.category_id
+    LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+    WHERE od.state&lt;2 AND oi.state>0 AND oi.state&lt;6 AND c.category_id&lt;>0
+    <if test="time != null">
+      and left(oi.create_time,7)=#{time}
+    </if>
+     GROUP BY od.goodscatid ) a
+  </select>
+</mapper>

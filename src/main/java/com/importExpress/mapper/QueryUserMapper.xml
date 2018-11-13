@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.QueryUserMapper">
+	
+	<!-- List<String> queryDropShipUserId(); -->
+	<select id="queryDropShipUserId" resultType="String">
+		SELECT oi.user_id FROM(
+			SELECT DISTINCT user_id FROM orderinfo WHERE isDropshipOrder = 1 AND state > 0
+		) oi 
+		, `user` tem WHERE oi.user_id = tem.id 
+		AND
+		(
+			tem.email not like '%qq.com%' and tem.email not like '%ww.com%' and 
+			tem.email not like 'test%'   and  tem.email not like '%qq.ss' and tem.email not like '%@q.ocm' and 
+			tem.email not like '%qqsss.com' and  tem.email not like '%csmfg.com%'  and  tem.email not like '%@sourcing-cn.com%'  and 
+			tem.email not like '%@china-synergy%'  and tem.email <![CDATA[ <> ]]> 'sb33@gmail.com'  and tem.email  <![CDATA[ <> ]]>  'sbtest@gmail.com'  and 
+			tem.email not like '%@qq.co%' and tem.email not like '%11.com' and tem.email not like '%@qq.ocm' and tem.email not like '%@163.com' 
+		)
+    </select>
+    
+    <!-- List<String> queryCarGoods(); -->
+    <select id="queryCarGoods" resultType="String">
+    	SELECT CONCAT(userid,'@',updateTime) 
+    	FROM goods_carconfig 
+    	WHERE userid is not null AND LENGTH(shopCarShowinfo) > 5
+    </select>
+    
+    <!-- void insertStaticizeData(List<ItemStaticFile> list); -->
+	<insert id="insertStaticizeData" parameterType="list">
+    	<!-- 清空临时表中原本数据 之后重新生成 -->
+    	TRUNCATE TABLE staticize_goods_html_sel;
+    	<!-- 查询数据 -->
+    	INSERT INTO staticize_goods_html_sel (item_static_file , create_time, createdate)
+    	VALUES
+    	<foreach collection="list" separator="," item="item">
+    		(#{item.itemStaticFile}, #{item.createTime}, NOW())
+    	</foreach>
+    	;
+    	<!-- 更新pid -->
+		UPDATE staticize_goods_html_sel
+		SET pid = SUBSTRING_INDEX(SUBSTRING_INDEX(item_static_file,'-',-1),'.',1);
+		<!-- 更新catid1字段 -->
+		UPDATE staticize_goods_html_sel a, custom_benchmark_ready b
+		SET a.catid1 = b.catid1
+		WHERE a.pid = b.pid;
+    </insert>
+    
+	<!-- String queryStaticizeTime(); -->
+    <select id="queryStaticizeTime" resultType="String">
+        SELECT createdate
+		FROM staticize_goods_html_sel
+		LIMIT 1
+    </select>
+    
+    <!-- List<String> queryRandomUser(@Param("startDate") String startDate, @Param("endDate") String endDate, @Param("haveOrder") boolean haveOrder) -->
+	<select id="queryRandomUser" resultType="String">
+		SELECT uu.id FROM(
+			SELECT tem.id FROM `user` tem 
+			WHERE 1=1
+			<if test="endDate != null and endDate != ''">
+                AND #{endDate} >= tem.createtime
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND tem.createtime >= #{startDate}
+            </if>
+			AND
+			(
+				tem.email not like '%qq.com%' and tem.email not like '%ww.com%' and 
+				tem.email not like 'test%'   and  tem.email not like '%qq.ss' and tem.email not like '%@q.ocm' and 
+				tem.email not like '%qqsss.com' and  tem.email not like '%csmfg.com%'  and  tem.email not like '%@sourcing-cn.com%'  and 
+				tem.email not like '%@china-synergy%'  and tem.email <![CDATA[ <> ]]> 'sb33@gmail.com'  and tem.email <![CDATA[ <> ]]> 'sbtest@gmail.com'  and 
+				tem.email not like '%@qq.co%' and tem.email not like '%11.com' and tem.email not like '%@qq.ocm' and tem.email not like '%@163.com' 
+			)
+		) uu
+		<if test="haveOrder">
+			, orderinfo oi
+			WHERE uu.id = oi.user_id AND state > 0
+		</if>
+	</select>
+	
+	<!-- List<String> queryLoginUser(List<String> list); -->
+	<select id="queryLoginUser" parameterType="list"  resultType="String">
+        SELECT 
+			concat(<![CDATA[ "https://www.import-express.com/simulateLogin/login?userName=" ]]>, id, <![CDATA[ "&password=" ]]>, name, <![CDATA[ "&currency=USD" ]]>) loginurl 
+		FROM `user` WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    
+    <!-- List<String> queryUserByPrice(@Param("price") Integer price); -->
+    <select id="queryUserByPrice" resultType="String">
+    	SELECT 
+		concat(<![CDATA[ "https://www.import-express.com/simulateLogin/login?userName=" ]]>, a.user_id, <![CDATA[ "&password=" ]]>, tem.name, <![CDATA[ "&total=" ]]>, a.total, <![CDATA[ "&currency=USD" ]]>) loginurl 
+		FROM
+		(SELECT user_id,SUM(pay_price) total FROM orderinfo WHERE state > 0 GROUP BY user_id HAVING SUM(pay_price) >= #{price}) a,
+		`user` tem 
+		WHERE a.user_id = tem.id
+		AND
+		(
+			tem.email not like '%qq.com%' and tem.email not like '%ww.com%' and 
+			tem.email not like 'test%'   and  tem.email not like '%qq.ss' and tem.email not like '%@q.ocm' and 
+			tem.email not like '%qqsss.com' and  tem.email not like '%csmfg.com%'  and  tem.email not like '%@sourcing-cn.com%'  and 
+			tem.email not like '%@china-synergy%'  and tem.email <![CDATA[ <> ]]> 'sb33@gmail.com'  and tem.email <![CDATA[ <> ]]> 'sbtest@gmail.com'  and 
+			tem.email not like '%@qq.co%' and tem.email not like '%11.com' and tem.email not like '%@qq.ocm' and tem.email not like '%@163.com' 
+		)
+    </select>
+    
+    <!-- List<Map<String, Object>> queryUserName(List<String> userIdList); -->
+    <select id="queryUserName" parameterType="list"  resultType="map">
+        SELECT 
+			id, name
+		FROM `user` WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    
+    <!-- List<GoodsInfoSpiderPO> queryMarkedList(@Param("rows") Integer rows, @Param("orderby") String orderby); -->
+    <select id="queryMarkedList" resultType="com.importExpress.pojo.GoodsInfoSpiderPO">
+        SELECT id, pid, ali_pid aliPid, price, ali_price aliPrice, img_path imgPath, ali_img_path aliImgPath, flag, marked
+		FROM tmp_goods_info_180905_spider 
+		WHERE flag in (1,3) AND marked = 0
+		<if test="orderby == 'desc'">
+			ORDER BY id DESC
+		</if>
+		LIMIT #{rows}
+    </select>
+    
+    <!-- void updateMarkedById(@Param("id") Long id, @Param("marked") Integer marked); -->
+    <update id="updateMarkedById">
+    	UPDATE tmp_goods_info_180905_spider SET marked=#{marked} WHERE id=#{id}
+    </update>
+    
+    <!-- Long queryNoMarkedTotal(); -->
+    <select id="queryNoMarkedTotal" resultType="long">
+        SELECT count(1)
+		FROM tmp_goods_info_180905_spider 
+		WHERE flag in (1,3) AND marked = 0
+    </select>
+    
+    <!-- List<ItemStaticFile> queryStaticizeData(); -->
+    <select id="queryStaticizeData" resultType="com.importExpress.pojo.ItemStaticFile">
+        SELECT item_static_file itemStaticFile, create_time createTime 
+		FROM staticize_goods_html
+    </select>
+    
+    <!-- void createStandardGoodsForm(); -->
+    <insert id="createStandardGoodsForm">
+    	<!-- 清空临时表中原本数据 之后重新生成 -->
+    	TRUNCATE TABLE standard_goods_form_data;
+    	<!-- range_price 价格 -->	
+		INSERT IGNORE INTO crossshop.standard_goods_form_data (bm_flag,pid, wprice, feeprice, range_price, online_price, online_ali_price, ali_price, valid, ali_pid, createtime)  
+		SELECT bm_flag,pid,wprice,feeprice,range_price,SUBSTRING_INDEX(range_price, '-', 1) online_price,SUBSTRING_INDEX(ali_price, '-', 1) online_ali_price,ali_price,valid, ali_pid, NOW() createtime
+		FROM custom_benchmark_ready
+		WHERE valid != 0 AND (range_price IS NOT NULL AND range_price != '') AND (bm_flag=1 || isBenchmark=1) and ali_weight>0;
+		<!-- 有feeprice价格 用feeprice价格 -->
+		INSERT IGNORE INTO crossshop.standard_goods_form_data (bm_flag, pid, wprice, feeprice, range_price, online_price, online_ali_price, ali_price, valid, ali_pid, createtime)  
+		SELECT a.bm_flag,a.pid,a.wprice,a.feeprice,a.range_price,REPLACE(SUBSTRING_INDEX(a.b_wprice, ' $ ', -1),']','') online_price,SUBSTRING_INDEX(a.ali_price, '-', 1) online_ali_price,a.ali_price,a.valid, a.ali_pid, NOW() createtime
+		FROM (
+		SELECT bm_flag,pid,
+		wprice,
+		feeprice,
+		SUBSTRING_INDEX(feeprice, ',', 1) b_wprice,
+		range_price,ali_price,valid,ali_pid FROM custom_benchmark_ready
+		WHERE valid != 0 AND (range_price IS NULL OR range_price = '') AND (bm_flag=1 || isBenchmark=1) and ali_weight>0 
+		AND (feeprice IS NOT NULL AND feeprice != '' AND feeprice !='[]')
+		) a;
+		<!-- 无feeprice价格 有wprice 价格  用wprice价格 -->
+		INSERT IGNORE INTO crossshop.standard_goods_form_data (bm_flag,pid, wprice, feeprice, range_price, online_price, online_ali_price, ali_price, valid, ali_pid, createtime)  
+		SELECT a.bm_flag,a.pid,a.wprice,a.feeprice,a.range_price,REPLACE(SUBSTRING_INDEX(a.b_wprice, ' $ ', -1),']','') online_price,SUBSTRING_INDEX(a.ali_price, '-', 1) online_ali_price,a.ali_price,a.valid, a.ali_pid,NOW() createtime
+		FROM (
+		SELECT bm_flag,pid,
+		wprice,
+		feeprice,
+		SUBSTRING_INDEX(wprice, ',', 1) b_wprice,
+		range_price,ali_price,valid,ali_pid FROM custom_benchmark_ready
+		WHERE valid != 0 AND (range_price IS NULL OR range_price = '') AND (bm_flag=1 || isBenchmark=1) and ali_weight>0 
+		AND (feeprice IS NULL OR feeprice = '' OR feeprice ='[]')
+		AND (wprice IS NOT NULL AND wprice != '' AND wprice !='[]') 
+		) a;
+		<!-- 无feeprice价格 无wprice 价格  用price价格 -->
+		INSERT IGNORE INTO crossshop.standard_goods_form_data (bm_flag, pid, wprice, feeprice, range_price, online_price, online_ali_price, ali_price, valid, ali_pid, createtime)  
+		SELECT a.bm_flag,a.pid,a.wprice,a.feeprice,a.range_price,price online_price,SUBSTRING_INDEX(a.ali_price, '-', 1) online_ali_price,a.ali_price,a.valid, a.ali_pid,NOW() createtime
+		FROM (
+		SELECT bm_flag,pid,
+		wprice,
+		feeprice,
+		price,
+		range_price,ali_price,valid,ali_pid FROM custom_benchmark_ready
+		WHERE valid != 0 AND (range_price IS NULL OR range_price = '') AND (bm_flag=1 || isBenchmark=1) and ali_weight>0
+		AND (feeprice IS NULL OR feeprice = '' OR feeprice ='[]')
+		AND (wprice IS NULL OR wprice = '' OR wprice ='[]') 
+		) a;
+		<!-- 更新标识 	对标商品中，我司价格 劣势（贵 10%）的产品-->
+		UPDATE standard_goods_form_data 
+		SET flag = 2
+		WHERE online_price >= online_ali_price * 1.1;
+		<!-- 更新标识 	对标商品中，我司价格 有明显优势（便宜20%）的产品-->
+		UPDATE standard_goods_form_data 
+		SET flag = 1
+		WHERE online_ali_price * 0.8 >= online_price;
+    </insert>
+    
+    <!-- String queryCreatetime(); -->
+    <select id="queryCreatetime" resultType="String">
+    	SELECT createtime FROM standard_goods_form_data LIMIT 1
+    </select>
+    
+    <!-- List<StandardGoodsFormDataPO> queryStandardGoodsFormList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("flag") Integer flag, @Param("bmFlag") Integer bmFlag, @Param("valid") Integer valid); -->
+	<select id="queryStandardGoodsFormList" resultType="com.importExpress.pojo.StandardGoodsFormDataPO">
+		SELECT id, pid, wprice, feeprice, range_price rangePrice, online_price onlinePrice, online_ali_price onlineAliPrice, ali_pid aliPid, ali_price aliPrice, valid, createtime, flag, bm_flag bmFlag
+		FROM standard_goods_form_data
+		<where>
+			<if test="valid != null">
+				 valid = #{valid}
+			</if>
+			<if test="flag != null">
+				 AND flag = #{flag}
+			</if>
+			<if test="bmFlag != null">
+				 AND bm_flag = #{bmFlag}
+			</if>
+		</where>
+		LIMIT #{startBars},#{rows}
+    </select>
+
+	<!-- Long queryStandardGoodsFormCount(@Param("flag") int flag, @Param("bmFlag") int bmFlag, @Param("valid") int valid); -->
+	<select id="queryStandardGoodsFormCount" resultType="long">
+		SELECT COUNT(1)
+		FROM standard_goods_form_data
+		<where>
+			<if test="valid != null">
+				 valid = #{valid}
+			</if>
+			<if test="flag != null">
+				 AND flag = #{flag}
+			</if>
+			<if test="bmFlag != null">
+				 AND bm_flag = #{bmFlag}
+			</if>
+		</where>
+    </select>
+    
+    <!-- Long queryNoStandardGoodsFormCount(); -->
+    <select id="queryNoStandardGoodsFormCount" resultType="long">
+		SELECT COUNT(1)
+		FROM custom_benchmark_ready a
+		WHERE  a.valid=1 AND a.isBenchmark=2
+			AND ( a.path_catid LIKE '311%'
+			OR a.path_catid LIKE '312%'
+			OR a.path_catid LIKE '10165%'
+			OR a.path_catid LIKE '10166%'
+			OR a.path_catid LIKE '54%')
+    </select>
+    
+    <!-- AuthInfo queryAuthInfo(Integer authId); -->
+    <select id="queryAuthInfo" resultType="com.cbt.website.userAuth.bean.AuthInfo">
+    	SELECT authId,authName,url,reMark,orderNo,module_type moduleType 
+    	FROM tbl_auth_info 
+    	WHERE authId = #{authId}
+    </select>
+	
+</mapper>

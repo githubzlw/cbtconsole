@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.KeywordCatidRecordMapper">
+	<resultMap type="com.importExpress.pojo.KeywordCatidRecordBean" id="BaseResultMap">
+		<id column="id" property="id"/>
+		<result column="keyword" property="keyword"/>
+		<result column="count" property="count"/>
+		<result column="catid1" property="catid1"/>
+		<result column="catid2" property="catid2"/>
+		<result column="catid3" property="catid3"/>
+		<result column="catname1" property="catname1"/>
+		<result column="catname2" property="catname2"/>
+		<result column="catname3" property="catname3"/>
+		<result column="keyword1" property="keyword1"/>
+		<result column="issyn" property="issyn"/>
+	</resultMap>
+	
+	<select id="getList" resultMap="BaseResultMap">
+		select id,keyword,count,(select name from 1688_category where category_id=catid1) catid1,(select name from 1688_category where category_id=catid2) catid2,
+		(select name from 1688_category where category_id=catid3) catid3,keyword1,issyn from synonym where isDelete=0
+		<if test="keyword != null">
+			and keyword like CONCAT('%', #{keyword}, '%') 
+		</if>
+		order by id desc limit #{offset},#{pageSize} 
+	</select>
+	
+	<select id="getCount" resultType="Integer">
+		select count(id) from synonym where 1=1
+		<if test="keyword != null">
+			and keyword like CONCAT('%', #{keyword}, '%') 
+		</if>
+	</select>
+	
+	<insert id="addKeyword" parameterType="com.importExpress.pojo.KeywordCatidRecordBean">
+		insert into synonym(keyword,catid1,catid2,catid3,keyword1,issyn)
+		values (#{keyword},#{catid1},#{catid2},#{catid3},#{keyword1},#{issyn})
+	</insert>
+	
+	<select id="getDetail" resultMap="BaseResultMap">
+		select id,keyword,count,catid1,(select name from 1688_category where category_id=catid1) catname1,catid2,(select name from 1688_category where category_id=catid2) catname2,catid3,(select name from 1688_category where category_id=catid3) catname3,keyword1,issyn from synonym where id=#{id} limit 1
+	</select>
+	
+	<update id="updateKeyword" parameterType="com.importExpress.pojo.KeywordCatidRecordBean">
+		update synonym set keyword=#{keyword},catid1=#{catid1},catid2=#{catid2},catid3=#{catid3},keyword1=#{keyword1},issyn=#{issyn} where id=#{id}
+	</update>
+	
+	<update id="delKeyword">
+		update synonym set isDelete=1 where id=#{id}
+	</update>
+	
+	<update id="updateSyn">
+		update synonym set issyn=#{issyn} where id=#{id}
+	</update>
+	
+	<select id="getKeyword1s" resultType="hashmap">
+		SELECT GROUP_CONCAT(keyword,';',keyword1) as keyword1  FROM synonym WHERE isDelete=0 AND issyn=1 AND keyword1 IS NOT NULL AND keyword1 != ''GROUP BY id
+	</select>
+	
+	<select id="getCountByKeyword" resultType="int">
+		select count(id) from synonym where isDelete=0 and keyword=#{keyword}
+	</select>
+	
+	<select id="getCountByKeyword1" resultType="int">
+		select count(id) from synonym where isDelete=0 and keyword=#{keyword} and id!=#{id}
+	</select>
+	
+	<select id="getCategorys" resultType="hashmap">
+		select id,lv,category_id,name,path,parent_id from 1688_category order by id asc
+	</select>
+
+</mapper>

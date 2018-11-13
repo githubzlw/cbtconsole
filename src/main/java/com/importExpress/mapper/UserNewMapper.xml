@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.UserNewMapper" >
+  
+  <resultMap id="UserBeanResultMap" type="com.importExpress.pojo.UserBean" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="pass" property="pass" />
+    <result column="applicable_credit" property="applicable_credit" />
+    <result column="email" property="email" />
+    <result column="picture" property="picture" />
+    <result column="area" property="area" />
+    <result column="country" property="countryName" />
+    <result column="available_m" property="availableM" />
+    <result column="firstdiscount" property="firstDiscount" />
+    <!--
+    <result column="available_m" property="availableM" />
+    <result column="updated" property="updated" />
+    <result column="ac_there" property="acThere" />
+    <result column="adminname" property="adminname" />
+    <result column="niceName" property="niceName" />
+     -->
+    
+    <result column="activationState" property="activationState" />
+    <result column="activationCode" property="activationCode" />
+    <result column="activationTime" property="activationTime" />
+    <result column="activationPassTime" property="activationPassTime" />
+    <result column="activationPassCode" property="activationPassCode" />
+    <result column="createtime" property="createtime" />
+    <result column="currency" property="currency" />
+    <result column="businessName" property="businessName" />
+    <result column="countryId" property="countryId" />
+    <result column="user_category" property="userCategory" />
+    <result column="signkey" property="signkey" />
+      <result column="signkey" property="signkey" />
+      <result column="businessIntroduction" property="businessIntroduction" />
+  </resultMap>
+  
+  <resultMap id="UserCouponBeanResultMap" type="com.importExpress.pojo.UserCouponBean" >
+    <id column="id" property="id" />
+    <result column="endtime" property="endtime" />
+    <result column="percentage" property="percentage" />
+    <result column="maxdis" property="maxdis" />
+    <result column="state" property="state" />
+  </resultMap>
+  
+  
+  
+  <insert id="regUser" useGeneratedKeys="true" parameterType="com.importExpress.pojo.UserBean">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert user(name,pass,email,activationCode,createtime,picture,activationState,activationTime,
+    currency,applicable_credit,businessName,countryId,user_category,isfastregistered,businessIntroduction)
+    	values (#{name}, #{pass}, #{email}, #{activationCode}, now(), #{picture},
+    	 #{activationState}, now(), #{currency}, #{applicable_credit}, #{businessName}, #{countryId}, #{userCategory},1,#{businessIntroduction})
+  </insert>
+  
+  <insert id="addDropShippApplay">
+    insert dropshippapply(user_id,website,email,phone_number,introduce,createtime)
+    	values (#{userId}, #{webSite}, #{email}, #{phoneNumber}, #{introduceYs},now())
+  </insert>
+  
+  <insert id="regGoogleUser" useGeneratedKeys="true" parameterType="com.importExpress.pojo.UserBean">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert user(name,email,activationCode,createtime,picture,activationState,activationTime,
+    currency,applicable_credit,businessName,countryId,user_category)
+    	select #{name}, #{email}, #{activationCode}, now(), #{picture},
+    	 #{activationState}, now(), #{currency}, #{applicable_credit}, #{businessName}, #{countryId}, #{userCategory}
+    	 FROM DUAL WHERE NOT EXISTS (SELECT * FROM user WHERE email=#{email} or name=#{name})
+  </insert>
+  
+  <update id="updateReg">
+  	update user set businessName=#{businessName} ,email=#{email},pass=#{pass1},name=#{email} where id=#{id}
+  </update>
+    <update id="updateUserInfo">
+        update user set
+        <choose>
+            <when test="businessName !=''">
+                businessName=#{businessName} ,
+            </when>
+        </choose>
+        <choose>
+            <when test="businessIntroduction != ''">
+                businessIntroduction=#{businessIntroduction},
+            </when>
+        </choose>
+        <choose>
+            <when test="password != ''">
+                pass=#{password},
+            </when>
+        </choose>
+        isfastregistered=2
+        where id=#{userId}
+    </update>
+  <update id="updateName">
+  	update user set name=#{name} where id = #{id}
+  </update>
+  
+  <update id="updatePasswordByEmail">
+  	update user set pass=#{password},isfastregistered = 3 where email = #{email}
+  </update>
+  
+  <update id="updatePasswordByName">
+  	update user set pass=#{password} where name = #{name}
+  </update>
+  
+  <select id="getIdByName" resultType="Integer" parameterType="String">
+    select max(id) from user where  name like '%${name}%'  
+  </select>
+  
+  <select id="getIdByNameAndEmail" resultType="Integer">
+    select id from user where name = #{name} and email = #{email}
+  </select>
+  
+  <select id="getIdByNameOrEmail" resultType="Integer">
+    select id from user where name = #{name} or email = #{email} limit 1;
+  </select>
+  
+  <select id="getUserByEmail" resultMap="UserBeanResultMap" parameterType="String">
+    select user.id,name,activationState,activationCode,createtime,email,currency,countryId,user_category ,area,country ,signkey ,user.businessName
+    from user left join zone on zone.id=user.countryId  where (email = #{email} OR  name = #{email}) limit 1
+  </select>
+  
+   <select id="getUserForActivation" resultMap="UserBeanResultMap" parameterType="String">
+    select id,name,activationState,email,activationCode,activationTime,activationPassCode,
+    activationPassTime from user where email = #{email} limit 1
+  </select>
+  
+  
+  <select id="getNameByEmail" parameterType="String" resultType="String">
+    select name from user where email = #{email}  limit 1
+  </select>
+  
+  <select id="getPassByEmail" resultType="String">
+    select pass from user where email = #{email}  limit 1
+  </select>
+  
+  <select id="getUserById" resultMap="UserBeanResultMap" parameterType="Integer">
+    select * from user where id = #{id}
+  </select>
+  
+  <select id="getUserCoupon" resultMap="UserCouponBeanResultMap" parameterType="Integer">
+    select endtime,percentage,maxdis,state from user_coupon where userid =#{id} and state=0 and type=1 order by id desc limit 1
+  </select>
+  
+  <select id="getUserByNameAndPass" resultMap="UserBeanResultMap">
+      select user.id,name,activationState,activationCode,createtime,email,currency,countryId,user_category ,area,country 
+    from user left join zone on zone.id=user.countryId where (name = #{name} or email=#{name}) 
+    and pass = #{pass} limit 1
+  </select>
+  
+   <select id="getUserByUUID" resultMap="UserBeanResultMap">
+    select id,name,activationState,activationCode,createtime,email,currency,countryId,user_category 
+    from user where uuid=#{uuid} and date_add(uuidCreatetime, INTERVAL 3 day)> now()
+  </select>
+  
+  <update id="upUserState">
+  	update user set activationState=1 where email = #{email}
+  </update>
+  
+  <update id="upUserCountry">
+  	update user set countryId=#{countryId} where id = #{id}
+  </update>
+  
+   <update id="upEmail">
+  	update user set email=#{email},name=#{email},pass=#{password} where id=#{uid}
+  </update>
+
+    <update id="upPass">
+        update user set
+        <choose>
+            <when test="bName!=''">
+                businessName=#{bName},
+            </when>
+        </choose>
+        <choose>
+            <when test="bName!=''">
+                user_category=1,
+            </when>
+        </choose>
+        pass=#{password},isfastregistered =3 where id=#{uid}
+    </update>
+  
+  <update id="upUserActivationCode">
+  	update user set 
+  	<choose>
+  		<when test="state == 1">
+  			activationTime=now(),activationCode=#{activationCode} where email = #{email}
+  		</when>
+  		<otherwise>
+  			activationPassTime=now(),  activationPassCode=#{activationCode} where email = #{email}
+  		</otherwise>
+  	</choose>
+  </update>
+  
+  <insert id="facebookbound" useGeneratedKeys="true">
+    insert facebookbound(userid,facebook_id,datetime) values(#{userid}, #{facebookid},now())
+  </insert>
+  
+  <select id="getFacebookUser" resultMap="UserBeanResultMap" parameterType="String">
+    select user.id,name,activationState,activationCode,user.createtime,currency,countryId,user_category,area,country from 
+    facebookbound,user   left join zone on zone.id=user.countryId where facebookbound.userid=user.id and facebook_id = #{facebookid}
+  </select>
+  
+  <update id="upPrice_re">
+  	update user set available_m=available_m+(#{price}),hasRecharge = #{hasRecharge}   where id = #{userId}
+  </update>
+  <update id="upPrice">
+  	update user set available_m=available_m+(#{price}) where id = #{userId}
+  </update>
+  <update id="upCashBack">
+  	update user set cashback=0 where id = #{userId}
+  </update>
+  
+  <update id="upOrderInfoCashback">
+  	update orderinfo set cashback=0 where user_id=#{userId} and order_no !=#{orderNo}
+  </update>
+  
+  <update id="upUserFirstDiscount">
+  	update user set firstdiscount=0 where id = #{userId}
+  </update>
+
+  <update id="upOrderInfoFirstDiscount">
+  	update orderinfo set firstdiscount=0 where user_id=#{userId} and order_no !=#{orderNo}
+  </update>
+
+
+  <update id="dePrice">
+  	update user set available_m=available_m-(#{price})  where id = #{userId}
+  </update>
+  
+  <update id="upUserPrice">
+  	update user set available_m=available_m+(#{price}),applicable_credit=applicable_credit+(#{acprice})  where id = #{userId}
+  </update>
+  
+  <update id="upUserCouponStatus">
+  	update user_coupon set state=1,orderid=#{orderNo} where userid = #{userId} and type=1
+  </update>
+  
+  <select id="getUserPrice" resultType="hashmap" parameterType="Integer">
+    select available_m,applicable_credit from user where id = #{userId}
+  </select>
+  
+  <select id="getBalance_currency" resultType="hashmap" parameterType="Integer">
+    select available_m,currency from user where id = #{userId}
+  </select>
+  
+  <select id="getUserApplicableCredit" resultType="Double" parameterType="Integer">
+    select applicable_credit from user where id = #{userId}
+  </select>
+  
+  <update id="upUserApplicableCredit">
+  	update user set applicable_credit=#{acprice} where id = #{userId}
+  </update>
+  
+  <select id="getNameById" parameterType="Integer" resultType="String">
+    select name from user where id = #{userId}
+  </select>
+  
+  <select id="getEmailById" parameterType="Integer" resultType="String">
+    select email from user where id = #{userId}
+  </select>
+  
+  <select id="getUserIdByEmail" parameterType="String" resultType="Integer">
+    select id from user where email = #{email}
+  </select>
+  
+  <select id="getUserInfo" parameterType="Integer" resultMap="UserBeanResultMap">
+    select s.admName name,s.Email email from admin_r_user r inner join admuser 
+    s on r.adminid = s.id where r.userid = #{userId} limit 1
+  </select>
+  
+  <select id="getAdminUser" resultType="hashmap">
+  	select email,emailpass from admuser where 
+  	<choose>
+  		<when test="userId != 0">
+  			id=(select adminid from admin_r_user where userid=#{userId})
+  		</when>
+  		<when test="email != null and email != ''">
+  			( admname=#{email} or email=#{email} )
+  		</when>
+  		<otherwise>
+  			id = #{adminId}
+  		</otherwise>
+  	</choose>
+  </select>
+  
+  <select id="getUserFromId" parameterType="Integer" resultMap="UserBeanResultMap">
+    select * from user where id = #{userId}
+  </select>
+  <!-- 更新扩展用户联系方式 -->
+  <update id="updateUserEx"  parameterType="com.importExpress.pojo.UserEx">
+ 	update user_ex set otheremail=#{otheremail}, otherphone=#{otherphone}, 
+ 	whatsapp=#{whatsapp}, facebook=#{facebook}, tweater=#{tweater}, kiki=#{kiki}, 
+ 	skype =#{skype}
+ 	 where userid= #{userid}
+  </update>
+  <!-- 获取扩展用户联系方式 -->
+  <select id="getUserEx" parameterType="Integer" resultType="com.importExpress.pojo.UserEx">
+ 	select id, userid, otheremail, otherphone, whatsapp, facebook, tweater, kiki, skype 
+ 	from user_ex where userid= #{userid} limit 1
+  </select>
+  <!-- 根据userid删除UserEx -->
+  <delete id="deleteUserEx" parameterType="Integer">
+	delete from user_ex where userid= #{userid}
+  </delete>
+  <!-- 插入UserEx表数据 -->
+  <insert id="insertUserEx" parameterType="com.importExpress.pojo.UserEx">
+  	insert into user_ex(userid ,otheremail ,otherphone ,whatsapp ,facebook,tweater,kiki,skype) 
+  	values (#{userid},#{otheremail},#{otherphone},#{whatsapp},#{facebook},#{tweater},#{kiki},#{skype})
+  </insert> 
+  
+  <select id="getUserByUserId" parameterType="Integer" resultType="String">
+  		select user_category  from user where id=#{userid}
+  </select>
+  
+  <!-- 变更用户余额和运费抵扣金额 -->
+  <insert id="updateUserAvailable">
+  	insert into recharge_record(userid,price,type,remark,datatime,adminuser,usesign) 
+  	values(#{userid},#{available},#{state},
+  	<choose>
+  		<when test="usersign==0">
+  			"add:"+ #{remark}
+  		</when>
+  		<otherwise>
+  			"deduction:"+ #{remark}
+  		</otherwise>
+  	</choose>
+  	,now(),#{modifyuser},0)
+  </insert>
+  <!-- 根据用户id修改available和order_ac -->
+  <update id="UpUserById">
+  	update user set available_m=available_m+ #{available},applicable_credit=applicable_credit+ #{order_ac} where id= #{userid}
+  </update> 
+    
+  <select id="getCountryId" resultType="hashmap" parameterType="Integer">
+    select countryId,area,country from user,zone where  user.countryid = zone.id and user.id=#{userId}
+  </select>
+   <update id="upCountryId">
+  	update    user set countryId=#{countryId} where id = #{userId};
+  	update goods_carconfig set  changeexpress=#{changeexpress} where userid = #{userId};
+  </update> 
+  
+  <update id="upDropShipType">
+  	update user set user_category=2 where id = #{userId};
+  </update> 
+  
+  <select id="getUserByCategory" resultType="String" parameterType="Integer">
+   select user_category  from user where id=#{userId}
+  </select>
+  
+    <insert id="saveupemail_log" >
+    insert tab_log_upemail(oldemail,newemail,upid,upobj,createtime) values(#{oldemail},#{newemail},#{userid},0,now())
+  </insert>
+  
+   <select id="getGradeUserId" parameterType="Integer" resultType="Map">
+  		select grade,hasRecharge  from user where id=#{userid}
+  </select>
+  <select id="getPassWordForEmail" resultMap="UserBeanResultMap">
+    select * from user where 
+    <if test="type==1">
+     bind_google=#{email}
+    </if>
+     <if test="type==0">
+     bind_facebook=#{email} 
+    </if>
+    limit 1
+  </select>
+  
+   <select id="getUserInfos" resultMap="UserBeanResultMap">
+    select * from user where email=#{email} or name =#{name} limit 1
+  </select>
+  
+  <update id="bindGoogle">
+    update user set 
+    <if test="type==0">
+     bind_facebook=#{google_email} 
+    </if>
+    <if test="type==1">
+     bind_google=#{google_email} 
+    </if>
+    where email=#{google_email}
+  </update>
+   <select id="isBinding" resultMap="UserBeanResultMap">
+    select user.id,user.pass,name,activationState,activationCode,createtime,email,currency,countryId,user_category ,area,country
+    from user left join zone on zone.id=user.countryId
+      where 1=1 
+     <if test="types==0">
+     and bind_facebook=#{email} or name=#{name}
+    </if>
+    <if test="types==1">
+     and bind_google=#{email} or name=#{name}
+    </if>
+     limit 1
+   </select>
+    <select id="getQuestionData" resultType="com.importExpress.pojo.QueAns">
+     	SELECT u.email as userName,q.question_content as qContent,q.create_time as createTime,ifnull(q.reply_content,'') as replyContent,q.reply_time as replyTime
+		FROM question_answer q 
+		INNER JOIN USER u ON q.userid=u.id
+		WHERE   ((q.pid=#{spider_itemid} and q.reply_status=2  and q.reply_content&lt;>'') or (q.isShow=2 and q.spider_mincatid=#{spider_mincatid} and q.shop_id=#{spider_shop_id} and q.reply_content&lt;>'')) order by create_time desc
+   </select>
+   <delete id="deleteUserByEmail">
+     delete from user where email=#{email}
+   </delete>
+   <select id="getZoneInfo" resultType="com.importExpress.pojo.ZoneBean">
+     select * FROM zone where id=#{id}
+   </select>
+
+    <select id="getEmailByIdOrUserCookieId"  resultType="String">
+        select email from user where  id = #{userId}
+    </select>
+    <select id="getCountryName"  resultType="String">
+        select country from zone where  id = #{countryId}
+    </select>
+    <select id="getEmailByIdList" resultType="Map">
+        select id,email from user where  id in
+        <foreach collection="list" item="item" close=")" open="(" separator=",">
+        #{item}
+        </foreach>
+    </select>
+    <insert id="addLoginLog">
+        insert into sing_in_data(login_type,email,createtime,ip,l_id,name) values(#{types},#{email},now(),#{ip},#{l_id},#{name})
+    </insert>
+    <!-- 插入ab_usermarkinfo表数据 -->
+    <insert id="saveUserMark">
+        insert into ab_usermarkinfo(userid ,usercookieid ,sessionid, usermark, creattime,updatetime,ip)
+        values (#{userid},#{usercookieid},#{sessionId},#{usermark},now(),now(),#{ip})
+    </insert>
+    <!-- 更新ab_usermarkinfo表数据 -->
+    <insert id="updateUserMark">
+        update ab_usermarkinfo set userid=#{userId},updatetime= now() where usercookieid=#{sessionId}
+    </insert>
+    <!-- 更新ab_usermarkinfo表数据 -->
+    <insert id="updateUserMarkCookieid">
+        update ab_usermarkinfo set flag=1,updatetime= now() where usercookieid=#{usercookieid}
+    </insert>
+    <!-- 更新ab_usermarkinfo表数据 -->
+    <insert id="bindUseridSessionid">
+        update ab_usermarkinfo set  usercookieid=#{usercookieid},sessionid =#{sessionId},updatetime= now()  where userid=#{userId}
+    </insert>
+</mapper>

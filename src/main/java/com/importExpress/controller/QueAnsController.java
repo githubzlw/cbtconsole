@@ -1,0 +1,325 @@
+package com.importExpress.controller;
+
+import com.cbt.customer.service.GuestBookServiceImpl;
+import com.cbt.customer.service.IGuestBookService;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
+import com.cbt.website.userAuth.bean.Admuser;
+import com.importExpress.pojo.QueAns;
+import com.importExpress.service.QuestionAndAnswerService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * 后台提问回答功能
+ * @author Administrator
+ *
+ */
+@Controller
+@RequestMapping("/question")
+public class QueAnsController {
+	private final static int PAGESIZE = 60;
+	private final static String URl_HEADER = "http://127.0.0.1:8083";
+	
+	@SuppressWarnings("unused")
+	private static final Log logger = LogFactory.getLog(QueAnsController.class);
+
+	@Autowired
+	private QuestionAndAnswerService questionAndAnswerService;
+	
+	/**
+	 * 后台查询所有提问和回复信息
+	 * @return
+	 */
+	@RequestMapping(value={"/questionlist"},method = {RequestMethod.POST,RequestMethod.GET})
+    public String list(HttpServletRequest request, HttpServletResponse response) {
+		String sessionId = request.getSession().getId();
+		String userJson = Redis.hget(sessionId, "admuser");
+		Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+		//产品id
+		String goodsPid = request.getParameter("pid");
+		goodsPid = StringUtils.isBlank(goodsPid) ? null : goodsPid;
+		//产品名称
+		String goodsName = request.getParameter("goodsName");
+		goodsName = StringUtils.isBlank(goodsName) ? null : goodsName;
+		//开始日期
+		String startdate = request.getParameter("startdate");
+		startdate = StringUtils.isBlank(startdate) ? null : startdate + " 00:00:00";
+		//结束日期
+		String enddate = request.getParameter("enddate");
+		enddate = StringUtils.isBlank(enddate) ? null : enddate + " 23:59:59";
+		//回复状态
+		String strRepalyFlag = request.getParameter("replayflag");
+		int replyFlag = StrUtils.isNum(strRepalyFlag) ? Integer.valueOf(strRepalyFlag) : 0;
+		//页码
+		String strPage = request.getParameter("page");
+		int page  = StrUtils.isNum(strPage) ? Integer.valueOf(strPage) : 1;
+		page = page < 1 ? 1 : page;
+		//回复人
+		String steAdm = request.getParameter("adminid");
+		int adminId = 0;//StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
+		if("ling".equals(user.getAdmName().toLowerCase()) && adminId != 0){
+			adminId = StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
+		}
+		if(!"ling".equals(user.getAdmName().toLowerCase()) && adminId != 0){
+			adminId = user.getId();
+		}
+		
+		List<QueAns> list = questionAndAnswerService.findByQuery(goodsPid, goodsName, adminId, replyFlag,startdate,enddate, (page-1) * PAGESIZE);
+		int total = questionAndAnswerService.getCountByQuery(goodsPid, goodsName, adminId, replyFlag, startdate,enddate);
+		
+		request.setAttribute("resultList", list);
+		int totalPage = total % PAGESIZE == 0 ? total / PAGESIZE : total / PAGESIZE + 1 ;
+		request.setAttribute("resultList", list);
+		request.setAttribute("page", page);
+		request.setAttribute("totalPage", totalPage);
+		request.setAttribute("replyFlag", replyFlag);
+		request.setAttribute("adminId", adminId);
+		request.setAttribute("replyFlag", replyFlag);
+		//回复人信息
+		UserDao dao = new UserDaoImpl();
+		List<ConfirmUserInfo> all = dao.getAll();
+		request.setAttribute("admList", all);
+		return "question";
+    }
+	
+	
+//	//去提问详情页面
+//	@RequestMapping("/goEdit")
+//    public String goEdit(Model model,Integer questionid){
+//		QueAns queAns = questionAndAnswerService.selectByPrimaryKey(questionid);
+//		String purl = queAns.getPurl();
+//		queAns.setPurl(URl_HEADER+purl);
+//		model.addAttribute("queAns", queAns);
+//		return "queAnsDetail";
+//	}
+	/**
+	 * 变更提问回复是否在产品单页显示
+	 * @Title changeIsShow 
+	 * @Description TODO
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 * @return int
+	 * 王宏杰 2018-05-03
+	 */
+	@RequestMapping("/changeIsShow")
+	@ResponseBody
+    public int changeIsShow(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		int row=0;
+		try{
+			String pid=request.getParameter("pid");
+			String type=request.getParameter("type");
+			row=questionAndAnswerService.changeIsShow(pid,type);
+			SendMQ sendMQ = new SendMQ();
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow='"+type+"' where questionid='"+pid+"'"));
+			sendMQ.closeConn();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return row;
+	}
+	/**
+	 * 该条问答影响同店铺下其他同类别产品
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/influenceShop")
+	@ResponseBody
+    public int influenceShop(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		SendMQ sendMQ = new SendMQ();
+		String strqid = request.getParameter("qid");
+		String shop_id = request.getParameter("shop_id");
+		String reply_content = request.getParameter("reply_content");
+		String state = request.getParameter("state");
+		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
+		if(qid == 0 || com.cbt.common.StringUtils.isStrNull(state)){
+			return -1;
+		}
+		int updateReplyContent = questionAndAnswerService.influenceShop(qid,shop_id,state);
+		if("1".equals(state)){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=2 where questionid='"+qid+"'"));
+		}else if("2".equals(state)){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_status=1 where questionid='"+qid+"'"));
+		}else if("3".equals(state)){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=2,shop_id='"+shop_id+"' where questionid='"+qid+"'"));
+		}else if("4".equals(state)){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set isShow=1 where questionid='"+qid+"'"));
+		}
+		sendMQ.closeConn();
+		return updateReplyContent;
+	}
+
+	/**
+	 * 产品单页问答删除操作
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/deleteQuestion")
+	@ResponseBody
+	public int deleteQuestion(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		SendMQ sendMQ = new SendMQ();
+		String strqid = request.getParameter("qid");
+		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
+		if(qid == 0){
+			return -1;
+		}
+		int updateReplyContent = questionAndAnswerService.deleteQuestion(qid);
+		if(updateReplyContent>0){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set is_delete=1 where questionid='"+qid+"'"));
+		}
+		sendMQ.closeConn();
+		return updateReplyContent;
+	}
+
+	/**
+	 * 后台产品单页提问邮件回复客户
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/sendEmail")
+	@ResponseBody
+	public int sendEmail(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		IGuestBookService ibs = new GuestBookServiceImpl();
+		String strqid = request.getParameter("qid");
+		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
+		String replyContent = request.getParameter("rcontent");
+		String url=request.getParameter("url");
+		if(StringUtils.isBlank(replyContent) || qid == 0){
+			return -1;
+		}
+		replyContent = replyContent.trim();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
+		Date now = new Date();
+		dateFormat.setLenient(false);
+		String date = dateFormat.format(now);
+		//给客户发送邮件
+		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
+		int updateReplyContent=ibs.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url);
+		return updateReplyContent;
+	}
+	/**回复提问
+	 * @date 2018年3月26日
+	 * @author user4
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception  
+	 */
+	@RequestMapping("/edit")
+	@ResponseBody
+    public int queAnwEdit(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		IGuestBookService ibs = new GuestBookServiceImpl();
+		String sessionId = request.getSession().getId();
+		String userJson = Redis.hget(sessionId, "admuser");
+		Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class); 
+		int adminid = user.getId();
+		String strqid = request.getParameter("qid");
+		String isShow = request.getParameter("isShow");
+		//影响同店铺标识 1影响
+		String shop_flag=request.getParameter("shop_flag");
+		String shop_id=request.getParameter("shop_id");
+		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
+		String replyContent = request.getParameter("rcontent");
+		String url=request.getParameter("url");
+		if(StringUtils.isBlank(replyContent) || qid == 0){
+			return -1;
+		}
+		replyContent = replyContent.trim();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);
+		Date now = new Date();
+		dateFormat.setLenient(false);
+		String date = dateFormat.format(now);
+		SendMQ sendMQ = new SendMQ();
+		int updateReplyContent =questionAndAnswerService.updateReplyContent(qid, adminid, replyContent,isShow,shop_id);
+		if(updateReplyContent > 0){
+			sendMQ.sendMsg(new RunSqlModel("update question_answer set reply_content='"+replyContent+"',reply_status=2,reply_name='"+adminid+"',reply_time=now(),shop_id='"+shop_id+"' where questionid='"+qid+"'"));
+			//影响同店铺
+			if("2".equals(shop_flag)){
+				int row=questionAndAnswerService.influenceShop(qid,shop_id,"3");
+				if(row>0){
+					sendMQ.sendMsg(new RunSqlModel(" update question_answer set isShow=2 where questionid='"+qid+"'"));
+				}
+			}
+		}
+		sendMQ.closeConn();
+		//给客户发送邮件
+		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
+		ibs.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url);
+//		}
+		return updateReplyContent;
+	}
+	@RequestMapping("/remark")
+	@ResponseBody
+	public int queAnwRemark(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		String sessionId = request.getSession().getId();
+		String userJson = Redis.hget(sessionId, "admuser");
+		Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class); 
+		int adminid = user.getId();
+		String strqid = request.getParameter("qid");
+		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
+		String remark = request.getParameter("remark");
+		//0-通过审核  1审核不通过并备注原因   2,3修改审核不通过的备注
+		String strRemarkFlag = request.getParameter("remarkflag");
+		int remarkFlag = StrUtils.isNum(strRemarkFlag) ? Integer.valueOf(strRemarkFlag) : -1;
+		if(remarkFlag != 0 ){
+			if(StringUtils.isBlank(remark) || qid == 0 || remarkFlag < 0){
+				return -1;
+			}
+		}
+		remark = remark.trim();
+		int isReview = remarkFlag == 0 ? 1 : 2;
+		SendMQ sendMQ = new SendMQ();
+		sendMQ.sendMsg(new RunSqlModel(" update question_answer set is_review='"+isReview+"',review_remark='"+remark+"',update_time=now() where id='"+qid+"'"));
+		sendMQ.closeConn();
+		int updateRemark=questionAndAnswerService.updateRemark(qid, adminid, isReview, remark);
+		return updateRemark;
+	}
+	
+	
+//
+//	@RequestMapping("/updateAll")
+//	public String updateAll(Integer[] ids,String pid,String pname,String replyName,String startdate,
+//			String enddate,Integer isshow,Integer replyStatus) throws Exception{
+//		questionAndAnswerService.updateAll(ids);
+//		//TODO 带条件的更改
+//		//?pid=${pid}&pname=${pname}&replyName=${replyName}&replyName=${replyName}&isshow=${isshow}&startdate=${startdate}&enddate=${enddate}
+//		return "redirect:/question/questionlist?pid="+pid+"&pname="+pname+"&replyName="+replyName+
+//				"&isshow="+isshow+"&replyStatus="+replyStatus+"&startdate="+startdate+"&enddate="+enddate;
+//	 }
+//	
+//	@RequestMapping("/deleteAll")
+//	public String deleteAll(Integer[] ids,String pid,String pname,String replyName,String startdate,
+//			String enddate,Integer isshow,Integer replyStatus) throws Exception{
+//		questionAndAnswerService.deleteAll(ids);
+//		return "redirect:/question/questionlist?pid="+pid+"&pname="+pname+"&replyName="+replyName+
+//				"&isshow="+isshow+"&replyStatus="+replyStatus+"&startdate="+startdate+"&enddate="+enddate;
+//	}
+//	
+}

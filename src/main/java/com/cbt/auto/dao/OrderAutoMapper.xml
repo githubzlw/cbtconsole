@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.auto.dao.OrderAutoMapper" >
+
+    <resultMap id="OrderAutoDetailMap" type="com.cbt.bean.OrderAutoDetail" >
+    <result column="admid" property="admid" jdbcType="VARCHAR" />
+    <result column="odid" property="odid" jdbcType="VARCHAR" />
+    <result column="goodsdataid" property="goodsdataid" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <resultMap id="AdmDsitributionMap" type="com.cbt.bean.AdmDsitribution" >
+    <result column="adid" property="adid" jdbcType="INTEGER" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="OrderAutoBeanlMap" type="com.cbt.auto.ctrl.OrderAutoBean" >
+    <result column="orderid" property="orderid" jdbcType="INTEGER" />
+    <result column="orderno" property="orderno" jdbcType="VARCHAR" />
+    <result column="paystaus" property="paystaus" jdbcType="INTEGER" />
+    <result column="paytime" property="paytime" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  
+   
+   <select id="getALLOrderDetailCount" resultType="java.lang.String" parameterType="java.lang.String" >
+    select od.goodsid from order_details od INNER JOIN orderinfo oi on od.orderid=oi.order_no
+  	where oi.order_no=#{order}
+  	 order by oi.order_no
+  </select>
+  
+ <select id="getGoodsDistributionCount" resultType="java.lang.String" parameterType="java.lang.String" >
+   select admuserid from goods_distribution  where goodsid=#{goodsId}
+  </select>
+  
+ 
+  
+  <insert id="insertDG" parameterType="com.cbt.pojo.GoodsDistribution" >
+    insert into goods_distribution (id, orderid, odid, 
+      goodsid, admuserid, createtime, 
+      distributionid,goodsdataid)
+    values (#{id,jdbcType=INTEGER}, #{orderid,jdbcType=VARCHAR}, #{odid,jdbcType=INTEGER}, 
+      #{goodsid,jdbcType=VARCHAR},#{admuserid,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{distributionid,jdbcType=VARCHAR}, 
+      #{goodsdataid,jdbcType=VARCHAR})
+  </insert>
+  
+  <select id="getALLAdmDsitribution" resultMap="AdmDsitributionMap">
+    select ad.id as adid,count(gd.id) as count from admuser ad INNER JOIN goods_distribution gd on ad.id=gd.admuserid  where ad.roleType=2  GROUP BY ad.id 
+  </select>
+  
+  <select id="getAllAdmUser" resultType="java.lang.String">
+    <![CDATA[
+     select id from admuser where roleType=2 and id<>13 and id<>14 and id<>28
+    ]]>
+  </select>
+  
+  <select id="getOrderDetail" resultMap="OrderAutoDetailMap" parameterType="java.lang.String">
+     select id as odid,goodsdata_id as goodsdataid from order_details where goodsid=#{goodid} and orderid=#{order}
+  </select>
+  
+  <select id="getMaxId" resultType="Integer">
+     select CASE when max(orderid) is null then 0 ELSE max(orderid) END from pure_autoplan
+  </select>
+  
+  <select id="getAllOrderAuto" resultMap="OrderAutoBeanlMap" parameterType="Integer">
+   <![CDATA[
+    select o.orderid as orderid,o.order_no as orderno,p.paystatus as paystaus,p.createtime as paytime from orderinfo o INNER JOIN payment p on o.order_no=p.orderid 
+    where p.paystatus=1 and o.state<>0 and o.orderid>#{order} order by o.orderid asc 
+    ]]>
+  </select>
+  
+  <select id="getAllocatedOrder" resultType="java.lang.String">
+  	<![CDATA[
+		SELECT o.order_no FROM ORDERINFO O INNER JOIN payment P ON O.order_no=P.orderid INNER JOIN goods_distribution G ON P.orderid=G.orderid
+		WHERE p.paystatus=1 and o.state<>0    
+	]]>
+  </select>
+  
+  <insert id="insertPap" parameterType="com.cbt.auto.ctrl.PureAutoPlanBean" >
+    insert into pure_autoplan (id, autoState, autitime, 
+      orderid, orderno, paystatus, 
+      paytime)
+    values (#{id,jdbcType=INTEGER}, #{autoState,jdbcType=INTEGER}, #{autitime,jdbcType=TIMESTAMP}, 
+      #{orderid,jdbcType=VARCHAR},#{orderno,jdbcType=VARCHAR}, #{paystatus,jdbcType=INTEGER}, #{paytime,jdbcType=TIMESTAMP})
+  </insert>
+</mapper>

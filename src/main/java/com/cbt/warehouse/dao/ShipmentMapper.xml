@@ -1,0 +1,1405 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.ShipmentMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.Shipment" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sentTime" property="senttime" jdbcType="TIMESTAMP" />
+    <result column="orderNo" property="orderno" jdbcType="VARCHAR" />
+    <result column="switchNo" property="switchno" jdbcType="VARCHAR" />
+    <result column="addressee" property="addressee" jdbcType="VARCHAR" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
+    <result column="transportCompany" property="transportcompany" jdbcType="VARCHAR" />
+    <result column="transportType" property="transporttype" jdbcType="VARCHAR" />
+    <result column="numbers" property="numbers" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="realWeight" property="realweight" jdbcType="DECIMAL" />
+    <result column="bulkWeight" property="bulkweight" jdbcType="VARCHAR" />
+    <result column="settleWeight" property="settleweight" jdbcType="DECIMAL" />
+    <result column="charge" property="charge" jdbcType="DECIMAL" />
+    <result column="fuelSurcharge" property="fuelsurcharge" jdbcType="DECIMAL" />
+    <result column="securityCosts" property="securitycosts" jdbcType="DECIMAL" />
+    <result column="taxs" property="taxs" jdbcType="DECIMAL" />
+    <result column="totalPrice" property="totalprice" jdbcType="DECIMAL" />
+    <result column="reMark" property="remark" jdbcType="VARCHAR" />
+    <result column="createTime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="uuid" property="uuid" jdbcType="VARCHAR" />
+    <result column="validate" property="validate" jdbcType="INTEGER" />
+	<result column="sp_time" property="sp_time" jdbcType="VARCHAR" />
+    <result column="sweight" property="sweight" jdbcType="VARCHAR" />
+    <result column="svolume" property="svolume" jdbcType="VARCHAR" />
+    <result column="volumeweight" property="volumeweight" jdbcType="VARCHAR" />
+     <result column="volumeweights" property="volumeweights" jdbcType="VARCHAR" />
+    <result column="tscompany" property="tscompany" jdbcType="VARCHAR" />
+    <result column="xtcountry" property="xtcountry" jdbcType="VARCHAR" />
+    <result column="delivery" property="delivery" jdbcType="VARCHAR" />
+    <result column="flag_remarks" property="flag_remarks" jdbcType="VARCHAR"/>
+    <result column="passFlag" property="passFlag" jdbcType="INTEGER"/>
+     <result column="actual_freight" property="actual_freight" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.cbt.warehouse.pojo.Shipment" extends="BaseResultMap" >
+    <result column="estimatefreight" property="estimatefreight" jdbcType="DECIMAL" />
+    <result column="freight" property="freight" jdbcType="DECIMAL" />
+    <result column="volumeweight" property="volumeweight" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, sentTime, orderNo, switchNo, addressee, country, transportCompany, transportType, 
+    numbers, type, realWeight, bulkWeight, settleWeight, charge, fuelSurcharge, securityCosts, 
+    taxs, totalPrice, reMark, createTime, uuid, validate
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.warehouse.pojo.ShipmentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from shipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from shipment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from shipment
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.warehouse.pojo.ShipmentExample" >
+    delete from shipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.warehouse.pojo.Shipment" >
+    insert IGNORE into shipment (id, sentTime, orderNo, 
+      switchNo, addressee, country, 
+      transportCompany, transportType, numbers, 
+      type, realWeight, bulkWeight, 
+      settleWeight, charge, fuelSurcharge, 
+      securityCosts, taxs, totalPrice, 
+      reMark, createTime, uuid, 
+      validate)
+    values (#{id,jdbcType=BIGINT}, #{senttime,jdbcType=TIMESTAMP}, #{orderno,jdbcType=VARCHAR}, 
+      #{switchno,jdbcType=VARCHAR}, #{addressee,jdbcType=VARCHAR}, #{country,jdbcType=VARCHAR}, 
+      #{transportcompany,jdbcType=VARCHAR}, #{transporttype,jdbcType=VARCHAR}, #{numbers,jdbcType=INTEGER}, 
+      #{type,jdbcType=VARCHAR}, #{realweight,jdbcType=DECIMAL}, #{bulkweight,jdbcType=VARCHAR}, 
+      #{settleweight,jdbcType=DECIMAL}, #{charge,jdbcType=DECIMAL}, #{fuelsurcharge,jdbcType=DECIMAL}, 
+      #{securitycosts,jdbcType=DECIMAL}, #{taxs,jdbcType=DECIMAL}, #{totalprice,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{uuid,jdbcType=VARCHAR}, 
+      #{validate,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.warehouse.pojo.Shipment" >
+    insert into shipment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="senttime != null" >
+        sentTime,
+      </if>
+      <if test="orderno != null" >
+        orderNo,
+      </if>
+      <if test="switchno != null" >
+        switchNo,
+      </if>
+      <if test="addressee != null" >
+        addressee,
+      </if>
+      <if test="country != null" >
+        country,
+      </if>
+      <if test="transportcompany != null" >
+        transportCompany,
+      </if>
+      <if test="transporttype != null" >
+        transportType,
+      </if>
+      <if test="numbers != null" >
+        numbers,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="realweight != null" >
+        realWeight,
+      </if>
+      <if test="bulkweight != null" >
+        bulkWeight,
+      </if>
+      <if test="settleweight != null" >
+        settleWeight,
+      </if>
+      <if test="charge != null" >
+        charge,
+      </if>
+      <if test="fuelsurcharge != null" >
+        fuelSurcharge,
+      </if>
+      <if test="securitycosts != null" >
+        securityCosts,
+      </if>
+      <if test="taxs != null" >
+        taxs,
+      </if>
+      <if test="totalprice != null" >
+        totalPrice,
+      </if>
+      <if test="remark != null" >
+        reMark,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+      <if test="uuid != null" >
+        uuid,
+      </if>
+      <if test="validate != null" >
+        validate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="senttime != null" >
+        #{senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderno != null" >
+        #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="switchno != null" >
+        #{switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="addressee != null" >
+        #{addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="transportcompany != null" >
+        #{transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="transporttype != null" >
+        #{transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null" >
+        #{numbers,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="realweight != null" >
+        #{realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="bulkweight != null" >
+        #{bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="settleweight != null" >
+        #{settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null" >
+        #{charge,jdbcType=DECIMAL},
+      </if>
+      <if test="fuelsurcharge != null" >
+        #{fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="securitycosts != null" >
+        #{securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="taxs != null" >
+        #{taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="totalprice != null" >
+        #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uuid != null" >
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="validate != null" >
+        #{validate,jdbcType=INTEGER},
+      </if>
+    </trim>
+    ON DUPLICATE KEY UPDATE 
+    <trim suffixOverrides="," >
+    	<if test="senttime != null" >
+        sentTime = #{senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="switchno != null" >
+        switchNo = #{switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="addressee != null" >
+        addressee = #{addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="transportcompany != null" >
+        transportCompany = #{transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="transporttype != null" >
+        transportType = #{transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null" >
+        numbers = #{numbers,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="realweight != null" >
+        realWeight = #{realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="bulkweight != null" >
+        bulkWeight = #{bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="settleweight != null" >
+        settleWeight = #{settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=DECIMAL},
+      </if>
+      <if test="fuelsurcharge != null" >
+        fuelSurcharge = #{fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="securitycosts != null" >
+        securityCosts = #{securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="taxs != null" >
+        taxs = #{taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="totalprice != null" >
+        totalPrice = #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        reMark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="validate != null" >
+        validate = #{validate,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.warehouse.pojo.ShipmentExample" resultType="java.lang.Integer" >
+    select count(*) from shipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update shipment
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.senttime != null" >
+        sentTime = #{record.senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.orderno != null" >
+        orderNo = #{record.orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.switchno != null" >
+        switchNo = #{record.switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.addressee != null" >
+        addressee = #{record.addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="record.country != null" >
+        country = #{record.country,jdbcType=VARCHAR},
+      </if>
+      <if test="record.transportcompany != null" >
+        transportCompany = #{record.transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="record.transporttype != null" >
+        transportType = #{record.transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.numbers != null" >
+        numbers = #{record.numbers,jdbcType=INTEGER},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.realweight != null" >
+        realWeight = #{record.realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="record.bulkweight != null" >
+        bulkWeight = #{record.bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="record.settleweight != null" >
+        settleWeight = #{record.settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="record.charge != null" >
+        charge = #{record.charge,jdbcType=DECIMAL},
+      </if>
+      <if test="record.fuelsurcharge != null" >
+        fuelSurcharge = #{record.fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="record.securitycosts != null" >
+        securityCosts = #{record.securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="record.taxs != null" >
+        taxs = #{record.taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="record.totalprice != null" >
+        totalPrice = #{record.totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.remark != null" >
+        reMark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createtime != null" >
+        createTime = #{record.createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.uuid != null" >
+        uuid = #{record.uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.validate != null" >
+        validate = #{record.validate,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update shipment
+    set id = #{record.id,jdbcType=BIGINT},
+      sentTime = #{record.senttime,jdbcType=TIMESTAMP},
+      orderNo = #{record.orderno,jdbcType=VARCHAR},
+      switchNo = #{record.switchno,jdbcType=VARCHAR},
+      addressee = #{record.addressee,jdbcType=VARCHAR},
+      country = #{record.country,jdbcType=VARCHAR},
+      transportCompany = #{record.transportcompany,jdbcType=VARCHAR},
+      transportType = #{record.transporttype,jdbcType=VARCHAR},
+      numbers = #{record.numbers,jdbcType=INTEGER},
+      type = #{record.type,jdbcType=VARCHAR},
+      realWeight = #{record.realweight,jdbcType=DECIMAL},
+      bulkWeight = #{record.bulkweight,jdbcType=VARCHAR},
+      settleWeight = #{record.settleweight,jdbcType=DECIMAL},
+      charge = #{record.charge,jdbcType=DECIMAL},
+      fuelSurcharge = #{record.fuelsurcharge,jdbcType=DECIMAL},
+      securityCosts = #{record.securitycosts,jdbcType=DECIMAL},
+      taxs = #{record.taxs,jdbcType=DECIMAL},
+      totalPrice = #{record.totalprice,jdbcType=DECIMAL},
+      reMark = #{record.remark,jdbcType=VARCHAR},
+      createTime = #{record.createtime,jdbcType=TIMESTAMP},
+      uuid = #{record.uuid,jdbcType=VARCHAR},
+      validate = #{record.validate,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.warehouse.pojo.Shipment" >
+    update shipment
+    <set >
+      <if test="senttime != null" >
+        sentTime = #{senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="switchno != null" >
+        switchNo = #{switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="addressee != null" >
+        addressee = #{addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="transportcompany != null" >
+        transportCompany = #{transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="transporttype != null" >
+        transportType = #{transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null" >
+        numbers = #{numbers,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="realweight != null" >
+        realWeight = #{realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="bulkweight != null" >
+        bulkWeight = #{bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="settleweight != null" >
+        settleWeight = #{settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=DECIMAL},
+      </if>
+      <if test="fuelsurcharge != null" >
+        fuelSurcharge = #{fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="securitycosts != null" >
+        securityCosts = #{securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="taxs != null" >
+        taxs = #{taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="totalprice != null" >
+        totalPrice = #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        reMark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="validate != null" >
+        validate = #{validate,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.warehouse.pojo.Shipment" >
+    update shipment
+    set sentTime = #{senttime,jdbcType=TIMESTAMP},
+      orderNo = #{orderno,jdbcType=VARCHAR},
+      switchNo = #{switchno,jdbcType=VARCHAR},
+      addressee = #{addressee,jdbcType=VARCHAR},
+      country = #{country,jdbcType=VARCHAR},
+      transportCompany = #{transportcompany,jdbcType=VARCHAR},
+      transportType = #{transporttype,jdbcType=VARCHAR},
+      numbers = #{numbers,jdbcType=INTEGER},
+      type = #{type,jdbcType=VARCHAR},
+      realWeight = #{realweight,jdbcType=DECIMAL},
+      bulkWeight = #{bulkweight,jdbcType=VARCHAR},
+      settleWeight = #{settleweight,jdbcType=DECIMAL},
+      charge = #{charge,jdbcType=DECIMAL},
+      fuelSurcharge = #{fuelsurcharge,jdbcType=DECIMAL},
+      securityCosts = #{securitycosts,jdbcType=DECIMAL},
+      taxs = #{taxs,jdbcType=DECIMAL},
+      totalPrice = #{totalprice,jdbcType=DECIMAL},
+      reMark = #{remark,jdbcType=VARCHAR},
+      createTime = #{createtime,jdbcType=TIMESTAMP},
+      uuid = #{uuid,jdbcType=VARCHAR},
+      validate = #{validate,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectShipmentByids" resultMap="BaseResultMap">
+  select * from unExistOrPayedShipment  where id in 
+  <foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+  </select>
+  <select id="selectCountShipment" resultType="java.util.Map" 
+		useCache="false" flushCache="true">
+		  <if test='choiseType == "0"'>
+		  	 select count(*) as count,SUM(totalPrice) as sumPrice  ,SUM(estimatefreight) as sumestimatefreight,SUM(freights) as sumfreight from 
+		  	 (
+		  	  select distinct sm.*,(sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as freights 
+		  	     from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno
+		  	     where sm.orderNo is not null 
+		  	     <if test='company != "0"'>
+					and sm.transportCompany = #{company} 
+				</if>
+				<if test='senttimeBegin != ""'>
+					<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+				</if>
+				<if test='senttimeEnd != ""'>
+					<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+				</if> 
+		         group by sm.orderNo order by sm.id 
+		       ) as res;
+		  </if>
+		   <if test='choiseType == "1"'>
+			select count(*) as count,SUM(totalPrice) as sumPrice	from (
+			     select * from 
+				 (
+					select * from (
+						select distinct sm.*   from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
+						where sm.orderNo is not null and sp.expressno is null 	
+						<if test='company != "0"'>
+						and sm.transportCompany = #{company} 
+						</if>
+						<if test='senttimeBegin != ""'>
+							<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+						</if>
+						<if test='senttimeEnd != ""'>
+							<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+						</if> 				  
+					group by sm.orderNo order by sm.id ) s 
+					)a
+					
+					group by a.orderNo order by a.id ) as res;
+					
+		   </if>
+		   <if test='choiseType == "2"'>
+		       select count(*) as count,SUM(totalPrice) as sumPrice	 ,SUM(estimatefreight) as sumestimatefreight,SUM(freights) as sumfreight  from  (select distinct sm.*,(sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as freights  
+                          , sp.orderid ,sp.sweight ,sp.svolume ,sp.transportcompany as  tscompany 
+                          from shipment sm
+						  left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null and sm.flag=0
+						    <if test='company != "0"'>
+							and sm.transportCompany = #{company} 
+							</if>
+							<if test='senttimeBegin != ""'>
+								<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+							</if>
+							<if test='senttimeEnd != ""'>
+								<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+							</if> 
+                     and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+                     group by sm.orderNo order by sm.id ) as res;
+		    </if>
+		    <if test='choiseType == "3"'>
+  					select count(*) as count,SUM(totalPrice) as sumPrice,SUM(estimatefreight) as sumestimatefreight,SUM(freights) as sumfreight  from  (select distinct sm.*, (sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as freights,greatest(sp.sweight+0,sp.volumeweight+0) as volumeweight 
+  					  , sp.orderid ,sp.sweight ,sp.svolume ,sp.transportcompany as  tscompany 
+  					 from shipment sm
+
+					 left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null 
+					  	<if test='company != "0"'>
+						and sm.transportCompany = #{company} 
+						</if>
+						<if test='senttimeBegin != ""'>
+						<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+						</if>
+						<if test='senttimeEnd != ""'>
+						<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+						</if>
+					 and sp.svolume is not null and sp.volumeweight is not null and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate} 
+					 and sm.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+					 group by sm.orderNo order by sm.id ) as res;
+ 		    </if>
+  </select>
+  <!-- 运单运费页面查询所有信息-->
+    <select id="queryAllShipmentInfo" resultMap="BaseResultMap">
+    SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume,ifnull(estimatefreight,0)*${exchageRate} as estimatefreight,
+      IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) AS actual_freight,
+    sp.sweight,sp.volumeweight as volumeweights,s.totalprice,ifnull(s.fuelSurcharge,0) as fuelSurcharge,ifnull(s.securityCosts,0) as securityCosts,s.taxs,
+    ifnull(s.reMark,'') as reMark,ifnull(s.flag_remark,'') as flag_remarks
+    FROM shipment s
+    LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    WHERE s.orderNo IS NOT NULL
+      <if test='choiseType == "1"'>
+        and  sp.expressno is null
+      </if>
+      <if test='company != "0"'>
+        and s.transportCompany = #{company}
+      </if>
+      <if test='senttimeBegin != ""'>
+        and s.sentTime >= #{senttimeBegin}
+      </if>
+      <if test='senttimeEnd != ""'>
+        and s.sentTime &lt;= #{senttimeEnd}
+      </if>
+      GROUP BY s.orderNo order by s.id
+      limit ${page},40;
+    </select>
+  <!-- 运单运费页面查询统计金额等所有信息-->
+    <select id="queryAllShipmentInfoCount" resultType="java.util.Map" >
+      select count(a.orderNo) as orderCount,sum(a.totalprice) as totalprice,sum(a.estimatefreight) as estimatefreight,sum(a.actual_freight) as actual_freight from (
+      SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume,sum(ifnull(sp.estimatefreight,0))*${exchageRate} as estimatefreight,
+      IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) AS actual_freight,
+      sp.sweight,sp.volumeweight as volumeweights,s.totalprice,ifnull(s.fuelSurcharge,0) as fuelSurcharge,ifnull(s.securityCosts,0) as securityCosts,s.taxs,
+      ifnull(s.reMark,'') as reMark,ifnull(s.flag_remark,'') as flag_remarks
+      FROM shipment s
+      LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+      WHERE s.orderNo IS NOT NULL
+      <if test='choiseType == "1"'>
+        and  sp.expressno is null
+      </if>
+      <if test='company != "0"'>
+        and s.transportCompany = #{company}
+      </if>
+      <if test='senttimeBegin != ""'>
+        and s.sentTime >= #{senttimeBegin}
+      </if>
+      <if test='senttimeEnd != ""'>
+        and s.sentTime &lt;= #{senttimeEnd}
+      </if>
+      GROUP BY s.orderNo order by s.id
+      ) a
+    </select>
+
+  <select id="queryBeyondFiveShipmentInfo" resultMap="BaseResultMap">
+    SELECT a.* FROM (
+    SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume, sp.sweight,sp.volumeweight AS volumeweights,s.totalprice,IFNULL(s.fuelSurcharge,0) AS fuelSurcharge,
+    IFNULL(s.securityCosts,0) AS securityCosts,s.taxs, IFNULL(s.reMark,'') AS reMark,IFNULL(s.flag_remark,'') AS flag_remarks ,(SUM(sp.estimatefreight) * 6.3) AS estimatefreight,
+    IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) AS actual_freight, SUBSTRING(SUBSTRING(IFNULL(oi.mode_transport,'') ,
+    LOCATE('@',IFNULL(oi.mode_transport,''))+1),1,LOCATE('@',SUBSTRING(IFNULL(oi.mode_transport,'') ,LOCATE('@',IFNULL(oi.mode_transport,''))+1))-1) AS delivery,
+    SUBSTRING(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3), LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2))+2,
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3))-LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2)-1) ) AS xtcountry
+    FROM shipment s
+    LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    INNER JOIN orderinfo oi ON sp.orderid = oi.order_no
+    WHERE s.orderNo IS NOT NULL  AND s.flag=0 AND s.orderNo IS NOT NULL
+    <if test='choiseType == "2"'>
+      AND s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+    </if>
+    <if test='choiseType == "3"'>
+      and sp.svolume is not null and sp.volumeweight is not null and s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+      and s.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+    </if>
+    <if test='company != "0"'>
+      and s.transportCompany = #{company}
+    </if>
+    <if test='senttimeBegin != ""'>
+      and s.sentTime >= #{senttimeBegin}
+    </if>
+    <if test='senttimeEnd != ""'>
+      and s.sentTime &lt;= #{senttimeEnd}
+    </if>
+    GROUP BY s.orderNo ORDER BY s.id) a
+    UNION
+    SELECT b.* FROM (
+    SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume, sp.sweight,sp.volumeweight AS volumeweights,s.totalprice,
+    IFNULL(s.fuelSurcharge,0) AS fuelSurcharge,IFNULL(s.securityCosts,0) AS securityCosts,s.taxs, IFNULL(s.reMark,'') AS reMark,IFNULL(s.flag_remark,'') AS flag_remarks ,
+    (SUM(sp.estimatefreight) * 6.3) AS estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) AS actual_freight,
+    SUBSTRING(SUBSTRING(IFNULL(oi.mode_transport,'') ,LOCATE('@',IFNULL(oi.mode_transport,''))+1),1,LOCATE('@',SUBSTRING(IFNULL(oi.mode_transport,'') ,
+    LOCATE('@',IFNULL(oi.mode_transport,''))+1))-1) AS delivery, SUBSTRING(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3),
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2))+2, LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3))-LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2)-1) ) AS xtcountry
+    FROM shipment s LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    INNER JOIN dropshiporder oi ON sp.orderid = oi.child_order_no
+    WHERE s.orderNo IS NOT NULL AND s.flag=0
+    <if test='choiseType == "2"'>
+      AND s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+    </if>
+    <if test='choiseType == "3"'>
+      and sp.svolume is not null and sp.volumeweight is not null and s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+      and s.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+    </if>
+    <if test='company != "0"'>
+      and s.transportCompany = #{company}
+    </if>
+    <if test='senttimeBegin != ""'>
+      and s.sentTime >= #{senttimeBegin}
+    </if>
+    <if test='senttimeEnd != ""'>
+      and s.sentTime &lt;= #{senttimeEnd}
+    </if>
+    GROUP BY s.orderNo ORDER BY s.id) b LIMIT 0,40;
+  </select>
+  <select id="queryBeyondFiveShipmentInfoCount" resultType="java.util.Map">
+    select count(c.orderNo) as orderCount,sum(c.totalprice) as totalprice,sum(c.estimatefreight) as
+    estimatefreight,sum(c.actual_freight) as actual_freight from
+    (
+    SELECT a.* FROM (
+    SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume,
+    sp.sweight,sp.volumeweight AS volumeweights,s.totalprice,IFNULL(s.fuelSurcharge,0) AS fuelSurcharge,
+    IFNULL(s.securityCosts,0) AS securityCosts,s.taxs, IFNULL(s.reMark,'') AS reMark,IFNULL(s.flag_remark,'') AS
+    flag_remarks ,(SUM(sp.estimatefreight) * 6.3) AS estimatefreight,
+    IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE s.totalPrice END,0.00) AS actual_freight,
+    SUBSTRING(SUBSTRING(IFNULL(oi.mode_transport,'') ,
+    LOCATE('@',IFNULL(oi.mode_transport,''))+1),1,LOCATE('@',SUBSTRING(IFNULL(oi.mode_transport,'')
+    ,LOCATE('@',IFNULL(oi.mode_transport,''))+1))-1) AS delivery,
+    SUBSTRING(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3),
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2))+2,
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3))-LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2)-1)
+    ) AS xtcountry
+    FROM shipment s
+    LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    INNER JOIN orderinfo oi ON sp.orderid = oi.order_no
+    WHERE s.orderNo IS NOT NULL AND s.flag=0 AND s.orderNo IS NOT NULL
+    <if test='choiseType == "2"'>
+      AND s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+    </if>
+    <if test='choiseType == "3"'>
+      and sp.svolume is not null and sp.volumeweight is not null and s.totalPrice > (sp.estimatefreight +
+      sp.estimatefreight * 0.05) * #{exchageRate}
+      and s.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+    </if>
+    <if test='company != "0"'>
+      and s.transportCompany = #{company}
+    </if>
+    <if test='senttimeBegin != ""'>
+      and s.sentTime >= #{senttimeBegin}
+    </if>
+    <if test='senttimeEnd != ""'>
+      and s.sentTime &lt;= #{senttimeEnd}
+    </if>
+    GROUP BY s.orderNo ORDER BY s.id) a
+    UNION
+    SELECT b.* FROM (
+    SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume,
+    sp.sweight,sp.volumeweight AS volumeweights,s.totalprice,
+    IFNULL(s.fuelSurcharge,0) AS fuelSurcharge,IFNULL(s.securityCosts,0) AS securityCosts,s.taxs, IFNULL(s.reMark,'') AS
+    reMark,IFNULL(s.flag_remark,'') AS flag_remarks ,
+    (SUM(sp.estimatefreight) * 6.3) AS estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE
+    s.totalPrice END,0.00) AS actual_freight,
+    SUBSTRING(SUBSTRING(IFNULL(oi.mode_transport,'')
+    ,LOCATE('@',IFNULL(oi.mode_transport,''))+1),1,LOCATE('@',SUBSTRING(IFNULL(oi.mode_transport,'') ,
+    LOCATE('@',IFNULL(oi.mode_transport,''))+1))-1) AS delivery,
+    SUBSTRING(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3),
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2))+2,
+    LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",3))-LENGTH(SUBSTRING_INDEX(IFNULL(oi.mode_transport,''),"@",2)-1)
+    ) AS xtcountry
+    FROM shipment s LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    INNER JOIN dropshiporder oi ON sp.orderid = oi.child_order_no
+    WHERE s.orderNo IS NOT NULL AND s.flag=0
+    <if test='choiseType == "2"'>
+      AND s.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+    </if>
+    <if test='choiseType == "3"'>
+      and sp.svolume is not null and sp.volumeweight is not null and s.totalPrice > (sp.estimatefreight +
+      sp.estimatefreight * 0.05) * #{exchageRate}
+      and s.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+    </if>
+    <if test='company != "0"'>
+      and s.transportCompany = #{company}
+    </if>
+    <if test='senttimeBegin != ""'>
+      and s.sentTime >= #{senttimeBegin}
+    </if>
+    <if test='senttimeEnd != ""'>
+      and s.sentTime &lt;= #{senttimeEnd}
+    </if>
+    GROUP BY s.orderNo ORDER BY s.id) b
+    ) c
+  </select>
+
+
+  <select id="selectShipment" resultMap="BaseResultMap"
+		useCache="false" flushCache="true">
+		<if test='choiseType == "0"'>
+		  select distinct ifnull(sp.volumeweight,0) as volumeweights,sm.*,(sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as actual_freight,sp.sweight,sp.volumeweight,sp.createtime as sp_time,ifnull(sm.flag_remark,'') as flag_remarks
+          from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno where sm.orderNo is not null
+				<if test='company != "0"'>
+					and sm.transportCompany = #{company} 
+				</if>
+				<if test='senttimeBegin != ""'>
+					<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+				</if>
+				<if test='senttimeEnd != ""'>
+					<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+				</if>
+				group by sm.orderNo order by sm.id  
+		  </if>
+		   <if test='choiseType == "1"'>
+					select * from (
+						select distinct sm.* ,ifnull(sp.passFlag,0.00) as passFlag,ifnull(sp.sweight,0.00) as sweight,ifnull(sp.volumeweight,0.00) as volumeweights,ifnull(sp.createtime,'') as sp_time,ifnull(sm.flag_remark,'') as flag_remarks  from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
+						where sm.orderNo is not null and sp.expressno is null 	
+						<if test='company != "0"'>
+						and sm.transportCompany = #{company} 
+						</if>
+						<if test='senttimeBegin != ""'>
+							<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+						</if>
+						<if test='senttimeEnd != ""'>
+							<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+						</if> 				  
+					group by sm.orderNo order by sm.id ) s
+		   </if>
+		   <if test='choiseType == "2"'>
+					  select DISTINCT s.* , oi.order_no , 
+						   substring(substring(oi.mode_transport ,locate('@',oi.mode_transport)+1),1,locate('@',substring(oi.mode_transport ,locate('@',oi.mode_transport)+1))-1)  as delivery,
+						   substring(substring_index(oi.mode_transport,"@",3),
+														LENGTH(substring_index(oi.mode_transport,"@",2))+2,
+														LENGTH(substring_index(oi.mode_transport,"@",3))-LENGTH(substring_index(oi.mode_transport,"@",2)-1)
+														)   as  xtcountry   
+                          	from 	(select distinct sm.*,(sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as actual_freight  
+                          	, sp.orderid ,sp.svolume,sp.sweight,ifnull(sp.volumeweight,0) as volumeweights,sp.volumeweight ,sp.transportcompany as  tscompany ,sp.createtime as sp_time ,ifnull(sm.flag_remark,'') as flag_remarks
+                          	 from shipment sm
+						  	 left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null and sm.flag=0 
+						  	  <if test='company != "0"'>
+									and sm.transportCompany = #{company} 
+								</if>
+								<if test='senttimeBegin != ""'>
+									<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+								</if>
+								<if test='senttimeEnd != ""'>
+									<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+								</if>
+						  	 and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+                 			 group by sm.orderNo order by sm.id 
+						     ) s 
+ 					   INNER  JOIN  orderinfo oi on s.orderid = oi.order_no 
+ 					   
+ 					   UNION 
+ 					    
+ 					    select DISTINCT s.* , droi.child_order_no , 
+						   substring(substring(droi.mode_transport ,locate('@',droi.mode_transport)+1),1,locate('@',substring(droi.mode_transport ,locate('@',droi.mode_transport)+1))-1)  as delivery,
+						   substring(substring_index(droi.mode_transport,"@",3),
+														LENGTH(substring_index(droi.mode_transport,"@",2))+2,
+														LENGTH(substring_index(droi.mode_transport,"@",3))-LENGTH(substring_index(droi.mode_transport,"@",2)-1)
+														)   as  xtcountry   
+                          	from 	(select distinct sm.*,(sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as actual_freight  
+                          	, sp.orderid ,sp.svolume,sp.sweight,ifnull(sp.volumeweight,0) as volumeweights,sp.volumeweight ,sp.transportcompany as  tscompany,sp.createtime as sp_time,ifnull(sm.flag_remark,'') as flag_remarks
+                          	 from shipment sm
+						  	 left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null and sm.flag=0 
+						  	  <if test='company != "0"'>
+									and sm.transportCompany = #{company} 
+								</if>
+								<if test='senttimeBegin != ""'>
+									<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+								</if>
+								<if test='senttimeEnd != ""'>
+									<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+								</if>
+						  	    and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+                 			    group by sm.orderNo order by sm.id 
+						     ) s 
+ 					   INNER JOIN  dropshiporder droi on s.orderid = droi.child_order_no     
+		    </if>
+		    <if test='choiseType == "3"'>
+					select  DISTINCT  s.* ,
+   					substring(substring(oi.mode_transport ,locate('@',oi.mode_transport)+1),1,locate('@',substring(oi.mode_transport ,locate('@',oi.mode_transport)+1))-1)  as delivery,
+					substring(substring_index(oi.mode_transport,"@",3),
+								LENGTH(substring_index(oi.mode_transport,"@",2))+2,
+								LENGTH(substring_index(oi.mode_transport,"@",3))-LENGTH(substring_index(oi.mode_transport,"@",2)-1)
+								)   as  xtcountry   
+  					from 	(select distinct sm.*, (sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as actual_freight,greatest(sp.sweight+0,sp.volumeweight+0) as volumeweight 
+  					  , sp.orderid ,sp.sweight ,sp.svolume,sp.volumeweight as  volumeweights,sp.transportcompany as  tscompany ,sp.createtime as sp_time ,ifnull(sm.flag_remark,'') as flag_remarks
+  					 from shipment sm 
+					 left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null and sm.flag=0 
+					 <if test='company != "0"'>
+						and sm.transportCompany = #{company} 
+					</if>
+					<if test='senttimeBegin != ""'>
+						<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+					</if>
+					<if test='senttimeEnd != ""'>
+						<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+					</if>
+					 and sp.svolume is not null and sp.volumeweight is not null and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate}
+					 and sm.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+				     group by sm.orderNo  order  by  sm.id  
+ 					) s 
+				INNER  JOIN  orderinfo oi on s.orderid = oi.order_no 
+				UNION
+				select  DISTINCT  s.* ,
+   					substring(substring(droi.mode_transport ,locate('@',droi.mode_transport)+1),1,locate('@',substring(droi.mode_transport ,locate('@',droi.mode_transport)+1))-1)  as delivery,
+					substring(substring_index(droi.mode_transport,"@",3),
+								LENGTH(substring_index(droi.mode_transport,"@",2))+2,
+								LENGTH(substring_index(droi.mode_transport,"@",3))-LENGTH(substring_index(droi.mode_transport,"@",2)-1)
+								)   as  xtcountry   
+  					from 	(select distinct sm.*, (sp.estimatefreight * #{exchageRate}) as estimatefreight,IFNULL(CASE WHEN sp.actual_freight>0 THEN sp.actual_freight ELSE sm.totalPrice END,0.00) as actual_freight,greatest(sp.sweight+0,sp.volumeweight+0) as volumeweight 
+  					  , sp.orderid ,sp.sweight ,sp.svolume,sp.volumeweight as volumeweights ,sp.transportcompany as  tscompany ,sp.createtime as sp_time ,ifnull(sm.flag_remark,'') as flag_remarks
+  					 from shipment sm 
+					 left join shipping_package sp on sm.orderNo = sp.expressno where sm.flag=0 and sm.orderNo is not null and sm.flag=0 
+					  <if test='company != "0"'>
+						and sm.transportCompany = #{company} 
+					</if>
+					<if test='senttimeBegin != ""'>
+						<![CDATA[ and sm.sentTime >= #{senttimeBegin} ]]>
+					</if>
+					<if test='senttimeEnd != ""'>
+						<![CDATA[ and sm.sentTime <= #{senttimeEnd} ]]>
+					</if>
+					 and sp.svolume is not null and sp.volumeweight is not null and sm.totalPrice > (sp.estimatefreight + sp.estimatefreight * 0.05) * #{exchageRate} 
+					 and sm.realWeight > (greatest(sp.sweight+0,sp.volumeweight+0) + (greatest(sp.sweight+0,sp.volumeweight+0) * 0.2))
+				     group by sm.orderNo  order  by  sm.id  
+ 					) s 
+				INNER  JOIN  dropshiporder  droi on s.orderid = droi.child_order_no 
+ 		    </if>
+		    <choose>
+			<when test='page != 0 and pageSize != 0'>
+				limit #{page} ,#{pageSize} 
+			</when>
+			<when test='pageSize != 0'>
+				limit #{pageSize} 
+			</when>
+		</choose>;
+  </select>
+  <select id="selectUnExistShipMent" resultMap="BaseResultMap"
+		useCache="false" flushCache="true">
+select distinct sm.* , sp.passFlag from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
+where 1 = 1 and sp.expressno is null and sm.orderNo in (${idStr}) 
+  </select>
+  
+  <select id="selectPayedShipMent"  resultMap="BaseResultMap">
+  select distinct sm.* , sp.passFlag from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
+where 1 = 1 and sp.expressno is null and sm.orderNo  = #{orderno}  
+
+UNION 
+       select distinct sm.* , sp.passFlag  from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
+where 1 = 1 and sp.passFlag = 1  and sm.orderNo  = #{orderno}   
+  </select>
+  <update id="updateShipMentFlag">
+    update shipment set flag=1 where id in 
+	  	<foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+				#{item}
+		</foreach>
+	;UPDATE shipping_package AS a inner JOIN shipment AS b 
+       ON a.expressNo=b.orderNo 
+       SET a.actual_freight=#{totalprice},b.flag_remark=#{flag_remark}
+       WHERE a.expressNo=b.orderNo and b.id in
+       <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+				#{item}
+		</foreach>
+  </update>
+  
+  <insert id="insertUnExistOrPayedSelective" parameterType="com.cbt.warehouse.pojo.Shipment" >
+    insert into  unExistOrPayedShipment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="senttime != null" >
+        sentTime,
+      </if>
+      <if test="orderno != null" >
+        orderNo,
+      </if>
+      <if test="switchno != null" >
+        switchNo,
+      </if>
+      <if test="addressee != null" >
+        addressee,
+      </if>
+      <if test="country != null" >
+        country,
+      </if>
+      <if test="transportcompany != null" >
+        transportCompany,
+      </if>
+      <if test="transporttype != null" >
+        transportType,
+      </if>
+      <if test="numbers != null" >
+        numbers,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="realweight != null" >
+        realWeight,
+      </if>
+      <if test="bulkweight != null" >
+        bulkWeight,
+      </if>
+      <if test="settleweight != null" >
+        settleWeight,
+      </if>
+      <if test="charge != null" >
+        charge,
+      </if>
+      <if test="fuelsurcharge != null" >
+        fuelSurcharge,
+      </if>
+      <if test="securitycosts != null" >
+        securityCosts,
+      </if>
+      <if test="taxs != null" >
+        taxs,
+      </if>
+      <if test="totalprice != null" >
+        totalPrice,
+      </if>
+      <if test="remark != null" >
+        reMark,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+      <if test="uuid != null" >
+        uuid,
+      </if>
+      <if test="validate != null" >
+        validate,
+      </if>
+      <if test="passFlag != null" >
+        passFlag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="senttime != null" >
+        #{senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderno != null" >
+        #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="switchno != null" >
+        #{switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="addressee != null" >
+        #{addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="transportcompany != null" >
+        #{transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="transporttype != null" >
+        #{transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null" >
+        #{numbers,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="realweight != null" >
+        #{realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="bulkweight != null" >
+        #{bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="settleweight != null" >
+        #{settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null" >
+        #{charge,jdbcType=DECIMAL},
+      </if>
+      <if test="fuelsurcharge != null" >
+        #{fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="securitycosts != null" >
+        #{securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="taxs != null" >
+        #{taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="totalprice != null" >
+        #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uuid != null" >
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="validate != null" >
+        #{validate,jdbcType=INTEGER},
+      </if>
+      <if test="passFlag != null" >
+        #{passFlag,jdbcType=INTEGER},
+      </if>
+    </trim>
+    ON DUPLICATE KEY UPDATE 
+    <trim suffixOverrides="," >
+    	<if test="senttime != null" >
+        sentTime = #{senttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="switchno != null" >
+        switchNo = #{switchno,jdbcType=VARCHAR},
+      </if>
+      <if test="addressee != null" >
+        addressee = #{addressee,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="transportcompany != null" >
+        transportCompany = #{transportcompany,jdbcType=VARCHAR},
+      </if>
+      <if test="transporttype != null" >
+        transportType = #{transporttype,jdbcType=VARCHAR},
+      </if>
+      <if test="numbers != null" >
+        numbers = #{numbers,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="realweight != null" >
+        realWeight = #{realweight,jdbcType=DECIMAL},
+      </if>
+      <if test="bulkweight != null" >
+        bulkWeight = #{bulkweight,jdbcType=VARCHAR},
+      </if>
+      <if test="settleweight != null" >
+        settleWeight = #{settleweight,jdbcType=DECIMAL},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=DECIMAL},
+      </if>
+      <if test="fuelsurcharge != null" >
+        fuelSurcharge = #{fuelsurcharge,jdbcType=DECIMAL},
+      </if>
+      <if test="securitycosts != null" >
+        securityCosts = #{securitycosts,jdbcType=DECIMAL},
+      </if>
+      <if test="taxs != null" >
+        taxs = #{taxs,jdbcType=DECIMAL},
+      </if>
+      <if test="totalprice != null" >
+        totalPrice = #{totalprice,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        reMark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="validate != null" >
+        validate = #{validate,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  <delete id="deleteShipment">
+  	delete from shipment where id in 
+	  	<foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+				#{item}
+		</foreach>
+  </delete>
+  
+    <select id="PurchaseStatisticsInquiry" resultType="hashmap">
+    SELECT b.times,SUM(b.od_count) AS od_count,SUM(b.oi_count) AS oi_count,SUM(b.od_buy_time) AS od_buy_time,SUM(b.goods_buy_time) AS goods_buy_time,SUM(ck_counts) AS ck_counts FROM (
+<!-- 	 商品数量  -->
+	SELECT LEFT(oi.`orderpaytime`,7) AS times,COUNT(DISTINCT od.id) AS od_count,0 AS oi_count,0 AS od_buy_time,0 AS goods_buy_time,0 AS ck_counts FROM orderinfo oi 
+	INNER JOIN order_details od ON oi.order_no=od.orderid
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2 AND a.adminid&lt;>'18' AND oi.isDropshipOrder&lt;>'3'
+	AND DATE_SUB(CURDATE(), INTERVAL ${tj_days} DAY) &lt;= DATE(oi.`orderpaytime`) AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY LEFT(oi.`orderpaytime`,7)
+	UNION
+<!-- 	 订单数量 -->
+	SELECT LEFT(oi.`orderpaytime`,7) AS times,0 AS od_count,COUNT(DISTINCT oi.order_no) AS oi_count,0 AS od_buy_time,0 AS goods_buy_time,0 AS ck_counts FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE oi.state>0 AND oi.state&lt;6  AND a.`adminid`&lt;>'18'
+	AND DATE_SUB(CURDATE(), INTERVAL ${tj_days} DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3' AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY LEFT(oi.`orderpaytime`,7)
+	UNION
+<!-- 	 订单采购时间 -->
+	SELECT a.times ,0 AS od_count,0 AS oi_count, SUM(a.counts) AS od_buy_time,0 AS goods_buy_time,0 AS ck_counts FROM (
+	SELECT LEFT(oi.`orderpaytime`,7) AS times,TIMESTAMPDIFF(DAY,LEFT(oi.orderpaytime,10),LEFT(id.createtime,10)) AS counts FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN id_relationtable id ON oi.order_no=id.orderid
+	WHERE oi.state>0 AND oi.state&lt;6 AND DATE_SUB(CURDATE(), INTERVAL ${tj_days} DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3'
+	AND a.`adminid`&lt;>'18' AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY id.orderid HAVING MAX(id.id) 
+	) a GROUP BY a.times
+	UNION
+<!-- 	 商品采购时间 -->
+	SELECT a.times,0 AS od_count,0 AS oi_count, 0 AS od_buy_time,SUM(a.counts) AS goods_buy_time,0 AS ck_counts FROM (
+	SELECT LEFT(oi.`orderpaytime`,7) AS times,ops.orderid,ops.goodsid,ops.addtime,id.createtime,CASE WHEN TIMESTAMPDIFF(DAY,LEFT(ops.addtime,10),LEFT(id.createtime,10))=0 THEN 1 ELSE TIMESTAMPDIFF(DAY,LEFT(ops.addtime,10),LEFT(id.createtime,10)) END AS counts FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN order_details od ON oi.order_no=od.`orderid`
+	INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+	INNER JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid
+	WHERE  DATE_SUB(CURDATE(), INTERVAL ${tj_days} DAY)  &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder` &lt;>'3'
+	AND a.`adminid` &lt;>'18' AND LENGTH(oi.order_no) &lt;=18 
+	) a GROUP BY a.times
+	UNION
+<!-- 	 订单出库时间 -->
+	SELECT a.times,0 AS od_count,0 AS oi_count, 0 AS od_buy_time,0 AS goods_buy_time,SUM(a.counts) AS ck_counts FROM (
+	SELECT  LEFT(oi.`orderpaytime`,7) AS times,oi.order_no,oi.orderpaytime,sp.createtime,TIMESTAMPDIFF(DAY,LEFT(oi.orderpaytime,10),LEFT(sp.createtime,10)) AS counts 
+	FROM orderinfo oi INNER JOIN shipping_package sp 
+	ON oi.order_no=sp.orderid
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE  DATE_SUB(CURDATE(), INTERVAL ${tj_days} DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3'
+	AND a.`adminid`&lt;>'18' AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY sp.orderid HAVING MAX(sp.id)
+	) a GROUP BY a.times
+	) b GROUP BY b.times
+    </select>
+  
+  <select id="shipmentTimeCount" resultType="hashmap">
+  	  select oi.order_no orderno,
+		date_format(orderpaytime, '%Y-%m-%d') orderpaytime,
+		date_format(sp.createtime, '%Y-%m-%d') createtime,
+		oi.delivery_time,
+		(TIMESTAMPDIFF( DAY,orderpaytime, sp.createtime )) intervals, 
+		((TIMESTAMPDIFF( DAY,orderpaytime, sp.createtime )) - oi.delivery_time )  delays,
+		admname,oi.state state ,(SELECT COUNT(id) FROM order_details WHERE orderid=oi.order_no AND state&lt;2) AS od_count,
+		( SELECT SUM(TIMESTAMPDIFF(DAY,ops.addtime,id.createtime))  FROM order_product_source ops 
+		inner join order_details od on od.orderid=ops.orderid and od.goodsid=ops.goodsid
+		INNER JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid WHERE od.orderid=oi.order_no and od.state&lt;2) AS cg_time
+       from orderinfo oi 
+       inner join  shipping_package sp  
+        on  oi.order_no=sp.orderid  left  join admin_r_user  aru on  aru.userid=oi.user_id 
+  	   where  
+  	 <if test="paytimestart != null and paytimeend != null">
+  	 	orderpaytime  &gt;  #{paytimestart} and  orderpaytime &lt; #{paytimeend}
+  	 </if>
+  	 <if test="days > 0">
+  	 	and  ( TIMESTAMPDIFF( DAY,orderpaytime, sp.createtime ) - oi.delivery_time )  &gt;  #{days}
+  	 </if>
+  	  <if test="paytimestart == null">
+  	 	date_sub(curdate(), INTERVAL 30 DAY) &lt;= date(sp.createtime)
+  	 </if>
+  	  order by orderpaytime desc
+  </select>
+  
+  
+  <select id="countShipmentTime"  resultType="Integer">
+    select count(*)  
+     from orderinfo oi inner join  shipping_package sp  
+ on  oi.order_no=sp.orderid  left  join admin_r_user  aru on  aru.userid=oi.user_id 
+  	   where  
+  	 <if test="paytimestart != null and paytimeend != null">
+  	 	orderpaytime  &gt;  #{paytimestart} and  orderpaytime &lt; #{paytimeend}
+  	 </if>
+  	 <if test="days > 0">
+  	 	and  ( TIMESTAMPDIFF( DAY,orderpaytime, sp.createtime ) - oi.delivery_time )  &gt;  #{days}
+  	 </if>
+  	  <if test="paytimestart == null">
+  	 	date_sub(curdate(), INTERVAL 30 DAY) &lt;= date(sp.createtime) 
+  	 </if>
+  </select>
+  
+  
+  <select id="showCalculFreight"  resultMap="BaseResultMap">
+     select SUM(totalPrice) as totalPrice ,transportcompany , createtime ,  max(passFlag)  as  passFlag  from  shipping_package  where  createtime  &gt; #{time}     GROUP BY  substring(createtime,1,7) ,transportcompany
+  </select>
+  
+  <update id="check">
+      update  shipping_package  set passFlag = 1 where createtime  &gt;= #{start}  and  createtime &lt; #{end}
+  </update>
+  
+  <select id="getNoTolPrice" resultType="java.lang.String"> 
+    SELECT SUM(s.totalprice) as totalprice FROM shipment s 
+	LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno 
+	WHERE s.orderNo IS NOT NULL AND sp.id IS NULL
+	 <if test='company != "0"'>
+			and s.transportCompany = #{company} 
+	</if>
+	<if test='senttimeBegin != ""'>
+			<![CDATA[ and s.sentTime >= #{senttimeBegin} ]]>
+	</if>
+	<if test='senttimeEnd != ""'>
+			<![CDATA[ and s.sentTime <= #{senttimeEnd} ]]>
+	</if>
+  </select>
+  <select id="getLogisticsCompensation" resultType="INTEGER">
+    select count(id) from logistics_compensation where datas=#{datas} and comps=#{comps}
+  </select>
+  <insert id="insertSources">
+     insert into logistics_compensation(amounts,datas,comps,createtime)values(#{amounts},#{datas},#{comps},now())
+  </insert>
+  <update id="upSources">
+    update logistics_compensation set amounts=#{amounts} where datas=#{datas} and comps=#{comps}
+  </update>
+  <select id="getCompensationAmounts" resultType="INTEGER">
+  select ifnull(sum(amounts),0) as amounts from logistics_compensation where datas >=left(#{startTime},7)
+  <if test='endTime !="" '>
+   and datas<![CDATA[ <=]]>left(#{endTime},7)
+  </if>
+    <if test='comps != "0"'>
+      and comps=#{comps}
+    </if>
+  </select>
+  <select id="getDetailsCount" resultType="INTEGER">
+     SELECT COUNT(DISTINCT od.id) FROM orderinfo oi 
+	INNER JOIN order_details od ON oi.order_no=od.orderid
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2 AND a.adminid&lt;>'18' AND oi.isDropshipOrder&lt;>'3'
+	AND DATE_SUB(CURDATE(), INTERVAL 120 DAY) &lt;= DATE(oi.`orderpaytime`) AND LENGTH(oi.order_no)&lt;=18
+  </select>
+  <select id="getOrderBuyTime" resultType="INTEGER">
+     SELECT SUM(a.counts) FROM (
+	SELECT oi.order_no,TIMESTAMPDIFF(DAY,LEFT(oi.orderpaytime,10),LEFT(id.createtime,10)) AS counts FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN id_relationtable id ON oi.order_no=id.orderid
+	WHERE oi.state>0 AND oi.state&lt;6 AND DATE_SUB(CURDATE(), INTERVAL 120 DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3'
+	AND a.`adminid`&lt;>'18' AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY id.orderid HAVING MAX(id.id) 
+	) a
+  </select>
+  <select id="getGoodsbuytime" resultType="INTEGER">
+	SELECT SUM(a.counts) FROM (
+	SELECT ops.orderid,ops.goodsid,ops.addtime,id.createtime,CASE WHEN TIMESTAMPDIFF(DAY,LEFT(ops.addtime,10),LEFT(id.createtime,10))=0 THEN 1 ELSE TIMESTAMPDIFF(DAY,LEFT(ops.addtime,10),LEFT(id.createtime,10)) END AS counts FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	INNER JOIN order_details od ON oi.order_no=od.`orderid`
+	INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
+	INNER JOIN id_relationtable id ON ops.orderid=id.orderid AND ops.goodsid=id.goodid
+	WHERE  DATE_SUB(CURDATE(), INTERVAL 120 DAY)  &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder` &lt;>'3'
+	AND a.`adminid` &lt;>'18' AND LENGTH(oi.order_no) &lt;=18 
+	) a
+  </select>
+  <select id="getChTime" resultType="INTEGER">
+    SELECT SUM(a.counts) FROM (
+	SELECT  oi.order_no,oi.orderpaytime,sp.createtime,TIMESTAMPDIFF(DAY,LEFT(oi.orderpaytime,10),LEFT(sp.createtime,10)) AS counts 
+	FROM orderinfo oi INNER JOIN shipping_package sp 
+	ON oi.order_no=sp.orderid
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE  DATE_SUB(CURDATE(), INTERVAL 120 DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3'
+	AND a.`adminid`&lt;>'18' AND LENGTH(oi.order_no)&lt;=18
+	GROUP BY sp.orderid HAVING MAX(sp.id)
+	) a
+  </select>
+  <select id="getOrderCount" resultType="INTEGER">
+    SELECT COUNT(DISTINCT oi.order_no) FROM orderinfo oi 
+	INNER JOIN admin_r_user a ON oi.user_id=a.userid
+	WHERE oi.state>0 AND oi.state&lt;6  AND a.`adminid`&lt;>'18'
+	AND DATE_SUB(CURDATE(), INTERVAL 120 DAY) &lt;= DATE(oi.`orderpaytime`) AND oi.`isDropshipOrder`&lt;>'3' AND LENGTH(oi.order_no)&lt;=18
+  </select>
+</mapper>

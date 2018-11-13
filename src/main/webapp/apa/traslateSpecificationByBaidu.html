@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>百度翻译</title>
+<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript">
+	var specificationLst = [];
+	var mappingLst = [];
+
+	$(function() {
+		$.ajax({
+			type : "get",
+			async : false,
+			url : "../specification/queryTranslationEnName",
+			success : function(data) {
+				if (data.ok) {
+					specificationLst = data.data;
+				} else {
+					alert(data.message);
+				}
+			}
+		});
+
+		$.ajax({
+			type : "get",
+			async : false,
+			url : "../specification/queryMappingEnName",
+			success : function(data) {
+				if (data.ok) {
+					mappingLst = data.data;
+				} else {
+					alert(data.message);
+				}
+			}
+		});
+		console.log("specificationLst length " + specificationLst.length);
+		console.log("mappingLst length " + mappingLst.length);
+
+	});
+
+	function testLst() {
+		if (specificationLst.length > 0) {
+			$.each(specificationLst, function(index, item) {
+				console.log(item);
+			})
+		}
+	}
+
+	function specificationTraslate() {
+		if (specificationLst.length > 0) {
+			var total = 0;
+			$.each(specificationLst,function(index, item) {
+				console.log("开始翻译：" + item);
+				$.ajax({
+					type : "get", //jquey是不支持post方式跨域的 
+					async : false,
+					url : "http://www.52miui.com/onlinetools/translate/baidu.php", //跨域请求的URL
+					data : {
+						code : item,
+						from : "auto",
+						to : "zh",
+					},
+					dataType : "jsonp",
+					jsonp : "callback",
+					success : function(data) {
+						if (data) {
+							var chinaCode = "";
+							$.each(data, function(idx,item) {
+								chinaCode = item.name;
+							});
+							console.log("翻译成功，结果为："+ chinaCode);
+							$.ajax({
+								type : "post",
+								url : "../specification/updateSpecificationByEnName",
+								data : {
+									enName : item,
+									chName : chinaCode
+								},
+								success : function(data) {
+									console.log(data.message + ",总数:" + (total++));
+								}
+							});
+						} else {
+							console.log("翻译失败了！");
+						}
+					}
+				});
+			});
+			console.log("翻译总数：" + total);
+		}
+	}
+
+	function mappingTraslate() {
+		if (mappingLst.length > 0) {
+			var total = 0;
+			$.each(mappingLst,function(index, item) {
+				console.log("开始翻译：" + item);
+				$.ajax({
+					type : "get", //jquey是不支持post方式跨域的 
+					async : false,
+					url : "http://www.52miui.com/onlinetools/translate/baidu.php", //跨域请求的URL
+					data : {
+						code : item,
+						from : "auto",
+						to : "zh",
+					},
+					dataType : "jsonp",
+					jsonp : "callback",
+					success : function(data) {
+						if (data) {
+							var chinaCode = "";
+							$.each(data, function(idx,item) {
+								chinaCode = item.name;
+							});
+							console.log("翻译成功，结果为："+ chinaCode);
+							$.ajax({
+								type : "post",
+								url : "../specification/updateMappingByEnName",
+								data : {
+									enName : item,
+									chName : chinaCode
+								},
+								success : function(data) {
+									console.log(data.message + ",总数:" + (total++));
+								}
+							});
+						} else {
+							console.log("翻译失败了！");
+						}
+					}
+				});
+			});
+			console.log("翻译总数：" + total);
+		}
+	}
+	
+	function initSpecification(){
+		$.ajax({
+			type : "get",
+			async : false,
+			url : "../specification/initSpecification",
+			success : function(data) {
+				if (data.ok) {
+					console.log("执行初始化规格和规格属性成功！");
+				} else {
+					console.log(data.message);
+				}
+			}
+		});
+	}
+
+	function btnClick() {
+		var code = $("#china").val();
+		$.ajax({
+			type : "get", //jquey是不支持post方式跨域的 
+			async : false,
+			url : "http://www.52miui.com/onlinetools/translate/baidu.php", //跨域请求的URL
+			data : {
+				code : code,
+				from : "auto",
+				to : "zh",
+			},
+			dataType : "jsonp",
+			jsonp : "callback",
+			success : function(data) {
+				if (data) {
+					$.each(data, function(idx, item) {
+						$("#resault").val(item.name);
+						console.log(code + " is:" + item.name);
+					});
+				} else {
+					alert("翻译失败了！");
+				}
+			}
+		});
+	}
+</script>
+</head>
+<body>
+
+	<div>
+
+		<input id="china" width=80px></input>
+		<button onclick="btnClick()">翻译</button>
+		<br> 
+		<label for="resault">结果：</label>
+		<br>
+		<input id="resault" width=80px></input> 
+		<br>
+		<br>
+		<button onclick="specificationTraslate()">规格翻译</button>
+		&nbsp;&nbsp;
+		<button onclick="mappingTraslate()">规格属性翻译</button>
+		<br>
+		<br>
+		<button onclick="initSpecification()">规格数据初始化</button>
+		&nbsp;&nbsp;
+		<button onclick="testLst()">测试翻译</button>
+
+	</div>
+
+
+</body>
+</html>

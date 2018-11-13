@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.CustomizedMapper">
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.CustomizedBean">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="price" jdbcType="VARCHAR" property="price" />
+    <result column="price_unit" jdbcType="VARCHAR" property="price_unit" />
+    <result column="delivery_time" jdbcType="VARCHAR" property="delivery_time" />
+    <result column="quantity" jdbcType="INTEGER" property="quantity" />
+    <result column="color" jdbcType="VARCHAR" property="color" />
+    <result column="color_note" jdbcType="VARCHAR" property="color_note" />
+    <result column="size" jdbcType="VARCHAR" property="size" />
+    <result column="size_data" jdbcType="VARCHAR" property="size_data" />
+    <result column="size_file" jdbcType="VARCHAR" property="size_file" />
+    <result column="size_note" jdbcType="VARCHAR" property="size_note" />
+    <result column="logo_data" jdbcType="VARCHAR" property="logo_data" />
+    <result column="logo_file" jdbcType="VARCHAR" property="logo_file" />
+    <result column="logo_note" jdbcType="VARCHAR" property="logo_note" />
+    <result column="label_file" jdbcType="VARCHAR" property="label_file" />
+    <result column="label_note" jdbcType="VARCHAR" property="label_note" />
+    <result column="tag_file" jdbcType="VARCHAR" property="tag_file" />
+    <result column="tag_note" jdbcType="VARCHAR" property="tag_note" />
+    <result column="pname" jdbcType="VARCHAR" property="pname" />
+    <result column="related_url" jdbcType="VARCHAR" property="related_url" />
+    <result column="img_url" jdbcType="VARCHAR" property="img_url" />
+    <result column="discount_rate" jdbcType="VARCHAR" property="discount_rate" />
+    <result column="discount_from" jdbcType="VARCHAR" property="discount_from" />
+    <result column="discount_category" jdbcType="VARCHAR" property="discount_category" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="telephone" jdbcType="VARCHAR" property="telephone" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="create_time" jdbcType="VARCHAR" property="create_time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, userid, price, price_unit,delivery_time, quantity, color, color_note, size, size_data, size_file, size_note, logo_data, 
+    logo_file, logo_note, label_file, label_note, tag_file, tag_note, pname, related_url, img_url, discount_rate, 
+    discount_from, discount_category, email, telephone, status, create_time
+  </sql>
+  <select id="get" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from customized
+    where id = #{id,jdbcType=INTEGER} limit 1
+  </select>
+  <select id="getList" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from customized
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="getMap" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+    select 
+    <include refid="Base_Column_List" />
+    from customized
+    where id = #{id,jdbcType=INTEGER} limit 1
+  </select>
+  <select id="getMapList" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+    select 
+    <include refid="Base_Column_List" />
+    from customized
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="java.lang.Integer">
+    delete from customized
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.importExpress.pojo.CustomizedBean" useGeneratedKeys="true" keyProperty="id">
+    insert into customized (userid, price, price_unit,delivery_time, quantity, 
+      color, color_note, size, 
+      size_data, size_file, size_note, 
+      logo_data, logo_file, logo_note, 
+      label_file, label_note, tag_file, 
+      tag_note, pname, related_url, img_url, discount_rate, 
+      discount_from, discount_category, email, telephone, status, create_time)
+    values (#{userid,jdbcType=INTEGER},#{price,jdbcType=VARCHAR},#{price_unit,jdbcType=VARCHAR}, 
+      #{delivery_time,jdbcType=VARCHAR},#{quantity,jdbcType=INTEGER}, 
+      #{color,jdbcType=VARCHAR}, #{color_note,jdbcType=VARCHAR}, #{size,jdbcType=VARCHAR}, 
+      #{size_data,jdbcType=VARCHAR}, #{size_file,jdbcType=VARCHAR}, #{size_note,jdbcType=VARCHAR}, 
+      #{logo_data,jdbcType=VARCHAR}, #{logo_file,jdbcType=VARCHAR}, #{logo_note,jdbcType=VARCHAR}, 
+      #{label_file,jdbcType=VARCHAR}, #{label_note,jdbcType=VARCHAR}, #{tag_file,jdbcType=VARCHAR}, 
+      #{tag_note,jdbcType=VARCHAR}, #{pname,jdbcType=VARCHAR}, #{related_url,jdbcType=VARCHAR}, 
+      #{img_url,jdbcType=VARCHAR}, #{discount_rate,jdbcType=VARCHAR}, #{discount_from,jdbcType=VARCHAR},
+      #{discount_category,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},#{telephone,jdbcType=VARCHAR},
+      #{status,jdbcType=CHAR}, #{create_time,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="update" parameterType="com.importExpress.pojo.CustomizedBean">
+    update customized
+    <set>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=INTEGER},
+      </if>
+      <if test="price_unit != null">
+        price_unit = #{price_unit,jdbcType=INTEGER},
+      </if>
+      <if test="delivery_time != null">
+        delivery_time = #{delivery_time,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="color != null">
+        color = #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="color_note != null">
+        color_note = #{color_note,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=VARCHAR},
+      </if>
+      <if test="size_data != null">
+        size_data = #{size_data,jdbcType=VARCHAR},
+      </if>
+      <if test="size_file != null">
+        size_file = #{size_file,jdbcType=VARCHAR},
+      </if>
+      <if test="size_note != null">
+        size_note = #{size_note,jdbcType=VARCHAR},
+      </if>
+      <if test="logo_data != null">
+        logo_data = #{logo_data,jdbcType=VARCHAR},
+      </if>
+      <if test="logo_file != null">
+        logo_file = #{logo_file,jdbcType=VARCHAR},
+      </if>
+      <if test="logo_note != null">
+        logo_note = #{logo_note,jdbcType=VARCHAR},
+      </if>
+      <if test="label_file != null">
+        label_file = #{label_file,jdbcType=VARCHAR},
+      </if>
+      <if test="label_note != null">
+        label_note = #{label_note,jdbcType=VARCHAR},
+      </if>
+      <if test="tag_file != null">
+        tag_file = #{tag_file,jdbcType=VARCHAR},
+      </if>
+      <if test="tag_note != null">
+        tag_note = #{tag_note,jdbcType=VARCHAR},
+      </if>
+      <if test="pname != null">
+        pname = #{pname,jdbcType=VARCHAR},
+      </if>
+      <if test="related_url != null">
+        related_url = #{related_url,jdbcType=VARCHAR},
+      </if>
+      <if test="img_url != null">
+        img_url = #{img_url,jdbcType=VARCHAR},
+      </if>
+      <if test="discount_rate != null">
+        discount_rate = #{discount_rate,jdbcType=VARCHAR},
+      </if>
+      <if test="discount_from != null">
+        discount_from = #{discount_from,jdbcType=VARCHAR},
+      </if>
+      <if test="discount_category != null">
+        discount_category = #{discount_category,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="telephone != null">
+        telephone = #{telephone,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStatus">
+    update customized set status=#{status} where id=#{id}
+  </update>
+</mapper>

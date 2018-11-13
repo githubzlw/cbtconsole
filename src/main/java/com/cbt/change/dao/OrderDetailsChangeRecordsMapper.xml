@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.change.dao.OrderDetailsChangeRecordsMapper">
+	<resultMap id="OrderDetailsChangeRecordsResultMap" type="com.cbt.change.bean.OrderDetailsChangeRecords">
+		<id column="id" property="id" />
+		<result column="order_no" property="orderNo" />
+		<result column="ods_id" property="odsId" />
+		<result column="goods_id" property="goodsId" />
+		<result column="goods_price" property="goodsPrice" />
+		<result column="goods_number" property="goodsNumber" />
+		<result column="ods_status" property="odsStatus" />
+		<result column="purchase_status" property="purchaseStatus" />
+		<result column="user_id" property="userId" />
+		<result column="admin_id" property="adminId" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+
+	<sql id="OrderDetailsChangeRecordsColumn">
+		id,order_no,ods_id,goods_id,goods_price,goods_number,ods_status,purchase_status,user_id,admin_id,create_time
+	</sql>
+
+	<select id="queryForList" resultMap="OrderDetailsChangeRecordsResultMap">
+		select <include refid="OrderDetailsChangeRecordsColumn"></include>
+		from order_details_change_records
+		where 1=1 
+		<if test="id != null and id !=0">
+			and id = #{id}
+		</if>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no = #{orderNo}
+		</if>
+		<if test="odsId != null and odsId !=0">
+			and ods_id = #{odsId}
+		</if>
+		<if test="goodsId != null and goodsId !=0">
+			and goods_id = #{goodsId}
+		</if>
+		<if test="odsStatus != null and odsStatus !=0">
+			and ods_status = #{odsStatus}
+		</if>
+		<if test="purchaseStatus != null and purchaseStatus !=0">
+			and purchase_status = #{purchaseStatus}
+		</if>
+		<if test="userId != null and userId !=0">
+			and user_id = #{userId}
+		</if>
+		<if test="adminId != null and adminId !=0">
+			and admin_id = #{adminId}
+		</if>
+		<if test="beginDate != null and beginDate !=''">
+			date(create_time) &gt;= date(#{beginDate})
+		</if>
+		<if test="endDate != null and endDate !=''">
+			date(create_time) &lt;= date(#{endDate})
+		</if>
+		order by create_time desc
+		<if test="limitCount != null and limitCount !=0">
+			limit #{startNo},#{limitCount}
+		</if>
+	</select>
+	
+	<select id="queryForCount" resultType="java.lang.Integer">
+		select count(id)
+		from order_details_change_records
+		where 1=1 
+		<if test="id != null and id !=0">
+			and id = #{id}
+		</if>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no = #{orderNo}
+		</if>
+		<if test="odsId != null and odsId !=0">
+			and ods_id = #{odsId}
+		</if>
+		<if test="goodsId != null and goodsId !=0">
+			and goods_id = #{goodsId}
+		</if>
+		<if test="odsStatus != null and odsStatus !=0">
+			and ods_status = #{odsStatus}
+		</if>
+		<if test="purchaseStatus != null and purchaseStatus !=0">
+			and purchase_status = #{purchaseStatus}
+		</if>
+		<if test="userId != null and userId !=0">
+			and user_id = #{userId}
+		</if>
+		<if test="adminId != null and adminId !=0">
+			and admin_id = #{adminId}
+		</if>
+		<if test="beginDate != null and beginDate !=''">
+			date(create_time) &gt;= date(#{beginDate})
+		</if>
+		<if test="endDate != null and endDate !=''">
+			date(create_time) &lt;= date(#{endDate})
+		</if>
+	</select>
+	
+	<insert id="insertChangeRecords" parameterType="com.cbt.change.bean.OrderChangeRecords">
+	
+	insert into order_details_change_records
+		(order_no,ods_id,goods_id,goods_price,goods_number,
+		ods_status,purchase_status,user_id,admin_id)
+	values(#{orderNo},#{odsId},#{goodsId},#{goodsPrice},#{goodsNumber},
+		#{odsStatus},#{purchaseStatus},#{userId},#{adminId});
+	
+	</insert>
+
+
+</mapper>

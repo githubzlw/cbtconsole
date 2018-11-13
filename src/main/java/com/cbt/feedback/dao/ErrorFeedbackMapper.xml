@@ -1,0 +1,93 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.feedback.dao.ErrorFeedbackMapper">
+	
+	
+	<resultMap id="resultMap" type="com.cbt.feedback.bean.ErrorFeedback">
+		<id column="id" property="id" />
+		<result column="type" property="type"/>
+		<result column="content" property="content" />
+		<result column="positionFlag" property="positionFlag" />
+		<result column="logLocation" property="logLocation" />
+		<result column="remark" property="remark" />
+		<result column="delFlag" property="delFlag" />
+		<result column="createtime" property="createtime" />
+	</resultMap>
+
+
+    <select id="showErrorFb"  resultMap="resultMap">
+       select *  from  ErrorFeedback  where 1=1 
+        <if test="type!=0">
+        and   type= #{type}
+       </if>  
+       <if test="belongto!=null ">
+        and   belongto= #{belongto}
+       </if>
+       <if test="startTime!=null ">
+        and   createtime   <![CDATA[  >=  ]]> #{startTime}
+       </if>
+       <if test="endTime!=null ">
+        and   createtime   <![CDATA[  <=  ]]> #{endTime}
+       </if>
+        <if test="deFlag!=2">
+        and   delFlag  =  #{deFlag} 
+       </if>
+         limit #{start} ,40 
+    </select>
+    
+    <update id="updateErrorFlag"> 
+        update  ErrorFeedback  set delFlag = 1 
+        <if test="remark!=null">
+         , remark =concat(ifnull(remark, ''),';',#{remark})
+        </if>
+         where id = #{id}
+    </update>
+    
+    
+    <insert id="InsertErrorInfo">
+       insert into ErrorFeedback (content,createtime,belongTo,type,logLocation,positionFlag) 
+       values (#{content},#{createtime},#{belongTo},#{type},#{logLocation},#{positionFlag})
+    </insert>
+    
+    
+    <select id="count"  resultType="Integer">
+      select count(*) as sum   from   ErrorFeedback  where 1=1 
+        <if test="type!=0">
+        and   type= #{type}
+       </if>  
+       <if test="belongto!=null">
+        and   belongto= #{belongto}
+       </if>
+       <if test="startTime!=null">
+        and   createtime   <![CDATA[  >=  ]]> #{startTime}
+       </if>
+       <if test="endTime!=null">
+        and   createtime   <![CDATA[  <=  ]]> #{endTime}
+       </if>
+        <if test="deFlag!=2">
+        and   delFlag  =  #{deFlag} 
+       </if>
+    </select>
+    
+    
+    <update id="updateSomeErrorFlag"  parameterType="list">
+    	update ErrorFeedback
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="delFlag =case" suffix="end,"> 
+				<foreach collection="list" item="i" index="index">
+						when id=${i.id}   then  1
+				</foreach>
+			</trim>  
+			<trim prefix="remark =case" suffix="end,"> 
+				<foreach collection="list" item="i" index="index">
+				      when id=${i.id}   then   '${i.remark}'
+				</foreach>
+			</trim>         
+		</trim>
+		
+		where
+		<foreach collection="list" separator="or" item="i" index="index">
+			id = ${i.id}
+		</foreach>
+    
+    </update>
+</mapper>

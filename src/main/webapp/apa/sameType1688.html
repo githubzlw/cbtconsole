@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>主图同款商品</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<script type="text/javascript">
+	window.onload = function() {
+		var url = document.location.href;
+		var begin = url.indexOf("?");
+		var mainPid = "";
+		if (begin != -1) {
+			var cidStr = url.substring(begin + 1, url.length);
+			var cidLst = cidStr.split("=");
+			if (cidLst.length == 2) {
+				mainPid = cidLst[1];
+			}
+			if (mainPid != "") {
+				doQuery(mainPid)
+			} else {
+				$.messager.alert("提醒", "获取参数失败", "error");
+			}
+		} else {
+			$.messager.alert("提醒", "获取参数失败", "error");
+		}
+	}
+
+	function doQuery(mainPid) {
+		$
+				.ajax({
+					type : 'POST',
+					url : '/cbtconsole/sameTypeGoods/queryListByMainPid',
+					data : {
+						mainPid : mainPid
+					},
+					success : function(data) {
+						if (data.ok) {
+							$("#same_type_table tbody").empty();
+							var results = data.data;
+							var content = "";
+							for (var i = 0; i < results.length; i++) {
+								content += '<tr>';
+								content += '<td style="width: 60px;" align="center"><span>'
+										+ (i + 1) + '</span></td>';
+								content += '<td style="width: 200px;"><a href="https://detail.1688.com/offer/' + results[i].goodsPid 
+										+ '.html" target="_blank">';
+								if(results[i].goodsImg == null || results[i].goodsImg == ""){
+									content += '1688Url';
+								}else{
+									content += '<img style="max-width: 200px;max-height: 200px;" src="' + results[i].goodsImg + '" />';
+								}
+								content += '</a></td>';
+								content += '<td style="width: 600px;">产品名称：<a href="' + results[i].expressUrl + '" target="_blank">'
+										+ results[i].goodsName + '</a>';
+								content += '<br><br> <b>价格：</b>$&nbsp;&nbsp;<span>'
+										+ results[i].goodsPrice
+										+ '</span><br><b>最小定量：</b><span>'
+										+ results[i].minOrderNum
+										+ '</span></td>';
+								if (results[i].syncFlag == 1) {
+									content += '<td style="width: 100px;" align="center"><span class="suc_sty">发布成功</td>';
+								} else if (results[i].syncFlag > 1) {
+									content += '<td align="center"><span class="err_sty">流程第4步,同步失败：<br>'
+										+ results[i].syncRemark
+										+ '</span></td>';
+								}  else if (results[i].crawlFlag == 0) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">数据还未进行处理，请等待</td>';
+								} else if (results[i].crawlFlag == 1) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第1步,正在抓取<span></td>';
+								} else if (results[i].crawlFlag > 2) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第1步,抓取失败<span></td>';
+								} else if (results[i].clearFlag == 0) {
+									content += '<td align="center"><span class="err_sty">流程第2步,数据待清洗</span></td>';
+								} else if (results[i].valid == 0) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第2步,数据清洗无效<span></td>';
+								} else if (results[i].imgDownFlag == 0) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第3步,正在下载网络图片到服务器<span></td>';
+								} else if (results[i].imgDownFlag > 1) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第3步,下载图片到本地失败<span></td>';
+								} else if (results[i].syncFlag == 0) {
+									content += '<td style="width: 100px;" align="center"><span class="err_sty">流程第4步,待数据同步<span></td>';
+								}
+								content += '<td style="width: 150px;" align="center">'
+										+ results[i].adminName + '</td>';
+								content += '<td style="width: 180px;" align="center">'
+										+ results[i].createTime + '</td>';
+								content += '<td align="center" style="width: 360px;">';
+								if (results[i].syncFlag > 0) {
+									content += '<br><a href="/cbtconsole/editc/detalisEdit?pid='
+											+ results[i].goodsPid
+											+ '" target="_blank">编辑详情</a>';
+								}
+								if (results[i].delFlag == 0) {
+									content += '<br><br><input type="button" class="style_btn_main" value="设置为主图" onclick="setMainPid(\''
+											+ results[i].goodsPid
+											+ '\',\''
+											+ mainPid + '\')" />';
+									content += '<br><br><br><input type="button" class="style_btn_litte" value="删除商品" onclick="deleteGoods('
+											+ mainPid
+											+ ','
+											+ results[i].goodsPid + ')" />';
+								} else {
+									content += '<br><br><span style="background:red;border:1px;color:black;font-size:24px;">当前商品已删除</span>&nbsp;&nbsp;&nbsp;';
+								}								
+								content += '</td></tr>';
+							}
+							$("#same_type_table tbody").append(content);
+						} else {
+							$.messager.alert("提醒", data.message, "info");
+						}
+					},
+					error : function(res) {
+						$.messager.alert("提醒", "查询错误，请联系管理员", "error");
+					}
+				});
+	}
+
+	function deleteGoods(mainPid, pid) {
+		$.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function(rs) {
+			if (rs) {
+				$.messager.progress({
+					title : '正在执行',
+					msg : '请等待...'
+				});
+				$.ajax({
+					type : "POST",
+					url : "/cbtconsole/sameTypeGoods/deleteGoodsByPid",
+					data : {
+						mainPid : mainPid,
+						pid : pid
+					},
+					success : function(data) {
+						$.messager.progress('close');
+						if (data.ok) {
+							showMessage('执行成功，页面即将刷新');
+							setTimeout(function() {
+								window.location.reload();
+							}, 1500);
+						} else {
+							$.messager.alert("提醒", '执行错误:' + data.message,
+									"info");
+						}
+					},
+					error : function(res) {
+						$.messager.progress('close');
+						$.messager.alert("提醒", '保存错误，请联系管理员', "error");
+					}
+				});
+			}
+		});
+
+	}
+
+	function setMainPid(newPid, oldPid) {
+		$.messager
+				.confirm(
+						'提示',
+						'是否替换?替换后数据将无法恢复',
+						function(rs) {
+							if (rs) {
+								$.messager.progress({
+									title : '正在执行',
+									msg : '请等待...'
+								});
+								$
+										.ajax({
+											type : "POST",
+											url : "/cbtconsole/sameTypeGoods/replaceGoodsMainPid",
+											data : {
+												newPid : newPid,
+												oldPid : oldPid
+											},
+											success : function(data) {
+												$.messager.progress('close');
+												if (data.ok) {
+													$.messager.alert("提醒",
+															'执行成功,即将刷新页面',
+															"info");
+													setTimeout(
+															function() {
+																window.location.href = "/cbtconsole/apa/sameType1688.html?mainPid="
+																		+ newPid;
+															}, 1500);
+												} else {
+													$.messager
+															.alert(
+																	"提醒",
+																	'执行错误:'
+																			+ data.message,
+																	"info");
+												}
+											},
+											error : function(res) {
+												$.messager.progress('close');
+												$.messager.alert("提醒",
+														'保存错误，请联系管理员', "error");
+											}
+										});
+							}
+						});
+	}
+
+	function showMessage(msgStr) {
+		$.messager.show({
+			title : '提醒',
+			msg : msgStr,
+			timeout : 1500,
+			showType : 'slide',
+			style : {
+				right : '',
+				top : ($(window).height() * 0.35),
+				bottom : ''
+			}
+		});
+	}
+</script>
+<style type="text/css">
+.style_btn_litte {
+	width: 130px;
+	height: 38px;
+	background-color: #f44336;
+	border-color: #ffffff;
+	font-size: 18px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.style_btn_main {
+	width: 130px;
+	height: 38px;
+	background-color: #40bef5;
+	border-color: #ffffff;
+	font-size: 18px;
+	padding: 0px;
+	border-radius: 0px;
+	border-width: 1px;
+	border-style: solid;
+	text-align: center;
+	line-height: 20px;
+	font-weight: bold;
+	font-style: normal;
+}
+
+.err_sty {
+	color: red;
+}
+
+.suc_sty {
+	color: green;
+}
+</style>
+</head>
+<body>
+
+	<div>
+
+		<h1 align="center">主图同款商品展示</h1>
+		<br>
+		<table id="same_type_table" border="1" cellpadding="0" cellspacing="0"
+			align="center">
+			<thead>
+				<tr align="center" bgcolor="#DAF3F5" style="height: 60px;">
+					<td style="width: 60px;"></td>
+					<td style="width: 200px;">1688图片</td>
+					<td style="width: 600px;">1688产品名称</td>
+					<td style="width: 200px;">产品上传结果</td>
+					<td style="width: 100px;">录入人</td>
+					<td style="width: 180px;">录入时间</td>
+					<td style="width: 360px;">操作</td>
+				</tr>
+			</thead>
+
+			<tbody>
+			</tbody>
+
+		</table>
+
+	</div>
+
+</body>
+</html>

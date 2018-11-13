@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>热卖管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #hot_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #hot_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+
+        .refresh_color {
+            background: #2340a8;
+            width: 170px;
+            height: 28px;
+            border: 1px #e02828 solid;
+            color: #fff;
+        }
+
+        #enter_div_sty{
+            display: none;
+            position: fixed;
+            top: 30%;
+            background: #8cdab6;
+            padding: 50px;
+            right: 35%;
+            width: 666px;
+            height: 300px;
+            box-shadow: 1px 10px 15px #e2e2e2;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            closeDialog();
+            setDatagrid();
+        });
+
+        function setDatagrid() {
+            $('#hot_easyui-datagrid').datagrid({
+                title: '热卖类别管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#hot_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/hotManage/queryForList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 25,//默认选择的分页是每页50行数据
+                pageList: [25],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function doQuery() {
+            var isOn = $("#query_is_on").val();
+            var hotType = $("#query_hot_type").val();
+            $("#hot_easyui-datagrid").datagrid("load", {
+                "isOn": isOn,
+                "hotType": hotType
+            });
+        }
+
+        function formatImg(val, row, index) {
+            return '<img src="' + val + '" style="max-height:80px;max-width:80px;"/>';
+        }
+
+        function formatHotType(val, row, index) {
+            //1热卖区(原始)、2今日折扣、3新品
+            var content = '';
+            if (val == 1) {
+                content = '热卖区(原始)';
+            } else if (val == 2) {
+                content = '今日折扣';
+            } else if (val == 3) {
+                content = '新品';
+            } else if (val == 4) {
+                content = '热卖区(Panda)';
+            } else if (val == 5) {
+                content = '热卖区(Alisa)';
+            } else if (val == 6) {
+                content = '热卖区(移动版)';
+            } else if (val == 7) {
+                content = '热卖区(Vicky)';
+            }
+            return content;
+        }
+
+        function formatIsOn(val, row, index) {
+            //0关闭 1开启
+            var content = '';
+            if (val == 0) {
+                content = '关闭';
+            } else if (val == 1) {
+                content = '开启';
+            }
+            return content;
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<button class="but_color" onclick="enterCategory(' + row.id + ',1)">编辑类别</button>'
+                + '&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="showCategoryGoods(' + row.id + ')" >查看商品</a>';
+            content += '&nbsp;&nbsp;&nbsp;<button style="background-color: red;" onclick="deleteCategory('+ row.id +')">删除</button>  ';
+            return content;
+        }
+
+        function closeDialog() {
+            $('#enter_div_sty').hide();
+            $("#form_enter")[0].reset();
+        }
+
+        function enterCategory(id, type) {
+            $("#add_or_edit").val(type);
+            if (id > 0 && type > 0) {
+                $("#category_id").val(id);
+                getCategory(id);
+                $("#add_title").text("编辑热卖类别");
+            } else {
+                $("#form_enter")[0].reset();
+                $("#add_title").text("新增热卖类别");
+            }
+            $('#enter_div_sty').show();
+        }
+
+        function getCategory(id) {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/hotManage/getCategoryById",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        var json = data.data;
+                        $("#hot_type").val(json.hotType);
+                        $("#is_on").val(json.isOn);
+                        $("#enter_sort").val(json.sorting);
+                        $("#category_name").val(json.categoryName);
+                        $("#show_name").val(json.showName);
+                        $("#show_img").val(json.showImg);
+                    } else {
+                        $.messager.alert("提醒", '查询失败:' + data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                }
+            });
+        }
+
+
+        function saveAndEditCategory() {
+            var category_name = $("#category_name").val();
+            var show_name = $("#show_name").val();
+            var show_img = $("#show_img").val();
+
+            if (category_name == "" || category_name == null) {
+                $.messager.alert("提醒", '请输入类别名称', "info");
+                return false;
+            }
+            if (show_name == "" || show_name == null) {
+                $.messager.alert("提醒", '请输入显示名称', "info");
+                return false;
+            }
+            if (show_img == "" || show_img == null) {
+                $.messager.alert("提醒", '请输入显示图片链接', "info");
+                return false;
+            }
+            var hot_type = $("#hot_type").val();
+            var is_on = $("#is_on").val();
+            var enter_sort = $("#enter_sort").val();
+            if (enter_sort == "" || enter_sort == null) {
+                enter_sort = 0;
+            }
+
+            var category_id = $("#category_id").val();
+            var add_or_edit = $("#add_or_edit").val();
+
+            if (add_or_edit == 1) {
+                //编辑状态
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/hotManage/updateCategory",
+                    data: {
+                        category_id: category_id,
+                        category_name: category_name,
+                        show_name: show_name,
+                        show_img: show_img,
+                        hot_type: hot_type,
+                        is_on: is_on,
+                        enter_sort: enter_sort
+                    },
+                    success: function (data) {
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            window.location.reload();
+                        } else {
+                            $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.progress('close');
+                        $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                    }
+                });
+            } else {
+                //新增状态
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/hotManage/saveCategory",
+                    data: {
+                        category_name: category_name,
+                        show_name: show_name,
+                        show_img: show_img,
+                        hot_type: hot_type,
+                        is_on: is_on,
+                        enter_sort: enter_sort
+                    },
+                    success: function (data) {
+                        $.messager.progress('close');
+                        if (data.ok) {
+                            $.messager.alert("提醒", '保存成功，请等待数据拉取', "info");
+                        } else {
+                            $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                        }
+                    },
+                    error: function (res) {
+                        $.messager.progress('close');
+                        $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                    }
+                });
+            }
+        }
+
+        //展示类别商品
+        function showCategoryGoods(id) {
+            var url = "/cbtconsole/hotManage/queryGoodsByCategoryId?categoryId=" + id;
+            window.open(url);
+            //$('#hot_goods_iframe').empty();
+            //$('#hot_goods_iframe').attr('src',url);
+            //scrollToLocation();
+        }
+
+        function scrollToLocation() {
+            $("body,html").scrollTop(800);
+        }
+
+        function deleteCategory(id){
+            $.messager.confirm('提示', '是否删除?删除后数据将无法恢复', function(rs) {
+                if (rs) {
+                    $.ajax({
+                            type: "POST",
+                            url: "/cbtconsole/hotManage/deleteCategory",
+                            data: {
+                                categoryId: id
+                            },
+                            success: function (data) {
+                                if (data.ok) {
+                                    $.messager.alert("提醒", '删除成功', "info");
+                                    window.location.reload();
+                                } else {
+                                    $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                                }
+                            },
+                            error: function (res) {
+                                $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                            }
+                        });
+                }
+            });
+
+        }
+
+        function refreshOnlineGoodsJson(){
+		$("#gen_show_notice").show();
+		$(".refresh_color").css("background","#aaa");
+		$(".refresh_color").attr("disabled",true);
+		$.ajax({
+			type : "POST",
+			url : "https://www.import-express.com/popProducts/refreshHotJson",
+			data : {},
+			success : function(data) {
+				$(".refresh_color").attr("disabled",false);
+				$(".refresh_color").css("background","#44a823");
+				if(data==1){
+					$("#gen_show_notice").html("刷新成功！");
+				}else{
+					$("#gen_show_notice").html("刷新失败，请重试，如果还不行，请联系IT！");
+				}
+			}
+		});
+	}
+    </script>
+</head>
+<body>
+
+<div id="hot_toolbar" style="padding: 5px; height: auto">
+    <form id="hot_query_form" action="#" onsubmit="return false;">
+
+			<span>热卖类别: <select id="query_hot_type"
+                                style="font-size: 16px; height: 24px; width: 140px;">
+					<option value="0" selected="selected">全部</option>
+                    <option value="1">热卖区(原始)</option>
+                    <option value="2">今日折扣</option>
+                    <option value="3">新品</option>
+                    <option value="4">热卖区(Panda)</option>
+                    <option value="5">热卖区(Alisa)</option>
+                    <option value="6">热卖区(移动版)</option>
+                    <option value="7">热卖区(Vicky)</option>
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>是否启用: <select
+            id="query_is_on"
+            style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未启用</option>
+                    <option value="1">启用</option>
+
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+            <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
+            <span><input type="button" class="but_color" value="录入类别" onclick="enterCategory(0,0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <input class="refresh_color" type="button" value="刷新最新热卖商品到线上" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
+            <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
+    </form>
+</div>
+
+<table id="hot_easyui-datagrid"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'categoryName',width:'300px'">分类名称</th>
+        <th data-options="field:'showName',width:'300px'">显示名称</th>
+        <th
+                data-options="field:'showImg',align:'center',width:'120px',formatter:formatImg">显示图片
+        </th>
+
+        <th data-options="field:'hotType',align:'center',width:'100px',formatter:formatHotType">所属类别</th>
+        <th
+                data-options="field:'isOn',align:'center',width:'100px',formatter:formatIsOn">启用状态
+        </th>
+        <th data-options="field:'sorting',align:'center',width:'80px'">排序号</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">录入人</th>
+        <th data-options="field:'createTime',align:'center',width:'180px'">创建时间</th>
+        <th
+                data-options="field:'opFlag',align:'center',width:'200px',formatter:formatOperation">操作
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<!--<div style="width: 100%;height: 100%;">
+
+</div>-->
+
+<!--<iframe id="hot_goods_iframe" src="" style="height: 888px;width: 99%;"></iframe>-->
+
+<div id="enter_div_sty">
+    <form id="form_enter" action="#" onsubmit="return false">
+        <table>
+            <caption id="add_title"  style="font-size: 24px;">新增热卖类别</caption>
+            <tr>
+                <td>分类名称：</td>
+                <td><input id="category_name" value="" style="width: 555px; height: 28px;" placeholder="请输入分类名称"/>
+                </td>
+            </tr>
+            <tr>
+                <td>显示名称：</td>
+                <td><input
+                        id="show_name" value="" style="width: 555px; height: 28px;"
+                        placeholder="请输入显示名称"/></td>
+            </tr>
+            <tr>
+                <td>显示图片：</td>
+                <td><input
+                        id="show_img" value="" style="width: 555px; height: 28px;"
+                        placeholder="请输入显示图片"/></td>
+            </tr>
+            <tr>
+                <td>所属类别：</td>
+                <td><select id="hot_type" style="width: 100px;height: 28px;">
+                    <option value="1">热卖区(原始)</option>
+                    <option value="2">今日折扣</option>
+                    <option value="3">新品</option>
+                    <option value="4">热卖区(Panda)</option>
+                    <option value="5">热卖区(Alisa)</option>
+                    <option value="6">热卖区(移动版)</option>
+                    <option value="7">热卖区(Vicky)</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>是否启用：</td>
+                <td><select id="is_on" style="width: 100px;height: 28px;">
+                    <option value="0">关闭</option>
+                    <option value="1">启用</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>排序:</td>
+                <td><input type="number" id="enter_sort" style="width: 100px; height: 28px" value=""
+                           placeholder="请输入排序值"/></td>
+            </tr>
+            <tr style="display: none;">
+                <td><input type="hidden" id="category_id" value="0"></td>
+                <td><input type="hidden" id="add_or_edit" value="0"></td>
+            </tr>
+        </table>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick=" saveAndEditCategory()" style="width: 80px">生成</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>

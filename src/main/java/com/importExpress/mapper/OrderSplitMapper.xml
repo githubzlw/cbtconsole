@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.OrderSplitMapper" >
+  
+  <resultMap id="OrderResultMap" type="com.importExpress.pojo.OrderBean" >
+    <id column="id" property="id" />
+    <result column="user_id" property="userid" />
+    <result column="product_cost" property="product_cost" />
+    <result column="create_time" property="createtime" />
+    <result column="mode_transport" property="mode_transport" />
+    <result column="ip" property="ip" />
+    <result column="currency" property="currency" />
+    <result column="pay_price" property="pay_price" />
+    <result column="pay_price_tow" property="pay_price_tow" />
+    <result column="pay_price_three" property="pay_price_three" />
+    <result column="actual_ffreight" property="actual_ffreight" />
+    <result column="service_fee" property="service_fee" />
+    <result column="order_ac" property="order_ac" />
+    <result column="details_number" property="details_number" />
+    <result column="foreign_freight" property="foreign_freight" />
+    <result column="discount_amount" property="discount_amount" />
+    <result column="state" property="state" />
+    <result column="purchase_number" property="purchase_number" />
+    <result column="order_no" property="orderNo" />
+    <result column="deliveryTime" property="deliveryTime" />
+    <result column="order_ac" property="order_ac" />
+    <result column="discount_amount" property="discount_amount" />
+    <result column="server_update" property="server_update" />
+    <result column="client_update" property="client_update" />
+  </resultMap>
+  
+  <resultMap id="PaymentResultMap" type="com.importExpress.pojo.Payment" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="orderid" property="orderid" />
+    <result column="paymentid" property="paymentid" />
+    <result column="payment_other" property="payment_other" />
+    <result column="payment_amount" property="payment_amount" />
+    <result column="payment_cc" property="payment_cc" />
+    <result column="orderdesc" property="orderdesc" />
+    <result column="username" property="username" />
+    <result column="paystatus" property="paystatus" />
+    <result column="createtime" property="createtime" />
+    <result column="paySID" property="paySID" />
+    <result column="payflag" property="payflag" />
+    <result column="paytype" property="paytype" />
+  </resultMap>
+    
+  <resultMap id="MessageErrorResultMap" type="com.importExpress.pojo.MessageError" >
+    <id column="id" property="id" />
+    <result column="email" property="email" />
+    <result column="error" property="error" />
+    <result column="info" property="info" />
+    <result column="createtime" property="createtime" />
+  </resultMap>
+  
+  <select id="getOrdersDetails_split" parameterType="String" resultType="hashmap">
+    select od.id,od.yourorder,od.goodsprice,total_weight,bulk_volume,purchase_state from order_details od,goods_car gc where od.state != 2 and od.orderid=#{orderNo} and gc.id=od.goodsid
+  </select>
+  
+  <select id="getOrdersDetails" parameterType="String" resultType="hashmap">
+    select od.orderid,od.id,od.yourorder,od.goodsprice,goodsname,googs_img,goods_type,(select img from goods_typeimg where gc.id = goods_id limit 1) goods_typeimg
+    	from order_details od,goods_car gc where od.state!=2 and  gc.id=od.goodsid and ( od.orderid=#{orderNo} or od.orderid=concat(#{orderNo}, '_1') )
+  </select>
+  
+  <update id="upOrder" parameterType="com.importExpress.pojo.OrderBean">
+  	update orderinfo set product_cost=#{product_cost},pay_price=#{pay_price},pay_price_tow=#{pay_price_tow},pay_price_three=#{pay_price_three},
+  		actual_ffreight=#{actual_ffreight},service_fee=#{service_fee},order_ac=#{order_ac},details_number=#{details_number},foreign_freight=#{foreign_freight},
+  		discount_amount=#{discount_amount},purchase_number=0,state=#{state},purchase_number=#{purchase_number} 
+  		where order_no = #{orderNo}
+  </update>
+  
+  <insert id="cpOrder_address" useGeneratedKeys="true" parameterType="com.importExpress.pojo.OrderAddress">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert into order_address select null,AddressID,#{orderno_new},Country,statename,address,address2,phoneNumber,zipcode,Adstatus,Updatetimr,admUserID,street,recipients from order_address 
+    	where orderno=#{orderno}
+  </insert>
+  
+  <insert id="addOrderInfo" useGeneratedKeys="true" parameterType="com.importExpress.pojo.OrderBean">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert orderinfo(order_no,user_id,product_cost,state,address_id,delivery_time,service_fee,ip,mode_transport,create_time,details_number,pay_price_three,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,order_ac,purchase_number,server_update,client_update)
+    	values (#{orderNo}, #{userid}, #{product_cost}, #{state}, #{addressid}, #{deliveryTime}, #{service_fee}, #{ip}, #{mode_transport}, now(), #{details_number}, #{pay_price_three}, #{foreign_freight}, #{pay_price}, #{pay_price_tow}, #{currency}, #{actual_ffreight}, #{discount_amount}, #{order_ac}, #{purchase_number}, #{server_update}, #{client_update})
+  </insert>
+  
+  <update id="upOrderDetails">
+  	update order_details set orderid=#{orderid} where id in (gids)
+  </update>
+  
+  <insert id="addPayment" useGeneratedKeys="true" parameterType="com.importExpress.pojo.Payment">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert payment(userid,orderid,paymentid,orderdesc,username,paystatus,payment_amount,payment_cc,createtime,paySID,payflag,paytype) 
+    	values(#{userid}, #{orderid}, #{paymentid}, #{orderdesc}, #{username}, #{paystatus}, #{payment_amount}, #{payment_cc}, now(), #{paySID}, #{payflag}, #{paytype})
+  </insert>
+  
+  <insert id="addOrderInfoLog" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert orderinfo_log(orderno,orderinfo,createtime) values(#{orderno}, #{orderinfo}, now())
+  </insert>
+  
+  <select id="getOrders" resultMap="OrderResultMap">
+    select order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number,pay_price_three,
+    	foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,order_ac,pay_price,purchase_number,server_update,client_update
+    	from orderinfo
+    	<if test="ordernos != null and ordernos.length > 0">
+  		 where order_no in
+	  	<foreach item="item" index="index" collection="ordernos" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+  	</if>
+  </select>
+  
+  <insert id="addMessage_error" useGeneratedKeys="true" parameterType="com.importExpress.pojo.MessageError">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert message_error(email,error,info,createtime) values(#{email}, #{error}, #{info},now())
+  </insert>
+    
+  <select id="getMessage_errorByPage" resultMap="MessageErrorResultMap">
+    select id,email,error,info,createtime from message_error where createtime &gt;= #{time} and createtime &lt;= #{endtime} limit #{page}, #{endpage}
+  </select>
+  
+  <select id="getMessage_error" resultType="Integer">
+    select count(id) counts from message_error
+    <where>
+    	<if test="time != null and time != ''">
+    		and createtime &gt; #{time}
+    	</if>
+    	<if test="endtime != null and endtime != ''">
+    		and createtime &lt; #{endtime}
+    	</if>
+    </where>
+  </select>
+  
+  <update id="upOrder_change" parameterType="String">
+  	update order_change oc inner join order_details od on od.goodsid=oc.goodid set oc.orderno=od.orderid where od.orderid=#{orderid}
+  </update>
+    
+  <insert id="cpOrder_Paymentconfirm" useGeneratedKeys="true" parameterType="com.importExpress.pojo.PaymentConfirm">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert into paymentconfirm select null, #{orderno_new},confirmname,confirmtime,paytype,paymentid from paymentconfirm where orderno=#{orderno}
+  </insert>
+    
+  <insert id="cpOrder_Buy" useGeneratedKeys="true" parameterType="com.importExpress.pojo.OrderBuy">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert into order_buy select null, #{orderno_new},buyuser,buyid,time from order_buy where orderid=#{orderid}
+  </insert>
+    
+  <update id="upOrder_remarkByProduct">
+  	update order_product_source ops inner join order_details od on od.goodsid=ops.goodsid set ops.orderid=od.orderid where od.orderid=#{orderid}
+  </update>
+  
+  <update id="upOrder_remarkByGooddata">
+  	update changegooddata cgd inner join order_details od on od.goodsid=cgd.goodscarid set cgd.orderno=od.orderid where od.orderid=#{orderid}
+  </update>
+    
+</mapper>

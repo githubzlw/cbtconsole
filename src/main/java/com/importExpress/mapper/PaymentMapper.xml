@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.PaymentMapper">
+    <resultMap id="paymentStatisticResultMap" type="com.cbt.website.bean.PaymentStatistics">
+        <result column="userId" property="userId"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="orderid" property="orderNo"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="createtime" property="paymentTime"/>
+        <result column="payment_cc" property="currency"/>
+        <result column="state" property="orderState"/>
+        <result column="paymentid" property="payId"/>
+        <result column="paytype" property="payType"/>
+    </resultMap>
+
+    <resultMap id="paymentDetailsResultMap" type="com.cbt.website.bean.PaymentDetails">
+        <result column="orderid" property="orderNo"/>
+        <result column="paytype" property="payType"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="payment_cc" property="currency"/>
+        <result column="paymentid" property="paymentNo"/>
+        <result column="createtime" property="paymentTime"/>
+        <result column="orderdesc" property="paymentEmail"/>
+    </resultMap>
+
+
+    <select id="queryPaymentStatistics" resultMap="paymentStatisticResultMap"
+            parameterType="com.cbt.website.bean.PayCheckBean">
+
+        select pm.*,pb.order_num,orderinfo.state from
+        (select userid,orderid,sum(payment_amount) as payment_amount,createtime,
+        paytype,payment_cc,paymentid from payment
+        where paystatus=1 and paytype in(0,1,2,5)
+        and userid not in(select id from `user` where email like 'test%'
+        or email like '%qq.com' or email like '%163.com' or email like '%ww.com' or email like 'rlef%'
+        or email = 'undefined' or email like 'asdf%' or email like 'importexpress@%' or email like 'ling@tes%'
+        or email like '%@qq.com%' or email like '%@test%' or email like 'eee@%' or email like 'ceshi@%'
+        or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')
+        <if test=" userid >0 ">
+            and userid= #{userid}
+        </if>
+        <if test=" userid == 0 ">
+            and userid > 0
+        </if>
+        <if test=" payEmail != null and payEmail != '' ">
+            and orderdesc like CONCAT('%',#{payEmail},'%')
+        </if>
+        <if test=" email != null and email != '' ">
+            and userid in (select id from user where email like CONCAT('%',#{email},'%'))
+        </if>
+        <if test="paytype != null and paytype != '-1'">
+            and paytype= #{paytype}
+        </if>
+        <if test=" dataStart != null and dataStart != '' ">
+            and createtime &gt;= #{dataStart}
+        </if>
+        <if test=" dataEnd != null and dataEnd != '' ">
+            and createtime &lt;= #{dataEnd}
+        </if>
+        <if test=" payId != null and payId != '' ">
+            and paymentid = #{payId}
+        </if>
+        group by orderid ) pm INNER JOIN
+        (select userid,count(userid) as order_num from (select userid,count(orderid)
+        from payment where paystatus=1
+        and LENGTH(orderid) = 16
+        <if test=" userid >0 ">
+            and userid= #{userid}
+        </if>
+        <if test=" userid == 0 ">
+            and userid > 0
+        </if>
+        group by orderid,userid) pp group by userid) pb on pm.userid = pb.userid
+        <if test=" ordersum ==1 ">
+            and pb.userid in(select user_id from orderinfo where
+            create_time &lt; #{dataStart} and state in(1,2,3,4,5))
+        </if>
+        <if test="ordersum > 1">
+            and pb.userid not in(select user_id from orderinfo where
+            create_time &lt; #{dataStart} and state in(1,2,3,4,5))
+        </if>
+        left JOIN orderinfo on pm.orderid = orderinfo.order_no
+        order by pm.createtime desc,userid,orderid
+        limit #{page},#{rows}
+    </select>
+
+    <select id="queryPaymentStatisticsCount" resultType="java.lang.Integer"
+            parameterType="com.cbt.website.bean.PayCheckBean">
+
+        select count(odd.orderid) from (select userid,count(orderid) as order_num,orderid,
+        sum(payment_amount) as payment_amount,createtime,paytype from payment where paystatus=1
+        and paytype in(0,1,2,5) and userid not in(select id from `user` where email like 'test%'
+        or email like '%qq.com' or email like '%163.com' or email like '%ww.com' or email like 'rlef%'
+        or email = 'undefined' or email like 'asdf%' or email like 'importexpress@%' or email like 'ling@tes%'
+        or email like '%@qq.com%' or email like '%@test%' or email like 'eee@%' or email like 'ceshi@%'
+        or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')
+        <if test=" userid >0 ">
+            and userid= #{userid}
+        </if>
+        <if test=" userid == 0 ">
+            and userid > 0
+        </if>
+        <if test=" payEmail != null and payEmail != '' ">
+            and orderdesc like CONCAT('%',#{payEmail},'%')
+        </if>
+        <if test=" email != null and email != '' ">
+            and userid in (select id from user where email like CONCAT('%',#{email},'%'))
+        </if>
+        <if test="paytype != null and paytype != '-1'">
+            and paytype= #{paytype}
+        </if>
+        <if test=" dataStart != null and dataStart != '' ">
+            and createtime &gt;= #{dataStart}
+        </if>
+        <if test=" dataEnd != null and dataEnd != '' ">
+            and createtime &lt;= #{dataEnd}
+        </if>
+        <if test=" payId != null and payId != '' ">
+            and paymentid = #{payId}
+        </if>
+        group by orderid order by createtime desc) odd INNER JOIN
+        (select userid,count(userid) as order_num from (select userid,count(orderid)
+        from payment where paystatus=1
+        and LENGTH(orderid) = 16
+        <if test=" userid >0 ">
+            and userid= #{userid}
+        </if>
+        <if test=" userid == 0 ">
+            and userid > 0
+        </if>
+        group by orderid) pp group by userid) pb on odd.userid = pb.userid
+        <if test=" ordersum ==1 ">
+            and pb.userid in(select payment.userid from payment,orderinfo where
+            payment.createtime &lt; #{dataStart} and payment.paystatus=1 and payment.paytype in(0,1,2,5)
+            and payment.orderid = orderinfo.order_no and orderinfo.state in(1,2,3,4,5) )
+        </if>
+        <if test="ordersum > 1">
+            and pb.userid not in(select payment.userid from payment,orderinfo where
+            payment.createtime &lt; #{dataStart} and payment.paystatus=1 and payment.paytype in(0,1,2,5)
+            and payment.orderid = orderinfo.order_no and orderinfo.state in(1,2,3,4,5) )
+        </if>
+    </select>
+
+    <select id="queryPaymentDetails" resultMap="paymentDetailsResultMap">
+
+        select orderid,paymentid,payment_amount,payment_cc,DATE_FORMAT(createtime,'%Y-%c-%d %H:%i:%s') as createtime,paytype,orderdesc
+        from payment where paystatus=1 and orderid = #{orderNo}
+    </select>
+    <select id="listStripePayment" resultType="Map">
+
+        select userid,orderid,paymentid,payment_amount,payment_cc, createtime,paytype,orderdesc
+        from payment where paystatus=1 and paytype=5 order by createtime desc
+        limit #{startNum},#{limitNum}
+    </select>
+    <select id="countStripePayment" resultType="java.lang.Integer">
+
+        select count(id)
+        from payment where paystatus=1 and paytype=5
+    </select>
+
+
+</mapper>

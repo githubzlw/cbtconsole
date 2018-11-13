@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.systemcode.dao.SystemCodeMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.SystemCode" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="code_type" property="codeType" jdbcType="VARCHAR" />
+    <result column="code_type_name" property="codeTypeName" jdbcType="VARCHAR" />
+    <result column="code_value_code" property="codeValueCode" jdbcType="VARCHAR" />
+    <result column="code_value_name" property="codeValueName" jdbcType="VARCHAR" />
+    <result column="create_datetime" property="createDatetime" jdbcType="TIMESTAMP" />
+    <result column="create_operator" property="createOperator" jdbcType="VARCHAR" />
+    <result column="update_datetime" property="updateDatetime" jdbcType="TIMESTAMP" />
+    <result column="update_operator" property="updateOperator" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, code_type, code_type_name, code_value_code, code_value_name, create_datetime, 
+    create_operator, update_datetime, update_operator, status, picture_url
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.pojo.SystemCodeExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from system_code
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from system_code
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from system_code
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.pojo.SystemCodeExample" >
+    delete from system_code
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.pojo.SystemCode" >
+    insert into system_code (id, code_type, code_type_name, 
+      code_value_code, code_value_name, create_datetime, 
+      create_operator, update_datetime, update_operator, 
+      status, picture_url)
+    values (#{id,jdbcType=INTEGER}, #{codeType,jdbcType=VARCHAR}, #{codeTypeName,jdbcType=VARCHAR}, 
+      #{codeValueCode,jdbcType=VARCHAR}, #{codeValueName,jdbcType=VARCHAR}, #{createDatetime,jdbcType=TIMESTAMP}, 
+      #{createOperator,jdbcType=VARCHAR}, #{updateDatetime,jdbcType=TIMESTAMP}, #{updateOperator,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{pictureUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.pojo.SystemCode" >
+    insert into system_code
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="codeType != null" >
+        code_type,
+      </if>
+      <if test="codeTypeName != null" >
+        code_type_name,
+      </if>
+      <if test="codeValueCode != null" >
+        code_value_code,
+      </if>
+      <if test="codeValueName != null" >
+        code_value_name,
+      </if>
+      <if test="createDatetime != null" >
+        create_datetime,
+      </if>
+      <if test="createOperator != null" >
+        create_operator,
+      </if>
+      <if test="updateDatetime != null" >
+        update_datetime,
+      </if>
+      <if test="updateOperator != null" >
+        update_operator,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="codeType != null" >
+        #{codeType,jdbcType=VARCHAR},
+      </if>
+      <if test="codeTypeName != null" >
+        #{codeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="codeValueCode != null" >
+        #{codeValueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="codeValueName != null" >
+        #{codeValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDatetime != null" >
+        #{createDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOperator != null" >
+        #{createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDatetime != null" >
+        #{updateDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOperator != null" >
+        #{updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pictureUrl != null" >
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.pojo.SystemCodeExample" resultType="java.lang.Integer" >
+    select count(*) from system_code
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update system_code
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.codeType != null" >
+        code_type = #{record.codeType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.codeTypeName != null" >
+        code_type_name = #{record.codeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.codeValueCode != null" >
+        code_value_code = #{record.codeValueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.codeValueName != null" >
+        code_value_name = #{record.codeValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createDatetime != null" >
+        create_datetime = #{record.createDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createOperator != null" >
+        create_operator = #{record.createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateDatetime != null" >
+        update_datetime = #{record.updateDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateOperator != null" >
+        update_operator = #{record.updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+      <if test="record.pictureUrl != null" >
+        picture_url = #{record.pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update system_code
+    set id = #{record.id,jdbcType=INTEGER},
+      code_type = #{record.codeType,jdbcType=VARCHAR},
+      code_type_name = #{record.codeTypeName,jdbcType=VARCHAR},
+      code_value_code = #{record.codeValueCode,jdbcType=VARCHAR},
+      code_value_name = #{record.codeValueName,jdbcType=VARCHAR},
+      create_datetime = #{record.createDatetime,jdbcType=TIMESTAMP},
+      create_operator = #{record.createOperator,jdbcType=VARCHAR},
+      update_datetime = #{record.updateDatetime,jdbcType=TIMESTAMP},
+      update_operator = #{record.updateOperator,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=INTEGER},
+      picture_url = #{record.pictureUrl,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.SystemCode" >
+    update system_code
+    <set >
+      <if test="codeType != null" >
+        code_type = #{codeType,jdbcType=VARCHAR},
+      </if>
+      <if test="codeTypeName != null" >
+        code_type_name = #{codeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="codeValueCode != null" >
+        code_value_code = #{codeValueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="codeValueName != null" >
+        code_value_name = #{codeValueName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDatetime != null" >
+        create_datetime = #{createDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createOperator != null" >
+        create_operator = #{createOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDatetime != null" >
+        update_datetime = #{updateDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateOperator != null" >
+        update_operator = #{updateOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pictureUrl != null" >
+        picture_url = #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.pojo.SystemCode" >
+    update system_code
+    set code_type = #{codeType,jdbcType=VARCHAR},
+      code_type_name = #{codeTypeName,jdbcType=VARCHAR},
+      code_value_code = #{codeValueCode,jdbcType=VARCHAR},
+      code_value_name = #{codeValueName,jdbcType=VARCHAR},
+      create_datetime = #{createDatetime,jdbcType=TIMESTAMP},
+      create_operator = #{createOperator,jdbcType=VARCHAR},
+      update_datetime = #{updateDatetime,jdbcType=TIMESTAMP},
+      update_operator = #{updateOperator,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      picture_url = #{pictureUrl,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

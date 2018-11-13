@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.feedback.dao.QuestionnaireMapper">
+	<resultMap id="QuestionnaireResultMap" type="com.cbt.feedback.bean.Questionnaire">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="content" property="content" />
+		<result column="otherComment" property="otherComment" />
+		<result column="userId" property="userId" />
+		<result column="userEmail" property="userEmail" />
+		<result column="searchUrl" property="searchUrl" />
+		<result column="create_time" property="createTime" />
+		<result column="searchKeywords" property="searchKeywords" />
+	</resultMap>
+
+	<sql id="QuestionnaireColumn">
+		id,type,content,otherComment,userId,userEmail,searchUrl,searchKeywords,create_time
+	</sql>
+
+	<select id="queryForList" resultMap="QuestionnaireResultMap">
+		select feedback.id,feedback.type,feedback.content,feedback.otherComment,
+		busiess.userId,busiess.email as userEmail,feedback.searchUrl,feedback.searchKeywords,feedback.create_time
+		from feedback left join busiess on busiess.feedbackId = feedback.id 
+		where 1=1 
+		<if test="type != null and type !=0">
+			and ifnull(feedback.type,0) = #{type}
+		</if>
+		<if test="userId != null and userId != 0">
+			and busiess.userId = #{userId}
+		</if>
+		<if test="userEmail != null and userEmail !=''">
+			and busiess.email like concat('%',#{userEmail},'%')
+		</if>
+		order by id desc
+		limit #{queryStart},20
+	</select>
+	
+	<select id="queryForAllList" resultMap="QuestionnaireResultMap">
+		select feedback.id,feedback.type,feedback.content,feedback.otherComment,
+		busiess.userId,busiess.email as userEmail,feedback.searchUrl,feedback.searchKeywords,feedback.create_time
+		from feedback left join busiess on busiess.feedbackId = feedback.id 
+		where 1=1 
+		order by id desc
+	</select>
+	
+	<select id="queryForCount" resultType="java.lang.Long">
+		select count(feedback.id)
+		from feedback left join busiess on busiess.feedbackId = feedback.id 
+		where 1=1 
+		<if test="type != null and type !=0">
+			and ifnull(feedback.type,0) = #{type}
+		</if>
+		<if test="userId != null and userId != 0">
+			and busiess.userId = #{userId}
+		</if>
+		<if test="userEmail != null and userEmail !=''">
+			and busiess.email like concat('%',#{userEmail},'%')
+		</if>
+	</select>
+
+
+</mapper>

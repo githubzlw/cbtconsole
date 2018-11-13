@@ -1,0 +1,1164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.OrderMapper" >
+  
+  <resultMap id="OrderDetailsResultMap" type="com.cbt.bean.OrderDetailsBean" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="goodsid" property="goodsid" />
+    <result column="goodsname" property="goodsname" />
+    <result column="car_url" property="goods_url" />
+    <result column="car_img" property="goods_img" />
+    <result column="car_type" property="goods_type" />
+    <result column="orderid" property="orderid" />
+    <result column="delivery_time" property="delivery_time" />
+    <result column="yourorder" property="yourorder" />
+    <result column="goodsprice" property="goodsprice" />
+    <result column="goodsfreight" property="goods_freight" />
+    <result column="checkprice_fee" property="checkprice_fee" />
+    <result column="checkproduct_fee" property="checkproduct_fee" />
+    <result column="actual_price" property="actual_price" />
+    <result column="actual_freight" property="actual_freight" />
+    <result column="actual_weight" property="actual_weight" />
+    <result column="actual_volume" property="actual_volume" />
+    <result column="state" property="state" />
+    <result column="fileupload" property="fileupload" />
+    <result column="paytime" property="paytime" />
+    <result column="create_time" property="createtime" />
+    <result column="freight_free" property="freight_free" />
+    <result column="purchase_state" property="purchase_state" />
+    <result column="purchase_time" property="purchase_time" />
+    <result column="purchase_confirmation" property="purchase_confirmation" />
+    <result column="remark" property="remark" />
+    <result column="goods_class" property="goods_class" />
+    <result column="extra_freight" property="extra_freight" />
+    <result column="od_bulk_volume" property="od_bulk_volume" />
+    <result column="od_total_weight" property="od_total_weight" />
+    <result column="discount_ratio" property="discount_ratio" />
+  </resultMap>
+  
+  <resultMap id="ForwarderResultMap" type="com.cbt.bean.Forwarder" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="order_no" property="order_no" />
+    <result column="express_no" property="express_no" />
+    <result column="logistics_name" property="logistics_name" />
+    <result column="transport_details" property="transport_details" />
+    <result column="new_state" property="new_state" />
+    <result column="createtime" property="createtime" />
+    <result column="isneed" property="isneed" />
+  </resultMap>
+  
+  <resultMap id="SpiderBeanResultMap" type="com.cbt.bean.SpiderBean" >
+    <id column="id" property="id" />
+    <result column="userid" property="userId" />
+    <result column="goods_url" property="url" />
+    <result column="goods_title" property="name" />
+    <result column="googs_seller" property="seller" />
+    <result column="googs_img" property="img_url" />
+    <result column="googs_price" property="price" />
+    <result column="googs_number" property="number" />
+    <result column="googs_size" property="size" />
+    <result column="googs_color" property="color" />
+    <result column="freight" property="freight" />
+    <result column="remark" property="remark" />
+    <result column="itemId" property="itemId" />
+    <result column="shopId" property="shopId" />
+    <result column="norm_least" property="norm_least" />
+    <result column="pWprice" property="pWprice" />
+    <result column="sessionid" property="sessionId" />
+    <result column="true_shipping" property="true_shipping" />
+    <result column="delivery_time" property="delivery_time" />
+    <result column="freight_free" property="freight_free" />
+    <result column="width" property="width" />
+    <result column="perWeight" property="perWeight" />
+    <result column="seilUnit" property="seilUnit" />
+    <result column="goodsUnit" property="goodsUnit" />
+    <result column="bulk_volume" property="bulk_volume" />
+    <result column="total_weight" property="total_weight" />
+    <result column="per_weight" property="weight" />
+    <result column="free_shopping_company" property="free_shopping_company" />
+    <result column="free_sc_days" property="free_sc_days" />
+    <result column="preferential" property="preferential" />
+    <result column="deposit_rate" property="deposit_rate" />
+    <result column="guid" property="guId" />
+    <result column="goods_type" property="types" />
+    <result column="feeprice" property="feeprice" />
+    <result column="currency" property="currency" />
+    <result column="goods_class" property="goods_class" />
+    <result column="extra_freight" property="extra_freight" />
+    <result column="source_url" property="source_url" />
+    <result column="packag_number" property="packag_number" />
+    <result column="orderRemark" property="orderRemark" />
+  </resultMap>
+  
+  <resultMap id="AdvanceOrderResultMap" type="com.cbt.bean.AdvanceOrderBean" >
+    <id column="id" property="id" />
+    <result column="orderno" property="orderNo" />
+    <result column="questions" property="questions" />
+    <result column="answer" property="answer" />
+    <result column="freight" property="freight" />
+    <result column="tariffs" property="tariffs" />
+    <result column="createtime" property="createtime" />
+  </resultMap>
+ 
+  
+  <resultMap id="ProductChangeResultMap" type="com.cbt.bean.ProductChangeBean" >
+    <id column="id" property="id" />
+    <result column="old_goods_img" property="aliImg" />
+    <result column="old_goods_url" property="aliUrl" />
+    <result column="old_goods_title" property="aliName" />
+    <result column="old_goods_price" property="aliPrice" />
+    <result column="confirm_price" property="changePrice" />
+    <result column="currency" property="currency" />
+    <result column="goods_data_id" property="goodId" />
+    <result column="goods_car_id" property="goodsCarId" />
+  </resultMap>
+  
+  <resultMap id="IdRelationtableResultMap" type="com.cbt.warehouse.pojo.IdRelationTable" >
+    <id column="id" property="id" />
+    <result column="orderid" property="orderid" />
+    <result column="goodid" property="goodid" />
+    <result column="goodurl" property="goodurl" />
+    <result column="goodstatus" property="goodstatus" />
+    <result column="createtime" property="createtime" />
+    <result column="picturepath" property="picturepath" />
+    <result column="barcode" property="barcode" />
+    <result column="tborderid" property="tborderid" />
+    <result column="position" property="position" />
+    <result column="username" property="username" />
+    <result column="userid" property="userid" />
+    <result column="state" property="state" />
+  </resultMap>
+  
+  <resultMap id="AddressResultMap" type="com.cbt.bean.Address" >
+    <id column="id" property="id" />
+    <result column="recipients" property="recipients" />
+    <result column="address" property="address" />
+    <result column="country" property="country" />
+    <result column="phone_number" property="phone_number" />
+    <result column="zip_code" property="zip_code" />
+    <result column="userid" property="userid" />
+    <result column="countryname" property="countryname" />
+    <result column="address2" property="address2" />
+    <result column="statename" property="statename" />
+    <result column="defaultaddress" property="defaultaddress" />
+    <result column="street" property="street" />	
+  </resultMap>
+  
+   
+  <resultMap id="OrderResultMap" type="com.cbt.bean.OrderBean" >
+    <id column="id" property="id" />
+    <result column="extra_discount" property="extra_discount" />
+    <result column="order_no" property="orderNo" />
+    <result column="foreign_freight" property="foreign_freight" />
+    <result column="product_cost" property="product_cost" />
+    <result column="state" property="state" />
+    <result column="create_time" property="createtime" />
+    <result column="remaining_price" property="remaining_price" />
+    <result column="discount_amount" property="discount_amount" />
+    <result column="share_discount" property="share_discount" />
+    <result column="currency" property="currency" />
+    <result column="order_ac" property="order_ac" />
+    <result column="actual_ffreight" property="actual_ffreight" />
+    <result column="pay_price" property="pay_price" />
+    <result column="service_fee" property="service_fee" />
+    <result column="ordernum" property="orderNumber" />
+    <result column="pay_price_tow" property="pay_price_tow" />
+    <result column="user_id" property="userid" />
+    <result column="actual_weight_estimate" property="actual_weight_estimate" />
+    <result column="orderRemark" property="orderRemark" />
+    <result column="delivery_time" property="deliveryTime" />
+    <result column="mode_transport" property="mode_transport" />
+    <result column="details_number" property="details_number" />
+    <result column="pay_price_three" property="pay_price_three" />
+    <result column="actual_lwh" property="actual_lwh" />
+    <result column="ip" property="ip" />
+    <result column="actual_weight" property="actual_weight" />
+    <result column="extra_freight" property="extra_freight" />
+    <result column="cashback" property="cashback" />
+    <result column="isDropshipOrder" property="isDropshipOrder" />
+    
+     <result column="car_img" property="order_img" />
+    <!-- 实体类中无该属性 <result column="packag_number" property="packag_number" /> -->
+  </resultMap>
+  <resultMap id="getHomefurnitureProductResultMap" type="com.cbt.bean.Eightcatergory" >
+    <id column="row" property="id" />
+    <result column="catergory" property="catergory" />
+    <result column="minorder" property="minorder" />
+    <result column="unit" property="unit" />
+    <result column="price" property="price" />
+    <result column="url" property="url" />
+    <result column="imgurl" property="imgurl" />
+    <result column="productname" property="productname" />
+  </resultMap>
+  
+  
+<!--   <select id="getOrders" resultMap="OrderDetailsResultMap">
+    select od.id id,od.orderid,goodsid,goodsprice ,od.userid,car_type,od.car_url,goodsname,car_img,yourorder,goodsfreight,od.remark,
+     (CASE WHEN create_time is not null THEN substring_index(create_time, ' ', 1) ELSE create_time END) as create_time, 
+     od.state,product_cost,od.actual_weight,od.actual_volume,yourorder,remaining_price,orderinfo.currency from order_details od,orderinfo
+     where orderinfo.order_no=od.orderid and od.userid=#{userid}
+     <choose>
+     	<when test="state != -2 and state != 2">
+     		 and orderinfo.state=#{state} and od.state !=2
+     	</when>
+     	<otherwise>
+     		 and od.state=1
+     	</otherwise>
+     </choose>
+     <if test="orderNo != null and orderNo != ''.toString()">
+     	and orderinfo.order_no=#{orderNo}
+     </if>
+     <if test="timeFrom != null and timeFrom != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &gt;= #{timeFrom}
+     </if>
+     <if test="timeTo != null and timeTo != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &lt;= #{timeTo}
+     </if>
+     and orderinfo.order_show = 0 and TIMESTAMPDIFF(MINUTE,orderinfo.create_time,now() )>1 order by od.orderid desc limit #{startpage}, #{endpage}
+  </select> -->
+  
+  <select id="getOrders" resultMap="OrderResultMap">
+    select order_no,
+     (CASE WHEN create_time is not null THEN substring_index(create_time, ' ', 1) ELSE create_time END) as create_time,currency, 
+     <!-- (CASE WHEN product_cost=0 THEN FORMAT(sum(order_details.goodsprice*order_details.yourorder),2) ELSE product_cost END) as product_cost, -->
+     round(sum(order_details.goodsprice*order_details.yourorder),2) as product_cost,
+      orderinfo.state ,isDropshipOrder from orderinfo 
+     inner join order_details
+     on orderinfo.order_no=order_details.orderid
+     where user_id=#{userid} and order_show = 0  
+     <if test="state == 4">
+     	and orderinfo.state in (4,6)
+     </if>
+     <if test="state != 4">
+     	and orderinfo.state=#{state}
+     </if>
+     <if test="orderNo != null and orderNo != ''.toString()">
+     	and order_no=#{orderNo}
+     </if>
+     <if test="timeFrom != null and timeFrom != ''.toString()">
+     	and substring_index(create_time, ' ', 1) &gt;= #{timeFrom}
+     </if>
+     <if test="timeTo != null and timeTo != ''.toString()">
+     	and substring_index(create_time, ' ', 1) &lt;= #{timeTo}
+     </if>
+     group by order_no
+     order by order_no desc limit #{startpage}, #{endpage}
+  </select>
+  
+  
+  <select id="getProductDetail" resultMap="OrderDetailsResultMap">
+  	select od.id id,od.orderid,goodsid,goodsprice ,od.userid,car_type,od.car_url,goodsname,car_img,yourorder,goodsfreight,od.remark,
+  	 (CASE WHEN create_time is not null THEN substring_index(create_time, ' ', 1) ELSE create_time END) as create_time,
+  	 od.state,product_cost,od.actual_weight,od.actual_volume,yourorder,remaining_price,orderinfo.currency from  order_details od,orderinfo
+  	 where orderinfo.order_no=od.orderid and od.userid=#{userid}
+     <choose>
+     	<when test="state != -2 and state != 2">
+     		 and orderinfo.state=#{state} and od.state not in(1,2)
+     	</when>
+     	<otherwise>
+     		 and od.state=1
+     	</otherwise>
+     </choose>
+     and orderinfo.order_no=#{orderNo} order by od.orderid desc  limit #{startpage}, #{page}
+  </select>
+  
+<!--   <select id="getCntByUseridAndState" resultType="Integer">
+    select count(order_details.id) counts from order_details,orderinfo where orderinfo.order_no=order_details.orderid and order_details.userid=#{userid} and orderinfo.order_show = 0
+    <choose>
+     	<when test="state != -2 and state != 2">
+     		 and orderinfo.state=#{state} and order_details.state != 2
+     	</when>
+     	<when test="state == 2">
+     		 and order_details.state=1 order by order_details.orderid
+     	</when>
+     </choose>
+     <if test="orderNo != null and orderNo != ''.toString()">
+     	and orderinfo.order_no=#{orderNo}
+     </if>
+     <if test="timeFrom != null and timeFrom != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &gt;= #{timeFrom}
+     </if>
+     <if test="timeTo != null and timeTo != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &lt;= #{timeTo}
+     </if>
+  </select> -->
+  
+  <select id="getCntByUseridAndState" resultType="Integer">
+    select count(*) counts from orderinfo where orderinfo.user_id=#{userid} 
+    <if test="state == 4">
+    	and orderinfo.state in (4,6)
+    </if>
+    <if test="state != 4">
+    	and orderinfo.state=#{state} 
+    </if>
+    and orderinfo.order_show = 0
+     <if test="orderNo != null and orderNo != ''.toString()">
+     	and orderinfo.order_no=#{orderNo}
+     </if>
+     <if test="timeFrom != null and timeFrom != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &gt;= #{timeFrom}
+     </if>
+     <if test="timeTo != null and timeTo != ''.toString()">
+     	and substring_index(orderinfo.create_time, ' ', 1) &lt;= #{timeTo}
+     </if>
+  </select>
+  
+  <select id="getNeedComfirmSourceGoods" resultType="hashMap">
+    SELECT
+        od.actual_volume specId,
+        od.id,
+        od.orderid,
+        od.goodsprice,
+        od.goods_pid,
+        od.userid,
+        oi.isDropshipOrder,
+        oi.ordertype,
+        od.car_url,
+        od.car_type,
+        od.car_img,
+        od.yourorder number,
+        od.dropshipid,
+        od.goodsname goodstitle
+    FROM
+        order_details od
+    INNER JOIN orderinfo oi ON oi.order_no = od.orderid
+    LEFT JOIN admin_r_user aru ON aru.userid = od.userid
+    LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.id=ops.od_id
+    WHERE
+        oi.state = 5 and od.orderid='QA31827632446534'
+     AND ops.id IS NULL
+  </select>
+  <!-- AND aru.adminid NOT IN (18, 55, 61)-->
+  
+  <select id="getCntByUserid" parameterType="Integer" resultType="Integer">
+  	select count(orderid) from orderInfo where user_id=#{userid} and state=4
+  </select>
+  
+  <select id="getOrdersIndividual" parameterType="Integer" resultType="hashmap">
+    select count(order_details.state) counts, orderinfo.state from orderinfo,order_details 
+     where orderinfo.order_no = order_details.orderid and order_details.state not in (1,2) and user_id=#{userid} and orderinfo.state in (0,5,3,4,1)
+     group by orderinfo.state
+  </select>
+  
+  <insert id="addForwarder" useGeneratedKeys="true" parameterType="com.cbt.bean.Forwarder">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert forwarder(order_no, express_no, logistics_name, new_state, transport_details, createtime)
+     values(#{order_no}, #{express_no}, #{logistics_name}, #{new_state}, #{transport_details}, #{createtime})
+  </insert>
+  
+  <select id="warehouse" parameterType="Integer" resultType="Integer">
+  	select count(id) counts from order_details where userid=#{userid} and state=1
+  </select>
+  
+  <select id="getForwarder" parameterType="String" resultMap="ForwarderResultMap">
+    <!-- select id,express_no,logistics_name,new_state,transport_details,createtime from forwarder where order_no=#{orderNo} -->
+    select id,expressno express_no,transportcompany logistics_name,'' new_state, '' transport_details,createtime  from  shipping_package
+    where orderid = (select mergeOrders from order_fee where orderno=#{orderNo})
+  </select>
+  
+  <select id="getConfirmThePriceOf" parameterType="Integer" resultType="hashmap">
+    select order_no,orderinfo.state from orderinfo,order_details 
+     where orderinfo.order_no = order_details.orderid and user_id=#{userid} and (orderinfo.state=5 or orderinfo.state=7) and order_details.state!=2 
+     group by order_no
+  </select>
+  
+  <select id="getCtpoOrderInfo" resultType="hashmap">
+    <!-- select oi.orderid,oi.order_no,oi.product_cost,od.goodsid,od.delivery_time,od.yourorder,od.goodsname,od.goodsprice,od.orderid,car_url,od.car_img,od.remark,od.goodsfreight,
+    	purchase_state,oi.foreign_freight,oi.currency,discount_amount,share_discount,order_ac,(select img from goods_typeimg where od.goodsid= goods_id) goods_typeimg,car_type,service_fee ,cashback
+    ,oi.extra_freight from orderinfo oi,order_details od  where oi.order_no=#{orderNo} and oi.state=5 and od.state!=2 and od.orderid=oi.order_no and oi.user_id=#{userId} order by od.car_url -->
+    
+    select oi.state,oi.orderid,oi.order_no,oi.product_cost,od.goodsid,od.delivery_time,od.yourorder,od.goodsname,od.goodsprice,od.orderid,car_url,od.car_img,od.remark,od.goodsfreight,
+    	purchase_state,oi.foreign_freight,oi.currency,discount_amount,share_discount,order_ac,(select img from goods_typeimg where od.goodsid= goods_id) goods_typeimg,car_type,service_fee ,cashback
+    ,oi.extra_freight from orderinfo oi,order_details od  where oi.order_no=#{orderNo} and od.state!=2 and od.orderid=oi.order_no and oi.user_id=#{userId} order by od.car_url
+  </select>
+  
+  <select id="getOrderChanges" resultType="hashmap">
+    select goodId,ropType,oldValue,newValue,status,dateline 
+    from order_change where (orderNo=#{orderNo} or  orderNo in (select parent_order_no from dropshiporder where child_order_no = #{orderNo} ))
+    and goodId=#{goodId} and ropType!=6 and status=1 and del_state=0 
+    order by id asc
+  </select>
+  
+  <insert id="saveOrderZiXun" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert into order_change(orderNo,goodId,ropType,oldValue,newValue,status) values(#{orderNo}, #{goodId}, #{ropType}, #{oldValue}, #{newValue}, #{status})
+  </insert>
+  
+  <update id="updateClientUpdateByOrderNo" parameterType="String">
+  	update orderinfo set client_update=1 where order_no=#{orderNo}
+  </update>
+  
+  <update id="updateOrderDetails2StateByGoodId">
+  	update order_details set state = 2 where goodsid=#{goodId} and orderid=#{orderNo}
+  </update>
+  <!-- yqy -->
+  <update id="updateOrderDetailsStateByDropshipNoAndGoodId">
+  	update order_details set state = 2 where goodsid=#{goodId} and dropshipid=#{dropshipNo}
+  </update>
+  
+  <update id="updateOrderChange2State">
+  	update order_change set del_state=1 where goodId=#{goodId} and orderNo=#{orderNo}
+  	<if test="ropType != null">
+  		and ropType = #{ropType}
+  	</if>
+  </update>
+  
+  <update id="updateOrderDetails2Price">
+  	update order_details set goodsprice=#{goodsprice} where userid=#{userid} and goodsid=#{goodsid} and orderid=#{orderid}
+  </update>
+  
+  <update id="updateUserAvailableM">
+  	update user set available_m=available_m-#{amount_u} where id=#{userId}
+  </update>
+  
+  <insert id="insertRechargeRecord" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert recharge_record(userid,price,type,remark,remark_id,datatime,usesign,currency)
+    	values(#{userId}, -#{price}, #{type}, #{remark}, #{remarkId}, now(), #{usesign}, #{currency})
+  </insert>
+  
+  <update id="updateOrderinfo2PayPrice">
+  	update orderinfo set pay_price=#{updatedtotalprice},remaining_price=0,product_cost=#{newProductCost},discount_amount=#{discount_amount} where user_id=#{userId} and order_no=#{orderNo}
+  </update>
+  
+  <update id="updateOrderinfo2RemainingPrice">
+  	update orderinfo set remaining_price=#{amount},product_cost=#{newProductCost},discount_amount=#{discount_amount} where user_id=#{userId} and order_no=#{orderNo}
+  </update>
+  
+  <update id="updateOrderDetails2DeliveryTime">
+  	update order_details set delivery_time=#{delivery_time} where userid=#{userid} and goodsid=#{goodsid} and orderid=#{orderid}
+  </update>
+  
+  <update id="updateOrderinfo2DeliveryTime">
+  	update orderinfo set delivery_time=#{delivery_time},client_update=1 where order_no=#{orderNo}
+  </update>
+  
+  <update id="updateOrderDetails2Yourorder">
+  	update order_details set yourorder=#{yourorder} where userid=#{userid} and goodsid=#{goodsid} and orderid=#{orderid}
+  </update>
+  
+  <update id="updateOrderDetails2Freight">
+  	update order_details set goodsfreight=#{goodsfreight} where userid=#{userid} and goodsid=#{goodsid} and orderid=#{orderid}
+  </update>
+  
+  <update id="updateOrderDetailsChange">
+  	update order_details od inner join order_change oc on od.goodsid=oc.goodid set yourorder = CASE WHEN ropType=3 THEN newValue ELSE yourorder END,
+  		goodsprice= CASE WHEN ropType=1 THEN newValue ELSE goodsprice END where (ropType=3 or ropType=1 ) and oc.status=1 and del_state=0 and userid=#{userid} and orderno=#{orderNo}
+  </update>
+  
+  <update id="updateOrderChange2StateByRopTypeIn">
+  	update order_change set del_state=1 where orderNo=#{orderNo}
+  	<if test="ropTypes != null and ropTypes.size() > 0">
+  		and ropType in 
+  		<foreach collection="ropTypes" index="index" item="item" open="(" close=")" separator=",">
+  			#{item}
+  		</foreach>
+  	</if>
+  </update>
+  
+<!--   <insert id="saveEvaluate" useGeneratedKeys="true" parameterType="com.importExpress.pojo.Evaluate">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert evaluate(userid,order_no,service,products,evaluate,createtime) values(#{userid}, #{orderNo}, #{service}, #{products}, #{evaluate},now())
+  </insert> -->
+  
+  <insert id="saveEvaluate" useGeneratedKeys="true" parameterType="com.cbt.bean.Evaluate" keyProperty="id">
+    insert evaluate(userid,order_no,service,products,evaluate,createtime) values(#{userid}, #{orderNo}, #{service}, #{products}, #{evaluate},now())
+  </insert>
+  
+  <update id="upOrderState">
+  	update orderinfo set state=#{state},arrive_time=now()  where order_no = #{orderNo}
+  </update>
+  
+  <update id="upCouponPrice">
+  	update orderinfo set coupon_discount=0 where order_no = #{orderNo}
+  </update>
+  
+  <update id="cancelOrder">
+  	update orderinfo set state=-1 ,cancel_obj = #{cancel_obj} where order_no = #{orderNo}
+  </update>
+  
+  <select id="getDelOrder" parameterType="String" resultType="Integer">
+    select count(id) counts from order_details where orderid=#{orderNo} and state!=2
+  </select>
+  
+  <select id="getOrderChangeState" resultType="hashmap">
+    select count(id) counts,orderno from order_change where (roptype &lt; 6 or roptype=7) and del_state=0
+    <if test="orderNos != null and orderNos.length > 0">
+  		<foreach collection="orderNos" index="index" item="item" open="" close="" separator="">
+  			and orderno = #{item}
+  		</foreach>
+  	</if>
+  </select>
+  
+  <select id="getPaymentState" resultType="hashmap">
+    select sum(payment_amount) sums,orderid from payment where paystatus=1
+    <if test="orderNos != null and orderNos.length > 0">
+  		<foreach collection="orderNos" index="index" item="item" open="" close="" separator="">
+  			and orderid = #{item}
+  		</foreach>
+  	</if>
+  </select>
+  
+  <select id="getOrderDetailsState" resultType="hashmap">
+    select  sum(yourorder*goodsprice+ifnull(goodsfreight,0)) sums,orderid from order_details where 1=1
+    <if test="orderNos != null and orderNos.length > 0">
+  		<foreach collection="orderNos" index="index" item="item" open="" close="" separator="">
+  			and orderid = #{item}
+  		</foreach>
+  	</if>
+  </select>
+  
+  <select id="getTotalPrice" resultType="Float" parameterType="String">
+    select sum(googs_price*googs_number) sums from goods_car where id in (replace(#{goodsids}, '@', ','))
+  </select>
+  
+  <update id="updateOrderinfo2State">
+  	update orderinfo set state=5 where user_id = #{userid} and order_no=#{orderid}
+  </update>
+  
+  <update id="updateOrderDetails2StateByUserid">
+  	update order_details set state=0 where userid=#{userid} and orderid=#{orderid}
+  </update>
+  
+  <insert id="saveQuestions" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert advance_order(orderno,questions,createtime) values(#{orderNo}, #{questions},now())
+  </insert>
+    
+  <select id="getSpidersByOrderid" resultMap="SpiderBeanResultMap" parameterType="String">
+    select id,goodsprice,car_url,goodsname,car_img,goodsprice,yourorder,car_type,goodsfreight,order_details.remark from  order_details where order_details.orderid=#{orderNo}
+  </select>
+  
+  <select id="getAdvanceOrderByOrderNo" resultMap="AdvanceOrderResultMap" parameterType="String">
+    select id,questions,answer,freight,tariffs,createtime from advance_order where orderno=#{orderNo}
+  </select>
+  
+  <select id="getSpiders" resultMap="SpiderBeanResultMap" parameterType="String">
+    select id, goodsname,yourorder,goodsprice,delivery_time from order_details where orderid=#{orderNo}
+  </select>
+  
+  <select id="getProductChangeInfoByOrderDetails" resultType="hashmap">
+    select distinct orderno,aliimg,aliurl,aliprice, aliname,goodid,od.goodsprice,od.goodsid as goodscarid,od.purchase_state,od.goodsname,changeflag,car_url,car_img,car_type,oi.currency
+    	from changegooddata inner join order_details od on changegooddata.orderno=od.orderid and od.state!=2
+    	<choose>
+    		<when test="flag == '1'.toString()">
+    			and changegooddata.goodscarid = od.goodsid
+    		</when>
+    		<otherwise>
+    			and changegooddata.chagoodurl = od.car_url and od.car_type=changegooddata.goodstype 
+    		</otherwise>
+    	</choose>
+    	inner join orderinfo oi on od.orderid = oi.order_no where orderno =#{orderNo} order by goodid asc
+  </select>
+  
+  <select id="getProductChangeInfoByGoodsdata" resultType="hashmap">
+    select cg.orderno, cg.aliimg,cg.aliurl,cg.aliprice,cg.aliname, cg.chagoodimg,cg.chagoodurl,cg.chagoodprice,cg.chagoodname,cg.changeflag,gd.pID,gd.name,
+    	gd.sPrice,cg.goodstype,cg.goodscarid,gd.id as gdid,gd.img as gdimg
+    	from changegooddata cg inner join goodsdata gd on cg.chagoodurl = gd.url
+    	where cg.delflag=0 and cg.aliurl=#{aliurl} and cg.goodscarid=#{goodscarid}
+  </select>
+  
+  <select id="getPriceReductionOffer" resultMap="ProductChangeResultMap" parameterType="String">
+    select tpi.goods_car_id,tpi.goods_data_id,tpi.old_goods_title,tpi.old_goods_img,tpi.old_goods_url,tpi.old_goods_price,tpi.confirm_price ,gc.currency
+    	from tbl_preshoppingcar_info tpi inner join goods_car gc on tpi.goods_car_id = gc.id and gc.state=0
+    	where tpi.flag=0 and tpi.userid= #{userid}
+  </select>
+  
+  <update id="upQuestions">
+  	update advance_order set questions=#{questions}  where orderno = #{orderid}
+  </update>
+  
+  <select id="getAdvance" resultType="String" parameterType="String">
+   select id from advance_order where orderno=#{orderid}
+  </select>
+  
+  <insert id="addAdvance" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert advance_order (orderno,questions,createtime) values(#{orderid}, #{questions}, now())
+  </insert>
+  
+  <select id="getOrderinfoByOrderNo" resultType="hashmap" parameterType="String">
+    select remaining_price,discount_amount,share_discount,currency,order_ac,product_cost,cashback,pay_price,coupon_discount  from orderinfo oi where order_no = #{orderid}
+  </select>
+  
+  <select id="getDelOrderByOrderNoAndStatus" resultMap="OrderDetailsResultMap">
+    select od.orderid,od.createtime,od.state,od.goodsprice,od.actual_volume,od.actual_weight,od.yourorder,goods_class,goodsid,discount_ratio,od_total_weight,goodscatid 
+    	from order_details od where od.orderid=#{orderNo} and goodsid=#{goodId} and state !=2 
+  </select>
+  
+  <select id="getDelOrderByDropshipIdAndStatus" resultMap="OrderDetailsResultMap">
+    select od.orderid,od.createtime,od.state,od.goodsprice,od.actual_volume,od.actual_weight,od.yourorder,goods_class,goodsid,discount_ratio,od_bulk_volume,od_total_weight,goodscatid 
+    	from order_details od where od.dropshipid=#{orderNo} and state !=2;
+  </select>
+  
+  <update id="upOrderPurchase" parameterType="com.cbt.warehouse.pojo.PvidBean" >
+  	<choose>
+  		<when test="state == 6">
+  			update orderinfo set state=#{state},arrive_time=now(),details_number=details_number-1
+  		</when>
+  		<otherwise>
+  			update orderinfo set details_number=details_number-1
+  		</otherwise>
+  	</choose>
+  	<if test="purchase_state == 1">
+  		,purchase_number=purchase_number-1
+  	</if>
+  	where order_no = #{orderno}
+  </update>
+  
+  <select id="getOrderState" resultType="Integer" parameterType="String">
+    select state from orderinfo where order_no = #{orderNo}
+  </select>
+  
+  <select id="getOrderDiscount" resultType="hashmap" parameterType="String">
+    select id, price from discount_chenge where orderno = #{orderNo} and state=0  order by id desc limit 1
+  </select>
+  
+  <select id="getIndividualOrdersDetails" resultType="hashmap" parameterType="String">
+    select od.delivery_time,od.userid,od.id oid,od.dropshipid,goodsname,od.checkprice_fee,od.state,od.paytime,goodsid,car_img,car_url, od.goodsfreight ,od.goodsprice,od.yourorder,yourorder,goodsfreight,od.remark,delivery_time,od.delivery_time
+    	,od.Actual_price,od.Actual_freight,od.Actual_weight,freight_free,od.Actual_volume,od.goodsid,od.fileupload,purchase_state,purchase_time,purchase_confirmation,car_type
+    	,date_format(od.createtime,'%Y-%m-%d') as create_time,(select img from goods_typeimg where goodsid = goods_id limit 1) goods_typeimg from  order_details od 
+    	 where od.orderid=#{orderNo}
+    	 <if test="state != 6">
+    	 and od.state!=2
+    	 </if>
+    	 order by od.car_url
+  </select>
+  
+   <select id="getDropshipIndividualOrdersDetails" resultType="hashmap" parameterType="String">
+    select od.delivery_time,od.userid,od.id oid,od.dropshipid,goodsname,od.checkprice_fee,od.state,od.paytime,goodsid,car_img,car_url, od.goodsfreight ,od.goodsprice,od.yourorder,yourorder,goodsfreight,od.remark,delivery_time,od.delivery_time
+    	,od.Actual_price,od.Actual_freight,od.Actual_weight,freight_free,od.Actual_volume,od.goodsid,od.fileupload,purchase_state,purchase_time,purchase_confirmation,car_type
+    	,date_format(od.createtime,'%Y-%m-%d') as create_time,(select img from goods_typeimg where goodsid = goods_id limit 1) goods_typeimg from  order_details od 
+    	 where od.dropshipid=#{orderNo}
+    	 <if test="state != 6">
+    	 and od.state!=2
+    	 </if>
+    	 order by od.car_url
+  </select>
+  
+  <select id="getIndividualOrdersChange" resultType="hashmap">
+    select ropType,oldValue,newValue from order_change where (ropType=1 or ropType=2 or ropType=4 or ropType=6 or ropType=7) and orderNo=#{orderNo} and goodId=#{goodId} and del_state=0
+  </select>
+  
+  <select id="getRemainingPrice" resultType="Double">
+    select remaining_price from orderinfo where order_no = #{orderNo} and user_id = #{userId}
+  </select>
+  
+  <update id="updateOrderInfopr">
+  	update orderinfo set remaining_price=#{remainingPrice} where order_no = #{orderNo} and user_id =#{userId}
+  </update>
+  
+  <update id="updateOrderDetail">
+  	update order_details set goodsprice=#{goodSprice},goodsname=#{name},goodsid=#{id},remark=#{remark},car_url=#{goodsUrl},car_img=#{goodsImg},car_type=#{goodsType},od_state=13 
+  	 where orderid = #{orderNo} and userid =#{userId} and goodsid=#{goodsCarId}
+  </update>
+  
+  <update id="updateChangeGood">
+  	update changegooddata set changeflag=1 where orderno = #{orderNo} and goodscarid = #{goodId}
+  </update>
+  
+  <update id="updateOrderinfo2Freight" parameterType="String">
+  	update orderinfo set domestic_freight=1 where order_no = #{orderNo}
+  </update>
+  
+<!--   <insert id="saveGoodsCar" useGeneratedKeys="true">
+  	<selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+    insert into goods_car (goods_url,goods_title,googs_img,goods_type,goodsdata_id,remark) values(#{goodsUrl}, #{goodsName}, #{goodsImg}, #{goodsType}, #{goodsId}, #{remark})
+  </insert> -->
+  
+
+  <insert id="saveGoodsCar"  parameterType="com.cbt.bean.SpiderBean" useGeneratedKeys="true" keyProperty="id">
+    insert into goods_car (goods_url,goods_title,googs_img,goods_type,goodsdata_id,remark,state) values(#{goods_url}, #{name}, #{img_url}, #{types}, #{goodsdata_id}, #{remark},1)
+  </insert>
+  
+  <update id="updateProductSource">
+  	update order_product_source set goodsid=#{goodCarKey},goodsdataid=#{goodsdataid},goods_url=#{goodsUrl},goods_p_url=#{goodsUrl},goods_img_url=#{goodsImgUrl},
+  		goods_price=#{goodsPrice},goods_p_price=#{goodsPrice},goods_name=#{name},goods_p_name=#{name},purchase_state=13
+  		where orderid = #{orderNo} and goodsid = #{goodsid}
+  </update>
+  
+  <select id="getIdRelationtable" resultMap="IdRelationtableResultMap" parameterType="String">
+    select id, orderid, goodid, goodurl, goodstatus, createtime, picturepath, barcode, tborderid,
+    	position, username, userid, state from  id_relationtable where orderid=#{orderNo}
+  </select>
+  
+  <update id="updatePreshoppingcarInfo">
+  	update tbl_preshoppingcar_info set flag=1  where flag = 0 and userid = #{userId} and goods_data_id=#{goodsDataId} and goods_car_id=#{goodsCarId}
+  </update>
+  
+  <update id="updateGoodsCar">
+  	update goods_car set state=9,updatetime=now()  where state=0 and userid = #{userId} and goodsdata_id=#{goodsDataId} and id=#{goodsCarId}
+  </update>
+  
+  <update id="updateGoodsCarByUserId" parameterType="Integer">
+  	update goods_car set state=9,updatetime=now()  where userid= #{userId} and state=0 and id not in (select  goods_car_id from  tbl_preshoppingcar_info where userid= 1645 and flag=0)
+  </update>
+  
+  <update id="upOrderDiscount" parameterType="Integer">
+  	update discount_chenge set state=1 where id=#{id}
+  </update>
+  
+  
+  <!-- 原com.cbt.pay.dao下************************************************************************************************************ -->
+  <!-- 添加订单详细信息 -->
+  <insert id="addOrderDetail">
+  	    insert order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,
+	  	goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,isFeight) 
+	  	select
+	        #{goodsid},#{orderid},#{dropshipid},#{delivery_time},#{checkprice_fee},#{checkproduct_fee},#{state},#{fileupload},
+	        #{yourorder},#{userid},#{goodsname},#{goodsprice},#{goodsfreight},#{goodsdata_id},#{remark},#{goods_class},
+	        #{extra_freight},#{goods_url},#{goods_img},#{goods_type},#{freight_free},#{bulk_volume},#{total_weight},#{discount_ratio},#{goodscatid},#{isFeight}
+	        FROM DUAL WHERE NOT EXISTS (SELECT * FROM order_details WHERE orderid=#{orderid} and goodsid=#{goodsid})
+  </insert>
+  <!-- 获取最大订单号 -->
+  <select id="getMaxOrderno" parameterType="String" resultType="String">
+  	select max(orderid) from order_details where  userid= #{userid}
+  </select>
+  <!-- 获取订单内所有商品的信息 -->
+  <select id="getOrderDetail" resultMap="OrderDetailsResultMap">
+  	select * from order_details where userid= #{userid} and goodsid in(#{orderid})
+  </select>
+  <!-- 添加新地址 -->
+  <insert id="addAddress" useGeneratedKeys="true" keyProperty="id" parameterType="com.cbt.bean.Address">
+  	insert address(userid,address,country,phone_number,zip_code,address2,statename,recipients,createtime,street) 
+  	values(#{userid},#{address},#{country},#{phone_number},#{zip_code},#{address2},#{statename},#{recipients},#{createtime},#{street})
+  </insert>
+  <!-- 获取用户地址 -->
+  <select id="getUserAddr" resultMap="AddressResultMap">
+  	select address.*,zone.country as countryname from address,zone where userid= #{userid}
+  	 and zone.id=address.country and (ISNULL(address.delflag) or address.delflag='0') order by createtime desc
+  </select>
+  <!-- 查询用户地址是否存在 -->
+  <select id="existUserAddr" parameterType="java.lang.Integer" resultType="java.lang.Integer" >
+  	select id from address where userid= #{userid} and (ISNULL(address.delflag) or address.delflag='0') order by createtime
+  </select>
+  <!-- 用户添加订单记录 -->
+  <insert id="addOrderInfo">
+  
+  	insert orderinfo(order_no,user_id,product_cost,state,delivery_time,service_fee,ip,mode_transport,create_time,details_number,pay_price_three,
+  	foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,share_discount,order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,orderRemark,cashback,isDropshipOrder,address_id,packag_number,coupon_discount,exchange_rate) 
+  	select
+  		#{orderNo},#{userid},#{product_cost},#{state},#{deliveryTime},#{service_fee},
+  		#{ip},#{mode_transport},now(),#{details_number},#{pay_price_three},#{foreign_freight},#{pay_price},
+  		#{pay_price_tow},#{currency},#{actual_ffreight},#{discount_amount},#{share_discount},#{order_ac},#{actual_lwh},
+  		#{actual_weight},#{actual_weight_estimate},#{extra_freight},#{orderRemark},#{cashback},#{isDropshipOrder},#{addressid},#{odcount},#{coupon_discount},#{exchange_rate}
+  	FROM DUAL WHERE NOT EXISTS (SELECT * FROM orderinfo WHERE order_no=#{orderNo});
+  </insert>
+  <!-- 获取用户的订单记录orderNo,userId -->
+  <select id="getOrderInfoByOrderNoAndUserId" resultMap="OrderResultMap">
+  	select order_no,foreign_freight,product_cost,state,create_time,remaining_price,currency,service_fee,pay_price,discount_amount,order_ac,pay_price_tow,
+  	actual_ffreight,(select count(orderid) from orderinfo where user_id=o.user_id)ordernum from orderinfo o where user_id= #{userId} and order_no in (#{orderNo})
+  </select>
+  <!-- 获取用户的订单记录 -->
+  <select id="getOrderInfoByOrder_noAndUserid" resultMap="OrderResultMap">
+  		select * from orderinfo where 1 = 1 
+  		<foreach collection="order_no" item="item" index="index"  separator="," open="and order_no in (" close=")">
+  			#{item}
+  		</foreach>
+  		<if test="userId != null and userId != ''.toString()">
+  			and user_id = #{userId}
+  		</if>
+  </select>
+  <!-- 获取用户的订单记录  zlw -->
+  <select id="getOrdersByUserid" parameterType="Integer" resultType="hashmap">
+  		select o.*,ifnull((select  max(paystatus )   paystatus  from payment  where orderid=o.order_no group by orderid ),'N') paystatus,f.remarks as express_no
+		, (select count(*) from changegooddata  where orderno=o.order_no and delflag=0 ) as chaOrderNo, 
+		 case when TIMESTAMPDIFF(MINUTE,o.create_time,now()) &lt;= 1 then 1 else 0 end as payflag,
+		 case when TIMESTAMPDIFF(HOUR,o.create_time,now()) &lt;= 4 then 1 else 0 end as cancelFlag,
+		 case when TIMESTAMPDIFF(HOUR,o.create_time,now()) &lt;= 8 then 1 else 0 end as comformFlag 
+		 from orderinfo o left join (select DISTINCT remarks from shipping_package) f  on find_in_set (o.order_no,f.remarks) 
+		 where o.user_id= #{userid} and o.state in (0,1,2,3,5) and o.order_show = 0 order by o.orderid desc
+  </select>
+  <!-- 根据用户id查询payment的最大createtime -->
+  <select id="selectOrderShowFlag" parameterType="Integer" resultType="String">
+  	select   max(pm.createtime) as paymentTime  from orderinfo o 
+		inner join payment pm on o.order_no = pm.orderid 
+		where o.user_id= #{userid} 
+		and o.state=5
+  </select>
+  <update id="updateOrderShowFlag">
+  	update orderinfo o set o.order_show =1 where o.user_id= #{userid} 
+		and o.state=0 and TIMESTAMPDIFF(MINUTE,o.create_time,#{paymentTime}) &lt;= 30 and o.create_time &lt; #{paymentTime}
+		and o.order_no in (select orderid  from payment group by orderid having  max(paystatus)!=0) 
+  </update>
+  <!-- 根据用户id查询orderinfo的最大createtime -->
+  <select id="selectUnpaidOrderShowFlag" parameterType="Integer" resultType="String">
+  	select max(create_time) as createTime from  orderinfo where user_id = #{userid} and state=0  and   order_show=0
+  </select>
+  <update id="updateUnpaidOrderShowFlag">
+  	update orderinfo set order_show=1 where user_id = #{userid}
+		and state=0 and order_show=0 and TIMESTAMPDIFF(MINUTE,create_time, #{paymentTime}) &lt;= 10 and create_time &lt; #{paymentTime}
+		and order_no in (select orderid  from payment group by orderid having  max(paystatus)!=0) 
+  </update>
+  <!-- 生成订单时更新购物车的商品状态 -->
+  <update id="updateGoodscarState">
+  	update goods_car set state=1,updatetime=now() where id in (select goodsid from order_details where  orderid  in (#{itemid}))
+  </update>
+  <!-- 生成订单时更新购物车的商品状态 -->
+  <update id="updateGoodscarStateByItemid">
+  	update goods_car set state=1,updatetime=now() where guid in
+  	<foreach collection="array" index="index" item="item" open="(" close=")" separator=",">
+  		#{item}
+  	</foreach>
+  </update>
+  <!-- 付款时再次更新购物车的商品状态 -->
+  <update id="updateGoodscarStateAgain">
+  	update goods_car set state=1,updatetime=now() where id in("#{itemid}") and userid= #{userid}
+  </update>
+  <!-- 确认付款后修改订单和订单详情状态 -->
+  <update id="updateOrderPayPriceThree">
+  	update orderinfo set state=5,pay_price_three= #{pay_price_three} where user_id= #{userid} and order_no= #{orderid}
+  </update>
+  <update id="updateOrderState">
+  	update order_details set state=0 where userid= #{userid} and orderid= #{orderid}
+  </update>
+  <!-- 更新用户地址 -->
+  <update id="updateUserAddress">
+  	update address  a   set   a.address= #{address},a.country= #{country},a.phone_number= #{phonenumber}, a.zip_code= #{zipcode},a.address2= #{address2},a.statename= #{statename},a.modifytime= NOW()
+		<if test="recipients != null">
+			,a.recipients= #{recipients} 
+		</if>
+		<if test="street != null">
+			,a.street= #{street} 
+		</if>
+		where a.id= #{id}
+  </update>
+  <!-- 获取homefurniture页面内容 -->
+  <select id="getHomefurnitureProduct" parameterType="String" resultMap="getHomefurnitureProductResultMap">
+  	select row,catergory,minorder,unit,price,url,imgurl,productname from eightcatergory  where valid=1 and catergory in (#{catergory})
+  </select>
+  <!-- 根据id删除收件地址 -->
+  <delete id="delUserAddressByid" parameterType="Integer">
+  	update address set delflag=1 where id= #{id}
+  </delete>
+  <!-- 设置默认地址 -->
+  <update id="setDefault">
+  	update address set defaultaddress= #{id} where userid= #{userid}
+  </update>
+  <!-- 通过id查询地址 -->
+  <select id="getUserAddrById" parameterType="Integer" resultMap="AddressResultMap">
+  	select address.*,zone.country as countryname from address,zone where address.id= #{id} and zone.id=address.country 
+  	and (ISNULL(address.delflag) or address.delflag='0') order by createtime
+  </select>
+  <!-- 通过userid查询地址count -->
+  <select id="getAddressCountByUserId" parameterType="Integer" resultType="Integer">
+  	select count(*) count from address where (ISNULL(address.delflag) or address.delflag='0') and userid= #{userid}
+  </select>
+  <!-- 合并订单 -->
+  <insert id="mergeOrder_insert">
+  	insert  into orderinfo(user_id,order_no,product_cost,state,create_time) select userid,#{newOrderNo},
+  	sum(ROUND(yourorder*goodsprice,2)),'0',now() from order_details where orderid in(orderid)
+  </insert>
+  <update id="mergeOrder_update">
+  	update order_details set orderid= #{newOrderNo} where orderid in(#{orderid})
+  </update>
+  <!-- 更新用户支付金额 -->
+  <update id="updateOrderPayPrice">
+  		update orderinfo set pay_price= #{pay_price}
+			<if test="ipnAddress != null">
+				, ipnaddress= #{ipnAddress}
+			</if>
+			<if test="discount_amount >= 0">
+				, discount_amount= #{discount_amount}
+			</if>
+			<if test="product_cost >= 0">
+				, product_cost= #{product_cost}
+			</if>
+			<if test="remaining_price >= 0">
+				, remaining_price= #{remaining_price}
+			</if>
+			<if test="cashback >= 0">
+				, cashback= #{cashback}
+			</if>
+		where user_id= #{userid} and order_no= #{order_no}
+  </update>
+  <!-- 更新用户支付金额,状态 -->
+  <update id="updateOrderStatePayPrice">
+  		update orderinfo set remaining_price=#{owe}, pay_price= #{pryprice},pay_price_tow = if( mode_transport like('%product' ),0,foreign_freight),state=5,pay_price_three= #{pay_price_three},order_show=0
+  		,order_ac= #{order_ac}
+		<if test="ipnAddressJson != null">
+			, ipnaddress= #{ipnAddressJson}
+		</if>
+		where user_id= #{userid} and order_no= #{orderid}
+  </update>
+  
+  <!-- 更新用户支付金额,状态 -->
+  <update id="updateOrderStatePayPrice_1"  parameterType="list">
+  		<foreach collection="orderInfo" item="item" index="index" open="" close="" separator=";" >  
+  				update orderinfo set remaining_price=0, pay_price= ${item[1]},pay_price_tow = foreign_freight,state=5,order_show=0,pay_price_three= ${item[2]}
+				<if test="ipnAddressJson != null">
+					, ipnaddress= #{ipnAddressJson}
+				</if>
+				where user_id= #{userid} and order_no= '${item[0]}'
+		</foreach>
+  </update>
+  
+   <update id="upGoogs_car_price"  parameterType="java.util.Map">
+        
+          <foreach collection="map_price" item="price" open="" close="" index="index"  separator=";"> 
+               	update goods_car 
+               	<set>
+                  googs_price='${price}'
+                </set>
+               where guid = '${index}' and state=0
+         </foreach>
+    </update> 
+  
+  
+  <!-- 获取订单自增id -->
+  <select id="getOrderid" resultType="Integer">
+  		select MAX(orderid) as orderid from orderinfo
+  </select>
+  <!-- 新增地址 -->
+  <insert id="addOrderAddress" useGeneratedKeys="true" keyProperty="id" parameterType="java.util.Map">
+  		insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients)
+  		 select #{addressid},#{orderno},#{country},#{statename},#{address},#{address2},#{phoneNumber},#{zipcode},0,#{street},#{recipients}
+  		 FROM DUAL WHERE NOT EXISTS (SELECT * FROM order_address WHERE orderNo=#{orderno})
+  </insert>
+  <!-- 新增订单地址 -->
+  <insert id="addOrderAddresss" parameterType="list">
+  		insert into order_address(AddressID,orderNo,Country,statename,address,address2,phoneNumber,zipcode,Adstatus,street,recipients) 
+  		values
+  		<foreach collection="list" item="item" index="index" separator="," >
+                   (#{list[${index}].addressid},#{list[${index}].orderno},#{list[${index}].country},#{list[${index}].statename},#{list[${index}].address},
+                   #{list[${index}].address2},#{list[${index}].phoneNumber},#{list[${index}].zipcode},0,#{list[${index}].street},#{list[${index}].recipients})
+  		</foreach>
+  </insert>
+  <!-- 获取订单地址 -->
+  <select id="getOrderAddress" parameterType="String" resultMap="AddressResultMap">
+  		select * from order_address where orderNo=#{orderid}
+  </select>
+  <select id="getZoneBy" parameterType="Integer" resultType="String">
+  		select country countryname from zone where id= #{id}
+  </select>
+  <!-- 更新订单地址 -->
+  <update id="updateOrderAddress" parameterType="com.cbt.bean.Address">
+  		update order_address set Country= #{country},statename= #{statename},address= #{address},address2= #{address2},phoneNumber= #{phone_number},
+  		zipcode= #{zip_code},recipients= #{recipients},street= #{street} where orderNo= #{orderid}
+  </update>
+  
+  <select id="getOrderProductcost" parameterType="String" resultType="String">
+  		select ROUND(sum(yourorder*goodsprice),2) as sum from order_details where orderid in( #{orderid})
+  </select>
+  
+  <update id="updateOrderinfo">
+  		update orderinfo set product_cost= #{product_cost},service_fee= #{service_fee} where order_no= #{orderid}
+  </update>
+  
+  <delete id="delGoods">
+  		delete from order_details where goodsid= #{goodsid} and orderid= #{orderid}
+  </delete>
+  <update id="updateOrderinfoByOrderNo" parameterType="String">
+  		update orderinfo set details_number=details_number -1 where order_no= #{orderid}
+  </update>
+  
+    <!-- 保存订单折扣信息 -->
+    <insert id="saveOrder_discount">
+    		insert order_discount(orderno,discounttype,price,discountinfo,createtime)
+    		 values( #{orderno}, #{discounttype}, #{price}, #{discountinfo},now())
+    </insert>
+    <!-- 修改订单需支付运费金额，运输方式 -->
+    <update id="upOrderExpress">
+    		update orderinfo set mode_transport= #{mode_transport},actual_ffreight= #{actual_ffreight} where order_no= #{orderno}
+    </update>
+    <!-- 修改订单需支付运费金额，运输方式,运费，剩余支付金额，已支付运费 -->
+    <update id="upOrderExpress_1">
+    		update orderinfo set mode_transport= #{mode_transport},actual_ffreight= #{actual_ffreight},remaining_price= #{remaining_price},pay_price_tow= #{pay_price_tow},
+    		foreign_freight= #{actual_freight},service_fee= #{service_fee},pay_price= #{pay_price} where order_no= #{orderno}
+    </update>
+    <!-- 修改订单服务费 -->
+    <update id="upOrderService_fee">
+    		update orderinfo set service_fee= #{service_fee} where order_no= #{orderno}
+    </update>
+    
+    <!-- 降价优惠查询 -->
+    <select id="getPriceReduction" parameterType="Integer" resultType="Integer">
+    	select count(*) count from tbl_preshoppingcar_info tpi 
+		 inner join goods_car gc on tpi.userid=gc.userid and tpi.goods_data_id=gc.goodsdata_id and tpi.goods_car_id= gc.id and gc.state=0 
+		 where tpi.flag=0 and tpi.userid= #{userid}
+    </select>
+    
+    <!-- 获得历史订单数量 -->
+    <select id="getHistoryCount" parameterType="Integer" resultType="Integer">
+    	select count(*) count from orderinfo where user_id= #{userid} and state in (4,6)
+    </select>
+    
+    <!-- 更新替換表刪除flag -->
+    <update id="updateChangeDelFlag">
+    		update changegooddata set delflag=1 where orderno= #{order_no} and goodscarid= #{goodsCarid}
+    </update>
+    
+    <!-- 取消订单更新订单表状态 -->
+    <update id="updateOrderInfoState">
+    		update orderinfo set state=6 where order_no= #{orderNo}
+    </update>
+    
+    <select id="getOrderByUid" parameterType="Integer" resultMap="OrderResultMap">
+    		SELECT order_no,user_id,create_time FROM orderinfo WHERE user_id= #{uid} order by create_time DESC
+    </select>
+  
+  <!-- 获取订单号 -->
+  <select id="getOrderNo" statementType="CALLABLE"  resultType="String">
+            {CALL GetOrderIndex()}
+    </select>
+    
+     <!-- 获取订单号 -->
+  <select id="checkUpOrderState" statementType="CALLABLE" parameterType="String"  resultType="Integer">
+            {CALL checkupdate_ordersate(#{orderNo,mode=IN,jdbcType=VARCHAR})}
+    </select>
+    
+  <select id="initCheckData" statementType="CALLABLE" >
+            {call initCheckData(#{orderNos,mode=IN,jdbcType=VARCHAR})}
+    </select>
+  
+  <!-- 更新订单服务器 -->
+  <update id="updateServerUpdate" parameterType="String">
+  		update orderinfo set server_update=0 where 1 &gt; (select count(id) from order_change where orderno= #{order_no} and del_state=0) and order_no=#{order_no}
+  </update>
+  
+  <insert id="insertOrderInfo">
+  	insert into orderinfo(user_id,order_no,product_cost,state,create_time) 
+  		select userid,#{newOrderId},sum(ROUND(yourorder*goodsprice,2)),'0',now() from order_details where orderid in (#{oldOrderId})
+  </insert>
+  
+  <update id="updateOrderId">
+  	update order_details set orderid=#{newOrderId} where orderid in(#{oldOrderId})
+  </update>
+  
+  <select id="existOrderNo"  parameterType="String" resultType="Integer">
+  SELECT orderid from orderinfo   WHERE  left(order_no,16) = #{orderNo} limit 1
+  </select>
+    
+  <select id="getOrderByUidPage" resultMap="OrderResultMap">
+  	SELECT o.order_no,o.user_id,o.create_time,od.car_img from orderinfo o
+  		LEFT JOIN order_details od on o.order_no = od.orderid WHERE o.user_id=#{uid} 
+  		and o.state=3
+  		order by create_time DESC limit #{start}, #{pageSize}
+  </select>
+  
+  <select id="getOrderByUidPageCount" parameterType="int" resultType="int">
+  	SELECT count(*) from orderinfo o LEFT JOIN order_details od on o.order_no = od.orderid WHERE o.user_id=#{uid} and o.state=3
+  </select>
+  
+  
+  <!-- 余额支付成功后更新订单表 -->
+  <update id="updateOrderinfoByBalancePayOnSuccess">
+  	update orderinfo set remaining_price=0, state=5, order_show=0, pay_price=#{payPrice}, pay_price_three=#{payPriceThree}, pay_price_tow=#{payPriceTow}
+  		where user_id=#{userId} and order_no=#{orderNo}
+  </update>
+  
+  <update id="updateOrderAc">
+  	update orderinfo set order_ac=#{orderAc} where user_id=#{userId} and order_no=#{orderNo}
+  </update>
+  
+  <!-- 修改未支付金额 -->
+  <update id="updateRemainingPrice">
+  	update orderinfo set remaining_price=#{remainingPrice} where user_id=#{userId} and order_no=#{orderNo}
+  </update>
+    
+	<insert id="addOrderSelective" useGeneratedKeys="true" keyProperty="orderNo" parameterType="com.cbt.bean.OrderBean">
+  	insert orderinfo(order_no,user_id,product_cost,state,address_id,delivery_time,service_fee,ip,mode_transport,create_time,details_number,pay_price_three,
+  	foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,order_ac,actual_lwh,actual_weight,actual_weight_estimate,extra_freight,packag_number,orderRemark,cashback) 
+  	values 
+  		(#{orderNo},#{userid},#{product_cost},#{state},#{addressid},#{deliveryTime},#{service_fee},
+  		#{ip},#{mode_transport},now(),#{details_number},#{pay_price_three},#{foreign_freight},#{pay_price},
+  		#{pay_price_tow},#{currency},#{actual_ffreight},#{discount_amount},#{order_ac},#{actual_lwh},
+  		#{actual_weight},#{actual_weight_estimate},#{extra_freight},#{packag_number},#{orderRemark},#{cashback})
+  </insert>
+
+	<!-- yqy dropship api根据订单号获取总金额 -->
+	<select id="getTotalPriceFormOrderNo" resultType="hashmap" parameterType="String">
+    select service_fee,product_cost,foreign_freight from orderinfo where order_no = #{orderNo};
+  </select>
+  
+  <select id="getCountryIdFromOrderNo" resultType="String">
+  	select Country from order_address where orderNo = #{orderNo};
+  </select>
+	
+	<update id="updateOrderInfoFormCancelProduct" parameterType="java.util.Map">
+	update orderinfo set product_cost = round(product_cost-#{productcost},2),foreign_freight = round(foreign_freight-#{foreignfreight},2),pay_price = round(pay_price-#{productcost}-#{foreignfreight},2),pay_price_tow = round(pay_price_tow-#{foreignfreight},2),details_number = round(details_number-#{detailsnumber},0),actual_weight_estimate=round(actual_weight_estimate-#{actualweightestimate},2) 
+	<if test="state != null">
+		,state = #{state} 
+	</if>
+	<if test="server_update != null">
+		,server_update = #{server_update} 
+	</if>
+	where order_no = #{orderno} and user_id = #{userid}
+	</update>
+	
+	 <!-- 订单生成日志记录，用来记录该订单对应的商品信息 -->
+    <insert id="addOrderNoLog">
+    		insert orderno_addlog(userid,orderno,shippingday,addressid,itemid,createtime,order_amount)
+    		 values( #{userId}, #{orderNo}, #{days}, #{addressId}, #{itemInfo},now(),#{pay_product})
+    </insert>
+    
+    
+    <select id="getOrderByorderNo" resultMap="OrderResultMap">
+		select * from orderinfo where order_no = #{orderNo};
+    </select>
+    
+     <!-- 更新用户支付金额 -->
+  <update id="updateOrderPayPrice1">
+  		update orderinfo set pay_price= #{pay_price}
+			<if test="ipnAddress != null">
+				, ipnaddress= #{ipnAddress}
+			</if>
+			<if test="discount_amount >= 0">
+				, discount_amount= #{discount_amount}
+			</if>
+			<if test="share_discount >= 0">
+				, share_discount= #{share_discount}
+			</if>
+			<if test="product_cost >= 0">
+				, product_cost= #{product_cost}
+			</if>
+			<if test="remaining_price >= 0">
+				, remaining_price= #{remaining_price}
+			</if>
+			<if test="cashback >= 0">
+				, cashback= #{cashback}
+			</if>
+		where user_id= #{userid} and order_no= #{order_no}
+  </update>
+  
+  <select id="getOrderCgWithCancle" resultType="java.lang.Integer">
+    select count(*) 
+    from order_change where (orderNo=#{orderNo} or  orderNo in (select parent_order_no from dropshiporder where child_order_no = #{orderNo} ))
+    and ropType=4 and status=1 and del_state=0 
+  </select>
+  <select id="queryPreferential" resultType="Integer">
+     SELECT count(id) FROM user_coupon WHERE userid=#{userid} and state=0 limit 1
+  </select>
+  <update id="updatePreferential">
+    update user_coupon set state=1,orderid=#{orderNo} where userid=#{userid}
+  </update>
+  <select id="getExchangeRate" resultType="String">
+     select exchange_rate from exchange_rate where country=#{type}
+  </select>
+  <update id="upPrice">
+  	update user set available_m=available_m+(#{price})  where id = #{userId}
+  </update>
+</mapper>

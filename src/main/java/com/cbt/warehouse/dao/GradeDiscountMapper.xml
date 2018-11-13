@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.GradeDiscountMapper" >
+  <!-- grade_discount表 -->
+  <resultMap  id="gradeDiscountResultMap" type="com.cbt.warehouse.pojo.GradeDiscountBean">
+	  <id column="id" property="id"/>
+	  <result column="gid" property="gid"/>
+	  <result column="gname" property="gname"/>
+	  <result column="discount" property="discount"/>
+	  <result column="minGradeValue" property="minGradeValue"/>
+	  <result column="maxGradeValue" property="maxGradeValue"/>
+	  <result column="times" property="times"/>
+	  <result column="valid" property="valid"/>
+	  <result column="createtime" property="createtime"/>
+	  <!-- user_grade表 -->
+	  <result column="grade" property="grade"/>
+  </resultMap>
+  <!-- user_grade_growth表 -->
+  <resultMap id="userGradeGrowthResultMap" type="com.cbt.warehouse.pojo.UserGradeGrowthBean">
+    <id column="id" property="id"/>
+  	<result column="userId" property="userId"/>
+  	<result column="gradeDisId" property="gradeDisId"/>
+  	<result column="grade" property="grade"/>
+  	<result column="growthValue" property="growthValue"/>
+  	<result column="discount" property="discount"/>
+  	<result column="times" property="times"/>
+  	<result column="valid" property="valid"/>
+  	<result column="createTime" property="createTime"/>
+  	<result column="updateTime" property="updateTime"/>
+  	
+  	<result column="gname" property="gname"/>
+  	<result column="gid" property="gid"/>
+	<result column="minGradeValue" property="minGradeValue"/>
+	<result column="maxGradeValue" property="maxGradeValue"/>
+  </resultMap>
+  <!-- orderinfo表 -->
+  <resultMap id="orderResultMap" type="com.cbt.warehouse.pojo.OrderBean">
+  	<result column="order_no" property="orderNo"/>
+  	<result column="grade_discount" property="grade_discount"/>
+  	<result column="pay_price" property="pay_price"/>
+  	<result column="isDropshipOrder" property="isDropshipOrder"/>
+  	<result column="state" property="state"/>
+  </resultMap>
+  <!-- user_grade_growth_log表 -->
+  <resultMap type="com.cbt.warehouse.pojo.UserGradeGrowthLogBean" id="userGradeGrowthLogResultMap">
+  	<id column="id" property="id"/>
+  	<result column="userId" property="userId"/>
+  	<result column="grade" property="grade"/>
+  	<result column="beforeGrowthValue" property="beforeGrowthValue"/>
+  	<result column="afterGrowthValue" property="afterGrowthValue"/>
+  	<result column="gapGrowthValue" property="gapGrowthValue"/>
+  	<result column="backGrowthValue" property="backGrowthValue"/>
+  	<result column="orderGrowthValue" property="orderGrowthValue"/>
+  	<result column="orderNo" property="orderNo"/>
+  	<result column="orderPrice" property="orderPrice"/>
+  	<result column="times" property="times"/>
+  	<result column="comment" property="comment"/>
+  	<result column="isOldOrder" property="isOldOrder"/>
+  	<result column="createTime" property="createTime"/>
+  </resultMap>
+
+   
+  <!-- 原来查询信息 -->
+  <select id="getDisount" resultMap="gradeDiscountResultMap" >
+    select g.id,g.valid,g.discount,g.gid,u.grade  from grade_discount g,user_grade u where g.gid=u.id and 
+    g.valid=1 order by g.gid asc
+  </select>
+  
+  <!-- 获取所有vip等级优惠信息 -->
+  <select id="getAllGradeDiscount" resultMap="gradeDiscountResultMap">
+  select id,gid,gname,discount,minGradeValue,maxGradeValue,times,valid,createtime from grade_discount where valid=1 order by gid asc
+  </select>
+  
+  <!-- 用户等级信息 -->
+  <select id="getUserGradeGrowth" resultMap="userGradeGrowthResultMap">
+   select g.id,g.userId,g.gradeDisId,g.grade,g.growthValue,g.discount,g.times,g.valid,g.createTime,g.updateTime,d.gname,d.gid,d.minGradeValue,d.maxGradeValue from user_grade_growth g
+   inner join grade_discount d on g.gradeDisId=d.id where userId=#{userId} order by g.id desc limit 1 
+  </select>
+  
+  <!-- 根据总积分获取vip等级优惠grade_discount信息 -->
+  <select id="getGradeDiscountByGrowthValue" resultMap="gradeDiscountResultMap">
+  select id,gid,gname,discount,minGradeValue,maxGradeValue,times,valid,createtime from grade_discount where #{growthValue} between minGradeValue and maxGradeValue
+  </select>
+  
+  <!-- 根据等级字段获取等级优惠grade_discount信息 -->
+  <select id="getGradeDiscountByGid" resultMap="gradeDiscountResultMap">
+  select id,gid,gname,discount,minGradeValue,maxGradeValue,times,valid,createtime from grade_discount where gid=#{gid}
+  </select>
+  
+  <!-- 插入一条用户等级user_grade_growth信息 -->
+  <insert id="insertUserGradeGrowth" parameterType="com.cbt.warehouse.pojo.UserGradeGrowthBean" useGeneratedKeys="true"
+       keyProperty="id">
+  insert user_grade_growth(userId,gradeDisId,grade,growthValue,discount,times,valid,createTime) 
+  values(#{userId},#{gradeDisId},#{grade},#{growthValue},#{discount},#{times},#{valid},now())
+  </insert>
+  
+  <!-- 获取运送中或已完成的订单数 -->
+  <select id="getCompleteOrderCount" parameterType="Integer" resultType="Integer">
+  select count(orderid) from orderinfo where state in ('1','2','3','4') and user_id=#{userId}
+  </select>
+  
+  <!-- 修改vip等级user_grade_growth信息 -->
+  <update id="updateUserGradeGrowth" parameterType="com.cbt.warehouse.pojo.UserGradeGrowthBean">
+  update user_grade_growth set updateTime=now()
+  	<if test="gradeDisId!=null and gradeDisId!=0">
+  	,gradeDisId=#{gradeDisId}
+  	</if>
+  	<if test="grade!=null and grade!=0">
+  	,grade=#{grade}
+  	</if>
+  	<if test="growthValue!=null and growthValue>=0">
+  	,growthValue=#{growthValue}
+  	</if>
+  	<if test="discount!=null and discount>=0">
+  	,discount=#{discount}
+  	</if>
+  	<if test="times!=null and times>=0">
+  	,times=#{times}
+  	</if>
+  	where userId=#{userId}
+  </update>
+  
+  <!-- 获取确认价格中、出运中、完结、客户取消订单的订单 -->
+  <select id="getCompleteOrder" resultMap="orderResultMap">
+  select order_no,pay_price,isDropshipOrder,state from orderinfo where state in ('1','2','3','4','5','6','-1') and order_no=#{orderNo} order by orderid desc limit 1
+  </select>
+  
+  <!-- 修改user表中的vip等级 -->
+  <update id="updateUserGrade">
+  update user set grade=#{grade} where id=#{userId}
+  </update>
+  
+  <!-- 插入一条vip操作日志 -->
+  <insert id="insertUserGradeGrowthLog" parameterType="com.cbt.warehouse.pojo.UserGradeGrowthLogBean" useGeneratedKeys="true"
+       keyProperty="id">
+  insert user_grade_growth_log(userId,grade,beforeGrowthValue,afterGrowthValue,gapGrowthValue,backGrowthValue,orderGrowthValue,orderNo,orderPrice,times,comment,isOldOrder,createTime)
+  values (#{userId},#{grade},#{beforeGrowthValue},#{afterGrowthValue},#{gapGrowthValue},#{backGrowthValue},#{orderGrowthValue},#{orderNo},#{orderPrice},#{times},#{comment},#{isOldOrder},now())
+  </insert>
+  
+  <!-- 根据userid和orderNo获取日志 -->
+  <select id="getLogByUserIdAndOrderNo" resultMap="userGradeGrowthLogResultMap">
+  select id,userId,grade,beforeGrowthValue,afterGrowthValue,gapGrowthValue,backGrowthValue,orderGrowthValue,orderNo,orderPrice,times,comment,isOldOrder,createTime from user_grade_growth_log 
+  where userId=#{userId} and orderNo=#{orderNo} order by createTime desc limit 1
+  </select>
+  
+  <!-- 根据userid获取日志 -->
+  <select id="getLogByUserId" resultMap="userGradeGrowthLogResultMap">
+  select id,userId,grade,beforeGrowthValue,afterGrowthValue,gapGrowthValue,backGrowthValue,orderGrowthValue,orderNo,orderPrice,times,comment,isOldOrder,createTime from user_grade_growth_log 
+  where userId=#{userId} order by createTime desc limit 1
+  </select>
+  <!-- 根据userid和grade获取等级优惠剩余使用次数 -->
+  <select id="getTimesByUserIdAndGrade" resultType="Integer">
+  select times from user_grade_growth_log where userId=#{userId} and grade=#{grade} order by createTime desc limit 1
+  </select>
+  
+  <select id="getOtherGradeDiscount" resultMap="orderResultMap">
+  select order_no,grade_discount,pay_price from orderinfo where user_id=#{userId} and state='0' and isDropshipOrder=0
+  </select>
+  
+  <update id="updateOtherOrderGradeDiscout">
+  update orderinfo set grade_discount=#{grade_discount} where order_no=#{orderNo} and user_id=#{userId}
+  </update>
+  
+  <select id="getCountLikeOrderNo" resultType="Integer">
+  select count(*) from orderinfo where user_id=#{userId} and order_no like concat(#{orderNo},'%') and length(substring_index(order_no,'_',-1))!=4
+  </select>
+  
+  <select id="getDeleteCountLikeOrderNo" resultType="Integer">
+  select count(*) from orderinfo where user_id=#{userId} and order_no like concat(#{orderNo},'%') and length(substring_index(order_no,'_',-1))!=4 and state in ('-1','6')
+  </select>
+  
+  <!-- 获取除了该订单和同源的拆单以外完成的订单数 -->
+  <select id="getCompleteOrderCountExcludeTOrder" resultType="Integer">
+  select count(orderid) from orderinfo where state in ('1','2','3','4') and user_id=#{userId} and order_no not like concat(#{orderNo},'%')
+  </select>
+  
+  <select id="getTOrderNowTotalPayPrice" resultType="Double">
+   select sum(pay_price) from orderinfo where user_id=#{userId} and order_no like concat(#{orderNo},'%') and length(substring_index(order_no,'_',-1))!=4 and state in ('1','2','3','4','5')
+  </select>
+  
+</mapper>

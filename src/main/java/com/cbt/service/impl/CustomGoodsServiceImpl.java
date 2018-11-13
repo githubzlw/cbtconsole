@@ -1,0 +1,382 @@
+package com.cbt.service.impl;
+
+import com.cbt.bean.*;
+import com.cbt.dao.CustomGoodsDao;
+import com.cbt.dao.impl.CustomGoodsDaoImpl;
+import com.cbt.service.CustomGoodsService;
+import com.cbt.website.bean.ShopManagerPojo;
+import com.cbt.website.userAuth.bean.Admuser;
+import com.importExpress.mapper.CustomGoodsMapper;
+import com.importExpress.pojo.CustomBenchmarkSkuNew;
+import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.GoodsParseBean;
+import com.importExpress.pojo.SkuValPO;
+import net.sf.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class CustomGoodsServiceImpl implements CustomGoodsService {
+    private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
+
+    @Autowired
+    private CustomGoodsMapper customGoodsMapper;
+
+    @Override
+    public List<CategoryBean> getCaterory() {
+
+        return customGoodsDao.getCaterory();
+    }
+
+    @Override
+    public List<CategoryBean> queryCateroryByParam(CustomGoodsQuery queryBean) {
+        //return customGoodsDao.queryCateroryByParam(queryBean);
+        return customGoodsMapper.queryCategoryByParam(queryBean);
+    }
+
+    @Override
+    public List<CategoryBean> queryStaticizeCateroryByParam() {
+        return customGoodsDao.queryStaticizeCateroryByParam();
+    }
+
+    @Override
+    public List<CustomGoodsBean> getGoodsList(String catid, int page, String sttime, String edtime, int state) {
+
+        return customGoodsDao.getGoodsList(catid, page, sttime, edtime, state);
+    }
+
+    @Override
+    public CustomGoodsPublish getGoods(String pid, int type) {
+
+        return customGoodsDao.getGoods(pid, type);
+    }
+
+    @Override
+    public int updateInfo(CustomGoodsBean bean) {
+
+        return customGoodsDao.updateInfo(bean);
+    }
+
+    @Override
+    public int publish(CustomGoodsPublish bean) {
+
+        //如果存在range_price,则更新sku数据
+        if (StringUtils.isNotBlank(bean.getRangePrice())) {
+            //sku更新
+            List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
+            JSONArray sku_json = JSONArray.fromObject(bean.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            for (ImportExSku exSku : skuList) {
+                CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
+                skuNew.setFinalWeight(bean.getFinalWeight());
+                skuNew.setWprice(bean.getWprice());
+                skuNew.setSkuPropIds(exSku.getSkuPropIds());
+                skuNew.setSkuAttr(exSku.getSkuAttr());
+                skuNew.setPid(bean.getPid());
+                SkuValPO skuValPO = new SkuValPO();
+                skuValPO.setActSkuCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuCalPrice()));
+                skuValPO.setActSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyCalPrice()));
+                skuValPO.setActSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getActSkuMultiCurrencyDisplayPrice()));
+                skuValPO.setSkuMultiCurrencyCalPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyCalPrice()));
+                skuValPO.setSkuMultiCurrencyDisplayPrice(Double.valueOf(exSku.getSkuVal().getSkuMultiCurrencyDisplayPrice()));
+                skuValPO.setSkuCalPrice(Double.valueOf(exSku.getSkuVal().getSkuCalPrice()));
+                skuNew.setSkuVal(skuValPO);
+                insertList.add(skuNew);
+            }
+            if (insertList.size() > 0) {
+                customGoodsDao.updateCustomBenchmarkSkuNew(bean.getPid(), insertList);
+                insertList.clear();
+            }
+        }
+
+        int res = customGoodsDao.publish(bean);
+        if (res > 0) {
+            int count = customGoodsDao.publishTo28(bean);
+            if (count == 0) {
+                customGoodsDao.publishTo28(bean);
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public String getGoodsInfo(String pid) {
+
+        return customGoodsDao.getGoodsInfo(pid);
+    }
+
+    @Override
+    public int updateState(int state, String pid, int adminid) {
+
+        return customGoodsDao.updateState(state, pid, adminid);
+    }
+
+    @Override
+    public int updateValid(int valid, String pid) {
+
+        return customGoodsDao.updateValid(valid, pid);
+    }
+
+    @Override
+    public int insertRecord(String pid, String admin, int state, String record) {
+
+        return customGoodsDao.insertRecord(pid, admin, state, record);
+    }
+
+    @Override
+    public List<CustomRecord> getRecordList(String pid, int page) {
+
+        return customGoodsDao.getRecordList(pid, page);
+    }
+
+    @Override
+    public List<CustomGoodsBean> getGoodsList(String pidList) {
+
+        return customGoodsDao.getGoodsList(pidList);
+    }
+
+
+    @Override
+    public boolean updateStateList(int state, String pids, int adminid) {
+
+        return customGoodsDao.updateStateList(state, pids, adminid);
+    }
+
+    @Override
+    public int updateValidList(int valid, String pids) {
+
+        return customGoodsDao.updateValidList(valid, pids);
+    }
+
+    @Override
+    public int insertRecordList(List<String> pids, String admin, int state, String record) {
+
+        return customGoodsDao.insertRecordList(pids, admin, state, record);
+    }
+
+    @Override
+    public List<CustomGoodsBean> getGoodsListByCatid(String catid) {
+
+        return customGoodsDao.getGoodsListByCatid(catid);
+    }
+
+    @Override
+    public int updateInfoList(List<CustomGoodsBean> list) {
+        if (list == null || list.isEmpty()) {
+            return 0;
+        }
+
+        return customGoodsDao.updateInfoList(list);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsInfos(CustomGoodsQuery queryBean) {
+        //return customGoodsDao.queryGoodsInfos(queryBean);
+        return customGoodsMapper.queryForListByParam(queryBean);
+    }
+
+    @Override
+    public int queryGoodsInfosCount(CustomGoodsQuery queryBean) {
+        //return customGoodsDao.queryGoodsInfosCount(queryBean);
+        return customGoodsMapper.queryForListByParamCount(queryBean);
+    }
+
+    @Override
+    public int queryStaticizeGoodsInfosCount() {
+        return customGoodsDao.queryStaticizeGoodsInfosCount();
+    }
+
+    @Override
+    public void batchSaveEnName(Admuser user, List<CustomGoodsBean> cgLst) {
+        customGoodsDao.batchSaveEnName(user, cgLst);
+    }
+
+    @Override
+    public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
+        //return customGoodsDao.queryGoodsDetails(pid, type);
+        return customGoodsMapper.queryGoodsDetailsByPid(pid);
+    }
+
+    @Override
+    public int saveEditDetalis(CustomGoodsPublish cgp, String adminName, int adminId, int type) {
+        //return customGoodsDao.saveEditDetalis(cgp, adminName, adminId, type);
+        cgp.setAdminId(adminId);
+        cgp.setGoodsState(type == 1 ? 4 : 5);
+        return customGoodsMapper.updateGoodsDetailsByInfo(cgp);
+    }
+
+    @Override
+    public GoodsPictureQuantity queryPictureQuantityByPid(String pid) {
+        return customGoodsDao.queryPictureQuantityByPid(pid);
+    }
+
+    @Override
+    public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
+        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 0,remark);
+    }
+
+    @Override
+    public boolean batchDeletePids(String[] pidLst) {
+        return customGoodsDao.batchDeletePids(pidLst);
+    }
+
+    @Override
+    public int updateGoodsState(String pid, int goodsState) {
+        return customGoodsDao.updateGoodsState(pid, goodsState);
+    }
+
+    @Override
+    public boolean updateBmFlagByPids(String[] pidLst, int adminid) {
+        return customGoodsDao.updateBmFlagByPids(pidLst, adminid) == pidLst.length;
+    }
+
+    @Override
+    public ShopManagerPojo queryByShopId(String shopId) {
+        return customGoodsDao.queryByShopId(shopId);
+    }
+
+    @Override
+    public boolean batchInsertSimilarGoods(String mainPid, String similarPids, int adminId, List<String> existPids) {
+        return customGoodsDao.batchInsertSimilarGoods(mainPid, similarPids, adminId, existPids);
+    }
+
+    @Override
+    public List<SimilarGoods> querySimilarGoodsByMainPid(String mainPid) {
+        return customGoodsDao.querySimilarGoodsByMainPid(mainPid);
+    }
+
+    @Override
+    public boolean setGoodsFlagByPid(GoodsEditBean editBean) {
+        return customGoodsDao.setGoodsFlagByPid(editBean);
+    }
+
+    @Override
+    public boolean checkIsHotGoods(String pid) {
+        return customGoodsDao.checkIsHotGoods(pid);
+    }
+
+    @Override
+    public String getWordSizeInfoByPid(String pid) {
+        return customGoodsDao.getWordSizeInfoByPid(pid);
+    }
+
+    @Override
+    public boolean deleteWordSizeInfoByPid(String pid) {
+        return customGoodsDao.deleteWordSizeInfoByPid(pid);
+    }
+
+    @Override
+    public boolean setNoBenchmarking(String pid, double finalWeight) {
+        return customGoodsDao.setNoBenchmarking(pid, finalWeight);
+    }
+
+    @Override
+    public boolean setNeverOff(String pid) {
+        return customGoodsDao.setNeverOff(pid);
+    }
+
+    @Override
+    public int insertPidIsEdited(String shopId, String pid, int adminId) {
+        return customGoodsMapper.insertPidIsEdited(shopId, pid, adminId);
+    }
+
+    @Override
+    public int checkIsEditedByPid(String pid) {
+        return customGoodsMapper.checkIsEditedByPid(pid);
+    }
+
+    @Override
+    public int updatePidIsEdited(GoodsEditBean editBean) {
+        return customGoodsMapper.updatePidIsEdited(editBean);
+    }
+
+    @Override
+    public int queryTypeinGoodsTotal(int adminId, int valid) {
+        return customGoodsMapper.queryTypeinGoodsTotal(adminId, valid);
+    }
+
+    @Override
+    public int queryOnlineGoodsTotal(int valid) {
+        return customGoodsMapper.queryOnlineGoodsTotal(valid);
+    }
+
+    @Override
+    public int queryIsEditOnlineGoodsTotal(int adminId, int valid) {
+        return customGoodsMapper.queryIsEditOnlineGoodsTotal(adminId, valid);
+    }
+
+    @Override
+    public int saveBenchmarking(String pid, String aliPid, String aliPrice) {
+        return customGoodsMapper.saveBenchmarking(pid, aliPid, aliPrice);
+    }
+
+    @Override
+    public List<String> queryStaticizeList(String catid) {
+        return customGoodsMapper.queryStaticizeList(catid);
+    }
+
+    @Override
+    public int insertIntoGoodsEditBean(GoodsEditBean editBean) {
+        return customGoodsMapper.insertIntoGoodsEditBean(editBean);
+    }
+
+    @Override
+    public List<GoodsEditBean> queryGoodsEditBean(GoodsEditBean editBean) {
+        return customGoodsMapper.queryGoodsEditBean(editBean);
+    }
+
+    @Override
+    public int queryGoodsEditBeanCount(GoodsEditBean editBean) {
+        return customGoodsMapper.queryGoodsEditBeanCount(editBean);
+    }
+
+    @Override
+    public int queryMaxIdFromCustomGoods() {
+        return customGoodsMapper.queryMaxIdFromCustomGoods();
+    }
+
+    @Override
+    public List<GoodsParseBean> queryCustomGoodsByLimit(int minId, int maxId) {
+        return customGoodsMapper.queryCustomGoodsByLimit(minId, maxId);
+    }
+
+    @Override
+    public int updateCustomGoodsStatistic(GoodsParseBean goodsParseBean) {
+        return customGoodsMapper.updateCustomGoodsStatistic(goodsParseBean);
+    }
+
+    @Override
+    public int checkIsExistsGoods(String pid) {
+        return customGoodsMapper.checkIsExistsGoods(pid);
+    }
+
+    @Override
+    public int insertCustomGoodsStatistic(GoodsParseBean goodsParseBean) {
+        return customGoodsMapper.insertCustomGoodsStatistic(goodsParseBean);
+    }
+
+    @Override
+    public int updateGoodsSearchNum(String pid) {
+        return customGoodsMapper.updateGoodsSearchNum(pid);
+    }
+
+    @Override
+    public int updateGoodsClickNum() {
+        return customGoodsMapper.updateGoodsClickNum();
+    }
+
+    @Override
+    public int updateGoodsWeightByPid(String pid, double weight) {
+        return customGoodsMapper.updateGoodsWeightByPid(pid, weight);
+    }
+
+    @Override
+    public int editAndLockProfit(String pid, int type, double editProfit) {
+        return customGoodsMapper.editAndLockProfit(pid, type, editProfit);
+    }
+
+}

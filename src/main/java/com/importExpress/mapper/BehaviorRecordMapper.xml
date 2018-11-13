@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.BehaviorRecordMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.website.bean.UserBehavior">
+		 <id column="id"  property="id" />
+	    <result column="userid"  property="userid" />
+	    <result column="keywords"  property="keywords" />
+	    <result column="view_url"  property="view_url" />
+	    <result column="action"  property="action" />
+	    <result column="view_date_day"  property="view_date_day" />
+	    <result column="view_date_time"  property="view_date_time" />
+	</resultMap>
+	
+	<select id="recordUserBehavior" resultMap="BaseResultMap">
+	select  id,userid,keywords,view_url,action,view_date_day,view_date_time from behavior_record  where sessionid in 
+	(select DISTINCT sessionid from behavior_record  where userid = #{userid} AND sessionid&lt;&gt;'') 
+					
+	<if test="viewDateTime !=null">
+	and view_date_time > #{viewDateTime} 
+	</if>
+	order by view_url_count desc 
+	limit #{page},#{pagesize};
+	</select>
+	
+	<select id="recordUserBehaviorCount" resultType="java.lang.Integer">
+	select  count(1)  from behavior_record  where sessionid in 
+	(select DISTINCT sessionid from behavior_record  where userid =#{userid} AND sessionid&lt;&gt;'') 
+	<if test="viewDateTime !=null">
+	and view_date_time > #{viewDateTime} 
+	</if>
+	
+	</select>
+
+	
+</mapper>

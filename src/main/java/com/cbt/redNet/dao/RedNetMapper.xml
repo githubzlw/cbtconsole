@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.redNet.dao.RedNetMapper" >
+
+   <resultMap id="redNetResult" type="com.cbt.redNet.pojo.redNet" >
+		   <id column="id" property="id" jdbcType="INTEGER" />
+		   <result column="redNetName" property="redNetName" />
+		   <result column="site" property="site" />
+		   <result column="tomosonUrl" property="tomosonUrl" />
+		   <result column="pushSum" property="pushSum" />
+		   <result column="redNetOffer" property="redNetOffer" />
+		   <result column="email" property="email" />
+		   <result column="cooperationTime" property="cooperationTime" />
+		   <result column="bz" property="bz" />
+  </resultMap>
+  
+  <resultMap id="redNetStatisticsResult" type="com.cbt.redNet.pojo.redNetStatistics" >
+		   <id column="id" property="id" jdbcType="INTEGER" />
+		   <result column="shareId" property="shareId" />
+		   <result column="publishAddress" property="publishAddress" />
+		   <result column="redNetId" property="redNetId" />
+		   <result column="clickSum" property="clickSum" />
+		   <result column="addGoodCarSum" property="addGoodCarSum" />
+		   <result column="createOrderSum" property="createOrderSum" />
+		   <result column="createTime" property="createTime" />
+		   <result column="pushTime" property="pushTime" />
+		   <result column="bz" property="bz" />
+		   <result column ="redNetName"  property ="redNetName"/>
+  </resultMap>
+
+<select id="CountRedNetStatistics"  resultType="Integer">
+ select  count(*) from  rednetstatistics  where 
+  1= 1
+  <if test="redNetId!=null">
+    and  redNetId = #{redNetId} 
+  </if>
+  <if test="pushTime!=null">
+    and  pushTime = #{pushTime}
+  </if>
+  <if test="startTime!=null">
+    and createTime  &gt; #{startTime}
+  </if>
+   <if test="endTime!=null">
+    and createTime  &lt;  #{startTime}
+  </if>
+</select>
+
+<select id="showRedNetStatistics"  resultMap="redNetStatisticsResult">
+
+  select rs.* ,   rd.redNetName  from  rednetstatistics  rs  left join   rednet   rd  on rs.redNetId = rd.id  
+   where    1= 1
+  <if test="redNetId!=null">
+    and  rs.redNetId = #{redNetId} 
+  </if>
+  <if test="pushTime!=null">
+    and  rs.pushTime = #{pushTime}
+  </if>
+  <if test="startTime!=null">
+    and  rs.createTime  &gt; #{startTime}
+  </if>
+   <if test="endTime!=null">
+    and  rs.createTime  &lt;  #{startTime}
+  </if>
+  order by rs.id desc
+  limit  #{page},30
+</select>    
+
+
+<select id="showRedNetInfo"  resultMap="redNetResult">
+  select *  from  rednet   where  1=1 
+	  <if test="redNetId!=null">
+	     and  id = #{redNetId} 
+	  </if>
+	  <if test="redNetName!=null">
+	     and  redNetName  like '%${redNetName}%'
+	  </if>
+	  <if test="site!=null">
+	     and  site  like '%${site}%'
+	  </if>
+	  order by id desc 
+	  limit  #{page},20 
+</select>
+    
+<select id="CountRedNetInfo"  resultType="Integer">
+  select  count(*)   from  rednet   where  1=1 
+	  <if test="redNetId!=null">
+	     and  id = #{redNetId} 
+	  </if>
+	  <if test="redNetName!=null">
+	     and  redNetName  like '%${redNetName}%'
+	  </if>
+	  <if test="site!=null">
+	     and  site  like '%${site}%'
+	  </if>
+</select>
+ 
+<select id="showAllRedNet" resultMap="redNetResult">
+  select  *  from   rednet  
+</select> 
+
+	
+<insert id="addRedNet"  parameterType="com.cbt.redNet.pojo.redNet">
+  insert into  rednet(redNetName,site,tomosonUrl,pushSum,redNetOffer,email,cooperationTime,bz)
+  values(#{redNetName},#{site},#{tomosonUrl},#{pushSum},#{redNetOffer},#{email},#{cooperationTime},#{bz})
+</insert>	
+	
+	
+<select id="showRedNetById"  resultMap="redNetResult">
+  select  *  from  rednet  where  id = #{id}
+</select>
+    
+<insert id="addRedNetStatistics"  parameterType="com.cbt.redNet.pojo.redNetStatistics">
+  insert into  rednetstatistics(shareId,publishAddress,redNetId,pushTime,createTime,bz)
+  values (#{shareId},#{publishAddress},#{redNetId},#{pushTime},#{createTime},#{bz})
+</insert> 
+
+
+<select id="selectRedNetByName"  resultType="Integer">
+select count(*)  from  rednet  where redNetName = #{redNetName}
+</select>
+
+
+<select id="selectRedNetStatistics"  resultType="Integer">
+ select count(*)  from   rednetstatistics  where  shareId = #{shareId}
+</select>
+
+
+<update id="updateRedNet"  parameterType="com.cbt.redNet.pojo.redNet">
+ update  rednet  set 
+<if test="redNetName!=null">
+  redNetName =#{redNetName} ,
+ </if>
+ <if test="site!=null">
+  site = #{site},
+ </if>
+ <if test="tomosonUrl!=null">
+ tomosonUrl =#{tomosonUrl} ,
+ </if>
+ <if test="pushSum!=null">
+  pushSum = #{pushSum},
+ </if>
+ <if test="redNetOffer!=null">
+   redNetOffer = #{redNetOffer},
+ </if>
+  <if test="email!=null">
+   email = #{email} ,
+ </if>
+ <if test="cooperationTime!=null">
+   cooperationTime  =#{cooperationTime},
+ </if>
+<if test="bz!=null">
+     bz =#{bz}
+</if>
+ where  id  = #{id}
+</update>
+
+
+<select id="showRedNetStatisticsById" resultMap="redNetStatisticsResult">
+  select  rs.*  ,rd.redNetName  from  rednetstatistics   rs  left join  rednet   rd  on rs.redNetId = rd.id      where  rs.id = #{id}
+</select>
+
+<update id="updateRedNetStatistics"  parameterType="com.cbt.redNet.pojo.redNetStatistics">
+	 update rednetstatistics  set 
+	<if test="redNetId!=null">
+	  redNetId =#{redNetId} ,
+	 </if>
+	 <if test="publishAddress!=null">
+	  publishAddress = #{publishAddress},
+	 </if>
+	 <if test="pushTime!=null">
+	 pushTime =#{pushTime} ,
+	 </if>
+	 <if test="bz!=null">
+	  bz = #{bz}
+	 </if>
+	 where  id  = #{id} 
+</update>
+</mapper>

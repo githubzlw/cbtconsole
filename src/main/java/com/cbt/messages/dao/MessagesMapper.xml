@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.messages.dao.MessagesMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.Messages" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="href_name" property="hrefName" jdbcType="VARCHAR" />
+    <result column="isDelete" property="isDelete" jdbcType="TINYINT" />
+    <result column="typeName" property="typeName" jdbcType="VARCHAR" />
+    <result column="adminid" property="adminid" jdbcType="INTEGER" />
+    <result column="applytime" property="applytime" jdbcType="TIMESTAMP" />
+    <result column="complettime" property="complettime" jdbcType="TIMESTAMP" />
+    <result column="eventid" property="eventid" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="messagesResultMap" type="com.cbt.messages.vo.MessagesCountVo" >
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="typeName" property="typeName" jdbcType="VARCHAR" />
+    <result column="countAll" property="countAll" jdbcType="INTEGER" />
+    <result column="isDeleteCount" property="isDeleteCount" jdbcType="INTEGER" />
+    <result column="noDeleteCount" property="noDeleteCount" jdbcType="INTEGER" />
+    <result column="noArrgCount" property="noArrgCount" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="AdminResultMap" type="com.cbt.pojo.Admuser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="admName" property="admname" jdbcType="VARCHAR" />
+    <result column="Email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="roleType" property="roletype" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="emailpass" property="emailpass" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="AdminRUserResultMap" type="com.cbt.messages.vo.AdminRUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="useremail" property="useremail" jdbcType="VARCHAR" />
+    <result column="adminid" property="adminid" jdbcType="INTEGER" />
+    <result column="createdate" property="createdate" jdbcType="TIMESTAMP" />
+    <result column="admName" property="admname" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Admin_Column_List" >
+    id, admName, Email, password, title, roleType, status, emailpass
+  </sql>
+
+  <sql id="Base_Column_List" >
+    id, type, userid, title, create_time, content, href_name,adminid,isDelete,applytime,complettime,eventid
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from messages
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <update id="deleteByPrimaryKey" parameterType="com.cbt.pojo.Messages" >
+     update messages set isDelete=1 where eventid=  #{eventid,jdbcType=INTEGER}
+     and type=#{type,jdbcType=VARCHAR}
+  </update>
+  <insert id="insert" parameterType="com.cbt.pojo.Messages" >
+    insert into messages (id, type, userid, 
+      title, create_time, content, 
+      href_name)
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{userid,jdbcType=INTEGER}, 
+      #{title,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{content,jdbcType=VARCHAR}, 
+      #{hrefName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.pojo.Messages" >
+    insert into messages
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="1 != 2" >
+        create_time,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="hrefName != null" >
+        href_name,
+      </if>
+      <if test="adminid != null" >
+        adminid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="1 != 2" >
+        CURRENT_TIMESTAMP(),
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="hrefName != null" >
+        #{hrefName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminid != null" >
+        #{adminid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.Messages" >
+    update messages
+    <set >
+      <if test="adminid != null and adminid !=''" >
+        adminid = #{adminid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where userid = #{userid,jdbcType=INTEGER}
+  </update>
+ 
+  
+  <!-- 自定义 -->
+  <select id="selectByMessagesCount" parameterType="com.cbt.pojo.Messages" resultType="java.lang.Integer" >
+         select count(*)
+        from messages meg,system_code sc
+		 WHERE
+		meg.type =sc.code_value_code
+		<if test="adminid != 1" >
+        and adminid = #{adminid,jdbcType=INTEGER}
+      </if>
+      <if test="userid != null and userid != ''" >
+        and userid = #{userid,jdbcType=INTEGER}
+      </if>
+  </select>
+  
+   <select id="selectByMessages" parameterType="java.util.Map" resultMap="BaseResultMap" >
+    SELECT 
+        meg.id,
+		meg.type type,
+		meg.userid userid,
+		meg.title title,
+		meg.create_time createTime,
+		meg.content content,
+		meg.href_name hrefName,
+		meg.isDelete,
+		meg.adminid,
+		meg.eventid,
+		sc.code_value_name typeName
+		from messages meg,system_code sc
+		 WHERE
+		meg.type =sc.code_value_code
+		<if test="messages.adminid != 1" >
+         and adminid = #{messages.adminid,jdbcType=INTEGER}
+        </if>
+         <if test="messages.userid != null and messages.userid != ''" >
+         and userid = #{messages.userid,jdbcType=INTEGER}
+       </if>
+		ORDER BY meg.create_time DESC
+		limit #{startIndex,jdbcType=INTEGER},#{onePageCount,jdbcType=INTEGER}
+   </select>
+   
+   <select id="selectByMessagesByOne" parameterType="com.cbt.pojo.Messages" resultMap="BaseResultMap" >
+    SELECT 
+        meg.id,
+		meg.type type,
+		meg.userid userid,
+		meg.title title,
+		meg.create_time createTime,
+		meg.content content,
+		meg.href_name hrefName,
+		meg.isDelete,
+		meg.adminid,
+		meg.eventid,
+		sc.code_value_name typeName
+		from messages meg,system_code sc
+		 WHERE
+		meg.type =sc.code_value_code
+		and meg.isDelete=0
+		<if test="adminid != 1" >
+         and adminid = #{adminid,jdbcType=INTEGER}
+        </if>
+		ORDER BY meg.create_time DESC
+		limit 0,50
+   </select>
+   
+   
+   <select id="selectBasicMessagesAll" resultMap="messagesResultMap" >
+		    SELECT
+			IFNULL(typeCount, 0) isDeleteCount,
+			IFNULL(typecount1, 0) countAll,
+			IFNULL(typecount2, 0) noArrgCount,
+			(IFNULL(typecount1, 0) - IFNULL(typeCount,0)) noDeleteCount,
+			sc.code_value_code type,
+			sc.code_value_name typeName
+		FROM
+			system_code sc
+		LEFT JOIN (
+			SELECT
+				count(type) typeCount,
+				type type1
+			FROM
+				messages
+			WHERE
+				isDelete = 1
+			GROUP BY
+				type
+		) tab ON tab.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount1,
+				type type1
+			FROM
+				messages
+			GROUP BY
+				type
+		) tab1 ON tab1.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount2,
+				type type1
+			FROM
+				messages
+			WHERE
+				adminid = 1
+			GROUP BY
+				type
+		) tab2 ON tab2.type1 = sc.code_value_code
+   </select>
+   
+   <select id="selectComplainNum"  resultMap="messagesResultMap" >
+		  select 	'refundscom' AS type,sum(com.co) countAll,(CASE complainState WHEN 0 THEN	com.co	ELSE 0	END	)  noDeleteCount from (select count(id)co , complainState from tb_complain
+		  <if test="adminid != 0 ">
+		 	 where userid in (select  userid from admin_r_user where adminid=${adminid} )
+		  </if>
+		   group by  complainState order by complainState  ) com  
+   </select>
+   
+   <select id="selectComplainNum1"  resultMap="messagesResultMap" >
+		   SELECT 'refundscom2' AS type,COUNT(b.id) as noDeleteCount FROM tb_complain_chat b INNER JOIN tb_complain a ON a.id=b.complainid 
+		   left JOIN admin_r_user c ON a.userid=c.userid WHERE b.readorno=0 and b.flag=0
+		   <if test="adminid != 0 "> 
+		     AND c.adminid=${adminid}
+		   </if>
+   </select>
+   
+<!--    <select id="selectnoArrgOrderNum"  resultMap="messagesResultMap" >	    
+	<![CDATA[ SELECT
+		'ordermeg' AS type,
+		count(oi.orderid) noArrgCount
+	FROM
+		orderinfo oi left join payment pay on pay.orderid=oi.order_no 
+	WHERE
+		oi.state > 0
+	AND oi.state < 6
+	AND oi.user_id NOT IN (SELECT userid FROM admin_r_user) and to_days(pay.createtime)=to_days(now()) ]]>
+   </select> -->
+  <select id="selectnoArrgOrderNum"  resultMap="messagesResultMap" >	    
+	select 
+		'ordermeg' as type,
+		count(oi.order_no) noArrgCount
+		from (
+		SELECT
+				order_no, count(pay.id) sl ,user_id
+			FROM
+			orderinfo oi	
+			inner join user on user.id=oi.user_id
+			 left join  paymentconfirm pay on pay.orderno=oi.order_no 
+			WHERE
+				oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
+		group by order_no
+		
+		) oi 
+		<!-- where oi.sl=0 -->
+		LEFT JOIN admin_r_user aru on aru.userid=oi.user_id
+		where oi.sl=0 and LENGTH(oi.order_no)&lt;>18
+		<if test="adminid != 1">
+			 and aru.adminid=${adminid}
+		  </if>
+
+	<!-- <![CDATA[ SELECT
+		'ordermeg' AS type,
+		count(oi.orderid) noArrgCount
+	FROM
+		orderinfo oi left join payment pay on pay.orderid=oi.order_no 
+	WHERE
+		oi.state =5 ]]> -->
+   </select>
+    <select id="selectOrderessNum"  resultMap="messagesResultMap" parameterType="int">	    
+		  	<!-- select  
+		  	     'ordermessage' as type,
+		          count(o.orderid) as countAll
+			  	  from    orderinfo    o  
+			  	   <if test="adminid != 0">
+				  left  join admin_r_user  aru on  aru.userid=o.user_id 
+				  </if>
+			      where orderremark != ''  and state in(1,2,3,4,5)
+			       <if test="adminid != 0">
+				  	and adminid = #{adminid}
+				  </if> -->
+		SELECT  
+			'ordermessage' as type,
+		(
+			SELECT
+				COUNT(DISTINCT oc.orderNo)
+			FROM
+				order_change oc
+			INNER JOIN order_details od ON oc.orderNo = od.orderid AND oc.goodId = od.goodsid
+			INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
+			WHERE oc.ropType =5 AND od.state IN(0,1) 
+		) AS countAll,
+		(
+			SELECT
+				COUNT(DISTINCT oc.orderNo)
+			FROM
+				order_change oc
+			INNER JOIN order_details od ON oc.orderNo = od.orderid AND oc.goodId = od.goodsid
+			INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
+			WHERE oc.ropType =5 AND oc.del_state = 0 AND od.state IN(0,1) AND oi.state IN (1,5)
+		) AS noArrgCount
+   </select>
+   <select id="selectDelOrderessNum"  resultType="Integer" parameterType="int">
+		  	 	select  count(o.orderid)
+			  	  from    orderinfo    o   left join payment pay on pay.orderid=o.order_no
+			  	   <if test="adminid != 0">
+				  left  join admin_r_user  aru on  aru.userid=o.user_id 
+				  </if>
+			      where orderremark != '' and (date_add(pay.createtime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)
+			       <if test="adminid != 0">
+				  	and adminid = #{adminid}
+				  </if>
+   </select>
+<!--  <select id="selectOrderessNum"  resultMap="messagesResultMap" >	    
+		  	select  
+		  	     'ordermessage' as type,
+		          count(o.orderid) as countAll
+			  	  from    orderinfo    o 
+			  	  left join (select orderid,min(createtime) createtime,min(paytype) paytype,min(paystatus) paystatus from payment where payflag='O' group by orderid ) pay on pay.orderid=o.order_no
+			      inner join user  on o.user_id=user.id  
+			      left  join admin_r_user  aru on  aru.userid=o.user_id 
+			      left join order_buy  on  o.order_no =order_buy.orderid 
+			      where  aru.admName is null
+   </select>
+   <select id="selectDelOrderessNum"  resultType="Integer">
+		  	  select  count(o.orderid)
+			  	  from    orderinfo    o 
+			  	  left join (select orderid,min(createtime) createtime,min(paytype) paytype,min(paystatus) paystatus from payment where payflag='O' group by orderid ) pay on pay.orderid=o.order_no
+			      inner join user  on o.user_id=user.id  
+			      left  join admin_r_user  aru on  aru.userid=o.user_id 
+			      left join order_buy  on  o.order_no =order_buy.orderid 
+			      left join order_change oc on o.order_no = oc.orderNo
+			      where oc.ropType = 5 and oc.oldValue = 0 and oc.del_state = 0
+			      and  aru.admName is null
+
+   </select> -->
+   
+   <select id="selectBasicMessagesBytime" parameterType="com.cbt.messages.vo.MessagesCountVo" resultMap="messagesResultMap" >
+		    SELECT
+			IFNULL(typeCount, 0) isDeleteCount,
+			IFNULL(typecount1, 0) countAll,
+			IFNULL(typecount2, 0) noArrgCount,
+			(IFNULL(typecount1, 0) - IFNULL(typeCount,0)) noDeleteCount,
+			sc.code_value_code type,
+			sc.code_value_name typeName
+		FROM
+			system_code sc
+		LEFT JOIN (
+			SELECT
+				count(type) typeCount,
+				type type1
+			FROM
+				messages
+			WHERE
+				isDelete = 1
+			AND create_time BETWEEN #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+			GROUP BY
+				type
+		) tab ON tab.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount1,
+				type type1
+			FROM
+				messages
+			WHERE create_time BETWEEN #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+			GROUP BY
+				type
+		) tab1 ON tab1.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount2,
+				type type1
+			FROM
+				messages
+			WHERE
+				adminid = 1
+			GROUP BY
+				type
+		) tab2 ON tab2.type1 = sc.code_value_code
+   </select>
+  
+  <select id="selectAdmuser" resultMap="AdminResultMap">
+   select 
+   <include refid="Admin_Column_List" />
+   from admuser where STATUS =1 AND roleType IN (3,4) or id=18 or id=55
+   <!-- where status=1 -->
+   order by status desc,roleType,admName
+  </select>
+  
+  
+   <select id="selectBasicMessagesBytimeAndAdmin" parameterType="com.cbt.messages.vo.MessagesCountVo" resultMap="messagesResultMap" >
+		    SELECT
+			IFNULL(typeCount, 0) isDeleteCount,
+			IFNULL(typecount1, 0) countAll,
+			(IFNULL(typecount1, 0) - IFNULL(typeCount,0)) noDeleteCount,
+			sc.code_value_code type,
+			sc.code_value_name typeName
+		FROM
+			system_code sc
+		LEFT JOIN (
+			SELECT
+				count(type) typeCount,
+				type type1
+			FROM
+				messages
+			WHERE
+				isDelete = 1 and adminid = #{adminid,jdbcType=INTEGER}
+			AND create_time BETWEEN #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+			GROUP BY
+				type
+		) tab ON tab.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount1,
+				type type1
+			FROM
+				messages
+			WHERE create_time BETWEEN #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+			and adminid = #{adminid,jdbcType=INTEGER}
+			GROUP BY
+				type
+		) tab1 ON tab1.type1 = sc.code_value_code
+   </select>
+   
+   <select id="selectBasicMessagesAllbyAndAdmin" parameterType="com.cbt.messages.vo.MessagesCountVo" resultMap="messagesResultMap" >
+		    SELECT
+			IFNULL(typeCount, 0) isDeleteCount,
+			IFNULL(typecount1, 0) countAll,
+			(IFNULL(typecount1, 0) - IFNULL(typeCount,0)) noDeleteCount,
+			sc.code_value_code type,
+			sc.code_value_name typeName
+		FROM
+			system_code sc
+		LEFT JOIN (
+			SELECT
+				count(type) typeCount,
+				type type1
+			FROM
+				messages
+			WHERE
+				isDelete = 1  and adminid = #{adminid,jdbcType=INTEGER}
+			GROUP BY
+				type
+		) tab ON tab.type1 = sc.code_value_code
+		LEFT JOIN (
+			SELECT
+				count(type) typecount1,
+				type type1
+			FROM
+				messages
+			WHERE  adminid = #{adminid,jdbcType=INTEGER}
+			GROUP BY
+				type
+		) tab1 ON tab1.type1 = sc.code_value_code
+   </select>
+   
+   
+   <select id="selectGuestbookNum" resultMap="messagesResultMap" >
+		<!--  SELECT
+			'propagemessage' as type,
+			count(gb.id) countAll,
+      		ifnull(sum(IF(gbk.status=0,1,0)),0) noDeleteCount
+		from guestbook gb
+			left join guestbook gbk ON gb.id=gbk.id
+			AND gbk.STATUS = 0 where -->
+			SELECT
+				'propagemessage' as type,
+				COUNT(1) countAll,
+				COUNT(DISTINCT user_id) as noDeleteCount
+			FROM
+				guestbook gb
+			WHERE gb.`status` = 0
+			and gb.user_id IN (
+				SELECT
+					userid
+				FROM
+					admin_r_user aru,
+					guestbook gb
+				WHERE
+					aru.userid = gb.user_id
+				AND aru.adminid = 18
+			)
+			and
+			<if test="adminid == 1 or adminid == 0" >
+			   gb.create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+			</if>
+		<if test="adminid != 1 and adminid != 0" >
+			  gb.user_id in(select aru.userid from admin_r_user aru,guestbook gu where aru.userid=gu.user_id
+			  and aru.adminid=#{adminid,jdbcType=INTEGER})
+			  and  gb.create_time >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+		 </if> 
+   </select>
+   <select id="selectCustomerInfoCollectionNum" resultMap="messagesResultMap" >
+		SELECT
+			'customerInfoCollection' as type,
+			COUNT(1) countAll,
+			COUNT(DISTINCT uid) as noDeleteCount
+		FROM
+			problem_report a,admin_r_user b
+		WHERE a.email = b.useremail 
+		  AND (a.reply_content is null or a.reply_content = '')
+		  AND date(a.createtime) >= date(DATE_SUB(NOW(), INTERVAL 30 DAY))
+   </select>
+   <select id="selectQuestionNum" resultMap="messagesResultMap" >
+		SELECT
+			'questionnum' as type,
+			COUNT(1) countAll,
+			COUNT(DISTINCT userid) as noDeleteCount
+		FROM
+			question_answer
+		WHERE is_delete=0 and reply_status=1
+		AND date(create_time) >= date(DATE_SUB(NOW(), INTERVAL 30 DAY))
+   </select>
+   <select id="selectSystemFailure" parameterType="com.cbt.messages.vo.MessagesCountVo" resultMap="messagesResultMap">
+       SELECT 'systemfailure' AS TYPE,COUNT(DISTINCT pri.orderid)  AS noDeleteCount FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0
+   </select>
+   <select id="selectApplicationNum"  resultMap="messagesResultMap" >
+	    <!-- SELECT
+			prea.state state,
+			count(prea.id) countAll,
+			<if test="adminid == 1">
+			sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noArrgCount
+			</if>
+			<if test="adminid != 1" >
+				sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noDeleteCount
+			</if>
+			FROM
+			preferential_application prea
+		LEFT JOIN admin_r_user aru ON (prea.email = aru.useremail or (prea.userid = aru.userid  and prea.userid !=0))
+		 where 1=1 
+		 <if test="adminid != 1" >
+		   and   aru.adminid = #{adminid,jdbcType=INTEGER}
+		</if>
+		GROUP BY
+			prea.state; -->
+	SELECT 
+		(SELECT count(*) from preferential_application 
+		<if test="adminid != 1">
+			pa left JOIN admin_r_user aru on pa.userid=aru.userid 
+			where aru.adminid = #{adminid,jdbcType=INTEGER}
+		</if>
+		) countAll  ,
+		(SELECT count(*) from preferential_application 
+		<if test="adminid == 1">
+			where state=0 
+		</if>
+		<if test="adminid != 1">
+			pa left JOIN admin_r_user aru on pa.userid=aru.userid where state=0 
+			and aru.adminid = #{adminid,jdbcType=INTEGER}
+		</if>
+		) noDeleteCount
+		<if test="adminid==1">
+		, (SELECT count(*) from preferential_application pa left JOIN admin_r_user aru on pa.userid=aru.userid where aru.adminid is null ) noArrgCount
+		</if>
+			
+   </select>
+   <select id="selectBusiessNum"  resultMap="messagesResultMap" >
+	   SELECT
+			prea.status state,
+			count(prea.id) countAll,
+			<if test="adminid == 1">
+			sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noArrgCount
+			</if>
+			<if test="adminid != 1" >
+				sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	0	ELSE 1	END	)) noDeleteCount
+			</if>
+		FROM
+			busiess prea
+		LEFT JOIN admin_r_user aru ON prea.email = aru.useremail
+		<if test="adminid != 1" >
+		  AND aru.adminid = #{adminid,jdbcType=INTEGER}
+		</if>
+		GROUP BY
+			prea.status;
+   </select>
+   <select id="selectGoodscarNum"  resultMap="messagesResultMap" >
+		    SELECT
+			'refundscom' AS type,
+			count(tbc.id) countAll,
+			count(tbc1.id) noDeleteCount
+		FROM
+			tb_complain tbc
+			LEFT JOIN tb_complain tbc1 ON
+			tbc.id=tbc1.id and
+		    tbc1.complainState != 2
+   </select>
+   
+   
+   
+<select id="selectNoArrageGuestbook"  resultMap="AdminRUserResultMap" >
+	SELECT
+		g.user_id userid,
+		u.NAME username,
+		u.email useremail
+	FROM
+		guestbook g,
+		user u
+	LEFT JOIN admin_r_user ON u.email = admin_r_user.useremail
+	LEFT JOIN admuser ON admuser.id = admin_r_user.adminid
+	WHERE
+		u.id = g.user_id
+	AND g.user_id NOT IN (
+		SELECT
+			aru.userid
+		FROM
+			admin_r_user aru,
+			guestbook gu
+		WHERE
+			aru.userid = gu.user_id
+	)
+	GROUP BY
+		g.user_id
+</select>
+   <select id="selectCountAllCartMarketingNum" resultType="com.cbt.messages.vo.MessagesCountVo">
+   SELECT
+   'cartMarket' as type,
+	count(1)  as countAll
+	FROM
+	(
+		SELECT
+			u.id,
+			gc.datatime
+		FROM
+			goods_car gc
+		LEFT JOIN user u ON gc.userid = u.id
+		LEFT JOIN admin_r_user au ON gc.userid = au.userid
+		WHERE
+		u.id != 0
+		AND gc.state = 0
+    	AND gc.datatime>=DATE_SUB(NOW(), INTERVAL 7 DAY)
+		GROUP BY
+			gc.userid
+		ORDER BY
+		gc.datatime desc
+		) cartNum
+   </select>
+   
+   <select id="selectNoArrgCountNum"  resultType="Integer">
+   	SELECT
+	count(1)
+FROM
+	(
+		SELECT
+			u.id,
+			gc.datatime
+		FROM
+			goods_car gc
+		LEFT JOIN user u ON gc.userid = u.id
+		LEFT JOIN admin_r_user au ON gc.userid = au.userid
+		WHERE
+			u.id != 0
+		AND gc.state = 0
+		AND gc.datatime >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+		AND u.id NOT IN (
+			SELECT
+				userId
+			FROM
+				cart_market_email_send cmes
+			WHERE
+				cmes.sentEmailTime >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+			GROUP BY userId
+			ORDER BY cmes.sentEmailTime desc
+		)
+		GROUP BY
+			gc.userid
+		ORDER BY
+			gc.datatime DESC
+	) cartNum
+   </select>
+      <!-- Integer selectReviewManagementNum(); -->
+   <select id="selectReviewManagementNum" resultType="Integer">
+   		SELECT COUNT(1)
+		FROM goods_comments_real g
+		WHERE show_flag = 0 AND comments_time >= NOW() - INTERVAL 30 DAY
+   </select>
+   <!-- Integer selectQuestionAnswerNum(); -->
+   <select id="selectQuestionAnswerNum" resultType="Integer">
+   		SELECT COUNT(1) FROM question_answer 
+   		WHERE is_delete=0 AND reply_status=1
+   </select>
+   <!-- List<HashMap<String, String>> queryAuthNameByIds(List<String> list); -->
+   <select id="queryAuthNameByIds" resultType="HashMap" parameterType="list">
+   		SELECT authId, authName 
+   		FROM tbl_auth_info 
+   		WHERE authId IN 
+   		<foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+   </select>
+</mapper>

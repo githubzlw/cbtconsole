@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.DropShippApplyMapper">
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.DShippUser">
+ 	 <id column="id"  property="id" />
+  <association property="userBean" javaType="com.cbt.bean.UserBean">
+  	<result property="id" column="uId"></result>
+   <result property="user_category" column="userCategory"></result>
+  </association>
+  <collection property="dropShippApplys" ofType="com.importExpress.pojo.DropShippApply">
+   <result property="id" column="DropShippApplyId"></result>
+  	<result column="user_id"  property="userId" />
+    <result column="email"  property="email" />
+    <result column="website"  property="website" />
+    <result column="phone_number"  property="phoneNumber" />
+    <result column="introduce"  property="introduce" />
+    <result column="createtime"  property="time" />
+  </collection>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, email, website, phone_number, introduce
+  </sql>
+  <!--查询DropShippApply userCategory  -->
+  <select id="findAllDropShip" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    b.id,b.user_id,b.email,b.website,b.phone_number,b.introduce,b.createtime 
+    from user,dropshippapply b
+    where user.id=b.user_id
+   	and user.user_category = #{userCategory}
+  </select>
+  <!--查询DropShippApply userCategory  -->
+  <select id="dropShiptotal" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*) from user,dropshippapply
+    where user.id=dropshippapply.user_id
+   and user.user_category = #{userCategory}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from dropshippapply
+    where id = #{id}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from dropshippapply
+    where id = #{id}
+  </delete>
+  <insert id="insert" parameterType="com.importExpress.pojo.DropShippApply">
+    insert into dropshippapply (id, user_id, email, 
+      website, phone_number, introduce
+      )
+    values (#{id}, #{userId}, #{email}, 
+      #{website}, #{phoneNumber}, #{introduce}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.importExpress.pojo.DropShippApply">
+    insert into dropshippapply
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="website != null">
+        website,
+      </if>
+      <if test="phoneNumber != null">
+        phone_number,
+      </if>
+      <if test="introduce != null">
+        introduce,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="userId != null">
+        #{userId},
+      </if>
+      <if test="email != null">
+        #{email},
+      </if>
+      <if test="website != null">
+        #{website},
+      </if>
+      <if test="phoneNumber != null">
+        #{phoneNumber},
+      </if>
+      <if test="introduce != null">
+        #{introduce},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.importExpress.pojo.DropShippApply">
+    update dropshippapply
+    <set>
+      <if test="userId != null">
+        user_id = #{userId},
+      </if>
+      <if test="email != null">
+        email = #{email},
+      </if>
+      <if test="website != null">
+        website = #{website},
+      </if>
+      <if test="phoneNumber != null">
+        phone_number = #{phoneNumber},
+      </if>
+      <if test="introduce != null">
+        introduce = #{introduce},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.importExpress.pojo.DropShippApply">
+    update dropshippapply
+    set user_id = #{userId},
+      email = #{email},
+      website = #{website},
+      phone_number = #{phoneNumber},
+      introduce = #{introduce}
+    where id = #{id}
+  </update>
+</mapper>

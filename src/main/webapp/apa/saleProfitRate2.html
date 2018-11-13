@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>利润商品管理</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<style type="text/css">
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 35px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+input, textarea, select, button {
+	font-size: 16px;
+	height: 28px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 16px;
+}
+
+.datagrid-header .datagrid-cell span, .panel-body {
+	font-size: 16px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	height: 28px;
+	line-height: 28px;
+	padding: 3px 5px;
+}
+.removeclass,.removeclass2{
+    text-decoration: none;
+}
+</style>
+<script src="/cbtconsole/js/saleProfitRate.js"></script>
+
+</head>
+<body>
+	<div id="top_toolbar" style="padding: 5px; height: auto">
+	<div style="margin-left: 400px;font-size:20px;" style="padding: 5px; height: auto">
+		总产品数:<span onclick="doQuery(1,1);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_1" style="color:red;width:70px;text-decoration:underline;margin-right:1px;">10</span>
+		销售总金额:<span onclick="doQuery(1,2);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_2" style="color:red;width:50px;text-decoration:underline;margin-right:50px;">20</span>
+		采购总金额:<span onclick="doQuery(1,3);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_3" style="color:red;width:70px;text-decoration:underline;margin-right:50px;">10</span>
+		利润率:<span onclick="doQuery(1,4);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_4" style="color:red;width:70px;text-decoration:underline;margin-right:50px;">50%</span>
+		卖出总数量:<span onclick="doQuery(1,5);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_5" style="color:red;width:70px;text-decoration:underline">1</span>
+	</div> 
+		<div>
+			<form id="query_form" action="#" onsubmit="return false;">
+				<table>
+					<tr>
+						<td>商品id:</td>
+						<td>用户id:</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" id="query_keyword" style="width: 150px;" value="" />
+						</td>
+						<td>
+							<input type="text" id="query_keyword" style="width: 150px;" value="" />
+						</td>
+						<td><input class="but_color" onclick="doQuery()" value="查询"
+							type="button"></td>
+						<td><input class="but_color" onclick="doReset()" value="重置"
+							type="button"></td>
+							
+						<td>&nbsp;&nbsp;&nbsp;&nbsp;<input class="but_color" onclick="toAdd()" value="新增"
+							type="button"></td>
+						<!-- <td><input class="but_color" onclick="exportTxt()" value="导出"
+							type="button"></td> -->
+						
+					</tr>
+				</table>
+			</form>
+
+		</div>
+	</div>
+	<table id="main-datagrid" style="width: 100%; height: 100%"
+		class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th data-options="field:'userid',width:'100px',align:'center'">商品id</th>
+				<th data-options="field:'saleprice',width:'100px',align:'center'">销售价格</th>
+				<th data-options="field:'sourceprice',width:'100px',align:'center'">货源价格</th>
+				<th data-options="field:'profitrate',width:'100px',align:'center'">利润率</th>
+				<th data-options="field:'salesnum',width:'100px',align:'center'">销售数量</th>
+				
+				
+				<th data-options="field:'status',width:'150px',align:'center',formatter: function(value,row,index){
+									var buttonstr = '<input class=\'but_color\' onclick=\'toUpdate('+row.id+')\' value=\'修改\' type=\'button\'>&nbsp;&nbsp;<input class=\'but_color\' onclick=\'doDelete('+row.id+')\' value=\'删除\' type=\'button\'>';
+									return buttonstr;
+							}">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<!-- 弹框 -->
+	<div id="keyword_add_win" class="easyui-window" title="新增" style="width:700px;height:500px;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="keyword_add" method="post"> 
+			<table cellpadding="5px">
+				<tr>
+					<td><label for="goodsId">商品id:</label></td>
+					<td><input class="easyui-validatebox" type="text" name="keyword" data-options="required:true" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<!-- <tr>
+					<td><label for="catid1name">盲搜类别1:</label></td>
+					<input type="hidden" id="catid1" name="catid1" value="">
+					<td><input class="easyui-validatebox" type="text" id="catid1name" name="catid1name" onfocus="category_win('catid1')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<tr>
+					<td><label for="catid2name">盲搜类别2:</label></td>
+					<input type="hidden" id="catid2" name="catid2" value="">
+					<td><input class="easyui-validatebox" type="text" id="catid2name" name="catid2name" onfocus="category_win('catid2')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<tr>
+					<td><label for="catid3name">盲搜类别3:</label></td>
+					<input type="hidden" id="catid3" name="catid3" value="">
+					<td><input class="easyui-validatebox" type="text" id="catid3name" name="catid3name" onfocus="category_win('catid3')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				
+				<tr>
+					<td><label for="catid4">盲搜类别4:</label></td>
+					<td><input id="cc" value="" style="width:400px"></td>
+				</tr>
+				
+				<tr>
+					<td><label for="keyword1">同义词:</label></td>
+					<td>
+						<a href="#" id="AddMoreFileBox">添加更多的同义词输入框</a>
+						<div id="InputsWrapper">  
+							<div><input class="easyui-validatebox" type="text" name="keyword1" value=""/><a href="#" class="removeclass">×</a></div>  
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="issyn">同义词是否启用:</label></td>
+					<td><select id="issyn" class="easyui-combobox" name="issyn" style="width:400px;">   
+							<option value="1">是</option> 
+						    <option value="0">否</option>
+						</select> 
+						<input type="radio" checked="checked" name="issyn" value="1">是
+						<input type="radio" checked="checked" name="issyn" value="0">否
+					</td>
+				</tr> -->
+				<tr>
+					<td colspan="2" align="center"><input class="but_color" onclick="doAdd();" value="保存" type="button"></td>
+				</tr> 
+			</table>
+		</form>
+	</div>
+	
+	<!-- 弹框 -->
+	<div id="keyword_update_win" class="easyui-window" title="修改" style="width:700px;height:500px;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="keyword_update" method="post"> 
+			<table cellpadding="5px">
+				<input type="hidden" id="update_id" name="update_id">
+				<tr>
+					<td><label for="update_keyword">商品id:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="userid" name="userid" data-options="required:true" maxlength="500" style="width:400px"/></td>
+				</tr> 
+				<tr>
+					<td><label for="update_catid1name">销售价格:</label></td>
+					<input type="hidden" id="update_catid1" name="update_catid1" value="">
+					<td><input class="easyui-validatebox" type="text" id="update_catid1name" name="update_catid1name" onfocus="category_win('update_catid1')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<tr>
+					<td><label for="update_catid2name">货源价格:</label></td>
+					<input type="hidden" id="update_catid2" name="update_catid2" value="">
+					<td><input class="easyui-validatebox" type="text" id="update_catid2name" name="update_catid2name" onfocus="category_win('update_catid2')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<tr>
+					<td><label for="update_catid3name">利润率:</label></td>
+					<input type="hidden" id="update_catid3" name="update_catid3" value="">
+					<td><input class="easyui-validatebox" type="text" id="update_catid3name" name="update_catid3name" onfocus="category_win('update_catid3')" data-options="required:false" maxlength="500" style="width:400px"/></td>
+				</tr>
+				<tr>
+					<td><label for="update_keyword1">销售数量:</label></td>
+					<td>
+						<!-- <a href="#" id="AddMoreFileBox2">添加更多的同义词输入框</a>   -->
+						<div id="InputsWrapper2">  
+							<div><input class="easyui-validatebox" type="text" name="update_keyword1" value=""/><a href="#" class="removeclass2">×</a></div>  
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<!-- <td><label for="update_issyn">同义词是否启用:</label></td>
+					<td>
+						<input type="radio" checked="checked" name="update_issyn" value="1">是
+						<input type="radio" checked="checked" name="update_issyn" value="0">否
+					</td> -->
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><input class="but_color" onclick="doUpdate();" value="保存" type="button"></td>
+				</tr> 
+			</table>
+		</form>
+	</div>
+	
+	
+	<div id="category_win" class="easyui-window" title="类别" style="width:500px;height:600px" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+	    
+	    <div id="bb" class="easyui-layout" style="width:100%;height:100%;">   
+		    <div data-options="region:'north'" style="height:90%;">
+   				<table cellpadding="5px">
+					<input type="hidden" id="catid" name="catid" value="">
+					<input type="hidden" id="catname" name="catname" value="">
+					<tr>
+						<td><label for="catname">类别:</label></td>
+						<td><input class="easyui-validatebox" onblur="toBlur()" type="text" id="searchname" name="searchname" maxlength="255" style="width:400px;height:20px"/></td>
+					</tr>
+					<tr>
+						<td align="left" colspan="2">
+							<ul id="catid_tt">
+							</ul> 
+						</td>
+					</tr>
+			    </table>
+		    </div> 
+		    <div data-options="region:'south'" style="height:10%;">
+		    	<input class="but_color" onclick="qrCat();" value="确定" type="button">
+		    </div>   
+		</div> 
+	</div>
+
+
+</body>
+</html>

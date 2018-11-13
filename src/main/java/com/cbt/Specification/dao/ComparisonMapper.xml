@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.Specification.dao.ComparisonMapper">
+
+	<resultMap id="ComparisonResultMap"
+		type="com.cbt.Specification.bean.SpecificationComparison">
+		<result column="aliSpecificationChName" property="aliSpecificationChName"
+			jdbcType="VARCHAR" />
+		<result column="aliSpecificationEnName" property="aliSpecificationEnName"
+			jdbcType="VARCHAR" />
+		<result column="aliAttributeChName" property="aliAttributeChName"
+			jdbcType="VARCHAR" />
+		<result column="aliAttributeEnName" property="aliAttributeEnName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<select id="queryChoiceByAliCid" resultMap="ComparisonResultMap">
+		select
+		specification_translation.chName as aliSpecificationChName,
+		specification_translation.enName as aliSpecificationEnName,
+		specification_mapping.chName as aliAttributeChName,
+		specification_mapping.enName as aliAttributeEnName
+		from
+		specification_translation,specification_mapping
+		where
+		specification_translation.id = specification_mapping.specification_id
+		and specification_translation.product_category_id =
+		#{aliCid,jdbcType=VARCHAR}
+		and specification_translation.type = 1
+		and
+		specification_translation.enName in
+		<foreach collection="specificationNames" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		and
+		specification_mapping.enName in
+		<foreach collection="attributeNames" index="index" item="item"
+			open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		order by specification_translation.enName
+	</select>
+
+	<select id="queryDetailByAliCid" resultMap="ComparisonResultMap">
+		select
+		specification_translation.chName as aliSpecificationChName,
+		specification_translation.enName as aliSpecificationEnName,
+		specification_mapping.chName as aliAttributeChName,
+		specification_mapping.enName as aliAttributeEnName
+		from
+		specification_translation,specification_mapping
+		where
+		specification_translation.id = specification_mapping.specification_id
+		and specification_translation.product_category_id =
+		#{aliCid,jdbcType=VARCHAR}
+		and specification_translation.type = 2
+		order by specification_translation.enName
+	</select>
+
+
+</mapper>

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>团购商品管理</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #groupbuy_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .delete_btn {
+            width: 130px;
+            height: 26px;
+            margin-bottom: 10px;
+            color: #ffffff;
+            background-color: red;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .inp_sty {
+            width: 240px;
+            height: 24px;
+        }
+
+        .img_sty {
+            max-height: 180px;
+            max-width: 180px;
+        }
+
+        #form_enter {
+            font-size: 16px;
+            background-color: #afefe6;
+        }
+
+        .img_little {
+            max-width: 180px;
+            max-height: 180px;
+        }
+
+        .td_sty {
+            width: 130px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            closeDialog();
+            setDatagrid();
+            getAdminList();
+        });
+
+        /**
+         * 初始化datagrid数据
+         */
+        function setDatagrid() {
+            $('#groupbuy_easyui-datagrid').datagrid({
+                title: '团购商品管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#groupbuy_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/groupBuy/queryForList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 20,//默认选择的分页是每页50行数据
+                pageList: [20, 30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+
+        /**
+         * 获取下拉框录入人列表
+         */
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admid").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admid").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+
+        /**
+         * 消息提醒弹框
+         * @param message
+         */
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 1000,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }
+            });
+        }
+
+        /**
+         * 页面首次查询
+         */
+        function doQuery() {
+            var id = $("#pid_id").val();
+            if (id == null || id == "") {
+                id = "";
+            }
+            var sttime = $("#query_sttime").val();
+            if (sttime == null || sttime == "") {
+                sttime = "";
+            }
+            var edtime = $("#query_edtime").val();
+            if (edtime == null || edtime == "") {
+                edtime = "";
+            }
+            var admid = $("#query_admid").val();
+            if (admid == null || admid == "") {
+                admid = 0;
+            }
+            var type = $("#query_type").val();
+            if (type == null || type == "") {
+                type = -1;
+            }
+            $("#groupbuy_easyui-datagrid").datagrid("load", {
+                "id": id,
+                "sttime": sttime,
+                "edtime": edtime,
+                "type": type,
+                "admid": admid
+            });
+        }
+
+        /**
+         * grid格式化图片数据，提供页面展示
+         * @param val
+         * @param row
+         * @param index
+         * @returns {string}
+         */
+        function formatImg(val, row, index) {
+            var content = "";
+            if (val == null || val == "") {
+                content = "<a target='_blank' href='https://detail.1688.com/offer/" + row.pid + ".html' ><img class='img_sty' scr='/cbtconsole/img/yuanfeihang/loaderTwo.gif' alt='无图' /></a>";
+            } else {
+                content = "<a target='_blank' href='https://detail.1688.com/offer/" + row.pid + ".html' ><img class='img_sty' src='" + val + "' alt='无图' /></a>";
+            }
+            return content;
+        }
+
+        /**
+         * grid开启和关闭状态判断显示
+         * @param val
+         * @param row
+         * @param index
+         * @returns {string}
+         */
+        function formatIsOn(val, row, index) {
+            if (val > 0) {
+                return "启用";
+            } else {
+                return "关闭";
+            }
+        }
+
+        function formatType(val, row, index) {
+            var content = "";
+            if (val == 0) {
+                content = "默认";
+            } else if (val == 1) {
+                content = "Panda";
+            } else if (val == 2) {
+                content = "Serene";
+            }
+            return content;
+        }
+
+        /**
+         * grid格式化操作数据的按钮
+         * @param val
+         * @param row
+         * @param index
+         * @returns {string}
+         */
+        function formatOperation(val, row, index) {
+            var context = "<button class='enter_btn' onclick='doEditGroupBuyInfo(" + row.id + ")'>编辑</button>";
+            context += "<button class='delete_btn' onclick='doDeleteInfo(" + row.id + ")'>删除</button>";
+            context += "<button class='enter_btn' onclick='addShopIdGooods(" + row.id + ",\"" + row.shopId + "\",\"" + row.pid + "\")'>选择同店铺商品</button>";
+            context += "<button class='enter_btn' onclick='showShopIdGooods(" + row.id + ",\"" + row.shopId + "\")'>展示同店铺商品</button>";
+            return context;
+        }
+
+        /**
+         * 执行保存操作
+         */
+        function doSave() {
+            var type = $("#enter_type").val();
+            var groupBuyId = $("#group_buy_id").val();
+            var pid = $("#goods_pid").val();
+            if (pid == null || pid == "") {
+                $.messager.alert("提醒", "获取商品Pid失败", "info");
+                return;
+            }
+
+            var finalPriceNeedNum = $("#final_price_need_num").val();
+            if (finalPriceNeedNum == null || finalPriceNeedNum == "") {
+                $.messager.alert("提醒", "获取最终价要求人数失败", "info");
+                return;
+            }
+
+            var finalPrice = $("#final_price").val();
+            if (finalPrice == null || finalPrice == "") {
+                $.messager.alert("提醒", "获取最终价失败", "info");
+                return;
+            }
+            var initVirtualNum = $("#init_virtual_num").val();
+            if (initVirtualNum == null || initVirtualNum == "") {
+                $.messager.alert("提醒", "获取起始虚拟人数失败", "info");
+                return;
+            }
+
+            var activeBeginTime = $("#active_begin_time").val();
+            if (activeBeginTime == null || activeBeginTime == "") {
+                $.messager.alert("提醒", "获取团购开始时间失败", "info");
+                return;
+            }
+
+            var effectiveDay = $("#effective_day").val();
+            if (effectiveDay == null || effectiveDay == "") {
+                $.messager.alert("提醒", "获取团购天数失败", "info");
+                return;
+            }
+
+            var activeDesc = $("#active_desc").val();
+            if (activeDesc == null || activeDesc == "") {
+                $.messager.alert("提醒", "获取拼团描述失败", "info");
+                return;
+            }
+
+            var goods_off = $("input[type='radio'][name='goods_off']").filter(":checked");
+            var isOn = 0;
+            if (goods_off.attr("id") == "goods_flag_on") {
+                isOn = 1;
+            }
+
+            var groupType = $("#group_type").val();
+            var url = "/cbtconsole/groupBuy/insertGroupBuyInfos";
+            if (type > 0) {
+                url = "/cbtconsole/groupBuy/updateGroupBuyInfos";
+                addOrUpdatePidInfo(groupBuyId, pid, finalPriceNeedNum, finalPrice, initVirtualNum, activeBeginTime, effectiveDay, activeDesc, isOn, url,groupType);
+            } else {
+                checkExistsLatest(groupBuyId, pid, finalPriceNeedNum, finalPrice, initVirtualNum, activeBeginTime, effectiveDay, activeDesc, isOn, url,groupType);
+            }
+        }
+
+        /**
+         * 检查最近一次该PID商品的活动信息
+         * @param pid
+         * @param activeBeginTime
+         * @param effectiveDay
+         */
+        function checkExistsLatest(groupBuyId, pid, finalPriceNeedNum, finalPrice, initVirtualNum, activeBeginTime, effectiveDay, activeDesc, isOn, url,groupType) {
+            $.ajax({
+                type: 'POST',
+                url: "/cbtconsole/groupBuy/checkExistsLatest",
+                data: {
+                    "pid": pid,
+                    "activeBeginTime": activeBeginTime,
+                    "effectiveDay": effectiveDay
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        if (data.total > 0) {
+                            $.messager.alert("提醒", data.data, "info");
+                        } else {
+                            addOrUpdatePidInfo(groupBuyId, pid, finalPriceNeedNum, finalPrice, initVirtualNum, activeBeginTime, effectiveDay, activeDesc, isOn, url,groupType);
+                        }
+                    } else {
+                        $.messager.alert("提醒", data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", "执行错误，请联系管理员", "error");
+                }
+            });
+        }
+
+        /**
+         * 新增或编辑团购商品信息
+         * @param groupBuyId
+         * @param pid
+         * @param finalPriceNeedNum
+         * @param finalPrice
+         * @param initVirtualNum
+         * @param activeBeginTime
+         * @param effectiveDay
+         * @param activeDesc
+         * @param isOn
+         * @param url
+         */
+        function addOrUpdatePidInfo(groupBuyId, pid, finalPriceNeedNum, finalPrice, initVirtualNum, activeBeginTime, effectiveDay, activeDesc, isOn, url,groupType) {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: {
+                    "id": groupBuyId,
+                    "pid": pid,
+                    "finalPriceNeedNum": finalPriceNeedNum,
+                    "finalPrice": finalPrice,
+                    "initVirtualNum": initVirtualNum,
+                    "activeBeginTime": activeBeginTime,
+                    "effectiveDay": effectiveDay,
+                    "activeDesc": activeDesc,
+                    "groupType": groupType,
+                    "isOn": isOn
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        showMessage('保存成功，页面即将刷新');
+                        closeDialog();
+                        setTimeout(function () {
+                            doQuery();
+                        }, 1000);
+                    } else {
+                        $.messager.alert("提醒", data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                }
+            });
+        }
+
+
+        /**
+         * 弹框页面关闭
+         */
+        function closeDialog() {
+            $('#enter_div_sty').dialog('close');
+            resetGoodsData();
+        }
+
+        /**
+         * 录入或编辑商品弹框页面显示
+         */
+        function enterGoods(type) {
+            if (type == 0) {
+                resetGoodsData();
+            }
+            $('#enter_div_sty').dialog('open');
+            $('#enter_type').val(type);
+        }
+
+        /**
+         * 重置按钮响应
+         */
+        function resetGoodsData() {
+            $("#goods_pid").val("");
+            $('#enter_type').val("");
+            $("#goods_name").text("");
+            $("#goods_img_show").attr("src", "#");
+            $("#goods_img").val("");
+
+            $("#final_price_need_num").val(0);
+            $("#final_price").val(0.00);
+            $("#init_virtual_num").val(0);
+
+            $("#active_begin_time").val("");
+            $("#effective_day").val(0);
+            $("#active_desc").val("");
+            $("#group_type").val(0);
+            $("#query_btn").show();
+            $("#ret_btn").show();
+            $("#goods_pid").removeAttr("readonly")
+        }
+
+
+        /**
+         * 查询数据库表1688商品信息
+         */
+        function queryGoodsByPid() {
+            var pid = $("#goods_pid").val();
+            if (pid == null || pid == "") {
+                $.messager.alert("提醒", "请输入PID", "info");
+            } else {
+                $("#show_notice").show();
+                $.ajax({
+                    type: "post",
+                    url: "/cbtconsole/groupBuy/queryGoodsFrom1688",
+                    data: {
+                        url: pid
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        $("#show_notice").hide();
+                        if (data.ok) {
+                            var json = data.data;
+                            $("#show_notice").hide();
+                            $("#goods_pid").val(json.pid);
+                            $("#goods_name").text(json.enname);
+                            $("#goods_img_show").attr("src", json.remotpath + json.img);
+                            $("#goods_img").val(json.remotpath + json.img);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (res) {
+                        $("#show_notice").hide();
+                        $.messager.alert("提醒", "获取失败，请重试", "error");
+                    }
+                });
+            }
+        }
+
+        /**
+         * 根据ID查询编辑的商品信息
+         */
+        function doEditGroupBuyInfo(id) {
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/groupBuy/queryInfoById",
+                data: {
+                    id: id
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.ok) {
+                        var json = data.data;
+                        $("#group_buy_id").val(json.id);
+                        $("#goods_pid").val(json.pid);
+                        $("#goods_name").text(json.goodsName);
+                        $("#goods_img_show").attr("src", json.imgUrl);
+                        $("#goods_img").val(json.imgUrl);
+
+                        $("#final_price_need_num").val(json.finalPriceNeedNum);
+                        $("#final_price").val(json.finalPrice);
+                        $("#init_virtual_num").val(json.initVirtualNum);
+                        var activeBeginTime = json.activeBeginTime;
+                        $("#active_begin_time").val(activeBeginTime.substr(0, 10));
+                        $("#effective_day").val(json.effectiveDay);
+                        $("#active_desc").val(json.activeDesc);
+                        $("#group_type").val(json.type);
+                        if (json.isOn > 0) {
+                            $("#goods_flag_on").prop("checked", "checked");
+                        } else {
+                            $("#goods_flag_off").prop("checked", "checked");
+                        }
+                        $("#query_btn").hide();
+                        $("#ret_btn").hide();
+                        $("#goods_pid").prop("readonly", "readonly");
+                        enterGoods(1);
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", "获取失败，请重试", "error");
+                }
+            });
+        }
+
+        /**
+         * 根据ID删除的商品信息
+         */
+        function doDeleteInfo(id) {
+            $.messager.confirm('系统提醒', '是否删除，删除保存后数据不可恢复', function (r) {
+                if (r) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/groupBuy/deleteGroupBuyInfos",
+                        data: {
+                            id: id
+                        },
+                        success: function (data) {
+                            if (data.ok) {
+                                closeDialog();
+                                showMessage('执行成功，页面即将刷新！');
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            } else {
+                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+        function addShopIdGooods(gbId, shopId, pid) {
+            var url = "/cbtconsole/groupBuy/chooseShopGoods?gbId=" + gbId + "&shopId=" + shopId + "&pid=" + pid;
+            var param = "height=900,width=1822,top=80,left=60,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(url, "windows", param);
+        }
+
+        function showShopIdGooods(gbId, shopId) {
+            var url = "/cbtconsole/groupBuy/showShopGoods?gbId=" + gbId + "&shopId=" + shopId;
+            var param = "height=900,width=1822,top=80,left=60,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open(url, "windows", param);
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="enter_div_sty" class="easyui-dialog" title="团购商品信息"
+     data-options="modal:true" style="width: 666px; height: 710px;">
+    <form id="form_enter" action="#" onsubmit="return false">
+        <input id="enter_type" name="enter_type" type="hidden" value=""/>
+        <input id="group_buy_id" type="hidden" value="0"/>
+        <table class="edit_style">
+
+            <tr>
+                <td class="td_sty">商品PID：</td>
+                <td><input id="goods_pid" value="" class="inp_sty" placeholder="请输入商品PID"/>
+                    &nbsp;&nbsp;<input type="button" id="query_btn" value="查询" onclick="queryGoodsByPid()"/>&nbsp;<input
+                            type="button" id="ret_btn" value="重置" onclick="resetGoodsData()"/> <span
+                            id="show_notice" style="color: red; display: none;">正在读取中...</span></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">商品名：</td>
+                <td><span id="goods_name" name="goodsName" value="" style="width: 420px;height: 24px;"></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">商品图片：</td>
+                <td><img id="goods_img_show" class="img_little" alt="无图" src="#">
+                    <input id="goods_img" name="goodsImg" type="hidden" value=""/>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="td_sty">最终价：</td>
+                <td><input id="final_price" type="number" name="finalPrice" value="0" class="inp_sty"/><em>$</em></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">最终价要求人数：</td>
+                <td><input id="final_price_need_num" type="number" name="finalPriceNeedNum" value="0" class="inp_sty"/>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">起始虚拟人数：</td>
+                <td><input id="init_virtual_num" type="number" name="initVirtualNum" value="0" class="inp_sty"/></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">团购开始时间：</td>
+                <td><input id="active_begin_time" name="activeBeginTime" class="Wdate"
+                           style="width: 240px; height: 24px" type="text" value=""
+                           onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">团购天数：</td>
+                <td><input id="effective_day" type="number" name="effectiveDay" value="0" class="inp_sty"/></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">拼团描述：</td>
+                <td><textarea id="active_desc" style="width: 420px;height: 96px;" name="activeDesc" value=""></textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">是否启用：</td>
+                <td><input type="radio" id="goods_flag_on" name="goods_off"/>
+                    <label>启用</label>&nbsp;&nbsp;
+                    <input type="radio" id="goods_flag_off" name="goods_off"/> <label>关闭</label></td>
+            </tr>
+
+            <tr>
+                <td class="td_sty">分类：</td>
+                <td>
+                    <select id="group_type" style="width: 120px;height: 24px;" name="groupType">
+                        <option value="0">默认</option>
+                        <option value="1">Panda</option>
+                        <option value="2">Serene</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2" align="center">
+                    <a href="javascript:void(0)" data-options="iconCls:'icon-add'" class="easyui-linkbutton"
+                       onclick="doSave()" style="width: 80px">保存</a>
+                    <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+                       class="easyui-linkbutton" onclick="closeDialog()" style="width: 80px">取消</a></td>
+            </tr>
+
+        </table>
+
+    </form>
+</div>
+
+<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
+    <form id="groupbuy_query_form" action="#" onsubmit="return false;">
+			<span> 编号ID: <input type="text" id="pid_id"
+                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+				团购时间: <input id="query_sttime" class="Wdate"
+                             style="width: 110px; height: 24px" type="text" value=""
+                             onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
+                                                 style="width: 110px; height: 24px;" type="text" value=""
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+			</span>&nbsp;&nbsp;&nbsp;&nbsp; <span> 编辑人: <select id="query_admid"
+                                                                style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span> 分类: <select id="query_type" style="font-size: 16px; height: 24px; width: 120px;">
+            <option value="-1">全部</option>
+            <option value="0">默认</option>
+            <option value="1">Panda</option>
+            <option value="2">Serene</option>
+        </select></span>
+        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
+                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="enter_btn" value="新增团购信息"
+                     onclick="enterGoods(0)"/></span>
+    </form>
+</div>
+
+<table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'id',width:'120px'">编号</th>
+        <th data-options="field:'imgUrl',width:'185px',formatter:formatImg">产品图片</th>
+        <th data-options="field:'goodsName',align:'left',width:'200px'">产品名</th>
+        <th data-options="field:'finalPriceNeedNum',align:'center',width:'120px'">最终价要求人数</th>
+        <th data-options="field:'finalPrice',align:'center',width:'100px'">最终价($)</th>
+        <th data-options="field:'initVirtualNum',align:'center',width:'110px'">起始虚拟人数</th>
+        <th data-options="field:'activeBeginTime',align:'center',width:'100px'">团购开始时间</th>
+        <th data-options="field:'effectiveDay',align:'center',width:'100px'">团购天数</th>
+        <th data-options="field:'activeDesc',align:'left',width:'240px'">拼团描述</th>
+        <th data-options="field:'isOn',align:'center',width:'80px',formatter:formatIsOn">是否启用</th>
+        <th data-options="field:'type',align:'center',width:'80px',formatter:formatType">分类</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">创建人</th>
+        <th data-options="field:'createTime',align:'center',width:'100px'">创建时间</th>
+        <th data-options="field:'action',align:'center',width:'150px',formatter:formatOperation">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

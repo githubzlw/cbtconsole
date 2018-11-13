@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>设置二次验证密码</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <script type="text/javascript">
+        function checkSecondValidPwdAddEdit() {
+            var password_one = $("#second_valid_pwd").val();
+            var password_two = $("#second_valid_pwd_two").val();
+
+            var userid = $("#select_user_id").val();
+            var remark = $("#second_valid_remark").val();
+
+            if (password_one == null || password_one == "") {
+                $.messager.alert("操作提示", "请输入密码");
+                return;
+            } else if (password_two == null || password_two == "") {
+                $.messager.alert("操作提示", "请再次输入密码");
+                return;
+            }
+            if (password_one != password_two) {
+                $.messager.alert("操作提示", "两次密码输入不一致");
+                return;
+            } else {
+                var reg = new RegExp("[`~!@#$%^&*()+=|{}':;',\\[\\].<>~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？?]");
+                var reg2 = /[0-9]/;
+                var reg3 = /[A-Za-z]/;
+                if (password_one.length < 8) {
+                    $.messager.alert("操作提示", "输入密码最少8位");
+                    return;
+                } else if (!reg.test(password_one)) {
+                    $.messager.alert("操作提示", "输入框中必须含有特殊字符");
+                    return;
+                } else if (!reg2.test(password_one)) {
+                    $.messager.alert("操作提示", "输入框中必须含有数字");
+                    return;
+                } else if (!reg3.test(password_one)) {
+                    $.messager.alert("操作提示", "输入框中必须字母");
+                    return;
+                } else if (reg.test(password_one) && reg2.test(password_one) && reg3.test(password_one)) {
+                    var edit_type = $("#edit_type").val();
+                    if (edit_type == 0) {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'text',
+                            url: '/cbtconsole/secondaryValidation/insertSecondaryValidation',
+                            data: {userid: userid, password: password_one, remark: remark},
+                            success: function (data) {
+                                var json = eval("(" + data + ")");
+                                if (json.ok) {
+                                    $.messager.alert("操作提示", "执行成功，请关闭页面");
+                                } else {
+                                    $.messager.alert("操作提示", json.message);
+                                }
+                            },
+                            error: function () {
+                                $.messager.alert("操作提示", "执行失败,请联系管理员");
+                            }
+                        });
+                    } else if (edit_type == 1) {
+                        var second_valid_old = $("#second_valid_old").val();
+                        if (second_valid_old == null || second_valid_old == "") {
+                            $.messager.alert("操作提示", "请输入原始密码");
+                            return;
+                        }
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'text',
+                            url: '/cbtconsole/secondaryValidation/updateByUserId',
+                            data: {
+                                userid: userid,
+                                oldPassword: second_valid_old,
+                                password: password_one,
+                                remark: remark
+                            },
+                            success: function (data) {
+                                var json = eval("(" + data + ")");
+                                if (json.ok) {
+                                    $.messager.alert("操作提示", "执行成功，请关闭页面");
+                                    //window.close();
+                                } else {
+                                    $.messager.alert("操作提示", json.message);
+                                }
+                            },
+                            error: function () {
+                                $.messager.alert("操作提示", "执行失败,请联系管理员");
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        function hideDivSecondValidAddEdit() {
+            window.close();
+        }
+        
+        function changeEditType(obj) {
+            var type = $(obj).val();
+            $("#edit_type").val(type);
+            if(type == 0){
+                $("#tr_old_pwd").hide();
+            }else{
+                $("#tr_old_pwd").show();
+            }
+
+        }
+    </script>
+</head>
+<body>
+
+<div id="div_second_valid">
+    <table style="border-color: #99e86c;" border="1" cellpadding="1" cellspacing="0" align="center">
+        <caption id="set_title" style="font-size: 18px;">设置二次验证密码</caption>
+        <tr>
+            <td>类型:</td>
+            <td><select onclick="changeEditType(this)" style="width: 260px;height: 28px;">
+                <option value="0" selected="selected">新增</option>
+                <option value="1">修改</option>
+            </select>
+            <input id="edit_type" type="hidden" value="0"/></td>
+        </tr>
+        <tr>
+            <td>用户:</td>
+            <td><select id="select_user_id" disabled="disabled" style="width: 260px;;height: 28px;">
+                <option value="1" selected="selected">Ling</option>
+                <option value="8">Emma</option>
+            </select></td>
+        </tr>
+        <tr id="tr_old_pwd" style="display: none;">
+            <td>原始密码:</td>
+            <td><input type="password" id="second_valid_old" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>新密码:</td>
+            <td><input type="password" id="second_valid_pwd" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>确认密码:</td>
+            <td><input type="password" id="second_valid_pwd_two" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td><textarea id="second_valid_remark" style="width: 260px;height: 80px;"></textarea></td>
+        </tr>
+        <tr style="text-align: center">
+            <td colspan="2"><input type="button" value="确定" onclick="checkSecondValidPwdAddEdit()"/>
+                &nbsp;&nbsp;
+                <input type="button" value="取消" onclick="hideDivSecondValidAddEdit()"/></td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+<script type="text/javascript">
+
+
+    window.onload = function () {
+        $("#tr_old_pwd").hide();
+        var url = document.location.href;
+        var begin = url.indexOf("?");
+        if (begin != -1) {
+            var paramStr = url.substring(begin + 1, url.length);
+            var paramLst = paramStr.split("=");
+            //operatorId
+            if (paramLst.length == 2) {
+                $("#select_user_id").val(paramLst[1]);
+
+            }
+        }
+    }
+
+</script>
+</html>

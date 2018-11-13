@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.messages.dao.MessageNotificationMapper">
+	<resultMap id="MessageNotificationResultMap" type="com.cbt.pojo.MessageNotification">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+		<result column="sender_id" property="senderId" jdbcType="INTEGER" />
+		<result column="send_type" property="sendType" jdbcType="INTEGER" />
+		<result column="send_content" property="sendContent" jdbcType="VARCHAR" />
+		<result column="link_url" property="linkUrl" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="is_read" property="isRead" jdbcType="VARCHAR" />
+		<result column="refund_id" property="refundId" jdbcType="INTEGER" />
+		<result column="reservation1" property="reservation1" jdbcType="VARCHAR" />
+		<result column="reservation2" property="reservation2" jdbcType="VARCHAR" />
+		<result column="reservation3" property="reservation3" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="MessageStatisticalResultMap" type="com.cbt.pojo.MessageNotificationStatistical">
+		<result column="send_type" property="sendType" jdbcType="INTEGER" />
+		<result column="count" property="count" jdbcType="INTEGER" />
+		<result column="sender_id" property="senderId" jdbcType="INTEGER" />
+	</resultMap>
+
+
+	<sql id="MessageNotification_Column_List">
+		id, order_no, sender_id, send_type,
+		send_content, link_url,
+		create_time,
+		is_read,refund_id,reservation1,reservation2,reservation3,message_id
+	</sql>
+
+	<select id="queryForListByAdminId" resultMap="MessageNotificationResultMap" >
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where
+		sender_id= #{adminId} 
+		and send_type = #{sendType} 
+		and is_read = 'N' 
+		union
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where
+		sender_id= #{adminId} 
+		and send_type = #{sendType} 
+		and is_read = 'Y' 
+		and create_time>DATE_ADD(NOW(),INTERVAL -3 DAY)
+		order by is_read,create_time desc
+	</select>
+
+	<select id="queryForListByLingId" resultMap="MessageNotificationResultMap">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where
+		sender_id= 1
+		and (ifnull(is_read,'N') =
+		'N'
+		or (ifnull(is_read,'N') = 'Y' and date(create_time) = date(sysdate())))
+		order by create_time desc
+		limit 400
+	</select>
+
+
+	<select id="queryForListByType" resultMap="MessageNotificationResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where send_type = #{type,jdbcType=INTEGER}
+		order by send_type,create_time desc
+	</select>
+
+	<select id="queryByRoleType" resultMap="MessageNotificationResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where sender_id in (select id from admuser
+		where roleType = #{roleType})
+		and (ifnull(is_read,'N') = 'N' or
+		(date(create_time) = date(sysdate())))
+		order by send_type,create_time
+		desc
+	</select>
+
+
+	<select id="queryForListByIsRead" resultMap="MessageNotificationResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where ifnull(is_read,'N') =
+		#{type,jdbcType=VARCHAR}
+		order by send_type,create_time desc
+	</select>
+
+	<select id="queryForListByOrderNo" resultMap="MessageNotificationResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where order_no = #{orderNo,jdbcType=VARCHAR}
+		order by send_type,create_time desc
+	</select>
+
+	<select id="queryById" resultMap="MessageNotificationResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+
+
+	<insert id="insertMessageNotification" parameterType="com.cbt.pojo.MessageNotification">
+		insert into
+		message_notification(
+		order_no, sender_id, send_type,
+		send_content,
+		link_url,
+		create_time, is_read,refund_id,
+		reservation1,reservation2,reservation3)
+		values(
+		#{orderNo,jdbcType=VARCHAR},#{senderId,jdbcType=VARCHAR},#{sendType,jdbcType=INTEGER},
+		#{sendContent,jdbcType=VARCHAR},#{linkUrl,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},#{isRead,jdbcType=VARCHAR},
+		#{refundId,jdbcType=INTEGER},#{reservation1,jdbcType=VARCHAR},
+		#{reservation2,jdbcType=VARCHAR},#{reservation3,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateIsReadById" parameterType="java.lang.Integer">
+		update
+		message_notification
+		set is_read = 'Y',
+		update_time = sysdate()
+		where id
+		= #{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="countUnReaded" resultType="Integer" parameterType="java.lang.Integer">
+		select count(id) from message_notification
+		where
+		ifnull(is_read,'N')='N' and send_type = #{type}
+	</select>
+
+	<select id="getMsgList" resultMap="MessageNotificationResultMap">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification where send_type = #{type}
+		<if test="isread!=null"> and ifnull(is_read,'N')=#{isread} </if>
+		<if test="orderno!=null"> and order_no=#{orderno}</if>
+	</select>
+
+	<update id="updateApprovedOrder">
+		update message_notification
+		set create_time =
+		sysdate()
+		where sender_id = 15 and send_type = 6
+	</update>
+
+	<update id="updateByOrderNoTypeSenderId">
+		update
+		message_notification
+		set is_read = 'Y',
+		update_time = sysdate() where
+		<choose>
+		 <when test="message_id!=0">
+		   message_id=#{message_id,jdbcType=INTEGER} 
+		 </when>
+		 <otherwise>
+			order_no = #{orderNo,jdbcType=VARCHAR}
+			and send_type = #{type,jdbcType=INTEGER}
+		<if test="type!=7 and type!=9">
+		  	and (sender_id = #{senderId,jdbcType=INTEGER} or sender_id =1);
+		</if>
+		 </otherwise>
+		</choose>
+		
+
+	</update>
+
+	<update id="updateIsReadByUserId">
+		update
+		message_notification
+		set is_read = 'Y',
+		update_time = sysdate()
+		where sender_id = #{userId,jdbcType=INTEGER}
+		and send_type = #{type,jdbcType=INTEGER}
+	</update>
+
+	<select id="queryExistsMsgByType" resultMap="MessageNotificationResultMap">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where
+		date(create_time) =date(sysdate())
+		and order_no =#{orderNo}
+		and sender_id =#{senderId}
+		and send_type =#{sendType}
+		and ifnull(reservation1,'') =#{remarkUserId}
+		and send_content =#{sendContent}
+	</select>
+
+	<select id="queryExistsSysMsg" resultMap="MessageNotificationResultMap">
+		select
+		<include refid="MessageNotification_Column_List" />
+		from message_notification
+		where
+		sender_id= #{senderId}
+		and send_type =0
+		and ifnull(reservation1,'') = #{remarkUserId}
+		and send_content= #{sendContent}
+	</select>
+
+	<delete id="deleteBySendIdAndType">
+		delete from message_notification
+		where sender_id = 15 and send_type = 6
+	</delete>
+
+	<select id="queryAdmuserId" resultType="java.lang.Integer">
+		select adminid from
+		tb_1688_accounts
+		where account= #{username}
+	</select>
+
+	<select id="getInfoSendId" resultType="java.lang.Integer">
+		select reservation1 from
+		message_notification
+		where id = #{id}
+	</select>
+
+	<select id="queryGroupNumber" resultMap="MessageStatisticalResultMap"
+		parameterType="java.lang.Integer">
+		select send_type,count(send_type) as count,sender_id
+		from message_notification
+		where sender_id = #{senderId} and ifnull(is_read,'N') = 'N' and send_type not in (0,7)
+<!-- 		and date(create_time) between date(date_add(now(), interval -1 WEEK))  and date(sysdate()) -->
+		group by send_type
+	</select>
+</mapper>

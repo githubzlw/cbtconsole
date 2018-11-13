@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>规格比对</title>
+<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript">
+	var cid = "";
+
+	$(function() {
+
+		/* cid = "200000926";
+		var url = "https://detail.1688.com/offer/38103944075.html";
+		var aliSpecificationStr = "Color:Black@10;Size:XL@100014065";				
+		var choiceAreaStr = encodeURI("颜色:白色,尺寸:XL", "UTF-8"); */
+
+		var urlStr = decodeURI(document.location.href);
+		//var urlStr = decodeURIComponent(document.location.href);
+		var begin = urlStr.indexOf("?");
+		var paramStr = urlStr.substring(begin + 1, urlStr.length);
+		var paramLst = paramStr.split("#");
+
+		var cidLst = paramLst[0].split("&");
+		if (cidLst.length == 1) {
+			cid = cidLst[0];
+		} else if (cidLst.length == 2) {
+			cid = cidLst[1];
+		} else {
+			alert("解析cid失败，请重试");
+			return;
+		}
+
+		var aliSpecificationStr = paramLst[1];
+		var url = paramLst[2];
+		var choiceAreaStr = encodeURI(paramLst[3], "UTF-8");
+
+		/* alert("cid:" + cid);
+		alert("aliSpecificationStr:" + aliSpecificationStr);
+		alert("url:" + url);
+		alert("choiceAreaStr:" + choiceAreaStr); */
+
+		var accessUrl = '../specificationComparison/';
+
+		//alert(cid + "&" + aliSpecificationStr + "&" + url + "&" + choiceAreaStr);
+
+		$
+				.ajax({
+					type : 'GET',
+					url : accessUrl + 'queryChoiceComparisonByCid',
+					data : {
+						aliCid : cid,
+						aliSpecificationStr : aliSpecificationStr,
+						choiceAreaStr : choiceAreaStr
+					},
+					success : function(data) {
+						if (data.ok) {
+							var comparisons = data.data;
+							$("#comparisonChoiceTable tbody").empty();
+							if (comparisons.length > 0) {
+								var tbody = '';
+								for (var i = 0; i < comparisons.length; i++) {
+									if (comparisons[i].attributeMatch) {
+										tbody += '<tr class="match"><td>';
+									} else {
+										tbody += '<tr class="noMatch"><td>';
+									}
+
+									if (comparisons[i].aliSpecificationEnName == null
+											&& comparisons[i].aliSpecificationChName == null
+											&& comparisons[i].aliAttributeEnName == null
+											&& comparisons[i].aliAttributeChName == null) {
+										tbody += "";
+									} else {
+										tbody += comparisons[i].aliSpecificationEnName
+												+ '('
+												+ comparisons[i].aliSpecificationChName
+												+ '):'
+												+ comparisons[i].aliAttributeEnName
+												+ '(';
+										if (comparisons[i].attributeMatch) {
+											tbody += comparisons[i].aliAttributeChName;
+										} else {
+											tbody += "<span class='highlighted'>"
+													+ comparisons[i].aliAttributeChName
+													+ "</span>";
+										}
+										tbody += ')';
+									}
+									tbody += '</td><td>';
+									if (comparisons[i].specificationChName1688 == null
+											&& comparisons[i].attributeChName1688 == null) {
+										tbody += "";
+									} else {
+										tbody += comparisons[i].specificationChName1688
+												+ ':';
+										if (comparisons[i].attributeMatch) {
+											tbody += comparisons[i].attributeChName1688;
+										} else {
+											tbody += "<span class='highlighted'>"
+													+ comparisons[i].attributeChName1688
+													+ "</span>";
+										}
+
+									}
+									tbody += '</td><td style="text-align: center;">';
+									if (comparisons[i].attributeMatch) {
+										tbody += 'Y</td>';
+									} else {
+										tbody += 'N</td>';
+									}
+									tbody += '</tr>';
+								}
+								$("#comparisonChoiceTable tbody").append(tbody);
+								addChoiceTableClass();
+							} else {
+								alert("当前无数据！");
+							}
+						} else {
+							alert(data.message);
+						}
+					}
+				});
+
+		var regex1688 = new RegExp('://detail.1688.com/offer/');
+		var taobaoRegex = new RegExp('://item.taobao.com/item.htm');
+
+		if (regex1688.test(url)) {
+
+			$
+					.ajax({
+						type : 'GET',
+						url : accessUrl + 'queryDetailComparisonBy1688',
+						data : {
+							aliCid : cid,
+							url1688 : url
+						},
+						success : function(data) {
+							if (data.ok) {
+								var comparisons = data.data;
+								$("#comparisonDetailTable tbody").empty();
+								if (comparisons.length > 0) {
+									var tbody = '';
+									for (var i = 0; i < comparisons.length; i++) {
+										if (comparisons[i].attributeMatch) {
+											tbody += '<tr class="match"><td>';
+										} else {
+											tbody += '<tr class="noMatch"><td>';
+										}
+										if (comparisons[i].aliSpecificationEnName == null
+												&& comparisons[i].aliSpecificationChName == null
+												&& comparisons[i].aliAttributeEnName == null
+												&& comparisons[i].aliAttributeChName == null) {
+											tbody += "";
+										} else {
+											tbody += comparisons[i].aliSpecificationEnName
+													+ '('
+													+ comparisons[i].aliSpecificationChName
+													+ '):'
+													+ comparisons[i].aliAttributeEnName
+													+ '(';
+											if (comparisons[i].attributeMatch) {
+												tbody += comparisons[i].aliAttributeChName;
+											} else {
+												tbody += "<span class='highlighted'>"
+														+ comparisons[i].aliAttributeChName
+														+ "</span>";
+											}
+											tbody += ')';
+										}
+										tbody += '</td><td>';
+										if (comparisons[i].specificationChName1688 == null
+												&& comparisons[i].attributeChName1688 == null) {
+											tbody += "";
+										} else {
+											tbody += comparisons[i].specificationChName1688
+													+ ':';
+											if (comparisons[i].attributeMatch) {
+												tbody += comparisons[i].attributeChName1688;
+											} else {
+												tbody += "<span class='highlighted'>"
+														+ comparisons[i].attributeChName1688
+														+ "</span>";
+											}
+										}
+										tbody += '</td><td style="text-align: center;">';
+										if (comparisons[i].attributeMatch) {
+											tbody += 'Y</td>';
+										} else {
+											tbody += 'N</td>';
+										}
+										tbody += '</tr>';
+									}
+									$("#comparisonDetailTable tbody").append(
+											tbody);
+									addDetailTableClass();
+								} else {
+									alert("当前无数据！");
+								}
+							} else {
+								alert(data.message);
+							}
+						}
+					});
+
+		} else if (taobaoRegex.test(url)) {
+
+			$
+					.ajax({
+						type : 'POST',
+						url : accessUrl + 'queryDetailComparisonByTaobao',
+						data : {
+							aliCid : cid,
+							urlTaobao : url
+						},
+						success : function(data) {
+							if (data.ok) {
+								var comparisons = data.data;
+								$("#comparisonDetailTable tbody").empty();
+								if (comparisons.length > 0) {
+									var tbody = '';
+									for (var i = 0; i < comparisons.length; i++) {
+										if (comparisons[i].attributeMatch) {
+											tbody += '<tr class="match"><td>';
+										} else {
+											tbody += '<tr class="noMatch"><td>';
+										}
+										if (comparisons[i].aliSpecificationEnName == null
+												&& comparisons[i].aliSpecificationChName == null
+												&& comparisons[i].aliAttributeEnName == null
+												&& comparisons[i].aliAttributeChName == null) {
+											tbody += "";
+										} else {
+											tbody += comparisons[i].aliSpecificationEnName
+													+ '('
+													+ comparisons[i].aliSpecificationChName
+													+ '):'
+													+ comparisons[i].aliAttributeEnName
+													+ '(';
+											if (comparisons[i].attributeMatch) {
+												tbody += comparisons[i].aliAttributeChName;
+											} else {
+												tbody += "<span class='highlighted'>"
+														+ comparisons[i].aliAttributeChName
+														+ "</span>";
+											}
+											tbody += ')';
+										}
+										tbody += '</td><td>';
+										if (comparisons[i].specificationChName1688 == null
+												&& comparisons[i].attributeChName1688 == null) {
+											tbody += "";
+										} else {
+											tbody += comparisons[i].specificationChName1688
+													+ ':';
+											if (comparisons[i].attributeMatch) {
+												tbody += comparisons[i].attributeChName1688;
+											} else {
+												tbody += "<span class='highlighted'>"
+														+ comparisons[i].attributeChName1688
+														+ "</span>";
+											}
+										}
+										tbody += '</td><td style="text-align: center;">';
+										if (comparisons[i].attributeMatch) {
+											tbody += 'Y</td>';
+										} else {
+											tbody += 'N</td>';
+										}
+										tbody += '</tr>';
+									}
+									$("#comparisonDetailTable tbody").append(
+											tbody);
+									addDetailTableClass();
+								} else {
+									alert("当前无数据！");
+								}
+							} else {
+								alert(data.message);
+							}
+						}
+					});
+
+		} else {
+			alert("解析url失败，请重试");
+		}
+	});
+
+	function addChoiceTableClass() {
+		$("#comparisonChoiceTable tbody tr:even").addClass("even");
+		$("#comparisonChoiceTable tbody tr:odd").addClass("odd");
+	}
+
+	function addDetailTableClass() {
+		$("#comparisonDetailTable tbody tr:even").addClass("even");
+		$("#comparisonDetailTable tbody tr:odd").addClass("odd");
+	}
+
+	function doSpecificationTraslation() {
+		var el = document.createElement("a");
+		document.body.appendChild(el);
+		el.href = "/cbtconsole/apa/Specification.html?cid=" + cid;
+		el.target = '_blank';
+		el.click();
+		document.body.removeChild(el);
+	}
+</script>
+<style type="text/css">
+.table_bg th {
+	background: #b0b0b0;
+}
+
+.match {
+	background-color: #159041;
+}
+
+/* .noMatch {
+	background-color: #ce9191;
+} */
+.highlighted {
+	font-weight: bold;
+	color: #ef0d0d;
+}
+
+.but_color {
+	background: #44a823;
+	width: 130px;
+	height: 35px;
+	border: 1px #aaa solid;
+	color: #fff;
+	float: right;
+}
+
+.traslate_color {
+	background: #44a823;
+	width: 50px;
+	height: 22px;
+	border: 1px #aaa solid;
+	color: #fff;
+	float: right;
+}
+
+.a_style {
+	color: #0643bc;
+	float: right;
+}
+
+.even {
+	background-color: #fff;
+}
+
+.odd {
+	background-color: #f8f8f8;
+}
+</style>
+</head>
+<body>
+
+	<div style="width: 95%; display: inline;">
+		<h2 style="width: 1150px;">
+			选择区比对结果 <input type="button" class="but_color" value="翻译AliExpress规格"
+				onclick="doSpecificationTraslation()">
+		</h2>
+		<table id="comparisonChoiceTable" class="table_bg" border="1px"
+			bordercolor="#ccc" cellspacing="0px"
+			style="border-collapse: collapse">
+			<thead>
+				<th style="width: 700px;">AliExpress规格</th>
+				<th style="width: 350px;">淘宝/1688规格</th>
+				<th style="width: 100px;">匹配</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>AliExpress</td>
+					<td>淘宝/1688</td>
+					<td style="text-align: center;">Y</td>
+				</tr>
+			</tbody>
+
+		</table>
+
+	</div>
+
+	<div style="width: 95%; display: inline;">
+		<h2>详情区比对结果</h2>
+		<table id="comparisonDetailTable" class="table_bg" border="1px"
+			bordercolor="#ccc" cellspacing="0px"
+			style="border-collapse: collapse">
+			<thead>
+				<th style="width: 700px;">AliExpress规格</th>
+				<th style="width: 350px;">淘宝/1688规格</th>
+				<th style="width: 100px;">匹配</th>
+			</thead>
+			<tbody>
+				<tr>
+					<td>AliExpress</td>
+					<td>淘宝/1688</td>
+					<td style="text-align: center;">Y</td>
+				</tr>
+			</tbody>
+
+		</table>
+	</div>
+
+
+
+</body>
+</html>

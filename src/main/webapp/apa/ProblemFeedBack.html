@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>问题反馈</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<style type="text/css">
+table th {
+	background: #b0b0b0;
+}
+
+.btn_stl {
+	font-size: 16px;
+	background: #44a823;
+	border: 1px #aaa solid;
+	color: #fff;
+	height: 30px;
+}
+.mod_pay3 {
+	width: 720px;
+	position: fixed;
+	top: 250px;
+	left: 15%;
+	z-index: 1011;
+	background: gray;
+	padding: 5px;
+	padding-bottom: 20px;
+	z-index: 1011;
+	border: 15px solid #33CCFF;
+}
+</style>
+<script type="text/javascript">
+
+	$(function(){
+		$.ajax({
+			type : 'POST',
+			async : false,
+			url : '/cbtconsole/admuser/queryAllAdmuser',
+			success : function(data){
+				if(data.ok){
+					var results = data.data;
+					var options = '<option value="0" selected="selected">全部</option>';
+					for (var i = 0; i < results.length; i++) {
+						options += '<option value="'+results[i].id+'">'+results[i].admname+'</option>';
+					}
+					$("#adminSelect").empty();
+					$("#adminSelect").append(options);
+				} else{
+					alert("获取下拉框数据失败，请重新刷新页面");
+				}
+			}
+		});
+	});
+
+	function queryProblemFeedBack(currentPage) {
+		var typeSelect = $("#typeSelect").val();
+		var is_report = $("#is_report").val();
+		var beginDate = $("#beginDate").val();
+		var endDate = $("#endDate").val();
+		var adminId = $("#adminSelect").val();
+		$("#problemTable tbody").empty();
+		$.ajax({
+			type : 'POST',
+			async : false,
+			url : '/cbtconsole/problemFeedBack/queryForList',
+			data : {
+				"type" : typeSelect,
+				"beginDate" : beginDate,
+				"endDate" : endDate,
+				"page" : currentPage,
+				"adminId" :　adminId,
+				"is_report" :　is_report
+			},
+			success : function(data) {
+				if (data.ok) {
+					var results = data.data;
+					if (results.length > 0) {
+						showPagingData(data.total, currentPage);
+						var tbody = "";
+						for (var i = 0; i < results.length; i++) {
+							tbody += "<tr><td>" + results[i].id + "</td><td>";
+							if (results[i].uid != 0) {
+								tbody += results[i].uid;
+							}
+							tbody += "</td><td><a target='_blank' href='/cbtconsole/website/user.jsp?userid="+results[i].uid+"'>" + results[i].email + "</a></td>";
+							tbody += "<td>" + results[i].problem + "</td><td>";
+							if (results[i].type == 1) {
+								tbody += "注册页面反馈";
+							}
+							if (results[i].type == 2) {
+								tbody += "购物车页面反馈";
+							}
+							if (results[i].type == 3) {
+								tbody += "支付页面反馈";
+							}
+							tbody += "</td>";
+							if(results[i].admName == null || results[i].admName == ""){
+								tbody += "<td></td>";
+							} else{
+								tbody += "<td>"+results[i].admName+"</td>";
+							}
+							tbody += "<td>"
+									+ new Date(results[i].createtime)
+											.toLocaleString() + "</td>";
+							if(results[i].reply_content == null || results[i].reply_content == ""){
+								tbody += "<td></td>";
+							} else{
+								tbody += "<td>"+results[i].reply_content+"</td>";
+							}
+							if(results[i].reply_time == null || results[i].reply_time == ""){
+								tbody += "<td></td>";
+							} else{
+								tbody += "<td>"+results[i].reply_time+"</td>";
+							}
+							tbody += "<td><a style='margin-left:35px' href='javascript:openReplyCustom("+results[i].id+")'>回复</a></td>";
+							tbody+="</tr>";
+						}
+						$("#problemTable tbody").append(tbody);
+					} else {
+						showPagingData(0, 1);
+					}
+				} else {
+					alert(data.message);
+					showPagingData(0, 1);
+				}
+			}
+		});
+	}
+	
+	//打开回复弹出框
+	function openReplyCustom(report_id){
+		$("#report_id").val(report_id);
+		var rfddd = document.getElementById("repalyDiv1");
+		rfddd.style.display = "block";
+	}
+	//回复客户反馈并发送邮件
+		function saveRepalyContent() {
+		var report_id = $("#report_id").val();
+		var text = $("#remark_content_").val();
+		$
+				.ajax({
+					type : 'POST',
+					async : false,
+					url : '/cbtconsole/problemFeedBack/saveRepalyContent',
+					data : {
+						'report_id' : report_id,
+						'text' : text
+					},
+					dataType : 'text',
+					success : function(data) {
+						if (data.length > 0) {
+							$("#report_id").val("");
+							$("#remark_content_").val("");
+							$('#repalyDiv1').hide();
+							location.reload();
+						}
+					}
+				});
+	}
+
+	function showPagingData(total, currentPage) {
+		$("#total_count").text(total);
+		$("#total_pages").text(Math.ceil(total / 20));
+		$("#current_page").text(currentPage);
+	}
+
+	function doQueryAdd() {
+		var currentPage = Number($("#current_page").text()) + 1;
+		var totalPages = Number($("#total_pages").text());
+		if (currentPage <= 1) {
+			currentPage = 1;
+		} else if (currentPage >= totalPages) {
+			currentPage = totalPages;
+		}
+		queryProblemFeedBack(currentPage);
+	}
+
+	function doQuerySub() {
+		var currentPage = Number($("#current_page").text()) - 1;
+		var totalPages = Number($("#total_pages").text());
+		if (currentPage <= 1) {
+			currentPage = 1;
+		} else if (currentPage >= totalPages) {
+			currentPage = totalPages;
+		}
+		queryProblemFeedBack(currentPage);
+	}
+
+	function doQueryFirst() {
+		queryProblemFeedBack(1);
+	}
+
+	function doQueryLast() {
+		var totalPages = Number($("#total_pages").text());
+		queryProblemFeedBack(totalPages);
+	}
+
+	function doQueryByPage() {
+		var totalPages = Number($("#total_pages").text());
+		var jumpPage = Number($("#jumpPage").val());
+		if (jumpPage <= 1) {
+			jumpPage = 1;
+		} else if (jumpPage >= totalPages) {
+			jumpPage = totalPages;
+		}
+		queryProblemFeedBack(jumpPage);
+	}
+</script>
+</head>
+<body>
+	<div>
+		<div style="margin-left: 152px">
+			<label for="typeSelect">类型:</label> <select id="typeSelect"
+				style="height: 28px">
+				<option value="0" selected="selected">0-全部</option>
+				<option value="1">1-注册页面反馈</option>
+				<option value="2">2-购物车页面反馈</option>
+				<option value="3">3-支付页面反馈</option>
+				<option value="4">4-搜索结果页反馈</option>
+				<option value="5">5-产品单页反馈</option>
+				<option value="6">6-个人中心反馈</option>
+				<option value="7">7-交期选择页反馈</option>
+				</select>
+				<label for="is_report">是否回复:</label> <select id="is_report"
+				style="height: 28px">
+				<option value="0" selected="selected">全部</option>
+				<option value="1">已回复</option>
+				<option value="2">未回复</option>
+			</select>
+			 <label for="beginDate">&nbsp;&nbsp;开始日期:</label> <input
+				id="beginDate" style="height: 24px;" readonly="readonly"
+				onfocus="WdatePicker({isShowWeek:true})" /> <label for="endDate">&nbsp;&nbsp;结束日期:</label>
+			<input id="endDate" style="height: 24px;" readonly="readonly"
+				onfocus="WdatePicker({isShowWeek:true})" />
+			&nbsp;&nbsp;
+			<label for="adminSelect">负责人:</label> <select id="adminSelect"
+				style="height: 28px">
+				<option value="0" selected="selected">全部</option>
+			</select>
+			&nbsp;&nbsp;
+			<button class="btn_stl" onclick="queryProblemFeedBack(1)">查询</button>
+			&nbsp;&nbsp;<a href="/cbtconsole/problemFeedBack/exportExcel">全部导出到excel</a>
+		</div>
+		<br />
+
+
+		<div>
+			<table id="problemTable" border="1px" cellspacing="0px"
+				style="border-collapse: collapse; margin-left: 66px">
+				<thead>
+					<th style="width: 80px; height: 27px">ID</th>
+					<th style="width: 80px">user_id</th>
+					<th style="width: 200px">邮箱</th>
+					<th>反馈问题</th>
+					<th style="width: 160px">类型</th>
+					<th style="width: 100px">销售</th>
+					<th style="width: 210px">创建时间</th>
+					<th style="width: 210px">回复内容</th>
+					<th style="width: 120px">回复时间</th>
+					<th style="width: 100px">回复反馈</th>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+
+		</div>
+
+		<div id="pagePaging" style="margin-left: 66px">
+			<p>
+				总条数：<span id="total_count">0</span> &nbsp;总页数：<span id="total_pages">1</span>
+				&nbsp;当前页：<span id="current_page">1</span> &nbsp;
+				<button id="firstBtn" onclick="doQueryFirst()">首页</button>
+				<button id="prveBtn" onclick="doQuerySub()">上一页</button>
+				<button id="nextBtn" onclick="doQueryAdd()">下一页</button>
+				<button id="lastBtn" onclick="doQueryLast()">末页</button>
+				<input id="jumpPage" type="number" style="width: 50px;"
+					oninput="if(event.keyCode !=37 && event.keyCode != 39){if (!/^[\d]+$/ig.test(this.value)){this.value='';}}"
+					onkeydown="if(event.keyCode==13){doQueryByPage();}">
+				<button onclick="doQueryByPage()">Go</button>
+			</p>
+		</div>
+	</div>
+		<div class="mod_pay3" style="display: none;" id="repalyDiv1">
+		<div>
+			<a href="javascript:void(0)" class="show_x"
+				onclick="$('#repalyDiv1').hide();">╳</a>
+		</div>
+		<input id="report_id" type="hidden" value=""> 
+		反馈内容:
+		<textarea name="remark_content" rows="8" cols="50"
+			id="remark_content_"></textarea>
+		<input type="button" id="repalyBtnId" onclick="saveRepalyContent()"
+			value="提交反馈">
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = function() {
+		var url = document.location.href;
+		var begin = url.indexOf("?");
+		if (begin != -1) {
+			var selectStr = url.substring(begin + 1, url.length);
+			var selectLst = selectStr.split("=");
+			if (selectLst.length == 2) {
+				$("#typeSelect").val(selectLst[1]);
+			}
+		}
+		queryProblemFeedBack(1);
+	}
+</script>
+</html>

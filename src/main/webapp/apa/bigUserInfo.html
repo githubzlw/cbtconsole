@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>大客户列表</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #big_user_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            setDatagrid();
+            getAdminList();
+        });
+
+
+        function setDatagrid() {
+            $('#big_user_easyui-datagrid').datagrid({
+                title: '大客户列表',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#big_user_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/bigUserCtr/queryForList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admid").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admid").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function doQuery() {
+            var userId = $("#user_id").val();
+            if (userId == null || userId == "") {
+                userId = 0;
+            }
+            var adminId = $("#query_admid").val();
+            if (adminId == null || adminId == "") {
+                adminId = 0;
+            }
+            $("#big_user_easyui-datagrid").datagrid("load", {
+                "userId": userId,
+                "adminId": adminId
+            });
+        }
+
+        function formatIsOn(val, row, index) {
+            if (val > 0) {
+                return "启用";
+            } else {
+                return "关闭";
+            }
+        }
+    </script>
+
+</head>
+<body>
+
+<div id="big_user_top_toolbar" style="padding: 5px; height: auto">
+    <form id="big_user_query_form" action="#" onsubmit="return false;">
+			<span> 用户ID: <input type="text" id="user_id"
+                                style="width: 120px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp; <span> 销售: <select id="query_admid"
+                                                     style="font-size: 16px; height: 24px; width: 150px;">
+					<option value="0" selected="selected">全部</option>
+			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button"
+                     class="enter_btn" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="big_user_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userId',align:'center',width:'120px'">客户ID</th>
+        <th data-options="field:'orderNo',align:'center',width:'185px'">最近一次订单ID</th>
+        <th data-options="field:'lastOrderPayTime',align:'center',width:'200px'">最近一次订单时间</th>
+        <th data-options="field:'salesName',align:'center',width:'120px'">销售</th>
+        <th data-options="field:'orderTotalAmount',align:'center',width:'100px'">客户订单总金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

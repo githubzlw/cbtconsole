@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.CategoryResearchMapper">
+	<resultMap type="com.importExpress.pojo.TabSeachPageBean" id="BaseResultMap">
+		<id column="id" property="id" />
+    	<result column="keyword" property="keyword" />
+    	<result column="keyword1" property="keyword1" />
+    	<result column="banner" property="banner" />
+    	<result column="filename" property="filename" />
+    	<result column="createtime" property="createtime" />
+    	<result column="isshow" property="isshow"/>
+    	<result column="sate" property="sate" />
+    	<result column="parentId" property="parentId" />
+	</resultMap>
+	
+	<resultMap type="com.importExpress.pojo.TabSeachPagesDetailBean" id="detailBaseResultMap">
+		<id column="id" property="id" />
+    	<result column="sid" property="sid" />
+    	<result column="name" property="name" />
+    	<result column="seach_url" property="seachUrl" />
+    	<result column="keyword" property="keyword" />
+    	<result column="catid" property="catid" />
+    	<result column="anti_words" property="antiWords" />
+    	<result column="category" property="category" />
+	</resultMap>
+	
+	<resultMap type="com.importExpress.pojo.FineCategory" id="fineCategoryResultMap">
+		<id column="id" property="id" />
+    	<result column="sid" property="sid" />
+    	<result column="detail_product_name" property="detailProductName" />
+    	<result column="positive_keywords" property="positivekeywords" />
+    	<result column="reverse_keywords" property="reversekeywords" />
+    	<result column="createtime" property="createTime" />
+    	<result column="status" property="status" />
+    	<result column="1688id" property="catId1688" />
+    	<result column="file_name" property="fileName" />
+    	<result column="imageurl" property="imageUrl" />
+    	<result column="search_url" property="searchUrl" />
+	</resultMap>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.TabSeachPageBean">
+		insert into category_research_pages(keyword,keyword1,banner,filename,createtime,sate,parentId)
+		values (#{keyword},#{keyword1},#{banner},#{filename},now(),0,#{parentId})
+	</insert>
+	
+	<select id="list" resultMap="BaseResultMap">
+		select id,keyword,keyword1,banner,filename,createtime,sate,isshow,parentId  
+		from category_research_pages where sate=0 and parentId=#{id} order by createtime asc
+		
+	</select>
+	
+	<update id="delete">
+		update category_research_pages set sate=1 where id=#{id}
+	</update>
+	<update id="move">
+		update category_research_pages set parentId = -1 where parentId=#{id}
+	</update>
+	<select id="get" resultMap="BaseResultMap">
+		select id,keyword,keyword1,keyword2,keyword3,banner,filename,createtime,isshow,sate,parentId from category_research_pages
+		where id=#{id} limit 1
+	</select>
+	
+	<update id="update" parameterType="com.importExpress.pojo.TabSeachPageBean">
+		update category_research_pages set keyword=#{keyword},keyword1=#{keyword1},keyword2=#{keyword2},keyword3=#{keyword3},banner=#{banner},filename=#{filename},parentId=#{parentId} where id=#{id}
+	</update>
+	
+	<select id="search1688Category" resultType="hashmap">
+		<!-- select  category_id as cid,path, name as category,lv from 1688_category where lv &lt;= 5 order by id asc -->
+		select name, category_id as cid,path, en_name as category,lv from 1688_category where lv &lt;= 5 and en_name !='' or lv=0  order by id asc
+	</select>
+	
+	<select id="search1688CategoryLazy" resultType="hashmap">
+		<if test="id==null or id==''">
+			select  name, category_id as cid,path, en_name as category,lv ,childids from 1688_category where lv=1 and en_name !='' order by id asc
+		</if>
+		<if test="id != null and id != ''">
+			select  name, category_id as cid,path, en_name as category,lv,childids from 1688_category where path like '#{id},%'  order by id asc
+		</if>
+	</select>
+	<!-- 添加细分类 -->
+	<insert id="insertDetail" parameterType="com.importExpress.pojo.FineCategory">
+		insert into category_research_pages_details (detail_product_name,positive_keywords,reverse_keywords,sid,createtime,status,1688id,file_name,imageurl,search_url)
+		values (#{detailProductName},#{positivekeywords},#{reversekeywords},#{sid},#{createTime},#{status},#{catId1688},#{fileName},#{imageUrl},#{searchUrl})
+	</insert>
+	<!--查询该关键词下的  -->
+	<select id="detailList" resultMap="detailBaseResultMap">
+		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.anti_words,b.category from category_research_pages_details a,ali_category b where a.catid=b.cid and a.sate=0 and a.sid=#{sid} order by a.id asc
+	</select>
+	<!-- 查询关键字下的细分类 -->
+	<select id="detailFineCategoryList" resultMap="fineCategoryResultMap">
+		select id, detail_product_name,positive_keywords,reverse_keywords,sid,createtime,status,1688id,file_name ,imageurl from category_research_pages_details where sid=#{sid} and status=0 order by createtime asc
+	
+	</select>
+	<select id="getOneFineCategory" resultMap="fineCategoryResultMap">
+			select * from category_research_pages_details where id=#{id} and status=0
+	</select>
+	
+	<update id="updateDetail" parameterType="com.importExpress.pojo.TabSeachPagesDetailBean">
+		update category_research_pages_details set name=#{name},catid=#{catid},seach_url=#{seachUrl},keyword=#{keyword},anti_words=#{antiWords} where id=#{id}
+	</update>
+	
+	<update id="deleteDetail">
+		update category_research_pages_details set sate=1 where id=#{id}
+	</update>
+	
+	<select id="getDetail" resultMap="detailBaseResultMap">
+		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.anti_words,b.category from category_research_pages_details a,ali_category b
+		where a.catid=b.cid and a.id=#{id} limit 1
+	</select>
+	
+	<select id="getWordsCount" resultType="int">
+		select count(id) from category_research_pages where keyword=#{keyword} and sate=0
+	</select>
+	
+	<select id="getWordsCount1" resultType="int">
+		select count(id) from category_research_pages where keyword=#{keyword} and id!=#{id} and sate=0
+	</select>
+	
+	<select id="getNameCount" resultType="int">
+		select count(id) from category_research_pages_details where name=#{name} and sid=#{sid} and sate=0
+	</select>
+	
+	<select id="getNameCount1" resultType="int">
+		select count(id) from category_research_pages_details where name=#{name} and sid=#{sid} and id!=#{id} and sate=0
+	</select>
+	<!--是否启用关键词  -->
+	<update id="updateIsshow">
+		update category_research_pages set isshow=#{isshow} where id=#{id}
+	</update>
+	
+	<!-- 细分类修改保存 -->
+	<update id="updateFineCategory" parameterType="com.importExpress.pojo.FineCategory">
+		update category_research_pages_details set detail_product_name=#{detailProductName},positive_keywords=#{positivekeywords},reverse_keywords=#{reversekeywords},1688id=#{catId1688},search_url=#{searchUrl}
+					<if test="fileName!=null and fileName!=''">
+						,file_name=#{fileName},imageurl=#{imageUrl}
+					</if>
+					where id=#{id}
+	</update>
+	<!-- 删除 -->
+	<update id="deleteFineCategory">
+		update category_research_pages_details set status=1 where id=#{id}
+	</update>
+</mapper>

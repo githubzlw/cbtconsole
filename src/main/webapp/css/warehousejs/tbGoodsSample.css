@@ -1,0 +1,45 @@
+/*<link rel="stylesheet" href="${path}/css/warehousejs/tbGoodsSample.css" type="text/css"> */
+/**/
+/*×ÖÌåÑùÊ½*/
+body{font-family: arial,"Hiragino Sans GB","Microsoft Yahei",sans-serif;}
+
+.maindiv {
+	left : 200px;
+	top : 30px;
+	
+	width : 1100px;
+	position : relative;
+}
+
+.leftdiv {
+	/*border-width : 1px;
+	border-color : #0A0A0A;
+	border-style : solid;*/
+	
+	height : 310px;
+	width : 200px;
+	float:left;
+}
+
+.rigthdiv {
+	/*
+	border-width : 1px;
+	border-color : #0A0A0A;
+	border-style : solid;*/
+	height : 290px;
+	width : 880px;
+	float: right;
+}
+
+#t_sample_add{
+	border-width : 1px;
+	border-color : #0A0A0A;
+	border-style : solid;
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    background:#F8FFFF;
+   
+    display:none;
+}
+ 

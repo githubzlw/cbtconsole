@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.newProduct.dao.NewProductMapper" >
+
+   <resultMap id="newProductResult" type="com.cbt.newProduct.pojo.NewProduct" >
+		   <id column="id" property="id" jdbcType="INTEGER" />
+		   <result column="category" property="category" />
+		   <result column="cid" property="cid" />
+		   <result column="goods_pid" property="goods_pid" />
+		   <result column="goods_name" property="goods_name" />
+		   <result column="goods_price" property="goods_price" />
+		   <result column="goods_img" property="goods_img" />
+		   <result column="goods_url" property="goods_url" />
+			<result column="goods_sold" property="goods_sold" />
+			<result column="goods_morder" property="goods_morder" />		   
+            <result column="goods_free" property="goods_free" />
+			<result column="goods_flag" property="goods_flag" />
+			<result column="goods_price_unit" property="goods_price_unit" />	
+            <result column="goods_unit" property="goods_unit" />
+			<result column="createtime" property="createtime" />
+			<result column="goods_weight" property="goods_weight" />	
+  </resultMap>
+  
+  
+  
+  
+  <insert id="addNewProduct"  parameterType="com.cbt.newProduct.pojo.NewProduct">
+     insert  into new_product_data (cid,category,goods_pid,goods_name,goods_price,goods_img,goods_url,goods_sold,goods_morder   ,goods_free,goods_price_unit,goods_unit,createtime) 
+     values(#{cid},#{category},#{goods_pid},#{goods_name} ,#{goods_price} ,#{goods_img} ,#{goods_url} ,#{goods_sold} ,#{goods_morder}    ,#{goods_free} ,#{goods_price_unit} ,#{goods_unit} ,#{createtime})
+  </insert>
+  
+  
+  <select id="findNewProductData"   resultMap="newProductResult">
+     select *   from  new_product_data   where createtime = #{createtime}  and goods_flag = 1 
+     <if test="cid!=0 ">
+      and  cid = #{cid}
+     </if>
+      order by  createtime   desc 
+  </select>
+  
+  
+  <select id="showCategoryData"  resultMap="newProductResult">
+     select  cid, category , count(*) as  count   from  new_product_data  where
+      createtime = #{createtime}   and goods_flag = 1 
+      GROUP BY   cid    
+  </select>
+  
+  
+  <select id="checkUrl" resultType="Integer">
+    select  count(*) as  count  from  new_product_data  where  goods_url  like   CONCAT('%','${purl}','%' )  
+  </select>
+  
+  
+  <update id="down">
+     update  new_product_data  set  goods_flag = 2  where  goods_pid = #{pid}
+  </update>
+  
+  
+  <select id="getAllCategory" resultMap="newProductResult" >
+     select  cid,category  from  new_product_category  
+  </select>
+</mapper>

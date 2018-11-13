@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.change.dao.OrderChangeRecordsMapper">
+	<resultMap id="OrderChangeRecordsResultMap" type="com.cbt.change.bean.OrderChangeRecords">
+		<id column="id" property="id" />
+		<result column="order_no" property="orderNo" />
+		<result column="user_id" property="userId" />
+		<result column="admin_id" property="adminId" />
+		<result column="operation_type" property="operationType" />
+		<result column="product_cost" property="productCost" />
+		<result column="pay_price" property="payPrice" />
+		<result column="remaining_price" property="remainingPrice" />
+		<result column="status" property="status" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+
+	<sql id="OrderChangeRecordsColumn">
+		id,order_no,user_id,admin_id,operation_type,product_cost,pay_price,remaining_price,status,create_time
+	</sql>
+
+	<select id="queryForList" resultMap="OrderChangeRecordsResultMap">
+		select <include refid="OrderChangeRecordsColumn"></include>
+		from order_change_records
+		where 1=1 
+		<if test="id != null and id !=0">
+			and id = #{id}
+		</if>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no = #{orderNo}
+		</if>
+		<if test="userId != null and userId !=0">
+			and user_id = #{userId}
+		</if>
+		<if test="adminId != null and adminId !=0">
+			and admin_id = #{adminId}
+		</if>
+		<if test="operationType != null and operationType !=0">
+			and operation_type = #{operationType}
+		</if>
+		<if test="status != null and status !=0">
+			and status = #{status}
+		</if>
+		<if test="beginDate != null and beginDate !=''">
+			date(create_time) &gt;= date(#{beginDate})
+		</if>
+		<if test="endDate != null and endDate !=''">
+			date(create_time) &lt;= date(#{endDate})
+		</if>
+		order by create_time desc
+		<if test="limitCount != null and limitCount !=0">
+			limit #{startNo},#{limitCount}
+		</if>
+	</select>
+	
+	<select id="queryForCount" resultType="java.lang.Integer">
+		select count(id)
+		from 
+		where 1=1 
+		<if test="id != null and id !=0">
+			and id = #{id}
+		</if>
+		<if test="orderNo != null and orderNo != ''">
+			and order_no = #{orderNo}
+		</if>
+		<if test="userId != null and userId !=0">
+			and user_id = #{userId}
+		</if>
+		<if test="adminId != null and adminId !=0">
+			and admin_id = #{adminId}
+		</if>
+		<if test="operationType != null and operationType !=0">
+			and operation_type = #{operationType}
+		</if>
+		<if test="status != null and status !=0">
+			and status = #{status}
+		</if>
+		<if test="beginDate != null and beginDate !=''">
+			date(create_time) &gt;= date(#{beginDate})
+		</if>
+		<if test="endDate != null and endDate !=''">
+			date(create_time) &lt;= date(#{endDate})
+		</if>
+	</select>
+	
+	<insert id="insertRecords" parameterType="com.cbt.change.bean.OrderChangeRecords">
+	
+	insert into order_change_records
+		(order_no,user_id,admin_id,operation_type,product_cost,
+		pay_price,remaining_price,status)
+	values(#{orderNo},#{userId},#{adminId},#{operationType},#{productCost},
+		#{payPrice},#{remainingPrice},#{status});
+	
+	</insert>
+
+
+</mapper>

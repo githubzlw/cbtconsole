@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.RefundMapper">
+    <resultMap id="refundNewResultMap" type="com.importExpress.pojo.RefundNewBean">
+        <id column="id" property="id"/>
+        <result column="userid" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="status" property="state"/>
+        <result column="paypalname" property="paymentEmail"/>
+        <result column="email" property="userEmail"/>
+        <result column="available_m" property="userBalance"/>
+        <result column="orderid" property="orderNo"/>
+        <result column="appcount" property="appliedAmount"/>
+        <result column="apptime" property="appliedTime"/>
+        <result column="reasoncode" property="reasonCode"/>
+        <result column="reasonnote" property="reasonNote"/>
+        <result column="endtime" property="endTime"/>
+        <result column="agreetime" property="operationTime"/>
+        <result column="account" property="agreeAmount"/>
+        <result column="sales_id" property="salesId"/>
+        <result column="sales_name" property="salesName"/>
+        <result column="payment_no" property="paymentNo"/>
+    </resultMap>
+
+    <resultMap id="refundDetailsResultMap" type="com.importExpress.pojo.RefundDetailsBean">
+        <id column="id" property="id"/>
+        <result column="refund_id" property="refundId"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="refund_state" property="refundState"/>
+        <result column="reason_type" property="reasonType"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+
+    <resultMap id="paymentResultMap" type="com.cbt.website.bean.PaymentBean">
+        <result column="userid" property="userid"/>
+        <result column="orderid" property="orderid"/>
+        <result column="paymentid" property="paymentid"/>
+        <result column="payment_other" property="payment_other"/>
+        <result column="payment_amount" property="payment_amount"/>
+        <result column="payment_cc" property="payment_cc"/>
+        <result column="orderdesc" property="orderdesc"/>
+        <result column="username" property="username"/>
+        <result column="paystatus" property="paystatus"/>
+        <result column="createtime" property="createtime"/>
+        <result column="paySID" property="paySID"/>
+        <result column="payflag" property="payflag"/>
+        <result column="paytype" property="paytype"/>
+    </resultMap>
+
+
+    <resultMap id="paymentDetailsResultMap" type="com.cbt.website.bean.PaymentDetails">
+        <result column="orderid" property="orderNo"/>
+        <result column="paymentid" property="paymentNo"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="payment_cc" property="currency"/>
+        <result column="orderdesc" property="orderdesc"/>
+        <result column="paytype" property="payType"/>
+        <result column="createtime" property="paymentTime"/>
+    </resultMap>
+
+    <resultMap id="orderResultMap" type="com.cbt.bean.OrderBean">
+        <result column="order_no" property="orderNo"/>
+        <result column="cashback" property="cashback"/>
+        <result column="coupon_discount" property="coupon_discount"/>
+        <result column="currency" property="currency"/>
+        <result column="discount_amount" property="discount_amount"/>
+        <result column="extra_discount" property="extra_discount"/>
+        <result column="extra_freight" property="extra_freight"/>
+        <result column="foreign_freight" property="foreign_freight"/>
+        <result column="order_ac" property="order_ac"/>
+        <result column="pay_price" property="pay_price"/>
+        <result column="pay_price_three" property="pay_price_three"/>
+        <result column="product_cost" property="product_cost"/>
+        <result column="state" property="state"/>
+        <result column="create_time" property="createtime"/>
+    </resultMap>
+
+    <select id="queryForList" resultMap="refundNewResultMap">
+        select r.id,r.userid,r.appcount,
+        r.status,r.refuse,date_format(r.apptime,'%Y-%m-%d %H:%i:%s') as apptime,r.account,r.type,r.orderid,r.payid,
+        r.additionid,r.paypalstate,r.reasoncode,r.reasonnote,r.casetype,r.complainid,r.outcomecode,
+        r.refundtype,date_format(r.agreetime,'%Y-%m-%d %H:%i:%s') as agreetime,date_format(r.endtime,'%Y-%m-%d
+        %H:%i:%s') as endtime,
+        r.currency,r.remark,r.feedback,r.paypalname,u.name,u.available_m,u.email,u.sales_name,u.sales_id,ifnull(pm.paymentid,'')
+        as payment_no
+        from refund r inner join (select `user`.id,`user`.name,`user`.available_m,`user`.email,admuser.admName as
+        sales_name,
+        admuser.id as sales_id from `user`,admin_r_user,admuser
+        where `user`.id = admin_r_user.userid and admin_r_user.adminid = admuser.id) u on r.userid=u.id
+        left join payment pm on r.userid = pm.userid and r.orderid = pm.orderid and pm.paystatus = 1 and pm.paytype in(0,1)
+        where r.valid = 1
+
+        <if test="userId > 0">
+            and r.userid = #{userId}
+        </if>
+        <if test="adminId > 0">
+            and u.sales_id = #{adminId}
+        </if>
+        <if test="payPalEmail != null and payPalEmail != '' ">
+            and r.paypalname = #{payPalEmail}
+        </if>
+        <if test="beginTime != null and beginTime != '' ">
+            and date(r.apptime) &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date(r.apptime) &lt;= #{endTime}
+        </if>
+        <if test="type > -1">
+            and r.type = #{type}
+        </if>
+        <if test="state > -1">
+            and r.status = #{state}
+        </if>
+        <if test="appMoney == 1">
+            and r.account &lt;= 50
+        </if>
+        <if test="appMoney == 2">
+            and r.account > 50
+        </if>
+        order by r.apptime desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum};
+        </if>
+    </select>
+
+
+    <select id="queryForListCount" resultType="java.lang.Integer">
+        select count(0)
+        from refund r, (select `user`.id,`user`.name,`user`.available_m,`user`.email,admuser.admName,admuser.id as
+        sales_id
+        from `user`,admin_r_user,admuser
+        where `user`.id = admin_r_user.userid and admin_r_user.adminid = admuser.id) u
+        where r.userid=u.id
+        and r.valid = 1
+        <if test="userId > 0">
+            and r.userid = #{userId}
+        </if>
+        <if test="adminId > 0">
+            and u.sales_id = #{adminId}
+        </if>
+        <if test="payPalEmail != null and payPalEmail != '' ">
+            and r.paypalname = #{payPalEmail}
+        </if>
+        <if test="beginTime != null and beginTime != '' ">
+            and date(r.apptime) &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and date(r.apptime) &lt;= #{endTime}
+        </if>
+        <if test="type > -1">
+            and r.type = #{type}
+        </if>
+        <if test="state > -1">
+            and r.status = #{state}
+        </if>
+        <if test="appMoney == 1">
+            and r.account &lt;= 50
+        </if>
+        <if test="appMoney == 2">
+            and r.account > 50
+        </if>
+    </select>
+
+
+    <select id="queryRefundById" resultMap="refundNewResultMap">
+        select r.id,r.userid,r.appcount,
+        r.status,r.refuse,date_format(r.apptime,'%Y-%m-%d %H:%i:%s') as apptime,r.account,r.type,r.orderid,r.payid,
+        r.additionid,r.paypalstate,r.reasoncode,r.reasonnote,r.casetype,r.complainid,r.outcomecode,
+        r.refundtype,date_format(r.agreetime,'%Y-%m-%d %H:%i:%s') as agreetime,date_format(r.endtime,'%Y-%m-%d
+        %H:%i:%s') as endtime,
+        r.currency,r.remark,r.feedback,r.paypalname,u.name,u.available_m,u.email,u.sales_name,u.sales_id,ifnull(pm.paymentid,'')
+        as payment_no
+        from refund r inner join (select `user`.id,`user`.name,`user`.available_m,`user`.email,admuser.admName as
+        sales_name,
+        admuser.id as sales_id from `user`,admin_r_user,admuser
+        where `user`.id = admin_r_user.userid and admin_r_user.adminid = admuser.id) u on r.userid=u.id
+        left join payment pm on r.userid = pm.userid and r.orderid = pm.orderid and pm.paystatus = 1 and pm.paytype in(0,1)
+        where r.valid = 1 and r.id = #{refundId}
+    </select>
+
+
+    <select id="queryRefundDetailsByRefundId" resultMap="refundDetailsResultMap">
+        select rd.id,rd.refund_id,rd.user_id,rd.order_no,rd.refund_amount,rd.refund_state,rd.reason_type,
+          rd.admin_id,rd.remark,date_format(rd.create_time,'%Y-%m-%d %H:%i:%s') as create_time,adm.admName as admin_name
+        from refund_details rd left join admuser adm on rd.admin_id = adm.id
+        where rd.refund_id = #{refundId}
+        order by rd.create_time
+    </select>
+
+    <update id="updateRefundState" parameterType="com.importExpress.pojo.RefundDetailsBean">
+        update refund set status = #{refundState},agreetime =sysdate()
+        <if test="refundState != 4 and  refundState != 9 ">
+            ,account = #{refundAmount},orderid = #{orderNo}
+        </if>
+        <if test="refundState == 4">
+            ,endtime = sysdate()
+        </if>
+        <if test="refundState == 9 ">
+            ,account =0,endtime = sysdate()
+        </if>
+        where id = #{refundId} and userid = #{userId}
+    </update>
+
+    <insert id="insertIntoRefundDetails" parameterType="com.importExpress.pojo.RefundDetailsBean">
+        insert into refund_details(refund_id,user_id,order_no,refund_amount,refund_state,reason_type,admin_id,remark)
+        values(#{refundId},#{userId},#{orderNo},#{refundAmount},#{refundState},#{reasonType},#{adminId},#{remark})
+    </insert>
+
+
+    <select id="queryPaymentInfoByUserId" resultMap="paymentResultMap">
+        select userid,orderid,paymentid,payment_other,payment_amount,payment_cc,orderdesc,
+        username,paystatus,date_format(createtime,'%Y-%m-%d %H:%i:%s') as createtime,paySID,payflag,paytype
+        from payment
+        where 1=1 and paystatus = 1 and paytype = 0 and userid = #{userId} and length(orderid) = 16
+        <if test=" type == 1">
+            and createtime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+        </if>
+        <if test=" type == 2">
+            and createtime >= DATE_SUB(NOW(), INTERVAL 2 MONTH)
+        </if>
+        <if test=" type == 3">
+            and createtime >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+        </if>
+        order by createtime desc
+    </select>
+
+    <select id="queryRefundByUserId" resultMap="refundNewResultMap">
+        select r.id,r.userid,r.appcount,
+        r.status,r.refuse,date_format(r.apptime,'%Y-%m-%d %H:%i:%s') as apptime,r.account,r.type,r.orderid,r.payid,
+        r.additionid,r.paypalstate,r.reasoncode,r.reasonnote,r.casetype,r.complainid,r.outcomecode,
+        r.refundtype,date_format(r.agreetime,'%Y-%m-%d %H:%i:%s') as agreetime,date_format(r.endtime,'%Y-%m-%d %H:%i:%s') as endtime,
+        r.currency,r.remark,r.feedback,r.paypalname,u.name,u.available_m,u.email,u.sales_name,u.sales_id,ifnull(pm.paymentid,'') as payment_no
+        from refund r inner join (select `user`.id,`user`.name,`user`.available_m,`user`.email,admuser.admName as sales_name,
+        admuser.id as sales_id from `user`,admin_r_user,admuser
+        where `user`.id = admin_r_user.userid and admin_r_user.adminid = admuser.id) u on r.userid=u.id
+        left join payment pm on r.userid = pm.userid and r.orderid = pm.orderid
+        where r.valid = 1 and r.userid = #{userId}
+    </select>
+    
+    <select id="queryOrderInfoByOrderNoOrUserId" resultMap="orderResultMap">
+        select order_no,cashback,coupon_discount,currency,discount_amount,extra_discount,extra_freight,
+        foreign_freight,order_ac,pay_price,pay_price_three,product_cost,state,date_format(create_time,'%Y-%m-%d %H:%i:%s') as create_time
+        from orderinfo
+        where 1=1
+        <if test=" userId > 0">
+            and user_id = #{userId}
+        </if>
+        <if test=" orderNo != null and orderNo != '' ">
+            and order_no = #{orderNo}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="queryPaymentInfoByOrderNoOrUserId" resultMap="paymentDetailsResultMap">
+        select userid,orderid,paymentid,payment_amount,payment_cc,orderdesc
+        paystatus,date_format(createtime,'%Y-%m-%d %H:%i:%s') as createtime,paytype
+        from payment
+        where 1=1 and paystatus = 1
+        <if test=" userId > 0">
+            and userid = #{userId}
+        </if>
+        <if test=" orderNo != null and orderNo != '' ">
+            and orderid like concat(#{orderNo},'%')
+        </if>
+        order by createtime desc
+    </select>
+
+</mapper>

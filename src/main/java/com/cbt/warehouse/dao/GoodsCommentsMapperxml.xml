@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.GoodsCommentsMapper">
+
+	<resultMap id="goodsCommentsResultMap" type="com.cbt.warehouse.pojo.GoodsCommentsBean">
+		<id column="id" property="id" />
+		<result column="country_id" property="countryId" />
+		<result column="order_no" property="orderNo" />
+		<result column="user_id" property="userId" />
+		<result column="user_name" property="userName" />
+		<result column="goods_pid" property="goodsPid" />
+		<result column="goods_source" property="goodsSource" />
+		<result column="comments_content" property="commentsContent" />
+		<result column="comments_time" property="commentsTime" />
+		<result column="admin_id" property="adminId" />
+		<result column="oid" property="orderDetailId" />
+		<result column="car_type" property="carType" />
+		<result column="show_flag" property="showFlag" />
+	</resultMap>
+
+	<resultMap type="com.cbt.warehouse.pojo.CustGoodsCommentsBean" id="custGoodsCommentsResultMap" extends="goodsCommentsResultMap">
+		<id column="id" property="id" />
+		<result column="goodsname" property="goodsname" />
+		<result column="goodsprice" property="goodsprice" />
+		<result column="goods_url" property="goods_url" />
+		<result column="goods_img" property="goods_img" />
+	
+	</resultMap>
+
+	<sql id="goodsCommentsColumn">
+		id,country_id,order_no,user_id,user_name,goods_pid,
+		goods_source,comments_content,comments_time,admin_id,show_flag,oid,car_type
+	</sql>
+	
+	<!-- 查询该订单下该产品对应的销售评论 ,用来判断销售是否评论-->
+	<select id="selectByGoodsPidAndOrderNo" resultMap="goodsCommentsResultMap">
+	select
+	<include refid="goodsCommentsColumn" />
+	from goods_comments_real
+	where 1=1 and goods_pid = #{goodpid} and order_no=#{orderNo} and admin_id>0
+	</select>
+	<!--查询改产品下的所有客户评论  -->
+	<select id="selectCustomerComments" resultMap="goodsCommentsResultMap">
+			select
+	<include refid="goodsCommentsColumn" />
+	from goods_comments_real
+		where 1=1 and  goods_pid=#{goodsPid,jdbcType=VARCHAR} and admin_id=0
+	
+	</select>
+	<!-- 自定义查询每个产品的最新客户评论 -->
+	<select id="selectOneCustomerCommentOrderByTime" parameterType="com.cbt.warehouse.pojo.GoodsCommentsBean" resultMap="custGoodsCommentsResultMap">
+		SELECT od.id AS orderDetailId, gcr.car_type AS carType, od.goodsname,od.goodsprice,od.car_url AS goods_url,od.car_img AS goods_img, gcr.*
+		FROM goods_comments_real gcr
+		LEFT JOIN order_details od ON od.goods_pid = gcr.goods_pid  where 1=1
+	   AND gcr.id IN (SELECT MAX(tem.id) MID FROM goods_comments_real tem GROUP BY tem.goods_pid)
+		 	<if test="commentsBean.goodsPid != null">
+		 		and gcr.goods_pid = #{commentsBean.goodsPid}
+		 	</if>
+		 	<if test="commentsBean.userId != null">
+		 		and gcr.user_id = #{commentsBean.userId}
+		 	</if>
+		 	<if test="commentsBean.commentsTime != null">
+		 		and gcr.comments_time = #{commentsBean.commentsTime}
+		 	</if>
+		 	<if test="commentsBean.userName != null">
+		 		and gcr.user_name = #{commentsBean.userName}
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId >0">
+		 		and gcr.admin_id > #{commentsBean.adminId}
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId == 0">
+		 		and gcr.admin_id = #{commentsBean.adminId}
+		 	</if>
+			<if test="commentsBean.orderNo != null">
+				and gcr.order_no = #{commentsBean.orderNo}
+			</if>
+		 	GROUP BY gcr.goods_pid
+		 	limit #{start},#{end}
+	</select>
+	<!--查询每个产品的最新的销售评论  -->
+	<select id="selectOneSaleCommentOrderByTimes" parameterType="com.cbt.warehouse.pojo.GoodsCommentsBean" resultMap="goodsCommentsResultMap">
+		SELECT od.id AS orderDetailId, gcr.car_type AS carType, od.goodsname,od.goodsprice,od.car_url AS goods_url,od.car_img AS goods_img, gcr.*
+		FROM goods_comments_real gcr
+		LEFT JOIN order_details od ON od.goods_pid = gcr.goods_pid  where 1=1
+		 AND gcr.id IN (SELECT MAX(tem.id) MID FROM goods_comments_real tem GROUP BY tem.goods_pid)
+		<if test="commentsBean.goodsPid != null">
+		 		and gcr.goods_pid = #{commentsBean.goodsPid}
+		 	</if>
+		 	<if test="commentsBean.userId != null">
+		 		and gcr.user_id = #{commentsBean.userId}
+		 	</if>
+		 	<if test="commentsBean.commentsTime != null">
+		 		and gcr.comments_time = #{commentsBean.commentsTime}
+		 	</if>
+		 	<if test="commentsBean.userName != null">
+		 		and gcr.user_name = #{commentsBean.userName}
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId >0">
+		 		and gcr.admin_id > 0
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId == 0">
+		 		and gcr.admin_id = 0
+		 	</if>
+			<if test="commentsBean.orderNo != null">
+				and gcr.order_no = #{commentsBean.orderNo}
+			</if>
+		 GROUP BY goods_pid
+	
+	</select>
+	<!-- 查询总数 -->
+	<select id="getCustomerCommentOrderByTimeCount" resultType="java.lang.Integer">
+	SELECT count(1) from (SELECT COUNT(1) FROM goods_comments_real gcr LEFT JOIN
+		(SELECT MAX(tem.id) MID FROM goods_comments_real tem GROUP BY tem.goods_pid ) temp  ON temp.mid = gcr.id LEFT JOIN
+		order_details od ON  od.goods_pid = gcr.goods_pid WHERE 1=1
+		 	<if test="commentsBean.goodsPid != null">
+		 		and gcr.goods_pid = #{commentsBean.goodsPid}
+		 	</if>
+		 	<if test="commentsBean.userId != null">
+		 		and gcr.user_id = #{commentsBean.userId}
+		 	</if>
+		 	<if test="commentsBean.commentsTime != null">
+		 		and gcr.comments_time = #{commentsBean.commentsTime}
+		 	</if>
+		 	<if test="commentsBean.userName != null">
+		 		and gcr.user_name = #{commentsBean.userName}
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId >0">
+		 		and gcr.admin_id > #{commentsBean.adminId}
+		 	</if>
+		 	<if test="commentsBean.adminId != null and commentsBean.adminId == 0">
+		 		and gcr.admin_id = #{commentsBean.adminId}
+		 	</if>
+			<if test="commentsBean.orderNo != null">
+				and gcr.order_no = #{commentsBean.orderNo}
+			</if>
+		 	GROUP BY gcr.goods_pid) tmp
+	</select>
+	
+	<!--根据pid查询所有的销售评论  -->
+	<select id="selectSaleByGoodsPid" resultMap="goodsCommentsResultMap">
+		select
+		<include refid="goodsCommentsColumn" />
+		from goods_comments_real
+			where 1=1 and  goods_pid=#{goodsPid,jdbcType=VARCHAR} and admin_id>0
+	</select>
+	<!--  -->
+	<select id="searchGoodsCommnetsByList" parameterType="java.util.List" resultMap="goodsCommentsResultMap">
+			 SELECT
+           <include refid="goodsCommentsColumn" /> 
+        FROM
+            goods_comments_real
+        <where>
+            goods_pid in
+            <foreach item="pid" collection="listPids" separator="," open="(" close=")" index="">
+                #{pid}
+            </foreach>
+           and order_no=#{orderNo} and admin_id>0
+        </where>
+	
+	</select>
+	<!--新增评论  -->
+	<insert id="insertComments"   useGeneratedKeys="true" keyProperty="goodsComments.id" parameterType="com.cbt.warehouse.pojo.GoodsCommentsBean">
+		<!--  <selectKey keyProperty="id" resultType="int">  
+            select LAST_INSERT_ID()  
+        </selectKey> --> 
+		insert into goods_comments_real(oid,car_type,comments_time, user_name,country_id,order_no,user_id,goods_pid,
+		goods_source,comments_content,admin_id,show_flag)
+		values(#{goodsComments.orderDetailId},#{goodsComments.carType},#{goodsComments.commentsTime},#{goodsComments.userName},#{goodsComments.countryId},#{goodsComments.orderNo},#{goodsComments.userId},#{goodsComments.goodsPid},
+		#{goodsComments.goodsSource},#{goodsComments.commentsContent},#{goodsComments.adminId},#{goodsComments.showFlag})
+		
+	</insert>
+		<!-- 更新 -->
+		 <update id="updateComments" parameterType="com.cbt.warehouse.pojo.GoodsCommentsBean">
+        	update goods_comments_real 
+        <set>
+            <if test="commentsBean.orderDetailId != null">
+               country_id = #{commentsBean.countryId},
+            </if>
+            <if test="commentsBean.carType != null">
+               country_id = #{commentsBean.countryId},
+            </if>
+            <if test="commentsBean.countryId != null">
+               country_id = #{commentsBean.countryId},
+            </if>
+            <if test="commentsBean.orderNo != null">
+                order_no = #{commentsBean.orderNo},         
+            </if>
+            <if test="commentsBean.userId != null">
+                user_id = #{commentsBean.userId},         
+            </if>
+            <if test="commentsBean.userName != null">
+                user_name = #{commentsBean.userName},         
+            </if>
+            <if test="commentsBean.goodsPid != null">
+                goods_pid = #{commentsBean.goodsPid},         
+            </if>
+            <if test="commentsBean.goodsSource != null">
+                goods_source = #{commentsBean.goodsSource},         
+            </if>
+            <if test="commentsBean.commentsContent != null">
+                comments_content = #{commentsBean.commentsContent},         
+            </if>
+            <if test="commentsBean.commentsTime != null">
+                comments_time = #{commentsBean.commentsTime},         
+            </if>
+            <if test="commentsBean.adminId != null">
+                admin_id = #{commentsBean.adminId},         
+            </if>
+            <if test="commentsBean.showFlag != null">
+                show_flag = #{commentsBean.showFlag},         
+            </if>
+        </set>
+        where id = #{commentsBean.id}
+    </update>
+	
+
+
+</mapper>

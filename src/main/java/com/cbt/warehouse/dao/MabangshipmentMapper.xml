@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.MabangshipmentMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.Mabangshipment" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="orderNo" property="orderno" jdbcType="VARCHAR" />
+    <result column="paymentTime" property="paymenttime" jdbcType="TIMESTAMP" />
+    <result column="shipMethod" property="shipmethod" jdbcType="VARCHAR" />
+    <result column="shipNo" property="shipno" jdbcType="VARCHAR" />
+    <result column="storeName" property="storename" jdbcType="VARCHAR" />
+    <result column="clientAcount" property="clientacount" jdbcType="VARCHAR" />
+    <result column="clientName" property="clientname" jdbcType="VARCHAR" />
+    <result column="clientTelphone" property="clienttelphone" jdbcType="VARCHAR" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
+    <result column="productUnitPrice" property="productunitprice" jdbcType="DECIMAL" />
+    <result column="productTotalAmount" property="producttotalamount" jdbcType="DECIMAL" />
+    <result column="productTotalCost" property="producttotalcost" jdbcType="DECIMAL" />
+    <result column="freightRevenue" property="freightrevenue" jdbcType="DECIMAL" />
+    <result column="shipmentExpenses" property="shipmentexpenses" jdbcType="DECIMAL" />
+    <result column="weight" property="weight" jdbcType="DECIMAL" />
+    <result column="sku" property="sku" jdbcType="VARCHAR" />
+    <result column="productName" property="productname" jdbcType="VARCHAR" />
+    <result column="productNumbers" property="productnumbers" jdbcType="INTEGER" />
+    <result column="productDirectory" property="productdirectory" jdbcType="VARCHAR" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="orderTotalAmout" property="ordertotalamout" jdbcType="DECIMAL" />
+    <result column="createTime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="url" property="url" jdbcType="VARCHAR"/>
+    <result column="item_id" property="item_id" jdbcType="VARCHAR"/>
+    <result column="state" property="state" jdbcType="INTEGER"/>
+    <result column="unitCost" property="unitCost" jdbcType="DECIMAL"/>
+    <result column="cost" property="cost" jdbcType="FLOAT"/>
+    <result column="ym" property="ym" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, orderNo, paymentTime, shipMethod, shipNo, storeName, clientAcount, clientName, 
+    clientTelphone, country, productUnitPrice, productTotalAmount, productTotalCost, 
+    freightRevenue, shipmentExpenses, weight, sku, productName, productNumbers, productDirectory, 
+    currency, orderTotalAmout, createTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.warehouse.pojo.MabangshipmentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from mabangshipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from mabangshipment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from mabangshipment
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.warehouse.pojo.MabangshipmentExample" >
+    delete from mabangshipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.warehouse.pojo.Mabangshipment" >
+    insert into mabangshipment (id, orderNo, paymentTime, 
+      shipMethod, shipNo, storeName, 
+      clientAcount, clientName, clientTelphone, 
+      country, productUnitPrice, productTotalAmount, 
+      productTotalCost, freightRevenue, shipmentExpenses, 
+      weight, sku, productName, 
+      productNumbers, productDirectory, currency, 
+      orderTotalAmout, createTime)
+    values (#{id,jdbcType=BIGINT}, #{orderno,jdbcType=VARCHAR}, #{paymenttime,jdbcType=TIMESTAMP}, 
+      #{shipmethod,jdbcType=VARCHAR}, #{shipno,jdbcType=VARCHAR}, #{storename,jdbcType=VARCHAR}, 
+      #{clientacount,jdbcType=VARCHAR}, #{clientname,jdbcType=VARCHAR}, #{clienttelphone,jdbcType=VARCHAR}, 
+      #{country,jdbcType=VARCHAR}, #{productunitprice,jdbcType=DECIMAL}, #{producttotalamount,jdbcType=DECIMAL}, 
+      #{producttotalcost,jdbcType=DECIMAL}, #{freightrevenue,jdbcType=DECIMAL}, #{shipmentexpenses,jdbcType=DECIMAL}, 
+      #{weight,jdbcType=DECIMAL}, #{sku,jdbcType=VARCHAR}, #{productname,jdbcType=VARCHAR}, 
+      #{productnumbers,jdbcType=INTEGER}, #{productdirectory,jdbcType=VARCHAR}, #{currency,jdbcType=VARCHAR}, 
+      #{ordertotalamout,jdbcType=DECIMAL}, #{createtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.warehouse.pojo.Mabangshipment" >
+    insert into mabangshipment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderno != null" >
+        orderNo,
+      </if>
+      <if test="paymenttime != null" >
+        paymentTime,
+      </if>
+      <if test="shipmethod != null" >
+        shipMethod,
+      </if>
+      <if test="shipno != null" >
+        shipNo,
+      </if>
+      <if test="storename != null" >
+        storeName,
+      </if>
+      <if test="clientacount != null" >
+        clientAcount,
+      </if>
+      <if test="clientname != null" >
+        clientName,
+      </if>
+      <if test="clienttelphone != null" >
+        clientTelphone,
+      </if>
+      <if test="country != null" >
+        country,
+      </if>
+      <if test="productunitprice != null" >
+        productUnitPrice,
+      </if>
+      <if test="producttotalamount != null" >
+        productTotalAmount,
+      </if>
+      <if test="producttotalcost != null" >
+        productTotalCost,
+      </if>
+      <if test="freightrevenue != null" >
+        freightRevenue,
+      </if>
+      <if test="shipmentexpenses != null" >
+        shipmentExpenses,
+      </if>
+      <if test="weight != null" >
+        weight,
+      </if>
+      <if test="sku != null" >
+        sku,
+      </if>
+      <if test="productname != null" >
+        productName,
+      </if>
+      <if test="productnumbers != null" >
+        productNumbers,
+      </if>
+      <if test="productdirectory != null" >
+        productDirectory,
+      </if>
+      <if test="currency != null" >
+        currency,
+      </if>
+      <if test="ordertotalamout != null" >
+        orderTotalAmout,
+      </if>
+      <if test="createtime != null" >
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderno != null" >
+        #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymenttime != null" >
+        #{paymenttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipmethod != null" >
+        #{shipmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="shipno != null" >
+        #{shipno,jdbcType=VARCHAR},
+      </if>
+      <if test="storename != null" >
+        #{storename,jdbcType=VARCHAR},
+      </if>
+      <if test="clientacount != null" >
+        #{clientacount,jdbcType=VARCHAR},
+      </if>
+      <if test="clientname != null" >
+        #{clientname,jdbcType=VARCHAR},
+      </if>
+      <if test="clienttelphone != null" >
+        #{clienttelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="productunitprice != null" >
+        #{productunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalamount != null" >
+        #{producttotalamount,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalcost != null" >
+        #{producttotalcost,jdbcType=DECIMAL},
+      </if>
+      <if test="freightrevenue != null" >
+        #{freightrevenue,jdbcType=DECIMAL},
+      </if>
+      <if test="shipmentexpenses != null" >
+        #{shipmentexpenses,jdbcType=DECIMAL},
+      </if>
+      <if test="weight != null" >
+        #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="sku != null" >
+        #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="productname != null" >
+        #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productnumbers != null" >
+        #{productnumbers,jdbcType=INTEGER},
+      </if>
+      <if test="productdirectory != null" >
+        #{productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="ordertotalamout != null" >
+        #{ordertotalamout,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+    ON DUPLICATE KEY UPDATE 
+    <trim suffixOverrides="," >
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymenttime != null" >
+        paymentTime = #{paymenttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipmethod != null" >
+        shipMethod = #{shipmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="shipno != null" >
+        shipNo = #{shipno,jdbcType=VARCHAR},
+      </if>
+      <if test="storename != null" >
+        storeName = #{storename,jdbcType=VARCHAR},
+      </if>
+      <if test="clientacount != null" >
+        clientAcount = #{clientacount,jdbcType=VARCHAR},
+      </if>
+      <if test="clientname != null" >
+        clientName = #{clientname,jdbcType=VARCHAR},
+      </if>
+      <if test="clienttelphone != null" >
+        clientTelphone = #{clienttelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="productunitprice != null" >
+        productUnitPrice = #{productunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalamount != null" >
+        productTotalAmount = #{producttotalamount,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalcost != null" >
+        productTotalCost = #{producttotalcost,jdbcType=DECIMAL},
+      </if>
+      <if test="freightrevenue != null" >
+        freightRevenue = #{freightrevenue,jdbcType=DECIMAL},
+      </if>
+      <if test="shipmentexpenses != null" >
+        shipmentExpenses = #{shipmentexpenses,jdbcType=DECIMAL},
+      </if>
+      <if test="weight != null" >
+        weight = #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="sku != null" >
+        sku = #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="productname != null" >
+        productName = #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productnumbers != null" >
+        productNumbers = #{productnumbers,jdbcType=INTEGER},
+      </if>
+      <if test="productdirectory != null" >
+        productDirectory = #{productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        currency = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="ordertotalamout != null" >
+        orderTotalAmout = #{ordertotalamout,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.warehouse.pojo.MabangshipmentExample" resultType="java.lang.Integer" >
+    select count(*) from mabangshipment
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update mabangshipment
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.orderno != null" >
+        orderNo = #{record.orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paymenttime != null" >
+        paymentTime = #{record.paymenttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.shipmethod != null" >
+        shipMethod = #{record.shipmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="record.shipno != null" >
+        shipNo = #{record.shipno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.storename != null" >
+        storeName = #{record.storename,jdbcType=VARCHAR},
+      </if>
+      <if test="record.clientacount != null" >
+        clientAcount = #{record.clientacount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.clientname != null" >
+        clientName = #{record.clientname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.clienttelphone != null" >
+        clientTelphone = #{record.clienttelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.country != null" >
+        country = #{record.country,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productunitprice != null" >
+        productUnitPrice = #{record.productunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.producttotalamount != null" >
+        productTotalAmount = #{record.producttotalamount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.producttotalcost != null" >
+        productTotalCost = #{record.producttotalcost,jdbcType=DECIMAL},
+      </if>
+      <if test="record.freightrevenue != null" >
+        freightRevenue = #{record.freightrevenue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.shipmentexpenses != null" >
+        shipmentExpenses = #{record.shipmentexpenses,jdbcType=DECIMAL},
+      </if>
+      <if test="record.weight != null" >
+        weight = #{record.weight,jdbcType=DECIMAL},
+      </if>
+      <if test="record.sku != null" >
+        sku = #{record.sku,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productname != null" >
+        productName = #{record.productname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productnumbers != null" >
+        productNumbers = #{record.productnumbers,jdbcType=INTEGER},
+      </if>
+      <if test="record.productdirectory != null" >
+        productDirectory = #{record.productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="record.currency != null" >
+        currency = #{record.currency,jdbcType=VARCHAR},
+      </if>
+      <if test="record.ordertotalamout != null" >
+        orderTotalAmout = #{record.ordertotalamout,jdbcType=DECIMAL},
+      </if>
+      <if test="record.createtime != null" >
+        createTime = #{record.createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update mabangshipment
+    set id = #{record.id,jdbcType=BIGINT},
+      orderNo = #{record.orderno,jdbcType=VARCHAR},
+      paymentTime = #{record.paymenttime,jdbcType=TIMESTAMP},
+      shipMethod = #{record.shipmethod,jdbcType=VARCHAR},
+      shipNo = #{record.shipno,jdbcType=VARCHAR},
+      storeName = #{record.storename,jdbcType=VARCHAR},
+      clientAcount = #{record.clientacount,jdbcType=VARCHAR},
+      clientName = #{record.clientname,jdbcType=VARCHAR},
+      clientTelphone = #{record.clienttelphone,jdbcType=VARCHAR},
+      country = #{record.country,jdbcType=VARCHAR},
+      productUnitPrice = #{record.productunitprice,jdbcType=DECIMAL},
+      productTotalAmount = #{record.producttotalamount,jdbcType=DECIMAL},
+      productTotalCost = #{record.producttotalcost,jdbcType=DECIMAL},
+      freightRevenue = #{record.freightrevenue,jdbcType=DECIMAL},
+      shipmentExpenses = #{record.shipmentexpenses,jdbcType=DECIMAL},
+      weight = #{record.weight,jdbcType=DECIMAL},
+      sku = #{record.sku,jdbcType=VARCHAR},
+      productName = #{record.productname,jdbcType=VARCHAR},
+      productNumbers = #{record.productnumbers,jdbcType=INTEGER},
+      productDirectory = #{record.productdirectory,jdbcType=VARCHAR},
+      currency = #{record.currency,jdbcType=VARCHAR},
+      orderTotalAmout = #{record.ordertotalamout,jdbcType=DECIMAL},
+      createTime = #{record.createtime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.warehouse.pojo.Mabangshipment" >
+    update mabangshipment
+    <set >
+      <if test="orderno != null" >
+        orderNo = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymenttime != null" >
+        paymentTime = #{paymenttime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipmethod != null" >
+        shipMethod = #{shipmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="shipno != null" >
+        shipNo = #{shipno,jdbcType=VARCHAR},
+      </if>
+      <if test="storename != null" >
+        storeName = #{storename,jdbcType=VARCHAR},
+      </if>
+      <if test="clientacount != null" >
+        clientAcount = #{clientacount,jdbcType=VARCHAR},
+      </if>
+      <if test="clientname != null" >
+        clientName = #{clientname,jdbcType=VARCHAR},
+      </if>
+      <if test="clienttelphone != null" >
+        clientTelphone = #{clienttelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=VARCHAR},
+      </if>
+      <if test="productunitprice != null" >
+        productUnitPrice = #{productunitprice,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalamount != null" >
+        productTotalAmount = #{producttotalamount,jdbcType=DECIMAL},
+      </if>
+      <if test="producttotalcost != null" >
+        productTotalCost = #{producttotalcost,jdbcType=DECIMAL},
+      </if>
+      <if test="freightrevenue != null" >
+        freightRevenue = #{freightrevenue,jdbcType=DECIMAL},
+      </if>
+      <if test="shipmentexpenses != null" >
+        shipmentExpenses = #{shipmentexpenses,jdbcType=DECIMAL},
+      </if>
+      <if test="weight != null" >
+        weight = #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="sku != null" >
+        sku = #{sku,jdbcType=VARCHAR},
+      </if>
+      <if test="productname != null" >
+        productName = #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productnumbers != null" >
+        productNumbers = #{productnumbers,jdbcType=INTEGER},
+      </if>
+      <if test="productdirectory != null" >
+        productDirectory = #{productdirectory,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        currency = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="ordertotalamout != null" >
+        orderTotalAmout = #{ordertotalamout,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null" >
+        createTime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.warehouse.pojo.Mabangshipment" >
+    update mabangshipment
+    set orderNo = #{orderno,jdbcType=VARCHAR},
+      paymentTime = #{paymenttime,jdbcType=TIMESTAMP},
+      shipMethod = #{shipmethod,jdbcType=VARCHAR},
+      shipNo = #{shipno,jdbcType=VARCHAR},
+      storeName = #{storename,jdbcType=VARCHAR},
+      clientAcount = #{clientacount,jdbcType=VARCHAR},
+      clientName = #{clientname,jdbcType=VARCHAR},
+      clientTelphone = #{clienttelphone,jdbcType=VARCHAR},
+      country = #{country,jdbcType=VARCHAR},
+      productUnitPrice = #{productunitprice,jdbcType=DECIMAL},
+      productTotalAmount = #{producttotalamount,jdbcType=DECIMAL},
+      productTotalCost = #{producttotalcost,jdbcType=DECIMAL},
+      freightRevenue = #{freightrevenue,jdbcType=DECIMAL},
+      shipmentExpenses = #{shipmentexpenses,jdbcType=DECIMAL},
+      weight = #{weight,jdbcType=DECIMAL},
+      sku = #{sku,jdbcType=VARCHAR},
+      productName = #{productname,jdbcType=VARCHAR},
+      productNumbers = #{productnumbers,jdbcType=INTEGER},
+      productDirectory = #{productdirectory,jdbcType=VARCHAR},
+      currency = #{currency,jdbcType=VARCHAR},
+      orderTotalAmout = #{ordertotalamout,jdbcType=DECIMAL},
+      createTime = #{createtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <insert id="insertMabangShipment" >
+	  insert into mabangshipment (orderNo, paymentTime, 
+      shipMethod, shipNo, storeName, 
+      clientAcount, clientName, clientTelphone, 
+      country, productUnitPrice, productTotalAmount, 
+      productTotalCost, freightRevenue, shipmentExpenses, 
+      weight, sku, productName, 
+      productNumbers, productDirectory, currency, 
+      orderTotalAmout, createTime, url, item_id) values 
+	      <foreach collection="list" item="item" index="index" separator=",">
+		    (#{item.orderno,jdbcType=VARCHAR}, #{item.paymenttime,jdbcType=TIMESTAMP}, 
+			#{item.shipmethod,jdbcType=VARCHAR}, #{item.shipno,jdbcType=VARCHAR}, #{item.storename,jdbcType=VARCHAR}, 
+			#{item.clientacount,jdbcType=VARCHAR}, #{item.clientname,jdbcType=VARCHAR}, #{item.clienttelphone,jdbcType=VARCHAR}, 
+			#{item.country,jdbcType=VARCHAR}, #{item.productunitprice,jdbcType=DECIMAL}, #{item.producttotalamount,jdbcType=DECIMAL}, 
+			#{item.producttotalcost,jdbcType=DECIMAL}, #{item.freightrevenue,jdbcType=DECIMAL}, #{item.shipmentexpenses,jdbcType=DECIMAL}, 
+			#{item.weight,jdbcType=DECIMAL}, #{item.sku,jdbcType=VARCHAR}, #{item.productname,jdbcType=VARCHAR}, 
+			#{item.productnumbers,jdbcType=INTEGER}, #{item.productdirectory,jdbcType=VARCHAR}, #{item.currency,jdbcType=VARCHAR}, 
+			#{item.ordertotalamout,jdbcType=DECIMAL}, #{item.createtime,jdbcType=TIMESTAMP},
+			#{item.url,jdbcType=VARCHAR},#{item.item_id,jdbcType=VARCHAR})
+	      </foreach>
+  </insert>
+  
+  <select id="selectInstorage" parameterType="com.cbt.warehouse.pojo.Mabangshipment" resultMap="BaseResultMap">
+  	select orderNo, m.shipNo, productUnitPrice, productTotalCost, productNumbers, m.sku, state, s.unitCost, m.url
+	<!-- from mabangshipment m left JOIN taobao_1688_order_history t on m.orderNo = t.orderid where 1=1  -->
+	from mabangshipment  m left JOIN skuinfo s on m.sku = s.sku  where 1=1 
+  	<!-- 0 所有未到  1: 近3天到货  2:所有已到-->
+  	<if test="state == 0">
+  		and state = 0
+  	</if>
+  	<if test="state == 1">
+  		and state =1 and paymentTime >= date_sub(curdate(),interval 2 day)
+  	</if>
+  	<if test="state == 2">
+  		and state =1
+  	</if>
+  	order by paymentTime desc  limit #{page,jdbcType=INTEGER},20
+  </select>
+  
+  <select id="selectInstorageCount" parameterType="com.cbt.warehouse.pojo.Mabangshipment" resultType="java.lang.Integer">
+	select count(*) from mabangshipment  m left JOIN skuinfo s on m.sku = s.sku  where 1=1 
+  	<!-- 0 所有未到  1: 近3天到货  2:所有已到-->
+  	<if test="state == 0">
+  		and state = 0
+  	</if>
+  	<if test="state == 1">
+  		and state =1 and paymentTime >= date_sub(curdate(),interval 2 day)
+  	</if>
+  	<if test="state == 2">
+  		and state =1
+  	</if>
+  	order by paymentTime desc
+  </select>
+ 
+  <select id="selectPurchaseCost" parameterType="com.cbt.warehouse.pojo.Mabangshipment" resultMap="BaseResultMap">
+	<!-- SELECT sum((ifnull(itemprice,0)* ifnull(itemqty,0))) as cost, DATE_FORMAT(paymentTime,'%Y-%m') as ym
+	from mabangshipment m LEFT JOIN taobao_1688_order_history t on m.orderno=t.orderid  -->
+	SELECT sum(unitCost*productNumbers ) as cost , DATE_FORMAT(paymentTime,'%Y-%m') as ym 
+	from mabangshipment m LEFT JOIN skuinfo s on m.sku=s.sku
+	<![CDATA[
+	where paymentTime >= #{start_time,jdbcType=VARCHAR} and paymentTime <= #{end_time,jdbcType=VARCHAR}
+	]]>
+	GROUP BY ym order by paymentTime desc 
+  </select>
+
+</mapper>

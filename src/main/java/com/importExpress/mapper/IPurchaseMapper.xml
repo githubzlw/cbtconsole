@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.IPurchaseMapper">
+    <select id="findPageByCondition" resultType="java.util.Map">
+        {call purchase_search_bygoods(${startindex},${pagesize},${admin},${user},#{orderno},${good},#{date},#{dayy},${states},${unpaid},#{orderid_no_array},#{goodsid},#{goodname})}
+    </select>
+    <select id="getOrders" resultType="com.cbt.bean.OrderBean">
+        select GROUP_CONCAT(pm.paytype) AS paytypes,(select count(tb_complain.id) from tb_complain where complainState in(1,2) and  ref_orderid=order_no)complain,0 deliver,
+        (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
+        (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
+        (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
+        (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
+        (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON od.orderid=id.orderid AND od.goodsid=id.goodid
+        WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
+        pf.id dzid, pf.orderno dzOrderno, pf.confirmname dzConfirmname,pf.confirmtime dzconfirmtime,
+        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,a.country,
+        (select country from zone z where z.id=a.country) countryName ,
+        (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(a.country,' ','')) new_zid ,
+        a.statename,a.phonenumber,a.zipcode,packag_style,mode_transport,ifnull(expect_arrive_time,'') as expect_arrive_time,ug.grade,
+        actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,o.create_time as createtime,
+        recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
+        (select email from admuser au where aru.adminid=au.id) adminemail,
+        actual_lwh,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name userName,
+        u.email as userEmail,'' as buyuser,ifnull(exporttime,'') as transport_time,'' storagetime,  o.delivery_time as deliveryTime,  0  buyid,
+        o.orderRemark,o.actual_weight_estimate as freightFee,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount,u.businessName
+        ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume
+        from orderinfo o left join order_address a on o.order_no=a.orderNo
+        left join zone z ON a.country=z.country left join user u  on  u.id =o.user_id
+        left join order_fee of  on  of.orderno =o.order_no
+        left join  admin_r_user aru on aru.userid= o.user_id
+        left join  user_grade ug on ug.id= u.grade
+        left join  shipping_package sp on sp.orderid=o.order_no
+        LEFT JOIN payment pm ON pm.orderid=o.order_no
+        left join  paymentconfirm  pf on pf.orderno=o.order_no where order_no =#{orderNo}
+    </select>
+    <select id="getShopIdByGoodsPid" resultType="java.util.Map">
+        SELECT a.addr AS address,IFNULL(b.level,'') AS level,IFNULL(b.quality_avg,'') AS quality_avg FROM shop_addr_spider a LEFT JOIN supplier_scoring b ON a.shop_id=b.shop_id WHERE a.shop_id=#{shop_id}
+    </select>
+    <select id="getLevelBySid" resultType="java.util.Map">
+        select distinct a.address,s.level from ali_info_data a left join supplier_scoring s on a.shop_id=s.shop_id
+        where a.shop_id=#{sid} AND a.address IS NOT NULL AND a.address&lt;>'' limit 1
+    </select>
+    <select id="getLevelBySids" resultType="java.util.Map">
+        select distinct a.address,s.level from ali_info_data a left join supplier_scoring s on a.shop_id=s.shop_id
+        where a.shop_id=#{sid} ORDER BY address DESC limit 1
+    </select>
+
+    <select id="getTaoBaoInfoByShipno" resultType="java.util.Map">
+        select distinct orderid,totalprice from taobao_1688_order_history where shipno in (${shipnos})
+    </select>
+    <select id="getBhShopId" resultType="java.lang.String">
+        SELECT distinct shop_id FROM order_replenishment WHERE orderid=#{orderNo} AND goodsid=#{goodsid}
+    </select>
+    <select id="supplierScoringLevel" resultType="java.lang.String">
+        select level from supplier_scoring where shop_id = #{shopId}
+    </select>
+    <select id="getUseInventory" resultType="java.lang.String">
+        SELECT lock_remaining FROM lock_inventory WHERE od_id=${odid}
+    </select>
+    <select id="getEsPrice" resultType="java.lang.String">
+        SELECT IFNULL(a.wholesale_price,0) AS a_price FROM order_details od
+        inner JOIN custom_benchmark_ready a ON od.goods_pid=a.pid
+        WHERE od.id=#{odid} and od.orderid=#{orderNo} AND od.state&lt;2
+    </select>
+    <select id="straightHairList" resultType="com.cbt.pojo.StraightHairPojo">
+        SELECT distinct od.goodsname,oi.user_id AS userid,od.orderid,od.goodsid,od.car_type AS sku,od.car_img AS img,
+        od.car_url,od.straight_time AS times,a.admName AS buyer,od.straight_flag AS state,case when od.shipno='0' then '暂未发货' else od.shipno end as shipno,
+        (SELECT DISTINCT LOCATE('签收',shipstatus) FROM taobao_1688_order_history WHERE shipno=od.shipno) AS states,
+        CASE WHEN od.remark='' THEN '无备注' ELSE od.remark END AS remark
+        FROM order_details od INNER JOIN orderinfo oi ON od.orderid=oi.order_no INNER JOIN admin_r_user a ON oi.user_id=a.userid
+        INNER JOIN goods_distribution g ON od.goodsid=g.goodsid and od.orderid=g.orderid INNER JOIN admuser ad ON g.admuserid=ad.id
+        WHERE od.straight_flag=2 AND oi.state=1 AND od.state&lt;2
+    </select>
+    <update id="updateState">
+        update order_details set state=1,checked=1 where orderid=#{orderNo}' and goodsid=#{goodsid}
+    </update>
+    <select id="queryState" resultType="java.util.Map">
+        SELECT IFNULL(SUM(od.state),0) AS states,COUNT(od.id) AS counts FROM orderinfo oi
+        INNER JOIN order_details od ON oi.order_no=od.orderid AND oi.state=1 AND od.state&lt;2 AND od.orderid=#{orderNo}
+    </select>
+    <update id="updateOrderInfo">
+        update orderinfo set  state=2 where order_no=#{orderNo}
+    </update>
+    <update id="updateGoodsCommunicationInfo">
+        UPDATE goods_communication_info AS a
+        INNER JOIN goods_distribution AS b ON a.orderid=b.orderid AND a.goodsid=b.goodsid SET a.is_read=1
+        WHERE b.orderid=#{orderNo} AND b.admuserid=${admin}
+    </update>
+    <select id="getAllFreightByOrderid" resultType="java.util.Map">
+        SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) as allWeight FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
+    </select>
+    <select id="checkOrder" resultType="INTEGER">
+        select state from orderinfo where order_no=#{orderNo}
+    </select>
+    <select id="checkGoods" resultType="INTEGER">
+        select state from order_details where orderid=#{orderNo} and id=${odid}
+    </select>
+    <select id="checkOrderChange" resultType="java.lang.String">
+        select ropType from order_change where orderNo=#{orderNo} and odid=${odid} and ropType=4
+    </select>
+    <select id="getUserbyID" resultType="java.lang.String">
+        select admname from admuser where id=#{buyerId} and status=1
+    </select>
+    <select id="getOrderChangeState" resultType="INTEGER">
+        select count(id) as sum from order_change where orderNo=#{orderNo} and odid=#{od_id} and ropType=6 and del_state=0
+    </select>
+    <select id="getSourceCount" resultType="INTEGER">
+        select count(id) as suma from order_product_source where od_id=#{od_id} and orderid=#{orderNo}
+    </select>
+    <select id="getGoodsSourceCount" resultType="INTEGER">
+        select count(id) as sumb from goods_source where goods_url=#{goods_url} and goods_purl=#{reason}
+    </select>
+    <update id="updateGoodsChangeState">
+        update order_change set del_state=1 where orderNo=#{orderNo} and odid=#{od_id} and ropType=6 and del_state=0
+    </update>
+    <update id="updateGoodsOfSource">
+        UPDATE sourceofgoods SET source_of_goods = 0 WHERE goods_url=#{goods_url} and	goods_type=#{cGoodstype}
+    </update>
+    <delete id="deleteSource">
+        delete from order_product_source where orderid=#{orderNo} and od_id=#{od_id}
+    </delete>
+    <insert id="insertOrderProductSource">
+        insert into order_product_source(adminid,userid,addtime,orderid,goodsid,goodsdataid,goods_url,
+        goods_p_url,last_goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,usecount,buycount,currency,goods_p_name,bargainRemark,
+        deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks,unquestionsRemarks,
+        purchase_state,od_id,tb_1688_itemid,last_tb_1688_itemid,tborderid) values(${admid},#{userid},now(),#{orderNo},#{goodid},0,#{goods_url},#{resource},#{resource},#{googs_img},#{goods_price}
+        ,#{price},#{goods_title},#{googs_number},#{buycount},#{currency},'', #{bargainRemark},#{deliveryRemark},#{colorReplaceRemark},#{sizeReplaceRemark},#{orderNumRemarks},
+        #{questionsRemarks},#{unquestionsRemarks},${purchase_state},#{od_id},#{itemid},#{itemid},'')
+    </insert>
+    <update id="updateOrderProductSource">
+        update order_product_source set  userid=#{userid},adminid=${admid},addtime=now(),goods_p_url=#{resource},last_goods_p_url=#{resource},goods_p_price=#{price},
+        buycount=#{buycount},bargainRemark=#{bargainRemark},usecount=#{googs_number},
+        deliveryRemark=#{deliveryRemark},colorReplaceRemark=#{colorReplaceRemark},sizeReplaceRemark=#{sizeReplaceRemark},orderNumRemarks=#{orderNumRemarks},
+        questionsRemarks=#{questionsRemarks},unquestionsRemarks=#{unquestionsRemarks},purchase_state=${purchase_state},tb_1688_itemid=#{itemid},last_tb_1688_itemid=#{itemid}
+        where orderid=#{orderNo} and od_id=#{od_id}
+    </update>
+    <update id="updateSourceState">
+        update order_product_source set offline_purchase=1 where orderid=#{TbOrderid} and od_id=#{odid}
+    </update>
+    <insert id="insertRecords">
+        insert into offline_purchase_records (shipno,createtime,admuserid,goods_p_url,tb_orderid,goodsid,orderid,odid) values (#{shipno},now(),#{adminid},#{taobao_url},#{orderid},#{TbGoodsid},#{TbOrderid},#{odid})
+    </insert>
+    <update id="updateDetails">
+        update order_details set car_url = #{resource} where	orderid=#{orderNo} and id = #{od_id}
+    </update>
+    <select id="getOrderProductSource" resultType="INTEGER">
+        select id from order_product_source where orderid=#{orderNo} and od_id = #{od_id}
+    </select>
+    <insert id="addRecodChangeSourceLog">
+        insert into change_source_log (op_id,change_time,change_adminid,change_desc,source_url) values(#{opsId},now(),#{admid},1,#{resource})
+    </insert>
+    <select id="queryGoodsSource" resultType="java.util.Map">
+        SELECT distinct od.goods_pid,od.car_urlMD5,ifnull(gs.shop_id,'') as shop_id,gs.address FROM goods_source gs
+        INNER JOIN order_details od ON gs.goods_pid=od.goods_pid AND gs.car_urlMD5=od.car_urlMD5 WHERE od.id=#{od_id} and gs.goods_purl=#{resource}
+    </select>
+    <update id="updateGoodsSource">
+        update goods_source set goods_purl=#{resource}
+        , goods_img_url=#{goods_img_url},goods_price=#{price},buycount=#{buycount},
+        updatetime=now(),shop_id=#{gshop_id},address=#{gaddress} where goods_pid=#{ggoods_pid}
+    </update>
+    <select id="queryOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
+        select * from order_details where orderid=#{orderNo} and id = #{od_id}
+    </select>
+    <insert id="insertGoodsSource">
+        insert into goods_source(goodsdataid,goods_url,goods_purl,goods_img_url,
+        goods_price,goods_name,moq,goodssourcetype,buycount,del,updatetime,goods_pid,car_urlMD5,shop_id,address)
+        values(0,#{goods_url},#{resource},#{googs_img},#{price},#{goods_title},1,1,#{buycount},0,now(),#{ogoods_pid},#{ocar_urlMD5},'','')
+    </insert>
+    <select id="queryShopId" resultType="java.lang.String">
+        SELECT ifnull(c.shop_id,'') FROM order_details od INNER JOIN custom_benchmark_ready c ON od.goods_pid=c.pid WHERE od.orderid=#{orderNo} AND od.id=#{od_id}
+        union
+        SELECT ifnull(c.shop_id,'') FROM order_details od INNER JOIN custom_benchmark_ready_cloud c ON od.goods_pid=c.pid WHERE od.orderid=#{orderNo} AND od.id=#{od_id}
+    </select>
+    <update id="updateOrderProduct">
+        update order_product_source set old_shopid=#{cShopId} where orderid=#{orderNo} and od_id = #{od_id}
+    </update>
+    <select id="getOrderDeatails" resultType="com.cbt.bean.OrderDetailsBean">
+        select distinct od1.* from order_details od1 inner join order_details od2 on od1.goods_pid=od2.goods_pid
+        where od2.id=#{od_id} and od1.id&lt;>#{od_id} and od1.state&lt;2  AND od1.orderid=#{orderNo}
+    </select>
+    <select id="queryOrderProductSource" resultType="INTEGER">
+        select count(id) from order_product_source where orderid=#{orderid} and od_id = #{odid}
+    </select>
+    <update id="updateBuyUrl">
+        update order_product_source set purchase_state=0, goods_p_price=#{price},
+        goods_p_url=#{resource},last_goods_p_url=#{resource},tb_1688_itemid=#{itemid},last_tb_1688_itemid=#{itemid},shop_id=#{shop_id} where orderid=#{orderNo} and od_id=#{o_odid}
+    </update>
+    <insert id="insertOrderSource">
+        insert into order_product_source(adminid,userid,addtime,orderid,confirm_time,
+        goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,
+        usecount,buycount,purchase_state,od_id,tb_1688_itemid,shop_id,tborderid) values(#{admid},#{newuserid},now(),#{orderNo},now(),#{newgoodsid},
+        #{newgoodsdata_id},#{goods_url},#{resource},#{newcar_img},#{newgoodsprice},#{price},#{newgoodsname},#{newyourorder},#{buycount},0,#{newid},#{itemid},#{shop_id},'')
+    </insert>
+    <select id="ShowRmark" resultType="com.cbt.bean.OrderProductSource">
+        select bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks,unquestionsRemarks,againRemarks  from order_product_source where orderid=#{orderNo} and goodsdataid=#{goodsdataid} and od_id=#{odid}
+    </select>
+    <select id="getUserName" resultType="java.lang.String">
+        select admName from admuser where id=#{adminid}
+    </select>
+    <select id="getGoodsisList" resultType="java.lang.String">
+        SELECT distinct ops.od_id FROM order_product_source ops INNER JOIN goods_distribution gd ON ops.od_id=gd.odid WHERE ops.od_id=gd.odid AND ops.orderid=#{orderid}
+        AND ops.purchase_state=1 AND gd.admuserid=${adminid} AND ops.del=0
+    </select>
+    <select id="getIdList" resultType="java.lang.String">
+        select id from status_change_log where order_no=#{orderid} and odid=#{odid}
+    </select>
+    <update id="udpateLog">
+        update status_change_log set opStatus='取消货源',opTime=now(),opName=#{adminid} where order_no=#{orderid} and odid=#{odid}
+    </update>
+    <insert id="insertLog">
+        insert into status_change_log (opName,opTime,opStatus,order_no,odid) values (#{adminid},now(),#{msg},#{orderid},#{odid})
+    </insert>
+    <update id="updateOrderProSource">
+        UPDATE order_product_source  SET purchase_state=0,confirm_userid=null,confirm_time=null WHERE od_id=#{odid} and orderid=#{orderid}
+    </update>
+    <update id="updateDetailsState">
+        UPDATE order_details  SET purchase_state=0 WHERE orderid=#{orderid} and id=#{odid}
+    </update>
+    <select id="getAllNewDatas" resultType="java.util.Map">
+        SELECT ops.userid,ops.orderid,ops.od_id as id,ops.goods_p_url,ops.goodsid,ops.goods_p_price,ops.goodsdataid as goodsdata_id,ops.goods_url as car_url,od.car_urlMD5,od.goods_pid,od.car_img,
+        ops.goods_price as goodsprice,ops.goods_name as goodsname,ops.usecount as yourorder,oi.isDropshipOrder,od.dropshipid,ops.buycount
+        FROM order_product_source ops INNER JOIN order_details od ON ops.orderid=od.orderid and ops.od_id=od.id INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+        INNER JOIN goods_distribution gd ON od.orderid=gd.orderid and od.id=gd.odid
+        WHERE ops.orderid=#{orderid} and gd.admuserid=#{adminid} AND ops.purchase_state in (0,5)
+    </select>
+    <select id="getOpsCount" resultType="INTEGER">
+        select count(id) as sid from order_product_source where orderid=#{orderNo} and od_id=#{odid}
+    </select>
+    <select id="getOrderDtails" resultType="java.util.Map">
+        select yourorder,goods_pid,car_img,goodsname from order_details where id=#{odid}
+    </select>
+    <insert id="insertSource">
+        insert into order_product_source(adminid,userid,addtime,orderid,confirm_userid,
+        goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,
+        usecount,buycount,purchase_state,od_id,tb_1688_itemid,tborderid) select #{admid},#{userid},now(),#{orderNo},0,#{goodsid},#{goodsdataid},
+        #{goods_p_url},#{newValue},#{googsimg},#{goodsprice},#{oldValue},#{goodstitle},#{googsnumber},#{purchaseCount},1,#{od_id},#{itemid},'重复8'
+        FROM DUAL WHERE NOT EXISTS (SELECT * FROM order_product_source WHERE orderid=#{orderNo} and goodsid=#{goodid})
+    </insert>
+    <update id="updateOrderDetails">
+        update order_details set purchase_state=1 where orderid=#{orderNo} and id=#{odid}
+    </update>
+    <update id="updateOrderDetailsFlag">
+        update order_details set straight_flag=${flag} where orderid=#{orderNo} and id=#{odid}
+    </update>
+    <update id="updateSourceInfo">
+        update order_product_source set confirm_userid=#{admid},confirm_time=now(),purchase_state=1 where orderid=#{orderNo} and od_id=#{od_id};
+        update order_details set purchase_state=1 where orderid=#{orderNo} and id=#{od_id};
+    </update>
+    <select id="getAllGoodsisList" resultType="java.lang.String">
+        SELECT distinct ops.od_id FROM order_product_source ops INNER JOIN goods_distribution gd ON ops.od_id=gd.odid WHERE ops.od_id=gd.odid AND ops.orderid=#{orderid}
+        AND ops.purchase_state=3 AND gd.admuserid=#{adminid} AND ops.del=0
+    </select>
+    <update id="updateQxSourceState">
+        UPDATE order_product_source   SET purchase_state=1,purchasetime='' WHERE od_id=#{odid} and orderid=#{orderid};
+        UPDATE order_details  SET purchase_state=1,purchase_time=null WHERE id=#{odid} and orderid=#{orderid};
+        update orderinfo set purchase_number = (select count(*) from order_product_source where orderid=#{orderid} and purchase_state in(3,4)) where order_no=#{orderid}
+    </update>
+    <select id="getDpOrderInfo" resultType="java.lang.String">
+        SELECT dropshipid FROM order_details WHERE orderid=#{orderid}
+    </select>
+    <update id="updateDpOrderState">
+        update dropshiporder set state= (SELECT IF ((select count(*) from ( select * from order_details where dropshipid=#{dropshipid}
+        and state!=2 AND purchase_state=3) a)>0,'1','5')) where child_order_no=#{dropshipid}
+    </update>
+    <update id="updateOrderInfoState">
+        update orderinfo set state= (SELECT IF ((select count(*) from ( select * from order_details where orderid=#{orderid}
+        and state!=2 AND purchase_state=3) a)>0,'1','5')) where order_no=#{orderid}
+    </update>
+    <select id="getAlCgGoodsInfos" resultType="java.util.Map">
+        SELECT distinct ops.od_id,ops.goods_p_url,ops.last_goods_p_url FROM order_product_source ops
+        INNER JOIN goods_distribution gd ON ops.orderid=gd.orderid and ops.od_id=gd.odid WHERE  ops.orderid=#{orderid}
+        AND ops.purchase_state=1 AND gd.admuserid=#{adminid} AND ops.del=0
+    </select>
+    <update id="updateCgSourceState">
+        UPDATE order_product_source  SET purchase_state=3,confirm_userid=#{adminid} ,confirm_time=now(),purchasetime=now() WHERE od_id=#{odid} and orderid=#{orderid};
+        UPDATE order_details  SET purchase_state=3,purchase_time=now() WHERE id=#{odid} and orderid=#{orderid};
+        update orderinfo set purchase_number = (select count(*) from order_product_source where orderid=#{orderid} and purchase_state in(3,4)) where order_no=#{orderid}
+    </update>
+    <select id="getOtherSources" resultType="java.util.Map">
+        SELECT gs.goods_purl AS nv,MIN(gs.goods_price) AS gp,gs.updatetime AS ut,gs.shop_id,gs.address FROM goods_source gs
+        INNER JOIN order_details od ON gs.goods_pid=od.goods_pid AND gs.car_urlMD5=od.car_urlMD5
+        WHERE od.orderid=#{orderid} AND od.id=#{odid} group by ut DESC
+    </select>
+    <select id="getTbOrderid" resultType="java.lang.String">
+        select orderid from taobao_1688_order_history where shipno=#{shipno} limit 1
+    </select>
+    <select id="getTbOrderId" resultType="java.lang.String">
+        select id from taobao_1688_order_history where importOrderid=#{orderid} and odid=#{odid}
+    </select>
+    <update id="updateTaoBaoOrder">
+        update taobao_1688_order_history set totalprice=#{totalprice} ,itemurl=#{taobao_url} ,preferential=#{preferential} ,itemprice=#{taobaoPrice} ,shipno=#{shipno},itemid=#{itemid} where importOrderid=#{TbOrderid} and odid=#{odid}
+    </update>
+    <insert id="insertTaoBaoOrder">
+        insert into taobao_1688_order_history (importGoodsid,importOrderid,tbOr1688,orderid,totalprice,itemname,itemid,itemprice,
+        itemqty,sku,shipno,itemurl,username,preferential,paydata,imgurl,shipper,shipstatus,creattime,delivery_date,orderstatus,orderdate,odid) values
+        (#{TbGoodsid},#{TbOrderid},2,#{orderid},#{totalprice},#{taobao_name},#{itemid},#{taobaoPrice},#{goodsQty},#{goods_sku},#{shipno},
+        #{taobao_url},#{username},#{preferential},now(),#{goods_imgs},'无','等待买家确认收货',now(),now(),'等待买家确认收货',now(),#{odid})
+    </insert>
+    <update id="updateLockInventory">
+        update lock_inventory set is_use=1 where od_id=#{od_id}
+    </update>
+    <update id="updateInventory">
+        UPDATE inventory AS a LEFT JOIN lock_inventory AS b ON a.id=b.in_id SET a.can_remaining=a.can_remaining+b.lock_remaining WHERE a.id=b.in_id  and b.od_id=#{od_id}
+    </update>
+    <select id="getGoodsid" resultType="java.lang.String">
+        SELECT i.goods_pid FROM inventory i INNER JOIN lock_inventory li ON i.id=li.in_id WHERE li.od_id=#{od_id} LIMIT 1
+    </select>
+    <update id="updateCustomSstockFlag">
+        update custom_benchmark_ready set is_stock_flag=1 where pid=#{goods_pid}
+    </update>
+    <update id="updateDetailsRemark">
+        update order_details set inventory_remark='此次不使用库存' where id=#{od_id};
+        update lock_inventory set is_delete=1 where od_id=#{od_id}
+    </update>
+
+    <select id="queryUserIdAndStateByOrderNo" resultType="java.util.Map">
+        select user_id,state as old_state,if((select count(0) from ( select id,orderid from order_details where orderid = #{orderNo}
+        and state!=2 AND purchase_state=3) a)>0,'1','5') as new_state from orderinfo where order_no = #{orderNo}
+    </select>
+
+    <select id="getComfirmedSourceGoods" resultType="java.util.Map">
+select od.id,ops.sampling_flag,od.orderid,ops.adminid,od.goodsname,od.car_img,od.actual_volume,od.car_type,od.goodsprice,od.goods_pid,od.yourorder,cbr.shop_id from order_details od
+left join order_product_source ops on od.id = ops.od_id
+left join custom_benchmark_ready cbr on od.goods_pid = cbr.pid
+left join orderinfo oi on od.orderid = oi.order_no
+where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5)
+</select>
+
+    <update id="updateAutoOrderFlag">
+        update order_product_source set sampling_flag=2 where od_id in
+        <foreach item="item" index="index" collection="idsList" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.searchByPic.dao.SearchByPicMapper" >
+
+  <resultMap id="BaseResultMap" type="com.cbt.searchByPic.bean.CustomerRequireBean" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="keyWords" property="keyWords" />
+    <result column="minu" property="minu" />
+    <result column="maxu" property="maxu" />
+    <result column="quantity" property="quantity" />
+    <result column="comments" property="comments" />
+     <result column="email" property="email" />
+      <result column="flag" property="flag" />
+       <result column="index_id" property="index_id" />
+  </resultMap>
+  
+
+   <sql id="Base_Column_List" >
+    id,keyWords,minu,maxu,quantity,comments,email,createtime,flag,index_id
+  </sql>
+	<!-- 查询所有 -->
+	<select id="selectAll"  resultMap="BaseResultMap">
+	   select 
+	   <include refid="Base_Column_List" />
+	   from custom_search   order by  flag asc limit #{parseInt},40
+	</select>
+
+	<select id="count"  resultType="java.lang.Integer">
+	select count(*)  from  custom_search where flag = 0 
+	</select>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap">
+	   select 
+	   <include refid="Base_Column_List" />
+	   from custom_search where id = #{parseInt}
+	</select>
+	
+	  <resultMap id="ResultMap_temp" type="com.cbt.bean.SearchResults" >
+    <id column="id" property="id"  />
+    <result column="index_id"  property="indexId" />
+    <result column="goods_pid" property="goodsPid"  />
+    <result column="goods_url" property="goodsUrl"  />
+    <result column="goods_name_en" property="goodsNameEn"  />
+    <result column="goods_name" property="goodsName"  />
+    <result column="goods_price" property="goodsPrice"  />
+    <result column="goods_price_re" property="goodsPriceRe"  />
+    <result column="goods_sold" property="goodsSold"  />
+    <result column="goods_morder" property="goodsMorder"  />
+    <result column="goods_img" property="goodsImg"  />
+    <result column="factory_name" property="factoryName"  />
+    <result column="factory_id" property="factoryId"  />
+    <result column="factory_url" property="factoryUrl"  />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="goods_valid" property="goodsValid"  />
+    <result column="goods_type" property="goodsType"  />
+    <result column="goods_type_en" property="goodsTypeEn"  />
+    <result column="goods_detail" property="goodsDetail"  />
+    <result column="goods_detail_en" property="goodsDetailEn"  />
+    <result column="goods_info" property="goodsInfo"  />
+    <result column="goods_weight" property="goodsWeight"  />
+    <result column="trade" property="trade"  />
+    <result column="aliexpress_catid" property="aliexpressCatid"  />
+  </resultMap>
+	
+	<resultMap id="ResultMap" type="com.cbt.bean.SearchIndex" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="en_name" property="enName" jdbcType="VARCHAR" />
+    <result column="cn_name" property="cnName" jdbcType="VARCHAR" />
+    <result column="en_name_one" property="enNameOne" jdbcType="VARCHAR" />
+    <result column="cn_name_one" property="cnNameOne" jdbcType="VARCHAR" />
+    <result column="en_name_two" property="enNameTwo" jdbcType="VARCHAR" />
+    <result column="cn_name_two" property="cnNameTwo" jdbcType="VARCHAR" />
+    <result column="en_name_three" property="enNameThree" jdbcType="VARCHAR" />
+    <result column="cn_name_three" property="cnNameThree" jdbcType="VARCHAR" />
+    <result column="aliexpress_catid" property="aliexpressCatid" jdbcType="VARCHAR" />
+    <result column="detail_catid" property="detailCatid" jdbcType="VARCHAR" />
+    <result column="translation_catid" property="translationCatid" jdbcType="VARCHAR" />
+    <result column="keywords" property="keywords" jdbcType="VARCHAR" />
+    <result column="translation_time" property="translationTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="flag"  property="flag" jdbcType="INTEGER" />
+    <result column="min_price" property="minPrice" jdbcType="VARCHAR" />
+    <result column="max_price" property="maxPrice"  jdbcType="VARCHAR"/>
+     <result column="customId" property="customId"  jdbcType="INTEGER"/>
+  </resultMap>
+  <sql id="Column_List" >
+    id, en_name, cn_name, en_name_one, cn_name_one, en_name_two, cn_name_two, en_name_three, 
+    cn_name_three, detail_catid, aliexpress_catid,translation_catid, keywords, translation_time,
+    create_time,flag,min_price,max_price,customId
+    
+  </sql>
+   <sql id="Column_List_temp" >
+    id, index_id,goods_pid, goods_url, goods_name, goods_price, goods_img, factory_name,factory_id, create_time, 
+    goods_valid,goods_weight,goods_info,goods_detail_en,goods_detail,goods_type,goods_type_en,goods_name_en,
+    factory_url,trade,aliexpress_catid,goods_sold,goods_morder,goods_price_re
+  </sql>
+   <insert id="insertSelective" parameterType="com.cbt.bean.SearchIndex" useGeneratedKeys="true" keyProperty="id">
+    insert into search_index
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="enName != null" >
+        en_name,
+      </if>
+      <if test="cnName != null" >
+        cn_name,
+      </if>
+      <if test="enNameOne != null" >
+        en_name_one,
+      </if>
+      <if test="cnNameOne != null" >
+        cn_name_one,
+      </if>
+      <if test="enNameTwo != null" >
+        en_name_two,
+      </if>
+      <if test="cnNameTwo != null" >
+        cn_name_two,
+      </if>
+      <if test="enNameThree != null" >
+        en_name_three,
+      </if>
+      <if test="cnNameThree != null" >
+        cn_name_three,
+      </if>
+      <if test="detailCatid != null" >
+        detail_catid,
+      </if>
+      <if test="aliexpressCatid != null" >
+        aliexpress_catid,
+      </if>
+      <if test="translationCatid != null" >
+        translation_catid,
+      </if>
+      <if test="keywords != null" >
+        keywords,
+      </if>
+      <if test="translationTime != null" >
+        translation_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="minPrice != null" >
+        min_price,
+      </if>
+      <if test="maxPrice != null" >
+        max_price,
+      </if>
+      <if test="customId != null" >
+        customId
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="enName != null" >
+        #{enName,jdbcType=VARCHAR},
+      </if>
+      <if test="cnName != null" >
+        #{cnName,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameOne != null" >
+        #{enNameOne,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameOne != null" >
+        #{cnNameOne,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameTwo != null" >
+        #{enNameTwo,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameTwo != null" >
+        #{cnNameTwo,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameThree != null" >
+        #{enNameThree,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameThree != null" >
+        #{cnNameThree,jdbcType=VARCHAR},
+      </if>
+      <if test="detailCatid != null" >
+        #{detailCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="aliexpressCatid != null" >
+        #{aliexpressCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="translationCatid != null" >
+        #{translationCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="keywords != null" >
+        #{keywords,jdbcType=VARCHAR},
+      </if>
+      <if test="translationTime != null" >
+        #{translationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="minPrice != null" >
+        #{minPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="maxPrice != null" >
+        #{maxPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="customId != null" >
+        #{customId,jdbcType=INTEGER}
+      </if>
+    </trim>
+  </insert>
+  
+   <select id="countByEnName" parameterType="String" resultType="java.lang.Integer" >
+    select count(*) from search_index where en_name =#{enName};
+  </select>
+	
+	 <update id="updateByEnName" parameterType="com.cbt.bean.SearchIndex" >
+    update search_index
+    <set >
+      <if test="id != null" >
+        id = #{id,jdbcType=INTEGER},
+      </if>
+      <if test="cnName != null" >
+        cn_name = #{cnName,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameOne != null" >
+        en_name_one = #{enNameOne,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameOne != null" >
+        cn_name_one = #{cnNameOne,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameTwo != null" >
+        en_name_two = #{enNameTwo,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameTwo != null" >
+        cn_name_two = #{cnNameTwo,jdbcType=VARCHAR},
+      </if>
+      <if test="enNameThree != null" >
+        en_name_three = #{enNameThree,jdbcType=VARCHAR},
+      </if>
+      <if test="cnNameThree != null" >
+        cn_name_three = #{cnNameThree,jdbcType=VARCHAR},
+      </if>
+      <if test="detailCatid != null" >
+        detail_catid = #{detailCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="aliexpressCatid != null" >
+        aliexpress_catid = #{aliexpressCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="translationCatid != null" >
+        translation_catid = #{translationCatid,jdbcType=VARCHAR},
+      </if>
+      <if test="keywords != null" >
+        keywords = #{keywords,jdbcType=VARCHAR},
+      </if>
+      <if test="translationTime != null" >
+        translation_time = #{translationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="minPrice != null" >
+        min_price = #{minPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="maxPrice != null" >
+        max_price = #{maxPrice,jdbcType=VARCHAR},
+      </if>
+    </set>
+      where  en_name = #{enName,jdbcType=VARCHAR}
+  </update>
+  
+   <select id="selectList" resultMap="ResultMap"  parameterType="java.lang.Integer" >
+    select 
+    <include refid="Column_List" />
+    from search_index  where 1=1 
+    <if test="indexId>0">
+      and  id = #{indexId}
+    </if>
+     limit #{parseInt},40
+  </select>
+  
+  <select id="countIndex"  resultType="java.lang.Integer"  parameterType="java.lang.Integer"  >
+	select count(*)  from  search_index   
+	where 1=1 
+	<if test="indexId>0">
+	  and id = #{indexId}
+	</if>
+	</select>
+  
+  
+   <select id="selectKeyWords" resultMap="ResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Column_List" />
+    from search_index
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+     <!-- result_temp index_id  price查询 -->
+  <select id="selectByIndexIdAndPrice" resultMap="ResultMap_temp">
+    select 
+    <include refid="Column_List_temp" />
+    from search_results_temp
+    where index_id = #{indexId} 
+    <if test="minPrice!=0">
+    and goods_price_re&gt;#{minPrice}    
+    </if>
+    <if test="maxPrice!=0">
+    and goods_price_re&lt;#{maxPrice}
+    </if>
+    order by goods_price_re asc
+    limit #{start},80
+  </select>
+  
+    <!-- result_temp index_id  price计数- -->
+  <select id="countByIndexIdAndPrce"  resultType="java.lang.Integer" >
+    select count(*) from search_results_temp  where index_id=#{indexId} 
+    
+    <if test="minPrice!=0">
+    and goods_price_re&gt;#{minPrice}
+    
+    </if>
+    <if test="maxPrice!=0">
+    and goods_price_re&lt;#{maxPrice}
+    </if>    
+  </select>
+  
+   <!--result_temp  index_id查询 -->
+  <select id="selectByIndexId" resultMap="ResultMap_temp"  >
+    select 
+    <include refid="Column_List_temp" />
+    from search_results_temp
+    where index_id = #{indexId} limit #{start},80
+  </select>
+  <!--result_temp index_id 计数- -->
+  <select id="countByIndexId" parameterType="java.lang.Integer" resultType="java.lang.Integer" >
+    select count(*) from search_results_temp where index_id=#{indexId}
+  </select>
+  
+   <!--search_result  更新状态为无效 -->
+  <update id="updateValidByPids" >
+    update search_results set goods_valid=#{valid}
+      where  index_id=#{indexId} and goods_pid in 
+      <foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
+       #{item}
+      </foreach>
+
+  </update>
+   <!-- search_results_temp  更新状态为无效 -->
+  <update id="updateValidByPids1" >
+    update search_results_temp set goods_valid=#{valid}
+      where  index_id=#{indexId} and goods_pid in 
+      <foreach item="item" index="index" collection="pids" open="(" separator="," close=")">
+       #{item}
+      </foreach>
+
+  </update>
+  
+  
+   <!-- 删除临时表 -->
+  <update id="dropTempTable">
+	  DROP TABLE IF EXISTS search_results_table;
+	</update>
+	
+  <!-- 常见临时表 -->
+  <update id="createTempTable">
+  create temporary table search_results_table (
+						aliexpress_catid	varchar(20) DEFAULT NULL,
+						index_id	int(11)	DEFAULT '0',
+						goods_pid	varchar(20) DEFAULT NULL,
+						goods_url	varchar(500) DEFAULT NULL,
+						goods_name	varchar(500) DEFAULT NULL,
+						goods_name_en	varchar(1000) DEFAULT NULL,
+						goods_price	double(16,2) DEFAULT '0',
+						goods_price_re	double(16,2) DEFAULT '0',
+						goods_img	varchar(500) DEFAULT NULL,
+						factory_name	varchar	(100) DEFAULT NULL,
+						factory_id	varchar(50)	DEFAULT NULL,
+						factory_url	varchar(200) DEFAULT NULL,
+						trade	varchar	(100) DEFAULT NULL,
+						create_time	datetime,
+						goods_valid	int(2) DEFAULT '1',
+						goods_sold	int(11) DEFAULT '0',
+						goods_morder int(5) DEFAULT '1',
+						goods_type	text DEFAULT NULL,
+						goods_type_en	text DEFAULT NULL,
+						goods_detail	text DEFAULT NULL,
+						goods_detail_en	text DEFAULT NULL,
+						goods_info	text DEFAULT NULL,
+						goods_weight	varchar(50) DEFAULT NULL,
+						updateflag int(2) DEFAULT '0'
+  );
+  </update>
+  
+  <insert id="insertTempTable">
+   insert into search_results_table (index_id,goods_pid, goods_url, goods_name, goods_price, goods_img, factory_name,factory_id, create_time, 
+    goods_valid,goods_weight,goods_info,goods_detail_en,goods_detail,goods_type,goods_type_en,goods_name_en,factory_url,
+    trade,aliexpress_catid,goods_sold,goods_morder,goods_price_re) values 
+    
+    <foreach collection="list" item="item" index="index" separator=",">
+    (#{item.indexId},#{item.goodsPid},#{item.goodsUrl},#{item.goodsName},
+     #{item.goodsPrice},#{item.goodsImg},#{item.factoryName},#{item.factoryId},
+     #{item.createTime},#{item.goodsValid},#{item.goodsWeight},#{item.goodsInfo},
+     #{item.goodsDetailEn},#{item.goodsDetail},#{item.goodsType},#{item.goodsTypeEn},
+     #{item.goodsNameEn},#{item.factoryUrl},#{item.trade},#{item.aliexpressCatid},
+     #{item.goodsSold},#{item.goodsMorder},#{item.goodsPriceRe}
+     )
+    
+    </foreach>
+  </insert>
+  <!-- 更新临时表中数据 -->
+  <update id="updateTempTable">
+	update  search_results d,search_results_table  ds set
+	d.goods_url=ds.goods_url,
+	d.goods_name=ds.goods_name,
+	d.goods_price=ds.goods_price,
+	d.goods_price_re=ds.goods_price_re,
+	d.goods_sold=ds.goods_sold,
+	d.goods_morder=ds.goods_morder,
+	d.goods_img=ds.goods_img,
+	d.factory_name=ds.factory_name,
+	d.factory_id=ds.factory_id,
+	d.create_time=ds.create_time,
+	d.goods_valid=ds.goods_valid,
+	d.goods_weight=ds.goods_weight,
+	d.goods_info=ds.goods_info,
+	d.goods_detail=ds.goods_detail,
+	d.goods_detail_en=ds.goods_detail_en,
+	d.goods_type=ds.goods_type,
+	d.goods_type_en=ds.goods_type_en,
+	d.goods_name_en=ds.goods_name_en,
+	d.factory_url=ds.factory_url,
+	d.trade=ds.trade,
+	d.aliexpress_catid=ds.aliexpress_catid,
+	ds.updateflag=1  where d.goods_pid=ds.goods_pid and d.index_id=ds.index_id;
+	</update>
+  <insert id="addByTempTable">
+	insert into search_results (index_id,goods_pid, goods_url, goods_name, goods_price,goods_price_re, goods_img, factory_name,factory_id, create_time, 
+    goods_valid,goods_weight,goods_info,goods_detail_en,goods_detail,goods_type,goods_type_en,goods_name_en,factory_url,
+    trade,aliexpress_catid,goods_sold,goods_morder) 
+	select index_id,goods_pid, goods_url, goods_name, goods_price,goods_price_re, goods_img, factory_name,factory_id, create_time, 
+    goods_valid,goods_weight,goods_info,goods_detail_en,goods_detail,goods_type,goods_type_en,goods_name_en,factory_url,
+    trade,aliexpress_catid,goods_sold,goods_morder from search_results_table where updateflag=0;
+	</insert>
+	
+	 <!--search_results  index_id查询 -->
+  <select id="selectResultByIndexId" resultMap="ResultMap_temp"  >
+    select 
+    <include refid="Column_List_temp" />
+    from search_results
+    where goods_valid=1 and index_id = #{indexId} limit #{start},80
+  </select>
+  
+	<!--search_index   -->
+	 <update id="updateTranslationTime" parameterType="Integer" >
+    update search_index set translation_time=now()  
+      where   id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByIndexIdAll">
+      select 
+      <include refid="Column_List_temp" />
+    from search_results
+    where goods_valid=1 and index_id = #{indexId}
+  </select>
+  
+  <delete id="deleteByIndexId">
+    delete from search_results where index_id = #{indexId}
+  </delete>
+  
+  <update id="updateSyncFlag">
+    update search_index set syncflag = #{i} where id = #{indexId}
+  </update>
+  
+  <update id="updateCustomByIndexId">
+      update custom_search set index_id =#{index_id} where id =#{parseInt}
+  </update>
+</mapper>

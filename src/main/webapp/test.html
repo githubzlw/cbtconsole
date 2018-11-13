@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>File upload</title>
+    </head>
+
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.min.js"></script>
+
+    <link id="skin" rel="stylesheet" href="/cbtconsole/js/warehousejs/jBox/Skins2/Green/jbox.css" />
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jBox/jquery.jBox-2.3.min.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jBox/i18n/jquery.jBox-zh-CN.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/thelibrary.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/ajaxfileupload.js"></script>
+
+    <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.messager.js"></script>
+    <script type="text/javascript" src="/cbtconsole/js/JsBarcode.all.js"></script>
+
+    <body>
+
+        <div>
+            <img id="image" width="100px" style="cursor: pointer;" />
+            <input id="picture_upload" name="file" type="file"  multiple="multiple" />
+            <input type="button"  id="subbut2" value="上传" />
+        </div>
+
+        <script type="text/javascript">
+        	$("#subbut2").click(function() {
+        	 	ajax_upload("picture_upload",function(data) { 
+        	 		//上传图片的成功后的回调方法
+					console.log(data);
+                });
+        	});
+        	
+            function ajax_upload(feid, callback) { //上传图片 feid为 input[file] 的id，callback为回调函数
+                if(image_check(feid)) { //文件后缀名的验证
+                    $.ajaxFileUpload({
+                        fileElementId: feid, //需要上传的文件域的ID，即<input type="file">的ID。
+                        url: '/cbtconsole/warehouse/uploadImageFile', //后台方法的路径
+                        type: 'post', //当要提交自定义参数时，这个参数要设置成post
+                        dataType: 'json', //服务器返回的数据类型。可以为xml,script,json,html。如果不填写，jQuery会自动判断。
+                        secureuri: false, //是否启用安全提交，默认为false。
+                        async: true, //是否是异步
+                        success: function(data) { //提交成功后自动执行的处理函数，参数data就是服务器返回的数据。
+                            if(callback) callback.call(this, data);
+                        },
+                        error: function(data, status, e) { //提交失败自动执行的处理函数。
+                            console.error(e);
+                        }
+                    });
+                }
+            }
+            function image_check(feid) { //自己添加的文件后缀名的验证
+                var img = document.getElementById(feid);
+                return /.(jpg|jpeg|png|gif|bmp)$/.test(img.value.toLowerCase()) ? true : (function() {
+                    alert('图片格式仅支持jpg、jpeg、png、gif、bmp格式，且区分大小写。');
+                    return false;
+                })();
+            }
+        </script>
+
+    </body>
+
+</html>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.userinfo.dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.bean.UserInfoBean" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pass" property="pass" jdbcType="VARCHAR" />
+    <result column="niceName" property="nicename" jdbcType="VARCHAR" />
+    <result column="available_m" property="availableM" jdbcType="DOUBLE" />
+    <result column="applicable_credit" property="applicableCredit" jdbcType="DOUBLE" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+    <result column="activationState" property="activationstate" jdbcType="INTEGER" />
+    <result column="activationCode" property="activationcode" jdbcType="VARCHAR" />
+    <result column="activationTime" property="activationtime" jdbcType="VARCHAR" />
+    <result column="activationPassTime" property="activationpasstime" jdbcType="VARCHAR" />
+    <result column="activationPassCode" property="activationpasscode" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="VARCHAR" />
+    <result column="ac_there" property="acThere" jdbcType="INTEGER" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="adminname" property="adminname" jdbcType="VARCHAR" />
+    <result column="businessName" property="businessname" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="UserExResultMap" type="com.cbt.pojo.UserEx" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="otheremail" property="otheremail" jdbcType="VARCHAR" />
+    <result column="otherphone" property="otherphone" jdbcType="VARCHAR" />
+    <result column="whatsapp" property="whatsapp" jdbcType="VARCHAR" />
+    <result column="facebook" property="facebook" jdbcType="VARCHAR" />
+    <result column="tweater" property="tweater" jdbcType="VARCHAR" />
+    <result column="kiki" property="kiki" jdbcType="VARCHAR" />
+    <result column="skype" property="skype" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="userex_clumn_list">
+  id, userid, otheremail, otherphone, whatsapp, facebook, tweater, kiki, skype
+  </sql>
+  
+   <select id="getUserCount" resultType="java.util.Map">
+   		select id,(select count(g.id) from goods_car g where state=0 and userid=user.id) carcount, 
+   		(select count(o.orderid) from orderinfo o where user_id=user.id) ordercount,email,available_m,
+   		applicable_credit,currency from user where user.id=#{userID}
+   </select>
+   <select id="getPaypal" resultType="java.lang.String">
+   		select username from payment where userid=#{userID} and username is not null   group by username
+   </select>
+   
+    <select id="getUserEx" parameterType="com.cbt.pojo.UserEx" resultMap="UserExResultMap">
+   		select 
+   		<include refid="userex_clumn_list"/>
+   		from user_ex where 
+   		userid=#{userID}
+   </select>
+   
+   <select id="exitEmail" resultType="java.lang.String">
+   		select email from user where  name = #{email} or email = #{email}
+   </select>
+   
+    <update id="upEmail">
+  	update user set email=#{email},name=#{email},pass=#{password} where id=#{uid}
+  </update>
+   <insert id="saveupemail_log" >
+    insert tab_log_upemail(oldemail,newemail,upid,upobj,createtime) values(#{oldemail},#{newemail},#{adminid},1,now())
+  </insert>
+  <select id="exitPhone" resultType="java.lang.String">
+    SELECT id FROM  user_ex  WHERE userid=#{userid}
+  </select>
+  <update id="upPhone">
+    update user_ex set otherphone=#{newPhone} where userid=#{userid}
+  </update>
+  <insert id="InPhone">
+    insert into user_ex (userid,otherphone) values(#{userid},#{newPhone})
+  </insert>
+  <select id="getAllAdmuser" resultType="java.lang.String">
+    select distinct admName from admuser where 1=1 and status =1
+    <if test="admName != null">
+      and admName != #{admName}
+    </if>
+    order by status desc,admName
+  </select>
+</mapper>

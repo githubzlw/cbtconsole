@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.TabCouponMapper">
+	
+    <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode); -->
+	<select id="queryTabCouponList" resultType="com.importExpress.pojo.TabCouponNew">
+		SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid, a.mqlog, a.createtime, b.admName username
+		FROM tab_coupon_new a
+		LEFT JOIN admuser b ON a.userid = b.id
+		<where>
+			<if test="typeCode != null">
+				 a.type = #{typeCode}
+			</if>
+		</where>
+		LIMIT #{startBars},#{rows}
+    </select>
+
+	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode); -->
+	<select id="queryTabCouponListCount" resultType="long">
+		SELECT COUNT(1)
+		FROM tab_coupon_available
+		<where>
+			<if test="typeCode != null">
+				 type_code = #{typeCode}
+			</if>
+		</where>
+    </select>
+    
+    <!-- List<TabCouponType> queryTabCouponTypeCodeList(); -->
+    <select id="queryTabCouponTypeCodeList" resultType="com.importExpress.pojo.TabCouponType">
+		SELECT id, type_code typeCode, type_note typeNote, state, createtime
+		FROM tab_coupon_type
+		WHERE state = 1
+    </select>
+    
+    <!-- List<TabCouponRules> queryTabCouponRulesList(); -->
+    <select id="queryTabCouponRulesList" resultType="com.importExpress.pojo.TabCouponRules">
+		SELECT id, min_amount minAmount, category, available_time availableTime
+		FROM tab_coupon_rules
+    </select>
+    
+    <!-- void addCoupon(@Param("tabCouponNew") TabCouponNew tabCouponNew); -->
+    <insert id="addCoupon">
+    	INSERT INTO tab_coupon_new (`id`, `count`, `leftCount`, `describe`, `value`, `from`, `to`, `type`, `valid`, `userid`, `mqlog`, `createtime`) 
+    	VALUES (#{tabCouponNew.id}, #{tabCouponNew.count}, #{tabCouponNew.leftCount}, #{tabCouponNew.describe}, #{tabCouponNew.value}, 
+    		#{tabCouponNew.from}, #{tabCouponNew.to}, #{tabCouponNew.type}, #{tabCouponNew.valid}, #{tabCouponNew.userid}, #{tabCouponNew.mqlog}, NOW())
+    </insert>
+    
+    <!-- Long checkCouponCode(@Param("couponCode") String couponCode); -->
+    <select id="checkCouponCode" resultType="Long">
+    	SELECT COUNT(1) FROM tab_coupon_new WHERE id = #{couponCode}
+    </select>
+    
+</mapper>

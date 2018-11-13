@@ -1,0 +1,771 @@
+package com.cbt.warehouse.ctrl;
+
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.pojo.Admuser;
+import com.cbt.util.*;
+import com.cbt.website.dao.*;
+import com.cbt.website.service.IOrderSplitServer;
+import com.cbt.website.service.OrderSplitServer;
+import com.cbt.website.util.JsonResult;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/orderSplit")
+public class NewOrderSplitCtr {
+	private static final Log LOG = LogFactory.getLog(NewOrderSplitCtr.class);
+
+	/**
+	 * 订单拆分(正常订单和Drop Ship订单)
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/doSplit.do")
+	@ResponseBody
+	public JsonResult doSplit(HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("ordersplit start");
+		JsonResult json = new JsonResult();
+		try {
+			String orderno = request.getParameter("orderno");
+			String odids = request.getParameter("odids");
+			String state = request.getParameter("state");// 0取消1二次出货
+			if (state == null || "".equals(state)) {
+				json.setOk(false);
+				json.setMessage("获取拆单状态失败");
+			}
+
+			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+			if (admuserJson == null) {
+				json.setOk(false);
+				json.setMessage("用户未登陆");
+				return json;
+			} else {
+				Admuser admuser = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+				// 判断是否是Drop Ship订单，根据订单号获取订单信息
+				OrderInfoDao orderInfoDao = new OrderInfoImpl();
+				OrderBean orderBean = orderInfoDao.getOrderInfo(orderno, null);
+				IOrderSplitServer splitServer = new OrderSplitServer();
+				if (orderBean.getIsDropshipOrder() == 1) {
+					// Drop Ship 拆单流程
+					Map<String, String> map = splitServer.splitOrderShip(orderno, odids, orderBean.getUserid(),state);
+					if("1".equals(map.get("res"))){
+						json.setOk(true);
+						json.setData(map.get("orderNoNew"));
+					}else{
+						json.setOk(false);
+						json.setMessage(map.get("msg"));
+					}
+				} else {
+					// 正常拆单流程
+					// json = splitCommonOrder(orderno, odids, state);
+					json = newSplitCommonOrder(admuser, orderno, odids, state);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("orderSplit error:" + e.getMessage());
+			json.setOk(false);
+			json.setMessage("orderSplit error:" + e.getMessage());
+		}
+		// LOG.info("ordersplit end");
+		return json;
+	}
+
+	@SuppressWarnings("finally")
+	private JsonResult splitCommonOrder(String orderNo, String odids, String state) {
+		JsonResult json = new JsonResult();
+		IOrderSplitDao dao = new OrderSplitDaoImpl();
+		String nwOrderNo = "";
+
+		/*
+		 * 1.所有 有 采购链接的 商品 就 直接 转入一个 新订单，并且转状态到 采购中 2.已支付的产品金额按产品直接拆分 3.客户是以前付过
+		 * 运费的，我们就按照 体积重量，直接拆分 这 两个订单 体积重量 = 长* 宽*高 (厘米)/5000 和 实际重量对比 取 大值
+		 * 4.客户如果取消商品，而该订单 是 -split 的，就不再计算批量折扣 5.原订单的批量折扣金额， 按照价格比例分开 6.50美元的
+		 * 运费credit的拆分
+		 */
+		try {
+			// 查询订单和订单详情
+			OrderBean orderBean = dao.getOrders(orderNo);
+			String[] odidLst = odids.split("@");// 需要取消的商品order_details的id
+			// 记录老订单拆分日志
+			String info_log = ", product_cost=" + orderBean.getProduct_cost() + ",pay_price=" + orderBean.getPay_price()
+					+ ",pay_price_tow=" + orderBean.getPay_price_tow() + ",pay_price_three="
+					+ orderBean.getPay_price_three() + ",actual_ffreight=" + orderBean.getActual_ffreight()
+					+ ",service_fee=" + orderBean.getService_fee() + ",order_ac=" + orderBean.getOrder_ac()
+					+ ",discount_amount=" + orderBean.getDiscount_amount() + ",cashback=" + orderBean.getCashback()
+					+ ",extra_freight=" + orderBean.getExtra_freight() + ",share_discount="
+					+ orderBean.getShare_discount() + ",Coupon_discount=" + orderBean.getCoupon_discount()
+					+ ",extra_discount=" + orderBean.getExtra_discount() + "state=" + orderBean.getState();// --cjc
+
+			LOG.info("ordersplit info_log:" + info_log);
+
+			dao.addOrderInfoLog(orderBean.getOrderNo(), info_log);
+			List<OrderDetailsBean> orderDetails = dao.getOrdersDetails_split(orderNo);
+
+			List<OrderDetailsBean> nwOrderDetails = new ArrayList<OrderDetailsBean>();
+			List<Integer> goodsIds = new ArrayList<Integer>();
+			// 判断是否获取到要拆分的商品ids
+			if (odidLst.length > 0) {
+				for (OrderDetailsBean odds : orderDetails) {
+					for (String odid : odidLst) {
+						if (odds.getId() == Integer.valueOf(odid)) {
+							nwOrderDetails.add(odds);
+							goodsIds.add(odds.getGoodsid());
+							break;
+						}
+					}
+				}
+
+				if (nwOrderDetails.size() > 0) {
+					// 生成另一个采购中订单
+					// 修改已有货源订单详情的订单号
+					String orderNo1 = null;
+					if (orderNo.length() > 17) {
+						OrderBean orderBean1 = null;
+						if (orderNo.indexOf("_") > -1) {
+							String[] n = orderNo.split("_");
+							String orderNo_ = n[0];
+							orderBean1 = dao.getOrders(orderNo_);
+						}
+						String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
+						if (maxSplitOrderNo.indexOf("_") > -1) {
+							int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+							String[] n = orderNo.split("_");
+							orderNo1 = n[0];
+							nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
+						}
+					} else {
+						nwOrderNo = orderNo + "_1";
+						String maxSplitOrderNo = orderBean.getMaxSplitOrder();
+						if (maxSplitOrderNo.indexOf("_") > -1) {
+							int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+							nwOrderNo = orderNo + "_" + (splitIndex + 1);
+						}
+
+					}
+
+					// 开始执行拆单
+					boolean isOk = true;
+					StringBuffer ocBf = new StringBuffer();
+					for (OrderDetailsBean nwOdDt : nwOrderDetails) {
+						if (dao.orderSplitByOrderNo(orderBean.getUserid(), orderNo, nwOrderNo, nwOdDt.getGoodsid(),
+								nwOdDt.getYourorder())) {
+							ocBf.append("," + nwOdDt.getGoodsid());
+							continue;
+						} else {
+							isOk = false;
+							break;
+						}
+					}
+
+					if (!isOk) {
+						json.setOk(false);
+						json.setMessage("拆分失败，已成功拆分商品：" + (ocBf.length() > 0 ? ocBf.toString().substring(1) : ""));
+					} else {
+						// 判断是否是取消状态,是取消,则更新新订单的状态
+						if ("0".equals(state)) {
+							// 执行退款操作:更新客户余额=新订单payprice;更新新订单状态为取消;
+							// 新增客户余额变更记录表recharge_record;新增支付记录payment
+							dao.cancelNewOrder(orderBean.getUserid(), nwOrderNo);
+						} else {
+							// 补充新的支付信息
+							dao.insertIntoPayment(orderBean.getUserid(), nwOrderNo, orderNo);
+						}
+						// 更新订单的状态
+						dao.checkAndUpdateOrderState(orderNo, nwOrderNo);
+						// 更新新订单商品的入库信息,本地
+						if (goodsIds.size() > 0) {
+							dao.updateWarehouseInfo(orderNo, nwOrderNo, goodsIds);
+						}
+
+						json.setOk(true);
+						json.setMessage("拆分成功");
+						json.setData(nwOrderNo);
+						if ("0".equals(state)) {
+							// 拆单取消后取消的商品如果有使用库存则还原库存
+							dao.cancelInventory(odidLst);
+						}
+					}
+				} else {
+					json.setOk(false);
+					json.setMessage("拆分失败，匹配商品不成功");
+				}
+
+			} else {
+				json.setOk(false);
+				json.setMessage("获取拆分商品失败");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.debug("OrderSplitServer-Exception:", e);
+			json.setOk(false);
+			json.setMessage("拆分失败，原因：" + e.getMessage());
+		} finally {
+			return json;
+		}
+	}
+
+	@SuppressWarnings("finally")
+	private JsonResult newSplitCommonOrder(Admuser admuser, String orderNo, String odids, String state) {
+
+		// 1.订单拆单前，做数据保存信息
+		// 2.复制订单信息充当临时订单
+		// 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
+		// 4.执行拆单操作
+		// 5.执行完成后，给出执行的结果并保存数据库
+		// 6.如果是取消商品进余额，则调用统一接口进行客户余额变更
+
+		JsonResult json = new JsonResult();
+		IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+		String nwOrderNo = "";
+		try {
+			// 查询订单和订单详情
+			OrderBean orderBean = splitDao.getOrders(orderNo);
+			String[] odidLst = odids.split("@");// 需要取消的商品order_details的id
+			// 1.拆单之前保存订单原始信息 log
+			boolean isSuccess = saveOrderInfoBeforeSplitOrder(orderBean, orderNo, odids, admuser);
+			if (isSuccess) {
+				// 2.复制订单信息充当临时订单
+				OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
+				// 获取所有订单详情的信息
+				List<OrderDetailsBean> orderDetails = splitDao.getOrdersDetails_split(orderNo);
+				List<OrderDetailsBean> nwOrderDetails = new ArrayList<OrderDetailsBean>();
+				List<Integer> goodsIds = new ArrayList<Integer>();
+				// 判断是否获取到要拆分的商品ids
+				if (odidLst.length > 0) {
+					double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
+					double totalGoodsCostOld = 0;// 原订单商品总价
+					for (OrderDetailsBean odds : orderDetails) {
+						for (String odid : odidLst) {
+							if (odds.getId() == Integer.valueOf(odid)) {
+								nwOrderDetails.add(odds);
+								goodsIds.add(odds.getGoodsid());
+								break;
+							}
+						}
+						totalGoodsCostOld += Double.valueOf(odds.getGoodsprice()) * odds.getYourorder();
+					}
+					// 判断传递的odids有效
+					if (nwOrderDetails.size() == odidLst.length && !(totalPayPriceOld <= 0 || totalGoodsCostOld <= 0)) {
+						// 3.计算预期结果并保存和拆单操作
+						calculateExpectedResult(json, nwOrderDetails, orderNo, nwOrderNo, orderBean, totalGoodsCostOld,
+								totalPayPriceOld, orderBeanTemp, admuser, state, odidLst, goodsIds);
+						//取消订单后商品进入库存中
+						//判断该订单是否为测试订单如果是则不入库存
+//						boolean flag=splitDao.checkTestOrder(odidLst[0]);
+//						if(flag){
+							if ("0".equals(state)) {
+								for (String odid : odidLst) {
+									splitDao.addInventory(odid,"拆单取消库存");
+								}
+							}
+//						}
+					} else {
+						json.setOk(false);
+						if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
+							json.setMessage("拆分失败，匹配商品不成功");
+						} else if (totalPayPriceOld <= 0) {
+							json.setMessage("拆分失败，此订单支付金额小于等于0");
+						} else if (totalGoodsCostOld <= 0) {
+							json.setMessage("拆分失败，此订单总价小于等于0");
+						}
+					}
+				} else {
+					json.setOk(false);
+					json.setMessage("获取需要拆分的商品失败");
+				}
+			} else {
+				json.setOk(false);
+				json.setMessage("保存日志失败，请重试");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("OrderSplitServer-Exception:", e);
+			json.setOk(false);
+			json.setMessage("拆分失败，原因：" + e.getMessage());
+		} finally {
+			return json;
+		}
+	}
+
+	/**
+	 * 拆单之前保存订单原始信息
+	 */
+	private boolean saveOrderInfoBeforeSplitOrder(OrderBean orderBean, String orderNo, String odids, Admuser admuser) {
+		IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+		// 记录老订单拆分日志
+		String info_log = ", product_cost=" + orderBean.getProduct_cost() + ",pay_price=" + orderBean.getPay_price()
+				+ ",pay_price_tow=" + orderBean.getPay_price_tow() + ",pay_price_three="
+				+ orderBean.getPay_price_three() + ",actual_ffreight=" + orderBean.getActual_ffreight()
+				+ ",service_fee=" + orderBean.getService_fee() + ",order_ac=" + orderBean.getOrder_ac()
+				+ ",discount_amount=" + orderBean.getDiscount_amount() + ",cashback=" + orderBean.getCashback()
+				+ ",extra_freight=" + orderBean.getExtra_freight() + ",share_discount=" + orderBean.getShare_discount()
+				+ ",Coupon_discount=" + orderBean.getCoupon_discount() + ",extra_discount="
+				+ orderBean.getExtra_discount() + "state=" + orderBean.getState() 
+				+ "vatBalance = "+ orderBean.getVatBalance(); // --cjc
+		// 1.订单拆单前，做数据保存信息
+		LOG.info("ordersplit orderNo:" + orderNo + "; info_log:[" + info_log + "];");
+		LOG.info("ordersplit odids:[" + odids + "];");
+		info_log = "";
+		return splitDao.addOrderInfoAndPaymentLog(orderBean.getOrderNo(), admuser, 0);
+	}
+
+	/**
+	 * 计算预期结果并保存
+	 */
+	private void calculateExpectedResult(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
+			String nwOrderNo, OrderBean orderBean, double totalGoodsCostOld, double totalPayPriceOld,
+			OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst, List<Integer> goodsIds) {
+		IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+		// 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
+		double totalGoodsCostNew = 0;// 新的订单商品总价
+		for (OrderDetailsBean nwOdDt : nwOrderDetails) {
+			totalGoodsCostNew += Double.valueOf(nwOdDt.getGoodsprice()) * nwOdDt.getYourorder();
+		}
+		if (totalGoodsCostNew > 0) {
+			// 拆单新生成的订单号
+			String orderNo1 = null;
+			if (orderNo.length() > 17) {
+				OrderBean orderBean1 = null;
+				if (orderNo.indexOf("_") > -1) {
+					String[] n = orderNo.split("_");
+					String orderNo_ = n[0];
+					orderBean1 = splitDao.getOrders(orderNo_);
+				}
+				String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
+				if (maxSplitOrderNo.indexOf("_") > -1) {
+					int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+					String[] n = orderNo.split("_");
+					orderNo1 = n[0];
+					nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
+				}
+			} else {
+				nwOrderNo = orderNo + "_1";
+				String maxSplitOrderNo = orderBean.getMaxSplitOrder();
+				if (maxSplitOrderNo.indexOf("_") > -1) {
+					int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+					nwOrderNo = orderNo + "_" + (splitIndex + 1);
+				}
+			}
+			// 支付金额拆分逻辑：拆分比例=拆单商品的总价/原订单所有商品的总价
+			// 所有的折扣金额都按照计算的拆分比例计算，新生成的订单支付金额也是按照比例分割
+			double splitRatio = totalGoodsCostNew / totalGoodsCostOld;// 拆分比例
+			double totalPayPriceNew = totalPayPriceOld * splitRatio;// 新的订单支付金额
+			double coupon_discount_old = orderBean.getCoupon_discount();// coupon优惠
+			double coupon_discount_new = coupon_discount_old * splitRatio;// 新订单coupon优惠
+			double extra_discount_old = orderBean.getExtra_discount();// 其他优惠
+			double extra_discount_new = extra_discount_old * splitRatio;// 新订单其他优惠
+			double grade_discount_old = orderBean.getGradeDiscount();// 等级优惠
+			double grade_discount_new = grade_discount_old * splitRatio;// 新订单等级优惠
+			double share_discount_old = orderBean.getShare_discount();// 分享优惠
+			double share_discount_new = share_discount_old * splitRatio;// 新订单分享优惠
+			double discount_amount_old = orderBean.getDiscount_amount();// 优惠金额（之前BIz等）
+			double discount_amount_new = discount_amount_old * splitRatio;// 新订单优惠金额（之前BIz等）
+			double cash_back_old = orderBean.getCashback();// cash_back折扣
+			double cash_back_new = cash_back_old * splitRatio;// 新订单cash_back折扣
+			double extra_freight_old = orderBean.getExtra_freight();// 额外运费
+			double extra_freight_new = extra_freight_old * splitRatio;//新订单额外运费
+			
+			double vatBalanceOld = orderBean.getVatBalance();//双清包税价格
+			double vatBalanceNew = vatBalanceOld * splitRatio;//新双清包税价格
+			// 新生成订单信息
+			OrderBean odbeanNew = new OrderBean();
+			odbeanNew.setVatBalance(vatBalanceNew);
+			odbeanNew.setUserid(orderBean.getUserid());
+			odbeanNew.setOrderNo(nwOrderNo);
+			odbeanNew.setExchange_rate(orderBean.getExchange_rate());
+			odbeanNew.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_new));
+			odbeanNew.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_new));
+			odbeanNew.setGradeDiscount(
+					Float.valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_new))));
+			odbeanNew.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_new));
+			odbeanNew.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_new));
+			odbeanNew.setProduct_cost(String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostNew)));
+			odbeanNew.setCashback(cash_back_new);
+			odbeanNew.setExtra_freight(extra_freight_new);
+			odbeanNew.setOrderDetail(nwOrderDetails);
+			// 计算新订单支付金额
+			totalPayPriceNew = totalGoodsCostNew - coupon_discount_new - share_discount_new - discount_amount_new
+					- grade_discount_new-cash_back_new + extra_freight_new;
+			odbeanNew.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceNew));
+			// 原始订单减去拆分比例后的值
+			orderBeanTemp.setVatBalance(vatBalanceOld - vatBalanceNew);
+			orderBeanTemp.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_old - coupon_discount_new));
+			orderBeanTemp.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_old - extra_discount_new));
+			orderBeanTemp.setGradeDiscount(Float
+					.valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_old - grade_discount_new))));
+			orderBeanTemp.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_old - share_discount_new));
+			orderBeanTemp.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_old - discount_amount_new));
+			orderBeanTemp.setProduct_cost(
+					String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostOld - totalGoodsCostNew)));
+			orderBeanTemp.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceOld - totalPayPriceNew));
+			orderBeanTemp.setCashback(genDoubleWidthTwoDecimalPlaces(cash_back_old - cash_back_new));
+			orderBeanTemp.setExtra_freight(genDoubleWidthTwoDecimalPlaces(extra_freight_old - extra_freight_new));
+			// 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
+			List<OrderBean> orderBeans = new ArrayList<OrderBean>();
+			orderBeans.add(odbeanNew);
+			orderBeans.add(orderBeanTemp);
+			boolean success = splitDao.saveOrderInfoLogByList(orderBeans, admuser);
+			if (success) {
+				// 开始拆单操作
+				doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
+						odidLst, goodsIds, (float) totalPayPriceNew);
+			} else {
+				json.setOk(false);
+				json.setMessage("保存拆单信息失败，程序终止执行");
+			}
+		} else {
+			json.setOk(false);
+			json.setMessage("拆分失败，拆分商品商品总价为0");
+		}
+	}
+
+	/**
+	 * 真正的拆单操作
+	 */
+	private void doSplitOrderAction(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
+			String nwOrderNo, OrderBean orderBeanTemp, OrderBean odbeanNew, Admuser admuser, String state,
+			String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew) {
+
+		IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+		// 4.执行拆单操作
+		// 开始执行拆单
+		boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails,state);
+		if (!isOk) {
+			json.setOk(false);
+			json.setMessage("拆分失败请重试");
+		} else {
+
+			// 更新订单的状态
+			splitDao.checkAndUpdateOrderState(orderNo, nwOrderNo);
+			// 更新新订单商品的入库信息,本地
+			if (goodsIds.size() > 0) {
+				splitDao.updateWarehouseInfo(orderNo, nwOrderNo, goodsIds);
+			}
+
+			// 判断是否是取消状态,是取消,则更新新订单的状态
+			if ("0".equals(state)) {
+				// 执行退款操作:更新客户余额=新订单payprice;更新新订单状态为取消;
+				// 新增客户余额变更记录表recharge_record;新增支付记录payment
+				splitDao.cancelNewOrder(orderBeanTemp.getUserid(), nwOrderNo);
+				// 拆单取消后取消的商品如果有使用库存则还原库存
+				splitDao.cancelInventory(odidLst);
+				// 5.如果是取消商品进余额，则调用统一接口进行客户余额变更
+				ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
+				balanceDao.changeBalance(orderBeanTemp.getUserid(), genFloatWidthTwoDecimalPlaces(totalPayPriceNew), 1,
+						1, nwOrderNo, "", admuser.getId());
+			}
+			// 6.执行完成后，给出执行的结果并保存数据库
+			splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);
+
+			json.setOk(true);
+			json.setMessage("拆分成功");
+			json.setData(nwOrderNo);
+		}
+
+	}
+
+	/**
+	 * 生成两位小数的double类型数据
+	 * 
+	 * @param numVal
+	 * @return
+	 */
+	private double genDoubleWidthTwoDecimalPlaces(double numVal) {
+		BigDecimal bd = new BigDecimal(numVal);
+		return bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
+
+	/**
+	 * 生成两位小数的float类型数据
+	 * 
+	 * @param numVal
+	 * @return
+	 */
+	private float genFloatWidthTwoDecimalPlaces(float numVal) {
+		BigDecimal bd = new BigDecimal(numVal);
+		return bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+	}
+
+	/**
+	 * 获取订单拆分后的邮件信息
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/genOrderSplitEmail.do")
+	public String genOrderSplitEmail(HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("genOrderSplitEmail start sendEmailInfo");
+		try {
+
+			// 判断是否开启线下同步线上配置
+			if (GetConfigureInfo.openSync()) {
+				String odids = request.getParameter("odids");
+				String orderNo = request.getParameter("orderno");
+				String ordernoNew = request.getParameter("ordernoNew");
+
+				String time = request.getParameter("time");
+				String time_ = request.getParameter("time_");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				int state = Integer.parseInt(request.getParameter("state"));
+
+				IOrderSplitDao orderSplitDao = new OrderSplitDaoImpl();
+				// 老订单的订单信息
+				OrderBean oldOrderBean = orderSplitDao.getOrderInfo(orderNo);
+
+				OrderBean nwOrderBean = new OrderBean();
+				nwOrderBean.setOrderNo(ordernoNew);
+
+				Calendar calendar = Calendar.getInstance();
+				String expect_arrive_time_ = "";
+				String expect_arrive_time = "";
+				if (state == 1) {
+					// 获取运输方式和对应的运输时间
+					String mode_transport = oldOrderBean.getMode_transport();
+					int mode_transport_day = 0;
+					if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+						String[] mode_transports = mode_transport.split("@");
+						if (mode_transports.length > 3) {
+							mode_transport = mode_transport.split("@")[1];
+							if (Utility.getStringIsNull(mode_transport)) {
+								if (mode_transport.indexOf("-") > -1) {
+									mode_transport = mode_transport.split("-")[1];
+								}
+								mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
+							}
+						}
+					}
+					if (oldOrderBean.getOrderNo().indexOf("_") > -1) {
+						if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
+							calendar.setTime(sdf.parse(time_));
+							calendar.set(Calendar.DAY_OF_MONTH,
+									calendar.get(Calendar.DAY_OF_MONTH) + mode_transport_day);
+							expect_arrive_time_ = sdf.format(calendar.getTime());
+						}
+					} else {
+						if (mode_transport_day != 0 && Utility.getStringIsNull(time)) {
+							calendar.setTime(sdf.parse(time));
+							calendar.set(Calendar.DAY_OF_MONTH,
+									calendar.get(Calendar.DAY_OF_MONTH) + mode_transport_day);
+							expect_arrive_time = sdf.format(calendar.getTime());
+						}
+					}
+				}
+
+				// 获取用户uuid和个人中心自动登录路径
+				String uuid = UUIDUtil.getEffectiveUUID(oldOrderBean.getUserid(), "");
+				String url = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
+				request.setAttribute("autoUrl", url);
+				// 获取用户email
+				IOrderSplitServer splitServer = new OrderSplitServer();
+				request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
+
+				List<Object[]> orderDetails = orderSplitDao.queryLocalOrderDetails(orderNo);
+				List<Object[]> nwOrderDetails = new ArrayList<Object[]>();// 拆分的订单
+				List<Object[]> oldOrderDetails = new ArrayList<Object[]>();// 剩余的订单
+				// 发送邮件开始
+				String[] odidLst = odids.split("@");
+				// 判断是否获取到要拆分的商品ids
+				if (odidLst.length > 0) {
+					for (int i = 0; i < orderDetails.size(); i++) {
+						boolean isNew = false;
+						for (String odid : odidLst) {
+							if (orderDetails.get(i)[1].toString().equals(odid)) {
+								nwOrderDetails.add(orderDetails.get(i));
+								isNew = true;
+								break;
+							}
+						}
+						if (!isNew) {
+							oldOrderDetails.add(orderDetails.get(i));
+						}
+					}
+				}
+
+				float product_cost = 0;
+				if (nwOrderDetails.size() > 0) {
+					for (int k = 0; k < nwOrderDetails.size(); k++) {
+						product_cost += Float.valueOf(nwOrderDetails.get(k)[3].toString());
+
+					}
+				}
+
+				nwOrderBean.setProduct_cost(String.valueOf(product_cost));
+				// 发送邮件开始
+				request.setAttribute("details", oldOrderDetails);
+				request.setAttribute("details_", nwOrderDetails);
+				if (state == 1) {
+					request.setAttribute("expect_arrive_time_", expect_arrive_time_);
+					request.setAttribute("expect_arrive_time", expect_arrive_time);
+					request.setAttribute("orderbean", oldOrderBean);
+					request.setAttribute("orderbean_", nwOrderBean);
+				} else {
+					request.setAttribute("orderbean_", nwOrderBean);
+				}
+				request.setAttribute("currency", oldOrderBean.getCurrency());
+			} else {
+
+				String orderNo = request.getParameter("orderno");
+				String ordernoNew = request.getParameter("ordernoNew");
+				String time = request.getParameter("time");
+				String time_ = request.getParameter("time_");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				int state = Integer.parseInt(request.getParameter("state"));
+
+				IOrderSplitServer splitServer = new OrderSplitServer();
+				String[] orderNos;
+				if (state == 1) {
+					orderNos = new String[] { orderNo, ordernoNew };
+				} else {
+					orderNos = new String[] { ordernoNew };
+				}
+				List<OrderBean> orderBeans = splitServer.getSplitOrder(orderNos);
+				Calendar calendar = Calendar.getInstance();
+				String expect_arrive_time_ = "";
+				String expect_arrive_time = "";
+				OrderBean obBean = new OrderBean();
+				OrderBean obBean_ = new OrderBean();
+				if (state == 1) {
+					for (int i = 0; i < orderBeans.size(); i++) {
+						// 获取运输方式和对应的运输时间
+						String mode_transport = orderBeans.get(i).getMode_transport();
+						int mode_transport_day = 0;
+						if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+							String[] mode_transports = mode_transport.split("@");
+							if (mode_transports.length > 3) {
+								mode_transport = mode_transport.split("@")[1];
+								if (Utility.getStringIsNull(mode_transport)) {
+									if (mode_transport.indexOf("-") > -1) {
+										mode_transport = mode_transport.split("-")[1];
+									}
+									mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
+								}
+							}
+						}
+						if (orderBeans.get(i).getOrderNo().indexOf("_") > -1) {
+							if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
+								calendar.setTime(sdf.parse(time_));
+								calendar.set(Calendar.DAY_OF_MONTH,
+										calendar.get(Calendar.DAY_OF_MONTH) + mode_transport_day);
+								expect_arrive_time_ = sdf.format(calendar.getTime());
+							}
+							if(orderNo.equals(orderBeans.get(i).getOrderNo())){
+								obBean = orderBeans.get(i);
+							}else{
+								obBean_ = orderBeans.get(i);
+							}
+						} else {
+							if (mode_transport_day != 0 && Utility.getStringIsNull(time)) {
+								calendar.setTime(sdf.parse(time));
+								calendar.set(Calendar.DAY_OF_MONTH,
+										calendar.get(Calendar.DAY_OF_MONTH) + mode_transport_day);
+								expect_arrive_time = sdf.format(calendar.getTime());
+							}
+							obBean = orderBeans.get(i);
+						}
+					}
+				} else {
+					obBean_ = orderBeans.get(0);
+				}
+
+				// 获取用户uuid和个人中心自动登录路径
+				String uuid = UUIDUtil.getEffectiveUUID(orderBeans.get(0).getUserid(), "");
+				String url = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
+				request.setAttribute("autoUrl", url);
+				// 获取用户email
+				request.setAttribute("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
+				List<Object[]> orderDetails = new ArrayList<Object[]>();
+				if (state == 1) {
+					orderDetails = splitServer.getSplitOrderDetails(orderNos);
+				} else {
+					orderDetails = splitServer.getOrderDetails(orderNos);
+				}
+				List<Object[]> details_ = new ArrayList<Object[]>();// 拆分的订单
+				List<Object[]> details = new ArrayList<Object[]>();// 剩余的订单
+				// 发送邮件开始
+				for (int i = 0; i < orderDetails.size(); i++) {
+					if ((orderDetails.get(i)[0].toString().indexOf("_") > -1)) {
+						if (orderNo.length() > 17) {
+							if (!orderDetails.get(i)[0].equals(ordernoNew)) {
+								details.add(orderDetails.get(i));
+							} else {
+								details_.add(orderDetails.get(i));
+							}
+						} else {
+							details_.add(orderDetails.get(i));
+						}
+					} else {
+						details.add(orderDetails.get(i));
+					}
+				}
+
+				request.setAttribute("details", details);
+				request.setAttribute("details_", details_);
+				if (state == 1) {
+					request.setAttribute("expect_arrive_time_", expect_arrive_time_);
+					request.setAttribute("expect_arrive_time", expect_arrive_time);
+					request.setAttribute("orderbean", obBean);
+					request.setAttribute("orderbean_", obBean_);
+				} else {
+					//针对取消的订单计算折扣金额
+
+					double coupon_discount = obBean_.getCoupon_discount();// coupon优惠
+					double extra_discount = obBean_.getExtra_discount();// 其他优惠
+					double grade_discount = obBean_.getGradeDiscount();// 等级优惠
+					double share_discount = obBean_.getShare_discount();// 分享优惠
+					double discount_amount = obBean_.getDiscount_amount();// 优惠金额（之前BIz等）
+					double cash_back = obBean_.getCashback();// cash_back折扣
+
+					double extra_freight = obBean_.getExtra_freight();// 额外运费
+					double vatBalance = obBean_.getVatBalance();//双清包税价格
+
+					double totalDisCount = coupon_discount + extra_discount + grade_discount + share_discount + discount_amount + cash_back;
+					if(totalDisCount > 0.01){
+						request.setAttribute("totalDisCount", orderBeans.get(0).getCurrency() + " -" + (BigDecimalUtil.truncateDouble(totalDisCount,2)));
+					}else{
+						request.setAttribute("totalDisCount", "--");
+					}
+
+					double totalExtraFree = extra_freight + vatBalance;
+					if(totalExtraFree > 0.01){
+						request.setAttribute("totalExtraFree", orderBeans.get(0).getCurrency() + " " + BigDecimalUtil.truncateDouble(totalExtraFree,2));
+					}else{
+						request.setAttribute("totalExtraFree", "--");
+					}
+					request.setAttribute("orderbean_", obBean_);
+				}
+				request.setAttribute("currency", orderBeans.get(0).getCurrency());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("genOrderSplitEmail:" + e.getMessage());
+		}
+		LOG.info("getOrderSplit sendEmailInfo end");
+		return "sendemail_split";
+	}
+
+}

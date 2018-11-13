@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>品类精研编辑页</title><!--  updatetime: 2018/09/04 18:23 -->
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<script type="text/javascript">
+function imgError(obj, fileName) {
+    obj.onerror='';
+    obj.src=fileName;
+}
+var keyword_list;
+var keyword_id;
+$(function(){
+	keywords_show();
+	cate_reflush();
+ /*  $( '#add_detail_seach_1688cid_update' ).combotree ({
+   url:"../categoryResearch/listLazy?parentid=1",  
+   onBeforeExpand:function(node) {alert(node.id)
+         $('#add_detail_seach_1688cid_update').combotree("tree").tree("options").url = "../categoryResearch/listLazy?parentid=" + node.id;
+   }
+      }); */
+});
+ 
+//验证url
+function isURL(str_url) { 
+	var match = /^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/;
+	//re.test() 
+	if (match.test(str_url)) { 
+		return true; 
+	} else { 
+		return false; 
+	} 
+}
+
+function keywords_show(){
+	  $('#keyword_tt').tree({
+                url:'../categoryResearch/list',
+                onClick: function(node){
+					var id = node.id; 
+					if(node.pid==0){return;}
+					if(id){
+						$("#detail_neirong_div").html("");
+						$("#check_detail_id").val("");
+						detail(id);
+					}
+				}, 
+				 onContextMenu: function(e,node){ //var node = $("#keyword_tt").tree('getSelected');
+				     	if(node.pid!=0){return;}
+				            e.preventDefault();
+				            $(this).tree('select',node.target);
+				            $('#tabsMenu').menu('show',{
+				                left: e.pageX,
+				                top: e.pageY
+				            });
+				            
+				            $('#tabsMenu').menu({      
+				                onClick:function(item){
+				                	// 根据选择的id判断选中的是添加，修改，还是删除  
+				                	 var node = $("#keyword_tt").tree('getSelected');
+				                   if(item.id==1){// 添加  
+				                       document.getElementById("mydialog").title = "添加节点";  
+				                        
+				                       document.getElementById("txRolename").value = "";  
+				                       $('#mydialog').show(); // 弹出框显示  
+				                       $('#mydialog').dialog({   
+				                            collapsible: true,   
+				                            minimizable: true,   
+				                            maximizable: true,   
+				                          
+				                            buttons: [{   
+				                               text: '提交',   
+				                               iconCls: 'icon-ok',   
+				                               handler: function() { 
+				                                    $.ajax({  
+				                                        url : "../categoryResearch/add", 
+				                                        type:"post",
+				                                        data:{keyword:$("#txRolename").val()},
+				                                        success : function(data) {  
+				                                            keywords_show();   cate_reflush();                                            
+				                                            $('#mydialog').dialog('close');  
+				                                        }  
+				                                      
+				                                    });  
+				                               }   
+				                            }, {   
+				                               text: '取消',   
+				                               handler: function() {   
+				                                   $('#mydialog').dialog('close');  
+				                               }   
+				                               }]   
+				                       });   
+				                         
+				                   }else if(item.id==2){// 修改  
+				                       var node = $("#keyword_tt").tree('getSelected');  
+				                       document.getElementById("mydialog").title = "修改节点";  
+				                       document.getElementById("txRolename").value = node.text;  
+				                       $('#mydialog').show();   
+				                       $('#mydialog').dialog({   
+				                            collapsible: true,   
+				                            minimizable: true,   
+				                            maximizable: true,   
+				                          
+				                            buttons: [{   
+				                               text: '提交',   
+				                               iconCls: 'icon-ok',   
+				                               handler: function() {    
+				                                    $.ajax({  
+				                                        url : "../categoryResearch/update",  
+				                                        type : "post",  
+				                                        async : false,  
+				                                        data:{update_keyword:$("#txRolename").val(),update_id:node.id},
+				                                        dataType:"json",  
+				                                        success : function(data) {  
+				                                            keywords_show();  cate_reflush();                                                 
+				                                            $('#mydialog').dialog('close');  
+				                                        }  
+				                                      
+				                                    });  
+				                               }   
+				                            }, {   
+				                               text: '取消',   
+				                               handler: function() {   
+				                                   $('#mydialog').dialog('close');  
+				                               }   
+				                               }]   
+				                       });   
+				                         
+				                   }else if(item.id==3){// 删除  
+				                       var node = $("#keyword_tt").tree('getSelected');  
+				                       $('#mydialogtemp').show();   
+				                       $('#mydialogtemp').dialog({   
+				                            collapsible: true,   
+				                            minimizable: true,   
+				                            maximizable: true,   
+				                            buttons: [{   
+				                               text: '提交',   
+				                               iconCls: 'icon-ok',   
+				                               handler: function() {   
+				                                    $.ajax({  
+				                                        url : "../categoryResearch/deleteCate",  
+				                                        type : "post",  
+				                                        async : false,  
+				                                        data :{id : node.id},  
+				                                        dataType:"json",  
+				                                        success : function(data) { 
+				                                            keywords_show(); cate_reflush();                                                  
+				                                            $('#mydialogtemp').dialog('close');  
+				                                        }  
+				                                      
+				                                    });  
+				                               }   
+				                            }, {   
+				                               text: '取消',   
+				                               handler: function() {  
+				                            	   $('#mydialogtemp').dialog('close');   
+				                               }   
+				                               }]   
+				                       });   
+				                         
+				                   }  
+				                }      
+				            });  
+				            
+				        },
+				
+
+    });
+	  }
+	/* $.ajax({
+		url : '../categoryResearch/list',
+		method : 'post',
+		dataType:'json',
+		success : function(data) {
+			keyword_list = data; */
+			/* var keyword_tt = $("#keyword_tt");
+			var str = "[";
+			var checknum; 
+			if(keyword_list) {
+				for (var i=0;i<keyword_list.length;i++) {
+					//判断是否启用
+					if(keyword_list[i].isshow==1){
+						str += "{id:'"+keyword_list[i].id+"',text:'"+keyword_list[i].keyword+"<font id="+keyword_list[i].id+"f color=red>[已启用]</font>'";
+					}else{
+					   str += "{id:'"+keyword_list[i].id+"',text:'"+keyword_list[i].keyword+"<font id="+keyword_list[i].id+"f color=red></font>'";
+					}
+					
+					if(keyword_id) {
+						if(keyword_id == keyword_list[i].id) {
+							checknum = i;
+						}
+					}
+					
+					str += "}";
+					
+					if(i!=(keyword_list.length-1)){
+						str += ",";
+					}
+					
+				}
+			}
+			str += "]";
+			
+			keyword_json = eval(str);
+			 */
+			/*  keyword_json = keyword_list;
+			if(keyword_json!=null && keyword_json.length>0){
+			 	$('#keyword_tt').tree({
+					 onClick: function(node){
+						var id = node.id; 
+						if(id){
+							$("#detail_neirong_div").html("");
+							$("#check_detail_id").val("");
+							detail(id);
+						}
+							
+					}, 
+					onBeforeExpand:function(node){
+						$('#keyword_tt').tree('options').url = "../categoryResearch/list?parentId=" + node.id; */
+						//var selected = $('#keyword_tt').tree('getSelected');
+						/* var selected = $('#keyword_tt').tree('find', node.id);	
+				
+						keywords_show_append(selected,node)
+						 */
+				/* 	}, */
+		/* 			
+					
+					data: keyword_json
+				}); 
+				
+				
+			}
+			
+			 $("#keyword_tt").find("li").eq(checknum).find("div").addClass("tree-node-selected"); 
+		},
+		error: function (msg) {
+			  alert(msg);
+        }
+	}); */ 
+
+	/* function keywords_show_append(select,node){
+		 $.ajax({
+				url : '../categoryResearch/list',
+				method : 'post',
+				data:{"parentId": node.id},
+				dataType:'json',
+				success : function(data) {
+					var selected = $('#keyword_tt').tree('find', node.id);	
+				
+					 $('#keyword_tt').tree('append', {
+				            parent:selected.target,
+				            data:data
+				        });
+				}
+		 })
+	} */
+	/*  $(function(){
+		 var node = $('#keyword_tt').tree('getSelected');	
+		 alert(1)
+		 $('#keyword_tt').tree('append', {
+	            parent:node.target,
+	            data:nodes
+	        });
+	 
+	 }) */
+	 
+/*查询该关键字的详情,在关键字展示区展示  */
+function detail(id) {
+	$.ajax({
+		url : '../categoryResearch/get',
+		method : 'post',
+		data: {id : id},
+		dataType:'json',
+		success : function(data) {
+			var res = data;
+			if(res) {
+				$("#keyword_neirong_div").html("<table id=\"keyword_neirong\" style=\"width:auto\"></table>");
+				$('#keyword_neirong').propertygrid({   
+				    showGroup: false,    
+				    scrollbarSize: 0    
+				});
+				var row = {'name':'关键词','value':res.keyword};
+				$('#keyword_neirong').propertygrid('appendRow',row);
+				row = {'name':'同义词','value':res.keyword1};
+				$('#keyword_neirong').propertygrid('appendRow',row);
+				row = {'name':'访问路径','value':res.filename};
+				$('#keyword_neirong').propertygrid('appendRow',row);
+				var isshowstr = res.isshow == 1 ? '已启用' : '未启用';
+				row = {'name':'是否启用','value':isshowstr};
+				$('#keyword_neirong').propertygrid('appendRow',row);
+				
+				var buttonstr ="";
+		       buttonstr  += "&nbsp;&nbsp;&nbsp;&nbsp;<input onclick='preview(\""+res.keyword+"\",\""+res.importPath+"\")' type='button' value='预览关键词细分类专页'>";
+				if(res.isshow == 1){
+					buttonstr += "&nbsp;&nbsp;&nbsp;&nbsp;<input id='staticize_button' onclick='isshow("+res.id+",0)' type='button' value='停用'>";
+				}else{
+					buttonstr += "&nbsp;&nbsp;&nbsp;&nbsp;<input id='staticize_button' onclick='isshow("+res.id+",1)' type='button' value='启用'>";
+				}
+				
+				$("#keyword_neirong_div").append(buttonstr);
+			
+				detailList(res.id);
+				
+				$("#detail_sid").val(res.id);
+				
+				keyword_id = res.id;
+			}
+			
+		},
+		error: function (msg) {
+			alert(msg);
+		}
+	});
+}
+
+//预览专页
+function preview(keyword,importPath) {
+	window.open("https://www.import-express.com/goodslist?keyword="+keyword+"&srt=default&preview=default","_blank");
+	 /* $.ajax({
+		url : '../categoryResearch/preview.do',
+		method : 'post',
+		data: {keyword : keyword},
+		dataType:'json',
+		success : function(data) {
+			var res = data;
+			if(res.status){//window.open(importPath+"/categortpage/detail?keyword="+keyword+"&srt=default","_blank");
+				window.open("https://www.import-express.com/goodslist?keyword="+keyword+"&srt=default&preview=default","_blank");
+			 }else{
+				$.messager.alert('message',"请稍后重试");
+			}
+			$("#staticize_button").removeAttr("disabled");
+		},
+		error: function (msg) {
+			alert("服务器繁忙");
+			console.log(msg)
+		}
+	});  */
+} 
+//是否启用
+function isshow(id,isshow) {
+	$.ajax({
+		url : '../categoryResearch/isshow.do',
+		method : 'post',
+		data : {id : id,isshow : isshow},
+		dataType : 'json',
+		success : function(data) {
+			var res = data;
+			if(res.status) {
+				if(isshow==1){$("#"+id+"f").html('[已启用]')}
+				if(isshow==0){$("#"+id+"f").html('')}
+				$.messager.alert('message',res.message);
+				detail(id);
+			}else{
+				$.messager.alert('message',res.message);
+			}
+		},
+		error: function (msg) {
+			alert(msg);
+		}
+	});
+}
+
+
+
+//新增关键词
+function addKeyword() {
+	$('#keyword_add').form({    
+	    url:"../categoryResearch/add",    
+	    onSubmit: function(){    
+	    	var isValid = $(this).form('validate');
+			if (!isValid){
+				$.messager.progress('close');	// 如果表单是无效的则隐藏进度条
+			}
+			return isValid;	// 返回false终止表单提交    
+	    },    
+	    success:function(data){
+	    	var res = JSON.parse(data);
+	    	if(res.status) {
+	    		keyword_id = res.id;
+	    		keywords_show();//加载关键字列表和主关键字详情展示区
+	    		detail(res.id);
+				$("#detail_neirong_div").html("");
+	    		//$.messager.alert('message',res.message);
+				$('#keyword_add_win').window('close');
+		    	$('#keyword_add_win').form('clear');
+	    	}else{
+	    		$.messager.alert('message',res.message);
+	    	}
+	    }    
+	});    
+	// submit the form    
+	$('#keyword_add').submit();
+}
+//保存修改后的同义词
+function updateKeyword() {
+	$('#keyword_update').form({    
+	    url:"../categoryResearch/update",    
+	    onSubmit: function(){    
+	    	var isValid = $(this).form('validate');
+			if (!isValid){
+				$.messager.progress('close');	// 如果表单是无效的则隐藏进度条
+			}
+			return isValid;	// 返回false终止表单提交        
+	    },    
+	    success:function(data){
+	    	var res = JSON.parse(data);
+	    	if(res.status) {
+	    		keywords_show();//重新加载关键词列表
+	    		detail(keyword_id);//
+	    		$.messager.alert('message',res.message);
+	    		$('#keyword_update_win').window('close');//关闭窗口
+		    	$('#keyword_update_win').form('clear');//清空表单
+	    	}else{
+	    		$.messager.alert('message',res.message);
+	    	}
+	    }    
+	});    
+	// submit the form    
+	$('#keyword_update').submit(); 
+}
+
+function add_show(){
+	$('#keyword_add_win').window('open');
+}
+//修改关键词,出现窗口
+function update_show(){
+	var divs = $("#keyword_tt").find("div");
+	var checknum = 0;
+	if(divs) {
+		
+	}else{
+		$.messager.alert('message',"没有关键词！");
+		return;
+	}
+	
+	if(!keyword_id){
+		$.messager.alert('message',"请选中要修改的关键词！");
+		return;
+	}
+	$.ajax({
+		url : '../categoryResearch/get',
+		method : 'post',
+		data: {id : keyword_id},
+		dataType:'json',
+		success : function(data) {
+			var res = data;
+			if(res) {//查询赋值
+				$("#update_id").val(res.id)
+				$("#update_keyword").val(res.keyword);
+				$("#update_keyword1").val(res.keyword1);
+				$("#parentId_update").combobox('setValue',res.parentId);
+				$("#keyword_update_win").window('open');
+			}
+			
+		},
+		error: function (msg) {
+			alert(msg);
+		}
+	});
+	
+}
+//删除选中的关键词
+function delKeyword(){
+	var divs = $("#keyword_tt").find("div");
+	var checknum = 0;
+	if(divs) {
+		
+	}else{
+		$.messager.alert('message',"没有关键词！");
+		return;
+	}
+	
+	if(!keyword_id){
+		$.messager.alert('message',"请选中要修改的关键词！");
+		return;
+	}
+	
+	//var id = keyword_list[checknum].id;
+	$.messager.confirm('确认','您确认想要删除选中的主关键词吗？',function(r){ 
+		if (r){    
+			$.ajax({
+				url : '../categoryResearch/delete',
+				method : 'post',
+				data: {id : keyword_id},
+				dataType:'json',
+				success : function(data) {
+					if(data.status) {
+						//$.messager.alert('message',data.message);
+						keywords_show();//重新加载
+						$("#keyword_neirong_div").html("");
+					}else{
+						$.messager.alert('message',data.message);
+					}
+					
+				},
+				error: function (msg) {
+					  alert(msg);
+		        }
+			});
+		}
+	});
+	
+	
+}
+
+
+//新增细分类
+function addDetail() {
+		$('#detail_add').form({    
+	    url:"../categoryResearch/addDetail",    
+	    onSubmit: function(){   
+	    	var isValid = $(this).form('validate'); //文件框之外的校验，校验通过为true
+	    	var upFile = $("input[name=uploadfile]").val() != '';//文件框校验，校验通过为true
+			if (isValid && upFile){
+				//校验通过 提交表单
+				return true;
+			} else {
+				//校验失败 提示信息
+				if (!upFile) {
+					$.messager.alert('message','请选择图片!'); 
+				} else {
+					$.messager.alert('message','请填写完表单!'); 
+				}
+				return false;
+			}
+	    },    
+	    success:function(data){
+	    	if(data == null || data == undefined) {
+	    		detailList(keyword_id);//重新加载细分类列表
+	    	}
+	    	var res = JSON.parse(data);
+	    	if(res.status) {
+	    		/* $.messager.alert('message',res.message); */
+	    		$('#detail_add_win').window('close');
+	    		detailList(keyword_id);//重新加载细分类列表
+		    	/* $('#detail_add_win').form('clear'); */
+	    	}else{
+	    		$.messager.alert('message',res.message);
+	    	}
+	    }    
+	});    
+	// submit the form    
+	$('#detail_add').submit();
+}
+
+
+
+//关键字下的细分类
+function detailList(sid) {
+	$.ajax({
+		url : '../categoryResearch/detailCategoryList',
+		method : 'post',
+		data: {sid : sid},
+		dataType:'json',
+		success : function(data) {
+					if(data){
+						var str = "<tr>";
+						for(var i=0;i<data.length;i++) {
+								
+								if(i !=0 && i%8==0){//每行8个
+									str+="</tr><tr>1</tr><tr>1</tr><tr>";
+								}
+str+="<td><a href='javascript:void(0);' onclick='updateFineCategoryshow("+data[i].id+")'> <img onerror=\"imgError(this,\'" + data[i].imageUrl + "\')\" style='width:160px;height:160px;' src='"+data[i].fileName+"'></img></a></br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='updateFineCategoryshow("+data[i].id+")'><button>"+data[i].detailProductName+"</button></a></td>"
+//str+="<td><a href='javascript:void(0);' onclick='updateFineCategoryshow("+data[i].id+")'> <img style='width:160px;height:160px;' src='"+data[i].fileName+"'></img></a></br></br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='updateFineCategoryshow("+data[i].id+")'><button>"+data[i].detailProductName+"</button></a></td>"
+						}
+							str+="</tr>";
+							$("#detailList").html(str)
+					}
+			$("#check_detail_id").val(""); 
+			
+		},
+		 error: function (msg) {
+			alert(msg);
+		} 
+	});
+}
+
+//点击新增细分类按钮
+function add_detail_show() {
+	 if(!keyword_id) {
+		$.messager.alert('message','请选择关键词！');
+		return false;
+	} 
+	 /* $('#detail_add').form('clear'); */
+	 $('#detail_anti_words').val("");
+	 $('#detail_keyword').val("");
+	 $('#detail_img').parent().find("input").val("")
+	 $('#detail_name').val("");
+	 
+	$('#detail_sid').val(keyword_id);
+	$('#detail_add_win').window('open');
+}
+//发布到图片服务器按钮
+function submit_online(){
+	$.ajax({
+		url : '../categoryResearch/submitFineCategoryToLine',
+		method : 'post',
+		data: {sid : keyword_id},
+		dataType:'json',
+		success : function(data) {
+			alert(data.message);
+		},
+	});
+	
+	
+}
+//修改细分类窗口
+function updateFineCategoryshow(id){
+	/* if(id=='' || id= undefined){
+		$.messager.alert('message',"您选择的细分类商品有误!");
+		return;
+	} */
+	$.ajax({
+		url : '../categoryResearch/getOneFineCategory',
+		method : 'post',
+		data: {id : id},
+		dataType:'json',
+		success : function(data) {
+			var res = data;
+			if(res) {//查询赋值
+				$("#detail_update").form('clear');
+				$("#id_update").val(res.id);
+				$("#detail_sid_update").val(res.sid);
+				$("#detail_name_update").val(res.detailProductName);
+				$("#detail_img_update").attr('src',res.fileName); ;//图片
+				$("#detail_img_update").attr('onerror',"imgError(this, \""+ res.imageUrl + "\")"); ;//本地图片
+				$("#detail_keyword_update").val(res.positivekeywords);
+				$("#detail_anti_words_update").val(res.reversekeywords);
+				//$("#detail_seach_1688cid_update").val(res.catId1688);
+				$("#old_detail_keyword_update").val(res.detailProductName);
+				$("#old_positivekeywords").val(res.positivekeywords);
+				$('#update_detail_seach_1688cid_update').combotree('setValue', res.catId1688);
+				
+				$('#detail_update_win').window('open');
+
+			}
+		},
+		error: function (msg) {
+			alert(msg);
+		}
+	});
+}
+//保存修改后的细分类
+	function updateFineCategory() {
+		$('#detail_update').form({    
+		    url:"../categoryResearch/updateFineCategory",    
+		    onSubmit: function(){   
+		    	//图片框的处理
+		    	/* var img = $("#imgput").val();
+		    	if(img==''){
+		    		 $("#imgput").val("nofile")
+		    	} */
+		    	var isValid = $(this).form('validate');
+				if (!isValid){
+					$.messager.progress('close');	// 如果表单是无效的则隐藏进度条
+					alert("表单项存在为空,请检查表单输入是否正确")
+				}
+				return isValid;	// 返回false终止表单提交        
+		    },    
+		    success:function(data){
+		    	var res = JSON.parse(data);
+		    	if(res.status) {
+		    		//$.messager.alert('message',res.message);
+		    		detailList(keyword_id);
+		    		 $('#detail_update_win').window('close');
+			    	$('#detail_update_win').form('clear'); 
+		    	}else{
+		    		$.messager.alert('message',res.message);
+		    	}
+		    }    
+		});    
+		// submit the form    
+		$('#detail_update').submit(); 		
+	}
+//删除该细分类的商品
+	function deleteFineCategory() {
+			var id = $("#id_update").val();
+			var sid = $("#detail_sid_update").val();
+			var oldpositivekeywords = $("#old_detail_keyword_update").val();
+			$.messager.confirm('确认','您确认想要删除吗？',function(r){ 
+				if (r){ 
+					$.ajax({
+						url : '../categoryResearch/deleteFineCategory',
+						method : 'post',
+						data: {id : id,sid:sid,oldpositivekeywords:oldpositivekeywords},
+						dataType:'json',
+						success : function(data) {
+							if(data.status) {
+								$('#detail_update_win').window('close');
+						    	$('#detail_update_win').form('clear');
+								detailList(keyword_id);
+							} else {
+								$.messager.alert('message',data.message);
+							}
+							
+						},
+						error: function (msg) {
+							  alert(msg);
+				        }
+					});
+				}
+			});
+	}
+
+//取消窗口操作
+ function cancelDetail(name){
+	 $('#'+name).window('close');
+}
+
+
+
+
+
+
+function getDetail(id){
+	$.ajax({
+		url : '../categoryResearch/getDetail',
+		method : 'post',
+		data: {id : id},
+		dataType:'json',
+		success : function(data) {
+			var res = data;
+			if(res) {
+				$("#detail_neirong_div").html("<table id=\"detail_neirong\" style=\"width:600px\"></table>");
+				$('#detail_neirong').propertygrid({   
+				    showGroup: false,    
+				    scrollbarSize: 0    
+				});
+				var row = {'name':'主商品名','value':res.name};
+				$('#detail_neirong').propertygrid('appendRow',row);
+				var row = {'name':'商品分类','value':res.category};
+				$('#detail_neirong').propertygrid('appendRow',row);
+				row = {'name':'相关热搜词','value':res.keyword};
+				$('#detail_neirong').propertygrid('appendRow',row);
+				row = {'name':'搜索链接','value':res.seachUrl};
+				$('#detail_neirong').propertygrid('appendRow',row);
+				row = {'name':'反关键字','value':res.antiWords};
+				$('#detail_neirong').propertygrid('appendRow',row);
+				
+				var goodslist = res.goodslist;
+				var goodsstr = "";
+				if(goodslist) {
+					var goodsstr = "<table cellpadding='5px'><tr>";
+					for(var i=0;i<goodslist.length;i++) {
+						var goods_name = goodslist[i].goods_name;
+						if(goods_name.length>20){
+							goods_name = goods_name.substring(0,20) + "...";
+						}
+						goodsstr += "<td><a target='_blank' href='"+goodslist[i].goods_url+"'><img src='"+goodslist[i].goods_image+"' style='width:110px;height:110px'><br>"+goods_name+"</a><br>";
+						goodsstr += "$ "+goodslist[i].goods_price+" /"+goodslist[i].goodsPriceUnit+"</td>";
+					}
+					goodsstr += "<tr></table>";
+				}
+				
+				$("#detail_neirong_div").append(goodsstr);
+			}
+			
+		},
+		error: function (msg) {
+			alert(msg);
+		}
+	});
+}
+
+function cate_reflush(){
+	  $.ajax({
+	        url:"../categoryResearch/getAllCat",  
+	        dataType:"json",
+	        success:function(data){                                 
+	                    //绑定第一个下拉框
+	                    $("#parentId").combobox({
+	                            data: data,                        
+	                            valueField: 'id',
+	                            textField: 'keyword'}
+	                            );  
+	                    $("#parentId_update").combobox({
+	                        data: data,                        
+	                        valueField: 'id',
+	                        textField: 'keyword'}
+	                        );  
+	       },
+	       error:function(error){
+	           alert("初始化下拉控件失败");
+	       }
+	    })
+	}
+
+    
+   //新增fenlei
+   
+    function add_show_cat(){
+	$('#keyword_add_win_cat').window('open');
+}
+   
+function addcat() {
+	$('#keyword_add_cat').form({    
+	    url:"../categoryResearch/add",    
+	    onSubmit: function(){    
+	    	var isValid = $(this).form('validate');
+			if (!isValid){
+				$.messager.progress('close');	// 如果表单是无效的则隐藏进度条
+			}
+			return isValid;	// 返回false终止表单提交    
+	    },    
+	    success:function(data){
+	    	var res = JSON.parse(data);
+	    	if(res.status) {
+	    		keyword_id = res.id;
+	    		keywords_show();//加载关键字列表和主关键字详情展示区
+	    		cate_reflush();
+	    		detail(res.id);
+				$("#detail_neirong_div").html("");
+	    		//$.messager.alert('message',res.message);
+				$('#keyword_add_win_cat').window('close');
+		    	$('#keyword_add_win_cat').form('clear');
+	    	}else{
+	    		$.messager.alert('message',res.message);
+	    	}
+	    }    
+	});    
+	// submit the form    
+	$('#keyword_add_cat').submit();
+} 
+    
+</script>
+</script>
+</head>
+<body class="easyui-layout">  
+  <div id="tabsMenu" class="easyui-menu" style="width:120px;">    
+		    <div name="add" id="1">添加</div>    
+		    <div name="update" id="2">修改</div>    
+		    <div name="del" id="3">删除</div>  
+  </div>   
+		   <div id="mydialog" style="display:none;padding:5px;width:400px;height:100px;">  
+		    <label class="lbInfo">分类名称：</label>   
+		    <input id="txRolename" type="text" class="easyui-validatebox" required="true" /><br />   
+		  </div>  
+		    
+		  <div id="mydialogtemp" style="display:none;padding:5px;width:400px;height:200px;" title="删除分类">  
+		    你确定要删除该分类？删除的同时会将该分类下的所有关键词将移动到暂未分类中！  
+		  </div>    
+	<div id="cc" class="easyui-layout" style="width:100%;height:900px;">   
+	    <div data-options="region:'west',title:'关键词',split:true" style="width:20%;">
+	    	
+	    	<ul id="keyword_tt">
+			</ul> 
+	    </div>   
+	    <div data-options="region:'center',title:'编辑'" style="padding:5px;background:#eee;">
+			    <!-- <div data-options="region:'north',title:'自定义分类'" style="height:10%;">
+    				<a id="cust1" href="#" onclick="add_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">添加分类管理</a>
+    				<a id="cust2" href="#" onclick="update_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改分类管理</a>
+    				<a id="cust3" href="#" onclick="delKeyword()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除分类管理</a>
+    				主关键词详情页
+    				<div id="cust_neirong_div"></div>
+			    </div>  -->  
+	   			 <!--=======================================================================================================  -->
+	    	<div id="bb" class="easyui-layout" style="width:100%;height:100%;">   
+	    		   <!--=======================================================================================================  -->
+			    <div data-options="region:'north',title:'主关键字详情'" style="height:30%;">
+    				<a id="btn" href="#" onclick="add_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增关键词</a>
+    				<a id="btn" href="#" onclick="update_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改关键词</a>
+    				<a id="btn" href="#" onclick="delKeyword()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除关键词</a>
+    				<!-- 主关键词详情页 -->
+    				<div id="keyword_neirong_div"></div>
+			    </div>   
+			    <div data-options="region:'center',title:'细分类'" style="height:70%;">
+			    	<a id="btn" href="#" onclick="add_detail_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增细分类</a>
+<!-- 			    	<a id="btn" href="#" onclick="submit_online()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">上传图片去图片服务器</a>
+ -->    				<!-- <a id="btn" href="#" onclick="delDetail()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a> -->
+    				<input type="hidden" id="check_detail_id" value="">
+    				<table id="detailList" cellpadding="10"></table>
+			    </div> 
+			    <!-- <div data-options="region:'south',title:'主商品名详情'" style="height:40%;">
+			    	<div id="detail_neirong_div"></div>
+			    </div>    -->
+			</div> 
+	    </div> 
+	</div>
+	
+	
+	<!-- 弹框 -->
+	<div id="keyword_add_win_cat" class="easyui-window" title="新增分类" style="width:300px;height:200px;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="keyword_add_cat" method="post" enctype="multipart/form-data"> 
+			<table cellpadding="5px">
+				<tr>
+					<td><label for="keyword">分类名:</label></td>
+					<td><input class="easyui-validatebox" type="text" name="keyword" data-options="required:true" maxlength="155" style="width:200px;height:20px"/></td>
+				</tr> 
+				<tr>
+					<td colspan="2"><a id="btn" href="#" onclick="addcat();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	
+	<div id="keyword_add_win" class="easyui-window" title="新增关键词" style="width:700px;height:300px;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="keyword_add" method="post" enctype="multipart/form-data"> 
+			<table cellpadding="5px">
+				<tr>
+					<td><label for="keyword">主关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" name="keyword" data-options="required:true" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr> 
+				<tr>
+					<td><label for="keyword1">同义词:</label></td>
+					<td><input class="easyui-validatebox" type="text" name="keyword1" data-options="required:false" maxlength="255" style="width:400px;height:20px"/><font color="red">多个同义词使用英文分号分割</font></td>
+				</tr>
+				<tr>
+					<td><label for="parentId">所属类别:</label></td>
+					<td><input id="parentId" class="easyui-combobox" type="text" name="parentId" data-options="required:false" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr>
+				<tr>
+					<td colspan="2"><a id="btn" href="#" onclick="addKeyword();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a></td>
+				</tr> 
+			</table>
+		</form>
+	</div>
+	<div id="keyword_update_win" class="easyui-window" title="修改关键词" style="width:700px;height:400px" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="keyword_update" method="post" enctype="multipart/form-data">
+			<input type="hidden" id="update_id" name="update_id"> 
+			<table cellpadding="5px">
+				<tr>
+					<td><label for="update_keyword">主关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="update_keyword" name="update_keyword" data-options="required:true" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr>
+				<tr>
+					<td><label for="update_keyword1">同义词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="update_keyword1" name="update_keyword1" data-options="required:false" maxlength="255" style="width:400px;height:20px"/><font color="red">多个同义词使用英文分号分割</font></td>
+				</tr>
+				<tr>
+					<td><label for="parentId">所属类别:</label></td>
+					<td><input id="parentId_update" class="easyui-combobox" type="text" name="parentId" data-options="required:false" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr>
+				<tr>
+					<td colspan="2"><a id="btn" href="#" onclick="updateKeyword();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<!--新增细分类的窗口 -->
+	<div id="detail_add_win" class="easyui-window" title="新增细分类" style="width:700px;height:400px" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		<form id="detail_add"  method="post" enctype="multipart/form-data">  
+			<input type="hidden" id="detail_sid" name="detail_sid"> 
+			<table cellpadding="15px" >
+				<tr>
+					<td><label for="detail_name">产品线简述:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_name" name="detail_name" data-options="required:true" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr>
+				<tr>
+					<td><label for="detail_img">图片:</label></td>
+					<td>
+						<input
+						id="detail_img" name="uploadfile" class="easyui-filebox"
+						data-options="prompt:'请选择一张分辨率150*150的图片...'"
+						style="width: 360px"></td>
+				</tr>
+				<tr>
+					<td><label for="detail_keyword">英文正关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_keyword" name="detail_keyword" data-options="required:true" maxlength="90" style="width:400px;height:20px"/><font color="red">多个词之间使用英文分号隔开</font></td>
+				</tr>
+				<tr>
+					 <td><label for="detail_anti_words">英文排除关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_anti_words" name="detail_anti_words" data-options="required:false" maxlength="400" style="width:400px;height:20px"/><font color="red">多个词之间使用英文逗号隔开</font></td> 
+				</tr>
+				<tr>
+					<td><label for="add_detail_seach_1688cid">搜索用的 1688类别ID:</label></td>
+					<td>
+ 					<select id="add_detail_seach_1688cid_update" name="add_detail_seach_1688cid_update"  style="width:400px" data-options="required:true"></select>
+<!-- 					<select id="add_detail_seach_1688cid_update" name="add_detail_seach_1688cid_update" class="easyui-combotree" style="width:400px" data-options="url:'../categoryResearch/search1688Category',required:true"></select>
+ -->					</td>
+				</tr>
+				<tr><td><a id="btn" href="#" onclick="addDetail();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">确定</a><a id="btn" href="#" onclick="cancelDetail('detail_add_win');" class="easyui-linkbutton" data-options="iconCls:'icon-save'">取消</a>
+				</td></tr>
+		    </table>
+		</form>
+	</div>
+	<!-- 修改细分类商品窗口 -->
+	<div id="detail_update_win" class="easyui-window" title="修改细分类商品" style="width:700px;height:500px" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+		    <form id="detail_update"  method="post" enctype="multipart/form-data">  
+			<input type="hidden" id="detail_sid_update" name="detail_sid_update"> 
+			<input type="hidden" id="id_update" name="id"> 
+			<input type="hidden" id="old_detail_keyword_update" name="old_detail_keyword_update">
+			<input type="hidden" id="old_positivekeywords" name="old_positivekeywords">
+			<table cellpadding="15px" >
+				<tr>
+					<td><label for="detail_name_update">产品线简述:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_name_update" name="detail_name_update" data-options="required:true" maxlength="255" style="width:400px;height:20px"/></td>
+				</tr>
+				<tr>
+					<td><label for="detail_img_update">图片:</label></td>
+					<td>
+						<img id="detail_img_update" alt="暂无图片" src="" style="width: 100px; height: 100px">
+						<input id="imgput"
+						 name="uploadfile" class="easyui-filebox"
+						data-options="prompt:'请选择一张分辨率大于150*150的图片...'"
+						style="width: 360px"></td>
+				</tr>
+				
+				<tr>
+					<td><label for="detail_keyword_update">英文正关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_keyword_update" name="detail_keyword_update" data-options="required:true" maxlength="90" style="width:400px;height:20px"/><font color="red">多个词之间使用英文分号隔开</font></td>
+				</tr>
+				<tr>
+					 <td><label for="detail_anti_words_update">英文排除关键词:</label></td>
+					<td><input class="easyui-validatebox" type="text" id="detail_anti_words_update" name="detail_anti_words_update" data-options="required:false" maxlength="400" style="width:400px;height:20px"/><font color="red">多个词之间使用英文逗号隔开</font></td> 
+				</tr>
+				<tr>
+					<td><label for="update_detail_seach_1688cid_update">搜索用的 1688类别ID:</label></td>
+<!-- 					<td><input class="easyui-validatebox" type="text" id="detail_seach_1688cid_update" name="detail_seach_1688cid_update" data-options="required:true" maxlength="255" style="width:400px;height:20px"/></td>
+ -->				<td>
+<!--  			  <select id="update_detail_seach_1688cid_update" name="update_detail_seach_1688cid_update" class="easyui-combotree" style="width:400px" data-options="url:'../categoryResearch/search1688Category',required:true"></select> 
+ -->			<select id="update_detail_seach_1688cid_update" name="update_detail_seach_1688cid_update"  style="width:400px" data-options="required:true"></select>
+ 				</td>
+				</tr>
+				<tr><td><a id="btn" href="#" onclick="updateFineCategory();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">确定</a><a id="btn" href="#" onclick="cancelDetail('detail_update_win');" class="easyui-linkbutton" data-options="iconCls:'icon-save'">取消</a><a id="btn" href="#" onclick="deleteFineCategory();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">删除</a>
+				</td></tr>
+		    </table>
+		</form>
+	</div>
+<div style="z-index: 10;position: absolute;bottom: 50px;left: 30px;">
+	<a href="https://www.import-express.com/categortpage/detail" target="_blank">编辑完后点击刷新线上数据</a>
+</div>
+</body>
+<script type="text/javascript">
+	$(function(){
+		 $.ajax({
+				url : '../categoryResearch/search1688Category',
+				method : 'post',
+				dataType:'json',
+				success : function(data) {
+					var res = data;
+					 $("#add_detail_seach_1688cid_update").combotree({
+						 data:res
+					 });
+					 $("#update_detail_seach_1688cid_update").combotree({
+						 data:res
+					 });
+				},
+				
+			}); 
+	});
+	
+</script>
+</html>

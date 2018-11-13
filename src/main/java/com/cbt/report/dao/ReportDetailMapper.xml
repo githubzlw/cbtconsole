@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.report.dao.ReportDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.cbt.pojo.ReportDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="categroy" property="categroy" jdbcType="VARCHAR" />
+    <result column="purchase_price" property="purchasePrice" jdbcType="DOUBLE" />
+    <result column="sales_price" property="salesPrice" jdbcType="DOUBLE" />
+    <result column="average_price" property="averagePrice" jdbcType="DOUBLE" />
+    <result column="sales_volumes" property="salesVolumes" jdbcType="INTEGER" />
+    <result column="genral_report_id" property="genralReportId" jdbcType="INTEGER" />
+    <result column="buycount" property="buycount" jdbcType="INTEGER" />
+    <result column="buy_average_price" property="buyAveragePrice" jdbcType="DOUBLE" />
+    <result column="profit_loss" property="profitLoss" jdbcType="DOUBLE" />
+    <result column="freight" property="freight" jdbcType="DOUBLE" />
+    <result column="packageFee" property="packageFee" jdbcType="DOUBLE" />
+     <result column="usePayPrice" property="usePayPrice" jdbcType="DOUBLE" />
+    <result column="od_total_weight" property="od_total_weight" jdbcType="DOUBLE"/>
+     <result column="of_weight" property="of_weight" jdbcType="DOUBLE"/>
+     <result column="settle_weight" property="settle_weight" jdbcType="DOUBLE"/>   
+  </resultMap>
+  
+  <resultMap id="BaseReportOrderMap" type="com.cbt.pojo.ReportDetailOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="orderno" property="orderno" jdbcType="VARCHAR" />
+    <result column="purchase_price" property="purchasePrice" jdbcType="DOUBLE" />
+    <result column="sales_price" property="salesPrice" jdbcType="DOUBLE" />
+    <result column="average_price" property="averagePrice" jdbcType="DOUBLE" />
+    <result column="sales_volumes" property="salesVolumes" jdbcType="INTEGER" />
+    <result column="genral_report_id" property="genralReportId" jdbcType="INTEGER" />
+    <result column="buycount" property="buycount" jdbcType="INTEGER" />
+    <result column="buy_average_price" property="buyAveragePrice" jdbcType="DOUBLE" />
+    <result column="profit_loss" property="profitLoss" jdbcType="DOUBLE" />
+    <result column="freight" property="freight" jdbcType="DOUBLE" />
+    <result column="od_weight" property="od_weight" jdbcType="DOUBLE"/>
+     <result column="fee_weight" property="fee_weight" jdbcType="DOUBLE"/>
+     <result column="fw_weight" property="fw_weight" jdbcType="DOUBLE"/>   
+     <result column="inputFreight" property="inputFreight" jdbcType="DOUBLE"/>
+     <result column="typeship" property="typeship" jdbcType="VARCHAR"/>
+     <result column="shipnolist" property="expressno" jdbcType="VARCHAR"/>
+      <result column="orderlist" property="remarks" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <resultMap id="GoodsResultMap" type="com.cbt.bean.OrderProductSource" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="od_id" property="odId" jdbcType="INTEGER" />
+    <result column="adminid" property="adminid" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="addtime" property="addtime" jdbcType="TIMESTAMP" />
+    <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    <result column="confirm_userid" property="confirmUserid" jdbcType="INTEGER" />
+    <result column="confirm_time" property="confirmTime" jdbcType="TIMESTAMP" />
+    <result column="goodsid" property="goodsid" jdbcType="INTEGER" />
+    <result column="goodsdataid" property="goodsdataid" jdbcType="INTEGER" />
+    <result column="goods_url" property="goodsUrl" jdbcType="VARCHAR" />
+    <result column="goods_p_url" property="goodsPUrl" jdbcType="VARCHAR" />
+    <result column="goods_img_url" property="goodsImgUrl" jdbcType="VARCHAR" />
+    <result column="goods_price" property="goodsPrice" jdbcType="DOUBLE" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="goods_p_price" property="goodsPPrice" jdbcType="VARCHAR" />
+    <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goods_p_name" property="goodsPName" jdbcType="VARCHAR" />
+    <result column="moq" property="moq" jdbcType="INTEGER" />
+    <result column="goodssourcetype" property="goodssourcetype" jdbcType="VARCHAR" />
+    <result column="usecount" property="usecount" jdbcType="INTEGER" />
+    <result column="buycount" property="buycount" jdbcType="INTEGER" />
+    <result column="goods_c_shipcost" property="goodsCShipcost" jdbcType="DOUBLE" />
+    <result column="del" property="del" jdbcType="INTEGER" />
+    <result column="purchase_state" property="purchaseState" jdbcType="INTEGER" />
+    <result column="purchaseprice" property="purchaseprice" jdbcType="DOUBLE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="OrderProductResultMap" type="com.cbt.report.vo.OrderProductVo" >
+    <result column="od_id" property="odId" jdbcType="INTEGER" />
+    <result column="addtime" property="addtime" jdbcType="TIMESTAMP" />
+    <result column="orderid" property="orderid" jdbcType="VARCHAR" />
+    <result column="goods_price" property="goodsPrice" jdbcType="DOUBLE" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="goods_p_price" property="goodsPPrice" jdbcType="VARCHAR" />
+    <result column="usecount" property="usecount" jdbcType="INTEGER" />
+    <result column="buycount" property="buycount" jdbcType="INTEGER" />
+    <result column="categroy" property="categroy" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BuyGoodsResultMap" type="com.cbt.bean.buyGoods" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="goodId" property="goodId" jdbcType="INTEGER" />
+    <result column="category" property="category" jdbcType="VARCHAR" />
+    <result column="count" property="count" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="imgurl" property="imgurl" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="buysum" property="buysum" jdbcType="INTEGER" />
+    <result column="mOrder" property="mOrder" jdbcType="VARCHAR" />
+    <result column="pUnit" property="pUnit" jdbcType="VARCHAR" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="valid" property="valid" jdbcType="INTEGER" />
+    <result column="saleNums" property="saleNums" jdbcType="VARCHAR" />
+    <result column="buyprices" property="buyprices" jdbcType="VARCHAR" />
+    <result column="buySums" property="buySums" jdbcType="VARCHAR" />
+    <result column="buycount" property="buycount" jdbcType="VARCHAR" />
+    <result column="goods_pid" property="goods_pid" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap type="com.cbt.pojo.SalesReport" id="saleReportMap">
+  	<result column="user_id" property="user_id" jdbcType="INTEGER"/>
+  	<result column="admName" property="admName" jdbcType="VARCHAR"/>
+  	<result column="payprice" property="payprice" jdbcType="DOUBLE"/>
+  	<result column="orderpaytime" property="orderpaytime" jdbcType="VARCHAR"/>
+  	<result column="sl" property="sl" jdbcType="INTEGER"/>
+  	<result column="zje" property="zje" jdbcType="DOUBLE"/>
+  	<result column="zsl" property="zsl" jdbcType="INTEGER"/>
+  	<result column="firstbuy" property="firstbuy" jdbcType="VARCHAR"/>
+  	<result column="scgm" property="scgm" jdbcType="VARCHAR"/>
+  	<result column="newsign" property="newsign" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <resultMap type="com.cbt.pojo.ReportSalesInfo" id="salesReportInfoMap">
+  	<id column="id" property="id" jdbcType="INTEGER" />
+  	<result column="years" property="years" jdbcType="INTEGER"/>
+  	<result column="months" property="months" jdbcType="INTEGER"/>
+  	<result column="user_count" property="userCount" jdbcType="INTEGER"/>
+  	<result column="cost" property="cost" jdbcType="DOUBLE"/>
+  	<result column="order_count" property="orderCount" jdbcType="INTEGER"/>
+  	<result column="all_cost" property="allCost" jdbcType="DOUBLE"/>
+  	<result column="all_order" property="allOrder" jdbcType="INTEGER"/>
+  	<result column="new_user" property="newUser" jdbcType="INTEGER"/>
+  	<result column="old_user" property="oldUser" jdbcType="INTEGER"/>
+  </resultMap>
+  
+    <select id="selectOrderReportDetailss" parameterType="java.lang.String" resultMap="BaseReportOrderMap">
+    
+	 <!--  	select  od.orderid as categroy, sum(ifnull(od.od_total_weight,0)) as od_total_weight, sum(ifnull(of.weight,0)) as of_weight, sum(ifnull(fw.settleWeight, 0)) as settle_weight,
+		cast(sum(getExchangeRMB(ifnull(ops.goods_price*usecount,0) , ifnull(ops.currency,'USD'))) as DECIMAL(10,2)) as sales_price,  sum(ifnull(fw.shipprice,0)) as freight,
+		cast(sum(ifnull(ops.goods_p_price*buycount,0)) as DECIMAL(10,2)) as purchase_price, sum(ifnull(usecount,0)) as sales_volumes, sum(ifnull(buycount,0)) as buycount
+		<![CDATA[
+		from order_product_source ops inner join order_details  od on ops.od_id=od.id and od.state<2 inner join orderinfo oi on ops.orderid=oi.order_no and oi.state in(1,2,3,4,5)  
+		]]>
+		LEFT JOIN order_fee of ON of.orderno = oi.order_no left JOIN forwarder fw on oi.order_no = fw.order_no and fw.sourceType=0 
+		where  oi.orderpaytime  between #{timeFrom} and #{timeTo} GROUP BY od.orderid
+		order by oi.orderpaytime desc -->
+		
+		call getReportOrderByDate2(#{timeFrom},#{timeTo});
+		
+  </select>  
+  
+  <sql id="Goods_Column_List" >
+     od_id, adminid, addtime, ops.orderid, confirm_userid, confirm_time, ops.goodsid,ops.currency,
+    ops.goodsdataid, ops.goods_url, ops.goods_p_url, ops.goods_img_url, ops.goods_price, ops.goods_p_price, 
+    ops.goods_name, ops.goods_p_name, ops.moq, ops.goodssourcetype, ops.usecount, ops.buycount, ops.goods_c_shipcost, 
+    ops.del, ops.purchase_state, ops.purchaseprice, ops.remark
+  </sql>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, categroy, purchase_price, sales_price, average_price, sales_volumes, genral_report_id, 
+    buycount, buy_average_price, profit_loss
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cbt.pojo.ReportDetailExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from report_detail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from report_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cbt.pojo.ReportDetailExample" >
+    delete from report_detail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cbt.pojo.ReportDetail" >
+    insert into report_detail (id, categroy, purchase_price, 
+      sales_price, average_price, sales_volumes, 
+      genral_report_id, buycount, buy_average_price, 
+      profit_loss)
+    values (#{id,jdbcType=INTEGER}, #{categroy,jdbcType=VARCHAR}, #{purchasePrice,jdbcType=DOUBLE}, 
+      #{salesPrice,jdbcType=DOUBLE}, #{averagePrice,jdbcType=DOUBLE}, #{salesVolumes,jdbcType=INTEGER}, 
+      #{genralReportId,jdbcType=INTEGER}, #{buycount,jdbcType=INTEGER}, #{buyAveragePrice,jdbcType=DOUBLE}, 
+      #{profitLoss,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cbt.pojo.ReportDetail" >
+    insert into report_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="categroy != null" >
+        categroy,
+      </if>
+      <if test="purchasePrice != null" >
+        purchase_price,
+      </if>
+      <if test="salesPrice !=null" >
+        sales_price,
+      </if>
+      <if test="averagePrice != null" >
+        average_price,
+      </if>
+      <if test="salesVolumes != null" >
+        sales_volumes,
+      </if>
+      <if test="genralReportId != null" >
+        genral_report_id,
+      </if>
+      <if test="buycount != null" >
+        buycount,
+      </if>
+      <if test="buyAveragePrice != null" >
+        buy_average_price,
+      </if>
+      <if test="profitLoss != null" >
+        profit_loss,
+      </if>
+      <if test="freight  != null" >
+        freight,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="categroy != null" >
+        #{categroy,jdbcType=VARCHAR},
+      </if>
+      <if test="purchasePrice != null" >
+        #{purchasePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="salesPrice != null" >
+        #{salesPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="averagePrice != null" >
+        #{averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="salesVolumes != null" >
+        #{salesVolumes,jdbcType=INTEGER},
+      </if>
+      <if test="genralReportId != null" >
+        #{genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="buycount != null" >
+        #{buycount,jdbcType=INTEGER},
+      </if>
+      <if test="buyAveragePrice != null" >
+        #{buyAveragePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="profitLoss != null" >
+        #{profitLoss,jdbcType=DOUBLE},
+      </if>
+      <if test="freight != null" >
+        #{freight,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cbt.pojo.ReportDetailExample" resultType="java.lang.Integer" >
+    select count(*) from report_detail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update report_detail
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.categroy != null" >
+        categroy = #{record.categroy,jdbcType=VARCHAR},
+      </if>
+      <if test="record.purchasePrice != null" >
+        purchase_price = #{record.purchasePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.salesPrice != null" >
+        sales_price = #{record.salesPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.averagePrice != null" >
+        average_price = #{record.averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.salesVolumes != null" >
+        sales_volumes = #{record.salesVolumes,jdbcType=INTEGER},
+      </if>
+      <if test="record.genralReportId != null" >
+        genral_report_id = #{record.genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="record.buycount != null" >
+        buycount = #{record.buycount,jdbcType=INTEGER},
+      </if>
+      <if test="record.buyAveragePrice != null" >
+        buy_average_price = #{record.buyAveragePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.profitLoss != null" >
+        profit_loss = #{record.profitLoss,jdbcType=DOUBLE},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update report_detail
+    set id = #{record.id,jdbcType=INTEGER},
+      categroy = #{record.categroy,jdbcType=VARCHAR},
+      purchase_price = #{record.purchasePrice,jdbcType=DOUBLE},
+      sales_price = #{record.salesPrice,jdbcType=DOUBLE},
+      average_price = #{record.averagePrice,jdbcType=DOUBLE},
+      sales_volumes = #{record.salesVolumes,jdbcType=INTEGER},
+      genral_report_id = #{record.genralReportId,jdbcType=INTEGER},
+      buycount = #{record.buycount,jdbcType=INTEGER},
+      buy_average_price = #{record.buyAveragePrice,jdbcType=DOUBLE},
+      profit_loss = #{record.profitLoss,jdbcType=DOUBLE}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cbt.pojo.ReportDetail" >
+    update report_detail
+    <set >
+      <if test="categroy != null" >
+        categroy = #{categroy,jdbcType=VARCHAR},
+      </if>
+      <if test="purchasePrice != null" >
+        purchase_price = #{purchasePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="salesPrice != null" >
+        sales_price = #{salesPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="averagePrice != null" >
+        average_price = #{averagePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="salesVolumes != null" >
+        sales_volumes = #{salesVolumes,jdbcType=INTEGER},
+      </if>
+      <if test="genralReportId != null" >
+        genral_report_id = #{genralReportId,jdbcType=INTEGER},
+      </if>
+      <if test="buycount != null" >
+        buycount = #{buycount,jdbcType=INTEGER},
+      </if>
+      <if test="buyAveragePrice != null" >
+        buy_average_price = #{buyAveragePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="profitLoss != null" >
+        profit_loss = #{profitLoss,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cbt.pojo.ReportDetail" >
+    update report_detail
+    set categroy = #{categroy,jdbcType=VARCHAR},
+      purchase_price = #{purchasePrice,jdbcType=DOUBLE},
+      sales_price = #{salesPrice,jdbcType=DOUBLE},
+      average_price = #{averagePrice,jdbcType=DOUBLE},
+      sales_volumes = #{salesVolumes,jdbcType=INTEGER},
+      genral_report_id = #{genralReportId,jdbcType=INTEGER},
+      buycount = #{buycount,jdbcType=INTEGER},
+      buy_average_price = #{buyAveragePrice,jdbcType=DOUBLE},
+      profit_loss = #{profitLoss,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- @author zlg 自定义 -->
+  <select id="selectByTime"  resultMap="BaseResultMap" parameterType="com.cbt.report.vo.StatisticalReportVo" >
+	<![CDATA[
+       select category1 categroy,
+		((sum(salesPrice1)-sum(purchasePrice1))/sum(salesPrice1)) *100   profitLoss ,
+	    sum(gcount) salesVolumes,
+		  sum(buycount1) buycount,
+		  sum(purchasePrice1) purchasePrice,
+		  sum(salesPrice1) salesPrice
+		  from 
+			(
+			select  
+			category1,
+			salesVolumes gcount,
+			buycount buycount1,
+			purchasePrice1 purchasePrice1,
+			(salesPrice1/exchange_rate.exchange_rate)*${currency}  salesPrice1
+			from 
+			tmp_reportcate 
+			 inner join exchange_rate  on tmp_reportcate.currency=exchange_rate.country
+			)  tab GROUP BY category1
+    ]]>
+  </select>
+  
+  <select id="selectOrderProductByTime" parameterType="com.cbt.report.vo.StatisticalReportVo" resultMap="OrderProductResultMap" >
+	select ops.od_id,ops.orderid,ops.goods_price,ops.usecount,ops.buycount,ac.category
+	,ops.goods_p_price,ops.addtime 
+	from order_product_source ops,ali_category ac,goodsdata_expand_ex gee
+	where ops.goods_url =  gee.url and gee.catid1=ac.cid
+	and ops.addtime  between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+  </select>
+  <update id="updateTabletmp"  >
+     drop table IF EXISTS orderinfo;
+  </update>
+  
+  <update id="createTabletmp"  parameterType="com.cbt.report.vo.StatisticalReportVo">
+  <![CDATA[
+     create temporary  table  orderinfo (
+		select order_no,orderinfo.currency,ifnull(pay_price,0) payprice,
+		ifnull(acture_fee+package_fee,0) shipfee,ifnull(actual_freight_c,0) ship  from orderinfo  
+		LEFT JOIN order_fee  ON order_fee.orderno = orderinfo.order_no
+		where orderinfo.create_time between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+		 and orderinfo.state>0 and orderinfo.state<6 );
+  ]]>
+  </update>
+   <update id="updateTabletmp2"  >
+     drop table IF EXISTS tmp_report;
+  </update>
+  
+  <update id="createTabletmp2"  >
+  <![CDATA[
+     create temporary  table  tmp_report(
+		select  
+				orderinfo.order_no,
+				orderinfo.currency,
+				max(payprice) payprice,
+				max(ship) ship,
+				(CASE WHEN max(ship)>0 THEN  max(ship) ELSE max(shipfee) END)   AS shipfee,
+				sum(ifnull(usecount,0)) salesVolumes,
+				sum(ifnull(buycount,0)) buycount,
+				sum(ifnull(goods_price,0)*ifnull(usecount,0)) salesPrice1,
+				sum(ifnull(goods_p_price,0)*ifnull(buycount,0)) purchasePrice1
+			 from 
+					(select os.* from order_product_source os ,order_details od where os.od_id=od.id and  od.state<2) ops
+				LEFT join orderinfo  on 
+				ops.orderid=  orderinfo.order_no 
+				LEFT  join order_fee of on of.orderno =  ops.orderid
+				group by orderinfo.order_no);
+		]]>
+  </update>
+  
+  <update id="updateTabletmpcate"  >
+      drop table IF EXISTS orderinfocate;
+  </update>
+  
+  <update id="createTabletmpcate"  parameterType="com.cbt.report.vo.StatisticalReportVo">
+  <![CDATA[
+      create temporary  table  orderinfocate (
+		select ops.orderid,ac.category  category1,ops.currency,IFNULL(goods_p_price,0)*ifnull(buycount,0) purchasePrice1,
+     ifnull(goods_price,0)*ifnull(usecount,0) salesPrice1,
+			ifnull(usecount,0) salesVolumes,
+			ifnull(buycount,0) buycount
+		  from (orderinfo oi,order_product_source ops,ali_category ac,goodsdata_expand_ex gee) left JOIN order_details od
+		on  ops.id=od.id and  od.state<2
+  		where ops.orderid = oi.order_no
+     	and ops.goods_url =  gee.url and gee.catid1=ac.cid
+		and  oi.create_time between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+		 and oi.state>0 and oi.state<6 );
+  ]]>
+  </update>
+   <update id="updateTabletmpcate2"  >
+      drop table IF EXISTS tmp_reportcate;
+  </update>
+  
+  <update id="createTabletmpcate2"  >
+  <![CDATA[
+     create temporary  table  tmp_reportcate(
+		select  
+				 orderid,
+			   orderinfocate.category1,
+         orderinfocate.currency,
+				 sum(salesVolumes) salesVolumes,
+				 sum(buycount) buycount,
+				 sum(purchasePrice1) purchasePrice1, #采购价格
+				 sum(salesPrice1) salesPrice1  #销售价格
+			 from 
+				orderinfocate
+				LEFT  join order_fee of on of.orderno =  orderinfocate.orderid
+				group by orderinfocate.category1,orderinfocate.currency having salesVolumes>0);
+		]]>
+  </update>
+  
+  
+  <select id="selectOrderByTime"  resultMap="BaseResultMap" parameterType="com.cbt.report.vo.StatisticalReportVo" >
+		<![CDATA[
+		select order_no categroy,
+		payprice usePayPrice,
+		IFNULL((((payprice -IFNULL(shipfee,0) -IFNULL(purchasePrice1,0))/payprice) *100),0)  profitLoss,
+	    gcount salesVolumes,
+		buycount1 buycount,
+		purchasePrice1 purchasePrice,
+		payprice salesPrice,
+		shipfee freight
+		  from 
+			(
+			select  
+			 order_no,
+			IF(shipfee=NULL,(shipfee/exchange_rate.exchange_rate)*6.3555,ship) shipfee,
+			(payprice/exchange_rate.exchange_rate)*${currency} payprice,
+			salesVolumes gcount,
+			buycount buycount1,
+			purchasePrice1 purchasePrice1 ,
+			(salesPrice1/exchange_rate.exchange_rate)*${currency}  salesPrice1
+			from 
+			tmp_report  
+			 inner join exchange_rate  on tmp_report.currency=exchange_rate.country
+			)  tab  ]]>
+  </select>
+  
+<!--   
+  <select id="selectByGeneral" parameterType="java.util.Map"  resultMap="BaseResultMap">
+    call getGoodsCatByDate(#{beginDate},#{endDate},#{orderName});
+  </select> -->
+  
+    <select id="selectByGeneral" parameterType="java.util.Map"  resultMap="BaseResultMap">
+    select mode_transport,
+    ifnull(categroy,'无对应') categroy,
+    purchase_price purchasePrice,
+    sales_price salesPrice,
+    average_price averagePrice,
+    sales_volumes salesVolumes,
+    buycount buycount,
+    buy_average_price buyAveragePrice,
+    ifnull(od_total_weight,0) as od_total_weight , ifnull(of_weight,0) as of_weight, ifnull(settle_weight, 0) as settle_weight,
+	profit_loss profitLoss,
+	freight freight
+    FROM report_detail rd LEFT JOIN
+    general_report gr
+	on rd.genral_report_id = gr.id
+	LEFT JOIN orderinfo of on rd.categroy=of.order_no
+	where 1=1 
+	<if test="generalReport.breportId != null" >
+        and gr.breport_id = #{generalReport.breportId,jdbcType=INTEGER}
+    </if>
+	<if test="generalReport.reportYear != null" >
+        and report_year = #{generalReport.reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportMonth != null" >
+        and report_month = #{generalReport.reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek != null" >
+        and report_week = #{generalReport.reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="generalReport.reportDay != null" >
+        and report_day = #{generalReport.reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="generalReport.reportDay == null" >
+        and report_day is null
+    </if>
+    <!-- whj -->
+    <if test="generalReport.noFreeFreight ==1" >
+       <![CDATA[
+        and freight>0
+       ]]>
+    </if>
+	<if test="generalReport.noFreeFreight==5" >
+		<![CDATA[
+		and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==6" >
+		<![CDATA[
+		and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==7" >
+		<![CDATA[
+		and mode_transport like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==8" >
+		<![CDATA[
+		and mode_transport not like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+    order by ${orderName} desc
+    <if test="startRow!=-1">
+     limit ${startRow},20
+    </if>
+  </select>
+  
+  <select id="selectByGeneralCount" parameterType="java.util.Map"  resultType="java.lang.Integer">
+    select count(*) FROM report_detail rd LEFT JOIN general_report gr on rd.genral_report_id = gr.id
+	LEFT JOIN orderinfo of on rd.categroy=of.order_no  where 1=1 
+	<if test="generalReport.breportId != null" >
+        and gr.breport_id = #{generalReport.breportId,jdbcType=INTEGER}
+    </if>
+	<if test="generalReport.reportYear != null" >
+        and report_year = #{generalReport.reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportMonth != null" >
+        and report_month = #{generalReport.reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek != null" >
+        and report_week = #{generalReport.reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="generalReport.reportDay != null" >
+        and report_day = #{generalReport.reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="generalReport.reportDay == null" >
+        and report_day is null
+    </if>
+    <!-- whj -->
+    <if test="generalReport.noFreeFreight ==1" >
+       <![CDATA[
+        and freight>0
+       ]]>
+    </if>
+	<if test="generalReport.noFreeFreight==5" >
+		<![CDATA[
+		and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==6" >
+		<![CDATA[
+		and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==7" >
+		<![CDATA[
+		and mode_transport like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==8" >
+		<![CDATA[
+		and mode_transport not like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+  </select>
+  
+ <select id="selectByTimeAndCategroy" parameterType="com.cbt.report.vo.StatisticalReportVo" resultMap="GoodsResultMap" >
+	<!-- 
+ 	select 
+	<include refid="Goods_Column_List" /> 
+	from order_product_source ops,ali_category ac,goodsdata_expand_ex gee
+	where ops.goods_url =  gee.url and gee.catid1=ac.cid
+	and category = #{category,jdbcType=VARCHAR} 
+	and ops.addtime  between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+	order by ops.addtime desc  -->
+	
+	 select ifnull(ac.category,'') category, od_id, adminid, addtime, ops.orderid, confirm_userid, confirm_time, ops.goodsid,ops.currency,
+    ops.goodsdataid, ops.goods_url, ops.goods_p_url, ops.goods_img_url, ops.goods_price, ops.goods_p_price, 
+    ops.goods_name, ops.goods_p_name, ops.moq, ops.goodssourcetype, ops.usecount, ops.buycount, ops.goods_c_shipcost, 
+    ops.del, ops.purchase_state, ops.purchaseprice, ops.remark 
+    <![CDATA[
+	from order_product_source ops inner join order_details  od on ops.od_id=od.id 
+	inner join orderinfo oi on ops.orderid=oi.order_no 
+	left join goodsdata_expand_ex gee     on  ops.goods_url =  gee.url  left join  ali_category ac on gee.catid1=ac.cid
+	where  ops.addtime  between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP} 
+    ]]>
+	and  ac.category=#{category,jdbcType=VARCHAR} 
+	order by ops.addtime desc 
+  </select> 
+  
+  <select id="selectByTimeAndOrder" parameterType="com.cbt.report.vo.StatisticalReportVo" resultMap="GoodsResultMap" >
+	select 
+	<include refid="Goods_Column_List" /> 
+	from order_product_source ops,orderinfo oi,order_details od 
+	where ops.od_id=od.id 
+	and ops.orderid =  oi.order_no
+	and oi.order_no = #{category,jdbcType=VARCHAR}
+	and oi.create_time  between #{timeFrom,jdbcType=TIMESTAMP} AND #{timeTo,jdbcType=TIMESTAMP}
+	<![CDATA[and oi.state>0 and oi.state<6
+	and  od.state<2 ]]>
+  </select>
+  
+  <insert id="insertReportDetailList" parameterType="java.util.List" >
+    insert into report_detail 
+    (categroy,purchase_price,sales_price,average_price,sales_volumes,
+    genral_report_id,buycount,buy_average_price,profit_loss) 
+     values  
+    <foreach collection="list" item="item" index="index" separator="," > 
+        (#{item.categroy},#{item.purchasePrice},#{item.salesPrice},#{item.averagePrice},#{item.salesVolumes},
+        #{item.genralReportId},#{item.buycount},#{item.buyAveragePrice},#{item.profitLoss})  
+    </foreach>  
+  </insert>
+  
+  <insert id="insertReportDetailListO" parameterType="java.util.List" >
+    insert into report_detail 
+    (categroy,purchase_price,sales_price,average_price,sales_volumes,
+    genral_report_id,buycount,buy_average_price,profit_loss,freight,od_total_weight, of_weight, settle_weight) 
+     values  
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.categroy},#{item.purchasePrice},#{item.salesPrice},#{item.averagePrice},#{item.salesVolumes},
+        #{item.genralReportId},#{item.buycount},#{item.buyAveragePrice},#{item.profitLoss},#{item.freight},#{item.od_total_weight},#{item.of_weight},#{item.settle_weight})  
+    </foreach>  
+  </insert>
+  <select id="selectOrderDetailByTime" parameterType="java.lang.String"  resultType="com.cbt.pojo.ReportDetail" >
+  		call  getOrderByDate(#{timeFrom},#{timeTo});
+  </select>
+  
+  <select id="selectReportDetailByTime" parameterType="java.lang.String" resultType="com.cbt.pojo.ReportDetail">
+  		call getGoodsCatByDate(#{timeFrom},#{timeTo});
+  </select>
+  
+  <select id="selectBuyGoods"  resultMap="BuyGoodsResultMap">
+  		select od.goods_pid as goods_pid,od.car_urlMD5 as imgurl,ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(od.id) desc limit #{page},#{epage};
+  </select>
+  <select id="selectBuyGoods1"  resultMap="BuyGoodsResultMap">
+  		select od.goods_pid as goods_pid,od.car_urlMD5 as imgurl,ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(ops.buycount) desc limit #{page},#{epage};
+  </select>
+  <select id="selectBuyGoods2"  resultMap="BuyGoodsResultMap">
+  		select od.goods_pid as goods_pid,od.car_urlMD5 as imgurl,ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(od.goodsprice*od.yourorder) desc limit #{page},#{epage};
+  </select>
+   <select id="selectBuyGoods3"  resultMap="BuyGoodsResultMap">
+  		select ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(od.id) desc
+  </select>
+  <select id="selectBuyGoods4"  resultMap="BuyGoodsResultMap">
+  		select ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(ops.buycount) desc
+  </select>
+  <select id="selectBuyGoods5"  resultMap="BuyGoodsResultMap">
+  		select ifnull((SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=od.goodscatid),"") as category,
+  		od.goodsname as name,SUM(od.yourorder) AS saleNums,group_concat(distinct od.goodsprice) as price,count(ops.id) as count,sum(ops.buycount) as buycount,
+  		group_concat(distinct ops.goods_p_price) as buyprices,
+		FORMAT(sum(ops.buycount*ops.goods_p_price),2) as buySums from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end} group by od.goods_pid order by sum(od.goodsprice*od.yourorder) desc
+  </select>
+  <select id="selectBuyGoodsCount"   resultType="java.lang.Integer">
+<!--   		select count(*) from buy_goods  -->
+		select count(distinct od.goods_pid) from order_details od  inner join order_product_source ops on od.id=ops.od_id 
+		where od.goods_pid is not null and ops.purchase_state between 3 and 8 and ops.confirm_time between #{start} and #{end}
+  </select>
+  
+  <!-- 订单报表 -->
+    <insert id="insertReportDetailOrder" parameterType="java.util.List" >
+    insert into report_detail_order
+    (orderno,purchase_price,sales_price,average_price,sales_volumes,
+    genral_report_id,buycount,buy_average_price,profit_loss,inputFreight,freight,od_weight, fee_weight, fw_weight, typeship,expressno,remarks) 
+     values  
+    <foreach collection="list" item="item" index="index" separator="," >  
+        (#{item.orderno},#{item.purchasePrice},#{item.salesPrice},#{item.averagePrice},#{item.salesVolumes},
+        #{item.genralReportId},#{item.buycount},#{item.buyAveragePrice},#{item.profitLoss},#{item.inputFreight},#{item.freight},#{item.od_weight},#{item.fee_weight}
+        ,#{item.fw_weight},#{item.typeship},#{item.expressno},#{item.remarks})  
+    </foreach>  
+  </insert>
+  
+    <select id="selectReportOrder" parameterType="java.util.Map"  resultMap="BaseReportOrderMap">
+    select mode_transport,
+    ifnull(orderno,'') orderno,
+    purchase_price purchasePrice,
+    sales_price salesPrice,
+    average_price averagePrice,
+    sales_volumes salesVolumes,
+    buycount buycount,
+    buy_average_price buyAveragePrice,
+    ifnull(od_weight,0.00) as od_weight , ifnull(fee_weight,0.00) as fee_weight, ifnull(fw_weight, 0.00) as fw_weight,
+	profit_loss profitLoss,
+	freight freight,
+	ifnull(inputFreight,0.00) as inputFreight,
+	typeship,
+	expressno,
+	remarks
+    FROM report_detail_order rd LEFT JOIN
+    general_report gr
+	on rd.genral_report_id = gr.id
+	LEFT JOIN orderinfo of on rd.orderno=of.order_no
+	where 1=1 
+	<if test="generalReport.breportId != null" >
+        and gr.breport_id = #{generalReport.breportId,jdbcType=INTEGER}
+    </if>
+	<if test="generalReport.reportYear != null" >
+        and report_year = #{generalReport.reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportMonth != null" >
+        and report_month = #{generalReport.reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek != null" >
+        and report_week = #{generalReport.reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="generalReport.reportDay != null" >
+        and report_day = #{generalReport.reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="generalReport.reportDay == null" >
+        and report_day is null
+    </if>
+    <if test="generalReport.noFreeFreight ==1" >
+       <![CDATA[ and freight>0  ]]>
+    </if>
+	<if test="generalReport.noFreeFreight==5" >
+		<![CDATA[
+		and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==6" >
+		<![CDATA[
+		and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==7" >
+		<![CDATA[
+		and mode_transport like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==8" >
+		<![CDATA[
+		and mode_transport not like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==9" >
+		<![CDATA[
+		and (freight=0 or inputFreight=0 or freight is null )
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==10" >
+		<![CDATA[
+		and (purchase_price=0 or purchase_price is null)
+		]]>
+	</if>
+    GROUP BY orderno  order by ${orderName} desc
+    <if test="startRow!=-1">
+     limit ${startRow},20
+    </if>
+  </select>
+  
+  <select id="selectReportOrderTotal" parameterType="java.util.Map"  resultMap="BaseReportOrderMap">
+    select ifnull(sum(purchase_price),0) purchase_price, ifnull(sum(sales_price),0) sales_price,
+    ifnull(sum(sales_volumes),0) sales_volumes, ifnull(sum(buycount),0) buycount, ifnull(sum(freight),0) freight
+    FROM report_detail_order rd LEFT JOIN general_report gr on rd.genral_report_id = gr.id
+	LEFT JOIN orderinfo of on rd.orderno=of.order_no where 1=1 
+	<if test="generalReport.breportId != null" >
+        and gr.breport_id = #{generalReport.breportId,jdbcType=INTEGER}
+    </if>
+	<if test="generalReport.reportYear != null" >
+        and report_year = #{generalReport.reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportMonth != null" >
+        and report_month = #{generalReport.reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek != null" >
+        and report_week = #{generalReport.reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="generalReport.reportDay != null" >
+        and report_day = #{generalReport.reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="generalReport.reportDay == null" >
+        and report_day is null
+    </if>
+    <if test="generalReport.noFreeFreight ==1" >
+       <![CDATA[ and freight>0  ]]>
+    </if>
+	<if test="generalReport.noFreeFreight==5" >
+		<![CDATA[
+		and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==6" >
+		<![CDATA[
+		and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==7" >
+		<![CDATA[
+		and mode_transport like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==8" >
+		<![CDATA[
+		and mode_transport not like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==9" >
+		<![CDATA[
+		and (freight=0 or inputFreight=0 or freight is null )
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==10" >
+		<![CDATA[
+		and (purchase_price=0 or purchase_price is null)
+		]]>
+	</if>
+  </select>
+  
+  <select id="selectReportOrderCount" parameterType="java.util.Map"  resultType="java.lang.Integer">
+    select count(DISTINCT orderno) FROM report_detail_order rd LEFT JOIN general_report gr on rd.genral_report_id = gr.id
+	LEFT JOIN orderinfo of on rd.orderno=of.order_no  where 1=1 
+	<if test="generalReport.breportId != null" >
+        and gr.breport_id = #{generalReport.breportId,jdbcType=INTEGER}
+    </if>
+	<if test="generalReport.reportYear != null" >
+        and report_year = #{generalReport.reportYear,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportMonth != null" >
+        and report_month = #{generalReport.reportMonth,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek != null" >
+        and report_week = #{generalReport.reportWeek,jdbcType=VARCHAR}
+    </if>
+    <if test="generalReport.reportWeek == null" >
+        and report_week is null
+    </if>
+    <if test="generalReport.reportDay != null" >
+        and report_day = #{generalReport.reportDay,jdbcType=VARCHAR},
+    </if>
+    <if test="generalReport.reportDay == null" >
+        and report_day is null
+    </if>
+    <!-- whj -->
+    <if test="generalReport.noFreeFreight ==1" >
+       <![CDATA[
+        and freight>0
+       ]]>
+    </if>
+	<if test="generalReport.noFreeFreight==5" >
+		<![CDATA[
+		and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==6" >
+		<![CDATA[
+		and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==7" >
+		<![CDATA[
+		and mode_transport like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==8" >
+		<![CDATA[
+		and mode_transport not like '%@0.0@%' and freight>0 and  purchase_price<>0 and sales_price<>0
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==9" >
+		<![CDATA[
+		and (freight=0 or inputFreight=0 or freight is null )
+		]]>
+	</if>
+	<if test="generalReport.noFreeFreight==10" >
+		<![CDATA[
+		and (purchase_price=0 or purchase_price is null)
+		]]>
+	</if>
+  </select>
+  
+   <delete id="deleteReportDetailOrder" parameterType="com.cbt.pojo.ReportDetailExample" >
+    delete from report_detail_order
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <!-- 销售统计报表 -->
+  <select id="selectSalesReport" parameterType="java.util.Map" resultMap="saleReportMap">
+	call  getReportSalesByDate(#{timeFrom}, #{timeTo}, #{orderName})
+  </select>
+  
+    <insert id="insertSalesReport" parameterType="java.util.List" >
+    insert into report_sales
+    (user_id,admName,payprice,orderpaytime,sl,  zje,zsl,firstbuy,scgm,newsign) 
+     values  
+    <foreach collection="list" item="item" index="index" separator="," > 
+        (#{item.user_id},#{item.admName},#{item.payprice},#{item.orderpaytime},#{item.sl},
+        #{item.zje},#{item.zsl},#{item.firstbuy},#{item.scgm}, #{item.newsign})  
+    </foreach>  
+  </insert>
+  
+  <select id="selectSalesReportCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+  <![CDATA[
+  	select count(*) from report_sales where orderpaytime>=#{startTime} and orderpaytime<=#{endTime}
+  ]]>
+  </select>
+  
+  <select id="selectSalesReportByPage" parameterType="java.util.List" resultMap="saleReportMap">
+  <![CDATA[
+  	select * from report_sales where orderpaytime>=#{startTime} and orderpaytime<=#{endTime}
+  ]]>
+  	<if test="orderName!=null">
+  		order by #{orderName} desc
+  	</if>
+  	<if test="page!=-1">
+  	limit #{page},20
+  	</if>
+  </select>
+  
+  <delete id="deleteSalesReportByDate" parameterType="java.util.List">
+  <![CDATA[
+  	delete from report_sales where orderpaytime>=#{startTime} and orderpaytime<=#{endTime}
+  	  ]]>
+  </delete>
+
+  <insert id="insertSalesReportInfo" parameterType="com.cbt.pojo.ReportSalesInfo" >
+	insert into report_sales_info (years, months, user_count, cost, order_count,all_cost, all_order, new_user, old_user) 
+	values (#{years,jdbcType=INTEGER}, #{months,jdbcType=INTEGER}, #{userCount,jdbcType=INTEGER}, #{cost,jdbcType=DOUBLE}, 
+	#{orderCount,jdbcType=INTEGER}, #{allCost,jdbcType=DOUBLE}, #{allOrder,jdbcType=INTEGER}, #{newUser,jdbcType=INTEGER}, #{oldUser,jdbcType=INTEGER}) 
+  </insert>
+  
+  <delete id="deleteSalesReportInfoByMonth" parameterType="java.util.List">
+  	delete from report_sales_info where years = #{years} and months = #{months}
+  </delete>
+  
+  <select id="selectSaleReportInfo" parameterType="java.util.List" resultMap="salesReportInfoMap">
+  	select * from report_sales_info where years = #{years} and months = #{months}
+  </select>
+  <select id="getOrderReportList" resultType="com.cbt.pojo.StatisticalReportPojo">
+    select * from order_classification_report where left(create_time,7)=#{time}
+    order by
+    <choose>
+      <when test="orderName == 'sales_price'">
+        salesAmount
+      </when>
+      <when test="orderName == 'sales_volumes'">
+        salesCount
+      </when>
+      <otherwise>
+        proLoss
+      </otherwise>
+    </choose>
+    desc limit ${page},20
+  </select>
+  <select id="getOrderReportListCount" resultType="com.cbt.pojo.StatisticalReportPojo">
+    select * from order_classification_report where left(create_time,7)=#{time}
+    order by
+    <choose>
+      <when test="orderName == 'sales_price'">
+        salesAmount
+      </when>
+      <when test="orderName == 'sales_volumes'">
+        salesCount
+      </when>
+      <otherwise>
+        proLoss
+      </otherwise>
+    </choose>
+    desc
+  </select>
+  <select id="getAllOrderReportList" resultType="com.cbt.pojo.StatisticalReportPojo">
+    SELECT COUNT(orderid) AS orderid,SUM(buyAmount) AS buyAmount,SUM(salesAmount) AS salesAmount,SUM(salesCount) AS salesCount,CAST(SUM(salesAmount)/SUM(salesCount) AS DECIMAL(10,2)) AS avgSalePrice,
+    SUM(actualFreight) AS actualFreight,(SUM(salesAmount)-SUM(buyAmount)-SUM(actualFreight)) AS proLossAmount ,
+    CAST(((SUM(salesAmount)-SUM(buyAmount)-SUM(actualFreight))/SUM(salesAmount)*100) AS DECIMAL(10,2)) AS proLoss
+     FROM order_classification_report WHERE LEFT(create_time,7)=#{time}
+  </select>
+</mapper>

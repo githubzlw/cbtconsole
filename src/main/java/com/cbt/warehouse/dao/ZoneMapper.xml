@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.ZoneMapper" >
+  
+  <resultMap id="ZoneBeanResultMap" type="com.cbt.warehouse.pojo.ZoneBean" >
+    <id column="id" property="id" />
+    <result column="country" property="country" />
+    <result column="zone" property="zone" />
+    <result column="fedexie" property="fedexie" />
+    <result column="area" property="area" />
+  </resultMap>
+  
+  <resultMap id="StateNameResultMap" type="com.cbt.warehouse.pojo.StateName" >
+  	<id column="id" property="id" />
+    <result column="statecode" property="statecode" />
+    <result column="statename" property="statename" />
+  </resultMap>
+  
+   <resultMap id="TransitCheckfreeResultMap" type="com.cbt.warehouse.pojo.TransitCheckfree" >
+  	<id column="id" property="id" />
+    <result column="countryid" property="countryid" />
+    <result column="countryname" property="countryname" />
+    <result column="price" property="price" />
+    <result column="weight" property="weight" />
+    <result column="tariff" property="tariff" />
+  </resultMap>
+  
+     <resultMap id="DeliveryDateResultMap" type="com.cbt.warehouse.pojo.DeliveryDate" >
+  	<id column="id" property="id" />
+    <result column="area" property="area" />
+    <result column="countries" property="countries" />
+    <result column="transportation" property="transportation" />
+    <result column="deliveryDate" property="deliveryDate" />
+  </resultMap>
+  
+   <resultMap id="TransitTypeResultMap" type="com.cbt.warehouse.pojo.TransitType" >
+  	<id column="id" property="id" />
+    <result column="aliExpress_type" property="aliExpress_type" />
+    <result column="battery" property="battery" />
+    <result column="isvolumeweight" property="isvolumeweight" />
+  </resultMap>
+
+   <resultMap id="TransitPricecostResultMap" type="com.cbt.warehouse.pojo.TransitPricecost" >
+  	<id column="id" property="id" />
+    <result column="shippingmethod" property="shippingmethod" />
+    <result column="countryId" property="countryId" />
+    <result column="countrycname" property="countrycname" />
+    <result column="countryname" property="countryname" />
+    <result column="delivery_time" property="delivery_time" />
+    <result column="days" property="days" />
+    <result column="under" property="under" />
+    <result column="over" property="over" />
+    <result column="divisionweight" property="divisionweight" />
+    <result column="battery" property="battery" />
+    <result column="minweight" property="minweight" />
+    <result column="maxweight" property="maxweight" />
+    <result column="shippingmethod_en" property="shippingmethod_en" />
+    <result column="jcex_ratio" property="jcex_ratio" />
+    <result column="jcex_add" property="jcex_add" />
+    <result column="exist_epacket" property="exist_epacket" />
+  </resultMap>
+   <resultMap id="CountryEpacketjcexBeanResultMap" type="com.cbt.warehouse.pojo.CountryEpacketjcexBean" >
+  	<id column="id" property="id" />
+    <result column="countryid" property="countryid" />
+    <result column="exist_epacket" property="exist_epacket" />
+    <result column="jcex_ratio" property="jcex_ratio" />
+    <result column="jcex_add" property="jcex_add" />
+  </resultMap>
+  
+      
+  <select id="getAllZone" resultMap="ZoneBeanResultMap">
+    select id,country,zone,fedexie,area from zone where id not in(42,43)  order by country  in ('USA') desc
+  </select>
+  
+  <select id="getStateName" resultMap="StateNameResultMap">
+    select * from statename
+  </select>
+  
+  <select id="getShippingType" resultType="String">
+    select ${shiptype} from zone where id=#{countryid}
+  </select>
+  
+  <select id="getFedexiePrice" resultType="Float">
+    select ${name} from ${type} where weight=#{weight}
+  </select>
+    
+  <select id="getEpacketPrice" parameterType="String" resultType="hashmap">
+    select * from epacket where country=#{name}
+  </select>
+  
+  <select id="getDhlfbaPrice" resultType="hashmap">
+    select * from dhlfba
+  </select>
+  
+  <select id="getChinapostsalPrice" parameterType="String" resultType="hashmap">
+    select * from chinapostbig where country=#{name} and type='China Post SAL'
+  </select>
+  
+  <select id="getChinapostsurfacePrice" parameterType="String" resultType="hashmap">
+  	select * from chinapostbig where country=#{name} and type='China Post AIR'
+  </select>
+    
+  <select id="getSweden" parameterType="String" resultType="hashmap">
+  	select * from sweden where zone=#{name}
+  </select>
+  
+  <select id="getTNT" parameterType="String" resultType="hashmap">
+  	select * from tnt where zone=#{name}
+  </select>
+  
+  <select id="getKyd" parameterType="String" resultType="hashmap">
+  	select * from kyd where zone=#{name}
+  </select>
+  
+  <select id="getEMS" parameterType="String" resultType="hashmap">
+  	select * from ems where zone=#{name}
+  </select>
+  
+  <select id="getEfast" parameterType="String" resultType="hashmap">
+  	select * from efast where id=#{name}
+  </select>
+  
+  <select id="getFedexground" resultType="Float">
+  	select ${name} from fedexground where weight=#{weight}
+  </select>
+  
+  <select id="getPortpickup" parameterType="String" resultType="hashmap">
+  	select * from portpickup where id=#{name}
+  </select>
+  
+  <select id="getAirportpickup" parameterType="int" resultType="hashmap">
+  	select fee1,fee2,fee3 from airportpickup where countryid=#{countryid}
+  </select>
+  
+  <select id="getAramex" parameterType="String" resultType="hashmap">
+  	select * from aramexmideast where id=#{name}
+  </select>
+  
+  <select id="getDHL" parameterType="String" resultType="hashmap">
+  	select * from dhl where id=#{name}
+  </select>
+  
+  <select id="getDhlfbaother" parameterType="String" resultType="hashmap">
+  	select * from dhlfbaother where id=#{name}
+  </select>
+  
+  <select id="getCheckfreePrice" resultType="Double">
+  	select price from tab_transit_checkfree where countryid=#{countryid}
+  </select>
+    
+  <select id="getVat_Duty" resultType="hashmap">
+  	select aliExpress_type, vat,custom_duty,countryid,aliExpress_type_name from tab_vat_customduty
+  	<if test="type_prices != null and type_prices.size() > 0">
+  		 where aliExpress_type in
+	  	<foreach item="item" index="index" collection="type_prices" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+  	</if>
+  </select>
+  
+  <select id="getCheckfreeType" resultType="hashmap">
+  	select aliExpress_type,battery from tab_transit_battery
+  	<if test="typeIds != null and typeIds.length > 0">
+  		 where aliExpress_type in
+	  	<foreach item="item" index="index" collection="typeIds" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+  	</if>
+  </select>
+  <select id="getTransitType" resultMap="TransitTypeResultMap"  parameterType="Integer" >
+  	select id,aliExpress_type,battery,isvolumeweight from tab_transit_battery where
+  	<if test="type == 0">
+  	 battery="Y"
+  	 </if>
+  	 <if test="type == 1">
+  	isvolumeweight = 1
+  	 </if>
+  </select>
+  <select id="getCheckFree"  resultMap="TransitCheckfreeResultMap">
+  	select id,countryid,price,weight,tariff from tab_transit_checkfree  
+  </select>
+  
+    <select id="getDeliveryDate"  resultMap="DeliveryDateResultMap">
+  	    SELECT * FROM delivery_date
+  </select>
+  
+  
+   <select id="getPriceCost"  resultMap="TransitPricecostResultMap">
+  	  select pc.id,shippingmethod_en,days,under,over,divisionweight,battery,maxweight,minweight,shippingmethod,pc.countryid,countryname,delivery_time from tab_transit_pricecost pc  where pc.countryid is not null  order by  pc.countryid,days
+  </select>
+   <select id="getPriceCost1"  resultMap="TransitPricecostResultMap">
+  	  select pc.id,shippingmethod_en,days,under,over,divisionweight,battery,maxweight,minweight,shippingmethod,pc.countryid,countryname,delivery_time from tab_transit_pricecost1 pc where pc.countryid is not null  order by  pc.countryid,days
+  </select>
+  
+  <select id="getCheckfreeLimit" parameterType="Integer" resultType="hashmap">
+  	select price,weight,tariff from tab_transit_checkfree where countryid=#{countryid}
+  </select>
+  <select id="getFreightFates" parameterType="Integer" resultType="hashmap">
+    select shippingmethod_en,days,under,over,divisionweight,battery,weight,maxweight,minweight,shippingmethod,delivery_time from tab_transit_pricecost3 where countryid=#{countryid} and days &lt;&gt;90 and 
+    <foreach item="item" index="index" collection="sqlWeights" open="(" close=")" separator=" or ">
+    	<if test="item!=0">
+	    	<if test="1 > item">
+				( #{item} between minweight and maxweight )
+			</if>
+	    	<if test="item >= 1">
+				 weight = #{item}
+			</if>
+		</if>
+		<if test="isweights1kg == 0">
+			<if test="sqlWeights.size()>0"> or </if>
+			 weight = 1
+		</if>
+	</foreach>
+  </select>
+  
+  <select id="getDHL_FedEX" parameterType="Integer" resultType="hashmap">
+   select id,countryid,shippingmethod,shippingmethod_en,days,delivery_time,under,over,divisionweight,battery,minweight,maxweight,countryname,countrycname 
+   from tab_transit_pricecost where   days !=90 and battery='N' and countryid=#{countryid} and  minweight&lt;#{sqlWeight} and maxweight>#{sqlWeight} 
+    	<if test="isDHL==1">
+	    	 and  ( shippingmethod_en like '%DHL%' 
+		</if>
+		<if test="isFex == 1">
+			<if test="isDHL == 1"> or </if>
+			<if test="isDHL != 1"> and ( </if>
+			shippingmethod_en like '%FedEx%'
+		</if>
+		 ) order by shippingmethod_en
+  </select>
+  
+    <select id="getAirport_SeaAir" parameterType="Integer" resultType="hashmap">
+   select id,countryid,shippingmethod,shippingmethod_en,days,delivery_time,under,over,divisionweight,minweight,maxweight,countryname 
+   from tab_transit_pricecost where   countryid=36 and (shippingmethod_en= 'China Post Sea Air' or delivery_time='5-7')  and battery='N'
+  </select>
+  
+   <insert id="addVerifyWeight" >
+    	insert tab_verify_weight(userid,remark,createtime,packaging) values (#{userid},#{remark},now(),#{packaging})
+  </insert>
+  
+  <select id="spidertFreight"  resultType="hashmap">
+  	select under,over,divisionweight from tab_transit_pricecost where countryid=#{countryid} and  
+  	<if test="weight &lt; 1.7">
+	    shippingmethod_en ='ePacket' 
+	</if>
+	<if test="weight >= 1.7">
+	  shippingmethod_en='IMExpress'
+	</if>
+  	  and  #{weight} between minweight and maxweight
+  </select>
+  <select id="getIdFormCountry" resultType="integer">
+  	select id from zone where country = #{country};
+  </select>
+  
+   <select id="getCountryEpacket" resultMap="CountryEpacketjcexBeanResultMap">
+  	select id,countryid,exist_epacket,jcex_ratio,jcex_add from tab_transit_countryepacket ;
+  </select>
+  
+  <select id="queryDropshippingCountry" resultType="java.lang.String">
+  	select distinct country from zone 
+  	where isdropshipping = 2
+  	order by country;
+  </select>
+  
+</mapper>

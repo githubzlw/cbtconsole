@@ -1,0 +1,97 @@
+/*<link rel="stylesheet" href="${path}/css/warehousejs/orderfeepage.css" type="text/css"> */
+/**/
+/*字体样式*/
+body{font-family: arial,"Hiragino Sans GB","Microsoft Yahei",sans-serif;} 
+span{
+	text-indent : 0em;
+	word-spacing : 1px;
+	letter-spacing : 1px;
+	overflow : visible;
+	color : #980013;
+	font-size : 10pt;
+}
+
+/*maindiv*/
+.maindiv {
+	
+	
+	height : 750px;
+	width : 1350px;
+	position : relative;
+	left : 260px;
+	top : 10px;
+	z-index : 1;
+}
+
+
+/*出货列表*/
+.tablediv {
+	position : relative;
+	left : 150px;
+	top : 10px;
+	z-index : 1;
+}
+
+
+/*订单信息*/
+.ddinfodiv {
+	border-width : 1px;
+	border-color : #0A0A0A;
+	border-style : solid;
+	height : 310px;
+	width : 1100px;
+}
+/*给div带边框*/
+.alldiv {
+	border-width : 1px;
+	border-color : #1C000B;
+	border-style : solid;
+	left : 8px;
+	right : 4px;
+	position : relative;
+	width : 1078px;
+}
+.zldiv {
+	height : 100px;
+	border-width : 1px;
+	border-color : #1C000B;
+	border-style : solid;
+	left : 8px;
+	right : 4px;
+	position : relative;
+	width : 1078px;
+}
+
+/*出货按钮*/
+.btnOut{
+  line-height:33px;
+  height:33px;
+  width:300px;
+  color:#ffffff;
+  background-color:#d18f4f;
+  font-size:16px;
+  font-weight:bold;
+  font-family:Arial;
+  border:1px solid #999000;
+  -webkit-border-top-left-radius:5px;
+  -moz-border-radius-topleft:5px;
+  border-top-left-radius:5px;
+  -webkit-border-top-right-radius:5px;
+  -moz-border-radius-topright:5px;
+  border-top-right-radius:5px;
+  -webkit-border-bottom-left-radius:5px;
+  -moz-border-radius-bottomleft:5px;
+  border-bottom-left-radius:5px;
+  -webkit-border-bottom-right-radius:5px;
+  -moz-border-radius-bottomright:5px;
+  border-bottom-right-radius:5px;
+  -moz-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  -webkit-box-shadow: inset 0px 0px 0px 0px #ffffff;
+  box-shadow: inset 0px 0px 0px 0px #ffffff;
+  text-align:center;
+  display:inline-block;
+  text-decoration:none;
+}
+.btnOut:hover{
+  background-color:#b24926;
+}

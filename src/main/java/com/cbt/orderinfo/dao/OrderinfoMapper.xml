@@ -1,0 +1,1364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cbt.orderinfo.dao.OrderinfoMapper">
+    <sql id="Base_Column_List" >
+		orderid, order_no, user_id, address_id, delivery_time, packag_style, mode_transport,
+		service_fee, product_cost, domestic_freight, foreign_freight, actual_allincost, pay_price,
+		pay_price_tow, pay_price_three, actual_ffreight, remaining_price, actual_volume,
+		actual_weight, custom_discuss_other, custom_discuss_fright, transport_time, state,
+		cancel_obj, expect_arrive_time, arrive_time, create_time, client_update, server_update,
+		ip, order_ac, purchase_number, details_number, ipnaddress, currency, share_discount,
+		discount_amount, purchase_days, actual_lwh, actual_weight_estimate, actual_freight_c,
+		extra_freight, order_show, packag_number, orderRemark, flag, orderpaytime, cashback,
+		isDropshipOrder, extra_discount, coupon_discount, exchange_rate, ftpPicPath, localImgPath,
+		grade_discount, reAddCartState, vatbalance, ordertype, firstdiscount,
+		sendOrderNo
+	</sql>
+    <sql id="Example_Where_Clause" >
+        <where >
+            <foreach collection="oredCriteria" item="criteria" separator="or" >
+                <if test="criteria.valid" >
+                    <trim prefix="(" suffix=")" prefixOverrides="and" >
+                        <foreach collection="criteria.criteria" item="criterion" >
+                            <choose >
+                                <when test="criterion.noValue" >
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue" >
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue" >
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue" >
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <resultMap id="BaseResultMap" type="com.cbt.bean.Orderinfo">
+        <id column="orderid" property="orderid" jdbcType="INTEGER" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="address_id" property="addressId" jdbcType="INTEGER" />
+        <result column="delivery_time" property="deliveryTime" jdbcType="VARCHAR" />
+        <result column="packag_style" property="packagStyle" jdbcType="INTEGER" />
+        <result column="mode_transport" property="modeTransport" jdbcType="VARCHAR" />
+        <result column="service_fee" property="serviceFee" jdbcType="VARCHAR" />
+        <result column="product_cost" property="productCost" jdbcType="VARCHAR" />
+        <result column="domestic_freight" property="domesticFreight" jdbcType="VARCHAR" />
+        <result column="foreign_freight" property="foreignFreight" jdbcType="VARCHAR" />
+        <result column="actual_allincost" property="actualAllincost" jdbcType="DOUBLE" />
+        <result column="pay_price" property="payPrice" jdbcType="VARCHAR" />
+        <result column="pay_price_tow" property="payPriceTow" jdbcType="VARCHAR" />
+        <result column="pay_price_three" property="payPriceThree" jdbcType="VARCHAR" />
+        <result column="actual_ffreight" property="actualFfreight" jdbcType="VARCHAR" />
+        <result column="remaining_price" property="remainingPrice" jdbcType="DOUBLE" />
+        <result column="actual_volume" property="actualVolume" jdbcType="VARCHAR" />
+        <result column="actual_weight" property="actualWeight" jdbcType="VARCHAR" />
+        <result column="custom_discuss_other" property="customDiscussOther" jdbcType="VARCHAR" />
+        <result column="custom_discuss_fright" property="customDiscussFright" jdbcType="VARCHAR" />
+        <result column="transport_time" property="transportTime" jdbcType="TIMESTAMP" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="cancel_obj" property="cancelObj" jdbcType="INTEGER" />
+        <result column="expect_arrive_time" property="expectArriveTime" jdbcType="TIMESTAMP" />
+        <result column="arrive_time" property="arriveTime" jdbcType="TIMESTAMP" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="client_update" property="clientUpdate" jdbcType="INTEGER" />
+        <result column="server_update" property="serverUpdate" jdbcType="INTEGER" />
+        <result column="ip" property="ip" jdbcType="VARCHAR" />
+        <result column="order_ac" property="orderAc" jdbcType="DOUBLE" />
+        <result column="purchase_number" property="purchaseNumber" jdbcType="INTEGER" />
+        <result column="details_number" property="detailsNumber" jdbcType="INTEGER" />
+        <result column="ipnaddress" property="ipnaddress" jdbcType="VARCHAR" />
+        <result column="currency" property="currency" jdbcType="VARCHAR" />
+        <result column="share_discount" property="shareDiscount" jdbcType="DOUBLE" />
+        <result column="discount_amount" property="discountAmount" jdbcType="DOUBLE" />
+        <result column="purchase_days" property="purchaseDays" jdbcType="INTEGER" />
+        <result column="actual_lwh" property="actualLwh" jdbcType="VARCHAR" />
+        <result column="actual_weight_estimate" property="actualWeightEstimate" jdbcType="DOUBLE" />
+        <result column="actual_freight_c" property="actualFreightC" jdbcType="DOUBLE" />
+        <result column="extra_freight" property="extraFreight" jdbcType="DOUBLE" />
+        <result column="order_show" property="orderShow" jdbcType="INTEGER" />
+        <result column="packag_number" property="packagNumber" jdbcType="INTEGER" />
+        <result column="orderRemark" property="orderremark" jdbcType="VARCHAR" />
+        <result column="flag" property="flag" jdbcType="INTEGER" />
+        <result column="orderpaytime" property="orderpaytime" jdbcType="TIMESTAMP" />
+        <result column="cashback" property="cashback" jdbcType="DOUBLE" />
+        <result column="isDropshipOrder" property="isdropshiporder" jdbcType="INTEGER" />
+        <result column="extra_discount" property="extraDiscount" jdbcType="DOUBLE" />
+        <result column="coupon_discount" property="couponDiscount" jdbcType="DOUBLE" />
+        <result column="exchange_rate" property="exchangeRate" jdbcType="DECIMAL" />
+        <result column="ftpPicPath" property="ftppicpath" jdbcType="VARCHAR" />
+        <result column="localImgPath" property="localimgpath" jdbcType="VARCHAR" />
+        <result column="grade_discount" property="gradeDiscount" jdbcType="DOUBLE" />
+        <result column="reAddCartState" property="readdcartstate" jdbcType="INTEGER" />
+        <result column="vatbalance" property="vatbalance" jdbcType="DOUBLE" />
+        <result column="ordertype" property="ordertype" jdbcType="INTEGER" />
+        <result column="firstdiscount" property="firstdiscount" jdbcType="DOUBLE" />
+        <result column="memberFee" property="memberfee" jdbcType="DOUBLE" />
+        <result column="sendOrderNo" property="sendorderno" jdbcType="VARCHAR" />
+    </resultMap>
+    <!-- <select id="getOrdersCount" resultType="java.lang.Integer">
+          select  count(o.orderid)
+           from    orderinfo    o
+            <if test="startdate != null || enddate != null || type == 'overdelay' || type == 'ordermeg'">
+            left join (select orderid,min(createtime) createtime,min(paytype) paytype,min(paystatus) paystatus from payment where payflag='O' group by orderid ) pay on pay.orderid=o.order_no
+        </if>
+             <if test="email != null and email != ''">
+            inner join user  on o.user_id=user.id
+            </if>
+             <if test="admuserid != 0">
+      left  join admin_r_user  aru on  aru.userid=o.user_id
+      </if>
+        <if test="buyid != 0">
+       left join order_buy  on  o.order_no =order_buy.orderid
+       </if>
+        <choose>
+        <when test="type == 'agree'">
+           inner  join (select * from changegooddata where  changeflag=1 group by orderno)cg on orderno=  order_no    where o.state=5
+          </when>
+          <when test="type == 'suggest'">
+           inner  join (select * from changegooddata where  changeflag=0 group by orderno)cg on orderno=  order_no    where o.state = 5
+          </when>
+          <when test="type == 'purchase'">
+           inner  join (select * from order_product_source where  (purchase_state=5  and remark!=null) or purchase_state=12 group by orderid)ops on ops.orderid=order_no    where o.state=5
+          </when>
+          <when test="type == 'agree'">
+           inner  join (select * from changegooddata where  changeflag=1 group by orderno)cg on orderno=  order_no   where 1=1
+          </when>
+          <when test="type == 'suggest'">
+           inner  join (select * from changegooddata where  changeflag=0 group by orderno)cg on orderno=  order_no     where o.state = 5
+          </when>
+          <when test="type == 'purchase'">
+           inner  join (select * from order_product_source where  (purchase_state=5  and remark!=null) or purchase_state=12 group by orderid)ops on ops.orderid=order_no  where 1=1
+          </when>
+          <when test="type == 'deliver'">
+           inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno=  order_no    where o.state in (5,2,1)
+          </when>
+          <when test="type == 'notshipping'">
+          left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no
+           where o.state=2  and (date_add(irc.createtime, INTERVAL 2 day) &lt; now() )
+          </when>
+          <when test="type == 'overdelay'">
+              where ((date_add(pay.createtime, INTERVAL 2 day) &lt; now() and state = 5) or (date_add(pay.createtime, INTERVAL o.delivery_time-2 day) &lt; now() and state = 1) or ( date_add(pay.createtime, INTERVAL o.delivery_time day) &lt; now() and state = 2))
+          </when>
+          <when test="type == 'cacle'">
+              where state in (-1,6) and   to_days(now()) - to_days(create_time) &lt;= 10
+          </when>
+          <when test="type == 'cy'">
+              where state=3 and   to_days(now()) - to_days(create_time) &lt;= 60
+          </when>
+          <when test="type == 'ordermeg'">
+              where o.state &gt;0
+            AND o.state &lt; 6
+        AND aru.userid is null and to_days(pay.createtime)=to_days(now())
+          </when>
+          <otherwise>  where 1=1  </otherwise>
+      </choose>
+       <if test="userID != 0">
+                and o.user_ID=#{userID}
+       </if>
+       <choose>
+           <when test="state == -1 || state == 6 ">
+               and ( o.state=-1 or  o.state=6 )
+           </when>
+           <when test="state != -2">
+                and o.state=#{state}
+           </when>
+       </choose>
+        <if test="admuserid != 0">
+                and aru.adminid=#{admuserid}
+       </if>
+        <if test="buyid != 0">
+                and order_buy.buyid=#{buyid}
+       </if>
+        <if test="showUnpaid == 0">
+                and o.state != 0
+       </if>
+       <if test="startdate != null ">
+                 and to_days(pay.createtime) &gt; to_days(#{startdate})
+        </if>
+
+        <if test="enddate != null">
+                 and to_days(pay.createtime) &lt; to_days(#{enddate})
+        </if>
+         <if test="email != null and email != ''">
+                 and user.email = #{email}
+        </if>
+         <if test="orderno != null and orderno != ''">
+                 and order_no = #{orderno}
+        </if>
+          <if test="status == -1">
+            and  aru.admName is null
+        </if>
+      </select>-->
+
+    <select id="getProblem" resultType="String">
+     SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=#{orderid}
+  </select>
+    <select id="getOrders" resultType="java.util.Map">
+        select
+
+        -- (select count(g.id) from goods_car g,order_details od where g.id=od.goodsid  and preferential =1 and  od.orderid=o.order_no) preferential_applications,
+
+        (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
+
+        (select count(of.id) from order_fee of  where ( state=3 or  state=0)  and of.orderno = o.order_no) deliver,
+
+        (SELECT COUNT(id) FROM order_change WHERE orderNo=o.order_no AND FIND_IN_SET(is_read,0)) as message_read,
+
+        (SELECT orderremark FROM order_remark WHERE orderid=o.order_no ORDER BY id DESC LIMIT 1) AS orderremarks,
+
+        <!-- (SELECT COUNT(id)-SUM(goodstatus) FROM id_relationtable WHERE orderid=o.order_no) AS problem,
+
+        (SELECT SUM(freight) FROM goods_car WHERE id IN (SELECT goodsid FROM order_details WHERE orderid=o.order_no)) as allFreight,-->
+
+        <![CDATA[
+ 	(SELECT SUM(checked) FROM order_details WHERE orderid=o.order_no AND state<2) AS checked,
+
+ 	(SELECT count(id) FROM order_details WHERE orderid=o.order_no AND state<2) AS countOd,
+
+(SELECT COUNT(id) FROM order_details WHERE orderid=o.order_no AND state<>2) details_number,
+(SELECT COUNT(id) FROM order_details WHERE orderid=o.order_no AND state=1) number_of_warehouses,
+(SELECT COUNT(ops.id) FROM order_product_source ops INNER JOIN order_details od ON od.id=ops.od_id WHERE ops.orderid=o.order_no AND od.orderid=o.order_no AND od.state<>2 AND ops.purchase_state IN (2,3,4,6,7,8)) purchase_number,
+]]>
+        o.order_no,o.mode_transport, orderpaytime   paytime,o.orderid as id,o.delivery_time ,o.currency,o.user_id,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email, ''as buyer,
+        func_get_split_string(mode_transport,'@',3) as countrys, '' address,'' address2,'' statename,'' phoneNumber,'' street,'' zipcode,
+        (select count(id) from order_change oc where oc.orderno=o.order_no and roptype = 5 and oldvalue= 1) oc_c,(CASE WHEN pay_price_three='-999' THEN 3 WHEN IFNULL(pay_price_three,0)>0  THEN 2 ELSE 0 END ) paytype    ,1 paystatus,
+        (select count(*) from (select left(d.order_no,16) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, left(d.order_no,16) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
+        true then  (ifnull(pay_price,0)-ifnull(pay_price_three,0)) else 0 end )   service_fee
+        ,o.packag_style as changenum ,o.actual_weight_estimate as freightFee,date_format(ifnull(orderpaytime,o.create_time),'%Y-%c-%d %h:%i:%s') as createtime ,o.orderRemark,pay_price_three,isDropshipOrder
+        from orderinfo    o  inner join user  on o.user_id=user.id
+        left  join admin_r_user  aru on  aru.userid=o.user_id
+        <!-- left join order_buy  on  o.order_no =order_buy.orderid -->
+        <!-- LEFT JOIN order_address oad on oad.orderNo = o.order_no LEFT JOIN zone z on oad.country=z.id -->
+        <!--   left  join  (select orderid,GROUP_CONCAT(paytype)  paytype   from payment  where  paystatus=1 and   payflag='O'  group by orderid,paytype limit 1) pay  on pay.orderid=o.order_no  -->
+        <if test="state==7">
+            INNER  JOIN order_details od ON o.order_no=od.orderid
+        </if>
+        <choose>
+            <when test="type == 'agree'">
+                inner join  (select * from order_details where  od_state = 13 group by orderid)cgd where cgd.orderid=o.order_no   and o.state in (1,5)
+            </when>
+            <when test="type == 'suggest'">
+                <!--   	 	inner  join (select * from changegooddata where  changeflag=0 group by orderno) cgd on cgd.orderno =  o.order_no    where o.state = 5 -->
+                where o.order_no in (select cg.orderno from changegooddata cg
+                inner join order_details de 	on  cg.orderno=de.orderid and  cg.aliurl=de.car_url  and de.state!=13
+                where cg.changeflag=0 group by cg.orderno
+                ) and o.state in (1,5) and o.state != 0
+            </when>
+            <when test="type == 'purchase'">
+                inner  join (select * from order_product_source where   ((purchase_state=5  and remark!=null) or purchase_state=12)  group by orderid)ops on ops.orderid=order_no    where o.state =5
+            </when>
+            <when test="type == 'deliver'">
+                inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno =  order_no    where o.state in (5,2,1)
+            </when>
+            <when test="type == 'notshipping'">
+                <!-- left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no    -->
+                where  o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() )
+                <!-- inner  join (select * from order_fee   group by orderno)of on orderno =  order_no   -->
+            </when>
+
+            <when test="type == 'purchasewarning'">
+                <![CDATA[
+  		where  (date_add(orderpaytime, INTERVAL 2 day) < now() and state in (5)) AND o.isDropshipOrder&lt;>3
+  	]]>
+            </when>
+
+            <when test="type == 'storagewarning'">
+                <![CDATA[
+  		where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) < now() and state = 1)
+  	]]>
+            </when>
+            <when test="type == 'shipmentwarning'">
+                <![CDATA[
+  		where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
+  	]]>
+            </when>
+            <when test="type == 'systemfailure'">
+                where  o.order_no IN (SELECT distinct pri.orderid FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0)
+            </when>
+
+            <when test="type == 'cacle'">
+                <![CDATA[
+  		where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) <= 10  and  orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'cy'">
+                <![CDATA[
+  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'latelyOrdermessage'">
+                <![CDATA[
+  		where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'ordermessage'">
+                where orderremark != '' and state in(1,2,3,4,5)
+            </when>
+            <when test="type == 'ordermeg'">
+                <!--   	and o.state &gt;0 and o.state &lt;6 -->
+                LEFT JOIN
+                (
+                SELECT
+                order_no, count(payc.id) sl
+                FROM
+                orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
+                WHERE
+                oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
+                group by order_no
+                ) cc on cc.order_no=o.order_no
+                where  cc.sl=0
+            </when>
+            <otherwise>  where 1=1  </otherwise>
+        </choose>
+        <if test="userID != 0">
+            and o.user_ID=#{userID}
+        </if>
+        <choose>
+            <when test="state == -1 || state == 6 ">
+                and ( o.state=-1 or  o.state=6 )
+            </when>
+            <when test="state == 7 ">
+                and o.state=3 AND <![CDATA[od.state<2 ]]>
+            </when>
+            <when test="state != -2">
+                and o.state=#{state}
+            </when>
+        </choose>
+        <if test="admuserid != 0">
+            and aru.adminid=#{admuserid}
+        </if>
+        <!--  <if test="buyid != 0">
+                 and order_buy.buyid=#{buyid}
+        </if> -->
+        <if test="showUnpaid == 0">
+            and o.state != 0
+        </if>
+        <if test="startdate != null ">
+            <!--  and  TO_DAYS(ifnull(pay.createtime,o.create_time)) &gt; to_days(#{startdate})-->
+            <![CDATA[
+        	and  o.orderpaytime >=#{startdate}
+        ]]>
+        </if>
+
+        <if test="enddate != null">
+            <!--  and TO_DAYS(ifnull(pay.createtime,o.create_time))&lt; to_days(#{enddate})-->
+            <![CDATA[
+        	and  o.orderpaytime <=#{enddate}
+       ]]>
+        </if>
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+        <if test="orderno != null and orderno != ''">
+            and o.order_no = #{orderno}
+        </if>
+        <if test="status == -1">
+            and  aru.admName is null
+        </if>
+        <if test="state==7">
+            group by o.order_no  HAVING COUNT(od.id)-SUM(od.state)>0
+        </if>
+        order by
+        o.orderpaytime
+        <!--     <if test="showUnpaid == 1">
+                     o.create_time
+           </if>
+           <if test="showUnpaid == 0">
+                     pay.createtime
+           </if> -->
+        desc LIMIT #{startpage},#{page}
+    </select>
+
+    <select id="getOrders1" resultType="java.util.Map">
+        <!--   	select
+        (select count(g.id) from goods_car g,order_details od where g.id=od.goodsid  and preferential =1 and  od.orderid=o.order_no) preferential_applications,
+        (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
+        (select count(of.id) from order_fee of  where ( state=3 or  state=0)  and of.orderno = o.order_no) deliver,
+         o.order_no,o.mode_transport, pay.createtime  paytime,o.orderid as id,o.delivery_time ,o.currency,o.user_id,ifnull(aru.admName,'') adminname,cancel_obj,o.actual_ffreight,purchase_number,details_number,o.product_cost,o.state,user.name username,user.email email, ifnull(order_buy.buyuser,'') as buyer, func_get_split_string(mode_transport,'@',3) as countrys,'' address,'' address2,'' statename,'' phoneNumber,'' street,'' zipcode,
+                 (select count(id) from order_change oc where oc.orderno=o.order_no and roptype = 5 and oldvalue= 1) oc_c,paytype,paystatus,
+         (select count(*) from (select left(d.order_no,16) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, left(d.order_no,16) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
+          true then  (ifnull(pay_price,0)-ifnull(pay_price_three,0)) else 0 end )   service_fee
+         ,o.packag_style as changenum ,ifnull(( date_format( pay.createtime,'%Y-%m-%d %H:%i:%s') ),o.create_time)  as createtime ,o.orderRemark
+        from orderinfo    o  inner join user  on o.user_id=user.id
+          left  join admin_r_user  aru on  aru.userid=o.user_id
+           left join order_buy  on  o.order_no =order_buy.orderid
+          left  join  (select orderid,min(createtime) createtime,min(paytype)  paytype,min(paystatus) paystatus  from payment  where  payflag='O'  group by orderid ) pay  on pay.orderid=o.order_no
+          left join order_change oc on o.order_no = oc.orderNo -->
+        select
+        -- (select count(g.id) from goods_car g,order_details od where g.id=od.goodsid  and preferential =1 and  od.orderid=o.order_no) preferential_applications,
+        (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
+        (select count(of.id) from order_fee of  where ( state=3 or  state=0)  and of.orderno = o.order_no) deliver,
+        o.order_no,o.mode_transport, orderpaytime  paytime,o.orderid as id,o.delivery_time ,o.currency,o.user_id,ifnull(aru.admName,'') adminname,cancel_obj,o.actual_ffreight,purchase_number,details_number,o.product_cost,o.state,user.name username,user.email email, <!-- ifnull(order_buy.buyuser,'') -->'' as buyer, func_get_split_string(mode_transport,'@',3) as countrys,'' address,'' address2,'' statename,'' phoneNumber,'' street,'' zipcode,
+        (select count(id) from order_change oc where oc.orderno=o.order_no and roptype = 5 and oldvalue= 1) oc_c,(CASE ifnull(pay_price_three,0)>0 when true  then 2 else 0 end ) paytype    ,1 paystatus,
+        (select count(*) from (select left(d.order_no,16) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, left(d.order_no,16) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
+        true then  (ifnull(pay_price,0)-ifnull(pay_price_three,0)) else 0 end )   service_fee
+        ,o.packag_style as changenum ,date_format(ifnull(orderpaytime,o.create_time),'%Y-%c-%d %h:%i:%s')  as createtime ,o.orderRemark
+        from orderinfo    o  inner join user  on o.user_id=user.id
+        left  join admin_r_user  aru on  aru.userid=o.user_id
+        <!-- left join order_buy  on  o.order_no =order_buy.orderid   -->
+        left join order_change oc on o.order_no = oc.orderNo
+
+        <choose>
+            <when test="type == 'agree'">
+                inner join  (select * from order_details where  od_state = 13 group by orderid)cgd where cgd.orderid=o.order_no   and o.state=5
+            </when>
+            <when test="type == 'suggest'">
+                inner  join (select * from changegooddata where  changeflag=0 group by orderno) cgd on cgd.orderno =  o.order_no    where o.state = 5
+            </when>
+            <when test="type == 'purchase'">
+                inner  join (select * from order_product_source where   ((purchase_state=5  and remark!=null) or purchase_state=12)  group by orderid)ops on ops.orderid=order_no    where o.state =5
+            </when>
+            <when test="type == 'deliver'">
+                inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno =  order_no    where o.state in (5,2,1)
+            </when>
+            <when test="type == 'notshipping'">
+                <!-- left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no    -->
+                where o o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() )
+                <!-- inner  join (select * from order_fee   group by orderno)of on orderno =  order_no   -->
+            </when>
+            <!--   	采购预警 -->
+            <when test="type == 'purchasewarning'">
+                where  (date_add(orderpaytime, INTERVAL 2 day) &lt; now() and state in (5)) AND o.isDropshipOrder&lt;>3
+            </when>
+
+            <when test="type == 'storagewarning'">
+                where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and state = 1)
+            </when>
+            <when test="type == 'shipmentwarning'">
+                where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
+            </when>
+
+            <when test="type == 'cacle'">
+                where state in (-1,6) and   to_days(now()) - to_days(create_time) &lt;= 10
+            </when>
+            <when test="type == 'cy'">
+                where state=3 and   to_days(now()) - to_days(create_time) &lt;= 60
+            </when>
+            <when test="type == 'ordermeg'">
+                where o.state in (5,1,2) AND o.isDropshipOrder&lt;>3
+                <!-- AND aru.userid is null and to_days(pay.createtime)=to_days(now()) -->
+            </when>
+            <otherwise>  where 1=1  </otherwise>
+        </choose>
+        <if test="userID != 0">
+            and o.user_ID=#{userID}
+        </if>
+        <choose>
+            <when test="state == -1 || state == 6 ">
+                and ( o.state=-1 or  o.state=6 )
+            </when>
+            <when test="state != -2">
+                and o.state=#{state}
+            </when>
+        </choose>
+        <if test="admuserid != 0">
+            and aru.adminid=#{admuserid}
+        </if>
+        <!-- <if test="buyid != 0">
+                and order_buy.buyid=#{buyid}
+       </if> -->
+        <if test="showUnpaid == 0">
+            and o.state != 0
+        </if>
+        <if test="startdate != null ">
+            <!-- and  TO_DAYS(ifnull(orderpaytime,o.create_time)) &gt; to_days(#{startdate}) -->
+            <![CDATA[
+        	orderpaytime >= #{startdate}
+        	]]>
+        </if>
+
+        <if test="enddate != null">
+            <!-- and TO_DAYS(ifnull(orderpaytime,o.create_time))&lt; to_days(#{enddate}) -->
+            <![CDATA[
+        	orderpaytime <= #{enddate}
+        	]]>
+        </if>
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+        <if test="orderno != null and orderno != ''">
+            and o.order_no = #{orderno}
+        </if>
+        <if test="status == -1">
+            and  aru.admName is null
+        </if>
+
+        and oc.ropType = 5 and oc.oldValue = 0 and oc.del_state = 0
+        order by orderpaytime
+        <!--     <if test="showUnpaid == 1">
+                     o.create_time
+           </if>
+           <if test="showUnpaid == 0">
+                     pay.createtime
+           </if> -->
+        desc LIMIT #{startpage},#{page}
+    </select>
+    <select id="getOrdersCount" resultType="java.lang.Integer">
+        <choose>
+            <when test="state == 7">
+                SELECT COUNT(a.order_no) FROM (select distinct o.order_no
+            </when>
+            <otherwise>  select count(distinct o.order_no) </otherwise>
+        </choose>
+        from orderinfo    o  inner join user  on o.user_id=user.id
+        left  join admin_r_user  aru on  aru.userid=o.user_id
+        left join order_buy  on  o.order_no =order_buy.orderid
+        <if test="state==7">
+            INNER JOIN order_details od ON o.order_no=od.orderid
+        </if>
+        <choose>
+            <when test="type == 'agree'">
+                inner join  (select * from order_details where  od_state = 13 group by orderid)cgd where cgd.orderid=o.order_no   and o.state in (1,5)
+            </when>
+            <when test="type == 'suggest'">
+                inner  join (select * from changegooddata where  changeflag=0 group by orderno) cgd on cgd.orderno =  o.order_no    where o.state in (1,5)
+            </when>
+            <when test="type == 'purchase'">
+                inner  join (select * from order_product_source where   ((purchase_state=5  and remark!=null) or purchase_state=12)  group by orderid)ops on ops.orderid=order_no    where o.state =5
+            </when>
+            <when test="type == 'deliver'">
+                inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno =  order_no    where o.state in (5,2,1)
+            </when>
+            <when test="type == 'notshipping'">
+                <!-- left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no    -->
+                where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND o.isDropshipOrder&lt;>3
+            </when>
+            <when test="type == 'systemfailure'">
+                where  o.order_no IN (SELECT distinct pri.orderid FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0) AND o.isDropshipOrder&lt;>3
+            </when>
+            <when test="type == 'purchasewarning'">
+                where  (date_add(orderpaytime, INTERVAL 2 day) &lt; now() and state in (5)) AND o.isDropshipOrder&lt;>3
+            </when>
+
+            <when test="type == 'storagewarning'">
+                where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and state = 1) AND o.isDropshipOrder&lt;>3
+            </when>
+            <when test="type == 'shipmentwarning'">
+                where  o.isDropshipOrder&lt;>3 and (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
+            </when>
+
+            <when test="type == 'cacle'">
+                <![CDATA[
+  		where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) <= 10  and  orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'cy'">
+                <![CDATA[
+  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'cyw'">
+                <![CDATA[
+  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
+  		 AND order_no in(
+			SELECT
+				sp.orderid
+			FROM
+				(SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
+				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
+			WHERE
+				((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
+				((datediff(ti.updat_date,ti.track_update) IS null
+				OR datediff(ti.updat_date,ti.track_update) > 3
+				OR now() > ti.order_deliverDate))
+				OR ti.track_state IN (4,5,6)))
+			)
+  	]]>
+            </when>
+            <when test="type == 'latelyOrdermessage'">
+                <![CDATA[
+  		where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
+  	]]>
+            </when>
+            <when test="type == 'ordermessage'">
+                where orderremark != '' and state in(1,2,3,4,5)
+            </when>
+            <when test="type == 'ordermeg'">
+                LEFT JOIN
+                (
+                SELECT
+                order_no, count(payc.id) sl
+                FROM
+                orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
+                WHERE
+                oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
+                group by order_no
+                ) cc on cc.order_no=o.order_no
+                where  cc.sl=0 and LENGTH(o.order_no)&lt;>18
+            </when>
+            <otherwise>  where 1=1  </otherwise>
+        </choose>
+        <if test="userID != 0">
+            and o.user_ID=#{userID}
+        </if>
+        <choose>
+            <when test="state == -1 || state == 6 ">
+                and ( o.state=-1 or  o.state=6 )
+            </when>
+            <when test="state == 7 ">
+                and o.state=3 AND <![CDATA[ od.state<2 ]]>
+            </when>
+            <when test="state != -2">
+                and o.state=#{state}
+            </when>
+        </choose>
+        <if test="admuserid != 0">
+            and aru.adminid=#{admuserid}
+        </if>
+        <!--  <if test="buyid != 0">
+                 and order_buy.buyid=#{buyid}
+        </if> -->
+        <if test="showUnpaid == 0">
+            and o.state != 0
+        </if>
+        <if test="startdate != null ">
+            <![CDATA[
+        	and  o.orderpaytime >=#{startdate}
+        ]]>
+        </if>
+
+        <if test="enddate != null">
+            <![CDATA[
+        	and  o.orderpaytime <=#{enddate}
+       ]]>
+        </if>
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+        <if test="orderno != null and orderno != ''">
+            and o.order_no = #{orderno}
+        </if>
+        <if test="status == -1">
+            and  aru.admName is null
+        </if>
+        <if test="state == 7">
+            GROUP BY o.order_no HAVING COUNT(od.id)-SUM(od.state)>0 ORDER BY o.orderpaytime  ) a
+        </if>
+    </select>
+
+
+    <select id="getOrdersState" resultType="java.util.Map">
+        SELECT 'close' AS state,COUNT(o.order_no) AS counts FROM orderinfo o
+        <if test="admuserid != 0">
+            inner join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        WHERE o.state IN (-1,6) AND  TO_DAYS(NOW()) - TO_DAYS(o.orderpaytime) &lt;= 10
+        union all
+        select  'cy' as state,count(o.order_no)  as counts from orderinfo o
+        <if test="admuserid != 0">
+            inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60
+        union all
+        SELECT  'cyw' AS state,COUNT(o.orderid)  AS counts FROM
+        orderinfo o INNER JOIN shipping_package  sp ON o.order_no=sp.orderid AND TO_DAYS(NOW()) - TO_DAYS(orderpaytime) &lt;= 60 AND sp.sflag = 3
+        INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
+        <if test="admuserid != 0">
+            inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        WHERE ti.track_state != 3 AND ti.track_state != 7 AND DATEDIFF(NOW(), sp.createtime) >= 3 AND(
+        (DATEDIFF(ti.updat_date,ti.track_update) IS NULL
+        OR DATEDIFF(ti.updat_date,ti.track_update) > 3
+        OR NOW() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6)
+        union all
+        select 'agree',COUNT(DISTINCT order_no) counts from order_details de,orderinfo o
+        <if test="admuserid != 0">
+            inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        where de.orderid =  order_no and od_state =13   and o.state in (1,5)
+        union all
+        SELECT  'suggest',COUNT(DISTINCT cgd.orderno) counts FROM
+        changegooddata cgd
+        INNER JOIN orderinfo o ON  cgd.orderno = o.order_no  AND  o.state IN (5,1) AND   cgd.changeflag=0
+        INNER JOIN admin_r_user  aru ON  aru.userid=o.user_id
+        INNER JOIN order_details de 	ON  cgd.orderno=de.orderid AND  cgd.aliurl=de.car_url  AND de.state!=13
+        <if test="admuserid != 0">
+            where aru.adminid=#{admuserid}
+        </if>
+        union all
+        SELECT 'deliver' AS state,COUNT(id) AS counts FROM ( SELECT order_fee.* FROM order_fee  LEFT JOIN orderinfo o ON  orderno=  order_no
+        WHERE o.state IN (5,2,1) AND  ( order_fee.state=3 OR order_fee.state=0) GROUP BY orderno) ops
+        union all
+        SELECT 'notshipping' as state, COUNT(DISTINCT order_no)as counts  from  orderinfo o
+        <if test="admuserid != 0">
+            left  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND isDropshipOrder IN (0,1)
+        union all
+        select   'storagewarning' as state ,count(o.orderid)as counts from orderinfo  o
+        <if test="admuserid != 0">
+            inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        where DATE_ADD(o.orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 DAY) &lt; NOW() and state = 1
+        union all
+        select   'shipmentwarning' as state ,count(o.orderid)as counts from orderinfo  o
+        <if test="admuserid != 0">
+            inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+        </if>
+        where DATE_ADD(o.orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 DAY) &lt; NOW() and date_add(orderpaytime, INTERVAL o.delivery_time-2 day)>now() and state = 2
+        union all
+        SELECT 'order_pending' AS state,COUNT(orderid) counts FROM (SELECT p.orderid FROM payment p
+        INNER JOIN orderinfo oi ON p.orderid=oi.order_no
+        <if test="admuserid != 0">
+            inner JOIN admin_r_user a ON oi.user_id=a.userid and  a.adminid=#{admuserid}
+        </if>
+        WHERE  p.paystatus=0 AND oi.state=0
+        GROUP BY p.orderid) a
+
+    </select>
+    <select id="getorderPending" resultType="java.util.Map">
+        SELECT  o.order_no,o.mode_transport,o.orderid AS id,o.delivery_time ,o.currency,o.user_id,IFNULL(aru.admName,'') adminname,
+        IFNULL(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email,
+        ''AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
+        o.packag_style AS changenum ,(select createtime from payment where orderid=o.order_no limit 1) as paytime,
+        (CASE WHEN pay_price_three='-999' THEN 3 WHEN IFNULL(pay_price_three,0)>0 THEN 2 ELSE 0 END ) paytype,
+        (CASE (IFNULL(pay_price,0)-IFNULL(pay_price_three,0))>0 WHEN TRUE THEN (IFNULL(pay_price,0)-IFNULL(pay_price_three,0)) ELSE 0 END ) service_fee ,
+        DATE_FORMAT(IFNULL(orderpaytime,o.create_time),'%Y-%c-%d %H:%i:%s') AS createtime ,o.orderRemark,pay_price_three,isDropshipOrder, SPACE(200) AS preferential_applications,
+        SPACE(200) AS purchase,SPACE(200) AS deliver,SPACE(200) AS message_read,SPACE(200) AS allFreight,SPACE(200) AS checked,SPACE(200) AS countOd,
+        SPACE(200) AS no_checked,SPACE(200) AS details_number,SPACE(200) AS number_of_warehouses,SPACE(200) AS purchase_number,SPACE(200) AS oc_c,SPACE(200) AS order_count,
+        ifnull(re.orderremark,'-') as orderremarks
+        FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
+        left join order_remark re on re.orderid=o.order_no
+        where o.order_no in (${orderIds})
+    </select>
+    <select id="getOrderIds" resultType="java.lang.String">
+        SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
+        WHERE p.id IN(SELECT MAX(id) FROM payment GROUP BY orderid) AND p.paystatus=0 and oi.state=0   ORDER BY p.id DESC
+    </select>
+    <select id="getPayTypeForOrderNo" resultType="com.cbt.bean.Payment">
+        SELECT GROUP_CONCAT(paytype) as paytype,if(paystatus=2,4,paystatus) as paystatus FROM payment
+        WHERE orderid=#{orderNo} and paystatus=0 order by id desc limit 1
+    </select>
+    <select id="getOrderManagementQuery" resultType="java.util.Map">
+        {call order_management_query_bak(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},${buyid},#{startdate},#{enddate},#{email},${status},${startpage},${page},#{paymentid})}
+    </select>
+    <select id="getOrdersDetails" resultType="com.cbt.bean.OrderDetailsBean">
+        select DISTINCT oi.isDropshipOrder,adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,
+        IFNULL((ors.goods_p_price*(ifnull(ors.buycount,1))),0)as sumGoods_p_price,
+        ors.purchase_state orsstate,od.orderid,od.od_state,od.shipno, 6 as ropType,ors.goods_p_url newValue,ors.last_goods_p_url AS lastValue,ors.tb_1688_itemid,ors.last_tb_1688_itemid,ors.confirm_time,ors.confirm_userid,
+        ors.goods_p_price oldValue,ors.buycount,ors.del del_state,od.userid,od.id oid,od.goodsname,od.checkprice_fee,od.state,od.paytime,
+        car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
+        od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
+        (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
+        ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
+        date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
+        od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
+        ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,cbr.ali_sellunit,
+        cbr.bm_flag,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
+        from order_details od
+        left join order_address adr on od.orderid=adr.orderNo
+        left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
+        left join id_relationtable id on od.goodsid=id.goodid and id.orderid=od.orderid and id.is_replenishment=1
+        left join zone z ON adr.country=z.country   left join orderinfo oi ON oi.order_no=od.orderid
+        left join dropshiporder dso on od.dropshipid = dso.child_order_no
+        left join goods_communication_info gci on od.orderid=gci.orderid and od.goodsid=gci.goodsid
+        LEFT join custom_benchmark_ready  cbr ON cbr.pid = od.goods_pid
+        where od.orderid=#{orderNo}  order by dropshipid, car_url,od.id
+    </select>
+    <select id="selectByExample" resultType="com.cbt.bean.TabTransitFreightinfoUniteNew">
+        select distinct  id, transport_mode as transportMode, shipping_time as shippingTime, countryid, normal_base_weight as normalBaseWeight, normal_base_price as normalBasePrice,
+        normal_ratio_price as normalRatioPrice, normal_big_weight_price as normalBigWeightPrice, special_base_weight as specialBaseWeight, special_base_price as specialBasePrice,
+        special_ratio_price as specialRatioPrice, special_big_weight_price as specialBigWeightPrice, del, split
+        from tab_transit_freightinfo_unite_new
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null" >
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="getCatidDetails" resultType="com.cbt.bean.OrderDetailsBean">
+        SELECT od.goodscatid,od.od_total_weight,z.id AS countryId FROM order_details od
+        INNER JOIN order_address ad ON od.orderid=ad.orderNo or od.dropshipid=ad.orderNo
+        INNER JOIN zone z ON REPLACE(ad.country,' ','')=z.id OR REPLACE(ad.country,' ','')=REPLACE(z.country,' ','')
+        where od.orderid=#{orderid} and state&lt;2
+    </select>
+    <select id="getAllOrderCatid" resultType="java.util.Map">
+        SELECT od.goodscatid,od.od_total_weight,z.id AS countryId,od.orderid FROM order_details od
+        INNER JOIN order_address ad ON od.orderid=ad.orderNo or od.dropshipid=ad.orderNo
+        INNER JOIN zone z ON REPLACE(ad.country,' ','')=z.id OR REPLACE(ad.country,' ','')=REPLACE(z.country,' ','')
+        where od.orderid in (${orderids}) and state&lt;2
+    </select>
+    <select id="getBhShopId" resultType="java.lang.String">
+        SELECT distinct ifnull(shop_id,'') FROM order_replenishment WHERE orderid=#{orderNo} AND goodsid=#{goodsid}
+    </select>
+    <select id="getOrderChange" resultType="com.cbt.bean.OrderChange">
+        select ropType,oldValue,newValue,del_state,goodId,dateline from order_change where orderNo=#{orderNo}  and  (((ropType  BETWEEN 2 AND 4)  and del_state=0 ) or (ropType=1 ) or (ropType=5 )) order by id desc
+    </select>
+    <select id="getOrder" resultType="com.cbt.bean.OrderBean">
+        select GROUP_CONCAT(pm.paytype) AS paytypes,(select count(tb_complain.id) from tb_complain where complainState in(1,2) and  ref_orderid=order_no)complain,
+        0 deliver,
+        (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
+        (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
+        (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
+        (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
+        (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
+        (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON od.orderid=id.orderid AND od.goodsid=id.goodid
+        WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
+        pf.id dzid, pf.orderno dzorderno, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
+        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
+        (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
+        (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
+        a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
+        actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,date_format(o.create_time,'%Y-%m-%d') as createtime,
+        recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
+        (select email from admuser au where aru.adminid=au.id) adminemail,
+        actual_lwh,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name username,
+        u.email as userEmail,'' as buyer,exporttime,   '' storagetime,o.actual_weight_estimate as freightFee,  o.delivery_time as deliveryTime,  0  buyid,
+        o.orderRemark,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount,u.businessName
+        ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume
+        from orderinfo o left join order_address a on o.order_no=a.orderNo
+        left join zone z ON a.country=z.country left join user u  on  u.id =o.user_id
+        left join order_fee of  on  of.orderno =o.order_no
+        left join  admin_r_user aru on aru.userid= o.user_id
+        left join  user_grade ug on ug.id= u.grade
+        left join  shipping_package sp on sp.orderid=o.order_no
+        LEFT JOIN payment pm ON pm.orderid=o.order_no
+        left join  paymentconfirm  pf on pf.orderno=o.order_no where order_no =#{orderNo}
+    </select>
+    <!-- public String getDropshipOrderNoList(String orderNo); -->
+    <select id="getDropshipOrderNoList" resultType="String">
+        SELECT GROUP_CONCAT(child_order_no) dropShipList FROM dropshiporder
+        WHERE parent_order_no = #{orderNo} GROUP BY parent_order_no
+    </select>
+    <select id="getShipPackmentInfo" resultType="com.cbt.bean.ShippingBean">
+        SELECT sp.transportcompany,ifnull(sp.shippingtype,'-') as shippingtype,IF(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) AS ac_weight,IF(sp.actual_freight&lt;=0,s.totalprice,sp.actual_freight) AS actual_freight,ifnull(sp.estimatefreight,0.00) as estimatefreight
+        FROM shipping_package sp LEFT JOIN shipment s ON sp.expressno=s.orderNo
+        WHERE sp.orderid=#{orderNo} OR (LOCATE(CONCAT(#{orderNo},','),sp.remarks)>0 AND sp.orderid !=#{orderNo} )
+    </select>
+    <select id="getFreightInfo" resultType="com.cbt.website.bean.TabTransitFreightinfoUniteOur">
+        SELECT  jcex_base_weight as jcexBaseWeight,jcex_base_price as jcexBasePrice,jcex_ratio_price as jcexRatioPrice,jcex_ratio_weight as jcexRatioWeight,eub_base_price as eubBasePrice,
+        eub_base_weight as eubBaseWeight,eub_ratio_price as eubRatioPrice,eub_ratio_weight as eubRatioWeight,eub_type as eubType  from  tab_transit_freightinfo_unite_our where     countrynamecn = #{countryNameCn} and eub_type = ${isEub} limit 1
+    </select>
+    <select id="getEstimatefreight" resultType="Double">
+        select sum(a.estimatefreight) from (
+        select ifnull(estimatefreight,0) as estimatefreight from shipping_package where  orderid=#{orderNo} or LOCATE(#{orderNo},remarks)>0 and LOCATE(#{orderNo},orderid)&lt;=0
+        ) a
+    </select>
+    <select id="getAllWeight" resultType="Double">
+        SELECT SUM(a.finalWeight) FROM (
+        SELECT SUM(IFNULL(c.final_weight,0)) AS finalWeight FROM custom_benchmark_ready c
+        INNER JOIN order_details od ON c.pid=od.goods_pid WHERE od.orderid=#{orderNo}
+        UNION
+        SELECT SUM(IFNULL(c.final_weight,0)) AS finalWeight FROM custom_benchmark_ready_cloud c
+        INNER JOIN order_details od ON c.pid=od.goods_pid WHERE od.orderid=#{orderNo}
+        UNION
+        select 0
+        ) a
+    </select>
+    <select id="getFileByOrderid" resultType="java.lang.String">
+        select invoice from payment_invoice where  orderid=#{orderNo}
+    </select>
+    <select id="getOrdersPays" resultType="java.util.Map">
+        <if test="flag ==1">
+            select orderid,payment_cc,payment_amount,createtime,paytype,paymentid
+            from payment where orderid like '%${orderNo}%' and paystatus=1 order by id desc
+        </if>
+        <if test="flag ==0">
+            select orderid,payment_cc,payment_amount,createtime,paytype,paymentid
+            from payment where orderid=#{orderNo} and paystatus=1 order by id desc
+        </if>
+    </select>
+    <select id="getForwarder" resultType="com.cbt.bean.Forwarder">
+        select orderid order_no,expressno express_no, transportcompany logistics_name,'' as transport_details,'' as new_state ,createtime,''as isneed
+        from shipping_package where
+        orderid=#{orderNo} OR (LOCATE(#{orderNo},remarks)>0 AND LOCATE(#{orderNo},orderid)&lt;=0)
+    </select>
+    <select id="getLogisticsInfo" resultType="com.cbt.bean.CodeMaster">
+        select code_id as codeId,code_name as codeName from codemaster where code_type='001' and delete_flg=0
+    </select>
+    <select id="getEvaluate" resultType="com.cbt.bean.Evaluate">
+        select id,userid,order_no as orderNo,service,products,evaluate,createtime  from evaluate where order_no= #{orderNo}
+    </select>
+    <select id="queryBuyCount" resultType="java.lang.String">
+        select account from tb_1688_accounts where adminid=${admuserId} and del=1
+    </select>
+    <select id="getShipStatusInfoFor" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t where t.importorderid=#{orderId} and t.importgoodsid=${goodsId} order by id desc limit 1
+    </select>
+    <select id="getOrderReplenishment" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        select tb_1688_itemid,createtime from order_replenishment where orderid=#{orderId} and goodsid=#{goodsId} and tb_1688_itemid is not null order by id desc limit 1
+    </select>
+    <select id="getShipStatusInfo" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t
+        WHERE t.itemid=#{itmeid}  AND t.username=#{admName}
+        and t.delivery_date>=#{createtime}
+        order by t.delivery_date asc limit 1
+    </select>
+    <select id="getShipStatusInfos" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t INNER JOIN order_product_source os ON
+        t.itemid = os.tb_1688_itemid OR t.itemid = os.last_tb_1688_itemid WHERE (os.tb_1688_itemid=#{itemid} OR last_tb_1688_itemid=#{itemids})
+        AND t.username=#{admName} and t.delivery_date>=#{createtime}
+        and os.confirm_userid=(select adminid from tb_1688_accounts where account=#{admName}
+        and del=1) order by t.delivery_date asc limit 1
+    </select>
+    <select id="getOrderNos" resultType="java.lang.String">
+        select order_no from orderinfo where (state=5 or state=1 or state=2) and user_id = ${userId} and order_no&lt;>#{orderNo} ORDER BY orderid desc  limit 10
+    </select>
+    <select id="getall" resultType="com.cbt.email.entity.EmailReceive1">
+        select * from(select er.id,er.cname,er.title,er.content,er.create_time as createTime,er.sale_name as saleName,er.customer_id as customerId,er.orderid from email_receive1 er where er.orderid=#{orderNo}
+        union
+        select ei.id,ei.cname,ei.title,ei.content,ei.create_time as createTime,ei.sale_name as saleName,ei.customer_id as customerId,ei.orderid from email_info ei where ei.orderid=#{orderNo}) a order by a.createTime desc
+    </select>
+    <select id="getAllBuyer" resultType="com.cbt.pojo.Admuser">
+        SELECT * FROM admuser WHERE roleType in (3,5) AND status=1
+    </select>
+    <select id="getTypeNameByOdid" resultType="java.lang.String">
+        SELECT c.type_name FROM custom_benchmark_sku c INNER JOIN order_details od ON c.spec_id=od.actual_volume WHERE od.id=#{odid}  and c.type_name IS not null and type_name!='' limit 1
+    </select>
+    <select id="getTaobaoInfoByOrderid" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        select id,sku from taobao_1688_order_history where orderid=#{tbOrderId} and sku is not null and sku!=''
+    </select>
+    <select id="getChildrenOrders" resultType="com.cbt.bean.OrderBean">
+        select (select count(tb_complain.id) from tb_complain where complainState in(1,2) and  ref_orderid=child_order_no)complain,
+        0 deliver, (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)
+        and ops.orderid = o.child_order_no) purchase, pf.id dzid, pf.orderno dzOrderno, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
+        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,
+        (select id from zone z where z.id=a.country or z.country=a.country) as country,
+        (select IF(exchange_rate&lt;=0,6.3,exchange_rate) from orderinfo where order_no=o.parent_order_no) as exchange_rate,
+        (select country from zone z where z.id=a.country or z.country=a.country) countryName , a.statename,a.phonenumber,a.zipcode,packag_style,mode_transport,
+        ifnull(expect_arrive_time,'') as expect_arrive_time, actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,
+        date_format(o.create_time,'%Y-%m-%d') as createtime, recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,
+        product_cost, (select email from admuser au where aru.adminid=au.id) email, actual_lwh,0 ordernum,ifnull(aru.admName,'') adminname,
+        ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name userName, u.email as userEmail,'' as buyer,ifnull(exporttime,'') as exporttime,ug.grade,
+        '' storagetime, o.delivery_time as deliveryTime, 0  buyid, o.orderRemark ,o.cashback  from dropshiporder o
+        left join order_address a on a.orderNo=o.child_order_no
+        left join user u  on  u.id =o.user_id left join user_grade ug  on  u.grade =ug.id
+        left join order_fee of  on  of.orderno =o.child_order_no
+        left join  admin_r_user aru on aru.userid= o.user_id
+        left join  paymentconfirm  pf on pf.orderno=o.child_order_no where child_order_no =#{orderid}
+    </select>
+    <select id="getAllFreightByOrderid" resultType="java.lang.String">
+        SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
+    </select>
+    <select id="getChildrenOrdersDetails" resultType="com.cbt.bean.OrderDetailsBean">
+		select adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,
+		IFNULL((ors.goods_p_price*(ifnull(buycount,1))),0)as sumGoods_p_price,
+		ors.purchase_state orsstate,od.od_state, 6 as ropType,ors.goods_p_url newValue,
+		( SELECT COUNT(DISTINCT ods.goods_pid)*5 FROM order_details ods  WHERE ods.dropshipid=#{orderNo}  AND ods.state in (0,1)) as pid_amount,
+		 ors.goods_p_price oldValue,ors.buycount,ors.del del_state,  od.delivery_time,od.userid,od.id oid,od.goodsname,od.checkprice_fee,od.state,od.paytime,od.goodsid,
+		 car_img,car_url, od.goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
+		 od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(purchase_time,'') as purchase_time,purchase_confirmation,car_type,
+		 date_format(od.createtime,'%Y-%m-%d') as create_time,od.car_img goods_typeimg, 	ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,IFNULL(pa.sprice,0) AS sprice,dropshipid,checked,id.goodstatus,
+-- 		 gc.freight ,
+		 od.goods_pid
+		,cbr.weight cbrWeight,cbr.wholesale_price cbrPrice,od.car_urlMD5  from order_details od
+		 left join order_address adr on od.orderid=adr.orderNo
+		 left join order_product_source ors on ors.goodsid=od.goodsid and  od.orderid=ors.orderid
+		 left join preferential_application pa on  od.goodsid= pa.goodsid
+		 left join id_relationtable id on od.goodsid=id.goodid
+		 LEFT join custom_benchmark_ready  cbr ON cbr.pid = od.goods_pid
+		 where od.dropshipid=#{orderNo}  order by car_url,od.id
+	</select>
+    <update id="updateAdminUser">
+		update admin_r_user set adminid=${adminid},admName=#{admName} where userid=${userid}
+	</update>
+    <select id="queryAdmin" resultType="INTEGER">
+		SELECT count(id) FROM admin_r_user WHERE userid=${userid}
+	</select>
+    <insert id="insertAdminUser">
+		insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) values(#{userid},#{email},#{email},#{adminid},now(),#{admName})
+	</insert>
+    <select id="getAdmName" resultType="java.lang.String">
+		select admName from admuser where id=#{adminid}
+	</select>
+    <select id="getAdmNameByShipno" resultType="INTEGER">
+        SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history t ON ta.account=t.username WHERE t.shipno=#{shipno} AND ta.del=1 LIMIT 1
+    </select>
+    <select id="queryOrderBuyer" resultType="INTEGER">
+		SELECT COUNT(id) FROM goods_distribution WHERE orderid=#{orderNo}
+	</select>
+    <update id="updateGoodsDis">
+        update goods_distribution set admuserid=#{admuserid} where odid=#{odid}
+    </update>
+    <select id="queryGoodsDis" resultType="INTEGER">
+         SELECT COUNT(g.id) FROM goods_distribution g INNER JOIN order_details od ON g.orderid=od.orderid AND g.goodsid=od.goodsid WHERE od.id=#{odid}
+    </select>
+    <update id="updateOrderBuyer">
+		update goods_distribution set admuserid=#{adminid} where orderid=#{orderNo}
+	</update>
+    <insert id="insertOrderBuyer">
+		insert into goods_distribution (orderid,odid,goodsid,admuserid,createtime,goodscatid,goods_pid)
+		SELECT orderid,id,goodsid,${adminid},NOW(),goodscatid,goods_pid   FROM order_details WHERE orderid=#{orderNo}
+	</insert>
+    <select id="getAllSalesAndBuyer" resultType="com.cbt.website.bean.ConfirmUserInfo">
+		SELECT id,admName as confirmusername,roleType as role FROM admuser  WHERE STATUS =1 AND roleType IN (3,4) or id=18
+	</select>
+    <select id="getBuyerAndAll" resultType="com.cbt.pojo.Admuser">
+		SELECT id,admName,admName as admname FROM admuser  WHERE STATUS =1 AND roleType IN (3,5) or id=61
+	</select>
+    <select id="queryAllSales" resultType="INTEGER">
+        select count(id) from admuser where id=#{adminid} and roleType=3 and STATUS=1
+    </select>
+    <select id="getRemarkInspetion" resultType="java.util.Map">
+		select warehouse_remark,itemqty from id_relationtable where orderid=#{orderid} and odid=#{odid} and is_replenishment=1 and is_delete=0
+	</select>
+    <select id="updateIdrelationtable" resultType="INTEGER">
+		{call update_idrelationtable(#{orderid},${goodid},${status},#{goodurl},#{barcode},#{userid},#{userName},#{tbOrderId},#{shipno},#{itemid},#{repState},#{remark},${old_itemqty},#{odid})}
+	</select>
+    <select id="getPositionByBarcode" resultType="java.lang.String">
+        SELECT CONVERT(POSITION USING utf8) FROM storage_location WHERE barcode=#{barcode} AND is_company=${type}
+    </select>
+    <insert id="insertIdRelationtable">
+         INSERT INTO id_relationtable(orderid,goodid,goodstatus,goodurl,barcode,picturepath,createtime,POSITION,userid,username,tborderid,warehouse_remark,shipno,is_replenishment,itemqty,itemid,odid)
+         VALUES(#{orderid},${goodid},${status},#{goodurl},#{barcode},CONCAT(DATE_FORMAT(NOW(),'%Y-%m'),'/',#{orderid},'_',${goodid},'.jpg'),NOW(),#{positon},#{userid},#{userName},#{tbOrderId} ,#{remark},
+         #{shipno},${repState},#{old_itemqty},#{itemid},#{odid});
+    </insert>
+    <update id="updateIdRationtable">
+        UPDATE id_relationtable SET goodstatus=${status},warehouse_remark = #{remark},odid=#{odid},itemqty=#{old_itemqty},shipno= #{shipno},tborderid=#{tbOrderId} WHERE orderid=#{orderid} AND odid=#{odid} AND is_replenishment=1;
+    </update>
+    <update id="updateOrderSourceState">
+        UPDATE order_product_source SET purchase_state=6 WHERE orderid=#{orderid} AND od_id=#{odid};
+    </update>
+    <update id="updateOrderReState">
+        UPDATE order_details SET state=1,inventory_remark='',re_shipnos=CONCAT(IFNULL(re_shipnos,''),',',#{shipno}) WHERE orderid=#{orderid} AND id=#{odid};
+		UPDATE order_replenishment SET updatetime = NOW(),rep_state = 1,shipno=#{shipno} WHERE orderid=#{orderid} AND odid=#{odid} AND tb_1688_itemid=#{itemid};
+    </update>
+    <update id="updateBuyState">
+        UPDATE order_details SET state=1,inventory_remark='',shipno=#{shipno} WHERE orderid=#{orderid} AND id=#{odid};
+		UPDATE order_product_source SET purchase_state=4,tb_id=#{tbId} WHERE orderid=#{orderid} AND od_id=#{odid};
+    </update>
+    <update id="updateState">
+        UPDATE storage_location SET acount=1 WHERE barcode=#{barcode};
+        UPDATE id_relationtable SET goodstatus=1 WHERE orderid=#{orderid} AND odid=#{odid} AND is_replenishment=1;
+    </update>
+    <select id="getIdRelationtable" resultType="INTEGER">
+        SELECT count(id) FROM id_relationtable WHERE orderid=#{orderid} AND odid=${odid} AND is_delete =0 AND is_replenishment=1
+    </select>
+    <update id="updateStorageProblemOrder">
+		update storage_problem_order set flag=1 where shipno=#{shipno}
+	</update>
+    <select id="queyIsDropshipOrder" resultType="INTEGER">
+		select isDropshipOrder from orderinfo where order_no=#{orderid}
+	</select>
+    <update id="updateOrderDetails">
+		update order_details set state=1 where orderid=#{orderid} and goodsid=#{goodid}
+	</update>
+    <select id="getDtailsState" resultType="INTEGER">
+		SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid=#{orderid} AND o.goodsid=#{goodid} and b.state&lt;2
+	</select>
+    <update id="updateDropshiporder">
+		update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid=#{orderid} and goodsid=#{goodid})
+	</update>
+    <select id="getAllChildOrderState" resultType="INTEGER">
+		SELECT  COUNT(orderid)*2-SUM(state) as countss FROM dropshiporder WHERE parent_order_no=#{orderid}
+	</select>
+    <update id="updateOrderInfoState">
+		update orderinfo set state=2 where order_no=#{orderid}
+	</update>
+    <select id="getDetailsState" resultType="INTEGER">
+		SELECT (COUNT(id) - SUM(state)) as orderdetails_count FROM order_details WHERE state&lt;2 AND orderid=#{orderid}
+	</select>
+    <select id="queryData"  resultType="java.util.Map">
+		SELECT od.goods_pid,ops.buycount AS buycount,ops.goods_name as goods_name,ops.goods_p_price AS goods_p_price,od.car_type AS car_type,
+		ops.goods_p_url AS goods_p_url,od.goodscatid AS cid,od.car_img AS car_img FROM order_product_source ops
+		 INNER JOIN order_details od ON ops.orderid=od.orderid and od.id=ops.od_id  WHERE ops.od_id=#{odid} AND ops.orderid=#{orderid}
+	</select>
+    <insert id="insertGoodsInventory">
+		insert into goods_inventory_whj (orderid,goodsid,createtime,counts,goods_pid,admName,barcode,type,remark)
+		values(#{orderid},#{goodid},now(),${old_itemqty},#{goods_pid},#{userName},#{barcode},'1',#{remark})
+	</insert>
+    <update id="updateChecked">
+        update order_details set checked =1,shipno=#{shipno} where orderid=#{orderid} and goodsid=#{goodid}
+    </update>
+    <update id="updateSourceState">
+        update order_product_source set purchase_state=4 where goodsid=#{goodid} and orderid=#{orderid}
+    </update>
+    <select id="getInspetionMap" resultType="java.util.Map">
+        select warehouse_remark,weight,itemqty from id_relationtable where goodid=#{goodid} and orderid=#{orderid} and is_delete=0 and is_replenishment=1
+    </select>
+    <update id="updateRelationTable">
+        update id_relationtable set weight=#{weight},goodstatus=1,itemqty=#{count} ,warehouse_remark=#{warehouseRemark} where goodid=#{goodid} and orderid=#{orderid}  and is_replenishment=1 and is_delete=0
+    </update>
+    <select id="checkOrderState" resultType="INTEGER">
+        SELECT SUM(od.state) AS rkCount,SUM(od.checked) as yhCount,COUNT(od.id) as odCount FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
+        WHERE oi.state>0 AND oi.state&lt;6 AND od.state&lt;2 AND oi.order_no=#{orderid}
+    </select>
+    <update id="updateDetails">
+		UPDATE order_details t SET t.checked = 0,t.state=1,purchase_state=3 WHERE t.orderid = #{orderid} AND t.goodsid = #{goodid};
+		UPDATE order_product_source SET purchase_state=4 WHERE orderid= #{orderid} AND goodsid= #{goodid}
+	</update>
+    <select id="getInventoryMap" resultType="java.util.Map">
+		SELECT ifnull(od.yourorder,1) as yourorder,od.car_type,od.goods_pid,od.car_urlMD5,ops.goods_p_price,od.seilUnit
+		FROM order_details od
+		inner join order_product_source ops on od.id=ops.od_id
+		WHERE od.orderid=#{orderid} AND od.goodsid=#{goodid}
+	</select>
+    <select id="getInventoryInfo" resultType="com.cbt.pojo.Inventory">
+		select * from inventory where sku=#{sku} and car_urlMD5=#{car_urlMD5} and goods_pid=#{goods_pid} and barcode=#{barcode}
+	</select>
+    <update id="updateInventory">
+		update inventory set new_remaining=#{new_remaining},can_remaining=#{can_remaining},new_inventory_amount=#{amount},updatetime=now()
+		where sku=#{sku} and car_urlMD5=#{car_urlMD5} and goods_pid=#{goods_pid} and barcode=#{barcode}
+	</update>
+    <update id="updateInventoryFlag">
+		update inventory set remaining=#{new_remaining},can_remaining=#{can_remaining},inventory_amount=#{amount},updatetime=now() where sku=#{sku} and car_urlMD5=#{car_urlMD5} and goods_pid=#{goods_pid} and barcode=#{barcode}
+	</update>
+    <update id="updateUutboundDetails">
+		update storage_outbound_details set is_delete=1 where goodsid=#{goodid} and orderid=#{orderid}
+	</update>
+    <update id="updateIdrelationtableFlag">
+		UPDATE id_relationtable t SET t.is_delete = 1 WHERE t.orderid = #{orderid} AND t.odid = #{odid}
+	</update>
+    <select id="getInCount" resultType="INTEGER">
+		SELECT count(id) as counts FROM id_relationtable WHERE orderid =#{orderid} AND is_delete = 0
+	</select>
+    <update id="udpateStorage">
+		update storage_location set acount=0 where barcode=(select barcode from id_relationtable where orderid=#{orderid} limit 1)
+	</update>
+    <update id="updateDetailsShipno">
+		UPDATE order_details t SET t.state = 0,t.shipno=0 WHERE t.orderid = #{orderid} AND t.id = #{odid}
+	</update>
+    <update id="updateOrderState">
+		UPDATE orderinfo t SET t.state = 1 WHERE t.order_no = #{orderid}
+	</update>
+    <update id="updateOrderRe">
+		UPDATE order_replenishment t SET t.rep_state = 0 WHERE t.orderid = #{orderid} AND t.od_id = #{odid}
+	</update>
+    <update id="updateOrderSource">
+		UPDATE order_product_source t SET t.purchase_state = 3 WHERE t.orderid = #{orderid} AND t.od_id = #{odid}
+	</update>
+    <select id="getGoodsPrice" resultType="java.lang.String">
+		select goods_p_price from order_product_source where goodsid=#{goodid} and orderid=#{orderid}
+	</select>
+    <select id="getGoodsInventory" resultType="java.util.Map">
+		select * from goods_inventory_whj where goodsid=#{goodid}
+	</select>
+    <insert id="insertScanLog">
+		insert into scan_parcel_log_info (shipno,username,createtime)
+		select #{shipno},#{admName},now() from dual where not exists (select * from scan_parcel_log_info where shipno=#{shipno})
+	</insert>
+    <select id="getGoodsData" resultType="com.cbt.bean.Tb1688OrderHistory">
+		select id,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
+		,shipstatus,itemurl,imgurl,username,creatTime from taobao_1688_order_history where shipno=#{shipno}
+	</select>
+    <select id="getAdminid" resultType="java.lang.String">
+		SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history t ON ta.account=t.username WHERE t.shipno=#{shipno} and ta.del=1 LIMIT 1
+	</select>
+    <select id="getOrderDataOne" resultType="java.util.Map">
+		{call getOrderData_1(#{shipno})}
+	</select>
+    <select id="getOrderData" resultType="java.util.Map">
+		{call getOrderData(#{shipno},${adminid})}
+	</select>
+    <select id="getAllCancelDetails" resultType="com.cbt.bean.OrderDetailsBean">
+        select orderid,goodsid,id from order_details where checked=0 and shipno=#{shipno}
+    </select>
+    <select id="getShopId" resultType="java.lang.String">
+		select shop_id from custom_benchmark_ready where pid=#{goodsPid}
+		LIMIT 1
+	</select>
+    <select id="getCatid" resultType="java.lang.String">
+		SELECT func_get_split_string(path,',',1) AS catid FROM 1688_category WHERE category_id=#{goodscatid}
+	</select>
+    <select id="getOrderRemark" resultType="java.util.Map">
+		select * from order_remark where orderid=#{orderNo}
+	</select>
+
+    <select id="queryUserIdByOrderNo" resultType="java.lang.Integer">
+		select user_id from orderinfo where order_no = #{orderNo}
+	</select>
+    <select id="getAcPayPrice" resultType="Double">
+		SELECT CAST(IF(oi.exchange_rate&lt;=0,6.3,oi.exchange_rate)*(dp.pay_price+dp.extra_freight) AS DECIMAL(10,2)) AS sale
+		FROM  dropshiporder dp INNER JOIN orderinfo oi ON dp.parent_order_no=oi.order_no WHERE dp.child_order_no=#{orderNo}
+	</select>
+    <select id="getModeTransport" resultType="java.lang.String">
+		SELECT mode_transport FROM orderinfo WHERE order_no=#{orderNo}
+		UNION
+		SELECT mode_transport FROM dropshiporder WHERE child_order_no=#{orderNo}
+	</select>
+    <select id="getOrderNo" resultType="java.lang.String">
+		{call GetOrderIndex()}
+	</select>
+    <select id="getPayMentCount" resultType="INTEGER">
+		select  count(*) from payment where orderid=#{orderid}
+	</select>
+    <update id="updatePayMent">
+		update payment set userid=${userid},paymentid=#{paymentid},payment_amount=#{payment_amount},payment_cc=#{payment_cc},
+        orderdesc=#{orderdesc},paystatus=#{paystatus},createtime=#{createtime},paySID=#{paySID},payflag=#{payflag},paytype=#{paytype},payment_other=#{payment_other},
+         username=#{username} where orderid=#{orderid}
+	</update>
+    <insert id="insertPayMent">
+		insert into  payment (userid,orderid,paymentid,payment_amount,payment_cc,orderdesc,
+        paystatus,createtime,paySID,payflag,paytype,payment_other,username)
+        values(${userid},#{orderid},#{paymentid},#{payment_amount},#{payment_cc},#{orderdesc},#{paystatus},#{createtime},#{paySID},#{payflag},#{paytype},#{payment_other},#{username})
+	</insert>
+    <select id="getUserFromIdForCheck" resultType="com.cbt.bean.UserBean">
+		select * from user where id = #{userId}
+	</select>
+    <insert id="addPaymentNote">
+		insert into  payment_invoice (userid,orderid,payment_admin,createtime,ispayment,invoice) values(#{userid},#{orderno},#{dealMan},now(),1,#{upfile})
+	</insert>
+    <update id="updatePaymentNote">
+		update  payment_invoice set payment_admin=#{dealMan},ispayment=1,invoice=#{upfile} where userid=#{userid} and orderid=#{orderno}
+	</update>
+    <select id="countPaymentInvoiceByorderuser" resultType="INTEGER">
+		select count(*) from payment_invoice where 1 = 1 and userid=#{userid} and orderid=#{orderno}
+	</select>
+    <select id="getUserAddr" resultType="com.cbt.bean.Address">
+        select address.*,zone.country as countryname from address,zone where userid=${userId}
+        and zone.id=address.country and (ISNULL(address.delflag) or address.delflag='0') order by createtime
+    </select>
+    <select id="getExchangeRate" resultType="java.lang.String">
+        select rmb_rate from exchange_rate_daily order by id desc limit 1
+    </select>
+    <select id="getCountryById" resultType="java.lang.String">
+        select country  from zone where id=${country} or country=${country}
+    </select>
+    <select id="getOtherCountry" resultType="java.lang.String">
+        SELECT z.country FROM order_address ad
+        INNER JOIN orderinfo oi ON ad.orderNo=oi.order_no
+        INNER JOIN zone z ON z.id=ad.country OR z.country=ad.country
+        WHERE oi.user_id=${userid} ORDER BY ad.id DESC LIMIT 1
+    </select>
+    <insert id="addOrderInfo" parameterType="java.util.List">
+        insert orderinfo(order_no,user_id,product_cost,state,address_id,delivery_time,service_fee,
+        ip,mode_transport,create_time,details_number,pay_price_three,foreign_freight,pay_price,
+        pay_price_tow,currency,actual_ffreight,discount_amount,order_ac,actual_lwh,actual_weight,
+        actual_weight_estimate,extra_freight,packag_number,orderRemark,cashback,exchange_rate) values
+        <foreach collection ="list1" item="item" index= "index" separator =",">
+            (#{item.orderNo},${item.userid},#{item.product_cost},${item.state},0,#{item.deliveryTime},#{item.service_fee},
+            #{item.ip},#{item.mode_transport},now(),#{item.details_number},#{item.pay_price_three},#{item.foreign_freight},#{item.pay_price},
+            #{item.pay_price_tow},#{item.currency},#{item.actual_ffreight},#{item.discount_amount},#{item.order_ac},#{item.actual_lwh},#{item.actual_weight},
+            #{item.actual_weight_estimate},#{item.extra_freight},1,#{item.orderRemark},0,#{item.exchange_rate})
+        </foreach>
+    </insert>
+    <insert id="addOrderDetail" parameterType="java.util.List">
+        insert order_details(goodsid,orderid,delivery_time,checkprice_fee,checkproduct_fee,state,
+        yourorder,userid,goodsname,goodsprice,goodsfreight,goodsdata_id,remark,goods_class,extra_freight,car_url,
+        car_img,car_type,freight_free,od_bulk_volume,od_total_weight) values
+        <foreach collection ="orderdetails" item="item" index= "index" separator =",">
+            (#{item.goodsid},#{item.orderid},#{item.delivery_time},#{item.checkprice_fee},#{item.checkproduct_fee},#{item.state},
+            #{item.yourorder},#{item.userid},#{item.goodsname},
+            #{item.goodsprice},#{item.freight},#{item.goodsdata_id},#{item.remark},#{item.goods_class},#{item.extra_freight},#{item.goods_url},
+            #{item.goods_img},#{item.goods_type},#{item.freight_free},#{item.od_bulk_volume},#{item.od_total_weight}
+            )
+        </foreach>
+    </insert>
+    <insert id="addOrderAddress">
+        insert into order_address(AddressID,orderNo,Country,statename,address,address2,
+        phoneNumber,zipcode,Adstatus,street,recipients) values(#{addressid},#{orderno},#{country},#{statename},#{address},#{address2},#{phoneNumber},#{zipcode},0,#{street},#{recipients})
+    </insert>
+    <select id="getOrderList" resultType="com.cbt.bean.AutoOrderBean">
+        SELECT sql_calc_found_rows p.id,p.createtime as createTime,p.orderid,p.userid,p.order_admin as orderAdmin,p.payment_admin as paymentAdmin,
+        o.state,o.pay_price as payPrice,o.currency,o.orderid as oid,
+        (select concat_ws(',',py.paystatus,py.paytype,py.id) from payment py where
+        py.orderid=p.orderid and py.paystatus !=0 limit 1) as paymentstr
+        FROM payment_invoice p,orderinfo o where p.valid=1 and p.orderid=o.order_no
+        <if test="orderid != null">
+            and p.orderid=#{orderid}
+        </if>
+        <if test="userid != null">
+            and p.userid=#{userid}
+        </if>
+        limit ${page},40
+    </select>
+    <select id="getCounts" resultType="INTEGER">
+        select found_rows();
+    </select>
+    <update id="cancelOrder">
+        update orderinfo set state=-1 where order_no=#{orderNo}
+    </update>
+    <update id="cancelPayment">
+        update payment set paystatus=0  where id=#{pid}
+    </update>
+    <select id="getOrderIdList" resultType="java.lang.String">
+        select order_no from orderinfo where state BETWEEN 1 and 5 and user_id in (
+        SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%'
+        ) and orderpaytime BETWEEN DATE_SUB(NOW(),INTERVAL 6 MONTH) AND NOW()
+    </select>
+    <update id="updateGoodsCarMessage">
+        update order_change set is_read=1 where orderNo=#{orderNo}
+    </update>
+    <select id="getAllOrderinfoFreight" resultType="INTEGER">
+        SELECT COUNT(order_no) from orderinfo where ftpPicPath is null or ftpPicPath =''
+    </select>
+    <select id="getAllNoFreight" resultType="com.cbt.bean.OrderBean">
+        SELECT order_no as orderNo,mode_transport FROM orderinfo WHERE transport_time IS NULL OR transport_time ='' ORDER BY orderid DESC
+    </select>
+    <update id="updateFreight">
+        update orderinfo set transport_time=#{freight} where order_no=#{orderNo}
+    </update>
+    <select id="getAllOrderShippingMehtodIsNull" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        from	 orderinfo where	 orderinfo.mode_transport LIKE "null@%" AND  create_time > "2018-08-08 10:40:42" ORDER BY orderid DESC
+    </select>
+    <update id="updateOrderinfomodeTransport">
+        update orderinfo set mode_transport=#{modeTransport}where order_no=#{orderNo}
+    </update>
+    <insert id="orderReturn">
+        insert into buyReturnDetails(tId,orderid,createtime,admName) values(#{id},#{orderid},now(),#{admName})
+    </insert>
+    <select id="getFlushOrderFreightOrder" resultType="com.cbt.bean.OrderBean">
+        SELECT order_no AS orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
+        WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1) AND od.goodsid != '1400'
+        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime)
+        GROUP BY oi.order_no  ORDER BY oi.orderid DESC;
+    </select>
+    <select id="getAllOrderInfo" resultType="com.cbt.bean.OrderBean">
+        SELECT oi.order_no as orderNo,oi.esBuyPrice ,SUM(od.yourorder) AS yourorder,CAST(SUM(ops.goods_p_price*ops.buycount)+COUNT(DISTINCT IFNULL(od.goods_pid,''))*5 AS DECIMAL(10,2)) AS buyAmount,SUM(ops.buycount) AS buycount
+        FROM orderinfo oi
+        INNER JOIN order_details od ON oi.order_no=od.orderid
+        INNER JOIN order_product_source ops ON od.id=ops.od_id
+        WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) AND oi.user_id IN (
+        SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%'
+        )  GROUP BY oi.order_no ORDER BY oi.orderid DESC
+    </select>
+    <delete id="deleteFlagByOrder">
+        delete from order_warning where orderNo=#{orderNo}
+    </delete>
+    <insert id="insertFlagByOrderid">
+        insert into order_warning(orderNo,flag) values(#{orderNo},1)
+    </insert>
+    <select id="getFlushOrderFreightOrderCancel" resultType="com.cbt.bean.OrderBean">
+        SELECT oi.order_no as orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
+        WHERE oi.actual_weight_estimate&lt;=0
+        AND (oi.state IN (1,2) OR od.state IN (-1,2) OR LEFT(oi.order_no,16)=LEFT(FIND_IN_SET(oi.order_no,'_'),16))
+        AND oi.isDropshipOrder IN(0,1) AND  DATE_SUB(CURDATE(), INTERVAL 20 DAY) &lt;= date(oi.orderpaytime)
+        GROUP BY oi.order_no  ORDER BY
+    </select>
+    <update id="updateFreightForOrder">
+        update orderinfo set actual_weight_estimate=#{freight},esBuyPrice=#{esBuyPrice} where order_no=#{orderNo}
+    </update>
+    <insert id="insertOrderinfoCache" parameterType="java.util.List">
+        INSERT INTO orderinfo_cache (id,order_no,mode_transport,delivery_time,currency,user_id,adminname,adminid,cancel_obj,actual_ffreight,product_cost,state,username,email,buyer,countrys,
+        address,address2,statename,phoneNumber,street,zipcode,paystatus,changenum,paytime,paytype
+        ,service_fee,createtime,orderRemark
+        ,pay_price_three,isDropshipOrder,preferential_applications,purchase,allFreights,estimatefreight,deliver,message_read
+        ,checked,countOd,no_checked,problems,paytypes,details_number,number_of_warehouses,purchase_number,oc_c,order_count,orderremarks
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.order_no},#{item.mode_transport},#{item.delivery_time},#{item.currency},#{item.user_id},#{item.adminname},#{item.adminid},#{item.cancel_obj},#{item.actual_ffreight},
+            #{item.product_cost},#{item.state},#{item.username},#{item.email},#{item.buyer},#{item.countrys}
+            ,#{item.address},#{item.address2},#{item.statename},#{item.phoneNumber},#{item.street},#{item.zipcode},#{item.paystatus},#{item.changenum},#{item.paytime},#{item.paytype}
+            ,#{item.service_fee},#{item.createtime},#{item.orderRemark}
+            ,#{item.pay_price_three},#{item.isDropshipOrder},#{item.preferential_applications},#{item.purchase},#{item.allFreights}
+            ,#{item.estimatefreight},#{item.deliver},#{item.message_read}
+            ,#{item.checked},#{item.countOd},#{item.no_checked},#{item.problems},#{item.paytypes},#{item.details_number},#{item.number_of_warehouses},#{item.purchase_number},#{item.oc_c},#{item.order_count},#{item.orderremarks}
+            )
+        </foreach>
+    </insert>
+</mapper>

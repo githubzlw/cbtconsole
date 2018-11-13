@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.feedback.dao.CustomerInfoCollectionMapper">
+	<resultMap id="CustomerInfoResultMap" type="com.cbt.feedback.bean.CustomerInfoCollection">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="needs_products" property="needsProducts" />
+		<result column="sales" property="sales" />
+		<result column="email" property="email" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+	
+	<resultMap id="CustomerFeedbackResultMap" type="com.cbt.feedback.bean.CustomerFeedback">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="needs_products" property="needsProducts" />
+		<result column="sales" property="sales" />
+		<result column="email" property="email" />
+		<result column="userId" property="userId" />
+		<result column="create_time" property="createTime" />
+	</resultMap>
+
+	<sql id="CustomerInfoColumn">
+		id,type,needs_products,sales,email,create_time
+	</sql>
+
+	<select id="queryForList" resultMap="CustomerFeedbackResultMap">
+		select a.id,a.type,a.needs_products,a.sales,a.email,a.create_time,b.id as userId
+		from customer_info_collection a left join user b on a.email = b.email
+		<where>	
+			<if test="type !=0">
+				and a.type = #{type}
+			</if>
+			<if test="sales != null and sales !=''">
+				and a.sales = #{sales}
+			</if>
+			<if test="beginDate != null and beginDate !=''">
+				and date(a.create_time) &gt;= date(#{beginDate})
+			</if>
+			<if test="endDate != null and endDate !=''">
+				and date(a.create_time) &lt;= date(#{endDate})
+			</if>
+			<if test="comment != null and comment !=''">
+				and a.needs_products like CONCAT('%',#{comment},'%')
+			</if>
+		</where>
+		order by a.create_time desc
+		limit #{pageNo},20
+	</select>
+	
+	<select id="queryForAllList" resultMap="CustomerFeedbackResultMap">
+		select a.id,a.type,a.needs_products,a.sales,a.email,a.create_time,b.id as userId
+		from customer_info_collection a left join user b on a.email = b.email
+		where 1=1
+		order by a.id desc
+	</select>
+	
+	<select id="queryCount" resultType="java.lang.Long">
+		select count(*)
+		from customer_info_collection
+		<where>
+			<if test="type !=0">
+				and type = #{type}
+			</if>
+			<if test="sales != null and sales !=''">
+				and sales = #{sales}
+			</if>
+			<if test="beginDate != null and beginDate !=''">
+				and date(create_time) &gt;= date(#{beginDate})
+			</if>
+			<if test="endDate != null and endDate !=''">
+				and date(create_time) &lt;= date(#{endDate})
+			</if>
+			<if test="comment != null and comment !=''">
+				and needs_products like CONCAT('%',#{comment},'%')
+			</if>
+		</where>
+	</select>
+
+	<select id="queryByType" parameterType="java.lang.Integer"
+		resultMap="CustomerInfoResultMap">
+		select
+		<include refid="CustomerInfoColumn"></include>
+		from customer_info_collection
+		where type = #{type}
+	</select>
+
+	<insert id="insertCustomerInfo" parameterType="com.cbt.feedback.bean.CustomerInfoCollection">
+		insert into
+		customer_info_collection(type,needs_products,sales,email)
+		values(#{type},#{needsProducts},#{sales},#{email})
+	</insert>
+
+	<update id="updateCustomerInfo" parameterType="com.cbt.feedback.bean.CustomerInfoCollection">
+		update customer_info_collection
+		<set>
+			<if test="type !=null and type !=0">
+				type = #{type},
+			</if>
+			<if test="needsProducts !=null and needsProducts !=''">
+				needs_products = #{needsProducts},
+			</if>
+			<if test="sales !=null and sales !=''">
+				sales = #{sales},
+			</if>
+			<if test="email !=null and email !=''">
+				email = #{email},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteCustomerInfo" parameterType="java.lang.Integer">
+		delete from
+		customer_info_collection
+		where id = #{id}
+	</delete>
+
+
+</mapper>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.TakeGoodsDao">
+
+	<!-- 所有样品 -->
+	<select id="getTbGoodsSample" resultType="com.cbt.warehouse.pojo.TbGoodsSamplePojo">
+		select * from tb_goods_sample where isdelete = 0
+		<if test="title !='' and title !=null">
+			and title like CONCAT('%','${title}','%' )
+		</if>
+	</select>
+
+	<!-- 单件样品 -->
+	<select id="getTbGoodsSampleById" resultType="com.cbt.warehouse.pojo.TbGoodsSamplePojo">
+		select * from
+		tb_goods_sample where id=${id} and isdelete = 0
+	</select>
+	
+	<!-- 读取样品 -->
+	<select id="getGoodsDataById" resultType="com.cbt.website.bean.SampleGoodsBean">
+<!-- select goodsdata_id goodsid, url,name,img,factory_price,discount_price,type,weight from goods_car_view where goods_url='${url}' or goodsdata_id='${id}' LIMIT 1 -->
+		
+		select goodsdata_id goodsid,goods_url url,goods_title name,googs_img img,notfreeprice factory_price,goods_type type,perweight weight 
+		from goods_car_view where goods_url like '%www.aliexpress.com%' and goods_url=#{url} order by id desc limit 1
+	</select>
+
+	<!-- 读取样品类型 -->
+	<select id="getAliCategory" resultType="com.cbt.warehouse.pojo.AliCategoryPojo">
+		${sql}
+	</select>
+
+	<!-- 插入新样品 -->
+	<insert id="insertTbGoodsSample" parameterType="java.util.Map">
+		insert into
+		tb_goods_sample
+		(ymx_discount,cid,category,title,viewimg,discount,discountprice,minnum,defaultnum,remark,createuser,createtime)
+		values('${ymx_discount}','${cid}','${category}','${title}','${viewimg}','${discount}','${discountprice}','${minnum}','${defaultnum}','${remark}','${createuser}',now())
+	</insert>
+
+	<!-- 样品所有商品 -->
+	<select id="getTbGoodsSampleDetails" resultType="com.cbt.warehouse.pojo.TbGoodsSampleDetailsPojo">
+		select * from
+		tb_goods_sample_details where goodssampleid = '${goodssampleid}'
+	</select>
+
+
+	<!-- 删除单件商品 -->
+	<delete id="delteCommodityByid">
+		delete from tb_goods_sample_details where id='${id}'
+	</delete>
+
+	<!-- 删除样品下所有商品 -->
+	<delete id="delteGoodsSampleDetails">
+		delete from tb_goods_sample_details where
+		goodssampleid ='${goodssampleid}'
+	</delete>
+
+	<!-- 删除的单个样品 -->
+	<delete id="deleteTbGoodsSample">
+		delete from tb_goods_sample where id='${id}'
+	</delete>
+	<!-- 修改单件样品 -->
+	<update id="updateTbGoodsSampleByid">
+		update tb_goods_sample set
+		cid='${cid}',ymx_discount='${ymx_discount}',
+		category='${category}',title='${title}',viewimg='${viewimg}',discount='${discount}',
+		discountprice='${discountprice}',minnum='${minnum}',defaultnum='${defaultnum}',
+		remark='${remark}',createuser='${createuser}',createtime=now()
+		where
+		id='${id}'
+	</update>
+
+	<!-- 修改单件商品 -->
+	<!-- ,cid='${cid}',cidpath='${cidpath}',category='${category}' -->
+	<update id="updateTbGoodsSampleDetailsByid">
+		update tb_goods_sample_details set
+		flag='${flag}',
+		originalprice='${originalprice}',
+		type='${type}',weight='${weight}',
+		goodsid='${goodsid}',goodsname='${goodsname}',goodsurl='${goodsurl}',goodsimg='${goodsimg}',
+		goodsprice='${goodsprice}',amazongoosid='${amazongoosid}',amazongoosprice='${amazongoosprice}'
+
+		where id='${id}'
+	</update>
+
+	<!-- 单件商品 -->
+	<select id="getTbGoodsSampleDetailsById" resultType="com.cbt.warehouse.pojo.TbGoodsSampleDetailsPojo">
+		select *
+		from tb_goods_sample_details where id='${id}'
+	</select>
+
+	<!-- 查询扫描快递记录数量 -->
+	<select id="getCountExpressRecord" resultType="java.lang.Integer">
+		select count(*) from (
+		select * from express_record
+		where 1=1
+		<if test="express_code != null and express_code != '' ">
+			and express_code like CONCAT('%','${express_code}','%' )
+		</if>
+		<if
+			test="ckStartTime != null and ckStartTime != '' and ckEndTime != null and ckEndTime != ''">
+			and create_time &gt;='${ckStartTime}' and create_time
+			&lt;='${ckEndTime}'
+		</if>
+		order by create_time desc
+		LIMIT 0,10000
+		) a
+	</select>
+
+	<select id="getidRelationtable" resultType="java.lang.String"
+		parameterType="java.lang.String">
+		SELECT distinct orderid FROM id_relationtable WHERE
+		tborderid=#{orderid}
+	</select>
+
+	<!-- 查询扫描快递记录 -->
+	<select id="getExpressRecord" resultType="com.cbt.warehouse.pojo.ExpressRecord">
+		select * from express_record
+		where 1=1
+		<if test="express_code != null and express_code != '' ">
+			and express_code like CONCAT('%','${express_code}','%' )
+		</if>
+		<if
+			test="ckStartTime != null and ckStartTime != '' and ckEndTime != null and ckEndTime != ''">
+			and create_time &gt;='${ckStartTime}' and create_time
+			&lt;='${ckEndTime}'
+		</if>
+		order by create_time desc
+		LIMIT #{startNum},#{endNum}
+	</select>
+
+
+
+
+
+
+	<!-- 记录扫描快递 -->
+	<insert id="insertExpressRecord" parameterType="java.util.Map">
+		insert into
+		express_record
+		(create_time,express_code)values(now(),'${express_code}');
+	</insert>
+
+	<!-- 插入新商品 -->
+	<!-- ,cid,cidpath,category -->
+	<!-- ,'${cid}','${cidpath}','${category}' -->
+	<insert id="insertTbGoodsSampleDetails" parameterType="java.util.Map">
+		insert into tb_goods_sample_details
+		(flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,
+		goodsprice,amazongoosid,amazongoosprice,originalprice
+		)
+		values('${flag}','${type}','${weight}','${goodssampleid}','${goodsid}','${goodsname}','${goodsurl}',
+		'${goodsimg}','${goodsprice}','${amazongoosid}','${amazongoosprice}','${originalprice}'
+		)
+	</insert>
+	<!-- 根据用户ID或者订单ID批量插入商品 -->
+	<insert id="batchImportTbGSD" parameterType="java.util.Map">
+<!-- 		insert into -->
+<!-- 		tb_goods_sample_details(goodssampleid,goodsid,goodsname,goodsurl,goodsimg,goodsprice,weight,originalprice,flag) -->
+<!-- 		select'${goodssampleid}',ga.id,ga.`name`,ga.url, -->
+<!-- 		if( -->
+<!-- 		locate('jpg', -->
+<!-- 		IF(locate(',',ga.img)>0,substring(ga.img,2,locate(',',ga.img)-2),substring(ga.img,2,CHAR_LENGTH(ga.img)-2))) -->
+<!-- 		>0, -->
+<!-- 		IF(locate(',',ga.img)>0,substring(ga.img,2,locate(',',ga.img)-2),substring(ga.img,2,CHAR_LENGTH(ga.img)-2)), -->
+<!-- 		concat(IF(locate(',',ga.img)>0,substring(ga.img,2,locate(',',ga.img)-2),substring(ga.img,2,CHAR_LENGTH(ga.img)-2)),'jpg') -->
+<!-- 		)as 'img', -->
+<!-- 		FORMAT((IF(locate('-',ga.sPrice)>0,substring(ga.sPrice,1,CHAR_LENGTH(ga.sPrice)-locate('-',ga.sPrice)-2),ga.sPrice)*${profit}/100),2) -->
+<!-- 		as 'sPrice' , -->
+<!-- 		substring(ga.weight,1,CHAR_LENGTH(ga.weight)-2) as -->
+<!-- 		'weight', -->
+<!-- 		IF(locate('-',ga.sPrice)>0,substring(ga.sPrice,1,CHAR_LENGTH(ga.sPrice)-locate('-',ga.sPrice)-2),ga.sPrice) -->
+<!-- 		as 'originalprice','1' -->
+<!-- 		from goodsdata ga -->
+<!-- 		inner join ( -->
+<!-- 		select * from order_details -->
+<!-- 		group by car_url -->
+<!-- 		<if test="userid!='' and userid!=null"> -->
+<!-- 			having userid=#{userid} -->
+<!-- 		</if> -->
+<!-- 		<if test="orderid!='' and orderid!=null"> -->
+<!-- 			having orderid=#{orderid} -->
+<!-- 		</if> -->
+<!-- 		) b -->
+<!-- 		on ga.url = b.car_url -->
+		
+		insert into
+		tb_goods_sample_details(goodssampleid,goodsid,goodsname,goodsurl,goodsimg,goodsprice,weight,originalprice,flag)
+		select #{goodssampleid},ga.goodsdata_id id,ga.goods_title as name ,ga.goods_url as url, 
+		CONCAT(func_get_split_string(ga.googs_img,'.jpg',1),'.jpg') as img, 
+		<choose>
+		<when test="notfreeprice!=''and notfreeprice!=null">
+		 (ga.notfreeprice-(ga.notfreeprice)*${profit}/100) as sPrice 
+		</when>
+		<otherwise>(ga.googs_price-(ga.googs_price)*${profit}/100) as sPrice </otherwise>
+		</choose>,
+		REPLACE(ga.perWeight,'kg','') as weight, max(ga.googs_price) as originalprice ,'1' as flag
+<!-- 		from goods_car_view ga  -->
+        from goods_car_view ga 
+		inner join 
+		(select car_url,max(goodsid) goodsid from order_details where state<![CDATA[<]]>2
+		<if test="userid!='' and userid!=null">
+			and userid=#{userid}
+		</if>
+		<if test="orderid!='' and orderid!=null">
+			and orderid=#{orderid}
+		</if>
+		group by car_url) b 
+		on ga.id = b.goodsid 
+		where ga.goods_url like '%www.aliexpress.com%' 
+		group by ga.goods_title,ga.goods_url,img order by b.goodsid
+		
+	</insert>
+<!-- 	insert into -->
+<!-- 		tb_goods_sample_details(goodssampleid,goodsid,goodsname,goodsurl,goodsimg,goodsprice,weight,originalprice,flag) -->
+<!-- 		select 26,ga.goodsdata_id id,ga.goods_title as name ,ga.goods_url as url,  -->
+<!-- 		CONCAT(func_get_split_string(ga.googs_img,'.jpg',1),'.jpg') as img,  -->
+<!-- 		(ga.googs_price-(ga.googs_price)*11/100) as sPrice , -->
+<!-- 		REPLACE(ga.perWeight,'kg','') as weight, max(ga.googs_price) as originalprice ,'1' as flag  -->
+<!-- 		from goods_car ga  -->
+<!-- 		inner join  -->
+<!-- 		(select car_url,max(goodsid) goodsid from order_details where state<2 and orderid='P221485797622713' group by car_url) b  -->
+<!-- 		on ga.id = b.goodsid  -->
+<!-- 		group by ga.goods_title,ga.goods_url,img order by b.goodsid -->
+	
+	
+	
+	
+</mapper>

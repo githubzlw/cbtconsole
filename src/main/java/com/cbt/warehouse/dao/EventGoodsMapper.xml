@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.EventGoodsDao">
+
+	<!-- 所有样品 -->
+	<select id="getTbGoodsSample" resultType="com.cbt.warehouse.pojo.EventGoodsPojo">
+		select * from eventgoods where isdelete = 0
+		<if test="title !='' and title !=null">
+			and title like CONCAT('%','${title}','%' )
+		</if>
+	</select>
+
+	<!-- 单件样品 -->
+	<select id="getTbGoodsSampleById" resultType="com.cbt.warehouse.pojo.EventGoodsPojo">
+		select * from
+		eventgoods where id=${id} and isdelete = 0
+	</select>
+	
+	<!-- 读取样品 -->
+	<select id="getGoodsDataById" resultType="com.cbt.website.bean.EventGoodsBean">
+<!-- select goodsdata_id goodsid, url,name,img,factory_price,discount_price,type,weight from goods_car_view where goods_url='${url}' or goodsdata_id='${id}' LIMIT 1 -->
+		
+		select goodsdata_id goodsid,goods_url url,goods_title name,googs_img img,notfreeprice factory_price,goods_type type,perweight weight 
+		from goods_car_view where goods_url like '%www.aliexpress.com%' and goods_url=#{goodsurl} order by id desc limit 1
+	</select>
+
+	<!-- 读取样品类型 -->
+	<select id="getAliCategory" resultType="com.cbt.warehouse.pojo.AliCategoryPojo">
+		${sql}
+	</select>
+
+	<!-- 插入新样品 -->
+	<insert id="insertTbGoodsSample" parameterType="java.util.Map">
+		insert into
+		eventgoods
+		(cid,category,title,createtime)
+		values('${cid}','${category}','${title}',now())
+	</insert>
+
+	<!-- 样品所有商品 -->
+	<select id="getTbGoodsSampleDetails" resultType="com.cbt.warehouse.pojo.EventGoodsDetailsPojo">
+		select * from
+		eventgoodsdetails where goodssampleid = '${goodssampleid}'
+	</select>
+
+
+	<!-- 删除单件商品 -->
+	<delete id="delteCommodityByid">
+		delete from eventgoodsdetails where id='${id}'
+	</delete>
+
+	<!-- 删除样品下所有商品 -->
+	<delete id="delteGoodsSampleDetails">
+		delete from eventgoodsdetails where
+		goodssampleid ='${goodssampleid}'
+	</delete>
+
+	<!-- 删除的单个样品 -->
+	<delete id="deleteTbGoodsSample">
+		delete from eventgoods where id='${id}'
+	</delete>
+	<!-- 修改商品包的信息 -->
+	<update id="updateTbGoodsSampleByid">
+		update eventgoods set
+		cid='${cid}',ymx_discount='${ymx_discount}',
+		category='${category}',title='${title}',createtime=now()
+		where
+		id='${id}'
+	</update>
+
+	<!-- 修改单件商品 -->
+	<!-- ,cid='${cid}',cidpath='${cidpath}',category='${category}' -->
+	<update id="updateTbGoodsSampleDetailsByid">
+		update eventgoodsdetails set
+		flag='${flag}',
+		originalprice='${originalprice}',
+		type='${type}',weight='${weight}',
+		goodsid='${goodsid}',goodsname='${goodsname}',goodsurl='${goodsurl}',goodsimg='${goodsimg}',
+		goodsprice='${goodsprice}',discount='${discount}',avilibleStock='${avilibleStock}',sold='${sold}'
+		where id='${id}'
+	</update>
+
+	<!-- 单件商品 -->
+	<select id="getTbGoodsSampleDetailsById" resultType="com.cbt.warehouse.pojo.EventGoodsDetailsPojo">
+		select *
+		from eventgoodsdetails where id='${id}'
+	</select>
+
+
+<!-- 插入新商品 -->
+	<insert id="insertTbGoodsSampleDetails" parameterType="java.util.Map">
+		insert into eventgoodsdetails
+		(flag,type,weight,goodssampleid,goodsid,goodsname,goodsurl,goodsimg,avilibleStock,sold,
+		goodsprice,originalprice,discount)
+		values('${flag}','${type}','${weight}','${goodssampleid}','${goodsid}','${goodsname}','${goodsurl}',
+		'${goodsimg}','${avilibleStock}','${sold}','${goodsprice}','${originalprice}','${discount}'
+		)
+	</insert>
+</mapper>

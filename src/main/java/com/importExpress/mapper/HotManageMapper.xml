@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.HotManageMapper">
+
+    <resultMap id="hotCategoryResultMap" type="com.cbt.warehouse.pojo.HotCategory">
+        <id column="id" property="id"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="show_name" property="showName"/>
+        <result column="show_img" property="showImg"/>
+        <result column="is_on" property="isOn"/>
+        <result column="hot_type" property="hotType"/>
+        <result column="sorting" property="sorting"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admName" property="adminName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_admin_id" property="updateAdminId"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+
+    <resultMap id="hotDiscountResultMap" type="com.cbt.warehouse.pojo.HotDiscount">
+        <id column="id" property="id"/>
+        <result column="hot_id" property="hotId"/>
+        <result column="goods_pid" property="goodsPid"/>
+        <result column="percentage" property="percentage"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+
+    <sql id="hotCategoryColumn">
+		id,category_name,show_name,show_img,is_on,sorting,hot_type,
+		admin_id,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,update_admin_id,
+		DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+	</sql>
+
+    <sql id="hotDiscountColumn">
+        id,hot_id,goods_pid,percentage,begin_time,end_time,create_time,
+        DATE_FORMAT(begin_time,'%Y-%m-%d %H:%i:%S') as begin_time,
+        DATE_FORMAT(end_time,'%Y-%m-%d %H:%i:%S') as end_time,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,admin_id,sort
+    </sql>
+
+    <select id="queryForList" resultMap="hotCategoryResultMap"
+            parameterType="com.cbt.warehouse.pojo.HotCategory">
+        select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
+        a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from hot_category a left join admuser b on a.admin_id =b.id
+        where 1=1
+        <if test=" isOn > -1">
+            and is_on = #{isOn}
+        </if>
+        <if test=" hotType > 0">
+            and hot_type = #{hotType}
+        </if>
+        order by hot_type,is_on desc,sorting desc
+        <if test=" limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryForListCount" resultType="java.lang.Integer"
+            parameterType="com.cbt.warehouse.pojo.HotCategory">
+        select count(0)
+        from hot_category
+        where 1=1
+        <if test=" isOn > -1">
+            and is_on = #{isOn}
+        </if>
+        <if test=" hotType > 0">
+            and hot_type = #{hotType}
+        </if>
+    </select>
+
+    <select id="getCategoryById" resultMap="hotCategoryResultMap">
+        select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
+        a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+        from hot_category a left join admuser b on a.admin_id =b.id
+        where a.id = #{id}
+    </select>
+
+    <select id="checkHotCategoryIsExists" resultType="java.lang.Integer"
+            parameterType="com.cbt.warehouse.pojo.HotCategory">
+        select count(0)
+        from hot_category
+        where 1=1 and hot_type = #{hotType} and (show_img = #{showImg} or show_name = #{showName})
+        <if test=" id > 0">
+            and id != #{id}
+        </if>
+    </select>
+
+
+    <insert id="insertIntoHotCategory" parameterType="com.cbt.warehouse.pojo.HotCategory">
+        insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id)
+        values(#{categoryName},#{showName},#{showImg},#{isOn},#{sorting},#{hotType},#{adminId})
+    </insert>
+
+
+    <update id="updateHotCategory" parameterType="com.cbt.warehouse.pojo.HotCategory">
+        update hot_category set category_name = #{categoryName},show_name = #{showName},show_img = #{showImg},
+        is_on = #{isOn},sorting = #{sorting},hot_type = #{hotType},update_admin_id = #{adminId}
+        where id = #{id}
+    </update>
+
+
+    <select id="queryDiscountByHotIdAndPid" resultMap="hotDiscountResultMap">
+        select id,hot_id,goods_pid,percentage,begin_time,end_time,create_time,
+        DATE_FORMAT(begin_time,'%Y-%m-%d %H:%i:%S') as begin_time,
+        DATE_FORMAT(end_time,'%Y-%m-%d %H:%i:%S') as end_time,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,admin_id,sort
+        from hot_goods_discount
+        where hot_id = #{hotId} and goods_pid = #{pid}
+    </select>
+
+    <select id="checkDiscountIsExists" resultType="java.lang.Integer">
+        select count(0) from hot_goods_discount where hot_id = #{hotId} and goods_pid = #{pid}
+    </select>
+
+    <insert id="insertIntoDiscount" parameterType="com.cbt.warehouse.pojo.HotDiscount">
+        insert into hot_goods_discount(hot_id,goods_pid,percentage,begin_time,end_time,admin_id,sort)
+        values(#{hotId},#{goodsPid},#{percentage},#{beginTime},#{endTime},#{adminId},#{sort})
+    </insert>
+
+
+    <update id="updateDiscountInfo" parameterType="com.cbt.warehouse.pojo.HotDiscount">
+        update hot_goods_discount set hot_id= #{hotId},goods_pid= #{goodsPid},percentage= #{percentage},
+        begin_time= #{beginTime},end_time= #{endTime},admin_id= #{adminId},sort= #{hotId}
+        where id = #{id}
+    </update>
+
+
+    <select id="checkEvaluationIsExists" resultType="java.lang.Integer">
+        select count(0) from hot_goods_evaluation where goods_pid = #{goodsPid} and sku_id = #{skuId}
+    </select>
+
+    <insert id="insertIntoHotEvaluation" parameterType="com.cbt.warehouse.pojo.HotEvaluation">
+        insert into hot_goods_evaluation(goods_pid,sku_id,user_id,content,evaluation_level,service_level,admin_id,evaluation_time)
+        values(#{goodsPid},#{skuId},#{userId},#{content},#{evaluationLevel},#{serviceLevel},#{adminId},#{evaluationTime})
+    </insert>
+
+
+    <update id="updateHotEvaluation" parameterType="com.cbt.warehouse.pojo.HotEvaluation">
+        update hot_goods_evaluation set goods_pid= #{goodsPid},sku_id= #{skuId},user_id= #{userId},
+        content= #{content},evaluation_level= #{evaluationLevel},service_level= #{serviceLevel},
+        admin_id= #{adminId},evaluation_time = #{evaluationTime}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCategory">
+        delete from hot_category where id = #{id}
+    </delete>
+
+    <delete id="deleteGoodsByCategoryId">
+        delete from hot_selling_goods where hot_selling_id = #{id}
+    </delete>
+
+</mapper>

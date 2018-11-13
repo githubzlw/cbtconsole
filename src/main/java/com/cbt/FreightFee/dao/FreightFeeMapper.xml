@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.FreightFee.dao.FreightFeeMapper" >
+ 
+ 
+ <resultMap type="com.cbt.warehouse.pojo.ZoneBean" id="zoneResult">
+     <result column="id" property="id"/>
+     <result column="country" property="country"/>
+     <result column="area" property="area"/>
+     <result column="fedexie" property="fedexie"/>
+     <result column="chinapostbig" property="chinapostbig"/>
+ </resultMap>
+ 
+ 
+ <resultMap type="com.cbt.warehouse.pojo.TransitPricecost" id="TransitPriceResult">
+     <result column="id" property="id"/>
+     <result column="shippingmethod" property="shippingmethod"/>
+     <result column="countryId" property="countryId"/>
+     <result column="countryname" property="countryname"/>
+     <result column="minweight" property="minweight"/>
+     <result column="under" property="under"/>
+     <result column="divisionweight" property="divisionweight"/>
+     <result column="delivery_time" property="delivery_time"/>
+     <result column="maxweight" property="maxweight"/>
+     <result column="over" property="over"/>
+     <result column="over" property="over"/>
+     <result column="over" property="over"/>
+ </resultMap>
+ 
+ 
+ <select id="getZone"   resultMap="zoneResult">
+   select  * from zone  where  id  = #{countId} or REPLACE(country,' ','')=#{countId} ORDER BY id ASC LIMIT 1
+ </select>
+	
+	
+	<select id="selectTransitInfo"  resultMap="TransitPriceResult" >
+	   select *  from  tab_transit_pricecost_new where  countryid = #{countId}  and shippingmethod = #{shippingmethod} and countryid<![CDATA[<>]]>0
+	   union
+	   select *  from  tab_transit_pricecost_new where  countryid = (select id from zone where country=#{countId} order by id asc limit 1)  and shippingmethod = #{shippingmethod}
+	</select>
+	
+	
+	<select id="getShippingInfo"  resultType="hashmap">
+<!-- 	select sp.*,oa.country from shipping_package sp left join  order_address  oa  on  sp.orderid  =  oa.orderNo where  sp.shippingtype is not null and sp.sweight is not null  and sp.expressno in (select orderNo from shipment where sentTime>='2017-0-01 00:00:00' and sentTime<![CDATA[<=]]>'2017-04-01 00:00:00') and sp.estimatefreight*6.75<![CDATA[<>]]>sp.totalPrice and oa.id is not null -->
+<!--  	 select  sp.*  ,  oa.country  from  shipping_package  sp  left join  order_address  oa  on  sp.orderid  =  oa.orderNo   -->
+<!-- 		select sp.*,oa.country from shipping_package sp left join  order_address  oa  on  sp.orderid  =  oa.orderNo where  -->
+<!-- 		 sp.createtime>='2017-08-01 00:00:00' and sp.createtime<![CDATA[<=]]>'2017-08-31 23:59:59' and sp.transportcompany='原飞航' and sp.sflag=3 and oa.country is not null -->
+		 
+		 
+		 select sp.*,oa.country
+		from shipping_package sp 
+		inner join shipment s on sp.expressno=s.orderNo 
+		left join  order_address  oa  on  sp.orderid  =  oa.orderNo
+		where s.sentTime>='2018-01-01 00:00:00'  and oa.country is not null and s.transportCompany in ('emsinten') and (estimatefreight is null or estimatefreight='')
+<!-- 		and sp.expressno='989533834' -->
+<!--      where  sp.createtime  >=  '2017-03-01 00:00:00'  and   sp.createtime <![CDATA[<=]]>   '2017-06-01 00:00:00' AND sp.transportcompany in ('JCEX','原飞航') AND oa.country is not null and oa.country<![CDATA[<>]]>'' -->
+	</select>
+    <!-- and optimal_cost<![CDATA[<=]]>0.00 -->
+    <select id="getShippingCostInfo"  resultType="hashmap">
+        select sp.*,oa.country from shipping_package sp inner join shipment s on sp.expressno=s.orderNo
+        left join  order_address  oa  on  sp.orderid  =  oa.orderNo
+        where 1=1 and optimal_cost<![CDATA[<=]]>0.00 order by sp.createtime desc limit 5000;
+    </select>
+	<update id="updateFreightByexpressno">
+      update shipping_package set estimatefreight=#{freightFee},shippingtype=#{subShippingmethod},transportcompany=#{shippingmethod} where id=#{id}
+	</update>
+    <update id="updatePackCost">
+      update shipping_package set optimal_cost=#{cost},optimal_company=#{company} where id=#{id}
+    </update>
+    <select id="getOrderRate" resultType="java.lang.String">
+        SELECT CASE WHEN oi.exchange_rate>0 THEN oi.exchange_rate ELSE 6.3 END AS rate FROM orderinfo oi INNER JOIN shipping_package sp ON oi.order_no=sp.orderid WHERE sp.id=1111119932
+    </select>
+</mapper>

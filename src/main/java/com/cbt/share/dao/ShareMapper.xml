@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.share.dao.ShareDao" >
+
+	<!-- 所得所有ip地址 -->
+	<select id="getAllIpAddress"  resultType="com.cbt.share.pojo.SharePojo">
+		select * from ip
+	</select>
+</mapper>

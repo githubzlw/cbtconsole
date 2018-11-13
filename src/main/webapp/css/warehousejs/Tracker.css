@@ -1,0 +1,29 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+
+.tab-wrap{width:966px; background:#FFF; margin:0 auto; border:1px #e2e2e2 solid; height:100%;}
+.tab-main{width:900px; margin:20px 10px 50px;border-collapse: collapse ;
+border-left: 1px solid #505050 ;
+border-bottom: 1px solid #505050;}
+
+.tab-main td{height:30px; margin:10px;font-size:14px; padding-left:10px;border-right:1px solid #505050;
+border-top:1px solid #505050;}
+.tab-sp{padding:20px 10px 5px; margin-left:12px;float:left; color:#ff4800;font-size:16px; font-weight:bold;border-top:1px solid #ffb57d; }
+.tab-tr1{font-weight:bold;  width:900px;height:40px; background:#42aacd; font-size:24px;color:#fff;}
+
+.tab-tr2{ padding:10px; width:180px;text-align:center;}
+.tab-tr3{width:720px; padding-left:30px;}
+.trmore{padding:20px;width:926px;border:1px solid #e2e2e2;border-top:0;background:#fff;margin:0 auto;}
+.trmotit{text-align:center;font-size:16px;padding-bottom:15px;}
+.trmolink::after{content:"";display:block;width:0;clear:both;}
+.trmola{display:block;float:left;margin-right:30px;}
+.trmola:hover{border:1px solid #ddd;}
+.trmowa{padding:10px;background:url(../img/track/y_6.jpg) 700px bottom no-repeat;border:1px dashed #ddd;margin-top:20px;padding-right:200px;}
+.trmowp{padding:5px 0;}
+.trmoth{margin-top:20px;}
+.trmotlink{color:#00afff;text-decoration:none;margin-right:30px;}
+.trmotlink:hover{color:#f90;text-decoration:underline;}
+.trmotlinkl{padding-left:50px;}
+.trmola img{width:120px;}

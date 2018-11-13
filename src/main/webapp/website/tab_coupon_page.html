@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+<meta charset="utf-8">
+<!--
+    	文件兼容性声明，表示使用最新的ie渲染模式  
+    -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--
+    	视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+    		width=device-width：视口宽度等于设备宽度。
+    		initial-scale=1   ：初始化缩放比，1:1
+    -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+<title>折扣卷管理</title>
+
+<!-- 这是bootStrap所需要的css文件 -->
+<link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!-- 
+   		条件注释,专门为ie浏览器设计的。
+   -->
+<!--[if lt IE 9]>
+	      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+<!-- 这是bootstrap所必要的jquery文件。 -->
+<script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+<!-- 这是bootstrap的js文件 -->
+<script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+<!-- 日期控件 -->
+<link href="/cbtconsole/css/bootstrap-datetimepicker.min.css"
+	rel="stylesheet" />
+<script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+<!--页面加载进度条-->
+<!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+<!--easyui-->
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<style type="text/css">
+.panel-title {
+	text-align: center;
+	height: 30px;
+	font-size: 24px;
+}
+
+.but_color {
+	background: #44a823;
+	width: 80px;
+	height: 35px;
+	border: 1px #aaa solid;
+	color: #fff;
+}
+
+input, textarea, select, button {
+	font-size: 16px;
+	height: 28px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	font-size: 16px;
+}
+
+.datagrid-header .datagrid-cell span, .panel-body {
+	font-size: 16px;
+}
+
+.datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+	.datagrid-cell-rownumber {
+	height: 28px;
+	line-height: 28px;
+	padding: 3px 5px;
+}
+
+#waring_id span {
+	color: red;
+	font-weight: bolder;
+}
+</style>
+
+</head>
+
+<body>
+
+	<!-- 模态框（Modal） -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="width: 80%;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">新增折扣卷</h4>
+				</div>
+
+				<form id="addCoupon" class="form-horizontal">
+					<table class="table table-striped table-hover"
+						style="float: left; font-size: 13px;">
+						<tr>
+							<td width="6%"></td>
+							<td width="14%">卷码</td>
+							<td width="80%"><input name="couponCode" type="text"
+								style="width: 500px" placeholder="示例:001-20180929-1000">
+								<span class="add-on" style="color: red;"></span></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>卷类别</td>
+							<td><select name="type" id="typeCodeMo" style="width: 500px"></select>
+								<!-- 满减卷规则 -->
+								<table id="type1" style="display: none;">
+									<tr>
+										<td width="108px">最低消费金额</td>
+										<td><input name="valueLeft" type="text" onkeyup="value=value.replace(/[^\d]/g,'')"
+											style="width: 360px" placeholder="该卷可用的最低消费金额(为0则不限制最低消费)">
+											<span class="add-on">$</span></td>
+									</tr>
+									<tr>
+										<td>抵扣金额</td>
+										<td><input name="valueRight" type="text" onkeyup="value=value.replace(/[^\d]/g,'')"
+											style="width: 360px" placeholder="该卷抵扣金额"> <span
+											class="add-on">$</span></td>
+									</tr>
+								</table> <!-- 折扣卷规则 -->
+								<table id="type2" style="display: none;">
+									<tr>
+										<td>功能完善中...</td>
+									</tr>
+								</table> <!-- 代金卷规则 -->
+								<table id="type3" style="display: none;">
+									<tr>
+										<td>功能完善中...</td>
+									</tr>
+								</table></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>描述</td>
+								<td><input name="describe" type="text"
+									style="width: 500px" placeholder="示例:-3$ discount"> <span
+									class="add-on"></span></td>
+							</tr>
+						<tr>
+							<td></td>
+							<td>卷数量(发放数量)</td>
+							<td><input name="count" type="text"
+								placeholder="为0则不可用" style="width: 500px" onkeyup="value=value.replace(/[^\d]/g,'')"> <span
+								class="add-on">张</span></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>领取开始时间</td>
+							<td><a class='input-group date' id='fromTime'
+								style="float: left;"> <input type='text'
+									class="form-control" name="fromTime"
+									style="width: 100px; height: 30px;" /> <span
+									class="input-group-addon"
+									style="float: left; width: 50px; height: 30px;"> <span
+										class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</a></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>领取截止时间</td>
+							<td><a class='input-group date' id='toTime'
+								style="float: left;"> <input type='text'
+									class="form-control" name="toTime"
+									style="width: 100px; height: 30px;" /> <span
+									class="input-group-addon"
+									style="float: left; width: 50px; height: 30px;"> <span
+										class="glyphicon glyphicon-calendar"></span>
+								</span>
+							</a></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td><input type="submit" value="创建" style="width: 100px">
+								<input type="button" value="重置" onclick="formReset()"
+								style="margin-left: 30px"></td>
+						</tr>
+					</table>
+				</form>
+
+				<div class="modal-footer"></div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+
+	<script type="text/javascript">
+		//卷码校验 重复校验
+		$("input[name=couponCode]").blur(function(){
+			$.ajax({
+				type: "GET",
+				url: "/cbtconsole/coupon/checkcouponcode.do?couponCode=" + $("input[name=couponCode]").val(),
+				data: "",
+				dataType:"json",
+				success: function(msg){
+			        if (msg) {
+						//卷重复
+						$("input[name=couponCode]").next().text("卷码重复!");
+						window.CHECK = false;
+					} 
+				}
+			});
+		});
+		$("input[name=couponCode]").focus(function(){
+			$("input[name=couponCode]").next().text("");
+			window.CHECK = true;
+		});
+		//重置按钮
+		function formReset() {
+			$("input[name=couponCode]").val("");
+			$("input[name=couponCode]").next().text("");
+			$("input[name=type]").val("");
+			$("input[name=valueLeft]").val("");
+			$("input[name=valueRight]").val("");
+			$("input[name=describe]").val("");
+			$("input[name=count]").val("");
+			$("input[name=fromTime]").val("");
+			$("input[name=toTime]").val("");
+		}
+		//表单校验
+		function formCheck() {
+			if (!window.CHECK) {
+				$("input[name=couponCode]").next().text("卷码重复, 未提交!");
+				return false;
+			}
+			if ($("input[name=couponCode]").val() == '') {
+				$("input[name=couponCode]").next().text("请输入卷码!");
+				return false;
+			}
+			
+			if ($("#typeCodeMo").val() == "1") {
+				//1-满减卷
+				var valueLeft = $("input[name=valueLeft]").val();
+				var valueRight = $("input[name=valueRight]").val();
+				if (valueRight == '') {
+					$("input[name=couponCode]").next().text("请输入抵扣金额!");
+					return false;
+				}
+				if (valueLeft != '' && valueLeft != '0' && valueLeft < valueRight) {
+					$("input[name=couponCode]").next().text("最低消费金额应大于等于抵扣金额 或者最低消费金额设置为0!");
+					return false;
+				}
+			}
+			
+			var fromTime = $("input[name=fromTime]").val();
+			var toTime = $("input[name=toTime]").val();
+			if (fromTime == '' || toTime == '') {
+				$("input[name=couponCode]").next().text("领取开始时间和截止时间不能为空!");
+				return false;
+			}
+			if (new Date(fromTime) > new Date(toTime)) {
+				$("input[name=couponCode]").next().text("领取开始时间应早于领取截止时间!");
+				return false;
+			}
+			return true;
+		}
+		//增加卷的表单提交
+		$("#addCoupon").submit(function(e) {
+			if (!formCheck()) {
+				return false;
+			}
+			$.ajax({
+				type : "POST",
+				url : "/cbtconsole/coupon/addcoupon.do",
+				data : $("#addCoupon").serialize(),
+				dataType : "json",
+				success : function(msg) {
+					if (msg.state == 'success') {
+						//保存成功
+						formReset();
+						$('#myModal').modal('hide');
+						$("#date-range-search").click();
+					} else {
+						$("input[name=couponCode]").next().text(msg.message);
+					}
+				}
+			});
+			return false;
+		});
+		//删除卷
+		function delCoupon(couponCode) {
+			console.log(couponCode);
+		}
+		//设置日期时间控件
+		function Datetime(dateId) {
+			$(dateId).datetimepicker({
+				language : 'zh-CN',//显示中文
+				format : 'yyyy-mm-dd',//显示格式
+				minView : "month",//设置只显示到月份
+				initialDate : new Date(),
+				autoclose : true,//选中自动关闭
+				todayBtn : true,//显示今日按钮
+				pickerPosition : 'top-right',//显示位置
+				locale : moment.locale('zh-cn')
+			});
+		}
+		Datetime('#fromTime');
+		Datetime('#toTime');
+
+		function formatNum(val) {
+			return val < 10 ? "0" + val : val
+		}
+
+		$(function() {
+			//设置datagrid属性
+			$('#main-datagrid').datagrid({
+				//title: '复购率退款数商品查询',
+				width : "100%",
+				fit : true, //自动补全 
+				pageSize : 20, //默认选择的分页是每页20行数据
+				pageList : [ 10, 20, 30, 50, 100 ], //可以选择的分页集合
+				nowrap : true, //设置为true，当数据长度超出列宽时将会自动截取
+				striped : true, //设置为true将交替显示行背景。
+				collapsible : true, //显示可折叠按钮
+				toolbar : "#top_toolbar", //在添加 增添、删除、修改操作的按钮要用到这个
+				loadMsg : '数据装载中......',
+				singleSelect : true, //为true时只能选择单行
+				fitColumns : true, //允许表格自动缩放，以适应父容器
+				pagination : true, //分页
+				rownumbers : true,
+				style : {
+					padding : '8 8 10 8'
+				},
+				onLoadError : function() {
+					return;
+				}
+			});
+			//页面加载完成后获取总数
+			/* $('#main-datagrid').datagrid({"onLoadSuccess":function(data){
+				console.log(data.total);
+			}}); */
+			/*重置*/
+			$("#date-range-reset").click(function() {
+				//初始化
+				$("#typeCode").val(0);
+			});
+			/*新增*/
+			$("#date-add").click(function() {
+				$('#myModal').modal('show');
+			});
+			/*查询*/
+			$("#date-range-search")
+					.click(
+							function() {
+								var typeCode = $("#typeCode").val()
+								// 页数
+								var pageSize = $("#main-datagrid").datagrid(
+										"options").pageSize;
+								var pageNumber = 1;
+								//查询对标商品
+								$("#main-datagrid").datagrid("options").url = "/cbtconsole/coupon/list.do";
+								$('#main-datagrid').datagrid("load", {
+									rows : pageSize,
+									page : pageNumber,
+									typeCode : typeCode
+								});
+
+							});
+		});
+
+		/*时间格式化 完整*/
+		function formatterDataFull(value) {
+			if (value != null) {
+				var date = new Date(value);
+				return date.getFullYear() + '-'
+						+ formatNum(date.getMonth() + 1) + '-'
+						+ formatNum(date.getDate()) + ' '
+						+ formatNum(date.getHours()) + ':'
+						+ formatNum(date.getMinutes());
+			} else {
+				return "";
+			}
+		}
+		/*时间格式化 年月日*/
+		function formatterData(value) {
+			if (value != null) {
+				var date = new Date(value);
+				return date.getFullYear() + '-'
+						+ formatNum(date.getMonth() + 1) + '-'
+						+ formatNum(date.getDate()) + ' ';
+			} else {
+				return "";
+			}
+		}
+		//卷类别
+		function formatterTypeCode(value, row, index) {
+			if (row.type != null) {
+				return window.TYPECODEMAP[row.type];
+			}
+			return '';
+		}
+		//是否有效
+		function formatterValid(value, row, index) {
+			if (row.valid != null) {
+				switch (row.valid) {
+					case 1:
+						return "有效";
+						break;
+					case 0:
+						return "无效";
+						break;
+				}
+			}
+			return '';
+		}
+		//卷规则
+		function formatterRules(value, row, index) {
+			if (row.type != null) {
+				switch (row.type) {
+				case 1:
+					//满减卷
+					return "最低消费金额-抵扣金额:" + row.value;
+				default:
+					break;
+				}
+			}
+			return '';
+		}
+		//操作列
+		function formatterEdit(value, row, index) {
+			if (row.id != null) {
+				return '<a href=\"#\" onclick=\"delCoupon(\'' + row.id
+						+ '\')\">删除</a>'
+			}
+			return;
+		}
+	</script>
+
+	<div id="top_toolbar" style="padding: 5px; height: auto">
+		<div>
+			<table>
+				<tr>
+					<td colspan="2">
+						<h3>折扣卷管理</h3>
+					</td>
+				</tr>
+				<div style="clear: both"></div>
+				<tr height="30px">
+					<td align="center" style="width: 124px;"><span
+						style="float: left; line-height: 30px;">&nbsp;卷类别&nbsp;&nbsp;</span>
+					</td>
+					<td style="width: 100px;">
+						<!--重置按钮-->
+					</td>
+					<td style="width: 56px;">
+						<!--查询按钮-->
+					</td>
+					<td style="width: 180px;">
+						<!--新增折扣卷按钮-->
+					</td>
+				</tr>
+				<tr>
+					<!--typeCode-->
+					<td align="center"><select class="form-control" id="typeCode"
+						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="0">0-全部</option>
+					</select></td>
+					<!--查询按钮-->
+					<td align="center">
+						<button type="button" id="date-range-search"
+							class="btn btn-default"
+							style="height: 30px; width: 98px; text-align: center;">查询</button>
+					</td>
+					<!--重置按钮-->
+					<td align="center">
+						<button type="button" id="date-range-reset"
+							class="btn btn-default" style="height: 30px; text-align: left;">重置</button>
+					</td>
+					<!--新增折扣卷-->
+					<td align="right">
+						<button type="button" id="date-add" class="btn btn-default"
+							style="height: 30px; width: 100px; text-align: right;">新增折扣卷</button>
+					</td>
+					<td id="errMsg" style="color: royalblue;"></td>
+				</tr>
+			</table>
+
+		</div>
+
+	</div>
+
+	<table id="main-datagrid" firstLoad="false"
+		style="width: 100%; height: 100%" class="easyui-datagrid">
+		<thead>
+			<tr>
+				<th data-options="field:'id',width:'180px',align:'center'">卷码</th>
+				<th
+					data-options="field:'type',width:'100px',align:'center',formatter:formatterTypeCode">卷类别</th>
+				<th
+					data-options="field:'valid',width:'100px',align:'center',formatter:formatterValid">是否有效</th>
+				<th
+					data-options="field:'rules',width:'380px',align:'center',formatter:formatterRules">券规则</th>
+				<th data-options="field:'describe',width:'100px',align:'center'">描述</th>
+				<th
+					data-options="field:'from',width:'100px',align:'center',formatter:formatterData">领取开始时间</th>
+				<th
+					data-options="field:'to',width:'100px',align:'center',formatter:formatterData">领取截止时间</th>
+				<th
+					data-options="field:'createtime',width:'100px',align:'center',formatter:formatterData">创建时间</th>
+				<th
+					data-options="field:'username',width:'100px',align:'center'">创建人</th>
+				<!-- <th
+					data-options="field:'edit',width:'100px',align:'center',formatter:formatterEdit">操作</th> -->
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+</body>
+<script type="text/javascript">
+	//卷类别
+	var typeMap = {};
+	typeMap[1] = "满减券";
+	typeMap[2] = "折扣券";
+	typeMap[3] = "代金券";
+	window.TYPECODEMAP = typeMap;
+	// 卷类别下拉框初始化
+	$.each(typeMap, function(index,value){
+		$("#typeCode,#typeCodeMo").append($("<option>", {
+			value : index,
+			html : index + "-" + value
+		}));
+	})
+	//卷类别 改变事件
+	$("#typeCodeMo").change(function() {
+		$("#typeCodeMo").parent().find("table").css("display", "none");
+		$("#type" + $("#typeCodeMo").val()).css("display", "contents");
+	});
+	$("#typeCodeMo").val(1);
+	$("#typeCodeMo").change();
+</script>
+</html>

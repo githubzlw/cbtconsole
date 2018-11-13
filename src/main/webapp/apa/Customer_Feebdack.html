@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>客户反馈</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	function queryFeedback(currentPage) {
+		var typeSelect = $("#typeSelect").val();
+		var typeSales = $("#typeSales").val();
+		var beginDate = $("#beginDate").val();
+		var endDate = $("#endDate").val();
+		var searchComment = $("#searchComment").val();
+		$("#feedbackTable tbody").empty();
+		$.ajax({
+			type : 'POST',
+			async : false,
+			url : '/cbtconsole/customerInfoCollection/queryForList',
+			data : {
+				"type" : typeSelect,
+				"sales" : typeSales,
+				"beginDate" : beginDate,
+				"endDate" : endDate,
+				"comment" : searchComment,
+				"page" : currentPage
+			},
+			success : function(data) {
+				if (data.ok) {
+					var results = data.data;
+					if (results.length > 0) {
+						showPagingData(data.total, currentPage);
+						var tbody = "";
+						for (var i = 0; i < results.length; i++) {
+							tbody += "<tr><td>" + results[i].id + "</td><td>";
+							if (results[i].type == 1) {
+								tbody += "订阅";
+							} else if (results[i].type == 2) {
+								tbody += "注册";
+							} else {
+								tbody += "";
+							}
+							tbody += "</td><td>";
+							if(results[i].userId !=0){
+								tbody += results[i].userId;
+							}
+							tbody += "</td><td><a target='_blank' href='/cbtconsole/website/user.jsp?userid="+results[i].userId+"'>" + results[i].email + "</a></td>";
+							tbody += "<td>" + results[i].needsProducts + "</td>";
+							tbody += "<td>" + results[i].sales + "</td>";
+							tbody += "<td>"
+									+ new Date(results[i].createTime)
+											.toLocaleString() + "</td></tr>";
+						}
+						$("#feedbackTable tbody").append(tbody);
+					} else {
+						showPagingData(0, 1);
+					}
+				} else {
+					showPagingData(0, 1);
+					alert("连接失败，请重试");
+				}
+			}
+		});
+	}
+
+	function showPagingData(total, currentPage) {
+		$("#total_count").text(total);
+		$("#total_pages").text(Math.ceil(total / 20));
+		$("#current_page").text(currentPage);
+	}
+
+	function doQueryAdd() {
+		var currentPage = Number($("#current_page").text()) + 1;
+		var totalPages = Number($("#total_pages").text());
+		if (currentPage <= 1) {
+			currentPage = 1;
+		} else if (currentPage >= totalPages) {
+			currentPage = totalPages;
+		}
+		queryFeedback(currentPage);
+	}
+
+	function doQuerySub() {
+		var currentPage = Number($("#current_page").text()) - 1;
+		var totalPages = Number($("#total_pages").text());
+		if (currentPage <= 1) {
+			currentPage = 1;
+		} else if (currentPage >= totalPages) {
+			currentPage = totalPages;
+		}
+		queryFeedback(currentPage);
+	}
+
+	function doQueryFirst() {
+		queryFeedback(1);
+	}
+
+	function doQueryLast() {
+		var totalPages = Number($("#total_pages").text());
+		queryFeedback(totalPages);
+	}
+
+	function doQueryByPage() {
+		var totalPages = Number($("#total_pages").text());
+		var jumpPage = Number($("#jumpPage").val());
+		if (jumpPage <= 1) {
+			jumpPage = 1;
+		} else if (jumpPage >= totalPages) {
+			jumpPage = totalPages;
+		}
+		queryFeedback(jumpPage);
+	}
+</script>
+<style type="text/css">
+#feedbackTable th {
+	background: #b0b0b0;
+}
+</style>
+</head>
+<body>
+
+	<div>
+		<div id="searchDiv">
+			<label for="typeSelect">来源:</label> 
+			<select id="typeSelect"
+				style="height: 24px;">
+				<option value="0" selected="selected">全部</option>
+				<option value="1">订阅进入</option>
+				<option value="2">注册进入</option>
+			</select> 
+			
+			<label for="typeSales">&nbsp;&nbsp;销售额:</label> <select id="typeSales"
+				style="height: 24px;">
+				<option value="" selected="selected">全部</option>
+				<option value="Just Starting">Just Starting</option>
+				<option value="$300K">$300K</option>
+				<option value="$1M">$1M</option>
+				<option value=">$1M">>$1M</option>
+			</select> 
+			
+			<label for="searchComment">&nbsp;&nbsp;留言:</label>
+			<input id="searchComment" style="height: 24px;" /> 
+			
+			<label for="beginDate">&nbsp;&nbsp;开始日期:</label> 
+			<input id="beginDate" style="height: 24px;" readonly="readonly"
+				onfocus="WdatePicker({isShowWeek:true})" /> 
+				
+			<label for="endDate">&nbsp;&nbsp;结束日期:</label>
+			<input id="endDate" style="height: 24px;" readonly="readonly"
+				onfocus="WdatePicker({isShowWeek:true})" /> 
+						
+			&nbsp;<input type="submit" value="搜索" style="font-size: 16px;background: #44a823;
+			border: 1px #aaa solid;color: #fff;height: 30px;" onclick="queryFeedback(1)" />
+			&nbsp;&nbsp;<a href="/cbtconsole/customerInfoCollection/exportExcel">全部导出到excel</a>
+			&nbsp;&nbsp;&nbsp;<a href="/cbtconsole/subscribeEmail/exportExcel">导出订阅邮箱列表</a>
+		</div>
+		<br>
+		<div id="resultDiv">
+			<table id="feedbackTable" border="1px" bordercolor="#ccc"
+				cellspacing="0px" style="border-collapse: collapse">
+				<thead>
+					<th style="width: 80px;">ID</th>
+					<th style="width: 60px;">来源</th>
+					<th style="width: 80px;">userId</th>
+					<th style="width: 200px;">邮箱</th>
+					<th>comment</th>
+					<th style="width: 125px;">sales</th>
+					<th style="width: 230px;">创建时间</th>
+				</thead>
+				<tbody>
+				</tbody>
+
+			</table>
+		</div>
+		<div id="pagePaging">
+			<p>
+				总条数：<span id="total_count">0</span> &nbsp;总页数：<span id="total_pages">1</span>
+				&nbsp;当前页：<span id="current_page">1</span> &nbsp;
+				<button id="firstBtn" onclick="doQueryFirst()">首页</button>
+				<button id="prveBtn" onclick="doQuerySub()">上一页</button>
+				<button id="nextBtn" onclick="doQueryAdd()">下一页</button>
+				<button id="lastBtn" onclick="doQueryLast()">末页</button>
+				<input id="jumpPage" type="number" style="width: 50px;"
+					oninput="if(event.keyCode !=37 && event.keyCode != 39){if (!/^[\d]+$/ig.test(this.value)){this.value='';}}"
+					onkeydown="if(event.keyCode==13){doQueryByPage();}">
+				<button onclick="doQueryByPage()">Go</button>
+			</p>
+		</div>
+
+	</div>
+
+</body>
+<script type="text/javascript">
+window.onload = function() {
+	var url = document.location.href;
+	var begin = url.indexOf("?");
+	if (begin != -1) {
+		var selectStr = url.substring(begin + 1, url.length);
+		var selectLst = selectStr.split("=");
+		if(selectLst.length == 2){
+			 $("#typeSelect").val(selectLst[1]);
+		}
+	}
+	queryFeedback(1);
+}
+</script>
+</html>

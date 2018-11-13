@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.BigUserMapper">
+
+    <resultMap id="bigUserBeanResultMap" type="com.importExpress.pojo.BigUserBean">
+        <id column="user_id" property="userId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="orderpaytime" property="lastOrderPayTime"/>
+        <result column="sales_id" property="salesId"/>
+        <result column="sales_name" property="salesName"/>
+        <result column="total_amount" property="orderTotalAmount"/>
+    </resultMap>
+
+
+    <select id="queryForList" parameterType="com.importExpress.pojo.BigUserBean" resultMap="bigUserBeanResultMap">
+        select a.*,b.order_no,b.orderpaytime
+        from
+        (select od.user_id,CAST(sum(od.pay_price) AS DECIMAL(11,2)) as total_amount,ifnull(au.admin_id,0) as sales_id,
+        IFNULL(au.admin_name,'') as sales_name from orderinfo od left join
+        (select admin_r_user.userid,admuser.id as admin_id,admuser.admName as admin_name from admin_r_user,admuser
+        where admin_r_user.adminid = admuser.id) au
+        on od.user_id = au.userid
+        where od.state in(1,2,3,4,5) and od.user_id in(select user_id from orderinfo
+        where pay_price >= 400 and state in(1,2,3,4,5) GROUP BY user_id)
+        GROUP BY user_id ) a,
+        (select user_id,order_no,orderpaytime from orderinfo where orderid in(
+        select max(orderid) as orderid from orderinfo
+        where state in(1,2,3,4,5)
+        and user_id in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email != 'sb33@gmail.com'  AND email != 'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') GROUP BY user_id) ) b where a.user_id = b.user_id
+        <if test=" userId > 0">
+            and a.user_id = #{userId}
+        </if>
+        <if test=" salesId > 0">
+            and a.sales_id = #{salesId}
+        </if>
+        order by b.orderpaytime desc
+        <if test=" limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryForListCount" parameterType="com.importExpress.pojo.BigUserBean" resultType="java.lang.Integer">
+        select count(0)
+        from
+        (select od.user_id,CAST(sum(od.pay_price) AS DECIMAL(11,2)) as total_amount,ifnull(au.admin_id,0) as sales_id,
+        IFNULL(au.admin_name,'') as sales_name from orderinfo od left join
+        (select admin_r_user.userid,admuser.id as admin_id,admuser.admName as admin_name from admin_r_user,admuser
+        where admin_r_user.adminid = admuser.id) au
+        on od.user_id = au.userid
+        where od.pay_price > 400 and od.state in(1,2,3,4,5) and LENGTH(od.order_no)=16
+        GROUP BY user_id ) a,
+        (select user_id,order_no,orderpaytime from orderinfo where orderid in(
+        select max(orderid) as orderid from orderinfo
+        where state in(1,2,3,4,5) and LENGTH(order_no) = 16
+        and user_id in(SELECT id FROM USER WHERE email NOT LIKE '%[图片]qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email != 'sb33@gmail.com'  AND email != 'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') GROUP BY user_id) ) b where a.user_id = b.user_id
+        <if test=" userId > 0">
+            and a.user_id = #{userId}
+        </if>
+        <if test=" salesId > 0">
+            and a.sales_id = #{salesId}
+        </if>
+    </select>
+
+</mapper>
