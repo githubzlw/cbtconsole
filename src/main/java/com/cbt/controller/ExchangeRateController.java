@@ -4,8 +4,8 @@ import com.cbt.bean.ExchangeRateDaily;
 import com.cbt.exchangeRate.service.ExchangeRateService;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.website.util.EasyUiJsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ import java.util.Map;
 @RequestMapping(value = "/exchangeRate")
 @Controller
 public class ExchangeRateController {
-    private static final Log LOG = LogFactory.getLog(ExchangeRateController.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ExchangeRateController.class);
 
     @Autowired
     private ExchangeRateService exchangeRateService;

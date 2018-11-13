@@ -1,7 +1,7 @@
 package com.cbt.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +14,7 @@ import java.util.Properties;
  *
  */
 public class GetConfigureInfo {
-	private static final Log LOG = LogFactory.getLog(GetConfigureInfo.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GetConfigureInfo.class);
 
 	private static Properties cbtProperties = new Properties();
 	private static Properties paypalProperties = new Properties();

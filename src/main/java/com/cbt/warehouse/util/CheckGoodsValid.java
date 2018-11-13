@@ -2,8 +2,8 @@ package com.cbt.warehouse.util;
 
 import com.cbt.parse.service.GoodsBean;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +16,7 @@ import org.jsoup.select.Elements;
  *
  */
 public class CheckGoodsValid {
-	private static final Log LOG = LogFactory.getLog(CheckGoodsValid.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CheckGoodsValid.class);
 
 	/**
 	 * 根据url判断商品有效性

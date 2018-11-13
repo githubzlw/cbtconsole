@@ -1,8 +1,8 @@
 package com.cbt.util;
 
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.sql.SQLException;
  *
  */
 public class UniqueIdUtil {
-	private static final Log LOG = LogFactory.getLog(UniqueIdUtil.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(UniqueIdUtil.class);
 
 	/**
 	 * 调用存储过程获取唯一id

@@ -1,7 +1,7 @@
 package com.cbt.parse.driver;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
  *
  */
 public class FtpDriver {
-	private static final Log LOG = LogFactory.getLog(FtpDriver.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(FtpDriver.class);
 	 /**  
      *   
      * @param path 上传到ftp服务器哪个路径下     
@@ -45,7 +45,7 @@ public class FtpDriver {
 			}      
 		} catch (IOException e) {
 			ftp = null;
-			LOG.warn(e);
+			LOG.warn("",e);
 		}      
         return ftp;      
     } 
@@ -59,7 +59,7 @@ public class FtpDriver {
     		try {
 				ftp.disconnect();
 			} catch (IOException e) {
-				LOG.warn(e);
+				LOG.warn("",e);
 			}
     	}
     }

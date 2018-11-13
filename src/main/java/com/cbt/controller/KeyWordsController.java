@@ -4,8 +4,8 @@ import com.cbt.dao.KeyWordSearchDao;
 import com.cbt.dao.impl.KeyWordSearchDaoImpl;
 import com.cbt.util.Cache;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequestMapping(value = "/cbt/keywords")
 public class KeyWordsController {
 	
-	private static final Log LOG = LogFactory.getLog(KeyWordsController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(KeyWordsController.class);
 	
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public void update(HttpServletRequest request, HttpServletResponse response, String zc, String tyc, Map<String, Object> map) throws ServletException, IOException {

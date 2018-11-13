@@ -17,8 +17,8 @@ import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/shopCarMarketingCtr")
 public class ShopCarMarketingController {
-    private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(ShopCarMarketingController.class);
 
 
     @Autowired

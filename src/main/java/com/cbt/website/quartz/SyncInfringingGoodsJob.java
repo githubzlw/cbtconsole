@@ -3,8 +3,8 @@ package com.cbt.website.quartz;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,7 +12,7 @@ import org.quartz.JobExecutionException;
 import java.util.List;
 
 public class SyncInfringingGoodsJob implements Job {
-    private static final Log LOG = LogFactory.getLog(SyncInfringingGoodsJob.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SyncInfringingGoodsJob.class);
     private static CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
     @Override

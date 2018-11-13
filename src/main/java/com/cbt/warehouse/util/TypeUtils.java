@@ -2,8 +2,8 @@ package com.cbt.warehouse.util;
 
 import com.cbt.util.Md5Util;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -22,7 +22,7 @@ public class TypeUtils {
 	public static final String myhome = "http://192.168.1.58:8080/";
 	public static final String path = "/usr/wwwRoot";
 	
-	private static final Log LOG = LogFactory.getLog(TypeUtils.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TypeUtils.class);
 	private static final String[] url_items = new String[]{ 
 			"bestway020.en.alibaba.com",
 			"en.alibaba.com",

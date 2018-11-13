@@ -5,8 +5,8 @@ import com.cbt.website.bean.GoodsSource;
 import com.cbt.website.service.AliExpress240Sercive;
 import com.cbt.website.service.IAliExpress240Sercive;
 import com.cbt.website.thread.DownloadImgThred;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +19,7 @@ import java.util.List;
 public class Aliexpress_top120 extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory.getLog(Aliexpress_top120.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(Aliexpress_top120.class);
     public Aliexpress_top120() {
         super();
     }

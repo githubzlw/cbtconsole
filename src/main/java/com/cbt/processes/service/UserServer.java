@@ -7,14 +7,14 @@ import com.cbt.util.AppConfig;
 import com.cbt.util.Md5Util;
 import com.cbt.util.ResCode;
 import com.cbt.util.UUIDUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public class UserServer implements IUserServer {
-	private static final Log LOG = LogFactory.getLog(UserServer.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(UserServer.class);
 	IUserDao userDao = new UserDao();
 	
 	@Override

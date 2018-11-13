@@ -14,15 +14,15 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.UpdateTblModel;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
 
 public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
-    private static final Log LOG = LogFactory.getLog(CustomGoodsDaoImpl.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CustomGoodsDaoImpl.class);
 
     @Override
     public List<CategoryBean> getCaterory() {

@@ -7,8 +7,8 @@ import com.cbt.website.dao.GoodsSourceDaoImp;
 import com.cbt.website.dao.IGoodsSourceDao;
 import com.cbt.website.service.WebsiteParse;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class GoodsWebsiteServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(GoodsWebsiteServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsWebsiteServlet.class);
        
     public GoodsWebsiteServlet() {
         super();

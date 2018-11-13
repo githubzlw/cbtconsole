@@ -1,15 +1,15 @@
 package com.cbt.change.util;
 
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class ErrorLogDao {
-	private static final Log LOG = LogFactory.getLog(ErrorLogDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ErrorLogDao.class);
 
 	public static void insertErrorInfo(String updateTable, String sqlStr, int adminId, int flag, String remark) {
 

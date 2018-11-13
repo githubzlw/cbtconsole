@@ -15,8 +15,8 @@ import com.importExpress.pojo.RefundResultInfo;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ import java.util.Map;
 public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 
     //private static Logger logger = REFUNDLOGFactory.getREFUNDLOG(PayPalServiceImpl.class);
-    private static final Log REFUNDLOG = LogFactory.getLog("refund");
+    private final static org.slf4j.Logger REFUNDLOG = LoggerFactory.getLogger("refund");
     @Autowired
     private RefundResultInfoMapper refundResultInfoMapper;
 

@@ -4,8 +4,8 @@ import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.service.OffShelfService;
 import com.cbt.service.impl.OffShelfServiceImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Service
 public class GoodsOffShelfJob implements Job {
-	private static final Log LOG = LogFactory.getLog(GoodsOffShelfJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsOffShelfJob.class);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

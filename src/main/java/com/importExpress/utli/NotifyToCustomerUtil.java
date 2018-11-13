@@ -1,7 +1,7 @@
 package com.importExpress.utli;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * 通知客户消息
@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
  * @author JXW
  */
 public class NotifyToCustomerUtil {
-    private static final Log LOG = LogFactory.getLog(NotifyToCustomerUtil.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NotifyToCustomerUtil.class);
 
 
     /**

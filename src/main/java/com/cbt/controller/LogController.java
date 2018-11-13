@@ -3,8 +3,8 @@ package com.cbt.controller;
 import com.cbt.log.dao.SaveLogToMysql;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,7 +18,7 @@ import java.io.IOException;
 @Controller
 @RequestMapping(value = "/cbt/lz")
 public class LogController {
-	private static final Log LOG = LogFactory.getLog(KeyWordsController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(KeyWordsController.class);
 	
 	@RequestMapping(value = "/savelz", method = RequestMethod.POST)
 	public String savelog(HttpServletRequest request, HttpServletResponse response,

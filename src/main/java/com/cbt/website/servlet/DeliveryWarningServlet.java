@@ -10,8 +10,8 @@ import com.cbt.website.dao.IOrderwsDao;
 import com.cbt.website.dao.OrderwsDao;
 import com.cbt.website.userAuth.bean.Admuser;
 import net.minidev.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class DeliveryWarningServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(DeliveryWarningServlet.class);   
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DeliveryWarningServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

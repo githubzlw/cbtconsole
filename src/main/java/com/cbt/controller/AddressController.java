@@ -4,8 +4,8 @@ import com.cbt.bean.StateName;
 import com.cbt.fee.service.IZoneServer;
 import com.cbt.fee.service.ZoneServer;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping(value = "/cbt/address")
 public class AddressController {
 	
-	private static final Log LOG = LogFactory.getLog(AddressController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(AddressController.class);
 	
 	@RequestMapping(value = "/getState", method = RequestMethod.POST)  
 	@ResponseBody  

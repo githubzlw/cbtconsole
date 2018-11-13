@@ -4,8 +4,8 @@ import com.cbt.service.CustomGoodsService;
 import com.cbt.util.StrUtils;
 import com.importExpress.pojo.GoodsParseBean;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParseGoodsPriceAndSearchJob extends QuartzJobBean {
-    private static final Log logger = LogFactory.getLog(ParseGoodsPriceAndSearchJob.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(ParseGoodsPriceAndSearchJob.class);
 
     @Autowired
     private CustomGoodsService customGoodsService;

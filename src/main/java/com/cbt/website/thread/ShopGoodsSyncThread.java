@@ -1,8 +1,8 @@
 package com.cbt.website.thread;
 
 import com.cbt.parse.service.DownloadMain;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * @date 2018年3月1日
  */
 public class ShopGoodsSyncThread implements Runnable {
-	private static final Log LOG = LogFactory.getLog(ShopGoodsSyncThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsSyncThread.class);
 	// private static final String ACCESSUTL = "http://127.0.0.1:8080/checkimage/clear/shopGoods?shopId=";
 	//private static final String ACCESSUTL = "http://192.168.1.31:8080/checkimage/sync/shopGoodsSync?shopId=";
 	private static final String ACCESSUTL = "http://192.168.1.31:8088/syncGoodsToOnline/sync/shopGoodsSync?shopId=";

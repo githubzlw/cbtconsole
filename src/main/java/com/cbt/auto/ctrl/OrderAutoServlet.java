@@ -15,8 +15,8 @@ import com.importExpress.service.AllotAdminService;
 import com.importExpress.service.AllotAdminServiceImpl;
 import jxl.Sheet;
 import jxl.Workbook;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.Mac;
@@ -47,7 +47,7 @@ public class OrderAutoServlet extends HttpServlet {
     @Autowired
     private PaymentConfirmServer paymentConfirmServer;
     private static final long serialVersionUID = 1L;
-    private static final Log LOG = LogFactory.getLog(OrderAutoServlet.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderAutoServlet.class);
     private static final int base = 5;
     IOrderAutoService preOrderAutoService = new PreOrderAutoService();
     public static final String[] FEMALE_FIRST_NAMES = {

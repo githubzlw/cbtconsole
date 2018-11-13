@@ -2,8 +2,8 @@ package com.cbt.parse.service;
 
 import com.cbt.parse.bean.ParseBean;
 import com.cbt.util.AppConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CategoryUtils {
-	private static final Log LOG = LogFactory.getLog(CategoryUtils.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryUtils.class);
 	
 	
 	public  static Boolean gategory(String name,String cID,List<HashMap<String, String>> list,String keywords,String tem_path){

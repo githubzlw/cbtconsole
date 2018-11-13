@@ -1,7 +1,7 @@
 package com.importExpress.mail;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class SendMailFactory {
 
-    private static final Log logger = LogFactory.getLog(SendMailFactory.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMailFactory.class);
 
     @Autowired
     private SpringTemplateEngine thymeleafEngine;

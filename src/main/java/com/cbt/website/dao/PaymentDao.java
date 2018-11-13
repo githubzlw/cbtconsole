@@ -10,8 +10,8 @@ import com.cbt.pojo.RechangeRecord;
 import com.cbt.refund.bean.RefundBean;
 import com.cbt.website.bean.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class PaymentDao implements PaymentDaoImp {
-    private static final Log LOG = LogFactory.getLog(PaymentDao.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PaymentDao.class);
     private DecimalFormat format = new DecimalFormat("#0.00");
 
     @Override
@@ -255,7 +255,7 @@ public class PaymentDao implements PaymentDaoImp {
             orderisList = null;
             orderisPayList = null;
         } catch (SQLException e) {
-            LOG.error(e);
+            LOG.error("",e);
         } catch (ParseException e) {
 
             e.printStackTrace();
@@ -264,28 +264,28 @@ public class PaymentDao implements PaymentDaoImp {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt2 != null) {
                 try {
                     stmt2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st2 != null) {
                 try {
                     st2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -373,14 +373,14 @@ public class PaymentDao implements PaymentDaoImp {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -511,34 +511,34 @@ public class PaymentDao implements PaymentDaoImp {
                 list.add(pbean);
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt2 != null) {
                 try {
                     stmt2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st2 != null) {
                 try {
                     st2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -584,34 +584,34 @@ public class PaymentDao implements PaymentDaoImp {
                 list.add(pbean);
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt2 != null) {
                 try {
                     stmt2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st2 != null) {
                 try {
                     st2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -637,20 +637,20 @@ public class PaymentDao implements PaymentDaoImp {
                 total_pay = st.getDouble("payment_amount");
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -676,20 +676,20 @@ public class PaymentDao implements PaymentDaoImp {
                 total_pay = st.getDouble("payment_amount");
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -739,20 +739,20 @@ public class PaymentDao implements PaymentDaoImp {
                 result.put("all", st.getDouble("payment_amountb") + st.getDouble("payment_amounta") + st.getDouble("payment_amountd"));
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -784,20 +784,20 @@ public class PaymentDao implements PaymentDaoImp {
                 map.put(st.getString("userid"), st.getString("payment_amount"));
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -827,20 +827,20 @@ public class PaymentDao implements PaymentDaoImp {
                 map.put(st.getString("userid"), st.getString("paypal"));
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -865,20 +865,20 @@ public class PaymentDao implements PaymentDaoImp {
                 result = st.getDouble("paypal");
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -1862,62 +1862,62 @@ public class PaymentDao implements PaymentDaoImp {
 
             }
         } catch (SQLException e) {
-            LOG.warn(e);
+            LOG.warn("",e);
         } finally {
             if (stmt != null) {
                 try {
                     stmt.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt2 != null) {
                 try {
                     stmt2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st2 != null) {
                 try {
                     st2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt3 != null) {
                 try {
                     stmt3.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st3 != null) {
                 try {
                     st3.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt4 != null) {
                 try {
                     stmt4.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (st4 != null) {
                 try {
                     st4.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);
@@ -2120,84 +2120,84 @@ public class PaymentDao implements PaymentDaoImp {
                 try {
                     stmtDrop.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtCreate != null) {
                 try {
                     stmtCreate.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtPay != null) {
                 try {
                     stmtPay.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtAdd != null) {
                 try {
                     stmtAdd.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtOrder != null) {
                 try {
                     stmtOrder.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtAll != null) {
                 try {
                     stmtAll.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtref1 != null) {
                 try {
                     stmtref1.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtref2 != null) {
                 try {
                     stmtref2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmtref3 != null) {
                 try {
                     stmtref3.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (rs2 != null) {
                 try {
                     rs2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             if (stmt2 != null) {
                 try {
                     stmt2.close();
                 } catch (SQLException e) {
-                    LOG.warn(e);
+                    LOG.warn("",e);
                 }
             }
             DBHelper.getInstance().closeConnection(conn);

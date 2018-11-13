@@ -3,15 +3,15 @@ package com.cbt.change.util;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Orderinfo;
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class ChangeRecordsDao {
-	private static final Log LOG = LogFactory.getLog(ChangeRecordsDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ChangeRecordsDao.class);
 
 	public void insertOrderChange(Orderinfo orderinfo, int adminId, int operationType) {
 

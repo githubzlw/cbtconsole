@@ -7,8 +7,8 @@ import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
 import com.cbt.website.dao.*;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ import java.util.*;
 
 public class OrderSplitServer implements IOrderSplitServer{
 
-	private static final Log LOG = LogFactory.getLog(OrderSplitServer.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderSplitServer.class);
 	IOrderSplitDao dao = new OrderSplitDaoImpl();
     IOrderwsDao orderwsDao = new OrderwsDao();
 	

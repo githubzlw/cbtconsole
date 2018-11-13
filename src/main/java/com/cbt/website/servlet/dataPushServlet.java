@@ -1,7 +1,7 @@
 package com.cbt.website.servlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 public class dataPushServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(dataPushServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(dataPushServlet.class);
 	
 	
 	protected void dataPush(String sqlStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

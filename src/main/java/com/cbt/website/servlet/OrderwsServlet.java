@@ -34,8 +34,8 @@ import net.minidev.json.JSONArray;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,7 +54,7 @@ import java.util.*;
 public class OrderwsServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(OrderwsServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderwsServlet.class);
 	IExpressTrackDao dao= new ExpressTrackDaoImpl();
 	public OrderwsServlet() {
 		super();

@@ -19,8 +19,8 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.service.PaymentServiceNew;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +41,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/paycheckc")
 public class PaypalCheckController {
-	private static final Log LOG = LogFactory.getLog(PaypalCheckController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PaypalCheckController.class);
 	@Autowired
 	private RefundSSService refundSSService;
 	@Autowired
@@ -467,7 +467,7 @@ public class PaypalCheckController {
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
-			LOG.error(e);
+			LOG.error("",e);
 		}
 
 		return mv;
@@ -511,7 +511,7 @@ public class PaypalCheckController {
 			result = JSONArray.fromObject(recordList).toString();
 
 		} catch (Exception e) {
-			LOG.warn(e);
+			LOG.warn("",e);
 		}
 
 		return result;
@@ -666,7 +666,7 @@ public class PaypalCheckController {
 			list_payMentBean = null;
 		} catch (Exception e) {
 			// TODO: handle exception
-			LOG.warn(e);
+			LOG.warn("",e);
 		}
 		return mv;
 	}

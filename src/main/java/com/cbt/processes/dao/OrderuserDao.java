@@ -3,8 +3,8 @@ package com.cbt.processes.dao;
 import com.cbt.bean.*;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -12,7 +12,7 @@ import java.util.*;
 
 public class OrderuserDao implements IOrderuserDao {
 
-	private static final Log LOG = LogFactory.getLog(OrderuserDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderuserDao.class);
 	
 	@Override
 	public List<OrderDetailsBean> getOrders(int userID, int state, int startpage, int page) {

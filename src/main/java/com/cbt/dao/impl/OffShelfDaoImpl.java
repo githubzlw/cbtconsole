@@ -4,8 +4,8 @@ import com.cbt.dao.OffShelfDao;
 import com.cbt.jdbc.DBHelper;
 import com.importExpress.service.SendMQService;
 import com.importExpress.service.impl.SendMQServiceImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class OffShelfDaoImpl implements OffShelfDao {
 
-	private static final Log LOG = LogFactory.getLog(OffShelfDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OffShelfDao.class);
 
 	@Autowired
 	private SendMQService sendMQ;

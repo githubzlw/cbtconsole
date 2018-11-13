@@ -14,8 +14,8 @@ import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +38,7 @@ import java.util.Map;
 @RequestMapping(value = "/singleGoods")
 public class SingleGoodsController {
 
-    private static final Log LOG = LogFactory.getLog(SingleGoodsController.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SingleGoodsController.class);
     private static final String LOCAL_SHOW_URL = "http://192.168.1.31:9090/";
     private static final String REMOTE_SHOW_URL = "http://117.144.21.74:9090/";
     private static final String LOCAL_FILE_PATH = "G:/img_unzip/";

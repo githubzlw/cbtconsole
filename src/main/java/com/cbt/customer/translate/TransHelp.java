@@ -3,8 +3,8 @@ package com.cbt.customer.translate;
 import com.cbt.parse.service.GoodsBean;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.Date;
 
 public class TransHelp {
-	private static final Log LOG = LogFactory.getLog(TransHelp.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TransHelp.class);
 	  /**
      * 方法描述:翻译前与翻译后的实体转换
      * author: 李湛君

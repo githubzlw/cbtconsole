@@ -1,8 +1,8 @@
 package com.cbt.website.quartz;
 
 import com.cbt.orderinfo.service.IOrderinfoService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class parseOrderManageJob extends QuartzJobBean {
-    private static final Log logger = LogFactory.getLog(parseOrderManageJob.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(parseOrderManageJob.class);
 
 
     @Autowired

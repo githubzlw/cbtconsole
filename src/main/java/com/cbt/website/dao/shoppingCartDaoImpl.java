@@ -16,8 +16,8 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.Utility;
 import com.ibm.icu.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.*;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class shoppingCartDaoImpl implements shoppingCartDao {
 
-	private static final Log LOG = LogFactory.getLog(shoppingCartDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(shoppingCartDaoImpl.class);
 	
 	
 	@Override

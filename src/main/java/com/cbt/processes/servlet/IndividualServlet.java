@@ -13,8 +13,8 @@ import com.cbt.processes.service.*;
 import com.cbt.util.WebCookie;
 import com.cbt.website.service.IMessageServer;
 import com.cbt.website.service.MessageServer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class IndividualServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(IndividualServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(IndividualServlet.class);
     public IndividualServlet() {
         super();
     }

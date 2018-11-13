@@ -4,8 +4,8 @@ import com.cbt.bean.UserBean;
 import com.cbt.processes.service.IUserServer;
 import com.cbt.processes.service.UserServer;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class RegServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(RegServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RegServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

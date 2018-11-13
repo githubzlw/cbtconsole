@@ -3,8 +3,8 @@ package com.importExpress.utli;
 import com.cbt.util.SysParamUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public enum MongoDBHelp {
      */
     INSTANCE;
 
-    private static final Log logger = LogFactory.getLog(MongoDBHelp.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(MongoDBHelp.class);
 
     private static final String MONGODB_URL = SysParamUtil.getParam("mongodb.url");
     private static final String MONGODB_DB = SysParamUtil.getParam("mongodb.db");

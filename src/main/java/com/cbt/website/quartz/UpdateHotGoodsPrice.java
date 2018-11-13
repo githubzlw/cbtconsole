@@ -3,8 +3,8 @@ package com.cbt.website.quartz;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import java.io.IOException;
 
 public class UpdateHotGoodsPrice extends QuartzJobBean {
-    private static final Log logger = LogFactory.getLog(UpdateHotGoodsPrice.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(UpdateHotGoodsPrice.class);
     private static final String ACCESS_URL = "https://www.import-express.com/popProducts/refreshHotJson";
     //private static final String ACCESS_URL = "http://127.0.0.1:8087/popProducts/refreshHotJson";
 

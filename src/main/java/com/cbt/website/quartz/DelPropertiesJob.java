@@ -1,8 +1,8 @@
 package com.cbt.website.quartz;
 
 import com.cbt.method.servlet.OrderDetailsServlet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class DelPropertiesJob implements Job {
-	private static final Log LOG = LogFactory.getLog(CheckUnpaidOrderJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CheckUnpaidOrderJob.class);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

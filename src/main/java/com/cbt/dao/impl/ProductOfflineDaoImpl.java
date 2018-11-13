@@ -5,8 +5,8 @@ import com.cbt.dao.ProductOfflineDao;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.Md5Util;
 import com.cbt.website.userAuth.bean.Admuser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductOfflineDaoImpl implements ProductOfflineDao {
-	private static final Log LOG = LogFactory.getLog(ProductOfflineDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ProductOfflineDaoImpl.class);
 
 	@Override
 	public List<CategoryBean> queryCateroryByParam(CustomGoodsQuery queryBean) {

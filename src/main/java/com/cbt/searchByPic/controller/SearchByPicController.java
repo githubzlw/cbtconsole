@@ -7,8 +7,8 @@ import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.searchByPic.bean.CustomerRequireBean;
 import com.cbt.searchByPic.service.SearchByPicService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +43,7 @@ public class SearchByPicController {
 	@Autowired
 	private  com.cbt.util.JspToPDF  jspToPDF ; 
 	
-	private static final Log LOG = LogFactory.getLog(SearchByPicController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SearchByPicController.class);
 	
 	/**
 	 * 获取客户信息列表
@@ -71,7 +71,7 @@ public class SearchByPicController {
 			mv.addObject("current", page);
 			mv.addObject("items", selectAll);
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		}
 		return mv;
 		
@@ -105,7 +105,7 @@ public class SearchByPicController {
 			mv.addObject("current", page);
 			mv.addObject("items", selectAll);
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		}
 		return mv;
 	}
@@ -157,7 +157,7 @@ public class SearchByPicController {
 			mv.addObject("items", selectByIndexId);
 			
 		} catch (Exception e) {
-			LOG.warn(e);
+			LOG.warn("",e);
 		}
 		
 		return mv;
@@ -176,7 +176,7 @@ public class SearchByPicController {
 			}
 			mv.addObject("index", Bean);
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		}
 		return mv;
 	}
@@ -270,7 +270,7 @@ public class SearchByPicController {
 				}
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 			results = "程序发生错误，请通知开发人员";
 		}
 		mv.addObject("results", results);
@@ -370,7 +370,7 @@ public class SearchByPicController {
 			mv.addObject("total", count_page);
 			
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		}
 		return mv;
 	}
@@ -525,7 +525,7 @@ public class SearchByPicController {
 			mv.addObject("items", results);
 			
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		}
 		return mv;
 	}
@@ -646,7 +646,7 @@ public class SearchByPicController {
 				result =  -1;
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 			result = -2;
 		}
 		return String.valueOf(result);
@@ -810,7 +810,7 @@ public class SearchByPicController {
 				}
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 			result = "程序发生错误";
 		}finally{
 			//数据库还原

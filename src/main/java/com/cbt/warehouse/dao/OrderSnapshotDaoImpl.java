@@ -2,8 +2,8 @@ package com.cbt.warehouse.dao;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.warehouse.pojo.OrderSnapshot;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 
-	private static final Log LOG = LogFactory.getLog(OrderSnapshotDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderSnapshotDaoImpl.class);
 
 	@SuppressWarnings("resource")
 	@Override

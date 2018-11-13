@@ -16,8 +16,8 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/hotGoods")
 public class HotGoodsCtrl {
-    private static final Log LOG = LogFactory.getLog(HotGoodsCtrl.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(HotGoodsCtrl.class);
 
     @Autowired
     private HotGoodsService hotGoodsService;

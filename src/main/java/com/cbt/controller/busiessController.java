@@ -4,8 +4,8 @@ import com.cbt.bean.BusiessBean;
 import com.cbt.service.BusiessService;
 import com.cbt.util.Utility;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/cbt/busiess")
 public class busiessController {
-	private static final Log LOG = LogFactory.getLog(busiessController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(busiessController.class);
 	@Autowired
 	private BusiessService busiessService;
 

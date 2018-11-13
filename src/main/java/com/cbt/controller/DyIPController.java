@@ -2,8 +2,8 @@ package com.cbt.controller;
 
 import com.cbt.common.DynamicsIP;
 import com.cbt.util.AppConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @RequestMapping(value = "/dyipc")
 public class DyIPController {
-	private static final Log LOG = LogFactory.getLog(DyIPController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DyIPController.class);
 	//获取订单号
 	@RequestMapping("/get")
 	@ResponseBody

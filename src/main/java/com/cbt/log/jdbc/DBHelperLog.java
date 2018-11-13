@@ -6,8 +6,8 @@ package com.cbt.log.jdbc;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.Properties;
 
 public class DBHelperLog {
-	private static final Log LOG = LogFactory.getLog(DBHelperLog.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DBHelperLog.class);
 	public static ComboPooledDataSource pool = null;
 //	public static int serverId=0;
 	public static void init() {

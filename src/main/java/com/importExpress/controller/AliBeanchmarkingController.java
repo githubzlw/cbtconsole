@@ -10,8 +10,8 @@ import com.importExpress.pojo.AliBenchmarkingStatistic;
 import com.importExpress.pojo.KeyWordBean;
 import com.importExpress.service.AliBeanchmarkingService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/aliBeanchmarking")
 public class AliBeanchmarkingController {
 
-    private static final Log logger = LogFactory.getLog(AliBeanchmarkingController.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(AliBeanchmarkingController.class);
 
     @Autowired
     private AliBeanchmarkingService beanchmarkingService;

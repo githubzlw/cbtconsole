@@ -5,8 +5,8 @@ import com.cbt.method.dao.OrderDetailsMethodBean;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public class GetListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(OrderInfoNewController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderInfoNewController.class);
        
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		this.doPost(request, response);

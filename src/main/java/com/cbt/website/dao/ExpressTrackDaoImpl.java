@@ -14,8 +14,8 @@ import com.cbt.website.bean.SearchTaobaoInfo;
 import com.cbt.website.util.Utility;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -26,8 +26,8 @@ import java.util.*;
 import java.util.Date;
 
 public class ExpressTrackDaoImpl implements IExpressTrackDao {
-    private static final Log LOG = LogFactory.getLog(ExpressTrackDaoImpl.class);
-    private static final Log MQLOG = LogFactory.getLog("mq");
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ExpressTrackDaoImpl.class);
+    private final static org.slf4j.Logger MQLOG = LoggerFactory.getLogger("mq");
     // 添加的备注对内
     IOrderwsDao orderwsdao = new OrderwsDao();
 
@@ -4066,7 +4066,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
             }
         }catch (Exception e){
             e.printStackTrace();
-            LOG.error(e);
+            LOG.error("",e);
         }finally {
             DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closePreparedStatement(stmt);

@@ -7,8 +7,8 @@ import com.cbt.processes.dao.ISpiderDao;
 import com.cbt.processes.dao.SpiderDao;
 import com.cbt.processes.utils.Processes;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class SpiderServer implements ISpiderServer {
 	ISpiderDao dao = new SpiderDao();
 	public static int cartNumber = 0;
-	private static final Log LOG = LogFactory.getLog(SpiderServer.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderServer.class);
 	@Override
 	public int addGoogs_car(SpiderBean spider) {
 		int res = dao.addGoogs_car(spider);

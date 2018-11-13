@@ -5,8 +5,8 @@ import com.cbt.feedback.bean.CustomerInfoCollection;
 import com.cbt.feedback.bean.Questionnaire;
 import com.cbt.feedback.service.CustomerInfoCollectionService;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/customerInfoCollection")
 public class CustomerInfoCollectionController {
-	private static final Log LOG = LogFactory.getLog(CustomerInfoCollectionController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CustomerInfoCollectionController.class);
 
 	@Resource
 	private CustomerInfoCollectionService customerInfonService;

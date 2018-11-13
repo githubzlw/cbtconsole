@@ -18,8 +18,8 @@ import com.cbt.util.Application;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class Goods extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(SpiderServer.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderServer.class);
 	
 	/**
 	 * 获取购物车中的商品shop-car.jsp

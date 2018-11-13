@@ -8,8 +8,8 @@ import com.cbt.parse.service.*;
 import com.cbt.parse.thread.CacheThread;
 import com.cbt.util.Cache;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ import java.util.Map;
  *
  */
 public class SearchCacheDriver {
-	private static  final Log LOG = LogFactory.getLog(SearchCacheDriver.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SearchCacheDriver.class);
 	private static IAliSearchCache param_dao = new AliSearchCache();
 	
 	/**缓存读取数据，若缓存中没有，则后台启动缓存保存
@@ -117,7 +117,7 @@ public class SearchCacheDriver {
 			LOG.warn("search from cache");
 			return list;
 		} catch (Exception e) {
-			LOG.warn(e);
+			LOG.warn("",e);
 			return null;
 		}
 	}

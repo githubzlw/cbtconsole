@@ -10,8 +10,8 @@ import com.cbt.service.impl.LogServiceImpl;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class RegServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(RegServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RegServlet.class);
     public RegServlet() {
         super();
     }

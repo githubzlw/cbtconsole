@@ -5,8 +5,8 @@ import com.cbt.util.SpringContextUtil;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.Map;
  *
  */
 public class warehouseThread extends Thread {
-	private static final Log LOG = LogFactory.getLog(warehouseThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(warehouseThread.class);
 	private static IWarehouseService iWarehouseService = (IWarehouseService) SpringContextUtil
 			.getBean("warehouseServiceImpl");;
 

@@ -6,8 +6,8 @@ import com.cbt.customer.service.IGuestBookService;
 import com.cbt.warehouse.pojo.ProblemFeedBackBean;
 import com.cbt.warehouse.service.ProblemFeedBackService;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +33,7 @@ import java.util.Locale;
 @RequestMapping("/problemFeedBack")
 public class ProblemFeedBackController {
 
-	private static final Log LOG = LogFactory.getLog(ProblemFeedBackController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ProblemFeedBackController.class);
 
 	@Autowired
 	private ProblemFeedBackService problemFeedBackService;

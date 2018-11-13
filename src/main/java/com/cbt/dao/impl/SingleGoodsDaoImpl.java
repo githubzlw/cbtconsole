@@ -6,15 +6,15 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Admuser;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SingleGoodsDaoImpl implements SingleGoodsDao {
-    private static final Log LOG = LogFactory.getLog(SingleGoodsDaoImpl.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SingleGoodsDaoImpl.class);
 
     @Override
     public JsonResult saveGoods(String goodsUrl, int adminId, double goodsWeight, int drainageFlag, int goodsType, String aliPid, String aliPrice) {

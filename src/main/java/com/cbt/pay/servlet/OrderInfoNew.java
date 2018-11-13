@@ -17,8 +17,8 @@ import com.cbt.processes.service.UserServer;
 import com.cbt.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -31,7 +31,7 @@ public class OrderInfoNew extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Log LOG = LogFactory.getLog(OrderInfoNew.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderInfoNew.class);
 
 	// 添加新的订单
 	public void addOrder(HttpServletRequest request,
@@ -170,7 +170,7 @@ public class OrderInfoNew extends HttpServlet {
 //				List<Address> addresslist = new ArrayList<Address>();
 				int addressid = 0;
 				
-				LOG.warn(userid);
+				LOG.warn(String.valueOf(userid));
 				/*if (userid != 0) {
 					addresslist = os.getUserAddr(userid);
 					LOG.warn("address list count:" + addresslist.size());

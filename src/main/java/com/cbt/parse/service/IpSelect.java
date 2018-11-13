@@ -1,13 +1,13 @@
 package com.cbt.parse.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.regex.Pattern;
 
 public class IpSelect {
-	private static final Log LOG = LogFactory.getLog(IpSelect.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(IpSelect.class);
 	private static int count = 0;
 //	private static String pat = "(81.17[67].\\d+.\\d+)|(80.241.\\d+.\\d+)|(80.240.2((0[8-9])|(1[0-9])|(2[0-3])).\\d+)"
 //			                  + "|(80.237.\\d+.\\d+)|(81.92.1(([123]\\d)|(4[0-3])).\\d+)|(80.94.((1[6-9])|([2-3][0-9])|(4[0-7])).\\d+)";

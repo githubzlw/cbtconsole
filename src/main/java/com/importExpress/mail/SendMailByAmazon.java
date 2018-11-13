@@ -1,8 +1,8 @@
 package com.importExpress.mail;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class SendMailByAmazon implements SendMail {
 
-    private static final Log logger = LogFactory.getLog(SendMailByAmazon.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMailByAmazon.class);
 
     private static final String FROM = "service@importexpress.com";
     private static final String FROMNAME = "Import-Express.com";

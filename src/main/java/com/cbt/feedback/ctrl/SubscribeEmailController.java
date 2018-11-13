@@ -3,8 +3,8 @@ package com.cbt.feedback.ctrl;
 import com.cbt.feedback.bean.SubscribeEmail;
 import com.cbt.feedback.service.SubscribeEmailService;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/subscribeEmail")
 public class SubscribeEmailController {
-	private static final Log LOG = LogFactory.getLog(SubscribeEmailController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SubscribeEmailController.class);
 
 	@Resource
 	private SubscribeEmailService subscribeEmailService;

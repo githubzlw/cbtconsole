@@ -6,8 +6,8 @@ import com.cbt.email.service.IEmailReceiveService;
 import com.cbt.email.util.SplitPage;
 import com.cbt.messages.service.MessagesService;
 import com.cbt.util.SpringContextUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +26,7 @@ public class EmailReceiveServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MessagesService messagesService = null;
 	private static final int  PAGE_SIZE=30;
-	private static final Log LOG = LogFactory.getLog(EmailReceiveServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(EmailReceiveServlet.class);
 	/**
 	 * 方法描述:获取收件
 	 * author:wy

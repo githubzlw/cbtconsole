@@ -2,8 +2,8 @@ package com.cbt.util;
 
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /*
  * 使用线程上传网络文件
@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
  * netUrl:网络文件链接
  */
 public class FtpUploadNetFileThread implements Runnable {
-	private static final Log LOG = LogFactory.getLog(FtpUploadNetFileThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(FtpUploadNetFileThread.class);
 
 	private String remoteFullFileName;
 

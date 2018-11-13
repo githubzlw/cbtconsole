@@ -13,8 +13,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.importExpress.service.IPurchaseService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 
 public class GoodsSourceComfirmedJob extends QuartzJobBean{
-	private static final Log LOG = LogFactory.getLog(GoodsSourceComfirmedJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsSourceComfirmedJob.class);
 	
 	@Autowired
     private OrderService orderService;

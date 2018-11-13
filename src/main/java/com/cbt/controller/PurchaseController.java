@@ -19,8 +19,8 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.service.IPurchaseService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +37,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/purchase")
 public class PurchaseController {
-	private static final Log LOG = LogFactory.getLog(PurchaseController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PurchaseController.class);
 	private PurchaseServer purchaseServer = new PurchaseServerImpl();
 	@Autowired
 	private IPurchaseService iPurchaseService;

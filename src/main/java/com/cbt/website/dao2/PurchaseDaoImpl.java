@@ -34,8 +34,8 @@ import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 public class PurchaseDaoImpl implements PurchaseDao {
 	IExpressTrackDao dao = new ExpressTrackDaoImpl();
 	IOrderwsServer server = new OrderwsServer();
-	private static final Log LOG = LogFactory.getLog(PurchaseServerImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PurchaseServerImpl.class);
 	int total;
 	int goodsnum = 0;
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -11,8 +11,8 @@ import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import com.cbt.website.dao.IOrderwsDao;
 import com.cbt.website.dao.OrderwsDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequestMapping(value = "/cbt/pay")
 public class PayController {
 	
-	private static final Log LOG = LogFactory.getLog(PayController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PayController.class);
 	
 	@RequestMapping(value = "/topay", method = RequestMethod.POST)
 	@ResponseBody

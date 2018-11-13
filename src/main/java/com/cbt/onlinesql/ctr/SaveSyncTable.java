@@ -4,11 +4,11 @@ import com.cbt.onlinesql.bean.OnlineDataInfo;
 import com.cbt.onlinesql.dao.OnlineDataInfoDao;
 import com.cbt.onlinesql.dao.OnlineDataInfoDaoImpl;
 import com.cbt.util.UniqueIdUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 public class SaveSyncTable {
-	private static final Log LOG = LogFactory.getLog(SaveSyncTable.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SaveSyncTable.class);
 
 	/**
 	 * 插入更新SQL语句到OnlineDataInfo表中

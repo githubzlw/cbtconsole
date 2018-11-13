@@ -9,8 +9,8 @@ import com.cbt.parse.service.GetFilterUtils;
 import com.cbt.parse.service.ParseSearchUrl;
 import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.Map;
  *
  */
 public class CacheThread extends Thread {
-	private  final Log LOG = LogFactory.getLog(CacheThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CacheThread.class);
 	private SearchCacheDriver cacheDriver = new SearchCacheDriver();
 	private String keyword;//搜索关键
 	private String catid;//类别id

@@ -36,8 +36,8 @@ import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +55,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/orderDetails")
 public class NewOrderDetailsCtr {
-	private static final Log LOG = LogFactory.getLog(NewOrderDetailsCtr.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderDetailsCtr.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	@Autowired

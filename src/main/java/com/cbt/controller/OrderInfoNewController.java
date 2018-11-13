@@ -10,8 +10,8 @@ import com.cbt.util.Md5Util;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +28,7 @@ import java.util.*;
 @RequestMapping(value = "/cbt/orderinfonew")
 public class OrderInfoNewController {
 
-	private static final Log LOG = LogFactory.getLog(OrderInfoNewController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderInfoNewController.class);
 	@Autowired
 	private IOrderServer iOrderServer;
 	

@@ -7,8 +7,8 @@ import com.cbt.website.dao.EmailSendInfoDao;
 import com.cbt.website.dao.EmailSendInfoDaoImpl;
 import com.cbt.website.dao.IOrderwsDao;
 import com.cbt.website.dao.OrderwsDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class CheckUnpaidOrderJob implements Job {
 
-	private static final Log LOG = LogFactory.getLog(CheckUnpaidOrderJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CheckUnpaidOrderJob.class);
 	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

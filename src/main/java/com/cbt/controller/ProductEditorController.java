@@ -16,8 +16,8 @@ import com.cbt.website.util.JsonResult;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -44,7 +44,7 @@ import java.util.Map.Entry;
 @Controller
 @RequestMapping(value = "/productEdit")
 public class ProductEditorController {
-	private static final Log LOG = LogFactory.getLog(ProductEditorController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ProductEditorController.class);
 	private String chineseChar = "([\\一-\\龥]+)";
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 

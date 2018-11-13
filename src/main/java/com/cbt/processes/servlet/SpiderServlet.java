@@ -21,8 +21,8 @@ import com.cbt.util.DownloadPage;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * 抓取网页数据,单个商品信息
  */
 public class SpiderServlet extends HttpServlet {
-	private static final Log LOG = LogFactory.getLog(SpiderServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderServlet.class);
 	
 	private static final long serialVersionUID = 1L;
 	

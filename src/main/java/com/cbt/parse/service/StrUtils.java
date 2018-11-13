@@ -1,7 +1,7 @@
 package com.cbt.parse.service;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StrUtils {
-	private static Log LOG = LogFactory.getLog(StrUtils.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(StrUtils.class);
 	
 
 	/**URL编码

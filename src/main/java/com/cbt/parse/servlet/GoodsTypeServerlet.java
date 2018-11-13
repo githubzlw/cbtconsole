@@ -13,8 +13,8 @@ import com.cbt.util.WebCookie;
 import com.cbt.website.service.AliExpress240Sercive;
 import com.cbt.website.service.IAliExpress240Sercive;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  */
 public class GoodsTypeServerlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(GoodsTypeServerlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsTypeServerlet.class);
        
     public GoodsTypeServerlet() {
         super();
@@ -834,7 +834,7 @@ public class GoodsTypeServerlet extends HttpServlet {
 			LOG.warn("get datas from web: "+(new Date().getTime()-st));
 			return map;
 		}catch(Exception e){
-			LOG.warn(e);
+			LOG.warn("",e);
 			throw e;
 		}
 	}

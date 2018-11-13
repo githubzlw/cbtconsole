@@ -15,8 +15,8 @@ import com.cbt.util.Md5Util;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -31,7 +31,7 @@ import java.net.URLEncoder;
 import java.util.*;
 
 public class PaymentServerlet extends HttpServlet {
-	private static final Log LOG = LogFactory.getLog(PaymentServerlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PaymentServerlet.class);
 	/**
 	 * wanyang 付款记录处理
 	 */

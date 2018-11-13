@@ -6,8 +6,8 @@ import com.cbt.parse.dao.PvidDao;
 import com.cbt.parse.dao.ServerDao;
 import com.cbt.parse.daoimp.ICatPvdDao;
 import com.cbt.parse.daoimp.IPvidDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  *
  */
 public class ParseSearchUrl {
-	private static final Log LOG = LogFactory.getLog(ParseSearchUrl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ParseSearchUrl.class);
 	//不使用代理服务器
 	public static ArrayList<SearchGoods> parseSearch(String turl, int cycle, String keyword, String catid, boolean page_flag){
 		long st1 = new Date().getTime();

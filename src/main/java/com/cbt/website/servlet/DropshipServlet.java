@@ -9,8 +9,8 @@ import com.cbt.website.dao.EmailSendInfoDaoImpl;
 import com.cbt.website.server.GoodsServer;
 import com.cbt.website.server.IGoodsServer;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class DropshipServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Log LOG = LogFactory.getLog(DropshipServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DropshipServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

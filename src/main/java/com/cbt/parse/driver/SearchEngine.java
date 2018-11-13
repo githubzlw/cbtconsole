@@ -8,13 +8,13 @@ import com.cbt.parse.dao.AliCategoryDao;
 import com.cbt.parse.dao.CatPvdDao;
 import com.cbt.parse.daoimp.IAliCategoryDao;
 import com.cbt.parse.daoimp.ICatPvdDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 public class SearchEngine {
-	private static final Log LOG = LogFactory.getLog(SearchEngine.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SearchEngine.class);
 	
 	/**sql匹配
 	 * @param keyword

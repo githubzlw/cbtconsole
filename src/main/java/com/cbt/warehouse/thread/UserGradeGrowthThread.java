@@ -6,8 +6,8 @@ import com.cbt.warehouse.pojo.OrderBean;
 import com.cbt.warehouse.pojo.UserGradeGrowthBean;
 import com.cbt.warehouse.pojo.UserGradeGrowthLogBean;
 import com.cbt.warehouse.service.GradeDiscountService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class UserGradeGrowthThread implements Runnable {
 	
-	private final Log LOG = LogFactory.getLog(UserGradeGrowthThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(UserGradeGrowthThread.class);
 	
 	private GradeDiscountService gradeDiscountService = (GradeDiscountService) SpringContextUtil.getBean("gradeDiscountServiceImpl");
 	private int userId;

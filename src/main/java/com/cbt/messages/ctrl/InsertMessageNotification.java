@@ -9,8 +9,8 @@ import com.cbt.website.dao.MsgNotificationDaoImpl;
 import com.cbt.website.userAuth.Dao.AdmUserDao;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +26,7 @@ import java.util.List;
  *
  */
 public class InsertMessageNotification {
-	private static final Log LOG = LogFactory.getLog(InsertMessageNotification.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InsertMessageNotification.class);
 
 	/**
 	 * 提醒类型1，订单备注时给出的提醒

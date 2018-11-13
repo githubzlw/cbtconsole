@@ -1,15 +1,15 @@
 package com.cbt.processes.utils;
 
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Processes {
-	private static final Log LOG = LogFactory.getLog(Processes.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(Processes.class);
 
 	//价格根据数据改变
 	public static String getWPrice(String wprice, int number, double mm, double feeprice_cost){
@@ -42,7 +42,7 @@ public class Processes {
 			priceString =  wp[wp.length-1].split("\\$")[1];
 			priceString = df.format((Double.parseDouble(priceString)-feeprice_cost)*mm);
 		} catch (Exception e) {
-			LOG.debug(e);
+			LOG.error("",e);
 			e.printStackTrace();
 		}
 		return priceString;

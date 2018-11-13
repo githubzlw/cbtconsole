@@ -20,8 +20,8 @@ import com.cbt.website.util.MD5Util;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -56,7 +56,7 @@ import java.util.Map.Entry;
 @Controller
 @RequestMapping(value = "/CoreUrlC")
 public class CoreUrlController {
-	private static final Log LOG = LogFactory.getLog(CoreUrlController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CoreUrlController.class);
 	private String rootPath = "F:/console/tomcatImportCsv/webapps/";
 	private String localIP = "http://27.115.38.42:8083/";
 	private String wanlIP = "http://192.168.1.27:8083/";

@@ -3,8 +3,8 @@ package com.cbt.dao.impl;
 import com.cbt.bean.LevelPageBean;
 import com.cbt.dao.LevelPageDao;
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelPageDaoImpl implements LevelPageDao {
-	private static final Log LOG = LogFactory.getLog(LevelPageDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(LevelPageDaoImpl.class);
 
 	@Override
 	public List<LevelPageBean> getList(int page) {
@@ -50,34 +50,34 @@ public class LevelPageDaoImpl implements LevelPageDao {
 				list.add(bean);
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			if (stmt2 != null) {
 				try {
 					stmt2.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			if (rs2 != null) {
 				try {
 					rs2.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -103,13 +103,13 @@ public class LevelPageDaoImpl implements LevelPageDao {
 			stmt.setInt(5, bean.getId());
 			rs = stmt.executeUpdate();
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -133,13 +133,13 @@ public class LevelPageDaoImpl implements LevelPageDao {
 			rs = stmt.executeUpdate();
 			
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);

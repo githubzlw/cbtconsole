@@ -7,8 +7,8 @@ import com.cbt.website.dao.IOrderSplitDao;
 import com.cbt.website.dao.OrderSplitDaoImpl;
 import com.cbt.website.dao.UpdateCustomFlagDao;
 import com.cbt.website.dao.UpdateCustomFlagDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -22,7 +22,7 @@ import java.util.Properties;
 public class SendEmailOld {
 	private static int count=1;
 	private static int index=0;
-	private static final Log LOG = LogFactory.getLog(SendEmail.class);   
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SendEmail.class);
 	public static final String HOST = "secure.emailsrvr.com"; 
     public static final String NOSSLSMTP_HOST = "smtp.emailsrvr.com";
     public static final String PROTOCOL = "smtp";   
@@ -121,7 +121,7 @@ public class SendEmailOld {
         }
         catch (MessagingException mex) {
             mex.printStackTrace();
-            LOG.error(mex);
+            LOG.error("",mex);
             System.out.println("SendEmail:"+mex);
             splitDao.addMessage_error(title, mex.getMessage(), title+",split_orderNo:" + orderNo+",toEmail:" + toEmail);
             	if(number != 0){
@@ -154,7 +154,7 @@ public class SendEmailOld {
         catch (Exception mex) {
         	LOG.info("发送邮件失败["+count+"]次失败");
             mex.printStackTrace();
-            LOG.error(mex);
+            LOG.error("",mex);
             System.out.println("SendEmail:"+mex);
             splitDao.addMessage_error(email, mex.getMessage(), title+",split_orderNo:" + orderNo+",toEmail:" + toEmail);
             if(count==3){
@@ -210,7 +210,7 @@ public class SendEmailOld {
 	            return 1;
 			}catch (Exception e) {
 				e.printStackTrace();
-				 LOG.error(e);
+				 LOG.error("",e);
 		         System.out.println("SendEmail:"+e);
 		         splitDao.addMessage_error(title, e.getMessage(), title+",split_orderNo:" + orderNo+",toEmail:" + toEmail);
 				return 0;

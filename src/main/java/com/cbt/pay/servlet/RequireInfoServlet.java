@@ -12,8 +12,8 @@ import com.cbt.util.Application;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public class RequireInfoServlet extends HttpServlet {
 	
-	private static final Log LOG = LogFactory.getLog(RequireInfoServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RequireInfoServlet.class);
 	private static final long serialVersionUID = 1L;
        
     /**

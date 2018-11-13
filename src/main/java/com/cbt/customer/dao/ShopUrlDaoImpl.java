@@ -6,8 +6,8 @@ import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.controller.TabSeachPageController;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.Date;
 
 public class ShopUrlDaoImpl implements IShopUrlDao {
-    private static final Log LOG = LogFactory.getLog(ShopUrlDaoImpl.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopUrlDaoImpl.class);
 
     @SuppressWarnings("resource")
     @Override

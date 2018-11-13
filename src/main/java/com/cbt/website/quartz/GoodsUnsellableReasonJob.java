@@ -2,8 +2,8 @@ package com.cbt.website.quartz;
 
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -19,7 +19,7 @@ import java.util.Map.Entry;
  * @date 2018年4月21日
  */
 public class GoodsUnsellableReasonJob implements Job {
-	private static final Log LOG = LogFactory.getLog(GoodsUnsellableReasonJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsUnsellableReasonJob.class);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

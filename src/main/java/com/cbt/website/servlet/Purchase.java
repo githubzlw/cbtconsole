@@ -29,8 +29,8 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
@@ -51,9 +51,9 @@ import java.util.concurrent.*;
 
 @SuppressWarnings("all")
 public class Purchase extends HttpServlet {
-	private static final Log LOG = LogFactory.getLog(Purchase.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(Purchase.class);
 	PurchaseServer purchaseServer = new PurchaseServerImpl();
-	private static final Log SLOG = LogFactory.getLog("source");
+	private final static org.slf4j.Logger SLOG = LoggerFactory.getLogger("source");
 	@Autowired
 	private IWarehouseService iWarehouseService;
 	

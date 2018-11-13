@@ -10,8 +10,8 @@ import com.cbt.warehouse.pojo.TrankBean;
 import com.cbt.warehouse.service.TrackService;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -41,7 +41,7 @@ import java.util.*;
 @RequestMapping("/trackingController")
 public class TrackingController {
 
-	private static final Log LOG = LogFactory.getLog(TrackingController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TrackingController.class);
 	
 	private   SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
  	@Autowired

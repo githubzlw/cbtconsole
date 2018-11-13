@@ -10,8 +10,8 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 public class DownloadMain {
 	private static int count = 0;//链接超时
 	public static final String TYPE = "TYPE_A";
-	private static final Log LOG = LogFactory.getLog(DownloadMain.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DownloadMain.class);
 	
 
 	/**随机数生成函数

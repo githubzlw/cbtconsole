@@ -9,8 +9,8 @@ import com.cbt.util.AppConfig;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +26,7 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/category")
 public class CategoryRefreshController {
-	private static final Log LOG = LogFactory.getLog(CategoryRefreshController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryRefreshController.class);
 	@Autowired
 	private CategoryService categoryService;
 	

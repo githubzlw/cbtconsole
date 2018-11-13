@@ -10,8 +10,8 @@ import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +36,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/goodsComment")
 public class GoodsCommentCtrl {
-	private static final Log LOG = LogFactory.getLog(GoodsCommentCtrl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsCommentCtrl.class);
 	@Autowired
 	private GoodsCommentsService goodsCommentsService;
 	/**

@@ -7,8 +7,8 @@ import com.cbt.util.Md5Util;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +19,7 @@ import java.util.List;
 
 public class NewCloudGoodsDaoImpl implements NewCloudGoodsDao {
 
-	private static final Log LOG = LogFactory.getLog(NewCloudGoodsDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewCloudGoodsDaoImpl.class);
 
 	@Override
 	public List<CategoryBean> getCaterory() {

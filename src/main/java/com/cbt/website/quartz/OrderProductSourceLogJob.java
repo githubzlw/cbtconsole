@@ -5,8 +5,8 @@ import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.website.bean.OrderProductSourceLogBean;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -21,7 +21,7 @@ import java.util.List;
  * @date 2018/06/27 16:06
  */
 public class OrderProductSourceLogJob implements Job {
-	private static final Log LOG = LogFactory.getLog(OrderProductSourceLogJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderProductSourceLogJob.class);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

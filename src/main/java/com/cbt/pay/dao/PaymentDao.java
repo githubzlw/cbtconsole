@@ -4,15 +4,15 @@ import com.cbt.bean.Payment;
 import com.cbt.bean.RechargeRecord;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.StrUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentDao implements IPaymentDao {
-	private static final Log LOG = LogFactory.getLog(PaymentDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PaymentDao.class);
 	@Override
 	public void addPayment(Payment pay) {
 		// TODO Auto-generated method stub

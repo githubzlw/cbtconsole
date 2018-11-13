@@ -2,8 +2,8 @@ package com.cbt.website.quartz;
 
 import com.cbt.website.dao.IReportSyncFreightDao;
 import com.cbt.website.dao.ReportSyncFreightDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ReportSyncFreightJob implements Job {
 
-	private static final Log LOG = LogFactory.getLog(ReportSyncFreightJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ReportSyncFreightJob.class);
 	
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

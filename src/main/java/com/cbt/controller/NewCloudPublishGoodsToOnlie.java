@@ -7,8 +7,8 @@ import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.NewFtpUtil;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewCloudPublishGoodsToOnlie extends Thread {
-	private static final Log LOG = LogFactory.getLog(NewCloudPublishGoodsToOnlie.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewCloudPublishGoodsToOnlie.class);
 
 	private String pid;
 	private NewCloudGoodsService newCloudGoodsService;

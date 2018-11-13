@@ -6,8 +6,8 @@ import com.cbt.processes.service.IPayServer;
 import com.cbt.processes.service.OrderServer;
 import com.cbt.processes.service.PayServer;
 import com.cbt.util.WebCookie;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +26,7 @@ import java.net.URLConnection;
  */
 public class PayServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(PayServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PayServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

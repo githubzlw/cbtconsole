@@ -7,8 +7,8 @@ import com.importExpress.service.EmailStatisticsLogService;
 import com.importExpress.service.OrderSplitService;
 import com.importExpress.service.SendMailService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 @Component
 public class SendEmailNew {
 
-    private static final Log MAILLOG = LogFactory.getLog(SendEmailNew.class);
+    private final static org.slf4j.Logger MAILLOG = LoggerFactory.getLogger(SendEmailNew.class);
 
 
     /*private static OrderSplitService orderSplitService = SpringContextUtil.getBean("orderSplitServiceImpl", OrderSplitService.class);
@@ -46,7 +46,7 @@ public class SendEmailNew {
     private static String bccMailAddr = reader.getProperty("send.mail.bccAddress");
 
     private int index = 0;
-    private static final Log logger = LogFactory.getLog(SendEmailNew.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendEmailNew.class);
     public static final String HOST = "smtp.emailsrvr.com";
     public static final String imap_HOST = "pop.emailsrvr.com";
     public static final String PROTOCOL = "smtp";

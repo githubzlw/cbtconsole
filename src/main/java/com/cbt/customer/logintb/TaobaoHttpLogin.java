@@ -5,8 +5,8 @@ import com.cbt.parse.service.GoodsBean;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.TypeUtils;
 import com.cbt.processes.servlet.Currency;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -44,7 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TaobaoHttpLogin extends HttpServlet {
-	private static final Log LOG = LogFactory.getLog(TaobaoHttpLogin.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TaobaoHttpLogin.class);
 	private static final long serialVersionUID = 1L;
 	
 	private static CookieStore sslcookies = new BasicCookieStore();

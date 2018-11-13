@@ -8,15 +8,15 @@ import com.cbt.parse.service.GoodsBean;
 import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.Md5Util;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 public class GoodsThread extends Thread {
-	private final Log LOG = LogFactory.getLog(GoodsThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsThread.class);
 	private IGoodsDao gd = new GoodsDao();
 	private GoodsBean goods;
 	private Boolean isSource;//货源商品

@@ -1,7 +1,7 @@
 package com.cbt.website.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
@@ -12,7 +12,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class FileTool {
-	private static final Log LOG = LogFactory.getLog(FileTool.class);  
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(FileTool.class);
 	/**
 	 * Description: 向FTP服务器上传文件
 	 * @Version      1.0

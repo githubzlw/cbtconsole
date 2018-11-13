@@ -8,8 +8,8 @@ import com.cbt.parse.service.DownloadMain;
 import com.cbt.util.ContentConfig;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,7 +26,7 @@ import java.util.Map.Entry;
  * @date 2018年2月27日
  */
 public class ShopGoodsToOnline {
-	private static final Log LOG = LogFactory.getLog(ShopGoodsToOnline.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsToOnline.class);
 	//private static final String SHOWURL = "http://192.168.1.100:8765/editimg/shopimg/";
 	//private static final String SHOWURL = "http://192.168.1.219:8765/editimg/shopimg/";
 	private static final String SHOWURL = "http://img1.import-express.com/importcsvimg/shopimg/";

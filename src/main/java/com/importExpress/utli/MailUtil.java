@@ -6,8 +6,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -25,7 +25,7 @@ public class MailUtil {
 	private final  static String MAILGUN_API_KEY;
 	public final static String MAIL_GUN_ADDRESS;
 
-	private static final Log MAILLOG = LogFactory.getLog(MailUtil.class);
+	private final static org.slf4j.Logger MAILLOG = LoggerFactory.getLogger(MailUtil.class);
 	
 	static{
 		ResourceBundle resource = ResourceBundle.getBundle("resource",Locale.getDefault());

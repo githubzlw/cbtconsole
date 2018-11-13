@@ -7,8 +7,8 @@ import com.cbt.fee.dao.MisceDaoImpl;
 import com.cbt.util.Utility;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,7 +28,8 @@ import java.util.Map;
 
 public class MisceServerImpl implements IMisceServer {
 	private IMisceDao misceDao=new MisceDaoImpl();
-	private static final Log LOG = LogFactory.getLog(MisceServerImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(MisceServerImpl.class);
+
 	@Override
 	public String getZipResult(String zipcode){
 		BufferedReader in = null;
@@ -160,10 +161,10 @@ public class MisceServerImpl implements IMisceServer {
             	
 //            	按下列公式计算卡车运费
             	float frwfs=(float) (((0.35 * distancemiles/1000 * pcfClass * 0.0215) * productweight/1000 * 0.0569+130.41)*1.22);
-            	LOG.warn(frwfs);
+            	LOG.warn(String.valueOf(frwfs));
             	float laf= (float) (0.0952*productweight);
-            	LOG.warn(productweight);
-            	LOG.warn(laf);
+            	LOG.warn(String.valueOf(productweight));
+            	LOG.warn(String.valueOf(laf));
             	//卡车运费
             	float tbsf=(float) ((frwfs+laf)*0.1);
             	

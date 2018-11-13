@@ -5,8 +5,8 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class NewSendMQ {
 
-	private static final Log logger = LogFactory.getLog(NewSendMQ.class);
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(NewSendMQ.class);
 
 	/**  优惠卷json数据*/
 	private final static String RECOMMEND_NAME = "recommend";

@@ -4,8 +4,8 @@ import com.cbt.util.OrderInfoConstantUtil;
 import com.cbt.website.userAuth.Dao.AdmUserDao;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * 线上订单/订单详情状态更新校验
@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class CheckCanUpdateUtil {
-	private static final Log LOG = LogFactory.getLog(CheckCanUpdateUtil.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CheckCanUpdateUtil.class);
 
 	/**
 	 * 线下更改线上订单状态校检

@@ -2,8 +2,8 @@ package com.cbt.parse.servlet;
 
 import com.cbt.parse.service.CategoryUtils;
 import com.cbt.util.AppConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class SaveFormServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(SaveFormServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SaveFormServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

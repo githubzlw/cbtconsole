@@ -3,8 +3,8 @@ package com.cbt.method.servlet;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,8 +21,8 @@ import java.util.Date;
  *
  */
 public class SourceServlet extends HttpServlet {
-	private static final org.apache.commons.logging.Log LOG = LogFactory.getLog(SourceServlet.class);
-	private static final Log SLOG = LogFactory.getLog("source");
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SourceServlet.class);
+	private final static org.slf4j.Logger SLOG = LoggerFactory.getLogger("source");
 	private static final long serialVersionUID = 1L;
 	
        

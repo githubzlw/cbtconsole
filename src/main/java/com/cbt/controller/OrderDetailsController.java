@@ -11,8 +11,8 @@ import com.cbt.processes.service.PreferentialServer;
 import com.cbt.processes.servlet.Goods;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 @RequestMapping(value = "/cbt/orderdetails")
 public class OrderDetailsController {
 	
-	private static final Log LOG = LogFactory.getLog(OrderDetailsController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderDetailsController.class);
 
 	@RequestMapping(value = "/discountsView", method = RequestMethod.GET)
 	public String discountsView(HttpServletRequest request, String totalPrice, String country,

@@ -25,8 +25,8 @@ import com.cbt.website.bean.UserBehavior;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -38,7 +38,7 @@ import java.util.Date;
 // 订单管理功能的订单查询过程
 //由 孙秀文 2016-01-26 优化
 public class OrderwsDao implements IOrderwsDao {
-    private static final Log LOG = LogFactory.getLog(OrderwsDao.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderwsDao.class);
     String gdsUrl = null;
     @SuppressWarnings("rawtypes")
     List grlist = new ArrayList();

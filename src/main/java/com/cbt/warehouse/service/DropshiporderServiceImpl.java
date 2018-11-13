@@ -13,8 +13,8 @@ import com.cbt.website.bean.DataGridResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ import java.util.*;
  */
 @Service
 public class DropshiporderServiceImpl implements DropshiporderService {
-	private static final Log LOG = LogFactory.getLog(DropshiporderServiceImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DropshiporderServiceImpl.class);
 
 	@Autowired
 	private DropshiporderMapper dropshiporderMapper;

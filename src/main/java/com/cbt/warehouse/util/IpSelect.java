@@ -1,13 +1,13 @@
 package com.cbt.warehouse.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.regex.Pattern;
 
 public class IpSelect {
-	private static final Log LOG = LogFactory.getLog(IpSelect.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(IpSelect.class);
 	private static int count = 0;
 	private static String pat = "(81\\.((17[67].\\d+)|(9[0-5]\\.\\d+))\\.\\d+)|"
 			+"(81\\.162(\\.\\d+)+)|"

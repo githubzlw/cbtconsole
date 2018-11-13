@@ -22,8 +22,8 @@ import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ import java.util.*;
 
 @Service
 public class OrderinfoService implements IOrderinfoService {
-	private static final Log LOG = LogFactory.getLog(OrderinfoService.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
 	private OrderinfoMapper dao;
 	@Autowired
@@ -50,7 +50,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Autowired
 	private TabTrackInfoMapping tabTrackInfoMapping;
 
-	private static final Log logger = LogFactory.getLog(OrderinfoService.class);
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderinfoService.class);
 
 	@Override
 	public List<Map<String, String>> getOrders(int userID, int state,

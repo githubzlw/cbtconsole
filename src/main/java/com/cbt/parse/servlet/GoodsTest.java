@@ -5,8 +5,8 @@ import com.cbt.parse.driver.DriverInterface;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.parse.service.TypeUtils;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public class GoodsTest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(GoodsTest.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsTest.class);
        
     public GoodsTest() {
         super();

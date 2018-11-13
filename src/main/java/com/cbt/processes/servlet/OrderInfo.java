@@ -13,8 +13,8 @@ import com.cbt.util.WebCookie;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -38,7 +38,7 @@ public class OrderInfo extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static final Log LOG = LogFactory.getLog(OrderInfo.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderInfo.class);
 	
 	
 	//根据状态获取订单

@@ -3,8 +3,8 @@ package com.cbt.change.util;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Orderinfo;
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OnlineOrderInfoDao {
-	private static final Log LOG = LogFactory.getLog(OnlineOrderInfoDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OnlineOrderInfoDao.class);
 
 	/**
 	 * 根据订单号查询订单信息

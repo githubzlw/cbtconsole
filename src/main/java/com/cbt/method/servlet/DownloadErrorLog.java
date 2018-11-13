@@ -5,8 +5,8 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,7 +17,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 public class DownloadErrorLog {
-	private static final Log LOG = LogFactory.getLog(DownloadErrorLog.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(DownloadErrorLog.class);
 	public static void main(String[] args) {
 		///usr/local/tomcat7/logs/cbtprogram2016  "192.168.1.32", 22, "downloaderrlog", "root@123", "./cbtprogram2016"
 		//new DownloadErrorLog().listFileNames("192.168.1.32", 22, "root", "root123", "/root/log");

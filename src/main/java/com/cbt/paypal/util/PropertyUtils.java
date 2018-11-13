@@ -2,8 +2,8 @@ package com.cbt.paypal.util;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.Assert;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class PropertyUtils {
 
-    private static final Log logger = LogFactory.getLog(PropertyUtils.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
     private static final String RESOURCE_FILE = "../../../../resourc.eproperties";
     private static final String PAYPAL_FILE = "../../../../paypal.properties";
     /**

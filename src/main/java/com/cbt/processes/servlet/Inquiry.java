@@ -7,8 +7,8 @@ import com.cbt.processes.service.ISpiderServer;
 import com.cbt.processes.service.InquiryServer;
 import com.cbt.processes.service.SpiderServer;
 import com.cbt.util.WebCookie;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -29,7 +29,7 @@ public class Inquiry extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final Log LOG = LogFactory.getLog(Inquiry.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(Inquiry.class);
 
 	/**
 	 * ylm

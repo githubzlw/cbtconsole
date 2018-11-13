@@ -4,8 +4,8 @@ import com.cbt.change.bean.OrderDetailsChangeRecords;
 import com.cbt.change.bean.OrderDetailsChangeRecordsQuery;
 import com.cbt.change.service.OrderDetailsChangeRecordsService;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/orderDetailsChangeRecords")
 public class OrderDetailsChangeRecordsController {
 
-	private static final Log LOG = LogFactory.getLog(OrderDetailsChangeRecordsController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderDetailsChangeRecordsController.class);
 
 	@Resource
 	private OrderDetailsChangeRecordsService detailsChangeService;

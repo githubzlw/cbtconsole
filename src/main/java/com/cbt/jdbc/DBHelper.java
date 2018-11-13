@@ -7,8 +7,8 @@ package com.cbt.jdbc;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DBHelper {
 
-    private static final Log logger = LogFactory.getLog(DBHelper.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(DBHelper.class);
 
     private static DruidDataSource dataSource = null;
     private static ComboPooledDataSource dataSource2 = null;
@@ -69,12 +69,12 @@ public class DBHelper {
                     p = new Properties();
                     p.load(ins);
                 } catch (IOException ioe) {
-                    logger.error(ioe);
+                    logger.error("DBHelper",ioe);
                 }finally {
                     try{
                         ins.close();
                     }catch (IOException ioe){
-                        logger.error(ioe);
+                        logger.error("DBHelper",ioe);
                     }
                 }
                 initDataSource(p);
@@ -265,7 +265,7 @@ public class DBHelper {
             try {
                 instance = new DBHelper();
             } catch (Exception e) {
-                logger.error(e);
+                logger.error("",e);
             }
         }
         return instance;
@@ -281,7 +281,7 @@ public class DBHelper {
             conn = dataSource.getConnection();
             logger.info("取得数据库连接+1 (#1),连接数：" + totalConnect1.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection",e);
             throw new RuntimeException("getConnection ERROR");
         }
         return conn;
@@ -297,7 +297,7 @@ public class DBHelper {
             conn = dataSource2.getConnection();
             logger.info("取得数据库连接+1 (#2),连接数：" + totalConnect2.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection2",e);
             throw new RuntimeException("getConnection2 ERROR");
         }
         return conn;
@@ -313,7 +313,7 @@ public class DBHelper {
             conn = dataSource3.getConnection();
             logger.info("取得数据库连接+1 (#3),连接数：" + totalConnect3.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection3",e);
             throw new RuntimeException("getConnection3 ERROR");
         }
         return conn;
@@ -329,7 +329,7 @@ public class DBHelper {
             conn = dataSource4.getConnection();
             logger.info("取得数据库连接+1 (#4),连接数：" + totalConnect4.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection4",e);
             throw new RuntimeException("getConnection4 ERROR");
         }
         return conn;
@@ -345,7 +345,7 @@ public class DBHelper {
             conn = dataSource5.getConnection();
             logger.info("取得数据库连接+1 (#5),连接数：" + totalConnect5.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection5",e);
             throw new RuntimeException("getConnection5 ERROR");
         }
         return conn;
@@ -361,7 +361,7 @@ public class DBHelper {
             conn = dataSource6.getConnection();
             logger.info("取得数据库连接+1 (#6),连接数：" + totalConnect6.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection6",e);
             throw new RuntimeException("getConnection6 ERROR");
         }
         return conn;
@@ -377,7 +377,7 @@ public class DBHelper {
             conn = dataSource7.getConnection();
             logger.info("取得数据库连接+1 (#7),连接数：" + totalConnect7.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection7",e);
             throw new RuntimeException("getConnection7 ERROR");
         }
         return conn;
@@ -393,7 +393,7 @@ public class DBHelper {
             conn = dataSource8.getConnection();
             logger.info("取得数据库连接+1 (#8),连接数：" + totalConnect8.incrementAndGet() + ",返回总数/获取总数：" + totalDisConnectNum + "/" + totalConnectNum.incrementAndGet());
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection8",e);
             throw new RuntimeException("getConnection8 ERROR");
         }
         return conn;
@@ -407,7 +407,7 @@ public class DBHelper {
                 logger.info("释放数据库连接-1,总返回数量：" + totalDisConnectNum.incrementAndGet());
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("getConnection",e);
         }
     }
 
@@ -418,7 +418,7 @@ public class DBHelper {
                 stmt.close();
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("closePreparedStatement",e);
         }
     }
     
@@ -428,7 +428,7 @@ public class DBHelper {
                 rs.close();
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("closeResultSet",e);
         }
     }
 
@@ -438,7 +438,7 @@ public class DBHelper {
                 conn.rollback();
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("rollbackConnection",e);
         }
     }
 
@@ -448,7 +448,7 @@ public class DBHelper {
                 stmt.close();
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("closeStatement",e);
         }
     }
 

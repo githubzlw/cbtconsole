@@ -7,8 +7,8 @@ import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.dao.PaymentDao;
 import com.cbt.website.dao.PaymentDaoImp;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.ServletException;
@@ -26,7 +26,7 @@ import java.util.List;
 @Controller
 public class PaypalCheckServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(PaypalCheckServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PaypalCheckServlet.class);
 	private RefundSSService  refundDao = new RefundServiceImpl(); 
 	
 	
@@ -94,7 +94,7 @@ public class PaypalCheckServlet extends HttpServlet {
 			list.add(pb);
 			//request.setAttribute("allTotalMoney", allTotalMoney);
 		} catch (Exception e) {
-			LOG.warn(e);
+			LOG.warn("",e);
 		}finally{
 			out.print(JSONArray.fromObject(list));
 			out.flush();

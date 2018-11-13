@@ -3,8 +3,8 @@ package com.cbt.dao.impl;
 import com.cbt.bean.CustomOnlineGoodsBean;
 import com.cbt.dao.SyncPidToOnlineDao;
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SyncPidToOnlineDaoImpl implements SyncPidToOnlineDao {
-	private static final Log LOG = LogFactory.getLog(SyncPidToOnlineDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SyncPidToOnlineDaoImpl.class);
 
 	@Override
 	public CustomOnlineGoodsBean queryGoodsInfoByPid(String goodsPid, String dealTable) {

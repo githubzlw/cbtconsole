@@ -3,8 +3,8 @@ package com.importExpress.service.impl;//package com.cn.hnust.service.impl;
 import com.cbt.util.Utility;
 import com.importExpress.service.SendMailService;
 import com.importExpress.utli.PropertiesUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,7 +29,7 @@ public class SendMailServiceImpl implements SendMailService {
     private static String bccMailAddr = reader.getProperty("send.mail.bccAddress");
     private static String nickName = reader.getProperty("nick.name");
 
-    private static final Log MAILLOG = LogFactory.getLog("maillog");
+    private final static org.slf4j.Logger MAILLOG = LoggerFactory.getLogger("maillog");
 
 
     @Resource

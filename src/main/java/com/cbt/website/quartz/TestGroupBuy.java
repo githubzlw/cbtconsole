@@ -6,14 +6,14 @@ import com.cbt.warehouse.dao.GroupBuyDao;
 import com.cbt.warehouse.dao.GroupBuyDaoImpl;
 import com.cbt.warehouse.pojo.GroupBuyManageBean;
 import com.cbt.warehouse.pojo.UserCouponBean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class TestGroupBuy {
-    private static final Log LOG = LogFactory.getLog(TestGroupBuy.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TestGroupBuy.class);
     private static final SimpleDateFormat sdfNoHour = new SimpleDateFormat("yyyy-MM-dd");
     private static GroupBuyDao gbDao = new GroupBuyDaoImpl();
 

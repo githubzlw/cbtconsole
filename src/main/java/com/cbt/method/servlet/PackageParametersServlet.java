@@ -2,7 +2,7 @@ package com.cbt.method.servlet;
 
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +18,7 @@ import java.io.PrintWriter;
  *
  */
 public class PackageParametersServlet extends HttpServlet {
-	private static final org.apache.commons.logging.Log LOG = LogFactory.getLog(PackageParametersServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PackageParametersServlet.class);
 	private static final long serialVersionUID = 1L;
        
 

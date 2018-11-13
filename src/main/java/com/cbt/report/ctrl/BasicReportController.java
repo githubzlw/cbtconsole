@@ -14,8 +14,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -37,7 +37,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/basicStatistical")
 public class BasicReportController {
-	private static final Log LOG = LogFactory.getLog(BasicReportController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(BasicReportController.class);
 
 	private static final String EXTENSION_XLS = "xls";
 	private static final String EXTENSION_XLSX = "xlsx";

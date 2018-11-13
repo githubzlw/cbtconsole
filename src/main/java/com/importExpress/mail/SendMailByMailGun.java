@@ -6,8 +6,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -22,7 +22,7 @@ public class SendMailByMailGun implements SendMail {
     private final static String MAILGUN_DOMAIN_NAME = "mg.import-express.com";
     private final static String MAILGUN_API_KEY = "key-5af11fc491becf8970b5c8eb45bbf6af";
     private final static String MAIL_GUN_ADDRESS = "Import-Express.com<admin@importx.com>";
-    private static final Log logger = LogFactory.getLog(SendMailByMailGun.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMailByMailGun.class);
     private static HostnameVerifier hv = (urlHostName, session) -> {
         logger.info("Warning: URL Host: " + urlHostName + " vs. "
                 + session.getPeerHost());

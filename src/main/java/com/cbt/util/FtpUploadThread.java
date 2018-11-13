@@ -1,8 +1,8 @@
 package com.cbt.util;
 
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /*
  * 使用线程上传文件
@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
  * localFullFileName:本地文件全路径名称
  */
 public class FtpUploadThread implements Runnable {
-	private static final Log LOG = LogFactory.getLog(FtpUploadThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(FtpUploadThread.class);
 
 	private String remoteFullFileName;
 

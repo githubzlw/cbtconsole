@@ -5,8 +5,8 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.warehouse.util.DownloadMainUtil;
 import com.cbt.warehouse.util.Set;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class SpiderAliexpress {
-	private static final Log LOG = LogFactory.getLog(SpiderAliexpress.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderAliexpress.class);
 	/**
 	 * 根据url 获取抓取的相关信息
 	 * @param url

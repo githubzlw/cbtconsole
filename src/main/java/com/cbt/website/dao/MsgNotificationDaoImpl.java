@@ -2,13 +2,13 @@ package com.cbt.website.dao;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.MessageNotification;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
 public class MsgNotificationDaoImpl implements MsgNotificationDao {
-	private static final Log LOG = LogFactory.getLog(MsgNotificationDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(MsgNotificationDaoImpl.class);
 
 	@Override
 	public void insertMessageNotification(MessageNotification messageNotification) throws Exception {

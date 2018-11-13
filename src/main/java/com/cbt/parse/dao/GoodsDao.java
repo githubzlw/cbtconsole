@@ -3,8 +3,8 @@ package com.cbt.parse.dao;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.bean.GoodsDaoBean;
 import com.cbt.parse.daoimp.IGoodsDao;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,7 @@ import java.util.Date;
  *set session transaction isolation level read uncommitted;
  */
 public class GoodsDao implements IGoodsDao{
-	private static final Log LOG = LogFactory.getLog(GoodsDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsDao.class);
 	/**添加一条数据信息
 	 * @param 
 	 * @return

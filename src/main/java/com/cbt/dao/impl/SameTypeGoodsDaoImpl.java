@@ -7,8 +7,8 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.Md5Util;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SameTypeGoodsDaoImpl implements SameTypeGoodsDao {
-	private static final Log LOG = LogFactory.getLog(SameTypeGoodsDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SameTypeGoodsDaoImpl.class);
 
 	@Override
 	public JsonResult batchAddUrl(String mainUrl, String urls, int adminId, int typeFlag, double aveWeight) {

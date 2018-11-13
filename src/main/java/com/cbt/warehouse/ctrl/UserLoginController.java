@@ -10,8 +10,8 @@ import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
 import com.cbt.website.userAuth.impl.UserAuthDaoImpl;
 import com.cbt.website.util.JsonResult;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,7 +25,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/userLogin")
 public class UserLoginController {
-	private static final Log LOG = LogFactory.getLog(HotGoodsCtrl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(HotGoodsCtrl.class);
 
 	/**
 	 * 判断用户信息

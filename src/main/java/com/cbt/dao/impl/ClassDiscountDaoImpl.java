@@ -3,8 +3,8 @@ package com.cbt.dao.impl;
 import com.cbt.bean.DiscountBean;
 import com.cbt.dao.ClassDiscountDao;
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassDiscountDaoImpl implements ClassDiscountDao {
-	private static final Log LOG = LogFactory.getLog(ClassDiscountDaoImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ClassDiscountDaoImpl.class);
 
 	@Override
 	public List<DiscountBean> getDiscount(String catid,String price,String desopite) {
@@ -63,20 +63,20 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 				list.add(bean);
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -102,13 +102,13 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 			stmt.setInt(6, bean.getClassType());
 			rs = stmt.executeUpdate();
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -128,13 +128,13 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 			stmt.setInt(1,id);
 			rs = stmt.executeUpdate();
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -161,13 +161,13 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 			stmt.setInt(7, bean.getId());
 			rs = stmt.executeUpdate();
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);
@@ -192,20 +192,20 @@ public class ClassDiscountDaoImpl implements ClassDiscountDao {
 			}
 			
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("",e);
 		} finally {
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					LOG.error(e);
+					LOG.error("",e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);

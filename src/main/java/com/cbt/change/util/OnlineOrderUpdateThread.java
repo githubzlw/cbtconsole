@@ -3,15 +3,15 @@ package com.cbt.change.util;
 import com.cbt.bean.Orderinfo;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.messages.ctrl.InsertMessageNotification;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class OnlineOrderUpdateThread implements Runnable {
-	private static final Log LOG = LogFactory.getLog(OnlineOrderUpdateThread.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OnlineOrderUpdateThread.class);
 
 	private String orderNo;// 订单号
 	private int adminId;// 操作人id

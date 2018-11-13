@@ -10,8 +10,8 @@ import com.cbt.util.Utility;
 import com.cbt.website.service.IPreferentialwServer;
 import com.cbt.website.service.PreferentialwServer;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class PreferentialwServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(PreferentialwServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PreferentialwServlet.class);
 	
 //	private MessagesService messagesService = new MessagesServiceImpl();
 	

@@ -6,8 +6,8 @@ import com.cbt.warehouse.dao.GroupBuyDao;
 import com.cbt.warehouse.dao.GroupBuyDaoImpl;
 import com.cbt.warehouse.pojo.GroupBuyManageBean;
 import com.cbt.warehouse.pojo.UserCouponBean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -20,7 +20,7 @@ import java.util.*;
  * 执行计算用户下单后包含团购活动商品的折扣金额，作为优惠券返还给客户，并记录优惠券金额
  */
 public class GroupBuyJob implements Job {
-    private static final Log LOG = LogFactory.getLog(GroupBuyJob.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GroupBuyJob.class);
     private static final SimpleDateFormat sdfNoHour = new SimpleDateFormat("yyyy-MM-dd");
     //private static final SimpleDateFormat sdfAll = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static GroupBuyDao gbDao = new GroupBuyDaoImpl();

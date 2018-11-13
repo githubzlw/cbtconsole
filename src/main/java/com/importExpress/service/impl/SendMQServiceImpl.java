@@ -5,8 +5,8 @@ import com.importExpress.service.SendMQService;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
@@ -21,7 +21,7 @@ import java.sql.SQLException;
 @Service
 public class SendMQServiceImpl implements SendMQService {
 	
-	private static final Log LOG = LogFactory.getLog(SendMQServiceImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SendMQServiceImpl.class);
 
 	//通过mq更新线上数据并保存更新记录到本地 成功返回1 否则返回0
 	@Override

@@ -1,8 +1,8 @@
 package com.cbt.website.thread;
 
 import com.cbt.jdbc.DBHelper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
  * @version 创建时间：2016年11月18日 上午9:58:13 类说明 :异步操作
  */
 public class PurchaseThred extends Thread {
-	private static final Log LOG = LogFactory.getLog(PurchaseThred.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PurchaseThred.class);
 	private String orderNo;
 	private Integer od_id;
 	private String sqlc;

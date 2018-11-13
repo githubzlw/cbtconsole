@@ -4,15 +4,15 @@ import com.cbt.website.dao.AliExpress240Dao;
 import com.cbt.website.dao.IAliExpress240Dao;
 import com.cbt.website.servlet.Aliexpress_top120;
 import com.cbt.website.util.FileTool;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadImgThred  implements Runnable {
 
-	private static final Log LOG = LogFactory.getLog(Aliexpress_top120.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(Aliexpress_top120.class);
    public static final List<String[]> listimg = new ArrayList<String[]>();
    public static boolean Flag = true;
    public IAliExpress240Dao dao = new AliExpress240Dao();

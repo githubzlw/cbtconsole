@@ -9,8 +9,8 @@ import com.importExpress.service.SaleprofitrateService;
 import com.importExpress.utli.SaleProfitRateUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +31,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/saleprofitrate")
 public class SaleprofitrateController{
-    private static final Log logger = LogFactory.getLog(SaleprofitrateController.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SaleprofitrateController.class);
     @Autowired
     private SaleprofitrateService saleprofitrateService; 
     @RequestMapping("/insertInfo")

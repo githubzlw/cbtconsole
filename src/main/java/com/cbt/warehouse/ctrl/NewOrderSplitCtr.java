@@ -8,8 +8,8 @@ import com.cbt.website.dao.*;
 import com.cbt.website.service.IOrderSplitServer;
 import com.cbt.website.service.OrderSplitServer;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,7 +29,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/orderSplit")
 public class NewOrderSplitCtr {
-	private static final Log LOG = LogFactory.getLog(NewOrderSplitCtr.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
 
 	/**
 	 * 订单拆分(正常订单和Drop Ship订单)

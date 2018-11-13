@@ -75,8 +75,8 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -136,7 +136,7 @@ public class WarehouseCtrl {
 	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
 	private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
 	private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
-	private static final Log LOG = LogFactory.getLog(WarehouseCtrl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseCtrl.class);
 
 	IExpressTrackDao expressTrackDao= new ExpressTrackDaoImpl();
 

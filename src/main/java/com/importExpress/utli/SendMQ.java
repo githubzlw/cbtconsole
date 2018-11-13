@@ -7,8 +7,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class SendMQ {
 
-    private static final Log logger = LogFactory.getLog(SendMQ.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMQ.class);
 
     /** 直接执行的sql 及 下架*/
     private final static String QUEUE_NAME = "updateTbl";

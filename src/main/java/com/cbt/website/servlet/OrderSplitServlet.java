@@ -14,8 +14,8 @@ import com.cbt.website.service.IOrderSplitServer;
 import com.cbt.website.service.OrderSplitServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,7 +30,7 @@ import java.util.*;
 public class OrderSplitServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(OrderwsServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderwsServlet.class);
 	String urlll = null;
     
     /**

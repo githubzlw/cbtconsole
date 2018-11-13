@@ -3,12 +3,12 @@ package com.cbt.service.impl;
 import com.cbt.service.InitCacheService;
 import com.cbt.website.userAuth.Dao.AuthInfoDao;
 import com.cbt.website.userAuth.impl.AuthInfoDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 public class InitCacheServiceImpl implements InitCacheService{
 	
-	private static final Log LOG = LogFactory.getLog(InitCacheServiceImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(InitCacheServiceImpl.class);
 	
 	@Override
 	public void init() throws Exception {

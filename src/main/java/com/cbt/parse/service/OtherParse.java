@@ -2,8 +2,8 @@ package com.cbt.parse.service;
 
 import com.cbt.parse.bean.TypeBean;
 import com.cbt.util.AppConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  *
  */
 public class OtherParse {
-	private  final Log LOG = LogFactory.getLog(OtherParse.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OtherParse.class);
 	private  ArrayList<String> pImage = new ArrayList<String>();//商品图片
 	private  ArrayList<String> price = new ArrayList<String>();//批发价格
 	private  ArrayList<TypeBean> types = new ArrayList<TypeBean>();//颜色 尺寸

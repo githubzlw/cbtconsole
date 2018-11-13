@@ -6,8 +6,8 @@ import com.cbt.customer.dao.ShopUrlDaoImpl;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.util.ContentConfig;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 2018年3月2日
  */
 public class ShopGoodsToOnlineWhole {
-	private static final Log LOG = LogFactory.getLog(ShopGoodsToOnlineWhole.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsToOnlineWhole.class);
 	private static final String LOCALSHOPZIPPAHT = "http://117.144.21.74:9000/";
 	//private static final String SHOWURL = "http://192.168.1.100:8765/editimg/shopimg/";
 	private static final String SHOWURL = "http://img1.import-express.com/importcsvimg/shopimg/";

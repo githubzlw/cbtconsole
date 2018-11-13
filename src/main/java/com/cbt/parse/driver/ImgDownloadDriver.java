@@ -7,8 +7,8 @@ import com.cbt.parse.daoimp.IOneSixExpressDao;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.TypeUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ImgDownloadDriver {
-	private static final Log LOG = LogFactory.getLog(ImgDownloadDriver.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ImgDownloadDriver.class);
 	
 	public static String driver(int id1,int id2,int index) throws Exception{
 		ImgFileDao  imgdao = new ImgFileDao();

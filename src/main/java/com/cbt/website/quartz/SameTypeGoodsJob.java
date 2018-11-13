@@ -8,8 +8,8 @@ import com.cbt.parse.service.DownloadMain;
 import com.cbt.util.ContentConfig;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,7 +29,7 @@ import java.util.Map.Entry;
  * @date 2018年1月23日
  */
 public class SameTypeGoodsJob implements Job {
-	private static final Log LOG = LogFactory.getLog(SameTypeGoodsJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SameTypeGoodsJob.class);
 	
 	//private static final String SHOWURL = "http://192.168.1.100:8765/editimg/sametype/";
 	//private static final String SHOWURL = "http://192.168.1.29:8765/editimg/sametype/";

@@ -24,8 +24,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class WarehouseServiceImpl implements IWarehouseService {
-    private  static final Log LOG=LogFactory.getLog(WarehouseServiceImpl.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseServiceImpl.class);
     @Autowired
     private IWarehouseDao dao;
     @Autowired

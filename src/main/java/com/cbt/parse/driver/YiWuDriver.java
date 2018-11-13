@@ -4,8 +4,8 @@ import com.cbt.parse.bean.*;
 import com.cbt.parse.dao.YiWuDao;
 import com.cbt.parse.daoimp.IYiWuDao;
 import com.cbt.parse.service.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  *
  */
 public class YiWuDriver {
-	private static final Log LOG = LogFactory.getLog(YiWuDriver.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(YiWuDriver.class);
 	private static IYiWuDao iywd = new YiWuDao();
 	private ArrayList<String> price = new ArrayList<String>();
 	private static DecimalFormat format = new DecimalFormat("#0.00");

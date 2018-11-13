@@ -5,8 +5,8 @@ import com.cbt.dao.SyncPidToOnlineDao;
 import com.cbt.dao.impl.SyncPidToOnlineDaoImpl;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ import java.io.File;
  * @date 2018年3月8日
  */
 public class SyncSingleGoodsToOnlineUtil {
-	private static final Log LOG = LogFactory.getLog(SyncSingleGoodsToOnlineUtil.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SyncSingleGoodsToOnlineUtil.class);
 
 	/**
 	 * ZIP文件临时存放路径

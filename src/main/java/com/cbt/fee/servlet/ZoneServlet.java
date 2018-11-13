@@ -10,8 +10,8 @@ import com.cbt.util.Redis;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class ZoneServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(MisceServerImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(MisceServerImpl.class);
 	
 	//获取zone分区表的数据
 	public void getAllZone(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

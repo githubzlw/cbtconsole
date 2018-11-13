@@ -9,8 +9,8 @@ import com.cbt.parse.daoimp.IAliCategoryDao;
 import com.cbt.util.Application;
 import com.cbt.util.PropertiesFile;
 import com.cbt.util.Utility;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class SearchUtils {
 
-	private static final Log LOG = LogFactory.getLog(SearchUtils.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SearchUtils.class);
 	
 	/**unicode解码
 	 * @param str

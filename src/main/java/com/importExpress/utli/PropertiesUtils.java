@@ -10,8 +10,8 @@
 package com.importExpress.utli;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -29,7 +29,7 @@ import java.util.Properties;
 public class PropertiesUtils {
 
 
-    private static final Log logger = LogFactory.getLog(PropertiesUtils.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
 
     private static ResourceLoader resourceLoader = new DefaultResourceLoader();
 

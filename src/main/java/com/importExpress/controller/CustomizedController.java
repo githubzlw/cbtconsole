@@ -3,8 +3,8 @@ package com.importExpress.controller;
 import com.importExpress.pojo.CustomizedBean;
 import com.importExpress.service.CustomizedService;
 import net.sf.json.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ import java.io.*;
 @RequestMapping("/customized")
 public class CustomizedController {
 	
-	private static final Log logger = LogFactory.getLog(CustomizedController.class);
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(CustomizedController.class);
 
 	@Autowired
 	private CustomizedService customizedService;
@@ -91,7 +91,7 @@ public class CustomizedController {
 				}
 				bos.flush();
 			}catch(Exception e){
-				logger.error(e);
+				logger.error("",e);
 			}finally {
 				if(bis != null)
 					bis.close();

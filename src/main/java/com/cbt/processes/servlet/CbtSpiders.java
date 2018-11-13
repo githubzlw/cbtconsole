@@ -4,8 +4,8 @@ import com.cbt.parse.bean.SearchGoods;
 import com.cbt.parse.service.ParseSearchUrl;
 import com.cbt.parse.service.SearchUtils;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class CbtSpiders extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(CbtSpiders.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CbtSpiders.class);
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -105,7 +105,7 @@ public class CbtSpiders extends HttpServlet {
 			}
 			search = null;
 		}catch(Exception e){
-			LOG.warn(e);
+			LOG.warn("",e);
 		}finally{
 			if(out!=null){
 				out.print(JSONArray.fromObject(list));

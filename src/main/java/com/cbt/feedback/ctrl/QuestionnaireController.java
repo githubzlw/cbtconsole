@@ -3,8 +3,8 @@ package com.cbt.feedback.ctrl;
 import com.cbt.feedback.bean.Questionnaire;
 import com.cbt.feedback.service.QuestionnaireService;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/questionnaire")
 public class QuestionnaireController {
-	private static final Log LOG = LogFactory.getLog(QuestionnaireController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(QuestionnaireController.class);
 
 	@Resource
 	private QuestionnaireService questionnaireService;

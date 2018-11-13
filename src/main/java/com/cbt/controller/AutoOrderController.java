@@ -14,8 +14,8 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.dao.PaymentDao;
 import com.cbt.website.dao.PaymentDaoImp;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +35,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/autoorder")
 public class AutoOrderController {
-	private static final Log LOG = LogFactory.getLog(AutoOrderController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(AutoOrderController.class);
 	@Autowired
 	private AutoOrderService autoOrderService ;
 	@Autowired

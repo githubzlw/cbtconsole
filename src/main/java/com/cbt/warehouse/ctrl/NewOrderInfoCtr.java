@@ -7,8 +7,8 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/orderInfo")
 public class NewOrderInfoCtr {
-	private static final Log LOG = LogFactory.getLog(NewOrderInfoCtr.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderInfoCtr.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	/**

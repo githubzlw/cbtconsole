@@ -10,8 +10,8 @@ import com.cbt.util.SendRedirectPage;
 import com.cbt.util.Utility;
 import com.cbt.util.WebCookie;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -39,7 +39,7 @@ import java.util.Map;
 public class FacebookCallback extends HttpServlet {
 	private static final long serialVersionUID = 1L;
       
-	private static final Log LOG = LogFactory.getLog(FacebookCallback.class);  
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(FacebookCallback.class);
    
     public FacebookCallback() {
         super();
@@ -185,7 +185,7 @@ public class FacebookCallback extends HttpServlet {
 		try {
 		ui = new URI(url);
 		LOG.warn(ui.getHost());
-		LOG.warn(ui.isAbsolute());
+		LOG.warn(String.valueOf(ui.isAbsolute()));
 		LOG.warn(url);
 
 		HttpClient hc = null;

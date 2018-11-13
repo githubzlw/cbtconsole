@@ -11,8 +11,8 @@ import com.cbt.website.dao.OrderwsDao;
 import com.cbt.website.userAuth.Dao.AdmUserDao;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class CheckDeliveryWarningJob implements Job {
 
-	private static final Log LOG = LogFactory.getLog(CheckDeliveryWarningJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CheckDeliveryWarningJob.class);
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {

@@ -9,8 +9,8 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.Utility;
 import com.importExpress.service.impl.SendMQServiceImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class OrderDao implements IOrderDao{
 
-	private static final Log LOG = LogFactory.getLog(OrderDao.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderDao.class);
 
 /*	@Override
 	public List<OrderDetailsBean> getOrders(int userID, int state, int startpage,int page) {

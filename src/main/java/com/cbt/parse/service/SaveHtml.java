@@ -12,8 +12,8 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,7 +30,7 @@ public class SaveHtml {
 	public static Boolean isRun_search = true;
 	public static Boolean isRun_goods = true;
 //	private static  String filepath;
-	private static final Log LOG = LogFactory.getLog(SaveHtml.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SaveHtml.class);
 	
 	/**解析url内容，写入html文件
 	 * @param url

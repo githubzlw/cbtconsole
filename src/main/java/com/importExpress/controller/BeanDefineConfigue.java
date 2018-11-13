@@ -3,8 +3,8 @@ package com.importExpress.controller;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.utli.MongoDBHelp;
 import com.rabbitmq.client.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -17,7 +17,7 @@ public class BeanDefineConfigue implements
  //@Autowired
  private SendMailFactory sendMailFactory;
 
-    private static final Log logger = LogFactory.getLog(BeanDefineConfigue.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(BeanDefineConfigue.class);
 
     /**  Queue Name*/
     private final static String QNAME_MAIL = "mail";

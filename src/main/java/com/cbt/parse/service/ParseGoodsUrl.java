@@ -17,8 +17,8 @@ import com.cbt.util.AppConfig;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,7 +39,7 @@ public class ParseGoodsUrl {
 	private final static String PATE = "([hH]ot\\s*[sS]ale,*!*\\:*)|([fF][rR][eE]*\\s*[sS][hH][iI][pP]+[iI][nN][gG],*!*\\:*)|(\\d*%*\\s*[bB]rand\\s*[nN]ew,*!*\\:*)"
 							+ "|([tT]op\\s*[rR]ated,*!*\\:*)|([lL]owest\\s*[pP]rice,*!*\\:*)|(\\(*[sS]hip\\s*[fF]rom\\s*[uU][sS]\\)*,*!*\\:*)"
 							+ "|([hH]igh\\s*[qQ]uality,*!*\\:*)|(2015,*!*\\:*)|([pP][aA][nN][dD][oO][rR][aA])";
-	private static final Log LOG = LogFactory.getLog(ParseGoodsUrl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ParseGoodsUrl.class);
 	private static IGoodsDao gd = new GoodsDao();
 	private static String t_url = "http://116.228.150.218:8083/translation/gettrans?catid=0&cntext=";
 	

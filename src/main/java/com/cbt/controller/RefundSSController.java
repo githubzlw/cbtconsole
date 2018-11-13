@@ -27,8 +27,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +52,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/refundss")
 public class RefundSSController {
-    private static final Log LOG = LogFactory.getLog(RefundSSController.class);
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RefundSSController.class);
 
     @Autowired
     private UserServer userServer;

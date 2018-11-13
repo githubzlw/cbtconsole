@@ -7,8 +7,8 @@ import com.cbt.parse.daoimp.IGoodsExpandDao;
 import com.cbt.parse.daoimp.IHotWordDao;
 import com.cbt.parse.driver.FtpDriver;
 import com.cbt.parse.driver.ImgDownloadDriver;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 
 import javax.servlet.ServletException;
@@ -26,7 +26,7 @@ import java.util.HashMap;
  */
 public class GoodsConfigServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(GoodsConfigServlet.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsConfigServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

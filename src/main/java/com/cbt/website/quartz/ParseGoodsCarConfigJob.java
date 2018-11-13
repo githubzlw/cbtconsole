@@ -7,8 +7,8 @@ import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParseGoodsCarConfigJob extends QuartzJobBean {
-    private static final Log logger = LogFactory.getLog(ParseGoodsCarConfigJob.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(ParseGoodsCarConfigJob.class);
 
 
     @Autowired

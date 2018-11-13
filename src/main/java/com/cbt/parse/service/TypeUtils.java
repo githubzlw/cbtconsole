@@ -3,8 +3,8 @@ package com.cbt.parse.service;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Md5Util;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,7 +22,7 @@ public class TypeUtils {
 	public static final String myhome = "http://192.168.1.58:8080/";
 	public static final String path = "/usr/local/apache2/htdocs";
 	
-	private static final Log LOG = LogFactory.getLog(TypeUtils.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TypeUtils.class);
 	private static final String[] url_items = new String[]{ 
 			"bestway020.en.alibaba.com",
 			"en.alibaba.com",

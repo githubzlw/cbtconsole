@@ -1,8 +1,8 @@
 package com.cbt.jdbc;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.Enumeration;
@@ -14,7 +14,7 @@ import java.util.Vector;
  谢这篇文章的作者。*/
 
 public class ConnectionPool {
-	private static final Log LOG = LogFactory.getLog(ConnectionPool.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ConnectionPool.class);
 
 	private String jdbcDriver = ""; // 数据库驱动
 

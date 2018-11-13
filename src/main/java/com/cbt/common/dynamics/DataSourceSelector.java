@@ -1,7 +1,7 @@
 package com.cbt.common.dynamics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * 数据源切换选择器
@@ -11,7 +11,7 @@ public class DataSourceSelector {
 
     private final static ThreadLocal<String> contextHolder = new ThreadLocal<String>();
 
-    private static final Log logger = LogFactory.getLog(DataSourceSelector.class);
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(DataSourceSelector.class);
 
     /**
      *    默认数据源

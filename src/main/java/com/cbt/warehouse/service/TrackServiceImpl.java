@@ -5,8 +5,8 @@ import com.cbt.warehouse.dao.TrackDao;
 import com.cbt.warehouse.pojo.TrankBean;
 import com.cbt.warehouse.util.Utility;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -24,7 +24,7 @@ import java.util.*;
 @Service
 public class TrackServiceImpl  implements  TrackService {
 
-	private static final Log LOG = LogFactory.getLog("track");
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger("track");
 	
 	@Autowired
 	private TrackDao  trackDao;

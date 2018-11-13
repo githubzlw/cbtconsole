@@ -5,8 +5,8 @@ import com.cbt.service.InitCacheService;
 import com.cbt.service.impl.InitCacheServiceImpl;
 import com.cbt.util.AppConfig;
 import com.cbt.website.quartz.CheckDeliveryWarningExample;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -14,7 +14,7 @@ import javax.servlet.ServletContextListener;
 
 public class ContextPathListener implements ServletContextListener {
 
-	private static final Log LOG = LogFactory.getLog(ContextPathListener.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ContextPathListener.class);
 
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext sc = sce.getServletContext();

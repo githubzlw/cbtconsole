@@ -5,8 +5,8 @@ import com.cbt.util.ContentConfig;
 import com.cbt.warehouse.dao.OrderSnapshotDao;
 import com.cbt.warehouse.dao.OrderSnapshotDaoImpl;
 import com.cbt.warehouse.pojo.OrderSnapshot;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 public class OrderSnapshotJob implements Job {
 
-	private static final Log LOG = LogFactory.getLog(OrderSnapshotJob.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderSnapshotJob.class);
 //	private static final String SHOWURL = "http://192.168.1.29:8765/editimg/snapshot/";
 	private static final String SHOWURL ="http://img1.import-express.com/importcsvimg/snapshot/";
 

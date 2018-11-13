@@ -3,14 +3,14 @@ package com.cbt.paypal;
 
 import com.braintreegateway.*;
 import com.cbt.paypal.util.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 public class BtTransactionHelper {
-    private static final Log LOG = LogFactory.getLog("pay");
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger("pay");
     // Braintree Gateway via PayPal Access Token
     protected BraintreeGateway gateway = new BraintreeGateway(PropertyUtils.getValueFromPaypelFile("sandbox".equals(PropertyUtils.getValueFromPaypelFile("paypal_type")) ? "SANDBOX_ACCESS_TOKEN" : "LIVE_ACCESS_TOKEN"));
     private boolean success;

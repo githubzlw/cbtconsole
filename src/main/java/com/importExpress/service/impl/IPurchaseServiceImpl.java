@@ -36,8 +36,8 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class IPurchaseServiceImpl implements IPurchaseService {
-	private  static final Log LOG= LogFactory.getLog(IPurchaseServiceImpl.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(IPurchaseServiceImpl.class);
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private final static String CHAR_STR="(\\d{6})";
 	@Autowired

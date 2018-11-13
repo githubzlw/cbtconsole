@@ -7,8 +7,8 @@ import com.cbt.parse.service.*;
 import com.cbt.processes.service.ISpiderServer;
 import com.cbt.processes.service.SpiderServer;
 import com.cbt.util.Redis;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class OneSixExpressDriver {
-	private final Log LOG = LogFactory.getLog(OneSixExpressDriver.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OneSixExpressDriver.class);
 	int count = 0;
 	IOneSixExpressDao adao_1688 = new OneSixExpressDao();
 	ArrayList<OneSixExpressBean> bean_list = new ArrayList<OneSixExpressBean>();

@@ -7,8 +7,8 @@ import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +22,7 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/secondaryValidation")
 public class SecondaryValidationController {
-	private static final Log LOG = LogFactory.getLog(SecondaryValidationController.class);
+	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SecondaryValidationController.class);
 
 	@Autowired
 	private SecondaryValidationService secValiService;
