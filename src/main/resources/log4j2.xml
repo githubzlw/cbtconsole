@@ -5,7 +5,7 @@
 <configuration status="DEBUG" monitorInterval="300">
     <properties>
         <!--定义变量-->
-        <property name="LOG_HOME">${catalina.home}/logs/express/express2.log</property>
+        <property name="LOG_HOME">C:</property>
     </properties>
     <!--先定义所有的appender-->
     <appenders>
@@ -15,12 +15,12 @@
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
         </console>
         <!--文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，这个也挺有用的，适合临时测试用-->
-        <File name="log" fileName="${LOG_HOME}/logs/express2018/test.log" append="false">
+        <File name="log" fileName="${LOG_HOME}/logs/cbtconsole/test.log" append="false">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
         </File>
         <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
-        <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/logs/express2018/info.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileInfo" fileName="${LOG_HOME}/logs/cbtconsole/info.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
@@ -29,8 +29,8 @@
                 <SizeBasedTriggeringPolicy size="300 MB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="RollingFileWarn" fileName="${LOG_HOME}/logs/express2018/warn.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileWarn" fileName="${LOG_HOME}/logs/cbtconsole/warn.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -38,8 +38,8 @@
                 <SizeBasedTriggeringPolicy size="300 MB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="RollingFileError" fileName="${LOG_HOME}/logs/express2018/error.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFileError" fileName="${LOG_HOME}/logs/cbtconsole/error.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -48,8 +48,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="pay" fileName="${LOG_HOME}/logs/express2018/pay.log"
-                                           filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/pay-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="pay" fileName="${LOG_HOME}/logs/cbtconsole/pay.log"
+                                           filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/pay-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -58,8 +58,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="ipnpay" fileName="${LOG_HOME}/logs/express2018/ipnpay.log"
-                                           filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/ipnpay-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="ipnpay" fileName="${LOG_HOME}/logs/cbtconsole/ipnpay.log"
+                                           filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/ipnpay-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -68,8 +68,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="search" fileName="${LOG_HOME}/logs/express2018/searchlog.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/search-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="search" fileName="${LOG_HOME}/logs/cbtconsole/searchlog.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/search-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -78,8 +78,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="track" fileName="${LOG_HOME}/logs/express2018/tracklog.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/track-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="track" fileName="${LOG_HOME}/logs/cbtconsole/tracklog.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/track-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -88,8 +88,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="price" fileName="${LOG_HOME}/logs/express2018/price.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/price-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="price" fileName="${LOG_HOME}/logs/cbtconsole/price.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/price-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -98,8 +98,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="mail" fileName="${LOG_HOME}/logs/express2018/mail.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/mail-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="mail" fileName="${LOG_HOME}/logs/cbtconsole/mail.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/mail-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>
@@ -108,8 +108,8 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="interceptor" fileName="${LOG_HOME}/logs/express2018/interceptor.log"
-                     filePattern="${LOG_HOME}/logs/express2018/$${date:yyyy-MM}/interceptor-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="interceptor" fileName="${LOG_HOME}/logs/cbtconsole/interceptor.log"
+                     filePattern="${LOG_HOME}/logs/cbtconsole/$${date:yyyy-MM}/interceptor-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] - %l - %m%n" charset="UTF-8"/>
             <Policies>

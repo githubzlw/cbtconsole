@@ -140,7 +140,7 @@ public class UserLoginController {
 				for (int i = 0; i < authlist.size(); i++) {
 					if (url.equals(authlist.get(i).getUrl())) {
 						json.setOk(true);
-						System.out.println(url + ":匹配成功");
+						LOG.info( "{}:匹配成功",url);
 						break;
 					}
 				}
