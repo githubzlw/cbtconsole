@@ -125,6 +125,25 @@ public class GetConfigureInfo {
 		return is;
 	}
 
+	/**
+	 * 获取谷歌插件存放数据的路径
+	 * @return
+	 */
+	public static String getAddGoodsPath() {
+		String path = "";
+		try {
+			if (cbtProperties == null) {
+				initCbt();
+			}
+			path = String.valueOf(cbtProperties.getProperty("adGoodsPath"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("getAddGoodsPath error : " + e.getMessage());
+			LOG.error("getAddGoodsPath error : " + e.getMessage());
+		}
+		return path;
+	}
+
 
 
 	public static FtpConfig getFtpConfig() {

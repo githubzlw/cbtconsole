@@ -3,6 +3,7 @@ package com.cbt.method.servlet;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
 import com.cbt.pojo.Admuser;
+import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
@@ -51,7 +52,7 @@ public class OrderDetailsServlet extends HttpServlet {
 		Properties properties = new Properties();
         try
         {
-        	String filePath="F:/cbtconsole/adgoods/addGoodsNo.properties";//获取项目路径
+        	String filePath= GetConfigureInfo.getAddGoodsPath();//获取项目路径
             InputStream inputStream = new FileInputStream(filePath);
             properties.load(inputStream);
             inputStream.close(); //关闭流
