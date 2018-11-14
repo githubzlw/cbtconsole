@@ -15,7 +15,7 @@
         <result column="publishtime" property="publishtime"/>
         <result column="admin_name" property="admin"/>
         <result column="admin_id" property="adminId"/>
-        <result column="updatetime" property="updatetime"/>
+        <result column="update_time" property="updatetime"/>
         <result column="name" property="name"/>
         <result column="img" property="img"/>
         <result column="custom_main_image" property="showMainImage"/>
@@ -39,6 +39,7 @@
         <result column="shop_id" property="shopId"/>
         <result column="unsellableReason" property="unsellAbleReason"/>
         <result column="off_reason" property="offReason"/>
+        <result column="click_num" property="clickNum"/>
     </resultMap>
 
 
@@ -69,7 +70,7 @@
         <result column="wprice" property="wprice"/>
         <result column="ali_pid" property="aliGoodsPid"/>
         <result column="ali_price" property="aliGoodsPrice"/>
-        <result column="updatetime" property="updatetime"/>
+        <result column="update_time" property="updatetime"/>
         <result column="valid" property="valid"/>
         <result column="goodsState" property="goodsState"/>
         <result column="is_edited" property="isEdited"/>
@@ -95,6 +96,10 @@
         <result column="unsellableReason" property="unsellAbleReason"/>
         <result column="off_reason" property="offReason"/>
         <result column="valid" property="valid"/>
+        <result column="click_num" property="clickNum"/>
+        <result column="weight_flag" property="weightNotFlag"/>
+        <result column="ugly_flag" property="uglyFlag"/>
+        <result column="repaired_flag" property="repairedFlag"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -115,6 +120,7 @@
         <result column="admin_name" property="admin_name"/>
         <result column="weight_flag" property="weight_flag"/>
         <result column="ugly_flag" property="ugly_flag"/>
+        <result column="repaired_flag" property="repaired_flag"/>
         <result column="benchmarking_flag" property="benchmarking_flag"/>
         <result column="describe_good_flag" property="describe_good_flag"/>
         <result column="never_off_flag" property="never_off_flag"/>
@@ -182,6 +188,9 @@
         <if test="weight_is_edit > 0">
             ,weight_is_edit = #{weight_is_edit}
         </if>
+        <if test="repaired_flag > 0">
+            ,repaired_flag = #{repaired_flag}
+        </if>
         where pid = #{pid}
     </update>
 
@@ -243,14 +252,14 @@
 
     <insert id="insertIntoGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean">
         insert into custom_goods_edited_log(pid,old_title,new_title,admin_id,weight_flag,ugly_flag,
-          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag)
+          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag,repaired_flag)
         values(#{pid},#{old_title},#{new_title},#{admin_id},#{weight_flag},#{ugly_flag},
-          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag})
+          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag})
     </insert>
 
     <select id="queryGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean" resultMap="goodsEditResultMap">
         select a.id,a.pid,a.old_title,a.new_title,a.admin_id,b.admName as admin_name,a.weight_flag,a.ugly_flag,
-        a.benchmarking_flag,a.describe_good_flag,a.never_off_flag,a.publish_flag,
+        a.benchmarking_flag,a.describe_good_flag,a.never_off_flag,a.publish_flag,a.repaired_flag,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time
         from custom_goods_edited_log a left join admuser b
         on a.admin_id = b.id
@@ -260,6 +269,15 @@
         </if>
         <if test="admin_id > 0">
             and a.admin_id =#{admin_id}
+        </if>
+        <if test="weight_flag > 0">
+            and a.weight_flag =#{weight_flag}
+        </if>
+        <if test="ugly_flag > 0">
+            and a.ugly_flag =#{ugly_flag}
+        </if>
+        <if test="repaired_flag > 0">
+            and a.repaired_flag =#{repaired_flag}
         </if>
         order by create_time desc
         <if test="limitNum > 0">
@@ -279,6 +297,15 @@
         <if test="admin_id > 0">
             and a.admin_id =#{admin_id}
         </if>
+        <if test="weight_flag > 0">
+            and a.weight_flag =#{weight_flag}
+        </if>
+        <if test="ugly_flag > 0">
+            and a.ugly_flag =#{ugly_flag}
+        </if>
+        <if test="repaired_flag > 0">
+            and a.repaired_flag =#{repaired_flag}
+        </if>
     </select>
 
     <select id="queryForListByParam" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
@@ -287,9 +314,10 @@
         cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
-        cbu.updatetime,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
+        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
         ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,
-        cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason
+        cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
+        ifnull(cge.click_num,0) as click_num
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -373,8 +401,11 @@
         <if test="offlineTime != null">
             and cge.off_time &gt;= #{offlineTime}
         </if>
-        <if test="editTime != null">
-            and cge.update_time &gt;= #{editTime}
+        <if test="editBeginTime != null">
+            and cge.update_time &gt;= #{editBeginTime}
+        </if>
+        <if test="editEndTime != null">
+            and cge.update_time &lt;= #{editEndTime}
         </if>
         <if test="weight1688Begin > 0">
             and cbu.weight &gt;= #{weight1688Begin}
@@ -400,6 +431,9 @@
         </if>
         <if test="isSort == 3">
             order by cge.click_num desc
+        </if>
+        <if test="isSort == 4">
+            order by cbu.catid1
         </if>
 
         limit #{page},40
@@ -488,8 +522,11 @@
         <if test="offlineTime != null">
             and cge.off_time &gt;= #{offlineTime}
         </if>
-        <if test="editTime != null">
-            and cge.update_time &gt;= #{editTime}
+        <if test="editBeginTime != null">
+            and cge.update_time &gt;= #{editBeginTime}
+        </if>
+        <if test="editEndTime != null">
+            and cge.update_time &lt;= #{editEndTime}
         </if>
         <if test="weight1688Begin > 0">
             and cbu.weight &gt;= #{weight1688Begin}
@@ -593,8 +630,11 @@
         <if test="offlineTime != null">
             and cge.off_time &gt;= #{offlineTime}
         </if>
-        <if test="editTime != null">
-            and cge.update_time &gt;= #{editTime}
+        <if test="editBeginTime != null">
+            and cge.update_time &gt;= #{editBeginTime}
+        </if>
+        <if test="editEndTime != null">
+            and cge.update_time &lt;= #{editEndTime}
         </if>
         <if test="weight1688Begin > 0">
             and cbu.weight &gt;= #{weight1688Begin}
@@ -618,13 +658,14 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.updatetime,cbu.unsellableReason,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
-        ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
+        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
-        ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason
+        ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag
+        ,ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -691,10 +732,10 @@
             ,b.range_price=#{rangePrice},b.sku=#{sku}
         </if>
         <if test="feeprice != null">
-            ,b.price=#{price},b.feeprice=#{feeprice}
+            ,b.price=#{price},b.feeprice=#{feeprice},b.range_price=#{rangePrice}
         </if>
         <if test="wprice != null">
-            ,b.price=#{price},b.wprice=#{wprice}
+            ,b.price=#{price},b.wprice=#{wprice},b.range_price=#{rangePrice}
         </if>
         <if test="type != null">
             ,b.entype=#{type}

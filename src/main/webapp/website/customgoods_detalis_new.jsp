@@ -930,6 +930,32 @@
             });
         }
 
+        function setGoodsRepairedByPid(pid) {
+            $.messager.confirm('提示', '是否确认设置已修复？', function (rs) {
+                if (rs) {
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'text',
+                        url: '/cbtconsole/editc/setGoodsRepairedByPid',
+                        data: {
+                            "pid": pid
+                        },
+                        success: function (data) {
+                            var json = eval('(' + data + ')');
+                            if (json.ok) {
+                                showMessage(json.message);
+                            } else {
+                                $.messager.alert("提醒", json.message, "info");
+                            }
+                        },
+                        error: function () {
+                            $.messager.alert("提醒", "执行错误，请联系管理员", "error");
+                        }
+                    });
+                }
+            });
+        }
+
         function addKeyWordWeight(shopId, catid, pid) {
             $("#add_shop_id").val(shopId);
             $("#add_shop_catid").val(catid);
@@ -1622,7 +1648,10 @@
             </c:if> <c:if test="${goods.priorityFlag >0}">
                 <br>
                 <b style="font-size: 16px;">商品优先级:${goods.priorityFlag ==1 ? '核心':'非核心'}</b>
-            </c:if><%--<c:if test="${goods.sourceUsedFlag >0}">
+            </c:if>
+            <br>
+			<b style="font-size: 16px;">点击数:${goods.clickNum}</b>
+            <%--<c:if test="${goods.sourceUsedFlag >0}">
                 <br>
                 <b style="font-size: 16px;">OCR货源可用度:${goods.sourceUsedFlag ==2 ? '描述很精彩':'可用'}</b>
             </c:if>
@@ -1665,6 +1694,18 @@
 					<br>
 					<b style="font-size: 16px;">软下架原因:${goods.unsellAbleReasonDesc}</b>
 				</c:if>
+                <c:if test="${goods.weightNotFlag > 0}">
+					<br>
+					<b style="font-size: 16px;">重量不合理</b>
+				</c:if>
+                <c:if test="${goods.uglyFlag > 0}">
+					<br>
+					<b style="font-size: 16px;">难看</b>
+				</c:if>
+                <c:if test="${goods.repairedFlag > 0}">
+					<br>
+					<b style="font-size: 16px;color: green;">产品已修复</b>
+				</c:if>
 			</span> <br> <br>
                 <span class="s_btn" onclick="addKeyWordWeight('${goods.shopId}','${goods.catid1}','${goods.pid}')">添加关键词重量</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="addBenchmarking('${goods.pid}')">亚马逊对标数据</span>
@@ -1680,6 +1721,7 @@
                     <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0)">对标不准确</span>
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0)">对标准确</span>
                 </c:if>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
 
                 <br><a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
