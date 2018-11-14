@@ -4,6 +4,7 @@ import com.cbt.controller.OrderInfoNewController;
 import com.cbt.method.dao.OrderDetailsMethodBean;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
+import com.cbt.util.GetConfigureInfo;
 import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class GetListServlet extends HttpServlet {
 			String admname=request.getParameter("nickname");
 			Properties props = new Properties();
 			String ipurl=admname;
-			String path="F:/cbtconsole/adgoods/addGoodsNo.properties";
+			String path= GetConfigureInfo.getAddGoodsPath();
 			 InputStream in = new BufferedInputStream (new FileInputStream(path));
 			 props.load(in);
 			 StringBuffer goodsid=new StringBuffer();
