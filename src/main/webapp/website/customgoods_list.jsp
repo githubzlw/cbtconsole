@@ -550,7 +550,7 @@ b {
 				<a class="a_style" target="_blank" href="${list.aliGoodsUrl}">${list.aliGoodsName}</a>
 			</c:if></td>--%>
 			<td>
-				<c:if test="${list.aliGoodsPid != null}">
+				<c:if test="${list.aliGoodsPid != null && list.aliGoodsPid != ''}">
 					<img alt="无图" src="${list.aliGoodsImgUrl}" class="img_sty">
 					<br>
 					<a target="_blank" href="${list.aliGoodsUrl}">${list.aliGoodsName}</a>
@@ -586,6 +586,8 @@ b {
 					<br>
 					<span>OCR货源可用度:${list.sourceUsedFlag ==2 ? '描述很精彩':'可用'}</span>
 				</c:if>
+				<br>
+				<span>点击数:${list.clickNum}</span>
 				<%--<c:if test="${list.sourceUsedFlag == 0}">
 					<br>
 					<span>OCR货源可用度:不可用</span>
@@ -603,8 +605,9 @@ b {
 					<span>发布时间:${list.publishtime}</span>
 				</c:if> <c:if test="${not empty list.updatetime}">
 					<br>
-					<span>更新时间:${list.updatetime}</span>
-				</c:if><c:if test="${list.infringingFlag > 0}">
+					<span>人为编辑时间:${list.updatetime}</span>
+				</c:if>
+				<c:if test="${list.infringingFlag > 0}">
 					<br>
 					<b style="color: red;font-size: 16px;">${list.infringingFlag == 1 ? '此商品侵权':'8月人为精选'}</b>
 				</c:if><c:if test="${list.valid == 0}">

@@ -10,6 +10,7 @@ public class GoodsEditBean {
     private String admin_name;
     private int weight_flag;//重量不合理标注
     private int ugly_flag;//难看标识
+    private int repaired_flag;//修复标识
     private int benchmarking_flag;//对标标记
     private int describe_good_flag;//描述很精彩标识
     private int uniqueness_flag;
@@ -219,6 +220,14 @@ public class GoodsEditBean {
 
     public void setStartNum(int startNum) {
         this.startNum = startNum;
+    }
+
+    public int getRepaired_flag() {
+        return repaired_flag;
+    }
+
+    public void setRepaired_flag(int repaired_flag) {
+        this.repaired_flag = repaired_flag;
     }
 
     @Override
