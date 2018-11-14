@@ -3,9 +3,10 @@ package com.importExpress.pojo;
 public class WebhookPaymentBean {
 	private String id;
 	private String createTime;
-	private String amount;
+	private String amount;//金额
 	private String paymentMode;
-	private String transactionFee;
+	private String transactionFee;//手续
+	private String profit;//利润
 	private String type;//类型  贸易 ebay  importexpress
 	private String userid;
 	private String email;
@@ -15,6 +16,21 @@ public class WebhookPaymentBean {
 	private long time;
 	private String receiverID;
 	
+	private double mcGross;//金额
+	
+	
+	public double getMcGross() {
+		return mcGross;
+	}
+	public void setMcGross(double mcGross) {
+		this.mcGross = mcGross;
+	}
+	public String getProfit() {
+		return profit;
+	}
+	public void setProfit(String profit) {
+		this.profit = profit;
+	}
 	public String getReceiverID() {
 		return receiverID;
 	}
