@@ -40,9 +40,16 @@ public interface PaymentMapper {
      * @param limitNum
      * @return
      */
-    List<Map<String,Object>> listStripePayment(@Param("startNum") int startNum, @Param("limitNum") int limitNum);
+    List<Map<String,Object>> listStripePayment(@Param("startNum")int startNum,@Param("limitNum")int limitNum,
+    										@Param("startTime")String startTime,@Param("endTime")String endTime);
+    /**
+     * @param startNum
+     * @param limitNum
+     * @return
+     */
+    Double countAmount(@Param("startTime")String startTime,@Param("endTime")String endTime);
     /**统计
      * @return
      */
-    int countStripePayment();
+    int countStripePayment(@Param("startTime")String startTime,@Param("endTime")String endTime);
 }
