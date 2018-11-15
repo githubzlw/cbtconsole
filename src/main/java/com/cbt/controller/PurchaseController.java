@@ -442,7 +442,7 @@ public class PurchaseController {
 		Properties properties = new Properties();
 		try
 		{
-			String filePath= GetConfigureInfo.getAddGoodsPath();//获取项目路径
+			String filePath= GetConfigureInfo.getAdgoodsPath();//获取项目路径
 			InputStream inputStream = new FileInputStream(filePath);
 			properties.load(inputStream);
 			inputStream.close(); //关闭流

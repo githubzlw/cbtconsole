@@ -7,8 +7,13 @@ import com.cbt.processes.dao.ISpiderDao;
 import com.cbt.processes.dao.SpiderDao;
 import com.cbt.processes.utils.Processes;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.SpiderMapper;
+
+import ceRong.tools.bean.SearchLog;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -16,10 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class SpiderServer implements ISpiderServer {
 	ISpiderDao dao = new SpiderDao();
 	public static int cartNumber = 0;
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(SpiderServer.class);
+	
+	@Autowired
+	private SpiderMapper spiderMapper;
+	
 	@Override
 	public int addGoogs_car(SpiderBean spider) {
 		int res = dao.addGoogs_car(spider);
@@ -59,7 +69,22 @@ public class SpiderServer implements ISpiderServer {
 		int res = dao.delGoogs_car(goodsid,guid);
 		return res;
 	}
-
+	
+	/******搜索页面的搜索日志跟踪以及商品的展示和点击信息存储************************/
+	@Override
+	public int saveTheSearchLogOnSearchPage(SearchLog seaLog){
+		if("0".equals(seaLog.getSaveFlag())){
+			spiderMapper.saveTheSearchLogOnSearchPage(seaLog);
+			return seaLog.getId();
+		}else{
+			return spiderMapper.updateTheSearchLogOnSearchPage(seaLog.getId(),seaLog.getProductShowIdList());
+		}
+	}
+	@Override
+	public int saveTheClickCountOnSearchPage(String goodsPid,String searchMD5,String searchUserMD5){
+		return spiderMapper.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
+	}
+	
 	@Override
 	public int addURL(String userName, String url, int fruit) {
 		int res = dao.addURL(userName, url,fruit);
