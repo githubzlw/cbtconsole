@@ -2002,7 +2002,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 //		String sql=" select user_id,url,create_time from error_info  ";
 		String sql= " select b.email,a.user_id,a.url,a.create_time from error_info a ";
-			   sql= sql+"LEFT JOIN user b on a.user_id=b.id where 1=1 ";
+			   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
+			   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+			   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+			   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+			   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
 			   if(!"".equals(userId) && userId!=null){
 				   sql =sql+" and a.user_id = '"+userId+"' ";
 			   }
@@ -3134,7 +3138,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	public int getErrorInfoCount(String userId,String timeFrom,String timeTo) {
 		
 		String sql = "select count(1) as maxCount from error_info a ";
-		sql =sql +"LEFT JOIN user b on a.user_id=b.id where 1=1 ";
+		sql =sql +"LEFT JOIN user b on a.user_id=b.id ";
+	    sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+	    sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+	    sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+	    sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
 		if(!"".equals(userId) && userId!=null){
 			   sql =sql+" and a.user_id = '"+userId+"' ";
 		   }
