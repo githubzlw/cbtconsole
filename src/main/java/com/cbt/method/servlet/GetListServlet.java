@@ -43,7 +43,7 @@ public class GetListServlet extends HttpServlet {
 			String admname=request.getParameter("nickname");
 			Properties props = new Properties();
 			String ipurl=admname;
-			String path= GetConfigureInfo.getAddGoodsPath();
+			String path= GetConfigureInfo.getAdgoodsPath();
 			 InputStream in = new BufferedInputStream (new FileInputStream(path));
 			 props.load(in);
 			 StringBuffer goodsid=new StringBuffer();

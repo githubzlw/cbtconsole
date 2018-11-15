@@ -24,7 +24,7 @@ public class DelPropertiesJob implements Job {
 				System.out.println("开始清空存放商品编号文件.........................");
 				Properties properties = new Properties();
 				//String filePath="E:/myproject/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/cbtconsole/WEB-INF/classes/addGoodsNo.properties";//获取项目路径
-				String filePath= GetConfigureInfo.getAddGoodsPath();//获取项目路径
+				String filePath= GetConfigureInfo.getAdgoodsPath();//获取项目路径
 	            InputStream inputStream;
 				inputStream = new FileInputStream(filePath);
 				properties.load(inputStream);
