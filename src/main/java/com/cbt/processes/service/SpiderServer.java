@@ -13,6 +13,7 @@ import ceRong.tools.bean.SearchLog;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class SpiderServer implements ISpiderServer {
 	ISpiderDao dao = new SpiderDao();
 	public static int cartNumber = 0;

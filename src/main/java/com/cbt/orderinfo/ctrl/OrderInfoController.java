@@ -835,7 +835,8 @@ public class OrderInfoController{
      */
     @SuppressWarnings({ "unchecked", "static-access" })
     @RequestMapping("/searchProductLog")
-    public @ResponseBody Map<String,Object> searchProductLog(HttpServletRequest request) {
+    public @ResponseBody Map<String,Object> searchProductLog(HttpServletRequest request,HttpServletResponse response) {
+    	response.setHeader("Access-Control-Allow-Origin", "*");
         String saveFlag = request.getParameter("saveFlag");
         Map<String,Object> map = new HashMap<String,Object>();
         String userinfo = request.getParameter("userid");
