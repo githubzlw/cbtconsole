@@ -6,6 +6,8 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.processes.service.ISpiderServer;
+import com.cbt.util.Md5Util;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.Utility;
@@ -18,6 +20,8 @@ import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.google.gson.Gson;
 import com.importExpress.service.IPurchaseService;
+
+import ceRong.tools.bean.SearchLog;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,6 +48,8 @@ public class OrderInfoController{
 	@Autowired
 	private IPurchaseService purchaseService;
 
+	@Autowired
+	private ISpiderServer spiderService;
 
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
@@ -819,7 +825,85 @@ public class OrderInfoController{
 		return list_map;
 	}
 	
-	public static void main(String[] args) {
-		
-	}
+	/**
+     * 
+     * @Title searchProductLog 
+     * @Description 搜索页面记录用户的搜索结果和点击商品
+     * @param request
+     * @return
+     * @return Map<String,Object>
+     */
+    @SuppressWarnings({ "unchecked", "static-access" })
+    @RequestMapping("/searchProductLog")
+    public @ResponseBody Map<String,Object> searchProductLog(HttpServletRequest request) {
+        String saveFlag = request.getParameter("saveFlag");
+        Map<String,Object> map = new HashMap<String,Object>();
+        String userinfo = request.getParameter("userid");
+        int userid = userinfo==null?0:Integer.parseInt(userinfo);
+        if("0".equals(saveFlag)||"1".equals(saveFlag)){//搜索日志记录和页面产品展示数量更新
+            String keyWords = request.getParameter("keyWords")==null?"":request.getParameter("keyWords");
+            if(StringUtil.isNotBlank(keyWords) && keyWords.length()>200){
+                keyWords = keyWords.substring(0, 198);
+            }
+            String catid = request.getParameter("catid");
+            String sortType = request.getParameter("sortType");
+            String pageNumber = request.getParameter("pageNumber")==null?"":request.getParameter("pageNumber");
+            if(StringUtil.isNotBlank(pageNumber) && pageNumber.length()>10){
+                pageNumber = pageNumber.substring(0, 8);
+            }
+            String productShowIdList = request.getParameter("productShowIdList");
+            String allProductList = request.getParameter("allProductList");
+            int listSize = Integer.parseInt(request.getParameter("listSize")==null?"0":request.getParameter("listSize"));
+            String rowid = request.getParameter("rowid");
+            SearchLog seaLog = new SearchLog();
+            seaLog.setKeyWords(keyWords);
+            seaLog.setCatid(catid);
+            seaLog.setPageNumber(pageNumber);
+            seaLog.setSortType(sortType);
+            seaLog.setProductShowIdList(productShowIdList);
+            seaLog.setSaveFlag(saveFlag);
+            seaLog.setId(Integer.parseInt(rowid==null?"0":rowid));
+            seaLog.setUserid(userid);
+            seaLog.setAllProductList(allProductList);
+            seaLog.setListSize(listSize);
+            //如果是移动端
+            if("1".equals(request.getParameter("device"))){
+                seaLog.setDevice(1);
+            }else{
+                seaLog.setDevice(0);
+            }
+            String sessionid = request.getSession(true).getId();
+            seaLog.setSessionid(sessionid);
+            String ip = "";
+            Calendar cal = Calendar.getInstance();
+            int year = Calendar.YEAR;
+            int month = Calendar.MONTH;
+            int date = Calendar.DATE;
+            seaLog.setYear(cal.get(year));
+            seaLog.setMonth(cal.get(year)+"-"+(cal.get(month)+1));
+            seaLog.setDay(cal.get(year)+"-"+(cal.get(month)+1)+"-"+cal.get(date));
+            seaLog.setSearchMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()));
+            if(userid!=0){
+                seaLog.setSearchUserMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()+userid));
+            }else{
+                seaLog.setSearchUserMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()+sessionid));
+            }
+            int rowId = spiderService.saveTheSearchLogOnSearchPage(seaLog);
+            map.put("rowid", rowId);
+            map.put("searchMD5", seaLog.getSearchMD5());
+            map.put("searchUserMD5", seaLog.getSearchUserMD5());
+            return map;
+        }else{
+            return map;
+        }
+    }
+	
+    @RequestMapping("/searchClickProductLog")
+    @ResponseBody
+    public void markTheProduct(HttpServletRequest request) {
+        String searchMD5 = request.getParameter("searchMD5");
+        String searchUserMD5 = request.getParameter("searchUserMD5");
+        String goodsPid = request.getParameter("goodsPid");
+        spiderService.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
+    }
 }

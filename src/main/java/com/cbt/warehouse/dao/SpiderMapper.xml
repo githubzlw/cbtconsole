@@ -570,4 +570,17 @@
   
   <!-- ****com.cbt.pay.dao end*** -->
   
+  <!-- 搜索页面用户行为跟踪 -->
+<insert id="saveTheSearchLogOnSearchPage" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.SearchLog">
+  insert into searchproductlog(userid,sessionid,userIP,keywords,catid,sortType,pageNumber,showPageYear,showPageMonth,showPageDay,showPageTime,productShowIdList,allProductList,listSize,device,searchMD5,searchUserMD5) 
+  values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
+</insert>
+<update id="updateTheSearchLogOnSearchPage">
+  update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
+</update>
+<insert id="saveTheClickCountOnSearchPage">
+  insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime) 
+  values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
+  on duplicate key update clickCount=clickCount+1,updateTime = now()
+</insert>
 </mapper>
