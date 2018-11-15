@@ -1,19 +1,30 @@
 package com.importExpress.controller;
 
-import com.cbt.FtpUtil.ContinueFTP2;
-import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.parse.service.ImgDownload;
-import com.cbt.util.ImageCompression;
-import com.cbt.util.SyncSingleGoodsToOnlineUtil;
-import com.cbt.warehouse.util.StringUtil;
-import com.importExpress.pojo.FineCategory;
-import com.importExpress.pojo.TabSeachPageBean;
-import com.importExpress.service.CategoryResearchService;
-import com.importExpress.utli.JsonTreeUtils;
-//import com.sun.image.codec.jpeg.JPEGCodec;
-//import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.io.IOUtils;
@@ -28,7 +39,7 @@ import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HTTP;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,15 +47,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
-
+import com.cbt.FtpUtil.ContinueFTP2;
+import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.parse.service.ImgDownload;
+import com.cbt.util.ImageCompression;
+import com.cbt.util.SyncSingleGoodsToOnlineUtil;
+import com.cbt.warehouse.util.StringUtil;
+import com.importExpress.pojo.FineCategory;
+import com.importExpress.pojo.TabSeachPageBean;
+import com.importExpress.service.CategoryResearchService;
+import com.importExpress.utli.JsonTreeUtils;
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
 /**
  * 品类精研
  * @ClassName CategoryResearchController 
@@ -59,7 +73,7 @@ public class CategoryResearchController {
 	@Autowired
 	private CategoryResearchService categoryResearchService;
 	
-	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryResearchController.class);
+	private static Logger LOG = Logger.getLogger(CategoryResearchController.class);
 	private static List<Map<String,Object>> search1688Category;
 	
 //	private static String importexpressPath = SysParamUtil.getParam("importexpress");
@@ -104,8 +118,7 @@ public class CategoryResearchController {
 	}
 	
 	@RequestMapping("getAllCat")
-	public @ResponseBody
-    List<TabSeachPageBean> getAllCat(){
+	public @ResponseBody List<TabSeachPageBean> getAllCat(){
 		DataSourceSelector.set("dataSource127hop");
 		List<TabSeachPageBean> list = categoryResearchService.list(0);
 		DataSourceSelector.restore();
@@ -154,7 +167,7 @@ public class CategoryResearchController {
 		 DataSourceSelector.set("dataSource127hop");
 	        //在此只id及name属性, 
 //	        String[] s = new String[] { "getId", "getKeyword","getParentId","getIsshow" };  
-	        List<TabSeachPageBean> li = this.categoryResearchService.list(Integer.parseInt(pid));
+	        List<TabSeachPageBean> li = this.categoryResearchService.list(Integer.parseInt(pid)); 
 	        //生成json格式的数据
 	        String jsontree = JsonTreeUtils.jsonTree(li);
 	        //this.tree(tm, li, s, true); 
@@ -292,7 +305,7 @@ public class CategoryResearchController {
 	//新增细分类
 	@RequestMapping("/addDetail")
 	public void addDetail(HttpServletRequest request, HttpServletResponse response,
-                          @RequestParam(value = "uploadfile", required = true) MultipartFile file) throws IOException {
+			@RequestParam(value = "uploadfile", required = true) MultipartFile file) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		//文件不能为空
@@ -473,7 +486,7 @@ public class CategoryResearchController {
 	
 	//保存更新后的细分类商品
 	@RequestMapping("/updateFineCategory")
-	public void updateFineCategory(HttpServletRequest request, @RequestParam(value = "uploadfile", required = true) MultipartFile file , HttpServletResponse response) throws IOException {
+	public void updateFineCategory(HttpServletRequest request,@RequestParam(value = "uploadfile", required = true) MultipartFile file ,HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		
@@ -1071,8 +1084,8 @@ public class CategoryResearchController {
 				BufferedImage tag = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
 				tag.getGraphics().drawImage(src.getScaledInstance((int) 150, 150, Image.SCALE_SMOOTH), 0, 0, null);
 				out = new FileOutputStream(targetImgUrl);
-//				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//				encoder.encode(tag);
+				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+				encoder.encode(tag);
 				is = true;
 			
 		} catch (IOException ex) {
