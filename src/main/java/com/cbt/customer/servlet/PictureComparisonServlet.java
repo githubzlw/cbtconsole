@@ -797,11 +797,11 @@ public class PictureComparisonServlet extends HttpServlet {
 	public void getErrorInfo(HttpServletRequest request, HttpServletResponse response) {
 		
 		//无对标标识
-		String noBenchFlag = request.getParameter("noBenchFlag");
+		String userId = request.getParameter("userId");
 		//alipid
-		String aliPid = request.getParameter("aliPid");
+		String timeFrom = request.getParameter("timeFrom");
 		//1688pid
-		String ylbbPid = request.getParameter("ylbbPid");
+		String timeTo = request.getParameter("timeTo");
 		//销量
 		String su = request.getParameter("selled");
 		int selled = 0;
@@ -838,26 +838,25 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("categoryList1", categoryList1);
 		
 		//取得登录的用户名字
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		noBenchFlag = adm.getAdmName();
-		String getSourceTbl = "";
+//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+//		noBenchFlag = adm.getAdmName();
+//		String getSourceTbl = "";
 		//根据分类查结果
-		List<GoodsCheckBean> goodsCheckBeans = ips.getErrorInfo(selled,noBenchFlag,aliPid,start, PAGESIZE);
+		List<GoodsCheckBean> goodsCheckBeans = ips.getErrorInfo(userId,timeFrom,timeTo,start, PAGESIZE);
 		
 		
 		request.setAttribute("gbbs", goodsCheckBeans);
 		
 		//总条数 批量筛选用
-//		int goodsCheckCount = ips.getYlbbGooddataCount(noBenchFlag,selled);
-		int goodsCheckCount = 2;
+		int goodsCheckCount = ips.getErrorInfoCount(userId,timeFrom,timeTo);
 		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
 		request.setAttribute("cid", cid);
 		request.setAttribute("categoryId", categoryId);
 		request.setAttribute("categoryId1", categoryId1);
-		request.setAttribute("similarityId", aliPid);
-		request.setAttribute("ylbbPid", ylbbPid);
-		request.setAttribute("selled", selled);
+		request.setAttribute("userId", userId);
+		request.setAttribute("timeFrom", timeFrom);
+		request.setAttribute("timeTo", timeTo);
 		
 		try {
 			request.getRequestDispatcher("/website/health_page.jsp").forward(request, response);
