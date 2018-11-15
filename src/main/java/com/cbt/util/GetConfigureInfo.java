@@ -27,7 +27,7 @@ public class GetConfigureInfo {
 	static void initCbt() {
 		InputStream ins = null;
 		try {
-			ins = GetConfigureInfo.class.getResourceAsStream("../../../cbt.properties");
+			ins = GetConfigureInfo.class.getClassLoader().getResourceAsStream("cbt.properties");
 			cbtProperties.load(ins);
 			ins.close();
 		} catch (Exception e) {
