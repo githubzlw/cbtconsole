@@ -60,7 +60,7 @@ public class CustomerDisputeController {
 
         EasyUiJsonResult json = new EasyUiJsonResult();
         int startNum = 0;
-        int limitNum = 20;
+        int limitNum = 50;
         
         String pageStr = request.getParameter("page");
         String limitNumStr = request.getParameter("rows");
