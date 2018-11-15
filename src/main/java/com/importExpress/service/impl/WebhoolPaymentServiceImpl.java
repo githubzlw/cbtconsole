@@ -88,12 +88,13 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 				String receiver_id = parseObject.getString("receiver_id");
 				bean.setReceiverID(StringUtils.equals(receiver_id, "UDSXBNQ5ARA76") ? "新("+receiver_id+")" : "旧("+receiver_id+")");
 				String mcFee = parseObject.getString("mc_fee");
-				bean.setTransactionFee(mcFee + " " + parseObject.getString("mc_currency"));
+				String mcCurrency = parseObject.getString("mc_currency");
+				bean.setTransactionFee(mcFee + " " + mcCurrency);
 				String mcGross = parseObject.getString("mc_gross");
 				bean.setMcGross(!StringUtils.isEmpty(mcGross) ? Double.valueOf(mcGross) : 0);
-				bean.setAmount(mcGross + " " + parseObject.getString("mc_currency"));
+				bean.setAmount(mcGross + " " + mcCurrency);
 				if(!StringUtils.isEmpty(mcGross) && !StringUtils.isEmpty(mcFee)) {
-					bean.setProfit(df.format(Double.valueOf(mcGross) - Double.valueOf(mcFee)));
+					bean.setProfit(df.format(Double.valueOf(mcGross) - Double.valueOf(mcFee))+" "+mcCurrency);
 				}
 				
 				
