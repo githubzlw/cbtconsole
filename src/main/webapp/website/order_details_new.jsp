@@ -1164,7 +1164,11 @@ em {
 				<!-- 客户订单信息显示 -->
 				<tr>
 					<td class="ormtittd">
-						<span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a><br>
+						<span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a>
+						<c:if test="${not empty order.backFlag}">
+							<span style="color:red">${order.backFlag}</span>
+						</c:if>
+						<br>
 						<span style="color: red; display: none" id="other_id"></span>
 					</td>
 					<td>
@@ -1223,7 +1227,9 @@ em {
 				  		商品总金额 <span class="ormtittdred">（<fmt:formatNumber value="${order.product_cost+preferential_price}" pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span> + 订单实收运费<span class="ormtittdred">（${actual_ffreight_+order.foreign_freight}）</span>
 							+ 服务费 <span class="ormtittdred">（${order.service_fee}）</span>
-							+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
+						+ 质检费 <span class="ormtittdred">（${order.actual_lwh}）</span>
+						+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
+						+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
 							-  <c:if test="${order.order_ac != 0}">
 							批量优惠金额<span class="ormtittdred">（${preferential_price}） </span>
 							</c:if> -混批优惠金额<span class="ormtittdred">（${order.discount_amount}）</span>
@@ -1233,15 +1239,15 @@ em {
 						</span>  -新用户赠送运费<span class="ormtittdred">(0)
 						<%--（${order.order_ac}） --%>
 					</span> -返单优惠<span class="ormtittdred">（
-								${order.coupon_discount}） </span> -VIP折扣<span class="ormtittdred">（
+								${order.coupon_discount}） </span> -${order.gradeName}<span class="ormtittdred">（
 								${order.gradeDiscount}） </span> 
 								+双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
 								-首单优惠<span class="ormtittdred">（${order.firstdiscount}） </span>
 								+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
 								=<b>实收金额</b><span
 							class="ormtittdred ormtittdb"> （<fmt:formatNumber
-									value="${(order.product_cost+actual_ffreight_+order.foreign_freight+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-order.firstdiscount+order.actual_freight_c) >0 ?
-									(order.product_cost+actual_ffreight_+order.foreign_freight+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-order.gradeDiscount + order.vatBalance - order.firstdiscount + order.actual_freight_c) : 0.00 }"
+							value="${(order.product_cost+actual_ffreight_+order.foreign_freight+order.actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-order.firstdiscount+order.actual_freight_c) >0 ?
+									(order.product_cost+actual_ffreight_+order.foreign_freight+order.extra_freight+order.actual_lwh+order.memberFee-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-order.gradeDiscount + order.vatBalance - order.firstdiscount + order.actual_freight_c) : 0.00 }"
 									pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span>
 						 <a href="/cbtconsole/orderDetails/orderPayDetails.do?orderNo=${order.orderNo}&userId=${order.userid}" target="_blank" style="text-decoration: none;">【到账详情 】</a>
@@ -1500,7 +1506,11 @@ em {
 					</tr>
 					<tr>
 						<td>预计采购金额(￥):</td>
-						<td style="text-align:center;vertical-align:middle;"><span id="es_price" style="color:red;">-</span></td>
+						<td style="text-align:center;vertical-align:middle;"><span id="es_price" style="color:red;">-</span>
+							<c:if test="${not empty tipprice}">
+								<span style="color:blue">(${tipprice})</span>
+							</c:if>
+						</td>
 					</tr>
 					<tr>
 						<td>录入采购金额(￥):</td>
@@ -1892,10 +1902,10 @@ em {
 									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">原始货源重量(kg): ${orderd.cbrWeight}</p>
+									<p style="width:200px;">原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">加入购物车重量(kg): ${orderd.od_total_weight}</p>
+									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
 								</span>
 								<%--<span id="spanurl${sd.index}">--%>
 									<%--<p style="width:200px;">产品总重量(kg): ${orderd.final_weight}</p>--%>
@@ -2214,7 +2224,7 @@ em {
 											<p>原始货源价格(RMB): ${orderd.price1688}</p>
 										</span>
 										<span id="spanurl${sd.index}">
-											<p>原始货源重量(kg): ${orderd.weight1688}</p>
+											<p>1688货源重量（单件）(kg): ${orderd.weight1688}</p>
 										</span>
 										
 										<span id="spanurl${sd.index}">

@@ -16,7 +16,9 @@ function confirmnamebtn(){
 	var paytypeflag=$("#paytype option:selected").attr("id");
 	$.post("/cbtconsole/cbt/orderws/paymentConfirm",{orderNo: '${param.orderNo}',userId: '${userId}',pass :userpass, paytypeid:paytypeflag},
     	function(result){
-    		if(result.code == 0){
+    		if(result.code == 12){
+                alert(result.msg);
+			}else if(result.code == 0){
     			window.opener.fnPaymentConfirmClose(result.confirmtime,result.confirmname);
 				window.close();
     		}else{

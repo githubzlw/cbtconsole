@@ -281,6 +281,7 @@ public class OrderInfoController{
 			map.put("shipno", request.getParameter("shipno"));
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
+			map.put("odid",request.getParameter("odid"));
 			map.put("warehouseRemark", request.getParameter("warehouseRemark"));
 			int count = Integer.valueOf(request.getParameter("count"));
 			map.put("count", String.valueOf(count));

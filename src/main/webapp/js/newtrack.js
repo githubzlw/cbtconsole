@@ -645,7 +645,15 @@ function btnCap(orderid, odid) {
             success : function(response) {
                 if (response.status == 1) {
                     $("#bt_"+orderid+"_"+odid+"").css("color", "red");
-                     $("#pics_"+orderid+odid+"").append("<img width='40px' height='40px' onmouseout='closeBigImg();' ondblclick='delPics(this,\""+orderid+"\",\""+odid+"\",\""+response.picPath+"\",\""+response.localPath+"\")' onmouseover='BigImg(\""+response.localPath+"\")' src=\""+response.localPath+"\"></img>");
+                     $("#pics_"+orderid+odid+"").append("<img width='40px' height='40px' onmouseout='closeBigImg();' ondblclick='delPics(this,\""+orderid+"\",\""+odid+"\",\""+response.picPath+"\",\""+response.localPath+"\")' onmouseover='BigImg(\""+response.localPath+"\")'  src='/cbtconsole/img/yuanfeihang/loaderTwo.gif' data-original=\""+response.localPath+"\"></img>");
+                    // setInterval(function(){
+                    //     $("#pics_"+orderid+odid+"").find('img').each(function(){
+                    //         var imgSrc=$(this).attr('data-original');
+                    //         $(this).attr('src',imgSrc);
+                    //     })
+                    // },100);
+
+
                 }else{
                     alert("图片上传失败,请重新拍摄");
                 }
@@ -655,7 +663,6 @@ function btnCap(orderid, odid) {
             }
         });
 }
-
 var dragObj = document.getElementById("paizhao");
 var w = $(window).width();
 w = w - 320;

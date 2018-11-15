@@ -1150,6 +1150,40 @@ public class WarehouseCtrl {
 		return json;
 	}
 
+	/**
+	 * 黑名单用户管理
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/getUserBackList", method = RequestMethod.POST)
+	@ResponseBody
+	public EasyUiJsonResult getUserBackList(HttpServletRequest request, Model model) throws ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		List<BlackList> list = new ArrayList<BlackList>();
+		String email = request.getParameter("qEmail");
+		int page = Integer.parseInt(request.getParameter("page"));
+		String flag=request.getParameter("flag");
+		flag=StringUtil.isBlank(flag)?null:flag;
+		if (page > 0) {
+			page = (page - 1) * 40;
+		}
+		map.put("page", String.valueOf(page));
+		map.put("email", email);
+		map.put("flag",flag);
+		try{
+			list = iWarehouseService.getUserBackList(map);
+			List<BlackList> counts = iWarehouseService.getUserBackListCount(map);
+			json.setRows(list);
+			json.setTotal(counts.size());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return json;
+	}
+
 
 	/**
 	 *
@@ -1659,7 +1693,12 @@ public class WarehouseCtrl {
 				return r_map;
 			}
 			p_map.put("time",year+"-"+month);
-			r_map=iWarehouseService.getExchange(p_map);
+			Map<String,String> resultMap=iWarehouseService.getExchange(p_map);
+			r_map.put("eur_rate",resultMap.get("eur_rate"));
+			r_map.put("cad_rate",resultMap.get("cad_rate"));
+			r_map.put("gbp_rate",resultMap.get("gbp_rate"));
+			r_map.put("aud_rate",resultMap.get("aud_rate"));
+			r_map.put("rmb_rate",resultMap.get("rmb_rate"));
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -6703,6 +6742,60 @@ public class WarehouseCtrl {
 		}
 		return "" + row;
 	}
+
+	/**
+	 * 用户黑名单单利更新状态
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/updateFlag", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updateFlag(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String id=request.getParameter("id");
+		String type=request.getParameter("type");
+		try{
+			row=iWarehouseService.updateFlag(id,type);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
+	@RequestMapping(value = "/addBackUser", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String addBackUser(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String userEmail=request.getParameter("userEmail");
+		String userIp=request.getParameter("userIp");
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		try{
+			if(adm == null){
+				return "0";
+			}
+			row=iWarehouseService.addBackUser(userEmail,userIp,adm.getAdmName());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
+	@RequestMapping(value = "/updatebackEmail", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updatebackEmail(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String id=request.getParameter("id");
+		String email=request.getParameter("email");
+		try{
+			row=iWarehouseService.updatebackEmail(id,email);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
 
 	// 重置库位
 	@RequestMapping(value = "/resetLocation", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")

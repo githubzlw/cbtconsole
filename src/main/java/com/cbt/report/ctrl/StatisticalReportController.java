@@ -3111,6 +3111,37 @@ public class StatisticalReportController {
 	}
 
 	/**
+	 * 获取当月平均汇率在用户月利润统计报表
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/getExchange", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,String> getExchange(HttpServletRequest request, Model model) throws ParseException {
+		Map<String,String> p_map=new HashMap<String,String>();
+		Map<String,String> r_map=new HashMap<String,String>();
+		try{
+			String year=request.getParameter("year");
+			String month=request.getParameter("month");
+			if(StringUtil.isBlank(month) || StringUtil.isBlank(year)){
+				return r_map;
+			}
+			p_map.put("time",year+"-"+month);
+			Map<String,String> resultMap=iWarehouseService.getExchange(p_map);
+			r_map.put("eur_rate",String.valueOf(resultMap.get("eur_rate")));
+			r_map.put("cad_rate",String.valueOf(resultMap.get("cad_rate")));
+			r_map.put("gbp_rate",String.valueOf(resultMap.get("gbp_rate")));
+			r_map.put("aud_rate",String.valueOf(resultMap.get("aud_rate")));
+			r_map.put("rmb_rate",String.valueOf(resultMap.get("rmb_rate")));
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return r_map;
+	}
+
+	/**
 	 * 异步获取利润汇总数据
 	 * @param request
 	 * @param response
