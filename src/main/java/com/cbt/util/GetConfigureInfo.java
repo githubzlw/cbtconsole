@@ -142,20 +142,6 @@ public class GetConfigureInfo {
 		return path;
 	}
 
-	public static String getImgUplaodPath() {
-		String path="/data/cbtconsole/cbtimg/product";
-		try {
-			if (cbtProperties == null) {
-				initCbt();
-			}
-			path = String.valueOf(cbtProperties.getProperty("imgUploadPath"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("get openJob error : " + e.getMessage());
-			LOG.error("get openJob error : " + e.getMessage());
-		}
-		return path;
-	}
 
 
 
