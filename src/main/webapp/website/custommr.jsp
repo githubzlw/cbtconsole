@@ -97,9 +97,7 @@ b {
 }
 
 .tr_disable {
-	background-color: #d4d3d3;
-	!
-	import
+	background-color: #d4d3d3 !important;
 }
 
 .tr_isEdited {
@@ -114,11 +112,11 @@ b {
 			"isEdited":"-1", "isAbnormal":"-1", "isBenchmark":"-1","weightCheck":"-1",
 			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"0",
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
-			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editTime":"",
+			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0"
 	};
 	var isQuery =0;
-	
+
 	$(function() {
 		var state = sessionStorage.getItem("state");
 		if(!(state == null || state == "" || state == "0")){
@@ -137,12 +135,12 @@ b {
 		if(!(sttime == null || sttime == "")){
 			queryParams.sttime = sttime;
 			$("#query_publish_begin_time").val(sttime);
-		}	
+		}
 		var edtime = sessionStorage.getItem("edtime");
 		if(!(edtime == null || edtime == "")){
 			queryParams.edtime = edtime;
 			$("#query_publish_end_time").val(edtime);
-		}	
+		}
 		var adminid = sessionStorage.getItem("adminid");
 		if(!(adminid == null || adminid == "" || adminid == "0")){
 			queryParams.adminid = adminid;
@@ -162,7 +160,7 @@ b {
 		if(!(isBenchmark == null || isBenchmark == "" || isBenchmark == "-1")){
 			queryParams.isBenchmark = isBenchmark;
 			$("#query_is_benchmark").val(isBenchmark);
-		}	
+		}
 		var weightCheck = sessionStorage.getItem("weightCheck");
 		if(!(weightCheck == null || weightCheck == "" || weightCheck == "-1")){
 			queryParams.weightCheck = weightCheck;
@@ -229,10 +227,15 @@ b {
             queryParams.offlineTime = offlineTime;
             $("#query_offline_time").val(offlineTime);
         }
-        var editTime = sessionStorage.getItem("editTime");
-        if(!(editTime == null || editTime == "")){
-            queryParams.editTime = editTime;
-            $("#query_edit_time").val(editTime);
+        var editBeginTime = sessionStorage.getItem("editBeginTime");
+        if(!(editBeginTime == null || editBeginTime == "")){
+            queryParams.editBeginTime = editBeginTime;
+            $("#query_edit_begin_time").val(editBeginTime);
+        }
+        var editEndTime = sessionStorage.getItem("editEndTime");
+        if(!(editEndTime == null || editEndTime == "")){
+            queryParams.editEndTime = editEndTime;
+            $("#query_edit_end_time").val(editEndTime);
         }
         var weight1688Begin = sessionStorage.getItem("weight1688Begin");
         if(!(weight1688Begin == null || weight1688Begin == "")){
@@ -264,8 +267,8 @@ b {
 		doQueryList();
         doStatistic();
 	});
-	
-	function createCateroryTree(nodeId){	
+
+	function createCateroryTree(nodeId){
 		sessionStorage.setItem("catid", nodeId);
 		$('.easyui-tree').tree({
 			url : "/cbtconsole/cutom/queryCategoryTree",
@@ -279,30 +282,30 @@ b {
 		    	doQueryList();
 		    },
 		    onBeforeExpand: function(node){
-		    	if(node.children.length ==0){  
-		    		showMessage('当前节点没有子节点'); 
+		    	if(node.children.length ==0){
+		    		showMessage('当前节点没有子节点');
 		    		return false;
                 }
 		    },
 		    onLoadSuccess:function(node,data){
 		    	isQuery = 0;
-		    	$('.easyui-tree').find('.tree-node-selected').removeClass('tree-node-selected');	
+		    	$('.easyui-tree').find('.tree-node-selected').removeClass('tree-node-selected');
 		    	if(data.length > 0){
 		    		if(nodeId==null || nodeId=="" || nodeId=="0"){
 		    			var nd = $('.easyui-tree').tree('find', data[0].id);
-			            $('.easyui-tree').tree('select', nd.target);	
+			            $('.easyui-tree').tree('select', nd.target);
 		    		}else{
 		    			var clNode = $('.easyui-tree').tree('find', nodeId);
 		    			if(clNode){
 		    				$('.easyui-tree').tree('select', clNode.target);
-		    			}            
-		    		}	  
+		    			}
+		    		}
 		    	}
 		    	$(".easyui-tree").show();
 		    }
-		});	
+		});
 	}
-	
+
 	function doQueryWidthJump(){
 		var adminid = $("#query_admid").val();
 		var state = $("#query_state").val();
@@ -310,12 +313,12 @@ b {
 		var edtime = $("#query_publish_end_time").val();
 		var isEdited =$("#query_is_edited").val();
 		var isAbnormal = $("#query_is_abnormal").val();
-		var isBenchmark = $("#query_is_benchmark").val();	
+		var isBenchmark = $("#query_is_benchmark").val();
 		//var weightCheck = $("#query_weight_check").val();
 		var weightCheck = -1;
 		var bmFlag = $("#query_bm_flag").val();
 		var sourceProFlag = $("#query_sourcePro_flag").val();
-		var priorityFlag = $("#query_priority_flag").val();		
+		var priorityFlag = $("#query_priority_flag").val();
 		var addCarFlag = $("#query_add_car_flag").val();
 		//var sourceUsedFlag = $("#query_source_used_flag").val();
 		var sourceUsedFlag = -1;
@@ -328,13 +331,14 @@ b {
 		var aliWeightEnd = $("#query_ali_weight_end").val();
 		var onlineTime = $("#query_online_time").val();
 		var offlineTime = $("#query_offline_time").val();
-		var editTime = $("#query_edit_time").val();
+		var editBeginTime = $("#query_edit_begin_time").val();
+		var editEndTime = $("#query_edit_end_time").val();
 		var weight1688Begin = $("#query_1688_weight_begin").val();
 		var weight1688End = $("#query_1688_weight_end").val();
 		var price1688Begin = $("#query_1688_price_begin").val();
 		var price1688End = $("#query_1688_price_end").val();
 		var isSort = $("#query_is_sort").val();
-		
+
 		queryParams.catid = "0";
 		queryParams.page = "1";
 		queryParams.adminid = adminid;
@@ -343,7 +347,7 @@ b {
 		queryParams.edtime = edtime;
 		queryParams.isAbnormal = isAbnormal;
 		queryParams.isEdited = isEdited;
-		queryParams.isBenchmark = isBenchmark;	
+		queryParams.isBenchmark = isBenchmark;
 		queryParams.weightCheck = weightCheck;
 		queryParams.bmFlag = bmFlag;
 		queryParams.sourceProFlag = sourceProFlag;
@@ -358,7 +362,8 @@ b {
         queryParams.aliWeightEnd = aliWeightEnd;
         queryParams.onlineTime = onlineTime;
         queryParams.offlineTime = offlineTime;
-        queryParams.editTime = editTime;
+        queryParams.editBeginTime = editBeginTime;
+        queryParams.editEndTime = editEndTime;
         queryParams.weight1688Begin = weight1688Begin;
         queryParams.weight1688End = weight1688End;
         queryParams.price1688Begin = price1688Begin;
@@ -368,28 +373,28 @@ b {
 		createCateroryTree(queryParams.catid);
 		doQueryList();
 	}
-	
+
 	function parentDoQuery(page){
 		queryParams.page=page;
 		doQueryList();
 	}
-	
+
 	function doQueryList(){
-		
+
 		if(isQuery ==0){
-			sessionStorage.setItem("catid", queryParams.catid); 	
-			sessionStorage.setItem("page", queryParams.page); 	
-			sessionStorage.setItem("state", queryParams.state); 
-			sessionStorage.setItem("sttime", queryParams.sttime); 
-			sessionStorage.setItem("edtime", queryParams.edtime); 
-			sessionStorage.setItem("adminid", queryParams.adminid); 
-			sessionStorage.setItem("isEdited", queryParams.isEdited); 
-			sessionStorage.setItem("isBenchmark", queryParams.isBenchmark); 
+			sessionStorage.setItem("catid", queryParams.catid);
+			sessionStorage.setItem("page", queryParams.page);
+			sessionStorage.setItem("state", queryParams.state);
+			sessionStorage.setItem("sttime", queryParams.sttime);
+			sessionStorage.setItem("edtime", queryParams.edtime);
+			sessionStorage.setItem("adminid", queryParams.adminid);
+			sessionStorage.setItem("isEdited", queryParams.isEdited);
+			sessionStorage.setItem("isBenchmark", queryParams.isBenchmark);
 			sessionStorage.setItem("weightCheck", queryParams.weightCheck);
-			sessionStorage.setItem("isAbnormal", queryParams.isAbnormal); 
-			sessionStorage.setItem("bmFlag", queryParams.bmFlag); 
-			sessionStorage.setItem("sourceProFlag", queryParams.sourceProFlag); 
-			sessionStorage.setItem("priorityFlag", queryParams.priorityFlag); 
+			sessionStorage.setItem("isAbnormal", queryParams.isAbnormal);
+			sessionStorage.setItem("bmFlag", queryParams.bmFlag);
+			sessionStorage.setItem("sourceProFlag", queryParams.sourceProFlag);
+			sessionStorage.setItem("priorityFlag", queryParams.priorityFlag);
 			sessionStorage.setItem("addCarFlag", queryParams.addCarFlag);
 			sessionStorage.setItem("sourceUsedFlag", queryParams.sourceUsedFlag);
 			sessionStorage.setItem("ocrMatchFlag", queryParams.ocrMatchFlag);
@@ -400,31 +405,32 @@ b {
             sessionStorage.setItem("aliWeightEnd", queryParams.aliWeightEnd);
             sessionStorage.setItem("onlineTime", queryParams.onlineTime);
             sessionStorage.setItem("offlineTime", queryParams.offlineTime);
-            sessionStorage.setItem("editTime", queryParams.editTime);
+            sessionStorage.setItem("editBeginTime", queryParams.editBeginTime);
+            sessionStorage.setItem("editEndTime", queryParams.editEndTime);
             sessionStorage.setItem("weight1688Begin", queryParams.weight1688Begin);
             sessionStorage.setItem("weight1688End", queryParams.weight1688End);
             sessionStorage.setItem("price1688Begin", queryParams.price1688Begin);
             sessionStorage.setItem("price1688End", queryParams.price1688End);
             sessionStorage.setItem("isSort", queryParams.isSort);
-			
+
 			$('#goods_list').empty();
-			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid 
-			+ "&state=" + queryParams.state + "&sttime=" + queryParams.sttime + "&edtime=" 
+			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
+			+ "&state=" + queryParams.state + "&sttime=" + queryParams.sttime + "&edtime="
 			+ queryParams.edtime + "&adminid=" + queryParams.adminid+ "&isBenchmark=" + queryParams.isBenchmark
-			+ "&weightCheck=" + queryParams.weightCheck+ "&isEdited=" + queryParams.isEdited + "&isAbnormal=" + queryParams.isAbnormal 
+			+ "&weightCheck=" + queryParams.weightCheck+ "&isEdited=" + queryParams.isEdited + "&isAbnormal=" + queryParams.isAbnormal
 			+ "&bmFlag=" + queryParams.bmFlag + "&sourceProFlag=" + queryParams.sourceProFlag + "&soldFlag=" + queryParams.soldFlag
 			+ "&priorityFlag=" + queryParams.priorityFlag + "&addCarFlag=" + queryParams.addCarFlag + "&sourceUsedFlag=" + queryParams.sourceUsedFlag
             + "&infringingFlag=" + queryParams.infringingFlag + "&aliWeightBegin=" + queryParams.aliWeightBegin + "&aliWeightEnd=" + queryParams.aliWeightEnd
 			+ "&onlineTime=" + queryParams.onlineTime + "&offlineTime=" + queryParams.offlineTime
-			+ "&editTime=" + queryParams.editTime + "&weight1688Begin=" + queryParams.weight1688Begin
-			+ "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
+			+ "&editBeginTime=" + queryParams.editBeginTime + "&editEndTime=" + queryParams.editEndTime + "&weight1688Begin="
+			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort;
 
-			$('#goods_list').attr('src',url);  
+			$('#goods_list').attr('src',url);
 		}
 	}
 
-	
+
 	function showMessage(msgStr) {
 		$.messager.show({
 			title : '提醒',
@@ -438,11 +444,11 @@ b {
 			}
 		});
 	}
-	
+
 	function reloadHtml(){
 		window.location.reload();
 	}
-	
+
 	function jumpToTranslation() {
 		var ipStr = location.href;
 		var opUrl = "";
@@ -457,7 +463,7 @@ b {
 		}
 		window.open(opUrl);
 	}
-	
+
 	function doStatistic() {
         $.ajax({
             async : true,
@@ -504,8 +510,7 @@ b {
 						style="font-size: 18px; height: 28px;">
 							<option value="-1" selected="selected">所有</option>
 							<option value="0">未编辑</option>
-							<option value="1">仅标题已编辑</option>
-							<option value="2">详情已编辑</option>
+							<option value="1">已编辑</option>
 					</select></td>
 
 					<td>编辑人: <select id="query_admid"
@@ -555,7 +560,7 @@ b {
 							<option value="1">核心</option>
 							<option value="2">非核心</option>
 					</select></td>
-					
+
 					<td>货源属性:<select id="query_sourcePro_flag"
 						style="font-size: 18px; height: 28px;">
 							<option value="0" selected="selected">请选择</option>
@@ -644,9 +649,15 @@ b {
 							<option value="0">正常数据</option>
 					</select></td>
 
-					<td>修改时间晚于:<input id="query_edit_time" class="Wdate"
-						style="width: 95px; height: 26px" type="text" value="${param.sttime}"
-						onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})" /></td>
+					<td>修改时间:<input id="query_edit_begin_time" class="Wdate"
+						style="width: 95px; height: 26px" type="text" value=""
+						onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})" />
+						<span>-</span>
+						<input id="query_edit_end_time" class="Wdate"
+						style="width: 95px; height: 26px" type="text" value=""
+						onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})" />
+
+					</td>
 					<td>1688&nbsp;&nbsp;重量:<input id="query_1688_weight_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_1688_weight_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
@@ -659,6 +670,7 @@ b {
 							<option value="1">搜索次数倒排序</option>
 							<option value="2">点击次数倒排序</option>
 							<%--<option value="3">已点击商品倒排序</option>--%>
+							<option value="4">按照类别排序</option>
 					</select>&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
 						value="查询" style="height: 30px; width: 60px;" class="btn" />
 						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"

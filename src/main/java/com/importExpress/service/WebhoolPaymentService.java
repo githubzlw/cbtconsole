@@ -10,6 +10,6 @@ public interface WebhoolPaymentService {
 	 * @param type
 	 * @return
 	 */
-	Map<String,Object> list(int startNum, int limitNum, String type);
+	Map<String,Object> list(int startNum,int limitNum,String startTime,String endTime,String type);
 
 }

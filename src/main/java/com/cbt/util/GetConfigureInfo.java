@@ -27,7 +27,7 @@ public class GetConfigureInfo {
 	static void initCbt() {
 		InputStream ins = null;
 		try {
-			ins = GetConfigureInfo.class.getResourceAsStream("../../../cbt.properties");
+			ins = GetConfigureInfo.class.getClassLoader().getResourceAsStream("cbt.properties");
 			cbtProperties.load(ins);
 			ins.close();
 		} catch (Exception e) {
@@ -143,6 +143,25 @@ public class GetConfigureInfo {
 		}
 		return path;
 	}
+
+
+
+	public static String getAdgoodsPath() {
+		String path="/data/cbtconsole/cbtimg/editimg/addGoodsNo.properties";
+		try {
+			if (cbtProperties == null) {
+				initCbt();
+			}
+			path = String.valueOf(cbtProperties.getProperty("adgoodsPath"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("get openJob error : " + e.getMessage());
+			LOG.error("get openJob error : " + e.getMessage());
+		}
+		return path;
+	}
+
+
 
 
 

@@ -1,6 +1,32 @@
 package com.cbt.controller;
 
-import com.cbt.bean.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.importExpress.pojo.OnlineGoodsStatistic;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.omg.PortableInterceptor.INACTIVE;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cbt.bean.CategoryBean;
+import com.cbt.bean.CustomGoodsBean;
+import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.bean.CustomGoodsQuery;
+import com.cbt.bean.CustomRecord;
+import com.cbt.bean.FileBean;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Redis;
@@ -10,31 +36,14 @@ import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
-import com.importExpress.pojo.OnlineGoodsStatistic;
+
 import net.sf.json.JSONArray;
-import org.apache.commons.lang3.StringUtils;
-
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/cutom")
 public class CustomGoodsController {
-	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CustomGoodsController.class);
-	
+	private static final Log LOG = LogFactory.getLog(CustomGoodsController.class);
+
 	private String imgFilePath = "F:\\console\\tomcatImportCsv\\webapps\\importsvimg\\img\\";
 
 	// private String localIP = "http://27.115.38.42:8083/";
@@ -46,7 +55,7 @@ public class CustomGoodsController {
 
 	/**
 	 * 列出指定产品的操作记录
-	 * 
+	 *
 	 * @date 2017年3月14日
 	 * @author abc
 	 * @param request
@@ -78,7 +87,7 @@ public class CustomGoodsController {
 
 	/**
 	 * 显示产品列表页面
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @return
@@ -124,10 +133,10 @@ public class CustomGoodsController {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 列出产品
-	 * 
+	 *
 	 * @date 2017年3月14日
 	 * @author abc
 	 * @param request
@@ -204,9 +213,9 @@ public class CustomGoodsController {
 			isBenchmark = "-1";
 		}
 		queryBean.setIsBenchmark(Integer.valueOf(isBenchmark));
-		
+
 		/**
-		 * 重量检查组合方式( 0 2 3 4 5 2*5 3*5); 0不是异常;2对于重量 比 类别平均重量 高30% 而且 运费占 总价格 占比超 35%的 ; 
+		 * 重量检查组合方式( 0 2 3 4 5 2*5 3*5); 0不是异常;2对于重量 比 类别平均重量 高30% 而且 运费占 总价格 占比超 35%的 ;
 		 * 3如果重量 比 类别平均重量低40%，请人为检查; 4重量数据为空的; 5对于所有的 运费占总免邮价格 60%以上的
 		 */
 		String weightCheck = request.getParameter("weightCheck");
@@ -284,9 +293,14 @@ public class CustomGoodsController {
 			queryBean.setOfflineTime(offlineTime);
 		}
 
-		String editTime = request.getParameter("editTime");
-		if(StringUtils.isNotBlank(editTime)){
-			queryBean.setEditTime(editTime);
+		String editBeginTime = request.getParameter("editBeginTime");
+		if(StringUtils.isNotBlank(editBeginTime)){
+			queryBean.setEditBeginTime(editBeginTime);
+		}
+
+		String editEndTime = request.getParameter("editEndTime");
+		if(StringUtils.isNotBlank(editEndTime)){
+			queryBean.setEditEndTime(editEndTime);
 		}
 
 		String weight1688Begin = request.getParameter("weight1688Begin");
@@ -378,9 +392,9 @@ public class CustomGoodsController {
 			isBenchmark = "-1";
 		}
 		queryBean.setIsBenchmark(Integer.valueOf(isBenchmark));
-		
+
 		/**
-		 * 重量检查组合方式( 0 2 3 4 5 2*5 3*5); 0不是异常;2对于重量 比 类别平均重量 高30% 而且 运费占 总价格 占比超 35%的 ; 
+		 * 重量检查组合方式( 0 2 3 4 5 2*5 3*5); 0不是异常;2对于重量 比 类别平均重量 高30% 而且 运费占 总价格 占比超 35%的 ;
 		 * 3如果重量 比 类别平均重量低40%，请人为检查; 4重量数据为空的; 5对于所有的 运费占总免邮价格 60%以上的
 		 */
 		String weightCheck = request.getParameter("weightCheck");
@@ -457,9 +471,14 @@ public class CustomGoodsController {
 			queryBean.setOnlineTime(offlineTime);
 		}
 
-		String editTime = request.getParameter("editTime");
-		if(StringUtils.isNotBlank(editTime)){
-			queryBean.setOnlineTime(editTime);
+		String editBeginTime = request.getParameter("editBeginTime");
+		if(StringUtils.isNotBlank(editBeginTime)){
+			queryBean.setEditBeginTime(editBeginTime);
+		}
+
+		String editEndTime = request.getParameter("editEndTime");
+		if(StringUtils.isNotBlank(editEndTime)){
+			queryBean.setEditEndTime(editEndTime);
 		}
 
 		String weight1688Begin = request.getParameter("weight1688Begin");

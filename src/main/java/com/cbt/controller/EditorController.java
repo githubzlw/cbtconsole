@@ -17,8 +17,8 @@ import com.importExpress.utli.GoodsPriceUpdateUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -45,7 +45,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/editc")
 public class EditorController {
-    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(EditorController.class);
+    private static final Log LOG = LogFactory.getLog(EditorController.class);
     private String rootPath = "F:/console/tomcatImportCsv/webapps/";
     private String localIP = "http://27.115.38.42:8083/";
     private String wanlIP = "http://192.168.1.27:8083/";
@@ -612,19 +612,27 @@ public class EditorController {
             String rangePrice = request.getParameter("rangePrice");
 
             if (rangePrice == null || "".equals(rangePrice)) {
+                //获取最大值和最小值信息
                 String feePrice = request.getParameter("feePrice");
+                double minPrice = 0;
+                double maxPrice = 0;
                 if(StringUtils.isNotBlank(feePrice)){
                     String[] priceLst = feePrice.split(",");
-                    double price = Double.valueOf(priceLst[0].split("@")[1]);
+                    minPrice = Double.valueOf(priceLst[0].split("@")[1]);
+                    maxPrice = minPrice;
                     for (String priceStr : priceLst) {
                         double tempPrice = Double.valueOf(priceStr.split("@")[1]);
-                        if (tempPrice < price) {
-                            price = tempPrice;
+                        if (tempPrice < minPrice) {
+                            minPrice = tempPrice;
+                        }
+                        if (tempPrice > maxPrice) {
+                            maxPrice = tempPrice;
                         }
                     }
+                    //格式化
                     DecimalFormat df = new DecimalFormat("######0.00");
-                    cgp.setPrice(df.format(price));
-                    cgp.setFeeprice("[" + feePrice.replace("@", " $ ") + "]",1);
+                    cgp.setPrice(df.format(minPrice));
+                    cgp.setFeeprice("[" + feePrice.replace("@", " $ ") + "]");
                 }else{
                     String wprice = request.getParameter("wprice");
                     if (wprice == null || "".equals(wprice)) {
@@ -643,16 +651,21 @@ public class EditorController {
                         }
                     } else {
                         String[] priceLst = wprice.split(",");
-                        double price = Double.valueOf(priceLst[0].split("@")[1]);
+                        minPrice = Double.valueOf(priceLst[0].split("@")[1]);
+                        maxPrice = minPrice;
                         for (String priceStr : priceLst) {
                             double tempPrice = Double.valueOf(priceStr.split("@")[1]);
-                            if (tempPrice < price) {
-                                price = tempPrice;
+                            if (tempPrice < minPrice) {
+                                minPrice = tempPrice;
+                            }
+                            if (tempPrice > maxPrice) {
+                                maxPrice = tempPrice;
                             }
                         }
+                        //格式化
                         DecimalFormat df = new DecimalFormat("######0.00");
-                        cgp.setPrice(df.format(price));
-                        cgp.setWprice("[" + wprice.replace("@", " $ ") + "]",1);
+                        cgp.setPrice(df.format(minPrice));
+                        cgp.setWprice("[" + wprice.replace("@", " $ ") + "]");
                     }
                 }
             } else {
@@ -2065,6 +2078,53 @@ public class EditorController {
     }
 
 
+    @RequestMapping(value = "/setGoodsRepairedByPid", method = {RequestMethod.POST})
+    @ResponseBody
+    public JsonResult setGoodsRepairedByPid(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        GoodsEditBean editBean = new GoodsEditBean();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }else{
+            editBean.setAdmin_id(user.getId());
+        }
+
+        String pid = request.getParameter("pid");
+        if (pid == null || "".equals(pid)) {
+            json.setOk(false);
+            json.setMessage("获取商品PID失败");
+            return json;
+        } else {
+            editBean.setPid(pid);
+        }
+        editBean.setRepaired_flag(1);
+
+        try {
+            boolean is = customGoodsService.updatePidIsEdited(editBean) > 0;
+            if (is) {
+                customGoodsService.insertIntoGoodsEditBean(editBean);
+                json.setOk(true);
+                json.setMessage("执行成功");
+            } else {
+                json.setOk(true);
+                json.setMessage("执行错误，请重试");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("pid:" + pid + " setGoodsRepairedByPid 执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + " setGoodsRepairedByPid 执行错误：" + e.getMessage());
+        }
+        return json;
+    }
+
+
     @RequestMapping(value = "/setNoBenchmarking", method = {RequestMethod.POST})
     @ResponseBody
     public JsonResult setNoBenchmarking(HttpServletRequest request, HttpServletResponse response) {
@@ -2434,6 +2494,33 @@ public class EditorController {
         if (StringUtils.isNotBlank(adminIdStr)) {
             editBean.setAdmin_id(Integer.valueOf(adminIdStr));
         }
+        String weightFlagStr = request.getParameter("weightFlag");
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            editBean.setWeight_flag(Integer.valueOf(weightFlagStr));
+        }
+        String uglyFlagStr = request.getParameter("uglyFlag");
+        if (StringUtils.isNotBlank(uglyFlagStr)) {
+            editBean.setUgly_flag(Integer.valueOf(uglyFlagStr));
+        }
+        String repairedFlagStr = request.getParameter("repairedFlag");
+        if (StringUtils.isNotBlank(repairedFlagStr)) {
+            editBean.setRepaired_flag(Integer.valueOf(repairedFlagStr));
+        }
+
+        int startNum = 0;
+        int limitNum = 30;
+        String limitNumStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(limitNumStr)) {
+            limitNum = Integer.valueOf(limitNumStr);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        editBean.setStartNum(startNum);
+        editBean.setLimitNum(limitNum);
+
         try {
             List<GoodsEditBean> editList = customGoodsService.queryGoodsEditBean(editBean);
             int total = customGoodsService.queryGoodsEditBeanCount(editBean);
