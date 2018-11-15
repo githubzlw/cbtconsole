@@ -757,12 +757,12 @@ public class OrderinfoService implements IOrderinfoService {
 			int isDropshipOrder=dao.queyIsDropshipOrder(map);
 			if (isDropshipOrder == 1) {
 				dao.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
 				int counts=dao.getDtailsState(map);
 				if(counts == 0){
 					dao.updateDropshiporder(map);
 					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+orderid+"' " +
-							"and goodsid='"+goodsid+"')"));
+							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
 				counts=dao.getAllChildOrderState(map);
@@ -773,7 +773,7 @@ public class OrderinfoService implements IOrderinfoService {
 			}else{
 				// 非dropshi订单
 				dao.updateOrderDetails(map);
-				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and goodsid='"+goodsid+"'"));
+				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
 				int counts=dao.getDetailsState(map);
 				if(counts == 0){
@@ -1253,6 +1253,17 @@ public class OrderinfoService implements IOrderinfoService {
 			int checkeds=iWarehouseDao.getChecked(orderNo,"1");//验货无误总数
 			int cg=iWarehouseDao.getPurchaseCount(orderNo,"1");//采购总数
 			int rk=iWarehouseDao.getStorageCount(orderNo,"1");//入库总数
+			//判断该用户是否为黑名单
+			int backList=iWarehouseDao.getBackList(ob.getUserEmail());
+			int payBackList=0;
+			if(StringUtil.isNotBlank(ob.getPayUserName())){
+				payBackList=iWarehouseDao.getPayBackList(ob.getPayUserName());
+			}
+			String backFlag="";
+			if(backList>0 || payBackList>0){
+				backFlag="该用户为黑名单";
+			}
+			ob.setBackFlag(backFlag);
 			ob.setYhCount(yhCount.size());
 			ob.setCheckeds(checkeds);
 			ob.setCg(cg);
@@ -1309,6 +1320,20 @@ public class OrderinfoService implements IOrderinfoService {
 				tp=StringUtil.getPayType(paytype);
 			}
 			ob.setPaytypes(tp);
+			String gradeName="Non Member";
+			double grade=Double.parseDouble(String.format("%.2f", ob.getGradeDiscount()/Double.parseDouble(ob.getProduct_cost())))*100;
+			if(grade==3){
+				gradeName="BizClub Member";
+			}else if(grade==7){
+				gradeName="Silver VIP";
+			}else if(grade==10){
+				gradeName="Gold VIP";
+			}else if(grade==14){
+				gradeName="Platinum VIP";
+			}else if(grade==18){
+				gradeName="Diamond VIP";
+			}
+			ob.setGradeName(gradeName);
 		}
 		return ob;
 	}

@@ -835,6 +835,18 @@ public interface IWarehouseDao {
 	 */
 	public int getShopBuyLogInfoCount(Map<String, String> map);
 	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackList(Map<String,String> map);
+	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackListCount(Map<String,String> map);
+	/**
 	 * 获取所有采购人
 	 * @return
 	 */
@@ -1129,6 +1141,20 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	int getStorageCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+
+	/**
+	 * 判断用户邮箱是否为黑名单
+	 * @param email
+	 * @return
+	 */
+	int getBackList(@Param("email") String email);
+
+	/**
+	 * 判断支付邮箱是否为黑名单
+	 * @param payName
+	 * @return
+	 */
+	int getPayBackList(@Param("payName") String payName);
 	/**
 	 * 获取某个采购的订单采购商品数量
 	 * @param orderid
@@ -1274,11 +1300,11 @@ public interface IWarehouseDao {
 	public List<LocationManagementInfo> getLocationManagementInfoByOrderid(@Param("orderid") String orderid);
 	//重置库位
     public int resetLocation(Map<String, String> map);
-
+	public int updateFlag(@Param("id") String id,@Param("type") String type);
     public int searchCount(Map<Object, Object> map);
-
+	public int updatebackEmail(@Param("id") String id,@Param("email") String email);
     public void inertLocationTracking(Map<String, String> map);
-
+	public int addBackUser(@Param("email") String email,@Param("ip") String ip,@Param("userName") String userName);
     public List<LocationTracking> getLocationTracking(Map<Object, Object> map);
 
     public int searchCount1();

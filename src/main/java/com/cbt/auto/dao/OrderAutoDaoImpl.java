@@ -51,6 +51,8 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 			//
 			String sql="SELECT distinct oi.order_no"
 					+" FROM orderinfo oi "
+					+" INNER JOIN order_address oa ON oi.order_no=oa.orderNo"
+					+" INNER JOIN zone z ON oa.country=z.country or oa.country=z.id"
 					+" INNER JOIN USER u ON oi.user_id=u.id"
 					+" INNER JOIN payment p ON oi.order_no=p.orderid "
 					+" LEFT JOIN goods_distribution g ON oi.order_no=g.orderid"
@@ -62,7 +64,7 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 					"email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND " +
 					"email NOT LIKE 'zhouxueyun%') AND"
 					+" oi.state>0 AND oi.state<6"
-					+" AND u.available_m>=0 AND p.paystatus=1";
+					+" AND u.available_m>=0 AND oi.ipnaddress is not null and p.paystatus=1 and  ((oi.ipnaddress !='' and oi.ipnaddress=z.shorthand and p.paytype=0) or p.paytype<>0)";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			while(rs.next()){

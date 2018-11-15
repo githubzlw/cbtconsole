@@ -6288,10 +6288,10 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
-    public int changeOrderBuyer(String orderid, int admuserid, String goodsids) {
+    public int changeOrderBuyer(String orderid, int admuserid, String odids) {
         String sql = "update goods_distribution set admuserid=" + admuserid + "  where orderid = '" + orderid
-                + "' and goodsid in (" + goodsids + ")";
-        if ("0".equals(goodsids)) {
+                + "' and odid in (" + odids + ")";
+        if ("0".equals(odids)) {
             sql = "update goods_distribution set admuserid=" + admuserid + "  where orderid = '" + orderid + "'";
         }
         Connection conn = DBHelper.getInstance().getConnection();

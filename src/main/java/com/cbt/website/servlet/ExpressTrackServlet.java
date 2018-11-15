@@ -945,6 +945,9 @@ public class ExpressTrackServlet extends HttpServlet {
                 }
             }
         }
+        System.out.println("fileData=="+fileData);
+        System.out.println("f=="+f);
+        System.out.println("imgPath=="+imgPath);
         status = uploadImage(fileData, f, imgPath);//进行文件上传操作，上传到服务器tomcat中
         if (status > 0) {
             //远程上传到图片服务器
@@ -1082,7 +1085,8 @@ public class ExpressTrackServlet extends HttpServlet {
                     System.out.println("验货图片数据丢失上传失败，已删除");
                 } else {
                     //压缩图片
-                    resize(new File(imgPath), new File(imgPath), 1.00, 0.9f);
+//                    resize(new File(imgPath), new File(imgPath), 1.00, 0.9f);
+                    ImageCompression.checkImgResolution(imgPath, 400, 400);
                     status = 1;
                 }
             }
@@ -1110,39 +1114,39 @@ public class ExpressTrackServlet extends HttpServlet {
      * @param scale        缩放比例;  1等大.
      * @throws IOException
      */
-    public static void resize(File originalFile, File resizedFile, double scale, float quality) throws IOException {
-        ImageIcon ii = new ImageIcon(originalFile.getCanonicalPath());
-        Image i = ii.getImage();
-        int iWidth = (int) (i.getWidth(null) * scale);
-        int iHeight = (int) (i.getHeight(null) * scale);
-        //在这你可以自定义 返回图片的大小 iWidth iHeight
-        Image resizedImage = i.getScaledInstance(iWidth, iHeight, Image.SCALE_SMOOTH);
-        // 获取图片中的所有像素
-        Image temp = new ImageIcon(resizedImage).getImage();
-        // 创建缓冲
-        BufferedImage bufferedImage = new BufferedImage(temp.getWidth(null), temp.getHeight(null), BufferedImage.TYPE_INT_RGB);
-        // 复制图片到缓冲流中
-        Graphics g = bufferedImage.createGraphics();
-        // 清除背景并开始画图
-        g.setColor(Color.white);
-        g.fillRect(0, 0, temp.getWidth(null), temp.getHeight(null));
-        g.drawImage(temp, 0, 0, null);
-        g.dispose();
-        // 柔和图片.
-        float softenFactor = 0.05f;
-        float[] softenArray = {0, softenFactor, 0, softenFactor, 1 - (softenFactor * 4), softenFactor, 0, softenFactor, 0};
-        Kernel kernel = new Kernel(3, 3, softenArray);
-        ConvolveOp cOp = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
-        bufferedImage = cOp.filter(bufferedImage, null);
-        FileOutputStream out = new FileOutputStream(resizedFile);
-        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(bufferedImage);
-        param.setQuality(quality, true);
-        encoder.setJPEGEncodeParam(param);
-        encoder.encode(bufferedImage);
-        bufferedImage.flush();
-        out.close();
-    }
+//    public static void resize(File originalFile, File resizedFile, double scale, float quality) throws IOException {
+//        ImageIcon ii = new ImageIcon(originalFile.getCanonicalPath());
+//        Image i = ii.getImage();
+//        int iWidth = (int) (i.getWidth(null) * scale);
+//        int iHeight = (int) (i.getHeight(null) * scale);
+//        //在这你可以自定义 返回图片的大小 iWidth iHeight
+//        Image resizedImage = i.getScaledInstance(iWidth, iHeight, Image.SCALE_SMOOTH);
+//        // 获取图片中的所有像素
+//        Image temp = new ImageIcon(resizedImage).getImage();
+//        // 创建缓冲
+//        BufferedImage bufferedImage = new BufferedImage(temp.getWidth(null), temp.getHeight(null), BufferedImage.TYPE_INT_RGB);
+//        // 复制图片到缓冲流中
+//        Graphics g = bufferedImage.createGraphics();
+//        // 清除背景并开始画图
+//        g.setColor(Color.white);
+//        g.fillRect(0, 0, temp.getWidth(null), temp.getHeight(null));
+//        g.drawImage(temp, 0, 0, null);
+//        g.dispose();
+//        // 柔和图片.
+//        float softenFactor = 0.05f;
+//        float[] softenArray = {0, softenFactor, 0, softenFactor, 1 - (softenFactor * 4), softenFactor, 0, softenFactor, 0};
+//        Kernel kernel = new Kernel(3, 3, softenArray);
+//        ConvolveOp cOp = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+//        bufferedImage = cOp.filter(bufferedImage, null);
+//        FileOutputStream out = new FileOutputStream(resizedFile);
+//        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+//        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(bufferedImage);
+//        param.setQuality(quality, true);
+//        encoder.setJPEGEncodeParam(param);
+//        encoder.encode(bufferedImage);
+//        bufferedImage.flush();
+//        out.close();
+//    }
 
 //    /**
 //     * ly 重写图片压缩
