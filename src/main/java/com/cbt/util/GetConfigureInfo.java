@@ -125,24 +125,38 @@ public class GetConfigureInfo {
 		return is;
 	}
 
-	/**
-	 * 获取谷歌插件存放数据的路径
-	 * @return
-	 */
-	public static String getAddGoodsPath() {
-		String path = "";
+
+
+	public static String getAdgoodsPath() {
+		String path="/data/cbtconsole/cbtimg/editimg/addGoodsNo.properties";
 		try {
 			if (cbtProperties == null) {
 				initCbt();
 			}
-			path = String.valueOf(cbtProperties.getProperty("adGoodsPath"));
+			path = String.valueOf(cbtProperties.getProperty("adgoodsPath"));
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("getAddGoodsPath error : " + e.getMessage());
-			LOG.error("getAddGoodsPath error : " + e.getMessage());
+			System.out.println("get openJob error : " + e.getMessage());
+			LOG.error("get openJob error : " + e.getMessage());
 		}
 		return path;
 	}
+
+	public static String getImgUplaodPath() {
+		String path="/data/cbtconsole/cbtimg/product";
+		try {
+			if (cbtProperties == null) {
+				initCbt();
+			}
+			path = String.valueOf(cbtProperties.getProperty("imgUploadPath"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("get openJob error : " + e.getMessage());
+			LOG.error("get openJob error : " + e.getMessage());
+		}
+		return path;
+	}
+
 
 
 

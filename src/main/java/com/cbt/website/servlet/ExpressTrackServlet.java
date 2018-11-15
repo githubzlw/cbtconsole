@@ -9,6 +9,7 @@ import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.common.StringUtils;
 import com.cbt.parse.driver.FtpDriver;
 import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.WebTool;
@@ -923,7 +924,7 @@ public class ExpressTrackServlet extends HttpServlet {
         String fileData = request.getParameter("fileData");//Base64编码过的图片数据信息，对字节数组字符串进行Base64解码
         HashMap<String, Object> resp = new HashMap<String, Object>();
         int status = 0;
-        String imgPath = "D:/product/" + storePath;
+        String imgPath = GetConfigureInfo.getImgUplaodPath() + storePath;
         //如果此文件夹不存在则创建
         File f = new File(imgPath);
         if (!f.exists()) {
