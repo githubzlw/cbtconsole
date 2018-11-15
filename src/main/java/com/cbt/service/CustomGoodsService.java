@@ -523,10 +523,12 @@ public interface CustomGoodsService {
      * 修改商品重量
      *
      * @param pid
-     * @param weight
+     * @param newWeight
+     * @param oldWeight
+     * @param weightIsEdit
      * @return
      */
-    int updateGoodsWeightByPid(String pid, double weight);
+    int updateGoodsWeightByPid(String pid, double newWeight,double oldWeight,int weightIsEdit);
 
     /**
      * 更新和锁定利润率

@@ -370,8 +370,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int updateGoodsWeightByPid(String pid, double weight) {
-        return customGoodsMapper.updateGoodsWeightByPid(pid, weight);
+    public int updateGoodsWeightByPid(String pid, double newWeight,double oldWeight,int weightIsEdit) {
+        return customGoodsMapper.updateGoodsWeightByPid(pid, newWeight,oldWeight,weightIsEdit);
     }
 
     @Override
