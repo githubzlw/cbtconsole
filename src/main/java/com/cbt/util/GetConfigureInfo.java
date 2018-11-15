@@ -133,7 +133,7 @@ public class GetConfigureInfo {
 			if (cbtProperties == null) {
 				initCbt();
 			}
-			path = String.valueOf(cbtProperties.getProperty("adgoodsPath"));
+			path = String.valueOf(cbtProperties.getProperty("adGoodsPath"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("get openJob error : " + e.getMessage());
