@@ -9,10 +9,7 @@ import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.common.StringUtils;
 import com.cbt.parse.driver.FtpDriver;
 import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.WebTool;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ExpressTrackInfo;
 import com.cbt.website.bean.SearchResultInfo;
@@ -24,6 +21,7 @@ import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.ContentConfig;
 import com.cbt.website.util.DownloadMain;
+import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.Utility;
 import com.google.gson.Gson;
 //import com.sun.image.codec.jpeg.JPEGCodec;
@@ -57,6 +55,7 @@ import java.util.List;
  */
 public class ExpressTrackServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
     // 上传文件存储目录
     private static final String UPLOAD_DIRECTORY = "upload";
     // 上传配置
@@ -924,7 +923,12 @@ public class ExpressTrackServlet extends HttpServlet {
         String fileData = request.getParameter("fileData");//Base64编码过的图片数据信息，对字节数组字符串进行Base64解码
         HashMap<String, Object> resp = new HashMap<String, Object>();
         int status = 0;
-        String imgPath = GetConfigureInfo.getImgUplaodPath() + storePath;
+        if (ftpConfig == null) {
+            ftpConfig = GetConfigureInfo.getFtpConfig();
+        }
+        // 检查配置文件信息是否正常读取
+        String imgUploadPath = ftpConfig.getLocalDiskPath();
+        String imgPath = imgUploadPath + storePath;
         //如果此文件夹不存在则创建
         File f = new File(imgPath);
         if (!f.exists()) {
