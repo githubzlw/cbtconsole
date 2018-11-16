@@ -1,8 +1,10 @@
 package com.importExpress.service.impl;
 
 import com.importExpress.mapper.ShopCarMarketingMapper;
+import com.importExpress.pojo.ShopCarInfo;
 import com.importExpress.pojo.ShopCarMarketing;
 import com.importExpress.pojo.ShopCarMarketingExample;
+import com.importExpress.pojo.ShopCarUserStatistic;
 import com.importExpress.service.ShopCarMarketingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -93,4 +95,39 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     public int deleteShopCarBatch(List<ShopCarMarketing> recordList) {
         return shopCarMarketingMapper.deleteShopCarBatch(recordList);
     }
+
+    @Override
+    public List<ShopCarInfo> queryShopCarInfoByUserId(int userId) {
+        List<ShopCarInfo> resultList = shopCarMarketingMapper.queryShopCarInfoByUserId(userId);
+        if(!(resultList == null  || resultList.isEmpty())){
+            for(ShopCarInfo carInfo : resultList){
+                if(!(carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1)){
+                    //carInfo.setAliPid(null);
+                }
+            }
+        }
+        return resultList;
+    }
+
+    @Override
+    public ShopCarUserStatistic queryUserInfo(int userId) {
+        return shopCarMarketingMapper.queryUserInfo(userId);
+    }
+
+    @Override
+    public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
+        shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
+        return shopCarMarketingMapper.updateUserFollowTime(userId, adminId);
+    }
+
+    @Override
+    public List<ShopCarUserStatistic> queryForList(ShopCarUserStatistic statistic) {
+        return shopCarMarketingMapper.queryForList(statistic);
+    }
+
+    @Override
+    public int queryForListCount(ShopCarUserStatistic statistic) {
+        return shopCarMarketingMapper.queryForListCount(statistic);
+    }
+
 }

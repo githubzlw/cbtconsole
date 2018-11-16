@@ -41,22 +41,26 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 				sql.append("select sql_calc_found_rows u.id,u.email,count(distinct gc.catid) as species," +
 						"SUM(gc.googs_price * gc.googs_number) as totalAmount, " +
 						"(SUM(gc.googs_price * gc.googs_number) / sum(gc.googs_number)) as avgPrice ,gdcf.updateTime as lastAccTime," +
-						"u.currency,au.adminid,au.admName,gc.datatime from shop_car_marketing gc LEFT JOIN user u on gc.userid = u.id LEFT JOIN " +
+						"u.currency,au.adminid,au.admName,gc.datatime,gdcf.follow_time " +
+						"from shop_car_marketing gc left join goods_carconfig gdcf on gc.userid = gdcf.userid " +
+						"LEFT JOIN user u on gc.userid = u.id LEFT JOIN " +
 						"admin_r_user au on gc.userid=au.userid where 1 = 1 and u.id != 0 and gc.state = 0 AND " +
-						"gc.datatime>=DATE_SUB(NOW(), INTERVAL 7 DAY)  "
-						+ " and u.id NOT IN (select userId from cart_market_email_send cmes WHERE " +
-						"cmes.sentEmailTime >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY userId ORDER BY cmes.sentEmailTime desc)");
+						"gc.datatime>=DATE_SUB(NOW(), INTERVAL 7 DAY)");
 		}else if(status ==2){
 			   sql.append("select sql_calc_found_rows u.id,u.email,count(distinct gc.catid) as species,SUM(gc.googs_price * gc.googs_number) " +
 					   "as totalAmount, (SUM(gc.googs_price * gc.googs_number) / sum(gc.googs_number)) as avgPrice ," +
-					   "gdcf.updateTime as lastAccTime,u.currency,au.adminid,au.admName,gc.datatime from shop_car_marketing gc " +
+					   "gdcf.updateTime as lastAccTime,u.currency,au.adminid,au.admName,gc.datatime,gdcf.follow_time " +
+					   "from shop_car_marketing gc left join goods_carconfig gdcf on gc.userid = gdcf.userid " +
 					   "LEFT JOIN user u on gc.userid = u.id LEFT JOIN admin_r_user au on gc.userid=au.userid where 1 = 1 " +
 					   "and gc.userid > 0 and gc.state = 0 AND gc.datatime>=DATE_SUB(NOW(), INTERVAL 7 DAY)");
 		}else{
 			sql.append("select sql_calc_found_rows u.id,u.email,count(distinct gc.catid) as species,SUM(gc.googs_price * gc.googs_number) " +
-					"as totalAmount, (SUM(gc.googs_price * gc.googs_number) / sum(gc.googs_number)) as avgPrice ,gdcf.updateTime as lastAccTime," +
-					"u.currency,au.adminid,au.admName from shop_car_marketing gc LEFT JOIN user u on gc.userid = u.id LEFT JOIN admin_r_user au " +
-					"on gc.userid=au.userid left join goods_carconfig gdcf on gc.userid = gdcf.userid where 1 = 1 and gc.userid > 0 and gc.state = 0 ");
+					"as totalAmount, (SUM(gc.googs_price * gc.googs_number) / sum(gc.googs_number)) as avgPrice ," +
+					"gdcf.updateTime as lastAccTime,u.currency,au.adminid,au.admName,gdcf.follow_time " +
+					"from shop_car_marketing gc " +
+					"LEFT JOIN user u on gc.userid = u.id LEFT JOIN admin_r_user au " +
+					"on gc.userid=au.userid left join goods_carconfig gdcf on gc.userid = gdcf.userid " +
+					"where 1 = 1 and gc.userid > 0 and gc.state = 0 ");
 		}		
 		if (admuser != null) {
 			if ("1".equals(admuser.getRoletype())) {
@@ -90,7 +94,7 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 				total = rs2.getInt("found_rows()");
 			}
 			while (rs.next()) {
-				Object[] obj = new Object[10];
+				Object[] obj = new Object[11];
 				obj[0] = rs.getInt("id");
 				obj[1] = rs.getString("email");
 				obj[2] = rs.getInt("species");
@@ -100,7 +104,8 @@ public class shoppingCartDaoImpl implements shoppingCartDao {
 				obj[6] = rs.getString("currency");
 				obj[7] = total;
 				obj[8] = rs.getInt("adminid");
-				obj[9] = rs.getString("admName");				
+				obj[9] = rs.getString("admName");
+				obj[10] = rs.getString("follow_time");
 				list.add(obj);
 			}
 			
