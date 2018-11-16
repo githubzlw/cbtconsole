@@ -3383,8 +3383,13 @@
 	<select id="getWeight" resultType="com.cbt.website.bean.SearchResultInfo">
 		select weight,createtime from package_weight order by id desc limit 1
 	</select>
-	<select id="getGoodsWeight" resultType="String">
-		SELECT weight FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+    <select id="getGoodsWeight" resultType="com.cbt.website.bean.SearchResultInfo">
+		SELECT weight,syn FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+	</select>
+    <select id="updateGoodsWeightFlag">
+        UPDATE package_goods_weight
+        SET syn = 1
+        WHERE pid=#{pid} AND del = 0
 	</select>
 	<insert id="saveWeight">
 		<!-- UPDATE id_relationtable SET weight=weight+${weight} WHERE orderid=#{orderid} and odid=#{odid} -->
@@ -3496,6 +3501,12 @@
 	<select id="getOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
 		select yourorder from order_details where orderid=#{orderid} and goodsid=#{goodsid};
 	</select>
+    <select id="getBackList" resultType="INTEGER">
+        SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.email=#{email}
+    </select>
+    <select id="getPayBackList" resultType="INTEGER">
+         SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.email=#{payName}
+    </select>
 	<update id="updateInventory">
 		<if test="flag == 0">
 			UPDATE inventory SET remaining=remaining-${yourorder},can_remaining=can_remaining-${yourorder},inventory_amount=inventory_amount-${cancelAmount} WHERE id=${id}
@@ -3504,6 +3515,34 @@
 			UPDATE inventory SET new_remaining=new_remaining-${yourorder},can_remaining=can_remaining-${yourorder},new_inventory_amount=new_inventory_amount-${cancelAmount} WHERE id=${id}
 		</if>
 	</update>
+	<select id="getUserBackList" resultType="com.cbt.bean.BlackList">
+		select id,email,createtime,updateTime,userip,flag,username from tblacklist where 1=1
+		<if test="email != null">
+            and email like CONCAT('%','${email}','%' )
+		</if>
+		<if test="flag != null">
+			and flag=#{flag}
+		</if>
+		order by flag asc
+	</select>
+	<insert id="addBackUser">
+		insert into tblacklist(email,createtime,userip,username) values(#{email},now(),#{ip},#{userName})
+	</insert>
+	<update id="updatebackEmail">
+		update tblacklist set email=#{email},updateTime=now() where id=${id}
+	</update>
+	<update id="updateFlag">
+		update tblacklist set flag=${type},updateTime=now() where id=#{id}
+	</update>
+	<select id="getUserBackListCount" resultType="com.cbt.bean.BlackList">
+		select * from tblacklist where 1=1
+		<if test="email != null">
+			and email like CONCAT('%','${email}','%' )
+		</if>
+		<if test="flag != null">
+			and flag=#{flag}
+		</if>
+	</select>
 	<update id="updateIsRefund">
 		update id_relationtable set is_refund=1 where orderid=#{orderid} and goodid=#{goodsid};
 	</update>

@@ -1,19 +1,30 @@
 package com.cbt.website.dao;
 
-import com.cbt.bean.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import com.cbt.warehouse.util.StringUtil;
+
+import com.cbt.bean.OrderAddress;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.OrderProductSource;
+import com.cbt.bean.Payment;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.onlinesql.ctr.SaveSyncTable;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
-import com.cbt.warehouse.util.StringUtil;
-
-import java.sql.*;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class OrderSplitDaoImpl implements IOrderSplitDao {
 //	private static final Log   SLOG = (Log) LogFactory.getLog("source");
@@ -289,8 +300,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	}
 
 
-	
-	
+
+
 	@Override
 	public int addInventory(String odid,String remark) {
 		int row=0;
@@ -301,8 +312,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		try{
 			sql="SELECT od.id,od.orderid,od.goodsid,od.car_url,od.seilUnit,od.goodsname,od.car_type,id.barcode,ca.en_name,ops.goods_p_price,od.car_img,od.goods_pid,od.car_urlMD5,"
 					+ " ops.usecount,ops.goods_p_url,ops.goodsid "
-					+" FROM order_details od INNER JOIN order_product_source ops ON od.goodsid=ops.goodsid and od.orderid=ops.orderid"
-					+" INNER JOIN id_relationtable id ON od.orderid=id.orderid AND od.goodsid=id.goodid"
+					+" FROM order_details od INNER JOIN order_product_source ops ON od.id=ops.od_id"
+					+" INNER JOIN id_relationtable id ON od.id=id.odid"
 					+" LEFT JOIN 1688_category ca ON od.goodscatid=ca.category_id"
 					+" WHERE od.id="+odid+" AND od.checked=1 AND id.goodstatus=1 limit 1";
 			stmt=conn.prepareStatement(sql);
@@ -323,16 +334,16 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					if(flag==1){
 						//已盘点过
 						sql="update inventory set new_remaining=?,can_remaining=?,new_inventory_amount=?,goods_p_url=?,goods_p_price=?,od_id=?,updatetime=now(),remark=?"
-							+ "where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
-							stmt=conn.prepareStatement(sql);
-							stmt.setString(1, String.valueOf(rs1.getInt("new_remaining")+rs.getInt("usecount")));
-							stmt.setString(2,  String.valueOf(rs1.getInt("can_remaining")+rs.getInt("usecount")));
-							stmt.setString(3, String.valueOf(rs1.getDouble("new_inventory_amount")+rs.getInt("usecount")*rs.getDouble("goods_p_price")));
+								+ "where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
+						stmt=conn.prepareStatement(sql);
+						stmt.setString(1, String.valueOf(rs1.getInt("new_remaining")+rs.getInt("usecount")));
+						stmt.setString(2,  String.valueOf(rs1.getInt("can_remaining")+rs.getInt("usecount")));
+						stmt.setString(3, String.valueOf(rs1.getDouble("new_inventory_amount")+rs.getInt("usecount")*rs.getDouble("goods_p_price")));
 
 					}else{
 						//未盘点库存
 						sql="update inventory set remaining=?,can_remaining=?,inventory_amount=?,goods_p_url=?,goods_p_price=?,od_id=?,updatetime=now(),remark=?"
-						+ "where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
+								+ "where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
 						stmt=conn.prepareStatement(sql);
 						stmt.setString(1, String.valueOf(rs1.getInt("remaining")+rs.getInt("usecount")));
 						stmt.setString(2,   String.valueOf(rs1.getInt("can_remaining")+rs.getInt("usecount")));
@@ -359,44 +370,44 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 					stmt.executeUpdate();
 				}else{
 					//不存在该商品库存则新增
-						sql="insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goods_p_url,goodscatid,"
+					sql="insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goods_p_url,goodscatid,"
 							+ "inventory_amount,car_img,goods_p_price,od_id,goods_pid,createtime,car_urlMD5,remark) values(?,?,?,?,?,?,?,?,?,?,?,?,?,now(),?,?)";
+					stmt=conn.prepareStatement(sql);
+					stmt.setString(1, rs.getString("car_url"));//goods_url
+					stmt.setString(2, rs.getString("usecount"));//remaining
+					stmt.setString(3, rs.getString("usecount"));//can_remaining
+					stmt.setString(4, rs.getString("goodsname"));//good_name
+					stmt.setString(5, rs.getString("car_type"));//sku
+					stmt.setString(6, rs.getString("barcode"));//barcode
+					stmt.setString(7, rs.getString("goods_p_url"));//goods_p_url
+					stmt.setString(8, rs.getString("en_name"));//goodscatid
+					stmt.setString(9, String.valueOf(rs.getInt("usecount")*rs.getDouble("goods_p_price")));//inventory_amount
+					stmt.setString(10, rs.getString("car_img"));//car_img
+					stmt.setString(11, rs.getString("goods_p_price"));//goods_p_price
+					stmt.setString(12, rs.getString("id"));//od_id
+					stmt.setString(13, rs.getString("goods_pid"));//goods_pid
+					stmt.setString(14, rs.getString("car_urlMD5"));//car_urlMD5
+					stmt.setString(15, rs.getString("orderid")+"-"+rs.getString("goodsid")+remark);//remark
+					row=stmt.executeUpdate();
+					sql="select * from inventory where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
+					stmt=conn.prepareStatement(sql);
+					stmt.setString(1, rs.getString("goods_pid"));
+					stmt.setString(2, rs.getString("car_type"));
+					stmt.setString(3, rs.getString("car_urlMD5"));
+					stmt.setString(4, rs.getString("barcode"));
+					rs1=stmt.executeQuery();
+					if(rs1.next()){
+						sql="insert into storage_outbound_details (orderid,goodsid,in_id,type,admName,createtime,add_inventory,storage_count) values(?,?,?,?,?,now(),?,?)";
 						stmt=conn.prepareStatement(sql);
-						stmt.setString(1, rs.getString("car_url"));//goods_url
-						stmt.setString(2, rs.getString("usecount"));//remaining
-						stmt.setString(3, rs.getString("usecount"));//can_remaining
-						stmt.setString(4, rs.getString("goodsname"));//good_name
-						stmt.setString(5, rs.getString("car_type"));//sku
-						stmt.setString(6, rs.getString("barcode"));//barcode
-						stmt.setString(7, rs.getString("goods_p_url"));//goods_p_url
-						stmt.setString(8, rs.getString("en_name"));//goodscatid
-						stmt.setString(9, String.valueOf(rs.getInt("usecount")*rs.getDouble("goods_p_price")));//inventory_amount
-						stmt.setString(10, rs.getString("car_img"));//car_img
-						stmt.setString(11, rs.getString("goods_p_price"));//goods_p_price
-						stmt.setString(12, rs.getString("id"));//od_id
-						stmt.setString(13, rs.getString("goods_pid"));//goods_pid
-						stmt.setString(14, rs.getString("car_urlMD5"));//car_urlMD5
-						stmt.setString(15, rs.getString("orderid")+"-"+rs.getString("goodsid")+remark);//remark
-						row=stmt.executeUpdate();
-						sql="select * from inventory where goods_pid=? and sku=? and car_urlMD5=? and barcode=?";
-						stmt=conn.prepareStatement(sql);
-						stmt.setString(1, rs.getString("goods_pid"));
-						stmt.setString(2, rs.getString("car_type"));
-						stmt.setString(3, rs.getString("car_urlMD5"));
-						stmt.setString(4, rs.getString("barcode"));
-						rs1=stmt.executeQuery();
-						if(rs1.next()){
-							sql="insert into storage_outbound_details (orderid,goodsid,in_id,type,admName,createtime,add_inventory,storage_count) values(?,?,?,?,?,now(),?,?)";
-							stmt=conn.prepareStatement(sql);
-							stmt.setString(1, rs.getString("orderid"));
-							stmt.setString(2, rs.getString("goodsid"));
-							stmt.setString(3, rs1.getString("id"));
-							stmt.setString(4, "3");
-							stmt.setString(5, "订单销售");
-							stmt.setString(6, rs.getString("usecount"));
-							stmt.setString(7, rs.getString("usecount"));
-							stmt.executeUpdate();
-						}
+						stmt.setString(1, rs.getString("orderid"));
+						stmt.setString(2, rs.getString("goodsid"));
+						stmt.setString(3, rs1.getString("id"));
+						stmt.setString(4, "3");
+						stmt.setString(5, "订单销售");
+						stmt.setString(6, rs.getString("usecount"));
+						stmt.setString(7, rs.getString("usecount"));
+						stmt.executeUpdate();
+					}
 				}
 			}else{
 				System.out.println("----------------没有入库存入-------------------");
@@ -636,9 +647,9 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public int splitOrder(OrderBean ob, OrderBean orderBeannew, String odId_now, String selSplitArr, Payment pay,
-                          int state, double order_ac, double balance_pay, String gId_last, String adminUserName, String pay_time,
-                          List<OrderDetailsBean> updateOrderDetaildList, List<OrderDetailsBean> insertOrderDetaildList,
-                          String splitGoodsId) {
+	                      int state, double order_ac, double balance_pay, String gId_last, String adminUserName, String pay_time,
+	                      List<OrderDetailsBean> updateOrderDetaildList, List<OrderDetailsBean> insertOrderDetaildList,
+	                      String splitGoodsId) {
 		// 修改拆分后原订单orderinfo
 		String sql_up = "UPDATE orderinfo SET product_cost=?,pay_price=?,pay_price_tow=?,pay_price_three=?,actual_ffreight=?,service_fee=?,order_ac=?,details_number=?,foreign_freight=?,discount_amount=?,purchase_number=0,state=?,purchase_number=?,extra_freight=?,remaining_price=?,packag_style=0,share_discount=?,extra_discount=?,coupon_discount=?  WHERE order_no = ?";
 		// 更新本地orderinfo主单的替换标志
@@ -1512,10 +1523,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@Override
 	public List<OrderProductSource> getOrderProductSource(String orderid, String[] orderdtlIds) {
 		String sql = "SELECT * FROM order_product_source WHERE orderid = ? ";// and
-																				// od_id
-																				// =
-																				// ?
-																				// ";
+		// od_id
+		// =
+		// ?
+		// ";
 		// AND od_id IN ?
 		if (orderdtlIds.length == 1) {
 			sql += " and od_id=?";
@@ -1610,7 +1621,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	/**
 	 * 根据orderNo,goodsid查询出需要拆分的订单
-	 * 
+	 *
 	 * @param orderNo
 	 * @param goodsid
 	 * @return
@@ -2107,12 +2118,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	/**
 	 * 根据OrderNo获取订单列表信息(用来判断Drop Ship订单拆分是否只有一个子订单)
-	 * 
+	 *
 	 * @param orderNo
 	 * @return
 	 */
 	@Override
-	public List<OrderDetailsBean> getOrdersDetailsList(String orderNo, int noCancel) {
+	public List<OrderDetailsBean> getOrdersDetailsList(String orderNo,int noCancel) {
 		StringBuffer sqlBuffer = new StringBuffer();
 		sqlBuffer.append(
 				"select id,userid,goodsid,goodsdata_id,goodsname,car_url,car_img,car_type,orderid,dropshipid,delivery_time,yourorder,goodsprice,goodsfreight,");
@@ -2123,9 +2134,9 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		sqlBuffer.append(
 				"od_bulk_volume,od_total_weight,discount_ratio,flag,goodscatid,isAuto,isFeight,checked from order_details where orderid=?");
 		if(noCancel > 0){
-            sqlBuffer.append(
-                    " and dropshipid not in(select child_order_no from dropshiporder where parent_order_no = ? and state in(-1,6))");
-        }
+			sqlBuffer.append(
+					" and dropshipid not in(select child_order_no from dropshiporder where parent_order_no = ? and state in(-1,6))");
+		}
 		Connection conn = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2134,9 +2145,9 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		try {
 			stmt = conn.prepareStatement(sqlBuffer.toString());
 			stmt.setString(1, orderNo);
-            if(noCancel > 0){
-                stmt.setString(2, orderNo);
-            }
+			if(noCancel > 0){
+				stmt.setString(2, orderNo);
+			}
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				orderDetailsBean = new OrderDetailsBean();
@@ -2281,7 +2292,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public boolean orderSplitByOrderNo(int userId, String orderNoOld, String orderNoNew, int updateGoodsId,
-			int updateGoodsNum) {
+	                                   int updateGoodsNum) {
 
 		Connection conn2 = DBHelper.getInstance().getConnection2();
 		String sql = "call order_split_by_orderno(?,?,?,?) ;";
@@ -2937,7 +2948,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@SuppressWarnings("resource")
 	@Override
 	public boolean newOrderSplitFun(OrderBean orderBeanTemp, OrderBean odbeanNew,
-                                    List<OrderDetailsBean> nwOrderDetails, String state) {
+	                                List<OrderDetailsBean> nwOrderDetails,String state) {
 
 		String orderNoOld = orderBeanTemp.getOrderNo();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
@@ -2981,7 +2992,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ orderBeanTemp.getPay_price() + ",discount_amount=" + orderBeanTemp.getDiscount_amount()
 				+ ",share_discount=" + orderBeanTemp.getShare_discount() + ",extra_discount="
 				+ orderBeanTemp.getExtra_discount() + ",coupon_discount=" + orderBeanTemp.getCoupon_discount()
-				+ ",grade_discount=" + orderBeanTemp.getGradeDiscount() + ",cashback=" + orderBeanTemp.getCashback() 
+				+ ",grade_discount=" + orderBeanTemp.getGradeDiscount() + ",cashback=" + orderBeanTemp.getCashback()
 				+ ",extra_freight=" + orderBeanTemp.getExtra_freight()
 				+ " where order_no = '"
 				+ orderBeanTemp.getOrderNo() + "'";
@@ -3079,10 +3090,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				remoteConn.commit();
 				ppStamt = localConn.createStatement();
 				for(String loSql : localSqlList){
-                    ppStamt.addBatch(loSql);
-                }
+					ppStamt.addBatch(loSql);
+				}
 				//ppStamt.executeUpdate(localSql);
-                ppStamt.executeBatch();
+				ppStamt.executeBatch();
 				//拆单取消时记录拆单的商品
 				if("0".equals(state)){
 					wStamt = localConn.createStatement();

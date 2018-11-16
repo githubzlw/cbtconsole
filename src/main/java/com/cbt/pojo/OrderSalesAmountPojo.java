@@ -33,6 +33,16 @@ public class OrderSalesAmountPojo {
 	private String orderids;
 	private String shipnos;
 	private int flag;
+
+	public String getfProfits() {
+		return fProfits;
+	}
+
+	public void setfProfits(String fProfits) {
+		this.fProfits = fProfits;
+	}
+
+	private String fProfits;
 	public int getFlag() {
 		return flag;
 	}

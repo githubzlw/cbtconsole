@@ -5,6 +5,7 @@ import com.cbt.bean.OrderProductSource;
 import com.cbt.bean.ShippingBean;
 import com.cbt.common.StringUtils;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.service.IWarehouseService;
@@ -441,7 +442,7 @@ public class PurchaseController {
 		Properties properties = new Properties();
 		try
 		{
-			String filePath="F:/cbtconsole/adgoods/addGoodsNo.properties";//获取项目路径
+			String filePath= GetConfigureInfo.getAdgoodsPath();//获取项目路径
 			InputStream inputStream = new FileInputStream(filePath);
 			properties.load(inputStream);
 			inputStream.close(); //关闭流

@@ -64,6 +64,8 @@ public interface IPictureComparisonService {
 
 	public int getYlbbGooddataCount(String userName, int flag);
 
+	public int getErrorInfoCount(String userId,String timeF,String timeE);
+	
 	public int getLireImgCount(String userName, int flag);
 
 	public int getFactoryCount(String cid, String shopId);
@@ -128,7 +130,7 @@ public interface IPictureComparisonService {
 
 	public List<GoodsCheckBean> findYLGoodsDataCheck(int selled, String cid, String categoryId1, int start, int end);
 
-	public List<GoodsCheckBean> getErrorInfo(int selled, String cid, String categoryId1, int start, int end);
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int end);
 
 	public List<GoodsCheckBean> findSamplInfo(int selled, String cid, String categoryId1, int start, int end);
 

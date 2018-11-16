@@ -9,9 +9,7 @@ import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.common.StringUtils;
 import com.cbt.parse.driver.FtpDriver;
 import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.WebTool;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ExpressTrackInfo;
 import com.cbt.website.bean.SearchResultInfo;
@@ -23,11 +21,9 @@ import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.ContentConfig;
 import com.cbt.website.util.DownloadMain;
+import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.Utility;
 import com.google.gson.Gson;
-//import com.sun.image.codec.jpeg.JPEGCodec;
-//import com.sun.image.codec.jpeg.JPEGEncodeParam;
-//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -56,6 +52,7 @@ import java.util.List;
  */
 public class ExpressTrackServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
     // 上传文件存储目录
     private static final String UPLOAD_DIRECTORY = "upload";
     // 上传配置
@@ -923,7 +920,12 @@ public class ExpressTrackServlet extends HttpServlet {
         String fileData = request.getParameter("fileData");//Base64编码过的图片数据信息，对字节数组字符串进行Base64解码
         HashMap<String, Object> resp = new HashMap<String, Object>();
         int status = 0;
-        String imgPath = "D:/product/" + storePath;
+        if (ftpConfig == null) {
+            ftpConfig = GetConfigureInfo.getFtpConfig();
+        }
+        // 检查配置文件信息是否正常读取
+        String imgUploadPath = ftpConfig.getLocalDiskPath();
+        String imgPath = imgUploadPath + storePath;
         //如果此文件夹不存在则创建
         File f = new File(imgPath);
         if (!f.exists()) {
@@ -937,7 +939,10 @@ public class ExpressTrackServlet extends HttpServlet {
                 }
             }
         }
-        //status = uploadImage(fileData, f, imgPath);//进行文件上传操作，上传到服务器tomcat中
+        System.out.println("fileData=="+fileData);
+        System.out.println("f=="+f);
+        System.out.println("imgPath=="+imgPath);
+        status = uploadImage(fileData, f, imgPath);//进行文件上传操作，上传到服务器tomcat中
         if (status > 0) {
             //远程上传到图片服务器
             AddInventoryThread a = new AddInventoryThread(storePath, imgPath, orderid, odid, 0);
@@ -958,7 +963,7 @@ public class ExpressTrackServlet extends HttpServlet {
             DownloadMain.postContentClient(ContentConfig.DOWNLOAD_LIST_URL, nvps);
         }
         resp.put("status", status);
-        resp.put("localPath", "http://192.168.1.34:8085/" + storePath + "");
+        resp.put("localPath", ftpConfig.getLocalShowPath()+ storePath + "");
         resp.put("picPath", "https://img.import-express.com/importcsvimg/inspectionImg/" + storePath + "");
         WebTool.writeJson(SerializeUtil.ObjToJson(resp), response);
     }
@@ -1047,52 +1052,53 @@ public class ExpressTrackServlet extends HttpServlet {
      * @param file
      * @return
      */
-//    private int uploadImage(String fileData, File file, String imgPath) {
-//        int status = 0;
-//        //使用BASE64对图片文件数据进行解码操作
-//        BASE64Decoder decoder = new BASE64Decoder();
-//        ByteArrayInputStream bais = null;
-//        byte[] bytes = null;
-//        BufferedImage bi = null;
-//        try {
-//            //通过Base64解密，将图片数据解密成字节数组
-//            bytes = decoder.decodeBuffer(fileData);
-//            //构造字节数组输入流
-//            bais = new ByteArrayInputStream(bytes);
-//            //读取输入流的数据
-//            bi = ImageIO.read(bais);
-//            //将数据信息写进图片文件中
-//            ImageIO.write(bi, "png", file);// 不管输出什么格式图片，此处不需改动
-//            //上传完成后判断图片大小，如果小于10KB则上传失败
-//            File new_file = new File(imgPath);
-//            if (new_file.exists() && new_file.isFile()) {
-//                long fileS = new_file.length();
-//                double size = (double) fileS / 1024;
-//                if (size < 9) {
-//                    //图片上传失败删除图片
-//                    new_file.delete();
-//                    System.out.println("验货图片数据丢失上传失败，已删除");
-//                } else {
-//                    //压缩图片
+    private int uploadImage(String fileData, File file, String imgPath) {
+        int status = 0;
+        //使用BASE64对图片文件数据进行解码操作
+        BASE64Decoder decoder = new BASE64Decoder();
+        ByteArrayInputStream bais = null;
+        byte[] bytes = null;
+        BufferedImage bi = null;
+        try {
+            //通过Base64解密，将图片数据解密成字节数组
+            bytes = decoder.decodeBuffer(fileData);
+            //构造字节数组输入流
+            bais = new ByteArrayInputStream(bytes);
+            //读取输入流的数据
+            bi = ImageIO.read(bais);
+            //将数据信息写进图片文件中
+            ImageIO.write(bi, "png", file);// 不管输出什么格式图片，此处不需改动
+            //上传完成后判断图片大小，如果小于10KB则上传失败
+            File new_file = new File(imgPath);
+            if (new_file.exists() && new_file.isFile()) {
+                long fileS = new_file.length();
+                double size = (double) fileS / 1024;
+                if (size < 9) {
+                    //图片上传失败删除图片
+                    new_file.delete();
+                    System.out.println("验货图片数据丢失上传失败，已删除");
+                } else {
+                    //压缩图片
 //                    resize(new File(imgPath), new File(imgPath), 1.00, 0.9f);
-//                    status = 1;
-//                }
-//            }
-//        } catch (IOException e) {
-//            status = 0;
-//        } finally {
-//            if (bais != null) {
-//                try {
-//                    bais.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            bytes = null;
-//            bi = null;
-//        }
-//        return status;
-//    }
+                    ImageCompression.checkImgResolution(imgPath, 400, 400);
+                    status = 1;
+                }
+            }
+        } catch (IOException e) {
+            status = 0;
+        } finally {
+            if (bais != null) {
+                try {
+                    bais.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            bytes = null;
+            bi = null;
+        }
+        return status;
+    }
 
 
     /**

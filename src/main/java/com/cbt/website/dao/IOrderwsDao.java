@@ -1,5 +1,10 @@
 package com.cbt.website.dao;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.cbt.bean.*;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.TaoBaoOrderInfo;
@@ -11,11 +16,6 @@ import com.cbt.website.bean.QualityResult;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author ylm 后台订单管理
  */
@@ -23,13 +23,13 @@ public interface IOrderwsDao {
 
 	/**
 	 * 获取订单信息 ylm
-	 * 
+	 *
 	 * @param userId
 	 *            用户ID,订单状态
 	 */
 	public List<OrderBean> getOrders(int userID, int state, Date startdate, Date enddate, String username, String email,
-                                     String orderno, String phone, int startpage, int endpage, int admuserid, int buyid, int showUnpaid,
-                                     int status);
+	                                 String orderno, String phone, int startpage, int endpage, int admuserid, int buyid, int showUnpaid,
+	                                 int status);
 	/**
 	 * 根据1688pid获取ali  pid
 	 * @Title getAliPid
@@ -46,7 +46,7 @@ public interface IOrderwsDao {
 	 *            用户ID,订单状态
 	 */
 	public int getOrdersPage(int userID, int state, Date date, String username, String email, String orderno,
-                             String phone);
+	                         String phone);
 
 	/**
 	 * 查询订单是否取消 ylm
@@ -71,7 +71,7 @@ public interface IOrderwsDao {
 	 * @param orderNo
 	 * @return
 	 */
-	public int checkOrderState(String orderNo, String isDropshipOrder1);
+	public int checkOrderState(String orderNo,String isDropshipOrder1);
 	/**
 	 * 采购页面查询订单支付金额等信息
 	 * @param orderNo
@@ -89,7 +89,7 @@ public interface IOrderwsDao {
 	 * @param map
 	 * @return
 	 */
-	public List<QualityResult> openCheckResult(Map<String, String> map);
+	public List<QualityResult> openCheckResult(Map<String,String> map);
 	/**
 	 * 获取所有的采购人员信息
 	 *
@@ -106,9 +106,9 @@ public interface IOrderwsDao {
 	 */
 	public int changeBuyer(int odid, int admuserid);
 
-	public int changeOrderBuyer(String orderid, int admuserid, String goodsids);
+	public int changeOrderBuyer(String orderid, int admuserid,String odids);
 
-	public int addOrderDetails(String goodsid, String count, String newOrderid, String orderid, int admuserid);
+	public int addOrderDetails(String goodsid, String count, String newOrderid, String orderid,int admuserid);
 
 	public int addOrderInfo(String orderid, String newOrderid, int length);
 
@@ -175,7 +175,7 @@ public interface IOrderwsDao {
 	 * @param userid
 	 *            用户ID
 	 */
-	public List<String> getOrderNos(int userid, String orderid);
+	public List<String> getOrderNos(int userid,String orderid);
 
 	/**
 	 * 获取用户总付款金额 ylm
@@ -257,7 +257,7 @@ public interface IOrderwsDao {
 	 * @param admName  采购人
 	 * @return  商品物流信息
 	 */
-	public TaoBaoOrderInfo getShipStatusInfo(String tb_1688_itemid, String last_tb_1688_itemid, String time, String admName, String shipno, int offline_purchase, String orderid, int goodsid);
+	public TaoBaoOrderInfo getShipStatusInfo(String tb_1688_itemid,String last_tb_1688_itemid, String time, String admName,String shipno,int offline_purchase,String orderid,int goodsid);
 
 	/**
 	 * 增加订单详情中的到货信息 ylm
@@ -266,12 +266,12 @@ public interface IOrderwsDao {
 	 *            实际体积【实际采购价格】,国内运费 订单详情ID,订单状态
 	 */
 	public int upOrderDeatail(int orderDatailId, String file, String weight, String volume, String actual_price,
-                              String actual_freight, String file_upload);
+	                          String actual_freight, String file_upload);
 
 	public int upOrder(String orderNo, String actual_ffreight, String custom_discuss_other, int state, Date date,
-                       String actual_weight, String actual_volume, Date expect_arrive_date, String actual_allincost,
-                       double remaining_price_d, double order_ac, String service_fee, String domestic_freight,
-                       String mode_transport, double actual_freight_c_, float payPrice);
+	                   String actual_weight, String actual_volume, Date expect_arrive_date, String actual_allincost,
+	                   double remaining_price_d, double order_ac, String service_fee, String domestic_freight,
+	                   String mode_transport, double actual_freight_c_, float payPrice);
 
 	/**
 	 * ylm 录入 货代相关信息
@@ -716,9 +716,9 @@ public interface IOrderwsDao {
 	 * 增加订单优惠变更记录 ylm
 	 *
 	 *//*
-		 * public int addDiscountChenge(String orderNo,String sprice,String
-		 * price,String info);
-		 */
+	 * public int addDiscountChenge(String orderNo,String sprice,String
+	 * price,String info);
+	 */
 
 	public List<CodeMaster> getLogisticsInfo();
 
@@ -859,7 +859,7 @@ public interface IOrderwsDao {
 	 *            订单号
 	 * @return
 	 */
-	public int closeDropshipOrder(int userId, String orderNo) throws Exception;
+	public int closeDropshipOrder(int userId,String orderNo) throws Exception;
 
 	/**
 	 * 根据dropship主订单号取消所有子订单
@@ -893,7 +893,7 @@ public interface IOrderwsDao {
 	 *
 	 * @return
 	 */
-	public int closeOrderByDropshipOrder(int userId, String orderNo) throws Exception;
+	public int closeOrderByDropshipOrder(int userId,String orderNo) throws Exception;
 
 	/**
 	 * 根据dropship子订单号取消所有关联的商品
@@ -902,7 +902,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public int closeOrderGoodsByDropshipOrder(int userId, String orderNo) throws Exception;
+	public int closeOrderGoodsByDropshipOrder(int userId,String orderNo) throws Exception;
 
 	/**
 	 * 减去dropship主订单的商品总价和运费
@@ -912,7 +912,7 @@ public interface IOrderwsDao {
 	 * @param orderAc
 	 * @return
 	 */
-	public int updateMainOrderNoTotalPriceAndFreight(int userId, String mainOrderNo, float totalPrice, float orderAc, float extraFreight, float weight)
+	public int updateMainOrderNoTotalPriceAndFreight(int userId,String mainOrderNo, float totalPrice, float orderAc,float extraFreight, float weight)
 			throws Exception;
 
 	/**
@@ -924,186 +924,186 @@ public interface IOrderwsDao {
 	 */
 	public float queryGoodsPriceFromDetails(String orderNo);
 
-    TabTransitFreightinfoUniteOur getFreightInfo(String orderNo, int isEub);
+	TabTransitFreightinfoUniteOur getFreightInfo(String orderNo,int isEub);
 
-    /**
-     *
-     * @Title statisticsRegisterUser
-     * @Description 新注册用户统计
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsRegisterUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsRegisterUser
+	 * @Description 新注册用户统计
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsRegisterUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryRegisterUserDetails
-     * @Description 分组显示新注册用户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryRegisterUserDetails
+	 * @Description 分组显示新注册用户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsAddFirstAddress
-     * @Description 当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsAddFirstAddress(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsAddFirstAddress
+	 * @Description 当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsAddFirstAddress(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryAddFirstAddressDetails
-     * @Description 分组显示当日录入收货地址的用户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryAddFirstAddressDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryAddFirstAddressDetails
+	 * @Description 分组显示当日录入收货地址的用户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryAddFirstAddressDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsAddCarWithNoRegisterUser
-     * @Description 有添加购物车的客户数量 （未注册的客户）
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsAddCarWithNoRegisterUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsAddCarWithNoRegisterUser
+	 * @Description 有添加购物车的客户数量 （未注册的客户）
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsAddCarWithNoRegisterUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryAddCarWithNoRegisterUserDetails
-     * @Description 分组显示有添加购物车的客户 （未注册的客户）
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryAddCarWithNoRegisterUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryAddCarWithNoRegisterUserDetails
+	 * @Description 分组显示有添加购物车的客户 （未注册的客户）
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryAddCarWithNoRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsAddCarWithHasRegisterUser
-     * @Description 有添加购物车的客户数量 （有注册过的客户）
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsAddCarWithHasRegisterUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsAddCarWithHasRegisterUser
+	 * @Description 有添加购物车的客户数量 （有注册过的客户）
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsAddCarWithHasRegisterUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryAddCarWithHasRegisterUserDetails
-     * @Description 分组显示有添加购物车的客户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryAddCarWithHasRegisterUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryAddCarWithHasRegisterUserDetails
+	 * @Description 分组显示有添加购物车的客户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryAddCarWithHasRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsAddCarWithOldUser
-     * @Description 有添加购物车的客户数量 （老客户 （以前购买过））
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsAddCarWithOldUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsAddCarWithOldUser
+	 * @Description 有添加购物车的客户数量 （老客户 （以前购买过））
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsAddCarWithOldUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryAddCarWithOldUserDetails
-     * @Description 分组显示有添加购物车的客户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryAddCarWithOldUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryAddCarWithOldUserDetails
+	 * @Description 分组显示有添加购物车的客户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryAddCarWithOldUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsMakeOrderAllUser
-     * @Description 当日下单的 总客户
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsMakeOrderAllUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsMakeOrderAllUser
+	 * @Description 当日下单的 总客户
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsMakeOrderAllUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryMakeOrderAllUserDetails
-     * @Description 分组显示当日下单的 总客户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryMakeOrderAllUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryMakeOrderAllUserDetails
+	 * @Description 分组显示当日下单的 总客户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryMakeOrderAllUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsMakeOrderNewUser
-     * @Description 当日下单的 新客户数量
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsMakeOrderNewUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsMakeOrderNewUser
+	 * @Description 当日下单的 新客户数量
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsMakeOrderNewUser(String beginDate,String endDate);
 
-    /**
-     *
-     * @Title queryMakeOrderNewUserDetails
-     * @Description 分组显示当日下单的 新客户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryMakeOrderNewUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	/**
+	 *
+	 * @Title queryMakeOrderNewUserDetails
+	 * @Description 分组显示当日下单的 新客户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryMakeOrderNewUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
-    /**
-     *
-     * @Title statisticsPayOrderUser
-     * @Description 当日付款按钮的用户数量
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return int
-     */
-    int statisticsPayOrderUser(String beginDate, String endDate);
+	/**
+	 *
+	 * @Title statisticsPayOrderUser
+	 * @Description 当日付款按钮的用户数量
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return int
+	 */
+	int statisticsPayOrderUser(String beginDate,String endDate);
 
 	/**
 	 * 产品单页浏览总次数
@@ -1111,19 +1111,19 @@ public interface IOrderwsDao {
 	 * @param endDate
 	 * @return
 	 */
-    int statisticsRecentView(String beginDate, String endDate);
-    /**
-     *
-     * @Title queryPayOrderUserDetails
-     * @Description 分组显示当日付款按钮的用户
-     * @param beginDate
-     * @param endDate
-     * @param startNum
-     * @param offSet
-     * @return
-     * @return List<UserBehaviorDetails>
-     */
-    List<UserBehaviorDetails> queryPayOrderUserDetails(String beginDate, String endDate, int startNum, int offSet);
+	int statisticsRecentView(String beginDate,String endDate);
+	/**
+	 *
+	 * @Title queryPayOrderUserDetails
+	 * @Description 分组显示当日付款按钮的用户
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 * @return List<UserBehaviorDetails>
+	 */
+	List<UserBehaviorDetails> queryPayOrderUserDetails(String beginDate,String endDate,int startNum,int offSet);
 
 	/**
 	 * 分组显示浏览次数最大的50个产品
@@ -1133,15 +1133,15 @@ public interface IOrderwsDao {
 	 * @param offSet
 	 * @return
 	 */
-    List<UserBehaviorDetails> queryUserRecentView(String beginDate, String endDate, int startNum, int offSet);
-    /**
-     *
-     * @Title queryExistsBehaviorData
-     * @Description 查询已经存在的单日统计信息
-     * @param beginDate
-     * @param endDate
-     * @return
-     * @return List<UserBehaviorBean>
-     */
-    List<UserBehaviorBean> queryExistsBehaviorData(String beginDate, String endDate);
+	List<UserBehaviorDetails> queryUserRecentView(String beginDate,String endDate,int startNum,int offSet);
+	/**
+	 *
+	 * @Title queryExistsBehaviorData
+	 * @Description 查询已经存在的单日统计信息
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 * @return List<UserBehaviorBean>
+	 */
+	List<UserBehaviorBean> queryExistsBehaviorData(String beginDate,String endDate);
 }

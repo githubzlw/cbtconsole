@@ -220,7 +220,7 @@ public class UserInfo {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	
-	
-	
+
+
+
 }

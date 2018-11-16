@@ -3,6 +3,7 @@ package com.cbt.service;
 import com.cbt.bean.*;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsParseBean;
 
@@ -523,10 +524,12 @@ public interface CustomGoodsService {
      * 修改商品重量
      *
      * @param pid
-     * @param weight
+     * @param newWeight
+     * @param oldWeight
+     * @param weightIsEdit
      * @return
      */
-    int updateGoodsWeightByPid(String pid, double weight);
+    int updateGoodsWeightByPid(String pid, double newWeight,double oldWeight,int weightIsEdit);
 
     /**
      * 更新和锁定利润率
@@ -537,5 +540,7 @@ public interface CustomGoodsService {
      * @return
      */
     int editAndLockProfit(String pid, int type, double editProfit);
+
+    JsonResult setGoodsWeightByWeigher(String pid, String newWeight);
 
 }

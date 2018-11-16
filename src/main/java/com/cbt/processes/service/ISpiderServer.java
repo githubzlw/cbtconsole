@@ -3,6 +3,8 @@ package com.cbt.processes.service;
 import com.cbt.bean.CollectionBean;
 import com.cbt.bean.SpiderBean;
 
+import ceRong.tools.bean.SearchLog;
+
 import java.util.List;
 import java.util.Map;
 
@@ -159,6 +161,9 @@ public interface ISpiderServer {
 	 * 修改商品的运输方式
 	 */
 	public int upExpreeType(String goodsId, String expreeType, String days, int countryId);
-	
+
+	public int saveTheSearchLogOnSearchPage(SearchLog seaLog);
+
+	public int saveTheClickCountOnSearchPage(String goodsPid, String searchMD5, String searchUserMD5);
 	
 }

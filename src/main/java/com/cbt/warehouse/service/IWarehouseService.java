@@ -44,6 +44,7 @@ public interface IWarehouseService {
 	int updateSendMail(Map<String, String> map);
 	int saveClothingData(Map<String, String> map);
 	int saveWeight(Map<String, String> map);
+	int saveWeightFlag(String pid);
 
 	/**
 	 * 产品单页提问图片路径保存
@@ -360,6 +361,9 @@ public interface IWarehouseService {
 	//重置库位
 	int resetLocation(Map<String, String> map);
 
+	int updateFlag(String id,String type);
+	int updatebackEmail(String id,String email);
+	int addBackUser(String email,String ip,String userName);
 	int updateState(Map<String, String> map);
 
 	int insertRemark(Map<String, String> map);
@@ -742,6 +746,19 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	List<ShopManagerPojo> getShopManagerDetailsList(Map<String, Object> map);
+
+	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackList(Map<String,String> map);
+	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackListCount(Map<String,String> map);
 
 	/**
 	 * 供应商的采购历史

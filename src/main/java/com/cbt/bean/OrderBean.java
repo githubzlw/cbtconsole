@@ -101,6 +101,43 @@ public class OrderBean implements Cloneable {
     private int purchase;
     private int deliver;
     private double freightFee;
+    //会员费
+    private double memberFee;
+    private String payUserName;
+    private String backFlag;
+
+    public String getGradeName() {
+        return gradeName;
+    }
+
+    public void setGradeName(String gradeName) {
+        this.gradeName = gradeName;
+    }
+
+    private String gradeName;
+    public String getBackFlag() {
+        return backFlag;
+    }
+
+    public void setBackFlag(String backFlag) {
+        this.backFlag = backFlag;
+    }
+
+    public String getPayUserName() {
+        return payUserName;
+    }
+
+    public void setPayUserName(String payUserName) {
+        this.payUserName = payUserName;
+    }
+
+    public double getMemberFee() {
+        return memberFee;
+    }
+
+    public void setMemberFee(double memberFee) {
+        this.memberFee = memberFee;
+    }
 
     public String getEsBuyPrice() {
         return esBuyPrice;
