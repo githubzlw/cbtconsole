@@ -905,20 +905,35 @@ function fnGetAddress() {
         dataType:"json",
         success:function(data){
             console.log("res=="+data.orderid);
-            console.log("res=="+data.receiver_email);
-            if(data.receiver_email== null || data.receiver_email== "" || data.receiver_email== "null"){
-                return;
+            if(data.stripe){
+                console.log("data.stripe="+data.stripe);
+                var stripeJson=JSON.parse(data.stripe)
+                document.getElementById("address_name").value = stripeJson.data.object.source.name;
+                document.getElementById("address_street").value = 'brand=' + stripeJson.data.object.source.brand;
+                document.getElementById("address_city").value = 'funding=' + stripeJson.data.object.source.funding;
+                document.getElementById("address_state").value = 'last4=' + stripeJson.data.object.source.last4;
+                document.getElementById("address_country_code").value = stripeJson.data.object.source.country;
+            }else {
+                console.log("res==" + data.receiver_email);
+                if (data.receiver_email == null || data.receiver_email == "" || data.receiver_email == "null") {
+                    return;
+                }
+                $("#receiveremail").text(data.receiver_email);
+                $("#receiveremail").attr("href", "mailto:" + data.receiver_email);
+                document.getElementById("address_name").value = data.address_name;
+                document.getElementById("address_country_code").value = data.address_country_code;
+                // if (data.address_country != undefined) {
+                //     document.getElementById("address_country").value = data.address_country;
+                // }
+                document.getElementById("address_city").value = data.address_city;
+                document.getElementById("address_state").value = data.address_state;
+                document.getElementById("address_street").value = data.address_street;
+
+                console.log("data.stripe=" + data.stripe);
+                if (data.stripe) {
+                    document.getElementById("address_country_code").value = data.stripe.data.source.country;
+                }
             }
-            $("#receiveremail").text(data.receiver_email);
-            $("#receiveremail").attr("href","mailto:" + data.receiver_email);
-            document.getElementById("address_name").value = data.address_name;
-            document.getElementById("address_country_code").value = data.address_country_code;
-            // if (data.address_country != undefined) {
-            //     document.getElementById("address_country").value = data.address_country;
-            // }
-            document.getElementById("address_city").value = data.address_city;
-            document.getElementById("address_state").value = data.address_state;
-            document.getElementById("address_street").value =data.address_street;
         }
     });
 
