@@ -295,6 +295,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updatePidIsEdited(GoodsEditBean editBean) {
+        //如果有对标标识，则进行非对标的相关数据清除
+        if(editBean.getBenchmarking_flag() == 1){
+            CustomGoodsPublish good = customGoodsDao.getGoods(editBean.getPid(), 0);
+            double finalWeight = 0;
+            if(StringUtils.isNotBlank(good.getFinalWeight())){
+                finalWeight = Double.valueOf(good.getFinalWeight());
+            }
+            customGoodsDao.setNoBenchmarking(editBean.getPid(), finalWeight);
+        }
         return customGoodsMapper.updatePidIsEdited(editBean);
     }
 

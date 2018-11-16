@@ -153,45 +153,48 @@
     </select>
 
     <update id="updatePidIsEdited" parameterType="com.importExpress.pojo.GoodsEditBean">
-        update custom_goods_edit
-        set admin_id =#{admin_id},update_count = update_count + 1
+        update custom_goods_edit a,custom_benchmark_ready b
+        set a.admin_id =#{admin_id},a.update_count = a.update_count + 1
         <if test="weight_flag > 0">
-            ,weight_flag = #{weight_flag}
+            ,a.weight_flag = #{weight_flag}
         </if>
         <if test="ugly_flag > 0">
-            ,ugly_flag = #{ugly_flag}
+            ,a.ugly_flag = #{ugly_flag}
         </if>
         <if test="benchmarking_flag > 0">
-            ,benchmarking_flag = #{benchmarking_flag}
+            ,a.benchmarking_flag = #{benchmarking_flag}
+        </if>
+        <if test="benchmarking_flag == 1">
+            ,b.isBenchmark = 0,b.bm_flag = 1
         </if>
         <if test="describe_good_flag > 0">
-            ,describe_good_flag = #{describe_good_flag}
+            ,a.describe_good_flag = #{describe_good_flag}
         </if>
         <if test="uniqueness_flag > 0">
-            ,uniqueness_flag = #{uniqueness_flag}
+            ,a.uniqueness_flag = #{uniqueness_flag}
         </if>
         <if test="never_off_flag > 0">
-            ,never_off_flag = #{never_off_flag}
+            ,a.never_off_flag = #{never_off_flag}
         </if>
         <if test="publish_flag > 0">
-            ,publish_flag = #{publish_flag}
+            ,a.publish_flag = #{publish_flag}
         </if>
         <if test="is_edited > 0">
-            ,is_edited = #{is_edited}
+            ,a.is_edited = #{is_edited}
         </if>
         <if test="publish_flag > 0">
-            ,publish_time = now()
+            ,a.publish_time = now()
         </if>
         <if test="off_flag > 0">
-            ,off_time = now()
+            ,a.off_time = now()
         </if>
         <if test="weight_is_edit > 0">
-            ,weight_is_edit = #{weight_is_edit}
+            ,a.weight_is_edit = #{weight_is_edit}
         </if>
         <if test="repaired_flag > 0">
-            ,repaired_flag = #{repaired_flag}
+            ,a.repaired_flag = #{repaired_flag}
         </if>
-        where pid = #{pid}
+        where a.pid = b.pid and a.pid = #{pid}
     </update>
 
     <select id="queryTypeinGoodsTotal" resultType="java.lang.Integer">
@@ -279,6 +282,9 @@
         <if test="repaired_flag > 0">
             and a.repaired_flag =#{repaired_flag}
         </if>
+        <if test="benchmarking_flag > 0">
+            and a.benchmarking_flag =#{benchmarking_flag}
+        </if>
         order by create_time desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -305,6 +311,9 @@
         </if>
         <if test="repaired_flag > 0">
             and a.repaired_flag =#{repaired_flag}
+        </if>
+        <if test="benchmarking_flag > 0">
+            and a.benchmarking_flag =#{benchmarking_flag}
         </if>
     </select>
 

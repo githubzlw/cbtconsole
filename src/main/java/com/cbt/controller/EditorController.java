@@ -2053,15 +2053,10 @@ public class EditorController {
         }
         try {
             //boolean is = customGoodsService.setGoodsFlagByPid(editBean);
-            boolean is = customGoodsService.updatePidIsEdited(editBean) > 0;
-            if (is) {
-                customGoodsService.insertIntoGoodsEditBean(editBean);
-                json.setOk(true);
-                json.setMessage("执行成功");
-            } else {
-                json.setOk(true);
-                json.setMessage("执行错误，请重试");
-            }
+            customGoodsService.updatePidIsEdited(editBean);
+            customGoodsService.insertIntoGoodsEditBean(editBean);
+            json.setOk(true);
+            json.setMessage("执行成功");
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
@@ -2513,6 +2508,10 @@ public class EditorController {
         String repairedFlagStr = request.getParameter("repairedFlag");
         if (StringUtils.isNotBlank(repairedFlagStr)) {
             editBean.setRepaired_flag(Integer.valueOf(repairedFlagStr));
+        }
+        String benchmarkingFlagStr = request.getParameter("benchmarkingFlag");
+        if (StringUtils.isNotBlank(benchmarkingFlagStr)) {
+            editBean.setBenchmarking_flag(Integer.valueOf(benchmarkingFlagStr));
         }
 
         int startNum = 0;
