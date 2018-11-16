@@ -1,17 +1,21 @@
 package com.cbt.service.impl;
 
 import com.cbt.bean.*;
+import com.cbt.controller.EditorController;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
+import com.cbt.parse.service.DownloadMain;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.SkuValPO;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -377,6 +381,34 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int editAndLockProfit(String pid, int type, double editProfit) {
         return customGoodsMapper.editAndLockProfit(pid, type, editProfit);
+    }
+
+    @Override
+    public JsonResult setGoodsWeightByWeigher(String pid, String newWeight) {
+        JsonResult json = new JsonResult();
+        // 获取商品信息
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), 2) > 0;
+        if (is) {
+            // 重新刷新价格数据
+            String url = EditorController.SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
+                    + "&sourceTable=custom_benchmark_ready&database=27";
+            String resultJson = DownloadMain.getContentClient(url, null);
+            System.err.println("pid=" + pid + ",result:[" + resultJson + "]");
+            JSONObject jsonJt = JSONObject.fromObject(resultJson);
+            System.out.println(json.toString());
+            if (!jsonJt.getBoolean("ok")) {
+                json.setOk(false);
+                json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
+            } else {
+                json.setOk(true);
+                json.setMessage("执行成功");
+            }
+        } else {
+            json.setOk(false);
+            json.setMessage("执行错误，请重试");
+        }
+        return json;
     }
 
 }

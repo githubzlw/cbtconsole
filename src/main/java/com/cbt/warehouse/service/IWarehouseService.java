@@ -44,6 +44,7 @@ public interface IWarehouseService {
 	int updateSendMail(Map<String, String> map);
 	int saveClothingData(Map<String, String> map);
 	int saveWeight(Map<String, String> map);
+	int saveWeightFlag(String pid);
 
 	/**
 	 * 产品单页提问图片路径保存

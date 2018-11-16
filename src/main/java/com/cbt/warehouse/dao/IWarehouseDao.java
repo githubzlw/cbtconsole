@@ -209,7 +209,8 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	public SearchResultInfo getWeight();
-	public String getGoodsWeight(@Param("pid") String pid);
+	public SearchResultInfo getGoodsWeight(@Param("pid") String pid);
+	public SearchResultInfo updateGoodsWeightFlag(@Param("pid") String pid);
 	//getAllStorageLocationByPage
 	public List<StorageLocationBean> getAllStorageLocationByPage(int startNum, int endNum);
 	//获得采购数量
