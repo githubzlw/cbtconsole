@@ -254,6 +254,12 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 </div> --%>
 
 </section>
+<section>
+<div style="font-size: 18px;color: red;font-weight: bold;">
+${error }
+</div>
+</section>
+
 <section id="compose">
 
 <c:if test="${statusFlag==0 || statusFlag ==1}">

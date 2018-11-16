@@ -108,13 +108,13 @@ public enum MongoDBHelp {
     	this.closeConnection();
     	return result;
     }
-    public  List<String> findAny(String collectionName,BasicDBObject find){
+    public  List<String> findAny(String collectionName,BasicDBObject find,BasicDBObject sort){
     	this.getConnection();
     	List<String> result = new ArrayList<>();
     	FindIterable<Document> documents = mongoDatabase.getCollection(collectionName).find(find);
-//    	if(sort != null) {
-//    		documents = documents.sort(sort);
-//    	}
+    	if(sort != null) {
+    		documents = documents.sort(sort);
+    	}
 //    	
 //    	documents = documents.skip(startNum).limit(limitNum);
     	

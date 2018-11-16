@@ -481,7 +481,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql = "update shop_url_bak set shop_id=?,shop_url=?,is_valid=?,sales_volume_threshold=?,download_num=?,admuser=?,admin_id=?,url_type=?,input_shop_name=?, flag =?,updatetime=?,input_shop_description=?,shop_enname=?,shop_brand=? where id=?";
         } else {
             sql = "insert into shop_url_bak(shop_id,shop_url,is_valid,sales_volume_threshold,download_num,admuser,admin_id,url_type,"
-                    + "input_shop_name,createtime,updatetime,input_shop_description,shop_enname,shop_brand,is_trade) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    + "input_shop_name,createtime,updatetime,input_shop_description,shop_enname,shop_brand,is_trade) " +
+                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         }
 
         conn = DBHelper.getInstance().getConnection5();
@@ -571,7 +572,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             }
 
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         } finally {
             if (stmt != null) {
                 try {

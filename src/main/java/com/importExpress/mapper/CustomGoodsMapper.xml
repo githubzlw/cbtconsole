@@ -719,7 +719,8 @@
 
     <update id="updateGoodsWeightByPid">
         update custom_goods_edit a,custom_benchmark_ready b
-        set b.revise_weight=#{weight},b.final_weight=#{weight},a.weight_is_edit = 1
+        set b.revise_weight=#{newWeight},b.final_weight=#{newWeight},
+        a.weight_is_edit = #{weightIsEdit},a.old_weight = #{oldWeight}
         where a.pid = b.pid and  b.pid = #{pid}
     </update>
 

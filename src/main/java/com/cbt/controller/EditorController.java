@@ -91,11 +91,11 @@ public class EditorController {
             goods.setCanEdit(0);
         }
 
-        if(StringUtils.isNotBlank(goods.getFeeprice())){
+        if (StringUtils.isNotBlank(goods.getFeeprice())) {
             goods.setFeeprice(goods.getFeeprice().replace("[", "").replace("]", "").replace("$", "@"));
         }
 
-        if(StringUtils.isNotBlank(goods.getWprice())){
+        if (StringUtils.isNotBlank(goods.getWprice())) {
             goods.setWprice(goods.getWprice().replace("[", "").replace("]", "").replace("$", "@"));
         }
 
@@ -147,7 +147,6 @@ public class EditorController {
         request.setAttribute("showattribute", pInfo);
 
 
-
         request.setAttribute("isSoldFlag", goods.getSoldFlag());
 
 
@@ -177,10 +176,10 @@ public class EditorController {
         }
 
         //判断是否是非免邮商品(isSoldFlag > 0)，如果是则显示非免邮价格显示
-        if(goods.getSoldFlag() >0){
-            if(StringUtils.isNotBlank(goods.getFeeprice())){
+        if (goods.getSoldFlag() > 0) {
+            if (StringUtils.isNotBlank(goods.getFeeprice())) {
                 request.setAttribute("feePrice", goods.getFeeprice());
-            }else{
+            } else {
                 request.setAttribute("feePrice", "");
             }
         }
@@ -198,9 +197,9 @@ public class EditorController {
         double freight = 0.076 * Double.valueOf(goods.getFinalWeight()) * 1000;
         //获取1688价格(1piece)
         String wholePriceStr = goods.getWholesalePrice();
-        if(StringUtils.isNotBlank(wholePriceStr)){
+        if (StringUtils.isNotBlank(wholePriceStr)) {
             String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
-            firstPrice = firstPrice.replace("]","");
+            firstPrice = firstPrice.replace("]", "");
             double wholePrice = 0;
             if (firstPrice.contains("-")) {
                 wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
@@ -217,11 +216,11 @@ public class EditorController {
                     singlePriceStr = goods.getRangePrice().split("-")[1].trim();
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
-                    if(singlePriceStr.contains("\\$")){
+                    if (singlePriceStr.contains("\\$")) {
                         singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                    }else if(singlePriceStr.contains("@")){
+                    } else if (singlePriceStr.contains("@")) {
                         singlePriceStr = singlePriceStr.split("@")[1].trim();
-                    }else{
+                    } else {
                         singlePriceStr = singlePriceStr.trim();
                     }
                 }
@@ -231,18 +230,18 @@ public class EditorController {
                     singlePriceStr = goods.getRangePrice().split("-")[1].trim();
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
-                    if(singlePriceStr.contains("\\$")){
+                    if (singlePriceStr.contains("\\$")) {
                         singlePriceStr = singlePriceStr.split("\\$")[1].trim();
-                    }else if(singlePriceStr.contains("@")){
+                    } else if (singlePriceStr.contains("@")) {
                         singlePriceStr = singlePriceStr.split("@")[1].trim();
-                    }else{
+                    } else {
                         singlePriceStr = singlePriceStr.trim();
                     }
                 } else {
                     singlePriceStr = goods.getPrice();
                 }
             }
-            singlePriceStr = singlePriceStr.replace("]","");
+            singlePriceStr = singlePriceStr.replace("]", "");
             //获取1piece的最高价格
             if (singlePriceStr.contains("-")) {
                 singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
@@ -270,7 +269,7 @@ public class EditorController {
                 oldProfit = 0.55 + catXs;
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
             }
-        }else{
+        } else {
             System.err.println("pid:" + pid + ",wholePrice is null");
         }
 
@@ -331,7 +330,7 @@ public class EditorController {
         if (!(goods.getAliGoodsPid() == null || "".equals(goods.getAliGoodsPid()))) {
             GoodsBean algood = null;
             String aliUrl = "https://www.aliexpress.com/item/"
-                    + (goods.getAliGoodsName() == null ? "ali goods":goods.getAliGoodsName())
+                    + (goods.getAliGoodsName() == null ? "ali goods" : goods.getAliGoodsName())
                     + "/" + goods.getAliGoodsPid() + ".html";
             goods.setAliGoodsUrl(aliUrl);
             System.err.println("url:" + aliUrl);
@@ -416,7 +415,6 @@ public class EditorController {
             page = null;
         }
     }
-
 
 
     /**
@@ -601,7 +599,7 @@ public class EditorController {
                 // 产品详情
                 String eninfo = contentStr.replaceAll(remotepath, "");
                 //解析和上传阿里商品的图片
-                eninfo = uploadAliImgToLocal(pidStr,eninfo);
+                eninfo = uploadAliImgToLocal(pidStr, eninfo);
                 cgp.setEninfo(eninfo);
             } else {
                 json.setOk(false);
@@ -616,7 +614,7 @@ public class EditorController {
                 String feePrice = request.getParameter("feePrice");
                 double minPrice = 0;
                 double maxPrice = 0;
-                if(StringUtils.isNotBlank(feePrice)){
+                if (StringUtils.isNotBlank(feePrice)) {
                     String[] priceLst = feePrice.split(",");
                     minPrice = Double.valueOf(priceLst[0].split("@")[1]);
                     maxPrice = minPrice;
@@ -633,14 +631,14 @@ public class EditorController {
                     DecimalFormat df = new DecimalFormat("######0.00");
                     cgp.setPrice(df.format(minPrice));
                     cgp.setFeeprice("[" + feePrice.replace("@", " $ ") + "]");
-                }else{
+                } else {
                     String wprice = request.getParameter("wprice");
                     if (wprice == null || "".equals(wprice)) {
                         // 判断wprice是不是空的，如果是，不更新wprice和price值
                         if (orGoods.getWprice() == null || "".equals(orGoods.getWprice())
                                 || orGoods.getWprice().trim().length() < 3) {
                             cgp.setPrice(orGoods.getPrice());
-                            cgp.setWprice("[]",1);
+                            cgp.setWprice("[]", 1);
                         } else {
                             String goodsPrice = request.getParameter("goodsPrice");
                             if (StringUtils.isBlank(goodsPrice)) {
@@ -716,24 +714,24 @@ public class EditorController {
             String typeRepalceIds = request.getParameter("typeRepalceIds");
 
             String[] tpList;
-            if(StringUtils.isNotBlank(typeRepalceIds)){
+            if (StringUtils.isNotBlank(typeRepalceIds)) {
                 //进行数据的分割
                 tpList = typeRepalceIds.split(",");
                 String[] spSt;
-                for(String tpCt : tpList){
+                for (String tpCt : tpList) {
                     spSt = tpCt.split("@");
-                    if(spSt.length == 2){
+                    if (spSt.length == 2) {
                         //判断是否存在删除的规格，如果存在则用newTypeList,否则用typeList
-                        if(StringUtils.isNotBlank(typeDeleteIds)){
-                            for(TypeBean nwType : newTypeList){
-                                if(nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())){
+                        if (StringUtils.isNotBlank(typeDeleteIds)) {
+                            for (TypeBean nwType : newTypeList) {
+                                if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
                                     nwType.setValue(spSt[1].trim());
                                     break;
                                 }
                             }
-                        }else{
-                            for(TypeBean nwType : typeList){
-                                if(nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())){
+                        } else {
+                            for (TypeBean nwType : typeList) {
+                                if (nwType.getId().equals(spSt[0]) && !nwType.getType().trim().equals(spSt[1].trim())) {
                                     nwType.setValue(spSt[1].trim());
                                     break;
                                 }
@@ -743,14 +741,14 @@ public class EditorController {
                     spSt = null;
                 }
 
-                if(StringUtils.isNotBlank(typeDeleteIds)){
+                if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
-                }else{
+                } else {
                     cgp.setType(typeList.toString());
                 }
                 tpList = null;
-            }else{
-                if(StringUtils.isNotBlank(typeDeleteIds)){
+            } else {
+                if (StringUtils.isNotBlank(typeDeleteIds)) {
                     cgp.setType(newTypeList.toString());
                     newTypeList.clear();
                 }
@@ -792,22 +790,22 @@ public class EditorController {
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getLocalAddr();
                     int isUpdateImg = 0;
-                    if(ip.contains("1.34") || ip.contains("38.42")){
+                    if (ip.contains("1.34") || ip.contains("38.42")) {
                         isUpdateImg = 1;
                     }
-                    if(StringUtils.isNotBlank(updateTimeStr)){
+                    if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         //离上次编辑小于15分钟，不能发布
-                        if(System.currentTimeMillis() -  sdf.parse(updateTimeStr).getTime() < 1000 * 60 * 15){
+                        if (System.currentTimeMillis() - sdf.parse(updateTimeStr).getTime() < 1000 * 60 * 15) {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
-                        }else{
-                            PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig,isUpdateImg);
+                        } else {
+                            PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
                             pbThread.start();
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
-                    }else{
-                        PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig,isUpdateImg);
+                    } else {
+                        PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
                         pbThread.start();
                         json.setMessage("更新成功,异步上传图片中，请等待");
                     }
@@ -914,7 +912,7 @@ public class EditorController {
                 return json;
             }
 
-            int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(),-1,reason);
+            int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), -1, reason);
             if (count > 0) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -954,7 +952,7 @@ public class EditorController {
                 return json;
             }
 
-            int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(),1,"");
+            int count = customGoodsService.setGoodsValid(pidStr, user.getAdmName(), user.getId(), 1, "");
             if (count > 0) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -970,7 +968,6 @@ public class EditorController {
         }
         return json;
     }
-
 
 
     @RequestMapping(value = "/checkIsHotGoods")
@@ -1010,9 +1007,6 @@ public class EditorController {
     }
 
 
-
-
-
     @RequestMapping(value = "/setGoodsInvalid")
     @ResponseBody
     public JsonResult setGoodsInvalid(HttpServletRequest request, HttpServletResponse response) {
@@ -1034,7 +1028,7 @@ public class EditorController {
                 return json;
             }
             // type -1 下架该商品 1 检查通过
-            customGoodsService.setGoodsValid(pidStr, "", Integer.valueOf(adminId), -1,"");
+            customGoodsService.setGoodsValid(pidStr, "", Integer.valueOf(adminId), -1, "");
             json.setOk(true);
             json.setMessage("执行成功");
 
@@ -1420,7 +1414,7 @@ public class EditorController {
         return json;
     }
 
-    private String  uploadAliImgToLocal(String pid,String eninfo) {
+    private String uploadAliImgToLocal(String pid, String eninfo) {
 
         String tempEninfo = "";
         try {
@@ -1995,7 +1989,7 @@ public class EditorController {
             json.setOk(false);
             json.setMessage("请登录后操作");
             return json;
-        }else{
+        } else {
             editBean.setAdmin_id(user.getId());
         }
 
@@ -2091,7 +2085,7 @@ public class EditorController {
             json.setOk(false);
             json.setMessage("请登录后操作");
             return json;
-        }else{
+        } else {
             editBean.setAdmin_id(user.getId());
         }
 
@@ -2153,7 +2147,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.setNoBenchmarking(pid,Double.valueOf(finalWeight));
+            boolean is = customGoodsService.setNoBenchmarking(pid, Double.valueOf(finalWeight));
             if (is) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -2211,7 +2205,6 @@ public class EditorController {
     }
 
 
-
     @RequestMapping(value = "/saveBenchmarking", method = {RequestMethod.POST})
     @ResponseBody
     public JsonResult saveBenchmarking(HttpServletRequest request, HttpServletResponse response) {
@@ -2246,7 +2239,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.saveBenchmarking(pid,benchmarkingPid,benchmarkingPrice) > 0;
+            boolean is = customGoodsService.saveBenchmarking(pid, benchmarkingPid, benchmarkingPrice) > 0;
             if (is) {
                 json.setOk(true);
                 json.setMessage("执行成功");
@@ -2327,7 +2320,7 @@ public class EditorController {
             mv.addObject("isShow", 0);
             mv.addObject("message", "获取PID失败");
             return mv;
-        }else{
+        } else {
             mv.addObject("pid", pid);
         }
 
@@ -2346,8 +2339,6 @@ public class EditorController {
         }
         return mv;
     }
-
-
 
 
     @RequestMapping(value = "/updateGoodsWeight", method = {RequestMethod.POST})
@@ -2384,7 +2375,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.updateGoodsWeightByPid(pid,Double.valueOf(newWeight)) > 0;
+            boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
             if (is) {
                 // 重新刷新价格数据
                 String url = SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
@@ -2396,7 +2387,7 @@ public class EditorController {
                 if (!jsonJt.getBoolean("ok")) {
                     json.setOk(false);
                     json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
-                }else{
+                } else {
                     json.setOk(true);
                     json.setMessage("执行成功");
                 }
@@ -2409,6 +2400,57 @@ public class EditorController {
             json.setOk(false);
             json.setMessage("pid:" + pid + " updateGoodsWeight 执行错误：" + e.getMessage());
             LOG.error("pid:" + pid + " updateGoodsWeight 执行错误：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/setGoodsWeightByWeigher")
+    @ResponseBody
+    public JsonResult setGoodsWeightByWeigher(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取商品PID失败");
+            return json;
+        }
+        String newWeight = request.getParameter("newWeight");
+        if (StringUtils.isBlank(newWeight)) {
+            json.setOk(false);
+            json.setMessage("获取商品重量失败");
+            return json;
+        }
+        try {
+            // 获取商品信息
+            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
+            boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), 2) > 0;
+            if (is) {
+                // 重新刷新价格数据
+                String url = SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
+                        + "&sourceTable=custom_benchmark_ready&database=27";
+                String resultJson = DownloadMain.getContentClient(url, null);
+                System.err.println("pid=" + pid + ",result:[" + resultJson + "]");
+                JSONObject jsonJt = JSONObject.fromObject(resultJson);
+                System.out.println(json.toString());
+                if (!jsonJt.getBoolean("ok")) {
+                    json.setOk(false);
+                    json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
+                } else {
+                    json.setOk(true);
+                    json.setMessage("执行成功");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("执行错误，请重试");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("pid:" + pid + " setGoodsWeightByWeigher 执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + " setGoodsWeightByWeigher 执行错误：" + e.getMessage());
         }
         return json;
     }
@@ -2466,8 +2508,6 @@ public class EditorController {
         }
         return json;
     }
-
-
 
 
     @RequestMapping(value = "/queryGoodsEditLog")

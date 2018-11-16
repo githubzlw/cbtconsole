@@ -17,4 +17,11 @@ public interface CustomerDisputeService {
 	
 	
 	
+	/**申诉详情
+	 * @param disputeID
+	 * @return
+	 */
+	String info(String disputeID);
+	
+	
 }
