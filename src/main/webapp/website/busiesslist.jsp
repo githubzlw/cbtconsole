@@ -177,10 +177,10 @@ function distributionMessages(i){
     var adminName = $('#todo'+i).find("option:selected").text();
     var hrefName=$('#email'+i).val();
     var userid=$('#userid'+i).val();
-    if(userid=='' || userid == "0"){
-        alert("用户ID错误");
-        return;
-    }
+//    if(userid=='' || userid == "0"){
+//        alert("用户ID错误");
+//        return;
+//    }
     $.ajax({
         url: "/cbtconsole/order/addUser",
         type: "POST",

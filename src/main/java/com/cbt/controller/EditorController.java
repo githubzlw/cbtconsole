@@ -53,8 +53,8 @@ public class EditorController {
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
     // 重量清洗的访问路径
-//	private static final String SHOPGOODSWEIGHTCLEARURL = "http://127.0.0.1:8080/checkimage/clear/shopGoodsWeight?";
-    private static final String SHOPGOODSWEIGHTCLEARURL = "http://192.168.1.31:8080/checkimage/clear/shopGoodsWeight?";
+//	public static final String SHOPGOODSWEIGHTCLEARURL = "http://127.0.0.1:8080/checkimage/clear/shopGoodsWeight?";
+    public static final String SHOPGOODSWEIGHTCLEARURL = "http://192.168.1.31:8080/checkimage/clear/shopGoodsWeight?";
 
     @Autowired
     private CustomGoodsService customGoodsService;
@@ -2407,51 +2407,19 @@ public class EditorController {
 
     @RequestMapping(value = "/setGoodsWeightByWeigher")
     @ResponseBody
-    public JsonResult setGoodsWeightByWeigher(HttpServletRequest request, HttpServletResponse response) {
+    public JsonResult setGoodsWeightByWeigher(String pid, String newWeight) {
         JsonResult json = new JsonResult();
-
-
-        String pid = request.getParameter("pid");
         if (StringUtils.isBlank(pid)) {
             json.setOk(false);
             json.setMessage("获取商品PID失败");
             return json;
         }
-        String newWeight = request.getParameter("newWeight");
         if (StringUtils.isBlank(newWeight)) {
             json.setOk(false);
             json.setMessage("获取商品重量失败");
             return json;
         }
-        try {
-            // 获取商品信息
-            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), 2) > 0;
-            if (is) {
-                // 重新刷新价格数据
-                String url = SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
-                        + "&sourceTable=custom_benchmark_ready&database=27";
-                String resultJson = DownloadMain.getContentClient(url, null);
-                System.err.println("pid=" + pid + ",result:[" + resultJson + "]");
-                JSONObject jsonJt = JSONObject.fromObject(resultJson);
-                System.out.println(json.toString());
-                if (!jsonJt.getBoolean("ok")) {
-                    json.setOk(false);
-                    json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
-                } else {
-                    json.setOk(true);
-                    json.setMessage("执行成功");
-                }
-            } else {
-                json.setOk(false);
-                json.setMessage("执行错误，请重试");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            json.setOk(false);
-            json.setMessage("pid:" + pid + " setGoodsWeightByWeigher 执行错误：" + e.getMessage());
-            LOG.error("pid:" + pid + " setGoodsWeightByWeigher 执行错误：" + e.getMessage());
-        }
+        json = customGoodsService.setGoodsWeightByWeigher(pid, newWeight);
         return json;
     }
 

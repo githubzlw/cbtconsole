@@ -461,9 +461,12 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
-				// 2018/11/06 11:39 ly 实秤重量
-				String weight = iWarehouseDao.getGoodsWeight(map.get("goods_pid"));
-				searchresultinfo.setWeight(weight);
+                // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
+                SearchResultInfo weightAndSyn = iWarehouseDao.getGoodsWeight(map.get("goods_pid"));
+                if (null != weightAndSyn){
+                    searchresultinfo.setWeight(weightAndSyn.getWeight());
+                    searchresultinfo.setSyn(weightAndSyn.getSyn());
+                }
 				//获取验货商品的最大类别ID 王宏杰
 				String catid="";
 				if("1".equals(checked)){
