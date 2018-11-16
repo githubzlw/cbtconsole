@@ -6,6 +6,7 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pay.dao.IPaymentDao;
 import com.cbt.pay.dao.PaymentDao;
 import com.cbt.util.BigDecimalUtil;
+import com.cbt.warehouse.util.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -54,6 +55,37 @@ public class OrderInfoImpl implements OrderInfoDao {
 			}
 			DBHelper.getInstance().closeConnection(conn);
 		}
+	}
+
+	@Override
+	public int updateOrderinfoIpnAddress(String orderNo) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		int row=12;
+		String shorthand="";
+		try{
+			String  sql="select paytype from payment where orderod='"+orderNo+"' and paystatus=1 and paytype<>0";
+			stmt=conn.prepareStatement(sql);
+			rs=stmt.executeQuery();
+			if(rs.next()){
+				return 1;
+			}
+			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo='"+orderNo+"'";
+			stmt=conn.prepareStatement(sql);
+			rs=stmt.executeQuery();
+			if(rs.next()){
+				shorthand=rs.getString("shorthand");
+			}
+			if(StringUtil.isNotBlank(shorthand)){
+				sql="update orderinfo set ipnaddress='"+shorthand+"' where order_no='"+orderNo+"'";
+				stmt=conn.prepareStatement(sql);
+				row=stmt.executeUpdate();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row;
 	}
 
 	@Override

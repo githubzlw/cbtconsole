@@ -1,6 +1,7 @@
 package com.cbt.customer.service;
 
 import ceRong.tools.bean.DorpDwonBean;
+
 import com.cbt.bean.*;
 import com.cbt.customer.dao.IPictureComparisonDao;
 import com.cbt.customer.dao.PictureComparisonDaoImpl;
@@ -95,6 +96,12 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	public int getYlbbGooddataCount(String userName,int flag){
 		return dao.getYlbbGooddataCount(userName,flag);
 	}
+	
+	@Override
+	public int getErrorInfoCount(String userId,String timeF,String timeE){
+		return dao.getErrorInfoCount(userId,timeF,timeE);
+	}
+	
 	
 	@Override
 	public int getLireImgCount(String userName,int flag){
@@ -287,8 +294,8 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	}
 	
 	@Override
-	public List<GoodsCheckBean> getErrorInfo(int selled, String cid, String categoryId1, int start, int end) {
-		return dao.getErrorInfo(selled,cid,categoryId1,start,end);
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int end) {
+		return dao.getErrorInfo(userId,timeF,timeE,start,end);
 	}
 	
 	

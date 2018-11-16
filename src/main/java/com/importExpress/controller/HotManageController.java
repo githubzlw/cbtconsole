@@ -405,6 +405,8 @@ public class HotManageController {
                                 if (matchStrList.size() > 1) {
                                     maxPrice = StrUtils.matchStr(matchStrList.get(0), "(\\d+\\.\\d+)");
                                     range_price = range_price + "-" + maxPrice;
+                                } else {
+                                    maxPrice = range_price;
                                 }
                             } else {
                                 range_price = StrUtils.object2Str(goods.getGoodsPrice());
@@ -419,23 +421,28 @@ public class HotManageController {
                             if (matchStrList.size() > 1) {
                                 maxPrice = StrUtils.matchStr(matchStrList.get(0), "(\\d+\\.\\d+)");
                                 range_price = range_price + "-" + maxPrice;
+                            } else {
+                                maxPrice = range_price;
                             }
                         } else {
                             range_price = StrUtils.object2Str(goods.getGoodsPrice());
                             maxPrice = range_price;
                         }
                     }
-                } else{
-                    if(range_price.contains("-")){
+                } else {
+                    if (range_price.contains("-")) {
                         maxPrice = range_price.split("-")[1].trim();
-                    }else{
+                    } else {
                         maxPrice = range_price;
                     }
                 }
+                if ("".equals(maxPrice)) {
+                    System.err.println(maxPrice);
+                }
                 goods.setMaxPrice(maxPrice);
                 goods.setShowPrice(range_price);
-                if(hotCategory.getHotType() == 2){
-                    goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) * ( 1 + goods.getDiscountPercentage() / 100D) ,2));
+                if (hotCategory.getHotType() == 2) {
+                    goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) * (1 + goods.getDiscountPercentage() / 100D), 2));
                 }
                 goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + goods.getShowName() + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }

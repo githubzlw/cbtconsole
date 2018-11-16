@@ -666,7 +666,7 @@
                 <span id="showName_${goods.id}">${goods.showName}</span><br>
                 <span id="goodsPrice_${goods.id}">价格:$${goods.showPrice}&nbsp;&nbsp;<em>${goods.goodsUnit}</em></span>
                 &nbsp;&nbsp;<span>(<a target="_blank"
-                                      href=https://detail.1688.com/offer/"${goods.goodsPid}.html">商品原链接</a>)</span><br>
+                                      href=https://detail.1688.com/offer/${goods.goodsPid}.html">商品原链接</a>)</span><br>
                 <span>亚马逊价格:$&nbsp;${goods.amazonPrice}</span><br>
                 <span>ASIN码:${goods.asinCode}</span><br>
                 <span>利润率:${goods.profitMargin}</span><em>%</em><br>

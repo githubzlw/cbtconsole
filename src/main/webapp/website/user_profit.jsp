@@ -267,7 +267,7 @@ function doReset(){
 
      //异步获取利润汇总数据
      function profitSummaryData(){
-         $("#AllEstimateProfit").html("--");
+         // $("#AllEstimateProfit").html("--");
          $("#AllForecastProfits").html("--");
          $("#endProfit").html("--");
          var year=$('#year').combobox('getValue');
@@ -283,9 +283,8 @@ function doReset(){
              data:{year:year,month:month,userId:userId},
              success : function(data){
                  var json=eval(data);
-                 console.log(json);
                  if(json != null){
-                     $("#AllEstimateProfit").html(json.estimateProfit);
+                     // $("#AllEstimateProfit").html(json.estimateProfit);
                      $("#AllForecastProfits").html(json.forecastProfits);
                      $("#endProfit").html(json.endProfit);
                  }
@@ -325,7 +324,7 @@ function doReset(){
 			</form>
 		</div>
 		<span style="color:crimson;margin-left:500px;">物流公司运费计算最终利润金额：<span style="color:red;" id="endProfit"></span></span>
-		<span style="color:crimson;margin-left:100px;">预估重量预估运费计算预估利润金额：<span style="color:red;" id="AllEstimateProfit"></span></span>
+		<%--<span style="color:crimson;margin-left:100px;">预估重量预估运费计算预估利润金额：<span style="color:red;" id="AllEstimateProfit"></span></span>--%>
 		<span style="color:crimson;margin-left:100px;">实际重量预估的运费实际利润金额：<span style="color:red;" id="AllForecastProfits"></span></span><br>
 		<span style="color:blueviolet;">EUR兑美元汇率：<span style="color:red;" id="eur_rate"></span></span>
 		<span style="color:blueviolet;margin-left:100px;">CAD兑美元汇率：<span style="color:red;" id="cad_rate"></span></span>
@@ -366,7 +365,7 @@ function doReset(){
 				<th data-options="field:'estimateFreight',width:45,align:'center'">M</th>
 				<%--<th data-options="field:'esFreight',width:45,align:'center'">预估运费(RMB)</th>--%>
 				<th data-options="field:'forecastProfits',width:45,align:'center'">N</th>
-				<th data-options="field:'Profits',width:45,align:'center'">R</th>
+				<th data-options="field:'fProfits',width:45,align:'center'">R</th>
 				<%--<th data-options="field:'estimateProfit',width:45,align:'center'">O</th>--%>
 				<%--<th data-options="field:'esprofits',width:45,align:'center'">P</th>--%>
 				<th data-options="field:'endProfits',width:45,align:'center'">S</th>
@@ -384,11 +383,11 @@ function doReset(){
         var month=$('#month').combobox('getValue');
         $.ajax({
             type:"post",
-            url:"/cbtconsole/warehouse/getExchange",
+            url:"/cbtconsole/StatisticalReport/getExchange",
             data:{year:year,month:month},
             success : function(data){
-                var json=eval(data);
-                console.log(json);
+                console.log(data);
+                 var json=eval(data);
                 if(json != null){
                     $("#eur_rate").html(json.eur_rate);
                     $("#cad_rate").html(json.cad_rate);

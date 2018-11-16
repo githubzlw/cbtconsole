@@ -16,6 +16,13 @@ public interface OrderInfoDao {
 	 */
 	public OrderBean getOrderInfo(String orderNo, String userId) throws Exception;
 
+	/**
+	 * 更新订单表中的ipn国家简称
+	 * @param orderNo
+	 * @return
+	 */
+	public int updateOrderinfoIpnAddress(String orderNo);
+
 
 	/**
 	 * 更新订单状态

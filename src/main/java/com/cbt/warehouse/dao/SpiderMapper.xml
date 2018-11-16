@@ -66,7 +66,26 @@
     <result column="addPrice" property="freight_upgrade" />
     
   </resultMap>
-  
+    <resultMap id="searchLogMap" type="ceRong.tools.bean.SearchLog" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="sessionid" property="sessionid" />
+    <result column="userIP" property="userIP" />
+    <result column="keyWords" property="keyWords" />
+    <result column="catid" property="catid" />
+    <result column="sortType" property="sortType" />
+    <result column="pageNumber" property="pageNumber" />
+    <result column="productShowIdList" property="productShowIdList" />
+    <result column="allProductList" property="allProductList" />
+    <result column="listSize" property="listSize" />
+    <result column="device" property="device" />
+    <result column="saveFlag" property="saveFlag" />
+    <result column="showPageYear" property="year" />
+    <result column="showPageMonth" property="month" />
+    <result column="showPageDay" property="day" />
+    <result column="searchMD5" property="searchMD5" />
+    <result column="searchUserMD5" property="searchUserMD5" />
+  </resultMap>
   <resultMap id="CollectionBeanResultMap" type="com.cbt.warehouse.pojo.CollectionBean" >
     <id column="id" property="id" />
     <result column="userid" property="userid" />
@@ -570,4 +589,17 @@
   
   <!-- ****com.cbt.pay.dao end*** -->
   
+  <!-- 搜索页面用户行为跟踪 -->
+<insert id="saveTheSearchLogOnSearchPage" useGeneratedKeys="true" keyProperty="id" parameterType="ceRong.tools.bean.SearchLog">
+  insert into searchproductlog(userid,sessionid,userIP,keywords,catid,sortType,pageNumber,showPageYear,showPageMonth,showPageDay,showPageTime,productShowIdList,allProductList,listSize,device,searchMD5,searchUserMD5) 
+  values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
+</insert>
+<update id="updateTheSearchLogOnSearchPage">
+  update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
+</update>
+<insert id="saveTheClickCountOnSearchPage">
+  insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime) 
+  values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
+  on duplicate key update clickCount=clickCount+1,updateTime = now()
+</insert>
 </mapper>

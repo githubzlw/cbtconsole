@@ -197,10 +197,12 @@ public interface CustomGoodsMapper {
      * 修改商品重量
      *
      * @param pid
-     * @param weight
+     * @param newWeight
+     * @param oldWeight
+     * @param weightIsEdit
      * @return
      */
-    int updateGoodsWeightByPid(@Param("pid") String pid, @Param("weight") double weight);
+    int updateGoodsWeightByPid(@Param("pid") String pid, @Param("newWeight") double newWeight, @Param("oldWeight") double oldWeight, @Param("weightIsEdit") int weightIsEdit);
 
     /**
      * 更新商品详情信息

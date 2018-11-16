@@ -3,6 +3,9 @@ package com.cbt.warehouse.dao;
 import com.cbt.bean.CollectionBean;
 import com.cbt.bean.SpiderBean;
 import com.cbt.warehouse.pojo.TypeAvgWeightBean;
+
+import ceRong.tools.bean.SearchLog;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -244,4 +247,11 @@ public interface SpiderMapper {
 	 * 获取类别平均重量
 	 */
 	public List<TypeAvgWeightBean> getCatid_Filter_AvgWeight();
+	
+	/**
+	 * 搜索页面记录日志 qiqing 2018/04/11
+	 */
+	public int saveTheSearchLogOnSearchPage(SearchLog seaLog);
+	public int updateTheSearchLogOnSearchPage(@Param("rowid") int rowid, @Param("productShowIdList") String productShowIdList);
+	public int saveTheClickCountOnSearchPage(@Param("goods_id") String goodsPid, @Param("searchmd5") String searchMD5, @Param("searchusermd5") String searchUserMD5);
 }

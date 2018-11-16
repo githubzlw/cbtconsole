@@ -80,6 +80,8 @@ function fn(va) {
 		var paystatus = json[i].paystatus;
 		var isDropship = json[i].isDropshipOrder;
 		var orderRemark =json[i].orderRemark;
+		var ipnaddress=json[i].ipnaddress;
+		var odCode=json[i].odCode;
 		var showImg = "";
 		if(paytype == 1){
 			showImg += "<span class='spiconbl'>Wire</span>";
@@ -91,6 +93,12 @@ function fn(va) {
 		}
 		if(paystatus == 2){
 			showImg += "<span class='spiconbl'>电汇</span>";
+		}
+        if((odCode == null || ipnaddress == null || ipnaddress !=odCode) && json[i].paytypes.indexOf("paypal")>-1){
+            showImg += "<span class='spiconbl' style='color:red'>付款失败</span>";
+        }
+        if(json[i].backList>0 || json[i].payBackList>0){
+            showImg += "<span class='spiconbl' style='color:red'>黑名单</span>";
 		}
 		if(isDropship == 1){
 			showImg += "<img style='width: 20px;' title='dropship' src='/cbtconsole/img/ds1.png'>";

@@ -2779,7 +2779,7 @@
                 url:"/cbtconsole/orderDetails/changeOrderBuyer.do",
                 type:"post",
                 dataType:"json",
-                data : {"orderid":orderid,"admuserid":admuserid,"goodsids":check_val.toString()},
+                data : {"orderid":orderid,"admuserid":admuserid,"odids":check_val.toString()},
                 success:function(data){
                     if(data.ok){
                         $("#buyuserinfo").text("执行成功");

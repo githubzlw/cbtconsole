@@ -47,7 +47,28 @@ public class Md5Util {
 		}
 		return null;
 	}
-
+    /**
+	 * 对字符串进行MD5数字指纹计算
+	 *
+	 * */
+	public static String md5Operation(String data) {
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}  
+		md.update(data.getBytes());  
+		StringBuffer buf = new StringBuffer();  
+		byte[] bits = md.digest();  
+		for(int i=0;i<bits.length;i++){  
+		    int a = bits[i];  
+		    if(a<0) a+=256;  
+		    if(a<16) buf.append("0");  
+		    buf.append(Integer.toHexString(a));  
+		}  
+		return buf.toString();  
+    }
 	/**
 	 * 
 	 * @param source

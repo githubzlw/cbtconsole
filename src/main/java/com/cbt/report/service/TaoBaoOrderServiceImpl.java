@@ -458,7 +458,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		for(int i=0;i<list.size();i++){
 			OrderSalesAmountPojo o=list.get(i);
 			o.setSalesAmount(df.format(Double.valueOf(StringUtil.isBlank(o.getSalesAmount())?"0.00":o.getSalesAmount())));
-			if(StringUtil.isNotBlank(o.getBuyAmount())){
+			if(StringUtil.isNotBlank(o.getBuyAmount()) && Double.parseDouble(o.getBuyAmount())>0){
 				o.setBuyAmount(df.format(Double.valueOf(o.getBuyAmount())+o.getPid_amount()));
 			}else{
 				o.setBuyAmount("0.00");
@@ -467,17 +467,20 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 			double profit=Double.valueOf(StringUtil.isBlank(o.getSalesAmount())?"0.00":o.getSalesAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getBuyAmount())?"0.00":o.getBuyAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getEstimateFreight())?"0.00":o.getEstimateFreight());
-			if(StringUtil.isNotBlank(o.getBuyAmount())){
+			if(StringUtil.isBlank(o.getBuyAmount()) || Double.parseDouble(o.getBuyAmount())<=0){
 				profit=0.00;
 			}
-			if(StringUtil.isNotBlank(o.getEstimateFreight()) && Double.parseDouble(o.getEstimateFreight())>0){
+			if(profit>0){
 				forecastProfitsAmount+=profit;
 			}
 			//根据物流公司运费计算最终利润金额=实际销售额-录入采购金额-实际支出运费
 			double endProfits=Double.valueOf(StringUtil.isBlank(o.getSalesAmount())?"0.00":o.getSalesAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getBuyAmount())?"0.00":o.getBuyAmount())
-					-Double.valueOf(StringUtil.isBlank(o.getTotalPriceFreight())?"0.00":o.getTotalPriceFreight());
-			if(StringUtil.isNotBlank(o.getTotalPriceFreight())){
+					-Double.valueOf(StringUtil.isBlank(o.getFreight())?"0.00":o.getFreight());
+			if(StringUtil.isBlank(o.getBuyAmount()) || Double.parseDouble(o.getBuyAmount())<=0 || StringUtil.isBlank(o.getFreight()) || Double.parseDouble(o.getFreight())<=0){
+				endProfits=0.00;
+			}
+			if(endProfits>0){
 				endProfit+=endProfits;
 			}
 			//根据预估重量预估运费计算预估利润金额=实际销售额-预估采购金额-客户付的预估国际运费
@@ -540,24 +543,24 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 			double profit=Double.valueOf(StringUtil.isBlank(o.getSalesAmount())?"0.00":o.getSalesAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getBuyAmount())?"0.00":o.getBuyAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getEstimateFreight())?"0.00":o.getEstimateFreight());
-			if(StringUtil.isNotBlank(o.getBuyAmount())){
+			if(StringUtil.isBlank(o.getBuyAmount()) || Double.parseDouble(o.getBuyAmount())<=0 || StringUtil.isBlank(o.getEstimateFreight()) || Double.parseDouble(o.getEstimateFreight())<=0){
 				profit=0.00;
 			}
-			if(StringUtil.isNotBlank(o.getEstimateFreight()) && Double.parseDouble(o.getEstimateFreight())>0){
+			if(profit>0){
 				o.setForecastProfits("<span title='实际重量预估的运费实际利润金额=实际销售额-实际重量预估运费-录入采购额' style='color:red'>"+df.format(profit)+"</span>");
-				o.setProfits(df.format(profit/(Double.valueOf(o.getSalesAmount()))*100)+"%");
+				o.setfProfits(df.format(profit/(Double.valueOf(o.getSalesAmount()))*100)+"%");
 			}else{
 				o.setForecastProfits("<span title='实际重量预估的运费实际利润金额=实际销售额-实际重量预估运费-录入采购额' style='color:red'>--</span>");
-				o.setProfits("--");
+				o.setfProfits("--");
 			}
 			//根据物流公司运费计算最终利润金额=实际销售额-录入采购金额-实际支出运费
 			double endProfits=Double.valueOf(StringUtil.isBlank(o.getSalesAmount())?"0.00":o.getSalesAmount())
 					-Double.valueOf(StringUtil.isBlank(o.getBuyAmount())?"0.00":o.getBuyAmount())
-					-Double.valueOf(StringUtil.isBlank(o.getTotalPriceFreight())?"0.00":o.getTotalPriceFreight());
-			if(StringUtil.isNotBlank(o.getBuyAmount())){
+					-Double.valueOf(StringUtil.isBlank(o.getFreight())?"0.00":o.getFreight());
+			if(StringUtil.isBlank(o.getBuyAmount()) || Double.parseDouble(o.getBuyAmount())<=0 || StringUtil.isBlank(o.getFreight()) || Double.parseDouble(o.getFreight())<=0){
 				endProfits=0.00;
 			}
-			if(StringUtil.isNotBlank(o.getTotalPriceFreight()) || endProfits<=0){
+			if(endProfits>0){
 				o.setEndProfits("<span title='物流公司运费计算最终利润金额=实际销售额-录入采购金额-实际支出运费' style='color:red'>"+df.format(endProfits)+"</span>");
 			}else{
 				o.setEndProfits("<span title='物流公司运费计算最终利润金额=实际销售额-录入采购金额-实际支出运费' style='color:red'>--</span>");
