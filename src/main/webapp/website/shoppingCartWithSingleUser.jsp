@@ -124,6 +124,7 @@
                 + 'If you have any questions or concerns, please do let us know.';
             $("#simle_email_content").text(content);
             $("#simple_email_div").dialog('open');
+            $('#simple_email_div').window('center');//使Dialog居中显示
         }
 
         function enterShopCarEmail(userId) {
@@ -153,10 +154,8 @@
             });
         }
 
-        function confirmAndSendEmail(userId, userEmail, emailContentId) {
-            var r = confirm("是否确认发送邮件?");
-            if (r) {
-                var emailContent = $("#" + emailContentId).text();
+        function confirmAndSendEmail(userId, userEmail, emailContentId,type) {
+            var emailContent = $("#" + emailContentId).text();
                 if (emailContent == null || emailContent == "") {
                     $.messager.alert("提醒", "获取邮件内容失败", "info");
                     return false;
@@ -172,16 +171,22 @@
                         },
                         success: function (data) {
                             var json = eval("(" + data + ")");
-                            $.messager.alert("提醒", json.message, "info");
+                            if(json.ok){
+                                showMessage("执行成功");
+                                if (type == 1) {
+                                    closeDialog('simple_email_div', 'simple_form_enter');
+                                } else {
+                                    closeDialog('shop_cart_div', 'hop_cart_form');
+                                }
+                            }else{
+                                $.messager.alert("提醒", json.message, "info");
+                            }
                         },
                         error: function () {
                             $.messager.alert("提醒", "执行失败,请联系管理员", "info");
                         }
                     });
                 }
-            } else {
-                return false;
-            }
         }
 
         function openComparedEmail(userId) {
@@ -192,6 +197,20 @@
             var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
             var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
             window.open(url, 'windows', param);
+        }
+
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 1500,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.25),
+                    bottom: ''
+                }
+            });
         }
     </script>
 </head>
@@ -210,7 +229,7 @@
             <div style="text-align: center;">
                 <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                    class="easyui-linkbutton"
-                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simle_email_content')"
+                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simle_email_content',1)"
                    style="width: 80px">发送</a>
                 <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                    class="easyui-linkbutton" onclick="closeDialog('simple_email_div','simple_form_enter')"
@@ -229,7 +248,7 @@
             <div style="text-align: center;">
                 <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                    class="easyui-linkbutton"
-                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','shop_cart_content')"
+                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','shop_cart_content',2)"
                    style="width: 80px">发送</a>
                 <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                    class="easyui-linkbutton" onclick="closeDialog('shop_cart_div','hop_cart_form')"

@@ -102,7 +102,7 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         if(!(resultList == null  || resultList.isEmpty())){
             for(ShopCarInfo carInfo : resultList){
                 if(!(carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1)){
-                    //carInfo.setAliPid(null);
+                    carInfo.setAliPid(null);
                 }
             }
         }
@@ -117,7 +117,7 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
         shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
-        return shopCarMarketingMapper.updateUserFollowTime(userId, adminId);
+        return shopCarMarketingMapper.updateUserFollowTime(userId);
     }
 
     @Override
