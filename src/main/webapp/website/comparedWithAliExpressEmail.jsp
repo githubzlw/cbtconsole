@@ -26,7 +26,12 @@
                     },
                     success: function (data) {
                         var json = eval("(" + data + ")");
-                        alert(json.message);
+                        if(json.ok){
+                            window.close();
+                        }else{
+                            alert(json.message);
+                        }
+
                     },
                     error: function () {
                         alert("执行失败,请联系管理员");
