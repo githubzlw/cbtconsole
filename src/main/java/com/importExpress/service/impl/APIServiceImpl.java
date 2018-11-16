@@ -102,7 +102,6 @@ public class APIServiceImpl implements APIService {
 		String url = DISPUTE_URL + disputeID;
 		//请求
 		String response = okHttpUtils.get(url, header);
-		System.out.println("showDisputeDetails:\r\n"+response);
 		return 	response;
 	}
 

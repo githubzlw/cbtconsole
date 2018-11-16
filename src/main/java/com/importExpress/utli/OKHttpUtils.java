@@ -31,7 +31,7 @@ public class OKHttpUtils {
 	    if(response.isSuccessful()) {
 	    	return response.body().string();
 	    }else {
-	    	throw new Exception("result:"+response.body().string()+"Exception:"+response);
+	    	throw new Exception("Error:"+response.body().string()+"Exception:"+response);
 	    }
 	}
 	

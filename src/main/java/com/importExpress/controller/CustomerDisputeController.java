@@ -28,6 +28,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.FileMeta;
 import com.cbt.util.FileUtil;
@@ -60,7 +61,7 @@ public class CustomerDisputeController {
 
         EasyUiJsonResult json = new EasyUiJsonResult();
         int startNum = 0;
-        int limitNum = 20;
+        int limitNum = 50;
         
         String pageStr = request.getParameter("page");
         String limitNumStr = request.getParameter("rows");
@@ -131,12 +132,34 @@ public class CustomerDisputeController {
     	int statusFlag = 0;
     	int disputeLifeCycleFlag = 0;
 		try {
-			String showDisputeDetails = apiService.showDisputeDetails(disputeID);
+			String showDisputeDetails = "";//customerDisputeService.info(disputeID);
+			if(StringUtils.isBlank(showDisputeDetails)) {
+				showDisputeDetails = apiService.showDisputeDetails(disputeID);
+			}		
 			if(StringUtils.isNotEmpty(showDisputeDetails)) {
 				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
 			}
 			if(infoByDisputeID != null) {
 				mv.addObject("result", infoByDisputeID);
+				JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
+				
+				String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
+				mv.addObject("orderNo", "");
+				if(StringUtils.indexOf(custom, "@") > -1) {
+					if(custom.indexOf("{@}") > -1) {
+						String[] split = custom.split("\\{@\\}");
+						if(split.length > 3) {
+							mv.addObject("userid", split[0]);
+							mv.addObject("orderNo", split[2]);
+						}
+					}else {
+						String[] split = custom.split("@");
+						if(split.length == 10) {
+							mv.addObject("userid", split[0]);
+							mv.addObject("orderNo", split[6]);
+						}
+					}
+				}
 				//原因
 				String reason = infoByDisputeID.getString("reason");
 				resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
@@ -150,8 +173,6 @@ public class CustomerDisputeController {
 				String disputeLifeCycleStage = infoByDisputeID.getString("dispute_life_cycle_stage");
 				disputeLifeCycleFlag = StringUtils.equals("INQUIRY", disputeLifeCycleStage) ? 1 : disputeLifeCycleFlag;
 				disputeLifeCycleFlag = StringUtils.equals("CHARGEBACK", disputeLifeCycleStage) ? 2 : disputeLifeCycleFlag;
-				
-				
 				//
 				JSONObject disputeOutcome = (JSONObject)infoByDisputeID.get("dispute_outcome");
 				if(disputeOutcome != null) {
