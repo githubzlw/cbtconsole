@@ -74,7 +74,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 		WebhookPaymentBean bean;
 //			BasicDBObject s = new BasicDBObject();
 //			s.put("ISODate(payment_date)", -1);
-		List<String> findAny = MongoDBHelp.INSTANCE.findAny("data", q);//, s, startNum, limitNum
+		List<String> findAny = MongoDBHelp.INSTANCE.findAny("data", null,q);//, s, startNum, limitNum
 		List<WebhookPaymentBean> list = new ArrayList<WebhookPaymentBean>();
 		try {
 			for (String find : findAny) {
