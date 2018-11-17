@@ -143,6 +143,19 @@
         <result column="weight" property="weight_1688"/>
     </resultMap>
 
+
+    <resultMap id="onlineGoodsCheckResultMap" type="com.importExpress.pojo.OnlineGoodsCheck">
+        <result column="pid" property="pid"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="catid1" property="catid"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="remotpath" property="remotePath"/>
+        <result column="custom_main_image" property="mainImg"/>
+        <result column="img" property="imgs"/>
+        <result column="eninfo" property="eninfo"/>
+        <result column="click_num" property="clickNum"/>
+    </resultMap>
+
     <insert id="insertPidIsEdited">
         insert into custom_goods_edit(pid,shop_id,admin_id)
         values(#{pid},#{shopId},#{adminId})
@@ -286,7 +299,8 @@
     </select>
 
 
-    <select id="queryGoodsEditBeanCount" parameterType="com.importExpress.pojo.GoodsEditBean" resultType="java.lang.Integer">
+    <select id="queryGoodsEditBeanCount" parameterType="com.importExpress.pojo.GoodsEditBean"
+            resultType="java.lang.Integer">
         select count(0)
         from custom_goods_edited_log a left join admuser b
         on a.admin_id = b.id
@@ -314,7 +328,8 @@
         cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
-        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
+        ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
+        admin_name,
         ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num
@@ -353,7 +368,7 @@
             and cge.is_abnormal = #{isAbnormal}
         </if>
         <if test="isBenchmark == 1">
-            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+            and cbu.isBenchmark = 1 and cbu.bm_flag=1
         </if>
         <if test="isBenchmark > -1 and isBenchmark != 1">
             and cbu.isBenchmark = #{isBenchmark}
@@ -475,7 +490,7 @@
             and cge.is_abnormal = #{isAbnormal}
         </if>
         <if test="isBenchmark == 1">
-            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+            and cbu.isBenchmark = 1 and cbu.bm_flag=1
         </if>
         <if test="isBenchmark > -1 and isBenchmark != 1">
             and cbu.isBenchmark = #{isBenchmark}
@@ -583,7 +598,7 @@
             and cge.is_abnormal = #{isAbnormal}
         </if>
         <if test="isBenchmark == 1">
-            and cbu.isBenchmark = 1 and  cbu.bm_flag=1
+            and cbu.isBenchmark = 1 and cbu.bm_flag=1
         </if>
         <if test="isBenchmark > -1 and isBenchmark != 1">
             and cbu.isBenchmark = #{isBenchmark}
@@ -758,5 +773,95 @@
         </if>
         where pid = #{pid}
     </update>
+
+    <select id="queryOnlineGoodsForList" resultMap="onlineGoodsCheckResultMap"
+            parameterType="com.importExpress.pojo.OnlineGoodsCheck">
+        select a.pid,a.remotpath,a.eninfo,a.custom_main_image,a.img,a.catid1,a.shop_id,b.click_num,c.`name` as
+        category_name
+        from custom_benchmark_ready a left join custom_goods_edit b on a.pid = b.pid
+        left join 1688_category c on a.catid1 = c.category_id
+        where a.valid = 1
+        <if test="pid != null">
+            and a.pid = #{pid}
+        </if>
+        <if test="catid != null">
+            and a.catid1 = #{catid}
+        </if>
+        <if test="clickNum == 1">
+            and b.click_num &lt; 10
+        </if>
+        <if test="clickNum == 2">
+            and b.click_num &gt;= 10 and b.click_num &lt; 50
+        </if>
+        <if test="clickNum == 3">
+            and b.click_num &gt;= 50 and b.click_num &lt; 100
+        </if>
+        <if test="clickNum == 4">
+            and b.click_num &gt;= 100
+        </if>
+        <if test="clickNum == 0">
+            order by a.shop_id
+        </if>
+        <if test="clickNum > 0">
+            order by b.click_num desc
+        </if>
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryOnlineGoodsForListCount" resultType="java.lang.Integer"
+            parameterType="com.importExpress.pojo.OnlineGoodsCheck">
+        select count(1)
+        from custom_benchmark_ready a left join custom_goods_edit b on a.pid = b.pid
+        left join 1688_category c on a.catid1 = c.category_id
+        where a.valid = 1
+        <if test="pid != null">
+            and a.pid = #{pid}
+        </if>
+        <if test="catid != null">
+            and a.catid1 = #{catid}
+        </if>
+        <if test="clickNum == 1">
+            and b.click_num &lt; 10
+        </if>
+        <if test="clickNum == 2">
+            and b.click_num &gt;= 10 and b.click_num &lt; 50
+        </if>
+        <if test="clickNum == 3">
+            and b.click_num &gt;= 50 and b.click_num &lt; 100
+        </if>
+        <if test="clickNum == 4">
+            and b.click_num &gt;= 100
+        </if>
+    </select>
+
+    <select id="queryCategoryList" resultMap="categoryResultMap" parameterType="com.importExpress.pojo.OnlineGoodsCheck">
+        select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,
+        path,lv from 1688_category where lv > 0) cat1688 left join
+        (select a.catid1,count(a.catid1) as total from custom_benchmark_ready a left join custom_goods_edit b
+        on a.pid = b.pid left join 1688_category c on a.catid1 = c.category_id
+        where a.valid = 1
+        <if test="pid != null">
+            and a.pid = #{pid}
+        </if>
+        <if test="catid != null">
+            and a.catid1 = #{catid}
+        </if>
+        <if test="clickNum == 1">
+            and b.click_num &lt; 10
+        </if>
+        <if test="clickNum == 2">
+            and b.click_num &gt;= 10 and b.click_num &lt; 50
+        </if>
+        <if test="clickNum == 3">
+            and b.click_num &gt;= 50 and b.click_num &lt; 100
+        </if>
+        <if test="clickNum == 4">
+            and b.click_num &gt;= 100
+        </if>
+        group by catid) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
+    </select>
 
 </mapper>
