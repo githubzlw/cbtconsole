@@ -81,4 +81,13 @@
 			INNER JOIN admuser ad ON a.adminid=ad.id
 			WHERE p.id=${report_id}
 	</select>
+
+    <!--List<Map<String,String>> queryWarningNum();-->
+    <select id="queryWarningNum" resultType="java.util.HashMap">
+        SELECT type,COUNT(1) total FROM problem_report,admin_r_user
+        WHERE problem_report.email = admin_r_user.useremail
+        AND (reply_content is null or reply_content = '')
+        GROUP BY type
+    </select>
+
 </mapper>

@@ -48,6 +48,10 @@
 	width: 100%;
 	height: 880px;
 }
+#warning_info span{
+    color: red;
+    font-weight: bolder;
+}
 </style>
 <title>购物车&支付页面问题统计</title>
 </head>
@@ -57,19 +61,39 @@
 		<div class="div_search">
 			<ul class="main_ul">
 				<li class="selected"><a href="javascript:;" onclick="showResault(1)">用户使用问题反馈</a></li>
-				<li><a href="javascript:;" onclick="showResault(2)">搜索页问卷调查</a></li>
+				<!--<li><a href="javascript:;" onclick="showResault(2)">搜索页问卷调查</a></li>-->
 				<li><a href="javascript:;" onclick="showResault(3)">注册&订阅用户信息收集</a></li>
 			</ul>
 		</div>
 		<br> <br>
 		<div class="div_content"></div>
 	</div>
+    <div id="warning_info" style="position: absolute;top: 18px;right: 30px;"></div>
 </body>
 <script type="text/javascript">
 	window.onload = function() {
 		$(".div_content").empty();
 		var div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html"></iframe>';
 		$(".div_content").append(div_iframe);
+        <!--用户使用问题反馈数据-->
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/problemFeedBack/queryWarningNum",
+            dataType:"json",
+            success: function(msg){
+                if(msg != undefined){
+                    $("#warning_info").html("注册页面(<span>" + (msg.type1 == undefined?"0":msg.type1)
+                        + "</span>),购物车(<span>" + (msg.type2 == undefined?"0":msg.type2)
+                        + "</span>),支付页面(<span>" + (msg.type3 == undefined?"0":msg.type3)
+                        + "</span>),搜索结果(<span>" + (msg.type4 == undefined?"0":msg.type4)
+                        + "</span>),产品单页(<span>" + (msg.type5 == undefined?"0":msg.type5)
+                        + "</span>),个人中心(<span>" + (msg.type6 == undefined?"0":msg.type6)
+                        + "</span>),交期选择(<span>" + (msg.type7 == undefined?"0":msg.type7)
+                        + "</span>)");
+                }
+            }
+        });
+
 	}
 </script>
 </html>
