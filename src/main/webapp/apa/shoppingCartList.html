@@ -94,10 +94,12 @@
         function doQuery() {
             var isOrder = $("#query_is_order").val();
             var userId = $("#query_user_id").val();
+            var userEmail = $("#query_user_email").val();
             var isFollow = $("#query_is_follow").val();
             $("#shop_marketing_easyui-datagrid").datagrid("load", {
                 "isOrder": isOrder,
                 "userId": userId,
+                "userEmail": userEmail,
                 "isFollow": isFollow
             });
         }
@@ -127,13 +129,14 @@
 <div id="shop_marketing_toolbar" style="padding: 5px; height: auto">
     <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
 
-        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;"/></span>
-        &nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 24px; width: 120px;">
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;height: 22px;"/></span>
+         &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value="" style="width: 200px;height: 22px;"/></span>
+        &nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 120px;">
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">未下单</option>
                     <option value="1">已下单</option>
 			</select></span>&nbsp;&nbsp;<span>是否跟进: <select id="query_is_follow"
-                                                            style="font-size: 16px; height: 24px; width: 120px;">
+                                                            style="font-size: 16px; height: 26px; width: 120px;">
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">未跟进</option>
                     <option value="1">已跟进</option>

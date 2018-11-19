@@ -1621,7 +1621,6 @@
         select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.updateTime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(scm.total_price,decimal(10,2)) as total_price,convert(scm.average_price,decimal(10,2)) as average_price,
         us.countryId,zone.country,us.currency,au.adminid,au.admName,
-        <!-- DATE_FORMAT(us.createtime,'%Y-%m-%d %H:%i:%s') as last_login_time,  -->
         '' as last_login_time,
         DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
         from goods_carconfig gcf
@@ -1637,6 +1636,9 @@
         where 1=1
         <if test="userId > 0">
             and gcf.userid = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and us.email = #{userEmail}
         </if>
         <if test="isOrder == 0">
             and gcf.userid not in(select DISTINCT user_id from orderinfo)
@@ -1674,6 +1676,9 @@
         where 1=1
         <if test="userId > 0">
             and gcf.userid = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and us.email = #{userEmail}
         </if>
         <if test="isOrder == 0">
             and gcf.userid not in(select DISTINCT user_id from orderinfo)

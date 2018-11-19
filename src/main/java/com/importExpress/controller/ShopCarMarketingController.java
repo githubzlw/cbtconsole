@@ -542,6 +542,11 @@ public class ShopCarMarketingController {
             userId = Integer.parseInt(userIdStr);
         }
 
+        String userEmail = request.getParameter("userEmail");
+         if (StringUtils.isNotBlank(userEmail)) {
+            statistic.setUserEmail(userEmail);
+        }
+
         String isOrderStr = request.getParameter("isOrder");
         int isOrder = -1;
         if (StringUtils.isNotBlank(isOrderStr)) {
