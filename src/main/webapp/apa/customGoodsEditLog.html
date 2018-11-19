@@ -145,13 +145,15 @@
             var weightFlag = $("#query_weight_flag").val();
             var uglyFlag = $("#query_ugly_flag").val();
             var repairedFlag = $("#query_repaired_flag").val();
+            var benchmarkingFlag = $("#query_benchmarking_flag").val();
 
             $("#edit-easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "adminId": adminId,
                 "weightFlag": weightFlag,
                 "uglyFlag": uglyFlag,
-                "repairedFlag": repairedFlag
+                "repairedFlag": repairedFlag,
+                "benchmarkingFlag": benchmarkingFlag
             });
         }
 
@@ -188,6 +190,16 @@
                 return "";
             }
         }
+
+        function formatBenchmarking(val, row, index) {
+            if (val == 1) {
+                return "对标不准确";
+            }else if (val == 2) {
+                return "对标准确";
+            } else {
+                return "";
+            }
+        }
     </script>
 
 </head>
@@ -213,6 +225,11 @@
 					<option value="0" selected="selected">全部</option>
                     <option value="1">已修复</option>
 			</select></span>
+        &nbsp;&nbsp;<span> 对标: <select id="query_benchmarking_flag" style="font-size: 16px; height: 24px; width: 120px;">
+					<option value="0" selected="selected">全部</option>
+                    <option value="1">对标不准确</option>
+                    <option value="2">对标准确</option>
+			</select></span>
         &nbsp;&nbsp; <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
         &nbsp;&nbsp; <span><input type="button" class="enter_btn" value="重置" onclick="doReset()"/></span>
     </form>
@@ -226,9 +243,10 @@
         <th data-options="field:'old_title',align:'center',width:'350px'">原标题</th>
         <th data-options="field:'new_title',align:'center',width:'350px'">新标题</th>
         <th data-options="field:'weight_flag',align:'center',width:'80px',formatter:formatWeight">重量不合理标注</th>
-        <th data-options="field:'ugly_flag',align:'center',width:'70px',formatter:formatUgly">难看标注</th>
-        <th data-options="field:'repaired_flag',align:'center',width:'70px',formatter:formatRepaired">修复标注</th>
-        <th data-options="field:'admin_name',align:'center',width:'60px'">操作人</th>
+        <th data-options="field:'ugly_flag',align:'center',width:'65px',formatter:formatUgly">难看标注</th>
+        <th data-options="field:'repaired_flag',align:'center',width:'65px',formatter:formatRepaired">修复标注</th>
+        <th data-options="field:'benchmarking_flag',align:'center',width:'65px',formatter:formatBenchmarking">对标情况改变</th>
+        <th data-options="field:'admin_name',align:'center',width:'50px'">操作人</th>
         <th data-options="field:'create_time',align:'center',width:'120px'">操作时间</th>
     </tr>
     </thead>
