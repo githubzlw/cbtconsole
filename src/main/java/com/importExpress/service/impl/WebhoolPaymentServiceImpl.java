@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,14 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ibm.icu.math.BigDecimal;
 import com.importExpress.mapper.PaymentMapper;
 import com.importExpress.pojo.WebhookPaymentBean;
 import com.importExpress.service.WebhoolPaymentService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 @Service
 public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -74,7 +70,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 		WebhookPaymentBean bean;
 //			BasicDBObject s = new BasicDBObject();
 //			s.put("ISODate(payment_date)", -1);
-		List<String> findAny = MongoDBHelp.INSTANCE.findAny("data", null,q);//, s, startNum, limitNum
+		List<String> findAny = MongoDBHelp.INSTANCE.findAny("data",q,null);//, s, startNum, limitNum
 		List<WebhookPaymentBean> list = new ArrayList<WebhookPaymentBean>();
 		try {
 			for (String find : findAny) {
