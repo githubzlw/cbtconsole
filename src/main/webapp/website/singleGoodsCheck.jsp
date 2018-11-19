@@ -131,11 +131,13 @@
         }
     </style>
     <script type="text/javascript">
+        var ipStr = location.href;
         var sessionStorage = window.sessionStorage;
-        var queryParams = {"pid": "", "catid": "0", "isPass": "-1", "isUpdate": "-1"};
+        var queryParams = {"pid": "", "catid": "0", "isPass": "-1", "isUpdate": "-1","ip":ipStr};
         var nDivHight = 0;
         var nScrollTop = 0;  //滚动到的当前位置
         var tempNScrollTop = 0;
+
 
         $(document).ready(function () {
             var pid = sessionStorage.getItem("pid");
@@ -603,7 +605,7 @@
 </div>
 
 
-<div style="float: right;width: 87%;height: 933px;">
+<div style="float: right;width: 87%;height: 966px;">
     <div id="single_check_top_toolbar" style="padding: 5px; height: auto">
         <form id="single_check_query_form" action="#" onsubmit="return false;">
 		<span> PID: <input type="text" id="query_pid"
