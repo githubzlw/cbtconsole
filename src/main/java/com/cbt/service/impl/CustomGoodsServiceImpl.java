@@ -101,6 +101,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 customGoodsDao.publishTo28(bean);
             }
         }
+        //更新SkuGoodsOffers和SingleOffersChild信息
+        int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
+        if (count > 0) {
+            customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+        } else {
+            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+        }
         return res;
     }
 
@@ -404,6 +411,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             JSONObject jsonJt = JSONObject.fromObject(resultJson);
             System.out.println(json.toString());
             if (!jsonJt.getBoolean("ok")) {
+                //更新成功后，直接发布到线上
+
                 json.setOk(false);
                 json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
             } else {
@@ -430,6 +439,20 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm) {
         return customGoodsMapper.queryCategoryList(queryPm);
+    }
+
+    @Override
+    public boolean refreshPriceRelatedData(CustomGoodsPublish bean) {
+        //更新28库的custom_benchmark_ready_newest [source_pro_flag]=7
+        customGoodsDao.updateSourceProFlag(bean.getPid());
+        //更新SkuGoodsOffers和SingleOffersChild信息
+        int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
+        if (count > 0) {
+            count = customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+        } else {
+            count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+        }
+        return count > 0;
     }
 
 }

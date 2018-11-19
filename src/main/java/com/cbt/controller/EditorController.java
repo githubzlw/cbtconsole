@@ -2380,6 +2380,8 @@ public class EditorController {
                 JSONObject jsonJt = JSONObject.fromObject(resultJson);
                 System.out.println(json.toString());
                 if (!jsonJt.getBoolean("ok")) {
+                    CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
+                    customGoodsService.refreshPriceRelatedData(orGoods);
                     json.setOk(false);
                     json.setMessage("修改重量后，价格清洗失败：" + jsonJt.getString("message"));
                 } else {

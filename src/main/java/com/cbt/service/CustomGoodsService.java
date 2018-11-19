@@ -551,4 +551,6 @@ public interface CustomGoodsService {
 
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
+    boolean refreshPriceRelatedData(CustomGoodsPublish bean);
+
 }

@@ -2378,6 +2378,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         }
         upsql += ",is_show_det_img_flag=?,entype=?,sellunit=?";
         upsql += ",ali_pid=?,ali_price=?,matchSource=?";
+        if(bean.getWeightIsEdit() > 0){
+            upsql += ",source_pro_flag = 7 ";
+        }
         upsql += " where pid=?";
         Connection conn = DBHelper.getInstance().getConnection8();
         ResultSet rs = null;
@@ -3763,6 +3766,100 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 		}
 		return result;
 	}
+
+    @Override
+    public int checkSkuGoodsOffers(String pid) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String querySql = "select count(1) from sku_goods_offers where goods_pid = ?";
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            stmt31 = conn31.prepareStatement(querySql);
+            stmt31.setString(1, pid);
+            rs = stmt31.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",checkSkuGoodsOffers error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",checkSkuGoodsOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
+
+    @Override
+    public int updateSkuGoodsOffers(String pid, double finalWeight) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String updateSql = "update sku_goods_offers set clear_flag=0,b.crawl_flag=2,set_weight= ? where goods_pid = ?";
+        int count = 0;
+        try {
+            stmt31 = conn31.prepareStatement(updateSql);
+            stmt31.setDouble(1, finalWeight);
+            stmt31.setString(2, pid);
+            count = stmt31.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updateSkuGoodsOffers error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updateSkuGoodsOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
+
+    @Override
+    public int updateSourceProFlag(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7 where goods_pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(querySql);
+            stmt28.setString(1, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
+    @Override
+    public int insertIntoSingleOffersChild(String pid, double finalWeight) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String updateSql = "replace into single_goods_offers_child(good_url,goods_pid,set_weight,change_mark," +
+                "crawl_flag,service_ip) values(?,?,?,1,0,'')";
+        int count = 0;
+        try {
+            stmt31 = conn31.prepareStatement(updateSql);
+            stmt31.setString(1, "https://detail.1688.com/offer/" + pid + ".html");
+            stmt31.setString(2, pid);
+            stmt31.setDouble(3, finalWeight);
+            count = stmt31.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",insertIntoSingleOffersChild error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",insertIntoSingleOffersChild error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
 
 
 }
