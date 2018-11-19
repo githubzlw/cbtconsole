@@ -9,6 +9,9 @@ import com.cbt.processes.service.SendEmail;
 import com.cbt.service.IComplainChatService;
 import com.cbt.service.IComplainService;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +47,8 @@ public class ComplainChatController {
 	private IComplainChatService complainChatService;
 	@Autowired
 	private IComplainService complainService;
-	
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	@RequestMapping(value = "/responseCustomer", method = RequestMethod.POST)
 	@ResponseBody
 	public JsonResult responseCustomer(ComplainChat t, String dealAdmin, Integer dealAdminId, String userEmail, String orderNo, String urls){
@@ -63,7 +67,15 @@ public class ComplainChatController {
 				}
 				StringBuffer sb = new StringBuffer(t.getChatText());
 				String contents = SendEmail.SetComplainContent("aaa", sb).toString();
-				SendEmail.send(SendEmail.FROM, SendEmail.PWD, userEmail, contents, "Reply to your support request", orderNo, 1);
+				//SendEmail.send(SendEmail.FROM, SendEmail.PWD, userEmail, contents, "Reply to your support request", orderNo, 1);
+				Map<String,Object> model = new HashedMap();
+				String chatText= t.getChatText();
+				model.put("chatText",chatText);
+				model.put("name",userEmail);
+				model.put("email","saycjc@outlook.com");
+				model.put("chatText",chatText);
+				model.put("chatText",chatText);
+				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Reply to your support request", model, TemplateType.COMPLAINT);
 				js.setOk(true);
 				js.setMessage("回复成功");
 			}else{

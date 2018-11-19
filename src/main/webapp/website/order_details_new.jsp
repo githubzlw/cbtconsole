@@ -1160,6 +1160,9 @@ em {
 						</div>
 					</c:if>
 					</td>
+					<td>
+						<a href="/cbtconsole/customerRelationshipManagement/reorder?orderNo=${order.orderNo}"><input type="button" value="AddOrderToTest" style="color: red"></a>
+					</td>
 				</tr>
 				<!-- 客户订单信息显示 -->
 				<tr>

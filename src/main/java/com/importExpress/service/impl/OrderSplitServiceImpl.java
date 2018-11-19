@@ -300,5 +300,8 @@ public class OrderSplitServiceImpl implements OrderSplitService {
         }
         return messageError.getId();
     }
-
+    @Override
+    public UserBean getUserFromId(int userId) {
+        return userMapper.getUserFromId(userId);
+    }
 }

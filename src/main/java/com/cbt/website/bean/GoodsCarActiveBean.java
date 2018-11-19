@@ -59,7 +59,27 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
     private double gbPrice;//加入购物车时团购价格
 
     private int isFreeShipProduct;//是否是免邮商品；0-无免邮价；1-老客户订单商品（强制要有免邮价）；2-有免邮价商品
+    private int isStockFlag;//库存标识
+    /**
+     * 店铺商品数量
+     */
+    private int shopCount;
 
+    public int getIsStockFlag() {
+        return isStockFlag;
+    }
+
+    public void setIsStockFlag(int isStockFlag) {
+        this.isStockFlag = isStockFlag;
+    }
+
+    public int getShopCount() {
+        return shopCount;
+    }
+
+    public void setShopCount(int shopCount) {
+        this.shopCount = shopCount;
+    }
 
     public int getIsFreeShipProduct() {
         return isFreeShipProduct;
