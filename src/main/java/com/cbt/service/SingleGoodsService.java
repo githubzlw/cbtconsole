@@ -110,7 +110,7 @@ public interface SingleGoodsService {
 	 * @param queryPm
 	 * @return
 	 */
-	List<CategoryBean> queryCateroryList(SingleGoodsCheck queryPm);
+	List<CategoryBean> queryCategoryList(SingleGoodsCheck queryPm);
 
 
 	/**
