@@ -23,6 +23,10 @@ import com.importExpress.service.WebhoolPaymentService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.stripe.model.Card;
+import com.stripe.model.Charge;
+import com.stripe.model.Event;
+import com.stripe.net.APIResource;
 @Service
 public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -75,55 +79,70 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 		try {
 			for (String find : findAny) {
 				bean = new WebhookPaymentBean();
-				JSONObject parseObject = JSONObject.parseObject(find);
-				String id = parseObject.getString("payer_id");
-//					System.out.println(id);
-				bean.setId(id);
-				bean.setPayType("paypal");
-				bean.setFindType("Webhook");
-				String receiver_id = parseObject.getString("receiver_id");
-				bean.setReceiverID(StringUtils.equals(receiver_id, "UDSXBNQ5ARA76") ? "新("+receiver_id+")" : "旧("+receiver_id+")");
-				String mcFee = parseObject.getString("mc_fee");
-				bean.setTransactionFee(mcFee + " " + parseObject.getString("mc_currency"));
-				String mcGross = parseObject.getString("mc_gross");
-				bean.setMcGross(!StringUtils.isEmpty(mcGross) ? Double.valueOf(mcGross) : 0);
-				bean.setAmount(mcGross + " " + parseObject.getString("mc_currency"));
-				if(!StringUtils.isEmpty(mcGross) && !StringUtils.isEmpty(mcFee)) {
-					bean.setProfit(df.format(Double.valueOf(mcGross) - Double.valueOf(mcFee)));
-				}
-				
-				
-				String create_time = parseObject.getString("payment_date").replace("PST", "").trim();//注意是空格+UTC
-				if(create_time.indexOf(",") == -1) {
-					create_time = create_time +", 2018";
-				}
-				Date parse = sdfe.parse(create_time );
-				bean.setCreateTime(sdf.format(parse));
-				bean.setTime(parse.getTime());
-				bean.setEmail(parseObject.getString("payer_email"));
-				String custom = parseObject.getString("custom");
-				bean.setOrderNO("");
-				if(StringUtils.indexOf(custom, "@") > -1) {
+				if(StringUtils.indexOf(find, "JSON:") > -1) {
+					Event event = APIResource.GSON.fromJson(find.split("JSON:")[1], Event.class);
+					Long created = event.getCreated() * 1000L;
+					String creatTime = sdf.format(created);
+					bean.setTime(created);
+				    bean.setCreateTime(creatTime);
+					Charge charge = (Charge) event.getData().getObject();
+					String amount = String.valueOf(charge.getAmount());
+					amount = amount.substring(0,amount.length()-2)+"."+amount.substring(amount.length()-2);
+					bean.setAmount(amount+" "+charge.getCurrency());
+					bean.setMcGross(Double.valueOf(amount));
+					
+					bean.setUserid("");		
+					bean.setOrderNO(charge.getMetadata().get("order_no"));
+					bean.setEmail(charge.getReceiptEmail());
+					
 					bean.setType( "ImportExpress");
-					if(custom.indexOf("{@}") > -1) {
-						String[] split = custom.split("\\{@\\}");
-						if(split.length > 3) {
-							bean.setUserid(split[0]);
-							bean.setOrderNO(split[2]);
-						}
-					}else {
-						String[] split = custom.split("@");
-						if(split.length == 10) {
-							bean.setUserid(split[0]);
-							bean.setOrderNO(split[6]);
-						}
-					}
-				}else if(StringUtils.startsWith(custom, "EBAY")) {
-					bean.setType( "EBAY");
+					bean.setPayType("Stripe");
+					bean.setFindType("Webhook");
+					bean.setReceiverID("");
+					bean.setTransactionFee("");
+					bean.setProfit("");
 				}else {
-					bean.setType( "贸易" );
-					String name = parseObject.getString("payer_business_name");
-					bean.setUserid(StringUtils.isEmpty(name) ?  parseObject.getString("last_name") : name);
+					JSONObject parseObject = JSONObject.parseObject(find);
+					String id = parseObject.getString("payer_id");
+					bean.setId(id);
+					bean.setPayType("paypal");
+					bean.setFindType("Webhook");
+					String receiver_id = parseObject.getString("receiver_id");
+					bean.setReceiverID(StringUtils.equals(receiver_id, "UDSXBNQ5ARA76") ? "新("+receiver_id+")" : "旧("+receiver_id+")");
+					String mcFee = parseObject.getString("mc_fee");
+					bean.setTransactionFee(mcFee + " " + parseObject.getString("mc_currency"));
+					String mcGross = parseObject.getString("mc_gross");
+					bean.setMcGross(!StringUtils.isEmpty(mcGross) ? Double.valueOf(mcGross) : 0);
+					bean.setAmount(mcGross + " " + parseObject.getString("mc_currency"));
+					if(!StringUtils.isEmpty(mcGross) && !StringUtils.isEmpty(mcFee)) {
+						bean.setProfit(df.format(Double.valueOf(mcGross) - Double.valueOf(mcFee)));
+					}
+					String create_time = parseObject.getString("payment_date").replace("PST", "").trim();//注意是空格+UTC
+					if(create_time.indexOf(",") == -1) {
+						create_time = create_time +", 2018";
+					}
+					Date parse = sdfe.parse(create_time );
+					bean.setCreateTime(sdf.format(parse));
+					bean.setTime(parse.getTime());
+					bean.setEmail(parseObject.getString("payer_email"));
+					String custom = parseObject.getString("custom");
+					bean.setOrderNO("");
+					if(StringUtils.indexOf(custom, "@") > -1) {
+						bean.setType( "ImportExpress");
+						
+						String[] split = custom.indexOf("{@}") > -1 ? 
+								custom.split("\\{@\\}") : custom.split("@");
+						
+						bean.setUserid(split.length > 3 ? split[0] : "");		
+						bean.setOrderNO(split.length == 10 ? split[6] : split.length > 3 ? split[2] : "");
+						
+					}else if(StringUtils.startsWith(custom, "EBAY")) {
+						bean.setType( "EBAY");
+					}else {
+						bean.setType( "贸易" );
+						String name = parseObject.getString("payer_business_name");
+						bean.setUserid(StringUtils.isEmpty(name) ?  parseObject.getString("last_name") : name);
+					}
 				}
 				list.add(bean);
 			}
@@ -148,7 +167,6 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 			//时间排序
 			stream = stream.sorted((w1,w2)->{
 				return Long.compare(w2.getTime(), w1.getTime());
-				
 			});
 			
 			list = stream.collect(Collectors.toList());
@@ -162,7 +180,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 				resultList = list.stream().skip(startNum).limit(limitNum)
 						.collect(Collectors.toList());
 			}else {
-				resultList = list;
+				resultList.addAll(list) ;
 			}
 			
 		} catch (Exception e) {
@@ -193,7 +211,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 			if((limitNum!=0 && slimitNum != 0) || (limitNum ==0)) {
 				List<Map<String,Object>> listStripePayment = paymentMapper.listStripePayment(sstartNum, slimitNum,startTime,endTime);
 				for (Map<String, Object> map : listStripePayment) {
-					bean = new WebhookPaymentBean();		
+					bean = new WebhookPaymentBean();
 					bean.setId((String)map.get("paymentid"));
 					bean.setCreateTime(((Timestamp)map.get("createtime")).toString());
 					bean.setUserid(String.valueOf((int)map.get("userid")));
@@ -216,6 +234,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 		Double countAmount = paymentMapper.countAmount(startTime, endTime);
 		countAmount = countAmount == null ? 0.00: countAmount;
 		mcGrossTatal += countAmount;
+		
 		result.put("total", wTotal);
 		result.put("data", resultList);
 		result.put("mcGrossTatal", mcGrossTatal);
