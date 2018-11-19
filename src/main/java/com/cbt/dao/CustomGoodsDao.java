@@ -552,4 +552,11 @@ public interface CustomGoodsDao {
 
     int insertIntoSingleOffersChild(String pid, double finalWeight);
 
+    List<CustomBenchmarkSkuNew> querySkuByPid(String pid);
+
+    int deleteSkuByPid(String pid);
+
+    int insertIntoSkuToOnline(List<CustomBenchmarkSkuNew> insertList);
+
+
 }
