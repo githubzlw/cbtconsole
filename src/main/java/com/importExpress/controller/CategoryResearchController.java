@@ -5,13 +5,12 @@ import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.util.ImageCompression;
 import com.cbt.util.SyncSingleGoodsToOnlineUtil;
+import com.cbt.util.SysParamUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.pojo.FineCategory;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.service.CategoryResearchService;
 import com.importExpress.utli.JsonTreeUtils;
-//import com.sun.image.codec.jpeg.JPEGCodec;
-//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpStatus;
@@ -45,6 +44,9 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
+//import com.sun.image.codec.jpeg.JPEGCodec;
+//import com.sun.image.codec.jpeg.JPEGImageEncoder;
+
 /**
  * 品类精研
  * @ClassName CategoryResearchController
@@ -62,13 +64,14 @@ public class CategoryResearchController {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryResearchController.class);
 	private static List<Map<String,Object>> search1688Category;
 
-	//	private static String importexpressPath = SysParamUtil.getParam("importexpress");
-	private static String importexpressPath = "https://www.import-express.com/";
-	private static String IMAGEHOSTURL="http://192.168.1.34:8002/";
-	private static final String LOCALPATH =  "D:/shopimgzip/";//图片上传的位置
-	private static final String LOCALPATHZIPIMG =  "D:/shopimgzip/research/";//图片上传的位置
-	private static final String IMAGESEARCHURL="https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";//图片访问路径
-	//新增关键词
+	private static String importexpressPath = SysParamUtil.getParam("importexpress");
+//	private static String importexpressPath = "https://www.import-express.com/";
+//	private static String IMAGEHOSTURL="http://192.168.1.34:8002/";
+//	private static final String LOCALPATH =  "D:/shopimgzip/";//图片上传的位置
+//	private static final String LOCALPATHZIPIMG =  "D:/shopimgzip/research/";//图片上传的位置
+//	private static final String IMAGESEARCHURL="https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";//图片访问路径
+
+    //新增关键词
 	@RequestMapping("/add")
 	public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
@@ -348,13 +351,13 @@ public class CategoryResearchController {
 				String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
 				String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
 				// 本地服务器磁盘全路径
-				String localFilePath =LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
+				String localFilePath =TabSeachPageController.LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
 
 				// 文件流输出到本地服务器指定路径
 				ImgDownload.writeImageToDisk(file.getBytes(),localFilePath);
 				//解压图片为120*120
 				// 本地压缩图片
-				File file2 = new File(LOCALPATHZIPIMG+sid);
+				File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
 				if(!file2.exists()){
 					file2.mkdirs();
 				}
@@ -364,10 +367,10 @@ public class CategoryResearchController {
 				boolean checked = ImageCompression.checkImgResolution(localFilePath, 150, 150);
 				if(!checked){
 					//小于时直接输出到
-					outputImage(localFilePath,LOCALPATHZIPIMG+sid+"/"+fileCurrName);
+					outputImage(localFilePath,TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
 				}else{
 					//将图片压缩到制定的目录 并重命名图片
-					boolean is150 = reduceImgOnlyWidth(150, localFilePath, LOCALPATHZIPIMG + sid + "/" + fileCurrName,null);
+					boolean is150 = reduceImgOnlyWidth(150, localFilePath, TabSeachPageController.LOCALPATHZIPIMG + sid + "/" + fileCurrName,null);
 					if(is150){
 						System.out.println("压缩图片成功");
 					}
@@ -375,11 +378,11 @@ public class CategoryResearchController {
 
 				fineCategory.setFileName(sid + "/" + fileCurrName);
 				//保存图片的url访问路径,
-				fineCategory.setImageUrl(IMAGESEARCHURL + fileCurrName);
+				fineCategory.setImageUrl(TabSeachPageController.IMAGESEARCHURL + fileCurrName);
 
 				//支持断点续存上传图片,ss
-				ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21", "/stock_picture/researchimg/"
-						+fileCurrName, LOCALPATHZIPIMG+sid+"/"+fileCurrName);
+				ContinueFTP2 f1 = new ContinueFTP2(TabSeachPageController.ftpURL, TabSeachPageController.ftpUserName, TabSeachPageController.ftpPassword, TabSeachPageController.ftpPort,
+                        "/stock_picture/researchimg/"+fileCurrName, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
 				//远程上传到图片服务器
 				f1.start();
 
@@ -444,7 +447,7 @@ public class CategoryResearchController {
 		DataSourceSelector.set("dataSource127hop");
 		String id = request.getParameter("id");
 		FineCategory bean = categoryResearchService.getOneFineCategory(Integer.parseInt(id));
-		bean.setFileName(IMAGEHOSTURL+bean.getFileName());
+		bean.setFileName(TabSeachPageController.IMAGEHOSTURL+bean.getFileName());
 		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
@@ -462,7 +465,7 @@ public class CategoryResearchController {
 		DataSourceSelector.set("dataSource127hop");
 		List<FineCategory> list = categoryResearchService.detailFineCategoryList(Integer.parseInt(sid));
 		for (FineCategory fineCategory : list) {
-			fineCategory.setFileName(IMAGEHOSTURL+fineCategory.getFileName());
+			fineCategory.setFileName(TabSeachPageController.IMAGEHOSTURL+fineCategory.getFileName());
 		}
 		DataSourceSelector.restore();
 		JSONArray jsonarr = JSONArray.fromObject(list);
@@ -498,13 +501,13 @@ public class CategoryResearchController {
 				String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
 				String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
 				// 本地服务器磁盘全路径
-				String localFilePath =LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
+				String localFilePath =TabSeachPageController.LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
 
 				// 文件流输出到本地服务器指定路径
 				ImgDownload.writeImageToDisk(file.getBytes(),localFilePath);
 				//解压图片为120*120
 				// 本地压缩图片
-				File file2 = new File(LOCALPATHZIPIMG+sid);
+				File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
 				if(!file2.exists()){
 					file2.mkdirs();
 				}
@@ -514,10 +517,10 @@ public class CategoryResearchController {
 				boolean checked = ImageCompression.checkImgResolution(localFilePath, 150, 150);
 				if(!checked){
 					//小于时直接输出到
-					outputImage(localFilePath,LOCALPATHZIPIMG + sid + "/" + fileCurrName);
+					outputImage(localFilePath,TabSeachPageController.LOCALPATHZIPIMG + sid + "/" + fileCurrName);
 				}else{
 					//将图片压缩到制定的目录 并重命名图片
-					boolean is150 = reduceImgOnlyWidth(150, localFilePath, LOCALPATHZIPIMG+sid+"/"+fileCurrName,null);
+					boolean is150 = reduceImgOnlyWidth(150, localFilePath, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName,null);
 					if(is150){
 						System.out.println("压缩图片成功");
 					}
@@ -525,11 +528,11 @@ public class CategoryResearchController {
 
 				fineCategory.setFileName(sid+"/"+fileCurrName);
 				//保存图片的url访问路径,
-				fineCategory.setImageUrl(IMAGESEARCHURL + fileCurrName);
+				fineCategory.setImageUrl(TabSeachPageController.IMAGESEARCHURL + fileCurrName);
 
 				//支持断点续存上传图片,ss
-				ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21", "/stock_picture/researchimg/"
-						+fileCurrName, LOCALPATHZIPIMG+sid+"/"+fileCurrName);
+				ContinueFTP2 f1 = new ContinueFTP2(TabSeachPageController.ftpURL, TabSeachPageController.ftpUserName, TabSeachPageController.ftpPassword, TabSeachPageController.ftpPort,
+                        "/stock_picture/researchimg/" + fileCurrName, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
 				//远程上传到图片服务器
 				f1.start();
 
@@ -674,7 +677,7 @@ public class CategoryResearchController {
 		String result;
 		//发布的操作
 		String sid = request.getParameter("sid");
-		File file = new File(LOCALPATHZIPIMG+sid);
+		File file = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
 		if(!file.exists()){
 			result = "{\"status\":false,\"message\":\"当前分类已全部发布\"}";
 		}else{
@@ -738,7 +741,6 @@ public class CategoryResearchController {
 	 * 查询分类列表search1688Category
 	 * @Title makeFileName
 	 * @Description TODO
-	 * @param filename
 	 * @return
 	 * @return String
 	 */
@@ -1011,7 +1013,7 @@ public class CategoryResearchController {
 	//清理临时和缓存图片
 	private static void deleteTempZip(String sid) {
 		try {
-			File file = new File(LOCALPATHZIPIMG+sid);
+			File file = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
 			if (file.exists()) {
 				File[] chidsFls = file.listFiles();
 				for (File tempFl : chidsFls) {
@@ -1020,7 +1022,7 @@ public class CategoryResearchController {
 				file.delete();
 				chidsFls = null;
 			}
-			File file2 = new File(LOCALPATHZIPIMG);
+			File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG);
 			if (file2.exists()) {
 				File[] chidsFls = file2.listFiles();
 				for (File tempFl : chidsFls) {

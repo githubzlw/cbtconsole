@@ -63,6 +63,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -9661,7 +9662,7 @@ public class WarehouseCtrl {
 		int minute = c.get(Calendar.MINUTE);
 		int second = c.get(Calendar.SECOND);
 		//上传文件目录
-		String relatDir = "D:/product/";
+		String relatDir = TabSeachPageController.LOCALPATHZIPIMG;
 		//文件夹不存在则创建
 		File fdir = new File(relatDir);
 		File fdirExi = new File(relatDir + time + "/");
