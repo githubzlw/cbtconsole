@@ -79,13 +79,13 @@ public class CustomerDisputeController {
         if (sttime == null || "".equals(sttime)) {
             sttime = "";
         } else {
-            sttime += "T00:00:00.000Z";
+            sttime += " 00:00:00";
         }
         String edtime = request.getParameter("edtime");
         if (edtime == null || "".equals(edtime)) {
             edtime = "";
         } else {
-            edtime += "T23:59:59.000Z";
+            edtime += " 23:59:59";
         }
         String status = request.getParameter("status");
         status = StringUtils.equals("-1", status) ? null : status;

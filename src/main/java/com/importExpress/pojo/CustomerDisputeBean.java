@@ -11,9 +11,15 @@ public class CustomerDisputeBean {
 	private String userid;
 	private String orderNo;
 	private String email;
+	private String type;//paypal  stripe
 	
 	
-	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	public String getUserid() {
 		return userid;
 	}
