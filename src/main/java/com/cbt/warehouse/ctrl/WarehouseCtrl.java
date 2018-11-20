@@ -521,7 +521,35 @@ public class WarehouseCtrl {
 		}
 		out.close();
 	}
-	
+
+    /**
+     *
+     * 将重量同步到产品库（使用蒋先伟接口）
+     *  2018/11/16 10:41 ly
+     *
+     *  //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
+     */
+    @RequestMapping(value = "/saveWeightFlag")
+    public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        try{
+            String pid=request.getParameter("pid");
+            //数据校验
+            if (StringUtil.isBlank(pid) || pid.length() < 3) {
+                out.print(2);
+                out.close();
+                return;
+            }
+            int result = iWarehouseService.saveWeightFlag(pid);
+            out.print(result);
+        }catch(Exception e){
+            out.print(0);
+            e.printStackTrace();
+        }
+        out.close();
+    }
+
 	/**
 	 * 保存服装质检结果
 	 * @param request

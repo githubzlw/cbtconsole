@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车营销</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #shop_marketing_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #shop_marketing_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-row{
+            height: 26px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+        });
+
+        function setDatagrid() {
+            $('#shop_marketing_easyui-datagrid').datagrid({
+                title: '购物车营销',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#shop_marketing_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/shopCarMarketingCtr/queryForList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+        function doQuery() {
+            var isOrder = $("#query_is_order").val();
+            var userId = $("#query_user_id").val();
+            var userEmail = $("#query_user_email").val();
+            var isFollow = $("#query_is_follow").val();
+            $("#shop_marketing_easyui-datagrid").datagrid("load", {
+                "isOrder": isOrder,
+                "userId": userId,
+                "userEmail": userEmail,
+                "isFollow": isFollow
+            });
+        }
+
+        function formatUserId(val, row, index) {
+            return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId="' + val + '>' + val + '</a>';
+        }
+
+        function formatMoney(val, row, index) {
+            if(val >= 150){
+                return '<b style="color: red;">'+val+'</b>';
+            }else{
+                return val;
+            }
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
+                row.userId + '" target="_blank">跟进</a>';
+            return content;
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="shop_marketing_toolbar" style="padding: 5px; height: auto">
+    <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
+
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;height: 22px;"/></span>
+         &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value="" style="width: 200px;height: 22px;"/></span>
+        &nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未下单</option>
+                    <option value="1">已下单</option>
+			</select></span>&nbsp;&nbsp;<span>是否跟进: <select id="query_is_follow"
+                                                            style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未跟进</option>
+                    <option value="1">已跟进</option>
+			</select></span>&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
+    </form>
+</div>
+
+<table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
+        <th data-options="field:'userEmail',width:'150px'">用户Email</th>
+        <th data-options="field:'currency',align:'center',width:'100px'">货币</th>
+        <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
+        <th data-options="field:'totalCatid',align:'center',width:'80px'">商品种类</th>
+        <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">总金额</th>
+        <th data-options="field:'averagePrice',align:'center',width:'100px'">均价</th>
+        <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">最后添加时间</th>
+        <th data-options="field:'lastLoginTime',align:'center',width:'130px'">最后登录时间</th>
+        <th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>
+        <th data-options="field:'followTime',align:'center',width:'130px'">跟进时间</th>
+        <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,7 +1,9 @@
 package com.importExpress.mapper;
 
+import com.importExpress.pojo.ShopCarInfo;
 import com.importExpress.pojo.ShopCarMarketing;
 import com.importExpress.pojo.ShopCarMarketingExample;
+import com.importExpress.pojo.ShopCarUserStatistic;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -40,4 +42,41 @@ public interface ShopCarMarketingMapper {
     int updateShopCarBatch(List<ShopCarMarketing> recordList);
 
     int deleteShopCarBatch(List<ShopCarMarketing> recordList);
+
+    List<ShopCarInfo> queryShopCarInfoByUserId(@Param("userId") int userId);
+
+    ShopCarUserStatistic queryUserInfo(@Param("userId") int userId);
+
+
+    /**
+     * 更新客户的跟进信息
+     *
+     * @param userId
+     * @return
+     */
+    int updateUserFollowTime(@Param("userId") int userId);
+
+    /**
+     * 插入跟进日志
+     * @param userId
+     * @param adminId
+     * @param content
+     * @return
+     */
+    int insertIntoShopCarFollow(@Param("userId") int userId, @Param("adminId") int adminId, @Param("content") String content);
+
+    /**
+     * 获取购物车营销列表
+     *
+     * @param statistic
+     * @return
+     */
+    List<ShopCarUserStatistic> queryForList(ShopCarUserStatistic statistic);
+
+    /**
+     * 物车营销列表总数统计
+     * @param statistic
+     * @return
+     */
+    int queryForListCount(ShopCarUserStatistic statistic);
 }

@@ -917,7 +917,10 @@
                         success: function (data) {
                             var json = eval('(' + data + ')');
                             if (json.ok) {
-                                showMessage(json.message);
+                                showMessage("执行成功");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
                             } else {
                                 $.messager.alert("提醒", json.message, "info");
                             }
@@ -1636,10 +1639,10 @@
             </c:if> <c:if test="${goods.bmFlag >0}">
                 <br>
                 <b style="font-size: 16px;">人为对标货源:${goods.bmFlag ==1 ? '是':'不是'}</b>
-            </c:if> <c:if test="${goods.sourceProFlag >0}">
+            </c:if> <%--<c:if test="${goods.sourceProFlag >0}">
                 <br>
                 <b style="font-size: 16px;">货源属性:${goods.sourceProValue}</b>
-            </c:if> <c:if test="${goods.soldFlag >0}">
+            </c:if>--%> <c:if test="${goods.soldFlag >0}">
                 <br>
                 <b style="font-size: 16px;">是否售卖:${goods.soldFlag ==1 ? '卖过':'没有卖过'}</b>
             </c:if> <c:if test="${goods.addCarFlag >0}">

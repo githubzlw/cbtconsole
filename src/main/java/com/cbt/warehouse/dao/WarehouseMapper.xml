@@ -3391,8 +3391,13 @@
 	<select id="getWeight" resultType="com.cbt.website.bean.SearchResultInfo">
 		select weight,createtime from package_weight order by id desc limit 1
 	</select>
-	<select id="getGoodsWeight" resultType="String">
-		SELECT weight FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+    <select id="getGoodsWeight" resultType="com.cbt.website.bean.SearchResultInfo">
+		SELECT weight,syn FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+	</select>
+    <select id="updateGoodsWeightFlag">
+        UPDATE package_goods_weight
+        SET syn = 1
+        WHERE pid=#{pid} AND del = 0
 	</select>
 	<insert id="saveWeight">
 		<!-- UPDATE id_relationtable SET weight=weight+${weight} WHERE orderid=#{orderid} and odid=#{odid} -->

@@ -131,11 +131,13 @@
         }
     </style>
     <script type="text/javascript">
+        var ipStr = location.href;
         var sessionStorage = window.sessionStorage;
-        var queryParams = {"pid": "", "catid": "0", "isPass": "-1", "isUpdate": "-1"};
+        var queryParams = {"pid": "", "catid": "0", "isPass": "-1", "isUpdate": "-1","ip":ipStr};
         var nDivHight = 0;
         var nScrollTop = 0;  //滚动到的当前位置
         var tempNScrollTop = 0;
+
 
         $(document).ready(function () {
             var pid = sessionStorage.getItem("pid");
@@ -420,37 +422,39 @@
 
         function updateSingleGoodsCheck(pid,shopId,ojb) {
 
-            $.messager.confirm('系统提醒', '是否确认不通过?', function (r) {
-                if (r) {
-                    $.ajax({
-                        type: "POST",
-                        url: "/cbtconsole/singleGoods/updateSingleGoodsCheck",
-                        data: {
-                            "pid": pid,
-                            "isPass": 1
-                        },
-                        success: function (data) {
-                            if (data.ok) {
-                                //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
-                                //setTimeout(function () {window.location.reload();}, 300);
-                               //reloadData();
-                                hideButton(pid,shopId,0,ojb);
-                            } else {
-                                $.messager.alert("提醒", '执行错误:' + data.message, "info");
-                            }
-                        },
-                        error: function (res) {
-                            $.messager.alert("提醒", '执行错误，请联系管理员', "error");
-                        }
-                    });
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/updateSingleGoodsCheck",
+                data: {
+                    "pid": pid,
+                    "isPass": 1
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
+                        //setTimeout(function () {window.location.reload();}, 300);
+                       //reloadData();
+                        hideButton(pid,shopId,0,ojb);
+                    } else {
+                        $.messager.alert("提醒", '执行错误:' + data.message, "info");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '执行错误，请联系管理员', "error");
                 }
             });
+
+            /*$.messager.confirm('系统提醒', '是否确认不通过?', function (r) {
+                if (r) {
+
+                }
+            });*/
         }
 
 
         function hideButton(pid,shopId,type,ojb) {
             if(type == 0){
-                $(".notice_" + pid).text('已审核');
+                $(".notice_" + pid).text('已审核,不通过');
                 $(ojb).parent().find(".shop_check").hide();
                 $(ojb).parent().find(".btn_check").hide();
             }else{
@@ -505,7 +509,7 @@
         function formatWindowImg1(val, row, index) {
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
-            if (row.isUpdate == 0) {
+            if (row.isUpdate > -1) {
                 content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
                     + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
                     + (row.imgCheck == 1 ? 'checked="checked"' : '') + '/></span>';
@@ -520,7 +524,7 @@
         function formatWindowImg2(val, row, index) {
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
-            if (row.isUpdate == 0) {
+            if (row.isUpdate > -1) {
                 content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
                     + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
                     + (row.imgCheck == 2 ? 'checked="checked"' : '') + '/></span>';
@@ -535,7 +539,7 @@
         function formatWindowImg3(val, row, index) {
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
-            if (row.isUpdate == 0) {
+            if (row.isUpdate > -1) {
                 content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
                     + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
                     + (row.imgCheck == 3 ? 'checked="checked"' : '') + '/></span>';
@@ -556,7 +560,7 @@
         function formatMainImg(val, row, index) {
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
-            if (row.isUpdate == 0) {
+            if (row.isUpdate > -1) {
                 content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
                     + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
                     + (row.imgCheck == 0 ? 'checked="checked"' : '') +'/></span></div>';
@@ -603,7 +607,7 @@
 </div>
 
 
-<div style="float: right;width: 87%;height: 933px;">
+<div style="float: right;width: 87%;height: 966px;">
     <div id="single_check_top_toolbar" style="padding: 5px; height: auto">
         <form id="single_check_query_form" action="#" onsubmit="return false;">
 		<span> PID: <input type="text" id="query_pid"

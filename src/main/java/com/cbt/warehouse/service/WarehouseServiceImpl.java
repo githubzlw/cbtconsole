@@ -9,6 +9,7 @@ import com.cbt.pojo.BuyerCommentPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.servlet.Currency;
+import com.cbt.service.CustomGoodsService;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.ClassDiscount;
@@ -24,7 +25,6 @@ import com.cbt.website.service.OrderwsServer;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
     private IWarehouseDao dao;
     @Autowired
     private FreightFeeSerive freightFeeSerive;
+    @Autowired
+    private CustomGoodsService customGoodsService;
 
     @Override
     public outIdBean findOutId(Integer uid) {
@@ -68,6 +70,22 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int saveWeight(Map<String, String> map) {
         return dao.saveWeight(map);
+    }
+
+    //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
+    @Override
+    public int saveWeightFlag(String pid) {
+        // 查询已保存的实秤重量
+        SearchResultInfo weightAndSyn = dao.getGoodsWeight(pid);
+        if (null == weightAndSyn){
+            return 3;
+        }
+        if (weightAndSyn.getSyn() == 1){
+            return 4;
+        }
+        customGoodsService.setGoodsWeightByWeigher(pid, weightAndSyn.getWeight()); //蒋先伟同步重量到产品库接口
+        dao.updateGoodsWeightFlag(pid);
+        return 1;
     }
 
     @Override

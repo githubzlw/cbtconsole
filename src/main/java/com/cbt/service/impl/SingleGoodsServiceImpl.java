@@ -72,8 +72,8 @@ public class SingleGoodsServiceImpl implements SingleGoodsService {
     }
 
 	@Override
-	public List<CategoryBean> queryCateroryList(SingleGoodsCheck queryPm) {
-		return sgGdDao.queryCateroryList(queryPm);
+	public List<CategoryBean> queryCategoryList(SingleGoodsCheck queryPm) {
+		return sgGdDao.queryCategoryList(queryPm);
 	}
 
     @Override
