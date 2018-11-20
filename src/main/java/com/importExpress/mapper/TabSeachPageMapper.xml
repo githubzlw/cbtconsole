@@ -121,10 +121,10 @@
 		    </when>
 		    <otherwise>
 		        INSERT INTO alidata.shop_url_authorized_info 
-				(shop_id, file_name, file_url, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime) 
-				VALUES (#{shopId}, #{fileName}, #{fileUrl}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW()) 
+				(shop_id, file_name, file_url, img_file_url, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime)
+				VALUES (#{shopId}, #{fileName}, #{fileUrl}, #{imgFileUrl}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW())
 				ON DUPLICATE KEY UPDATE 
-				file_name = #{fileName}, file_url = #{fileUrl}, admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
+				file_name = #{fileName}, file_url = #{fileUrl}, img_file_url = #{imgFileUrl}, admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
 				end_time = #{endTime}, remark = #{remark}, valid= #{valid}, updatetime=NOW()
 		    </otherwise>
 		</choose>
