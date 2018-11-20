@@ -10,10 +10,7 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
-import com.importExpress.pojo.CustomBenchmarkSkuNew;
-import com.importExpress.pojo.GoodsEditBean;
-import com.importExpress.pojo.GoodsParseBean;
-import com.importExpress.pojo.SkuValPO;
+import com.importExpress.pojo.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -418,6 +415,21 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             json.setMessage("执行错误，请重试");
         }
         return json;
+    }
+
+    @Override
+    public List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm) {
+        return customGoodsMapper.queryOnlineGoodsForList(queryPm);
+    }
+
+    @Override
+    public int queryOnlineGoodsForListCount(OnlineGoodsCheck queryPm) {
+        return customGoodsMapper.queryOnlineGoodsForListCount(queryPm);
+    }
+
+    @Override
+    public List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm) {
+        return customGoodsMapper.queryCategoryList(queryPm);
     }
 
 }

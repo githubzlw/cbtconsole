@@ -112,7 +112,7 @@ function fnquery(va){
 		page =  $("#forwordPage").val();
 	}
 	var status =  ${status};
-	$.post("/cbtconsole/WebsiteServlet?action=getAllUserShopCarList&className=shoppingCartManagement",
+	$.post("/cbtconsole/shopCarMarketingCtr/queryShopCarList",
 			{admid:admid,userid:userid,currenPage:page,isorder:isorder,status:status},
 			function(res){
 				$("#load").css("display","none");
@@ -156,10 +156,10 @@ function fnquery(va){
 						$("#result tr:eq("+(i+1)+")").append('<td id="'+json[i][0]+'td"><select id="'+json[i][0]+'user">'+userstr+'</select><input type="button" value="确认" onclick="addUser('+json[i][0]+')"><p id="'+json[i][0]+'msg" style="display: none;color:red">更新成功</p></td>');
 						$("#"+json[i][0]+"user option[flag='" + json[i][9] + "']").attr('selected', 'selected');
 					}
-					if((json[i][10]+'')=='null' || json[i][10] == undefined){
+					if((json[i][5]+'')=='null' || json[i][5] == undefined){
 						$("#result tr:eq("+(i+1)+")").append('<td>无</td>');
 					}else{
-						$("#result tr:eq("+(i+1)+")").append('<td>'+json[i][10]+'</td>');
+						$("#result tr:eq("+(i+1)+")").append('<td>'+json[i][5]+'</td>');
 					}
 
 					$("#result tr:eq("+(i+1)+")").append("<td><input type='button' value='操作' onclick='show("+ json[i][0] + ")'></td>");
@@ -210,9 +210,10 @@ function show(userId) {
 	var iLeft = (window.screen.availWidth-10-iWidth)/2; //获得窗口的水平位置;
 	var param = "height="+iHeight+",width="+iWidth+",top="+iTop+",left="+iLeft+",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
 	//var url = '/cbtconsole/website/shoppingCarProductPush.jsp?userid=' +userId;
-    var url = '/cbtconsole/shopCarMarketingCtr/queryCarInfoByUserId?userId=' +userId;
-	window.open(url,'windows',param);
-	window.location.href
+    //var url = '/cbtconsole/shopCarMarketingCtr/queryCarInfoByUserId?userId=' +userId;
+	var url = '/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +userId;
+	//window.open(url,'windows',param);
+	window.open(url);
 }
 
 </script>
@@ -234,8 +235,8 @@ function show(userId) {
      			<td style="width:120px">最后访问时间</td>
     			<td style="width:80px">用户货币</td>
     			<td style="width:100px">默认国家</td>
-    			<td style="width:160px">处理人员</td>
-    			<td style="width:120px">处理时间</td>
+    			<td style="width:160px">跟进人员</td>
+    			<td style="width:120px">跟进时间</td>
     			<td style="width:80px">操作</td>
     		</tr>
     	</table>

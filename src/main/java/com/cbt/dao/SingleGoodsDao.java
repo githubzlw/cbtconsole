@@ -180,7 +180,7 @@ public interface SingleGoodsDao {
 	 * @param queryPm
 	 * @return
 	 */
-	List<CategoryBean> queryCateroryList(SingleGoodsCheck queryPm);
+	List<CategoryBean> queryCategoryList(SingleGoodsCheck queryPm);
 
 	/**
 	 * 设置跨境商品的搜索图

@@ -5,6 +5,7 @@ import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsParseBean;
+import com.importExpress.pojo.OnlineGoodsCheck;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -222,5 +223,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     int editAndLockProfit(@Param("pid") String pid, @Param("type") int type, @Param("editProfit") double editProfit);
+
+    List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm);
+
+    int queryOnlineGoodsForListCount(OnlineGoodsCheck queryPm);
+
+    List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
 }

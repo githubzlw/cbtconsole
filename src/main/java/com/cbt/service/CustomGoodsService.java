@@ -6,6 +6,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsParseBean;
+import com.importExpress.pojo.OnlineGoodsCheck;
 
 import java.util.List;
 
@@ -542,5 +543,12 @@ public interface CustomGoodsService {
     int editAndLockProfit(String pid, int type, double editProfit);
 
     JsonResult setGoodsWeightByWeigher(String pid, String newWeight);
+
+
+    List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm);
+
+    int queryOnlineGoodsForListCount(OnlineGoodsCheck queryPm);
+
+    List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
 }

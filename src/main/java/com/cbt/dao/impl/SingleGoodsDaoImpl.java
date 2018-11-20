@@ -1180,7 +1180,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     }
 
     @Override
-    public List<CategoryBean> queryCateroryList(SingleGoodsCheck queryPm) {
+    public List<CategoryBean> queryCategoryList(SingleGoodsCheck queryPm) {
 
         List<CategoryBean> list = new ArrayList<CategoryBean>();
         Connection conn31 = DBHelper.getInstance().getConnection6();
@@ -1225,8 +1225,8 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("queryCateroryList error :" + e.getMessage());
-            LOG.error("queryCateroryList error :" + e.getMessage());
+            System.err.println("queryCategoryList error :" + e.getMessage());
+            LOG.error("queryCategoryList error :" + e.getMessage());
         } finally {
             DBHelper.getInstance().closePreparedStatement(stmt31);
             DBHelper.getInstance().closeResultSet(rs);
