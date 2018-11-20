@@ -65,7 +65,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 		int row=12;
 		String shorthand="";
 		try{
-			String  sql="select paytype from payment where orderod='"+orderNo+"' and paystatus=1 and paytype<>0";
+			String  sql="select paytype from payment where orderid='"+orderNo+"' and paystatus=1 and paytype<>0";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			if(rs.next()){

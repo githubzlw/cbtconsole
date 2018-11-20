@@ -330,21 +330,21 @@ public class AdmUserDaoImpl implements AdmUserDao {
 	/**
 	 * 根据orderid,goodsid获取采购人员
 	 * @param orderid
-	 * @param goodsid
+	 * @param odid
 	 * @return 采购人员ID
 	 * @author 王宏杰 2017-07-27
 	 */
 	@Override
-	public int queryByBuyerOrderNo(String orderid, String goodsid) {
+	public int queryByBuyerOrderNo(String orderid, String odid) {
 		int admuserid=0;
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql="SELECT admuserid FROM goods_distribution WHERE orderid=? AND goodsid=?";
+		String sql="SELECT admuserid FROM goods_distribution WHERE orderid=? AND odid=?";
 		try{
 			stmt=conn.prepareStatement(sql);
 		    stmt.setString(1, orderid);
-		    stmt.setString(2, goodsid);
+		    stmt.setString(2, odid);
 		    rs=stmt.executeQuery();
 		    if(rs.next()){
 		    	admuserid=rs.getInt("admuserid");

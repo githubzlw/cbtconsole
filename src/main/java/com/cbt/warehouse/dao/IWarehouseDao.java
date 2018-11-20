@@ -218,7 +218,8 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	public SearchResultInfo getWeight();
-	public String getGoodsWeight(@Param("pid") String pid);
+	public SearchResultInfo getGoodsWeight(@Param("pid") String pid);
+	public SearchResultInfo updateGoodsWeightFlag(@Param("pid") String pid);
 
 	/**
 	 * 获取该商品上一次发货的订单国家
