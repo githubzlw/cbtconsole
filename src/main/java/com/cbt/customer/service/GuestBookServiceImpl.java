@@ -1,6 +1,7 @@
 package com.cbt.customer.service;
 
 import com.cbt.bean.GuestBookBean;
+import com.cbt.bean.OrderBean;
 import com.cbt.common.StringUtils;
 import com.cbt.customer.dao.GuestBookDaoImpl;
 import com.cbt.customer.dao.IGuestBookDao;
@@ -57,7 +58,15 @@ public class GuestBookServiceImpl implements IGuestBookService{
 		}.start();
 		return Utility.getStringIsNull(sale_email)?dao.replyReport(id, replyContent,date):0;
 	}
-	
+	/**
+	 * 订单出运时给客户发送邮件
+	 * @return
+	 */
+	@Override
+	public int SendEmailForBatck(OrderBean ob) {
+		return 0;
+	}
+
 	@Override
 	public int replyReportQes(final int id,final String replyContent,final String date,final String name,
 			final String qustion,final String email,final int userId,final String sale_email,String url) {

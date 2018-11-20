@@ -1086,8 +1086,12 @@ function search() {
                                 + json[i].usecount
                                 + '</span></h3></p>';
                         }
+                        if(json[i].isExitPhone>0){
+                            str+='<a target="_blank" href="/cbtconsole/website/inspection_picture_editing.jsp?goodsPid='+json[i].goods_pid+'&odid='+json[i].odid+'&oldOrderid='+json[i].orderid+'" style="color:red">该商品存在验货图片,点击查看</a>';
+                        }
                         str += '<div style="height: 50px;">'
-                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'"></div><br />'
+                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'">'
+                            +'</div><br />'
                             + '<canvas onclick="AutoResizeImage(this)"  id="canvas_'+json[i].orderid+'_'+json[i].odid+'"></canvas>'
                             + '</div>';
                         str += '</div>';

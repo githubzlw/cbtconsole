@@ -2969,12 +2969,12 @@
         });
     }
     //商品授权操作
-    function productAuthorization(odid,type){
+    function productAuthorization(goodsPid,odid,type){
         $.ajax({
             type:"post",
             url:"/cbtconsole/warehouse/productAuthorization",
             dataType:"text",
-            data:{odid:odid,type:type},
+            data:{odid:odid,type:type,goodsPid:goodsPid},
             success : function(data){
 				if(data>0){
                     window.location.reload();
@@ -3692,7 +3692,7 @@
 								</select><span id="${orderd.od_id}_buyid">${pb.buyid}</span><span id="info${orderd.od_id}"></span>
 							</c:if>
 							<br>
-							<span>商品号：</span><span>${pb.goodsid};</span>
+							<span>商品号：</span><span>${pb.goodsid};商品id:${pb.od_id}</span>
 							<br>
 							<input type="hidden" id="order_${pbsi.index+1}" value="${pb.orderNo}" />
 							<input type="hidden" id="goodsid_${pbsi.index+1}" value="${pb.od_id}" />
@@ -3852,11 +3852,11 @@
 								<c:if test="${pb.offline_purchase==1}">
 									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" style="background-color: red;" value="线下采购" onclick="AddinsertSources('${pb.newValue}','${pb.purchaseCount}','${pb.cGoodstype}','${pb.googs_img}','${pb.oldValue}','${pb.orderNo}','${pb.goodsid}');" class="f" />
 								</c:if>
-								<c:if test="${pb.authorized_flag==0}">
-									<input type="button" style="background-color: green;"  value="授权该商品" onclick="productAuthorization('${pb.od_id}',1);" class="f" />
+								<c:if test="${pb.authorized_flag==1 || pb.authorized_flag==2}">
+									<input type="button" style="background-color: green;"  value="授权该商品" onclick="productAuthorization('${pb.goods_pid}','${pb.od_id}',0);" class="f" />
 								</c:if>
-								<c:if test="${pb.authorized_flag==1}">
-									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" style="background-color: red;" value="取消商品授权" onclick="productAuthorization('${pb.od_id}',0);" class="f" />
+								<c:if test="${pb.authorized_flag==0}">
+									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" style="background-color: red;" value="取消商品授权" onclick="productAuthorization('${pb.goods_pid}','${pb.od_id}',1);" class="f" />
 								</c:if>
 									<%--<span>--%>
 

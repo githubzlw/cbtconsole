@@ -141,6 +141,8 @@ public interface TaoBaoOrderMapper {
 	 * @return
 	 */
 	public List<OrderSalesAmountPojo> orderSalesAmount(Map<Object, Object> map);
+
+	public OrderSalesAmountPojo getMonthlyFinancialStatistics(@Param("times") String times);
 	/**
 	 * 异步获取利润汇总数据
 	 * @param map

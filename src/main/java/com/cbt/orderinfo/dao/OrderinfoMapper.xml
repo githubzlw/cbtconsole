@@ -801,13 +801,12 @@
         0 deliver,
         (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
         (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
-        (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
-         (select pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no) as payUserName,
+         (select DISTINCT pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no LIMIT 1) as payUserName,
         (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
         (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
         (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
-        pf.id dzid, pf.orderno dzorderno, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
+        pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
         a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
@@ -1023,8 +1022,8 @@
         UPDATE order_product_source SET purchase_state=6 WHERE orderid=#{orderid} AND od_id=#{odid};
     </update>
     <update id="updateOrderReState">
-        UPDATE order_details SET state=1,inventory_remark='',re_shipnos=CONCAT(IFNULL(re_shipnos,''),',',#{shipno}) WHERE orderid=#{orderid} AND id=#{odid};
-		UPDATE order_replenishment SET updatetime = NOW(),rep_state = 1,shipno=#{shipno} WHERE orderid=#{orderid} AND odid=#{odid} AND tb_1688_itemid=#{itemid};
+        UPDATE order_details SET state=1,inventory_remark='',re_shipnos=CONCAT(IFNULL(re_shipnos,''),',',#{shipno}) WHERE  id=#{odid};
+		UPDATE order_replenishment SET updatetime = NOW(),rep_state = 1,shipno=#{shipno} WHERE orderid=#{orderid} AND od_id=#{odid} AND tb_1688_itemid=#{itemid};
     </update>
     <update id="updateBuyState">
         UPDATE order_details SET state=1,inventory_remark='',shipno=#{shipno} WHERE orderid=#{orderid} AND id=#{odid};
@@ -1325,7 +1324,7 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%'
-        )  GROUP BY oi.order_no ORDER BY oi.orderid DESC
+        )  GROUP BY oi.order_no ORDER BY oi.orderid DESC limit 500
     </select>
     <delete id="deleteFlagByOrder">
         delete from order_warning where orderNo=#{orderNo}

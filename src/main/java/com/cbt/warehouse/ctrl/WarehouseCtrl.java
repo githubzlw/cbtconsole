@@ -5,6 +5,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -676,6 +677,37 @@ public class WarehouseCtrl {
 		}
 		out.print(index);
         out.close();
+	}
+
+	/**
+	 * 验货图片关联验货商品
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/insInsp")
+	public void insInsp(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		int index=0;
+		PrintWriter out = response.getWriter();
+		String goodsPid=request.getParameter("goodsPid");
+		String odid=request.getParameter("odid");
+		String picPath=request.getParameter("picPath");
+		String orderid=request.getParameter("orderid");
+		Map<String,String> map=new HashMap<String,String>(2);
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		try{
+			map.put("goodsPid",goodsPid);
+			map.put("odid",odid);
+			map.put("picPath",picPath);
+			map.put("orderid",orderid);
+			index=iWarehouseService.insInsp(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		out.print(index);
+		out.close();
 	}
 
 	/**
@@ -2635,9 +2667,11 @@ public class WarehouseCtrl {
 			throws Exception {
 		String odid=request.getParameter("odid");
 		String type=request.getParameter("type");
+		String goodsPid=request.getParameter("goodsPid");
 		Map<String, String> map = new HashMap<String, String>(); // sql 参数
 		map.put("odid", odid);
-		map.put("type", type);
+		map.put("flag", type);
+		map.put("goodsPid",goodsPid);
 		PrintWriter out = response.getWriter();
 		out.print(iWarehouseService.productAuthorization(map));
 		out.close();
@@ -3738,9 +3772,11 @@ public class WarehouseCtrl {
 		String page=request.getParameter("page");
 		String goods_pid=request.getParameter("pid");
 		String orderno=request.getParameter("orderno");
+		String odid=request.getParameter("odid");
 		String goods_id=request.getParameter("goods_id");
 		String times=request.getParameter("times");
 		String admuserid=request.getParameter("admuserid");
+		String oldOrderid=request.getParameter("oldOrderid");
 		if(StringUtil.isNotBlank(times) && "999".equals(times)){
 			times=null;
 		}else if(StringUtil.isBlank(times)){
@@ -3754,10 +3790,12 @@ public class WarehouseCtrl {
 		int pages=(Integer.valueOf(page)-1)*10;
 		map.put("page",String.valueOf(pages));
 		map.put("goods_pid", goods_pid);
-		map.put("times",times);
+		map.put("times",StringUtil.isNotBlank(odid)?null:times);
 		map.put("orderno",orderno);
 		map.put("goods_id",goods_id);
 		map.put("admuserid",admuserid);
+		map.put("odid",odid);
+		map.put("oldOrderid",oldOrderid);
 	}
 
 	// 出库验货
@@ -7197,6 +7235,10 @@ public class WarehouseCtrl {
 					}
 					bgMap.put("expressno", expressNo); // 添加包裹号
 					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
+					//发送邮件给客户告知已经发货
+//					IGuestBookService ibs = new GuestBookServiceImpl();
+//					OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+//					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
 			}
 		}catch (Exception e){
@@ -7308,6 +7350,8 @@ public class WarehouseCtrl {
 						iWarehouseService.updateBarcodeByOrderNo(orderid);
 						// 更新货源变商品状态->改为出运中
 						iWarehouseService.updateOrderSourceState(orderid);
+						//发货商品authorized_flag标记为2，商品发货
+						iWarehouseService.checkAuthorizedFlag(orderid);
 					} catch (Exception e) {
 						LOG.error("更新orderid 的库位状态/货源表商品状态【订单号:" + orderid+ "】", e);
 					}
