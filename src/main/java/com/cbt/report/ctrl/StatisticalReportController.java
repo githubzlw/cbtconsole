@@ -3278,6 +3278,8 @@ public class StatisticalReportController {
 		}
 		map.put("startTime", startTime);
 		map.put("endTime", endTime);
+		map.put("year",!"0".equals(year)?year:null);
+		map.put("month",!"0".equals(month)?month:null);
 		List<BuyReconciliationPojo> list = taoBaoOrderService.buyReconciliationReport(map,"0");
 		json.setRows(list);
 		json.setTotal(list.size());

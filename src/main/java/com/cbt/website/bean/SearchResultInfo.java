@@ -62,6 +62,14 @@ public class SearchResultInfo {
 	private String catid;
 	private String evaluation;
 	private int order_num;//1688包裹对应的销售订单数量
+	private String isExitPhone;
+	public String getIsExitPhone() {
+		return isExitPhone;
+	}
+
+	public void setIsExitPhone(String isExitPhone) {
+		this.isExitPhone = isExitPhone;
+	}
 
 	public String getAuthorizedFlag() {
 		return authorizedFlag;

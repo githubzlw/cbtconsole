@@ -432,6 +432,12 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 				buyReconciliationPojo.setGrabAmounts(String.valueOf(ac));
 				buyReconciliationPojo.setZfbPayAmount(df.format(zfbPayAmount));
 			}
+			OrderSalesAmountPojo osp=taoBaoOrderMapper.getMonthlyFinancialStatistics(buyReconciliationPojo.getTimes());
+			if(osp!=null && StringUtil.isNotBlank(osp.getOrder_sales())){
+				buyReconciliationPojo.setOrder_sales(osp.getOrder_sales());
+				buyReconciliationPojo.setBalance_compensation(osp.getBalance_compensation());
+			}
+
 		}
 		return list;
 	}

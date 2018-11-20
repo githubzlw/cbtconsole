@@ -168,6 +168,13 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	int insertEvaluation(Map<String, String> map);
+
+	/**
+	 * 验货图片关联验货商品
+	 * @param map
+	 * @return
+	 */
+	int insInsp(Map<String,String> map);
 	/**
 	 * 新增验货图片上传-验货编辑
 	 * @param pid
@@ -1108,6 +1115,13 @@ public interface IWarehouseService {
 
 	public int updateBarcodeByOrderNo(String orderid);
 
+	/**
+	 * 根据用户订单号获取发送邮件需要的用户邮箱等信息
+	 * @param orderNo
+	 * @return
+	 */
+	public OrderBean getUserOrderInfoByOrderNo(String orderNo);
+
 	//入库备注
 	public void treasuryNote(String orderNo, int goodsid, String remarkContent);
 
@@ -1153,6 +1167,13 @@ public interface IWarehouseService {
 	 * @param orderid
 	 */
 	public int updateOrderSourceState(String orderid);
+
+	/**
+	 * 将出运的订单 商品在授权表中标记
+	 * @param orderid
+	 * @return
+	 */
+	public int checkAuthorizedFlag(String orderid);
 
 	/**
 	 * 更新补录订单状态

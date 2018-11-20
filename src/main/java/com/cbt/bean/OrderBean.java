@@ -105,6 +105,14 @@ public class OrderBean implements Cloneable {
     private double memberFee;
     private String payUserName;
     private String backFlag;
+    private double processingfee;
+    public double getProcessingfee() {
+        return processingfee;
+    }
+
+    public void setProcessingfee(double processingfee) {
+        this.processingfee = processingfee;
+    }
 
     public String getGradeName() {
         return gradeName;

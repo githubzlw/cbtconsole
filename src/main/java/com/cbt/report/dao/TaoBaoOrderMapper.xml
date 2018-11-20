@@ -750,23 +750,31 @@
      #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
   </insert>
   <update id="updateInventory">
-     upate inventory 
+
   </update>
+    <select id="getMonthlyFinancialStatistics" resultType="com.cbt.pojo.OrderSalesAmountPojo">
+      SELECT * FROM monthly_financial_statistics WHERE statistics_year=LEFT(#{times},4) AND statistics_month=RIGHT(#{times},2)
+    </select>
   <select id="buyReconciliationReport" resultType="com.cbt.pojo.BuyReconciliationPojo">
     	select times,sum(beginBlance) as beginBlance,sum(endBlance) as endBlance,sum(transfer) as transfer,sum(payFreight) as payFreight,sum(ebayAmount) as ebayAmount,sum(materialsAmount) as materialsAmount,sum(zfbFright) as zfbFright,sum(grabAmount) as grabAmount,sum(normalAmount) as normalAmount,sum(cancelAmount) as cancelAmount,sum(noMatchingOrder) as noMatchingOrder,sum(noStorage) as noStorage,sum(lastMonth) as lastMonth,sum(forecastAmount) as forecastAmount,sum(actualAmount) as actualAmount,sum(inventory_amount) as inventory_amount,sum(sale_inventory) as sale_inventory,sum(order_sales) as order_sales,sum(balance_compensation) as balance_compensation,sum(orderFreight) as orderFreight from (
-    	SELECT left(datas,7) AS times,cast(beginBlance as decimal(10,2)) as beginBlance,cast(endBlance as decimal(10,2)) as endBlance,cast(transfer as decimal(10,2)) as transfer,cast(payFreight as decimal(10,2)) as payFreight,cast(ebayAmount as decimal(10,2)) as ebayAmount,cast(materialsAmount as decimal(10,2)) as materialsAmount,cast(ZfbFright as decimal(10,2)) as ZfbFright,0.00 as grabAmount,0.00 as normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM zfb_amount where datas>=#{startTime}
+    	SELECT left(datas,7) AS times,cast(beginBlance as decimal(10,2)) as beginBlance,cast(endBlance as decimal(10,2)) as endBlance,
+      cast(transfer as decimal(10,2)) as transfer,cast(payFreight as decimal(10,2)) as payFreight,cast(ebayAmount as decimal(10,2)) as ebayAmount,
+      cast(materialsAmount as decimal(10,2)) as materialsAmount,cast(ZfbFright as decimal(10,2)) as ZfbFright,0.00 as grabAmount,0.00 as normalAmount,
+      0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,
+      0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM zfb_amount where datas>=#{startTime}
 		<if test="endTime!=null">
 		and datas<![CDATA[<=]]>#{endTime}
 		</if> GROUP BY year(datas),month(datas)
 		union
 <!-- 		 抓取金额 -->
 		SELECT LEFT(a.paydata,7) as times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,cast(SUM(a.totalprice) as decimal(10,2)) as grabAmount,0.00 as normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight  FROM (
-		SELECT DISTINCT orderid,totalprice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 and
+		SELECT DISTINCT orderid,totalprice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消'
+      AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 and
 		paydata>=#{startTime} 
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime}
 		</if>
-		AND tbOr1688 IN ('0','1','2','3')) a 
+		AND tbOr1688 between 0 and 3) a 
 		group by year(a.paydata),month(a.paydata)
 		union
 <!-- 		 对应正常订单金额 -->
@@ -779,7 +787,7 @@
 		<if test="endTime!=null">
 		and t.paydata<![CDATA[<=]]>#{endTime}
 		</if>
-		 AND t.tbOr1688 IN ('0','1','2','3')
+		 AND t.tbOr1688 between 0 and 3
 		AND oi.state IN (1,2,3,4,5) 
 		) a group by year(a.paydata),month(a.paydata)
 		union
@@ -789,95 +797,70 @@
 		FROM taobao_1688_order_history t 
 		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
 		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
-		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		WHERE t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 AND t.paydata>=#{startTime}
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime}
 		</if>
-		 AND t.tbOr1688 IN ('0','1','2','3')
+		 AND t.tbOr1688 between 0 and 3
 		AND oi.state IN (-1,6) ) a group by YEAR(a.paydata),MONTH(a.paydata)
 <!-- 		无货源匹配金额（肯定没有入库） -->
 		union
-		select LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 as normalAmount,0.00 AS cancelAmount,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from (
-		SELECT distinct orderid,totalPrice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
-		paydata>=#{startTime} 
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		 AND tbOr1688 IN ('0','1','3') and orderid not in (
-		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
-		paydata>=#{startTime} 
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		 AND tbOr1688 IN ('0','1','2','3')
-		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
-		))a group by YEAR(a.paydata),MONTH(a.paydata)
+          select LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 as normalAmount,0.00 AS cancelAmount,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from (
+          select distinct t.orderid,t.totalPrice,t.paydata from taobao_1688_order_history t
+          left join order_product_source ops on t.itemid=ops.tb_1688_itemid
+          left join order_replenishment orp on t.itemid=orp.tb_1688_itemid
+          where t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 and
+           t.tbOr1688 between 0 and 3 and ops.id is null and orp.id is null
+          and t.paydata>=#{startTime}
+          <if test="endTime!=null">
+              and t.paydata&lt;=#{endTime}
+          </if>
+          )a group by YEAR(a.paydata),MONTH(a.paydata)
 <!-- 		有货源匹配没有入库 -->
-		union
-		SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as ZfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
-		SELECT DISTINCT orderid,totalPrice,paydata FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
-		paydata>=#{startTime} 
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		AND tbOr1688 IN ('0','1','3') 
-		AND orderid NOT IN (
-		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
-		)  
-		AND orderid NOT IN (
-		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
-		) AND orderid NOT IN (
-		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
-		paydata>=#{startTime} 
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		AND tbOr1688 IN ('0','1','3') AND orderid NOT IN (
-		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
-		paydata>=#{startTime} 
-		<if test="endTime!=null">
-		and paydata<![CDATA[<=]]>#{endTime} 
-		</if>
-		AND tbOr1688 IN ('0','1','2','3')
-		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
-		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
-		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
-		) )) a group by YEAR(a.paydata),MONTH(a.paydata)
+		  union
+          SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as ZfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
+          select distinct t.orderid,t.totalPrice,t.paydata from taobao_1688_order_history t
+          left join order_product_source ops on t.itemid=ops.tb_1688_itemid
+          left join order_replenishment orp on t.itemid=orp.tb_1688_itemid
+          left join id_relationtable id on t.orderid=id.tborderid
+          where t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 and
+          t.paydata>=#{startTime} AND t.tbOr1688 between 0 and 3 and ops.id is not null and orp.id is not null and id.id is null
+          <if test="endTime!=null">
+              and t.paydata&lt;=#{endTime}
+          </if>
+          ) a group by YEAR(a.paydata),MONTH(a.paydata)
 <!-- 		 对应上月订单金额 -->
 		 union
 		 SELECT LEFT(a.paydata,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,CAST(SUM(a.totalprice) AS DECIMAL(10,2)) as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM (
-		SELECT DISTINCT t.orderid,t.totalprice,t.paydata FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
-		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		SELECT DISTINCT t.orderid,t.totalprice,t.paydata FROM taobao_1688_order_history t
+        INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid
+        INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
+		WHERE t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 AND t.paydata>=#{startTime}
 		<if test="endTime!=null">
 		and t.paydata<![CDATA[<=]]>#{endTime}
 		</if> 
-        AND t.tbOr1688 IN ('0','1','2','3')
-		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{startTime} )a group by YEAR(a.paydata),MONTH(a.paydata)
+        AND t.tbOr1688 between 0 and 3
+		AND oi.state between 1 and 5 AND oi.orderpaytime&lt;#{startTime} )a group by YEAR(a.paydata),MONTH(a.paydata)
 		union
 		<!-- 本月库存金额 -->
-		select LEFT(createtime,7) as times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,cast(SUM(IF(flag=1,new_inventory_amount,inventory_amount)) as decimal(10,2)) as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight from inventory where createtime>=#{startTime}
+		select LEFT(createtime,7) as times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,cast(SUM(IF(flag=1,new_inventory_amount,inventory_amount)) as decimal(10,2)) as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight
+      from inventory where createtime>=#{startTime}
 		<if test="endTime!=null">
 		and createtime<![CDATA[<=]]>#{endTime}  
 		</if>
 		 group by year(createtime),month(createtime)
 		union
 		<!-- 本月销售出去的库存 -->
-		     SELECT LEFT(li.createtime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,0.00 as inventory_amount,cast(SUM(li.lock_remaining*func_get_split_string(i.goods_p_price,',',1)) as decimal(10,2)) AS sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM lock_inventory li INNER JOIN inventory i ON li.in_id=i.id WHERE li.flag=1 and li.is_use=1 and li.is_delete=0 and li.createtime>=#{startTime}
+		     SELECT LEFT(li.createtime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 AS noStorage,0.00 AS lastMonth,0.00 AS forecastAmount,0.00 AS actualAmount,0.00 as inventory_amount,cast(SUM(li.lock_remaining*func_get_split_string(i.goods_p_price,',',1)) as decimal(10,2)) AS sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight
+        FROM lock_inventory li INNER JOIN inventory i ON li.in_id=i.id WHERE li.flag=1 and li.is_use=1 and li.is_delete=0 and li.createtime>=#{startTime}
 		<if test="endTime!=null">
 		and li.createtime<![CDATA[<=]]>#{endTime}  
 		</if> 
 		GROUP BY YEAR(li.createtime),MONTH(li.createtime)   
 		union
 		<!-- 		 预估运费金额 -->
-		SELECT  LEFT(senttime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,cast(getExchangeRMB(SUM(sp.estimatefreight),'USD') as decimal(10,2)) as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight FROM shipping_package sp INNER JOIN shipment s ON sp.expressno=s.orderNo WHERE senttime>=#{startTime}
+		SELECT  LEFT(senttime,7) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 AS grabAmount,0.00 AS normalAmount,0.00 AS cancelAmount,0.00 AS noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,cast(getExchangeRMB(SUM(sp.estimatefreight),'USD') as decimal(10,2)) as forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,0.00 as order_sales,0.00 as balance_compensation,0.00 as orderFreight
+        FROM shipping_package sp INNER JOIN shipment s ON sp.expressno=s.orderNo WHERE senttime>=#{startTime}
 		<if test="endTime!=null">
 		and senttime<![CDATA[<=]]>#{endTime}  
 		</if>
@@ -890,7 +873,11 @@
 		</if> group by year(sentTime),month(sentTime)
       <!-- 销售额R1-->
         union
-      SELECT GROUP_CONCAT(statistics_year,'-',statistics_month) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,0.00 AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,cast(order_sales*6.3 as decimal(10,2)) as order_sales,cast(balance_compensation*6.3 as decimal(10,2)) as balance_compensation,0.00 as orderFreight FROM monthly_financial_statistics  where 1=1
+      SELECT GROUP_CONCAT(statistics_year,'-',statistics_month) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,0.00 AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,cast(order_sales*6.3 as decimal(10,2)) as order_sales,cast(balance_compensation*6.3 as decimal(10,2)) as balance_compensation,0.00 as orderFreight
+      FROM monthly_financial_statistics  where 1=1
+      <if test="year !=null">
+          and statistics_year=left(#{startTime},4)
+      </if>
       <if test="endTime!=null">
          and statistics_year=left(#{endTime},4) and statistics_month=subString(#{endTime},6,2)
       </if>
@@ -971,7 +958,7 @@
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime}  
 		</if>
-		AND tbOr1688 IN ('0','1','2','3')) a 
+		AND tbOr1688 between 0 and 3) a 
 		group by year(a.paydata),month(a.paydata)
 		union
 		SELECT CONCAT(YEAR(senttime),'年',MONTH(senttime),'月') AS times,0.00 as orderAmount,0.00 as grabAmount,cast(getExchangeRMB(SUM(sp.estimatefreight),'USD') as decimal(10,2)) as forecastAmount
@@ -1208,8 +1195,8 @@
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
 		paydata>=#{startTime}
 		AND paydata<![CDATA[<=]]>#{endTime}
-		AND tbOr1688 IN ('0','1','2','3')
-		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
+		AND tbOr1688 between 0 and 3
+		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
 		<if test="userName != null">
 		  and username=#{userName}
 		</if>
@@ -1226,8 +1213,8 @@
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
 		paydata>=#{startTime}
 		AND paydata<![CDATA[<=]]>#{endTime}
-		AND tbOr1688 IN ('0','1','2','3')
-		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00') or itemid  IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
+		AND tbOr1688 between 0 and 3
+		and (itemid  in (select tb_1688_itemid from order_product_source where confirm_time>'2017-03-01 00:00:00')  or itemid  in (select tb_1688_itemid from order_replenishment where createtime>'2017-03-01 00:00:00'))
 		<if test="userName != null">
 		  and username=#{userName}
 		</if>
@@ -1246,14 +1233,14 @@
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
+		AND tbOr1688 between 0 and 3 AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
 		)  
 		AND orderid NOT IN (
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
+		AND tbOr1688 between 0 and 3 AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
 		) AND orderid NOT IN (
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
 		paydata>=#{startTime} 
@@ -1266,9 +1253,8 @@
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3')
-		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
-		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		AND tbOr1688 between 0 and 3
+		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00')  OR itemid
 		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
 		) )
 		<if test="userName != null">
@@ -1288,14 +1274,14 @@
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
+		AND tbOr1688 between 0 and 3 AND shipno <![CDATA[<>]]> '' AND shipno IS NOT NULL AND  shipno IN (SELECT shipno FROM order_details)
 		)  
 		AND orderid NOT IN (
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus <![CDATA[<>]]> '交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus) <![CDATA[<]]> 1 AND paydata>=#{startTime}
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3') AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
+		AND tbOr1688 between 0 and 3 AND orderid IN (SELECT tborderid FROM id_relationtable WHERE createtime>='2017-04-01 00:00:00')
 		) AND orderid NOT IN (
 		SELECT DISTINCT orderid FROM taobao_1688_order_history WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1 AND
 		paydata>=#{startTime} 
@@ -1308,9 +1294,8 @@
 		<if test="endTime!=null">
 		and paydata<![CDATA[<=]]>#{endTime} 
 		</if>
-		AND tbOr1688 IN ('0','1','2','3')
-		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
-		IN (SELECT last_tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00') OR itemid  
+		AND tbOr1688 between 0 and 3
+		AND (itemid  IN (SELECT tb_1688_itemid FROM order_product_source WHERE confirm_time>'2017-03-01 00:00:00')  OR itemid
 		IN (SELECT tb_1688_itemid FROM order_replenishment WHERE createtime>'2017-03-01 00:00:00')) 
 		) )
 		<if test="userName != null">
@@ -1323,7 +1308,7 @@
 		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
 		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
 		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
-		 AND t.tbOr1688 IN ('0','1','2','3')
+		 AND t.tbOr1688 between 0 and 3
 		 <if test="userName != null">
 		  and t.username=#{userName}
 		</if>
@@ -1335,7 +1320,7 @@
 		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
 		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
 		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
-		AND t.tbOr1688 IN ('0','1','2','3')
+		AND t.tbOr1688 between 0 and 3
 		AND oi.state IN (-1,6) 
 		<if test="userName != null">
 		  and t.username=#{userName}
@@ -1344,7 +1329,7 @@
   <select id="getLastAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
   		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
 		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
-        AND t.tbOr1688 IN ('0','1','2','3')
+        AND t.tbOr1688 between 0 and 3
 		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{endTime}
 		<if test="userName != null">
 		  and t.username=#{userName}
@@ -1354,7 +1339,7 @@
   <select id="getLastAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
   		SELECT t.id,t.operation_remark,t.shipno,t.itemid,t.tbOr1688,t.orderid,t.orderstatus,t.itemname,t.itemurl,t.imgurl,t.itemprice,t.itemqty,t.preferential,t.totalprice,t.sku,t.orderdate,t.paydata,t.delivery_date,t.username FROM taobao_1688_order_history t INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid INNER JOIN orderinfo oi ON ir.orderid=oi.order_no
 		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime} and t.paydata<![CDATA[<=]]>#{endTime}
-        AND t.tbOr1688 IN ('0','1','2','3')
+        AND t.tbOr1688 between 0 and 3
 		AND oi.state IN (1,2,3,4,5) AND oi.orderpaytime<![CDATA[<]]>#{endTime}
 		<if test="userName != null">
 		  and t.username=#{userName}
@@ -1409,7 +1394,7 @@
   <select id="getGrabNormalAmount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
      SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history 
      WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1
-	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 IN ('0','1','2','3')
+	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 between 0 and 3
 	 <if test="userName != null">
 		  and username=#{userName}
 	</if>
@@ -1418,7 +1403,7 @@
     <select id="getGrabNormalAmountCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
      SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username FROM taobao_1688_order_history 
      WHERE orderstatus<![CDATA[<>]]>'交易关闭' and orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',orderstatus)<![CDATA[<]]>1
-	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 IN ('0','1','2','3')
+	 AND  paydata>=#{startTime} and paydata<![CDATA[<=]]>#{endTime} AND tbOr1688 between 0 and 3
 	 <if test="userName != null">
 		  and username=#{userName}
 	</if>
