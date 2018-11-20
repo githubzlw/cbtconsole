@@ -80,8 +80,11 @@ public class WebHookPaymentController {
             json.setRows(result.get("data"));
             json.setTotal((int)result.get("total"));
             WebhookPaymentBean footer = new WebhookPaymentBean();
-            footer.setEmail("总金额:"+result.get("mcGrossTatal")+" USD");
+            footer.setEmail("Amount:"+result.get("mcGrossTatal")+" USD");
             footer.setOrderNO("");
+            footer.setAmount("Refunded:"+result.get("mcRefundTatal")+" USD");
+            footer.setProfit("Amount - Refunded:");
+            footer.setType(result.get("profit")+" USD");
             List<WebhookPaymentBean> footerLst = new ArrayList<WebhookPaymentBean>();
 			footerLst.add(footer);
             
