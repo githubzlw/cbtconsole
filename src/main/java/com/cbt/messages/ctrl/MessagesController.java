@@ -304,13 +304,13 @@ public class MessagesController {
 	 * 		/messages/findCustomerMessages
 	 */
 	@RequestMapping(value = "/findCustomerMessages")
-	@ResponseBody
-	public List<HashMap<String, String>> findCustomerMessages(HttpServletRequest request) {
+    @ResponseBody
+	public String findCustomerMessages(HttpServletRequest request) {
 		List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 		
 		String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		if (admJson == null) {
-			return list;
+			return null;
 		}
 		Admuser user = (Admuser) SerializeUtil.JsonToObj(admJson, Admuser.class);
 		int admuserid = user.getId();
@@ -322,12 +322,11 @@ public class MessagesController {
 		
 		try {
 			list = messagesService.findCustomerMessages(admuserid);
-		} catch (Exception e) {
-			System.out.println(e);
-			list = null;
-		}
-		
-		return list;
+            return SerializeUtil.ListToJson(list);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
 	}
 
 	/**

@@ -119,6 +119,7 @@ public class ShopUrlController {
         String shopTypeStr = request.getParameter("shopType");
         String authorizedFlagStr = request.getParameter("authorizedFlag");
         String authorizedFileFlagStr = request.getParameter("authorizedFileFlag");
+        String ennameBrandFlagStr = request.getParameter("ennameBrandFlag"); //-1-无筛选;1-店铺英文为空;2-品牌属性为空;3-店铺英文+品牌属性为空;
         String admName=request.getParameter("admName");
         String days=request.getParameter("days");
         int authorizedFlag = -1;
@@ -128,6 +129,10 @@ public class ShopUrlController {
         int authorizedFileFlag = -1;
         if (StringUtils.isNotBlank(authorizedFileFlagStr)) {
         	authorizedFileFlag = Integer.valueOf(authorizedFileFlagStr);
+        }
+        int ennameBrandFlag = -1;
+        if (StringUtils.isNotBlank(ennameBrandFlagStr)) {
+            ennameBrandFlag = Integer.valueOf(ennameBrandFlagStr);
         }
         int shopType = -1;
         if (StringUtils.isNotBlank(shopTypeStr)) {
@@ -176,8 +181,9 @@ public class ShopUrlController {
             shopids=shopUrlService.getShopList(admName,days);
         }
         List<ShopUrl> findAll = shopUrlService.findAll(shopId, shopUserName, date, start, 25, timeFrom, timeTo, isOn,
-                state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,shopids);
-        int total = shopUrlService.total(shopId, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,shopids);
+                state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids);
+        int total = shopUrlService.total(shopId, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
+                authorizedFileFlag,ennameBrandFlag,shopids);
         json.setRows(findAll);
         json.setTotal(total);
         return json;
@@ -193,13 +199,13 @@ public class ShopUrlController {
     	Map<String, Integer> result = new HashMap<String, Integer>();
     	try {
     		//1-已授权但无授权文件
-    		int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,1,null);
+    		int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,1,-1,null);
     		result.put("authorizedFileFlag1", authorizedFileFlag1);
     		//2-授权文件到期
-    		int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,2,null);
+    		int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,2,-1,null);
     		result.put("authorizedFileFlag2", authorizedFileFlag2);
     		//3-已授权但无授权文件+授权文件到期
-    		int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,3,null);
+    		int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, -1, -1, -1, -1,-1,-1,3,-1,null);
     		result.put("authorizedFileFlag3", authorizedFileFlag3);
     		result.put("state", 1);
 		} catch (Exception e) {

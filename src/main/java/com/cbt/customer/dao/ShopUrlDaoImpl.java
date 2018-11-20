@@ -107,7 +107,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public List<ShopUrl> findAll(String shopId, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel,int shopTypeFlag,
-                                 int authorizedFlag,int authorizedFileFlag,String shopids) {
+                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
         String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b where b.shop_id =a.shop_id and b.valid=1) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, au.admuser au_admuser, au.start_time au_start_time, au.end_time au_end_time, au.remark au_remark, au.valid au_valid from shop_url_bak a ";
@@ -162,7 +162,31 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 			default:
 				break;
 			}
-        }  
+        }
+        if(ennameBrandFlag > 0){//-1-无筛选;1-店铺英文为空;2-品牌属性为空;3-店铺英文+品牌属性为空;4-店铺英文不为空;5-品牌属性不为空;6-店铺英文+品牌属性都不为空
+            switch (ennameBrandFlag) {
+                case 1:
+                    sql += "  and  (shop_enname is null OR shop_enname = '')";
+                    break;
+                case 2:
+                    sql += "  and (shop_brand is null OR shop_brand = '')";
+                    break;
+                case 3:
+                    sql += "  and (shop_enname is null OR shop_enname = '' OR shop_brand is null OR shop_brand = '')";
+                    break;
+                case 4:
+                    sql += "  and  (shop_enname is not null AND shop_enname != '')";
+                    break;
+                case 5:
+                    sql += "  and (shop_brand is not null AND shop_brand != '')";
+                    break;
+                case 6:
+                    sql += "  and (shop_enname is not null AND shop_enname != '' AND shop_brand is not null AND shop_brand != '')";
+                    break;
+                default:
+                    break;
+            }
+        }
 
         sql += " order by a.createtime desc limit " + start + ", " + end + "";
         System.out.println(sql);
@@ -238,6 +262,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
                 String stateInfo = "";
                 if (onlineStatus == 0) {
+                    stateInfo = "<button class=\"but_color\" onclick=\"edit(" + su.getId() + "," + su.getIsAuto() + ")\">编辑</button>";
                     su.setStateInfo("<button class=\"but_color\" onclick=\"edit(" + su.getId() + "," + su.getIsAuto() + ")\">编辑</button>"
                             + "<button class=\"del_color\" onclick=\"delreply(" + su.getId()
                             + ")\">删除</button>");
@@ -316,7 +341,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
     @Override
     public int total(String shopId, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
-                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,String shopids) {
+                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -370,7 +395,31 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 			default:
 				break;
 			}
-        }        
+        }
+        if(ennameBrandFlag > 0){//-1-无筛选;1-店铺英文为空;2-品牌属性为空;3-店铺英文+品牌属性为空;4-店铺英文不为空;5-品牌属性不为空;6-店铺英文+品牌属性都不为空
+            switch (ennameBrandFlag) {
+                case 1:
+                    sql += "  and (shop_enname is null OR shop_enname = '')";
+                    break;
+                case 2:
+                    sql += "  and (shop_brand is null OR shop_brand = '')";
+                    break;
+                case 3:
+                    sql += "  and (shop_enname is null OR shop_enname = '' OR shop_brand is null OR shop_brand = '')";
+                    break;
+                case 4:
+                    sql += "  and  (shop_enname is not null AND shop_enname != '')";
+                    break;
+                case 5:
+                    sql += "  and (shop_brand is not null AND shop_brand != '')";
+                    break;
+                case 6:
+                    sql += "  and (shop_enname is not null AND shop_enname != '' AND shop_brand is not null AND shop_brand != '')";
+                    break;
+                default:
+                    break;
+            }
+        }
 
         System.out.println(sql);
         conn = DBHelper.getInstance().getConnection5();
