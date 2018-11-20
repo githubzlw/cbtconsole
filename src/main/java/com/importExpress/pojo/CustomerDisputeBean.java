@@ -7,7 +7,37 @@ public class CustomerDisputeBean {
 	private String updateTime;
 	private String value;
 	private String status;
+	private long time;
+	private String userid;
+	private String orderNo;
+	private String email;
 	
+	
+	
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getOrderNo() {
+		return orderNo;
+	}
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public long getTime() {
+		return time;
+	}
+	public void setTime(long time) {
+		this.time = time;
+	}
 	public String getId() {
 		return id;
 	}
