@@ -476,10 +476,10 @@ function afterReplenishment(){
 
 
 //备注回复
-function doReplay1(orderid,goodsid){
+function doReplay1(orderid,odid){
 	$("#remark_content_").val("");
 	$("#rk_orderNo").val(orderid);
-	$("#rk_goodsid").val(goodsid);
+	$("#rk_odid").val(odid);
 	var rfddd = document.getElementById("repalyDiv1");
 	rfddd.style.display = "block";
 }
@@ -487,7 +487,7 @@ function doReplay1(orderid,goodsid){
 //增加商品沟通信息
 function saveRepalyContent(){
 	var orderid=$("#rk_orderNo").val();
-	var goodsid=$("#rk_goodsid").val();
+	var odid=$("#rk_odid").val();
 	var text=$("#remark_content_").val();
 	 $.ajax({
 			type : 'POST',
@@ -495,14 +495,14 @@ function saveRepalyContent(){
 			url : '/cbtconsole/PurchaseServlet?action=saveRepalyContent&className=Purchase',
 			data : {
 			    'orderid' : orderid,
-	  			'goodsid' : goodsid,
+	  			'odid' : odid,
 	  			"type":'2',
 	  			'text' : text
 			},
 			dataType : 'text',
 			success : function(data){
 				if(data.length>0){
-					$("#rk_remark_"+orderid+goodsid+"").html(data);
+					$("#rk_remark_"+orderid+odid+"").html(data);
 					$('#repalyDiv1').hide();
 				}
 			}
@@ -663,7 +663,7 @@ em {
 					onclick="$('#repalyDiv1').hide();" style="float: right;">╳</a>
 			</div>
 		    <input id="rk_orderNo" type="hidden" value="">
-		    <input id="rk_goodsid" type="hidden" value="">
+		    <input id="rk_odid" type="hidden" value="">
 		    <input type="hidden" id="ordercountry_value">
 		    回复内容:
 		    <textarea name="remark_content" rows="8" cols="50" style="margin-top: 20px;" id="remark_content_"></textarea>
@@ -1976,11 +1976,11 @@ em {
 							<!-- 消息备注列合并过来的-->
 							<div style="overflow-y:scroll;height:200px;width:200px;">
 								<div class="w-font">
-									<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.goodsid}">${orderd.goods_info}</font>
+									<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.id}">${orderd.goods_info}</font>
 								</div>
 							</div>
 							<div class="w-margin-top">
-								<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.goodsid});" class="repalyBtn" />
+								<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 							</div>
 								
 							</td>
@@ -2299,11 +2299,11 @@ em {
 									<!-- 消息备注列合并过来的-->
 									<div style="overflow-y:scroll;height:200px;width:200px;">
 										<div class="w-font">
-											<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.goodsid}">${orderd.goods_info}</font>
+											<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.id}">${orderd.goods_info}</font>
 										</div>
 									</div>
 									<div class="w-margin-top">
-										<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.goodsid});" class="repalyBtn" />
+										<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 									</div>
 								
 									</td>
