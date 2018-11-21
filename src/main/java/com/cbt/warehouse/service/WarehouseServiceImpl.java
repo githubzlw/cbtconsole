@@ -22,6 +22,7 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
+import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -473,7 +474,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + ip + ":8084/"
+                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -485,7 +486,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + ip + ":8084/" + bean.getLocalImgPath() + "'/>";
+                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }
@@ -531,7 +532,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + ip + ":8084/"
+                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -543,7 +544,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + ip + ":8084/" + bean.getLocalImgPath() + "'/>";
+                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }

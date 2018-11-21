@@ -318,6 +318,7 @@
             $(".shop_check_" + shopId).each(function (i, item) {
                 $(this).prop("checked", false);
             });
+            $(".pid_shop_" + shopId).prop("checked", false);
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/singleGoods/setMainImgByShopId",
@@ -405,7 +406,7 @@
                                     //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
                                     //setTimeout(function () {window.location.reload();}, 300);
                                     //reloadData();
-                                    hideButton('', shopId, 1, null);
+                                    hideButton('', shopId, 1, null,type);
                                 } else {
                                     $.messager.alert("提醒", '执行错误:' + data.message, "info");
                                 }
@@ -434,7 +435,7 @@
                         //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
                         //setTimeout(function () {window.location.reload();}, 300);
                        //reloadData();
-                        hideButton(pid,shopId,0,ojb);
+                        hideButton(pid,shopId,0,ojb,0);
                     } else {
                         $.messager.alert("提醒", '执行错误:' + data.message, "info");
                     }
@@ -452,7 +453,7 @@
         }
 
 
-        function hideButton(pid,shopId,type,ojb) {
+        function hideButton(pid,shopId,isPid,ojb,isPass) {
             if(type == 0){
                 $(".notice_" + pid).text('已审核,不通过');
                 $(ojb).parent().find(".shop_check").hide();
@@ -460,7 +461,11 @@
             }else{
                 $(".shop_btn_" + shopId).hide();
                 $(".pid_btn_" + shopId).hide();
-                $(".notice_" + shopId).text('已审核');
+                if(isPass == 0){
+                    $(".notice_" + shopId).text('已审核,已通过');
+                }else{
+                    $(".notice_" + shopId).text('已审核,不通过');
+                }
             }
         }
 
@@ -510,12 +515,16 @@
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 1 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 1 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 1 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.shopCheck == 1 ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
@@ -525,12 +534,16 @@
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 2 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 2 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 2 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.shopCheck == 2 ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
@@ -540,12 +553,16 @@
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 3 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 3 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 3 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId + '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.shopCheck == 3 ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
@@ -561,9 +578,13 @@
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 0 ? 'checked="checked"' : '') +'/></span></div>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" '
+                    +'class="chk_sty pid_check_' + row.pid + ' pid_shop_' + row.shopId +  '"';
+                if (row.isUpdate > 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                } else {
+                    content += ((row.imgCheck == 0 && row.shopCheck == 0) ? 'checked="checked"' : '') + '/></span></div>';
+                }
             }
             return content;
         }

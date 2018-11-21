@@ -15,10 +15,24 @@ public class WebhookPaymentBean {
 	private String findType;//查询类型 mysql  webhook
 	private long time;
 	private String receiverID;
+	private String trackID;
 	
 	private double mcGross;//金额
+	private double refundAmount;
 	
 	
+	public String getTrackID() {
+		return trackID;
+	}
+	public void setTrackID(String trackID) {
+		this.trackID = trackID;
+	}
+	public double getRefundAmount() {
+		return refundAmount;
+	}
+	public void setRefundAmount(double refundAmount) {
+		this.refundAmount = refundAmount;
+	}
 	public double getMcGross() {
 		return mcGross;
 	}
