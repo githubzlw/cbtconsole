@@ -134,9 +134,11 @@ public class SupplierScoringController {
 		try{
 			String shop_id=request.getParameter("shop_id");
 			boolean flag="1".equals(request.getParameter("flag"))?true:false;
+			String goodsPid=request.getParameter("goodsPid");
 			map.put("shop_id",shop_id);
 			map.put("userid",userid);
 			map.put("flag",String.valueOf(flag));
+			map.put("goodsPid",StringUtil.isBlank(goodsPid)?null:goodsPid);
 			supplierproducts=supplierScoringService.getAllShopInfo(map);
 			if (!flag) {
 				supplierProductsBeans=supplierScoringService.getAllShopGoodsInfo(map);
@@ -280,7 +282,8 @@ public class SupplierScoringController {
 		Map<String, String> map=new HashMap<String, String>();
 		String id=request.getParameter("id");
 		String remark=request.getParameter("newRemark");
-		int row=supplierScoringService.updateRemark(id,remark);
+		String newQuality=request.getParameter("newQuality");
+		int row=supplierScoringService.updateRemark(id,remark,newQuality);
 		map.put("row",row+"");
 		return map;
 	}
