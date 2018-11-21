@@ -170,6 +170,7 @@ $(document).ready(function(){
     }
     if(es_buyAmount == null || es_buyAmount == ""){
         es_buyAmount=0.00;
+        piaAmount=0.00;
     }else{
         es_buyAmount=Number(es_buyAmount)+Number(piaAmount);
 	}
@@ -205,7 +206,8 @@ $(document).ready(function(){
         end_p=end_p.toFixed(2);
 	}
 	$("#es_price").html(es_buyAmount.toFixed(2));
-    $("#pay_price").html(sale);
+    $("#esPidAmount").html("(包含预计国内运费:"+piaAmount+")");
+    $("#pay_price").html(sale+";汇率:("+rate+")");
     $("#end_profit").html(end_profit);
     $("#end_p").html(end_p+"%");
     $("#transportcompany").html(transportcompany == null || transportcompany ==""?"--":transportcompany);
@@ -1541,6 +1543,7 @@ em {
 					<tr>
 						<td>预计采购金额(￥):</td>
 						<td style="text-align:center;vertical-align:middle;"><span id="es_price" style="color:red;">-</span>
+                           <span style="color:red;" id="esPidAmount"></span>
 							<c:if test="${not empty tipprice}">
 								<span style="color:blue">(${tipprice})</span>
 							</c:if>
@@ -1936,7 +1939,10 @@ em {
 									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">原始货源重量(kg): ${orderd.final_weight}</p>
+									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
+								</span>
+								<span id="spanurl${sd.index}">
+									<p style="width:200px;">采购货源标题: ${orderd.goodsname}</p>
 								</span>
 								<span id="spanurl${sd.index}">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
@@ -1947,6 +1953,9 @@ em {
 								
 								<span id="spanurl${sd.index}">
 									<p>采购数量: ${orderd.buycount}</p>
+								</span>
+								<span id="spanurl${sd.index}">
+									<p>供应商ID： <a target="_blank" style="color:red;" title="查看该供应商采购历史记录" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${orderd.shop_id}">${orderd.shop_id}</a></p>
 								</span>
 								<span id="spanurl${sd.index}">
 										<p>实际采购价格(RMB):${orderd.sourc_price}</p>
@@ -1960,7 +1969,7 @@ em {
 								</c:choose>
 										<p>${orderd.oremark}</p> 
 								</span>
-							</font> 
+							</font>
 							
 							</td>
 
