@@ -5,7 +5,6 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
-import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -1207,6 +1206,31 @@ public class WarehouseCtrl {
 		}catch (Exception e){
 			e.printStackTrace();
 		}
+		return json;
+	}
+
+	/**
+	 * 月销售商品努力报表
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/monthSalesEffortsList", method = RequestMethod.POST)
+	@ResponseBody
+	public EasyUiJsonResult monthSalesEffortsList(HttpServletRequest request, Model model) throws ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		String pages=request.getParameter("pages");
+		if(StringUtil.isBlank(pages)){
+			pages="1";
+		}
+		int page=(Integer.valueOf(pages)-1)*20;
+		map.put("page",String.valueOf(page));
+		List<PurchaseSamplingStatisticsPojo> list = iWarehouseService.monthSalesEffortsList(map);
+		List<PurchaseSamplingStatisticsPojo> listCount=iWarehouseService.monthSalesEffortsListCount(map);
+		json.setRows(list);
+		json.setTotal(listCount.size());
 		return json;
 	}
 

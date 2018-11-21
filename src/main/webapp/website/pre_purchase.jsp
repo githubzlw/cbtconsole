@@ -518,7 +518,7 @@
 			</select>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input class="easyui-textbox" name="iduserid" id="iduserid" style="width:10%;margin-top: 10px;"  data-options="label:'客户编号(ID):'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:8%;margin-top: 10px;"  data-options="label:'订单商品编号:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:12%;margin-top: 10px;"  data-options="label:'商品编号/购物车id:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input class="easyui-textbox" name="orderid" id="orderid" style="width:12%;margin-top: 10px;"  data-options="label:'客户订单号:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input class="easyui-textbox" name="goods_name" id="goods_name" style="width:10%;margin-top: 10px;"  data-options="label:'产品名称:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)">
