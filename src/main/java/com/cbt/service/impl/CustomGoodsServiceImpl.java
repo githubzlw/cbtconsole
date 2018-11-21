@@ -103,9 +103,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         }
         //更新SkuGoodsOffers和SingleOffersChild信息
         int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
+        //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers
         if (count > 0) {
             customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
         } else {
+            //否则插入或者更新SingleOffersChild信息
             customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
         }
         return res;
@@ -453,10 +455,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             } else {
                 count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }
-            //插入sku信息
-            customGoodsDao.deleteSkuByPid(bean.getPid());
-            List<CustomBenchmarkSkuNew> list = customGoodsDao.querySkuByPid(bean.getPid());
-            count = customGoodsDao.insertIntoSkuToOnline(list);
+            if(count > 0){
+                //插入sku信息
+                customGoodsDao.deleteSkuByPid(bean.getPid());
+                List<CustomBenchmarkSkuNew> list = customGoodsDao.querySkuByPid(bean.getPid());
+                count = customGoodsDao.insertIntoSkuToOnline(list);
+            }
         }
 
         return count > 0;

@@ -689,9 +689,9 @@
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
-        ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag
-        ,ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
-        ,ifnull(cge.weight_is_edit,0) as weight_is_edit
+        ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
+        ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
+        ifnull(cge.weight_is_edit,0) as weight_is_edit
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id

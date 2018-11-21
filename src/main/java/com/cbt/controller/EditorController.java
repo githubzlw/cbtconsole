@@ -790,7 +790,7 @@ public class EditorController {
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getLocalAddr();
                     int isUpdateImg = 0;
-                    if (ip.contains("1.34") || ip.contains("38.42")) {
+                    if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27")) {
                         isUpdateImg = 1;
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
