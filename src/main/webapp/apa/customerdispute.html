@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>申诉消息管理</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #groupbuy_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .delete_btn {
+            width: 130px;
+            height: 26px;
+            margin-bottom: 10px;
+            color: #ffffff;
+            background-color: red;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .inp_sty {
+            width: 240px;
+            height: 24px;
+        }
+
+        .img_sty {
+            max-height: 180px;
+            max-width: 180px;
+        }
+
+        #form_enter {
+            font-size: 16px;
+            background-color: #afefe6;
+        }
+
+        .img_little {
+            max-width: 180px;
+            max-height: 180px;
+        }
+
+        .td_sty {
+            width: 130px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            setDatagrid();
+        });
+
+        /**
+         * 初始化datagrid数据
+         */
+        function setDatagrid() {
+            $('#groupbuy_easyui-datagrid').datagrid({
+                title: '申诉消息管理',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#groupbuy_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/customer/dispute/list',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 50,//默认选择的分页是每页50行数据
+                pageList: [20, 30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+        /**
+         * 页面首次查询
+         */
+        function doQuery() {
+            var disputeid = $("#pid_id").val();
+            if (disputeid == null || disputeid == "") {
+            	disputeid = "";
+            }
+            var sttime = $("#query_sttime").val();
+            if (sttime == null || sttime == "") {
+                sttime = "";
+            }
+            var edtime = $("#query_edtime").val();
+            if (edtime == null || edtime == "") {
+                edtime = "";
+            }
+            var type = $("#query_type").val();
+            if (type == null || type == "") {
+                type = -1;
+            }
+            $("#groupbuy_easyui-datagrid").datagrid("load", {
+                "disputeid": disputeid,
+                "sttime": sttime,
+                "edtime": edtime,
+                "status": type,
+            });
+        }
+        
+        function formatAction(val, row, index) {
+    		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+    					+ row.disputeID + '">查看</a>';
+    	}
+        function formatOrder(val, row, index) {
+        	if(row.orderNo == undefined ){
+        		return 'undefind';
+        	}else if(row.orderNo != ""){
+	        	if(row.orderNo.substring(0,2)=='AR'){
+	        		return row.orderNo+'(充值)';
+	        	}
+	    		return '<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo='
+	    					+ row.orderNo + '">'+row.orderNo+'</a>';
+	        	}
+    	}
+        </script>
+
+</head>
+<body>
+
+<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
+    <form id="groupbuy_query_form" action="#" onsubmit="return false;">
+			<span> 事件号: <input type="text" id="pid_id"
+                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+				申诉时间: <input id="query_sttime" class="Wdate"
+                             style="width: 110px; height: 24px" type="text" value=""
+                             onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
+                                                 style="width: 110px; height: 24px;" type="text" value=""
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+			</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+        <span> 状态: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
+            <option value="-1">全部</option>
+            <option value="0">open</option>
+            <option value="1">waiting for seller response</option>
+            <option value="3">under review</option>
+            <option value="4">resolved</option>
+        </select></span>
+        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
+                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      
+    </form>
+</div>
+
+<table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
+        <th data-options="field:'disputeID',width:'80px'">事件号</th>
+        <th data-options="field:'reason',align:'left',width:'200px'">原因</th>
+        <th data-options="field:'updateTime',align:'center',width:'100px'">最后更新时间</th>
+        <th data-options="field:'status',align:'center',width:'190px'">状态</th>
+        <th data-options="field:'value',align:'center',width:'100px'">金额</th>
+        <th data-options="field:'userid',align:'center',width:'50px'">用户</th>
+        <th data-options="field:'email',align:'center',width:'120px'">邮箱</th>
+        <th data-options="field:'orderNo',align:'center',width:'130px',formatter:formatOrder">订单号</th>
+        <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

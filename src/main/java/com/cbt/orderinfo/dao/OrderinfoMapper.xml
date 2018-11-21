@@ -741,7 +741,7 @@
         WHERE orderid=#{orderNo} and paystatus=0 order by id desc limit 1
     </select>
     <select id="getOrderManagementQuery" resultType="java.util.Map">
-        {call order_management_query_bak(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},${buyid},#{startdate},#{enddate},#{email},${status},${startpage},${page},#{paymentid})}
+        {call order_management_query(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},${buyid},#{startdate},#{enddate},#{email},${status},${startpage},${page},#{paymentid})}
     </select>
     <select id="getOrdersDetails" resultType="com.cbt.bean.OrderDetailsBean">
         select DISTINCT oi.isDropshipOrder,adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,
@@ -759,10 +759,10 @@
         from order_details od
         left join order_address adr on od.orderid=adr.orderNo
         left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
-        left join id_relationtable id on od.goodsid=id.goodid and id.orderid=od.orderid and id.is_replenishment=1
+        left join id_relationtable id on od.id=id.odid  and id.is_replenishment=1
         left join zone z ON adr.country=z.country   left join orderinfo oi ON oi.order_no=od.orderid
         left join dropshiporder dso on od.dropshipid = dso.child_order_no
-        left join goods_communication_info gci on od.orderid=gci.orderid and od.goodsid=gci.goodsid
+        left join goods_communication_info gci on  od.id=gci.odid
         LEFT join custom_benchmark_ready  cbr ON cbr.pid = od.goods_pid
         where od.orderid=#{orderNo}  order by dropshipid, car_url,od.id
     </select>
@@ -801,12 +801,12 @@
         0 deliver,
         (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
         (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
-        (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
+         (select DISTINCT pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no LIMIT 1) as payUserName,
         (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
         (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
-        (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON od.orderid=id.orderid AND od.goodsid=id.goodid
+        (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
-        pf.id dzid, pf.orderno dzorderno, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
+        pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
         a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
@@ -814,9 +814,9 @@
         actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,date_format(o.create_time,'%Y-%m-%d') as createtime,
         recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
         (select email from admuser au where aru.adminid=au.id) adminemail,
-        actual_lwh,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name username,
+        actual_lwh,memberFee,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name username,
         u.email as userEmail,'' as buyer,exporttime,   '' storagetime,o.actual_weight_estimate as freightFee,  o.delivery_time as deliveryTime,  0  buyid,
-        o.orderRemark,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount,u.businessName
+        o.orderRemark,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount as gradeDiscount,u.businessName
         ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume
         from orderinfo o left join order_address a on o.order_no=a.orderNo
         left join zone z ON a.country=z.country left join user u  on  u.id =o.user_id
@@ -915,7 +915,7 @@
         SELECT * FROM admuser WHERE roleType in (3,5) AND status=1
     </select>
     <select id="getTypeNameByOdid" resultType="java.lang.String">
-        SELECT c.type_name FROM custom_benchmark_sku c INNER JOIN order_details od ON c.spec_id=od.actual_volume WHERE od.id=#{odid}  and c.type_name IS not null and type_name!='' limit 1
+        SELECT c.type_name FROM custom_benchmark_sku_type_name c INNER JOIN order_details od ON c.spec_id=od.actual_volume WHERE od.id=#{odid}  and c.type_name IS not null and type_name!='' limit 1
     </select>
     <select id="getTaobaoInfoByOrderid" resultType="com.cbt.pojo.TaoBaoOrderInfo">
         select id,sku from taobao_1688_order_history where orderid=#{tbOrderId} and sku is not null and sku!=''
@@ -955,7 +955,7 @@
 		 od.goods_pid
 		,cbr.weight cbrWeight,cbr.wholesale_price cbrPrice,od.car_urlMD5  from order_details od
 		 left join order_address adr on od.orderid=adr.orderNo
-		 left join order_product_source ors on ors.goodsid=od.goodsid and  od.orderid=ors.orderid
+		 left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
 		 left join preferential_application pa on  od.goodsid= pa.goodsid
 		 left join id_relationtable id on od.goodsid=id.goodid
 		 LEFT join custom_benchmark_ready  cbr ON cbr.pid = od.goods_pid
@@ -1022,8 +1022,8 @@
         UPDATE order_product_source SET purchase_state=6 WHERE orderid=#{orderid} AND od_id=#{odid};
     </update>
     <update id="updateOrderReState">
-        UPDATE order_details SET state=1,inventory_remark='',re_shipnos=CONCAT(IFNULL(re_shipnos,''),',',#{shipno}) WHERE orderid=#{orderid} AND id=#{odid};
-		UPDATE order_replenishment SET updatetime = NOW(),rep_state = 1,shipno=#{shipno} WHERE orderid=#{orderid} AND odid=#{odid} AND tb_1688_itemid=#{itemid};
+        UPDATE order_details SET state=1,inventory_remark='',re_shipnos=CONCAT(IFNULL(re_shipnos,''),',',#{shipno}) WHERE  id=#{odid};
+		UPDATE order_replenishment SET updatetime = NOW(),rep_state = 1,shipno=#{shipno} WHERE orderid=#{orderid} AND od_id=#{odid} AND tb_1688_itemid=#{itemid};
     </update>
     <update id="updateBuyState">
         UPDATE order_details SET state=1,inventory_remark='',shipno=#{shipno} WHERE orderid=#{orderid} AND id=#{odid};
@@ -1043,13 +1043,13 @@
 		select isDropshipOrder from orderinfo where order_no=#{orderid}
 	</select>
     <update id="updateOrderDetails">
-		update order_details set state=1 where orderid=#{orderid} and goodsid=#{goodid}
+		update order_details set state=1 where orderid=#{orderid} and id=#{odid}
 	</update>
     <select id="getDtailsState" resultType="INTEGER">
-		SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid=#{orderid} AND o.goodsid=#{goodid} and b.state&lt;2
+		SELECT DISTINCT COUNT(b.id)-SUM(b.state) as counts FROM order_details o INNER JOIN order_details b ON o.dropshipid=b.dropshipid WHERE o.orderid=#{orderid} AND o.id=#{odid} and b.state&lt;2
 	</select>
     <update id="updateDropshiporder">
-		update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid=#{orderid} and goodsid=#{goodid})
+		update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid=#{orderid} and id=#{odid})
 	</update>
     <select id="getAllChildOrderState" resultType="INTEGER">
 		SELECT  COUNT(orderid)*2-SUM(state) as countss FROM dropshiporder WHERE parent_order_no=#{orderid}
@@ -1070,16 +1070,16 @@
 		values(#{orderid},#{goodid},now(),${old_itemqty},#{goods_pid},#{userName},#{barcode},'1',#{remark})
 	</insert>
     <update id="updateChecked">
-        update order_details set checked =1,shipno=#{shipno} where orderid=#{orderid} and goodsid=#{goodid}
+        update order_details set checked =1,shipno=#{shipno} where id=#{odid}
     </update>
     <update id="updateSourceState">
-        update order_product_source set purchase_state=4 where goodsid=#{goodid} and orderid=#{orderid}
+        update order_product_source set purchase_state=4 where od_id=#{odid}
     </update>
     <select id="getInspetionMap" resultType="java.util.Map">
-        select warehouse_remark,weight,itemqty from id_relationtable where goodid=#{goodid} and orderid=#{orderid} and is_delete=0 and is_replenishment=1
+        select warehouse_remark,weight,itemqty from id_relationtable where odid=#{odid}  and is_delete=0 and is_replenishment=1
     </select>
     <update id="updateRelationTable">
-        update id_relationtable set weight=#{weight},goodstatus=1,itemqty=#{count} ,warehouse_remark=#{warehouseRemark} where goodid=#{goodid} and orderid=#{orderid}  and is_replenishment=1 and is_delete=0
+        update id_relationtable set weight=#{weight},goodstatus=1,itemqty=#{count} ,warehouse_remark=#{warehouseRemark} where odid=#{odid} and orderid=#{orderid}  and is_replenishment=1 and is_delete=0
     </update>
     <select id="checkOrderState" resultType="INTEGER">
         SELECT SUM(od.state) AS rkCount,SUM(od.checked) as yhCount,COUNT(od.id) as odCount FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
@@ -1324,7 +1324,7 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%'
-        )  GROUP BY oi.order_no ORDER BY oi.orderid DESC
+        )  GROUP BY oi.order_no ORDER BY oi.orderid DESC limit 500
     </select>
     <delete id="deleteFlagByOrder">
         delete from order_warning where orderNo=#{orderNo}

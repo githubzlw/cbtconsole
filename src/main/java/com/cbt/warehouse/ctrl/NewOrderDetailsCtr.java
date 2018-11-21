@@ -741,7 +741,7 @@ public class NewOrderDetailsCtr {
 		JsonResult json = new JsonResult();
 		String orderid = request.getParameter("orderid");
 		String admuserid = request.getParameter("admuserid");
-		String goodsids=request.getParameter("goodsids");
+		String odids=request.getParameter("odids");
 		try {
 			if (StringUtil.isBlank(orderid)) {
 				json.setOk(false);
@@ -754,7 +754,7 @@ public class NewOrderDetailsCtr {
 				return json;
 			}
 			IOrderwsServer server = new OrderwsServer();
-			server.changeOrderBuyer(orderid, Integer.valueOf(admuserid),goodsids);
+			server.changeOrderBuyer(orderid, Integer.valueOf(admuserid),odids);
 			json.setOk(true);
 		} catch (Exception e) {
 			e.getStackTrace();

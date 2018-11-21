@@ -173,7 +173,7 @@ public class Purchase extends HttpServlet {
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		String time=sdf.format(date);
 		String orderid=request.getParameter("orderid");
-		String goodsid=request.getParameter("goodsid");
+		String odid=request.getParameter("odid");
 		String text=request.getParameter("text");
 		String type=request.getParameter("type");
 		if(!StringUtils.isEmpty(text)){
@@ -182,7 +182,7 @@ public class Purchase extends HttpServlet {
 			text="获取备注错误";
 		}
 		map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
+		map.put("odid", odid);
 		map.put("text", text);
 		map.put("type", type);
 		String context = purchaseServer.saveRepalyContent(map);
@@ -196,7 +196,7 @@ public class Purchase extends HttpServlet {
 					}
 				}else if(!StringUtils.isEmpty(text) && "2".equals(type)){
 					//发给对应的采购
-					int admuserid = admDao.queryByBuyerOrderNo(orderid,goodsid);
+					int admuserid = admDao.queryByBuyerOrderNo(orderid,odid);
 					msgNtDao.insertMessageInsertByType(orderid,text,admuserid,1,admuser.getId(),0);
 				}
 			} catch (Exception e) {

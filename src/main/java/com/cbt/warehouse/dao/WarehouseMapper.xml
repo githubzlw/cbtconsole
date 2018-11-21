@@ -2356,9 +2356,10 @@
 		group by user.id order by user.id desc limit #{start},#{end}
 	</select>
 	<select id="getUserInfoForPriceCount" resultType="com.cbt.website.bean.UserInfo">
-		select distinct user_ex.otherphone,user.businessName,user.grade AS gid,user.id as userid,name as userName,email,pass,bind_facebook,bind_google,user.createtime,user.currency,address,address2,phone_number,statename,zip_code,  zone.country as zone,admin_r_user.admName as adminname,
-		(select grade from user_grade ug where user.grade=ug.id) grade,(SELECT distinct shopCarinfo FROM goods_carconfig WHERE userid=user.id) car_info,
-		(select sum(payment_amount)from payment where payment.userid = user.id and paystatus=1) pay,user.available_m as available
+		select distinct user_ex.otherphone,user.businessName,user.grade AS gid,user.id as userid,name as userName,email,pass,bind_facebook,bind_google,user.createtime,
+		user.currency,address,address2,phone_number,statename,zip_code,  zone.country as zone,admin_r_user.admName as adminname,
+		'' as  grade,'' as car_info,
+		'' as pay,user.available_m as available
 		from user INNER JOIN  zone ON zone.id = user.countryId
 		left join admin_r_user on user.id=admin_r_user.userid
 		left join user_ex on user_ex.userid=user.id
@@ -2374,12 +2375,12 @@
 		<if test="state != null">
 			and address.statename  like '%${state}%'
 		</if>
+		<if test="address != null">
+			and address.address  like '%${address}%' or  address.address2  like '%${address}%'
+		</if>
 		<if test="conutry != null">
 			and zone.country like '%${conutry}%'
 		</if>
-        <if test="address != null">
-            and address.address  like '%${address}%' or 	 address.address2  like '%${address}%'
-        </if>
 		<if test="admUserId != 0">
 			and admin_r_user.adminid=#{admUserId}
 		</if>
@@ -2398,12 +2399,13 @@
 		<if test="startdate != null">
 			and user.createtime >=#{startdate}
 		</if>
-        <if test="states != null">
-            and user.id in (select distinct user_id from orderinfo where state in (${states}))
-        </if>
 		<if test="endDate != null">
 			and user.createtime <![CDATA[<=]]>#{endDate}
 		</if>
+		<if test="states != null">
+			and user.id in (select distinct user_id from orderinfo where state in (${states}))
+		</if>
+		GROUP BY user.id
 	</select>
 	<select id="getAllAdmuser" resultType="com.cbt.website.bean.ConfirmUserInfo">
 		SELECT id,admName as confirmusername FROM admuser  WHERE STATUS =1 AND roleType IN (3,4) or id=1
@@ -3287,7 +3289,7 @@
 		<if test="goods_id != null">
 			and i.goods_id=#{goods_id}
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid !=15">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="times != null and times == 1">
@@ -3344,7 +3346,7 @@
 		<if test="goods_id != null">
 			and i.goods_id=#{goods_id}
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid !=15">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="goods_pid != null">
@@ -3380,11 +3382,22 @@
 		SELECT pic_path as goods_url,state as userid,pid as orderid,id as currency,goods_id as goods_p_url,orderid as goods_img_url
 		FROM inspection_picture WHERE pic_path &lt;>'' AND pid=#{goods_pid} and isdelete=0 ORDER BY state desc,createtime DESC
 	</select>
+    <select id="checnInspIsExit" resultType="INTEGER">
+        select count(1) from inspection_picture where odid=${odid} and pic_path=#{picPath}
+    </select>
+    <insert id="insertInspPath">
+        insert into inspection_picture(pid,orderid,pic_path,createtime,odid) values(#{goodsPid},#{orderid},#{picPath},now(),#{odid})
+    </insert>
 	<select id="getWeight" resultType="com.cbt.website.bean.SearchResultInfo">
 		select weight,createtime from package_weight order by id desc limit 1
 	</select>
-	<select id="getGoodsWeight" resultType="String">
-		SELECT weight FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+    <select id="getGoodsWeight" resultType="com.cbt.website.bean.SearchResultInfo">
+		SELECT weight,syn FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+	</select>
+    <select id="updateGoodsWeightFlag">
+        UPDATE package_goods_weight
+        SET syn = 1
+        WHERE pid=#{pid} AND del = 0
 	</select>
 	<insert id="saveWeight">
 		<!-- UPDATE id_relationtable SET weight=weight+${weight} WHERE orderid=#{orderid} and odid=#{odid} -->
@@ -3490,12 +3503,39 @@
 		select i.* from inventory i inner join order_details od on i.sku=od.car_type and i.car_urlMD5=od.car_urlMD5 and i.goods_pid=od.goods_pid
 		where od.orderid=#{orderid} and od.goodsid=#{goodsid} and INSTR(i.remark,'取消库存')>0
 	</select>
+	<select id="getBatckInfo" resultType="java.lang.String">
+		SELECT CONCAT('订单号:',oi.order_no,';发货时间:',sp.createtime,';订单国家:',z.country) FROM order_details od
+		INNER JOIN orderinfo oi ON od.orderid=oi.order_no
+		INNER JOIN order_address oa ON oi.order_no=oa.orderNo
+		INNER JOIN zone z ON REPLACE(z.country,' ','')=REPLACE(oa.country,' ','') OR oa.country=z.id
+		INNER JOIN shipping_package sp ON oi.order_no=sp.orderid
+		WHERE oi.state=3 AND od.state=1 AND od.goods_pid=#{pid}
+		ORDER BY oi.orderid DESC LIMIT 1
+	</select>
     <update id="productAuthorization">
         update order_product_source set authorized_flag=${type} where od_id=#{odid}
     </update>
+	<select id="getAllGoodsPidsByOrderNo" resultType="java.lang.String">
+		select distinct goods_pid from order_details where orderid=#{orderid} and state=1
+	</select>
+	<select id="checkIsExit" resultType="INTEGER">
+		select count(id) from authorized_flag where goodsPid=#{goodsPid}
+	</select>
+	<insert id="insertAuthorizedFlag">
+		insert into authorized_flag(goodsPid,flag,createTime) values (#{goodsPid},${flag},now())
+	</insert>
+	<update id="updateAuthorizedFlag">
+		update authorized_flag set flag=#{flag} where goodsPid=#{goodsPid}
+	</update>
 	<select id="getOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
 		select yourorder from order_details where orderid=#{orderid} and goodsid=#{goodsid};
 	</select>
+    <select id="getBackList" resultType="INTEGER">
+        SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.email=#{email}
+    </select>
+    <select id="getPayBackList" resultType="INTEGER">
+         SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.email=#{payName}
+    </select>
 	<update id="updateInventory">
 		<if test="flag == 0">
 			UPDATE inventory SET remaining=remaining-${yourorder},can_remaining=can_remaining-${yourorder},inventory_amount=inventory_amount-${cancelAmount} WHERE id=${id}
@@ -3504,6 +3544,34 @@
 			UPDATE inventory SET new_remaining=new_remaining-${yourorder},can_remaining=can_remaining-${yourorder},new_inventory_amount=new_inventory_amount-${cancelAmount} WHERE id=${id}
 		</if>
 	</update>
+	<select id="getUserBackList" resultType="com.cbt.bean.BlackList">
+		select id,email,createtime,updateTime,userip,flag,username from tblacklist where 1=1
+		<if test="email != null">
+            and email like CONCAT('%','${email}','%' )
+		</if>
+		<if test="flag != null">
+			and flag=#{flag}
+		</if>
+		order by flag asc
+	</select>
+	<insert id="addBackUser">
+		insert into tblacklist(email,createtime,userip,username) values(#{email},now(),#{ip},#{userName})
+	</insert>
+	<update id="updatebackEmail">
+		update tblacklist set email=#{email},updateTime=now() where id=${id}
+	</update>
+	<update id="updateFlag">
+		update tblacklist set flag=${type},updateTime=now() where id=#{id}
+	</update>
+	<select id="getUserBackListCount" resultType="com.cbt.bean.BlackList">
+		select * from tblacklist where 1=1
+		<if test="email != null">
+			and email like CONCAT('%','${email}','%' )
+		</if>
+		<if test="flag != null">
+			and flag=#{flag}
+		</if>
+	</select>
 	<update id="updateIsRefund">
 		update id_relationtable set is_refund=1 where orderid=#{orderid} and goodid=#{goodsid};
 	</update>
@@ -3888,6 +3956,14 @@
 			and b.tId>0 and b.id is not null
 		</if>
 		limit ${page},40;
+	</select>
+	<select id="getUserOrderInfoByOrderNo" resultType="com.cbt.bean.OrderBean">
+		 SELECT oi.order_no,u.email,u.id,ad.Email as adminemail
+		 FROM orderinfo oi
+		 INNER JOIN USER u ON oi.user_id=u.id
+		 INNER JOIN admin_r_user a ON u.id=a.userid
+		 INNER JOIN admuser ad ON a.adminid=ad.id
+		 WHERE oi.order_no=#{orderNo}
 	</select>
 	<select id="getBuyReturnManageCount" resultType="INTEGER">
 		SELECT count(distinct t.id) FROM order_details od

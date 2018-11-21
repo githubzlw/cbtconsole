@@ -127,6 +127,8 @@ tr .td_class{width:230px;}
 		var orderno=$("#orderno").val();
 		var goods_id=$("#goods_id").val();
         var times = $("#times").val();
+        var odid=$("#odid").val();
+        var oldOrderid=$("#oldOrderid").val();
         var admuserid=$('#admuserid').combobox('getValue');
 		$("#easyui-datagrid").datagrid("load", {
 			"page" : page,
@@ -134,7 +136,9 @@ tr .td_class{width:230px;}
 			"times":times,
 			"orderno":orderno,
 			"goods_id":goods_id,
-			"admuserid":admuserid
+			"admuserid":admuserid,
+			"odid":odid,
+			"oldOrderid":oldOrderid
 		});
 	}
 
@@ -142,6 +146,8 @@ tr .td_class{width:230px;}
 		$("#goods_pid").textbox('setValue','');
         $("#orderno").textbox('setValue','');
         $("#goods_id").textbox('setValue','');
+        $("#odid").val("");
+        $("#oldOrderid").val("");
         $('#admuserid').combobox('setValue','<%=adm.getId()%>');
 		$("times").val("1");
 	}
@@ -365,6 +371,27 @@ tr .td_class{width:230px;}
             }
         });
 	}
+	//验货图片关联验货商品
+	function insInsp(goodsPid,odid,picPath,orderid){
+        if(!confirm("确定关联该验货照片?")){
+            return;
+		}
+        $.ajax({
+            type: "POST",//方法类型
+            dataType:'json',
+            url:'/cbtconsole/warehouse/insInsp',
+            data:{goodsPid:goodsPid,odid:odid,picPath:picPath,orderid:orderid},
+            dataType:"json",
+            success:function(data) {
+                if(data>0){
+                    topCenter("关联成功");
+                    $('#easyui-datagrid').datagrid('reload');
+                }else{
+                    topCenter("关联失败");
+                }
+            }
+        });
+	}
 	</script>
 </head>
 <body onload="doQuery(1);$('#pic_dlg').dialog('close');$('#pic_dlg1').dialog('close');;$('#dlg2').dialog('close');">
@@ -432,7 +459,9 @@ tr .td_class{width:230px;}
 			</div>
 	</div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
-		<input class="easyui-textbox" name="goods_pid" id="goods_pid" style="width:10%;margin-top: 15px;"  data-options="label:'商品pid:'">
+		<input type="hidden" id="odid" value="${param.odid}">
+		<input type="hidden" id="oldOrderid" value="${param.oldOrderid}">
+		<input class="easyui-textbox" name="goods_pid" id="goods_pid" value="${param.goodsPid}" style="width:10%;margin-top: 15px;"  data-options="label:'商品pid:'">
 		<input class="easyui-textbox" name="orderno" id="orderno" style="width:10%;margin-top: 15px;"  data-options="label:'订单号:'">
 		<input class="easyui-textbox" name="goods_id" id="goods_id" style="width:10%;margin-top: 15px;"  data-options="label:'商品号:'">
 		验货时间: <select name="times" id="times" style="width: 60px;">

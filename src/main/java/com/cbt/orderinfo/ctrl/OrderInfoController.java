@@ -6,19 +6,22 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Utility;
+import com.cbt.processes.service.ISpiderServer;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
+import com.cbt.website.quartz.ParseOrderFreightJob;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.google.gson.Gson;
 import com.importExpress.service.IPurchaseService;
+
+import ceRong.tools.bean.SearchLog;
 import net.minidev.json.JSONArray;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,12 +41,15 @@ import java.util.*;
 @Controller
 @RequestMapping("/order")
 public class OrderInfoController{
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderInfoController.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	
 	@Autowired
 	private IPurchaseService purchaseService;
 
+	@Autowired
+	private ISpiderServer spiderService;
 
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
@@ -71,32 +77,71 @@ public class OrderInfoController{
 	 */
 	@RequestMapping(value = "/flushOrderFreight")
 	public void flushOrderFreight(HttpServletRequest request, HttpServletResponse response)throws Exception {
-		PrintWriter out = response.getWriter();
 		try{
-			DecimalFormat df = new DecimalFormat("######0.00");
+			logger.info("开始刷新订单预估运费数据===");
 			List<OrderBean> list=iOrderinfoService.getFlushOrderFreightOrder();
-			for(OrderBean o:list){
-				double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
-				String freight=df.format(freightFee);
-				//更新预估国际运费
-//				iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight);
-			}
+			flushFreight(list);
 			list.clear();
-//			list=iOrderinfoService.getFlushOrderFreightOrderCancel();
-//			for(OrderBean o:list){
-//				double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
-//				String freight=df.format(freightFee);
-//				//更新预估国际运费
-//				iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight);
-//			}
-//			list.clear();
+			logger.info("结束刷新订单预估运费数据===");
 		}catch (Exception e){
-			e.printStackTrace();
+			logger.info("刷新订单运费运费错误。、。。。。。。。。。。");
 		}
-		out.print(1);
-		out.flush();
-		out.close();
+		//采购输入的价格数量和订单销售数量有问题的订单预警
+		List<OrderBean> listFlag=iOrderinfoService.getAllOrderInfo();
+		for(int i=0;i<listFlag.size();i++){
+			OrderBean o=listFlag.get(i);
+			String orderNo=o.getOrderNo();
+			String yourorder=o.getYourorder();
+			String buyAmount=o.getBuyAmount();
+			String buycount=o.getBuycount();
+			String esprice=o.getEsBuyPrice();
+			System.out.println("orderNo==================="+orderNo);
+			if(StringUtil.isBlank(buyAmount) || StringUtil.isBlank(buycount)){
+				continue;
+			}
+			double fit=Math.abs((Double.parseDouble(esprice)-Double.parseDouble(buyAmount))/Double.parseDouble(buyAmount)*100);
+			if(Integer.valueOf(buycount)>Integer.valueOf(yourorder) || fit>10){
+				iOrderinfoService.deleteFlagByOrder(orderNo);
+				iOrderinfoService.insertFlagByOrderid(orderNo);
+			}
 		}
+	}
+
+	public void flushFreight(List<OrderBean> list){
+		DecimalFormat df = new DecimalFormat("######0.00");
+		for(OrderBean o:list){
+			logger.info("开始刷新订单【"+o.getOrderNo()+"】运费和预估采购额");
+			double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
+			String freight=df.format(freightFee);
+			//刷新订单的预计采购金额
+			List<OrderDetailsBean> odList=iOrderinfoService.getOrdersDetails(o.getOrderNo());
+			double BuyPrice=0.00;
+			for(OrderDetailsBean odb:odList){
+				String price1688 = Utility.getStringIsNull(odb.getCbrPrice()) ? odb.getCbrPrice() : "0";
+				if("0".equals(price1688) || StringUtil.isBlank(odb.getCbrPrice())){
+					price1688=odb.getCbrdPrice();
+				}
+				price1688=StringUtil.isBlank(price1688)?"0":price1688;
+				String es_price=price1688;
+				if(odb.getState() ==1 || odb.getState() == 0){
+					es_price=StringUtil.getEsPrice(es_price);
+				}else{
+					es_price="0.00";
+				}
+				String ali_sellunit=odb.getAli_sellunit();
+				int unit= Util.getNumberForStr(ali_sellunit);
+				BuyPrice+=Double.valueOf(es_price)*odb.getYourorder()*unit;
+			}
+			double pid_amount=0.00;
+			if(odList.size()>0){
+				pid_amount=odList.get(0).getPid_amount();
+			}
+			//更新预估国际运费,预估采购金额
+			String esBuyPrice=df.format(BuyPrice+pid_amount);
+			logger.info("订单【"+o.getOrderNo()+"】运费【"+freight+"】和预估采购额：【"+esBuyPrice+"】");
+			iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight,esBuyPrice);
+		}
+	}
 
 	/**
 	 * 月用户利润订单预警
@@ -275,6 +320,7 @@ public class OrderInfoController{
 			map.put("shipno", request.getParameter("shipno"));
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
+			map.put("odid",request.getParameter("odid"));
 			map.put("warehouseRemark", request.getParameter("warehouseRemark"));
 			int count = Integer.valueOf(request.getParameter("count"));
 			map.put("count", String.valueOf(count));
@@ -314,6 +360,7 @@ public class OrderInfoController{
 			map.put("warehouseRemark",request.getParameter("warehouseRemark"));
 			map.put("repState",request.getParameter("repState"));
 			map.put("count",request.getParameter("count"));
+			map.put("odid",request.getParameter("odid"));
 			//取消验货数量
 			map.put("barcode",request.getParameter("barcode"));
 			map.put("seiUnit",request.getParameter("seiUnit"));
@@ -819,7 +866,86 @@ public class OrderInfoController{
 		return list_map;
 	}
 	
-	public static void main(String[] args) {
-		
-	}
+	/**
+     * 
+     * @Title searchProductLog 
+     * @Description 搜索页面记录用户的搜索结果和点击商品
+     * @param request
+     * @return
+     * @return Map<String,Object>
+     */
+    @SuppressWarnings({ "unchecked", "static-access" })
+    @RequestMapping("/searchProductLog")
+    public @ResponseBody Map<String,Object> searchProductLog(HttpServletRequest request,HttpServletResponse response) {
+    	response.setHeader("Access-Control-Allow-Origin", "*");
+        String saveFlag = request.getParameter("saveFlag");
+        Map<String,Object> map = new HashMap<String,Object>();
+        String userinfo = request.getParameter("userid");
+        int userid = userinfo==null?0:Integer.parseInt(userinfo);
+        if("0".equals(saveFlag)||"1".equals(saveFlag)){//搜索日志记录和页面产品展示数量更新
+            String keyWords = request.getParameter("keyWords")==null?"":request.getParameter("keyWords");
+            if(StringUtil.isNotBlank(keyWords) && keyWords.length()>200){
+                keyWords = keyWords.substring(0, 198);
+            }
+            String catid = request.getParameter("catid");
+            String sortType = request.getParameter("sortType");
+            String pageNumber = request.getParameter("pageNumber")==null?"":request.getParameter("pageNumber");
+            if(StringUtil.isNotBlank(pageNumber) && pageNumber.length()>10){
+                pageNumber = pageNumber.substring(0, 8);
+            }
+            String productShowIdList = request.getParameter("productShowIdList");
+            String allProductList = request.getParameter("allProductList");
+            int listSize = Integer.parseInt(request.getParameter("listSize")==null?"0":request.getParameter("listSize"));
+            String rowid = request.getParameter("rowid");
+            SearchLog seaLog = new SearchLog();
+            seaLog.setKeyWords(keyWords);
+            seaLog.setCatid(catid);
+            seaLog.setPageNumber(pageNumber);
+            seaLog.setSortType(sortType);
+            seaLog.setProductShowIdList(productShowIdList);
+            seaLog.setSaveFlag(saveFlag);
+            seaLog.setId(Integer.parseInt(rowid==null?"0":rowid));
+            seaLog.setUserid(userid);
+            seaLog.setAllProductList(allProductList);
+            seaLog.setListSize(listSize);
+            //如果是移动端
+            if("1".equals(request.getParameter("device"))){
+                seaLog.setDevice(1);
+            }else{
+                seaLog.setDevice(0);
+            }
+            String sessionid = request.getSession(true).getId();
+            seaLog.setSessionid(sessionid);
+            String ip = "";
+            Calendar cal = Calendar.getInstance();
+            int year = Calendar.YEAR;
+            int month = Calendar.MONTH;
+            int date = Calendar.DATE;
+            seaLog.setYear(cal.get(year));
+            seaLog.setMonth(cal.get(year)+"-"+(cal.get(month)+1));
+            seaLog.setDay(cal.get(year)+"-"+(cal.get(month)+1)+"-"+cal.get(date));
+            seaLog.setSearchMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()));
+            if(userid!=0){
+                seaLog.setSearchUserMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()+userid));
+            }else{
+                seaLog.setSearchUserMD5(Md5Util.md5Operation(seaLog.getKeyWords()+seaLog.getCatid()+seaLog.getSortType()+seaLog.getPageNumber()+sessionid));
+            }
+            int rowId = spiderService.saveTheSearchLogOnSearchPage(seaLog);
+            map.put("rowid", rowId);
+            map.put("searchMD5", seaLog.getSearchMD5());
+            map.put("searchUserMD5", seaLog.getSearchUserMD5());
+            return map;
+        }else{
+            return map;
+        }
+    }
+	
+    @RequestMapping("/searchClickProductLog")
+    @ResponseBody
+    public void markTheProduct(HttpServletRequest request) {
+        String searchMD5 = request.getParameter("searchMD5");
+        String searchUserMD5 = request.getParameter("searchUserMD5");
+        String goodsPid = request.getParameter("goodsPid");
+        spiderService.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
+    }
 }

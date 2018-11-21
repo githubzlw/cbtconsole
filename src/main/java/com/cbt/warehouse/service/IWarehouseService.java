@@ -44,6 +44,7 @@ public interface IWarehouseService {
 	int updateSendMail(Map<String, String> map);
 	int saveClothingData(Map<String, String> map);
 	int saveWeight(Map<String, String> map);
+	int saveWeightFlag(String pid);
 
 	/**
 	 * 产品单页提问图片路径保存
@@ -168,6 +169,13 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	int insertEvaluation(Map<String, String> map);
+
+	/**
+	 * 验货图片关联验货商品
+	 * @param map
+	 * @return
+	 */
+	int insInsp(Map<String,String> map);
 	/**
 	 * 新增验货图片上传-验货编辑
 	 * @param pid
@@ -360,6 +368,9 @@ public interface IWarehouseService {
 	//重置库位
 	int resetLocation(Map<String, String> map);
 
+	int updateFlag(String id,String type);
+	int updatebackEmail(String id,String email);
+	int addBackUser(String email,String ip,String userName);
 	int updateState(Map<String, String> map);
 
 	int insertRemark(Map<String, String> map);
@@ -744,6 +755,19 @@ public interface IWarehouseService {
 	List<ShopManagerPojo> getShopManagerDetailsList(Map<String, Object> map);
 
 	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackList(Map<String,String> map);
+	/**
+	 * 黑名单信息查询
+	 * @param map
+	 * @return
+	 */
+	public List<BlackList> getUserBackListCount(Map<String,String> map);
+
+	/**
 	 * 供应商的采购历史
 	 * @param map
 	 * @return
@@ -1092,6 +1116,13 @@ public interface IWarehouseService {
 
 	public int updateBarcodeByOrderNo(String orderid);
 
+	/**
+	 * 根据用户订单号获取发送邮件需要的用户邮箱等信息
+	 * @param orderNo
+	 * @return
+	 */
+	public OrderBean getUserOrderInfoByOrderNo(String orderNo);
+
 	//入库备注
 	public void treasuryNote(String orderNo, int goodsid, String remarkContent);
 
@@ -1137,6 +1168,13 @@ public interface IWarehouseService {
 	 * @param orderid
 	 */
 	public int updateOrderSourceState(String orderid);
+
+	/**
+	 * 将出运的订单 商品在授权表中标记
+	 * @param orderid
+	 * @return
+	 */
+	public int checkAuthorizedFlag(String orderid);
 
 	/**
 	 * 更新补录订单状态

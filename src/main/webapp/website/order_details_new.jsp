@@ -476,10 +476,10 @@ function afterReplenishment(){
 
 
 //备注回复
-function doReplay1(orderid,goodsid){
+function doReplay1(orderid,odid){
 	$("#remark_content_").val("");
 	$("#rk_orderNo").val(orderid);
-	$("#rk_goodsid").val(goodsid);
+	$("#rk_odid").val(odid);
 	var rfddd = document.getElementById("repalyDiv1");
 	rfddd.style.display = "block";
 }
@@ -487,7 +487,7 @@ function doReplay1(orderid,goodsid){
 //增加商品沟通信息
 function saveRepalyContent(){
 	var orderid=$("#rk_orderNo").val();
-	var goodsid=$("#rk_goodsid").val();
+	var odid=$("#rk_odid").val();
 	var text=$("#remark_content_").val();
 	 $.ajax({
 			type : 'POST',
@@ -495,14 +495,14 @@ function saveRepalyContent(){
 			url : '/cbtconsole/PurchaseServlet?action=saveRepalyContent&className=Purchase',
 			data : {
 			    'orderid' : orderid,
-	  			'goodsid' : goodsid,
+	  			'odid' : odid,
 	  			"type":'2',
 	  			'text' : text
 			},
 			dataType : 'text',
 			success : function(data){
 				if(data.length>0){
-					$("#rk_remark_"+orderid+goodsid+"").html(data);
+					$("#rk_remark_"+orderid+odid+"").html(data);
 					$('#repalyDiv1').hide();
 				}
 			}
@@ -663,7 +663,7 @@ em {
 					onclick="$('#repalyDiv1').hide();" style="float: right;">╳</a>
 			</div>
 		    <input id="rk_orderNo" type="hidden" value="">
-		    <input id="rk_goodsid" type="hidden" value="">
+		    <input id="rk_odid" type="hidden" value="">
 		    <input type="hidden" id="ordercountry_value">
 		    回复内容:
 		    <textarea name="remark_content" rows="8" cols="50" style="margin-top: 20px;" id="remark_content_"></textarea>
@@ -1167,7 +1167,11 @@ em {
 				<!-- 客户订单信息显示 -->
 				<tr>
 					<td class="ormtittd">
-						<span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a><br>
+						<span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a>
+						<c:if test="${not empty order.backFlag}">
+							<span style="color:red">${order.backFlag}</span>
+						</c:if>
+						<br>
 						<span style="color: red; display: none" id="other_id"></span>
 					</td>
 					<td>
@@ -1226,7 +1230,10 @@ em {
 				  		商品总金额 <span class="ormtittdred">（<fmt:formatNumber value="${order.product_cost+preferential_price}" pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span> + 订单实收运费<span class="ormtittdred">（${actual_ffreight_+order.foreign_freight}）</span>
 							+ 服务费 <span class="ormtittdred">（${order.service_fee}）</span>
-							+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
+						+ 手续费 <span class="ormtittdred">（${order.processingfee}）</span>
+						+ 质检费 <span class="ormtittdred">（${order.actual_lwh}）</span>
+						+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
+						+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
 							-  <c:if test="${order.order_ac != 0}">
 							批量优惠金额<span class="ormtittdred">（${preferential_price}） </span>
 							</c:if> -混批优惠金额<span class="ormtittdred">（${order.discount_amount}）</span>
@@ -1236,15 +1243,15 @@ em {
 						</span>  -新用户赠送运费<span class="ormtittdred">(0)
 						<%--（${order.order_ac}） --%>
 					</span> -返单优惠<span class="ormtittdred">（
-								${order.coupon_discount}） </span> -VIP折扣<span class="ormtittdred">（
+								${order.coupon_discount}） </span> -${order.gradeName}<span class="ormtittdred">（
 								${order.gradeDiscount}） </span> 
 								+双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
 								-首单优惠<span class="ormtittdred">（${order.firstdiscount}） </span>
 								+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
 								=<b>实收金额</b><span
 							class="ormtittdred ormtittdb"> （<fmt:formatNumber
-									value="${(order.product_cost+actual_ffreight_+order.foreign_freight+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-order.firstdiscount+order.actual_freight_c) >0 ?
-									(order.product_cost+actual_ffreight_+order.foreign_freight+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-order.gradeDiscount + order.vatBalance - order.firstdiscount + order.actual_freight_c) : 0.00 }"
+							value="${(order.product_cost+actual_ffreight_+order.foreign_freight+order.processingfee+order.actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-order.firstdiscount+order.actual_freight_c) >0 ?
+									(order.product_cost+actual_ffreight_+order.foreign_freight+order.processingfee+order.extra_freight+order.actual_lwh+order.memberFee-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-order.gradeDiscount + order.vatBalance - order.firstdiscount + order.actual_freight_c) : 0.00 }"
 									pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span>
 						 <a href="/cbtconsole/orderDetails/orderPayDetails.do?orderNo=${order.orderNo}&userId=${order.userid}" target="_blank" style="text-decoration: none;">【到账详情 】</a>
@@ -1391,41 +1398,74 @@ em {
 						<tr>
 							<td>Recipients:</td>
 							<td><input id="orderrecipients" type="text" maxlength="50"
-								value="" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.recipients}" style="width: 200px" disabled="disabled"></td>
 						</tr>
 						<tr>
 							<td>Street:</td>
 							<td>
-								<input id="orderstreet" type="text" maxlength="50" value="" style="width: 200px" disabled="disabled"><br>
-								<input id="orderstreet2" maxlength="50" type="text" value="" style="width: 200px;" disabled="disabled">
+								<input id="orderstreet" type="text" maxlength="50" value="${order.address.address}" style="width: 200px" disabled="disabled"><br>
+								<input id="orderstreet2" maxlength="50" type="text" value="${order.address.street}" style="width: 200px;" disabled="disabled">
 							</td>
 						</tr>
 						<tr>
 							<td>City:</td>
 							<td><input id="ordercity" type="text" maxlength="50"
-								value="" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.address2}" style="width: 200px" disabled="disabled"></td>
 						</tr>
 						<tr>
 							<td>State:</td>
 							<td><input id="orderstate" type="text" maxlength="50"
-								value="" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.statename}" style="width: 200px" disabled="disabled"></td>
 						</tr>
 						<tr>
 							<td>Country:</td>
-							<td><select id="ordercountry" style="width: 180px"
-								disabled="disabled" >
-							</select>
+							<td>
+								<select id="ordercountry" style="width: 180px" disabled="disabled" >
+									<option value="USA" selected="selected">USA</option><option value="ARGENTINA">ARGENTINA</option><option value="AUSTRALIA">AUSTRALIA</option>
+									<option value="AUSTRIA">AUSTRIA</option><option value="BELGIUM">BELGIUM</option><option value="BRAZIL">BRAZIL</option><option value="CANADA">CANADA</option>
+									<option value="CHILE">CHILE</option><option value="CZECH">CZECH</option><option value="DENMARK">DENMARK</option><option value="EGYPT">EGYPT</option>
+									<option value="FINLAND">FINLAND</option><option value="FRANCE">FRANCE</option><option value="GERMANY">GERMANY</option><option value="GREECE">GREECE</option>
+									<option value="HUNGARY">HUNGARY</option><option value="INDIA">INDIA</option><option value="IRAQ">IRAQ</option><option value="IRELAND">IRELAND</option>
+									<option value="ISRAEL">ISRAEL</option><option value="ITALY">ITALY</option><option value="JAPAN">JAPAN</option><option value="MEXICO">MEXICO</option>
+									<option value="Holland">Holland</option><option value="NEWZEALAND">NEWZEALAND</option><option value="NORWAY">NORWAY</option><option value="POLAND">POLAND</option>
+									<option value="PORTUGAL">PORTUGAL</option><option value="KSA(Saudi)">KSA(Saudi)</option><option value="S.AFRICA">S.AFRICA</option><option value="SPAIN">SPAIN</option>
+									<option value="SWEDEN">SWEDEN</option><option value="SWITZERLAND">SWITZERLAND</option><option value="TURKEY">TURKEY</option><option value="UAE">UAE</option>
+									<option value="UK">UK</option><option value="AFRICA">AFRICA</option><option value="APAC">APAC</option><option value="EUROPE">EUROPE</option>
+									<option value="MIDEAST">MIDEAST</option><option value="S.AMERICA">S.AMERICA</option><option value="Slovenia">Slovenia</option><option value="Slovakia">Slovakia</option>
+									<option value="Lithuania">Lithuania</option><option value="Luxembourg">Luxembourg</option><option value="Iran">Iran</option><option value="Pakistan">Pakistan</option>
+									<option value="Lebanon">Lebanon</option><option value="Cyprus">Cyprus</option><option value="Yemen">Yemen</option><option value="Kuwait">Kuwait</option>
+									<option value="Jordan">Jordan</option><option value="Qatar">Qatar</option><option value="Oman">Oman</option><option value="Bahrain">Bahrain</option>
+									<option value="SyrianArabRepublic">SyrianArabRepublic</option><option value="Bangladesh">Bangladesh</option><option value="Uganda">Uganda</option>
+									<option value="Zambia">Zambia</option><option value="Zimbabwe">Zimbabwe</option><option value="Tanzania">Tanzania</option><option value="Sudan">Sudan</option>
+									<option value="Ethiopia">Ethiopia</option><option value="Kenya">Kenya</option><option value="Ghana">Ghana</option><option value="Nigeria">Nigeria</option>
+									<option value="Dominica">Dominica</option><option value="CostaRica">CostaRica</option><option value="Panama">Panama</option><option value="Honduras">Honduras</option>
+									<option value="Venezuela">Venezuela</option><option value="Colombia">Colombia</option><option value="Paraguay">Paraguay</option><option value="Bolivia">Bolivia</option>
+									<option value="Uruguay">Uruguay</option><option value="RussianFederation">RussianFederation</option><option value="Ukraine">Ukraine</option>
+									<option value="Bulgaria">Bulgaria</option><option value="Croatia">Croatia</option><option value="Estonia">Estonia</option><option value="Romania">Romania</option>
+									<option value="Monaco">Monaco</option><option value="Georgia">Georgia</option><option value="SriLanka">SriLanka</option><option value="Vietnam">Vietnam</option>
+									<option value="Laos">Laos</option><option value="EastTimor">EastTimor</option><option value="Thailand">Thailand</option><option value="Brunei">Brunei</option>
+									<option value="Malaysia">Malaysia</option><option value="Singapore">Singapore</option><option value="Indonesia">Indonesia</option>
+									<option value="Philippines">Philippines</option><option value="Cambodia">Cambodia</option><option value="Myanmar">Myanmar</option>
+									<option value="MOROCCO">MOROCCO</option><option value="Latvia">Latvia</option><option value="Moldova">Moldova</option><option value="Iceland">Iceland</option>
+									<option value="Ecuador">Ecuador</option><option value="Kazakhstan">Kazakhstan</option><option value="Peru">Peru</option><option value="Korea">Korea</option>
+									<option value="SaudiArabia">SaudiArabia</option><option value="Malta">Malta</option><option value="Serbia">Serbia</option><option value="Mauritius">Mauritius</option>
+									<option value="Maldives">Maldives</option><option value="Armenia">Armenia</option><option value="Macedonia">Macedonia</option><option value="ReunionIsland">ReunionIsland</option><option value="Albania">Albania</option><option value="Azerbaijan">Azerbaijan</option><option value="Jamaica">Jamaica</option><option value="Uzbekistan">Uzbekistan</option><option value="Fiji">Fiji</option><option value="Salvador">Salvador</option><option value="Kyrgyzstan">Kyrgyzstan</option><option value="Nicaragua">Nicaragua</option><option value="Algeria">Algeria</option><option value="Barbados">Barbados</option><option value="Turkmenistan">Turkmenistan</option><option value="DominicanRepublic">DominicanRepublic</option><option value="Bhutan">Bhutan</option><option value="CapeVerde">CapeVerde</option><option value="Seychelles">Seychelles</option><option value="Botswana">Botswana</option><option value="FrenchGuiana">FrenchGuiana</option><option value="Greenland">Greenland</option><option value="Namibia">Namibia</option><option value="Tunisia">Tunisia</option><option value="Mozambique">Mozambique</option><option value="Liechtenstein">Liechtenstein</option><option value="Andorra">Andorra</option><option value="Angola">Angola</option><option value="Tajikistan">Tajikistan</option><option value="Mongolia">Mongolia</option><option value="Palestine">Palestine</option><option value="Trinidad&amp;Tobago">Trinidad&amp;Tobago</option><option value="Guatemala">Guatemala</option><option value="Rwanda">Rwanda</option><option value="Nepal">Nepal</option><option value="BurkinaFaso">BurkinaFaso</option><option value="Swaziland">Swaziland</option><option value="Senegal">Senegal</option><option value="Belize">Belize</option><option value="Togo">Togo</option>
+									<option value="Cuba">Cuba</option><option value="Madagascar">Madagascar</option><option value="Guyana">Guyana</option><option value="CotedIvoire">CotedIvoire</option>
+									<option value="Benin">Benin</option><option value="Grenada">Grenada</option><option value="Suriname">Suriname</option><option value="Gambia">Gambia</option><option value="Vanuatu">Vanuatu</option>
+									<option value="Gabon">Gabon</option><option value="Malawi">Malawi</option><option value="SanMarino">SanMarino</option><option value="SierraLeone">SierraLeone</option><option value="Djibouti">Djibouti</option><option value="Nauru">Nauru</option><option value="Haiti">Haiti</option><option value="Mali">Mali</option><option value="FalklandIslands">FalklandIslands</option><option value="AntiguaandBarbuda">AntiguaandBarbuda</option><option value="Afghanistan">Afghanistan</option><option value="Congo">Congo</option><option value="MarianaIslands">MarianaIslands</option><option value="Burundi">Burundi</option><option value="Guinea">Guinea</option><option value="Lesotho">Lesotho</option><option value="Niger">Niger</option><option value="WesternSamoa">WesternSamoa</option><option value="Mauritania">Mauritania</option><option value="Vatican">Vatican</option><option value="Tonga">Tonga</option>
+									<option value="Liberia">Liberia</option><option value="Kiribati">Kiribati</option><option value="EquatorialGuinea">EquatorialGuinea</option><option value="SolomonIslands">SolomonIslands</option><option value="ChristmasIsland">ChristmasIsland</option><option value="Chad">Chad</option><option value="St.Helena">St.Helena</option><option value="WesternSahara">WesternSahara</option><option value="Eritrea">Eritrea</option><option value="Somalia">Somalia</option><option value="Libya">Libya</option><option value="Tuvalu">Tuvalu</option><option value="Cameroon">Cameroon</option><option value="CanaryIslands">CanaryIslands</option><option value="CentralAfrica">CentralAfrica</option><option value="Montenegro">Montenegro</option><option value="SaintChristopher&amp;Nevis">SaintChristopher&amp;Nevis</option><option value="Comoros">Comoros</option><option value="Korea">Korea</option><option value="EastSamoa(US)">EastSamoa(US)</option><option value="Anguilla(GB)">Anguilla(GB)</option><option value="Aruba">Aruba</option><option value="Bermuda(GB)">Bermuda(GB)</option><option value="Bosnia&amp;Herzegovina">Bosnia&amp;Herzegovina</option><option value="CaymanIslands(GB)">CaymanIslands(GB)</option><option value="CocosIsland">CocosIsland</option><option value="CorkIslands(NZ)">CorkIslands(NZ)</option><option value="Congo(Gold)">Congo(Gold)</option><option value="FaroeIslands(DK)">FaroeIslands(DK)</option><option value="FrenchPolynesia">FrenchPolynesia</option><option value="Gibraltar(English)">Gibraltar(English)</option><option value="Guadeloupe(FR)">Guadeloupe(FR)</option><option value="Guinea-Bissau">Guinea-Bissau</option><option value="MarshallIslands">MarshallIslands</option><option value="Martinique(French)">Martinique(French)</option><option value="Mayotte">Mayotte</option><option value="Micronesia(US)">Micronesia(US)</option><option value="Montserrat(GB)">Montserrat(GB)</option><option value="NetherlandsAntilles">NetherlandsAntilles</option><option value="NewCaledoniaIslands(FR)">NewCaledoniaIslands(FR)</option><option value="Niue(NZ)">Niue(NZ)</option><option value="NorfolkIsland(AU)">NorfolkIsland(AU)</option><option value="Palau(US)">Palau(US)</option><option value="PapuaNewGuinea">PapuaNewGuinea</option><option value="PuertoRico(US)">PuertoRico(US)</option><option value="SaintLucia">SaintLucia</option><option value="St.Pierre&amp;Miquelon">St.Pierre&amp;Miquelon</option><option value="St.Vincent(GB)">St.Vincent(GB)</option><option value="SaoTome&amp;Principe">SaoTome&amp;Principe</option><option value="Svalbard(NO)">Svalbard(NO)</option><option value="Bahamas">Bahamas</option><option value="TokelauIslands(NZ)">TokelauIslands(NZ)</option><option value="Turks&amp;CaicosIslands(GB)">Turks&amp;CaicosIslands(GB)</option><option value="VirginIslands(GB)">VirginIslands(GB)</option><option value="VirginIslands(US)">VirginIslands(US)</option><option value="WallisandFujiaIslands(FR)">WallisandFujiaIslands(FR)</option><option value="Heard&amp;McDonaldIslands">Heard&amp;McDonaldIslands</option><option value="PitcairnIslands">PitcairnIslands</option><option value="AscensionIsland(English)">AscensionIsland(English)</option><option value="CzechRepublic">CzechRepublic</option><option value="Belarus">Belarus</option>
+								</select>
 							</td>
 						</tr>
 						<tr>
 							<td>Zip Code:</td>
 							<td><input id="orderzipcode" type="text" maxlength="10"
-								value="" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.zip_code}" style="width: 200px" disabled="disabled"></td>
 						</tr>
 						<tr>
 							<td>Phone:</td>
 							<td><input id="orderphone" type="text" maxlength="18"
-								value="" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.phone_number}" style="width: 200px" disabled="disabled"></td>
 						</tr>
 						<tr>
 							<td></td>
@@ -1503,7 +1543,11 @@ em {
 					</tr>
 					<tr>
 						<td>预计采购金额(￥):</td>
-						<td style="text-align:center;vertical-align:middle;"><span id="es_price" style="color:red;">-</span></td>
+						<td style="text-align:center;vertical-align:middle;"><span id="es_price" style="color:red;">-</span>
+							<c:if test="${not empty tipprice}">
+								<span style="color:blue">(${tipprice})</span>
+							</c:if>
+						</td>
 					</tr>
 					<tr>
 						<td>录入采购金额(￥):</td>
@@ -1895,10 +1939,10 @@ em {
 									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">原始货源重量(kg): ${orderd.cbrWeight}</p>
+									<p style="width:200px;">原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">加入购物车重量(kg): ${orderd.od_total_weight}</p>
+									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
 								</span>
 								<%--<span id="spanurl${sd.index}">--%>
 									<%--<p style="width:200px;">产品总重量(kg): ${orderd.final_weight}</p>--%>
@@ -1935,11 +1979,11 @@ em {
 							<!-- 消息备注列合并过来的-->
 							<div style="overflow-y:scroll;height:200px;width:200px;">
 								<div class="w-font">
-									<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.goodsid}">${orderd.goods_info}</font>
+									<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.id}">${orderd.goods_info}</font>
 								</div>
 							</div>
 							<div class="w-margin-top">
-								<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.goodsid});" class="repalyBtn" />
+								<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 							</div>
 								
 							</td>
@@ -2217,7 +2261,7 @@ em {
 											<p>原始货源价格(RMB): ${orderd.price1688}</p>
 										</span>
 										<span id="spanurl${sd.index}">
-											<p>原始货源重量(kg): ${orderd.weight1688}</p>
+											<p>1688货源重量（单件）(kg): ${orderd.weight1688}</p>
 										</span>
 										
 										<span id="spanurl${sd.index}">
@@ -2258,11 +2302,11 @@ em {
 									<!-- 消息备注列合并过来的-->
 									<div style="overflow-y:scroll;height:200px;width:200px;">
 										<div class="w-font">
-											<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.goodsid}">${orderd.goods_info}</font>
+											<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.id}">${orderd.goods_info}</font>
 										</div>
 									</div>
 									<div class="w-margin-top">
-										<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.goodsid});" class="repalyBtn" />
+										<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 									</div>
 								
 									</td>

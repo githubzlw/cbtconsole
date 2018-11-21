@@ -47,7 +47,8 @@ public class CustomGoodsQuery {
 	private double aliWeightEnd;
 	private String onlineTime;
 	private String offlineTime;
-	private String editTime;
+	private String editBeginTime;
+	private String editEndTime;
 	private double weight1688Begin;
 	private double weight1688End;
 	private double price1688Begin;
@@ -248,12 +249,20 @@ public class CustomGoodsQuery {
 		this.offlineTime = offlineTime;
 	}
 
-	public String getEditTime() {
-		return editTime;
+	public String getEditBeginTime() {
+		return editBeginTime;
 	}
 
-	public void setEditTime(String editTime) {
-		this.editTime = editTime;
+	public void setEditBeginTime(String editBeginTime) {
+		this.editBeginTime = editBeginTime;
+	}
+
+	public String getEditEndTime() {
+		return editEndTime;
+	}
+
+	public void setEditEndTime(String editEndTime) {
+		this.editEndTime = editEndTime;
 	}
 
 	public double getWeight1688Begin() {

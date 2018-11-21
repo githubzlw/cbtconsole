@@ -5,6 +5,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -62,6 +63,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -520,7 +522,35 @@ public class WarehouseCtrl {
 		}
 		out.close();
 	}
-	
+
+    /**
+     *
+     * 将重量同步到产品库（使用蒋先伟接口）
+     *  2018/11/16 10:41 ly
+     *
+     *  //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
+     */
+    @RequestMapping(value = "/saveWeightFlag")
+    public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        try{
+            String pid=request.getParameter("pid");
+            //数据校验
+            if (StringUtil.isBlank(pid) || pid.length() < 3) {
+                out.print(2);
+                out.close();
+                return;
+            }
+            int result = iWarehouseService.saveWeightFlag(pid);
+            out.print(result);
+        }catch(Exception e){
+            out.print(0);
+            e.printStackTrace();
+        }
+        out.close();
+    }
+
 	/**
 	 * 保存服装质检结果
 	 * @param request
@@ -648,6 +678,37 @@ public class WarehouseCtrl {
 		}
 		out.print(index);
         out.close();
+	}
+
+	/**
+	 * 验货图片关联验货商品
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/insInsp")
+	public void insInsp(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		int index=0;
+		PrintWriter out = response.getWriter();
+		String goodsPid=request.getParameter("goodsPid");
+		String odid=request.getParameter("odid");
+		String picPath=request.getParameter("picPath");
+		String orderid=request.getParameter("orderid");
+		Map<String,String> map=new HashMap<String,String>(2);
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		try{
+			map.put("goodsPid",goodsPid);
+			map.put("odid",odid);
+			map.put("picPath",picPath);
+			map.put("orderid",orderid);
+			index=iWarehouseService.insInsp(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		out.print(index);
+		out.close();
 	}
 
 	/**
@@ -1144,6 +1205,40 @@ public class WarehouseCtrl {
 			list = iWarehouseService.getCleaningQuality(map);
 			json.setRows(list);
 			json.setTotal(list.size());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return json;
+	}
+
+	/**
+	 * 黑名单用户管理
+	 * @param request
+	 * @param model
+	 * @return
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/getUserBackList", method = RequestMethod.POST)
+	@ResponseBody
+	public EasyUiJsonResult getUserBackList(HttpServletRequest request, Model model) throws ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		List<BlackList> list = new ArrayList<BlackList>();
+		String email = request.getParameter("qEmail");
+		int page = Integer.parseInt(request.getParameter("page"));
+		String flag=request.getParameter("flag");
+		flag=StringUtil.isBlank(flag)?null:flag;
+		if (page > 0) {
+			page = (page - 1) * 40;
+		}
+		map.put("page", String.valueOf(page));
+		map.put("email", email);
+		map.put("flag",flag);
+		try{
+			list = iWarehouseService.getUserBackList(map);
+			List<BlackList> counts = iWarehouseService.getUserBackListCount(map);
+			json.setRows(list);
+			json.setTotal(counts.size());
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1659,7 +1754,12 @@ public class WarehouseCtrl {
 				return r_map;
 			}
 			p_map.put("time",year+"-"+month);
-			r_map=iWarehouseService.getExchange(p_map);
+			Map<String,String> resultMap=iWarehouseService.getExchange(p_map);
+			r_map.put("eur_rate",resultMap.get("eur_rate"));
+			r_map.put("cad_rate",resultMap.get("cad_rate"));
+			r_map.put("gbp_rate",resultMap.get("gbp_rate"));
+			r_map.put("aud_rate",resultMap.get("aud_rate"));
+			r_map.put("rmb_rate",resultMap.get("rmb_rate"));
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -2568,9 +2668,11 @@ public class WarehouseCtrl {
 			throws Exception {
 		String odid=request.getParameter("odid");
 		String type=request.getParameter("type");
+		String goodsPid=request.getParameter("goodsPid");
 		Map<String, String> map = new HashMap<String, String>(); // sql 参数
 		map.put("odid", odid);
-		map.put("type", type);
+		map.put("flag", type);
+		map.put("goodsPid",goodsPid);
 		PrintWriter out = response.getWriter();
 		out.print(iWarehouseService.productAuthorization(map));
 		out.close();
@@ -3671,9 +3773,11 @@ public class WarehouseCtrl {
 		String page=request.getParameter("page");
 		String goods_pid=request.getParameter("pid");
 		String orderno=request.getParameter("orderno");
+		String odid=request.getParameter("odid");
 		String goods_id=request.getParameter("goods_id");
 		String times=request.getParameter("times");
 		String admuserid=request.getParameter("admuserid");
+		String oldOrderid=request.getParameter("oldOrderid");
 		if(StringUtil.isNotBlank(times) && "999".equals(times)){
 			times=null;
 		}else if(StringUtil.isBlank(times)){
@@ -3687,10 +3791,12 @@ public class WarehouseCtrl {
 		int pages=(Integer.valueOf(page)-1)*10;
 		map.put("page",String.valueOf(pages));
 		map.put("goods_pid", goods_pid);
-		map.put("times",times);
+		map.put("times",StringUtil.isNotBlank(odid)?null:times);
 		map.put("orderno",orderno);
 		map.put("goods_id",goods_id);
 		map.put("admuserid",admuserid);
+		map.put("odid",odid);
+		map.put("oldOrderid",oldOrderid);
 	}
 
 	// 出库验货
@@ -6704,6 +6810,60 @@ public class WarehouseCtrl {
 		return "" + row;
 	}
 
+	/**
+	 * 用户黑名单单利更新状态
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/updateFlag", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updateFlag(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String id=request.getParameter("id");
+		String type=request.getParameter("type");
+		try{
+			row=iWarehouseService.updateFlag(id,type);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
+	@RequestMapping(value = "/addBackUser", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String addBackUser(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String userEmail=request.getParameter("userEmail");
+		String userIp=request.getParameter("userIp");
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		try{
+			if(adm == null){
+				return "0";
+			}
+			row=iWarehouseService.addBackUser(userEmail,userIp,adm.getAdmName());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
+	@RequestMapping(value = "/updatebackEmail", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updatebackEmail(HttpServletRequest request, HttpServletResponse response) {
+		int row=0;
+		String id=request.getParameter("id");
+		String email=request.getParameter("email");
+		try{
+			row=iWarehouseService.updatebackEmail(id,email);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row+"";
+	}
+
+
 	// 重置库位
 	@RequestMapping(value = "/resetLocation", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
@@ -7076,6 +7236,10 @@ public class WarehouseCtrl {
 					}
 					bgMap.put("expressno", expressNo); // 添加包裹号
 					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
+					//发送邮件给客户告知已经发货
+//					IGuestBookService ibs = new GuestBookServiceImpl();
+//					OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+//					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
 			}
 		}catch (Exception e){
@@ -7187,6 +7351,8 @@ public class WarehouseCtrl {
 						iWarehouseService.updateBarcodeByOrderNo(orderid);
 						// 更新货源变商品状态->改为出运中
 						iWarehouseService.updateOrderSourceState(orderid);
+						//发货商品authorized_flag标记为2，商品发货
+						iWarehouseService.checkAuthorizedFlag(orderid);
 					} catch (Exception e) {
 						LOG.error("更新orderid 的库位状态/货源表商品状态【订单号:" + orderid+ "】", e);
 					}
@@ -9496,7 +9662,7 @@ public class WarehouseCtrl {
 		int minute = c.get(Calendar.MINUTE);
 		int second = c.get(Calendar.SECOND);
 		//上传文件目录
-		String relatDir = "D:/product/";
+		String relatDir = TabSeachPageController.LOCALPATHZIPIMG;
 		//文件夹不存在则创建
 		File fdir = new File(relatDir);
 		File fdirExi = new File(relatDir + time + "/");

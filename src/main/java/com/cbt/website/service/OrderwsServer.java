@@ -1,6 +1,15 @@
 package com.cbt.website.service;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.cbt.FreightFee.controller.FreightFeeController;
 import com.cbt.bean.*;
+import com.cbt.common.StringUtils;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.dao.IUserDao;
@@ -9,16 +18,11 @@ import com.cbt.processes.service.SendEmail;
 import com.cbt.util.AppConfig;
 import com.cbt.util.UUIDUtil;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.QualityResult;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.dao.*;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 public class OrderwsServer implements IOrderwsServer {
 
@@ -28,7 +32,7 @@ public class OrderwsServer implements IOrderwsServer {
 
 	@Override
 	public List<OrderBean> getOrders(int userID, int state, Date startdate, Date enddate, String username, String email,
-			String orderno, String phone, int page, int admuserid, int buyid, int showUnpaid, int status) {
+	                                 String orderno, String phone, int page, int admuserid, int buyid, int showUnpaid, int status) {
 		List<OrderBean> order = dao.getOrders(userID, state, startdate, enddate, username, email, orderno, phone,
 				(page - 1) * 40, 40, admuserid, buyid, showUnpaid, status);
 		return order;
@@ -70,22 +74,22 @@ public class OrderwsServer implements IOrderwsServer {
 		List<OrderDetailsBean> list=dao.getOrdersDetails(orderNo);
 		return list;
 	}
-	
+
 	@Override
 	public double getAllFreightByOrderid(String orderid) {
-		
+
 		return dao.getAllFreightByOrderid(orderid);
 	}
-	
+
 	@Override
 	public void updateGoodsCarMessage(String orderNo) {
 		dao.updateGoodsCarMessage(orderNo);
 	}
-	
+
 	@Override
 	public TaoBaoOrderInfo getShipStatusInfo(String tb_1688_itemid,
-			String last_tb_1688_itemid, String time, String admName,String shipno,int offline_purchase,String orderid,int goodsid) {
-		
+	                                         String last_tb_1688_itemid, String time, String admName,String shipno,int offline_purchase,String orderid,int goodsid) {
+
 		return dao.getShipStatusInfo(tb_1688_itemid,last_tb_1688_itemid,time,admName,shipno,offline_purchase,orderid,goodsid);
 	}
 
@@ -98,10 +102,10 @@ public class OrderwsServer implements IOrderwsServer {
 
 	@Override
 	public int upOrder(int userId, String orderNo, String actual_ffreight, String custom_discuss_other,
-			Date transport_time, String actual_weight, int state, String actual_volume, Date expect_arrive_date,
-			String actual_allincost, String remaining_price, double order_ac, String service_fee,
-			String domestic_freight, String mode_transport, double actual_freight_c_, float exchange_rate,
-			float applicable_credit) {
+	                   Date transport_time, String actual_weight, int state, String actual_volume, Date expect_arrive_date,
+	                   String actual_allincost, String remaining_price, double order_ac, String service_fee,
+	                   String domestic_freight, String mode_transport, double actual_freight_c_, float exchange_rate,
+	                   float applicable_credit) {
 
 		float remaining_price_d = Float.parseFloat(remaining_price);
 		int res = dao.upOrder(orderNo, actual_ffreight, custom_discuss_other, state, transport_time, actual_weight,
@@ -128,7 +132,7 @@ public class OrderwsServer implements IOrderwsServer {
 
 	@Override
 	public int upOrderDeatail(int orderDatailId, String file, String weight, String volume, String actual_price,
-			String actual_freight, String file_upload) {
+	                          String actual_freight, String file_upload) {
 		// TODO Auto-generated method stub
 		return dao.upOrderDeatail(orderDatailId, file, weight, volume, actual_price, actual_freight, file_upload);
 	}
@@ -185,7 +189,7 @@ public class OrderwsServer implements IOrderwsServer {
 		return dao.queryForPaymentConfirm(orderNo);
 	}
 
-	
+
 	@Override
 	public int isTblack(String userName) {
 		return dao.isTblack(userName);
@@ -248,7 +252,7 @@ public class OrderwsServer implements IOrderwsServer {
 
 	@Override
 	public String sendCutomers(String serverName, int port, String orderNo, int whichOne, int isDropship,
-			String orderNo1) {
+	                           String orderNo1) {
 		int result = 0;
 		UserBean user = dao.getUserBeanByOrderNo(orderNo);
 		StringBuffer sb = new StringBuffer("<div style='font-size: 14px;'>");
@@ -301,7 +305,7 @@ public class OrderwsServer implements IOrderwsServer {
 			 * price =Double.parseDouble((String)obj[0]); int number =
 			 * Integer.parseInt(obj[1].toString()); double price_ = price *
 			 * number;
-			 * 
+			 *
 			 * String class_g = obj[2].toString();
 			 * if(Utility.getStringIsNull(class_g) && price <= 150){ for (int j
 			 * = 0; j < list_cd.size(); j++) { ClassDiscount cd =
@@ -468,7 +472,7 @@ public class OrderwsServer implements IOrderwsServer {
 
 	@Override
 	public int getOrdersPage(int userID, int state, Date date, String username, String email, String orderno,
-			String phone) {
+	                         String phone) {
 
 		return dao.getOrdersPage(userID, state, date, username, email, orderno, phone);
 	}
@@ -487,7 +491,7 @@ public class OrderwsServer implements IOrderwsServer {
 	public void cancelInventory1(String orderNo) {
 		dao.cancelInventory1(orderNo);
 	}
-	
+
 	@Override
 	public void cancelInventory(String orderNo) {
 		dao.cancelInventory(orderNo);
@@ -619,9 +623,9 @@ public class OrderwsServer implements IOrderwsServer {
 	}
 
 	@Override
-	public int changeOrderBuyer(String orderid, int admuserid,String goodsids) {
+	public int changeOrderBuyer(String orderid, int admuserid,String odids) {
 
-		return dao.changeOrderBuyer(orderid, admuserid,goodsids);
+		return dao.changeOrderBuyer(orderid, admuserid,odids);
 	}
 
 	@Override
@@ -634,10 +638,10 @@ public class OrderwsServer implements IOrderwsServer {
 
 		return dao.addOrderInfo(orderid, newOrderid, length);
 	}
-	
+
 	@Override
 	public int addAutoAdmuser(String orderid) {
-		
+
 		return dao.addAutoAdmuser(orderid);
 	}
 
@@ -712,55 +716,55 @@ public class OrderwsServer implements IOrderwsServer {
 		return dao.queryGoodsPriceFromDetails(orderNo) ;
 	}
 	@Override
-    public TabTransitFreightinfoUniteOur getFreightInfo(String countryNameCn, int isEub){
-        return dao.getFreightInfo(countryNameCn, isEub);
-    }
+	public TabTransitFreightinfoUniteOur getFreightInfo(String countryNameCn,int isEub){
+		return dao.getFreightInfo(countryNameCn, isEub);
+	}
 
-    @Override
-    public double getFreightByWeight(TabTransitFreightinfoUniteOur fo,
-            double weight) {
-        //weithg 是kg 转g
-        double weihtG = weight * 1000;
-        //是否支持eub
-        int eubType = fo.getEubType();
-        //jcex首重
-        double baseWeiht = 0.0;
-        //jcex首重价格
-        double basePrice =0.0;
-        //jcex 续重
-        double ratioWeight = 0.0;
-        //jcex续重价格
-        double ratioPrice = 0.0;
-        //运费
-        double FreightFeeController = 0.0;
-        switch (eubType) {
-        case 1:
-            //Eub首重
-            baseWeiht = fo.getEubBaseWeight();
-            //Eub首重价格
-            basePrice = fo.getEubBasePrice().doubleValue();
-            //Eub 续重
-            ratioWeight = fo.getEubRatioWeight();
-            //Eub续重价格
-            ratioPrice = fo.getEubRatioPrice().doubleValue();
-            break;
-        default:
-            //jcex首重
-            baseWeiht = fo.getJcexBaseWeight();
-            //jcex首重价格
-             basePrice = fo.getJcexBasePrice().doubleValue();
-            //jcex 续重
-             ratioPrice = fo.getJcexRatioWeight();
-            //jcex续重价格
-              ratioWeight  = fo.getJcexRatioPrice().doubleValue();
-            break;
-        }
-        System.out.println("basePrice "+basePrice+"+ "+"("+"weihtG "+weihtG+"+"+ "-"+"baseWeiht "+baseWeiht+") /"+  "ratioWeight "+ratioWeight +"*"+"ratioPrice:"+ratioPrice);
-        if(ratioWeight > 0.0) {
-            FreightFeeController = new BigDecimal((weihtG - baseWeiht) / ratioWeight * ratioPrice + basePrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-        }
-        return FreightFeeController;
-    }
+	@Override
+	public double getFreightByWeight(TabTransitFreightinfoUniteOur fo,
+	                                 double weight) {
+		//weithg 是kg 转g
+		double weihtG = weight * 1000;
+		//是否支持eub
+		int eubType = fo.getEubType();
+		//jcex首重
+		double baseWeiht = 0.0;
+		//jcex首重价格
+		double basePrice =0.0;
+		//jcex 续重
+		double ratioWeight = 0.0;
+		//jcex续重价格
+		double ratioPrice = 0.0;
+		//运费
+		double FreightFeeController = 0.0;
+		switch (eubType) {
+			case 1:
+				//Eub首重
+				baseWeiht = fo.getEubBaseWeight();
+				//Eub首重价格
+				basePrice = fo.getEubBasePrice().doubleValue();
+				//Eub 续重
+				ratioWeight = fo.getEubRatioWeight();
+				//Eub续重价格
+				ratioPrice = fo.getEubRatioPrice().doubleValue();
+				break;
+			default:
+				//jcex首重
+				baseWeiht = fo.getJcexBaseWeight();
+				//jcex首重价格
+				basePrice = fo.getJcexBasePrice().doubleValue();
+				//jcex 续重
+				ratioPrice = fo.getJcexRatioWeight();
+				//jcex续重价格
+				ratioWeight  = fo.getJcexRatioPrice().doubleValue();
+				break;
+		}
+		System.out.println("basePrice "+basePrice+"+ "+"("+"weihtG "+weihtG+"+"+ "-"+"baseWeiht "+baseWeiht+") /"+  "ratioWeight "+ratioWeight +"*"+"ratioPrice:"+ratioPrice);
+		if(ratioWeight > 0.0) {
+			FreightFeeController = new BigDecimal((weihtG - baseWeiht) / ratioWeight * ratioPrice + basePrice).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+		}
+		return FreightFeeController;
+	}
 
 	@Override
 	public int isExistsMessageByOrderNo(String orderNo) {

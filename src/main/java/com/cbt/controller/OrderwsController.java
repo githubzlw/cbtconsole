@@ -77,7 +77,10 @@ public class OrderwsController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (result == 1) {
+		if(result == 12){
+			map.put("code", "11");
+			map.put("msg", "订单地址对应的国家简称为空，请补全数据后再确认到账");
+		}else if (result == 1) {
 			map.put("code", "0");
 			map.put("msg", "Successful operation");
 			map.put("confirmname", adm.getAdmName());

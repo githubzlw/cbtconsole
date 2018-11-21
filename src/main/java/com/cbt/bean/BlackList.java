@@ -13,7 +13,34 @@ public class BlackList {
 	private String userip;
 	/*黑名单人用户名	*/
 	private String username;
-	
+
+	private String updateTime;
+	private String flag;
+	private String option;
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+
+	public String getOption() {
+		return option;
+	}
+
+	public void setOption(String option) {
+		this.option = option;
+	}
+
 	public Integer getId() {
 		return id;
 	}

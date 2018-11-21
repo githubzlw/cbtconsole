@@ -645,7 +645,15 @@ function btnCap(orderid, odid) {
             success : function(response) {
                 if (response.status == 1) {
                     $("#bt_"+orderid+"_"+odid+"").css("color", "red");
-                     $("#pics_"+orderid+odid+"").append("<img width='40px' height='40px' onmouseout='closeBigImg();' ondblclick='delPics(this,\""+orderid+"\",\""+odid+"\",\""+response.picPath+"\",\""+response.localPath+"\")' onmouseover='BigImg(\""+response.localPath+"\")' src=\""+response.localPath+"\"></img>");
+                     $("#pics_"+orderid+odid+"").append("<img width='40px' height='40px' onmouseout='closeBigImg();' ondblclick='delPics(this,\""+orderid+"\",\""+odid+"\",\""+response.picPath+"\",\""+response.localPath+"\")' onmouseover='BigImg(\""+response.localPath+"\")'  src='/cbtconsole/img/yuanfeihang/loaderTwo.gif' data-original=\""+response.localPath+"\"></img>");
+                    // setInterval(function(){
+                    //     $("#pics_"+orderid+odid+"").find('img').each(function(){
+                    //         var imgSrc=$(this).attr('data-original');
+                    //         $(this).attr('src',imgSrc);
+                    //     })
+                    // },100);
+
+
                 }else{
                     alert("图片上传失败,请重新拍摄");
                 }
@@ -655,7 +663,6 @@ function btnCap(orderid, odid) {
             }
         });
 }
-
 var dragObj = document.getElementById("paizhao");
 var w = $(window).width();
 w = w - 320;
@@ -1059,21 +1066,32 @@ function search() {
                             queryRecord(json[i].odid);
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:#ff0000;">'
                                 +id_qty
-                                + '</span></h3><h3>商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
+                                + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
                                 /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
-                            	str += '<span>之前未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
-							} else {
-								str += '<span>之前保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
-							}
+                                str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                            } else {
+                                str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                            }
+                            str += '<br />';
+                            if (json[i].syn == undefined || json[i].syn == '0') {
+                                str += '<span name="save_weight_flag">未同步到产品库!</span>';
+                            } else {
+                                str += '<span name="save_weight_flag">已同步到产品库</span>';
+                            }
+                            str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';
                             str += '<span id="tip_'+json[i].orderid+json[i].odid+'" style="color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
                         }else{
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>客户下单数量:<span id="'+json[i].orderid+'_count'+json[i].odid+'" style="font-size:35px;">'
                                 + json[i].usecount
                                 + '</span></h3></p>';
                         }
+                        if(json[i].isExitPhone>0){
+                            str+='<a target="_blank" href="/cbtconsole/website/inspection_picture_editing.jsp?goodsPid='+json[i].goods_pid+'&odid='+json[i].odid+'&oldOrderid='+json[i].orderid+'" style="color:red">该商品存在验货图片,点击查看</a>';
+                        }
                         str += '<div style="height: 50px;">'
-                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'"></div><br />'
+                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'">'
+                            +'</div><br />'
                             + '<canvas onclick="AutoResizeImage(this)"  id="canvas_'+json[i].orderid+'_'+json[i].odid+'"></canvas>'
                             + '</div>';
                         str += '</div>';
@@ -1399,13 +1417,20 @@ function search() {
                                 queryRecord(json[i].odid);
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:red;">'
                                     +id_qty
-                                    + '</span></h3><h3>商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
+                                    + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
                                     /*+ '<input type="button"  value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">'*/
                                 if (json[i].weight == undefined) {
-                                	str += '<span>之前未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
-    							} else {
-    								str += '<span>之前保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
-    							}
+                                    str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                } else {
+                                    str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                }
+                                str += '<br />';
+                                if (json[i].syn == undefined || json[i].syn == '0') {
+                                    str += '<span name="save_weight_flag">未同步到产品库!</span>';
+                                } else {
+                                    str += '<span name="save_weight_flag">已同步到产品库</span>';
+                                }
+                                str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';
                                 str += '<span id="tip_\'+json[i].orderid+json[i].odid+\'" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
                             }else{
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>客户下单数量:<span id="'+json[i].orderid+'_count'+json[i].odid+'" style="font-size:35px;">'
@@ -1647,9 +1672,21 @@ function getWeight(orderid,odid){
         }
     });
 }
+
 //保存验货商品重量
 function saveWeight(orderid,odid,pid){
     var weight=$("#"+orderid+"weight"+odid+"").val();
+    //数据校验
+    if(weight == undefined || weight == ''){
+        document.getElementById("tip_"+orderid+odid).innerHTML = "未录入单件商品重量!";
+        return;
+    }
+    var reg = new RegExp("^\\d+([.]{1}\\d+)?$");//重量录入值校验正则
+    if(!reg.test(weight)){
+        document.getElementById("tip_"+orderid+odid).innerHTML = "录入单件商品重量值不正确!";
+        return;
+    }
+    //更新
     $.ajax({
         type: "POST",//方法类型
         dataType:'json',
@@ -1658,11 +1695,44 @@ function saveWeight(orderid,odid,pid){
         dataType:"json",
         success:function(data){
             if(Number(data) == 1){
-                document.getElementById("tip_"+orderid+odid).innerHTML = "成功";
+                document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量成功";
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html("已保存的重量:" + weight + "Kg&nbsp;")
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight_flag]").html("未同步到产品库");
             }else if(Number(data) == 1){
-                document.getElementById("tip_"+orderid+odid).innerHTML = "失败";
+                document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量失败";
             }else if(Number(data) == 2){
-                document.getElementById("tip_"+orderid+odid).innerHTML = "保存的数据问题!";
+                document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量的数据问题!";
+            }
+        }
+    });
+}
+//将重量同步至产品库
+function saveWeightFlag(orderid,odid,pid){
+    //网页中获取之前保存记录
+    var his_weight = $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html();
+    //数据校验
+    if(his_weight.indexOf("已保存") == -1){
+        document.getElementById("tip_"+orderid+odid).innerHTML = "未保存单件商品重量,请先保存重量!";
+        return;
+    }
+    //更新
+    $.ajax({
+        type: "POST",//方法类型
+        dataType:'json',
+        url:'/cbtconsole/warehouse/saveWeightFlag',
+        data:{pid:pid},
+        dataType:"json",
+        success:function(data){
+            //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
+            if(Number(data) == 1){
+                document.getElementById("tip_"+orderid+odid).innerHTML = "同步到产品库成功";
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight_flag]").html("已同步到产品库")
+            }else if(Number(data) == 4){
+                document.getElementById("tip_"+orderid+odid).innerHTML = "已经同步到产品库过";
+            }else if(Number(data) == 3){
+                document.getElementById("tip_"+orderid+odid).innerHTML = "未找到已保存的单件商品重量,请先保存";
+            }else {
+                document.getElementById("tip_"+orderid+odid).innerHTML = "内部异常";
             }
         }
     });

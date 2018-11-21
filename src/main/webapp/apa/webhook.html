@@ -92,12 +92,32 @@
         .td_sty {
             width: 130px;
         }
+        .datagrid-btable{
+        table-layout:fixed;}
+        .datagrid-btable td{
+        word-wrap:break-word;}
     </style>
     <script>
         $(document).ready(function () {
             setDatagrid();
         });
-
+        function fnexport(){
+        	
+        	var sttime = $("#query_sttime").val();
+            if (sttime == null || sttime == "") {
+                sttime = "";
+            }
+            var edtime = $("#query_edtime").val();
+            if (edtime == null || edtime == "") {
+                edtime = "";
+            } 
+            var type = $("#query_type").val();
+            if (type == null || type == "") {
+                type = -1;
+            }
+            window.location.href ="/cbtconsole/webhook/payment/export?sttime="+sttime+"&edtime="+edtime+"&type="+type;
+        }
+          
         /**
          * 初始化datagrid数据
          */
@@ -115,9 +135,10 @@
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 nowrap: false,//超出换行
                 rownumbers: true,
-                pageSize: 20,//默认选择的分页是每页50行数据
+                pageSize: 50,//默认选择的分页是每页50行数据
                 pageList: [20, 30, 50],//可以选择的分页集合
                 pagination: true,//分页
+                showFooter : true,//底部统计显示
                 style: {
                     padding: '8 8 10 8'
                 },
@@ -132,25 +153,25 @@
          * 页面首次查询
          */
         function doQuery() {
-            /* var sttime = $("#query_sttime").val();
+             var sttime = $("#query_sttime").val();
             if (sttime == null || sttime == "") {
                 sttime = "";
             }
             var edtime = $("#query_edtime").val();
             if (edtime == null || edtime == "") {
                 edtime = "";
-            } */
+            } 
             var type = $("#query_type").val();
             if (type == null || type == "") {
                 type = -1;
             }
             $("#groupbuy_easyui-datagrid").datagrid("load", {
-              /*   "sttime": sttime,
-                "edtime": edtime, */
+                 "sttime": sttime,
+                "edtime": edtime, 
                 "type": type
             });
         }
-        
+    
         function formatAction(val, row, index) {
         	if(row.orderNO == undefined ){
         		return 'undefind';
@@ -170,22 +191,24 @@
 <div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
     <form id="groupbuy_query_form" action="#" onsubmit="return false;">
 			<!-- <span> 事件号: <input type="text" id="pid_id"
-                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span> -->
 				时间: <input id="query_sttime" class="Wdate"
                              style="width: 110px; height: 24px" type="text" value=""
                              onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
                                                  style="width: 110px; height: 24px;" type="text" value=""
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;&nbsp;&nbsp;  -->
+			</span>&nbsp;&nbsp;&nbsp;&nbsp; 
         <span> 类型: <select id="query_type" style="font-size: 16px; height: 28px; width: 120px;">
             <option value="-1">全部</option>
             <option value="1">ImportExpress</option>
             <option value="2">Ebay</option>
             <option value="3">贸易</option>
         </select></span>
-        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
-                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp; 
+        <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="enter_btn export_btn" id ="export_btn" value="导出" onclick="fnexport()"/></span>
       
     </form>
 </div>
@@ -194,16 +217,18 @@
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'id',width:'150px'">ID</th>
-        <th data-options="field:'createTime',width:'100px'">时间</th>
-        <th data-options="field:'email',align:'left',width:'200px'">邮箱</th>
-        <th data-options="field:'orderNO',align:'left',width:'100px',formatter:formatAction">订单号</th>
+        <!-- <th data-options="field:'id',width:'150px'">ID</th> -->
+        <th data-options="field:'createTime',width:'80px'">时间</th>
+        <th data-options="field:'userid',align:'left',width:'80px'">用户</th>
+        <th data-options="field:'email',align:'left',width:'150px'">邮箱</th>
+        <th data-options="field:'orderNO',align:'left',width:'80px',formatter:formatAction">订单号</th>
         <th data-options="field:'amount',align:'left',width:'80px'">金额</th>
         <th data-options="field:'transactionFee',align:'left',width:'80px'">手续费</th>
-        <th data-options="field:'type',align:'center',width:'80px'">类型</th>
-        <th data-options="field:'findType',align:'center',width:'50px'">数据来源</th>
-        <th data-options="field:'payType',align:'center',width:'50px'">支付方式</th>
-        <th data-options="field:'receiverID',align:'center',width:'100px'">pp账户</th>
+        <th data-options="field:'profit',align:'left',width:'80px'">利润</th>
+        <th data-options="field:'type',align:'center',width:'55px'">类型</th>
+        <th data-options="field:'findType',align:'center',width:'30px'">数据来源</th>
+        <th data-options="field:'payType',align:'center',width:'30px'">支付方式</th>
+        <th data-options="field:'receiverID',align:'center',width:'90px'">pp账户</th>
     </tr>
     </thead>
     <tbody>

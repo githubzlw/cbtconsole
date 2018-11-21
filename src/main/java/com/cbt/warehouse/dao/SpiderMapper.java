@@ -9,6 +9,9 @@ import org.apache.ibatis.annotations.Param;
 import com.cbt.bean.CollectionBean;
 import com.cbt.bean.SpiderBean;
 import com.cbt.warehouse.pojo.TypeAvgWeightBean;
+
+import ceRong.tools.bean.SearchLog;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -249,4 +252,11 @@ public interface SpiderMapper {
 	public List<TypeAvgWeightBean> getCatid_Filter_AvgWeight();
 
 	public List<Map<String, Object>> getGoodsInfoByOrderNo(@Param("orderNo") String orderNo, @Param("goods_id") String[] goods_id);
+
+	/**
+	 * 搜索页面记录日志 qiqing 2018/04/11
+	 */
+	public int saveTheSearchLogOnSearchPage(SearchLog seaLog);
+	public int updateTheSearchLogOnSearchPage(@Param("rowid") int rowid, @Param("productShowIdList") String productShowIdList);
+	public int saveTheClickCountOnSearchPage(@Param("goods_id") String goodsPid, @Param("searchmd5") String searchMD5, @Param("searchusermd5") String searchUserMD5);
 }

@@ -59,7 +59,12 @@ public class PaymentConfirmDaoImpl implements PaymentConfirmDao {
 	public int insertPaymentConfirm(String orderNo, String confirmname, String confirmtime, 
 			                     String paytype, String tradingencoding, String wtprice, 
 			                     int userId) {
-		// TODO Auto-generated method stub
+		OrderInfoDao orderDao = new OrderInfoImpl();
+		int res = 0;
+		res=orderDao.updateOrderinfoIpnAddress(orderNo);
+		if(res == 12){
+			return res;
+		}
 		String sql = "insert into paymentconfirm(orderno,confirmname,confirmtime,paytype,paymentid) SELECT ?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT * FROM paymentconfirm WHERE orderno='"+orderNo+"')";
 		if("1".equals(paytype)|| paytype == "1"){
 			IPaymentDao payDao = new PaymentDao();
@@ -74,7 +79,6 @@ public class PaymentConfirmDaoImpl implements PaymentConfirmDao {
 			pay.setPaytype(paytype);
 			payDao.addPayment(pay);
 			//更新订单状态
-			OrderInfoDao orderDao = new OrderInfoImpl();
 			try {
 				orderDao.updateOrderStatu(userId, orderNo);
 			} catch (Exception e) {
@@ -85,7 +89,6 @@ public class PaymentConfirmDaoImpl implements PaymentConfirmDao {
 		//Connection conn1 = DBHelper.getInstance().getConnection2();
 		PreparedStatement stmt = null;
 		//PreparedStatement stmt1 = null;
-		int res = 0;
 		try {
 			stmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, orderNo);
@@ -121,7 +124,6 @@ public class PaymentConfirmDaoImpl implements PaymentConfirmDao {
                 NotifyToCustomerUtil.sendSqlByMq(sqlBf.toString());
                 ////订单状态修改，通知客户
                 NotifyToCustomerUtil.confimOrderPayment(userId, orderNo);
-
 				res = 1;
 			}
 						

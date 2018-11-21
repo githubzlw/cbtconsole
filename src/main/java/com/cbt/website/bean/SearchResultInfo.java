@@ -57,13 +57,30 @@ public class SearchResultInfo {
 	private List<String> bh_shop_id;
 
 
-	private String weight;
+	private String weight; //实秤重量
+	private Integer syn; //实秤重量是否同步到产品表：0 未同步；1 已同步
 	private String createtime;
 	private String catid;
 	private String evaluation;
 	private int order_num;//1688包裹对应的销售订单数量
+	private String isExitPhone;
+	public String getIsExitPhone() {
+		return isExitPhone;
+	}
 
-	public String getAuthorizedFlag() {
+	public void setIsExitPhone(String isExitPhone) {
+		this.isExitPhone = isExitPhone;
+	}
+
+    public Integer getSyn() {
+        return syn;
+    }
+
+    public void setSyn(Integer syn) {
+        this.syn = syn;
+    }
+
+    public String getAuthorizedFlag() {
 		return authorizedFlag;
 	}
 

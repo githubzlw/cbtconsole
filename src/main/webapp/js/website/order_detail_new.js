@@ -745,26 +745,27 @@ function openorderaddress() {
 //	$("#open").val("隐藏订单详情地址");
 //	$("#orderaddressdiv").css("display", "");
 //	$("#open").attr("onclick", "closeorderaddress()");
-	$.post("/cbtconsole/feeServlet?action=getAllZone&className=ZoneServlet",
-			function(data) {
-				var json = eval(data);
-				if (countryid == 36) {
-					countryid = 43;
-				}
-				for (var i = 0; i < json.length; i++) {
-					if (countryid.replace(/\s+/g,"")!="0" && (json[i].id.replace(/\s+/g,"") == countryid.replace(/\s+/g,"") || json[i].country.replace(/\s+/g,"") == countryid.replace(/\s+/g,""))) {
-						$('#ordercountry').append(
-								'<option value="' + json[i].country.replace(/\s+/g,"")
-										+ '" selected="selected">'
-										+ json[i].country.replace(/\s+/g,"") + '</option>');
-					} else {
-						$('#ordercountry').append(
-								'<option value="' + json[i].country.replace(/\s+/g,"") + '">'
-										+ json[i].country.replace(/\s+/g,"") + '</option>');
-					}
-				}
-				$("#ordercountry").val($("#ordercountry_value").val());
-			});
+// 	$.post("/cbtconsole/feeServlet?action=getAllZone&className=ZoneServlet",
+// 			function(data) {
+// 				var json = eval(data);
+// 				if (countryid == 36) {
+// 					countryid = 43;
+// 				}
+// 				for (var i = 0; i < json.length; i++) {
+// 					if (countryid.replace(/\s+/g,"")!="0" && (json[i].id.replace(/\s+/g,"") == countryid.replace(/\s+/g,"") || json[i].country.replace(/\s+/g,"") == countryid.replace(/\s+/g,""))) {
+// 						$('#ordercountry').append(
+// 								'<option value="' + json[i].country.replace(/\s+/g,"")
+// 										+ '" selected="selected">'
+// 										+ json[i].country.replace(/\s+/g,"") + '</option>');
+// 					} else {
+// 						$('#ordercountry').append(
+// 								'<option value="' + json[i].country.replace(/\s+/g,"") + '">'
+// 										+ json[i].country.replace(/\s+/g,"") + '</option>');
+// 					}
+// 				}
+// 				$("#ordercountry").val($("#ordercountry_value").val());
+// 			});
+    $("#ordercountry").val($("#ordercountry_value").val());
 }
 // 直接抵扣赠送运费操作
 function refreight() {
@@ -905,86 +906,68 @@ function fnGetAddress() {
         dataType:"json",
         success:function(data){
             console.log("res=="+data.orderid);
-            console.log("res=="+data.receiver_email);
-            if(data.receiver_email== null || data.receiver_email== "" || data.receiver_email== "null"){
-                return;
+            if(data.stripe){
+                console.log("data.stripe="+data.stripe);
+                var stripeJson=JSON.parse(data.stripe)
+                document.getElementById("address_name").value = stripeJson.data.object.source.name;
+                document.getElementById("address_street").value = 'brand=' + stripeJson.data.object.source.brand;
+                document.getElementById("address_city").value = 'funding=' + stripeJson.data.object.source.funding;
+                document.getElementById("address_state").value = 'last4=' + stripeJson.data.object.source.last4;
+                document.getElementById("address_country_code").value = stripeJson.data.object.source.country;
+            }else {
+                console.log("res==" + data.receiver_email);
+                if (data.receiver_email == null || data.receiver_email == "" || data.receiver_email == "null") {
+                    return;
+                }
+                $("#receiveremail").text(data.receiver_email);
+                $("#receiveremail").attr("href", "mailto:" + data.receiver_email);
+                document.getElementById("address_name").value = data.address_name;
+                document.getElementById("address_country_code").value = data.address_country_code;
+                // if (data.address_country != undefined) {
+                //     document.getElementById("address_country").value = data.address_country;
+                // }
+                document.getElementById("address_city").value = data.address_city;
+                document.getElementById("address_state").value = data.address_state;
+                document.getElementById("address_street").value = data.address_street;
+
+                console.log("data.stripe=" + data.stripe);
+                if (data.stripe) {
+                    document.getElementById("address_country_code").value = data.stripe.data.source.country;
+                }
             }
-            $("#receiveremail").text(data.receiver_email);
-            $("#receiveremail").attr("href","mailto:" + data.receiver_email);
-            document.getElementById("address_name").value = data.address_name;
-            document.getElementById("address_country_code").value = data.address_country_code;
-            // if (data.address_country != undefined) {
-            //     document.getElementById("address_country").value = data.address_country;
-            // }
-            document.getElementById("address_city").value = data.address_city;
-            document.getElementById("address_state").value = data.address_state;
-            document.getElementById("address_street").value =data.address_street;
         }
     });
 
-	//
-	// $
-	// 		.post(
-	// 				"/cbtconsole/WebsiteServlet?action=getIpnaddress&className=OrderwsServlet",
+	// $.post("/cbtconsole/WebsiteServlet?action=getOrderAddress&className=OrderwsServlet",
 	// 				{
 	// 					orderid : orderNo
 	// 				},
-	// 				function(res) {
-	// 					console.log("res=="+res.receiver_email);
-	// 					// if (res !== null && res !== 'null' && res !== '' && res !== undefined) {
-	// 					// 	// var json1 = eval(res);
-     //                     //    // var json1= JSON.stringify(res);
-	// 					// 	// alert(json1);
-	// 					// 	// console.log(json1);
-	// 					// 	for (var i = 0; i < json1.length; i++) {
-	// 					// 		if(json1[i].receiver_email== null || json1[i].receiver_email== "" || json1[i].receiver_email== "null"){
-	// 					// 				return;
-	// 					// 		}
-	// 					// 		$("#receiveremail").text(json1[i].receiver_email);
-	// 					// 		$("#receiveremail").attr("href","mailto:" + json1[i].receiver_email);
-	// 					// 		document.getElementById("address_name").value = json1[i].address_name;
-	// 					// 		document.getElementById("address_country_code").value = json1[i].address_country_code;
-	// 					// 		if (json1[i].address_country != undefined) {
-	// 					// 			document.getElementById("address_country").value = json1[i].address_country;
-	// 					// 		}
-	// 					// 		document.getElementById("address_city").value = json1[i].address_city;
-	// 					// 		document.getElementById("address_state").value = json1[i].address_state;
-	// 					// 		document.getElementById("address_street").value = json1[i].address_street;
-	// 					// 	}
-	// 					// }
+	// 				function(data) {
+	// 					if (data !== null && data !== 'null' && data !== undefined) {
+	// 						var json = eval(data);
+	// 						// console.log(data);
+	// 						for (var i = 0; i < json.length; i++) {
+	// 							var orderaddress = json[i];
+	// 							if((orderaddress.address== null || orderaddress.address== "" || orderaddress.address== "null")
+	// 								&& (orderaddress.zip_code== null || orderaddress.zip_code== "" || orderaddress.zip_code== "null")){
+	// 								document.getElementById("div_address").style.display = "none";
+	// 								return;
+	// 							}
+	// 							document.getElementById("orderstreet").value = orderaddress.address;
+	// 							document.getElementById("ordercity").value = orderaddress.address2;
+	// 							document.getElementById("orderstate").value = orderaddress.statename;
+	// 							countryid = orderaddress.country;
+	// 							document.getElementById("orderzipcode").value = orderaddress.zip_code;
+	// 							document.getElementById("orderphone").value = orderaddress.phone_number;
+	// 							if ((orderaddress.recipients + '') == 'null') {
+	// 								document.getElementById("orderrecipients").value = '';
+	// 							} else {
+	// 								document.getElementById("orderrecipients").value = orderaddress.recipients;
+	// 							}
+	// 							document.getElementById("orderstreet2").value = orderaddress.street;
+	// 						}
+	// 					}
 	// 				});
-	$
-			.post(
-					"/cbtconsole/WebsiteServlet?action=getOrderAddress&className=OrderwsServlet",
-					{
-						orderid : orderNo
-					},
-					function(data) {
-						if (data !== null && data !== 'null' && data !== undefined) {
-							var json = eval(data);
-							// console.log(data);
-							for (var i = 0; i < json.length; i++) {
-								var orderaddress = json[i];
-								if((orderaddress.address== null || orderaddress.address== "" || orderaddress.address== "null") 
-									&& (orderaddress.zip_code== null || orderaddress.zip_code== "" || orderaddress.zip_code== "null")){
-									document.getElementById("div_address").style.display = "none";
-									return;
-								}
-								document.getElementById("orderstreet").value = orderaddress.address;
-								document.getElementById("ordercity").value = orderaddress.address2;
-								document.getElementById("orderstate").value = orderaddress.statename;
-								countryid = orderaddress.country;
-								document.getElementById("orderzipcode").value = orderaddress.zip_code;
-								document.getElementById("orderphone").value = orderaddress.phone_number;
-								if ((orderaddress.recipients + '') == 'null') {
-									document.getElementById("orderrecipients").value = '';
-								} else {
-									document.getElementById("orderrecipients").value = orderaddress.recipients;
-								}
-								document.getElementById("orderstreet2").value = orderaddress.street;
-							}
-						}
-					});
 	getAddress = 1;
 }
 

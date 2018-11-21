@@ -1,6 +1,7 @@
 package com.cbt.customer.dao;
 
 import ceRong.tools.bean.DorpDwonBean;
+
 import com.cbt.bean.*;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
@@ -8,6 +9,7 @@ import com.cbt.parse.service.TypeUtils;
 import com.cbt.util.StrUtils;
 import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1994,11 +1996,28 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	}
 	
 	@Override
-	public List<GoodsCheckBean> getErrorInfo(int selled, String noBenchFlag, String sourceTbl, int start, int end){
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeFrom, String timeTo, int start, int end){
 		
 		List<GoodsCheckBean> gsfList = new ArrayList<GoodsCheckBean>();
 		
-		String sql=" select user_id,url,create_time from error_info  ";
+//		String sql=" select user_id,url,create_time from error_info  ";
+		String sql= " select b.email,a.user_id,a.url,a.create_time from error_info a ";
+			   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
+			   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+			   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+			   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+			   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
+			   if(!"".equals(userId) && userId!=null){
+				   sql =sql+" and a.user_id = '"+userId+"' ";
+			   }
+			   if(!"".equals(timeFrom) && timeFrom!=null){
+				   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
+			   }
+			   if(!"".equals(timeTo) && timeTo!=null){
+				   sql =sql+" and a.create_time <= '"+timeTo+"' ";
+			   }
+			   sql= sql+"order by a.create_time desc ";
+
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -2009,6 +2028,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				GoodsCheckBean gfb = new GoodsCheckBean();
+				gfb.setEmail(rs.getString("email"));
 				gfb.setUserName(rs.getString("user_id"));
 				gfb.setUrl(rs.getString("url"));
 				gfb.setCreatetime(rs.getString("create_time"));
@@ -3112,6 +3132,61 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		}
 		return mCount;
 	}
+	
+	
+	@Override
+	public int getErrorInfoCount(String userId,String timeFrom,String timeTo) {
+		
+		String sql = "select count(1) as maxCount from error_info a ";
+		sql =sql +"LEFT JOIN user b on a.user_id=b.id ";
+	    sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+	    sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+	    sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+	    sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
+		if(!"".equals(userId) && userId!=null){
+			   sql =sql+" and a.user_id = '"+userId+"' ";
+		   }
+		   if(!"".equals(timeFrom) && timeFrom!=null){
+			   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
+		   }
+		   if(!"".equals(timeTo) && timeTo!=null){
+			   sql =sql+" and a.create_time <= '"+timeTo+"' ";
+		   }
+//		sql =sql +"";
+		
+		Connection conn = DBHelper.getInstance().getConnection();
+		int mCount=0;
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			if(rs.next()){
+				mCount = rs.getInt("maxCount");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return mCount;
+	}
+	
 	
 	@Override
 	public int getLireImgCount(String userName,int flag) {

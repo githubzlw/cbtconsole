@@ -149,13 +149,42 @@
     <select id="listStripePayment" resultType="Map">
 
         select userid,orderid,paymentid,payment_amount,payment_cc, createtime,paytype,orderdesc
-        from payment where paystatus=1 and paytype=5 order by createtime desc
+        from payment where paystatus=1 and paytype=5 
+        <if test="startTime != ''">
+        and createtime &gt; #{startTime}
+        </if>
+        <if test="endTime != ''">
+        and createtime &lt; #{endTime}
+        </if>
+        
+        order by createtime desc
+        <if test="limitNum > 0">
         limit #{startNum},#{limitNum}
+        </if>
+    </select>
+    <select id="countAmount" resultType="Double">
+
+        select sum(payment_amount)
+        from payment where paystatus=1 and paytype=5 
+        <if test="startTime != ''">
+        and createtime &gt; #{startTime}
+        </if>
+        <if test="endTime != ''">
+        and createtime &lt; #{endTime}
+        </if>
+        
+        order by createtime desc
     </select>
     <select id="countStripePayment" resultType="java.lang.Integer">
 
         select count(id)
         from payment where paystatus=1 and paytype=5
+        <if test="startTime != ''">
+        and createtime &gt; #{startTime}
+        </if>
+        <if test="endTime != ''">
+        and createtime &lt; #{endTime}
+        </if>
     </select>
 
 

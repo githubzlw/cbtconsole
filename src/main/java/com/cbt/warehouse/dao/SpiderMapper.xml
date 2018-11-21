@@ -1,89 +1,108 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.warehouse.dao.SpiderMapper" >
-
-    <resultMap id="SpiderBeanResultMap" type="com.cbt.warehouse.pojo.SpiderBean" >
-        <id column="id" property="id" />
-        <result column="userid" property="userId" />
-        <result column="goods_url" property="url" />
-        <result column="goods_title" property="name" />
-        <result column="googs_seller" property="seller" />
-        <result column="googs_img" property="img_url" />
-        <result column="googs_price" property="price" />
-        <result column="googs_number" property="number" />
-        <result column="googs_size" property="size" />
-        <result column="googs_color" property="color" />
-        <result column="freight" property="freight" />
-        <result column="remark" property="remark" />
-        <result column="itemId" property="itemId" />
-        <result column="shopId" property="shopId" />
-        <result column="norm_least" property="norm_least" />
-        <result column="pWprice" property="pWprice" />
-        <result column="sessionid" property="sessionId" />
-        <result column="true_shipping" property="true_shipping" />
-        <result column="delivery_time" property="delivery_time" />
-        <result column="freight_free" property="freight_free" />
-        <result column="width" property="width" />
-        <result column="perWeight" property="perWeight" />
-        <result column="seilUnit" property="seilUnit" />
-        <result column="goodsUnit" property="goodsUnit" />
-        <result column="bulk_volume" property="bulk_volume" />
-        <result column="total_weight" property="total_weight" />
-        <result column="per_weight" property="weight" />
-        <result column="free_shopping_company" property="free_shopping_company" />
-        <result column="free_sc_days" property="free_sc_days" />
-        <result column="preferential" property="preferential" />
-        <result column="deposit_rate" property="deposit_rate" />
-        <result column="guid" property="guId" />
-        <result column="goods_type" property="types" />
-        <result column="feeprice" property="feeprice" />
-        <result column="currency" property="currency" />
-        <result column="goods_class" property="goods_class" />
-        <result column="extra_freight" property="extra_freight" />
-        <result column="source_url" property="source_url" />
-        <result column="method_feight" property="method_feight" />
-        <result column="catid" property="goods_catid" />
-        <result column="goodsdata_id" property="goodsdata_id" />
-        <result column="isshipping_promote" property="isshipping_promote" />
-        <result column="price1" property="price1" />
-        <result column="price2" property="price2" />
-        <result column="price3" property="price3" />
-        <result column="theproductfrieght" property="theproductfrieght" />
-        <result column="notfreeprice" property="notfreeprice" />
-        <result column="isvolume" property="isvolume" />
-        <result column="freeprice" property="freeprice" />
-        <result column="firstprice" property="firstprice" />
-        <result column="firstnumber" property="firstnumber" />
-
-        <result column="shipping_express" property="shipping_express" />
-        <result column="international_time" property="international_time" />
-        <result column="shipping_cost" property="shipping_cost" />
-        <result column="pay_price" property="pay_price" />
-        <result column="country" property="countryId" />
-        <result column="isFeight" property="isFeight" />
-        <result column="isBattery" property="isBattery" />
-        <result column="aliPosttime" property="aliPosttime" />
-        <result column="addPrice" property="freight_upgrade" />
-
-    </resultMap>
-
-    <resultMap id="CollectionBeanResultMap" type="com.cbt.warehouse.pojo.CollectionBean" >
-        <id column="id" property="id" />
-        <result column="userid" property="userid" />
-        <result column="titile" property="titile" />
-        <result column="moq" property="moq" />
-        <result column="url" property="url" />
-        <result column="price" property="price" />
-        <result column="img" property="img" />
-        <result column="createtime" property="createtime" />
-    </resultMap>
-
-    <resultMap id="TypeAvgWeightBeanResultMap" type="com.cbt.warehouse.pojo.TypeAvgWeightBean" >
-        <id column="catid" property="catid" />
-        <result column="weight" property="weight" />
-    </resultMap>
-
-    <select id="getMaxGoodsdata" resultType="Integer" parameterType="String">
+  
+  <resultMap id="SpiderBeanResultMap" type="com.cbt.warehouse.pojo.SpiderBean" >
+    <id column="id" property="id" />
+    <result column="userid" property="userId" />
+    <result column="goods_url" property="url" />
+    <result column="goods_title" property="name" />
+    <result column="googs_seller" property="seller" />
+    <result column="googs_img" property="img_url" />
+    <result column="googs_price" property="price" />
+    <result column="googs_number" property="number" />
+    <result column="googs_size" property="size" />
+    <result column="googs_color" property="color" />
+    <result column="freight" property="freight" />
+    <result column="remark" property="remark" />
+    <result column="itemId" property="itemId" />
+    <result column="shopId" property="shopId" />
+    <result column="norm_least" property="norm_least" />
+    <result column="pWprice" property="pWprice" />
+    <result column="sessionid" property="sessionId" />
+    <result column="true_shipping" property="true_shipping" />
+    <result column="delivery_time" property="delivery_time" />
+    <result column="freight_free" property="freight_free" />
+    <result column="width" property="width" />
+    <result column="perWeight" property="perWeight" />
+    <result column="seilUnit" property="seilUnit" />
+    <result column="goodsUnit" property="goodsUnit" />
+    <result column="bulk_volume" property="bulk_volume" />
+    <result column="total_weight" property="total_weight" />
+    <result column="per_weight" property="weight" />
+    <result column="free_shopping_company" property="free_shopping_company" />
+    <result column="free_sc_days" property="free_sc_days" />
+    <result column="preferential" property="preferential" />
+    <result column="deposit_rate" property="deposit_rate" />
+    <result column="guid" property="guId" />
+    <result column="goods_type" property="types" />
+    <result column="feeprice" property="feeprice" />
+    <result column="currency" property="currency" />
+    <result column="goods_class" property="goods_class" />
+    <result column="extra_freight" property="extra_freight" />
+    <result column="source_url" property="source_url" />
+    <result column="method_feight" property="method_feight" />
+    <result column="catid" property="goods_catid" />
+    <result column="goodsdata_id" property="goodsdata_id" />
+    <result column="isshipping_promote" property="isshipping_promote" />
+    <result column="price1" property="price1" />
+    <result column="price2" property="price2" />
+    <result column="price3" property="price3" />
+    <result column="theproductfrieght" property="theproductfrieght" />
+    <result column="notfreeprice" property="notfreeprice" />
+    <result column="isvolume" property="isvolume" />
+    <result column="freeprice" property="freeprice" />
+    <result column="firstprice" property="firstprice" />
+    <result column="firstnumber" property="firstnumber" />
+    
+    <result column="shipping_express" property="shipping_express" />
+    <result column="international_time" property="international_time" />
+    <result column="shipping_cost" property="shipping_cost" />
+    <result column="pay_price" property="pay_price" />
+    <result column="country" property="countryId" />
+    <result column="isFeight" property="isFeight" />
+    <result column="isBattery" property="isBattery" />
+    <result column="aliPosttime" property="aliPosttime" />
+    <result column="addPrice" property="freight_upgrade" />
+    
+  </resultMap>
+  <resultMap id="searchLogMap" type="ceRong.tools.bean.SearchLog" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="sessionid" property="sessionid" />
+    <result column="userIP" property="userIP" />
+    <result column="keyWords" property="keyWords" />
+    <result column="catid" property="catid" />
+    <result column="sortType" property="sortType" />
+    <result column="pageNumber" property="pageNumber" />
+    <result column="productShowIdList" property="productShowIdList" />
+    <result column="allProductList" property="allProductList" />
+    <result column="listSize" property="listSize" />
+    <result column="device" property="device" />
+    <result column="saveFlag" property="saveFlag" />
+    <result column="showPageYear" property="year" />
+    <result column="showPageMonth" property="month" />
+    <result column="showPageDay" property="day" />
+    <result column="searchMD5" property="searchMD5" />
+    <result column="searchUserMD5" property="searchUserMD5" />
+  </resultMap>
+  <resultMap id="CollectionBeanResultMap" type="com.cbt.warehouse.pojo.CollectionBean" >
+    <id column="id" property="id" />
+    <result column="userid" property="userid" />
+    <result column="titile" property="titile" />
+    <result column="moq" property="moq" />
+    <result column="url" property="url" />
+    <result column="price" property="price" />
+    <result column="img" property="img" />
+    <result column="createtime" property="createtime" />
+  </resultMap>
+  
+  <resultMap id="TypeAvgWeightBeanResultMap" type="com.cbt.warehouse.pojo.TypeAvgWeightBean" >
+    <id column="catid" property="catid" />
+    <result column="weight" property="weight" />
+  </resultMap>
+  
+  <select id="getMaxGoodsdata" resultType="Integer" parameterType="String">
     select max(id) from goodsdata where url = #{url}
   </select>
 
@@ -518,60 +537,60 @@
         select id,googs_number,googs_price,state,freight_free,goods_class,extra_freight,free_sc_days,perWeight, seilUnit, goodsUnit,guid,price1 from goods_car
         where userid=#{userid} and preferential=#{itemid}
 
-        <!-- 	select
-            distinct(goods_car.id),googs_number,preferential_application.discountedunitprice as googs_price,goods_car.state,
-            freight_free,goods_class,extra_freight,free_sc_days,goods_car.perWeight,seilUnit, goodsUnit,guid
-            from goods_car
-            INNER JOIN preferential_application
-            on goods_car.preferential = preferential_application.itemId
-            and goods_car.goods_type = preferential_application.goods_types
-            where goods_car.userid=#{userid} and preferential_application.itemId =#{itemid}  -->
-
-    </select>
-
-    <!-- 获取订单信息，地址，交期  -->
-    <select id="getOrderInfo" parameterType="String" resultType="hashmap">
-        select  order_no,product_cost,address,address2,phoneNumber,zipcode,(select country from zone where oa.country = zone.id) Country,statename,
-        street,recipients,create_time,pay_price_tow,currency,mode_transport from order_address oa ,orderinfo o where oa.orderno=o.order_no and  oa.orderNo in
-        <foreach item="item" index="index" collection="orderNo" open="(" close=")" separator=",">
-            #{orderNo}
-        </foreach>
-    </select>
-    <!-- 获取订单详情信息，产品名称，总价 -->
-    <select id="getOrderDetails" parameterType="String" resultType="hashmap">
-        select orderid,yourorder,goodsprice,goodsname,oa.delivery_time,car_img,yourorder,car_type,(select img from goods_typeimg where oa.goodsid = goods_id)
-        goods_typeimg from order_details oa where  orderid in
-        <foreach item="item" index="index" collection="orderNo" open="(" close=")" separator=",">
-            #{orderNo}
-        </foreach>
-    </select>
-    <select id="getGid_numbers" parameterType="String" resultType="hashmap">
-        select id,googs_number,googs_price,freight_free,total_weight,guid from goods_car where guid in
-        <foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-        <choose>
-            <when test="userId != 0">
-                and userid=#{userId}
-            </when>
-            <otherwise>
-                and sessionid=#{sessionId}
-            </otherwise>
-        </choose>
-    </select>
-    <select id="getSelectedItemVat" parameterType="String" resultType="hashmap">
-        select catid,sum(googs_price*googs_number) sprice,(select category  from ali_category where catid= cid) category from goods_car   where goods_car.id in
-        <foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-        and freight_free=0 and catid is not null group by catid
-    </select>
-
-    <select id="getCatid_Filter_AvgWeight"  resultMap="TypeAvgWeightBeanResultMap">
-        select catid,weight from  catid_filter where type=9 and valid=1
-    </select>
-
-    <!-- ****com.cbt.pay.dao end*** -->
+<!-- 	select
+	distinct(goods_car.id),googs_number,preferential_application.discountedunitprice as googs_price,goods_car.state,
+	freight_free,goods_class,extra_freight,free_sc_days,goods_car.perWeight,seilUnit, goodsUnit,guid
+	from goods_car
+	INNER JOIN preferential_application
+	on goods_car.preferential = preferential_application.itemId
+	and goods_car.goods_type = preferential_application.goods_types
+	where goods_car.userid=#{userid} and preferential_application.itemId =#{itemid}  -->
+	
+  </select>
+  
+  <!-- 获取订单信息，地址，交期  -->
+  <select id="getOrderInfo" parameterType="String" resultType="hashmap">
+		select  order_no,product_cost,address,address2,phoneNumber,zipcode,(select country from zone where oa.country = zone.id) Country,statename,
+		street,recipients,create_time,pay_price_tow,currency,mode_transport from order_address oa ,orderinfo o where oa.orderno=o.order_no and  oa.orderNo in 
+		<foreach item="item" index="index" collection="orderNo" open="(" close=")" separator=",">
+			#{orderNo}
+		</foreach>
+  </select>
+  <!-- 获取订单详情信息，产品名称，总价 -->
+  <select id="getOrderDetails" parameterType="String" resultType="hashmap">
+			select orderid,yourorder,goodsprice,goodsname,oa.delivery_time,car_img,yourorder,car_type,(select img from goods_typeimg where oa.goodsid = goods_id) 
+			goods_typeimg from order_details oa where  orderid in 
+			<foreach item="item" index="index" collection="orderNo" open="(" close=")" separator=",">
+			#{orderNo}
+			</foreach>
+  </select>
+   <select id="getGid_numbers" parameterType="String" resultType="hashmap">
+			select id,googs_number,googs_price,freight_free,total_weight,guid from goods_car where guid in 
+			<foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
+			#{item}
+			</foreach>
+			<choose>
+    	<when test="userId != 0">
+    		and userid=#{userId}
+    	</when>
+    	<otherwise>
+    		and sessionid=#{sessionId}
+    	</otherwise>
+    </choose>
+  </select>
+   <select id="getSelectedItemVat" parameterType="String" resultType="hashmap">
+			select catid,sum(googs_price*googs_number) sprice,(select category  from ali_category where catid= cid) category from goods_car   where goods_car.id in  
+			<foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+     and freight_free=0 and catid is not null group by catid 
+  </select>
+  
+  <select id="getCatid_Filter_AvgWeight"  resultMap="TypeAvgWeightBeanResultMap">
+			select catid,weight from  catid_filter where type=9 and valid=1
+  </select>
+  
+  <!-- ****com.cbt.pay.dao end*** -->
     <!-- 根据orderNo、itemId、goods_type、userid获取购物车商品信息 -->
     <select id="getGoodsInfoByOrderNo" parameterType="string" resultType="java.util.HashMap">
         select goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
@@ -593,4 +612,17 @@
             </otherwise>
         </choose>
     </select>
+    <!-- 搜索页面用户行为跟踪 -->
+    <insert id="saveTheSearchLogOnSearchPage" useGeneratedKeys="true" keyProperty="id" parameterType="ceRong.tools.bean.SearchLog">
+        insert into searchproductlog(userid,sessionid,userIP,keywords,catid,sortType,pageNumber,showPageYear,showPageMonth,showPageDay,showPageTime,productShowIdList,allProductList,listSize,device,searchMD5,searchUserMD5)
+        values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
+    </insert>
+    <update id="updateTheSearchLogOnSearchPage">
+        update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
+    </update>
+    <insert id="saveTheClickCountOnSearchPage">
+        insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime)
+        values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
+        on duplicate key update clickCount=clickCount+1,updateTime = now()
+    </insert>
 </mapper>

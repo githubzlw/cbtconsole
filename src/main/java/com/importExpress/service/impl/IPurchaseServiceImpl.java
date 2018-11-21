@@ -1409,10 +1409,10 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		} else {
 			purchaseBean.setSaler(map.get("aruadminid"));
 		}
-		if(map.get("authorized_flag") != null){
-			purchaseBean.setAuthorized_flag(Integer.valueOf(String.valueOf(map.get("authorized_flag"))));
+		if(map.get("aFlag") != null && StringUtil.isNotBlank(String.valueOf(map.get("aFlag")))){
+			purchaseBean.setAuthorized_flag(Integer.valueOf(String.valueOf(map.get("aFlag"))));
 		}else{
-			purchaseBean.setAuthorized_flag(2);
+			purchaseBean.setAuthorized_flag(1);
 		}
 		String authorizedFlag="未授权";
 		if((map.get("tb_1688_itemid") != null && String.valueOf(map.get("goods_pid")).equals(String.valueOf(map.get("tb_1688_itemid")))) || map.get("tb_1688_itemid") == null){

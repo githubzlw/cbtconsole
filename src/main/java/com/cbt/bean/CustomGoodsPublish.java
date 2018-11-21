@@ -79,6 +79,10 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String unsellAbleReasonDesc;//软下架说明
 
     private String offReason;//下架原因
+    private int clickNum;//点击次数
+    private int weightNotFlag;//重量不合理标注
+    private int uglyFlag;//难看标识
+    private int repairedFlag;//修复标识
 
 
     public String getAliGoodsPrice() {
@@ -545,6 +549,8 @@ public class CustomGoodsPublish extends CustomGoodsBean {
             unsellAbleReasonDesc = "1688商品货源变更";
         } else if (unsellAbleReason == 15) {
             unsellAbleReasonDesc = "除服装珠宝分类外的非精品数据更新到软下架";
+        } else if (unsellAbleReason == 16) {
+            unsellAbleReasonDesc = "“搜索展现点击比+添加购物车数据”指标不符合要求";
         }
     }
 
@@ -562,5 +568,37 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setOffReason(String offReason) {
         this.offReason = offReason;
+    }
+
+    public int getWeightNotFlag() {
+        return weightNotFlag;
+    }
+
+    public void setWeightNotFlag(int weightNotFlag) {
+        this.weightNotFlag = weightNotFlag;
+    }
+
+    public int getUglyFlag() {
+        return uglyFlag;
+    }
+
+    public void setUglyFlag(int uglyFlag) {
+        this.uglyFlag = uglyFlag;
+    }
+
+    public int getRepairedFlag() {
+        return repairedFlag;
+    }
+
+    public void setRepairedFlag(int repairedFlag) {
+        this.repairedFlag = repairedFlag;
+    }
+
+    public int getClickNum() {
+        return clickNum;
+    }
+
+    public void setClickNum(int clickNum) {
+        this.clickNum = clickNum;
     }
 }

@@ -33,6 +33,34 @@ public class OrderSalesAmountPojo {
 	private String orderids;
 	private String shipnos;
 	private int flag;
+
+	public String getOrder_sales() {
+		return order_sales;
+	}
+
+	public void setOrder_sales(String order_sales) {
+		this.order_sales = order_sales;
+	}
+
+	public String getBalance_compensation() {
+		return balance_compensation;
+	}
+
+	public void setBalance_compensation(String balance_compensation) {
+		this.balance_compensation = balance_compensation;
+	}
+
+	private String order_sales;
+	private String balance_compensation;
+	public String getfProfits() {
+		return fProfits;
+	}
+
+	public void setfProfits(String fProfits) {
+		this.fProfits = fProfits;
+	}
+
+	private String fProfits;
 	public int getFlag() {
 		return flag;
 	}
