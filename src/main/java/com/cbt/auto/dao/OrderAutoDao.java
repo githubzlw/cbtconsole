@@ -5,6 +5,7 @@ import com.cbt.auto.ctrl.OrderAutoBean;
 import com.cbt.auto.ctrl.PureAutoPlanBean;
 import com.cbt.bean.AdmDsitribution;
 import com.cbt.bean.OrderAutoDetail;
+import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.GoodsDistribution;
 
@@ -65,7 +66,12 @@ public interface OrderAutoDao {
     public String getPayPalAddress(String orderNo);
     public int updateIsStockFlag();
      public List<AdmDsitribution> getAdmuserType(String time);
-     
+    /**
+     * 根据用户订单号获取发送邮件需要的用户邮箱等信息
+     * @param orderNo
+     * @return
+     */
+     public OrderBean getUserOrderInfoByOrderNo(String orderNo);
      public int insertBGP(OrderAutoBean o, String time);
 
      public int insertPap(PureAutoPlanBean pap);

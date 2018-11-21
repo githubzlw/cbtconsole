@@ -17,6 +17,8 @@ import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
 import com.cbt.website.bean.*;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -434,13 +436,15 @@ public class OrderinfoService implements IOrderinfoService {
 				String check="";
 				String address =String.valueOf(map.get("address"));
 				searchresultinfo.setStrcar_type(changetypeName(car_type));
+				searchresultinfo.setIsExitPhone(String.valueOf(map.get("isExitPhone")));
 				searchresultinfo.setTaobao_itemid(resultTaobaoItemId);
 				//获取商品的店铺名称
 				String shop_id="0000";
-				if(String.valueOf(map.get("goods_pid")).equals(String.valueOf(map.get("tb_1688_itemid")))){
+				String goods_pid=String.valueOf(map.get("goods_pid"));
+				if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
 					//采购货源和推荐货源一致
-					shop_id=dao.getShopId(String.valueOf(map.get("goods_pid")));
-					//是否授权(0,2)
+					shop_id=dao.getShopId(goods_pid);
+					//是否授权
 					String flag="1";
 					if(map.get("authorizedFlag") == null || StringUtil.isBlank(map.get("authorizedFlag")) || "0".equals(String.valueOf(map.get("authorizedFlag"))) || "2".equals(String.valueOf(map.get("authorizedFlag")))){
 						flag="0";
@@ -450,13 +454,14 @@ public class OrderinfoService implements IOrderinfoService {
 							|| (address.contains("加拿大") || "6".equals(address) || "CANADA".equals(address.toLowerCase())))){
 						check="请核查该商品是否侵权";
 					}
-				}else{
-					//采购 货源和推荐货源不一致，换了一家店铺采购
 				}
 				//采购是否该商品授权  1已授权
-				String authorized_flag=String.valueOf(map.get("authorized_flag"));
-				if("1".equals(authorized_flag)){
-					check="";
+				String authorized_flag=String.valueOf(map.get("aFlag"));
+				if("0".equals(authorized_flag)){
+					check="采购已对该商品授权";
+				}else if("2".equals(authorized_flag)){
+					//查询上一次该商品发货的订单信息
+					check=iWarehouseDao.getBatckInfo(goods_pid);
 				}
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
@@ -945,6 +950,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public List<Map<String, String>> getOrderManagementQuery(int userID, int state, String startdate, String enddate, String email, String orderno, int startpage, int page, int admuserid, int buyid,
 	                                                         int showUnpaid, String type, int status, String paymentid) {
 		long start=System.currentTimeMillis();
+		UserDao udao = new UserDaoImpl();
 		List<Map<String, String>> list=dao.getOrderManagementQuery(userID,state,StringUtils.isStrNull(startdate)?"":startdate,StringUtils.isStrNull(enddate)?"":enddate,StringUtils.isStrNull(email)?"":email, StringUtils.isStrNull(orderno)?"":orderno,startpage,page,admuserid,buyid,showUnpaid,StringUtils.isStrNull(type)?"":type,status,paymentid);
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
@@ -963,10 +969,25 @@ public class OrderinfoService implements IOrderinfoService {
 				tp=StringUtil.getPayType(paytype);
 			}
 			map.put("paytypes",tp);
+			// if((odCode == null || ipnaddress == null || ipnaddress !=odCode) && json[i].paytypes.indexOf("paypal")>-1){
 			String allFreight =String.valueOf(map.get("allFreight"));
 			OrderBean orderInfo=new OrderBean();
 			orderInfo.setMode_transport(String.valueOf(map.get("mode_transport")));
 			orderInfo.setOrderNo(String.valueOf(map.get("order_no")));
+			String addressFlag="0";
+			String odCode=map.get("odCode");
+			String ipnaddress=map.get("ipnaddress");
+			String zCountry=map.get("zCountry");
+			if((StringUtil.isBlank(odCode) || StringUtil.isBlank(ipnaddress) || !ipnaddress.equals(odCode)) && tp.indexOf("paypal")>-1){
+				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
+				String addressCountry=aMap.get("address_country");
+				if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
+					addressFlag="0";
+				}else{
+					addressFlag="1";
+				}
+			}
+			map.put("addressFlag",addressFlag);
 			long starttime=System.currentTimeMillis();
 			double freightFee = orderInfo.getFreightFee();
 			//getFreightFee(allFreight, orderInfo);

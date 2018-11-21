@@ -7,6 +7,7 @@ import com.cbt.auto.dao.OrderAutoDao;
 import com.cbt.auto.dao.OrderAutoDaoImpl;
 import com.cbt.bean.AdmDsitribution;
 import com.cbt.bean.OrderAutoDetail;
+import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.GoodsDistribution;
 
@@ -90,6 +91,11 @@ public class PreOrderAutoService implements IOrderAutoService {
 	@Override
 	public String getPayPalAddress(String orderNo) {
 		return dao.getPayPalAddress(orderNo);
+	}
+
+	@Override
+	public OrderBean getUserOrderInfoByOrderNo(String orderNo) {
+		return dao.getUserOrderInfoByOrderNo(orderNo);
 	}
 
 	@Override

@@ -18,10 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * 获取注册页面、支付页面、购物车页面的反馈信息;
@@ -120,6 +117,26 @@ public class ProblemFeedBackController {
 		}
 
 	}
+
+
+    /**
+     * customerInfo_collection.html 页头提醒条数
+     *  2018/11/19 9:57 ly
+     *  http://192.168.1.57:8086/cbtconsole/problemFeedBack/queryWarningNum
+     *
+     * @return
+     */
+    @RequestMapping("/queryWarningNum")
+    @ResponseBody
+    public Map<String, String> queryWarningNum() {
+        try {
+            Map<String, String> result = problemFeedBackService.queryWarningNum();
+            return result;
+        } catch (Exception e) {
+            LOG.error("The queryWarningNum query fails, the reason is :" + e.getMessage());
+        }
+        return null;
+    }
 
 	@RequestMapping("/exportExcel")
 	@ResponseBody

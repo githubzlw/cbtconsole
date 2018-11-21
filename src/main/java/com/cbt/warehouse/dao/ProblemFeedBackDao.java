@@ -4,6 +4,7 @@ import com.cbt.warehouse.pojo.ProblemFeedBackBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProblemFeedBackDao {
 
@@ -25,4 +26,5 @@ public interface ProblemFeedBackDao {
 	 */
 	public List<ProblemFeedBackBean> getReportProblem(@Param("report_id") String report_id);
 
+    List<Map<String,String>> queryWarningNum();
 }

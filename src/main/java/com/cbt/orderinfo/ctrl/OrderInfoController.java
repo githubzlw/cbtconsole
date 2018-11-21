@@ -7,22 +7,21 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.processes.service.ISpiderServer;
-import com.cbt.util.Md5Util;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Utility;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
+import com.cbt.website.quartz.ParseOrderFreightJob;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.google.gson.Gson;
 import com.importExpress.service.IPurchaseService;
 
 import ceRong.tools.bean.SearchLog;
 import net.minidev.json.JSONArray;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +41,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/order")
 public class OrderInfoController{
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderInfoController.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	
@@ -77,32 +77,71 @@ public class OrderInfoController{
 	 */
 	@RequestMapping(value = "/flushOrderFreight")
 	public void flushOrderFreight(HttpServletRequest request, HttpServletResponse response)throws Exception {
-		PrintWriter out = response.getWriter();
 		try{
-			DecimalFormat df = new DecimalFormat("######0.00");
+			logger.info("开始刷新订单预估运费数据===");
 			List<OrderBean> list=iOrderinfoService.getFlushOrderFreightOrder();
-			for(OrderBean o:list){
-				double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
-				String freight=df.format(freightFee);
-				//更新预估国际运费
-//				iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight);
-			}
+			flushFreight(list);
 			list.clear();
-//			list=iOrderinfoService.getFlushOrderFreightOrderCancel();
-//			for(OrderBean o:list){
-//				double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
-//				String freight=df.format(freightFee);
-//				//更新预估国际运费
-//				iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight);
-//			}
-//			list.clear();
+			logger.info("结束刷新订单预估运费数据===");
 		}catch (Exception e){
-			e.printStackTrace();
+			logger.info("刷新订单运费运费错误。、。。。。。。。。。。");
 		}
-		out.print(1);
-		out.flush();
-		out.close();
+		//采购输入的价格数量和订单销售数量有问题的订单预警
+		List<OrderBean> listFlag=iOrderinfoService.getAllOrderInfo();
+		for(int i=0;i<listFlag.size();i++){
+			OrderBean o=listFlag.get(i);
+			String orderNo=o.getOrderNo();
+			String yourorder=o.getYourorder();
+			String buyAmount=o.getBuyAmount();
+			String buycount=o.getBuycount();
+			String esprice=o.getEsBuyPrice();
+			System.out.println("orderNo==================="+orderNo);
+			if(StringUtil.isBlank(buyAmount) || StringUtil.isBlank(buycount)){
+				continue;
+			}
+			double fit=Math.abs((Double.parseDouble(esprice)-Double.parseDouble(buyAmount))/Double.parseDouble(buyAmount)*100);
+			if(Integer.valueOf(buycount)>Integer.valueOf(yourorder) || fit>10){
+				iOrderinfoService.deleteFlagByOrder(orderNo);
+				iOrderinfoService.insertFlagByOrderid(orderNo);
+			}
 		}
+	}
+
+	public void flushFreight(List<OrderBean> list){
+		DecimalFormat df = new DecimalFormat("######0.00");
+		for(OrderBean o:list){
+			logger.info("开始刷新订单【"+o.getOrderNo()+"】运费和预估采购额");
+			double freightFee = iOrderinfoService.getFreightFee(o.getVolumeweight(), o);
+			String freight=df.format(freightFee);
+			//刷新订单的预计采购金额
+			List<OrderDetailsBean> odList=iOrderinfoService.getOrdersDetails(o.getOrderNo());
+			double BuyPrice=0.00;
+			for(OrderDetailsBean odb:odList){
+				String price1688 = Utility.getStringIsNull(odb.getCbrPrice()) ? odb.getCbrPrice() : "0";
+				if("0".equals(price1688) || StringUtil.isBlank(odb.getCbrPrice())){
+					price1688=odb.getCbrdPrice();
+				}
+				price1688=StringUtil.isBlank(price1688)?"0":price1688;
+				String es_price=price1688;
+				if(odb.getState() ==1 || odb.getState() == 0){
+					es_price=StringUtil.getEsPrice(es_price);
+				}else{
+					es_price="0.00";
+				}
+				String ali_sellunit=odb.getAli_sellunit();
+				int unit= Util.getNumberForStr(ali_sellunit);
+				BuyPrice+=Double.valueOf(es_price)*odb.getYourorder()*unit;
+			}
+			double pid_amount=0.00;
+			if(odList.size()>0){
+				pid_amount=odList.get(0).getPid_amount();
+			}
+			//更新预估国际运费,预估采购金额
+			String esBuyPrice=df.format(BuyPrice+pid_amount);
+			logger.info("订单【"+o.getOrderNo()+"】运费【"+freight+"】和预估采购额：【"+esBuyPrice+"】");
+			iOrderinfoService.updateFreightForOrder(o.getOrderNo(),freight,esBuyPrice);
+		}
+	}
 
 	/**
 	 * 月用户利润订单预警
@@ -321,6 +360,7 @@ public class OrderInfoController{
 			map.put("warehouseRemark",request.getParameter("warehouseRemark"));
 			map.put("repState",request.getParameter("repState"));
 			map.put("count",request.getParameter("count"));
+			map.put("odid",request.getParameter("odid"));
 			//取消验货数量
 			map.put("barcode",request.getParameter("barcode"));
 			map.put("seiUnit",request.getParameter("seiUnit"));

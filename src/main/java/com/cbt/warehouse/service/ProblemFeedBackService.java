@@ -3,6 +3,7 @@ package com.cbt.warehouse.service;
 import com.cbt.warehouse.pojo.ProblemFeedBackBean;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProblemFeedBackService {
 
@@ -20,5 +21,6 @@ public interface ProblemFeedBackService {
 	 * @return List<ProblemFeedBackBean>
 	 */
 	public List<ProblemFeedBackBean> getReportProblem(String report_id);
-	
+
+    Map<String,String> queryWarningNum();
 }

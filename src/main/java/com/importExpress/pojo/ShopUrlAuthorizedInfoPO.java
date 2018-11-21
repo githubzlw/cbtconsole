@@ -12,8 +12,11 @@ public class ShopUrlAuthorizedInfoPO {
 	// 授权文件名
 	private String fileName;
 
-	// 上传服务器地址
+	// 该文件在本地路径（下载时候会用到）
 	private String fileUrl;
+
+	// 该文件在图片服务器中地址（只做备份 未使用）
+	private String imgFileUrl;
 
 	// 文件上传人
 	private Integer adminId = 0;
@@ -36,7 +39,15 @@ public class ShopUrlAuthorizedInfoPO {
 
 	private Date updatetime;
 
-	public Long getId() {
+    public String getImgFileUrl() {
+        return imgFileUrl;
+    }
+
+    public void setImgFileUrl(String imgFileUrl) {
+        this.imgFileUrl = imgFileUrl;
+    }
+
+    public Long getId() {
 		return id;
 	}
 

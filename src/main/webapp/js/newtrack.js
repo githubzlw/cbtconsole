@@ -1066,7 +1066,7 @@ function search() {
                             queryRecord(json[i].odid);
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:#ff0000;">'
                                 +id_qty
-                                + '</span></h3><h3>商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
+                                + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
                                 /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
                                 str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
@@ -1086,8 +1086,12 @@ function search() {
                                 + json[i].usecount
                                 + '</span></h3></p>';
                         }
+                        if(json[i].isExitPhone>0){
+                            str+='<a target="_blank" href="/cbtconsole/website/inspection_picture_editing.jsp?goodsPid='+json[i].goods_pid+'&odid='+json[i].odid+'&oldOrderid='+json[i].orderid+'" style="color:red">该商品存在验货图片,点击查看</a>';
+                        }
                         str += '<div style="height: 50px;">'
-                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'"></div><br />'
+                            + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'">'
+                            +'</div><br />'
                             + '<canvas onclick="AutoResizeImage(this)"  id="canvas_'+json[i].orderid+'_'+json[i].odid+'"></canvas>'
                             + '</div>';
                         str += '</div>';
@@ -1413,7 +1417,7 @@ function search() {
                                 queryRecord(json[i].odid);
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:red;">'
                                     +id_qty
-                                    + '</span></h3><h3>商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
+                                    + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
                                     /*+ '<input type="button"  value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">'*/
                                 if (json[i].weight == undefined) {
                                     str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
@@ -1693,6 +1697,7 @@ function saveWeight(orderid,odid,pid){
             if(Number(data) == 1){
                 document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量成功";
                 $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html("已保存的重量:" + weight + "Kg&nbsp;")
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight_flag]").html("未同步到产品库");
             }else if(Number(data) == 1){
                 document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量失败";
             }else if(Number(data) == 2){
