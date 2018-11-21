@@ -25,6 +25,6 @@ public enum TemplateType {
     }
     @Override
     public String toString(){
-        return this.name.toLowerCase();
+        return "mailTemplate/"+this.name.toLowerCase();
     }
 }

@@ -823,7 +823,9 @@ public class NewOrderSplitCtr {
 		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER);*/
 		// 购物车营销
 		model = SerializeUtil.JsonToMapStr(shopcar);
-		sendMailFactory.sendMail("saycjc@outlook.com", null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.SHOPPING_CART_MARKETING);
+		sendMailFactory.sendMail("saycjc@outlook.com", null,
+				"Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!",
+				model, TemplateType.SHOPPING_CART_MARKETING);
 		return "1";
 	}
 }
