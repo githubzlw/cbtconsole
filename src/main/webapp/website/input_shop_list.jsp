@@ -439,6 +439,15 @@
             <option value="2">2-授权文件到期</option>
             <option value="3">3-已授权但无授权文件+授权文件到期</option>
         </select>
+            店铺英文及品牌属性筛选：<select id="enname_brand_flag" class="easyui-combobox" name="authorizedFlag" style="width:180px;">
+            <option value="-1">无筛选</option>
+            <option value="1">1-店铺英文为空</option>
+            <option value="2">2-品牌属性为空</option>
+            <option value="3">3-店铺英文+品牌属性都为空</option>
+            <option value="4">4-店铺英文不为空</option>
+            <option value="5">5-品牌属性不为空</option>
+            <option value="6">6-店铺英文+品牌属性都不为空</option>
+        </select>
             <input
                     class="but_color" type="button" value="查询" onclick="doQuery(1)">
             <input class="but_color" type="button" value="重置"
@@ -581,6 +590,7 @@
         var shopType = $("#shop_type").combobox('getValue');
         var authorizedFlag = $("#authorized_flag").combobox('getValue');
         var authorizedFileFlag = $("#authorized_file_flag").combobox('getValue');
+        var ennameBrandFlag = $("#enname_brand_flag").combobox('getValue');
         $("#easyui-datagrid").datagrid("load", {
             "page": page,
             "createTime": data,
@@ -595,6 +605,7 @@
             "shopType":shopType,
             "authorizedFlag":authorizedFlag,
             "authorizedFileFlag":authorizedFileFlag,
+            "ennameBrandFlag":ennameBrandFlag,
             "admName":admName,
             "days":days
         });

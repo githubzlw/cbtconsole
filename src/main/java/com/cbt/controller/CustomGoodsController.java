@@ -2,7 +2,6 @@ package com.cbt.controller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.importExpress.pojo.OnlineGoodsStatistic;
+import com.importExpress.utli.EasyUiTreeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -509,39 +508,7 @@ public class CustomGoodsController {
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);
 		int count = customGoodsService.queryGoodsInfosCount(queryBean);
 
-		Map<String, Object> treeRoot = new HashMap<String, Object>();// 根节点
-		List<Map<String, Object>> treeMap = new ArrayList<Map<String, Object>>();// 根节点的所有子节点
-
-		List<Map<String, Object>> parentMaps = new ArrayList<Map<String, Object>>();
-		// 循环获取一级目录数据并赋值子菜单
-		for (CategoryBean ct : categorys) {
-			if (ct.getLv() == 1 && !"2".equals(ct.getCid())) {
-				Map<String, Object> childMap = new HashMap<String, Object>();
-				childMap.put("id", ct.getCid());
-				childMap.put("text", ct.getCategoryName());
-				childMap.put("state", "closed");
-				childMap.put("total", ct.getTotal());
-				childMap.put("children", getChildMap(ct.getCid(), categorys, ct.getLv()));
-				parentMaps.add(childMap);
-			}
-		}
-		List<Map<String, Object>> nwParentMaps = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> ptMap : parentMaps) {
-			int ptCount = doTreeCount(ptMap);
-			if (ptCount == 0) {
-				ptMap.put("children", null);
-			} else {
-				ptCount += Integer.valueOf(ptMap.get("total").toString());
-				ptMap.put("text", ptMap.get("text") + "(<b>" + ptCount + "</b>)");
-				nwParentMaps.add(ptMap);
-			}
-		}
-		parentMaps.clear();
-
-		treeRoot.put("children", nwParentMaps);
-		treeRoot.put("id", "0");
-		treeRoot.put("text", "全部类别" + "(<b>" + count + "</b>)");
-		treeMap.add(treeRoot);
+		List<Map<String, Object>> treeMap = EasyUiTreeUtils.genEasyUiTree(categorys,count);
 		categorys.clear();
 		return treeMap;
 	}
@@ -553,104 +520,9 @@ public class CustomGoodsController {
 		List<CategoryBean> categorys = customGoodsService.queryStaticizeCateroryByParam();
 		int count = customGoodsService.queryStaticizeGoodsInfosCount();
 
-		Map<String, Object> treeRoot = new HashMap<String, Object>();// 根节点
-		List<Map<String, Object>> treeMap = new ArrayList<Map<String, Object>>();// 根节点的所有子节点
-
-		List<Map<String, Object>> parentMaps = new ArrayList<Map<String, Object>>();
-		// 循环获取一级目录数据并赋值子菜单
-		for (CategoryBean ct : categorys) {
-			if (ct.getLv() == 1 && !"2".equals(ct.getCid())) {
-				Map<String, Object> childMap = new HashMap<String, Object>();
-				childMap.put("id", ct.getCid());
-				childMap.put("text", ct.getCategoryName());
-				childMap.put("state", "closed");
-				childMap.put("total", ct.getTotal());
-				childMap.put("children", getChildMap(ct.getCid(), categorys, ct.getLv()));
-				parentMaps.add(childMap);
-			}
-		}
-		List<Map<String, Object>> nwParentMaps = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> ptMap : parentMaps) {
-			int ptCount = doTreeCount(ptMap);
-			if (ptCount == 0) {
-				ptMap.put("children", null);
-			} else {
-				ptCount += Integer.valueOf(ptMap.get("total").toString());
-				ptMap.put("text", ptMap.get("text") + "(<b>" + ptCount + "</b>)");
-				nwParentMaps.add(ptMap);
-			}
-		}
-		parentMaps.clear();
-
-		treeRoot.put("children", nwParentMaps);
-		treeRoot.put("id", "0");
-		treeRoot.put("text", "全部类别" + "(<b>" + count + "</b>)");
-		treeMap.add(treeRoot);
+		List<Map<String, Object>> treeMap = EasyUiTreeUtils.genEasyUiTree(categorys,count);
 		categorys.clear();
 		return treeMap;
-	}
-
-	// 根据cid和lv寻找次级目录
-	private List<Map<String, Object>> getChildMap(String cid, List<CategoryBean> categorys, int lv) {
-		List<Map<String, Object>> childMaps = new ArrayList<Map<String, Object>>();
-		for (CategoryBean ct : categorys) {
-			// 判断path数据不为空lv是传递参数的+1值，并且在path中含有父类的cid
-			if ((ct.getLv() == lv + 1) && !(ct.getPath() == null || "".equals(ct.getPath()))) {
-				// 寻找当前数据的
-				String[] catids = ct.getPath().split(",");
-				if (catids.length > 0) {
-					for (String catid : catids) {
-						if (cid.equals(catid)) {
-							Map<String, Object> child = new HashMap<String, Object>();
-							child.put("id", ct.getCid());
-							child.put("text", ct.getCategoryName());
-							child.put("total", ct.getTotal());
-
-							List<Map<String, Object>> childList = getChildMap(ct.getCid(), categorys, ct.getLv());
-							// 递归创建
-							child.put("children", childList);
-							if (ct.getLv() == 2 && childList.size() > 0) {
-								child.put("state", "closed");
-							}
-							childMaps.add(child);
-							break;
-						}
-					}
-				}
-				catids = null;
-			}
-		}
-		return childMaps;
-	}
-
-	// 递归统计总数
-	@SuppressWarnings("unchecked")
-	private int doTreeCount(Map<String, Object> parentMap) {
-		int count = 0;
-		List<Map<String, Object>> list = (List<Map<String, Object>>) parentMap.get("children");
-		if (list == null || list.size() == 0) {
-			return count;
-		}
-		List<Map<String, Object>> nwList = new ArrayList<Map<String, Object>>();
-		for (Map<String, Object> childMap : list) {
-			// 统计子节点的孩子总数+本身的总数
-			int cur_cnt = doTreeCount(childMap);
-			if (cur_cnt == 0) {
-				childMap.put("children", null);
-			}
-			cur_cnt += Integer.valueOf(childMap.get("total").toString());
-			childMap.put("text", childMap.get("text") + "(<b>" + cur_cnt + "</b>)");
-			// 覆盖赋值
-			childMap.put("total", cur_cnt);
-			if (cur_cnt > 0) {
-				nwList.add(childMap);
-			}
-			count += cur_cnt;
-		}
-		parentMap.put("children", nwList);
-		list.clear();
-		// 返回前记录当前节点的统计个数
-		return count;
 	}
 
 	@SuppressWarnings("unchecked")

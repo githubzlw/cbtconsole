@@ -4,10 +4,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.pojo.Admuser;
-import com.cbt.util.ImageCompression;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.SysParamUtil;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
@@ -16,8 +13,6 @@ import com.importExpress.service.TabSeachPageService;
 import com.importExpress.utli.JsonTreeUtils;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-//import com.sun.image.codec.jpeg.JPEGCodec;
-//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpStatus;
@@ -44,8 +39,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -54,6 +47,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+//import com.sun.image.codec.jpeg.JPEGCodec;
+//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 /**
  * 
@@ -80,10 +76,41 @@ public class TabSeachPageController {
 	 * SysParamUtil.getParam("hotwordbanner"); private FtpConfig ftpConfig =
 	 * GetConfigureInfo.getFtpConfig();
 	 */
-	public static String IMAGEHOSTURL = "http://192.168.1.34:8002/";
-	private static final String LOCALPATH = "D:/shopimgzip/";// 图片上传的位置
-	private static final String LOCALPATHZIPIMG = "D:/shopimgzip/research/";// 图片上传的位置
-	private static final String IMAGESEARCHURL = "https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";// 图片访问路径
+//	public static String IMAGEHOSTURL = "http://192.168.1.34:8002/";
+//	private static final String LOCALPATH = "D:/shopimgzip/";// 图片上传的位置
+//	private static final String LOCALPATHZIPIMG = "D:/shopimgzip/research/";// 图片上传的位置
+//	private static final String IMAGESEARCHURL = "https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";// 图片访问路径
+
+    public static String IMAGEHOSTURL;// http://192.168.1.9/editimg/shopimgzip/research/
+    public static String LOCALPATH;// /data/cbtconsole/cbtimg/editimg/shopimgzip/
+    public static String LOCALPATHZIPIMG;// /data/cbtconsole/cbtimg/editimg/shopimgzip/research/
+    public static String IMAGESEARCHURL;// http://img1.import-express.com/importcsvimg/stock_picture/researchimg/
+
+    public static String ftpURL;
+    public static String ftpPort;
+    public static String ftpUserName;
+    public static String ftpPassword;
+
+    static {
+        FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+        String localShowPath = ftpConfig.getLocalShowPath();//localShowPath=http://192.168.1.9/editimg/
+        String localDiskPath = ftpConfig.getLocalDiskPath();//localDiskPath=/data/cbtconsole/cbtimg/editimg/
+        String remoteShowPath = ftpConfig.getRemoteShowPath();//remoteShowPath=http://img1.import-express.com/importcsvimg/
+        if (StringUtils.isNotBlank(localShowPath)){
+            IMAGEHOSTURL = (localShowPath.endsWith("/")?localShowPath:localShowPath + "/") + "shopimgzip/research/";
+        }
+        if (StringUtils.isNotBlank(localDiskPath)){
+            LOCALPATH = (localDiskPath.endsWith("/")?localDiskPath:localDiskPath + "/") + "shopimgzip/";
+            LOCALPATHZIPIMG = LOCALPATH + "research/";
+        }
+        if (StringUtils.isNotBlank(remoteShowPath)){
+            IMAGESEARCHURL = ((remoteShowPath.endsWith("/")?remoteShowPath:remoteShowPath + "/") + "stock_picture/researchimg/").replace("http:", "https:");
+        }
+        ftpURL = ftpConfig.getFtpURL();
+        ftpPort = ftpConfig.getFtpPort();
+        ftpUserName = ftpConfig.getFtpUserName();
+        ftpPassword = ftpConfig.getFtpPassword();
+    }
 
 	@RequestMapping("getAllCat")
 	public @ResponseBody
@@ -542,7 +569,7 @@ public class TabSeachPageController {
 				bean.setBannerImgName(sid + "/" + fileCurrName);
 				bean.setBannerImgUrl(IMAGESEARCHURL + fileCurrName);
 				// 支持断点续存上传图片
-				ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21",
+				ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
 						"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
 				// 远程上传到图片服务器
 				f1.start();
@@ -779,7 +806,7 @@ public class TabSeachPageController {
 					bean.setBannerImgName(sid + "/" + fileCurrName);
 					bean.setBannerImgUrl(IMAGESEARCHURL + fileCurrName);
 					// 支持断点续存上传图片
-					ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21",
+					ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
 							"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
 					// 远程上传到图片服务器
 					f1.start();
@@ -869,20 +896,21 @@ public class TabSeachPageController {
 			bean.setFileName(originalName);
 			String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
 			// 上传图片文件名
-			String fileCurrName = "/AuthorizedFile/" + System.currentTimeMillis() + fileSuffix;
+			String fileCurrName = "AuthorizedFile/" + System.currentTimeMillis() + fileSuffix;
 			bean.setFileUrl(fileCurrName);
+			bean.setImgFileUrl(IMAGESEARCHURL + fileCurrName);
 			// 本地服务器磁盘全路径
-			File file2 = new File(LOCALPATHZIPIMG + "/AuthorizedFile");
+			File file2 = new File(LOCALPATHZIPIMG + "AuthorizedFile");
 			if (!file2.exists()) {
 				file2.mkdirs();
 			}
 			// 文件流输出到本地服务器指定路径
 			ImgDownload.writeImageToDisk(file.getBytes(), LOCALPATHZIPIMG + fileCurrName);
 			// 支持断点续存上传图片
-//			ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21",
-//					"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
+			ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
+					"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + fileCurrName);
 //			// 远程上传到图片服务器
-//			f1.start();
+			f1.start();
 		}
 		//保存
 		DataSourceSelector.set("dataSource28hop");

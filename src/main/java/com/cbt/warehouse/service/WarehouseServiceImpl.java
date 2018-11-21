@@ -22,6 +22,7 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
+import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -250,6 +251,27 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public int insInsp(Map<String, String> map) {
+	    int checked=0;
+    	try{
+		    checked=dao.checnInspIsExit(map);
+		    if(checked<=0){
+			    checked=dao.insertInspPath(map);
+		    }else{
+			    checked=0;
+		    }
+		    if(checked>0){
+			    SendMQ sendMQ = new SendMQ();
+			    sendMQ.sendMsg(new RunSqlModel(" insert into inspection_picture(pid,orderid,pic_path,createtime,odid) values('"+map.get("goodsPid")+"','"+map.get("orderid")+"','"+map.get("picPath")+"',now(),'"+map.get("odid")+"')"));
+			    sendMQ.closeConn();
+		    }
+	    }catch (Exception e){
+    		e.printStackTrace();
+	    }
+        return checked;
+    }
+
+    @Override
     public OrderAddress getAddressByOrderID(String orderNo) {
 
         return dao.getAddressByOrderID(orderNo);
@@ -452,7 +474,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + ip + ":8084/"
+                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -464,7 +486,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + ip + ":8084/" + bean.getLocalImgPath() + "'/>";
+                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }
@@ -510,7 +532,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + ip + ":8084/"
+                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -522,7 +544,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + ip + ":8084/" + bean.getLocalImgPath() + "'/>";
+                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }
@@ -720,13 +742,20 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 sb.append("<button onclick=\"delInPic("+p.getGoods_p_url()+",\'"+p.getGoods_img_url()+"\',\'"+s.getOrderid()+"\',\'"+picture+"\',"+p.getCurrency()+")\">图片删除</button>");
                 if(p.getUserid()==0){
                     sb.append("<button style='color:red' onclick=\"disabledPic("+p.getCurrency()+",1,\'"+picture+"\')\">停用</button>");
+                    if(StringUtil.isNotBlank(map.get("odid"))){
+                        sb.append("<button style='color:red' onclick=\"insInsp("+p.getOrderid()+","+map.get("odid")+",\'"+picture+"\',\'"+map.get("oldOrderid")+"\')\">关联</button>");
+                    }
                     if(index<=3){
                         sb.append("<span style='color:red'>展示中...</span>");
                         index++;
                     }
                     sb.append("</div></div>");
                 }else{
-                    sb.append("<button style='color:green' onclick=\"disabledPic("+p.getCurrency()+",0,\'"+picture+"\')\">启用</button></div></div>");
+                    sb.append("<button style='color:green' onclick=\"disabledPic("+p.getCurrency()+",0,\'"+picture+"\')\">启用</button>");
+                    if(StringUtil.isNotBlank(map.get("odid"))){
+                        sb.append("<button style='color:red' onclick=\"insInsp("+p.getOrderid()+","+map.get("odid")+",\'"+picture+"\',\'"+map.get("oldOrderid")+"\')\">关联</button>");
+                    }
+                    sb.append("</div></div>");
                 }
             }
             s.setGcUnit(sb.toString());
@@ -1925,7 +1954,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int productAuthorization(Map<String, String> map) {
-        return dao.productAuthorization(map);
+        int ret=dao.checkIsExit(map);
+        if(ret>0){
+            ret=dao.updateAuthorizedFlag(map);
+        }else{
+            ret=dao.insertAuthorizedFlag(map);
+        }
+        return ret;
     }
 
     @Override
@@ -2585,6 +2620,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public OrderBean getUserOrderInfoByOrderNo(String orderNo) {
+        return dao.getUserOrderInfoByOrderNo(orderNo);
+    }
+
+    @Override
     public int updateBarcodeByOrderNo(String orderid) {
 
         List<String>  list = dao.selectBarcideByOrderNo(orderid);
@@ -2830,6 +2870,22 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int updateOrderSourceState(String orderid) {
 
         return dao.updateOrderSourceState(orderid);
+    }
+
+    @Override
+    public int checkAuthorizedFlag(String orderid) {
+        int ret=0;
+        Map<String,String> map=new HashMap<String,String>();
+        List<String> oList=dao.getAllGoodsPidsByOrderNo(orderid);
+        for(String pid:oList){
+            map.put("goodsPid",pid);
+            ret=dao.checkIsExit(map);
+            if(ret<=0){
+                map.put("flag","2");
+                ret=dao.insertAuthorizedFlag(map);
+            }
+        }
+        return ret;
     }
 
     @Override

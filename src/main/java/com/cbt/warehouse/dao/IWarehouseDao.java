@@ -20,6 +20,15 @@ public interface IWarehouseDao {
 	public void callResult(Map<String, String> param);
 	public void callUpdateIdrelationtable(Map<String, String> param);
 	public void insertStorage_location(String a, String b, String c, String d, String e);
+
+	/**
+	 * 判断该商品是否存在该张验货图片
+	 * @param map
+	 * @return
+	 */
+	int checnInspIsExit(Map<String,String> map);
+
+	int insertInspPath(Map<String,String> map);
 	/**
 	 * 保存验货时商品重量
 	 * @param map
@@ -211,6 +220,13 @@ public interface IWarehouseDao {
 	public SearchResultInfo getWeight();
 	public SearchResultInfo getGoodsWeight(@Param("pid") String pid);
 	public SearchResultInfo updateGoodsWeightFlag(@Param("pid") String pid);
+
+	/**
+	 * 获取该商品上一次发货的订单国家
+	 * @param pid
+	 * @return
+	 */
+	public String getBatckInfo(@Param("pid") String pid);
 	//getAllStorageLocationByPage
 	public List<StorageLocationBean> getAllStorageLocationByPage(int startNum, int endNum);
 	//获得采购数量
@@ -286,6 +302,17 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	public int productAuthorization(Map<String, String> map);
+
+	public int insertAuthorizedFlag(Map<String, String> map);
+
+	public int updateAuthorizedFlag(Map<String, String> map);
+
+	/**
+	 * 检查该商品是否已被授权
+	 * @param map
+	 * @return
+	 */
+	public int checkIsExit(Map<String, String> map);
 	/**
 	 * 出运运费预警时信息录入
 	 * @param map
@@ -1354,7 +1381,12 @@ public interface IWarehouseDao {
     public List<Tb1688Account> getAllBuy();
 
     public void updateMessageY(@Param("ids") String ids);
-
+	/**
+	 * 根据用户订单号获取发送邮件需要的用户邮箱等信息
+	 * @param orderNo
+	 * @return
+	 */
+	public OrderBean getUserOrderInfoByOrderNo(@Param("orderNo") String orderNo);
 	public int updateBarcodeByOrderNo(List<String> list);
 
     public List<TaoBaoOrderInfo> getAllCount(Map<Object, Object> map);
@@ -1429,7 +1461,14 @@ public interface IWarehouseDao {
 	 * @param orderid
 	 * @return
 	 */
-	public int updateOrderSourceState(String orderid);
+	public int updateOrderSourceState(@Param("orderid") String orderid);
+
+	/**
+	 * 获取订单的所有出运商品
+	 * @param orderid
+	 * @return
+	 */
+	public List<String> getAllGoodsPidsByOrderNo(@Param("orderid") String orderid);
 	/**
 	 * 出库时增加出库明细
 	 * @param orderid

@@ -1,6 +1,7 @@
 package com.cbt.customer.service;
 
 import com.cbt.bean.GuestBookBean;
+import com.cbt.bean.OrderBean;
 
 import java.util.List;
 
@@ -22,6 +23,12 @@ public interface IGuestBookService {
 	 * @return
 	 */
 	public List<GuestBookBean>  findByPid(String pid, int userId, int start, int number);
+
+	/**
+	 * 订单出运时给客户发送邮件
+	 * @return
+	 */
+	public int SendEmailForBatck(OrderBean ob);
 
 	/**
 	 * 方法描述:根据主键id查询留言信息

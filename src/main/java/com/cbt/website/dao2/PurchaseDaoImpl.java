@@ -6863,9 +6863,9 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		ResultSet rs = null;
 		String sql = "";
 		try {
-			sql = "select context from goods_communication_info where goodsid=? and orderid=?";
+			sql = "select context from goods_communication_info where odid=? and orderid=?";
 			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, map.get("goodsid"));
+			stmt.setString(1, map.get("odid"));
 			stmt.setString(2, map.get("orderid"));
 			rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -6873,27 +6873,27 @@ public class PurchaseDaoImpl implements PurchaseDao {
 				context += "<br>" + map.get("text");
 				if("2".equals(map.get("type"))){
 					//销售回复采购
-					sql = "update goods_communication_info set context=?,is_read=0 where goodsid=? and orderid=?";
+					sql = "update goods_communication_info set context=?,is_read=0 where odid=? and orderid=?";
 				}else{
 					//采购回复销售
-					sql = "update goods_communication_info set context=?,is_read_sale=0 where goodsid=? and orderid=?";
+					sql = "update goods_communication_info set context=?,is_read_sale=0 where odid=? and orderid=?";
 				}
 				stmt = conn.prepareStatement(sql);
 				stmt.setString(1, context);
-				stmt.setString(2, map.get("goodsid"));
+				stmt.setString(2, map.get("odid"));
 				stmt.setString(3, map.get("orderid"));
 				stmt.executeUpdate();
 				rk = context;
 			} else {
 				if("1".equals(map.get("type"))){
-					sql = "insert into goods_communication_info (context,orderid,goodsid,create_time,is_read) values(?,?,?,now(),?)";
+					sql = "insert into goods_communication_info (context,orderid,odid,create_time,is_read) values(?,?,?,now(),?)";
 				}else{
-					sql = "insert into goods_communication_info (context,orderid,goodsid,create_time,is_read_sale) values(?,?,?,now(),?)";
+					sql = "insert into goods_communication_info (context,orderid,odid,create_time,is_read_sale) values(?,?,?,now(),?)";
 				}
 				stmt = conn.prepareStatement(sql);
 				stmt.setString(1, map.get("text"));
 				stmt.setString(2, map.get("orderid"));
-				stmt.setString(3, map.get("goodsid"));
+				stmt.setString(3, map.get("odid"));
 				stmt.setInt(4,1);
 				stmt.executeUpdate();
 				rk = map.get("text");

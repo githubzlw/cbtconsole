@@ -570,10 +570,10 @@ b {
 				</c:if> <c:if test="${list.bmFlag >0}">
 					<br>
 					<span>人为对标货源:${list.bmFlag ==1 ? '是':'不是'}</span>
-				</c:if> <c:if test="${list.sourceProFlag >0}">
+				</c:if> <%--<c:if test="${list.sourceProFlag >0}">
 					<br>
 					<span>货源属性:${list.sourceProValue}</span>
-				</c:if> <c:if test="${list.soldFlag >0}">
+				</c:if> --%><c:if test="${list.soldFlag >0}">
 					<br>
 					<span>是否售卖:${list.soldFlag ==1 ? '卖过':'没有卖过'}</span>
 				</c:if> <c:if test="${list.addCarFlag >0}">

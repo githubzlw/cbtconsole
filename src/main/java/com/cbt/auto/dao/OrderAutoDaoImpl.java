@@ -3,10 +3,7 @@ package com.cbt.auto.dao;
 import com.cbt.auto.ctrl.AutoToSalePojo;
 import com.cbt.auto.ctrl.OrderAutoBean;
 import com.cbt.auto.ctrl.PureAutoPlanBean;
-import com.cbt.bean.AdmDsitribution;
-import com.cbt.bean.OrderAutoDetail;
-import com.cbt.bean.OrderProductSource;
-import com.cbt.bean.Payment;
+import com.cbt.bean.*;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.messages.ctrl.InsertMessageNotification;
@@ -920,7 +917,37 @@ public class OrderAutoDaoImpl implements OrderAutoDao {
 			DBHelper.getInstance().closeConnection(conn);
 		}
 	}
-	
+
+	@Override
+	public OrderBean getUserOrderInfoByOrderNo(String orderNo) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs=null;
+		OrderBean ob=new OrderBean();
+		String sql = " SELECT oi.order_no,u.email,u.id,ad.Email as adminEmail  FROM orderinfo oi " +
+				" INNER JOIN USER u ON oi.user_id=u.id " +
+				" INNER JOIN admin_r_user a ON u.id=a.userid  " +
+				"INNER JOIN admuser ad ON a.adminid=ad.id " +
+				"WHERE oi.order_no='"+orderNo+"'";
+		try {
+			stmt = conn.prepareStatement(sql);
+			rs=stmt.executeQuery();
+			if(rs.next()){
+				ob.setOrderNo(rs.getString("order_no"));
+				ob.setUserEmail(rs.getString("email"));
+				ob.setAdminemail(rs.getString("adminEmail"));
+				ob.setUserid(rs.getInt("id"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeResultSet(rs);
+			DBHelper.getInstance().closePreparedStatement(stmt);
+		}
+		return ob;
+	}
+
 	@Override
 	public int insertBGP(OrderAutoBean o,String time) {
 		Connection conn = DBHelper.getInstance().getConnection();
