@@ -559,7 +559,7 @@ public class SingleGoodsController {
                     rsMap.put(goodsCheck.getShopId(), goodsCheck.getShopCheck());
                 } else {
                     if (rsMap.containsKey(goodsCheck.getShopId())) {
-                        goodsCheck.setShopCheck(rsMap.get(goodsCheck.getShopId()));
+                        goodsCheck.setShopCheck(rsMap.get(goodsCheck.getShopId()) + 8);
                     }
                 }
                 if (StringUtils.isNotBlank(ipStr) && ipStr.contains("27.115.")) {
