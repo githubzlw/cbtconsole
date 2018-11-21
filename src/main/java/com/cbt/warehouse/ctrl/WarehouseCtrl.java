@@ -132,6 +132,7 @@ import java.util.regex.Pattern;
 @RequestMapping("/warehouse")
 public class WarehouseCtrl {
 	// 上传文件存储目录
+	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
 	// 上传配置
 	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
@@ -9504,13 +9505,18 @@ public class WarehouseCtrl {
 				String dir="";
 				String old_name=gbookid+"guestbook.jpg";
 				// 本地服务器磁盘全路径
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				// 检查配置文件信息是否正常读取
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
 				String localFilePath ="2020-08/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				System.out.println("新上传的文件名："+(tims+old_name));
-				System.out.println("新上传的文件路径："+("d:/product/" + localFilePath));
-				flag=ImgDownload.writeImageToDisk1(file.getBytes(), "d:/product/" + localFilePath);
+				System.out.println("新上传的文件路径："+(imgUploadPath + localFilePath));
+				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", localFilePath, "d:/product/" + localFilePath);
+					flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
 				}
 				int row=0;
 				if(flag){
