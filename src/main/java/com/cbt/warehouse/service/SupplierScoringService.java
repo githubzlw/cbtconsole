@@ -73,7 +73,7 @@ public interface SupplierScoringService {
 	 * @param reamrk
 	 * @return
 	 */
-	public int updateRemark(String id, String reamrk);
+	public int updateRemark(String id, String reamrk,String newQuality);
 	/**
 	 * 查询打过分的产品信息
 	 * @Title searchProductListByShopId

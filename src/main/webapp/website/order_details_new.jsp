@@ -1617,7 +1617,7 @@ em {
 				<table id="orderDetail" class="ormtable2" align="center">
 					<tbody>
 						<tr class="detfretit">
-							<td>Item</td>
+							<td>Item/购物车id</td>
 							<td colspan="2">详情</td>
 							<td style="width:400px;">订单信息</td>
 							<!-- 							<td>交期(新)</td> -->
@@ -1636,7 +1636,7 @@ em {
 					<c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
 						<tr id="goodsid_${orderd.goodsid}"
 							style="${orderd.state == 2?'background-color: #FF8484':''}">
-							<td>${sd.index+1}<br>${orderd.goodsid}</td>
+							<td>${sd.index+1}<br>${orderd.goodsid}/${orderd.id}</td>
 							<td><input type="hidden" value="${orderd.state}"> <a>
 									<img class="imgclass" onclick="fnRend('${orderd.goods_url}')"
 									width="200px" height="200px;" src="/cbtconsole/img/wy/grey.gif"
@@ -1813,19 +1813,19 @@ em {
 									<c:if test="${ostate==1 && orderd.checked==0}">  
 										已到仓库
 										<c:if test="${orderd.goodstatus==5}">
-											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.goodsid}">,已校验数量不对</a>
+											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验数量不对</a>
 										</c:if>
 										<c:if test="${orderd.goodstatus==4}">
-											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.goodsid}">,已校验有疑问</a>
+											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验有疑问</a>
 										</c:if>
 										<c:if test="${orderd.goodstatus==3}">
-											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.goodsid}">,已到仓库，已校验有破损</a>
+											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已到仓库，已校验有破损</a>
 										</c:if>
 										<c:if test="${orderd.goodstatus==1}">
 											<font color="red">,未校验</font>
 										</c:if>
 										<c:if test="${orderd.goodstatus==2}">
-											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.goodsid}">,已校验该到没到</a>
+											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验该到没到</a>
 										</c:if>
 										<%--<c:if test="${orderd.goodstatus != 1}">--%>
 											<%--<input type="button" style="color:royalblue" value="查看质检结果" onclick="openCheckResult('${order.orderNo}','${orderd.goodsid}')">--%>

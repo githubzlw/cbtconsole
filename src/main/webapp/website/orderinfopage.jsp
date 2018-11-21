@@ -288,9 +288,9 @@ function showType(orderid){
 		<div>          
 
 			
-			订单号:<input class="querycss" style="width : 160px;" id="idname" name="orderid" value="${oip.orderid}" type="text"/>
-			用户ID:<input class="querycss" style="width : 100px;" id="idname" name="userid" value="${oip.userid}" type="text"/>
-			商品编号:<input class="querycss" style="width : 100px;"  name="goodid" value="${oip.goodid}" type="text"/>
+			订单号:<input class="querycss" style="width : 160px;"  name="orderid" value="${oip.orderid}" type="text"/>
+			用户ID:<input class="querycss" style="width : 100px;"  name="userid" value="${oip.userid}" type="text"/>
+			商品编号/购物车Id:<input class="querycss" style="width : 100px;"  name="goodid" value="${oip.goodid}" type="text"/>
 			<!-- readonly="readonly" -->
 			开始日期:<input type="text" id="ckStartTime" name="ckStartTime"  value="${oip.ckStartTime}"  onfocus="WdatePicker({isShowWeek:true})"  />
 			结束日期:<input type="text" id="ckEndTime" name="ckEndTime" value="${oip.ckEndTime}"  onfocus="WdatePicker({isShowWeek:true})"  />
@@ -342,7 +342,7 @@ function showType(orderid){
 	   						<tr style="background-color:#FAFFF4;">
 	  		  	    			<td width="50px"><font style="font-size : 15px;">用户ID</font></td>
 						  		<td width="210px"><font style="font-size : 15px;">订单编号</font></td>
-				  				<td width="70px"><font style="font-size : 15px;">商品编号</font></td>
+				  				<td width="70px"><font style="font-size : 15px;">商品编号/购物车Id</font></td>
 			  					<td width="220px"><font style="font-size : 15px;">入库时间</font></td>
 								<td width="230px"><font style="font-size : 15px;">拍照图片</font></td>
 								<td width="70px"><font style="font-size : 15px;">仓库位置</font></td>
@@ -359,7 +359,7 @@ function showType(orderid){
 										</c:if>
 										<td><font style="font-size : 15px;">${storageLocation.user_id }</font></td>
 										<td><font style="font-size : 15px;">${storageLocation.orderid }</font></td>
-										<td><font style="font-size : 15px;">${storageLocation.goodid }</font></td>
+										<td><font style="font-size : 15px;">${storageLocation.goodid }/${storageLocation.odid}</font></td>
 										<td><font style="font-size : 15px;">${storageLocation.createtime }</font></td>
 										<td >
 											<c:forEach var="pic" items="${storageLocation.picList}" varStatus="m">
