@@ -454,7 +454,7 @@
 
 
         function hideButton(pid,shopId,isPid,ojb,isPass) {
-            if(type == 0){
+            if(isPid == 0){
                 $(".notice_" + pid).text('已审核,不通过');
                 $(ojb).parent().find(".shop_check").hide();
                 $(ojb).parent().find(".btn_check").hide();
