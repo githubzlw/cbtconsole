@@ -196,18 +196,24 @@ $('#dlg').dialog('close');
 		 <div>
 			商品ID：<input class="easyui-textbox" name="pid" value="${pid}" id="pid" style="width: 11%; margin-top: 10px;">
 			商品名称：<input class="easyui-textbox" name="goodsName" value="${goodsName}" id="pname" style="width: 10%;">
-			回复人：<select class="easyui-combobox"  name="adminid" id="adminid">
+			负责人：<select class="easyui-combobox"  name="adminid" id="adminid">
 					<option value="0" <c:if test="${adminId==0}">selected</c:if>>全部</option>
 					<c:forEach var="adm" items="${ admList}">
 					<option value="${adm.id }" <c:if test="${adm.id==adminId }">selected</c:if>>${adm.confirmusername}</option>
 					</c:forEach>
 			     </select>
 			回复状态：
-				<select class="easyui-combobox" name="replayflag" id="replyStatus" style="width: 10%;">
+				<select class="easyui-combobox" name="replayflag" id="replayflag" style="width: 10%;">
 					<option value="0" <c:if test="${replyFlag == 0 }">selected</c:if> >全部</option> 
 					<option value="1" <c:if test="${replyFlag == 1 }">selected</c:if> >未回复</option> 
 					<option value="2" <c:if test="${replyFlag == 2 }">selected</c:if> >已回复</option>
 				</select>
+            产品单页是否显示：
+             <select class="easyui-combobox" name="replyStatus" id="replyStatus" style="width: 10%;">
+                 <option value="0" <c:if test="${replyStatus == 0 }">selected</c:if> >全部</option>
+                 <option value="1" <c:if test="${replyStatus == 1 }">selected</c:if> >不同意显示</option>
+                 <option value="2" <c:if test="${replyStatus == 2 }">selected</c:if> >同意显示</option>
+             </select>
 				提问日期:
 				<input  type="text" name="startdate" id="startdate" style="width: 88px" 
 				placeholder="开始日期" title="开始日期" onfocus="WdatePicker({isShowWeek:true})"<c:if test="${startdate != null}">value="${startdate}"</c:if> > 
@@ -296,6 +302,7 @@ $('#dlg').dialog('close');
 	<div align="center">
 	<input type="hidden" value="${totalPage}" id="totalPage">
 	<input type="hidden" value="${page}" id="cpage">
+    总条数:${total}&nbsp;&nbsp;&nbsp;
 	总共:
 	${page}/${totalPage}
 	<a class="easyui-linkbutton" id="precheck" onclick="gotopage(1)">上一页</a>

@@ -25,6 +25,7 @@
     	<result column="category" property="category" />
     	<result column="sort" property="sort" />
     	<result column="banner_img_name" property="bannerImgName" />
+    	<result column="banner_img_url" property="bannerImgUrl" />
     	<result column="banner_name" property="bannerName" />
     	<result column="banner_describe" property="bannerDescribe" />
 	</resultMap>
@@ -65,7 +66,7 @@
 	
 	<select id="detailList" resultMap="detailBaseResultMap">
 		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.relateKeyWordUrl,a.anti_words,a.sort,b.en_name as category,
-			a.banner_img_name, a.banner_name, a.banner_describe
+			a.banner_img_name,a.banner_img_url, a.banner_name, a.banner_describe
 		from tab_seach_pages_details a,1688_category b 
 		where a.catid=b.category_id and a.sate=0 and a.sid=#{sid} order by a.sort asc
 	</select>
@@ -80,7 +81,7 @@
 	
 	<select id="getDetail" resultMap="detailBaseResultMap">
 		select a.id,a.sid,a.name,a.seach_url,a.keyword,a.catid,a.relateKeyWordUrl,a.anti_words,a.sort,b.en_name as category,
-			a.banner_img_name , a.banner_name , a.banner_describe 
+			a.banner_img_name ,a.banner_img_url , a.banner_name , a.banner_describe
 		from tab_seach_pages_details a,1688_category b
 		where a.catid=b.category_id and a.id=#{id} limit 1
 	</select>

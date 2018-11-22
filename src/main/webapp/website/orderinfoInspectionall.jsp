@@ -926,7 +926,7 @@ function BigImg(objImg,imgPath,orderid){
 									var orderid = data.orderid;
 									$(data.uploadImgList).each(function(indexImg, itemImg) {
 										  var temId = itemImg.substring(itemImg.indexOf("/") + 1, itemImg.indexOf("."));
-										  var temSrc = "http://"+ location.hostname + ":8084/" + itemImg;
+										  var temSrc = data.imagehost + itemImg;
 											var temHtml = "<img onerror=\"imgError(this,\'" + itemImg + "\')\" width='50px' height='50px' onclick=\"BigImg(this,\'"
 														+ itemImg
 														+ "\',\'"
