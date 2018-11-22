@@ -17,9 +17,9 @@
   </sql>
   
   <select id="selectAdmuser" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from admuser
+    SELECT
+        id, admName, Email, title, roleType, status, emailpass
+    FROM admuser WHERE roleType in(0,3,4) AND status = 1
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 

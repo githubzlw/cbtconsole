@@ -240,31 +240,26 @@ function gotoBuiess(flag){
     	<%--<span>Busiess 询盘</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--%>
     	<label for="queryFilter">筛选:</label> 
     	<select id="queryFilter" style="height: 24px;">
-    		<option value="0">全部</option>
+    		<%--<option value="0">全部</option>--%>
 			<option value="1" selected="selected">Busiess 询盘</option>
-			<option value="2">服装定制</option>
-			<option value="3">问卷调查</option>
+			<%--<option value="2">服装定制</option>
+			<option value="3">问卷调查</option>--%>
     	</select>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<label for="queryFilter">状态:</label>
 		<select id="state" style="height: 24px;">
 			<option value="-1">全部</option>
-			<option value="0">新</option>
-			<option value="1">完结</option>
+			<option value="0">待办</option>
+			<option value="1">完成</option>
 		</select>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<label for="queryFilter">负责人:</label>
-		<select id="admName" style="height: 24px;">
-			<option value="-1">全部</option>
-			<option value="18">testAdm</option>
-			<option value="56">salebuy1</option>
-			<option value="62">Sales2</option>
-			<option value="64">sales3</option>
-			<option value="68">salebuy4</option>
-			<option value="69">salebuy5</option>
-			<option value="70">salebuy6</option>
-			<option value="71">sales4</option>
-		</select>
+        <select class="easyui-combobox"  name="admName" id="admName">
+            <option value="0" selected>全部</option>
+            <c:forEach var="adm" items="${ admList}">
+                <option value="${adm.id }">${adm.admname }</option>
+            </c:forEach>
+        </select>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		创建开始时间：<input id="startdate" name="startdate" readonly="readonly"
 												onfocus="WdatePicker({isShowWeek:true})"
@@ -382,10 +377,10 @@ function getBusiess(pagenum){
 			    		htm_+='</td>';
 			    	}
 			    	if(json[i].status == 0){
-			    		htm_+="<td>新</td>";
+			    		htm_+="<td>待办</td>";
 			    		htm_+='<td><a href="#" onclick="javascript:changestatus('+json[i].id+')">完结</a></td>';
 			    	}else{
-			    		htm_+="<td>完结</td>";
+			    		htm_+="<td>完成</td>";
 				    	htm_+='<td>已完结</td>';
 			    	}
 			    	htm_+="</tr>"
@@ -456,10 +451,10 @@ function queryByChoice(pagenum,type){
 			    		htm_+='</td>';
 			    	}
 			    	if(json[i].status == 0){
-			    		htm_+="<td>新</td>";
+			    		htm_+="<td>待办</td>";
 			    		htm_+='<td><a href="#" onclick="javascript:changestatus('+json[i].id+')">完结</a></td>';
 			    	}else{
-			    		htm_+="<td>完结</td>";
+			    		htm_+="<td>完成</td>";
 				    	htm_+='<td>已完结</td>';
 			    	}
 			    	htm_+="</tr>"

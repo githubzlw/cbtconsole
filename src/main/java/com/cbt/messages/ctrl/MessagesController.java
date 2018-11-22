@@ -1,5 +1,6 @@
 package com.cbt.messages.ctrl;
 
+import com.cbt.admuser.service.AdmuserService;
 import com.cbt.bean.Complain;
 import com.cbt.bean.ComplainVO;
 import com.cbt.bean.UserBean;
@@ -45,6 +46,9 @@ public class MessagesController {
 
 	@Autowired
 	private IComplainService complainService;
+
+    @Autowired
+    private AdmuserService admuserService;
 
 	/**
 	 * 
@@ -446,7 +450,10 @@ public class MessagesController {
 		adminid = adm.getId();
 		mav.addObject("status", status);
 		mav.addObject("adminid", adminid);
-		mav.setViewName("/busiesslist");
+		//负责人列表
+        List<Admuser> admuserLis = admuserService.selectAdmuser();
+		request.setAttribute("admList", admuserLis);
+        mav.setViewName("/busiesslist");
 		return mav;
 	}
 
