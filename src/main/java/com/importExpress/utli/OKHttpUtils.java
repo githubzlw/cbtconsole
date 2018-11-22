@@ -2,16 +2,15 @@ package com.importExpress.utli;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import com.alibaba.fastjson.JSONObject;
-
-import okhttp3.*;
-import okhttp3.Request.Builder;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 
@@ -46,11 +45,11 @@ public class OKHttpUtils {
 	public String post(String url,Headers mHeaders,String mediaType,String param) throws Exception{
 		
 		//设置请求头header
-		System.out.println("----heads:"+mHeaders);
+//		System.out.println("----heads:"+mHeaders);
 		//设置请求参数
 		RequestBody body = RequestBody.create(MediaType.parse(mediaType), param);
 		//发送post请求
-		System.out.println("-------body:"+body);
+//		System.out.println("-------body:"+body);
 		Request request = new Request.Builder().url(url).headers(mHeaders).post(body).build();
 	    
 	    Response response = client.newCall(request).execute();
@@ -71,7 +70,7 @@ public class OKHttpUtils {
 	public String postFile(String url,Headers mHeaders,String param,File file) throws Exception{
 		
 		//设置请求头header
-		System.out.println("----heads:"+mHeaders);
+//		System.out.println("----heads:"+mHeaders);
 		
 		//设置请求参数
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);

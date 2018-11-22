@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,20 +16,14 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.cbt.parse.service.StrUtils;
-import com.cbt.parse.service.TypeUtils;
-import com.google.gson.JsonObject;
-import com.importExpress.mapper.PaymentMapper;
+import com.importExpress.mapper.CustomerDisputeMapper;
 import com.importExpress.mapper.UserNewMapper;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
 import com.stripe.model.BalanceTransaction;
-import com.stripe.model.Card;
-import com.stripe.model.Charge;
 import com.stripe.model.Dispute;
-import com.stripe.model.Event;
 import com.stripe.net.APIResource;
 @Service
 public class CustomerDisputeServiceImpl implements CustomerDisputeService {
@@ -38,6 +31,8 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
 	@Autowired
 	private UserNewMapper userNewMapper;
+	@Autowired
+	private CustomerDisputeMapper customerDisputeMapper;
 	@Override
 	public Map<String, Object> list(String disputeID,int startNum, int limitNum,
 			String startTime, String endTime, String status) {
@@ -72,7 +67,6 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			JSONObject document = JSONObject.parseObject(content);
 	    			JSONObject  resource = (JSONObject)document.get("resource");
 	    			bean.setDisputeID(resource.getString("dispute_id"));
-	    			bean.setId("");
 	    			Date parse = utc.parse(document.getString("create_time").replace("Z", " UTC"));
 	    			bean.setUpdateTime(sdf.format(parse));
 	    			bean.setTime(parse.getTime());
@@ -83,8 +77,11 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setStatus(resource.getString("status"));
 	    			bean.setType("Paypal");
 	    			JSONArray disputedTransactions = (JSONArray)resource.get("disputed_transactions");
-	    			
-	    			String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
+	    			JSONObject disputedTransaction = (JSONObject)disputedTransactions.get(0);
+	    			JSONObject seller = (JSONObject)disputedTransaction.get("seller");
+	    			String merchant_id = seller.getString("merchant_id");
+	    			bean.setMerchantID(merchant_id);
+	    			String custom = disputedTransaction.getString("custom");
 	    			bean.setOrderNo("");
 	    			if(StringUtils.indexOf(custom, "@") > -1) {
 	    				
@@ -189,18 +186,30 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
 		BasicDBObject q = new BasicDBObject();
 		q.put("resource_type", "dispute");
-		if(StringUtils.isNotBlank(disputeID)) {
-			q.put("resource.dispute_id", disputeID);
-		}
+		q.put("resource.dispute_id", disputeID);
 		BasicDBObject s = new BasicDBObject("create_time",-1);
 		List<String> documents = 
 				instance.findAny("data",q,s);
 		if(documents != null && !documents.isEmpty()) {
 			JSONObject  resource= (JSONObject)JSONObject.parseObject(documents.get(0)).get("resource");
-			
 			return JSONObject.toJSONString(resource);
 		}
 		return null;
+	}
+	
+	@Override
+	public int confirm(CustomerDisputeBean customer) {
+		
+		if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
+			return customerDisputeMapper.insert(customer);
+		}else {
+			return customerDisputeMapper.update(customer);
+		}
+	}
+	@Override
+	public int getConfim(String disputeID) {
+		Integer count = customerDisputeMapper.count(disputeID) ;
+		return count == null ? 0 : count;
 	}
 
 }

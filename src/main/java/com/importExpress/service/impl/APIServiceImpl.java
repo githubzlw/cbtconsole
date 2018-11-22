@@ -34,7 +34,6 @@ public class APIServiceImpl implements APIService {
 	
 	private OKHttpUtils okHttpUtils = new OKHttpUtils();
 	
-	
 	static{
 		ResourceBundle resource = ResourceBundle.getBundle("paypal",Locale.getDefault());
 		SANDBOX_FLAG = resource.getString("SANDBOX_FLAG");
@@ -52,8 +51,12 @@ public class APIServiceImpl implements APIService {
 		DISPUTE_LIST = URL +"/v1/customer/disputes?disputed_transaction_id=";
 	}
 	@Override
-	public String getAccessToken() throws Exception {
+	public String getAccessToken(String merchantID) throws Exception {
 		String authorization = CLIENT_ID + ":" + SECRET;
+		if(StringUtils.equals(merchantID, "584JZVFU6PPVU")) {
+			authorization = "Aap97fKTuvW4Fu11jGXs2lGRG20I_nhYrQxJhFz165AQwZ-YXlaAzSy4Lv3TIoTdHTCzYrwXrmzbnlWE:"
+					+ "ECjebKSWXfuDtCIPXXf58v3w-gd70JctE4bphIbcpVkkoL8jOajiEDFaC6FlnaYaOayWIkN6eLGkH1VZ";
+		}
     	authorization = Base64.encodeBase64String(authorization.getBytes());
     	
 		Headers header = new Headers.Builder()
@@ -68,15 +71,14 @@ public class APIServiceImpl implements APIService {
 		String response = okHttpUtils.post(TOKEN_URL, header, mediaType, param);
 		if(StringUtils.isNotEmpty(response)) {
 			JSONObject parseObject = JSONObject.parseObject(response);
-			System.out.println(parseObject);
 			return parseObject.getString("access_token");
 		}
 		return "";
 	}
 
 	@Override
-	public String listDispute(String disputedTransactionID) throws Exception {
-		String accessToken = getAccessToken();
+	public String listDispute(String disputedTransactionID,String merchantID) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 		.set("content-type", "application/json")
@@ -91,8 +93,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String showDisputeDetails(String disputeID) throws Exception {
-		String accessToken = getAccessToken();
+	public String showDisputeDetails(String disputeID,String merchantID) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 		.set("content-type", "application/json")
@@ -106,8 +108,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String partiallyUpdates(String disputeID, JSONObject param) throws Exception {
-		String accessToken = getAccessToken();
+	public String partiallyUpdates(String disputeID, String merchantID, JSONObject param) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 		.set("content-type", "application/json")
@@ -124,8 +126,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String acceptClaim(String disputeID, JSONObject param) throws Exception {
-		String accessToken = getAccessToken();
+	public String acceptClaim(String disputeID , String merchantID, JSONObject param) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 		.set("content-type", "application/json")
@@ -142,8 +144,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String updateDisputeStatus(String disputeID) throws Exception {
-		String accessToken = getAccessToken();
+	public String updateDisputeStatus(String disputeID, String merchantID) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 		.set("content-type", "application/json")
@@ -160,8 +162,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String makeOffer(String disputeID, JSONObject param) throws Exception {
-		String accessToken = getAccessToken();
+	public String makeOffer(String disputeID, String merchantID, JSONObject param) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 				.set("content-type", "application/json")
@@ -178,8 +180,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String acknowledgeReturnedItem(String disputeID, JSONObject param) throws Exception {
-		String accessToken = getAccessToken();
+	public String acknowledgeReturnedItem(String disputeID, String merchantID, JSONObject param) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 				.set("content-type", "application/json")
@@ -194,8 +196,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String sendMessage(String disputeID, JSONObject param) throws Exception {
-		String accessToken = getAccessToken();
+	public String sendMessage(String disputeID, String merchantID, JSONObject param) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 				.set("content-type", "application/json")
@@ -210,8 +212,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String provideEvidence(String disputeID,String param,File fileName) throws Exception {
-		String accessToken = getAccessToken();
+	public String provideEvidence(String disputeID, String merchantID,String param,File fileName) throws Exception {
+		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
 				.set("Content-Type", "multipart/related; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
