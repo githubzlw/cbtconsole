@@ -12,6 +12,7 @@ import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.OrderSplitService;
 import com.importExpress.utli.RedisModel;
+import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
@@ -289,10 +290,18 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                     }
                     // 向 goods_carconfig 表插入 activeList 和 showinfList 信息 在前台网站从新登陆则直接从数据库查询
                     // 要使用mq
-                    DataSourceSelector.set("dataSource127hop");
+                   /* DataSourceSelector.set("dataSource127hop");
                     int count = saveShpCarInfoToDateBase(Integer.parseInt(userId),list_active,list_show);
-                    DataSourceSelector.restore();
-                    if(listActive_new_1.size()>0 && count>0){
+                    DataSourceSelector.restore();*/
+                    String sql = "update goods_carconfig set shopCarShowinfo = '"+SerializeUtil.ListToJson(list_show) +"', shopCarinfo='"+SerializeUtil.ListToJson(list_active)+"' where userid="+userId;
+                    try {
+                        SendMQ sendMQ = new SendMQ();
+                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        sendMQ.closeConn();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if(listActive_new_1.size()>0){
                         /**
                          * 向goods_car表异步插入购物车数据
                          * */
@@ -311,9 +320,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                             }
                         }
                         // 要使用mq
-                        DataSourceSelector.set("dataSource127hop");
                         int i = addGoogs_cars(Integer.valueOf(userId), spidersDB);
-                        DataSourceSelector.restore();
                         if(i>0 ){
                             message = "success!";
                         }
@@ -466,10 +473,22 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
 
         int res=0;
         try {
-            res = spiderMapper.batchAddGoogs_car(userid,spider);
+//            res = spiderMapper.batchAddGoogs_car(userid, spider);
+            String sql = "insert goods_car(userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,\n" + "        pWprice,sessionid,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,free_shopping_company,free_sc_days,goodsdata_id,preferential,deposit_rate,guid,goods_type,currency,feeprice,goods_class,extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,price4,theproductfrieght,notfreeprice,isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime,goodsUrlMD5,priceListSize,skuid_1688,isFreeShipProduct,is_stock_flag,shopCount) values ";
+            for (int i = 0; i < spider.size(); i++) {
+                SpiderNewBean spiderNewBean = spider.get(i);
+                sql += "('" + userid + "','" + spiderNewBean.getUrl() + "','" + spiderNewBean.getName() + "','" + spiderNewBean.getSeller() + "','" + spiderNewBean.getImg_url() + "','" + spiderNewBean.getPrice() + "','" + spiderNewBean.getNumber() + "','" + spiderNewBean.getFreight() + "','" + spiderNewBean.getRemark() + "',now(),'" + spiderNewBean.getItemId() + "','" + spiderNewBean.getShopId() + "','" + spiderNewBean.getNorm_least() + "','" + spiderNewBean.getpWprice() + "','" + spiderNewBean.getSessionId() + "','" + spiderNewBean.getTrue_shipping() + "','" + spiderNewBean.getDelivery_time() + "','" + spiderNewBean.getFreight_free() + "','" + spiderNewBean.getWidth() + "','" + spiderNewBean.getPerWeight() + "','" + spiderNewBean.getSeilUnit() + "','"+ spiderNewBean.getGoodsUnit() + "','" + spiderNewBean.getBulk_volume() + "','" + spiderNewBean.getTotal_weight() + "','" + spiderNewBean.getWeight() + "','" + spiderNewBean.getFree_shopping_company() + "','" + spiderNewBean.getFree_sc_days() + "','" + spiderNewBean.getGoodsdata_id() + "','" + spiderNewBean.getPreferential() + "','" + spiderNewBean.getDeposit_rate() + "','" + spiderNewBean.getGuId() + "','" + spiderNewBean.getTypes() + "','" + spiderNewBean.getCurrency() + "','" + spiderNewBean.getFeeprice() + "','" + spiderNewBean.getGoods_class() + "','" + spiderNewBean.getExtra_freight() + "','" + spiderNewBean.getSource_url() + "','" + spiderNewBean.getGoods_catid() + "','" + spiderNewBean.getMethod_feight() + "','" + spiderNewBean.getIsshipping_promote() + "','" + spiderNewBean.getPrice1() + "','" + spiderNewBean.getPrice2() + "','" + spiderNewBean.getPrice3() + "','" + spiderNewBean.getPrice4() + "','" + spiderNewBean.getTheproductfrieght() + "','" + spiderNewBean.getNotfreeprice() + "','" + spiderNewBean.getIsvolume() + "','" + spiderNewBean.getFreeprice() + "','" + spiderNewBean.getFirstprice() + "','" + spiderNewBean.getFirstnumber() + "','" + spiderNewBean.getState() + "','" + spiderNewBean.getFreight_upgrade() + "','" + spiderNewBean.getIsFeight() + "','" + spiderNewBean.getIsBattery() + "','" + spiderNewBean.getAliPosttime() + "','" + spiderNewBean.getUrlMD5() + "','" + spiderNewBean.getPrice_List() + "','" + spiderNewBean.getSkuid_1688() + "','" + spiderNewBean.getIsFreeShipProduct() + "','" + spiderNewBean.getIsStockFlag() + "','" + spiderNewBean.getShopCount() + "')";
+                if (i < (spider.size() - 1)) {
+                    sql += ",";
+                }
+            }
+            SendMQ sendMQ = new SendMQ();
+            sendMQ.sendMsg(new RunSqlModel(sql));
+            res = 1;
+            sendMQ.closeConn();
         } catch (Exception e) {
-            logger.error("GoodsAddThread:批量插入goods_car表出错!"+e.getMessage());
-            logger.error("------商品信息： "+spider.toString());
+            logger.error("GoodsAddThread:批量插入goods_car表出错!" + e.getMessage());
+            logger.error("------商品信息： " + spider.toString());
             e.printStackTrace();
         }
         for (int i = 0; i < spider.size(); i++) {

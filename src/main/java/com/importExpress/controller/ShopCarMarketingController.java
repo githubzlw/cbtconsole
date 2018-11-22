@@ -355,9 +355,9 @@ public class ShopCarMarketingController {
             if(modelB){
                 String modelStr = request.getParameter("model");
                 Map<String,Object> model = SerializeUtil.JsonToMapStr(modelStr);
-                sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, title, model, TemplateType.SHOPPING_CART_MARKETING);
+                sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
             }else {
-                sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, title, "", 1);
+                sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
             //End：
             //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
