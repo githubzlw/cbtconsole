@@ -279,6 +279,8 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("orderNo", orderNo);
 			request.setAttribute("orderDetail", odb);
 			request.setAttribute("order_state", orderInfo.getState());
+			IZoneServer os = new ZoneServer();
+			request.setAttribute("countryList",os.getAllZone());
 			// 实际运费
 			Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
 			request.setAttribute("actual_ffreight_", actual_ffreight_);
