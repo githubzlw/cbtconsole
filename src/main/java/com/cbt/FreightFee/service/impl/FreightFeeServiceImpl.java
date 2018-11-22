@@ -38,6 +38,10 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				fweight=Double.valueOf(String.valueOf(fweight).split("\\.")[0])+0.5;
 			}
 			freightFee = getYFHFreightFee(fweight, countId, freightFee,subShippingmethod);
+			if(freightFee<=0){
+				//如果预估《=0，则国家使用南非来预估
+				freightFee = getYFHFreightFee(fweight, "29", freightFee,subShippingmethod);
+			}
 		}else if(shippingmethod.equals("大誉") || shippingmethod.equals("迅邮")){
 			if(fweight%Double.valueOf(String.valueOf(fweight).split("\\.")[0])>=0.5){
 				fweight=Double.valueOf(String.valueOf(fweight).split("\\.")[0])+1;
