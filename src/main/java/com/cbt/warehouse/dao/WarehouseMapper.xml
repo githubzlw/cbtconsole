@@ -2515,7 +2515,7 @@
 			and o.user_id=#{userid}
 		</if>
 		<if test="goodsid != null">
-			and od.goodsid=#{goodsid}
+			and (od.goodsid=#{goodsid} or od.id=#{goodsid})
 		</if>
 		<if test="days != null and days != '999'">
 			and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)

@@ -1592,7 +1592,7 @@ em {
 				<table id="orderDetail" class="ormtable2" align="center">
 					<tbody>
 						<tr class="detfretit">
-							<td>Item/购物车id</td>
+							<td>商品编号/购物车id</td>
 							<td colspan="2">详情</td>
 							<td style="width:400px;">订单信息</td>
 							<!-- 							<td>交期(新)</td> -->
