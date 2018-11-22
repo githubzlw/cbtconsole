@@ -3799,8 +3799,8 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     public int updateSkuGoodsOffers(String pid, double finalWeight) {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         PreparedStatement stmt31 = null;
-        String updateSql = "update sku_goods_offers set clear_flag=0,b.crawl_flag=2,set_weight= ? where goods_pid = ?";
-        int count = 0;
+        String updateSql = "update sku_goods_offers set clear_flag=0,crawl_flag=2,set_weight= ? where goods_pid = ?";
+        int count = -1;
         try {
             stmt31 = conn31.prepareStatement(updateSql);
             stmt31.setDouble(1, finalWeight);
@@ -3821,8 +3821,8 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     public int updateSourceProFlag(String pid) {
         Connection conn28 = DBHelper.getInstance().getConnection8();
         PreparedStatement stmt28 = null;
-        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7 where goods_pid = ?";
-        int count = 0;
+        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7 where pid = ?";
+        int count = -1;
         try {
             stmt28 = conn28.prepareStatement(querySql);
             stmt28.setString(1, pid);
@@ -3844,7 +3844,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         PreparedStatement stmt31 = null;
         String updateSql = "replace into single_goods_offers_child(good_url,goods_pid,set_weight,change_mark," +
                 "crawl_flag,service_ip) values(?,?,?,1,0,'')";
-        int count = 0;
+        int count = -1;
         try {
             stmt31 = conn31.prepareStatement(updateSql);
             stmt31.setString(1, "https://detail.1688.com/offer/" + pid + ".html");
@@ -3864,7 +3864,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
     @Override
     public List<CustomBenchmarkSkuNew> querySkuByPid(String pid) {
-        Connection conn27 = DBHelper.getInstance().getConnection6();
+        Connection conn27 = DBHelper.getInstance().getConnection();
         PreparedStatement stmt27 = null;
         String querySql = "select wprice, sku_attr, sku_prop_ids, act_sku_cal_price, act_sku_multi_currency_cal_price, " +
                 "act_sku_multi_currency_display_price,avail_quantity, inventory, is_activity, " +
@@ -3970,7 +3970,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 "act_sku_multi_currency_display_price,avail_quantity, inventory, is_activity, " +
                 "sku_cal_price, sku_multi_currency_cal_price, sku_multi_currency_display_price," +
                 "create_time,update_time,flag,spec_id,sku_id,final_weight,is_sold_flag)" +
-                " valuse(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         int count = 0;
         List<CustomBenchmarkSkuNew> list = new ArrayList<>();
         try {
@@ -3980,8 +3980,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt28 = conn28.prepareStatement(insertSql);
 
             for (CustomBenchmarkSkuNew benchmarkSkuNew : insertList) {
-                int upNum = 0;
+                int upNum = 1;
                 stmt28.setString(upNum++, benchmarkSkuNew.getWprice());
+                stmt28.setString(upNum++, benchmarkSkuNew.getPid());
                 stmt28.setString(upNum++, benchmarkSkuNew.getSkuAttr());
                 stmt28.setString(upNum++, benchmarkSkuNew.getSkuPropIds());
                 SkuValPO skuVal = benchmarkSkuNew.getSkuVal();
@@ -3998,12 +3999,14 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt28.setDate(upNum++, (Date) benchmarkSkuNew.getUpdateTime());
                 stmt28.setInt(upNum++, benchmarkSkuNew.getFlag());
                 stmt28.setString(upNum++, benchmarkSkuNew.getSpecId());
+                stmt28.setString(upNum++, benchmarkSkuNew.getSkuId());
                 stmt28.setString(upNum++, benchmarkSkuNew.getFinalWeight());
                 stmt28.setString(upNum++, benchmarkSkuNew.getIsSoldFlag());
                 stmt28.addBatch();
 
-                upNum = 0;
+                upNum = 1;
                 stmtAws.setString(upNum++, benchmarkSkuNew.getWprice());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getPid());
                 stmtAws.setString(upNum++, benchmarkSkuNew.getSkuAttr());
                 stmtAws.setString(upNum++, benchmarkSkuNew.getSkuPropIds());
                 stmtAws.setDouble(upNum++, skuVal.getActSkuCalPrice());
@@ -4019,13 +4022,14 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmtAws.setDate(upNum++, (Date) benchmarkSkuNew.getUpdateTime());
                 stmtAws.setInt(upNum++, benchmarkSkuNew.getFlag());
                 stmtAws.setString(upNum++, benchmarkSkuNew.getSpecId());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getSkuId());
                 stmtAws.setString(upNum++, benchmarkSkuNew.getFinalWeight());
                 stmtAws.setString(upNum++, benchmarkSkuNew.getIsSoldFlag());
                 stmtAws.addBatch();
             }
             count = stmtAws.executeBatch().length;
             if (count > 0) {
-                count = stmtAws.executeBatch().length;
+                count = stmt28.executeBatch().length;
                 if (count > 0) {
                     connAws.commit();
                     conn28.commit();

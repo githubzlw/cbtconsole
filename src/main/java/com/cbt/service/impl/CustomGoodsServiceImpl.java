@@ -447,7 +447,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public boolean refreshPriceRelatedData(CustomGoodsPublish bean) {
         //更新28库的custom_benchmark_ready_newest [source_pro_flag]=7
         int count = customGoodsDao.updateSourceProFlag(bean.getPid());
-        if (count > 0) {
+        if (count > -1) {
             //更新SkuGoodsOffers和SingleOffersChild信息
             count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
             if (count > 0) {
@@ -455,11 +455,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             } else {
                 count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }
-            if(count > 0){
+            if(count > -1){
                 //插入sku信息
                 customGoodsDao.deleteSkuByPid(bean.getPid());
                 List<CustomBenchmarkSkuNew> list = customGoodsDao.querySkuByPid(bean.getPid());
-                count = customGoodsDao.insertIntoSkuToOnline(list);
+                if(!(list == null || list.isEmpty())){
+                    count = customGoodsDao.insertIntoSkuToOnline(list);
+                }else{
+                    System.err.println("pid:" + bean.getPid() + ",sku list is empty");
+                }
             }
         }
 
