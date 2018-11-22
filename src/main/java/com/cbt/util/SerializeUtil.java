@@ -166,5 +166,20 @@ public class SerializeUtil {
         }
         return integerArray;
     }
-    
+    /**
+     * json反序列化为map集合
+     * @param jsonStr
+     * @return
+     */
+    public static Map<String, Object> JsonToMapStr(String jsonStr) {
+        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
+        Iterator<Object> it = jsonObject.keys();
+        Map<String, Object> map = new HashMap<>();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            Object value = jsonObject.get(key);
+            map.put(key, value);
+        }
+        return map;
+    }
 }

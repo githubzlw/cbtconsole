@@ -11,11 +11,17 @@ import com.cbt.processes.dao.UserDao;
 import com.cbt.processes.service.SendEmail1;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.util.StringUtil;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GuestBookServiceImpl implements IGuestBookService{
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	IGuestBookDao dao = new GuestBookDaoImpl();
 	@Override
 	public int addComment(GuestBookBean gbb) {
@@ -70,6 +76,7 @@ public class GuestBookServiceImpl implements IGuestBookService{
 	@Override
 	public int replyReportQes(final int id,final String replyContent,final String date,final String name,
 			final String qustion,final String email,final int userId,final String sale_email,String url) {
+		Map<String,Object> model = new HashMap<>();
 		new Thread(){
 			public void run() {
 				StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
@@ -89,7 +96,15 @@ public class GuestBookServiceImpl implements IGuestBookService{
 		    			   pwd = adminEmail[1];
 		    		   }
 		    	   }
-				   SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,StringUtils.isStrNull(sale_email)?"sale1@import-express.com":sale_email);
+				//SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,StringUtils.isStrNull(sale_email)?"sale1@import-express.com":sale_email);
+				String urlTem = "https://www.import-express.com/goodsinfo/...-1"+url+".html";
+				model.put("email",email);
+				model.put("replyContent",replyContent);
+				model.put("id",id);
+				model.put("qustion",qustion);
+				model.put("itemUrl",urlTem);
+
+				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From ImportExpress", model, TemplateType.BUSINESS_INQUIRIES);
 			};
 		}.start();
 		return Utility.getStringIsNull(sale_email)?dao.replyReport(id, replyContent,date):0;
