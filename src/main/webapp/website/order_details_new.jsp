@@ -1914,7 +1914,7 @@ em {
 									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">采购货源标题: ${orderd.goodsname}</p>
+									<p style="width:200px;">采购货源标题: ${orderd.goodsPName}</p>
 								</span>
 								<span id="spanurl${sd.index}">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
