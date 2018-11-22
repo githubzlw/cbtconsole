@@ -17,8 +17,8 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 
 	@Override
 	public List<QueAns> findByQuery(String goodsPid, String goodsName,
-                                    int adminId, int replyFlag, String startdate, String enddate, int page) {
-		List<QueAns> list=queAnsMapper.findByQuery(goodsPid, goodsName, adminId,replyFlag, startdate,enddate, page);
+                                    int adminId, int replyFlag, int replyStatus,String startdate, String enddate, int page) {
+		List<QueAns> list=queAnsMapper.findByQuery(goodsPid, goodsName, adminId,replyFlag,replyStatus, startdate,enddate, page);
 		for(QueAns q:list){
 			if(StringUtil.isNotBlank(q.getReply_content())){
 				q.setReply_content(q.getReply_content().replace("\n",""));
@@ -29,9 +29,9 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 
 	@Override
 	public int getCountByQuery(String goodsPid, String goodsName, int adminId,
-			int replyFlag, String startdate,String enddate) {
+			int replyFlag, int replyStatus, String startdate,String enddate) {
 		
-		return queAnsMapper.getCountByQuery(goodsPid, goodsName, adminId, replyFlag, startdate,enddate);
+		return queAnsMapper.getCountByQuery(goodsPid, goodsName, adminId, replyFlag, replyStatus, startdate,enddate);
 	}
 	@Override
 	public int changeIsShow(String pid, String type) {

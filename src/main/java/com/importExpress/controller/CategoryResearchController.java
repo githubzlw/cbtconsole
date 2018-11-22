@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
@@ -1075,6 +1076,8 @@ public class CategoryResearchController {
 			out = new FileOutputStream(targetImgUrl);
 //				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
 //				encoder.encode(tag);
+            String fileSuffix = targetImgUrl.substring(targetImgUrl.lastIndexOf(".") + 1);
+            ImageIO.write(tag,fileSuffix,new File(targetImgUrl));
 			is = true;
 
 		} catch (IOException ex) {

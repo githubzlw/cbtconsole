@@ -18,7 +18,7 @@ public interface QuestionAndAnswerService {
 	 * @param enddate 提问题时间
 	 * @return  
 	 */
-	public List<QueAns> findByQuery(String goodsPid, String goodsName, int adminId, int replyFlag, String startdate, String enddate, int page);
+	public List<QueAns> findByQuery(String goodsPid, String goodsName, int adminId, int replyFlag, int replyStatus, String startdate, String enddate, int page);
 	/**根据查询条件获得总数
 	 * @date 2018年3月23日
 	 * @author user4
@@ -30,7 +30,7 @@ public interface QuestionAndAnswerService {
 	 * @param enddate 提问题时间
 	 * @return
 	 */
-	public int getCountByQuery(String goodsPid, String goodsName, int adminId, int replyFlag, String startdate, String enddate);
+	public int getCountByQuery(String goodsPid, String goodsName, int adminId, int replyFlag, int replyStatus, String startdate, String enddate);
 	/**更新回复内容
 	 * @date 2018年3月26日
 	 * @author user4

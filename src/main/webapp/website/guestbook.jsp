@@ -87,6 +87,12 @@ table.imagetable td {
 	int userid=adm.getId();
 	%>
 <script type="text/javascript">
+/* 获取url中参数 */
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg); //匹配目标参数
+    if (r != null) return unescape(r[2]); return null; //返回参数值
+}
 $(function(){
 // 	document.onkeydown = function(e){
 // 		var ev = document.all ? window.event : e; 
@@ -95,8 +101,7 @@ $(function(){
 // 			 doQuery(number);
 // 		}
 // 	} 
-	setDatagrid();
-	$('#timeFrom').datebox({  
+	$('#timeFrom').datebox({
 		 closeText:'关闭',  
 		 formatter:function(date){  
 		  var y = date.getFullYear();  
@@ -157,7 +162,7 @@ function setDatagrid() {
 			striped : true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮
 			toolbar : "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-			url : '/cbtconsole/StatisticalReport/findAll',//url调用Action方法
+//			url : '/cbtconsole/StatisticalReport/findAll',//url调用Action方法
 			loadMsg : '数据装载中......',
 			singleSelect : false,//为true时只能选择单行
 			fitColumns : true,//允许表格自动缩放，以适应父容器
@@ -175,6 +180,7 @@ function doQuery(page) {
 	var status=$('#status').combobox('getValue');
 	var questionType=$('#questionType').combobox('getValue');
 	var userid=$("#userid").val();
+	var adminId=$("#adminId").combobox('getValue');
 	var username = $("#username").val();
 	var pname = $("#pname").val();
 	var useremail=$("#useremail").val();
@@ -186,6 +192,7 @@ function doQuery(page) {
     	"status":status,
     	"questionType":questionType,
     	"userId":userid,
+    	"adminId":adminId,
     	"userName":username,
     	"pname":pname,
     	"useremail":useremail,
@@ -316,9 +323,45 @@ function closeBigImg(){
     $("#big_img").css("display","none");
     $('#big_img').empty();
 }
+
+$(function(){
+    //负责人下拉框
+    $.ajax({
+        type : 'POST',
+        async : false,
+        url : '/cbtconsole/admuser/queryAllAdmuser',
+        success : function(data){
+            if(data.ok){
+                var dataArr = [];
+                dataArr.push({'id':'0','text':'全部',"selected":'true'});
+                var results = data.data;
+                for (var i = 0; i < results.length; i++) {
+                    dataArr.push({'id':results[i].id,'text':results[i].admname});
+                }
+                $('#adminId').combobox("loadData", dataArr);
+            } else{
+                alert("获取下拉框数据失败，请重新刷新页面");
+            }
+        }
+    });
+
+    //页面加载完后 通过url中指定参数查询结果
+    setDatagrid();
+    var opts = $("#easyui-datagrid").datagrid("options");
+    opts.url = "/cbtconsole/StatisticalReport/findAll";
+    if(getUrlParam("status") != undefined && getUrlParam("status") != 'null') {
+        $("#status").combobox('select',getUrlParam("status"));
+    }
+    if(getUrlParam("adminId") != undefined && getUrlParam("adminId") != 'null') {
+        $('#adminId').combobox("setValue", getUrlParam("adminId"));
+    }
+    $("#questionType").combobox('select',getUrlParam("questionType"));
+    doQuery(1);
+})
+
 </script>
 </head>
-<body onload="$('#dlg').dialog('close');doQuery(1)">
+<body>
 <div class="mod_pay3" style="display: none;" id="big_img">
 
 </div>
@@ -352,7 +395,7 @@ function closeBigImg(){
 		<div>
 			<form id="query_form" action="#" style="margin-left:350px;" onsubmit="return false;">
 				<input class="easyui-textbox" name="userid" id="userid" style="width:15%;margin-top: 10px;"  data-options="label:'userid:'">
-				<select class="easyui-combobox" name="status" id="status" style="width:15%;" data-options="label:'state:',panelHeight:'auto'">
+				<select class="easyui-combobox" name="status" id="status" style="width:15%;" data-options="label:'回复状态:',panelHeight:'auto'">
 				<option value="-1" selected>全部</option>
 				<option value="0">未回复</option>
 				<option value="1">已回复</option>
@@ -368,6 +411,9 @@ function closeBigImg(){
 				<span>~</span>
 				<input class="easyui-datebox" name="timeTo" id="timeTo" style="width:100px;">
 				<br><br>
+                <select class="easyui-combobox" name="adminId" id="adminId" style="width:15%;height: 30px;"
+                        data-options="label:'负责人:',panelHeight:'auto',valueField: 'id',textField: 'text'">
+                </select>
 				<input class="easyui-textbox" name="username" id="username" style="width:15%;"  data-options="label:'username:'">
 				<input class="easyui-textbox" name="pname" id="pname" style="width:15%;"  data-options="label:'pname:'">
 				<input class="easyui-textbox" name="useremail" id="useremail" style="width:15%;"  data-options="label:'useremail:',validType:'email'">
@@ -383,7 +429,7 @@ function closeBigImg(){
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1200px;height:900px">
 		<thead>	
 			<tr>
-				<th data-options="field:'userInfos',width:30,align:'center'">user_id</th>
+				<th data-options="field:'userInfos',width:30,align:'center'">userid</th>
 				<th data-options="field:'email',width:50,align:'center'">email</th>
 				<th data-options="field:'pid',width:30,align:'center'">pid</th>
 				<th data-options="field:'pname',width:30,align:'center'">pname</th>
