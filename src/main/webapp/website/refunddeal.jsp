@@ -53,7 +53,7 @@
 <input value="${roletype }" id="roletype" type="hidden">
 <c:if test="${roletype=='0' || roletype=='3' || roletype=='4'}">
 	<div class="col-xs-1">
-		<c:if test="${admName=='Emma' || admName=='Ling'}">
+		<c:if test="${admName=='emmaxie' || admName=='Ling'}">
 				<span><input type="button" id="addSecValid"
 							 onclick="showSecValid(0)" value="设置验证密码" class="btn"></span>
 			<span><input type="button" id="updateSecValid"
@@ -123,7 +123,7 @@
 						onclick="resetPar()">重置
 				</button>
 			</div>
-			<c:if test="${admName=='Ling'}">
+			<c:if test="${admName=='Ling' || admName=='emmaxie'}">
 				<div class="col-xs-1">
 					<button type="reset" class="btn btn-primary btn-sm"
 							style="background-color: #00a65a;"
@@ -238,7 +238,7 @@
 							<span><em>code:</em>${refund.reasoncode}</span>
 							<br>
 							<span><em>note:</em>${refund.reasonnote}</span>
-							<c:if test="${admName=='Ling'}">
+							<c:if test="${admName=='Ling' || admName=='emmaxie'}">
 								<br>
 								<span><input type="button" class="bt-jz"
 											 onclick="changeavailable(${refund.userid},'${refund.orderid}','');"
@@ -246,7 +246,7 @@
 								<br>
 							</c:if>
 						</c:if> <c:if test="${refund.type==2 }">
-							<c:if test="${admName!='Emma' || admName!='Ling'}">
+							<c:if test="${admName!='emmaxie' || admName!='Ling'}">
 								<c:if test="${refund.additionBanlance>0}">
 												<span>该投诉已经余额补偿过:<em
 														style="font-weight: bold; font-size: 16px; color: red;">${refund.additionBanlance}</em>&nbsp;USD
@@ -265,7 +265,7 @@
 										href="/cbtconsole/complain/getComplainByCid?cid=${refund.complainId}"
 										target="_blank">投诉详情</a></span>
 							</c:if>
-							<c:if test="${admName=='Emma' || admName!='Ling'}">
+							<c:if test="${admName=='emmaxie' || admName!='Ling'}">
 								该用户有投诉
 							</c:if>
 						</c:if></td>
@@ -381,7 +381,7 @@
 								</c:if>
 
 								<c:if test="${roletype=='0'}">
-									<c:if test="${(refund.status== 1 || refund.status== -1) && admName=='Ling'}">
+									<c:if test="${(refund.status== 1 || refund.status== -1) && admName=='Ling' && admName=='emmaxie'}">
 											<textarea
 													style="min-height: 72px;  max-height: 80%;width: 300px;line-height: 15px; float: left;"
 													id="remark_${refund.id}"></textarea>
@@ -464,12 +464,12 @@
 								<div style="height: 30px;"></div>
 								<br>
 
-								<c:if test="${admName!='Ling'}">
+								<c:if test="${admName!='Ling' || admName!='emmaxie'}">
 									${refund.feedback}
 									<br>
 								</c:if>
 
-								<c:if test="${admName=='Ling'}">
+								<c:if test="${admName=='Ling' || admName=='emmaxie'}">
 
 									<c:if test="${refund.feedback != null}">
 										<c:if test="${refund.status == 2}">

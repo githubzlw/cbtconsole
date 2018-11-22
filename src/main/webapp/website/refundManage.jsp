@@ -134,7 +134,7 @@
     <div class="span_div" style="text-align: left;">
 
         <span style="margin-left: 100px;"><a href="/cbtconsole/refundss/rlist" target="_blank">未匹配用户申诉记录</a></span>
-        <c:if test="${roleType == '0' && (operatorName=='Emma' || operatorName=='Ling')}">
+        <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling')}">
             <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})" value="二次验证密码" class="btn_sty"></span>
         </c:if>
         <span class="sp_style ${chooseState == -1 ? ' is_choose':''}" onclick="changeAndQuery(-1)">全部</span>
@@ -339,7 +339,7 @@
             <td>账号：<input type="hidden" id="option_admin_id" value=""></td>
             <td><select id="select_op_id" disabled="disabled">
                 <option value="1" selected="selected">Ling</option>
-                <option value="8" selected="selected">Emma</option>
+                <option value="83" selected="selected">emmaxie</option>
             </select></td>
         </tr>
         <tr id="second_pwd">

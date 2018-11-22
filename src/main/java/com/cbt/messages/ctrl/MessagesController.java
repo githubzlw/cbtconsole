@@ -200,7 +200,7 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		int admuserid = adminid;
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")) {
+		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
 			admuserid = 0;
 		}
 
@@ -269,7 +269,7 @@ public class MessagesController {
 		busiessNum.setType(CommonConstants.BUSINQUIRIES);
 		int countAll = 0;
 		int noArrgCount = 0;
-		if (adminid == 1) {
+		if (adminid == 1 || adminid == 83) {
 			for (MessagesCountVo count : busiessNumList) {
 				countAll += count.getCountAll();
 				noArrgCount += count.getNoArrgCount();
@@ -316,7 +316,8 @@ public class MessagesController {
 		int admuserid = user.getId();
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("Sales5")) {
+		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
+				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
 			admuserid = 0;
 		}
 		

@@ -310,7 +310,7 @@ function getMessageNum(uid){
             	$('#questionnum1').html(messagesCountVo.countAll);
             }
             else if(messagesCountVo.type=='businquiries'){
-                if(admuserid ==1){
+                if(admuserid ==1 || admuserid == 83){
                     $('#businquiries').html(messagesCountVo.noArrgCount);
                     $('#businquiries1').html(messagesCountVo.noDeleteCount);
                     $('#businquiries2').html(messagesCountVo.countAll);
@@ -378,7 +378,7 @@ function getMessageNum(uid){
 //        				$('#systemfailure').html(messagesCountVo.noDeleteCount);
 //        			}
                         else if(messagesCountVo.type=='businquiries'){
-                            if(admuserid ==1){
+                            if(admuserid ==1 || admuserid ==83){
                                 $('#businquiries').html(messagesCountVo.noArrgCount);
                                 sessionStorage.setItem("noArrgCount",messagesCountVo.noArrgCount);
                                 $('#businquiries1').html(messagesCountVo.noDeleteCount);
