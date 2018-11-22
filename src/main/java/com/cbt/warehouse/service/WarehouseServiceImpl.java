@@ -1442,7 +1442,19 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return list;
     }
 
-    @Override
+	@Override
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsList(Map<String, String> map) {
+		List<PurchaseSamplingStatisticsPojo> list=dao.monthSalesEffortsList(map);
+		return list;
+	}
+
+	@Override
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsListCount(Map<String, String> map) {
+		List<PurchaseSamplingStatisticsPojo> list=dao.monthSalesEffortsListCount(map);
+		return list;
+	}
+
+	@Override
     public List<PurchaseSamplingStatisticsPojo> getCleaningQuality(Map<String, String> map) {
         List<PurchaseSamplingStatisticsPojo> list=dao.getCleaningQuality(map);
         int allWeightCount=0;

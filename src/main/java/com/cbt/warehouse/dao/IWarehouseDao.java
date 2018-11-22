@@ -969,6 +969,19 @@ public interface IWarehouseDao {
 	public List<PurchaseSamplingStatisticsPojo> weightProblemDetails(Map<String, String> map);
 	public List<PurchaseSamplingStatisticsPojo> weightProblemDetailsCount(Map<String, String> map);
 	/**
+	 *月销售商品努力报表
+	 * @param map
+	 * @return
+	 */
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsList(Map<String,String> map);
+	/**
+	 *月销售商品努力报表
+	 * @param map
+	 * @return
+	 */
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsListCount(Map<String,String> map);
+
+	/**
 	 * 清洗质量
 	 * @param map
 	 * @return

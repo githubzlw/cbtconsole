@@ -288,11 +288,17 @@
 		FROM custom_benchmark_ready c
 		inner JOIN supplier_product s ON c.shop_id=s.shop_id AND c.pid=s.goods_pid and s.goods_pid&lt;>#{shop_id}
 		WHERE c.valid=1 AND c.shop_id=#{shop_id}
+		<if test="goodsPid != null">
+			and c.pid=#{goodsPid}
+		</if>
 	</select>
 	<select id="getAllShopGoodsInfoList" resultType="com.cbt.warehouse.pojo.SupplierProductsBean">
 		SELECT c.shop_id as shopId,c.pid as goodsPid,'' as remarks,c.remotpath,c.custom_main_image,'' as quality,'' as service,''  as userName,createtime
 		FROM custom_benchmark_ready c
 		WHERE c.valid=1 AND c.shop_id=#{shop_id}
+		<if test="goodsPid != null">
+			and c.pid=#{goodsPid}
+		</if>
 		<if test="flag == 'true'">
 			AND c.pid in(
 				SELECT a.pid FROM(
@@ -327,6 +333,6 @@
 		FROM question_answer q LEFT JOIN admuser a ON q.reply_name=a.id WHERE q.pid=#{pid}
 	</select>
 	<update id="updateRemark">
-		update supplier_product set remark=#{remark} where id=${id}
+		update supplier_product set remark=#{remark},quality=#{newQuality} where id=${id}
 	</update>
 </mapper>

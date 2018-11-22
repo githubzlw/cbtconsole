@@ -963,6 +963,19 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	public List<PurchaseSamplingStatisticsPojo> getCleaningQuality(Map<String, String> map);
+
+	/**
+	 *月销售商品努力报表
+	 * @param map
+	 * @return
+	 */
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsList(Map<String,String> map);
+	/**
+	 *月销售商品努力报表
+	 * @param map
+	 * @return
+	 */
+	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsListCount(Map<String,String> map);
 	public List<PurchaseSamplingStatisticsPojo> getCleaningQualityCount(Map<String, Object> map);
 	/**
 	 * 人工赋能统计数量查询

@@ -89,7 +89,7 @@ public interface SupplierScoringMapper {
 	 * @param remark
 	 * @return
 	 */
-	public int updateRemark(@Param("id") String id, @Param("remark") String remark);
+	public int updateRemark(@Param("id") String id, @Param("remark") String remark,@Param("newQuality") String newQuality);
 	/**
 	 * 查询打过分数的产品信息
 	 * @Title searchProductListByShopId

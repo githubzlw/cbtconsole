@@ -3520,7 +3520,7 @@
 			<!-- 						<option value="3">已到仓库验货无误</option> -->
 				</select>
 				</span>
-			<span>商品编号:<input
+			<span>商品编号/购物车id:<input
 					type="text" id="goodid" class="h" value="${goodid}"
 					onkeypress="if (event.keyCode == 13) FnSearch('1');" /></span>
 			<span>产品名称:<input
@@ -3692,7 +3692,7 @@
 								</select><span id="${orderd.od_id}_buyid">${pb.buyid}</span><span id="info${orderd.od_id}"></span>
 							</c:if>
 							<br>
-							<span>商品号：</span><span>${pb.goodsid};商品id:${pb.od_id}</span>
+							<span>商品号：</span><span>${pb.goodsid};购物车id:${pb.od_id}</span>
 							<br>
 							<input type="hidden" id="order_${pbsi.index+1}" value="${pb.orderNo}" />
 							<input type="hidden" id="goodsid_${pbsi.index+1}" value="${pb.od_id}" />
@@ -3764,22 +3764,22 @@
 							<div>
 								<c:if test="${pb.rkgoodstatus == '2'}">
 									<h1 style="color: red;">
-										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.goodsid}">已到仓库，已校验该到没到</a>
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验该到没到</a>
 									</h1>
 								</c:if>
 								<c:if test="${pb.rkgoodstatus == '3'}">
 									<h1 style="color: red;">
-										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.goodsid}">已到仓库，已校验破损</a>
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验破损</a>
 									</h1>
 								</c:if>
 								<c:if test="${pb.rkgoodstatus == '4'}">
 									<h1 style="color: red;">
-										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.goodsid}">已到仓库，已校验有疑问</a>
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验有疑问</a>
 									</h1>
 								</c:if>
 								<c:if test="${pb.rkgoodstatus == '5'}">
 									<h1 style="color: red;">
-										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.goodsid}">已到仓库，已校验数量有误</a>
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验数量有误</a>
 									</h1>
 								</c:if>
 							</div>
