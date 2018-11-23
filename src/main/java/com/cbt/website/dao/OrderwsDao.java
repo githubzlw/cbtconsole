@@ -1894,7 +1894,8 @@ public class OrderwsDao implements IOrderwsDao {
         String sql = "SELECT order_no,pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
-                + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c FROM orderinfo where LEFT(order_no,17) = LEFT(?,17) ";
+                + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
+                " FROM orderinfo where LEFT(order_no,17) = LEFT(?,17) ";
         List<OrderBean> list = new ArrayList<OrderBean>();
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -1929,6 +1930,10 @@ public class OrderwsDao implements IOrderwsDao {
                 ob.setFirstdiscount(rs.getString("firstdiscount"));
                 ob.setVatBalance(rs.getDouble("vatbalance"));
                 ob.setActual_freight_c(rs.getDouble("actual_freight_c"));
+                ob.setActual_lwh(rs.getString("actual_lwh"));
+                ob.setProcessingfee(rs.getDouble("processingfee"));
+                ob.setMemberFee(rs.getDouble("memberFee"));
+
                 /*
                  * SimpleDateFormat dateFormat = new
                  * SimpleDateFormat("yyyy-MM-dd");
