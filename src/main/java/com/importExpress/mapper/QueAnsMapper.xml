@@ -33,9 +33,14 @@
     left join admin_r_user a on q.userid=a.userid
       left join admuser ad on a.adminid=ad.id
 	WHERE q.is_delete=0
-    
-    <if test="replyFlag != 0 ">
-        and q.reply_status=#{replyFlag}
+    <if test="replyStatus != 0 ">
+        and q.reply_status=#{replyStatus}
+    </if>
+    <if test="replyFlag == 1 ">
+        and (q.reply_name is null or q.reply_name = '')
+    </if>
+    <if test="replyFlag == 2 ">
+        and (q.reply_name is not null and q.reply_name != '')
     </if>
     <if test="goodsPid != null">
         and q.pid=#{goodsPid}
@@ -44,42 +49,46 @@
       and q.pname=#{goodsName}
     </if>
     <if test="adminId != 0">
-      and q.reply_name=#{adminId}
+      and ad.id=#{adminId}
     </if>
     <if test="startdate != null">
       and q.create_time &gt; #{startdate}
-      <!-- and to_day(q.create_time)&gt;to_day(#{startdate}) -->
     </if>
     <if test="enddate != null">
       and q.create_time &lt; #{enddate}
-      <!-- and to_day(q.create_time)&lt;to_day(#{enddate}) -->
     </if>
     order by create_time desc limit #{page},60 
-  
   </select>
   <select id="getCountByQuery"  resultType="java.lang.Integer">
-   select count(1)
-    from question_answer where is_delete=0
-     <if test="replyFlag != 0">
-        and reply_status=#{replyFlag}
-    </if>
-    <if test="goodsPid != null">
-        and pid=#{goodsPid}
-    </if>
-    <if test="goodsName != null">
-      and pname=#{goodsName}
-    </if>
-    <if test="adminId != 0">
-      and reply_name=#{adminId}
-    </if>
-     <if test="startdate != null">
-      and create_time &gt; #{startdate}
-      <!-- and to_day(a.create_time)&gt;to_day(#{startdate}) -->
-    </if>
-    <if test="enddate != null">
-      and create_time &lt; #{enddate}
-      <!-- and to_day(a.create_time)&lt;to_day(#{enddate}) -->
-    </if>
+      SELECT COUNT(1)
+      FROM question_answer q LEFT JOIN custom_benchmark_ready c ON q.pid=c.pid LEFT JOIN admuser b ON q.reply_name=b.id
+      left join admin_r_user a on q.userid=a.userid
+      left join admuser ad on a.adminid=ad.id
+      WHERE q.is_delete=0
+      <if test="replyStatus != 0 ">
+          and q.reply_status=#{replyStatus}
+      </if>
+      <if test="replyFlag == 1 ">
+          and (q.reply_name is null or q.reply_name = '')
+      </if>
+      <if test="replyFlag == 2 ">
+          and (q.reply_name is not null and q.reply_name != '')
+      </if>
+      <if test="goodsPid != null">
+          and q.pid=#{goodsPid}
+      </if>
+      <if test="goodsName != null">
+          and q.pname=#{goodsName}
+      </if>
+      <if test="adminId != 0">
+          and ad.id=#{adminId}
+      </if>
+      <if test="startdate != null">
+          and q.create_time &gt; #{startdate}
+      </if>
+      <if test="enddate != null">
+          and q.create_time &lt; #{enddate}
+      </if>
   </select>
   
   <update id="updateReplyContent" >

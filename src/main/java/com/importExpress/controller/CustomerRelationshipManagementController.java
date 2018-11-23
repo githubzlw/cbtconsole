@@ -4,20 +4,29 @@ package com.importExpress.controller;
 import com.cbt.admuser.service.AdmuserService;
 import com.cbt.bean.Orderinfo;
 import com.cbt.bean.TabTransitFreightinfoUniteNew;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.AdminRUserExample;
+import com.importExpress.pojo.UserBean;
 import com.importExpress.service.AdminRUserServiece;
+import com.importExpress.service.OrderSplitService;
+import com.importExpress.service.ReorderService;
+import com.importExpress.utli.RedisModel;
+import com.importExpress.utli.SendMQ;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * *****************************************************************************************
@@ -42,7 +51,9 @@ public class CustomerRelationshipManagementController {
     @Autowired
     private AdmuserService admuserService;
     @Autowired
-    private IOrderinfoService iOrderinfoService;
+    private  IOrderinfoService iOrderinfoService;
+    @Autowired
+    private OrderSplitService orderSplitService;
     /**
      * @Title: queryTheNumCustomersUnderSaler
      * @Author: cjc
@@ -118,5 +129,27 @@ public class CustomerRelationshipManagementController {
             }
 
         }
+    }
+    @Autowired
+    private ReorderService reorderService;
+    @RequestMapping(value = "/reorderTrue")
+    @ResponseBody
+    public String reorderTrue(String orderNo,String  userId) throws Exception {
+        String message = reorderService.reorder(orderNo, userId);
+        //清除redis 里面数据
+        //2.清空redis数据
+        //使用MQ清空购物车数据
+        //redis示例
+        SendMQ sendMQ = null;
+        String userIdStr = String.valueOf(userId);
+        sendMQ = new SendMQ();
+        sendMQ.sendMsg(new RedisModel(new String[]{userIdStr}));
+        sendMQ.closeConn();
+        return message;
+    }
+    @RequestMapping(value = "/reorder")
+    public String reorder(String orderNo,HttpServletRequest request) throws Exception {
+        request.setAttribute("orderNo",orderNo);
+        return "reorder";
     }
 }

@@ -140,13 +140,13 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String cbrdShop_id;
 
 	//采购货源标题
-	private String goodsName;
-	public String getGoodsName() {
-		return goodsName;
+	private String goodsPName;
+	public String getGoodsPName() {
+		return goodsPName;
 	}
 
-	public void setGoodsName(String goodsName) {
-		this.goodsName = goodsName;
+	public void setGoodsPName(String goodsPName) {
+		this.goodsPName = goodsPName;
 	}
 	public String getInventoryRemark() {
 		return inventoryRemark;

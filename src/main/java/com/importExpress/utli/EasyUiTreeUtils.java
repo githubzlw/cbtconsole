@@ -1,6 +1,7 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CategoryBean;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,13 +27,13 @@ public class EasyUiTreeUtils {
                 childMap.put("text", ct.getCategoryName());
                 childMap.put("state", "closed");
                 childMap.put("total", ct.getTotal());
-                childMap.put("children", EasyUiTreeUtils.getChildMap(ct.getCid(), categorys, ct.getLv()));
+                childMap.put("children", getChildMap(ct.getCid(), categorys, ct.getLv()));
                 parentMaps.add(childMap);
             }
         }
         List<Map<String, Object>> nwParentMaps = new ArrayList<Map<String, Object>>();
         for (Map<String, Object> ptMap : parentMaps) {
-            int ptCount = EasyUiTreeUtils.doTreeCount(ptMap);
+            int ptCount = doTreeCount(ptMap);
             if (ptCount == 0) {
                 ptMap.put("children", null);
             } else {
@@ -55,29 +56,22 @@ public class EasyUiTreeUtils {
         List<Map<String, Object>> childMaps = new ArrayList<Map<String, Object>>();
         for (CategoryBean ct : categorys) {
             // 判断path数据不为空lv是传递参数的+1值，并且在path中含有父类的cid
-            if ((ct.getLv() == lv + 1) && !(ct.getPath() == null || "".equals(ct.getPath()))) {
+            if ((ct.getLv() == lv + 1) && StringUtils.isNotBlank(ct.getPath())) {
                 // 寻找当前数据的
-                String[] catids = ct.getPath().split(",");
-                if (catids.length > 0) {
-                    for (String catid : catids) {
-                        if (cid.equals(catid)) {
-                            Map<String, Object> child = new HashMap<String, Object>();
-                            child.put("id", ct.getCid());
-                            child.put("text", ct.getCategoryName());
-                            child.put("total", ct.getTotal());
+                if((","+ct.getPath()+ ",").contains(","+cid+ ",")){
+                    Map<String, Object> child = new HashMap<String, Object>();
+                    child.put("id", ct.getCid());
+                    child.put("text", ct.getCategoryName());
+                    child.put("total", ct.getTotal());
 
-                            List<Map<String, Object>> childList = getChildMap(ct.getCid(), categorys, ct.getLv());
-                            // 递归创建
-                            child.put("children", childList);
-                            if (ct.getLv() == 2 && childList.size() > 0) {
-                                child.put("state", "closed");
-                            }
-                            childMaps.add(child);
-                            break;
-                        }
+                    List<Map<String, Object>> childList = getChildMap(ct.getCid(), categorys, ct.getLv());
+                    // 递归创建
+                    child.put("children", childList);
+                    if (ct.getLv() == 2 && childList.size() > 0) {
+                        child.put("state", "closed");
                     }
+                    childMaps.add(child);
                 }
-                catids = null;
             }
         }
         return childMaps;

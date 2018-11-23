@@ -18,7 +18,7 @@ public interface QueAnsMapper {
 	 * @return  
 	 */
 	public List<QueAns> findByQuery(@Param("goodsPid") String goodsPid, @Param("goodsName") String goodsName,
-                                    @Param("adminId") int adminId, @Param("replyFlag") int replyFlag, @Param("startdate") String startdate,
+                                    @Param("adminId") int adminId, @Param("replyFlag") int replyFlag, @Param("replyStatus") int replyStatus, @Param("startdate") String startdate,
                                     @Param("enddate") String enddate, @Param("page") int page);
 	/**
 	 * 获取产品单页提问信息
@@ -64,7 +64,7 @@ public interface QueAnsMapper {
 	 * @return
 	 */
 	public int getCountByQuery(@Param("goodsPid") String goodsPid, @Param("goodsName") String goodsName,
-                               @Param("adminId") int adminId, @Param("replyFlag") int replyFlag, @Param("startdate") String startdate,
+                               @Param("adminId") int adminId, @Param("replyFlag") int replyFlag, @Param("replyStatus") int replyStatus, @Param("startdate") String startdate,
                                @Param("enddate") String enddate);
 
 	/**更新回复内容

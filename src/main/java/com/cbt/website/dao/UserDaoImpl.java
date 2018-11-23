@@ -4,7 +4,6 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.onlinesql.ctr.SaveSyncTable;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.ctrl.NewOrderDetailsCtr;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ApplicationSummary;
 import com.cbt.website.bean.ConfirmUserInfo;
@@ -336,7 +335,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<ConfirmUserInfo> getAll() {
-        String sql = "SELECT id,admName,roleType FROM admuser  WHERE STATUS =1 AND roleType IN (3,4) or id=18";
+        String sql = "SELECT id,admName,roleType FROM admuser  WHERE STATUS =1 AND roleType IN (0,3,4)";
         Connection conn = DBHelper.getInstance().getConnection();
         List<ConfirmUserInfo> list = new ArrayList<ConfirmUserInfo>();
         PreparedStatement stmt = null;

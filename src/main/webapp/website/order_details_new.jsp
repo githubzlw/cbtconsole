@@ -242,6 +242,7 @@ $(document).ready(function(){
  		$("#saler_but").attr("disabled",true);
  	}
  	$("#ordercountry_value").val("${order.address.country}");
+    $("#ordercountry").val($("#ordercountry_value").val());
 });
 
 function showMessage(msg) {
@@ -1162,6 +1163,9 @@ em {
 						</div>
 					</c:if>
 					</td>
+					<td>
+						<a href="/cbtconsole/customerRelationshipManagement/reorder?orderNo=${order.orderNo}"><input type="button" value="AddOrderToTest" style="color: red"></a>
+					</td>
 				</tr>
 				<!-- 客户订单信息显示 -->
 				<tr>
@@ -1420,39 +1424,10 @@ em {
 							<td>Country:</td>
 							<td>
 								<select id="ordercountry" style="width: 180px" disabled="disabled" >
-									<option value="USA" selected="selected">USA</option><option value="ARGENTINA">ARGENTINA</option><option value="AUSTRALIA">AUSTRALIA</option>
-									<option value="AUSTRIA">AUSTRIA</option><option value="BELGIUM">BELGIUM</option><option value="BRAZIL">BRAZIL</option><option value="CANADA">CANADA</option>
-									<option value="CHILE">CHILE</option><option value="CZECH">CZECH</option><option value="DENMARK">DENMARK</option><option value="EGYPT">EGYPT</option>
-									<option value="FINLAND">FINLAND</option><option value="FRANCE">FRANCE</option><option value="GERMANY">GERMANY</option><option value="GREECE">GREECE</option>
-									<option value="HUNGARY">HUNGARY</option><option value="INDIA">INDIA</option><option value="IRAQ">IRAQ</option><option value="IRELAND">IRELAND</option>
-									<option value="ISRAEL">ISRAEL</option><option value="ITALY">ITALY</option><option value="JAPAN">JAPAN</option><option value="MEXICO">MEXICO</option>
-									<option value="Holland">Holland</option><option value="NEWZEALAND">NEWZEALAND</option><option value="NORWAY">NORWAY</option><option value="POLAND">POLAND</option>
-									<option value="PORTUGAL">PORTUGAL</option><option value="KSA(Saudi)">KSA(Saudi)</option><option value="S.AFRICA">S.AFRICA</option><option value="SPAIN">SPAIN</option>
-									<option value="SWEDEN">SWEDEN</option><option value="SWITZERLAND">SWITZERLAND</option><option value="TURKEY">TURKEY</option><option value="UAE">UAE</option>
-									<option value="UK">UK</option><option value="AFRICA">AFRICA</option><option value="APAC">APAC</option><option value="EUROPE">EUROPE</option>
-									<option value="MIDEAST">MIDEAST</option><option value="S.AMERICA">S.AMERICA</option><option value="Slovenia">Slovenia</option><option value="Slovakia">Slovakia</option>
-									<option value="Lithuania">Lithuania</option><option value="Luxembourg">Luxembourg</option><option value="Iran">Iran</option><option value="Pakistan">Pakistan</option>
-									<option value="Lebanon">Lebanon</option><option value="Cyprus">Cyprus</option><option value="Yemen">Yemen</option><option value="Kuwait">Kuwait</option>
-									<option value="Jordan">Jordan</option><option value="Qatar">Qatar</option><option value="Oman">Oman</option><option value="Bahrain">Bahrain</option>
-									<option value="SyrianArabRepublic">SyrianArabRepublic</option><option value="Bangladesh">Bangladesh</option><option value="Uganda">Uganda</option>
-									<option value="Zambia">Zambia</option><option value="Zimbabwe">Zimbabwe</option><option value="Tanzania">Tanzania</option><option value="Sudan">Sudan</option>
-									<option value="Ethiopia">Ethiopia</option><option value="Kenya">Kenya</option><option value="Ghana">Ghana</option><option value="Nigeria">Nigeria</option>
-									<option value="Dominica">Dominica</option><option value="CostaRica">CostaRica</option><option value="Panama">Panama</option><option value="Honduras">Honduras</option>
-									<option value="Venezuela">Venezuela</option><option value="Colombia">Colombia</option><option value="Paraguay">Paraguay</option><option value="Bolivia">Bolivia</option>
-									<option value="Uruguay">Uruguay</option><option value="RussianFederation">RussianFederation</option><option value="Ukraine">Ukraine</option>
-									<option value="Bulgaria">Bulgaria</option><option value="Croatia">Croatia</option><option value="Estonia">Estonia</option><option value="Romania">Romania</option>
-									<option value="Monaco">Monaco</option><option value="Georgia">Georgia</option><option value="SriLanka">SriLanka</option><option value="Vietnam">Vietnam</option>
-									<option value="Laos">Laos</option><option value="EastTimor">EastTimor</option><option value="Thailand">Thailand</option><option value="Brunei">Brunei</option>
-									<option value="Malaysia">Malaysia</option><option value="Singapore">Singapore</option><option value="Indonesia">Indonesia</option>
-									<option value="Philippines">Philippines</option><option value="Cambodia">Cambodia</option><option value="Myanmar">Myanmar</option>
-									<option value="MOROCCO">MOROCCO</option><option value="Latvia">Latvia</option><option value="Moldova">Moldova</option><option value="Iceland">Iceland</option>
-									<option value="Ecuador">Ecuador</option><option value="Kazakhstan">Kazakhstan</option><option value="Peru">Peru</option><option value="Korea">Korea</option>
-									<option value="SaudiArabia">SaudiArabia</option><option value="Malta">Malta</option><option value="Serbia">Serbia</option><option value="Mauritius">Mauritius</option>
-									<option value="Maldives">Maldives</option><option value="Armenia">Armenia</option><option value="Macedonia">Macedonia</option><option value="ReunionIsland">ReunionIsland</option><option value="Albania">Albania</option><option value="Azerbaijan">Azerbaijan</option><option value="Jamaica">Jamaica</option><option value="Uzbekistan">Uzbekistan</option><option value="Fiji">Fiji</option><option value="Salvador">Salvador</option><option value="Kyrgyzstan">Kyrgyzstan</option><option value="Nicaragua">Nicaragua</option><option value="Algeria">Algeria</option><option value="Barbados">Barbados</option><option value="Turkmenistan">Turkmenistan</option><option value="DominicanRepublic">DominicanRepublic</option><option value="Bhutan">Bhutan</option><option value="CapeVerde">CapeVerde</option><option value="Seychelles">Seychelles</option><option value="Botswana">Botswana</option><option value="FrenchGuiana">FrenchGuiana</option><option value="Greenland">Greenland</option><option value="Namibia">Namibia</option><option value="Tunisia">Tunisia</option><option value="Mozambique">Mozambique</option><option value="Liechtenstein">Liechtenstein</option><option value="Andorra">Andorra</option><option value="Angola">Angola</option><option value="Tajikistan">Tajikistan</option><option value="Mongolia">Mongolia</option><option value="Palestine">Palestine</option><option value="Trinidad&amp;Tobago">Trinidad&amp;Tobago</option><option value="Guatemala">Guatemala</option><option value="Rwanda">Rwanda</option><option value="Nepal">Nepal</option><option value="BurkinaFaso">BurkinaFaso</option><option value="Swaziland">Swaziland</option><option value="Senegal">Senegal</option><option value="Belize">Belize</option><option value="Togo">Togo</option>
-									<option value="Cuba">Cuba</option><option value="Madagascar">Madagascar</option><option value="Guyana">Guyana</option><option value="CotedIvoire">CotedIvoire</option>
-									<option value="Benin">Benin</option><option value="Grenada">Grenada</option><option value="Suriname">Suriname</option><option value="Gambia">Gambia</option><option value="Vanuatu">Vanuatu</option>
-									<option value="Gabon">Gabon</option><option value="Malawi">Malawi</option><option value="SanMarino">SanMarino</option><option value="SierraLeone">SierraLeone</option><option value="Djibouti">Djibouti</option><option value="Nauru">Nauru</option><option value="Haiti">Haiti</option><option value="Mali">Mali</option><option value="FalklandIslands">FalklandIslands</option><option value="AntiguaandBarbuda">AntiguaandBarbuda</option><option value="Afghanistan">Afghanistan</option><option value="Congo">Congo</option><option value="MarianaIslands">MarianaIslands</option><option value="Burundi">Burundi</option><option value="Guinea">Guinea</option><option value="Lesotho">Lesotho</option><option value="Niger">Niger</option><option value="WesternSamoa">WesternSamoa</option><option value="Mauritania">Mauritania</option><option value="Vatican">Vatican</option><option value="Tonga">Tonga</option>
-									<option value="Liberia">Liberia</option><option value="Kiribati">Kiribati</option><option value="EquatorialGuinea">EquatorialGuinea</option><option value="SolomonIslands">SolomonIslands</option><option value="ChristmasIsland">ChristmasIsland</option><option value="Chad">Chad</option><option value="St.Helena">St.Helena</option><option value="WesternSahara">WesternSahara</option><option value="Eritrea">Eritrea</option><option value="Somalia">Somalia</option><option value="Libya">Libya</option><option value="Tuvalu">Tuvalu</option><option value="Cameroon">Cameroon</option><option value="CanaryIslands">CanaryIslands</option><option value="CentralAfrica">CentralAfrica</option><option value="Montenegro">Montenegro</option><option value="SaintChristopher&amp;Nevis">SaintChristopher&amp;Nevis</option><option value="Comoros">Comoros</option><option value="Korea">Korea</option><option value="EastSamoa(US)">EastSamoa(US)</option><option value="Anguilla(GB)">Anguilla(GB)</option><option value="Aruba">Aruba</option><option value="Bermuda(GB)">Bermuda(GB)</option><option value="Bosnia&amp;Herzegovina">Bosnia&amp;Herzegovina</option><option value="CaymanIslands(GB)">CaymanIslands(GB)</option><option value="CocosIsland">CocosIsland</option><option value="CorkIslands(NZ)">CorkIslands(NZ)</option><option value="Congo(Gold)">Congo(Gold)</option><option value="FaroeIslands(DK)">FaroeIslands(DK)</option><option value="FrenchPolynesia">FrenchPolynesia</option><option value="Gibraltar(English)">Gibraltar(English)</option><option value="Guadeloupe(FR)">Guadeloupe(FR)</option><option value="Guinea-Bissau">Guinea-Bissau</option><option value="MarshallIslands">MarshallIslands</option><option value="Martinique(French)">Martinique(French)</option><option value="Mayotte">Mayotte</option><option value="Micronesia(US)">Micronesia(US)</option><option value="Montserrat(GB)">Montserrat(GB)</option><option value="NetherlandsAntilles">NetherlandsAntilles</option><option value="NewCaledoniaIslands(FR)">NewCaledoniaIslands(FR)</option><option value="Niue(NZ)">Niue(NZ)</option><option value="NorfolkIsland(AU)">NorfolkIsland(AU)</option><option value="Palau(US)">Palau(US)</option><option value="PapuaNewGuinea">PapuaNewGuinea</option><option value="PuertoRico(US)">PuertoRico(US)</option><option value="SaintLucia">SaintLucia</option><option value="St.Pierre&amp;Miquelon">St.Pierre&amp;Miquelon</option><option value="St.Vincent(GB)">St.Vincent(GB)</option><option value="SaoTome&amp;Principe">SaoTome&amp;Principe</option><option value="Svalbard(NO)">Svalbard(NO)</option><option value="Bahamas">Bahamas</option><option value="TokelauIslands(NZ)">TokelauIslands(NZ)</option><option value="Turks&amp;CaicosIslands(GB)">Turks&amp;CaicosIslands(GB)</option><option value="VirginIslands(GB)">VirginIslands(GB)</option><option value="VirginIslands(US)">VirginIslands(US)</option><option value="WallisandFujiaIslands(FR)">WallisandFujiaIslands(FR)</option><option value="Heard&amp;McDonaldIslands">Heard&amp;McDonaldIslands</option><option value="PitcairnIslands">PitcairnIslands</option><option value="AscensionIsland(English)">AscensionIsland(English)</option><option value="CzechRepublic">CzechRepublic</option><option value="Belarus">Belarus</option>
+									<c:forEach items="${countryList }" var="zone">
+										<option value="${zone.country}">${zone.country}</option>
+									</c:forEach>
+
 								</select>
 							</td>
 						</tr>
@@ -1620,7 +1595,7 @@ em {
 				<table id="orderDetail" class="ormtable2" align="center">
 					<tbody>
 						<tr class="detfretit">
-							<td>Item/购物车id</td>
+							<td>商品编号/购物车id</td>
 							<td colspan="2">详情</td>
 							<td style="width:400px;">订单信息</td>
 							<!-- 							<td>交期(新)</td> -->
@@ -1942,7 +1917,7 @@ em {
 									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">采购货源标题: ${orderd.goodsname}</p>
+									<p style="width:200px;">采购货源标题: ${orderd.goodsPName}</p>
 								</span>
 								<span id="spanurl${sd.index}">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>

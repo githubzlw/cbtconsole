@@ -34,6 +34,8 @@ import com.cbt.website.bean.QualityResult;
 import com.cbt.website.dao.*;
 import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
@@ -65,7 +67,9 @@ public class NewOrderDetailsCtr {
 
 	@Autowired
 	private IPurchaseService iPurchaseService;
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
+	/**
 	/**
 	 * 根据订单号获取订单详情
 	 *
@@ -279,6 +283,8 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("orderNo", orderNo);
 			request.setAttribute("orderDetail", odb);
 			request.setAttribute("order_state", orderInfo.getState());
+			IZoneServer os = new ZoneServer();
+			request.setAttribute("countryList",os.getAllZone());
 			// 实际运费
 			Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
 			request.setAttribute("actual_ffreight_", actual_ffreight_);
@@ -1422,7 +1428,7 @@ public class NewOrderDetailsCtr {
 	private JsonResult closeDropShipOrder(HttpServletRequest request, HttpServletResponse response,
                                           IOrderwsServer orderwsServer, int adminId, String mainOrderNo, String orderNo, String toEmail,
                                           String confirmEmail) throws Exception {
-
+		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeDropShipOrder start");
 		JsonResult json = new JsonResult();
 
@@ -1569,9 +1575,18 @@ public class NewOrderDetailsCtr {
 						sbBuffer.append("<br><br>Sincerely,");
 						sbBuffer.append("<br>Import-Express Team");
 
-						SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
-								"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
-						// ssd and end
+						//					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
+//							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+						model.put("email",confirmEmail);
+						model.put("name",toEmail);
+						model.put("accountLink",AppConfig.center_path);
+						model.put("orderNo",orderNo);
+						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
+						String modeStr = jsonObject.toString();
+
+						sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+						// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
+						insertChangeRecords(orderNo, -1, adminId);
 						json.setOk(true);
 					} else {
 						String remark = "订单号:" + orderNo + ",更改dropship子订单号失败,更改状态:"
@@ -1614,7 +1629,7 @@ public class NewOrderDetailsCtr {
 	private JsonResult closeGeneralOrder(HttpServletRequest request, HttpServletResponse response,
                                          IOrderwsServer orderwsServer, int adminId, String orderNo, String toEmail, String confirmEmail)
 			throws Exception {
-
+		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeGeneralOrder start,orderNo : " + orderNo);
 
 		JsonResult json = new JsonResult();
@@ -1681,13 +1696,16 @@ public class NewOrderDetailsCtr {
 				sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
 				sbBuffer.append("<br><br>Sincerely,");
 				sbBuffer.append("<br>Import-Express Team");
-				//Rewriter
-				//Rewrite <V1.0.1> Start：cjc 2018/10/22 17:25  秘密抄送人请使用邮箱，或者null
-				SendEmail.send(null, null, toEmail, sbBuffer.toString(),
-						"Your ImportExpress Order " + orderNo + " transaction is closed!", null, orderNo, 2);
-				//End：
+				//SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
+//							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+				model.put("email",confirmEmail);
+				model.put("name",toEmail);
+				model.put("accountLink",AppConfig.center_path);
+				model.put("orderNo",orderNo);
+				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
+				String modeStr = jsonObject.toString();
 
-				// ssd and end
+				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 				try {
 					insertChangeRecords(orderNo, -1, adminId);
@@ -1909,8 +1927,20 @@ public class NewOrderDetailsCtr {
 		if(org.apache.commons.lang3.StringUtils.isNotBlank(firstDiscountStr)){
 			firstDiscount = Double.valueOf(firstDiscountStr);
 		}
+
+		//质检费
+		double actual_lwh = 0;
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(orderInfo.getActual_lwh())){
+			actual_lwh = Double.valueOf(orderInfo.getActual_lwh());
+		}
+		//手续费
+		double processingfee = orderInfo.getProcessingfee();
+		//会员费
+		double memberFee = orderInfo.getMemberFee();
+
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
-				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c;
+				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
+				+ actual_lwh + processingfee + memberFee;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

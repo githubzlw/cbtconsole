@@ -9748,6 +9748,7 @@ public class WarehouseCtrl {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("uploadImgList", uploadImgList);
 		result.put("orderid", orderid);
+        result.put("imagehost", TabSeachPageController.IMAGEHOSTURL);
 		return result;
 	}
 

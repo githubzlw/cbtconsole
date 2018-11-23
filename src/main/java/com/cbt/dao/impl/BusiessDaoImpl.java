@@ -427,7 +427,8 @@ public class BusiessDaoImpl implements BusiessDao {
 		if(adminid==56){
 			adminid=1;
 		}
-		if(type !=0){
+        // type = 1 Busiess询盘 其他的暂未使用
+        if(type !=0){
 			if(type == 1){
 				sqlIf.append(" and busiess.customizedId is null and busiess.feedbackId is null ");
 			} else if(type == 2){
@@ -454,7 +455,7 @@ public class BusiessDaoImpl implements BusiessDao {
 		if(StringUtil.isNotBlank(enddate)){
 			sqlIf.append(" and busiess.createtime <='" + enddate + " 23:59:59'");
 		}
-
+        //状态 -1：未完成；0：待办；1-完成
 		if(state != -1){
 			sqlIf.append(" and busiess.status = "+state+"");
 		}

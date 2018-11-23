@@ -66,7 +66,7 @@
     <result column="addPrice" property="freight_upgrade" />
     
   </resultMap>
-    <resultMap id="searchLogMap" type="ceRong.tools.bean.SearchLog" >
+  <resultMap id="searchLogMap" type="ceRong.tools.bean.SearchLog" >
     <id column="id" property="id" />
     <result column="userid" property="userid" />
     <result column="sessionid" property="sessionid" />
@@ -105,8 +105,8 @@
   <select id="getMaxGoodsdata" resultType="Integer" parameterType="String">
     select max(id) from goodsdata where url = #{url}
   </select>
-  
-  <insert id="addGoogs_car" useGeneratedKeys="true"  parameterType="com.cbt.warehouse.pojo.SpiderBean" keyProperty="id">
+
+    <insert id="addGoogs_car" useGeneratedKeys="true"  parameterType="com.cbt.warehouse.pojo.SpiderBean" keyProperty="id">
     insert goods_car(userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
     	pWprice,sessionid,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,free_shopping_company,free_sc_days,
     	goodsdata_id,preferential,deposit_rate,guid,goods_type,feeprice,currency,goods_class,extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,theproductfrieght,notfreeprice,isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime)
@@ -116,423 +116,426 @@
     	#{bulk_volume}, #{total_weight}, #{weight}, #{free_shopping_company}, #{free_sc_days}, #{goodsdata_id}, #{preferential}, #{deposit_rate}, #{guId}, #{types},
     	#{feeprice}, #{currency}, #{goods_class}, #{extra_freight}, #{source_url},#{goods_catid},#{method_feight},#{isshipping_promote},#{price1},#{price2},#{price3},#{theproductfrieght},#{notfreeprice},#{isvolume},#{freeprice},#{firstprice},#{firstnumber},#{state},#{freight_upgrade},#{isFeight},#{isBattery},#{aliPosttime})
   </insert>
-    
-  <insert id="addGoogs_carTypeimg" useGeneratedKeys="true">
-  	<selectKey resultType="Integer" keyProperty="id" order="AFTER">  
-        SELECT 
-        LAST_INSERT_ID() 
-    </selectKey>
-    insert goods_typeimg(goods_id,img) values(#{goodsId},#{img})
-  </insert>
-  
-  <insert id="batchAddGoogs_car" useGeneratedKeys="true">
-  	<selectKey resultType="Integer" keyProperty="id" order="AFTER">  
-        SELECT 
-        LAST_INSERT_ID() 
-    </selectKey>
-  
-    insert goods_car(userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
-    	pWprice,sessionid,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,free_shopping_company,free_sc_days,
-    	goodsdata_id,preferential,deposit_rate,guid,goods_type,currency,feeprice,goods_class,extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,theproductfrieght,notfreeprice,isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime)
-    values
-    <foreach collection="list" item="item" index="index" separator="," >
-        (#{item.userId}, #{item.url}, #{item.name}, #{item.seller}, #{item.img_url}, #{item.price}, #{item.number}, 
-        #{item.freight}, #{item.remark},now(), #{item.itemId}, #{item.shopId}, #{item.norm_least}, #{item.pWprice}, #{item.sessionId}, #{item.true_shipping}, #{item.delivery_time},
-        #{item.freight_free}, #{item.width}, #{item.perWeight}, #{item.seilUnit}, #{item.goodsUnit}, #{item.bulk_volume}, #{item.total_weight}, #{item.weight}, #{item.free_shopping_company},
-        #{item.free_sc_days}, #{item.goodsdata_id}, #{item.preferential}, #{item.deposit_rate}, #{item.guId}, #{item.types}, #{item.currency}
-		,#{item.feeprice},#{item.goods_class},#{item.extra_freight},#{item.source_url},#{item.goods_catid},#{item.method_feight},#{item.isshipping_promote},#{item.price1},#{item.price2},#{item.price3},#{item.theproductfrieght},#{item.notfreeprice},#{item.isvolume},#{item.freeprice},#{item.firstprice},#{item.firstnumber},#{item.state},#{item.freight_upgrade},#{item.isFeight},#{item.isBattery},#{item.aliPosttime})
-    </foreach>
-  </insert>
-  
-  <!-- <select id="getGoogs_carsId" resultMap="SpiderBeanResultMap">
-    select id,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,pWprice,width,perWeight,seilUnit,goodsUnit,
-    	bulk_volume,total_weight,preferential,guid,currency,method_feight,isvolume from goods_car where 1=1
-    <choose>
-    	<when test="id == 0">
-    		and guid=#{guid}
-    	</when>
-    	<otherwise>
-    		and id=#{id}
-    	</otherwise>
-    </choose>
-    <choose>
-    	<when test="userId == 0">
-    		and sessionId=#{sessionId}
-    	</when>
-    	<otherwise>
-    		and userid=#{userid}
-    	</otherwise>
-    </choose>
-  </select> -->
-  
- <!--  <update id="upGoogs_car">
-    <choose>
-    	<when test="price == ''">
-    		<choose>
-    			<when test="sessionId != null and sessionId != ''">
-		    		update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight} , userid = #{userid} where state != 1 and sessionId = #{sessionId}
-		    	</when>
-		    	<otherwise>
-		    		update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight} where state != 1 and userid = #{userid}
-		    	</otherwise>
-    		</choose>
-    	</when>
-    	<when test="sessionId != null and sessionId != ''">
-    		update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight}, googs_price = #{price} , userid = #{userid} where state != 1 and sessionId = #{sessionId}
-    	</when>
-    	<otherwise>
-    		update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight}, googs_price = #{price} where state != 1 and userid = #{userid}
-    	</otherwise>
-    </choose>
-    <choose>
-    	<when test="spiderId == 0">
-    		and guid=#{guid}
-    	</when>
-    	<otherwise>
-    		and id=#{spiderId}
-    	</otherwise>
-    </choose>
-  </update> -->
-  
-  
-  <update id="up_carPrice">
-  	<foreach collection="spiders" item="item" index="index" open="" close="" separator=";" >  
-  		update goods_car set price1 = #{item.price1}, price2 = #{item.price2} ,theproductfrieght = #{item.theproductfrieght} ,googs_price = #{item.price},googs_number = #{item.number},
-	  		bulk_volume= #{item.bulk_volume},total_weight= #{item.total_weight},state=#{item.state},free_sc_days=#{item.free_sc_days},freeprice=#{item.freeprice},freight=#{item.freight}  
-	  		<if test="type!='chekout' and type!='schedule'">
-	  			,userid=#{userId}
-	  		</if>
-	  		 where guid=#{item.guId}  
-	  		 <if test="type!='login_up_carPrice'">
-	  		 	<choose>
-		  		<when test="userId != 0">
-		    		and userid=#{userId}
-		    	</when>
-		    	<otherwise>
-		    		and sessionid= #{sessionId}
-		    	</otherwise>
-		  		</choose> 
-	  		 </if>
-  	</foreach>
-  </update>
-  
-  <update id="login_carUser">
-  	update goods_car set userid=#{userId} where 
-     id in 
- 	<foreach item="item" index="index" collection="spiderIds" open="(" close=")" separator=",">
-		#{item} 
-	</foreach> 
- 	and state = 0
-  </update>
-  
-   <update id="delGoogs_car_preferential">
-  	update goods_car set state = 9 where state != 1 and preferential=#{preferential}
-    <choose>
-  		<when test="userId != 0">
-    		and userid=#{userId}
-    	</when>
-    	<otherwise>
-    		and sessionid= #{sesisonId}
-    	</otherwise>
-  		</choose>
-  </update>
-  
-  <update id="delGoogs_car">
-  	update goods_car set state = 9 where 1 = 1
-  	 <choose>
-  		<when test="userId != 0">
-    		and userid=#{userId}
-    	</when>
-    	<otherwise>
-    		and sessionid= #{sesisonId}
-    	</otherwise>
-  		</choose>
-    <choose>
-    	<when test="guid != null and guid != ''">
-    		and guid in 
-    		<foreach item="item" index="index" collection="guid" open="(" close=")" separator=",">
-				#{item}
-			</foreach>
-    	</when>
-    	<otherwise>
-    		and id in 
-    		<foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
-				#{item}
-			</foreach>
-    	</otherwise>
-    </choose>
-  </update>
-  
-  <update id="upGoogs_car_state">
-  	update goods_car set state = #{state} where 
-     id in 
- 	<foreach item="item" index="index" collection="List" open="(" close=")" separator=",">
-		#{item}
-	</foreach>
-  </update>
-  
-  <update id="upGoogs_car_price"  parameterType="java.util.Map">
-        
-          <foreach collection="map_price" item="price" open="" close="" index="index"  separator=";"> 
-               	update goods_car 
-               	<set>
-                  googs_price='${price}'
+
+    <insert id="addGoogs_carTypeimg" useGeneratedKeys="true">
+        <selectKey resultType="Integer" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+        insert goods_typeimg(goods_id,img) values(#{goodsId},#{img})
+    </insert>
+
+    <insert id="batchAddGoogs_car" useGeneratedKeys="true">
+        <selectKey resultType="integer" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+
+        insert goods_car(userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
+        pWprice,sessionid,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,free_shopping_company,free_sc_days,
+        goodsdata_id,preferential,deposit_rate,guid,goods_type,currency,feeprice,goods_class,extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,
+        price4,theproductfrieght,notfreeprice,isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime,goodsUrlMD5,priceListSize,skuid_1688,isFreeShipProduct,is_stock_flag,shopCount)
+        values
+        <foreach collection="spdMap" item="item" index="index" separator="," >
+            (#{userId}, #{item.url}, #{item.name}, #{item.seller}, #{item.img_url}, #{item.price}, #{item.number},
+            #{item.freight}, #{item.remark},now(), #{item.itemId}, #{item.shopId}, #{item.norm_least}, #{item.pWprice}, #{item.sessionId}, #{item.true_shipping}, #{item.delivery_time},
+            #{item.freight_free}, #{item.width}, #{item.perWeight}, #{item.seilUnit}, #{item.goodsUnit}, #{item.bulk_volume}, #{item.total_weight}, #{item.weight}, #{item.free_shopping_company},
+            #{item.free_sc_days}, #{item.goodsdata_id}, #{item.preferential}, #{item.deposit_rate}, #{item.guId}, #{item.types}, #{item.currency}
+            ,#{item.feeprice},#{item.goods_class},#{item.extra_freight},#{item.source_url},#{item.goods_catid},#{item.method_feight},#{item.isshipping_promote},#{item.price1},#{item.price2},#{item.price3},
+            #{item.price4},#{item.theproductfrieght},#{item.notfreeprice},#{item.isvolume},#{item.freeprice},#{item.firstprice},#{item.firstnumber},#{item.state},
+            #{item.freight_upgrade},#{item.isFeight},#{item.isBattery},#{item.aliPosttime},#{item.goodsUrlMD5},#{item.price_List},#{item.skuid_1688},#{item.isFreeShipProduct},#{item.isStockFlag},#{item.shopCount})
+        </foreach>
+    </insert>
+
+    <!-- <select id="getGoogs_carsId" resultMap="SpiderBeanResultMap">
+      select id,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,pWprice,width,perWeight,seilUnit,goodsUnit,
+          bulk_volume,total_weight,preferential,guid,currency,method_feight,isvolume from goods_car where 1=1
+      <choose>
+          <when test="id == 0">
+              and guid=#{guid}
+          </when>
+          <otherwise>
+              and id=#{id}
+          </otherwise>
+      </choose>
+      <choose>
+          <when test="userId == 0">
+              and sessionId=#{sessionId}
+          </when>
+          <otherwise>
+              and userid=#{userid}
+          </otherwise>
+      </choose>
+    </select> -->
+
+    <!--  <update id="upGoogs_car">
+       <choose>
+           <when test="price == ''">
+               <choose>
+                   <when test="sessionId != null and sessionId != ''">
+                       update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight} , userid = #{userid} where state != 1 and sessionId = #{sessionId}
+                   </when>
+                   <otherwise>
+                       update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight} where state != 1 and userid = #{userid}
+                   </otherwise>
+               </choose>
+           </when>
+           <when test="sessionId != null and sessionId != ''">
+               update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight}, googs_price = #{price} , userid = #{userid} where state != 1 and sessionId = #{sessionId}
+           </when>
+           <otherwise>
+               update goods_car set googs_number = #{number}, bulk_volume = #{totalvalume}, total_weight = #{totalweight}, googs_price = #{price} where state != 1 and userid = #{userid}
+           </otherwise>
+       </choose>
+       <choose>
+           <when test="spiderId == 0">
+               and guid=#{guid}
+           </when>
+           <otherwise>
+               and id=#{spiderId}
+           </otherwise>
+       </choose>
+     </update> -->
+
+
+    <update id="up_carPrice">
+        <foreach collection="spiders" item="item" index="index" open="" close="" separator=";" >
+            update goods_car set price1 = #{item.price1}, price2 = #{item.price2} ,theproductfrieght = #{item.theproductfrieght} ,googs_price = #{item.price},googs_number = #{item.number},
+            bulk_volume= #{item.bulk_volume},total_weight= #{item.total_weight},state=#{item.state},free_sc_days=#{item.free_sc_days},freeprice=#{item.freeprice},freight=#{item.freight}
+            <if test="type!='chekout' and type!='schedule'">
+                ,userid=#{userId}
+            </if>
+            where guid=#{item.guId}
+            <if test="type!='login_up_carPrice'">
+                <choose>
+                    <when test="userId != 0">
+                        and userid=#{userId}
+                    </when>
+                    <otherwise>
+                        and sessionid= #{sessionId}
+                    </otherwise>
+                </choose>
+            </if>
+        </foreach>
+    </update>
+
+    <update id="login_carUser">
+        update goods_car set userid=#{userId} where
+        id in
+        <foreach item="item" index="index" collection="spiderIds" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and state = 0
+    </update>
+
+    <update id="delGoogs_car_preferential">
+        update goods_car set state = 9 where state != 1 and preferential=#{preferential}
+        <choose>
+            <when test="userId != 0">
+                and userid=#{userId}
+            </when>
+            <otherwise>
+                and sessionid= #{sesisonId}
+            </otherwise>
+        </choose>
+    </update>
+
+    <update id="delGoogs_car">
+        update goods_car set state = 9 where 1 = 1
+        <choose>
+            <when test="userId != 0">
+                and userid=#{userId}
+            </when>
+            <otherwise>
+                and sessionid= #{sesisonId}
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="guid != null and guid != ''">
+                and guid in
+                <foreach item="item" index="index" collection="guid" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+                and id in
+                <foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </otherwise>
+        </choose>
+    </update>
+
+    <update id="upGoogs_car_state">
+        update goods_car set state = #{state} where
+        id in
+        <foreach item="item" index="index" collection="List" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="upGoogs_car_price"  parameterType="java.util.Map">
+
+        <foreach collection="map_price" item="price" open="" close="" index="index"  separator=";">
+            update goods_car
+            <set>
+                googs_price='${price}'
+            </set>
+            where guid = '${index}' and state=0
+        </foreach>
+    </update>
+
+
+    <update id="delTblPreshoppingcarInfo">
+        update tbl_preshoppingcar_info set flag = 1
+        <if test="goodsid != null and goodsid.length > 0">
+            where goods_car_id in
+            <foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+    <insert id="addURL" useGeneratedKeys="true">
+        <selectKey resultType="Integer" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+        insert url(username,url,state,date) values(#{userName},#{url},#{state},now())
+    </insert>
+
+    <update id="upGoogsCar">
+        update goods_car set goods_title=#{title} ,freight=#{freight},remark=#{remark} where  state=0 and guid in
+        <foreach item="item" index="index" collection="guid" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getExchangeRate" resultType="hashmap">
+        select id,country,exchange_rate from exchange_rate
+    </select>
+
+    <select id="getExchangeRateByCountry" resultType="Double">
+        select exchange_rate from exchange_rate where country = #{country} limit 1
+    </select>
+
+    <select id="getGoogs_carNum" resultType="int">
+        select count(id) from goods_car where state=0
+        <choose>
+            <when test="userId != 0">
+                and userid=#{userId}
+            </when>
+            <otherwise>
+                and sessionid = #{sessionId}
+            </otherwise>
+        </choose>
+    </select>
+
+    <update id="upCustom">
+        <choose>
+            <when test="rfq != '' ">
+                update customrfq set user_id = #{userId},email = #{email} where session_id = #{sessionId}
+            </when>
+            <otherwise>
+                <choose>
+                    <when test="custype == 'customOrder' ">
+                        update customorder set user_id = #{userId},email = #{email} where session_id = #{sessionId}
+                    </when>
+                    <when test="custype == 'yourPrice' ">
+                        update customprice set user_id = #{userId},email = #{email} where session_id = #{sessionId}
+                    </when>
+                    <when test="custype == 'priceMatch' ">
+                        update custompricematch set user_id = #{userId},email = #{email} where session_id = #{sessionId}
+                    </when>
+                    <otherwise>
+                    </otherwise>
+                </choose>
+            </otherwise>
+        </choose>
+    </update>
+
+    <select id="getGoogs_cars" resultType="hashmap">
+        <choose>
+            <when test="preshopping == 0">
+                select id,itemId,sessionid,catid,shopId,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,norm_least,delivery_time,freight_free,bulk_volume,total_weight,width,perWeight,seilUnit,goodsUnit,per_weight,goods_email,free_shopping_company,free_sc_days,preferential,deposit_rate,guid,goods_type,feeprice,goods_class,pWprice,(select img from goods_typeimg where gc.id = goods_id) goods_typeimg,extra_freight,source_url,currency,isshipping_promote,method_feight,isvolume,price1,price2,price3,theproductfrieght,notfreeprice,freeprice,firstprice,firstnumber,addPrice,isFeight,isBattery,aliPosttime from goods_car gc where
+            </when>
+            <otherwise>
+                select gc.id,itemId,sessionid,catid,shopId,gc.userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,gc.remark,datatime,norm_least,delivery_time,freight_free,bulk_volume,total_weight,width,perWeight,seilUnit,goodsUnit,per_weight,goods_email,free_shopping_company,free_sc_days,preferential,deposit_rate,guid,goods_type,feeprice,goods_class,pWprice,(select img from goods_typeimg where gc.id = goods_id) goods_typeimg,extra_freight,source_url,currency,ifnull(pre.flag,1) preflag,isshipping_promote,method_feight,isvolume,price1,price2,price3,theproductfrieght,notfreeprice,freeprice,firstprice,firstnumber,addPrice,isFeight,isBattery,aliPosttime from goods_car gc left join tbl_preshoppingcar_info pre on  pre.goods_car_id=gc.id where
+            </otherwise>
+        </choose>
+        <if test="type == 2">
+            (gc.userid=#{userid} or sessionid=#{sessionid})
+        </if>
+        <if test="type == 1">
+            <choose>
+                <when test="userid != 0">
+                    gc.userid=#{userid}
+                </when>
+                <otherwise>
+                    sessionid=#{sessionid}
+                </otherwise>
+            </choose>
+        </if>
+        and (state=0 or state=3) order by freight_free desc,free_sc_days,goods_url desc,datatime desc,preferential
+    </select>
+
+    <update id="upGoodsprice">
+        update goods_car set googs_price = #{price} where id = #{goodsid}
+        <choose>
+            <when test="userid != 0">
+                and userid=#{userid}
+            </when>
+            <otherwise>
+                and sessionid=#{sessionid}
+            </otherwise>
+        </choose>
+    </update>
+
+    <select id="getInquiryGoods" resultMap="SpiderBeanResultMap">
+        select id,goods_url,goods_title,googs_img,googs_price,googs_number,remark from goods_car where state=0
+        <if test="goodsid != null and goodsid.length > 0">
+            and id in
+            <foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getCollectionByUserid" parameterType="Integer" resultMap="CollectionBeanResultMap">
+        select id,url,price,img,createtime,titile,moq from collection where userid=#{userid}
+    </select>
+
+    <delete id="deleteCollection">
+        delete from collection where id in
+        <foreach collection="ids" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and userid = #{userid}
+    </delete>
+
+    <select id="getCollectionId" resultType="Integer">
+        select id from collection where url=#{url} and userid=#{userid} limit 1
+    </select>
+
+    <insert id="addCollection" useGeneratedKeys="true" parameterType="com.cbt.warehouse.pojo.CollectionBean">
+        <selectKey resultType="Integer" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+        insert collection(userid,titile,url,price,img,createtime,moq) values(#{userid}, #{titile}, #{url}, #{price}, #{img},now(),#{moq})
+    </insert>
+
+    <update id="updateGoodsEmailByUserid">
+        update goods_car set goods_email=#{email} where userid=#{userid}
+    </update>
+
+    <update id="updateGoodsEmailBySessionid">
+        update goods_car set goods_email=#{email} where sessionid=#{sessionid}
+    </update>
+
+    <update id="upExpreeType">
+        update goods_car set shopping_company = #{expreeType} , sc_days = #{days}, countryid = #{countryId} where id in (#{goodsIds})
+    </update>
+
+    <delete id="delCollectionByUrl">
+        delete from collection where url = #{url} and userid = #{userid}
+    </delete>
+
+    <update id="batchUpGoogs_car"  parameterType="list">
+        <if test="spiders != null and spiders.size() > 0">
+            <foreach collection="spiders" item="item" index="index" open="" close="" separator=";">
+                update goods_car
+                <set>
+                    googs_price = #{item.price},freight_free=0
                 </set>
-               where guid = '${index}' and state=0
-         </foreach>
-    </update> 
-  
-  
-  <update id="delTblPreshoppingcarInfo">
-  	update tbl_preshoppingcar_info set flag = 1
-  	<if test="goodsid != null and goodsid.length > 0">
-  		where goods_car_id in
-  		<foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-  	</if>
-  </update>
-  
-  <insert id="addURL" useGeneratedKeys="true">
-  	<selectKey resultType="Integer" keyProperty="id" order="AFTER">  
-        SELECT 
-        LAST_INSERT_ID() 
-    </selectKey>
-    insert url(username,url,state,date) values(#{userName},#{url},#{state},now())
-  </insert>
-  
-  <update id="upGoogsCar">
-  	update goods_car set goods_title=#{title} ,freight=#{freight},remark=#{remark} where  state=0 and guid in
-  	<foreach item="item" index="index" collection="guid" open="(" close=")" separator=",">
-		#{item}
-	</foreach>
-  </update>
-  
-  <select id="getExchangeRate" resultType="hashmap">
-    select id,country,exchange_rate from exchange_rate
-  </select>
-  
-  <select id="getExchangeRateByCountry" resultType="Double">
-    select exchange_rate from exchange_rate where country = #{country} limit 1
-  </select>
-  
-  <select id="getGoogs_carNum" resultType="int">
-    select count(id) from goods_car where state=0
-    <choose>
-    	<when test="userId != 0">
-    		and userid=#{userId}
-    	</when>
-    	<otherwise>
-    		and sessionid = #{sessionId}
-    	</otherwise>
-    </choose>
-  </select>
-			
-  <update id="upCustom">
-    <choose>
-    	<when test="rfq != '' ">
-    		update customrfq set user_id = #{userId},email = #{email} where session_id = #{sessionId} 
-    	</when>
-    	<otherwise>
-    		<choose>
-		    	<when test="custype == 'customOrder' ">
-		    		update customorder set user_id = #{userId},email = #{email} where session_id = #{sessionId} 
-		    	</when>
-		    	<when test="custype == 'yourPrice' ">
-		    		update customprice set user_id = #{userId},email = #{email} where session_id = #{sessionId} 
-		    	</when>
-		    	<when test="custype == 'priceMatch' ">
-		    		update custompricematch set user_id = #{userId},email = #{email} where session_id = #{sessionId} 
-		    	</when>
-		    	<otherwise>
-		    	</otherwise>
-	    	</choose>
-    	</otherwise>
-    </choose>
-  </update>
-  
-  <select id="getGoogs_cars" resultType="hashmap">
-    <choose>
-    	<when test="preshopping == 0">
-    		select id,itemId,sessionid,catid,shopId,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,norm_least,delivery_time,freight_free,bulk_volume,total_weight,width,perWeight,seilUnit,goodsUnit,per_weight,goods_email,free_shopping_company,free_sc_days,preferential,deposit_rate,guid,goods_type,feeprice,goods_class,pWprice,(select img from goods_typeimg where gc.id = goods_id) goods_typeimg,extra_freight,source_url,currency,isshipping_promote,method_feight,isvolume,price1,price2,price3,theproductfrieght,notfreeprice,freeprice,firstprice,firstnumber,addPrice,isFeight,isBattery,aliPosttime from goods_car gc where
-    	</when>
-    	<otherwise>
-    		select gc.id,itemId,sessionid,catid,shopId,gc.userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,gc.remark,datatime,norm_least,delivery_time,freight_free,bulk_volume,total_weight,width,perWeight,seilUnit,goodsUnit,per_weight,goods_email,free_shopping_company,free_sc_days,preferential,deposit_rate,guid,goods_type,feeprice,goods_class,pWprice,(select img from goods_typeimg where gc.id = goods_id) goods_typeimg,extra_freight,source_url,currency,ifnull(pre.flag,1) preflag,isshipping_promote,method_feight,isvolume,price1,price2,price3,theproductfrieght,notfreeprice,freeprice,firstprice,firstnumber,addPrice,isFeight,isBattery,aliPosttime from goods_car gc left join tbl_preshoppingcar_info pre on  pre.goods_car_id=gc.id where
-    	</otherwise>
-    </choose>
-      <if test="type == 2">
-    	(gc.userid=#{userid} or sessionid=#{sessionid}) 
-    </if>
-    <if test="type == 1">
-    <choose>
-    	<when test="userid != 0">
-    		gc.userid=#{userid}
-    	</when>
-    	<otherwise>
-    		sessionid=#{sessionid}
-    	</otherwise>
-    </choose>
-    </if>
-     and (state=0 or state=3) order by freight_free desc,free_sc_days,goods_url desc,datatime desc,preferential
-  </select>
-  
-  <update id="upGoodsprice">
-  	update goods_car set googs_price = #{price} where id = #{goodsid} 
-  	<choose>
-    	<when test="userid != 0">
-    		and userid=#{userid}
-    	</when>
-    	<otherwise>
-    		and sessionid=#{sessionid}
-    	</otherwise>
-    </choose>
-  </update>
-  
-  <select id="getInquiryGoods" resultMap="SpiderBeanResultMap">
-    select id,goods_url,goods_title,googs_img,googs_price,googs_number,remark from goods_car where state=0
-    <if test="goodsid != null and goodsid.length > 0">
-    	and id in
-    	<foreach item="item" index="index" collection="goodsid" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-    </if>
-  </select>
-  
-  <select id="getCollectionByUserid" parameterType="Integer" resultMap="CollectionBeanResultMap">
-  	select id,url,price,img,createtime,titile,moq from collection where userid=#{userid}
-  </select>
-  
-  <delete id="deleteCollection">
-    delete from collection where id in 
-    <foreach collection="ids" item="item" index="index" open="(" close=")" separator=",">
-     #{item}
-    </foreach>
-   and userid = #{userid}
-  </delete>
-  
-  <select id="getCollectionId" resultType="Integer">
-    select id from collection where url=#{url} and userid=#{userid} limit 1
-  </select>
-  
-  <insert id="addCollection" useGeneratedKeys="true" parameterType="com.cbt.warehouse.pojo.CollectionBean">
-  	<selectKey resultType="Integer" keyProperty="id" order="AFTER">  
-        SELECT 
-        LAST_INSERT_ID() 
-    </selectKey>
-    insert collection(userid,titile,url,price,img,createtime,moq) values(#{userid}, #{titile}, #{url}, #{price}, #{img},now(),#{moq})
-  </insert>
-  
-  <update id="updateGoodsEmailByUserid">
-    update goods_car set goods_email=#{email} where userid=#{userid}
-  </update>
-  
-  <update id="updateGoodsEmailBySessionid">
-    update goods_car set goods_email=#{email} where sessionid=#{sessionid}
-  </update>
-  
-  <update id="upExpreeType">
-    update goods_car set shopping_company = #{expreeType} , sc_days = #{days}, countryid = #{countryId} where id in (#{goodsIds})
-  </update>
-  
-  <delete id="delCollectionByUrl">
-    delete from collection where url = #{url} and userid = #{userid}
-  </delete>
-  
-  <update id="batchUpGoogs_car"  parameterType="list">
-	  <if test="spiders != null and spiders.size() > 0">
-	  	<foreach collection="spiders" item="item" index="index" open="" close="" separator=";">
-           update goods_car 
-           <set>
-             googs_price = #{item.price},freight_free=0
-           </set>
-           where guid = #{item.guId} and state=0
-	     </foreach>
-	  </if>
-  </update>
-    
-  
-  <select id="getGoogsCar" resultMap="SpiderBeanResultMap">
-  	select id,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,pWprice,preferential,guid,currency,isvolume,isBattery,aliPosttime from goods_car where state=0 and googs_size=#{size} and googs_color=#{color} and goods_type=#{types} and goods_url = #{url} 
-  	<choose>
-    	<when test="userId != 0">
-    		and userid=#{userId}
-    	</when>
-    	<otherwise>
-    		and sessionid=#{sessionId}
-    	</otherwise>
-    </choose>
-  	 having min(id) order by id desc
-  </select>
-  
-  <!-- ****com.cbt.pay.dao *** -->
-  <!-- 获取购物车商品的其他信息（交期，订量等等） -->
-  <select id="getSelectedItem" resultMap="SpiderBeanResultMap">
-  		select id,itemId,shopId,freight,googs_img,goods_title,googs_number,
-  		seilUnit,goodsUnit,googs_price,remark,googs_seller,goods_url,delivery_time,norm_least,goodsdata_id,guid,free_shopping_company,
-  		free_sc_days,state,freight_free,goods_class,feeprice,total_weight,bulk_volume,perWeight,extra_freight,source_url,currency,pWprice,goods_type,catid,width,catid,isvolume,isFeight,isBattery,aliPosttime
-  		 from goods_car where userid=#{userid} 
-  		and guid in 
-  		<foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-		order by freight_free desc,free_sc_days
-  </select>
-  
-<!--   <select id="getPreferentialInfo" resultMap="SpiderBeanResultMap">
-  		select 0 as id,0 as guid,1 as delivery_time,url as goods_url,goodsname as goods_title,0 as goodsdata_id, 
-			remark,0 as goods_class,pre_img as googs_img,goods_types as goods_type,total_weight,bulk_volume,catid,perWeight,sellUnit as seilUnit,
-			goods_unit as goodsUnit,per_weight,0 as extra_freight,discountnotfreeprice as price
-			from preferential_application where userid=#{userid} and itemId = #{itemid}
-  </select> -->
-  
-  <select id="getPreferentialInfo" resultMap="SpiderBeanResultMap">
-<!-- 	select
-	distinct(goods_car.id),goods_car.itemId,shopId,freight,googs_img,goods_title,googs_number,
-	seilUnit,goodsUnit,goods_car.remark,googs_seller,goods_url,norm_least,goodsdata_id,guid,free_shopping_company,
-	free_sc_days,goods_car.state,freight_free,goods_class,feeprice,goods_car.total_weight,goods_car.bulk_volume,goods_car.perWeight,
-	extra_freight,source_url,goods_car.currency,pWprice,goods_type,goods_car.catid,goods_car.width,isvolume,preferential_application.discountedunitprice
-	as googs_price,preferential_application.delivery_time,international_time,shipping_express,shipping_cost,preferential_application.country
-	from goods_car
-	INNER JOIN preferential_application
-	on goods_car.preferential = preferential_application.itemId
-	and goods_car.goods_type = preferential_application.goods_types
-	where goods_car.userid=#{userid} and preferential_application.itemId =#{itemid}
-	order by freight_free desc,free_sc_days -->
-	
-	select id,itemId,shopId,freight,googs_img,goods_title,googs_number,
-  		seilUnit,goodsUnit,googs_price,remark,googs_seller,goods_url,delivery_time,norm_least,goodsdata_id,guid,free_shopping_company,
-  		free_sc_days,state,freight_free,goods_class,feeprice,total_weight,bulk_volume,perWeight,extra_freight,source_url,currency,pWprice,goods_type,catid,width,catid,isvolume
-  		 from goods_car where userid=#{userid} 
-  		and preferential =#{itemid}
-		order by freight_free desc,free_sc_days
-  </select>
-  
-  <select id="getShippingInfo" resultMap="SpiderBeanResultMap">
-	select international_time,shipping_express,shipping_cost,country 
-	from preferential_application
-	where userid=#{userid} and itemId =#{itemid} limit 1
-  </select>
-  
-  <select id="getPreferential" resultMap="SpiderBeanResultMap">
-	select
-	delivery_time,international_time,shipping_express,shipping_cost,pay_price,country
-	from preferential_application
-	where userid=#{userid} and itemId =#{itemid} 
-	limit 1
-  </select>
-  
-  <!-- 获取购物车商品的其他信息（价格，订量等等） -->
-  <select id="getSelectedItemPrice" resultType="hashmap">
-  		select id,googs_number,googs_price,state,freight_free,goods_class,extra_freight,free_sc_days,perWeight, 
-  		seilUnit, goodsUnit,guid,price1 from goods_car where userid=#{userid} and guid in 
-  		<foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
-			#{item}
-		</foreach>
-  </select>
-  
+                where guid = #{item.guId} and state=0
+            </foreach>
+        </if>
+    </update>
+
+
+    <select id="getGoogsCar" resultMap="SpiderBeanResultMap">
+        select id,userid,goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,pWprice,preferential,guid,currency,isvolume,isBattery,aliPosttime from goods_car where state=0 and googs_size=#{size} and googs_color=#{color} and goods_type=#{types} and goods_url = #{url}
+        <choose>
+            <when test="userId != 0">
+                and userid=#{userId}
+            </when>
+            <otherwise>
+                and sessionid=#{sessionId}
+            </otherwise>
+        </choose>
+        having min(id) order by id desc
+    </select>
+
+    <!-- ****com.cbt.pay.dao *** -->
+    <!-- 获取购物车商品的其他信息（交期，订量等等） -->
+    <select id="getSelectedItem" resultMap="SpiderBeanResultMap">
+        select id,itemId,shopId,freight,googs_img,goods_title,googs_number,
+        seilUnit,goodsUnit,googs_price,remark,googs_seller,goods_url,delivery_time,norm_least,goodsdata_id,guid,free_shopping_company,
+        free_sc_days,state,freight_free,goods_class,feeprice,total_weight,bulk_volume,perWeight,extra_freight,source_url,currency,pWprice,goods_type,catid,width,catid,isvolume,isFeight,isBattery,aliPosttime
+        from goods_car where userid=#{userid}
+        and guid in
+        <foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        order by freight_free desc,free_sc_days
+    </select>
+
+    <!--   <select id="getPreferentialInfo" resultMap="SpiderBeanResultMap">
+              select 0 as id,0 as guid,1 as delivery_time,url as goods_url,goodsname as goods_title,0 as goodsdata_id,
+                remark,0 as goods_class,pre_img as googs_img,goods_types as goods_type,total_weight,bulk_volume,catid,perWeight,sellUnit as seilUnit,
+                goods_unit as goodsUnit,per_weight,0 as extra_freight,discountnotfreeprice as price
+                from preferential_application where userid=#{userid} and itemId = #{itemid}
+      </select> -->
+
+    <select id="getPreferentialInfo" resultMap="SpiderBeanResultMap">
+        <!-- 	select
+            distinct(goods_car.id),goods_car.itemId,shopId,freight,googs_img,goods_title,googs_number,
+            seilUnit,goodsUnit,goods_car.remark,googs_seller,goods_url,norm_least,goodsdata_id,guid,free_shopping_company,
+            free_sc_days,goods_car.state,freight_free,goods_class,feeprice,goods_car.total_weight,goods_car.bulk_volume,goods_car.perWeight,
+            extra_freight,source_url,goods_car.currency,pWprice,goods_type,goods_car.catid,goods_car.width,isvolume,preferential_application.discountedunitprice
+            as googs_price,preferential_application.delivery_time,international_time,shipping_express,shipping_cost,preferential_application.country
+            from goods_car
+            INNER JOIN preferential_application
+            on goods_car.preferential = preferential_application.itemId
+            and goods_car.goods_type = preferential_application.goods_types
+            where goods_car.userid=#{userid} and preferential_application.itemId =#{itemid}
+            order by freight_free desc,free_sc_days -->
+
+        select id,itemId,shopId,freight,googs_img,goods_title,googs_number,
+        seilUnit,goodsUnit,googs_price,remark,googs_seller,goods_url,delivery_time,norm_least,goodsdata_id,guid,free_shopping_company,
+        free_sc_days,state,freight_free,goods_class,feeprice,total_weight,bulk_volume,perWeight,extra_freight,source_url,currency,pWprice,goods_type,catid,width,catid,isvolume
+        from goods_car where userid=#{userid}
+        and preferential =#{itemid}
+        order by freight_free desc,free_sc_days
+    </select>
+
+    <select id="getShippingInfo" resultMap="SpiderBeanResultMap">
+        select international_time,shipping_express,shipping_cost,country
+        from preferential_application
+        where userid=#{userid} and itemId =#{itemid} limit 1
+    </select>
+
+    <select id="getPreferential" resultMap="SpiderBeanResultMap">
+        select
+        delivery_time,international_time,shipping_express,shipping_cost,pay_price,country
+        from preferential_application
+        where userid=#{userid} and itemId =#{itemid}
+        limit 1
+    </select>
+
+    <!-- 获取购物车商品的其他信息（价格，订量等等） -->
+    <select id="getSelectedItemPrice" resultType="hashmap">
+        select id,googs_number,googs_price,state,freight_free,goods_class,extra_freight,free_sc_days,perWeight,
+        seilUnit, goodsUnit,guid,price1 from goods_car where userid=#{userid} and guid in
+        <foreach item="item" index="index" collection="itemid" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
     <select id="getPreferentialPrice" resultType="hashmap">
-		select id,googs_number,googs_price,state,freight_free,goods_class,extra_freight,free_sc_days,perWeight, seilUnit, goodsUnit,guid,price1 from goods_car 
-		where userid=#{userid} and preferential=#{itemid}
+        select id,googs_number,googs_price,state,freight_free,goods_class,extra_freight,free_sc_days,perWeight, seilUnit, goodsUnit,guid,price1 from goods_car
+        where userid=#{userid} and preferential=#{itemid}
 
 <!-- 	select
 	distinct(goods_car.id),googs_number,preferential_application.discountedunitprice as googs_price,goods_car.state,
@@ -588,18 +591,38 @@
   </select>
   
   <!-- ****com.cbt.pay.dao end*** -->
-  
-  <!-- 搜索页面用户行为跟踪 -->
-<insert id="saveTheSearchLogOnSearchPage" useGeneratedKeys="true" keyProperty="id" parameterType="ceRong.tools.bean.SearchLog">
-  insert into searchproductlog(userid,sessionid,userIP,keywords,catid,sortType,pageNumber,showPageYear,showPageMonth,showPageDay,showPageTime,productShowIdList,allProductList,listSize,device,searchMD5,searchUserMD5) 
-  values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
-</insert>
-<update id="updateTheSearchLogOnSearchPage">
-  update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
-</update>
-<insert id="saveTheClickCountOnSearchPage">
-  insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime) 
-  values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
-  on duplicate key update clickCount=clickCount+1,updateTime = now()
-</insert>
+    <!-- 根据orderNo、itemId、goods_type、userid获取购物车商品信息 -->
+    <select id="getGoodsInfoByOrderNo" parameterType="string" resultType="java.util.HashMap">
+        select goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
+        pWprice,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,
+        free_shopping_company,free_sc_days,goodsdata_id,preferential,deposit_rate,guid,goods_type,feeprice,currency,goods_class,
+        extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,price4,comparealiPrice,theproductfrieght,notfreeprice,
+        isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime,goodsUrlMD5,spiderPrice,priceListSize,guid,datatime,skuid_1688,isFreeShipProduct,
+        sampleFee,sampleMoq,is_stock_flag,shopCount
+        from goods_car
+        <choose>
+            <when test="goods_id != null">
+                where id in
+                <foreach item="goodsid" index="index" collection="goods_id" open="(" close=")" separator=",">
+                    #{goodsid}
+                </foreach>
+            </when>
+            <otherwise>
+                where id in (select goodsid from order_details where orderid=#{orderNo})
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 搜索页面用户行为跟踪 -->
+    <insert id="saveTheSearchLogOnSearchPage" useGeneratedKeys="true" keyProperty="id" parameterType="ceRong.tools.bean.SearchLog">
+        insert into searchproductlog(userid,sessionid,userIP,keywords,catid,sortType,pageNumber,showPageYear,showPageMonth,showPageDay,showPageTime,productShowIdList,allProductList,listSize,device,searchMD5,searchUserMD5)
+        values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
+    </insert>
+    <update id="updateTheSearchLogOnSearchPage">
+        update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
+    </update>
+    <insert id="saveTheClickCountOnSearchPage">
+        insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime)
+        values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
+        on duplicate key update clickCount=clickCount+1,updateTime = now()
+    </insert>
 </mapper>

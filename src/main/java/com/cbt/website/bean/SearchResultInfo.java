@@ -64,6 +64,16 @@ public class SearchResultInfo {
 	private String evaluation;
 	private int order_num;//1688包裹对应的销售订单数量
 	private String isExitPhone;
+	public String getValid() {
+		return valid;
+	}
+
+	public void setValid(String valid) {
+		this.valid = valid;
+	}
+
+	private String valid;
+
 	public String getIsExitPhone() {
 		return isExitPhone;
 	}
