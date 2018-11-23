@@ -668,6 +668,7 @@ function initData(){
 				<th data-options="field:'createtime',width:60,align:'center'">首次库存录入时间</th>
 				<th data-options="field:'updatetime',width:60,align:'center'">最后更新库存时间</th>
 				<th data-options="field:'remark',width:60,align:'center'">备注</th>
+				<th data-options="field:'editLink',width:60,align:'center'">产品编辑链接</th>
 				<th data-options="field:'unsellableReason',width:60,align:'center'">下架原因</th>
 				<th data-options="field:'operation',width:50,align:'center'">盘点</th>
 			</tr>

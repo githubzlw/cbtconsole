@@ -1354,6 +1354,20 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 				}else {
 					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
 				}
+				if("1".equals(inventory.getDb_flag())){
+					inventory.setEditLink("<a target='_blank' href='/cbtconsole/editc/detalisEdit?pid="+inventory.getPid()+"'>产品编辑链接</a>");
+				}else{
+					inventory.setEditLink("--");
+				}
+				if("4".equals(inventory.getOnline_flag())){
+					String car_img=inventory.getCar_img();
+					String imgs[]=car_img.split("kf");
+					String one=imgs[0];
+					String two=imgs[1].replace(".jpg_50x50.jpg","");
+					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress="+two+"";
+				}else if("1".equals(inventory.getOnline_flag())){
+					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
+				}
 				inventory.setCar_img("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
 						+ "<img  src='"+ (inventory.getCar_img().indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":inventory.getCar_img()) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ inventory.getCar_img() + "')\" height='100' width='100'></a>");
 				if(!StringUtils.isStrNull(inventory.getGoods_p_url())){
