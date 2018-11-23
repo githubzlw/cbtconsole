@@ -354,7 +354,7 @@ public class PurchaseController {
 			Admuser admuser = (Admuser) su.JsonToObj(admuserw, Admuser.class);
 			admid=String.valueOf(admuser.getId());
 		}
-		if("999".equals(admid) || "1".equals(admid)){
+		if("999".equals(admid) || "1".equals(admid) || "83".equals(admid)){
 			datas="";
 		}else{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -689,7 +689,7 @@ public class PurchaseController {
 		request.setAttribute("totalpage", page.getTotalpage());
 		request.setAttribute("pblist", page.getRecords());
 		request.setAttribute("pid_amount",page.getPid_amount());
-		request.setAttribute("admid", admid == null || "".equals(admid) || "1".equals(admid) ? "999" : admid);
+		request.setAttribute("admid", admid == null || "".equals(admid) || "1".equals(admid) || "83".equals(admid) ? "999" : admid);
 		request.setAttribute("cgid", cgid);
 		request.setAttribute("userid", userid);
 		request.setAttribute("idtypes_", idtypes_);

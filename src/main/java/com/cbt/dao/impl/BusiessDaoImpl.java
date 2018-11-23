@@ -106,7 +106,7 @@ public class BusiessDaoImpl implements BusiessDao {
 		if (userid != null) {
 			sqlIf.append(" and userid='" + userid + "'");
 		}
-		if (adminid != null && adminid != 1) {
+		if (adminid != null && adminid != 1 && adminid != 83) {
 			if (status == 3) {
 				sql.append(" and busiess.status=0");
 				sql.append(
@@ -119,7 +119,7 @@ public class BusiessDaoImpl implements BusiessDao {
 								+ adminid + ")");
 				sql.append(sqlIf);
 			}
-		} else if (adminid != null && adminid == 1) {
+		} else if (adminid != null && (adminid == 1 || adminid == 83)) {
 			if (status == 2) {
 				sql.append(
 						" and busiess.email not in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid)");
@@ -223,7 +223,7 @@ public class BusiessDaoImpl implements BusiessDao {
 		}
 		sqlIf.append(" order by createtime desc limit " + ((pagenum - 1) * 20) + "," + 20);
 
-		if (adminid != null && adminid != 1) {
+		if (adminid != null && adminid != 1 && adminid != 83) {
 			if (status == 3) {
 				sql.append(
 						"select distinct busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -240,7 +240,7 @@ public class BusiessDaoImpl implements BusiessDao {
 								+ adminid + ")");
 				sql.append(sqlIf);
 			}
-		} else if (adminid != null && adminid == 1) {
+		} else if (adminid != null && (adminid == 1 || adminid == 83)) {
 			if (status == 2) {
 				sql.append(
 						"select distinct busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -475,8 +475,7 @@ public class BusiessDaoImpl implements BusiessDao {
 			sqlIf.append(" and userid='" + userid + "'");
 		}
 
-        // status =2 未分配 =3 未处理 =4 全部
-		if (adminid != null && adminid != 1) {
+		if (adminid != null && adminid != 1 && adminid != 83) {
 			if (status == 3) {
 				sql.append(
 						"select count(distinct busiess.id) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -493,7 +492,7 @@ public class BusiessDaoImpl implements BusiessDao {
 								+ adminid + ")");
 				sql.append(sqlIf);
 			}
-		} else if (adminid != null && adminid == 1) {
+		} else if (adminid != null && (adminid == 1 || adminid == 83)) {
 			if (status == 2) {
 				sql.append(
 						"select count(busiess.id) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -622,7 +621,7 @@ public class BusiessDaoImpl implements BusiessDao {
 		}
 		sqlIf.append(" order by createtime desc limit " + ((pagenum - 1) * 20) + "," + 20);
 
-		if (adminid != null && adminid != 1) {
+		if (adminid != null && adminid != 1 && adminid != 83) {
 			if (status == 3) {
 				sql.append(
 						"select busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -639,7 +638,7 @@ public class BusiessDaoImpl implements BusiessDao {
 								+ adminid + ")");
 				sql.append(sqlIf);
 			}
-		} else if (adminid != null && adminid == 1) {
+		} else if (adminid != null && (adminid == 1 || adminid == 83)) {
 			if (status == 2) {
 				sql.append(
 						"select busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");

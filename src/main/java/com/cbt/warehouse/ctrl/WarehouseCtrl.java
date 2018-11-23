@@ -205,7 +205,7 @@ public class WarehouseCtrl {
 		admuser.setAdmName("全部");
 		result.add(admuser);
 		
-		if(adm.getId()==1){
+		if(adm.getId()==1 || adm.getId()==83){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -901,7 +901,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;

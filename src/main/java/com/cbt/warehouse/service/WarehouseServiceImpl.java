@@ -708,6 +708,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return dao.getOutOrderInfo(map);
     }
 
+
     @Override
     public OrderDetailsBean queryVideo(Map<String, String> map) {
         return dao.queryVideo(map);
@@ -1604,18 +1605,18 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if(goods_info>0){
             if(fp==0){
                 p.setOrderid("<a  style='color:green;' target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
             }else{
                 p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
             }
         }else{
             if(fp==0){
                 p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' style='color:green;' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
             }else{
                 p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
             }
         }
     }
@@ -1640,10 +1641,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     private void getAmounts(Map<String, Object> map, PrePurchasePojo p, int checked, List<String> problem, int fp, int rk, int cg, int index_num) {
-        String numUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201315&search_state=0";
+        String numUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201315&search_state=0";
         String num=index_num>0?"<a href='"+numUrl+"' target='_blank' title='点击查看确认采购1天后还没有物流信息商品'>"+index_num+"</a>":"0";
         if(problem.size()>0){
-            String toUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201314&search_state=0";
+            String toUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201314&search_state=0";
             p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:aquamarine'>"+rk+"/"+checked+"/<a href='"+toUrl+"' target='_blank' title='点击查看验货疑问商品'>"+problem.size()+"</a>/"+num+"</span>");
         }else if(cg>=fp && checked<fp){
             p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:yellow'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
