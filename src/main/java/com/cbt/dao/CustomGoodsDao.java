@@ -543,4 +543,20 @@ public interface CustomGoodsDao {
 
     String getCatxs(String catId, String factoryPrice);
 
+
+    int checkSkuGoodsOffers(String pid);
+
+    int updateSkuGoodsOffers(String pid, double finalWeight);
+
+    int updateSourceProFlag(String pid);
+
+    int insertIntoSingleOffersChild(String pid, double finalWeight);
+
+    List<CustomBenchmarkSkuNew> querySkuByPid(String pid);
+
+    int deleteSkuByPid(String pid);
+
+    int insertIntoSkuToOnline(List<CustomBenchmarkSkuNew> insertList);
+
+
 }

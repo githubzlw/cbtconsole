@@ -771,10 +771,10 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                 stmt.setString(total++, queryPm.getEdtime());
             }
             if (queryPm.getDrainageFlag() > 0) {
-                stmt.setInt(count++, queryPm.getDrainageFlag());
+                stmt.setInt(total++, queryPm.getDrainageFlag());
             }
             if (queryPm.getGoodsType() > -1) {
-                stmt.setInt(count++, queryPm.getGoodsType());
+                stmt.setInt(total++, queryPm.getGoodsType());
             }
             rss = stmt.executeQuery();
             if (rss.next()) {

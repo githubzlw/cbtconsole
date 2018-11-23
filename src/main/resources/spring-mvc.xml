@@ -20,12 +20,12 @@
 	<!-- 将无法mapping到Controller的path交给default servlet handler处理 -->		
 	<mvc:default-servlet-handler/>
 	
-	<!-- 定义JSP文件的位置 --> 
+	<!--&lt;!&ndash; 定义JSP文件的位置 &ndash;&gt;
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<!-- <property name="prefix" value="/WEB-INF/views/"/> -->
+		&lt;!&ndash; <property name="prefix" value="/WEB-INF/views/"/> &ndash;&gt;
 		<property name="prefix" value="/website/"/>
 		<property name="suffix" value=".jsp"/>
-	</bean>
+	</bean>-->
 	
 	<!-- 日期格式format -->
 	 <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">  
@@ -53,7 +53,43 @@
 		<!-- 内存中的最大值500MB,500*1024*1024 -->
         <property name="maxInMemorySize" value="524288000" /> 
 	</bean>
-	
-	
+
+	<!--thymeleaf 布局框架配置 同时解析两种页面 start-->
+	<bean id="templateResolver"
+		  class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+		<property name="prefix" value="apa/" />
+		<property name="suffix" value=".html" />
+		<property name="templateMode" value="HTML5" />
+		<property name="cacheable" value="false" />
+		<property name="characterEncoding" value="UTF-8"/>
+	</bean>
+	<bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+		<property name="templateResolver" ref="templateResolver" />
+	</bean>
+	<!--  配置多个视图解析-->
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+
+		<property name="viewResolvers">
+			<list>
+				<!--used thymeleaf  -->
+				<bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+					<property name="characterEncoding" value="UTF-8"/>
+					<property name="templateEngine" ref="templateEngine" />
+					<property name="viewNames" value="*.html"/>
+					<property name="order" value="2" />
+				</bean>
+				<!-- used jsp -->
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<!--<property name="prefix" value="/"/>-->
+					<!--<property name="viewNames" value="*.jsp"/>-->
+					<property name="prefix" value="/website/"/>
+					<property name="suffix" value=".jsp"/>
+					<property name="order" value="1" />
+				</bean>
+
+			</list>
+		</property>
+	</bean>
+	<!--thymeleaf 布局框架配置 同时解析两种页面 end-->
 	
 </beans>

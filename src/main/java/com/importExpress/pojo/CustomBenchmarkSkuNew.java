@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class CustomBenchmarkSkuNew implements Serializable{
 
+
+
     private static final long serialVersionUID = -4423370471811080151L;
 
     private Integer id;
@@ -33,6 +35,26 @@ public class CustomBenchmarkSkuNew implements Serializable{
     private String wprice;
 
     private String finalWeight;
+
+    private String typeName;
+
+    private String isSoldFlag;
+
+    public String getIsSoldFlag() {
+        return isSoldFlag;
+    }
+
+    public void setIsSoldFlag(String isSoldFlag) {
+        this.isSoldFlag = isSoldFlag;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
 
     public String getFinalWeight() {
         return finalWeight;
@@ -152,6 +174,10 @@ public class CustomBenchmarkSkuNew implements Serializable{
                 ", flag=" + flag +
                 ", specId='" + specId + '\'' +
                 ", skuId='" + skuId + '\'' +
+                ", wprice='" + wprice + '\'' +
+                ", finalWeight='" + finalWeight + '\'' +
+                ", typeName='" + typeName + '\'' +
+                ", isSoldFlag='" + isSoldFlag + '\'' +
                 '}';
     }
 

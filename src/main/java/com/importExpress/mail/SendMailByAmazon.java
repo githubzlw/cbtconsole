@@ -1,7 +1,7 @@
 package com.importExpress.mail;
 
 import org.apache.commons.lang3.StringUtils;
-
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.mail.Message;
@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class SendMailByAmazon implements SendMail {
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(SendMailByAmazon.class);
+    private final static Logger logger = LoggerFactory.getLogger("maillog");
 
     private static final String FROM = "service@importexpress.com";
     private static final String FROMNAME = "Import-Express.com";
@@ -67,10 +67,9 @@ public class SendMailByAmazon implements SendMail {
         Transport transport = null;
         try {
             transport = session.getTransport();
-            logger.info("Sending...");
             transport.connect(HOST, SMTP_USERNAME, SMTP_PASSWORD);
             transport.sendMessage(msg, msg.getAllRecipients());
-            logger.info("Email sent!");
+            logger.info("邮件发送成功..ToMail:["+TO+"],Subject:["+SUBJECT+"]");
         } finally {
             transport.close();
         }
