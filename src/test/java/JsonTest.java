@@ -1,5 +1,7 @@
+import com.stripe.model.Charge;
 import com.stripe.model.Event;
 import com.stripe.net.APIResource;
+import net.sf.json.JSONObject;
 import org.junit.Test;
 
 /**
@@ -127,7 +129,13 @@ public class JsonTest {
                 "  \"user_id\": null\n" +
                 "}";
         System.out.println(json);
-        Event event = APIResource.GSON.fromJson(json.substring(json.indexOf("{")), Event.class);
-        System.out.println(event);
+        String substring = json.substring(json.indexOf("{"));
+        Event event = APIResource.GSON.fromJson(substring, Event.class);
+        Charge charge=(Charge)event.getData().getObject();
+        //System.out.println(charge);
+
+        String country = JSONObject.fromObject(substring).getJSONObject("data").getJSONObject("object").getJSONObject("source").getString("country");
+        System.out.println(country);
+
     }
 }
