@@ -15,7 +15,7 @@ public class TemplateConfig {
     @Bean
     public ClassLoaderTemplateResolver templateResolver(){
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("/mailTemplate/");
+        templateResolver.setPrefix("/apa/mailTemplate/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML5");
         templateResolver.setCharacterEncoding("UTF-8");

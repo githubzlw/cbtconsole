@@ -13,6 +13,8 @@ import com.cbt.website.dao.shoppingCartDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
@@ -20,8 +22,12 @@ import com.importExpress.utli.GoodsPriceUpdateUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.logging.Log;import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +45,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/shopCarMarketingCtr")
 public class ShopCarMarketingController {
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(ShopCarMarketingController.class);
+    private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
 
     @Autowired
@@ -54,6 +60,8 @@ public class ShopCarMarketingController {
     @Autowired
     private SendEmailNew sendEmailNew;
 
+    @Autowired
+    private SendMailFactory sendMailFactory;
     @Autowired
     private OrderinfoService orderinfoService;
 
@@ -173,6 +181,7 @@ public class ShopCarMarketingController {
 
     @RequestMapping("/sendEmailCarInfoByUserId")
     public ModelAndView sendEmailCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
+        Map<String,Object> model = new HashedMap();
         ModelAndView mv = new ModelAndView("goodsCarInfoEmail");
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
@@ -193,6 +202,7 @@ public class ShopCarMarketingController {
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
             mv.addObject("userEmail", listu.get("email"));
+            model.put("userEmail", listu.get("email"));
             listu.clear();
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
@@ -240,6 +250,16 @@ public class ShopCarMarketingController {
                 mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 mv.addObject("updateList", resultList);
                 mv.addObject("sourceList", sourceList);
+                model.put("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
+                model.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+                model.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                model.put("success", 1);
+                model.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+                model.put("updateList", resultList);
+                model.put("sourceList", sourceList);
+                JSONObject jsonObject = JSONObject.fromObject(model);
+                String modeStr = jsonObject.toString();
+                mv.addObject("modeStr",modeStr);
             } else {
                 mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
                 mv.addObject("success", 0);
@@ -330,7 +350,17 @@ public class ShopCarMarketingController {
                 }
             }
             //3.发送邮件给客户
-            sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
+            //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
+            boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
+            if(modelB){
+                String modelStr = request.getParameter("model");
+                Map<String,Object> model = SerializeUtil.JsonToMapStr(modelStr);
+                sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
+            }else {
+                sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
+            }
+            //End：
+            //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             //4.更新跟进信息
             shopCarMarketingService.updateAndInsertUserFollowInfo(userId,user.getId(),emailContent);
             json.setOk(true);
