@@ -52,7 +52,6 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.servlet.ExpressTrackServlet;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
@@ -66,6 +65,7 @@ import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -76,8 +76,6 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
-import org.slf4j.LoggerFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -91,6 +89,7 @@ import org.jbarcode.encode.Code128Encoder;
 import org.jbarcode.encode.InvalidAtributeException;
 import org.jbarcode.paint.EAN13TextPainter;
 import org.jbarcode.paint.WidthCodedPainter;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9692,7 +9691,7 @@ public class WarehouseCtrl {
 		int minute = c.get(Calendar.MINUTE);
 		int second = c.get(Calendar.SECOND);
 		//上传文件目录
-		String relatDir = TabSeachPageController.LOCALPATHZIPIMG;
+		String relatDir = SearchFileUtils.LOCALPATHZIPIMG;
 		//文件夹不存在则创建
 		File fdir = new File(relatDir);
 		File fdirExi = new File(relatDir + time + "/");
@@ -9748,7 +9747,7 @@ public class WarehouseCtrl {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("uploadImgList", uploadImgList);
 		result.put("orderid", orderid);
-        result.put("imagehost", TabSeachPageController.IMAGEHOSTURL);
+        result.put("imagehost", SearchFileUtils.IMAGEHOSTURL);
 		return result;
 	}
 

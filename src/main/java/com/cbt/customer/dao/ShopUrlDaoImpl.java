@@ -4,9 +4,8 @@ import com.cbt.bean.*;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
-import com.importExpress.controller.TabSeachPageController;
+import com.importExpress.utli.SearchFileUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -219,7 +218,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setInputShopBrand(rs.getString("shop_brand"));
                 su.getAuthorizedInfo().setFileName(rs.getString("au_file_name"));
                 if (StringUtils.isNotBlank(rs.getString("au_file_url"))) {
-                	su.getAuthorizedInfo().setFileUrl(TabSeachPageController.IMAGEHOSTURL + rs.getString("au_file_url"));
+                	su.getAuthorizedInfo().setFileUrl(SearchFileUtils.IMAGEHOSTURL + rs.getString("au_file_url"));
 				}
                 su.getAuthorizedInfo().setAdmuser(rs.getString("au_admuser"));
                 su.getAuthorizedInfo().setStartTime(rs.getTimestamp("au_start_time"));
