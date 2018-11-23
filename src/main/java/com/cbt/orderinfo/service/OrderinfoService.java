@@ -25,6 +25,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.map.HashedMap;
 
+import org.apache.poi.openxml4j.opc.internal.ZipContentTypeManager;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -977,13 +978,18 @@ public class OrderinfoService implements IOrderinfoService {
 			String addressFlag="0";
 			String odCode=map.get("odCode");
 			String ipnaddress=map.get("ipnaddress");
+			if(StringUtils.isEmpty(ipnaddress)){
+				ipnaddress = udao.getIpnaddress(orderInfo.getOrderNo()).get("ipnaddress");
+			}
 			String zCountry=map.get("zCountry");
 			if((StringUtil.isBlank(odCode) || StringUtil.isBlank(ipnaddress) || !ipnaddress.equals(odCode)) && tp.indexOf("paypal")>-1){
+				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
 				if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
 					addressFlag="0";
 				}else{
+					logger.warn("二次校验，全称国家不一致： zCountry={},addressCountry={}", zCountry,addressCountry);
 					addressFlag="1";
 				}
 			}
