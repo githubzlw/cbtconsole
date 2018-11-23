@@ -3274,12 +3274,12 @@
 		</foreach>
 	</select>
 	<select id="queryPictureInfos" resultType="com.cbt.website.bean.SearchResultInfo">
-		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
+		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.valid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
 		FROM inspection_picture i
 		INNER JOIN  custom_benchmark_ready c ON i.pid=c.pid
 		left join goods_evaluation ge on i.pid=ge.goods_pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where  c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where  c.custom_main_image&lt;>'' and  i.isdelete=0
 		<if test="goods_pid != null">
 			and i.pid=#{goods_pid}
 		</if>
@@ -3287,7 +3287,7 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
 		<if test="admuserid != 1 and admuserid !=15">
 			and g.admuserid=#{admuserid}
@@ -3300,12 +3300,12 @@
 		</if>
 		group by i.pid
 		UNION
-		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
+		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.valid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
 		FROM inspection_picture i
 		INNER JOIN  custom_benchmark_ready_cloud c ON i.pid=c.pid
 		left join goods_evaluation ge on i.pid=ge.goods_pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where  c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where  c.custom_main_image&lt;>'' and i.isdelete=0
 		<if test="goods_pid != null">
 			and i.pid=#{goods_pid}
 		</if>
@@ -3313,7 +3313,7 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
 		<if test="admuserid != 1">
 			and g.admuserid=#{admuserid}
@@ -3333,7 +3333,7 @@
 		FROM inspection_picture i
 		INNER JOIN custom_benchmark_ready c ON i.pid=c.pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where c.custom_main_image&lt;>'' and  i.isdelete=0
 		<if test="times != null and times == 1">
 			AND TO_DAYS(i.createtime)=TO_DAYS(NOW())
 		</if>
@@ -3344,7 +3344,7 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
 		<if test="admuserid != 1 and admuserid !=15">
 			and g.admuserid=#{admuserid}
@@ -3357,7 +3357,7 @@
 		FROM inspection_picture i
 		INNER JOIN custom_benchmark_ready_cloud c ON i.pid=c.pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where c.custom_main_image&lt;>''  and i.isdelete=0
 		<if test="times != null and times == 1">
 			AND TO_DAYS(i.createtime)=TO_DAYS(NOW())
 		</if>
@@ -3368,7 +3368,7 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
 		<if test="admuserid != 1">
 			and g.admuserid=#{admuserid}

@@ -761,6 +761,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
             s.setGcUnit(sb.toString());
             //|<button onclick=\"showEvaluation("+s.getOrderid()+")\">前台展示</button>fdgdf
             s.setPosition("<button onclick=\"uploadPics("+s.getOrderid()+")\">上传新图片</button>|<button onclick=\"openEvaluation("+s.getOrderid()+")\">产品评论</button>");
+            String valid=s.getValid();
+            if("0".equals(valid)){
+                valid="下架";
+            }else if("1".equals(valid)){
+                valid="上架";
+            }else if("2".equals(valid)){
+                valid="软下架";
+            }else{
+                valid="其他";
+            }
+            s.setValid(valid);
         }
         return list;
     }
