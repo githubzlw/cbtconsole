@@ -84,7 +84,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if (weightAndSyn.getSyn() == 1){
             return 4;
         }
-        customGoodsService.setGoodsWeightByWeigher(pid, weightAndSyn.getWeight()); //蒋先伟同步重量到产品库接口
+        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         dao.updateGoodsWeightFlag(pid);
         return 1;
     }

@@ -2419,16 +2419,7 @@ public class EditorController {
             json.setMessage("获取商品重量失败");
             return json;
         }
-        json = customGoodsService.setGoodsWeightByWeigher(pid, newWeight);
-        if (json.isOk()) {
-            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean isSuccess = customGoodsService.refreshPriceRelatedData(orGoods);
-            if (!isSuccess) {
-                json.setOk(false);
-                json.setMessage("更新数据失败");
-            }
-        }
-        return json;
+        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight);
     }
 
 

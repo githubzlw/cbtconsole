@@ -429,6 +429,20 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
+    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight) {
+        JsonResult json = setGoodsWeightByWeigher(pid, newWeight);
+        if (json.isOk()) {
+            CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+            boolean isSuccess = refreshPriceRelatedData(orGoods);
+            if (!isSuccess) {
+                json.setOk(false);
+                json.setMessage("更新数据失败");
+            }
+        }
+        return json;
+    }
+
+    @Override
     public List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm) {
         return customGoodsMapper.queryOnlineGoodsForList(queryPm);
     }
