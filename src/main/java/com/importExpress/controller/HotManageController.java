@@ -391,8 +391,12 @@ public class HotManageController {
             HotCategory hotCategory = hotManageService.getCategoryById(Integer.valueOf(categoryIdStr));
             List<HotSellingGoods> goodsList = hotGoodsService.queryByHotSellingCategory(Integer.valueOf(categoryIdStr), hotCategory.getHotType());
 
+            int isOnTotal = 0;
             for (HotSellingGoods goods : goodsList) {
 
+                if("1".equals(goods.getIsOn())){
+                    isOnTotal ++;
+                }
                 String range_price = StrUtils.object2Str(goods.getRangePrice());
                 String maxPrice = "";
                 if (StringUtils.isBlank(range_price) || range_price.trim().length() == 0) {
@@ -446,6 +450,8 @@ public class HotManageController {
                 }
                 goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + goods.getShowName() + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }
+            mv.addObject("isOnTotal", isOnTotal);
+            mv.addObject("allTotal", goodsList.size());
             mv.addObject("isShow", 1);
             mv.addObject("hotType", hotCategory.getHotType());
             mv.addObject("goodsList", goodsList);

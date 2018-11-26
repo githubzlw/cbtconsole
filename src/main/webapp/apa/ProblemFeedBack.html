@@ -32,27 +32,12 @@ table th {
 }
 </style>
 <script type="text/javascript">
-
-	$(function(){
-		$.ajax({
-			type : 'POST',
-			async : false,
-			url : '/cbtconsole/admuser/queryAllAdmuser',
-			success : function(data){
-				if(data.ok){
-					var results = data.data;
-					var options = '<option value="0" selected="selected">全部</option>';
-					for (var i = 0; i < results.length; i++) {
-						options += '<option value="'+results[i].id+'">'+results[i].admname+'</option>';
-					}
-					$("#adminSelect").empty();
-					$("#adminSelect").append(options);
-				} else{
-					alert("获取下拉框数据失败，请重新刷新页面");
-				}
-			}
-		});
-	});
+    /* 获取url中参数 */
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
 
 	function queryProblemFeedBack(currentPage) {
 		var typeSelect = $("#typeSelect").val();
@@ -297,15 +282,35 @@ table th {
 </body>
 <script type="text/javascript">
 	window.onload = function() {
-		var url = document.location.href;
-		var begin = url.indexOf("?");
-		if (begin != -1) {
-			var selectStr = url.substring(begin + 1, url.length);
-			var selectLst = selectStr.split("=");
-			if (selectLst.length == 2) {
-				$("#typeSelect").val(selectLst[1]);
-			}
-		}
+	    //负责人拉取
+        $.ajax({
+            type : 'POST',
+            async : false,
+            url : '/cbtconsole/admuser/queryAllAdmuser',
+            success : function(data){
+                if(data.ok){
+                    var results = data.data;
+                    var options = '<option value="0" selected="selected">全部</option>';
+                    for (var i = 0; i < results.length; i++) {
+                        options += '<option value="'+results[i].id+'">'+results[i].admname+'</option>';
+                    }
+                    $("#adminSelect").empty();
+                    $("#adminSelect").append(options);
+                } else{
+                    alert("获取下拉框数据失败，请重新刷新页面");
+                }
+            }
+        });
+	    //页面数据加载
+        if(getUrlParam("typeSelect") != undefined && getUrlParam("typeSelect") != 'null'){
+            $("#typeSelect").val(getUrlParam("typeSelect"));
+        }
+        if(getUrlParam("is_report") != undefined && getUrlParam("is_report") != 'null') {
+            $("#is_report").val(getUrlParam("is_report"));
+        }
+        if(getUrlParam("adminId") != undefined && getUrlParam("adminId") != 'null') {
+            $("#adminSelect").val(getUrlParam("adminId"));
+        }
 		queryProblemFeedBack(1);
 	}
 </script>

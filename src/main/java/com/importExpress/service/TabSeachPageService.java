@@ -50,4 +50,6 @@ public interface TabSeachPageService {
 	public ShopUrlAuthorizedInfoPO queryAuthorizedInfo(String shopId);
 
 	public List<TabSeachPageBean> queryStaticizeAll();
+
+    boolean updateTitleAndKey(int sid);
 }

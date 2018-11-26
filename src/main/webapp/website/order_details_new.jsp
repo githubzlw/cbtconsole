@@ -235,7 +235,7 @@ $(document).ready(function(){
  	getAllBuyuser();
 	fnGetAddress();
  	var adminName = '<%=user.getAdmName()%>';
- 	if(adminName !="Ling"){
+ 	if(adminName !="Ling" && adminName !="emmaxie"){
  		// $("#buyuser1").attr("disabled",true);
  		$("#buy_but").attr("disabled",true);
  		$("#saler").attr("disabled",true);
@@ -347,7 +347,7 @@ function getBuyer(oids){
 							 break;
 						 }
 					}
-					if(admid!=1 || adminName !="Ling"){ 
+					if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
 						 $("#buyer"+json[i].odid).attr("disabled",true);
 					}
 				}
@@ -1595,7 +1595,7 @@ em {
 				<table id="orderDetail" class="ormtable2" align="center">
 					<tbody>
 						<tr class="detfretit">
-							<td>Item/购物车id</td>
+							<td>商品编号/购物车id</td>
 							<td colspan="2">详情</td>
 							<td style="width:400px;">订单信息</td>
 							<!-- 							<td>交期(新)</td> -->
@@ -1704,7 +1704,7 @@ em {
 											
 											<c:if test="${order.state==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1811,7 +1811,7 @@ em {
 									</c:if> 
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus==1}">
 									 <!-- yyl 评论start -->
-										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 										 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 											<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1917,7 +1917,7 @@ em {
 									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
-									<p style="width:200px;">采购货源标题: ${orderd.goodsname}</p>
+									<p style="width:200px;">采购货源标题: ${orderd.goodsPName}</p>
 								</span>
 								<span id="spanurl${sd.index}">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
@@ -1934,6 +1934,9 @@ em {
 								</span>
 								<span id="spanurl${sd.index}">
 										<p>实际采购价格(RMB):${orderd.sourc_price}</p>
+									<c:if test="${orderd.pidInventory >0}">
+										<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${orderd.goods_pid}">有类似库存但规格不一致</a><br>
+									</c:if>
 								<c:choose>
 									  <c:when test="${orderd.newValue!=null}">
 									  	<a href="${orderd.newValue}" target="_blank">实际采购货源链接</a>
@@ -2020,7 +2023,7 @@ em {
 												
 												<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -2132,7 +2135,7 @@ em {
 												<%-- ${order.state==4?'完结':'' } --%>
 													<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -2173,7 +2176,7 @@ em {
 												</c:if>
 											</c:if> <c:if test="${ostate==1 && orderd.checked==1}">
 										<!-- yyl 评论start -->
-											<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='ling' }"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if> 
+											<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if>
 											<button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 												<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${goods_url }"/>

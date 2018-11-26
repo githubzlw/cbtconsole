@@ -81,7 +81,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	String[] excelTotal12 = { "序号","订单号","商品编号","产品规格","产品图片","采购数量","采购价格","审核状态","批准人","申请人","生成时间","付款时间","申请总额","申请备注"};
 	String[] excelTotal13 = { "序号","商品分类","采购金额（人民币）","销售金额（人民币）","平均价格（人民币）","销售数量（个）","采购数量（个）","盈亏（%）"};
 	String[] excelTota20 = { "序号","商品名称","网站链接","采购链接","商品规格","盘点前数量","盘点后数量","盘点前库位","盘点后库位","盘点人","盘点时间","盘点备注"};
-	String[] excelTota21 = { "序号","商品名称","网站链接","商品库位","商品规格","采购价","首次库存数量","首次库存金额","盘点后库存数量","盘点后库存金额","可用库存数量","首次录入时间","最后更新库存时间","删除人","删除时间"};
+	String[] excelTota21 = { "序号","商品名称","网站链接","商品库位","商品规格","采购价","首次库存数量","首次库存金额","盘点后库存数量","盘点后库存金额","可用库存数量","首次录入时间","最后更新库存时间","删除人","删除时间","删除备注"};
 	String[] excelTota22 = { "序号","盘点前库存","盘点后库存","盘点前库位","盘点后库位","商品规格","损耗单价","损耗库存金额","损耗时间","损耗人","损耗原因"};
 	String[] excelTota23 = { "序号","支付月份","用户ID","用户邮箱","VIP等级","订单数量","实际重量（kg）","预估重量(kg)","实际支付金额(RMB)","实际采购金额(RMB)","实际运费(RMB)","客户付的运费(RMB)","用户利润(RMB)","用户利润率(%)","预计运费(RMB)","用户利润预估(RMB)","用户预估利润率(%)"};
 
@@ -838,6 +838,7 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 				row.createCell(12).setCellValue(bg.getUpdatetime());
 				row.createCell(13).setCellValue(bg.getAdmName());
 				row.createCell(14).setCellValue(bg.getCreate_time());
+				row.createCell(15).setCellValue(bg.getDelRemark());
 			}
 		}catch(Exception e){
 			e.printStackTrace();

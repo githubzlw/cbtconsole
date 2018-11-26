@@ -52,7 +52,6 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.servlet.ExpressTrackServlet;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
@@ -66,6 +65,7 @@ import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -76,8 +76,6 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
-import org.slf4j.LoggerFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -91,6 +89,7 @@ import org.jbarcode.encode.Code128Encoder;
 import org.jbarcode.encode.InvalidAtributeException;
 import org.jbarcode.paint.EAN13TextPainter;
 import org.jbarcode.paint.WidthCodedPainter;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -205,7 +204,7 @@ public class WarehouseCtrl {
 		admuser.setAdmName("全部");
 		result.add(admuser);
 		
-		if(adm.getId()==1){
+		if(adm.getId()==1 || adm.getId()==83){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -901,7 +900,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -3793,6 +3792,43 @@ public class WarehouseCtrl {
 		}
 		return json;
 	}
+	/**
+	 *
+	 * @Title getAllBuyer
+	 * @Description 获取所有采购人
+	 * @param request 客户端请求
+	 * @param response 返回客户端参数
+	 * @return
+	 * @throws ServletException servlet异常
+	 * @throws IOException 输入输出流异常
+	 * @throws ParseException
+	 * @return com.alibaba.fastjson.JSONArray 返回结果类型
+	 */
+	@RequestMapping(value = "/getAllBuyerInsp", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllBuyerInsp(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(1);
+		System.out.println("采购人长度："+list.size());
+
+		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
+		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
+		admuser.setId(1);
+		admuser.setAdmName("全部");
+		result.add(admuser);
+
+		if(1==1){
+			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
+			a.setId(1);
+			a.setAdmName("Ling");
+			result.add(a);
+		}
+		result.addAll(list);
+		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
+		return jsonArr;
+	}
+
+
 
 	private void saveValueToMap(HttpServletRequest request, Map<String, String> map) {
 		String page=request.getParameter("page");
@@ -9692,7 +9728,7 @@ public class WarehouseCtrl {
 		int minute = c.get(Calendar.MINUTE);
 		int second = c.get(Calendar.SECOND);
 		//上传文件目录
-		String relatDir = TabSeachPageController.LOCALPATHZIPIMG;
+		String relatDir = SearchFileUtils.LOCALPATHZIPIMG;
 		//文件夹不存在则创建
 		File fdir = new File(relatDir);
 		File fdirExi = new File(relatDir + time + "/");
@@ -9748,6 +9784,7 @@ public class WarehouseCtrl {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("uploadImgList", uploadImgList);
 		result.put("orderid", orderid);
+        result.put("imagehost", SearchFileUtils.IMAGEHOSTURL);
 		return result;
 	}
 

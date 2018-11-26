@@ -210,7 +210,7 @@
 	<select id="getfpCount" resultType="String">
 		select count(distinct g.goods_pid) from goods_distribution g inner join order_details od on g.odid=od.id inner join orderinfo o on od.orderid=o.order_no left join admin_r_user a on o.user_id=a.userid
 		where 1=1
-		<if test="buyid != 1">
+		<if test="buyid != 1 and buyid != 83">
 			and g.admuserid='${buyid}'
 		</if>
 		and LEFT(g.createtime,7)=LEFT(NOW(),7)
@@ -222,7 +222,7 @@
 		SELECT count(*) from	(
 		SELECT gd.goods_url ,ops.goods_url as goodsurl,max(gd.orderid) orderid FROM(
 		SELECT goods_distribution.goods_url,goods_distribution.odid,goods_distribution.orderid FROM goods_distribution, order_details WHERE 1=1
-		<if test="buyid != 1">
+		<if test="buyid != 1 and buyid != 83">
 			and goods_distribution.admuserid = '${buyid}'
 		</if>
 		AND goods_distribution.odid = order_details.id
@@ -242,7 +242,7 @@
 		INNER JOIN orderinfo o ON od.orderid=o.order_no
 		left JOIN admin_r_user a ON o.user_id=a.userid
 		WHERE  LEFT(g.createtime,10)=LEFT(NOW(),10)
-		<if test="buyid != 1">
+		<if test="buyid != 1 and buyid != 83">
 			AND g.admuserid='${buyid}'
 		</if>
 		and od.state<![CDATA[<]]>2  and a.admName<![CDATA[<>]]>'testAdm' and o.state>0 and o.state<![CDATA[<]]>6
@@ -2515,7 +2515,7 @@
 			and o.user_id=#{userid}
 		</if>
 		<if test="goodsid != null">
-			and od.goodsid=#{goodsid}
+			and (od.goodsid=#{goodsid} or od.id=#{goodsid})
 		</if>
 		<if test="days != null and days != '999'">
 			and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
@@ -2523,7 +2523,7 @@
 		<if test="goods_name != null">
 			and od.goodsname like '%${goods_name}%'
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid=#{admuserid}
 		</if>
 		group by o.order_no
@@ -2555,7 +2555,7 @@
 		INNER JOIN order_details od ON g.orderid=od.orderid AND g.odid=od.id
 		INNER JOIN orderinfo o ON od.orderid=o.order_no
 		WHERE
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			g.admuserid='${admuserid}' AND
 		</if>
 		g.orderid =#{orderid} AND od.state<![CDATA[<]]>2
@@ -2570,7 +2570,7 @@
 		inner join order_details od on id.orderid=od.orderid and id.odid=od.id
 		inner join orderinfo oi on od.orderid=oi.order_no
 		WHERE
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			g.admuserid='${admuserid}' and
 		</if>
 		g.orderid=#{orderid} and id.goodstatus&lt;>1 and id.is_replenishment=1 and id.is_delete=0 and od.state&lt;2 and oi.state between 1 and 5
@@ -2584,7 +2584,7 @@
 			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm' )
 		</if>
 		where g.orderid=#{orderid}
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid='${admuserid}'
 		</if>
 		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
@@ -2596,7 +2596,7 @@
 			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm')
 		</if>
 		WHERE g.orderid =#{orderid}
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid='${admuserid}'
 		</if>
 		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
@@ -2607,7 +2607,7 @@
 		INNER JOIN orderinfo o ON od.orderid=o.order_no left JOIN admin_r_user a ON o.user_id=a.userid
 		inner JOIN order_product_source ops ON ops.orderid=od.orderid AND ops.od_id=od.id
 		WHERE g.orderid =#{orderid}  and ops.purchase_state=3
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid='${admuserid}'
 		</if>
 		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
@@ -2623,7 +2623,7 @@
 			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm')
 		</if>
 		WHERE
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			ops.confirm_userid='${admuserid}' AND
 		</if>
 		ops.orderid =#{orderid} AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
@@ -2692,7 +2692,7 @@
 		<if test="goods_name != null">
 			and od.goodsname like '%${goods_name}%'
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid=#{admuserid}
 		</if>
 		group by o.order_no
@@ -2720,7 +2720,7 @@
 	</select>
 	<select id="getAllBuyer" resultType="com.cbt.pojo.AdmuserPojo">
 		SELECT * FROM admuser  WHERE STATUS =1 AND roleType IN (3,5)
-		<if test="admuserid != 1 and admuserid != 9 ">
+		<if test="admuserid != 1 and admuserid != 9 and admuserid != 83">
 			and id=${admuserid}
 		</if>
 		order by admName asc
@@ -2728,7 +2728,7 @@
 	<select id="getGoodsInfo" resultType="INTEGER">
 		SELECT COUNT(DISTINCT gc.id) FROM goods_distribution g INNER JOIN goods_communication_info gc ON g.orderid=gc.orderid AND g.odid=gc.odid and gc.is_read=0
 		WHERE g.orderid =#{orderid}
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			AND g.admuserid='${admuserid}'
 		</if>
 	</select>
@@ -3274,12 +3274,12 @@
 		</foreach>
 	</select>
 	<select id="queryPictureInfos" resultType="com.cbt.website.bean.SearchResultInfo">
-		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
+		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.valid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
 		FROM inspection_picture i
 		INNER JOIN  custom_benchmark_ready c ON i.pid=c.pid
 		left join goods_evaluation ge on i.pid=ge.goods_pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where  c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where  c.custom_main_image&lt;>'' and  i.isdelete=0
 		<if test="goods_pid != null">
 			and i.pid=#{goods_pid}
 		</if>
@@ -3287,9 +3287,9 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1 and admuserid !=15">
+		<if test="admuserid != 1 and admuserid !=15 and and admuserid !=83">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="times != null and times == 1">
@@ -3300,12 +3300,12 @@
 		</if>
 		group by i.pid
 		UNION
-		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
+		SELECT i.goods_id as taobao_itemid,i.orderid as taobao_orderid,i.pid as orderid,c.valid,c.remotpath AS invoice,c.custom_main_image AS currency,ifnull(ge.evaluation,'') as evaluation
 		FROM inspection_picture i
 		INNER JOIN  custom_benchmark_ready_cloud c ON i.pid=c.pid
 		left join goods_evaluation ge on i.pid=ge.goods_pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where  c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where  c.custom_main_image&lt;>'' and i.isdelete=0
 		<if test="goods_pid != null">
 			and i.pid=#{goods_pid}
 		</if>
@@ -3313,9 +3313,9 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 and admuserid != 83">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="times != null and times == 1">
@@ -3333,7 +3333,7 @@
 		FROM inspection_picture i
 		INNER JOIN custom_benchmark_ready c ON i.pid=c.pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where c.custom_main_image&lt;>'' and  i.isdelete=0
 		<if test="times != null and times == 1">
 			AND TO_DAYS(i.createtime)=TO_DAYS(NOW())
 		</if>
@@ -3344,9 +3344,9 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1 and admuserid !=15">
+		<if test="admuserid != 1 and admuserid !=15 and admuserid !=83">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="goods_pid != null">
@@ -3357,7 +3357,7 @@
 		FROM inspection_picture i
 		INNER JOIN custom_benchmark_ready_cloud c ON i.pid=c.pid
 		LEFT JOIN goods_distribution g ON i.odid=g.odid AND i.orderid=g.orderid
-		where c.custom_main_image&lt;>'' and c.valid=1 and i.isdelete=0
+		where c.custom_main_image&lt;>''  and i.isdelete=0
 		<if test="times != null and times == 1">
 			AND TO_DAYS(i.createtime)=TO_DAYS(NOW())
 		</if>
@@ -3368,9 +3368,9 @@
 			and i.orderid=#{orderno}
 		</if>
 		<if test="goods_id != null">
-			and i.goods_id=#{goods_id}
+			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1">
+		<if test="admuserid != 1 admuserid != 83">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="goods_pid != null">
