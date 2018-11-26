@@ -660,7 +660,6 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
-
         union all
         select  'cy' as state,count(o.order_no)  as counts from orderinfo o
         <if test="admuserid != 0">
@@ -673,7 +672,6 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
-
         union all
         SELECT  'cyw' AS state,COUNT(o.orderid)  AS counts FROM
         orderinfo o INNER JOIN shipping_package  sp ON o.order_no=sp.orderid AND TO_DAYS(NOW()) - TO_DAYS(orderpaytime) &lt;= 60 AND sp.sflag = 3
@@ -691,7 +689,6 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
-
         union all
         select 'agree',COUNT(DISTINCT order_no) counts from order_details de,orderinfo o
         <if test="admuserid != 0">
@@ -704,7 +701,6 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
-
         union all
         SELECT  'suggest',COUNT(DISTINCT cgd.orderno) counts FROM
         changegooddata cgd
@@ -721,11 +717,9 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
-
         union all
         SELECT 'deliver' AS state,COUNT(id) AS counts FROM ( SELECT order_fee.* FROM order_fee  LEFT JOIN orderinfo o ON  orderno=  order_no
-        WHERE o.state IN (5,2,1) AND  ( order_fee.state=3 OR order_fee.state=0) GROUP BY orderno) ops
-        WHERE o.state IN (5,2,1)  AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        WHERE o.state IN (5,2,1) AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
         email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
@@ -816,6 +810,7 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
+        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
@@ -875,7 +870,6 @@
         a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
-         (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0) as pidInventory,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
         actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,date_format(o.create_time,'%Y-%m-%d') as createtime,
         recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
