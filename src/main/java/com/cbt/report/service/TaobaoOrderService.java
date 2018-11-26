@@ -528,6 +528,11 @@ public interface TaobaoOrderService {
    public int createCouponSubsidiary(List<Map<String, Object>> list);
 
    public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+   /**
+    * 获取库存产品所有类别
+    * @return
+    */
+   public List<Inventory> getAllInventory();
 
    public List<Inventory> searchGoodsInventoryDeleteInfo(Map<Object, Object> map);
 
@@ -670,7 +675,7 @@ public interface TaobaoOrderService {
     * @return
     * @return int
     */
-   public int deleteInventory(int id);
+   public int deleteInventory(int id,String dRemark);
 
    /**
     * 查询order_details

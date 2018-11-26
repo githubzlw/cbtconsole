@@ -141,6 +141,16 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 
 	//采购货源标题
 	private String goodsPName;
+	//商品有库存但规格不一致
+	private String pidInventory;
+	public String getPidInventory() {
+		return pidInventory;
+	}
+
+	public void setPidInventory(String pidInventory) {
+		this.pidInventory = pidInventory;
+	}
+
 	public String getGoodsPName() {
 		return goodsPName;
 	}

@@ -1934,6 +1934,9 @@ em {
 								</span>
 								<span id="spanurl${sd.index}">
 										<p>实际采购价格(RMB):${orderd.sourc_price}</p>
+									<c:if test="${orderd.pidInventory >0}">
+										<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${orderd.goods_pid}">有类似库存但规格不一致</a><br>
+									</c:if>
 								<c:choose>
 									  <c:when test="${orderd.newValue!=null}">
 									  	<a href="${orderd.newValue}" target="_blank">实际采购货源链接</a>

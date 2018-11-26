@@ -654,12 +654,26 @@
             inner join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         WHERE o.state IN (-1,6) AND  TO_DAYS(NOW()) - TO_DAYS(o.orderpaytime) &lt;= 10
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+
         union all
         select  'cy' as state,count(o.order_no)  as counts from orderinfo o
         <if test="admuserid != 0">
             inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+
         union all
         SELECT  'cyw' AS state,COUNT(o.orderid)  AS counts FROM
         orderinfo o INNER JOIN shipping_package  sp ON o.order_no=sp.orderid AND TO_DAYS(NOW()) - TO_DAYS(orderpaytime) &lt;= 60 AND sp.sflag = 3
@@ -671,42 +685,88 @@
         (DATEDIFF(ti.updat_date,ti.track_update) IS NULL
         OR DATEDIFF(ti.updat_date,ti.track_update) > 3
         OR NOW() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6)
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+
         union all
         select 'agree',COUNT(DISTINCT order_no) counts from order_details de,orderinfo o
         <if test="admuserid != 0">
             inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         where de.orderid =  order_no and od_state =13   and o.state in (1,5)
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+
         union all
         SELECT  'suggest',COUNT(DISTINCT cgd.orderno) counts FROM
         changegooddata cgd
         INNER JOIN orderinfo o ON  cgd.orderno = o.order_no  AND  o.state IN (5,1) AND   cgd.changeflag=0
         INNER JOIN admin_r_user  aru ON  aru.userid=o.user_id
         INNER JOIN order_details de 	ON  cgd.orderno=de.orderid AND  cgd.aliurl=de.car_url  AND de.state!=13
+        where 1=1
         <if test="admuserid != 0">
-            where aru.adminid=#{admuserid}
+            aru.adminid=#{admuserid}
         </if>
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+
         union all
         SELECT 'deliver' AS state,COUNT(id) AS counts FROM ( SELECT order_fee.* FROM order_fee  LEFT JOIN orderinfo o ON  orderno=  order_no
         WHERE o.state IN (5,2,1) AND  ( order_fee.state=3 OR order_fee.state=0) GROUP BY orderno) ops
+        WHERE o.state IN (5,2,1)  AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913' AND  ( order_fee.state=3 OR order_fee.state=0) GROUP BY orderno) ops
         union all
         SELECT 'notshipping' as state, COUNT(DISTINCT order_no)as counts  from  orderinfo o
         <if test="admuserid != 0">
             left  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND isDropshipOrder IN (0,1)
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
         union all
         select   'storagewarning' as state ,count(o.orderid)as counts from orderinfo  o
         <if test="admuserid != 0">
             inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         where DATE_ADD(o.orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 DAY) &lt; NOW() and state = 1
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
         union all
         select   'shipmentwarning' as state ,count(o.orderid)as counts from orderinfo  o
         <if test="admuserid != 0">
             inner  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
         </if>
         where DATE_ADD(o.orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 DAY) &lt; NOW() and date_add(orderpaytime, INTERVAL o.delivery_time-2 day)>now() and state = 2
+        AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
         union all
         SELECT 'order_pending' AS state,COUNT(orderid) counts FROM (SELECT p.orderid FROM payment p
         INNER JOIN orderinfo oi ON p.orderid=oi.order_no
@@ -714,8 +774,13 @@
             inner JOIN admin_r_user a ON oi.user_id=a.userid and  a.adminid=#{admuserid}
         </if>
         WHERE  p.paystatus=0 AND oi.state=0
+        AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
         GROUP BY p.orderid) a
-
     </select>
     <select id="getorderPending" resultType="java.util.Map">
         SELECT  o.order_no,o.mode_transport,o.orderid AS id,o.delivery_time ,o.currency,o.user_id,IFNULL(aru.admName,'') adminname,
@@ -810,6 +875,7 @@
         a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
+         (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0) as pidInventory,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
         actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,date_format(o.create_time,'%Y-%m-%d') as createtime,
         recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
