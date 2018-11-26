@@ -328,7 +328,7 @@
 	<div class="mod_pay6" style="display: none;" id="big_img">
 
 	</div>
-	<%  if(!(adm.getId() ==1 || adm.getAdmName().equalsIgnoreCase("Ling"))){%>
+	<%  if(!(adm.getId() ==1 || adm.getAdmName().equalsIgnoreCase("Ling") || adm.getAdmName().equalsIgnoreCase("emmaxie"))){%>
 	<!-- 载入消息提醒jsp页面 -->
 	<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>

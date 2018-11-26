@@ -12,6 +12,11 @@
 <script type="text/javascript">
 var keyword_list;
 var keyword_id;
+//本地图片无法加载时候使用图片服务器中图片
+function imgError(obj, fileName) {
+    obj.onerror='';
+    obj.src=fileName;
+}
 $(function(){
 	keywords_show();
 	cate_reflush();
@@ -581,7 +586,7 @@ function detailList(sid) {
 						+ "<a id='btn' href='#' onclick='delBanner("+data[i].id+")' class='easyui-linkbutton' data-options='iconCls:\'icon-remove\''>删除banner</a>\"";
 					str += ",bannerName:\"" + data[i].bannerName + "\"";
 					str += ",bannerDescribe:\"" + data[i].bannerDescribe + "\"";
-					str += ",bannerImgName:\'<img src=\"" + data[i].bannerImgName + "\" style=\"height: 20px\">\'";
+					str += ",bannerImgName:\"<img onerror=\'imgError(this,\\\"" + data[i].bannerImgUrl + "\\\")\' src=\'" + data[i].bannerImgName + "\' style=\'height: 20px\'>\"";
 					str += "}";
 					
 					if(i!=(data.length-1)) {
@@ -590,7 +595,6 @@ function detailList(sid) {
 				}
 			}
 			str += "]";
-			
 			var datajson = eval(str);
 			$('#detailList').datagrid({
 				columns:[[    
@@ -710,7 +714,8 @@ function update_detail_show(id){
 				$("#detail_update_anti_words").val(res.antiWords);
 				$("#detail_update_sort").val(res.sort);
 				$("#detail_update_banner_img").attr('src',res.bannerImgName); ;//图片
-				$("#detail_update_banner_name").val(res.bannerName);
+				$("#detail_update_banner_img").attr('onerror',"imgError(this, \""+ res.bannerImgUrl + "\")");
+                $("#detail_update_banner_name").val(res.bannerName);
 				$("#detail_update_banner_describe").val(res.bannerDescribe);
 				$('#detail_update_win').window('open');
 			}
@@ -755,7 +760,7 @@ function getDetail(id){
 				$('#detail_neirong').propertygrid('appendRow',row);
 				row = {'name':'活动描述','value':res.bannerDescribe};
 				$('#detail_neirong').propertygrid('appendRow',row);
-				row = {'name':'横幅图片','value':"<img src=\"" + res.bannerImgName + "\" style=\"height: 100px\">"};
+				row = {'name':'横幅图片','value':"<img onerror=\"imgError(this,\'" + res.bannerImgUrl + "\')\" src=\"" + res.bannerImgName + "\" style=\"height: 100px\">"};
 				$('#detail_neirong').propertygrid('appendRow',row);
 				
 				var goodslist = res.goodslist;
@@ -912,7 +917,7 @@ function updateDetail() {
     				<input type="hidden" id="check_detail_id" value="">
     				<table id="detailList"></table>
 			    </div> 
-			    <div data-options="region:'south',title:'主商品名详情'" style="height:50%;">
+			    <div data-options="region:'south',title:'主商品名详情'" style="height:30%;">
 			    	<div id="detail_neirong_div"></div>
 			    </div>   
 			</div> 

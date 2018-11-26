@@ -70,31 +70,34 @@ public class QueAnsController {
 		//回复状态
 		String strRepalyFlag = request.getParameter("replayflag");
 		int replyFlag = StrUtils.isNum(strRepalyFlag) ? Integer.valueOf(strRepalyFlag) : 0;
+		//产品单页是否显示
+		String strReplyStatus = request.getParameter("replyStatus");
+		int replyStatus = StrUtils.isNum(strReplyStatus) ? Integer.valueOf(strReplyStatus) : 0;
 		//页码
 		String strPage = request.getParameter("page");
 		int page  = StrUtils.isNum(strPage) ? Integer.valueOf(strPage) : 1;
 		page = page < 1 ? 1 : page;
-		//回复人
+		//负责人
 		String steAdm = request.getParameter("adminid");
-		int adminId = 0;//StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
-		if("ling".equals(user.getAdmName().toLowerCase()) && adminId != 0){
+		int adminId = StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
+		/*if(!"ling".equals(user.getAdmName().toLowerCase())){
 			adminId = StrUtils.isNum(steAdm) ? Integer.valueOf(steAdm) : 0;
-		}
-		if(!"ling".equals(user.getAdmName().toLowerCase()) && adminId != 0){
-			adminId = user.getId();
-		}
+		}*/
 		
-		List<QueAns> list = questionAndAnswerService.findByQuery(goodsPid, goodsName, adminId, replyFlag,startdate,enddate, (page-1) * PAGESIZE);
-		int total = questionAndAnswerService.getCountByQuery(goodsPid, goodsName, adminId, replyFlag, startdate,enddate);
+		List<QueAns> list = questionAndAnswerService.findByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate, (page-1) * PAGESIZE);
+		int total = questionAndAnswerService.getCountByQuery(goodsPid, goodsName, adminId, replyFlag,replyStatus,startdate,enddate);
 		
+		request.setAttribute("total", total);
 		request.setAttribute("resultList", list);
 		int totalPage = total % PAGESIZE == 0 ? total / PAGESIZE : total / PAGESIZE + 1 ;
 		request.setAttribute("resultList", list);
 		request.setAttribute("page", page);
 		request.setAttribute("totalPage", totalPage);
-		request.setAttribute("replyFlag", replyFlag);
+		request.setAttribute("replyStatus", replyStatus);
 		request.setAttribute("adminId", adminId);
 		request.setAttribute("replyFlag", replyFlag);
+		request.setAttribute("startdate", request.getParameter("startdate"));
+		request.setAttribute("enddate", request.getParameter("enddate"));
 		//回复人信息
 		UserDao dao = new UserDaoImpl();
 		List<ConfirmUserInfo> all = dao.getAll();

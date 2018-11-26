@@ -1,7 +1,7 @@
 package com.importExpress.pojo;
 
 public class CustomerDisputeBean {
-	private String id;
+	private int id;
 	private String disputeID;
 	private String reason;
 	private String updateTime;
@@ -11,9 +11,50 @@ public class CustomerDisputeBean {
 	private String userid;
 	private String orderNo;
 	private String email;
+	private String type;//paypal  stripe
+	private String merchantID;//merchant_id
+	private String createTime;
+	private String remark;
+	private String transactionID;
+	private String oprateAdm;
 	
 	
-	
+	public String getTransactionID() {
+		return transactionID;
+	}
+	public void setTransactionID(String transactionID) {
+		this.transactionID = transactionID;
+	}
+	public String getOprateAdm() {
+		return oprateAdm;
+	}
+	public void setOprateAdm(String oprateAdm) {
+		this.oprateAdm = oprateAdm;
+	}
+	public String getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getMerchantID() {
+		return merchantID;
+	}
+	public void setMerchantID(String merchantID) {
+		this.merchantID = merchantID;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	public String getUserid() {
 		return userid;
 	}
@@ -38,10 +79,10 @@ public class CustomerDisputeBean {
 	public void setTime(long time) {
 		this.time = time;
 	}
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getDisputeID() {

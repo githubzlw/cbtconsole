@@ -75,7 +75,7 @@ public class NewCloudGoodsController {
 		List<ConfirmUserInfo> newAdms = new ArrayList<ConfirmUserInfo>();
 		for (ConfirmUserInfo userInfo : AllAdm) {
 			if (userInfo.getRole() == 0) {
-				if (userInfo.getConfirmusername().equalsIgnoreCase("Ling")) {
+				if (userInfo.getConfirmusername().equalsIgnoreCase("Ling") || userInfo.getConfirmusername().equalsIgnoreCase("emmaxie")) {
 					newAdms.add(userInfo);
 				} else if (userInfo.getConfirmusername().equalsIgnoreCase("testAdm")) {
 					newAdms.add(userInfo);

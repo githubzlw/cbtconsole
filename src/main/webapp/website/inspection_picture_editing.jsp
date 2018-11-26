@@ -463,7 +463,7 @@ tr .td_class{width:230px;}
 		<input type="hidden" id="oldOrderid" value="${param.oldOrderid}">
 		<input class="easyui-textbox" name="goods_pid" id="goods_pid" value="${param.goodsPid}" style="width:10%;margin-top: 15px;"  data-options="label:'商品pid:'">
 		<input class="easyui-textbox" name="orderno" id="orderno" style="width:10%;margin-top: 15px;"  data-options="label:'订单号:'">
-		<input class="easyui-textbox" name="goods_id" id="goods_id" style="width:10%;margin-top: 15px;"  data-options="label:'商品号:'">
+		<input class="easyui-textbox" name="goods_id" id="goods_id" style="width:10%;margin-top: 15px;"  data-options="label:'商品编号/购物车id:'">
 		验货时间: <select name="times" id="times" style="width: 60px;">
 		<option value="1">当天</option>
 		<option value="3">最近三天</option>
@@ -472,8 +472,8 @@ tr .td_class{width:230px;}
 		<option value="999">全部</option>
 	</select>
 		<select class="easyui-combobox" name="admuserid" id="admuserid" style="width:15%;" data-options="label:'电商采购人:',panelHeight:'auto',valueField: 'id',
-		textField: 'admName', value:'<%=adm.getId()%>',selected:true,
-		url: '/cbtconsole/warehouse/getAllBuyer',
+		textField: 'admName', value:'1',selected:true,
+		url: '/cbtconsole/warehouse/getAllBuyerInsp',
 		method:'get'">
 		</select>
 		<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)"> 
@@ -485,6 +485,7 @@ tr .td_class{width:230px;}
 		<thead>
 			<tr>
 				<th data-options="field:'orderid',width:10,align:'center'">商品pid</th>
+				<th data-options="field:'valid',width:10,align:'center'">商品状态</th>
 				<th data-options="field:'currency',width:20,align:'center'">主图图片</th>
 				<th data-options="field:'gcUnit',width:80,align:'center'">验货图片</th>
                 <th data-options="field:'evaluation',width:10,align:'center'">产品评论</th>

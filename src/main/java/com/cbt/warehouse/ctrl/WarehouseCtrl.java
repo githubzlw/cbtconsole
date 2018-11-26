@@ -205,7 +205,7 @@ public class WarehouseCtrl {
 		admuser.setAdmName("全部");
 		result.add(admuser);
 		
-		if(adm.getId()==1){
+		if(adm.getId()==1 || adm.getId()==83){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -901,7 +901,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -3793,6 +3793,43 @@ public class WarehouseCtrl {
 		}
 		return json;
 	}
+	/**
+	 *
+	 * @Title getAllBuyer
+	 * @Description 获取所有采购人
+	 * @param request 客户端请求
+	 * @param response 返回客户端参数
+	 * @return
+	 * @throws ServletException servlet异常
+	 * @throws IOException 输入输出流异常
+	 * @throws ParseException
+	 * @return com.alibaba.fastjson.JSONArray 返回结果类型
+	 */
+	@RequestMapping(value = "/getAllBuyerInsp", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllBuyerInsp(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(1);
+		System.out.println("采购人长度："+list.size());
+
+		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
+		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
+		admuser.setId(1);
+		admuser.setAdmName("全部");
+		result.add(admuser);
+
+		if(1==1){
+			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
+			a.setId(1);
+			a.setAdmName("Ling");
+			result.add(a);
+		}
+		result.addAll(list);
+		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
+		return jsonArr;
+	}
+
+
 
 	private void saveValueToMap(HttpServletRequest request, Map<String, String> map) {
 		String page=request.getParameter("page");
@@ -9748,6 +9785,7 @@ public class WarehouseCtrl {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("uploadImgList", uploadImgList);
 		result.put("orderid", orderid);
+        result.put("imagehost", TabSeachPageController.IMAGEHOSTURL);
 		return result;
 	}
 
