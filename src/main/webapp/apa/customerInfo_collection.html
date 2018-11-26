@@ -6,6 +6,12 @@
 <script type="text/javascript"
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript">
+    /* 获取url中参数 */
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
 	function showResault(order, num, obj) {
 		$(".main_ul li").click(function() {
 			$(this).addClass('selected') //为选中项添加高亮
@@ -15,10 +21,13 @@
 		$(".div_content").empty();
 		var div_iframe = "";
 		if (order == 1) {
-			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html"></iframe>';
-		} else if (order == 2) {
+			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html?is_report='
+                + getUrlParam("is_report") + '&typeSelect=' + getUrlParam("typeSelect") + '&adminId=' + getUrlParam("adminId") + '"></iframe>';
+		}
+		/*else if (order == 2) {
 			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/questionnaire.html"></iframe>';
-		} else if (order == 3) {
+		}*/
+        else if (order == 3) {
 			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/Customer_Feebdack.html"></iframe>';	
 		}
 		$(".div_content").append(div_iframe);
@@ -72,9 +81,9 @@
 </body>
 <script type="text/javascript">
 	window.onload = function() {
-		$(".div_content").empty();
-		var div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html"></iframe>';
-		$(".div_content").append(div_iframe);
+	    //页面加载完默认加载 “用户使用问题反馈”
+        showResault(1);
+
         <!--用户使用问题反馈数据-->
         $.ajax({
             type: "GET",
@@ -82,7 +91,12 @@
             dataType:"json",
             success: function(msg){
                 if(msg != undefined){
-                    $("#warning_info").html("注册页面(<span>" + (msg.type1 == undefined?"0":msg.type1)
+                    var total = 0;
+                    $.each(msg, function (key,val) {
+                        total += parseInt(val);
+                    });
+                    $("#warning_info").html("总条数(<span>" + total
+                        + "</span>). 其中 注册页面(<span>" + (msg.type1 == undefined?"0":msg.type1)
                         + "</span>),购物车(<span>" + (msg.type2 == undefined?"0":msg.type2)
                         + "</span>),支付页面(<span>" + (msg.type3 == undefined?"0":msg.type3)
                         + "</span>),搜索结果(<span>" + (msg.type4 == undefined?"0":msg.type4)

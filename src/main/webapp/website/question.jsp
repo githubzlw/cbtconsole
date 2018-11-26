@@ -196,18 +196,24 @@ $('#dlg').dialog('close');
 		 <div>
 			商品ID：<input class="easyui-textbox" name="pid" value="${pid}" id="pid" style="width: 11%; margin-top: 10px;">
 			商品名称：<input class="easyui-textbox" name="goodsName" value="${goodsName}" id="pname" style="width: 10%;">
-			回复人：<select class="easyui-combobox"  name="adminid" id="adminid">
+			负责人：<select class="easyui-combobox"  name="adminid" id="adminid">
 					<option value="0" <c:if test="${adminId==0}">selected</c:if>>全部</option>
 					<c:forEach var="adm" items="${ admList}">
 					<option value="${adm.id }" <c:if test="${adm.id==adminId }">selected</c:if>>${adm.confirmusername}</option>
 					</c:forEach>
 			     </select>
 			回复状态：
-				<select class="easyui-combobox" name="replayflag" id="replyStatus" style="width: 10%;">
+				<select class="easyui-combobox" name="replayflag" id="replayflag" style="width: 10%;">
 					<option value="0" <c:if test="${replyFlag == 0 }">selected</c:if> >全部</option> 
 					<option value="1" <c:if test="${replyFlag == 1 }">selected</c:if> >未回复</option> 
 					<option value="2" <c:if test="${replyFlag == 2 }">selected</c:if> >已回复</option>
 				</select>
+            产品单页是否显示：
+             <select class="easyui-combobox" name="replyStatus" id="replyStatus" style="width: 10%;">
+                 <option value="0" <c:if test="${replyStatus == 0 }">selected</c:if> >全部</option>
+                 <option value="1" <c:if test="${replyStatus == 1 }">selected</c:if> >不同意显示</option>
+                 <option value="2" <c:if test="${replyStatus == 2 }">selected</c:if> >同意显示</option>
+             </select>
 				提问日期:
 				<input  type="text" name="startdate" id="startdate" style="width: 88px" 
 				placeholder="开始日期" title="开始日期" onfocus="WdatePicker({isShowWeek:true})"<c:if test="${startdate != null}">value="${startdate}"</c:if> > 
@@ -275,16 +281,16 @@ $('#dlg').dialog('close');
 					</td>
 					<td>
 						<c:if test="${qa.reply_status ==1}">
-							<br><input type="button" style="margin-top:8px;color:green" onclick="influenceShop('${qa.questionid}','${qa.reply_content}','${qa.c_shop_id}',1);" value="同意前台显示">
+							<br><input type="button" style="margin-top:8px;color:green" onclick="influenceShop('${qa.questionid}','${qa.contextFlag}','${qa.c_shop_id}',1);" value="同意前台显示">
 						</c:if>
 						<c:if test="${qa.reply_status ==2 and not empty qa.reply_content}">
-							<br><input type="button" style="margin-top:8px;color:red" onclick="influenceShop('${qa.questionid}','${qa.reply_content}','${qa.c_shop_id}',2);" value="撤销前台显示">
+							<br><input type="button" style="margin-top:8px;color:red" onclick="influenceShop('${qa.questionid}','${qa.contextFlag}','${qa.c_shop_id}',2);" value="撤销前台显示">
 						</c:if>
 						<c:if test="${qa.isShow==1}">
-							<br><input type="button" style="margin-top:8px;color:green" onclick="influenceShop('${qa.questionid}','${qa.reply_content}','${qa.c_shop_id}',3);" value="影响同店铺商品问答">
+							<br><input type="button" style="margin-top:8px;color:green" onclick="influenceShop('${qa.questionid}','${qa.contextFlag}','${qa.c_shop_id}',3);" value="影响同店铺商品问答">
 						</c:if>
 						<c:if test="${qa.isShow==2 and not empty qa.reply_content and not empty qa.shop_id}">
-							<br><input type="button" style="margin-top:8px;color:red" onclick="influenceShop('${qa.questionid}','${qa.reply_content}','${qa.c_shop_id}',4);" value="撤销影响同店铺商品问答">
+							<br><input type="button" style="margin-top:8px;color:red" onclick="influenceShop('${qa.questionid}','${qa.contextFlag}','${qa.c_shop_id}',4);" value="撤销影响同店铺商品问答">
 						</c:if>
 						<input type="button" style="margin-top:8px;color:blue" onclick="deleteQuestion('${qa.questionid}');" value="删除问答">
 					</td>
@@ -296,6 +302,7 @@ $('#dlg').dialog('close');
 	<div align="center">
 	<input type="hidden" value="${totalPage}" id="totalPage">
 	<input type="hidden" value="${page}" id="cpage">
+    总条数:${total}&nbsp;&nbsp;&nbsp;
 	总共:
 	${page}/${totalPage}
 	<a class="easyui-linkbutton" id="precheck" onclick="gotopage(1)">上一页</a>
@@ -383,19 +390,21 @@ function tosearch(){
 	$("#query_form").submit();
 }
 //是否影响改商品同店铺商品问答信息
-function influenceShop(qid,reply_content,shop_id,state){
+function influenceShop(qid,contextFlag,shop_id,state){
 	var str="";
 	if(state == "1"){
 		str="确定同意前台显示";
-		if(reply_content == null || reply_content == ""){
+		if(contextFlag == "1"){
 		    alert("未回复不允许前台显示");
+		    return;
 		}
 	}else if(state == "2"){
 		str="撤销前台显示";
 	}else if(state == "3"){
         str="影响同店铺商品";
-        if(reply_content == null || reply_content == ""){
+        if(contextFlag == "1"){
             alert("未回复不允许影响同店铺商品");
+            return;
         }
     }else if(state == "4"){
         str="撤销影响同店铺商品";
@@ -407,7 +416,7 @@ function influenceShop(qid,reply_content,shop_id,state){
 		type:'POST',
 		dataType:'text',
 		url:'/cbtconsole/question/influenceShop',
-		data:{qid:qid,reply_content:reply_content,shop_id:shop_id,state:state},
+		data:{qid:qid,reply_content:contextFlag,shop_id:shop_id,state:state},
 		success:function(res){
 			if(res>0){
 				location.reload();

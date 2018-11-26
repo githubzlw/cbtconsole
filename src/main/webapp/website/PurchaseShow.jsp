@@ -3925,7 +3925,7 @@
 							</script>
 							<c:if test="${pb.oistate==6}">
 								<h1 style="color: red;">该订单已被客户取消</h1>
-							</c:if> <c:if test="${pb.saler=='Ling' || pb.saler=='testAdm'}">
+							</c:if> <c:if test="${pb.saler=='Ling' || pb.saler=='emmaxie'  || pb.saler=='testAdm'}">
 							<h1 style="color: red;">该订单为测试订单不要采购</h1>
 						</c:if>
 							<c:if test="${pb.odstate==2}">

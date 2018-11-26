@@ -645,9 +645,11 @@
                 <b style="color: red;">(提示：绿色背景表示当前商品已选中；点击图片可直接进入电商网站产品单页)</b> <br>
                 <br>
                 <div id="add_goods_btn">
+                    <b style="float:left;">统计：${isOnTotal}/${allTotal}(启用数/总数)</b>
                     <input type="button" class="but_edit_2" value="添加商品" onclick="addGoods('${categoryId}')"/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="but_edit_2" value="批量导入商品"
-                                                   onclick="querySearchGoods('${categoryId}')"/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="button" class="but_edit_2" value="批量导入商品" onclick="querySearchGoods('${categoryId}')"/>
+
                 </div>
             </td>
         </tr>

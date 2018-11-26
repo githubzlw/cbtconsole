@@ -1834,7 +1834,7 @@ public class NewOrderDetailsCtr {
 			LOG.error(e.getMessage());
 		}
 
-		if ("Ling".equalsIgnoreCase(admName)) {
+		if ("Ling".equalsIgnoreCase(admName) || "emmaxie".equalsIgnoreCase(admName)) {
 			return "paymentConfirm";
 		} else {
 			return "paymentConfirm1";
@@ -1927,8 +1927,20 @@ public class NewOrderDetailsCtr {
 		if(org.apache.commons.lang3.StringUtils.isNotBlank(firstDiscountStr)){
 			firstDiscount = Double.valueOf(firstDiscountStr);
 		}
+
+		//质检费
+		double actual_lwh = 0;
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(orderInfo.getActual_lwh())){
+			actual_lwh = Double.valueOf(orderInfo.getActual_lwh());
+		}
+		//手续费
+		double processingfee = orderInfo.getProcessingfee();
+		//会员费
+		double memberFee = orderInfo.getMemberFee();
+
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
-				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c;
+				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
+				+ actual_lwh + processingfee + memberFee;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

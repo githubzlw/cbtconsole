@@ -2,6 +2,8 @@ package com.importExpress.service;
 
 import java.util.Map;
 
+import com.importExpress.pojo.CustomerDisputeBean;
+
 public interface CustomerDisputeService {
 	
 	/**获取申诉列表
@@ -22,6 +24,24 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	String info(String disputeID);
+	
+	
+	/**
+	 * 确认财务去退款
+	 * @param disputeId
+	 * @param userid
+	 * @param orderNo
+	 * @param transctionID
+	 * @param remark
+	 * @return
+	 */
+	int confirm(CustomerDisputeBean customer);
+	
+	/**是否已经提醒退款
+	 * @param disputeID
+	 * @return
+	 */
+	int getConfim(String disputeID);
 	
 	
 }

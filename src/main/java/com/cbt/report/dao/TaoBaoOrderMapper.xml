@@ -76,6 +76,9 @@
     <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
     <result column="onLine" property="onLine" jdbcType="VARCHAR" />
      <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+       <result column="pid" property="pid" jdbcType="VARCHAR" />
+       <result column="online_flag" property="online_flag" jdbcType="VARCHAR" />
+       <result column="db_flag" property="db_flag" jdbcType="VARCHAR"/>
    </resultMap>
  
   <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
@@ -312,7 +315,7 @@
       where 1=1
     and if(i.flag=1,i.new_remaining,i.remaining)>0
      <if test="goodinfo!=null">
-       and LOCATE(#{goodinfo},i.good_name)
+         and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
      </if>
      <if test="sku!=null">
         and LOCATE(#{sku},i.sku)
@@ -365,9 +368,13 @@
          </otherwise>
        </choose>
      </if>
-     <if test="goodscatid!=null">
-        and i.goodscatid=#{goodscatid}
-     </if>
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
+      </if>
+
      <if test="startdate!=null">
         and i.updatetime>=#{startdate}
      </if>
@@ -380,69 +387,77 @@
     </if>
   </select>
   <select id="getIinOutInventoryCount" resultMap="InventoryResultMap">
-   SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine FROM inventory i left join storage_outbound_details s on i.id=s.in_id and s.type=1  left join custom_benchmark_ready c on i.goods_pid=c.pid where 1=1 and if(i.flag=1,i.new_remaining,i.remaining)>0
-     <if test="goodinfo!=null">
-       and LOCATE(#{goodinfo},i.good_name)
-     </if>
-     <if test="sku!=null">
-        and LOCATE(#{sku},i.sku)
-     </if>
+      SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine,c.unsellableReason FROM inventory i
+      left join storage_outbound_details s on i.id=s.in_id and s.type=1
+      left join custom_benchmark_ready c on i.goods_pid=c.pid
+      where 1=1
+      and if(i.flag=1,i.new_remaining,i.remaining)>0
+      <if test="goodinfo!=null">
+          and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
+      </if>
+      <if test="sku!=null">
+          and LOCATE(#{sku},i.sku)
+      </if>
       <if test="barcode!=null">
-       and i.barcode=#{barcode}
-     </if>
+          and i.barcode=#{barcode}
+      </if>
+      <if test="valid!=null and valid !=2">
+          and c.valid=${valid}
+      </if>
+      <if test="valid  == 2">
+          and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
       <if test="goods_pid!=null">
           and i.goods_pid=#{goods_pid}
       </if>
-     <if test="flag!=null">
-       and i.flag=#{flag}
-     </if>
-      <if test="valid!=null">
-          and c.valid=${valid}
+      <if test="flag!=null">
+          and i.flag=#{flag}
       </if>
-    <if test="scope==1">
-         <choose>
-         <when test="type == 'remaining'">
-              and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining>#{count})
-         </when>
-         <otherwise>
-             and 1=1
-         </otherwise>
-       </choose>
-       
-     </if>
-       <if test="scope==2">
-       <choose>
-         <when test="type == 'remaining'">
-              and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
-         </when>
-         <otherwise>
-             and 1=1
-         </otherwise>
-       </choose>
-     </if>
-     <if test="scope==3">
-        <choose>
-         <when test="type == 'remaining'">
-               <![CDATA[
-               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count}) 
-                ]]> 
-         </when>
-         <otherwise>
-             <![CDATA[
-              and 1=1
-               ]]> 
-         </otherwise>
-       </choose>
-     </if>
-     <if test="goodscatid!=null">
-        and i.goodscatid=#{goodscatid}
-     </if>
-          <if test="startdate!=null">
-        and i.updatetime>=#{startdate}
-     </if>
-     <if test="enddate!=null">
-        and i.updatetime&lt;=#{enddate}
-     </if>
+      <if test="scope==1">
+          <choose>
+              <when test="type == 'remaining'">
+                  and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+              </when>
+              <otherwise>
+                  and 1=1
+              </otherwise>
+          </choose>
+
+      </if>
+      <if test="scope==2">
+          <choose>
+              <when test="type == 'remaining'">
+                  and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+              </when>
+              <otherwise>
+                  and 1=1
+              </otherwise>
+          </choose>
+      </if>
+      <if test="scope==3">
+          <choose>
+              <when test="type == 'remaining'">
+                  <![CDATA[
+               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count})
+                ]]>
+              </when>
+              <otherwise>
+                  and 1=1
+              </otherwise>
+          </choose>
+      </if>
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
+      </if>
+      <if test="startdate!=null">
+          and i.updatetime>=#{startdate}
+      </if>
+      <if test="enddate!=null">
+          and i.updatetime&lt;=#{enddate}
+      </if>
   </select>
   
   <select id="selectStatus" resultType="String">
@@ -1521,13 +1536,16 @@
 	) b
   </select>
   <delete id="deleteInventory">
-    INSERT INTO inventory_delete_details SELECT * FROM inventory WHERE id= ${id};
+    INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
     delete from inventory where id=${id};
   </delete>
   <select id="queryInById" resultType="com.cbt.pojo.Inventory">
     select * from inventory where id=#{id}
   </select>
-  <update id="updateIsStockFlag">
+    <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
+        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
+    </select>
+    <update id="updateIsStockFlag">
     update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
   </update>
     <update id="updateIsStockFlag1">

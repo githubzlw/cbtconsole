@@ -538,7 +538,13 @@ public interface TaoBaoOrderMapper {
     public List<TaoBaoOrderInfo> queryBuyCount(@Param("torderid") String torderid, @Param("opsorderid") String opsorderid);
 
     public List<AliCategory> searchAliCategory(@Param("type") String type, @Param("cid") String cid);
-    /**
+	/**
+	 * 获取库存产品所有类别
+	 * @return
+	 */
+	public List<Inventory> getAllInventory();
+
+	/**
      * 库存商品对应的出入库明细
      * @Title searchInOutDetails
      * @Description TODO
@@ -578,7 +584,7 @@ public interface TaoBaoOrderMapper {
 	/**
 	 * 根据ID删除库存数据
 	 */
-	public int deleteInventory(@Param("id") int id);
+	public int deleteInventory(@Param("id") int id,@Param("dRemark") String dRemark);
     /**
      *盘点库存库位变更
      * @param id

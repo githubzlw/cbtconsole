@@ -796,7 +796,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 = #{catid}
+             and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -832,7 +832,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 = #{catid}
+            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -858,7 +858,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 = #{catid}
+            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -872,7 +872,7 @@
         <if test="clickNum == 4">
             and b.click_num &gt;= 100
         </if>
-        group by catid) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
+        group by a.catid1) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
 
 </mapper>
