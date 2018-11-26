@@ -361,10 +361,10 @@
 			</otherwise>
 		</choose>
 		<if test="userid != null and userid != ''">
-			and of.user_id like CONCAT('%','${userid}','%' )
+			and of.user_id=${userid}
 		</if>
 		<if test="goodid != null and goodid != ''">
-			and ir.goodid like CONCAT('%','${goodid}','%' )
+			and (ir.goodid=${goodid} or ir.odid=${goodid})
 		</if>
 		<if test="ckStartTime != null and ckStartTime != '' and ckEndTime != null and ckEndTime != ''">
 			and ir.createtime &gt;='${ckStartTime}' and ir.createtime &lt;='${ckEndTime}'
@@ -395,10 +395,10 @@
 			</otherwise>
 		</choose>
 		<if test="userid != null and userid != ''">
-			and of.user_id like CONCAT('%','${userid}','%' )
+			and of.user_id=${userid}
 		</if>
 		<if test="goodid != null and goodid != ''">
-			and ir.goodid like CONCAT('%','${goodid}','%' )
+			and (ir.goodid=${goodid} or ir.odid=${goodid})
 		</if>
 		<if test="ckStartTime != null and ckStartTime != '' and ckEndTime != null and ckEndTime != ''">
 			and ir.createtime &gt;='${ckStartTime}' and ir.createtime &lt;='${ckEndTime}'
@@ -2687,7 +2687,7 @@
 			and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
 		</if>
 		<if test="goodsid != null">
-			and g.goodsid=#{goodsid}
+			and (g.goodsid=#{goodsid} or od.id=#{goodsid})
 		</if>
 		<if test="goods_name != null">
 			and od.goodsname like '%${goods_name}%'
@@ -3995,5 +3995,55 @@
 		<if test="state == 3">
 			and b.tId>0 and b.id is not null
 		</if>
+	</select>
+	<select id="monthSalesEffortsList" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+		SELECT e.datas,e.endName as admName,SUM(e.yourorder) as salesAcount,SUM(e.prices) as salesAmount,SUM(e.searchNum) as searchAcount,SUM(e.openNum) as openAcount FROM (
+		SELECT d.pid,IF(d.editName IS NULL,d.admName,d.editName) AS endName,d.id,d.yourorder,d.prices,d.datas,d.searchNum,d.openNum FROM (
+		SELECT c.pid,a.admName,od.id,od.yourorder,CAST(od.goodsprice*od.yourorder AS DECIMAL(10,2)) AS prices,LEFT(oi.orderpaytime,7) AS datas ,
+		0 AS searchNum,
+-- 		(SELECT COUNT(1) FROM searchproductlog s WHERE MATCH(s.productShowIdList) AGAINST(od.goods_pid) AND LEFT(s.showPageTime,7)=LEFT(oi.orderpaytime,7)) AS searchNum,
+		(SELECT COUNT(1) FROM recent_view r WHERE r.pid=od.goods_pid AND LEFT(r.createtime,7)=LEFT(oi.orderpaytime,7)) AS openNum,
+		(SELECT IFNULL(a.admName,'--') FROM custom_goods_edited_log c INNER JOIN admuser a ON c.admin_id=a.id
+		WHERE c.pid=od.goods_pid AND LEFT(c.create_time,7)=LEFT(oi.orderpaytime,7) and c.admin_id in (62,56,68,80,69,57,51) ORDER BY c.id DESC LIMIT 1) AS editName
+		FROM orderinfo oi
+		INNER JOIN order_details od ON od.orderid=oi.order_no
+		INNER JOIN custom_benchmark_ready c ON od.goods_pid=c.pid
+		INNER JOIN admuser a ON c.admin_id=a.id
+		WHERE oi.user_id IN (
+		SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%'
+		) AND oi.state BETWEEN 1 AND 5 AND c.valid=1 AND c.admin_id>0
+		) d
+-- 		 group by d.datas,IF(d.editName IS NULL,d.admName,d.editName)
+		) e INNER JOIN admuser ad ON e.endName=ad.admName WHERE ad.id IN (62,56,68,80,69,57,51) GROUP BY e.datas,e.endName limit ${page},20
+	</select>
+	<select id="monthSalesEffortsListCount" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+		SELECT e.datas,e.endName as admName FROM (
+		SELECT d.pid,IF(d.editName IS NULL,d.admName,d.editName) AS endName,d.id,d.yourorder,d.prices,d.datas,d.searchNum,d.openNum FROM (
+		SELECT c.pid,a.admName,od.id,od.yourorder,CAST(od.goodsprice*od.yourorder AS DECIMAL(10,2)) AS prices,LEFT(oi.orderpaytime,7) AS datas ,
+		0 AS searchNum,
+-- 		(SELECT COUNT(1) FROM searchproductlog s WHERE MATCH(s.productShowIdList) AGAINST(od.goods_pid) AND LEFT(s.showPageTime,7)=LEFT(oi.orderpaytime,7)) AS searchNum,
+		(SELECT COUNT(1) FROM recent_view r WHERE r.pid=od.goods_pid AND LEFT(r.createtime,7)=LEFT(oi.orderpaytime,7)) AS openNum,
+		(SELECT IFNULL(a.admName,'--') FROM custom_goods_edited_log c INNER JOIN admuser a ON c.admin_id=a.id
+		WHERE c.pid=od.goods_pid AND LEFT(c.create_time,7)=LEFT(oi.orderpaytime,7) and c.admin_id in (62,56,68,80,69,57,51) ORDER BY c.id DESC LIMIT 1) AS editName
+		FROM orderinfo oi
+		INNER JOIN order_details od ON od.orderid=oi.order_no
+		INNER JOIN custom_benchmark_ready c ON od.goods_pid=c.pid
+		INNER JOIN admuser a ON c.admin_id=a.id
+		WHERE oi.user_id IN (
+		SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+		email NOT LIKE 'zhouxueyun%'
+		) AND oi.state BETWEEN 1 AND 5 AND c.valid=1 AND c.admin_id>0
+		) d
+-- 		 group by d.datas,IF(d.editName IS NULL,d.admName,d.editName)
+		) e  INNER JOIN admuser ad ON e.endName=ad.admName WHERE ad.id IN (62,56,68,80,69,57,51) GROUP BY e.datas,e.endName
 	</select>
 </mapper>

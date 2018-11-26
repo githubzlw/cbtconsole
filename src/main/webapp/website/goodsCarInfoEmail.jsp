@@ -24,7 +24,7 @@
     </style>
 </head>
 <body>
-
+<span id="modeStr" style="display: none">${modeStr}</span>
 <c:if test="${success == 0}">
     <h1 align="center">${message}</h1>
 </c:if>
@@ -204,6 +204,7 @@
         var r=confirm("是否确认发送邮件?");
         if (r){
             var emailContent = $("#email_content").html();
+            var model = $("#modeStr").html();
             $.ajax({
                 type: 'POST',
                 dataType: 'text',
@@ -211,7 +212,8 @@
                 data: {
                     "userEmail": userEmail,
                     "userId":userId,
-                    "emailContent": emailContent
+                    "emailContent": emailContent,
+                    "model":model
                 },
                 success: function (data) {
                     var json = eval("(" + data + ")");

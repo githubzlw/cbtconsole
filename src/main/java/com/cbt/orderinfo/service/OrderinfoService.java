@@ -1537,7 +1537,7 @@ public class OrderinfoService implements IOrderinfoService {
 			}else{
 				odb.setShopFlag("0");
 			}
-			odb.setFinal_weight(df.format(Double.parseDouble(final_weight)*odb.getYourorder()));
+//			odb.setFinal_weight(df.format(Double.parseDouble(final_weight)*odb.getYourorder()));
 			// 16 88 的重 量
 			String weitht1688 = Utility.getStringIsNull(odb.getCbrWeight()) ? odb.getCbrWeight(): "0";
 			// 1688的价格
@@ -1564,10 +1564,8 @@ public class OrderinfoService implements IOrderinfoService {
 			int unit=Util.getNumberForStr(ali_sellunit);
 			odb.setEs_price(Double.valueOf(es_price)*odb.getYourorder()*unit);
 			String shop_id = odb.getCbrShopid();
-			if(StringUtil.isBlank(shop_id) && StringUtil.isNotBlank(odb.getCbrdShop_id())){
-				shop_id=odb.getCbrdShop_id();
-			}else if(StringUtil.isBlank(shop_id)){
-				shop_id="0000";
+			if(StringUtil.isBlank(shop_id) || !odb.getGoods_pid().equals(odb.getTb_1688_itemid())){
+				shop_id="采购货源和推荐货源不一致，无法提供供应商";
 			}
 			odb.setShop_id(shop_id);
 			String inventoryRemark="";

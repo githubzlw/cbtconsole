@@ -788,9 +788,9 @@ public class EditorController {
                 if (!(type == null || "".equals(type) || "0".equals(type))) {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
-                    String ip = request.getLocalAddr();
+                    String ip = request.getRemoteAddr();
                     int isUpdateImg = 0;
-                    if (ip.contains("1.34") || ip.contains("38.42")) {
+                    if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
                         isUpdateImg = 1;
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
@@ -2373,8 +2373,13 @@ public class EditorController {
             boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
             if (is) {
                 // 重新刷新价格数据
+                String ip = request.getRemoteAddr();
+                int is27 = 29;
+                if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
+                    is27 = 27;
+                }
                 String url = SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
-                        + "&sourceTable=custom_benchmark_ready&database=27";
+                        + "&sourceTable=custom_benchmark_ready&database=" + is27;
                 String resultJson = DownloadMain.getContentClient(url, null);
                 System.err.println("pid=" + pid + ",result:[" + resultJson + "]");
                 JSONObject jsonJt = JSONObject.fromObject(resultJson);
@@ -2415,6 +2420,14 @@ public class EditorController {
             return json;
         }
         json = customGoodsService.setGoodsWeightByWeigher(pid, newWeight);
+        if (json.isOk()) {
+            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
+            boolean isSuccess = customGoodsService.refreshPriceRelatedData(orGoods);
+            if (!isSuccess) {
+                json.setOk(false);
+                json.setMessage("更新数据失败");
+            }
+        }
         return json;
     }
 

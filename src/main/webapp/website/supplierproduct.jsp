@@ -16,6 +16,7 @@
  				<br /><br />
  				<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>
 	    		<input type="radio" name="flag" value="0">所有的</input>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  goodsPid:<input type="text" id="goodsPid" value="" onkeypress="this.value=this.value.trim();if (event.keyCode == 13) doQuery()"  placeholder="回车搜索。。。。"/>
 	 			<!-- 显示店铺的打分信息 -->
 	 			<br><br><font style="text-align: center; padding-left: 200px">店铺打分信息展示 </font>
 					<table border="1px  #0094ff ; border-collapse: collapse" style="width: 50%;height: 50%">
@@ -69,7 +70,7 @@
 	 			<tr>
 					<td>
 							${supplierproduct.goodsImg }</td>
-					<td>${supplierproduct.quality}
+					<td><input type="text" id="111${status.index }quality" value="${supplierproduct.quality}">
 					</td>
 					<td>
 						<textarea id="111${status.index }remarks" name="remarks" rows="10" cols="15">${supplierproduct.remarks }</textarea>
@@ -118,6 +119,7 @@
 
 		 function updateRemark(index,id){
              var newRemark = $("#"+index+"remarks").val();
+             var newQuality=$("#"+index+"quality").val();
              if(newRemark == null || newRemark == ""){
                  alert("请输入更改的备注内容");
                  return;
@@ -126,7 +128,7 @@
                  type: "POST",
                  dataType:'json',
                  url:'/cbtconsole/supplierscoring/updateRemark',
-                 data:{newRemark:newRemark,id:id},
+                 data:{newRemark:newRemark,id:id,newQuality:newQuality},
                  dataType:"json",
                  success:function(data){
                      if(data.row >0){
@@ -206,8 +208,15 @@
             $('input[type=radio][name=flag]').change(function() {
     		    window.location.href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${param.shop_id}&flag="+$('input[type=radio][name=flag]:checked').val();
             });
-	 		
+
+		 function doQuery(){
+		     var goodsPid=$("#goodsPid").val();
+             window.location.href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${param.shop_id}&goodsPid="+goodsPid+"&flag="+$('input[type=radio][name=flag]:checked').val();
+		 }
+
             var flag='${map.flag}';
+         	var goodsPid='${map.goodsPid}';
+         	$("#goodsPid").val(goodsPid);
             if("true" == flag){
     			$('input[type=radio][name=flag][value=1]').get(0).checked = "checked";
     		} else{

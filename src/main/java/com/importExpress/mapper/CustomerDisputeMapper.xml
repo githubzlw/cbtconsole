@@ -22,20 +22,36 @@
     values (#{disputeID},#{userid},#{orderNo},#{transactionID},#{remark},#{oprateAdm},now(),now()
       )
   </insert>
-   <update id="update" parameterType="com.importExpress.pojo.CustomerDisputeBean">
-    update customer_dispute set user_id=#{userid}, order_no=#{orderNo}, 
-      transaction_id=#{transactionID}, remark=#{remark},update_time=now()
+   <update id="updateStatus">
+    update customer_dispute set status=#{status},update_time=now()
     where dispute_id = #{disputeID}
   </update>
   
-  <select id="count" parameterType="java.lang.String" resultType="java.lang.Integer">
-    select  count(id) from customer_dispute where  dispute_id = #{disputeId}
+  <select id="count"  resultType="java.lang.Integer">
+    select  count(id) from customer_dispute where  1=1 
+    <if test="disputeId != null">
+     and dispute_id = #{disputeId}
+    </if>
+    <if test="status != -1">
+     and status = #{status}
+    
+    </if>
+    
   </select>
  
-  <select id="list"  resultMap="BaseResultMap">
+  <select id="confirmList"  resultMap="BaseResultMap">
     select dispute_id,user_id, order_no, 
-      transaction_id, remark,status,create_time,update_time,oprate_adm from customer_dispute
-  
+      transaction_id, remark,status,create_time,update_time,oprate_adm from customer_dispute 
+       where 1=1
+       <if test="disputeid != null">
+     and dispute_id = #{disputeid}
+    </if>
+    <if test="status != -1">
+     and status = #{status}
+    
+    </if>
+    order by update_time desc
+      limit #{startNum},#{limitNum}
   </select>
  
   

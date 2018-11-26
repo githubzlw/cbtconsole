@@ -83,6 +83,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int weightNotFlag;//重量不合理标注
     private int uglyFlag;//难看标识
     private int repairedFlag;//修复标识
+    private int weightIsEdit;//重量手动更新标识 1产品编辑更新,2入库称重
 
 
     public String getAliGoodsPrice() {
@@ -600,5 +601,13 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setClickNum(int clickNum) {
         this.clickNum = clickNum;
+    }
+
+    public int getWeightIsEdit() {
+        return weightIsEdit;
+    }
+
+    public void setWeightIsEdit(int weightIsEdit) {
+        this.weightIsEdit = weightIsEdit;
     }
 }

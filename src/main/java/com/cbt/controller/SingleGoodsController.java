@@ -554,22 +554,28 @@ public class SingleGoodsController {
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
             //判断是否是外网，如果是，进行路径替换http://117.144.21.74
 
-            System.err.println("ip:" + ipStr);
-            if (StringUtils.isNotBlank(ipStr)) {
-                if (ipStr.contains("27.115.")) {
-                    for (SingleGoodsCheck goodsCheck : res) {
-                        if (StringUtils.isNotBlank(goodsCheck.getEninfoShow1())) {
-                            goodsCheck.setEninfoShow1(goodsCheck.getEninfoShow1().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
-                        }
-                        if (StringUtils.isNotBlank(goodsCheck.getEninfoShow2())) {
-                            goodsCheck.setEninfoShow2(goodsCheck.getEninfoShow2().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
-                        }
-                        if (StringUtils.isNotBlank(goodsCheck.getEninfoShow3())) {
-                            goodsCheck.setEninfoShow3(goodsCheck.getEninfoShow3().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
-                        }
+            Map<String,Integer> rsMap = new HashMap<>();
+            for (SingleGoodsCheck goodsCheck : res) {
+                if (goodsCheck.getShopCheck() > 0) {
+                    rsMap.put(goodsCheck.getShopId(), goodsCheck.getShopCheck());
+                } else {
+                    if (rsMap.containsKey(goodsCheck.getShopId())) {
+                        goodsCheck.setShopCheck(rsMap.get(goodsCheck.getShopId()) + 8);
+                    }
+                }
+                if (StringUtils.isNotBlank(ipStr) && ipStr.contains("27.115.")) {
+                    if (StringUtils.isNotBlank(goodsCheck.getEninfoShow1())) {
+                        goodsCheck.setEninfoShow1(goodsCheck.getEninfoShow1().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
+                    }
+                    if (StringUtils.isNotBlank(goodsCheck.getEninfoShow2())) {
+                        goodsCheck.setEninfoShow2(goodsCheck.getEninfoShow2().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
+                    }
+                    if (StringUtils.isNotBlank(goodsCheck.getEninfoShow3())) {
+                        goodsCheck.setEninfoShow3(goodsCheck.getEninfoShow3().replace(LOCAL_SHOW_URL, REMOTE_SHOW_URL));
                     }
                 }
             }
+
 
             int count = sgGsService.queryCrossBorderGoodsForListCount(queryPm);
             json.setSuccess(true);

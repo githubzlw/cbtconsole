@@ -200,16 +200,26 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	@Override
 	public int confirm(CustomerDisputeBean customer) {
 		
-		if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
-			return customerDisputeMapper.insert(customer);
+		return customerDisputeMapper.insert(customer);
+		/*if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
 		}else {
 			return customerDisputeMapper.update(customer);
-		}
+		}*/
 	}
 	@Override
-	public int getConfim(String disputeID) {
-		Integer count = customerDisputeMapper.count(disputeID) ;
+	public int count(String disputeID,String status) {
+		Integer count = customerDisputeMapper.count(disputeID,status) ;
 		return count == null ? 0 : count;
+	}
+	@Override
+	public List<CustomerDisputeBean> confirmList(String disputeid,String status,int startNum,int limitNum) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.confirmList(disputeid,status,startNum,limitNum);
+	}
+	@Override
+	public int updateStatus(String disputeId, String status) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateStatus(disputeId, status);
 	}
 
 }

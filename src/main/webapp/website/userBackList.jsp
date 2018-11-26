@@ -228,7 +228,7 @@ tr .td_class{width:230px;}
 		<div>
 			<table style="margin:auto;">
 				<tr>
-					<td class="td_class"<div class="w_input">邮箱：<input id="qEmail" type="text"
+					<td class="td_class"><div class="w_input">邮箱：<input id="qEmail" type="text"
 						value="${param.email}" onblur="this.value=this.value.trim();"
 						onkeypress="this.value=this.value.trim();if (event.keyCode == 13) doQuery(1)" /></div></td>
 					<td>

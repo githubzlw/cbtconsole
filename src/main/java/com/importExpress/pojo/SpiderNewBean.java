@@ -106,7 +106,26 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	//产品拿样费
 	private double sampleFee;
 	//产品那样moq
-    private int sampleMoq;
+	private int sampleMoq;
+	//库存标识
+	private int isStockFlag;
+	private int shopCount;
+
+	public int getIsStockFlag() {
+		return isStockFlag;
+	}
+
+	public void setIsStockFlag(int isStockFlag) {
+		this.isStockFlag = isStockFlag;
+	}
+
+	public int getShopCount() {
+		return shopCount;
+	}
+
+	public void setShopCount(int shopCount) {
+		this.shopCount = shopCount;
+	}
 
 	public double getSampleFee() {
 		return sampleFee;
@@ -127,22 +146,22 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	private double gbPrice;//加入购物车时团购价格
 	private int isFreeShipProduct;
 
-    public int getIsFreeShipProduct() {
-        return isFreeShipProduct;
-    }
+	public int getIsFreeShipProduct() {
+		return isFreeShipProduct;
+	}
 
-    public void setIsFreeShipProduct(int isFreeShipProduct) {
-        this.isFreeShipProduct = isFreeShipProduct;
-    }
+	public void setIsFreeShipProduct(int isFreeShipProduct) {
+		this.isFreeShipProduct = isFreeShipProduct;
+	}
 	public String getSkuid_1688() {
-        return skuid_1688;
-    }
+		return skuid_1688;
+	}
 
-    public void setSkuid_1688(String skuid_1688) {
-        this.skuid_1688 = skuid_1688;
-    }
+	public void setSkuid_1688(String skuid_1688) {
+		this.skuid_1688 = skuid_1688;
+	}
 
-    public String getPrice_List() {
+	public String getPrice_List() {
 		return price_List;
 	}
 
@@ -159,20 +178,20 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	}
 
 	public String getPriceListSize() {
-        return priceListSize;
-    }
+		return priceListSize;
+	}
 
-    public void setPriceListSize(String priceListSize) {
-        this.priceListSize = priceListSize;
-    }
+	public void setPriceListSize(String priceListSize) {
+		this.priceListSize = priceListSize;
+	}
 
-    public String getSpider_Price() {
-        return spider_Price;
-    }
+	public String getSpider_Price() {
+		return spider_Price;
+	}
 
-    public void setSpider_Price(String spider_Price) {
-        this.spider_Price = spider_Price;
-    }
+	public void setSpider_Price(String spider_Price) {
+		this.spider_Price = spider_Price;
+	}
 
 	public String getBizPriceDiscount() {
 		return bizPriceDiscount;
@@ -183,22 +202,22 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	}
 
 	public double getFreightByWeight() {
-        return freightByWeight;
-    }
+		return freightByWeight;
+	}
 
-    public void setFreightByWeight(double freightByWeight) {
-        this.freightByWeight = freightByWeight;
-    }
+	public void setFreightByWeight(double freightByWeight) {
+		this.freightByWeight = freightByWeight;
+	}
 
-    public double getFreight_es1() {
-        return freight_es1;
-    }
+	public double getFreight_es1() {
+		return freight_es1;
+	}
 
-    public void setFreight_es1(double freight_es1) {
-        this.freight_es1 = freight_es1;
-    }
+	public void setFreight_es1(double freight_es1) {
+		this.freight_es1 = freight_es1;
+	}
 
-    public String getStartBizFactoryPrice() {
+	public String getStartBizFactoryPrice() {
 		return startBizFactoryPrice;
 	}
 
@@ -382,9 +401,9 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	}
 
 	public SpiderNewBean(int id, int carId, String itemId, String shopId,
-                         int userId, String name, String uuid, String seller, String price,
-                         int number, double freight, String img_url, String remark, String norm_most, String norm_least,
-                         String delivery_time, String true_shipping) {
+						 int userId, String name, String uuid, String seller, String price,
+						 int number, double freight, String img_url, String remark, String norm_most, String norm_least,
+						 String delivery_time, String true_shipping) {
 		super();
 		this.id = id;
 		this.carId = carId;
@@ -412,14 +431,14 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public int getCarId() {
 		return carId;
 	}
-	
+
 	public void setTrue_shipping(String true_shipping) {
 		this.true_shipping = true_shipping;
 	}
 	public String getTrue_shipping() {
 		return true_shipping;
 	}
-	
+
 	public String getNorm_most() {
 		return norm_most;
 	}
@@ -561,7 +580,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 			if(price !=null){
 				price = price.replaceAll(",", "");
 			}else{
-				
+
 			}
 			return Double.parseDouble(price);
 		}
@@ -570,11 +589,11 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setpWprice(String pWprice) {
 		this.pWprice = pWprice;
 	}
-	
+
 	public String getpWprice() {
 		return pWprice;
 	}
-	
+
 	public int getFreight_free() {
 		return freight_free;
 	}
@@ -587,14 +606,14 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setTotal_weight(String total_weight) {
 		this.total_weight = total_weight;
 	}
-	
+
 	public String getWidth() {
 		return width;
 	}
 	public void setWidth(String width) {
 		this.width = width;
 	}
-	
+
 	public String getWeight() {
 		return weight;
 	}
@@ -607,7 +626,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public Date getCreatetime() {
 		return createtime;
 	}
-	
+
 	public void setNorm_least1(String norm_least1) {
 		this.norm_least1 = norm_least1;
 	}
@@ -620,28 +639,28 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public String getGoods_email() {
 		return goods_email;
 	}
-	
+
 	public void setFree_shopping_company(String free_shopping_company) {
 		this.free_shopping_company = free_shopping_company;
 	}
 	public String getFree_shopping_company() {
 		return free_shopping_company;
 	}
-	
+
 	public int getGoodsdata_id() {
 		return goodsdata_id;
 	}
 	public void setGoodsdata_id(int goodsdata_id) {
 		this.goodsdata_id = goodsdata_id;
 	}
-	
+
 	public void setFree_sc_days(String free_sc_days) {
 		this.free_sc_days = free_sc_days;
 	}
 	public String getFree_sc_days() {
 		return free_sc_days;
 	}
-	
+
 	public String getPreferential() {
 		return preferential;
 	}
@@ -669,7 +688,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setDeposit_rate(int deposit_rate) {
 		this.deposit_rate = deposit_rate;
 	}
-	
+
 	public void setGuId(String guId) {
 		this.guId = guId;
 	}
@@ -736,14 +755,14 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public String getGoods_catid() {
 		return goods_catid;
 	}
- 
+
 	public void setMethod_feight(double method_feight) {
 		this.method_feight = method_feight;
 	}
 	public double getMethod_feight() {
 		return method_feight;
 	}
-	
+
 	public int getIsshipping_promote() {
 		return isshipping_promote;
 	}
@@ -786,7 +805,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setPrice3(double price3) {
 		this.price3 = price3;
 	}
-	
+
 	public double getPrice4() {
 		return price4;
 	}
@@ -794,7 +813,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setPrice4(double price4) {
 		this.price4 = price4;
 	}
-	
+
 	public double getTheproductfrieght() {
 		return theproductfrieght;
 	}
@@ -802,7 +821,7 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 	public void setTheproductfrieght(double theproductfrieght) {
 		this.theproductfrieght = theproductfrieght;
 	}
-	
+
 	public double getNotfreeprice() {
 		return notfreeprice;
 	}
@@ -862,11 +881,11 @@ public class SpiderNewBean implements Serializable, Comparable<SpiderNewBean> {
 
 	private int valid; //保存商品状态 这里用于软下架 valid=2
 
-    public int getValid() {
-        return valid;
-    }
+	public int getValid() {
+		return valid;
+	}
 
-    public void setValid(int valid) {
-        this.valid = valid;
-    }
+	public void setValid(int valid) {
+		this.valid = valid;
+	}
 }

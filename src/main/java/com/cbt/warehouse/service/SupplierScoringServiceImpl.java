@@ -91,8 +91,8 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 	}
 
 	@Override
-	public int updateRemark(String id, String reamrk) {
-		return supplierScoringMapper.updateRemark(id,reamrk);
+	public int updateRemark(String id, String reamrk,String newQuality) {
+		return supplierScoringMapper.updateRemark(id,reamrk,newQuality);
 	}
 
 	//查询打过分的信息

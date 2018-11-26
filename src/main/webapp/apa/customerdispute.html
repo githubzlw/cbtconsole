@@ -124,6 +124,8 @@
                 onLoadSuccess: function (data) {
                     if (!data.success) {
                         showMessage(data.message);
+                    }else{
+                    	$("#confirm_count").html(data.message);
                     }
                 }
             });
@@ -171,6 +173,23 @@
 	    					+ row.orderNo + '">'+row.orderNo+'</a>';
 	        	}
     	}
+        /**
+         * 消息提醒弹框
+         * @param message
+         */
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 10000,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }
+            });
+        }
         </script>
 
 </head>
@@ -196,6 +215,8 @@
         </select></span>
         &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
                                               class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      
+      <span>确认退款(<a target="_blank" href="/cbtconsole/apa/disputerefund.html" id="confirm_count">0</a>)</span>
       
     </form>
 </div>

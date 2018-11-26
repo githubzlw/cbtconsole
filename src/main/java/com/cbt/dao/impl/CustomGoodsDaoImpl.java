@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 public class CustomGoodsDaoImpl implements CustomGoodsDao {
@@ -2378,6 +2379,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         }
         upsql += ",is_show_det_img_flag=?,entype=?,sellunit=?";
         upsql += ",ali_pid=?,ali_price=?,matchSource=?";
+        if(bean.getWeightIsEdit() > 0){
+            upsql += ",source_pro_flag = 7 ";
+        }
         upsql += " where pid=?";
         Connection conn = DBHelper.getInstance().getConnection8();
         ResultSet rs = null;
@@ -3763,6 +3767,289 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 		}
 		return result;
 	}
+
+    @Override
+    public int checkSkuGoodsOffers(String pid) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String querySql = "select count(1) from sku_goods_offers where goods_pid = ?";
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            stmt31 = conn31.prepareStatement(querySql);
+            stmt31.setString(1, pid);
+            rs = stmt31.executeQuery();
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",checkSkuGoodsOffers error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",checkSkuGoodsOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
+
+    @Override
+    public int updateSkuGoodsOffers(String pid, double finalWeight) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String updateSql = "update sku_goods_offers set clear_flag=0,crawl_flag=2,set_weight= ? where goods_pid = ?";
+        int count = -1;
+        try {
+            stmt31 = conn31.prepareStatement(updateSql);
+            stmt31.setDouble(1, finalWeight);
+            stmt31.setString(2, pid);
+            count = stmt31.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updateSkuGoodsOffers error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updateSkuGoodsOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
+
+    @Override
+    public int updateSourceProFlag(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7 where pid = ?";
+        int count = -1;
+        try {
+            stmt28 = conn28.prepareStatement(querySql);
+            stmt28.setString(1, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updateSourceProFlag error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
+    @Override
+    public int insertIntoSingleOffersChild(String pid, double finalWeight) {
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        PreparedStatement stmt31 = null;
+        String updateSql = "replace into single_goods_offers_child(good_url,goods_pid,set_weight,change_mark," +
+                "crawl_flag,service_ip) values(?,?,?,1,0,'')";
+        int count = -1;
+        try {
+            stmt31 = conn31.prepareStatement(updateSql);
+            stmt31.setString(1, "https://detail.1688.com/offer/" + pid + ".html");
+            stmt31.setString(2, pid);
+            stmt31.setDouble(3, finalWeight);
+            count = stmt31.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",insertIntoSingleOffersChild error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",insertIntoSingleOffersChild error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return count;
+    }
+
+    @Override
+    public List<CustomBenchmarkSkuNew> querySkuByPid(String pid) {
+        Connection conn27 = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt27 = null;
+        String querySql = "select wprice, sku_attr, sku_prop_ids, act_sku_cal_price, act_sku_multi_currency_cal_price, " +
+                "act_sku_multi_currency_display_price,avail_quantity, inventory, is_activity, " +
+                "sku_cal_price, sku_multi_currency_cal_price, sku_multi_currency_display_price," +
+                "create_time,update_time,flag,spec_id,sku_id,final_weight,is_sold_flag " +
+                "from custom_benchmark_sku where pid = ?";
+        ResultSet rs = null;
+        int count = 0;
+        List<CustomBenchmarkSkuNew> list = new ArrayList<>();
+        try {
+            stmt27 = conn27.prepareStatement(querySql);
+            stmt27.setString(1, pid);
+            rs = stmt27.executeQuery();
+
+            while (rs.next()) {
+                CustomBenchmarkSkuNew benchmarkSkuNew = new CustomBenchmarkSkuNew();
+                benchmarkSkuNew.setWprice(rs.getString("wprice"));
+                benchmarkSkuNew.setSkuAttr(rs.getString("sku_attr"));
+                benchmarkSkuNew.setSkuPropIds(rs.getString("sku_prop_ids"));
+                SkuValPO skuVal = new SkuValPO();
+                skuVal.setActSkuCalPrice(rs.getDouble("act_sku_cal_price"));
+                skuVal.setActSkuMultiCurrencyCalPrice(rs.getDouble("act_sku_multi_currency_cal_price"));
+                skuVal.setActSkuMultiCurrencyDisplayPrice(rs.getDouble("act_sku_multi_currency_display_price"));
+                skuVal.setAvailQuantity(rs.getInt("avail_quantity"));
+                skuVal.setInventory(rs.getInt("inventory"));
+                skuVal.setIsActivity(rs.getBoolean("is_activity"));
+                skuVal.setSkuCalPrice(rs.getDouble("sku_cal_price"));
+                skuVal.setSkuMultiCurrencyCalPrice(rs.getDouble("sku_multi_currency_cal_price"));
+                skuVal.setSkuMultiCurrencyDisplayPrice(rs.getDouble("sku_multi_currency_display_price"));
+                benchmarkSkuNew.setSkuVal(skuVal);
+                benchmarkSkuNew.setCreateTime(rs.getDate("create_time"));
+                benchmarkSkuNew.setUpdateTime(rs.getDate("update_time"));
+                benchmarkSkuNew.setFlag(rs.getInt("flag"));
+                benchmarkSkuNew.setSpecId(rs.getString("spec_id"));
+                benchmarkSkuNew.setFinalWeight(rs.getString("final_weight"));
+                benchmarkSkuNew.setIsSoldFlag(rs.getString("is_sold_flag"));
+                list.add(benchmarkSkuNew);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",querySkuByPid error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",querySkuByPid error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt27);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn27);
+        }
+        return list;
+    }
+
+    @Override
+    public int deleteSkuByPid(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        Connection connAws = DBHelper.getInstance().getConnection2();
+        PreparedStatement stmt28 = null;
+        PreparedStatement stmtAws = null;
+        String deleteSql = "delete from custom_benchmark_sku where pid = ?";
+        int count = 0;
+        try {
+            connAws.setAutoCommit(false);
+            conn28.setAutoCommit(false);
+            stmtAws = connAws.prepareStatement(deleteSql);
+            stmt28 = conn28.prepareStatement(deleteSql);
+
+            stmtAws.setString(1,pid);
+            stmt28.setString(1,pid);
+
+            count = stmtAws.executeUpdate();
+            if(count > 0 ){
+                count = stmt28.executeUpdate();
+                if(count > 0){
+                    connAws.commit();
+                    conn28.commit();
+                }else{
+                    connAws.rollback();
+                    conn28.rollback();
+                }
+            }else{
+                connAws.rollback();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",deleteSkuByPid error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",deleteSkuByPid error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmtAws);
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closeConnection(connAws);
+        }
+        return count;
+    }
+
+    @Override
+    public int insertIntoSkuToOnline(List<CustomBenchmarkSkuNew> insertList) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        Connection connAws = DBHelper.getInstance().getConnection2();
+        PreparedStatement stmt28 = null;
+        PreparedStatement stmtAws = null;
+
+        String insertSql = "insert into custom_benchmark_sku(wprice,pid, sku_attr, sku_prop_ids, act_sku_cal_price, " +
+                "act_sku_multi_currency_cal_price, " +
+                "act_sku_multi_currency_display_price,avail_quantity, inventory, is_activity, " +
+                "sku_cal_price, sku_multi_currency_cal_price, sku_multi_currency_display_price," +
+                "create_time,update_time,flag,spec_id,sku_id,final_weight,is_sold_flag)" +
+                " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        int count = 0;
+        List<CustomBenchmarkSkuNew> list = new ArrayList<>();
+        try {
+            connAws.setAutoCommit(false);
+            conn28.setAutoCommit(false);
+            stmtAws = connAws.prepareStatement(insertSql);
+            stmt28 = conn28.prepareStatement(insertSql);
+
+            for (CustomBenchmarkSkuNew benchmarkSkuNew : insertList) {
+                int upNum = 1;
+                stmt28.setString(upNum++, benchmarkSkuNew.getWprice());
+                stmt28.setString(upNum++, benchmarkSkuNew.getPid());
+                stmt28.setString(upNum++, benchmarkSkuNew.getSkuAttr());
+                stmt28.setString(upNum++, benchmarkSkuNew.getSkuPropIds());
+                SkuValPO skuVal = benchmarkSkuNew.getSkuVal();
+                stmt28.setDouble(upNum++, skuVal.getActSkuCalPrice());
+                stmt28.setDouble(upNum++, skuVal.getActSkuMultiCurrencyCalPrice());
+                stmt28.setDouble(upNum++, skuVal.getActSkuMultiCurrencyDisplayPrice());
+                stmt28.setInt(upNum++, skuVal.getAvailQuantity());
+                stmt28.setInt(upNum++, skuVal.getInventory());
+                stmt28.setBoolean(upNum++, skuVal.getIsActivity());
+                stmt28.setDouble(upNum++, skuVal.getSkuCalPrice());
+                stmt28.setDouble(upNum++, skuVal.getSkuMultiCurrencyCalPrice());
+                stmt28.setDouble(upNum++, skuVal.getSkuMultiCurrencyDisplayPrice());
+                stmt28.setDate(upNum++, (Date) benchmarkSkuNew.getCreateTime());
+                stmt28.setDate(upNum++, (Date) benchmarkSkuNew.getUpdateTime());
+                stmt28.setInt(upNum++, benchmarkSkuNew.getFlag());
+                stmt28.setString(upNum++, benchmarkSkuNew.getSpecId());
+                stmt28.setString(upNum++, benchmarkSkuNew.getSkuId());
+                stmt28.setString(upNum++, benchmarkSkuNew.getFinalWeight());
+                stmt28.setString(upNum++, benchmarkSkuNew.getIsSoldFlag());
+                stmt28.addBatch();
+
+                upNum = 1;
+                stmtAws.setString(upNum++, benchmarkSkuNew.getWprice());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getPid());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getSkuAttr());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getSkuPropIds());
+                stmtAws.setDouble(upNum++, skuVal.getActSkuCalPrice());
+                stmtAws.setDouble(upNum++, skuVal.getActSkuMultiCurrencyCalPrice());
+                stmtAws.setDouble(upNum++, skuVal.getActSkuMultiCurrencyDisplayPrice());
+                stmtAws.setInt(upNum++, skuVal.getAvailQuantity());
+                stmtAws.setInt(upNum++, skuVal.getInventory());
+                stmtAws.setBoolean(upNum++, skuVal.getIsActivity());
+                stmtAws.setDouble(upNum++, skuVal.getSkuCalPrice());
+                stmtAws.setDouble(upNum++, skuVal.getSkuMultiCurrencyCalPrice());
+                stmtAws.setDouble(upNum++, skuVal.getSkuMultiCurrencyDisplayPrice());
+                stmtAws.setDate(upNum++, (Date) benchmarkSkuNew.getCreateTime());
+                stmtAws.setDate(upNum++, (Date) benchmarkSkuNew.getUpdateTime());
+                stmtAws.setInt(upNum++, benchmarkSkuNew.getFlag());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getSpecId());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getSkuId());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getFinalWeight());
+                stmtAws.setString(upNum++, benchmarkSkuNew.getIsSoldFlag());
+                stmtAws.addBatch();
+            }
+            count = stmtAws.executeBatch().length;
+            if (count > 0) {
+                count = stmt28.executeBatch().length;
+                if (count > 0) {
+                    connAws.commit();
+                    conn28.commit();
+                } else {
+                    connAws.rollback();
+                    conn28.rollback();
+                }
+            } else {
+                connAws.rollback();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("insertIntoSkuToOnline error :" + e.getMessage());
+            LOG.error("insertIntoSkuToOnline error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
 
 
 }

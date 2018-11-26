@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.bcel.generic.NEW;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,6 +103,9 @@ public class CustomerDisputeController {
         
         try {
             // 查询所有数据库表中的类别
+        	int count = customerDisputeService.count(null, "0");
+        	
+        	json.setMessage(String.valueOf(count));
         	
         	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, sttime, edtime, status);
         	long total = 0;
@@ -115,10 +119,25 @@ public class CustomerDisputeController {
         } catch (Exception e) {
             e.printStackTrace();
             json.setSuccess(false);
-            json.setMessage("获取团购商品信息失败，原因：" + e.getMessage());
-            LOG.error("获取团购商品信息失败，原因：" + e.getMessage());
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            LOG.error("获取数据失败，原因：" + e.getMessage());
         }
         return json;
+    }
+    /**
+     * 
+     *申诉消息列表
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/update")
+    public String update(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	String disputeid = request.getParameter("disputeid");
+    	customerDisputeService.updateStatus(disputeid, "1");
+    	
+    	return "redirect:/apa/disputerefund.html";
     }
     
     
@@ -131,7 +150,7 @@ public class CustomerDisputeController {
     @RequestMapping("/info")
     @ResponseBody
     public ModelAndView info(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView mv = new ModelAndView("disputeinfo");
+    	 ModelAndView mv = new ModelAndView("disputeinfo");
     	 String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
          if (StringUtil.isBlank(admuserJson)) {
              mv.addObject("success", 0);
@@ -157,7 +176,7 @@ public class CustomerDisputeController {
     	int disputeLifeCycleFlag = 0;
     	mv.addObject("success", 1);
 		try {
-			int confim = customerDisputeService.getConfim(disputeID);
+			int confim = customerDisputeService.count(disputeID,"-1");
 			mv.addObject("confim", confim);
 			String showDisputeDetails = "";//
 			if(StringUtils.isBlank(showDisputeDetails)) {
@@ -218,6 +237,76 @@ public class CustomerDisputeController {
 			mv.addObject("success", 0);
 		}
     	return mv;
+    }
+    /**申诉消息详情
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/confirm/list")
+    @ResponseBody
+    public EasyUiJsonResult confirmList(HttpServletRequest request, HttpServletResponse response) {
+    	EasyUiJsonResult json = new EasyUiJsonResult();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+    	json.setRows(new ArrayList<CustomerDisputeBean>());
+    	if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        int adminId = 0;
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        int op = adm.getId() == 1|| adm.getId() == 8 ? 1 : 2;
+    	
+        int startNum = 0;
+        int limitNum = 50;
+        
+        String pageStr = request.getParameter("page");
+        String limitNumStr = request.getParameter("rows");
+        
+        if (!(limitNumStr == null || "".equals(limitNumStr) || "0".equals(limitNumStr))) {
+        	limitNum = Integer.valueOf(limitNumStr) ;
+        }
+        
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        String disputeid = request.getParameter("disputeid");
+        disputeid = StringUtils.isBlank(disputeid) ? null : disputeid;
+        
+        String sttime = request.getParameter("sttime");
+        if (sttime == null || "".equals(sttime)) {
+            sttime = "";
+        } else {
+            sttime += " 00:00:00";
+        }
+        String edtime = request.getParameter("edtime");
+        if (edtime == null || "".equals(edtime)) {
+            edtime = "";
+        } else {
+            edtime += " 23:59:59";
+        }
+        String status = request.getParameter("status");
+        status = StringUtils.isBlank(status) ? "-1" : status;
+    	try {
+    		List<CustomerDisputeBean> confirmList = customerDisputeService.confirmList(disputeid, status,startNum,limitNum);
+    		confirmList.stream().forEach(c -> {
+    			c.setOprateAdm(String.valueOf(op));
+    		});
+    		
+    		int count = customerDisputeService.count(disputeid, status);
+    		
+    		json.setRows(confirmList);
+    		json.setSuccess(true);
+    		json.setTotal(count);
+    			
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		json.setSuccess(false);
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            LOG.error("获取数据失败，原因：" + e.getMessage());
+    	}
+    	return json;
     }
     /**申诉消息回复
      * @param request
@@ -356,6 +445,7 @@ public class CustomerDisputeController {
     	customer.setRemark(remark);
     	customer.setTransactionID(seller_transaction_id);
     	customer.setUserid(userid);
+    	customer.setStatus("0");
     	int confirm = customerDisputeService.confirm(customer);
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;

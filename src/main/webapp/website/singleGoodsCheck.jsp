@@ -314,10 +314,20 @@
         }
 
 
-        function chooseShopMainImg(shopId, imgUrl, obj) {
-            $(".shop_check_" + shopId).each(function (i, item) {
+        function chooseShopMainImg(shopId, imgUrl, obj, numStr) {
+            $(".shop_check_1_" + shopId).each(function (i, item) {
                 $(this).prop("checked", false);
+                $(this).parent().parent().css("background-color","");
             });
+            $(".shop_check_2_" + shopId).each(function (i, item) {
+                $(this).prop("checked", false);
+                $(this).parent().parent().css("background-color","");
+            });
+            $(".shop_check_3_" + shopId).each(function (i, item) {
+                $(this).prop("checked", false);
+                $(this).parent().parent().css("background-color","");
+            });
+            $(".pid_shop_" + shopId).prop("checked", false);
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/singleGoods/setMainImgByShopId",
@@ -327,7 +337,11 @@
                 },
                 success: function (data) {
                     if (data.ok) {
-                        $(obj).prop("checked", true);
+                        //$(obj).prop("checked", true);
+                        $(".shop_check_"+numStr+"_" + shopId).each(function (i, item) {
+                            $(this).prop("checked", true);
+                        });
+                        $(obj).parent().parent().css("background-color","#27ec27");
                     } else {
                         $.messager.alert("提醒", '执行错误:' + data.message, "info");
                     }
@@ -405,7 +419,7 @@
                                     //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
                                     //setTimeout(function () {window.location.reload();}, 300);
                                     //reloadData();
-                                    hideButton('', shopId, 1, null);
+                                    hideButton('', shopId, 1, null,type);
                                 } else {
                                     $.messager.alert("提醒", '执行错误:' + data.message, "info");
                                 }
@@ -434,7 +448,7 @@
                         //$.messager.alert("提醒", "执行成功，页面即将刷新！", "info");
                         //setTimeout(function () {window.location.reload();}, 300);
                        //reloadData();
-                        hideButton(pid,shopId,0,ojb);
+                        hideButton(pid,shopId,0,ojb,0);
                     } else {
                         $.messager.alert("提醒", '执行错误:' + data.message, "info");
                     }
@@ -452,15 +466,19 @@
         }
 
 
-        function hideButton(pid,shopId,type,ojb) {
-            if(type == 0){
+        function hideButton(pid,shopId,isPid,ojb,isPass) {
+            if(isPid == 0){
                 $(".notice_" + pid).text('已审核,不通过');
                 $(ojb).parent().find(".shop_check").hide();
                 $(ojb).parent().find(".btn_check").hide();
             }else{
                 $(".shop_btn_" + shopId).hide();
                 $(".pid_btn_" + shopId).hide();
-                $(".notice_" + shopId).text('已审核');
+                if(isPass == 0){
+                    $(".notice_" + shopId).text('已审核,已通过');
+                }else{
+                    $(".notice_" + shopId).text('已审核,不通过');
+                }
             }
         }
 
@@ -507,45 +525,69 @@
 
 
         function formatWindowImg1(val, row, index) {
-            var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
+            var content = '<div';
+            if(row.shopCheck == 1){
+                content += ' style="background-color: #27ec27"';
+            }
+            content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 1 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 1 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 1 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_1_' + row.shopId + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,1)" ';
+                }
+                content += ((row.shopCheck == 1 || row.shopCheck == 9) ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
         }
 
         function formatWindowImg2(val, row, index) {
-            var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
+            var content = '<div';
+            if(row.shopCheck == 2){
+                content += ' style="background-color: #27ec27"';
+            }
+            content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 2 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 2 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 2 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_2_' + row.shopId + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,2)" ';
+                }
+                content += ((row.shopCheck == 2 || row.shopCheck == 10) ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
         }
 
         function formatWindowImg3(val, row, index) {
-            var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
+            var content = '<div';
+            if(row.shopCheck == 3){
+                content += ' style="background-color: #27ec27"';
+            }
+            content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 3 ? 'checked="checked"' : '') + '/></span>';
-                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_' + row.shopId
-                    + '" onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this)" '
-                    + (row.shopCheck == 3 ? 'checked="checked"' : '') + '/></span>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += (row.imgCheck == 3 ? 'checked="checked"' : '') + '/></span>';
+                content += '<span class="chk_span">同店铺搜索图<input type="checkbox" class="chk_sty shop_check_3_' + row.shopId + '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,3)" ';
+                }
+                content += ((row.shopCheck == 3 || row.shopCheck == 7) ? 'checked="checked"' : '') + '/></span>';
                 content += '</div>';
             }
             return content;
@@ -561,9 +603,12 @@
             var content = '<div><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
-                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" class="chk_sty pid_check_' + row.pid
-                    + '" onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" '
-                    + (row.imgCheck == 0 ? 'checked="checked"' : '') +'/></span></div>';
+                content += '<br><span class="chk_span">选为搜索图<input type="checkbox" '
+                    +'class="chk_sty pid_check_' + row.pid + ' pid_shop_' + row.shopId +  '"';
+                if (row.isUpdate == 0) {
+                    content += ' onclick="choosePidMainImg(\'' + row.pid + '\',\'' + val + '\',this)" ';
+                }
+                content += ((row.imgCheck == 0 && row.shopCheck == -1) ? 'checked="checked"' : '') + '/></span></div>';
             }
             return content;
         }
