@@ -39,6 +39,7 @@ public class SendMailFactory {
                 mail = new SendMailByMailGun();
                 mail.sendMail(TO, BCC, SUBJECT, BODY);
             } catch (Exception e1) {
+                logger.error(" SendMailByMailGun faild:" + SUBJECT +" TO:"+TO);
                 logger.error("SendMailByMailGun", e);
             }
         }

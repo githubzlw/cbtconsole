@@ -194,6 +194,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                 String saleId = paymentInfo.get("saleId").toString();
                 //获取付款金额
                 String total = paymentInfo.get("payAmount").toString();
+
                 if ("paypal".equals(payType)) {
                     //如果退款金额小于付款金额
                     if (Double.parseDouble(amountMoney) <= Double.parseDouble(total)) {
@@ -281,7 +282,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
-            json.setMessage("获取订单信息异常：" + e.getMessage());
+            json.setMessage("API退款失败，原因：" + e.getMessage());
         }
         return json;
     }
