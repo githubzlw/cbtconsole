@@ -1364,7 +1364,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 					String imgs[]=car_img.split("kf");
 					String one=imgs[0];
 					String two=imgs[1].replace(".jpg_50x50.jpg","");
-					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress="+two+"";
+					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
 				}else if("1".equals(inventory.getOnline_flag())){
 					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
 				}
@@ -1384,6 +1384,10 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 				}else{
 					inventory.setRemaining("<span>"+inventory.getRemaining()+"</span>");
 				}
+			}
+			String goodscatid=inventory.getGoodscatid();
+			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
+				inventory.setGoodscatid("其他");
 			}
 		}
 		return toryList;
@@ -1626,6 +1630,10 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.getSourceValidationCount(buyer,account,page,startdate,enddate);
 	}
+	@Override
+	public List<Inventory> getAllInventory() {
+		return taoBaoOrderMapper.getAllInventory();
+	}
 
 	@Override
 	public List<String> getNewBarcode() {
@@ -1636,9 +1644,9 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	 * 根据ID删除库存数据
 	 */
 	@Override
-	public int deleteInventory(int id) {
+	public int deleteInventory(int id,String dRemark) {
 
-		return taoBaoOrderMapper.deleteInventory(id);
+		return taoBaoOrderMapper.deleteInventory(id,dRemark);
 	}
 
 	@Override

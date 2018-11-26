@@ -1530,6 +1530,11 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			odb.setAlipid(aliLink);
 			odb.setOrderid(orderNo);
+			String pidInventory=odb.getPidInventory();
+			if(StringUtil.isBlank(pidInventory) || Integer.valueOf(pidInventory)<=0){
+				pidInventory="0";
+			}
+			odb.setPidInventory(pidInventory);
 			//产品总重量
 			String final_weight= odb.getFinal_weight();
 			if(StringUtil.isBlank(final_weight)){

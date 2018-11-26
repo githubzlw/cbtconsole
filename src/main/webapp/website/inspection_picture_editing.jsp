@@ -472,8 +472,8 @@ tr .td_class{width:230px;}
 		<option value="999">全部</option>
 	</select>
 		<select class="easyui-combobox" name="admuserid" id="admuserid" style="width:15%;" data-options="label:'电商采购人:',panelHeight:'auto',valueField: 'id',
-		textField: 'admName', value:'<%=adm.getId()%>',selected:true,
-		url: '/cbtconsole/warehouse/getAllBuyer',
+		textField: 'admName', value:'1',selected:true,
+		url: '/cbtconsole/warehouse/getAllBuyerInsp',
 		method:'get'">
 		</select>
 		<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)"> 

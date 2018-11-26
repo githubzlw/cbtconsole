@@ -83,6 +83,25 @@ public class Inventory {
 	private String online_flag;
 	private String db_flag;
 	private String editLink;
+	private String name;
+
+	public String getDelRemark() {
+		return delRemark;
+	}
+
+	public void setDelRemark(String delRemark) {
+		this.delRemark = delRemark;
+	}
+
+	private String delRemark;
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getEditLink() {
 		return editLink;
 	}

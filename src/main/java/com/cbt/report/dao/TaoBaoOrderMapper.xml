@@ -315,7 +315,7 @@
       where 1=1
     and if(i.flag=1,i.new_remaining,i.remaining)>0
      <if test="goodinfo!=null">
-       and LOCATE(#{goodinfo},i.good_name)
+         and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
      </if>
      <if test="sku!=null">
         and LOCATE(#{sku},i.sku)
@@ -368,9 +368,13 @@
          </otherwise>
        </choose>
      </if>
-     <if test="goodscatid!=null">
-        and i.goodscatid=#{goodscatid}
-     </if>
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
+      </if>
+
      <if test="startdate!=null">
         and i.updatetime>=#{startdate}
      </if>
@@ -389,7 +393,7 @@
       where 1=1
       and if(i.flag=1,i.new_remaining,i.remaining)>0
       <if test="goodinfo!=null">
-          and LOCATE(#{goodinfo},i.good_name)
+          and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
       </if>
       <if test="sku!=null">
           and LOCATE(#{sku},i.sku)
@@ -442,8 +446,11 @@
               </otherwise>
           </choose>
       </if>
-      <if test="goodscatid!=null">
-          and i.goodscatid=#{goodscatid}
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
       </if>
       <if test="startdate!=null">
           and i.updatetime>=#{startdate}
@@ -1529,13 +1536,16 @@
 	) b
   </select>
   <delete id="deleteInventory">
-    INSERT INTO inventory_delete_details SELECT * FROM inventory WHERE id= ${id};
+    INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
     delete from inventory where id=${id};
   </delete>
   <select id="queryInById" resultType="com.cbt.pojo.Inventory">
     select * from inventory where id=#{id}
   </select>
-  <update id="updateIsStockFlag">
+    <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
+        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
+    </select>
+    <update id="updateIsStockFlag">
     update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
   </update>
     <update id="updateIsStockFlag1">

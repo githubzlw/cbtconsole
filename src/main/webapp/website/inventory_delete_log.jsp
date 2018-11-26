@@ -228,6 +228,7 @@ function doReset(){
 				<th data-options="field:'updatetime',width:60,align:'center'">最后更新库存时间</th>
 				<th data-options="field:'admName',width:60,align:'center'">删除人</th>
 				<th data-options="field:'create_time',width:50,align:'center'">删除时间</th>
+				<th data-options="field:'delRemark',width:50,align:'center'">删除备注</th>
 			</tr>
 		</thead>
 	</table>
