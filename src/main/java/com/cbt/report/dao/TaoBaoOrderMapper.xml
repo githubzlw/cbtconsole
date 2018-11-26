@@ -76,6 +76,9 @@
     <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
     <result column="onLine" property="onLine" jdbcType="VARCHAR" />
      <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+       <result column="pid" property="pid" jdbcType="VARCHAR" />
+       <result column="online_flag" property="online_flag" jdbcType="VARCHAR" />
+       <result column="db_flag" property="db_flag" jdbcType="VARCHAR"/>
    </resultMap>
  
   <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
