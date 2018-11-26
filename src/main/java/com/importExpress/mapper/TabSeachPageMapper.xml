@@ -12,6 +12,11 @@
     	<result column="sate" property="sate" />
     	<result column="catid" property="catId" />
     	<result column="pid" property="parentId" />
+    	<result column="page_title" property="pageTitle" />
+    	<result column="page_keywords" property="pageKeywords" />
+    	<result column="page_description" property="pageDescription" />
+    	<result column="page_banner_name" property="pageBannerName" />
+    	<result column="page_banner_url" property="pageBannerUrl" />
 	</resultMap>
 	
 	<resultMap type="com.importExpress.pojo.TabSeachPagesDetailBean" id="detailBaseResultMap">
@@ -31,12 +36,15 @@
 	</resultMap>
 	
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.importExpress.pojo.TabSeachPageBean">
-		insert into tab_seach_pages(keyword,keyword1,banner,filename,createtime,sate,catid,pid)
-		values (#{keyword},#{keyword1},#{banner},#{filename},now(),0,#{catId},#{parentId})
+		insert into tab_seach_pages(keyword,keyword1,banner,filename,createtime,sate,catid,pid,
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url)
+		values (#{keyword},#{keyword1},#{banner},#{filename},now(),0,#{catId},#{parentId},
+		  #{pageTitle},#{pageKeywords},#{pageDescription},#{pageBannerName},#{pageBannerUrl})
 	</insert>
 	
 	<select id="list" resultMap="BaseResultMap">
-		select id,keyword,keyword1,banner,filename,createtime,sate,pid,isshow  
+		select id,keyword,keyword1,banner,filename,createtime,sate,pid,isshow,
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url
 		from tab_seach_pages where sate=0 and pid=#{id} order by createtime asc
 	</select>
 	
@@ -47,12 +55,22 @@
 		update tab_seach_pages set pid = -1 where pid=#{id}
 	</update>
 	<select id="get" resultMap="BaseResultMap">
-		select pid,id,keyword,keyword1,banner,filename,createtime,isshow,sate from tab_seach_pages
+		select pid,id,keyword,keyword1,banner,filename,createtime,isshow,sate,
+		  page_title, page_keywords, page_description, page_banner_name, page_banner_url
+		from tab_seach_pages
 		where id=#{id} limit 1
 	</select>
 	
 	<update id="update" parameterType="com.importExpress.pojo.TabSeachPageBean">
-		update tab_seach_pages set keyword=#{keyword},keyword1=#{keyword1},banner=#{banner},pid=#{parentId} where id=#{id}
+		update tab_seach_pages set keyword=#{keyword},keyword1=#{keyword1},banner=#{banner},pid=#{parentId},
+		  page_title=#{pageTitle},page_keywords=#{pageKeywords},page_description=#{pageDescription}
+		  <if test="pageBannerName != null">
+              , page_banner_name=#{pageBannerName}, page_banner_url=#{pageBannerUrl}
+          </if>
+          <if test='pageBannerName == "del"'>
+              , page_banner_name=NULL, page_banner_url=NULL
+          </if>
+		where id=#{id}
 	</update>
 	
 	<select id="aliCategory" resultType="hashmap">
@@ -141,7 +159,7 @@
 	
 	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
 	<select id="queryStaticizeAll" resultMap="BaseResultMap">
-		select id,keyword from tab_seach_pages where isshow = 1
+		select id,keyword from tab_seach_pages where isshow = 1 AND pid != 0
 	</select>
 	
 

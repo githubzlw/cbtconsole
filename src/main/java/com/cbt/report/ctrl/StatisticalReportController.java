@@ -3797,13 +3797,13 @@ public class StatisticalReportController {
 		// 用户问题类型
 		int qtype = StrUtils.isNotNullEmpty(type) == true ? Integer.parseInt(type) : 0;
 		// 获取登录用户
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		int adminid = adm.getId();
+//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+//		int adminid = adm.getId();
 		// 临时增加Sales1账号查看所有客户留言权限
-		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
-			adminid = 1;
-		}
+//		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
+//			adminid = 1;
+//		}
 		try {
 			if (date != null && !"".equals(date)) {
 				parse = date;
@@ -3817,7 +3817,7 @@ public class StatisticalReportController {
 			state = Integer.parseInt(s);
 		}
 		String strAdminId = request.getParameter("adminId");
-		adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
+		int adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
 		String su = request.getParameter("userId");
 		int userId = 0;
 		if (su != null && !"".equals(su)) {
