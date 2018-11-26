@@ -22,8 +22,8 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
-import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if (weightAndSyn.getSyn() == 1){
             return 4;
         }
-        customGoodsService.setGoodsWeightByWeigher(pid, weightAndSyn.getWeight()); //蒋先伟同步重量到产品库接口
+        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         dao.updateGoodsWeightFlag(pid);
         return 1;
     }
@@ -474,7 +474,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
+                            + "' height='50px' alt='' src='" + SearchFileUtils.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -486,7 +486,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
+                        + SearchFileUtils.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }
@@ -532,7 +532,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + bean.getLocalImgPath().split("&")[j] + "\",\""
                             + bean.getOrder_no() + "\");' id='"
                             + bean.getLocalImgPath().split("&")[j]
-                            + "' height='50px' alt='' src='" + TabSeachPageController.IMAGEHOSTURL
+                            + "' height='50px' alt='' src='" + SearchFileUtils.IMAGEHOSTURL
                             + bean.getLocalImgPath().split("&")[j] + "'/>";
                 }
             } else if (bean.getLocalImgPath() != null
@@ -544,7 +544,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + "\");' id='"
                         + bean.getLocalImgPath()
                         + "' src='"
-                        + TabSeachPageController.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
+                        + SearchFileUtils.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
         }
