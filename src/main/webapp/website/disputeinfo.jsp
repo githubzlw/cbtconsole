@@ -567,6 +567,8 @@ class=" edit">
 </div>
 <div style="margin-left: 60px;"  class="panel confirmrfund_form message_form hide">
 <form action="/cbtconsole/customer/dispute/confirm" method="post">
+Note:内部使用,意在销售客服通知Ling,该申诉需要退款
+<br>
 <span>Case&nbsp;ID:&nbsp;&nbsp;&nbsp;<input type="text" name="disputeid" value="${result.dispute_id }" readonly="readonly"></span>
 <span style="margin-left: 20px;">User ID:&nbsp;&nbsp;&nbsp;<input type="text" name="userid" value="${userid}" readonly="readonly"></span>
 <span style="margin-left: 20px;">Transaction ID:<input type="text" name=seller_transaction_id value="${result.disputed_transactions[0].seller_transaction_id }" readonly="readonly"></span>

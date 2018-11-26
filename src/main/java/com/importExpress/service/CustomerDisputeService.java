@@ -18,7 +18,8 @@ public interface CustomerDisputeService {
 	 * @param status
 	 * @return
 	 */
-	Map<String,Object> list(String disputeID,int startNum,int limitNum,String startTime,String endTime,String status);
+	Map<String,Object> list(String disputeID,int startNum,int limitNum,
+			String startTime,String endTime,String status,int admID);
 	
 	
 	

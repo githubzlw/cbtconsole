@@ -65,8 +65,15 @@ public class CustomerDisputeController {
     @RequestMapping(value = "/list")
     @ResponseBody
     public EasyUiJsonResult list(HttpServletRequest request, HttpServletResponse response) {
-
-        EasyUiJsonResult json = new EasyUiJsonResult();
+    	EasyUiJsonResult json = new EasyUiJsonResult();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+//        int adminId = 0;
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
         int startNum = 0;
         int limitNum = 50;
         
@@ -107,7 +114,8 @@ public class CustomerDisputeController {
         	
         	json.setMessage(String.valueOf(count));
         	
-        	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, sttime, edtime, status);
+        	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, 
+        			sttime, edtime, status,adm.getId());
         	long total = 0;
         	if(map != null && !map.isEmpty() ) {
         		total = (Long)map.get("total");
