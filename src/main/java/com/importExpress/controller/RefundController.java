@@ -394,7 +394,7 @@ public class RefundController {
                     if (actionFlag == 2 && refundAmount <= 50) {
                         //主管同意状态,并且金额小于等于50美元,自动设置到财务确认状态
                         detailsBean.setRefundState(3);
-                        detailsBean.setRemark("当前操作人：Ling,且退款金额小于等于50美金,系统自动确认为财务确认状态");
+                        detailsBean.setRemark("退款金额小于等于50美金,系统自动确认为财务确认状态");
                         refundNewService.setAndRemark(detailsBean);
                         //使用MQ更新线上状态
                         updateOnlineRefundState(detailsBean);
@@ -407,7 +407,7 @@ public class RefundController {
                         if (actionFlag == 2) {
                             //主管同意状态
                             detailsBean.setRefundState(3);
-                            detailsBean.setRemark("当前操作人：Emma,系统自动确认为财务确认状态");
+                            detailsBean.setRemark("系统自动确认为财务确认状态");
                             refundNewService.setAndRemark(detailsBean);
                             //使用MQ更新线上状态
                             updateOnlineRefundState(detailsBean);
@@ -446,10 +446,10 @@ public class RefundController {
                             "refundId_" + detailsBean.getRefundId(), detailsBean.getOrderNo()));
                 }
             } else {
-                logger.error("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :退款失败");
-                System.err.println("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :退款失败");
+                logger.error("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :" + json.getMessage());
+                System.err.println("userId:" + detailsBean.getUserId() + ",rdId:" + detailsBean.getRefundId() + ",refundByPayPalApi error :" + json.getMessage());
                 json.setOk(false);
-                json.setMessage("退款失败,原因:[" + json.getMessage() + "],状态已经更新到财务确认,请EMMA继续操作或者联系IT人员查看");
+                json.setMessage("退款失败,原因:[" + json.getMessage() + "],状态已经更新到“财务确认”,请EMMA继续操作或者联系IT人员查看");
             }
         } catch (Exception e) {
             e.printStackTrace();
