@@ -250,7 +250,8 @@
                               </li>
                             </ul>
                             <div class="order_usd">
-                              <strong>Product Value: <em th:text="${currency}">USD</em> <em th:text="${orderbean.product_cost}">5.58</em> </strong>
+                              <strong th:if="${orderbean.product_cost} !=null">Product Value: <em th:text="${currency}">USD</em>
+                                <em th:text="${orderbean.product_cost}">5.58</em> </strong>
                               <p>
                                 Estimated Ship Time: <em th:text="${time_}">2018-10-18</em>
                               </p>
