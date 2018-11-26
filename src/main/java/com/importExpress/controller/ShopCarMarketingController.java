@@ -28,6 +28,7 @@ import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.commons.logging.Log;import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -888,6 +891,179 @@ public class ShopCarMarketingController {
         }
         esFreight += (freight1 + freight2);
         return esFreight / GoodsPriceUpdateUtil.EXCHANGE_RATE;
+    }
+
+
+
+
+    @RequestMapping("/queryTrackingList")
+    @ResponseBody
+    public EasyUiJsonResult queryTrackingList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        ShopTrackingBean param = new ShopTrackingBean();
+        String adminUserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(adminUserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (StringUtils.isNotBlank(pageStr)) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            param.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String orderNo = request.getParameter("orderNo");
+        if (StringUtils.isNotBlank(orderNo)) {
+            param.setOrderNo(orderNo);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            param.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String orderPayBeginTime = request.getParameter("orderPayBeginTime");
+        if (StringUtils.isNotBlank(orderPayBeginTime)) {
+            param.setOrderPayTime(orderPayBeginTime);
+        }
+
+        String orderPayEndTime = request.getParameter("orderPayEndTime");
+        if (StringUtils.isNotBlank(orderPayEndTime)) {
+            param.setOrderPayEndTime(orderPayEndTime);
+        }
+
+        try {
+
+            param.setStartNum(startNum);
+            param.setLimitNum(limitNum);
+            List<ShopTrackingBean> res = shopCarMarketingService.queryTrackingList(param);
+            int count = shopCarMarketingService.queryTrackingListCount(param);
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+
+    @RequestMapping("/exportTrackingExcel")
+	@ResponseBody
+	public void exportTrackingExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        ShopTrackingBean param = new ShopTrackingBean();
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            param.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String orderNo = request.getParameter("orderNo");
+        if (StringUtils.isNotBlank(orderNo)) {
+            param.setOrderNo(orderNo);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            param.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String orderPayBeginTime = request.getParameter("orderPayBeginTime");
+        if (StringUtils.isNotBlank(orderPayBeginTime)) {
+            param.setOrderPayTime(orderPayBeginTime);
+        }
+
+        String orderPayEndTime = request.getParameter("orderPayEndTime");
+        if (StringUtils.isNotBlank(orderPayEndTime)) {
+            param.setOrderPayEndTime(orderPayEndTime);
+        }
+        OutputStream ouputStream = null;
+        try {
+            List<ShopTrackingBean> res = shopCarMarketingService.queryTrackingList(param);
+
+            HSSFWorkbook wb = genTrackingExcel(res, "购物车营销追踪详情");
+            response.setContentType("application/vnd.ms-excel");
+            String headerTitle = "attachment;filename=" + (StringUtils.isNotBlank(adminIdStr) ? res.get(0).getAdminName() : "")
+                    + "-shopCartMarketingTracking.xls";
+            response.setHeader("Content-disposition", headerTitle);
+            response.setCharacterEncoding("utf-8");
+            ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ouputStream != null) {
+                    ouputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+	private HSSFWorkbook genTrackingExcel(List<ShopTrackingBean> res, String title) {
+
+        // 第一步，创建一个webbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+        HSSFSheet sheet = wb.createSheet(title);
+        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+        HSSFRow row = sheet.createRow((int) 0);
+        // 第四步，创建单元格，并设置值表头 设置表头居中
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("用户ID");
+        cell.setCellStyle(style);
+        cell = row.createCell(1);
+        cell.setCellValue("订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("下单时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("下单金额(USD)");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("销售");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("跟进时间");
+        cell.setCellStyle(style);
+
+        for (int i = 0; i < res.size(); i++) {
+            row = sheet.createRow((int) i + 1);
+            // 第四步，创建单元格，并设置值
+            row.createCell(0).setCellValue(res.get(i).getUserId());
+            row.createCell(1).setCellValue(res.get(i).getOrderNo());
+            row.createCell(2).setCellValue(res.get(i).getOrderPayTime());
+            row.createCell(3).setCellValue(res.get(i).getOrderPayAmount());
+            row.createCell(4).setCellValue(res.get(i).getAdminName());
+            row.createCell(5).setCellValue(res.get(i).getFollowTime());
+        }
+        return wb;
     }
 
 

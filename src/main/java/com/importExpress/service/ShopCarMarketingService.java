@@ -1,9 +1,6 @@
 package com.importExpress.service;
 
-import com.importExpress.pojo.ShopCarInfo;
-import com.importExpress.pojo.ShopCarMarketing;
-import com.importExpress.pojo.ShopCarMarketingExample;
-import com.importExpress.pojo.ShopCarUserStatistic;
+import com.importExpress.pojo.*;
 
 import java.util.List;
 
@@ -70,5 +67,9 @@ public interface ShopCarMarketingService {
      */
     int queryForListCount(ShopCarUserStatistic statistic);
 
+
+    List<ShopTrackingBean> queryTrackingList(ShopTrackingBean param);
+
+    int queryTrackingListCount(ShopTrackingBean param);
 
 }

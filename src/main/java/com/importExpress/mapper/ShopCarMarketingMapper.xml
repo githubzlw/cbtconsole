@@ -123,6 +123,17 @@
     </resultMap>
 
 
+    <resultMap id="shopTrackingResultMap" type="com.importExpress.pojo.ShopTrackingBean">
+        <result column ="user_id" property="userId"/>
+        <result column ="follow_time" property="followTime"/>
+        <result column ="order_no" property="orderNo"/>
+        <result column ="order_pay_time" property="orderPayTime"/>
+        <result column ="payment_amount" property="orderPayAmount"/>
+        <result column ="admin_id" property="adminId"/>
+        <result column ="admName" property="adminName"/>
+    </resultMap>
+
+
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -1655,6 +1666,7 @@
         <if test="isFollow == 1">
             and follow_time is not null
         </if>
+        order by gcf.updateTime desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
@@ -1696,4 +1708,59 @@
             and follow_time is not null
         </if>
     </select>
+
+    <select id="queryTrackingList" parameterType="com.importExpress.pojo.ShopTrackingBean" resultMap="shopTrackingResultMap">
+        select * from (select a.user_id,a.create_time as follow_time,a.admin_id,c.admName,b.orderid as order_no,
+        b.payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
+        from shop_car_follow a  LEFT JOIN  payment b on a.user_id = b.userid and a.create_time &lt;=b.createtime
+        and b.createtime &lt;= DATE_ADD(a.create_time,INTERVAL 2 DAY)
+	    LEFT JOIN admuser c on a.admin_id = c.id
+        where  1=1 and  b.paystatus = 1 and b.paytype in(0,1,2,5) GROUP BY b.orderid) rs
+        where 1=1
+        <if test="userId > 0">
+            and rs.user_id = #{userId}
+        </if>
+        <if test="adminId > 0">
+            and rs.admin_id = #{adminId}
+        </if>
+        <if test="orderNo != null">
+            and rs.orderid = #{orderNo}
+        </if>
+        <if test="orderPayTime != null">
+            and DATE(rs.order_pay_time) &gt;= DATE(#{orderPayTime})
+        </if>
+        <if test="orderPayEndTime != null">
+            and DATE(rs.order_pay_time) &lt;= DATE(#{orderPayEndTime})
+        </if>
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryTrackingListCount" parameterType="com.importExpress.pojo.ShopTrackingBean" resultType="java.lang.Integer">
+        select count(1) from (select a.user_id,a.create_time as follow_time,a.admin_id,c.admName,b.orderid as order_no,
+        b.payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
+        from shop_car_follow a  LEFT JOIN  payment b on a.user_id = b.userid and a.create_time &lt;=b.createtime
+        and b.createtime &lt;= DATE_ADD(a.create_time,INTERVAL 2 DAY)
+	    LEFT JOIN admuser c on a.admin_id = c.id
+        where  1=1 and  b.paystatus = 1 and b.paytype in(0,1,2,5) GROUP BY b.orderid) rs
+        where 1=1
+        <if test="userId > 0">
+            and rs.user_id = #{userId}
+        </if>
+        <if test="adminId > 0">
+            and rs.admin_id = #{adminId}
+        </if>
+        <if test="orderNo != null">
+            and rs.orderid = #{orderNo}
+        </if>
+        <if test="orderPayTime != null">
+            and DATE(rs.order_pay_time) &gt;= DATE(#{orderPayTime})
+        </if>
+        <if test="orderPayEndTime != null">
+            and DATE(rs.order_pay_time) &lt;= DATE(#{orderPayEndTime})
+        </if>
+    </select>
+
 </mapper>

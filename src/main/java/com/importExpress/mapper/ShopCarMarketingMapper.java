@@ -1,9 +1,6 @@
 package com.importExpress.mapper;
 
-import com.importExpress.pojo.ShopCarInfo;
-import com.importExpress.pojo.ShopCarMarketing;
-import com.importExpress.pojo.ShopCarMarketingExample;
-import com.importExpress.pojo.ShopCarUserStatistic;
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -79,4 +76,9 @@ public interface ShopCarMarketingMapper {
      * @return
      */
     int queryForListCount(ShopCarUserStatistic statistic);
+
+
+    List<ShopTrackingBean> queryTrackingList(ShopTrackingBean param);
+
+    int queryTrackingListCount(ShopTrackingBean param);
 }
