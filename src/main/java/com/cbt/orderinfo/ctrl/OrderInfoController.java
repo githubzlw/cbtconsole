@@ -605,7 +605,8 @@ public class OrderInfoController{
 		}
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String strm=user.getRoletype(); int admuserid=user.getId();
-		if("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("Sales2")){
+		if(("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie")
+				|| user.getAdmName().equalsIgnoreCase("Sales2")) && !user.getAdmName().equalsIgnoreCase("testadm")){
 			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 		}
 		Date startdate =null;
