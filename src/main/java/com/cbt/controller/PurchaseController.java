@@ -638,7 +638,7 @@ public class PurchaseController {
 			admid = StringUtils.isStrNull(admid) ? "" : admid;
 			userid = StringUtils.isStrNull(userid) ? "" : userid;
 			orderno = StringUtils.isStrNull(orderno) ? "" : orderno;
-			goodid = StringUtils.isStrNull(goodid) ? "" : goodid;
+			goodid = StringUtils.isStrNull(goodid) ? "" : goodid.trim();
 			goodname = StringUtils.isStrNull(goodname) ? "" : goodname;
 			date = StringUtils.isStrNull(date) ? "" : date;
 			days = StringUtils.isStrNull(days) ? "" : days;

@@ -3289,7 +3289,7 @@
 		<if test="goods_id != null">
 			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1 and admuserid !=15 and and admuserid !=83">
+		<if test="admuserid != 1 and admuserid !=15 and  admuserid !=83">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="times != null and times == 1">
@@ -3370,7 +3370,7 @@
 		<if test="goods_id != null">
 			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1 admuserid != 83">
+		<if test="admuserid != 1 and admuserid != 83 and admuserid != 15">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="goods_pid != null">

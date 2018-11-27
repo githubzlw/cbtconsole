@@ -1174,6 +1174,9 @@ public class OrderinfoService implements IOrderinfoService {
 		}else {
 			sumGoodsCarWeight =  DoubleUtil.mul(weight,1000d);
 		}
+		if(countryid==37 && "epacket".equals(shippingMethod.toLowerCase())){
+			shippingMethod="China Post Packet(no tracking,unstable)";
+		}
 		double normalBaseWeight = 0d;
 		BigDecimal normalBasePrice = new BigDecimal(0);
 		BigDecimal normalRatioPrice = new BigDecimal(0);
