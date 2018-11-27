@@ -23,8 +23,6 @@
 <script type="text/javascript"
 	src="/cbtconsole/js/website/order_detail_new.js"></script>
 <script type="text/javascript"
-	src="/cbtconsole/js/lhgdialog/lhgcore.lhgdialog.min.js"></script>
-<script type="text/javascript"
 	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
