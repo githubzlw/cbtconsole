@@ -10,10 +10,9 @@
 <body onload="init();">
 <div style="margin-left: 700px; margin-top: 240px;">
 
-    <div class="easyui-panel" title="电商后台管理系统登录"
-         style="width: 500px; font-size: 28px; background: rgb(140, 228, 111);">
-        <!-- <h3 align="center">电商后台管理系统登录</h3> -->
-        <br>
+
+    <div style="width: 500px; font-size: 28px; background: rgb(140, 228, 111);">
+        <h3 style="text-align: center">电商后台管理系统登录</h3>
         <div style="padding: 10px 60px 20px 60px;">
             <table>
                 <tr>
@@ -31,7 +30,7 @@
                 <tr>
                     <td></td>
                     <td><br>
-                        <input style="width: 166px;height: 40px;font-size: 26px;background-color: #ffeb00;"
+                        <input style="width: 166px;height: 40px;font-size: 26px;background-color: #e0d7ef;"
                                type="button" onclick="submitForm()"
                                value="登录"/>
                         <div class="login_info" style="color: red;"></div>
