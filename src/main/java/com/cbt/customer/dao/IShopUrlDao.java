@@ -427,4 +427,11 @@ public interface IShopUrlDao {
      */
     Map<String,Integer> queryCompetitiveFlag(List<String> pids);
 
+    /**
+     * 根据PID删除店铺商品
+     * @param pid
+     * @return
+     */
+    boolean deleteGoodsByPid(String pid);
+
 }
