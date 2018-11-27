@@ -2698,7 +2698,7 @@ public class ShopUrlController {
                             System.out.println("设置搜索图成功!!!");
                         } else {
                             System.err.println("pid:" + cgp.getPid() + "，设置搜索图失败");
-                            json.setOk(true);
+                            json.setOk(false);
                             json.setMessage("设置搜索图失败,请重试");
                             return json;
                         }
