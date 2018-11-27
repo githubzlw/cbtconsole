@@ -1293,7 +1293,7 @@ em {
 <!-- 										<input type="button" -->
 <%-- 								onclick="showHistoryPrice('${orderd.goods_url}')" value="查看历史价格"></input> --%>
 								<br>
-									<c:if test="${orderd.bm_flag == 1}">
+									<c:if test="${orderd.bm_flag == 1 and orderd.isBenchmark == 1}">
 										    <span style="color: red">ali产品价格：</span>
 											<span>$${orderd.ali_price}</span>
 											<span><br /><a target="_blank" href="${orderd.alipid }">ali产品链接</a></span>
