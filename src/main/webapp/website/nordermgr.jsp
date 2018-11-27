@@ -530,8 +530,8 @@ $(document).ready(function(){
 <!-- 								</span> <input type="hidden" id="type" value="systemfailure"> -->
 <!-- 								<input type="hidden" id="style"  value="systemfailure"></td> -->
 
-								<td><span class="bt btn-success">未处理数量</span><br /> <span
-									class="bt btn-primary">未布置数量</span><br /> <span
+								<td><span class="bt btn-success">未处理数量(待办)</span><br /> <span
+									class="bt btn-primary">未布置数量(处理中)</span><br /> <span
 									class="bt btn-warning">所有数量</span></td>
 								<td><input type="button" value="刷新" onclick="reFreshoDate()"></td>
 							</tr>

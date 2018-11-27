@@ -499,7 +499,7 @@ var communicatechange = function(orderNo, goodid, isDropship) {
 							+ "&isDropship="
 							+ isDropship + "&changeType=5",
 					"windows",
-					"height=200,width=400,top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
+                    "height=300px,width=500px,top=100px,left=100px,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
 };
 
 // 打开订单备注内容
