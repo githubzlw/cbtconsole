@@ -231,19 +231,10 @@
                               </div>
                               <img>
                               <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses" th:text="${detail[4]}" th:title="${detail[4]}" >Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                              <div class="order_size" th:if="${ detail[6]}!=null">
-                                <span>Red</span>
-                                <span>L</span>
-                                <p>
-                                  <i th:if="${#strings.arraySplit(detail[6],'@')[0]} != null">
-                                    <span th:text="${#strings.arraySplit(detail[6],'@')[0]}">Color:Red</span>
-                                  </i>
-                                  <i th:if="${#strings.arraySplit(detail[6],',')[1]} != null">
-                                    <font th:if="${#strings.arraySplit(#strings.arraySplit(detail[6],',')[1],'@')[0]} != null">
-                                      <span th:text="${#strings.arraySplit(#strings.arraySplit(detail[6],',')[1],'@')[0]}">Size:S</span>
-                                    </font>
-                                  </i>
-                                </p>
+                              <div class="order_size" th:if="${detail[6]}!=null"  th:each="carType : ${#strings.arraySplit(detail[6],',')}">
+                                <font th:if="${carType} != null">
+                                  <span th:text="${#strings.arraySplit(carType,'@')[0]}">Size:S</span>
+                                </font>
                               </div>
                               <p class="order_pr"><em th:text="${detail[2]}">1</em> pc </p>
                               <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
