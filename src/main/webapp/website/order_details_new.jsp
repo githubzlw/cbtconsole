@@ -140,31 +140,31 @@ $(function(){
 })
 //计算预估运费
 $(document).ready(function(){
-	var sale = <%=request.getAttribute("sale")%>;  //销售额
-	var buy = <%=request.getAttribute("buy")%>;  //采购额
-	var country = <%=request.getAttribute("country")%>;  //国家id
-	var volume = <%=request.getAttribute("volume")%>; //总体积
-	var weight = <%=request.getAttribute("weight")%>; //总重量
+    var sale = <%=request.getAttribute("sale")%>;  //销售额
+    var buy = <%=request.getAttribute("buy")%>;  //采购额
+    var country = <%=request.getAttribute("country")%>;  //国家id
+    var volume = <%=request.getAttribute("volume")%>; //总体积
+    var weight = <%=request.getAttribute("weight")%>; //总重量
     var goodsWeight = <%=request.getAttribute("goodsWeight")%>; //产品总重量
-	var jq = <%=request.getAttribute("avg_jq")%>; //交期平均值
-	var rate = <%=request.getAttribute("rate")%>; //汇率
-	var allFreight = <%=request.getAttribute("allFreight")%>; //国际运费
-	var order_state = <%=request.getAttribute("order_state")%>;
+    var jq = <%=request.getAttribute("avg_jq")%>; //交期平均值
+    var rate = <%=request.getAttribute("rate")%>; //汇率
+    var allFreight = <%=request.getAttribute("allFreight")%>; //国际运费
+    var order_state = <%=request.getAttribute("order_state")%>;
     var actual_freight = <%=request.getAttribute("actual_freight")%>;
     var piaAmount=<%=request.getAttribute("piaAmount")%>;
     var estimatefreight = <%=request.getAttribute("estimatefreight")%>; //接口生成预估运费
     var es_buyAmount = <%=request.getAttribute("es_prices")%>;//预计采购金额
     var transportcompany = '<%=request.getAttribute("transportcompany")%>';//运输公司
     var shippingtype = '<%=request.getAttribute("shippingtype")%>';//运输方式
-	var allWeight=<%=request.getAttribute("allWeight")%>;//产品表中公式计算的重量，custom_benchmark_ready-final_weight
-	var awes_freight='<%=request.getAttribute("awes_freight")%>';//仓库称重后预估的运费
-	var ac_weight= <%=request.getAttribute("ac_weight")%>; //eric称重重量包裹
-	if(buy >0){
+    var allWeight=<%=request.getAttribute("allWeight")%>;//产品表中公式计算的重量，custom_benchmark_ready-final_weight
+    var awes_freight='<%=request.getAttribute("awes_freight")%>';//仓库称重后预估的运费
+    var ac_weight= <%=request.getAttribute("ac_weight")%>; //eric称重重量包裹
+    if(buy >0){
         buy=Number(buy)+Number(piaAmount);
-	}
+    }
     if(allFreight == null || allFreight == ""){
-		allFreight=0.00;
-	}
+        allFreight=0.00;
+    }
     if(estimatefreight == null || estimatefreight == ""){
         estimatefreight=0.00;
     }
@@ -173,8 +173,8 @@ $(document).ready(function(){
         piaAmount=0.00;
     }else{
         es_buyAmount=Number(es_buyAmount)+Number(piaAmount);
-	}
-	var es_profit=sale-es_buyAmount-allFreight;
+    }
+    var es_profit=sale-es_buyAmount-allFreight;
     es_profit=es_profit.toFixed(2);
     var ec_p=(sale-es_buyAmount-allFreight)/sale*100;
     if(ec_p == null || ec_p == ""){
@@ -188,8 +188,8 @@ $(document).ready(function(){
     var end_p="--";
     if(actual_freight == "654321"){
         actual_freight="--";
-	}
-  	if(awes_freight != "-"){
+    }
+    if(awes_freight != "-"){
         ac_profit=sale-buy-awes_freight;
         ac_profit=ac_profit.toFixed(2);
         ac_p=(sale-buy-awes_freight)/sale*100;
@@ -198,14 +198,14 @@ $(document).ready(function(){
         }else{
             ac_p=ac_p.toFixed(2);
         }
-	}
-	if(buy>0 && actual_freight != '--'){
+    }
+    if(buy>0 && actual_freight != '--'){
         end_profit=sale-buy-actual_freight;
         end_profit=end_profit.toFixed(2);
         end_p=end_profit/sale*100;
         end_p=end_p.toFixed(2);
-	}
-	$("#es_price").html(es_buyAmount.toFixed(2));
+    }
+    $("#es_price").html(es_buyAmount.toFixed(2));
     $("#esPidAmount").html("(包含预计国内运费:"+piaAmount+")");
     $("#pay_price").html(sale+";汇率:("+rate+")");
     $("#end_profit").html(end_profit);
@@ -223,425 +223,35 @@ $(document).ready(function(){
     // $("#goodsWeight").html(goodsWeight);
     $("#es_p").html(ec_p+"%");
     $("#ac_p").html(ac_p+"%");
-	var cname = "<%=request.getAttribute("countryName")%>"; //国际运输方式中的国家名
-	var orderNo = "<%=request.getAttribute("orderNo")%>"; //订单号
-	var oids = "<%=request.getAttribute("str_oid")%>"; //订单下所有的oid
-	if(orderNo!="" && cname!="" && cname!=null){
-		searchCountry(cname, orderNo);
-	}
-	var userid = <%=request.getAttribute("userid")%>;
-	queryRepeat(userid);
- 	getBuyer(oids);
- 	getAllBuyuser();
-	fnGetAddress();
- 	var adminName = '<%=user.getAdmName()%>';
- 	if(adminName !="Ling" && adminName !="emmaxie"){
- 		// $("#buyuser1").attr("disabled",true);
- 		$("#buy_but").attr("disabled",true);
- 		$("#saler").attr("disabled",true);
- 		$("#saler_but").attr("disabled",true);
- 	}
- 	$("#ordercountry_value").val("${order.address.country}");
+    var cname = "<%=request.getAttribute("countryName")%>"; //国际运输方式中的国家名
+    var orderNo = "<%=request.getAttribute("orderNo")%>"; //订单号
+    var oids = "<%=request.getAttribute("str_oid")%>"; //订单下所有的oid
+    if(orderNo!="" && cname!="" && cname!=null){
+        searchCountry(cname, orderNo);
+    }
+    var userid = <%=request.getAttribute("userid")%>;
+    queryRepeat(userid);
+    getBuyer(oids);
+    getAllBuyuser();
+    fnGetAddress();
+    var adminName = '<%=user.getAdmName()%>';
+    if(adminName !="Ling" && adminName !="emmaxie"){
+        // $("#buyuser1").attr("disabled",true);
+        $("#buy_but").attr("disabled",true);
+        $("#saler").attr("disabled",true);
+        $("#saler_but").attr("disabled",true);
+    }
+    $("#ordercountry_value").val("${order.address.country}");
     $("#ordercountry").val($("#ordercountry_value").val());
 });
-
-function showMessage(msg) {
-	$('.mask').show().text(msg);
-	setTimeout(function() {
-		$('.mask').hide();
-	}, 1500);
-}
-
-function searchCountry(cname, orderNo){
-	$.ajax({
-		url:"/cbtconsole/orderInfo/queryCountryNameByOrderNo.do",
-		type : "post",
-		dataType:"json",
-		data :{"orderNo":orderNo},
-		success:function(data){
-			if(data.ok){
-				if(cname!=data){
-					$("#od_country").css("display","inline");
-				}
-			}	
-		}
-	});
-}
-
-function queryRepeat(uid){
-	$.ajax({
-		url:"/cbtconsole/orderDetails/queryRepeatUserid.do",
-		type:"post",
-		dataType:"json",
-		data : {"userid":uid},
-		success:function(data){
-			if(data.ok){
-				var json = data.data;
-				$("#other_id").css("display","inline");
-				var content = "相似用户的id： ";			
-				for(var i=0;i<json.length;i++){
-					content +=json[i]+"&nbsp;";
-				}
-				$("#other_id").text("相似用户的id： ");
-				if(json == null || json == ""){
-					$("#other_id").css("display","none");
-				}
-			}
-		}
-	});
-}
-//手动调整采购人员
-function changeBuyer(odid,buyid){
-    $.ajax({
-        url: "/cbtconsole/order/changeBuyer",
-        type:"POST",
-        data : {"odid":odid,"admuserid":buyid},
-        dataType:"json",
-        success:function(data){
-            if(data>0){
-                $("#info"+odid).text("执行成功");
-            }else{
-                $("#info"+odid).text("执行失败");
-            }
-        }
-    });
-}
-
-function changeOrderBuyer(orderid,admuserid){
-	$.ajax({
-		url:"/cbtconsole/orderDetails/changeOrderBuyer.do",
-		type:"post",
-		dataType:"json",
-		data : {"orderid":orderid,"admuserid":admuserid},
-		success:function(data){
-			if(data.ok){
-				$("#buyuserinfo").text("执行成功");
-			}else{
-				$("#buyuserinfo").text("执行失败");
-			}
-			 window.location.reload();
-		},
-		error : function(res){
-			$("#buyuserinfo").text("执行失败,请联系管理员");
-		}
-		
-	});
-}
-
-//获取采购员
-function getBuyer(oids){
-	var adminName = '<%=user.getAdmName()%>'; 	
-	$.ajax({
-		url:"/cbtconsole/orderDetails/qyeruBuyerByOrderNo.do",
-		type:"post",
-		dataType:"json",
-		data : {"str_oid" : oids},
-		success:function(data){
-			if(data.ok>0){
-				var json = data.data;
-				for(var i=0;i< json.length;i++){
-//  					 $("#odid"+json[i].odid).append(json[i].admName);
-					for(var j=0;j<document.getElementById("buyer"+json[i].odid).options.length;j++){
-						 if (document.getElementById("buyer"+json[i].odid).options[j].text == json[i].admName){
-							 document.getElementById("buyer"+json[i].odid).options[j].selected=true;
-							 break;
-						 }
-					}
-					if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
-						 $("#buyer"+json[i].odid).attr("disabled",true);
-					}
-				}
-			}
-		}
-	});
-}
-
-//计算利润
-function jslr(orderno){
-	
-	var i = 0;
-	var j =0;
-	var hsSum = 0;
-	var heSum = 0;
-	$("div[id^='"+orderno+"']").each(function(){
-		
-		var sBut = $(this).children("div:first").children().eq(1).val();
-			alert(sBut);
-				var divId = $(this).attr('id');
-		       	
-		//获得原价   和货源价
-		var hs = $("#"+divId+"_s").val();
-		var _sQuantity = $("#"+divId+"_sQuantity").val();
-		var he = $("#"+divId+"_e").val();
-		var _eQuantity = $("#"+divId+"_eQuantity").val();
-		///${pb.orderNo}${pbsi.index}_eQuantity
-		alert(sBut+"------"+hs+"----"+he);                           
-		//是否确认货源
-	//	if(sBut =="取消货源"){
-			//有一个为空的价格就不计算
-			if(hs!='' & he!=''){
-				hsSum += Number(hs)*Number(_sQuantity);
-				
-				heSum += Number(he)*Number(_eQuantity);
-				i++;
-			}     
-	//	}
-		
-		
-		j++;         
-		   
-			
-		alert($(this).attr('id')+"------"+sBut);
-	});
-	
-	if(heSum == 0){
-		$("#"+orderno+"_span").html(j+"/"+i+"   利润：0%");   
-		$("#"+orderno+"_span_s").html(0);   
-		$("#"+orderno+"_span_e").html(0);   
-	}else{
-		$("#"+orderno+"_span_s").html((hsSum).toFixed(2) +"USD ("+(hsSum*6.78).toFixed(2)+")");   
-		$("#"+orderno+"_span_e").html(heSum.toFixed(2));   
-		var t = Number(hsSum)*6.78 - Number(heSum);
-		t = t*100/(Number(hsSum)*6.78);
-		t = parseInt(t);//.toFixed(2);   
-		$("#"+orderno+"_span").html(j+"/"+i+"   利润："+t+"%"); 
-		
-		//alert(j+"/"+i+"   利润："+t+"%");       
-	}
-	               
-   
-}
-
-//显示产品历史的价格
-function showHistoryPrice(url){
-	$.ajax({
-    	url: "/cbtconsole/orderDetails/showHistoryPrice.do",
-    	type:"POST",
-    	dataType:"json",
-    	data : {"url":url},
-    	success:function(data){
-    		if(data.ok){
-    			var json = data.data;
-    			var pri = "";
-    			pri += "<div class='pridivbg'><a class='pridclose' onclick='priclose()'>X</a>"
-    			for(var i =0;i<json.length;i++){
-    				pri += "<p>"+json[i][1]+" &nbsp;&nbsp; "+json[i][0]+"</p>";
-    			}
-    			pri +="</div>";
-    			var topHg = ($(window).height()-$("#prinum").height())/2 + $(document).scrollTop();
-    			var lefhWt = ($(window).width()-$("#prinum").width())/2;
-    			$("#prinum").show().append(pri).css({"top":topHg,"left":lefhWt});
-    		    $(".peimask").show().css("height",$(document).height());
-    			
-    		}else{
-    			data(info.message);
-    		}
-    	},
-    	error: function(res) {
-    		 alert('请求失败,请重试');
-    	}
-    });
-}
-function priclose(){
-	$(".pridivbg").remove();
-	$("#prinum").hide();
-	$(".peimask").hide();
-}
-
-function afterReplenishment(){
-	var str=document.getElementsByName("replenishment");
-	var orderid=$("#orderNo").val();
-	var objarray=str.length;
-    var parm="";
-	for (i=0;i<objarray;i++){
-		if(str[i].checked == true){
-			var count=$("#count_"+str[i].value).val();
-			if(count=="补货数量"){
-				alert("请输入补货数量");
-				return;
-			}
-			parm+=str[i].value+":"+count+":"+orderid+",";
-		}
-	}
-	$.ajax({
-    	url: "/cbtconsole/orderDetails/afterReplenishment.do",
-    	type:"POST",
-    	dataType:"json",
-    	data : {"parm":parm},
-    	success:function(data){
-    		alert(data.message);
-    	},
-    	error : function(res){
-    		alert("执行失败，请联系管理员");
-    	}
-    });
-}
-
-
-//备注回复
-function doReplay1(orderid,odid){
-	$("#remark_content_").val("");
-	$("#rk_orderNo").val(orderid);
-	$("#rk_odid").val(odid);
-	var rfddd = document.getElementById("repalyDiv1");
-	rfddd.style.display = "block";
-}
-
-//增加商品沟通信息
-function saveRepalyContent(){
-	var orderid=$("#rk_orderNo").val();
-	var odid=$("#rk_odid").val();
-	var text=$("#remark_content_").val();
-	 $.ajax({
-			type : 'POST',
-			async : false,
-			url : '/cbtconsole/PurchaseServlet?action=saveRepalyContent&className=Purchase',
-			data : {
-			    'orderid' : orderid,
-	  			'odid' : odid,
-	  			"type":'2',
-	  			'text' : text
-			},
-			dataType : 'text',
-			success : function(data){
-				if(data.length>0){
-					$("#rk_remark_"+orderid+odid+"").html(data);
-					$('#repalyDiv1').hide();
-				}
-			}
-		});
-}
-
-
-
-//弹出评论框yyl
-function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
-							//var timer1 = setTimeout(function(){
-								var controls=document.getElementsByName("but"+goods_pid);
-								$("#cm_id").val($(controls[0]).attr("cmid"))//获取主键
-								$("#cm_adminname").val(adminname);
-								$("#cm_orderNo").val(orderNo);
-								$("#cm_goodsPid").val(goods_pid);  
-								$("#cm_country").val(countryid);  
-								$("#cm_adminId").val(admindid); 
-								$("#cm_oid").val(id); 
-								$("#cm_carType").val(car_type); 
-								$("#comment_content_").val($(controls[0]).attr("title"))
-								var rfddd1 = document.getElementById("commentDiv1");
-								rfddd1.style.display = "block";;
-								//},2000)
-														
-}
-
-//保存或者修改评论yyl
-function saveCommentContent(){
-		    var cmid = $("#cm_id").val();
-		    var adminname = $("#cm_adminname").val();
-			var orderNo = $("#cm_orderNo").val();
-			var goods_pid = $("#cm_goodsPid").val();
-			var goodsSource = $("#cm_goodsSource").val();
-			var adminId = $("#cm_adminId").val();
-			var countryId = $("#cm_country").val();
-			var oid = $("#cm_oid").val();
-			var carType = $("#cm_carType").val();
-			var commentcontent = $("#comment_content_").val();
-	 $.ajax({
-			type : 'POST',
-			async : false,
-			url : '/cbtconsole/goodsComment/savecomment.do',
-			data : {
-				'id':cmid,
-	  			'userName' : adminname,
-	  			'orderNo' : orderNo,
-	  			'goodsPid' : goods_pid,
-	  			'goodsSource' : goodsSource,
-	  			'adminId' : adminId,
-			    'countryId' : countryId,
-			    'oid' : oid,
-			    'car_type' : carType,
-	  			"commentsContent":commentcontent,
-			},
-			dataType : 'json',
-			success : function(data){
-				if(data.success == true){
-					$('#commentDiv1').hide();
-					//将改页所有pid等于改pid的产品销售评论改变commentcontent
-					var button=document.getElementsByName(goods_pid+"ID");
-					for(var j=0;j<button.length;j++){
-						 button[j].innerHTML="已评论 &nbsp;&nbsp;<button cmid='"+data.cmid+"' name='but"+goods_pid+"' style='cursor:pointer' title=\""+commentcontent+"\">显示评论</button>"
-					} 
-				}else{
-					alert("操作失败!")
-				}
-			}
-		});
-}
-//弹窗
-function openWindow(url) {
-    window.open(url, 'bwindow', 'left=100,top=50,height=600,width=1000,toolbar=no,menubar=no,scrollbars=yes')
-}
-//查看所有评论入口,使用动态菜单完成 yyl
-function seeAllComments(goods_pid, orderNo){
-	 openWindow("/cbtconsole/website/reviewManagement.jsp?orderno=" + orderNo);
-	/* var goods_img = $("#goods_img"+goods_pid).val();
-	var oldUrl = $("#goods_url"+goods_pid).val();
-	var goodsname = $("#goodsname"+goods_pid).val();
-	var goodsprice = $("#goodsprice"+goods_pid).val();
-	form = $("<form></form>")
-     input1 = $("<input type='hidden' name='goods_img' />")
-     input1.attr('value',goods_img)
-     input2 = $("<input type='hidden' name='goods_url' />")
-     input2.attr('value',oldUrl)
-     input3 = $("<input type='hidden' name='goodsname' />")
-     input3.attr('value',goodsname)
-     input4 = $("<input type='hidden' name='goodsprice' />")
-     input4.attr('value',goodsprice)
-     input5 = $("<input type='hidden' name='goods_pid' />")
-     input5.attr('value',goods_pid)
-     
-     form.append(input1)
-     form.append(input2)
-     form.append(input3)
-     form.append(input4)
-     form.append(input5)
-	 openWindow("/cbtconsole/goodsComment/selectcomments.do?" + form.serialize());
-	 */
-}
-
-function jumpTracking(orderid, isDropshipOrderList) {
-	//跳转到tracking页面
-	if (isDropshipOrderList != undefined && isDropshipOrderList != '') {
-		var orderArr = isDropshipOrderList.split(",");
-		for(var i=0;i<orderArr.length;i++){
-			window.open(
-					"http://www.import-express.com/apa/tracking.html?loginflag=true&orderNo="
-							+ orderArr[i], "_blank");
-		}
-	} else {
-		window.open(
-				"http://www.import-express.com/apa/tracking.html?loginflag=true&orderNo="
-						+ orderid, "_blank");
-	}
-}
-function jumpDetails(orderid, isDropshipOrderList) {
-	//跳转到details页面
-	if (isDropshipOrderList != undefined && isDropshipOrderList != '') {
-		var orderArr = isDropshipOrderList.split(",");
-		for(var i=0;i<orderArr.length;i++){
-			window.open(
-					"http://www.import-express.com/orderInfo/ctporders?paystatus=1&comformFlag=0&loginFlag=true&orderNo="
-							+ orderArr[i], "_blank");
-		}
-	} else {
-		window.open(
-				"http://www.import-express.com/orderInfo/ctporders?paystatus=1&comformFlag=0&loginFlag=true&orderNo="
-						+ orderid, "_blank");
-	}
-}
 </script>
 
 <link type="text/css" rel="stylesheet"
 	href="/cbtconsole/css/web-ordetail.css" />
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <title>订单详情管理</title>
 <style type="text/css">
 em {
@@ -671,7 +281,7 @@ em {
 		    回复内容:
 		    <textarea name="remark_content" rows="8" cols="50" style="margin-top: 20px;" id="remark_content_"></textarea>
 		    <input type="button" id="repalyBtnId" onclick="saveRepalyContent()" value="提交回复">
-		</div>	
+		</div>
 		<!-- 采购商品打分弹出层 -->
 		<div class="mod_pay3" style="display: none;width:720px;" id="supplierDiv">
 		<div>
@@ -718,7 +328,7 @@ em {
 					    <input name="protocol" type="radio" value="2"/>有<input name="protocol" type="radio" value="1"/>无
 					  </td>
 					  <td>
-					   <input type="text" id="su_data" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"  
+					   <input type="text" id="su_data" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
     onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>
 					  </td>
 					</tr>
@@ -1158,7 +768,7 @@ em {
 						<div class="ormrelanum">
 							<c:forEach items="${orderNos}" var="order_correlation">
 								<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?&orderNo=${order_correlation}&state=${order.state}&username=${order.userName}">${order_correlation}</a>&nbsp;
-									
+
  							</c:forEach>
 						</div>
 					</c:if>
@@ -1190,11 +800,11 @@ em {
 				<c:if test="${order.state != 0}">
 					<tr>
 						<td>
-							<span class="ormtittd">付款时间：</span> 
+							<span class="ormtittd">付款时间：</span>
 							<c:forEach
 								items="${pays}" var="pay">
 								<c:if test="${pay.orderid == order.orderNo}">
-									${pay.createtime} 
+									${pay.createtime}
 								</c:if>
 							</c:forEach>
 						</td>
@@ -1247,7 +857,7 @@ em {
 						<%--（${order.order_ac}） --%>
 					</span> -返单优惠<span class="ormtittdred">（
 								${order.coupon_discount}） </span> -${order.gradeName}<span class="ormtittdred">（
-								${order.gradeDiscount}） </span> 
+								${order.gradeDiscount}） </span>
 								+双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
 								-首单优惠<span class="ormtittdred">（${order.firstdiscount}） </span>
 								+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
@@ -1273,24 +883,24 @@ em {
 					<td  style="margin-left:200px">
 						<c:if test="${order.state == 3 || order.state == 4 || order.state == 1 || order.state == 2}">
 							<a class="ordmlink" target="_blank" href="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid=${order.buyid}&userid=&orderno=${order.orderNo}&goodid=&date=&days=&state=&unpaid=0&pagesize=50&search_state=0">采购页面</a>&nbsp;&nbsp;
-	 					</c:if> 
+	 					</c:if>
 						<c:if test="${order.state == 3 || order.state == 4 }">
 							<a class="ordmlink" target="_blank" href="/cbtconsole/website/forwarderpageplck.jsp?orderid=${order.orderNo}&flag=true">出货页面</a>&nbsp;&nbsp;
-	 					</c:if> 
+	 					</c:if>
 	 					<br />
 	 					<c:if test="${order.state !=0 && order.state !=-1 && order.state !=6 }">
-							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;" 
+							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;"
 								onclick="jumpTracking('${order.orderNo}', '${order.dropShipList}')">Tracking</a>&nbsp;&nbsp;
-	 					</c:if> 
+	 					</c:if>
 	 					<c:if test="${order.state !=6 }">
-							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;" 
+							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;"
 								onclick="jumpDetails('${order.orderNo}', '${order.dropShipList}')">客户的订单页</a>&nbsp;&nbsp;
-	 					</c:if> 
+	 					</c:if>
 					</td>
 					<td  style="margin-left:100px">
 						<c:if test="${evaluate.evaluate != null && evaluate.evaluate !=''}">
 								<span>用户评价：<span style="color:red;font-size:20px">${evaluate.evaluate}</span></span>
-						</c:if> 
+						</c:if>
 					</td>
 					<td  colspan="2">
 						 <c:if test="${order.orderRemark != null && order.orderRemark!=''}">
@@ -1319,16 +929,16 @@ em {
 							'${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
 							${order.product_cost+preferential_price},${actual_ffreight_+order.foreign_freight},
 							${order.actual_weight_estimate},${isDropshipOrder })"value="取消订单">&nbsp;&nbsp;
-						</c:if> 
+						</c:if>
 						<c:if test="${count==1 }">
 							<input type="button" style="position: fixed; bottom: 400px; right: 50px; width: 150px; height: 30px; border-color: red" onclick="fnChangeProduct('${order.orderNo}')" value="建议替换">
-						</c:if> 
-						&nbsp;&nbsp; 
+						</c:if>
+						&nbsp;&nbsp;
 						<c:if test="${isSplitOrder == 0 && order.state != 3 && order.state != 4}">
 							<input type="button" style="position: fixed; bottom: 490px; right: 50px; width: 150px; height: 30px;" id="split_order_btn"
 							onclick="fnSplitOrder('${order.orderNo}','${order.email}','${param.paytime}')"
 							value="拆单">&nbsp;&nbsp;
-						</c:if> 
+						</c:if>
 						<c:if test="${isSplitOrder == 1}">
 							<input type="button" style="position: fixed; bottom: 490px; right: 50px; width: 150px; height: 30px;" id="split_order_btn"
 							onclick="fnSplitDropShipOrder('${order.orderNo}','${order.email}','${param.paytime}')"
@@ -1339,7 +949,7 @@ em {
 				</tr>
 				<tr>
 					<td>
-						<input type="button" style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="open" onclick="afterReplenishment()" value="售后补货"> 
+						<input type="button" style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="open" onclick="afterReplenishment()" value="售后补货">
 					</td>
 					<td colspan="3" style="display: none;" id="td_buyuser">
 						<%--<span style="margin-left:300px;">分配此订单的采购人员：</span>--%>
@@ -1347,8 +957,8 @@ em {
 						<%--<span id="buyuserinfo"></span> --%>
 						<%--<input type="submit" value="确认" id="buy_but" onclick="fnchangebuy()">--%>
 						<%--<span style="font-size: 15px; font-weight: bold; color: red;" id="buyresult"></span> --%>
-						<span style="margin-left:400px;">分配此订单的销售人员：</span>
-						<select id="saler" name="saler" style="width: 110px;"></select> 
+						<span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
+						<select id="saler" name="saler" style="width: 110px;"></select>
 						<input type="submit" value="确认" id="saler_but" onclick="addUser(${order.userid},'${order.userName}','${order.userEmail}')">
 						<span style="font-size: 15px; font-weight: bold; color: red;" id="salerresult"></span>
 					</td>
@@ -1362,7 +972,7 @@ em {
 				入库总数:<span style="color:red">${order.rk}</span>;验货无误总数:<span style="color:red">${order.checkeds}</span>;
 				验货疑问总数:<span style="color:red">${order.yhCount}</span>
 			</div>
-			
+
 			<div id="remarkdiv">
 				<div class="ormamark"><table style="border-collapse:separate; border-spacing:5px;">
 					<tbody>
@@ -1498,7 +1108,7 @@ em {
 				</div>
 			</div>
 		</div>
-				
+
 		<br>
 		<div>
 				<table border="1" style="margin-left:160px;">
@@ -1636,7 +1246,7 @@ em {
 							 </td>
 							<td style='width: 150px;'><span style="color: red;">商品名称:</span><br>${orderd.state == 2? "<br>用户已取消":""}${orderd.goodsname}<br>
 								<span style="color: red;">客户下单规格:</span><br> <span
-								style="color: #00B1FF;display: inline-block;max-width: 250px;overflow: hidden;word-wrap: break-word;"> 
+								style="color: #00B1FF;display: inline-block;max-width: 250px;overflow: hidden;word-wrap: break-word;">
 <%-- 									<c:if test="${not empty orderd.goods_type}"> --%>
 <%-- 										<c:forEach items="${fn:split(orderd.goods_type,',')}" --%>
 <%-- 											var="types" varStatus="i"> --%>
@@ -1649,7 +1259,7 @@ em {
 									<c:forEach items="${fn:split(orderd.img_type,'@')}"
 										var="img_type" varStatus="i">
 										<c:if test="${fn:indexOf(img_type,'http') > -1}">
-											<img style="max-width: 60px;max-height: 60px;" src="${img_type}">&nbsp; 
+											<img style="max-width: 60px;max-height: 60px;" src="${img_type}">&nbsp;
 										</c:if>
 									</c:forEach>
 								</c:if></td>
@@ -1681,7 +1291,7 @@ em {
 								${orderd.goodsprice} <em id="change_price_${sd.index}"
 								style="color: red;"> <c:if
 										test="${not empty orderd.change_price }">
-										<br>${orderd.change_price}</c:if></em><br /> 
+										<br>${orderd.change_price}</c:if></em><br />
 <!-- 										<input type="button" -->
 <%-- 								onclick="showHistoryPrice('${orderd.goods_url}')" value="查看历史价格"></input> --%>
 								<br>
@@ -1690,7 +1300,7 @@ em {
 											<span>$${orderd.ali_price}</span>
 											<span><br /><a target="_blank" href="${orderd.alipid }">ali产品链接</a></span>
 									</c:if>
-										<br /> 
+										<br />
 										<span
 								style="color: red;">备注:</span> ${orderd.remark} <c:if
 									test="${orderd.extra_freight != 0}">&nbsp;额外运费:${orderd.extra_freight}</c:if>
@@ -1701,7 +1311,7 @@ em {
 										test="${ostate==0}">
 											${order.state==-1?'取消订单':'' }${order.state==0?'等待付款':'' }${order.state==1?'购买中':'' }${order.state==3?'出运中':'' }
 											<%-- ${order.state==4?'完结2':'' } --%>
-											
+
 											<c:if test="${order.state==4}">
 															 <!-- yyl 评论start -->
 															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
@@ -1716,9 +1326,9 @@ em {
 														完结
 														<font color="red">销售评论状态： <font name="${orderd.goods_pid }ID">未评论</font></font>
 												</c:if>
-																	
-											
-											
+
+
+
 											${order.state==5?'确认价格中':'' }
 										<c:if test="${orderd.orsstate==1 && order.state==1}">
 											<br>
@@ -1788,7 +1398,7 @@ em {
 									</c:if> <%-- 									<c:if test="${ostate==1 }"> --%> <!-- 										产品买了并已经到我们仓库 -->
 									<%-- 									</c:if>  --%> <input type="hidden"
 									value="${ostate},${orderd.checked},${orderd.goodstatus}">
-									<c:if test="${ostate==1 && orderd.checked==0}">  
+									<c:if test="${ostate==1 && orderd.checked==0}">
 										已到仓库
 										<c:if test="${orderd.goodstatus==5}">
 											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验数量不对</a>
@@ -1808,7 +1418,7 @@ em {
 										<%--<c:if test="${orderd.goodstatus != 1}">--%>
 											<%--<input type="button" style="color:royalblue" value="查看质检结果" onclick="openCheckResult('${order.orderNo}','${orderd.goodsid}')">--%>
 										<%--</c:if>--%>
-									</c:if> 
+									</c:if>
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus==1}">
 									 <!-- yyl 评论start -->
 										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
@@ -1832,11 +1442,11 @@ em {
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus !=1}">
 									  	 <font color="red" style="font-size:20px;">已到仓库，验货状态错误，请联系管理员！！</font>
 									</c:if>
-							</em>	
-									
-								
-									
-									
+							</em>
+
+
+
+
 							 <input type="hidden" name="ostate" value="${ostate}"> <em
 								id="change_cancel_${sd.index}">${orderd.iscancel==1?'<br>系统取消':''}</em>
 								<em id="user_cancel_${sd.index}">${orderd.state == 2? "<br>用户已取消":""}</em>
@@ -1886,7 +1496,7 @@ em {
 									<input type="hidden" value="${isDropshipOrder1}" id="isDropshipOrder1">
 									<input type="hidden" value="${isDropshipOrder}">
 								</c:if>
-								<!-- 需沟通消息记录 -->				
+								<!-- 需沟通消息记录 -->
 								<c:if test="${fn:length(orderd.change_communication)>0}">
 									<hr>
 									<c:if test="${orderd.ropType==5 && orderd.del_state==0 }">
@@ -1905,11 +1515,11 @@ em {
 							</td>
 							<td
 								style="word-wrap: break-word; word-break: break-all; width: 240px; color: red">
-								<font color="red" class="newsourceurl"> 
-								
-								
+								<font color="red" class="newsourceurl">
+
+
 								<a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
-								
+
 								<span id="spanurl${sd.index}">
 									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
 								</span>
@@ -1925,7 +1535,7 @@ em {
 								<%--<span id="spanurl${sd.index}">--%>
 									<%--<p style="width:200px;">产品总重量(kg): ${orderd.final_weight}</p>--%>
 								<%--</span>--%>
-								
+
 								<span id="spanurl${sd.index}">
 									<p>采购数量: ${orderd.buycount}</p>
 								</span>
@@ -1945,10 +1555,10 @@ em {
 									  	<span>未录入货源链接</span>
 									  </c:otherwise>
 								</c:choose>
-										<p>${orderd.oremark}</p> 
+										<p>${orderd.oremark}</p>
 								</span>
 							</font>
-							
+
 							</td>
 
 							<td id="odid${orderd.id}">采购时间:${orderd.purchase_time}<br> <select
@@ -1959,7 +1569,7 @@ em {
 										<option value="${aub.id }">${aub.admName}</option>
 									</c:forEach>
 							</select><span id="info${orderd.id}"></span>
-							
+
 							<!-- 消息备注列合并过来的-->
 							<div style="overflow-y:scroll;height:200px;width:200px;">
 								<div class="w-font">
@@ -1969,7 +1579,7 @@ em {
 							<div class="w-margin-top">
 								<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 							</div>
-								
+
 							</td>
 							<td style="word-break: break-all; width: 30px;"><input
 								type="checkbox" style="zoom:140%;" onchange="fnChange(${orderd.id},this);"
@@ -2020,7 +1630,7 @@ em {
 									<c:if test="${orderd.dropShipState!=0}">
 												${orderd.dropShipState==-1?'后台取消订单':'' }${orderd.dropShipState==0?'等待付款':'' }${orderd.dropShipState==1?'购买中':'' }${orderd.dropShipState==3?'出运中':'' }
 												<%-- ${orderd.dropShipState==4?'完结3':'' } --%>
-												
+
 												<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
 															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
@@ -2035,7 +1645,7 @@ em {
 														完结
 														<br><font color="red">销售评论状态： <font name="${orderd.goods_pid }ID">未评论</font></font>
 												</c:if>
-												
+
 												${orderd.dropShipState==5?'确认价格中':'' }${orderd.dropShipState==2?'已到仓库':'' }${orderd.dropShipState==6?'客户取消订单':'' }
 									</c:if>
 									<strong>商品销售金额：</strong>--
@@ -2090,7 +1700,7 @@ em {
 											<c:forEach items="${fn:split(orderd.img_type,'@')}"
 												var="img_type" varStatus="i">
 												<c:if test="${fn:indexOf(img_type,'http') > -1}">
-													<img style="max-width: 60px;max-height: 60px;" src="${img_type}">&nbsp; 
+													<img style="max-width: 60px;max-height: 60px;" src="${img_type}">&nbsp;
 																</c:if>
 											</c:forEach>
 										</c:if></td>
@@ -2147,9 +1757,9 @@ em {
 														完结
 														<br>销售评论状态： <font name="${orderd.goods_pid }ID">未评论</font>
 												</c:if>
-																				
-															
-															
+
+
+
 															${orderd.dropShipState==5?'确认价格中':'' }
 														<c:if
 													test="${orderd.dropShipState==3 && orderd.dropShipState==5}">
@@ -2157,7 +1767,7 @@ em {
 													<br>
 													<font color="red">【采购中】</font>
 												</c:if>
-											</c:if> <c:if test="${ostate==1 && orderd.checked==0}">  
+											</c:if> <c:if test="${ostate==1 && orderd.checked==0}">
 										已到仓库,
 										<c:if test="${orderd.goodstatus==5}">
 													<font color="red">已校验数量不对</font>
@@ -2192,10 +1802,10 @@ em {
 											 <font color="red">
 											 销售评论状态：<font name="${orderd.goods_pid }ID">未评论</font><%-- <c:if test="${not empty maps[mygoodsid1]   }">已评论 <button style="cursor:pointer" title="${maps[mygoodsid1].commentsContent }">显示评论</button>  --%>
 											<%--  <input id="${orderd.goods_pid }" cmid="${maps[mygoodsid1].id }" type="hidden"  value="${maps[mygoodsid1].commentsContent }"></c:if> <c:if test="${ empty maps[mygoodsid1]  }">未评论</c:if></font> --%>
-											 
+
 											 <!--  yyl 评论 end-->
 											</c:if>
-											
+
 									</em> <input type="hidden" name="ostate" value="${ostate}">
 										<em id="change_cancel_${sd.index}">${orderd.iscancel==1?'<br>系统取消':''}</em>
 										<em id="user_cancel_${sd.index}">${orderd.state == 2? "<br>已取消":""}</em>
@@ -2219,7 +1829,7 @@ em {
 										<button
 											onclick="communicatechange('${orderd.orderid}',${orderd.goodsid})"
 											${order.state==5?'':'disabled=disabled' }>需沟通</button>
-										<!-- 需沟通消息记录 -->				
+										<!-- 需沟通消息记录 -->
 										<c:if test="${fn:length(orderd.change_communication)>0}">
 											<hr>
 											<c:if test="${orderd.ropType==5 && orderd.del_state==0 }">
@@ -2238,8 +1848,8 @@ em {
 									</td>
 									<!-- 添加列 -->
 									<td style="word-wrap: break-word; word-break: break-all; width: 180px; color: red; width: 10%;">
-										<font color="red" class="newsourceurl"> 
-										
+										<font color="red" class="newsourceurl">
+
 										<a href="http://192.168.1.34:8086/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
 										<span id="spanurl${sd.index}">
 											<p>原始货源价格(RMB): ${orderd.price1688}</p>
@@ -2247,12 +1857,12 @@ em {
 										<span id="spanurl${sd.index}">
 											<p>1688货源重量（单件）(kg): ${orderd.weight1688}</p>
 										</span>
-										
+
 										<span id="spanurl${sd.index}">
 											<p>采购数量:${orderd.buycount}</p>
-										</span> 
+										</span>
 										<span id="spanurl${sd.index}">
-											<p>采购价格(RMB):${orderd.sourc_price}</p> 
+											<p>采购价格(RMB):${orderd.sourc_price}</p>
 										<c:choose>
 										  <c:when test="${orderd.oldsourceurl!=null}">
 										  	<a href="${orderd.oldsourceurl}" target="_blank">实际采购货源链接</a>
@@ -2266,7 +1876,7 @@ em {
 										</c:choose>
 										<p>${orderd.oremark}</p> <br />
 										<a href="${orderd.oldUrl}" title='${orderd.oldUrl}' target="_blank">网站链接</a> </span>
-										</font> 
+										</font>
 									</td>
 									<td style="color: red; width: 5%;">${orderd.purchase_time}</td>
 									<td id="odid${orderd.id}" style="width: 2%;">
@@ -2282,7 +1892,7 @@ em {
 											<option value="50">Alisa</option>
 											<option value="51">Debora</option> -->
 									</select><span id="info${orderd.id}"></span>
-									
+
 									<!-- 消息备注列合并过来的-->
 									<div style="overflow-y:scroll;height:200px;width:200px;">
 										<div class="w-font">
@@ -2292,7 +1902,7 @@ em {
 									<div class="w-margin-top">
 										<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.id});" class="repalyBtn" />
 									</div>
-								
+
 									</td>
 									<td style="text-align: center; width: 5%;zoom:140%;"><input
 										type="checkbox" onchange="fnChange(${orderd.id},this);"
@@ -2355,14 +1965,14 @@ em {
 <!-- 			<br /> -->
 <%-- 			<div align="center">${pager }</div> --%>
 <!-- 		</div> -->
-	</div>	
+	</div>
 </body>
 <script type="text/javascript">
-  $(function(){ 
- 	 $(".toggle_btn").click(function(){ 
-		 $(this).parent().next().toggle(); 
-		
-		 ($(this).html()=="+")?$(this).html("-"):$(this).html("+"); 
+  $(function(){
+ 	 $(".toggle_btn").click(function(){
+		 $(this).parent().next().toggle();
+
+		 ($(this).html()=="+")?$(this).html("-"):$(this).html("+");
 		 return false;
 	 });
 	})
@@ -2386,12 +1996,12 @@ $(function(){
 			var controls=document.getElementsByName(pid+"ID");
 			for(var j=0;j<controls.length;j++){//cmid是该商品的id,
 				controls[j].innerHTML="已评论 &nbsp;&nbsp;<button cmid='"+data[i].id+"' name='but"+pid+"' style='cursor:pointer' title=\""+data[i].commentsContent+"\">显示评论</button>"
-			} 
+			}
 			}
 		}
 	});
-	
-})	
+
+})
 
 //获取 url 后的参数值
 function getUrl(para){
@@ -2406,12 +2016,12 @@ function getUrl(para){
 
 	var sum=0;
 // 	for(var i=0;i<$("#orderDetail").find('tbody:eq(1)').find('tr').length;i++){
-		
+
 // 		sum+=parseFloat($("#orderDetail").find('tbody:eq(1)').find('tr:eq('+i+')').find('div').html());
 // 		if(sum == 0){
-// 			$("#sumFreight").html("该订单购物车运费：0USD");     
+// 			$("#sumFreight").html("该订单购物车运费：0USD");
 // 		}else{
-// 			$("#sumFreight").html("该订单购物车中总运费："+(sum).toFixed(2) +"USD ("+(sum*6.89).toFixed(2)+"RMB)");   
+// 			$("#sumFreight").html("该订单购物车中总运费："+(sum).toFixed(2) +"USD ("+(sum*6.89).toFixed(2)+"RMB)");
 // 		}
 // 			}
 	admid = '<%=uid%>';

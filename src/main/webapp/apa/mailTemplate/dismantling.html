@@ -213,11 +213,11 @@
                       <td class="body-padding"></td>
                       <td class="body-padded">
                         <div class="body-title">Hey <span th:text="${email}">first_name</span>,</div>
-                        <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first. 
-  No more extra fee needed, just you will receive more than one delivery. If you have any problem with it, please contact your 
-  account manager or our 24/7 whatsapp service number 0086 13564025061.</p>
-                        <div class="dismantling_box">
-                          <div class="order_first">
+                        <div class="dismantling_box" >
+                          <div class="order_first" th:if="${state == 1}">
+                            <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first.
+                              No more extra fee needed, just you will receive more than one delivery. If you have any problem with it, please contact your
+                              account manager or our 24/7 whatsapp service number 0086 13564025061.</p>
                             <p class="order_number"><strong>Order Number: <span th:text=" ${orderno}">QA18474027512271
                               </span></strong></p>
                             <h5 class="order_items order_items2" >Items to send you first:</h5>
@@ -229,7 +229,7 @@
                                   <div class="aSK J-J5-Ji aYr"></div>
                                   </div>
                                 </div>
-                                <img> 
+                                <img>
                                 <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses" th:text="${detail[4]}" th:title="${detail[4]}" >Sex Woman 's Mark West Club Red Bandage Dresses</p>
                                 <div class="order_size" th:if="${ detail[6]}!=null">
                                   <span>Red</span>
@@ -250,7 +250,8 @@
                               </li>
                             </ul>
                             <div class="order_usd">
-                              <strong th:if="${orderbean.product_cost} !=null">Product Value: <em th:text="${currency}">USD</em>
+                              <strong th:if="${ orderbean !=null && orderbean.product_cost} != null">Product Value: <em
+                                      th:text="${currency}">USD</em>
                                 <em th:text="${orderbean.product_cost}">5.58</em> </strong>
                               <p>
                                 Estimated Ship Time: <em th:text="${time_}">2018-10-18</em>
@@ -261,13 +262,13 @@
                             </div>
                             <div >Due to the supply reason, part of your order can not be supplied and you can find the below refund amount in <a href="http://www.import-express.com${autoUrl }" th:href="${autoUrl}">Your Account</a></div>
                           </div>
+                          <p class="order_number order_number2">
+                            <strong> <i th:if="${state == 0}">Split </i>Order Number: <span
+                                    th:text="${orderbean_.orderNo}">QA18474027512271_1</span></strong>
+                          </p>
+                          <h5 class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</h5>
+                          <h5 class="order_items order_items2" th:if="${state == 0}">Items we can not supply:</h5>
                           <div class="order_first">
-                            <p class="order_number order_number2">
-                              <strong> <i th:if="${state == 0}">Split </i>Order Number: <span
-                                      th:text="${orderbean_.orderNo}">QA18474027512271_1</span></strong>
-                            </p>
-                            <h5 class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</h5>
-                            <h5 class="order_items order_items2" th:if="${state == 0}">Items we can not supply:</h5>
                             <ul class="clearfix">
                               <li class="order_li" th:each="detail,detailStat:${details_}">
                                 <img th:src="${detail[5]}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
@@ -278,24 +279,15 @@
                                 </div>
                                 <img>
                                 <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses" th:text="${detail[4]}" th:title="${detail[4]}" >Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                                <div class="order_size" th:if="${detail[6]}!=null">
-                                  <span>Red</span>
-                                  <span>L</span>
-                                  <p>
-                                    <i th:if="${#strings.arraySplit(detail[6],'@')[0]} != null">
-                                      <span th:text="${#strings.arraySplit(detail[6],'@')[0]}">Color:Red</span>
-                                    </i>
-                                    <i th:if="${#strings.arraySplit(detail[6],',')[1]} != null">
-                                      <font th:if="${#strings.arraySplit(#strings.arraySplit(detail[6],',')[1],'@')[0]} != null">
-                                        <span th:text="${#strings.arraySplit(#strings.arraySplit(detail[6],',')[1],'@')[0]}">Size:S</span>
-                                      </font>
-                                    </i>
-                                  </p>
+                                <div class="order_size" th:if="${detail[6]}!=null"  th:each="carType : ${#strings.arraySplit(detail[6],',')}">
+                                  <font th:if="${carType} != null">
+                                    <span th:text="${#strings.arraySplit(carType,'@')[0]}">Size:S</span>
+                                  </font>
                                 </div>
                                 <p class="order_pr"><em th:text="${detail[2]}">1</em> pc </p>
                                 <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
                               </li>
-                              
+
                             </ul>
                             <div class="order_usd order_usd_value">
                               <strong>Product Value: <em th:text="${currency}">USD</em><em th:text="${orderbean_.product_cost}"> 5.58</em></strong>
