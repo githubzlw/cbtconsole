@@ -262,9 +262,8 @@ public class CustomerDisputeController {
             json.setMessage("请登录后操作");
             return json;
         }
-        int adminId = 0;
         Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-        int op = adm.getId() == 1|| adm.getId() == 8 ? 1 : 2;
+        int op = adm.getId() == 1|| adm.getId() == 8 || adm.getId() == 18 ? 1 : 2;
     	
         int startNum = 0;
         int limitNum = 50;
@@ -282,26 +281,17 @@ public class CustomerDisputeController {
         String disputeid = request.getParameter("disputeid");
         disputeid = StringUtils.isBlank(disputeid) ? null : disputeid;
         
-        String sttime = request.getParameter("sttime");
-        if (sttime == null || "".equals(sttime)) {
-            sttime = "";
-        } else {
-            sttime += " 00:00:00";
-        }
-        String edtime = request.getParameter("edtime");
-        if (edtime == null || "".equals(edtime)) {
-            edtime = "";
-        } else {
-            edtime += " 23:59:59";
-        }
+      
         String status = request.getParameter("status");
         status = StringUtils.isBlank(status) ? "-1" : status;
     	try {
     		List<CustomerDisputeBean> confirmList = customerDisputeService.confirmList(disputeid, status,startNum,limitNum);
     		confirmList.stream().forEach(c -> {
-    			c.setOprateAdm(String.valueOf(op));
+    			String cstatus = c.getStatus();
+    			c.setStatus(StringUtils.equals(cstatus, "0") ? "等待退款" : "已完成");
     		});
     		
+    		json.setMessage(String.valueOf(op));
     		int count = customerDisputeService.count(disputeid, status);
     		
     		json.setRows(confirmList);
@@ -444,6 +434,7 @@ public class CustomerDisputeController {
     	String orderNo = request.getParameter("orderNo");
     	String remark = request.getParameter("messageBodyForGeneric");
     	String operatorName = request.getParameter("operatorName");
+    	String merchant = request.getParameter("merchant");
     	
     	CustomerDisputeBean customer = new CustomerDisputeBean();
     	
@@ -454,6 +445,7 @@ public class CustomerDisputeController {
     	customer.setTransactionID(seller_transaction_id);
     	customer.setUserid(userid);
     	customer.setStatus("0");
+    	customer.setMerchantID(merchant);
     	int confirm = customerDisputeService.confirm(customer);
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
@@ -489,12 +481,13 @@ public class CustomerDisputeController {
     		Amount.put("currency_code", refundCurrency);
     		data.put("refund_amount", Amount);
     	}
-		System.out.println(JSONObject.toJSONString(data));
+//		System.out.println(JSONObject.toJSONString(data));
     	String result = null;
 		try {
 			result = apiService.acceptClaim(disputeID, merchant, data);
+			customerDisputeService.updateStatus(disputeID, "1");
 			attr.addFlashAttribute("sendResult", "Successed");
-			System.out.println(result);
+//			System.out.println(result);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -592,7 +585,7 @@ public class CustomerDisputeController {
     		result = e.getMessage();
     		attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
     	}
-    	System.out.println(result);
+//    	System.out.println(result);
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }

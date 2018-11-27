@@ -94,6 +94,7 @@
         }
     </style>
     <script>
+    
         $(document).ready(function () {
             setDatagrid();
         });
@@ -124,6 +125,8 @@
                 onLoadSuccess: function (data) {
                     if (!data.success) {
                         showMessage(data.message);
+                    }else{
+                    	$("#oprator").val(data.message);
                     }
                 }
             });
@@ -136,31 +139,36 @@
             if (disputeid == null || disputeid == "") {
             	disputeid = "";
             }
-            var sttime = $("#query_sttime").val();
+           /*  var sttime = $("#query_sttime").val();
             if (sttime == null || sttime == "") {
                 sttime = "";
             }
             var edtime = $("#query_edtime").val();
             if (edtime == null || edtime == "") {
                 edtime = "";
-            }
+            } */
             var type = $("#query_type").val();
             if (type == null || type == "") {
                 type = -1;
             }
             $("#groupbuy_easyui-datagrid").datagrid("load", {
                 "disputeid": disputeid,
-                "sttime": sttime,
-                "edtime": edtime,
-                "status": type,
+                /* "sttime": sttime,
+                "edtime": edtime, */
+                "status": type
             });
         }
+        function formatdispute(val, row, index) {
+        	return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+			+ row.disputeID + '&merchant='+row.merchantID+'">'+row.disputeID+'</a>';
+	}
         
         function formatAction(val, row, index) {
+        		var oprator = $("#oprator").val();
 	        	if(row.status == '1'){
 	        		return "已确认";
 	        	}else{
-	        		if(row.oprateAdm == '1'){
+	        		if(oprator == '1'){
 		    		  return '<input type="button" onclick="comfirm(\''+row.disputeID+'\')" value="确认">';
 	        		}else{
 	        			return "等待确认";
@@ -204,18 +212,19 @@
 
 </head>
 <body>
-
+<input type="hidden" value="" id="oprator">
 <div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
     <form id="groupbuy_query_form" action="#" onsubmit="return false;">
 			<span> 事件号: <input type="text" id="pid_id"
-                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                               <!--  <span>
 				时间: <input id="query_sttime" class="Wdate"
                              style="width: 110px; height: 24px" type="text" value=""
                              onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
                                                  style="width: 110px; height: 24px;" type="text" value=""
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+			</span> -->&nbsp;&nbsp;&nbsp;&nbsp; 
         <span> 状态: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
             <option value="-1">全部</option>
             <option value="0">等待退款</option>
@@ -233,13 +242,13 @@
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
         <!-- <th data-options="field:'type',width:'30px'">来源</th> -->
-        <th data-options="field:'disputeID',width:'80px'">事件号</th>
-        <th data-options="field:'status',align:'center',width:'150px'">状态</th>
-        <th data-options="field:'userid',align:'center',width:'50px'">用户</th>
-        <th data-options="field:'remark',align:'left',width:'210px'">备注</th>
+        <th data-options="field:'disputeID',width:'80px',formatter:formatdispute">事件号</th>
+        <th data-options="field:'status',align:'center',width:'80px'">状态</th>
+        <th data-options="field:'userid',align:'center',width:'80px'">用户</th>
+        <th data-options="field:'remark',align:'left',width:'310px'">备注</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
         <th data-options="field:'orderNo',align:'center',width:'130px',formatter:formatOrder">订单号</th>
-        <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">确定退款</th>
+        <!-- <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">确定退款</th> -->
     </tr>
     </thead>
     <tbody>

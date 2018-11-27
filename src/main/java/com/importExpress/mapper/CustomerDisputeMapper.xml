@@ -12,14 +12,15 @@
     <result column="create_time" property="createTime" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
     <result column="oprate_adm" property="oprateAdm" jdbcType="VARCHAR" />
+    <result column="merchant" property="merchantID" jdbcType="VARCHAR" />
     
   </resultMap>
   
   <insert id="insert" parameterType="com.importExpress.pojo.CustomerDisputeBean">
-    insert into customer_dispute (dispute_id,user_id, order_no, 
+    insert into customer_dispute (dispute_id,user_id, order_no, merchant,
       transaction_id, remark,oprate_adm,create_time,update_time
       )
-    values (#{disputeID},#{userid},#{orderNo},#{transactionID},#{remark},#{oprateAdm},now(),now()
+    values (#{disputeID},#{userid},#{orderNo},#{merchantID},#{transactionID},#{remark},#{oprateAdm},now(),now()
       )
   </insert>
    <update id="updateStatus">
@@ -40,7 +41,7 @@
   </select>
  
   <select id="confirmList"  resultMap="BaseResultMap">
-    select dispute_id,user_id, order_no, 
+    select dispute_id,user_id, order_no, merchant,
       transaction_id, remark,status,create_time,update_time,oprate_adm from customer_dispute 
        where 1=1
        <if test="disputeid != null">

@@ -577,6 +577,7 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <span style="margin-left: 20px;">Operator:<input type="text" name="operatorName" value="${operatorName }" readonly="readonly"></span>
 <textarea class="form-controltext " name="messageBodyForGeneric" id="messageBody" rows="10" cols="100" maxlength="2000" placeholder="备注"></textarea>
 <br>
+<input type="hidden" name="merchant" value="${merchant }" class="button" >
 <input type="submit" name="send" value="Submint" class="button" >
 <input type="button" name="secondary" value="Cancel" class="cancel_button" >
 </form>
