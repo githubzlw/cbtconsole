@@ -286,6 +286,12 @@
 			 left join  paymentconfirm pay on pay.orderno=oi.order_no 
 			WHERE
 				oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
+      AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+      email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
 		group by order_no
 		
 		) oi 
@@ -311,6 +317,12 @@
 				  left  join admin_r_user  aru on  aru.userid=o.user_id 
 				  </if>
 			      where orderremark != '' and (date_add(pay.createtime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)
+       AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+       email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+       email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+       email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+       email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+       email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
 			       <if test="adminid != 0">
 				  	and adminid = #{adminid}
 				  </if>
@@ -327,6 +339,12 @@
         INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
         INNER JOIN admin_r_user a ON od.userid = a.userid
         WHERE oc.ropType =5 AND oc.del_state = 0 AND od.state IN(0,1) AND oi.state IN (1,5)
+        AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
         <if test="adminid != 1 and adminid != 0" >
             and a.adminid = #{adminid,jdbcType=INTEGER}
         </if>
