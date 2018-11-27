@@ -2534,6 +2534,43 @@ public class EditorController {
 
         try {
             List<GoodsEditBean> editList = customGoodsService.queryGoodsEditBean(editBean);
+            Map<String, List<String>> pidMapNews = new HashMap<>(limitNum + 1);
+            Map<String, List<String>> pidMapOlds = new HashMap<>(limitNum + 1);
+            for (GoodsEditBean gdEd : editList) {
+                if (pidMapOlds.containsKey(gdEd.getPid())) {
+                    if (StringUtils.isNotBlank(gdEd.getOld_title())) {
+                        if (pidMapOlds.get(gdEd.getPid()).contains(gdEd.getOld_title())) {
+                            gdEd.setOld_title("");
+                        } else {
+                            pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
+                        }
+                    }
+                } else {
+                    List<String> titleList = new ArrayList<>();
+                    titleList.add(gdEd.getOld_title());
+                    pidMapOlds.put(gdEd.getPid(), titleList);
+                }
+                if (pidMapNews.containsKey(gdEd.getPid())) {
+                    if (StringUtils.isNotBlank(gdEd.getNew_title())) {
+                        if (pidMapNews.get(gdEd.getPid()).contains(gdEd.getNew_title())) {
+                            gdEd.setNew_title("");
+                        } else {
+                            pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
+                        }
+                    }
+                } else {
+                    List<String> titleList = new ArrayList<>();
+                    titleList.add(gdEd.getNew_title());
+                    pidMapNews.put(gdEd.getPid(), titleList);
+                }
+                if(StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())){
+                    if(gdEd.getOld_title().equals(gdEd.getNew_title())){
+                        gdEd.setNew_title("");
+                    }
+                }
+            }
+            pidMapNews.clear();
+            pidMapOlds.clear();
             int total = customGoodsService.queryGoodsEditBeanCount(editBean);
             json.setSuccess(true);
             json.setRows(editList);
