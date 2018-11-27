@@ -47,8 +47,8 @@
         }
 
         .img_sty {
-            max-height: 180px;
-            max-width: 180px;
+            max-height: 160px;
+            max-width: 160px;
         }
 
         .enter_btn {
@@ -218,6 +218,18 @@
                         }, 400);
                     } else {
                         $.messager.alert(data.message);
+                    }
+                },
+                onClickRow: function(){
+                    var nowDivHight = $(".datagrid-body")[0].scrollHeight;
+                    if(Math.abs(nowDivHight - nDivHight) > 10){
+                        $(".datagrid-body")[0].animate({scrollTop:nowDivHight});
+                    }
+                },
+				onSelect: function(){
+                    var nowDivHight = $(".datagrid-body")[0].scrollHeight;
+                    if(Math.abs(nowDivHight - nDivHight) > 10){
+                        $(".datagrid-body")[0].animate({scrollTop:nowDivHight});
                     }
                 }
             });
@@ -687,15 +699,15 @@
            class="easyui-datagrid">
         <thead>
         <tr>
-            <th data-options="field:'pid',width:'150px',formatter:formatPid">PID</th>
-            <th data-options="field:'catid',align:'center',width:'170px',formatter:formatCatid">类别</th>
-            <th data-options="field:'shopId',align:'center',width:'160px'">店铺</th>
+            <th data-options="field:'pid',width:'130px',formatter:formatPid">PID</th>
+            <th data-options="field:'catid',align:'center',width:'150px',formatter:formatCatid">类别</th>
+            <th data-options="field:'shopId',align:'center',width:'150px'">店铺</th>
             <%--<th data-options="field:'mainImg',width:'220px',formatter:formatMainImg">搜索图</th>--%>
-            <th data-options="field:'imgShow',align:'center',width:'240px',formatter:formatMainImg">橱窗图</th>
-            <th data-options="field:'eninfoShow1',align:'center',width:'240px',formatter:formatWindowImg1">跨境详情图1</th>
-            <th data-options="field:'eninfoShow2',align:'center',width:'240px',formatter:formatWindowImg2">跨境详情图2</th>
-            <th data-options="field:'eninfoShow3',align:'center',width:'240px',formatter:formatWindowImg3">跨境详情图3</th>
-            <th data-options="field:'isUpdate',align:'center',width:'180px',formatter:formatOperation">操作</th>
+            <th data-options="field:'imgShow',align:'center',width:'260px',formatter:formatMainImg">橱窗图</th>
+            <th data-options="field:'eninfoShow1',align:'center',width:'260px',formatter:formatWindowImg1">跨境详情图1</th>
+            <th data-options="field:'eninfoShow2',align:'center',width:'260px',formatter:formatWindowImg2">跨境详情图2</th>
+            <th data-options="field:'eninfoShow3',align:'center',width:'260px',formatter:formatWindowImg3">跨境详情图3</th>
+            <th data-options="field:'isUpdate',align:'center',width:'170px',formatter:formatOperation">操作</th>
         </tr>
         </thead>
         <tbody>
