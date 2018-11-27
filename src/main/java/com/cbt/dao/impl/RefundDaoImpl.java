@@ -296,7 +296,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public List<AdminUserBean> getAllAdmUser() {
 		List<AdminUserBean> aubList = new ArrayList<AdminUserBean>();
 		String sql = "select * from admuser where status = 1 and roleType=0";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {

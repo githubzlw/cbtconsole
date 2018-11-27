@@ -1363,7 +1363,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 					String car_img=inventory.getCar_img();
 					String imgs[]=car_img.split("kf");
 					String one=imgs[0];
-					String two=imgs[1].replace(".jpg_50x50.jpg","");
+					String two=imgs[1].replace(".jpg_50x50","");
 					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
 				}else if("1".equals(inventory.getOnline_flag())){
 					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
