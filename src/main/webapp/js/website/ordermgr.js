@@ -296,18 +296,15 @@ function getMessageNum(uid){
             messagesCountVo = messagesCountList[i];
             if(messagesCountVo.type=='propagemessage'){
                 $('#propagemessage').html( messagesCountVo.noDeleteCount);
-                $('#propagemessage1').html(messagesCountVo.countAll);
             }else if(messagesCountVo.type=='shopcarmarket'){
                 $('#shopcarmarket').html(messagesCountVo.noDeleteCount);
                 $('#shopcarmarket1').html(messagesCountVo.countAll);
             }
             else if(messagesCountVo.type=='customerInfoCollection'){
                 $('#customerInfoCollection').html(messagesCountVo.noDeleteCount);
-                $('#customerInfoCollection1').html(messagesCountVo.countAll);
             }
             else if(messagesCountVo.type=='questionnum'){
             	$('#questionnum').html(messagesCountVo.noDeleteCount);
-            	$('#questionnum1').html(messagesCountVo.countAll);
             }
             else if(messagesCountVo.type=='businquiries'){
                 if(admuserid ==1 || admuserid == 83){
@@ -330,7 +327,6 @@ function getMessageNum(uid){
                 $("#shopcarmarket").html(messagesCountVo.noArrgCount);
             }else if(messagesCountVo.type=='ordermessage'){
                 $('#ordermessage').html(messagesCountVo.noArrgCount);
-                $("#ordermessage1").html(messagesCountVo.countAll);
             }
             if(messagesCountVo.type=='ordermeg'){
                 if(admuserid !=1){
@@ -361,18 +357,15 @@ function getMessageNum(uid){
                             sessionStorage.setItem("noDeleteCount",messagesCountVo.noDeleteCount);
                             sessionStorage.setItem("countAll",messagesCountVo.countAll);
                             $('#propagemessage').html( messagesCountVo.noDeleteCount);
-                            $('#propagemessage1').html(messagesCountVo.countAll);
                         }else if(messagesCountVo.type=='shopcarmarket'){
                             $('#shopcarmarket').html(messagesCountVo.noDeleteCount);
                             $('#shopcarmarket1').html(messagesCountVo.countAll);
                         }
                         else if(messagesCountVo.type=='customerInfoCollection'){
                             $('#customerInfoCollection').html(messagesCountVo.noDeleteCount);
-                            $('#customerInfoCollection1').html(messagesCountVo.countAll);
                         }
                         else if(messagesCountVo.type=='questionnum'){
                         	$('#questionnum').html(messagesCountVo.noDeleteCount);
-                        	$('#questionnum1').html(messagesCountVo.countAll);
                         }
 //        			else if(messagesCountVo.type=='systemfailure'){
 //        				$('#systemfailure').html(messagesCountVo.noDeleteCount);
@@ -409,7 +402,6 @@ function getMessageNum(uid){
                             $("#shopcarmarket").html(messagesCountVo.noArrgCount);
                         }else if(messagesCountVo.type=='ordermessage'){
                             $('#ordermessage').html(messagesCountVo.noArrgCount);
-                            $("#ordermessage1").html(messagesCountVo.countAll);
                         }
                         if(messagesCountVo.type=='ordermeg'){
                             if(admuserid !=1){
@@ -474,19 +466,14 @@ function fnGetMessage(uid){
 				window.open(url);
 			}
 		}else if(type=="propagemessage"){
-			url="/cbtconsole/website/guestbook.jsp?";
-			if(style=="noDelete"){
-				url+='&timeFrom='+timeFrom+'&timeTo='+timeTo+'&adminid='+uid+'&status=0';
-				window.open(url);
-			}else{
-				url+='&timeFrom='+timeFrom+'&timeTo='+timeTo+'&adminid='+uid;
-				window.open(url);
-			}
+			// url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2&adminId=" + uid;
+			url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2";
+            window.open(url);
 		}else if(type=="customerInfoCollection"){
-			url="/cbtconsole/apa/customerInfo_collection.html";
+			url="/cbtconsole/apa/customerInfo_collection.html?is_report=2";
 			window.open(url);
 		}else if(type=="questionnum"){
-			url="/cbtconsole/question/questionlist";
+			url="/cbtconsole/question/questionlist?replayflag=1";
 			window.open(url);
 		}else if(type=="businquiries"){
 			url="/cbtconsole/messages/getBusiess";
@@ -524,13 +511,7 @@ function fnGetMessage(uid){
 				url+='searchComplainByParam?userid=&creatTime=&complainState=2&username=&toPage=1&currentPage=1';
 				window.open(url);
 		}else if(type=="ordermessage"){
-//			fnInquiry(1,type);
-			url="/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=";
-			if(style=="ordermessage"){
-				url+='latelyOrdermessage';
-			}else{
-				url+='ordermessage';
-			}
+			url="/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=latelyOrdermessage";
 			window.location.href=url;
 		}else if(type=="systemfailure"){
 //			fnInquiry(1,type);

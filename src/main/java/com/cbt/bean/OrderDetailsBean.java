@@ -143,6 +143,15 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String goodsPName;
 	//商品有库存但规格不一致
 	private String pidInventory;
+	private int isBenchmark;
+	public int getIsBenchmark() {
+		return isBenchmark;
+	}
+
+	public void setIsBenchmark(int isBenchmark) {
+		this.isBenchmark = isBenchmark;
+	}
+
 	public String getPidInventory() {
 		return pidInventory;
 	}
