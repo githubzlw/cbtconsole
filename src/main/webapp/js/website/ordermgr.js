@@ -307,7 +307,7 @@ function getMessageNum(uid){
             	$('#questionnum').html(messagesCountVo.noDeleteCount);
             }
             else if(messagesCountVo.type=='businquiries'){
-                if(admuserid ==1 || admuserid == 83){
+                if(admuserid ==1 || admuserid == 83 || admuserid == 84){
                     $('#businquiries').html(messagesCountVo.noArrgCount);
                     $('#businquiries1').html(messagesCountVo.noDeleteCount);
                     $('#businquiries2').html(messagesCountVo.countAll);
@@ -371,7 +371,7 @@ function getMessageNum(uid){
 //        				$('#systemfailure').html(messagesCountVo.noDeleteCount);
 //        			}
                         else if(messagesCountVo.type=='businquiries'){
-                            if(admuserid ==1 || admuserid ==83){
+                            if(admuserid ==1 || admuserid ==83 || admuserid ==84){
                                 $('#businquiries').html(messagesCountVo.noArrgCount);
                                 sessionStorage.setItem("noArrgCount",messagesCountVo.noArrgCount);
                                 $('#businquiries1').html(messagesCountVo.noDeleteCount);
