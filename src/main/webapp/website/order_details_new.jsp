@@ -1496,7 +1496,7 @@ em {
 								</c:if>
 								<!-- 需沟通消息记录 -->
 								<c:if test="${fn:length(orderd.change_communication)>0}">
-									<hr>
+                                    <br/><hr>
 									<c:if test="${orderd.ropType==5 && orderd.del_state==0 }">
 										<button
 											onclick="fnResolve('${order.orderNo}',${orderd.goodsid})">问题解决了</button>
@@ -1829,7 +1829,7 @@ em {
 											${order.state==5?'':'disabled=disabled' }>需沟通</button>
 										<!-- 需沟通消息记录 -->
 										<c:if test="${fn:length(orderd.change_communication)>0}">
-											<hr>
+											<br/><hr>
 											<c:if test="${orderd.ropType==5 && orderd.del_state==0 }">
 												<button
 													onclick="fnResolve('${order.orderNo}',${orderd.goodsid})">问题解决了</button>
