@@ -294,7 +294,7 @@
                             </div>
                             <div class="order_usd" th:if="${state == 0}">
                               <p>Offered Discount Deduction: <em th:text="${totalDisCount}">1</em></p>
-                              <p>Extra Shipping Fee Paid: <em th:if="${totalExtraFree}">1</em></p>
+                              <p>Extra Shipping Fee Paid: <em th:text="${totalExtraFree}">1</em></p>
                               <p style="clear: both;"></p>
                               <div class="refund_amount">
                                 <h3>Refund Amount: <em th:text="${currency}">USD</em><em
