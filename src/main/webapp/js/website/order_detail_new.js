@@ -1570,7 +1570,7 @@ function getBuyer(oids){
                             break;
                         }
                     }
-                    if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
+                    if(admid!=1){
                         $("#buyer"+json[i].odid).attr("disabled",true);
                     }
                 }
