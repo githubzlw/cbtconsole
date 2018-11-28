@@ -199,6 +199,11 @@
             window.open(url, 'windows', param);
         }
 
+        function openUserInfo(userId) {
+            var url = "/cbtconsole/userinfo/getUserInfo.do?userId=" + userId;
+            window.open(url);
+        }
+
         function showMessage(message) {
             $.messager.show({
                 title: '提醒',
@@ -283,6 +288,8 @@
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
+                        &nbsp;&nbsp;
+                        <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId})"/>
                     </div>
                 </td>
             </tr>

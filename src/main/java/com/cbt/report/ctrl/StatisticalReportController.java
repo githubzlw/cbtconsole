@@ -3797,9 +3797,9 @@ public class StatisticalReportController {
 //		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 //		int adminid = adm.getId();
 		// 临时增加Sales1账号查看所有客户留言权限
-		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
+		/*if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
 			adminid = 1;
-		}
+		}*/
 		try {
 			if (date != null && !"".equals(date)) {
 				parse = date;

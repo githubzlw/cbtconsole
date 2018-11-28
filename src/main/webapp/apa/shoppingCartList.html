@@ -105,7 +105,7 @@
         }
 
         function formatUserId(val, row, index) {
-            return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId="' + val + '>' + val + '</a>';
+            return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '">' + val + '</a>';
         }
 
         function formatMoney(val, row, index) {
@@ -131,7 +131,13 @@
 
         <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;height: 22px;"/></span>
          &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value="" style="width: 200px;height: 22px;"/></span>
-        &nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 120px;">
+        &nbsp;&nbsp;<span>国家: <select id="query_country" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未下单</option>
+                    <option value="1">已下单</option>
+			</select></span>&nbsp;&nbsp;<span>金额: <input id="query_begin_money" type="number"/>
+            至: <input id="query_end_money"  type="number"/></span>
+            &nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 120px;">
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">未下单</option>
                     <option value="1">已下单</option>
@@ -141,7 +147,9 @@
                     <option value="0">未跟进</option>
                     <option value="1">已跟进</option>
 			</select></span>&nbsp;&nbsp;
-        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+        <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span><a href="/cbtconsole/apa/shoppingCartTracking.html" target="_blank">营销追踪</a></span>-->
     </form>
 </div>
 
