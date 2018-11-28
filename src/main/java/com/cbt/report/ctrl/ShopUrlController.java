@@ -2689,17 +2689,23 @@ public class ShopUrlController {
                     String editedImg = request.getParameter("imgInfo");
                     String[] editImgList = editedImg.split(";");
                     if(!editImgList[0].equals(orImgList.get(0))){
-                        System.err.println("pid:" + cgp.getPid() + "重新刷新搜索图");
+                        System.err.println("pid:" + cgp.getPid() + ",重新刷新搜索图");
                         OkHttpClient okHttpClient = new OkHttpClient();
                         Request okHttpReq = new Request.Builder().url(ACCESS_URL + cgp.getPid()).build();
                         Response okHttpResponse = okHttpClient.newCall(okHttpReq).execute();
                         String resultStr = okHttpResponse.body().string();
-                        if ("1".equals(resultStr)) {
+                        JSONObject jsonObject = JSONObject.fromObject(resultStr);
+
+                        if (jsonObject.getBoolean("ok")) {
                             System.out.println("设置搜索图成功!!!");
                         } else {
-                            System.err.println("pid:" + cgp.getPid() + "，设置搜索图失败");
+                            // 还原img信息
+                            cgp.setImg(orGoods.getImg());
+                            shopUrlService.saveEditGoods(cgp, shopId, user.getId());
+                            // 打印错误日志
+                            System.err.println("pid:" + cgp.getPid() + ",设置搜索图失败:" + jsonObject.getString("message"));
                             json.setOk(false);
-                            json.setMessage("设置搜索图失败,请重试");
+                            json.setMessage("设置搜索图失败:" + jsonObject.getString("message") + ",请重试");
                             return json;
                         }
                     }
