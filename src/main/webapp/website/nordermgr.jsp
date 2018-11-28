@@ -487,14 +487,20 @@ $(document).ready(function(){
 										id="shopcarmarket1" class="btn btn-warning btnto"></span>
 								</span> <input type="hidden" id="type" value="shopcarmarket"></td>
 
-								<td><span id="busquer"> <input type="hidden"
-										id="style" value="noArrage"> <span id="businquiries"
-										class="btn btn-primary btnto"></span>
-								</span> <span> <input type="hidden" id="style" value="noDelete">
+                                <!-- 商业询盘 -->
+								<td>
+                                    <%--<span id="busquer"> <input type="hidden" id="style" value="noArrage">
+                                        <span id="businquiries" class="btn btn-primary btnto"></span>
+								    </span>--%>
+                                    <span>
+                                        <input type="hidden" id="style" value="noDelete">
 										<span id="businquiries1" class="btn btn-success btnto"></span>
-								</span> <span> <span id="businquiries2"
-										class="btn btn-warning btnto"></span>
-								</span> <input type="hidden" id="type" value="businquiries"></td>
+								    </span>
+                                    <%--<span>
+                                        <span id="businquiries2" class="btn btn-warning btnto"></span>
+								    </span>--%>
+                                    <input type="hidden" id="type" value="businquiries">
+                                </td>
 								<!-- <td><span id="bat"> <input type="hidden" id="style"
 										value="noArrage"> <span id="batapply"
 										class="btn btn-primary btnto"></span>
