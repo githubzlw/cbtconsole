@@ -11,7 +11,6 @@
 <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
 <title>月销售商品努力报表</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
-<link rel="stylesheet" href="script/style.css" type="text/css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/AdminLTE.min.css">
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
@@ -81,11 +80,6 @@ table.imagetable td {
 }
 
 </style>
-<% 
-  String sku=request.getParameter("sku");
-  String goods_pid=request.getParameter("goods_pid");
-  String car_urlMD5=request.getParameter("car_urlMD5");
-%>
 <script type="text/javascript">
 $(function(){
 	setDatagrid();
@@ -123,6 +117,7 @@ function doQuery(page) {
     var adminId=$('#adminId').combobox('getValue');
     var createtime=$('#createtime').combobox('getValue');
     var updatetime=$('#updatetime').combobox('getValue');
+    console.log("pages="+page);
 	$("#easyui-datagrid").datagrid("load", {
         "page":page,
 		"adminId":adminId,
@@ -161,18 +156,6 @@ function topCenter(msg){
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<form id="query_form" action="#" onsubmit="return false;">
-				<select class="easyui-combobox" name="createtime" id="createtime" style="width:20%;" data-options="label:'发布时间:',panelHeight:'auto'">
-					<option value="0" selected>全部</option>
-					<option value="1">最近1天</option>
-					<option value="7">最近7天</option>
-					<option value="30">最近30天</option>
-				</select>
-				<select class="easyui-combobox" name="updatetime" id="updatetime" style="width:20%;" data-options="label:'编辑时间:',panelHeight:'auto'">
-					<option value="0" selected>全部</option>
-					<option value="1">最近1天</option>
-					<option value="7">最近7天</option>
-					<option value="30">最近30天</option>
-				</select>
 				<select class="easyui-combobox" name="adminId" id="adminId" style="width:12%;" data-options="label:'负责人:',panelHeight:'400px',valueField: 'id',
                     textField: 'barcode', value:'0',selected:true,
                     url: '/cbtconsole/StatisticalReport/getAllUser',
