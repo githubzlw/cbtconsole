@@ -2537,9 +2537,14 @@ public class EditorController {
             Map<String, List<String>> pidMapNews = new HashMap<>(limitNum + 1);
             Map<String, List<String>> pidMapOlds = new HashMap<>(limitNum + 1);
             for (GoodsEditBean gdEd : editList) {
+                if(StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())){
+                    if(gdEd.getNew_title().equals(gdEd.getOld_title())){
+                        gdEd.setNew_title("");
+                    }
+                }
                 if (pidMapOlds.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getOld_title())) {
-                        if (pidMapOlds.get(gdEd.getPid()).contains(gdEd.getOld_title())) {
+                        if (checkListContains(pidMapOlds.get(gdEd.getPid()),gdEd.getOld_title())) {
                             gdEd.setOld_title("");
                         } else {
                             pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
@@ -2552,7 +2557,7 @@ public class EditorController {
                 }
                 if (pidMapNews.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getNew_title())) {
-                        if (pidMapNews.get(gdEd.getPid()).contains(gdEd.getNew_title())) {
+                        if (checkListContains(pidMapNews.get(gdEd.getPid()),gdEd.getNew_title())) {
                             gdEd.setNew_title("");
                         } else {
                             pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
@@ -2563,11 +2568,7 @@ public class EditorController {
                     titleList.add(gdEd.getNew_title());
                     pidMapNews.put(gdEd.getPid(), titleList);
                 }
-                if(StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())){
-                    if(gdEd.getOld_title().equals(gdEd.getNew_title())){
-                        gdEd.setNew_title("");
-                    }
-                }
+
             }
             pidMapNews.clear();
             pidMapOlds.clear();
@@ -2585,5 +2586,19 @@ public class EditorController {
         return json;
     }
 
+    private boolean checkListContains(List<String> list,String str){
+        boolean isOk = false;
+        if(list == null || list.isEmpty() || StringUtils.isBlank(str)){
+            return isOk;
+        }else{
+            for(String tempStr : list){
+                if(str.equals(tempStr)){
+                    isOk = true;
+                    break;
+                }
+            }
+        }
+        return isOk;
+    }
 
 }
