@@ -451,9 +451,9 @@ public class MessagesController {
                                    @RequestParam(value = "status", required = false, defaultValue = "0") int status,
                                    @RequestParam(value = "state", required = false, defaultValue = "-1") int state,
                                    @RequestParam("adminid") int adminid) throws ParseException {
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		/*String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		adminid = adm.getId();
+		adminid = adm.getId();*/
 		mav.addObject("status", status);
 		mav.addObject("state", state);
 		mav.addObject("adminid", adminid);

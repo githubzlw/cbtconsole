@@ -469,27 +469,31 @@ function fnGetMessage(uid){
 				window.open(url);
 			}
 		}else if(type=="propagemessage"){
-			// url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2&adminId=" + uid;
 			url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2";
+            if(",0,1,8,18,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminId=" + uid;
+            }
             window.open(url);
 		}else if(type=="customerInfoCollection"){
 			url="/cbtconsole/apa/customerInfo_collection.html?is_report=2";
+			if(",0,1,8,18,83,84,".indexOf("," + uid + ",") == -1){
+			    url += "&adminId=" + uid;
+            }
 			window.open(url);
 		}else if(type=="questionnum"){
 			url="/cbtconsole/question/questionlist?replayflag=1";
+            if(",0,1,8,18,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminid=" + uid;
+            }
 			window.open(url);
 		}else if(type=="businquiries"){
-			url="/cbtconsole/messages/getBusiess";
-			if(style=="noArrage"){
-				url+='?adminid='+uid+'&state=2';/*未布置*/
-				window.open(url);
-			}else if(style=="noDelete"){/*待办*/
-				url+='?adminid='+uid+'&state=0';
-				window.open(url);
-			}else{
-				url+='?adminid='+uid;
-				window.open(url);
-			}
+			url="/cbtconsole/messages/getBusiess?state=0";
+            if(",0,1,8,18,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminid=" + uid;
+            } else {
+                url += "&adminid=0";
+            }
+            window.open(url);
 		}else if(type=="shopcarmarket"){
 			url="/cbtconsole/website/shoppingCartManagement.jsp";
 			 if(style=="noDelete"){
