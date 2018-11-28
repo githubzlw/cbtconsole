@@ -291,7 +291,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
-<c:if test="${confim==0 }">
+<c:if test="${confim==0 && role == 0}">
 <input type="submit" value="确认退款" id="confirmrefundRadio">
 </c:if>
 
@@ -299,7 +299,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 <input type="button" value="Refund and Close" id="refundCloseRadio">
 </c:if>
 
-<c:if test="${buyerOfferFlag==0 && resonFlag == 1 && role == 1}">
+<c:if test="${buyerOfferFlag==0 && resonFlag == 0 && role == 1}">
 <input type="button" value="Offer Full Refund" id="refundCloseRadio">
 </c:if>
 
