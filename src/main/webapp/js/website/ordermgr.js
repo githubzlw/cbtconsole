@@ -307,15 +307,16 @@ function getMessageNum(uid){
             	$('#questionnum').html(messagesCountVo.noDeleteCount);
             }
             else if(messagesCountVo.type=='businquiries'){
-                if(admuserid ==1 || admuserid == 83){
-                    $('#businquiries').html(messagesCountVo.noArrgCount);
-                    $('#businquiries1').html(messagesCountVo.noDeleteCount);
-                    $('#businquiries2').html(messagesCountVo.countAll);
-                }else{
-                    $('#businquiries').css("display","none");
-                    $('#businquiries1').html(messagesCountVo.noDeleteCount);
-                    $('#businquiries2').html(messagesCountVo.countAll);
-                }
+                $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                // if(admuserid ==1 || admuserid == 83){
+                //     $('#businquiries').html(messagesCountVo.noArrgCount);
+                //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                //     $('#businquiries2').html(messagesCountVo.countAll);
+                // }else{
+                //     $('#businquiries').css("display","none");
+                //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                //     $('#businquiries2').html(messagesCountVo.countAll);
+                // }
             }else if(messagesCountVo.type=='refundscom'){
                 $('#refundscom').html(messagesCountVo.noDeleteCount);
                 $('#refundscom1').html(messagesCountVo.countAll);
@@ -371,16 +372,18 @@ function getMessageNum(uid){
 //        				$('#systemfailure').html(messagesCountVo.noDeleteCount);
 //        			}
                         else if(messagesCountVo.type=='businquiries'){
-                            if(admuserid ==1 || admuserid ==83){
-                                $('#businquiries').html(messagesCountVo.noArrgCount);
-                                sessionStorage.setItem("noArrgCount",messagesCountVo.noArrgCount);
-                                $('#businquiries1').html(messagesCountVo.noDeleteCount);
-                                $('#businquiries2').html(messagesCountVo.countAll);
-                            }else{
-                                $('#businquiries').css("display","none");
-                                $('#businquiries1').html(messagesCountVo.noDeleteCount);
-                                $('#businquiries2').html(messagesCountVo.countAll);
-                            }
+                            sessionStorage.setItem("noDeleteCount",messagesCountVo.noDeleteCount);
+                            $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            // if(admuserid ==1 || admuserid ==83){
+                            //     $('#businquiries').html(messagesCountVo.noArrgCount);
+                            //     sessionStorage.setItem("noArrgCount",messagesCountVo.noArrgCount);
+                            //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            //     $('#businquiries2').html(messagesCountVo.countAll);
+                            // }else{
+                            //     $('#businquiries').css("display","none");
+                            //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            //     $('#businquiries2').html(messagesCountVo.countAll);
+                            // }
                         }/*else if(messagesCountVo.type=='batapply'){
         				if(admuserid ==1){
         				$('#batapply').html(messagesCountVo.noArrgCount);
@@ -478,13 +481,13 @@ function fnGetMessage(uid){
 		}else if(type=="businquiries"){
 			url="/cbtconsole/messages/getBusiess";
 			if(style=="noArrage"){
-				url+='?adminid='+uid+'&status=2';
+				url+='?adminid='+uid+'&state=2';/*未布置*/
 				window.open(url);
-			}else if(style=="noDelete"){
-				url+='?adminid='+uid+'&status=3';
+			}else if(style=="noDelete"){/*待办*/
+				url+='?adminid='+uid+'&state=0';
 				window.open(url);
 			}else{
-				url+='?adminid='+uid+'&status=4';
+				url+='?adminid='+uid;
 				window.open(url);
 			}
 		}else if(type=="shopcarmarket"){
