@@ -106,6 +106,16 @@ public class OrderBean implements Cloneable {
     private String payUserName;
     private String backFlag;
     private double processingfee;
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    private String street;
+
     public double getProcessingfee() {
         return processingfee;
     }

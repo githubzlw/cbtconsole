@@ -130,6 +130,7 @@ tr .td_class{width:230px;}
         var odid=$("#odid").val();
         var oldOrderid=$("#oldOrderid").val();
         var admuserid=$('#admuserid').combobox('getValue');
+        console.log("pages="+page);
 		$("#easyui-datagrid").datagrid("load", {
 			"page" : page,
 			"pid":goods_pid,
