@@ -205,7 +205,7 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		int admuserid = adminid;
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
 
@@ -324,7 +324,7 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
 		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")  || user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
 		
