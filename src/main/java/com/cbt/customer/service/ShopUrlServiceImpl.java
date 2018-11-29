@@ -242,5 +242,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return dao.queryCompetitiveFlag(pids);
     }
 
+    @Override
+    public boolean deleteGoodsByPid(String pid) {
+        return dao.deleteGoodsByPid(pid);
+    }
+
 
 }
