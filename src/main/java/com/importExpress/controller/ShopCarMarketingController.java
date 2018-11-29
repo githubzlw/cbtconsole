@@ -586,11 +586,32 @@ public class ShopCarMarketingController {
             isOrder = Integer.parseInt(isOrderStr);
         }
 
+        double beginMoney = 0;
+        String beginMoneyStr = request.getParameter("beginMoney");
+        if (StringUtils.isNotBlank(beginMoneyStr)) {
+            beginMoney = Double.parseDouble(beginMoneyStr);
+        }
+
+        double endMoney = 0;
+        String endMoneyStr = request.getParameter("endMoney");
+        if (StringUtils.isNotBlank(endMoneyStr)) {
+            endMoney = Double.parseDouble(endMoneyStr);
+        }
+
+        int countryId = 0;
+        String countryIdStr = request.getParameter("countryId");
+        if (StringUtils.isNotBlank(countryIdStr)) {
+            countryId = Integer.parseInt(countryIdStr);
+        }
+
         try {
 
             statistic.setIsFollow(isFollow);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);
+            statistic.setBeginMoney(beginMoney);
+            statistic.setEndMoney(endMoney);
+            statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
             List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
@@ -1064,6 +1085,21 @@ public class ShopCarMarketingController {
             row.createCell(5).setCellValue(res.get(i).getFollowTime());
         }
         return wb;
+    }
+
+
+    @RequestMapping("/queryAllCountry")
+    @ResponseBody
+    public List<ZoneBean> queryAllCountry(HttpServletRequest request, HttpServletResponse response) {
+
+        List<ZoneBean> list = new ArrayList<>();
+        try {
+            list = shopCarMarketingService.queryAllCountry();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+        }
+        return list;
     }
 
 

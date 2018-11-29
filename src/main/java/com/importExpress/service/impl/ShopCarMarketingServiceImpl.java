@@ -137,4 +137,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.queryTrackingListCount(param);
     }
 
+    @Override
+    public List<ZoneBean> queryAllCountry() {
+        return shopCarMarketingMapper.queryAllCountry();
+    }
+
 }

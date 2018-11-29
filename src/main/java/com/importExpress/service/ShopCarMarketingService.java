@@ -72,4 +72,6 @@ public interface ShopCarMarketingService {
 
     int queryTrackingListCount(ShopTrackingBean param);
 
+    List<ZoneBean> queryAllCountry();
+
 }

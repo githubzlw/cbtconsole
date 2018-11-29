@@ -24,6 +24,8 @@ public class ShopCarUserStatistic {
     private int isFollow= -1;//是否跟进
     private int limitNum;
     private int startNum;
+    private double beginMoney;
+    private double endMoney;
 
     public int getUserId() {
         return userId;
@@ -207,6 +209,22 @@ public class ShopCarUserStatistic {
 
     public void setLastAddCartTime(String lastAddCartTime) {
         this.lastAddCartTime = lastAddCartTime;
+    }
+
+    public double getBeginMoney() {
+        return beginMoney;
+    }
+
+    public void setBeginMoney(double beginMoney) {
+        this.beginMoney = beginMoney;
+    }
+
+    public double getEndMoney() {
+        return endMoney;
+    }
+
+    public void setEndMoney(double endMoney) {
+        this.endMoney = endMoney;
     }
 
     @Override

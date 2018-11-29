@@ -122,7 +122,7 @@
             var content = 'Hello, we noticed that you have over xx products in your shopping cart, '
                 + 'but haven’t placed orders.Could you please let us know the reason?  '
                 + 'If you have any questions or concerns, please do let us know.';
-            $("#simle_email_content").text(content);
+            $("#simple_email_content").text(content);
             $("#simple_email_div").dialog('open');
             $('#simple_email_div').window('center');//使Dialog居中显示
         }
@@ -155,7 +155,7 @@
         }
 
         function confirmAndSendEmail(userId, userEmail, emailContentId,type) {
-            var emailContent = $("#" + emailContentId).text();
+            var emailContent = $("#" + emailContentId).val();
                 if (emailContent == null || emailContent == "") {
                     $.messager.alert("提醒", "获取邮件内容失败", "info");
                     return false;
@@ -229,12 +229,12 @@
     <div id="simple_email_div" class="easyui-dialog" title="发送邮件(简单跟进)"
          data-options="modal:true" style="width: 750px; height: 463px;">
         <form id="simple_form_enter" action="#" onsubmit="return false">
-        <textarea id="simle_email_content" style="height: 91%;width: 99%;font-size: 22px;">
+        <textarea id="simple_email_content" style="height: 91%;width: 99%;font-size: 22px;">
         </textarea>
             <div style="text-align: center;">
                 <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                    class="easyui-linkbutton"
-                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simle_email_content',1)"
+                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simple_email_content',1)"
                    style="width: 80px">发送</a>
                 <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                    class="easyui-linkbutton" onclick="closeDialog('simple_email_div','simple_form_enter')"
@@ -301,7 +301,7 @@
 
         <table style="border-color: #0cc960;font-size: 18px;" border="1" cellpadding="1" cellspacing="0" align="center">
             <caption style="font-size: 20px;">
-                <b style="color: #0cc960;">商品信息</b>(<b style="color: red;">点击图片跳转对应的货源网站</b>)
+                <b style="color: #0cc960;">商品信息</b>(<span style="color: red;">点击PID进入商品编辑界面;点击产品标题进入电商网站产品单页;点击图片进入对应的货源网站</span>)
             </caption>
             <thead>
             <tr align="center">

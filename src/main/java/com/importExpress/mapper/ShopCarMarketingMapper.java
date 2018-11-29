@@ -81,4 +81,6 @@ public interface ShopCarMarketingMapper {
     List<ShopTrackingBean> queryTrackingList(ShopTrackingBean param);
 
     int queryTrackingListCount(ShopTrackingBean param);
+
+    List<ZoneBean> queryAllCountry();
 }

@@ -134,6 +134,15 @@
     </resultMap>
 
 
+    <resultMap id="zoneResultMap" type="com.importExpress.pojo.ZoneBean">
+        <id column ="id" property="id"/>
+        <result column ="country" property="country"/>
+        <result column ="zone" property="zone"/>
+        <result column ="fedexie" property="fedexie"/>
+        <result column ="area" property="area"/>
+    </resultMap>
+
+
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -1666,6 +1675,15 @@
         <if test="isFollow == 1">
             and follow_time is not null
         </if>
+        <if test="beginMoney > 0">
+            and scm.total_price &gt;= #{beginMoney}
+        </if>
+        <if test="endMoney > 0">
+            and scm.total_price &lt;= #{endMoney}
+        </if>
+        <if test="countryId > 0">
+            and us.countryId = #{countryId}
+        </if>
         order by gcf.updateTime desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -1706,6 +1724,15 @@
         </if>
         <if test="isFollow == 1">
             and follow_time is not null
+        </if>
+        <if test="beginMoney > 0">
+            and scm.total_price &gt;= #{beginMoney}
+        </if>
+        <if test="endMoney > 0">
+            and scm.total_price &lt;= #{endMoney}
+        </if>
+        <if test="countryId > 0">
+            and us.countryId = #{countryId}
         </if>
     </select>
 
@@ -1761,6 +1788,10 @@
         <if test="orderPayEndTime != null">
             and DATE(rs.order_pay_time) &lt;= DATE(#{orderPayEndTime})
         </if>
+    </select>
+
+    <select id="queryAllCountry" resultMap="zoneResultMap">
+        select id,country,fedexie,area from zone where id != 43 order by country
     </select>
 
 </mapper>
