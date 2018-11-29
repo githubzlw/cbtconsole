@@ -455,10 +455,6 @@ public class BusiessDaoImpl implements BusiessDao {
 		if(StringUtil.isNotBlank(enddate)){
 			sqlIf.append(" and busiess.createtime <='" + enddate + " 23:59:59'");
 		}
-        //状态 -1：未完成；0：待办；1-完成
-		if(state != -1){
-			sqlIf.append(" and busiess.status = "+state+"");
-		}
 		if (company != null && !"".equals(company)) {
 			sqlIf.append(" and company='" + company + "'");
 		}
@@ -474,25 +470,39 @@ public class BusiessDaoImpl implements BusiessDao {
 		if (userid != null) {
 			sqlIf.append(" and userid='" + userid + "'");
 		}
+		//分配的账户
+        if (adminid != null && adminid != 1 && adminid != 0) {
+            sqlIf.append(" and ( busiess.email in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid=\'")
+                    .append(adminid)
+                    .append("\')");
+            sqlIf.append(" or busiess.userid in (select aru.userid from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid=\'")
+                    .append(adminid)
+                    .append("\'))");
+        }
+        //状态 -1：全部；0：待办；1-完成；2-未布置
+		sql.append("select count(1) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
+        if(state == 0 || state == 1){
+            sql.append(" and busiess.status = "+state+"");
+        } else if (state == 2){
+            sql.append(" and busiess.userid not in (select DISTINCT aru.userid from admin_r_user aru,busiess bu where aru.userid = bu.userid)");
+            sql.append(" and busiess.email not in (select DISTINCT aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid)");
+        }
+        sql.append(sqlIf);
 
 		if (adminid != null && adminid != 1 && adminid != 83 && adminid != 84) {
+        // status=3 待办；status=2 未布置；status=4 所有；
+		/*if (adminid != null && adminid != 1 && adminid != 0) {
 			if (status == 3) {
 				sql.append(
 						"select count(distinct busiess.id) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
 				sql.append(" and busiess.status=0");
-				sql.append(
-						" and busiess.email in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid="
-								+ adminid + ")");
 				sql.append(sqlIf);
 			} else {
 				sql.append(
 						"select count(busiess.id) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
-				sql.append(
-						" and busiess.email in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid="
-								+ adminid + ")");
 				sql.append(sqlIf);
 			}
-		} else if (adminid != null && (adminid == 1 || adminid == 83 || adminid == 84)) {
+		} else if (adminid != null && (adminid == 1 || adminid == 0)) {
 			if (status == 2) {
 				sql.append(
 						"select count(busiess.id) as count from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -518,7 +528,7 @@ public class BusiessDaoImpl implements BusiessDao {
 				}
 				sql.append(sqlIf);
 			}
-		}
+		}*/
 
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
@@ -562,17 +572,21 @@ public class BusiessDaoImpl implements BusiessDao {
 		String needs = busiessBean.getNeeds();
 		String ordervalue = busiessBean.getOrdervalue();
 		Integer userid = busiessBean.getUserid();
-		Integer status = busiessBean.getStatus(); // status =2 未分配 =3 未处理 =4 全部
-		Integer adminid = busiessBean.getAdminid();
+//		Integer status = busiessBean.getStatus(); // status =2 未分配 =3 未处理 =4 全部
+//		Integer adminid = busiessBean.getAdminid();
 		int state=busiessBean.getState();
 		String startdate=busiessBean.getStartdate();
 		String enddate=busiessBean.getEnddate();
-		String admName=busiessBean.getAdmName();
+        Integer adminid=Integer.parseInt(busiessBean.getAdmName());
 		StringBuffer sql = new StringBuffer();
 		StringBuffer sqlIf = new StringBuffer();
 		if(adminid==56 || adminid==83 || adminid==84){
 			adminid=1;
 		}
+//		if(adminid==56){
+//			adminid=1;
+//		}
+        // type = 1 Busiess询盘 其他的暂未使用
 		if(type !=0){
 			if(type == 1){
 				sqlIf.append(" and busiess.customizedId is null and busiess.feedbackId is null ");
@@ -601,9 +615,6 @@ public class BusiessDaoImpl implements BusiessDao {
 			sqlIf.append(" and busiess.createtime <='" + enddate + " 23:59:59'");
 		}
 
-		if(state != -1){
-			sqlIf.append(" and busiess.status = "+state+"");
-		}
 		if (company != null && !"".equals(company)) {
 			sqlIf.append(" and company='" + company + "'");
 		}
@@ -619,9 +630,30 @@ public class BusiessDaoImpl implements BusiessDao {
 		if (userid != null) {
 			sqlIf.append(" and userid='" + userid + "'");
 		}
-		sqlIf.append(" order by createtime desc limit " + ((pagenum - 1) * 20) + "," + 20);
+        //分配的账户
+        if (adminid != null && adminid != 1 && adminid != 0) {
+            sqlIf.append(" and ( busiess.email in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid=\'")
+                    .append(adminid)
+                    .append("\')");
+            sqlIf.append(" or busiess.userid in (select aru.userid from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid=\'")
+                    .append(adminid)
+                    .append("\'))");
+        }
+        //分页
+        sqlIf.append(" order by createtime desc limit " + ((pagenum - 1) * 20) + "," + 20);
 
 		if (adminid != null && adminid != 1 && adminid != 83 && adminid != 84) {
+        //状态 -1：全部；0：待办；1-完成；2-未布置
+        sql.append("select busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
+        if(state == 0 || state == 1){
+            sql.append(" and busiess.status = "+state+"");
+        } else if (state == 2){
+            sql.append(" and busiess.email not in (select DISTINCT aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid)");
+            sql.append(" and busiess.userid not in (select DISTINCT aru.userid from admin_r_user aru,busiess bu where aru.userid = bu.userid)");
+        }
+        sql.append(sqlIf);
+
+		/*if (adminid != null && adminid != 1 && adminid != 83) {
 			if (status == 3) {
 				sql.append(
 						"select busiess.*,admuser.admName from busiess left join admin_r_user on busiess.userid=admin_r_user.userid left join admuser on admuser.id=admin_r_user.adminid where 1=1 ");
@@ -664,7 +696,7 @@ public class BusiessDaoImpl implements BusiessDao {
 				}
 				sql.append(sqlIf);
 			}
-		}
+		}*/
 
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;

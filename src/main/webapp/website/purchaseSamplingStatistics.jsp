@@ -167,9 +167,9 @@ function topCenter(msg){
                 <a href="/cbtconsole/website/cleaningQuality.jsp" target="_blank"
                    class="easyui-linkbutton"
                    data-options="iconCls:'icon-search',plain:true">清洗质量 (包含人为编辑和 店铺批量上线未编辑的)</a>
-				<%--<a href="/cbtconsole/website/monthSalesEfforts.jsp"   target="_blank"--%>
-				   <%--class="easyui-linkbutton"--%>
-				   <%--data-options="iconCls:'icon-search',plain:true">月销售商品努力报表</a>--%>
+				<a href="/cbtconsole/website/monthSalesEfforts.jsp"   target="_blank"
+				   class="easyui-linkbutton"
+				   data-options="iconCls:'icon-search',plain:true">月销售商品努力报表</a>
             </div>
 	</div>
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1200px;height:900px">

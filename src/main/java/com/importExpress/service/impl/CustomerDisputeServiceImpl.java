@@ -16,8 +16,12 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.importExpress.mapper.AdminRUserMapper;
 import com.importExpress.mapper.CustomerDisputeMapper;
 import com.importExpress.mapper.UserNewMapper;
+import com.importExpress.pojo.AdminRUser;
+import com.importExpress.pojo.AdminRUserExample;
+import com.importExpress.pojo.AdminRUserExample.Criteria;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
@@ -33,9 +37,11 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private UserNewMapper userNewMapper;
 	@Autowired
 	private CustomerDisputeMapper customerDisputeMapper;
+	@Autowired
+	private AdminRUserMapper adminRUserMapper;
 	@Override
 	public Map<String, Object> list(String disputeID,int startNum, int limitNum,
-			String startTime, String endTime, String status) {
+			String startTime, String endTime, String status,int admID) {
 		Map<String, Object> result = new HashMap<String,Object>();
 		
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
@@ -119,55 +125,62 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    		return Long.compare(b2.getTime(), b1.getTime());
 	    	}).collect(Collectors.toList());
 	    	
-	    	long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
-	    	
-	    	long etimeTemp = 0L;
-			if(StringUtils.isNotBlank(endTime)) {
-				etimeTemp  = sdf.parse(endTime).getTime();
-	    	}else {
-	    		Calendar rightNow = Calendar.getInstance();
-	    		rightNow.setTime(new Date());
-	    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
-	    		etimeTemp = rightNow.getTime().getTime();
-	    	}
-	    	long etime = etimeTemp;
-	    	
-	    	list = list.stream().filter(b->{
-	    		if(filter.contains(b.getDisputeID())) {
-	    			return false;
-	    		}else {
-	    			filter.add(b.getDisputeID());
-	    			boolean fl = true;
-	    			if(StringUtils.isNotBlank(disputeID)) {
-	    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
-	    			}
-	    			if(StringUtils.isNotBlank(status)) {
-	    				fl = fl && StringUtils.equals(b.getStatus(), status);
-	    			}
-	    			return fl && b.getTime() > sTime && b.getTime() < etime;
-	    		}
-	    	}).collect(Collectors.toList());
-	    	
-	    	total = list.stream().count();
-	    			
-	    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
-	    	
 	    	List<String> useridList = new ArrayList<String>();
 	    	list.stream().forEach(c->{
 	    		if(!StringUtils.isBlank(c.getUserid()) && !useridList.contains(c.getUserid())) {
 	    			useridList.add(c.getUserid());
 	    		}
 	    	});
+	    	
 	    	if(!useridList.isEmpty()) {
-	    		Map<String,String> useridMap = new HashMap<String,String>();
-	    		List<Map<String,Object>> emailList = userNewMapper.getEmailByIdList(useridList);
-	    		emailList.stream().forEach(m -> {
-	    			useridMap.put(String.valueOf(m.get("id")), (String)m.get("email"));
+	    		Map<String,AdminRUser> useridMap = new HashMap<String,AdminRUser>();
+	    		int admid = admID == 1 || admID == 8 || admID == 18? 0 : admID;
+	    		List<AdminRUser> selectByUserID = adminRUserMapper.selectByUserID(useridList,admid);
+	    		selectByUserID.stream().forEach(m -> {
+	    			useridMap.put(String.valueOf(m.getUserid()), m);
 	    		});
 	    		
 	    		list.stream().forEach(c->{
-	    			c.setEmail(useridMap.get(c.getUserid()));
+	    			AdminRUser adminRUser = useridMap.get(c.getUserid());
+	    			if(adminRUser != null) {
+	    				c.setEmail(adminRUser.getUseremail());
+	    				c.setOprateAdm(adminRUser.getAdmname());
+	    			}
 	    		});
+	    		
+	    		long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
+		    	
+		    	long etimeTemp = 0L;
+				if(StringUtils.isNotBlank(endTime)) {
+					etimeTemp  = sdf.parse(endTime).getTime();
+		    	}else {
+		    		Calendar rightNow = Calendar.getInstance();
+		    		rightNow.setTime(new Date());
+		    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
+		    		etimeTemp = rightNow.getTime().getTime();
+		    	}
+		    	long etime = etimeTemp;
+		    	
+		    	list = list.stream().filter(b->{
+		    		if(filter.contains(b.getDisputeID())) {
+		    			return false;
+		    		}else {
+		    			filter.add(b.getDisputeID());
+		    			boolean fl = true;
+		    			if(StringUtils.isNotBlank(disputeID)) {
+		    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
+		    			}
+		    			if(StringUtils.isNotBlank(status)) {
+		    				fl = fl && StringUtils.equals(b.getStatus(), status);
+		    			}
+		    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
+		    		}
+		    	}).collect(Collectors.toList());
+		    	
+		    	total = list.stream().count();
+		    			
+		    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
+		    	
 	    	}
 	    	
 		} catch (ParseException e) {
@@ -200,16 +213,26 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	@Override
 	public int confirm(CustomerDisputeBean customer) {
 		
-		if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
-			return customerDisputeMapper.insert(customer);
+		return customerDisputeMapper.insert(customer);
+		/*if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
 		}else {
 			return customerDisputeMapper.update(customer);
-		}
+		}*/
 	}
 	@Override
-	public int getConfim(String disputeID) {
-		Integer count = customerDisputeMapper.count(disputeID) ;
+	public int count(String disputeID,String status) {
+		Integer count = customerDisputeMapper.count(disputeID,status) ;
 		return count == null ? 0 : count;
+	}
+	@Override
+	public List<CustomerDisputeBean> confirmList(String disputeid,String status,int startNum,int limitNum) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.confirmList(disputeid,status,startNum,limitNum);
+	}
+	@Override
+	public int updateStatus(String disputeId, String status) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateStatus(disputeId, status);
 	}
 
 }

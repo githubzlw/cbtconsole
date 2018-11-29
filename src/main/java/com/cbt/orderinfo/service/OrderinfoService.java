@@ -1330,6 +1330,7 @@ public class OrderinfoService implements IOrderinfoService {
 			address.setStatename(ob.getStatename());
 			address.setAddress2(ob.getAddress2());
 			address.setRecipients(ob.getRecipients());
+			address.setStreet(StringUtil.isBlank(ob.getStreet())?"":ob.getStreet());
 			ob.setAddress(address);
 			ob.setOrderNumber(ob.getOrdernum() == 1);
 			ob.setPay_price(Double.parseDouble(Utility.formatPrice(String.valueOf(ob.getPay_price())).replaceAll(",", "")));

@@ -316,6 +316,16 @@ function getMessageNum(uid){
                     $('#businquiries1').html(messagesCountVo.noDeleteCount);
                     $('#businquiries2').html(messagesCountVo.countAll);
                 }
+                $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                // if(admuserid ==1 || admuserid == 83){
+                //     $('#businquiries').html(messagesCountVo.noArrgCount);
+                //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                //     $('#businquiries2').html(messagesCountVo.countAll);
+                // }else{
+                //     $('#businquiries').css("display","none");
+                //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                //     $('#businquiries2').html(messagesCountVo.countAll);
+                // }
             }else if(messagesCountVo.type=='refundscom'){
                 $('#refundscom').html(messagesCountVo.noDeleteCount);
                 $('#refundscom1').html(messagesCountVo.countAll);
@@ -381,6 +391,18 @@ function getMessageNum(uid){
                                 $('#businquiries1').html(messagesCountVo.noDeleteCount);
                                 $('#businquiries2').html(messagesCountVo.countAll);
                             }
+                            sessionStorage.setItem("noDeleteCount",messagesCountVo.noDeleteCount);
+                            $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            // if(admuserid ==1 || admuserid ==83){
+                            //     $('#businquiries').html(messagesCountVo.noArrgCount);
+                            //     sessionStorage.setItem("noArrgCount",messagesCountVo.noArrgCount);
+                            //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            //     $('#businquiries2').html(messagesCountVo.countAll);
+                            // }else{
+                            //     $('#businquiries').css("display","none");
+                            //     $('#businquiries1').html(messagesCountVo.noDeleteCount);
+                            //     $('#businquiries2').html(messagesCountVo.countAll);
+                            // }
                         }/*else if(messagesCountVo.type=='batapply'){
         				if(admuserid ==1){
         				$('#batapply').html(messagesCountVo.noArrgCount);

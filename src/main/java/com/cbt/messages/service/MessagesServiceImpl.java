@@ -1,5 +1,7 @@
 package com.cbt.messages.service;
 
+import com.cbt.bean.BusiessBean;
+import com.cbt.dao.BusiessDao;
 import com.cbt.messages.dao.MessagesMapper;
 import com.cbt.messages.vo.AdminRUser;
 import com.cbt.messages.vo.MessagesCountVo;
@@ -19,6 +21,9 @@ public class MessagesServiceImpl implements MessagesService{
 
 	@Autowired
 	private MessagesMapper messagesDao;
+
+    @Autowired
+    private BusiessDao busiessDao;
 
 	@Override
 	public int insertSelective(Messages record) {
@@ -215,7 +220,19 @@ public class MessagesServiceImpl implements MessagesService{
 		return result;
 	}
 
-	/**
+    @Override
+    public MessagesCountVo selectBusiessNumNew(int admuserid) {
+        BusiessBean busiessBean = new BusiessBean();
+        busiessBean.setAdmName(String.valueOf(admuserid));
+        busiessBean.setState(0);
+        int count = busiessDao.queryByChoiceCountPage(busiessBean, 1);
+        MessagesCountVo messagesCountVo = new MessagesCountVo();
+        messagesCountVo.setNoDeleteCount(count);
+        messagesCountVo.setType("businquiries");
+        return messagesCountVo;
+    }
+
+    /**
 	 * 查询批量优惠申请数量
 	 */
 	@Override

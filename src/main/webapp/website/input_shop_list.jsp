@@ -377,7 +377,7 @@
               onsubmit="return false;">
             <input type="hidden" id="admName" name="admName">
             <input type="hidden" id="days" name="days">
-            上线状态：<select id="state_id" class="easyui-combobox" name="isOn" style="width:150px;">
+            上线状态:<select id="state_id" class="easyui-combobox" name="isOn" style="width:150px;">
             <option value="-1">全选</option>
             <option value="0">代办</option>
             <option value="2">详情图片已下载</option>
@@ -388,58 +388,21 @@
             <option value="3">图片已上传美服</option>
             <option value="1">详情信息已下载</option>
         </select>
-            录入来源：<select id="is_auto" class="easyui-combobox" name="isAuto" style="width:80px;">
+            &nbsp;&nbsp;录入来源:<select id="is_auto" class="easyui-combobox" name="isAuto" style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">手动录入</option>
             <option value="1">自动导入</option>
         </select>
 
-            <input class="easyui-textbox" name="shopId" id="shopId"
-                   style="width:240px; margin-top: 10px;"
-                   data-options="label:'shopid:'"/>
+            &nbsp;&nbsp;店铺ID:<input class="easyui-textbox" name="shopId" id="shopId"
+                                    style="width:240px; margin-top: 10px;"/>
 
-            <input class="easyui-textbox" name="shopUserName" id="shopUserName"
-                   style="width: 9%; margin-top: 10px;"
-                   data-options="label:'负责人:'"/>
-
-            <input class="easyui-datebox" style="width: 10%;" name="timeFrom"
-                   id="timeFrom" value="${param.timeFrom}"
-                   data-options="label:'开始时间:'"/> <input class="easyui-datebox"
-                                                         style="width: 10%;" name="timeTo" id="timeTo"
-                                                         value="${param.timeTo}" data-options="label:'截止时间:'"/>
-            是否启用：<select id="is_on" class="easyui-combobox" name="isOn" style="width:75px;">
+            &nbsp;&nbsp;是否启用:<select id="is_on" class="easyui-combobox" name="isOn" style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">启用</option>
             <option value="1">不启用</option>
-        </select>
-            问题店铺：<select id="ready_del" class="easyui-combobox" name="readyDel" style="width:90px;">
-            <option value="-1">全选</option>
-            <option value="0">正常</option>
-            <option value="1">MOQ太高</option>
-            <option value="2">水印太多</option>
-            <option value="3">不适合运输</option>
-            <option value="4">其他</option>
-        </select>
-            店铺描述：<select id="shop_type" class="easyui-combobox" name="shopType" style="width:90px;">
-            <option value="-1">全选</option>
-            <option value="0">正常</option>
-            <option value="1">精品店铺</option>
-            <option value="2">侵权店铺</option>
-        </select>
-            授权店铺：<select id="authorized_flag" class="easyui-combobox" name="authorizedFlag" style="width:130px;">
-            <option value="-1">全选</option>
-            <option value="0">0-未去问是否给授权</option>
-            <option value="1">1-已给授权</option>
-            <option value="2">2-暂不给授权但可卖</option>
-            <option value="3">3-不给授权</option>
-        </select>
-           授权文件问题：<select id="authorized_file_flag" class="easyui-combobox" name="authorizedFlag" style="width:180px;">
-            <option value="-1">无筛选</option>
-            <option value="1">1-已授权但无授权文件</option>
-            <option value="2">2-授权文件到期</option>
-            <option value="3">3-已授权但无授权文件+授权文件到期</option>
-        </select>
-            店铺英文及品牌属性筛选：<select id="enname_brand_flag" class="easyui-combobox" name="authorizedFlag" style="width:180px;">
+        </select>&nbsp;&nbsp;&nbsp;&nbsp;店铺英文及品牌属性筛选:<select id="enname_brand_flag" class="easyui-combobox" name="authorizedFlag"
+                                                 style="width:180px;">
             <option value="-1">无筛选</option>
             <option value="1">1-店铺英文为空</option>
             <option value="2">2-品牌属性为空</option>
@@ -448,11 +411,48 @@
             <option value="5">5-品牌属性不为空</option>
             <option value="6">6-店铺英文+品牌属性都不为空</option>
         </select>
-            <input
-                    class="but_color" type="button" value="查询" onclick="doQuery(1)">
-            <input class="but_color" type="button" value="重置"
-                   onclick="doReset()"> <input class="but_color" type="button"
-                                               value="新增" onclick="doAdd()">
+            &nbsp;&nbsp;负责人:<input class="easyui-textbox" name="shopUserName" id="shopUserName"
+                                   style="width: 80px; margin-top: 10px;"/>
+
+            &nbsp;&nbsp;开始时间:<input class="easyui-datebox" style="width: 100px;" name="timeFrom"
+                                    id="timeFrom" value="${param.timeFrom}"/>
+            截止时间:<input class="easyui-datebox" style="width: 100px;" name="timeTo" id="timeTo" value="${param.timeTo}"/>
+
+
+            <br>授权店铺:<select id="authorized_flag" class="easyui-combobox" name="authorizedFlag" style="width:150px;">
+            <option value="-1">全选</option>
+            <option value="0">0-未去问是否给授权</option>
+            <option value="1">1-已给授权</option>
+            <option value="2">2-暂不给授权但可卖</option>
+            <option value="3">3-不给授权</option>
+        </select>
+            &nbsp;&nbsp;店铺描述:<select id="shop_type" class="easyui-combobox" name="shopType" style="width:100px;">
+            <option value="-1">全选</option>
+            <option value="0">正常</option>
+            <option value="1">精品店铺</option>
+            <option value="2">侵权店铺</option>
+        </select>
+            &nbsp;&nbsp;授权文件问题:<select id="authorized_file_flag" class="easyui-combobox" name="authorizedFlag"
+                                       style="width:207px;">
+            <option value="-1">无筛选</option>
+            <option value="1">1-已授权但无授权文件</option>
+            <option value="2">2-授权文件到期</option>
+            <option value="3">3-已授权但无授权文件+授权文件到期</option>
+        </select>
+            &nbsp;&nbsp;问题店铺:<select id="ready_del" class="easyui-combobox" name="readyDel" style="width:100px;">
+            <option value="-1">全选</option>
+            <option value="0">正常</option>
+            <option value="1">MOQ太高</option>
+            <option value="2">水印太多</option>
+            <option value="3">不适合运输</option>
+            <option value="4">其他</option>
+        </select>
+            &nbsp;&nbsp;<input
+                class="but_color" type="button" value="查询" onclick="doQuery(1)">
+            &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
+                               onclick="doReset()">
+            &nbsp;&nbsp;<input class="but_color" type="button"
+                               value="新增" onclick="doAdd()">
             <!--<input class="but_color" type="button" value="导入excel"
                 onclick="updateExcel()"> -->
         </form>
@@ -476,16 +476,16 @@
         <th data-options="field:'shopUrl',width:140,align:'center'">店铺url</th>
         <th data-options="field:'inputShopEnName',width:100,align:'center'">店铺英文</th>
         <th data-options="field:'inputShopBrand',width:100,align:'center'">品牌属性</th>
-        <th data-options="field:'onLineNum',width:50,align:'center'">已在线商品</th>
-        <th data-options="field:'isValidView',width:30,align:'center'">是否启用</th>
-        <th data-options="field:'onlineStatusView',width:150,align:'center'">上线状态</th>
-        <th data-options="field:'updatetime',width:80,align:'center'">更新日期</th>
+        <th data-options="field:'onLineNum',width:60,align:'center'">已在线商品</th>
+        <th data-options="field:'isValidView',width:40,align:'center'">是否启用</th>
+        <th data-options="field:'onlineStatusView',width:130,align:'center'">上线状态</th>
+        <th data-options="field:'updatetime',width:75,align:'center'">更新日期</th>
         <th data-options="field:'admUser',width:50,align:'center'">编辑者</th>
         <th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>
         <th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>
-        <th data-options="field:'inputShopDescription',width:50,align:'center'">店铺描述</th>
-        <th data-options="field:'stateInfo',width:240,align:'center'">操作</th>
-        <th data-options="field:'authorizedInfo',width:260,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
+        <th data-options="field:'inputShopDescription',width:80,align:'center'">店铺描述</th>
+        <th data-options="field:'stateInfo',width:200,align:'center'">操作</th>
+        <th data-options="field:'authorizedInfo',width:230,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
     </tr>
     </thead>
 </table>
@@ -554,8 +554,8 @@
             //iconCls : 'icon-ok',
             width: "100%",
             fit: true,//自动补全
-            pageSize: 25,//默认选择的分页是每页20行数据
-            pageList: [25],//可以选择的分页集合
+            pageSize: 50,//默认选择的分页是每页20行数据
+            pageList: [50],//可以选择的分页集合
             nowrap: false,//设置为true，当数据长度超出列宽时将会自动截取
             striped: true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮

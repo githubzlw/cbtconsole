@@ -197,7 +197,7 @@ public class WarehouseCtrl {
 		System.out.println("登录人ID："+adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		System.out.println("采购人长度："+list.size());
-		
+
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
 		admuser.setId(1);
@@ -1222,7 +1222,7 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult monthSalesEffortsList(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, String> map = new HashMap<String, String>();
-		String pages=request.getParameter("pages");
+		String pages=request.getParameter("page");
 		if(StringUtil.isBlank(pages)){
 			pages="1";
 		}
@@ -3922,7 +3922,7 @@ public class WarehouseCtrl {
 		request.setAttribute("orderPos", orderPos);
 		return "orderinfoInspection";
 	}
-	
+
 	// 出库验货 查询全部订单  2018/07/20 10:45  ly
 	@RequestMapping(value = "/getOrderInfoInspectionall.do", method = RequestMethod.GET)
 	public String getOrderInfoInspectionall(HttpServletRequest request, Model model) {
