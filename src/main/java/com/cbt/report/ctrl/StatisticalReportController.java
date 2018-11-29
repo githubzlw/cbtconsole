@@ -1551,14 +1551,15 @@ public class StatisticalReportController {
 		int start = 0;
 		int end = 0;
 		int DeliveryDate = 0;
-		startdate=StringUtils.isStrNull(startdate)?null:startdate;
+		startdate=StringUtils.isStrNull(startdate) ||"0".equals(startdate)?null:startdate;
 		paystartdate=StringUtils.isStrNull(paystartdate)?null:paystartdate;
 		enddate=!StringUtils.isStrNull(enddate)?enddate + " 23:59:59":null;
 		payenddate=!StringUtils.isStrNull(payenddate)?payenddate + " 23:59:59":null;
 		orderid=StringUtils.isStrNull(orderid)?null:orderid;
 		myorderid=StringUtils.isStrNull(myorderid)?null:myorderid;
-		orderstatus=StringUtils.isStrNull(orderstatus)?null:orderstatus;
+		orderstatus=StringUtils.isStrNull(orderstatus) || "0".equals(orderstatus)?null:orderstatus;
 		orderSource=orderSource.equals("-1")?null:orderSource;
+		isCompany="0".equals(isCompany)?null:isCompany;
 		procurementAccount=procurementAccount.equals("0")?null:procurementAccount;
 		if (noCycle.equals("0")) {
 			noCycle = null;
@@ -3797,9 +3798,9 @@ public class StatisticalReportController {
 		// 用户问题类型
 		int qtype = StrUtils.isNotNullEmpty(type) == true ? Integer.parseInt(type) : 0;
 		// 获取登录用户
-//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-//		int adminid = adm.getId();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		int adminid = adm.getId();
 		// 临时增加Sales1账号查看所有客户留言权限
 //		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
 //			adminid = 1;
@@ -3817,7 +3818,7 @@ public class StatisticalReportController {
 			state = Integer.parseInt(s);
 		}
 		String strAdminId = request.getParameter("adminId");
-		int adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
+		 adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
 		String su = request.getParameter("userId");
 		int userId = 0;
 		if (su != null && !"".equals(su)) {

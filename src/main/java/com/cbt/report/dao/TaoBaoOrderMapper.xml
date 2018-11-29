@@ -49,6 +49,7 @@
     <result column="sku" property="sku" jdbcType="VARCHAR" />
     <result column="itemPrice" property="itemPrice" jdbcType="VARCHAR" />
     <result column="short_term" property="short_term" jdbcType="VARCHAR"/>
+    <result column="types" property="types" jdbcType="VARCHAR"/>
    </resultMap>
    
    <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
@@ -84,7 +85,8 @@
   <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
      	SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
        AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01'  and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -151,16 +153,17 @@
      <if test="myorderid!=null">
         and ops.orderid=#{myorderid}
      </if>
-     GROUP BY t.orderid 
+     GROUP BY t.orderid
       <if test="page!=-1">
       limit #{page},20
       </if>
   </select>
   
   <select id="selectAllCount" resultMap="BaseResultMap">
-     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
-    AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate
+      AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
+   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01' and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -263,7 +266,7 @@
   </select>
   
   <select id="getIinOutDetails" resultMap="InoutResultMap">
-      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS TYPE,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
+      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS types,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
       FROM goods_inventory_whj g INNER JOIN order_details od
       ON g.orderid=od.orderid AND g.goodsid=od.goodsid
       INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid

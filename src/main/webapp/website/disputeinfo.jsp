@@ -211,7 +211,7 @@ Amount Refunded:${result.dispute_outcome.amount_refunded.value } ${result.disput
 <a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${orderNo }">${orderNo }</a></span>
 <span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a target="_blank" href="/cbtconsole/refundCtr/queryForList?userId=${userid}&type=1&appMoney=0&page=1&chooseState=-1">申诉退款</a>
+<a target="_blank" href="/cbtconsole/refundCtr/queryForList?userId=${userid}&type=1&appMoney=0&page=1&chooseState=-1">退款</a>
 </span>
 
 
@@ -291,7 +291,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
-<c:if test="${confim==0 }">
+<c:if test="${confim==0 && role == 0}">
 <input type="submit" value="确认退款" id="confirmrefundRadio">
 </c:if>
 
@@ -567,13 +567,17 @@ class=" edit">
 </div>
 <div style="margin-left: 60px;"  class="panel confirmrfund_form message_form hide">
 <form action="/cbtconsole/customer/dispute/confirm" method="post">
-<input type="hidden" name="disputeid" value="${result.dispute_id }">
-<input type="hidden" name=seller_transaction_id value="${result.disputed_transactions[0].seller_transaction_id }">
-<input type="hidden" name="userid" value="${userid}">
-<input type="hidden" name="orderNo" value="${orderNo }">
-<input type="hidden" name="operatorName" value="${operatorName }">
+Note:内部使用,意在销售客服通知Ling,该申诉需要退款
+<br>
+<span>Case&nbsp;ID:&nbsp;&nbsp;&nbsp;<input type="text" name="disputeid" value="${result.dispute_id }" readonly="readonly"></span>
+<span style="margin-left: 20px;">User ID:&nbsp;&nbsp;&nbsp;<input type="text" name="userid" value="${userid}" readonly="readonly"></span>
+<span style="margin-left: 20px;">Transaction ID:<input type="text" name=seller_transaction_id value="${result.disputed_transactions[0].seller_transaction_id }" readonly="readonly"></span>
+<br>
+<span>Order.No:<input type="text" name="orderNo" value="${orderNo }" readonly="readonly"></span>
+<span style="margin-left: 20px;">Operator:<input type="text" name="operatorName" value="${operatorName }" readonly="readonly"></span>
 <textarea class="form-controltext " name="messageBodyForGeneric" id="messageBody" rows="10" cols="100" maxlength="2000" placeholder="备注"></textarea>
 <br>
+<input type="hidden" name="merchant" value="${merchant }" class="button" >
 <input type="submit" name="send" value="Submint" class="button" >
 <input type="button" name="secondary" value="Cancel" class="cancel_button" >
 </form>

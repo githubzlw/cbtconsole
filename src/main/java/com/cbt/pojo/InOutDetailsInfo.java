@@ -28,7 +28,9 @@ public class InOutDetailsInfo {
 	private String car_img;
 	private String yourorder;
 	private String car_type;
-	private String TYPE;
+
+
+	private String types;
 	private String createtime;
 	private String counts;
 	private String goods_pid;
@@ -36,7 +38,13 @@ public class InOutDetailsInfo {
 	public String getOrderid() {
 		return orderid;
 	}
+	public String getTypes() {
+		return types;
+	}
 
+	public void setTypes(String types) {
+		this.types = types;
+	}
 	public void setOrderid(String orderid) {
 		this.orderid = orderid;
 	}
@@ -73,13 +81,6 @@ public class InOutDetailsInfo {
 		this.car_type = car_type;
 	}
 
-	public String getTYPE() {
-		return TYPE;
-	}
-
-	public void setTYPE(String TYPE) {
-		this.TYPE = TYPE;
-	}
 
 	public String getCreatetime() {
 		return createtime;
