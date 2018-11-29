@@ -171,6 +171,7 @@
                 var json = [];
                 var errContent = {};
                 $("#shop_goods_error").find(".div_sty").each(function () {
+                    $(this).find(".img_div_cs").css("background-color", "");
                     var tempPam = {};
                     var catid = $(this).find(".catid_sty").val();
                     tempPam["catid"] = catid;
@@ -180,9 +181,8 @@
                     var setWeight = divOj.find(".inp_sty").val();
                     var checkOj = divOj.find(".check_sty_l");
                     if ((setWeight == null || setWeight == "" || setWeight == "0" || setWeight == "0.0") && !(checkOj.is(':checked'))) {
-                        $.messager.alert("提醒", "存在未设置的重量或者未标记特例", "info");
                         isSave = false;
-                        return false;
+                        $(this).find(".img_div_cs").css("background-color", "red");
                     } else {
                         var curWeight = divOj.find(".cur_weight").val();
                         if (checkOj.is(':checked')) {
@@ -207,38 +207,43 @@
                     }
                     json[json.length] = tempPam;
                 });
-                var count = Object.keys(errContent).length;
-                if (count > 0) {
-                    var errDesc = "";
-                    for (var keyV in errContent) {
-                        errDesc += ";" + keyV + " : " + errContent[keyV] + "个";
-                    }
-                    $("#error_desc").empty();
-                    $("#error_desc").append("存在重量为0商品的未设置重量[" + errDesc.substring(1) + "]");
-                    $("#error_desc").show();
-                } else if (isSave) {
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'json',
-                        url: '/cbtconsole/ShopUrlC/saveDealErrorShopGoods',
-                        data: {
-                            shopId: shopId,
-                            infos: JSON.stringify(json)
-                        },
-                        success: function (data) {
-                            if (data.ok) {
-                                $.messager.alert("提醒", "执行成功,页面即将跳转", "info");
-                                setTimeout(function () {
-                                    window.location.href = "/cbtconsole/ShopUrlC/showHasDealShopGoods?shopId=" + shopId;
-                                }, 500);
-                            } else {
-                                $.messager.alert("提醒", data.message, "error");
-                            }
-                        },
-                        error: function (XMLResponse) {
-                            $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                if (isSave) {
+                    var count = Object.keys(errContent).length;
+                    if (count > 0) {
+                        var errDesc = "";
+                        for (var keyV in errContent) {
+                            errDesc += ";" + keyV + " : " + errContent[keyV] + "个";
                         }
-                    });
+                        $("#error_desc").empty();
+                        $("#error_desc").append("存在重量为0商品的未设置重量[" + errDesc.substring(1) + "]");
+                        $("#error_desc").show();
+                    } else if (isSave) {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: '/cbtconsole/ShopUrlC/saveDealErrorShopGoods',
+                            data: {
+                                shopId: shopId,
+                                infos: JSON.stringify(json)
+                            },
+                            success: function (data) {
+                                if (data.ok) {
+                                    $.messager.alert("提醒", "执行成功,页面即将跳转", "info");
+                                    setTimeout(function () {
+                                        window.location.href = "/cbtconsole/ShopUrlC/showHasDealShopGoods?shopId=" + shopId;
+                                    }, 500);
+                                } else {
+                                    $.messager.alert("提醒", data.message, "error");
+                                }
+                            },
+                            error: function (XMLResponse) {
+                                $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                            }
+                        });
+                    }
+                } else {
+                    $.messager.alert("提醒", "存在未设置的重量或者未标记特例", "info");
+                    return false;
                 }
             } else {
                 $.messager.alert("提醒", "执行成功,页面即将跳转", "info");
@@ -442,7 +447,7 @@
                                 <input type="hidden" class="pid_sty" value="${goods.pid}"/>
                                 <input type="checkbox" class="check_sty"
                                        onclick="chooseBox(this)" value="${goods.pid}"/>
-                                <div>
+                                <div class="img_div_cs">
                                     <a target="_blank"
                                        href="https://detail.1688.com/offer/${goods.pid}.html"><img
                                             class="img_sty" src="${goods.imgUrl}"/></a>
