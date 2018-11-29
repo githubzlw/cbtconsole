@@ -544,6 +544,7 @@ public interface CustomGoodsService {
 
     JsonResult setGoodsWeightByWeigher(String pid, String newWeight);
 
+    JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight);
 
     List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm);
 
@@ -552,5 +553,4 @@ public interface CustomGoodsService {
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
     boolean refreshPriceRelatedData(CustomGoodsPublish bean);
-
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.bcel.generic.NEW;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,9 +34,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.FileMeta;
 import com.cbt.util.FileUtil;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import com.cbt.util.SysParamUtil;
 import com.cbt.warehouse.ctrl.GroupBuyManageCtrl;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
+import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.service.APIService;
 import com.importExpress.service.CustomerDisputeService;
 
@@ -58,8 +65,15 @@ public class CustomerDisputeController {
     @RequestMapping(value = "/list")
     @ResponseBody
     public EasyUiJsonResult list(HttpServletRequest request, HttpServletResponse response) {
-
-        EasyUiJsonResult json = new EasyUiJsonResult();
+    	EasyUiJsonResult json = new EasyUiJsonResult();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+//        int adminId = 0;
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
         int startNum = 0;
         int limitNum = 50;
         
@@ -79,13 +93,13 @@ public class CustomerDisputeController {
         if (sttime == null || "".equals(sttime)) {
             sttime = "";
         } else {
-            sttime += "T00:00:00.000Z";
+            sttime += " 00:00:00";
         }
         String edtime = request.getParameter("edtime");
         if (edtime == null || "".equals(edtime)) {
             edtime = "";
         } else {
-            edtime += "T23:59:59.000Z";
+            edtime += " 23:59:59";
         }
         String status = request.getParameter("status");
         status = StringUtils.equals("-1", status) ? null : status;
@@ -96,8 +110,12 @@ public class CustomerDisputeController {
         
         try {
             // 查询所有数据库表中的类别
+        	int count = customerDisputeService.count(null, "0");
         	
-        	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, sttime, edtime, status);
+        	json.setMessage(String.valueOf(count));
+        	
+        	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, 
+        			sttime, edtime, status,adm.getId());
         	long total = 0;
         	if(map != null && !map.isEmpty() ) {
         		total = (Long)map.get("total");
@@ -109,10 +127,25 @@ public class CustomerDisputeController {
         } catch (Exception e) {
             e.printStackTrace();
             json.setSuccess(false);
-            json.setMessage("获取团购商品信息失败，原因：" + e.getMessage());
-            LOG.error("获取团购商品信息失败，原因：" + e.getMessage());
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            LOG.error("获取数据失败，原因：" + e.getMessage());
         }
         return json;
+    }
+    /**
+     * 
+     *申诉消息列表
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/update")
+    public String update(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	String disputeid = request.getParameter("disputeid");
+    	customerDisputeService.updateStatus(disputeid, "1");
+    	
+    	return "redirect:/apa/disputerefund.html";
     }
     
     
@@ -125,16 +158,37 @@ public class CustomerDisputeController {
     @RequestMapping("/info")
     @ResponseBody
     public ModelAndView info(HttpServletRequest request, HttpServletResponse response) {
-    	ModelAndView mv = new ModelAndView("disputeinfo");
+    	 ModelAndView mv = new ModelAndView("disputeinfo");
+    	 String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+         if (StringUtil.isBlank(admuserJson)) {
+             mv.addObject("success", 0);
+             mv.addObject("message", "请登录后操作");
+             return mv;
+         }
+//         int adminId = 0;
+         Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+         mv.addObject("operatorId", adm.getId());
+         mv.addObject("roleType", adm.getRoletype());
+         mv.addObject("operatorName", adm.getAdmName());
+         /*if ("0".equals(adm.getRoletype())) {
+             adminId = 0;
+         } else {
+             adminId = adm.getId();
+         }*/
+        mv.addObject("role", adm.getId() == 1||adm.getId() == 8 ? 1 : 2);
     	String disputeID = request.getParameter("disputeid");
+    	String merchant = request.getParameter("merchant");
     	JSONObject infoByDisputeID = null;
     	int resonFlag = 0;
     	int statusFlag = 0;
     	int disputeLifeCycleFlag = 0;
+    	mv.addObject("success", 1);
 		try {
-			String showDisputeDetails = "";//customerDisputeService.info(disputeID);
+			int confim = customerDisputeService.count(disputeID,"-1");
+			mv.addObject("confim", confim);
+			String showDisputeDetails = "";//
 			if(StringUtils.isBlank(showDisputeDetails)) {
-				showDisputeDetails = apiService.showDisputeDetails(disputeID);
+				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
 			}		
 			if(StringUtils.isNotEmpty(showDisputeDetails)) {
 				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
@@ -146,19 +200,11 @@ public class CustomerDisputeController {
 				String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
 				mv.addObject("orderNo", "");
 				if(StringUtils.indexOf(custom, "@") > -1) {
-					if(custom.indexOf("{@}") > -1) {
-						String[] split = custom.split("\\{@\\}");
-						if(split.length > 3) {
-							mv.addObject("userid", split[0]);
-							mv.addObject("orderNo", split[2]);
-						}
-					}else {
-						String[] split = custom.split("@");
-						if(split.length == 10) {
-							mv.addObject("userid", split[0]);
-							mv.addObject("orderNo", split[6]);
-						}
-					}
+					String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
+					String userid = split.length > 3 ? split[0] : "";
+					String orderNo = split.length > 5 ? split[6] : split.length > 3 ?split[2] : "";
+					mv.addObject("userid", userid);
+					mv.addObject("orderNo", orderNo);
 				}
 				//原因
 				String reason = infoByDisputeID.getString("reason");
@@ -189,13 +235,76 @@ public class CustomerDisputeController {
 				mv.addObject("resonFlag", resonFlag);
 				mv.addObject("statusFlag", statusFlag);
 				mv.addObject("disputeLifeCycleFlag", disputeLifeCycleFlag);
+				mv.addObject("merchant", merchant);
+				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			mv.addObject("error", e.getMessage());
+			mv.addObject("message", e.getMessage());
+			mv.addObject("success", 0);
 		}
     	return mv;
+    }
+    /**申诉消息详情
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/confirm/list")
+    @ResponseBody
+    public EasyUiJsonResult confirmList(HttpServletRequest request, HttpServletResponse response) {
+    	EasyUiJsonResult json = new EasyUiJsonResult();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+    	json.setRows(new ArrayList<CustomerDisputeBean>());
+    	if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        int op = adm.getId() == 1|| adm.getId() == 8 || adm.getId() == 18 ? 1 : 2;
+    	
+        int startNum = 0;
+        int limitNum = 50;
+        
+        String pageStr = request.getParameter("page");
+        String limitNumStr = request.getParameter("rows");
+        
+        if (!(limitNumStr == null || "".equals(limitNumStr) || "0".equals(limitNumStr))) {
+        	limitNum = Integer.valueOf(limitNumStr) ;
+        }
+        
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        String disputeid = request.getParameter("disputeid");
+        disputeid = StringUtils.isBlank(disputeid) ? null : disputeid;
+        
+      
+        String status = request.getParameter("status");
+        status = StringUtils.isBlank(status) ? "-1" : status;
+    	try {
+    		List<CustomerDisputeBean> confirmList = customerDisputeService.confirmList(disputeid, status,startNum,limitNum);
+    		confirmList.stream().forEach(c -> {
+    			String cstatus = c.getStatus();
+    			c.setStatus(StringUtils.equals(cstatus, "0") ? "等待退款" : "已完成");
+    		});
+    		
+    		json.setMessage(String.valueOf(op));
+    		int count = customerDisputeService.count(disputeid, status);
+    		
+    		json.setRows(confirmList);
+    		json.setSuccess(true);
+    		json.setTotal(count);
+    			
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		json.setSuccess(false);
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            LOG.error("获取数据失败，原因：" + e.getMessage());
+    	}
+    	return json;
     }
     /**申诉消息回复
      * @param request
@@ -206,7 +315,7 @@ public class CustomerDisputeController {
     public String sendMessage(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
     	String content = request.getParameter("messageBodyForGeneric");
-    	
+    	String merchant = request.getParameter("merchant");
     	String email = request.getParameter("sellerEmailForPhotoEvidence");
     	
 		
@@ -227,7 +336,7 @@ public class CustomerDisputeController {
 //					result = customerDisputeService.updateMessage(disputeID, data);
 //				}else {
 					data.put("message", content);
-					result = apiService.sendMessage(disputeID, data);
+					result = apiService.sendMessage(disputeID,merchant, data);
 //				}
 				System.out.println(result);
 				attr.addFlashAttribute("sendResult", "Successed");
@@ -249,6 +358,8 @@ public class CustomerDisputeController {
     @RequestMapping("/offer")
     public String makeOffer(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
+    	String merchant = request.getParameter("merchant");
+    	
     	String content = request.getParameter("messageBodyForGeneric");
     	String offerAmount = request.getParameter("refundAmount");
     	String offerType = request.getParameter("offerType");
@@ -299,7 +410,7 @@ public class CustomerDisputeController {
 		
     	String result = null;
 		try {
-			result = apiService.makeOffer(disputeID, data);
+			result = apiService.makeOffer(disputeID,merchant, data);
 			attr.addFlashAttribute("sendResult", "Successed");
 			System.out.println(result);
 		} catch (Exception e) {
@@ -310,6 +421,35 @@ public class CustomerDisputeController {
     	
 		return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }
+    /**提议
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/confirm")
+    public String confirm(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
+    	String disputeID = request.getParameter("disputeid");
+    	String seller_transaction_id = request.getParameter("seller_transaction_id");
+    	String userid = request.getParameter("userid");
+    	String orderNo = request.getParameter("orderNo");
+    	String remark = request.getParameter("messageBodyForGeneric");
+    	String operatorName = request.getParameter("operatorName");
+    	String merchant = request.getParameter("merchant");
+    	
+    	CustomerDisputeBean customer = new CustomerDisputeBean();
+    	
+    	customer.setDisputeID(disputeID);
+    	customer.setOprateAdm(operatorName);
+    	customer.setOrderNo(orderNo);
+    	customer.setRemark(remark);
+    	customer.setTransactionID(seller_transaction_id);
+    	customer.setUserid(userid);
+    	customer.setStatus("0");
+    	customer.setMerchantID(merchant);
+    	int confirm = customerDisputeService.confirm(customer);
+    	
+    	return "redirect:/customer/dispute/info?disputeid="+disputeID;
+    }
     /**接受索赔
      * @param request
      * @param response
@@ -318,6 +458,7 @@ public class CustomerDisputeController {
     @RequestMapping("/acceptClaim")
     public String acceptClaim(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
+    	String merchant = request.getParameter("merchant");
     	String content = request.getParameter("messageBodyForGeneric");
     	String refundAmount = request.getParameter("refundAmount");
     	String refundCurrency = request.getParameter("refundCurrency");
@@ -340,12 +481,13 @@ public class CustomerDisputeController {
     		Amount.put("currency_code", refundCurrency);
     		data.put("refund_amount", Amount);
     	}
-		System.out.println(JSONObject.toJSONString(data));
+//		System.out.println(JSONObject.toJSONString(data));
     	String result = null;
 		try {
-			result = apiService.acceptClaim(disputeID, data);
+			result = apiService.acceptClaim(disputeID, merchant, data);
+			customerDisputeService.updateStatus(disputeID, "1");
 			attr.addFlashAttribute("sendResult", "Successed");
-			System.out.println(result);
+//			System.out.println(result);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -363,6 +505,7 @@ public class CustomerDisputeController {
     @ResponseBody
     public String provideEvidence(HttpServletRequest request, HttpServletResponse response) {
     	String disputeID = request.getParameter("disputeid");
+    	String merchant = request.getParameter("merchant");
     	String content = request.getParameter("messageBodyForGeneric");
     	String fileLocation = request.getParameter("fileLocation");
     	
@@ -402,7 +545,7 @@ public class CustomerDisputeController {
     	
     	String result = null;
 		try {
-			result = apiService.provideEvidence(disputeID, JSONObject.toJSONString(data),file);
+			result = apiService.provideEvidence(disputeID, merchant, JSONObject.toJSONString(data),file);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -421,6 +564,7 @@ public class CustomerDisputeController {
     @RequestMapping("/acknowledge-return-item")
     public String acknowledgeReturnedItem(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
+    	String merchant = request.getParameter("merchant");
     	String content = request.getParameter("messageBodyForGeneric");
     	
     	attr.addFlashAttribute("sendResult", "Failed");
@@ -433,7 +577,7 @@ public class CustomerDisputeController {
     	
     	String result = null;
     	try {
-    		result = apiService.acknowledgeReturnedItem(disputeID, data);
+    		result = apiService.acknowledgeReturnedItem(disputeID, merchant, data);
     		attr.addFlashAttribute("sendResult", "Successed");
     	} catch (Exception e) {
     		// TODO Auto-generated catch block
@@ -441,7 +585,7 @@ public class CustomerDisputeController {
     		result = e.getMessage();
     		attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
     	}
-    	System.out.println(result);
+//    	System.out.println(result);
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }

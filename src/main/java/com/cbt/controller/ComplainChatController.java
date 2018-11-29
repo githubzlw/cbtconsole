@@ -72,7 +72,7 @@ public class ComplainChatController {
 				String chatText= t.getChatText();
 				model.put("chatText",chatText);
 				model.put("name",userEmail);
-				model.put("email","saycjc@outlook.com");
+				model.put("email",userEmail);
 				model.put("chatText",chatText);
 				model.put("chatText",chatText);
 				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Reply to your support request", model, TemplateType.COMPLAINT);

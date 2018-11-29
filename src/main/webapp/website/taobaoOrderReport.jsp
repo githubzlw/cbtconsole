@@ -50,7 +50,7 @@ var searchReport = "/cbtconsole/StatisticalReport/searchTaoBaoOrder"; //报表�
    <form id="adduserForm" name="adduserForm" action="" method="post">
       <div class="box box-solid" >
          <div class="box-header with-border">
-             <h4>查询条件</h4>
+             <h4>查询条件</h4><span style="color:Red">建议至少选择一个条件查询</span>
          </div>
          <div class="box-body">
              <!--   <div class="col-xs-4 form-group">
@@ -161,6 +161,9 @@ var searchReport = "/cbtconsole/StatisticalReport/searchTaoBaoOrder"; //报表�
 		             <div class="btn btn-primary pull-right" id="pgSearch" style="margin-right: 5px;">
 		                    <i class="fa fa-search">查 询</i>
 		             </div>
+                   <div>
+                       <span id="info" style="color:Red"></span>
+                   </div>
               </div>
          </div>
          <div  style="padding:15px;">
@@ -264,6 +267,7 @@ $('#pgSearch').click(function(){
 });
 
 function searchExport(page){
+    $("#info").html("查询中。。。。。");
 	$("#categroyReport tbody").html("");
 	var orderdate =$('#orderdate').val();
 	var orderstatus=$('#orderstatus').val();
@@ -297,6 +301,7 @@ function searchExport(page){
         	  },
         type:"post",
         success:function(data){
+            $("#info").html("");
         	if(data){
         		var reportDetailList=data.data.infoList;
         		var allCount=data.data.allCount;

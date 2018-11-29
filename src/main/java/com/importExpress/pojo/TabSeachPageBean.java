@@ -24,8 +24,54 @@ public class TabSeachPageBean {
 	
 	private int catId;//关键词对应的分类id
 	private int parentId;
-	
-	public int getParentId() {
+
+	private String pageTitle; //页面标题
+	private String pageKeywords; //页面keywords
+	private String pageDescription; //页面description
+	private String pageBannerName; //底部banner图片 本地
+	private String pageBannerUrl; //底部banner图片 图片服务器
+
+    public String getPageTitle() {
+        return pageTitle;
+    }
+
+    public void setPageTitle(String pageTitle) {
+        this.pageTitle = pageTitle;
+    }
+
+    public String getPageKeywords() {
+        return pageKeywords;
+    }
+
+    public void setPageKeywords(String pageKeywords) {
+        this.pageKeywords = pageKeywords;
+    }
+
+    public String getPageDescription() {
+        return pageDescription;
+    }
+
+    public void setPageDescription(String pageDescription) {
+        this.pageDescription = pageDescription;
+    }
+
+    public String getPageBannerName() {
+        return pageBannerName;
+    }
+
+    public void setPageBannerName(String pageBannerName) {
+        this.pageBannerName = pageBannerName;
+    }
+
+    public String getPageBannerUrl() {
+        return pageBannerUrl;
+    }
+
+    public void setPageBannerUrl(String pageBannerUrl) {
+        this.pageBannerUrl = pageBannerUrl;
+    }
+
+    public int getParentId() {
 		return parentId;
 	}
 	public void setParentId(int parentId) {

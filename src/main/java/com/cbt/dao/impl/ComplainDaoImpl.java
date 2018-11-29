@@ -331,7 +331,7 @@ public class ComplainDaoImpl implements IComplainDao{
 		if(t.getUserid()!=0){
 			sb.append(" and c.userid="+t.getUserid());
 		}
-		if(t.getCreatTime()!=null &&t.getCreatTime()!=""){
+		if(StringUtil.isNotBlank(t.getCreatTime())){
 			 sb.append(" and c.createTime like \"%"+t.getCreatTime()+"%\"");
 		}
 		if(StringUtil.isNotBlank(t.getComplainType())){

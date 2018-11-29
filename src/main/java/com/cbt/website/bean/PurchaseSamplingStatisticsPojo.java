@@ -59,6 +59,50 @@ public class PurchaseSamplingStatisticsPojo implements Serializable{
 	private String car_type;
 	private String car_img;
 	private String admId;
+	private String datas;
+	private String salesAcount;
+	private String searchAcount;
+	private String openAcount;
+	private String pids;
+	public String getPids() {
+		return pids;
+	}
+
+	public void setPids(String pids) {
+		this.pids = pids;
+	}
+	public String getDatas() {
+		return datas;
+	}
+
+	public void setDatas(String datas) {
+		this.datas = datas;
+	}
+
+	public String getSalesAcount() {
+		return salesAcount;
+	}
+
+	public void setSalesAcount(String salesAcount) {
+		this.salesAcount = salesAcount;
+	}
+
+	public String getSearchAcount() {
+		return searchAcount;
+	}
+
+	public void setSearchAcount(String searchAcount) {
+		this.searchAcount = searchAcount;
+	}
+
+	public String getOpenAcount() {
+		return openAcount;
+	}
+
+	public void setOpenAcount(String openAcount) {
+		this.openAcount = openAcount;
+	}
+
 	public String getAdmId() {
 		return admId;
 	}

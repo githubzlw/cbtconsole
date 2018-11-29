@@ -49,6 +49,7 @@
     <result column="sku" property="sku" jdbcType="VARCHAR" />
     <result column="itemPrice" property="itemPrice" jdbcType="VARCHAR" />
     <result column="short_term" property="short_term" jdbcType="VARCHAR"/>
+    <result column="types" property="types" jdbcType="VARCHAR"/>
    </resultMap>
    
    <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
@@ -76,12 +77,16 @@
     <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
     <result column="onLine" property="onLine" jdbcType="VARCHAR" />
      <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+       <result column="pid" property="pid" jdbcType="VARCHAR" />
+       <result column="online_flag" property="online_flag" jdbcType="VARCHAR" />
+       <result column="db_flag" property="db_flag" jdbcType="VARCHAR"/>
    </resultMap>
  
   <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
      	SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
        AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01'  and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -148,16 +153,17 @@
      <if test="myorderid!=null">
         and ops.orderid=#{myorderid}
      </if>
-     GROUP BY t.orderid 
+     GROUP BY t.orderid
       <if test="page!=-1">
       limit #{page},20
       </if>
   </select>
   
   <select id="selectAllCount" resultMap="BaseResultMap">
-     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
-    AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate
+      AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
+   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01' and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -260,7 +266,7 @@
   </select>
   
   <select id="getIinOutDetails" resultMap="InoutResultMap">
-      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS TYPE,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
+      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS types,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
       FROM goods_inventory_whj g INNER JOIN order_details od
       ON g.orderid=od.orderid AND g.goodsid=od.goodsid
       INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
@@ -312,7 +318,7 @@
       where 1=1
     and if(i.flag=1,i.new_remaining,i.remaining)>0
      <if test="goodinfo!=null">
-       and LOCATE(#{goodinfo},i.good_name)
+         and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
      </if>
      <if test="sku!=null">
         and LOCATE(#{sku},i.sku)
@@ -365,9 +371,13 @@
          </otherwise>
        </choose>
      </if>
-     <if test="goodscatid!=null">
-        and i.goodscatid=#{goodscatid}
-     </if>
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
+      </if>
+
      <if test="startdate!=null">
         and i.updatetime>=#{startdate}
      </if>
@@ -386,7 +396,7 @@
       where 1=1
       and if(i.flag=1,i.new_remaining,i.remaining)>0
       <if test="goodinfo!=null">
-          and LOCATE(#{goodinfo},i.good_name)
+          and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
       </if>
       <if test="sku!=null">
           and LOCATE(#{sku},i.sku)
@@ -439,8 +449,11 @@
               </otherwise>
           </choose>
       </if>
-      <if test="goodscatid!=null">
-          and i.goodscatid=#{goodscatid}
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
       </if>
       <if test="startdate!=null">
           and i.updatetime>=#{startdate}
@@ -1526,13 +1539,16 @@
 	) b
   </select>
   <delete id="deleteInventory">
-    INSERT INTO inventory_delete_details SELECT * FROM inventory WHERE id= ${id};
+    INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
     delete from inventory where id=${id};
   </delete>
   <select id="queryInById" resultType="com.cbt.pojo.Inventory">
     select * from inventory where id=#{id}
   </select>
-  <update id="updateIsStockFlag">
+    <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
+        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
+    </select>
+    <update id="updateIsStockFlag">
     update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
   </update>
     <update id="updateIsStockFlag1">

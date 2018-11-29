@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.CustomerDisputeMapper">
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.CustomerDisputeBean" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="dispute_id" property="disputeID" jdbcType="VARCHAR" />
+    <result column="user_id" property="userid" jdbcType="VARCHAR" />
+    <result column="transaction_id" property="transactionID" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+    <result column="oprate_adm" property="oprateAdm" jdbcType="VARCHAR" />
+    <result column="merchant" property="merchantID" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  
+  <insert id="insert" parameterType="com.importExpress.pojo.CustomerDisputeBean">
+    insert into customer_dispute (dispute_id,user_id, order_no, merchant,
+      transaction_id, remark,oprate_adm,create_time,update_time
+      )
+    values (#{disputeID},#{userid},#{orderNo},#{merchantID},#{transactionID},#{remark},#{oprateAdm},now(),now()
+      )
+  </insert>
+   <update id="updateStatus">
+    update customer_dispute set status=#{status},update_time=now()
+    where dispute_id = #{disputeID}
+  </update>
+  
+  <select id="count"  resultType="java.lang.Integer">
+    select  count(id) from customer_dispute where  1=1 
+    <if test="disputeId != null">
+     and dispute_id = #{disputeId}
+    </if>
+    <if test="status != -1">
+     and status = #{status}
+    
+    </if>
+    
+  </select>
+ 
+  <select id="confirmList"  resultMap="BaseResultMap">
+    select dispute_id,user_id, order_no, merchant,
+      transaction_id, remark,status,create_time,update_time,oprate_adm from customer_dispute 
+       where 1=1
+       <if test="disputeid != null">
+     and dispute_id = #{disputeid}
+    </if>
+    <if test="status != -1">
+     and status = #{status}
+    
+    </if>
+    order by update_time desc
+      limit #{startNum},#{limitNum}
+  </select>
+ 
+  
+ 
+ 
+ 
+</mapper>

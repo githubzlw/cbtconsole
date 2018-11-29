@@ -1,32 +1,16 @@
 package com.importExpress.controller;
 
-import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.parse.service.ImgDownload;
-import com.cbt.util.ImageCompression;
 import com.cbt.util.SyncSingleGoodsToOnlineUtil;
-import com.cbt.util.SysParamUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.pojo.FineCategory;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.service.CategoryResearchService;
 import com.importExpress.utli.JsonTreeUtils;
+import com.importExpress.utli.SearchFileUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.protocol.HTTP;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,23 +19,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
-
-//import com.sun.image.codec.jpeg.JPEGCodec;
-//import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 /**
  * 品类精研
  * @ClassName CategoryResearchController
- * @Description TODO
  * @author Administrator
  * @date 2018年3月8日 下午8:00:18
  */
@@ -64,13 +41,6 @@ public class CategoryResearchController {
 
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryResearchController.class);
 	private static List<Map<String,Object>> search1688Category;
-
-	private static String importexpressPath = SysParamUtil.getParam("importexpress");
-//	private static String importexpressPath = "https://www.import-express.com/";
-//	private static String IMAGEHOSTURL="http://192.168.1.34:8002/";
-//	private static final String LOCALPATH =  "D:/shopimgzip/";//图片上传的位置
-//	private static final String LOCALPATHZIPIMG =  "D:/shopimgzip/research/";//图片上传的位置
-//	private static final String IMAGESEARCHURL="https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";//图片访问路径
 
     //新增关键词
 	@RequestMapping("/add")
@@ -91,7 +61,7 @@ public class CategoryResearchController {
 			bean.setKeyword(keyword);
 			bean.setKeyword1(keyword1);
 			bean.setParentId(StringUtils.isNotBlank(parentId)?Integer.parseInt(parentId):0);
-			bean.setFilename(importexpressPath+"/goodslist?keyword="+keyword+"&catid=0&srt=default");
+			bean.setFilename(SearchFileUtils.importexpressPath+"/goodslist?keyword="+keyword+"&catid=0&srt=default");
 			int res = categoryResearchService.insert(bean);
 
 			if(res>0){
@@ -215,7 +185,7 @@ public class CategoryResearchController {
 		String id = request.getParameter("id");
 		TabSeachPageBean bean = categoryResearchService.get(Integer.parseInt(id));
 		DataSourceSelector.restore();
-		bean.setImportPath(importexpressPath);
+		bean.setImportPath(SearchFileUtils.importexpressPath);
 
 		/*if(StringUtil.isNotBlank(bean.getFilename())) {
 			bean.setFilename(importexpressPath+bean.getFilename());
@@ -276,7 +246,7 @@ public class CategoryResearchController {
 			bean.setId(Integer.parseInt(id));
 			bean.setKeyword(keyword);
 			bean.setKeyword1(keyword1);
-			bean.setFilename(importexpressPath+"/goodslist?keyword="+keyword+"&catid=0&srt=default");
+			bean.setFilename(SearchFileUtils.importexpressPath+"/goodslist?keyword="+keyword+"&catid=0&srt=default");
 			bean.setParentId(StringUtils.isNotBlank(parentId)?Integer.parseInt(parentId):0);
 			int res = categoryResearchService.update(bean);
 			if(res>0){
@@ -344,48 +314,11 @@ public class CategoryResearchController {
 
 				fineCategory.setSearchUrl(url);
 
-				//图片的接收
-				// 获取配置文件信息
-				// 文件的后缀取出来
-				Random random = new Random();
-				String originalName = file.getOriginalFilename();
-				String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-				String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-				// 本地服务器磁盘全路径
-				String localFilePath =TabSeachPageController.LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
-
-				// 文件流输出到本地服务器指定路径
-				ImgDownload.writeImageToDisk(file.getBytes(),localFilePath);
-				//解压图片为120*120
-				// 本地压缩图片
-				File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
-				if(!file2.exists()){
-					file2.mkdirs();
-				}
-				//上传图片文件名
-				String fileCurrName = System.currentTimeMillis() + ".150x150" + fileSuffix;
-				//判断图片是否da于150*150
-				boolean checked = ImageCompression.checkImgResolution(localFilePath, 150, 150);
-				if(!checked){
-					//小于时直接输出到
-					outputImage(localFilePath,TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
-				}else{
-					//将图片压缩到制定的目录 并重命名图片
-					boolean is150 = reduceImgOnlyWidth(150, localFilePath, TabSeachPageController.LOCALPATHZIPIMG + sid + "/" + fileCurrName,null);
-					if(is150){
-						System.out.println("压缩图片成功");
-					}
-				}
-
-				fineCategory.setFileName(sid + "/" + fileCurrName);
-				//保存图片的url访问路径,
-				fineCategory.setImageUrl(TabSeachPageController.IMAGESEARCHURL + fileCurrName);
-
-				//支持断点续存上传图片,ss
-				ContinueFTP2 f1 = new ContinueFTP2(TabSeachPageController.ftpURL, TabSeachPageController.ftpUserName, TabSeachPageController.ftpPassword, TabSeachPageController.ftpPort,
-                        "/stock_picture/researchimg/"+fileCurrName, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
-				//远程上传到图片服务器
-				f1.start();
+                String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, 150, 150, null, 1);
+                if (null != imgInfo && imgInfo.length > 0) {
+                    fineCategory.setFileName(imgInfo[0]);
+                    fineCategory.setImageUrl(imgInfo[1]);
+                }
 
 				DataSourceSelector.set("dataSource127hop");
 				int res = categoryResearchService.insertDetail(fineCategory);
@@ -434,11 +367,6 @@ public class CategoryResearchController {
 		}
 	}
 
-
-	private void preClear(String positivekeywords) {
-		// TODO Auto-generated method stub
-
-	}
 	//查询一个细分类商品
 	@RequestMapping("/getOneFineCategory")
 	public void getOneFineCategory(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -448,7 +376,7 @@ public class CategoryResearchController {
 		DataSourceSelector.set("dataSource127hop");
 		String id = request.getParameter("id");
 		FineCategory bean = categoryResearchService.getOneFineCategory(Integer.parseInt(id));
-		bean.setFileName(TabSeachPageController.IMAGEHOSTURL+bean.getFileName());
+		bean.setFileName(SearchFileUtils.IMAGEHOSTURL+bean.getFileName());
 		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
@@ -466,7 +394,7 @@ public class CategoryResearchController {
 		DataSourceSelector.set("dataSource127hop");
 		List<FineCategory> list = categoryResearchService.detailFineCategoryList(Integer.parseInt(sid));
 		for (FineCategory fineCategory : list) {
-			fineCategory.setFileName(TabSeachPageController.IMAGEHOSTURL+fineCategory.getFileName());
+			fineCategory.setFileName(SearchFileUtils.IMAGEHOSTURL+fineCategory.getFileName());
 		}
 		DataSourceSelector.restore();
 		JSONArray jsonarr = JSONArray.fromObject(list);
@@ -493,51 +421,11 @@ public class CategoryResearchController {
 		FineCategory fineCategory = new FineCategory();
 		String result="";
 		try {
-			if(!file.isEmpty()){//修改图片
-				//图片的接收
-				// 获取配置文件信息
-				// 文件的后缀取出来
-				Random random = new Random();
-				String originalName = file.getOriginalFilename();
-				String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-				String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-				// 本地服务器磁盘全路径
-				String localFilePath =TabSeachPageController.LOCALPATH+sid+"/"+ saveFilename + fileSuffix;
-
-				// 文件流输出到本地服务器指定路径
-				ImgDownload.writeImageToDisk(file.getBytes(),localFilePath);
-				//解压图片为120*120
-				// 本地压缩图片
-				File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
-				if(!file2.exists()){
-					file2.mkdirs();
-				}
-				//上传图片文件名
-				String fileCurrName = System.currentTimeMillis() + ".150x150" + fileSuffix;
-				//判断图片是否da于120*120
-				boolean checked = ImageCompression.checkImgResolution(localFilePath, 150, 150);
-				if(!checked){
-					//小于时直接输出到
-					outputImage(localFilePath,TabSeachPageController.LOCALPATHZIPIMG + sid + "/" + fileCurrName);
-				}else{
-					//将图片压缩到制定的目录 并重命名图片
-					boolean is150 = reduceImgOnlyWidth(150, localFilePath, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName,null);
-					if(is150){
-						System.out.println("压缩图片成功");
-					}
-				}
-
-				fineCategory.setFileName(sid+"/"+fileCurrName);
-				//保存图片的url访问路径,
-				fineCategory.setImageUrl(TabSeachPageController.IMAGESEARCHURL + fileCurrName);
-
-				//支持断点续存上传图片,ss
-				ContinueFTP2 f1 = new ContinueFTP2(TabSeachPageController.ftpURL, TabSeachPageController.ftpUserName, TabSeachPageController.ftpPassword, TabSeachPageController.ftpPort,
-                        "/stock_picture/researchimg/" + fileCurrName, TabSeachPageController.LOCALPATHZIPIMG+sid+"/"+fileCurrName);
-				//远程上传到图片服务器
-				f1.start();
-
-			}
+            String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, 150, 150, null, 1);
+            if (null != imgInfo && imgInfo.length > 0) {
+                fineCategory.setFileName(imgInfo[0]);
+                fineCategory.setImageUrl(imgInfo[1]);
+            }
 			fineCategory.setId(Integer.parseInt(id));
 			fineCategory.setDetailProductName(detailProductName);
 			fineCategory.setPositivekeywords(positivekeywords);
@@ -678,7 +566,7 @@ public class CategoryResearchController {
 		String result;
 		//发布的操作
 		String sid = request.getParameter("sid");
-		File file = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
+		File file = new File(SearchFileUtils.LOCALPATHZIPIMG+sid);
 		if(!file.exists()){
 			result = "{\"status\":false,\"message\":\"当前分类已全部发布\"}";
 		}else{
@@ -1014,7 +902,7 @@ public class CategoryResearchController {
 	//清理临时和缓存图片
 	private static void deleteTempZip(String sid) {
 		try {
-			File file = new File(TabSeachPageController.LOCALPATHZIPIMG+sid);
+			File file = new File(SearchFileUtils.LOCALPATHZIPIMG+sid);
 			if (file.exists()) {
 				File[] chidsFls = file.listFiles();
 				for (File tempFl : chidsFls) {
@@ -1023,7 +911,7 @@ public class CategoryResearchController {
 				file.delete();
 				chidsFls = null;
 			}
-			File file2 = new File(TabSeachPageController.LOCALPATHZIPIMG);
+			File file2 = new File(SearchFileUtils.LOCALPATHZIPIMG);
 			if (file2.exists()) {
 				File[] chidsFls = file2.listFiles();
 				for (File tempFl : chidsFls) {
@@ -1036,250 +924,6 @@ public class CategoryResearchController {
 			LOG.error("deleteTempZip error:" + e.getMessage());
 		}
 	}
-
-	/**
-	 * 根据宽度压缩图片，高度等比例压缩
-	 *
-	 * @param width
-	 *            压缩宽度，必填
-	 * @param imgUrl
-	 *            源图片地址
-	 * @param targetImgUrl
-	 *            目标图片地址
-	 */
-	public static boolean reduceImgOnlyWidth(double width, String imgUrl, String targetImgUrl, Float rate) {
-		boolean is = false;
-		FileOutputStream out = null;
-		try {
-
-			File srcfile = new File(imgUrl);
-			// 检查图片文件是否存在
-			if (!srcfile.exists()) {
-				System.out.println("文件不存在");
-			}
-			// 如果比例不为空则说明是按比例压缩
-			if (rate != null && rate > 0) {
-				//获得源图片的宽高存入数组中
-				int[] results = getImgWidth(srcfile);
-				if (results == null || results[0] == 0 || results[1] == 0) {
-					return false;
-				} else {
-					//按比例缩放或扩大图片大小，将浮点型转为整型
-					width = (int) (results[0] * rate);
-					width = (int) (results[1] * rate);
-				}
-			}
-			// 开始读取文件并进行压缩
-			Image src = javax.imageio.ImageIO.read(srcfile);
-			BufferedImage tag = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
-			tag.getGraphics().drawImage(src.getScaledInstance((int) 150, 150, Image.SCALE_SMOOTH), 0, 0, null);
-			out = new FileOutputStream(targetImgUrl);
-//				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//				encoder.encode(tag);
-            String fileSuffix = targetImgUrl.substring(targetImgUrl.lastIndexOf(".") + 1);
-            ImageIO.write(tag,fileSuffix,new File(targetImgUrl));
-			is = true;
-
-		} catch (IOException ex) {
-			ex.getStackTrace();
-			System.out.println("imgUrl:" + imgUrl + ",targetImgUrl" + targetImgUrl);
-			System.out.print(ex.getMessage());
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return is;
-	}
-	/**
-	 * 获取图片宽度
-	 *
-	 * @param file
-	 *            图片文件
-	 * @return 宽度
-	 */
-	public static int[] getImgWidth(File file) {
-		InputStream is = null;
-		BufferedImage src = null;
-		int result[] = { 0, 0 };
-		try {
-			is = new FileInputStream(file);
-			src = javax.imageio.ImageIO.read(is);
-			result[0] = src.getWidth(null); // 得到源图宽
-			result[1] = src.getHeight(null); // 得到源图高
-		} catch (Exception e) {
-			e.getStackTrace();
-			System.out.print(e.getMessage());
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * 接口调用方法
-	 * @param urls
-	 * @param params
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public static String getContentClientPost(String urls,List <NameValuePair> params){
-		java.util.logging.Logger.getLogger("org.apache.http.client.protocol")
-				.setLevel(java.util.logging.Level.OFF);
-		if(urls==null||urls.isEmpty()){
-			return "";
-		}
-		String co = "";
-		//HttpClient4.1的调用与之前的方式不同     
-		DefaultHttpClient client = new DefaultHttpClient();
-		HttpResponse response;
-		try {
-			String url = urls.replaceAll("\\s", "%20");
-			//链接超时
-			client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 5*60*1000);
-			//读取超时
-			client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 5*60*1000);
-			HttpClientParams.setCookiePolicy(client.getParams(), CookiePolicy.BROWSER_COMPATIBILITY);
-
-			HttpPost httpPost = new HttpPost(url);
-			httpPost.setEntity(new UrlEncodedFormEntity(params,HTTP.UTF_8));
-
-			response = client.execute(httpPost);
-
-			if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
-				HttpEntity entity = response.getEntity();
-				if (entity != null) {
-					InputStreamReader in = null;
-					if(Pattern.compile("(taobao)|(tmall)|(1688)").matcher(urls).find()){
-						in = new InputStreamReader(entity.getContent(), "gbk");
-					}else{
-						in = new InputStreamReader(entity.getContent(), HTTP.UTF_8);
-					}
-					BufferedReader reader = new BufferedReader(in);
-					co = IOUtils.toString(reader);
-					in.close();
-					reader.close();
-					in = null;
-					reader = null;
-				}
-				entity = null;
-				httpPost = null;
-			}
-		} catch (ClientProtocolException e) {
-			co = "";
-		} catch (IOException e) {
-			co = "";
-		}finally{
-			if(client!=null){
-				client.close();
-			}
-			response = null;
-		}
-		return co;
-	}
-
-
-
-	public static void outputImage(String srcPath, String destPath) {
-		// 打开输入流
-		try {
-			FileInputStream fis = new FileInputStream(srcPath);
-			// 打开输出流
-			FileOutputStream fos = new FileOutputStream(destPath);
-
-			// 读取和写入信息
-			int len = 0;
-			// 创建一个字节数组，当做缓冲区
-			byte[] b = new byte[1024];
-			while ((len = fis.read(b)) != -1) {
-				fos.write(b, 0, len);
-			}
-
-			// 关闭流  先开后关  后开先关
-			fos.close(); // 后开先关
-			fis.close(); // 先开后关
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-
-
-	public static void readfile(String filepath) {
-		File file1 = new File("K:\\researchimgs");
-		File[] files = file1.listFiles();
-		for (File file : files) {
-			if (file.isDirectory()) {
-				File file2 = new File(file.getAbsolutePath().replace("K:\\researchimgs", "K:/shopimgzip/research"));
-				if(!file2.exists()){
-					file2.mkdirs();
-				}
-				String[] filelist = file.list();
-				for (int i = 0; i < filelist.length; i++) {
-					//File srcfile = new File(file.getAbsolutePath() + "\\" + filelist[i]);
-					boolean checked = ImageCompression.checkImgResolution(file.getAbsolutePath() + "\\" + filelist[i], 150, 150);
-
-					String src = file.getAbsolutePath() + "\\" + filelist[i];
-					String desc = src.replace("K:\\researchimgs", "K:/shopimgzip/research");
-					String fileSuffix = desc.substring(desc.lastIndexOf("."));
-					String newdesc = desc.substring(0, desc.lastIndexOf("."));
-					if(!checked){
-						//小于时直接输出到
-						outputImage(file.getAbsolutePath() + "\\" + filelist[i],newdesc+".150x150"+fileSuffix);
-					}else{
-						//将图片压缩到制定的目录 并重命名图片
-						boolean is120 = reduceImgOnlyWidth(150, file.getAbsolutePath() + "\\" + filelist[i],newdesc+".150x150"+fileSuffix,null);
-					}
-
-				}
-			}
-		}
-
-
-
-	}
-
-
-
-
-
-	public static void main(String[] args) {
-		readfile(null);
-		/*//读取所有的图片.压缩后到k盘
-		
-		
-		
-		//判断图片是否小于150*150
-		boolean checked = ImageCompression.checkImgResolution(localFilePath, 150, 150);
-		if(checked){
-			//小于时直接输出到
-			outputImage(localFilePath,LOCALPATHZIPIMG+sid+"/"+saveFilename+".150x150"+fileSuffix);
-		}else{
-		//将图片压缩到制定的目录 并重命名图片
-		boolean is120 = reduceImgOnlyWidth(150, localFilePath, LOCALPATHZIPIMG+sid+"/"+saveFilename+".150x150"+fileSuffix,null);*/
-
-
-	}
-
-
-
-
-
 
 
 }

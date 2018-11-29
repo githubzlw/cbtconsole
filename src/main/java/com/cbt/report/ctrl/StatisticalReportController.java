@@ -1355,7 +1355,7 @@ public class StatisticalReportController {
 		String mouth = request.getParameter("mouth");
 		String scope = request.getParameter("scope");
 		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("type_");
+		String goodscatid = request.getParameter("goodscatid");
 		String have_barcode=request.getParameter("have_barcode");
 		String barcode = request.getParameter("barcode");
 		String startdate=request.getParameter("startdate");
@@ -1375,8 +1375,11 @@ public class StatisticalReportController {
 		} else if (year != null) {
 			buyTime = year + "-" + mouth;
 		}
-		if ("0".equals(goodscatid)) {
-			goodscatid = null;
+		goodscatid="0".equals(goodscatid)?null:goodscatid;
+		if("全部".equals(goodscatid)){
+			goodscatid="abc";
+		}else if("其他".equals(goodscatid)){
+			goodscatid="bcd";
 		}
 		if ("-1".equals(flag)) {
 			flag = null;
@@ -1548,14 +1551,15 @@ public class StatisticalReportController {
 		int start = 0;
 		int end = 0;
 		int DeliveryDate = 0;
-		startdate=StringUtils.isStrNull(startdate)?null:startdate;
+		startdate=StringUtils.isStrNull(startdate) ||"0".equals(startdate)?null:startdate;
 		paystartdate=StringUtils.isStrNull(paystartdate)?null:paystartdate;
 		enddate=!StringUtils.isStrNull(enddate)?enddate + " 23:59:59":null;
 		payenddate=!StringUtils.isStrNull(payenddate)?payenddate + " 23:59:59":null;
 		orderid=StringUtils.isStrNull(orderid)?null:orderid;
 		myorderid=StringUtils.isStrNull(myorderid)?null:myorderid;
-		orderstatus=StringUtils.isStrNull(orderstatus)?null:orderstatus;
+		orderstatus=StringUtils.isStrNull(orderstatus) || "0".equals(orderstatus)?null:orderstatus;
 		orderSource=orderSource.equals("-1")?null:orderSource;
+		isCompany="0".equals(isCompany)?null:isCompany;
 		procurementAccount=procurementAccount.equals("0")?null:procurementAccount;
 		if (noCycle.equals("0")) {
 			noCycle = null;
@@ -1797,7 +1801,8 @@ public class StatisticalReportController {
 //		String sku=request.getParameter("sku");
 		String barcode=request.getParameter("barcode");
 //		String amount=request.getParameter("amount");
-		int count = taoBaoOrderService.deleteInventory(id);
+		String dRemark=request.getParameter("dRemark");
+		int count = taoBaoOrderService.deleteInventory(id,dRemark);
 		if(count>0){
 			list.setAllCount(count);
 			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -3797,9 +3802,9 @@ public class StatisticalReportController {
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		int adminid = adm.getId();
 		// 临时增加Sales1账号查看所有客户留言权限
-		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
-			adminid = 1;
-		}
+//		if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
+//			adminid = 1;
+//		}
 		try {
 			if (date != null && !"".equals(date)) {
 				parse = date;
@@ -4120,7 +4125,7 @@ public class StatisticalReportController {
 		String mouth = request.getParameter("mouth");
 		String scope = request.getParameter("scope");
 		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("type_");
+		String goodscatid = request.getParameter("goodscatid");
 		String have_barcode=request.getParameter("have_barcode");
 		String barcode = request.getParameter("barcode");
 		String startdate=request.getParameter("startdate");
@@ -4144,6 +4149,11 @@ public class StatisticalReportController {
 			buyTime = year + "-" + mouth;
 		}
 		goodscatid="0".equals(goodscatid)?null:goodscatid;
+		if("全部".equals(goodscatid)){
+			goodscatid="abc";
+		}else if("其他".equals(goodscatid)){
+			goodscatid="bcd";
+		}
 		flag="-1".equals(flag)?null:flag;
 		page=page>0?(page - 1) * 20:page;
 		goodinfo=StringUtils.isStrNull(goodinfo)?null:goodinfo;
@@ -4186,6 +4196,22 @@ public class StatisticalReportController {
 		json.setTotal(toryListCount.size());
 		return json;
 	}
+
+	@RequestMapping(value = "/getAllInventory", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<Inventory> list=taoBaoOrderService.getAllInventory();
+		Inventory i=new Inventory();
+		i.setGoodscatid("全部");
+		list.add(0,i);
+		Inventory ii=new Inventory();
+		ii.setGoodscatid("其他");
+		list.add(list.size()-1,ii);
+		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
+		return jsonArr;
+	}
+
 
 	/**
 	 * 查询出入库明细报表

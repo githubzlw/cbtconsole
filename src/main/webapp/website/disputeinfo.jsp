@@ -163,7 +163,15 @@
     </script>
 </head>
 <body>
+<c:if test="${success ==0}">
 
+<div style="font-size: 18px;color: red;font-weight: bold;">
+${message}
+</div>
+
+</c:if>
+
+<c:if test="${success == 1}">
 <div style="width:980px; position: absolute;margin-left: 200px;">
 <div>
 <h1>消息</h1>
@@ -197,6 +205,17 @@ Amount Refunded:${result.dispute_outcome.amount_refunded.value } ${result.disput
 </c:if>
 </strong></p>
 <br>
+<p><strong><span>User:&nbsp;&nbsp;${userid } </span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span>Order.No:&nbsp;&nbsp;
+<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${orderNo }">${orderNo }</a></span>
+<span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a target="_blank" href="/cbtconsole/refundCtr/queryForList?userId=${userid}&type=1&appMoney=0&page=1&chooseState=-1">退款</a>
+</span>
+
+
+</strong></p>
 <c:set value="1" var="buyerFlag"></c:set>
 <c:forEach items="${result.messages }" var="message">
 <div id="message" class="message">
@@ -254,11 +273,6 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 </div> --%>
 
 </section>
-<section>
-<div style="font-size: 18px;color: red;font-weight: bold;">
-${error }
-</div>
-</section>
 
 <section id="compose">
 
@@ -277,16 +291,19 @@ ${error }
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
+<c:if test="${confim==0 && role == 0}">
+<input type="submit" value="确认退款" id="confirmrefundRadio">
+</c:if>
 
-<c:if test="${buyerOfferFlag== 0 && resonFlag == 0}">
+<c:if test="${buyerOfferFlag== 0 && resonFlag == 0 && role == 1}">
 <input type="button" value="Refund and Close" id="refundCloseRadio">
 </c:if>
 
-<c:if test="${buyerOfferFlag==0 && resonFlag == 1}">
+<c:if test="${buyerOfferFlag==0 && resonFlag == 1 && role == 1}">
 <input type="button" value="Offer Full Refund" id="refundCloseRadio">
 </c:if>
 
-<c:if test="${buyerOfferFlag==0 && resonFlag == 0 && disputeLifeCycleFlag!=0 }">
+<c:if test="${buyerOfferFlag==0 && resonFlag == 0 && disputeLifeCycleFlag!=0  && role == 1}">
 <input type="button" value="Send an Offer" id="offerRadio">
 </c:if>
 
@@ -312,6 +329,7 @@ The buyer can keep the item(s).
 button to send this refund and close the case.</p>
 <form method="post" name="MIPSrefundConfirm" action="/cbtconsole/customer/dispute/acceptClaim" class="edit">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <input type="hidden" name="refundAmount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.offer.buyer_requested_amount.currency_code }">
@@ -372,6 +390,7 @@ unable to provide an online tracking number, you will be asked to confirm
 delivery as a courtesy to the buyer before a refund will be issued.</p>
 <form method="post" name="MIPSrefundConfirm" action="/cbtconsole/customer/dispute/offer" class="edit">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <input type="hidden" name="refundAmount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.offer.buyer_requested_amount.currency_code }">
@@ -439,6 +458,7 @@ to determine the Net Refund Amount and the Fee Refunded. Click
  <p class="group"><label for="">Disputed amount:</label><span class="field">$${result.dispute_amount.value } ${result.dispute_amount.currency_code }</span></p>
  <p class="group"><label for="">Buyer's refund request:</label><span class="field">$${result.offer.buyer_requested_amount.value } ${result.offer.buyer_requested_amount.currency_code }</span></p>
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <input type="hidden" name="refundCurrency" value="${result.offer.buyer_requested_amount.currency_code }">
 <input type="hidden" name="offerType" value="REFUND_WITH_RETURN">
@@ -500,6 +520,7 @@ class=" edit">
 
 
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 
 <p>You'll find the buyer's reason for disputing each item below. You can disagree with all or part of the buyer's claim.
  Please address each item separately.</p><p>This information will be used by PayPal to decide the outcome of the claim.</p>
@@ -544,11 +565,27 @@ class=" edit">
 
 
 </div>
-
-
+<div style="margin-left: 60px;"  class="panel confirmrfund_form message_form hide">
+<form action="/cbtconsole/customer/dispute/confirm" method="post">
+Note:内部使用,意在销售客服通知Ling,该申诉需要退款
+<br>
+<span>Case&nbsp;ID:&nbsp;&nbsp;&nbsp;<input type="text" name="disputeid" value="${result.dispute_id }" readonly="readonly"></span>
+<span style="margin-left: 20px;">User ID:&nbsp;&nbsp;&nbsp;<input type="text" name="userid" value="${userid}" readonly="readonly"></span>
+<span style="margin-left: 20px;">Transaction ID:<input type="text" name=seller_transaction_id value="${result.disputed_transactions[0].seller_transaction_id }" readonly="readonly"></span>
+<br>
+<span>Order.No:<input type="text" name="orderNo" value="${orderNo }" readonly="readonly"></span>
+<span style="margin-left: 20px;">Operator:<input type="text" name="operatorName" value="${operatorName }" readonly="readonly"></span>
+<textarea class="form-controltext " name="messageBodyForGeneric" id="messageBody" rows="10" cols="100" maxlength="2000" placeholder="备注"></textarea>
+<br>
+<input type="hidden" name="merchant" value="${merchant }" class="button" >
+<input type="submit" name="send" value="Submint" class="button" >
+<input type="button" name="secondary" value="Cancel" class="cancel_button" >
+</form>
+</div>
 <div style="margin-left: 60px;"  class="panel sendmessage_form message_form hide">
 <form method="post" action="/cbtconsole/customer/dispute/sendmessage" >
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <div class="col-md-10 col-lg-7 col-xs-10 col-sm-10" style="float:left;margin-top: 15px;">
 <div class="form-group ">
 <label for="messageBody" class="sr-only">Message to buyer (optional)</label>
@@ -580,6 +617,7 @@ class=" edit">
 <input type="hidden" name="offerType" id="offer_type" value="REFUND">
 </c:if>
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <c:if test="${resonFlag == 0}">
 <input type="hidden" name="accept_claim_reason" value="DID_NOT_SHIP_ITEM">
@@ -756,6 +794,7 @@ this problem will be resolved and closed.
 <!-- 订单跟踪 -->
 <form method="post" action="/cbtconsole/customer/dispute/evidence" >
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="refundAmount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.offer.buyer_requested_amount.currency_code }">
 <div class="col-md-10 col-lg-7 col-sm-10" >
@@ -854,6 +893,7 @@ this problem will be resolved and closed.
 <div class="layout1">
 
 	 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+	 <input type="hidden" name="merchant" value="${merchant }">
 	  <div class="form-group">
 	  <div class="col-sm-3 col-sm-offset-1">
 	    <label for="uploadPic" class="control-label" style="text-align: left;">Upload Files:</label>
@@ -893,6 +933,7 @@ this problem will be resolved and closed.
 </div>
 <form id="evidenceform" class="form-horizontal" action="/cbtconsole/customer/dispute/evidence"  method="post"  style="display:none;">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" id="fileLocation" name="fileLocation"/>
 <input type="hidden" id="evidenceformcontent" name="messageBodyForGeneric"/>
 <input type="submit" value="submit">
@@ -901,6 +942,7 @@ this problem will be resolved and closed.
 <form action="/cbtconsole/customer/dispute/offer" method="post" id="makeoffer_form" style="display:none;">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
+<input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="refundCurrency" id="refundCurrency" value="${result.dispute_amount.currency_code }">
 <input type="hidden" name="postalCode" id="postalCode" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.postal_code }">
 <input type="hidden" name="address_line_1" id="address_line_1" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.address_line_1}">
@@ -919,7 +961,7 @@ this problem will be resolved and closed.
 </form>
 
 
-
+</c:if>
 </body>
 <script type="text/javascript">
 var sendResult = '${sendResult}'
@@ -942,7 +984,16 @@ $("#photoEvidenceCheck:checkbox").click(function () {
 	}
 }); 
 
+$("#confirmrefundRadio").click(function(){
+	$(".message_form").hide();
+	$(".offerbody").hide();
+	$(".addTrackingLink_form").hide();
+	$(".provideEvidence").hide();
+	$(".sendmessage_form").hide();
+	$(".confirmrfund_form").show();
+});
 $("#messageBuyerRadio").click(function(){
+	$(".confirmrfund_form").hide();
 	$(".message_form").hide();
 	$(".offerbody").hide();
 	$(".addTrackingLink_form").hide();
@@ -950,6 +1001,7 @@ $("#messageBuyerRadio").click(function(){
 	$(".sendmessage_form").show();
 });
 $("#refundCloseRadio").click(function(){
+	$(".confirmrfund_form").hide();
 	$(".offerbody").hide();
 	$(".message_form").hide();
 	$(".addTrackingLink_form").hide();
@@ -957,6 +1009,7 @@ $("#refundCloseRadio").click(function(){
 	$(".refund_form").show();
 });
 $("#offerRadio").click(function(){
+	$(".confirmrfund_form").hide();
 	$(".addTrackingLink_form").hide();
 	$(".offerbody").hide();
 	$(".message_form").hide();
@@ -964,6 +1017,7 @@ $("#offerRadio").click(function(){
 	$(".offer_form").show();
 });
 $("#addTrackingRadio").click(function(){
+	$(".confirmrfund_form").hide();
 	$(".offerbody").hide();
 	$(".message_form").hide();
 	$(".offer_form").hide();
@@ -972,6 +1026,7 @@ $("#addTrackingRadio").click(function(){
 	
 });
 $("#provideEvidence").click(function(){
+	$(".confirmrfund_form").hide();
 	$(".offerbody").hide();
 	$(".message_form").hide();
 	$(".offer_form").hide();

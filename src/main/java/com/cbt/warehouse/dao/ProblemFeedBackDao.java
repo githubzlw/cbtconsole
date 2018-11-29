@@ -26,5 +26,5 @@ public interface ProblemFeedBackDao {
 	 */
 	public List<ProblemFeedBackBean> getReportProblem(@Param("report_id") String report_id);
 
-    List<Map<String,String>> queryWarningNum();
+    List<Map<String,String>> queryWarningNum(@Param("adminid") int adminid);
 }

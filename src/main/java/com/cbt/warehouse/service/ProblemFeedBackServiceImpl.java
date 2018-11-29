@@ -43,8 +43,8 @@ public class ProblemFeedBackServiceImpl implements ProblemFeedBackService {
 	}
 
     @Override
-    public Map<String, String> queryWarningNum() {
-        List<Map<String, String>> list = problemFeedBackDao.queryWarningNum();
+    public Map<String, String> queryWarningNum(int admuserid) {
+        List<Map<String, String>> list = problemFeedBackDao.queryWarningNum(admuserid);
         if (list != null && list.size() > 0){
             Map<String, String> result = new HashMap<String, String>();
             for (Map<String, String> bean : list) {

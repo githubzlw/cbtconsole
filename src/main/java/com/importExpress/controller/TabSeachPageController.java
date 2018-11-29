@@ -1,10 +1,10 @@
 package com.importExpress.controller;
 
-import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.parse.service.ImgDownload;
 import com.cbt.pojo.Admuser;
-import com.cbt.util.*;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.SysParamUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
@@ -12,6 +12,7 @@ import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
 import com.importExpress.utli.JsonTreeUtils;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -30,6 +31,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HTTP;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,55 +64,14 @@ import java.util.regex.Pattern;
 @RequestMapping("/tabseachpage")
 public class TabSeachPageController {
 
-	@Autowired
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(CategoryResearchController.class);
+
+    @Autowired
 	private TabSeachPageService tabSeachPageService;
 
 	private static List<Map<String, Object>> aliCategory;
 
-	// private static String importexpressPath =
-	// SysParamUtil.getParam("importexpress");
-	private static String importexpressPath = "https://www.import-express.com";
 	private static String cbtstaticizePath = SysParamUtil.getParam("cbtstaticize");
-	/*
-	 * private static String hotwordbanner =
-	 * SysParamUtil.getParam("hotwordbanner"); private FtpConfig ftpConfig =
-	 * GetConfigureInfo.getFtpConfig();
-	 */
-//	public static String IMAGEHOSTURL = "http://192.168.1.34:8002/";
-//	private static final String LOCALPATH = "D:/shopimgzip/";// 图片上传的位置
-//	private static final String LOCALPATHZIPIMG = "D:/shopimgzip/research/";// 图片上传的位置
-//	private static final String IMAGESEARCHURL = "https://img1.import-express.com/importcsvimg/stock_picture/researchimg/";// 图片访问路径
-
-    public static String IMAGEHOSTURL;// http://192.168.1.9/editimg/shopimgzip/research/
-    public static String LOCALPATH;// /data/cbtconsole/cbtimg/editimg/shopimgzip/
-    public static String LOCALPATHZIPIMG;// /data/cbtconsole/cbtimg/editimg/shopimgzip/research/
-    public static String IMAGESEARCHURL;// http://img1.import-express.com/importcsvimg/stock_picture/researchimg/
-
-    public static String ftpURL;
-    public static String ftpPort;
-    public static String ftpUserName;
-    public static String ftpPassword;
-
-    static {
-        FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
-        String localShowPath = ftpConfig.getLocalShowPath();//localShowPath=http://192.168.1.9/editimg/
-        String localDiskPath = ftpConfig.getLocalDiskPath();//localDiskPath=/data/cbtconsole/cbtimg/editimg/
-        String remoteShowPath = ftpConfig.getRemoteShowPath();//remoteShowPath=http://img1.import-express.com/importcsvimg/
-        if (StringUtils.isNotBlank(localShowPath)){
-            IMAGEHOSTURL = (localShowPath.endsWith("/")?localShowPath:localShowPath + "/") + "shopimgzip/research/";
-        }
-        if (StringUtils.isNotBlank(localDiskPath)){
-            LOCALPATH = (localDiskPath.endsWith("/")?localDiskPath:localDiskPath + "/") + "shopimgzip/";
-            LOCALPATHZIPIMG = LOCALPATH + "research/";
-        }
-        if (StringUtils.isNotBlank(remoteShowPath)){
-            IMAGESEARCHURL = ((remoteShowPath.endsWith("/")?remoteShowPath:remoteShowPath + "/") + "stock_picture/researchimg/").replace("http:", "https:");
-        }
-        ftpURL = ftpConfig.getFtpURL();
-        ftpPort = ftpConfig.getFtpPort();
-        ftpUserName = ftpConfig.getFtpUserName();
-        ftpPassword = ftpConfig.getFtpPassword();
-    }
 
 	@RequestMapping("getAllCat")
 	public @ResponseBody
@@ -128,47 +89,35 @@ public class TabSeachPageController {
 	 * @throws IOException
 	 */
 	@RequestMapping("/add")
-	public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void add(HttpServletRequest request, HttpServletResponse response,
+                    @RequestParam(value = "uploadfile", required = true) MultipartFile file) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String result = null;
 		String keyword = request.getParameter("keyword");
-		String keyword1 = request.getParameter("keyword1");
-		String keyword2 = request.getParameter("keyword2");
-		String keyword3 = request.getParameter("keyword3");
-		String pid = request.getParameter("parentId");
 		DataSourceSelector.set("dataSource127hop");
 		if (tabSeachPageService.getWordsCount(keyword) > 0) {
 			result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
 		} else {
-			/*
-			 * String dirPath = ftpConfig.getLocalDiskPath(); Iterator<String>
-			 * itr = request.getFileNames(); MultipartFile mpf = null; String
-			 * remoteSavePath = null; while(itr.hasNext()) { mpf =
-			 * request.getFile(itr.next()); String originalFilename =
-			 * mpf.getOriginalFilename(); String localImgPath = dirPath +
-			 * hotwordbanner + filterKeyWord(URLDecoder.decode(keyword,"utf-8"))
-			 * + "_banner" +
-			 * originalFilename.substring(originalFilename.lastIndexOf("."));
-			 * FileCopyUtils.copy(mpf.getBytes(), new
-			 * FileOutputStream(localImgPath));
-			 * 
-			 * remoteSavePath = hotwordbanner +
-			 * filterKeyWord(URLDecoder.decode(keyword,"utf-8")) + "_banner" +
-			 * originalFilename.substring(originalFilename.lastIndexOf("."));
-			 * 
-			 * 
-			 * NewFtpUtil.uploadFileToRemoteSSM(remoteSavePath, localImgPath,
-			 * ftpConfig); }
-			 */
-
 			TabSeachPageBean bean = new TabSeachPageBean();
+            String keyword1 = request.getParameter("keyword1");
+            String pid = request.getParameter("parentId");
+            String pageTitle = request.getParameter("pageTitle");
+            String pageKeywords = request.getParameter("pageKeywords");
+            String pageDescription = request.getParameter("pageDescription");
 			bean.setKeyword(keyword);
 			bean.setKeyword1(keyword1);
+			bean.setPageTitle(pageTitle);
+			bean.setPageKeywords(pageKeywords);
+			bean.setPageDescription(pageDescription);
 			if (StringUtils.isNotBlank(pid)) {
 				bean.setParentId(Integer.parseInt(pid));
 			}
-			/* bean.setBanner(ftpConfig.getRemoteShowPath()+remoteSavePath); */
+            String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
+            if (null != imgInfo && imgInfo.length > 0) {
+                bean.setPageBannerName(imgInfo[0]);
+                bean.setPageBannerUrl(imgInfo[1]);
+            }
 			// 关键词对应的分类id
 			Integer catid = tabSeachPageService.getCategoryId(keyword);
 			if (catid != null) {
@@ -286,12 +235,14 @@ public class TabSeachPageController {
 		String id = request.getParameter("id");
 		TabSeachPageBean bean = tabSeachPageService.get(Integer.parseInt(id));
 		DataSourceSelector.restore();
-		bean.setImportPath(importexpressPath);
+		bean.setImportPath(SearchFileUtils.importexpressPath);
 
 		if (StringUtil.isNotBlank(bean.getFilename())) {
-			bean.setFilename(importexpressPath + bean.getFilename());
+			bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
 		}
-
+        if (StringUtil.isNotBlank(bean.getPageBannerName())){
+		    bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
+        }
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
 		out.print(jsonob);
@@ -306,50 +257,43 @@ public class TabSeachPageController {
 	 * @throws IOException
 	 */
 	@RequestMapping("/update")
-	public void update(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void update(HttpServletRequest request, HttpServletResponse response,
+                       @RequestParam(value = "uploadfile", required = true) MultipartFile file) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String result = null;
 		String id = request.getParameter("update_id");
 		String keyword = request.getParameter("update_keyword");
-		String keyword1 = request.getParameter("update_keyword1");
-		String keyword2 = request.getParameter("update_keyword2");
-		String keyword3 = request.getParameter("update_keyword3");
-		String pid = request.getParameter("parentId");
 
 		DataSourceSelector.set("dataSource127hop");
 		if (tabSeachPageService.getWordsCount1(keyword, Integer.parseInt(id)) > 0) {
 			result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
 		} else {
-			/*
-			 * String dirPath = ftpConfig.getLocalDiskPath(); Iterator<String>
-			 * itr = request.getFileNames(); MultipartFile mpf = null; String
-			 * remoteSavePath = null; while(itr.hasNext()) { mpf =
-			 * request.getFile(itr.next()); String originalFilename =
-			 * mpf.getOriginalFilename(); String localImgPath = dirPath +
-			 * hotwordbanner + filterKeyWord(URLDecoder.decode(keyword,"utf-8"))
-			 * + "_banner" +
-			 * originalFilename.substring(originalFilename.lastIndexOf("."));
-			 * FileCopyUtils.copy(mpf.getBytes(), new
-			 * FileOutputStream(localImgPath));
-			 * 
-			 * remoteSavePath = hotwordbanner +
-			 * filterKeyWord(URLDecoder.decode(keyword,"utf-8")) + "_banner" +
-			 * originalFilename.substring(originalFilename.lastIndexOf("."));
-			 * 
-			 * 
-			 * NewFtpUtil.uploadFileToRemoteSSM(remoteSavePath, localImgPath,
-			 * ftpConfig); }
-			 */
 
 			TabSeachPageBean bean = new TabSeachPageBean();
+            String keyword1 = request.getParameter("update_keyword1");
+            String pid = request.getParameter("parentId");
+            String pageTitle = request.getParameter("update_pageTitle");
+            String pageKeywords = request.getParameter("update_pageKeywords");
+            String pageDescription = request.getParameter("update_pageDescription");
 			bean.setId(Integer.parseInt(id));
 			bean.setKeyword(keyword);
 			bean.setKeyword1(keyword1);
+            bean.setPageTitle(pageTitle);
+            bean.setPageKeywords(pageKeywords);
+            bean.setPageDescription(pageDescription);
 			if (StringUtils.isNotBlank(pid)) {
 				bean.setParentId(Integer.parseInt(pid));
 			}
-			/* bean.setBanner(ftpConfig.getRemoteShowPath()+remoteSavePath); */
+            if ("on".equals(request.getParameter("del_pageBannerName"))){ //判断修改时候是否删除已上传的底部banner图片
+                bean.setPageBannerName("del");
+            } else {
+                String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
+                if (null != imgInfo && imgInfo.length > 0) {
+                    bean.setPageBannerName(imgInfo[0]);
+                    bean.setPageBannerUrl(imgInfo[1]);
+                }
+            }
 			int res = tabSeachPageService.update(bean);
 			if (res > 0) {
 				result = "{\"status\":true,\"message\":\"修改成功！\"}";
@@ -539,41 +483,12 @@ public class TabSeachPageController {
 			String detail_banner_describe = request.getParameter("detail_banner_describe");
 			bean.setBannerName(detail_banner_name);
 			bean.setBannerDescribe(detail_banner_describe);
-			if (!file.isEmpty()) {
-				String originalName = file.getOriginalFilename();
-				String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-				// 上传图片文件名
-				String fileCurrName = System.currentTimeMillis() + fileSuffix;
-				// 本地服务器磁盘全路径
-				String localFilePath = LOCALPATH + sid + "/" + fileCurrName;
-				// 文件流输出到本地服务器指定路径
-				ImgDownload.writeImageToDisk(file.getBytes(), localFilePath);
-				// 本地压缩图片
-				File file2 = new File(LOCALPATHZIPIMG + sid);
-				if (!file2.exists()) {
-					file2.mkdirs();
-				}
-				// 判断图片是否da于150*150
-				boolean checked = ImageCompression.checkImgResolution(localFilePath, 1600, 1);
-				if (!checked) {
-					// 小于时直接输出到
-					CategoryResearchController.outputImage(localFilePath, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
-				} else {
-					// 将图片压缩到制定的目录 并重命名图片
-//					boolean is150 = reduceImgOnlyWidth(1600, localFilePath, LOCALPATHZIPIMG
-//							+ sid + "/" + fileCurrName);
-//					if (is150) {
-//						System.out.println("压缩图片成功");
-//					}
-				}
-				bean.setBannerImgName(sid + "/" + fileCurrName);
-				bean.setBannerImgUrl(IMAGESEARCHURL + fileCurrName);
-				// 支持断点续存上传图片
-				ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
-						"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
-				// 远程上传到图片服务器
-				f1.start();
-			}
+
+            String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
+            if (null != imgInfo && imgInfo.length > 0) {
+                bean.setBannerImgName(imgInfo[0]);
+                bean.setBannerImgUrl(imgInfo[1]);
+            }
 
 			int res = tabSeachPageService.insertDetail(bean);
 
@@ -611,7 +526,7 @@ public class TabSeachPageController {
 		if (null != list && list.size() > 0) {
 			for (TabSeachPagesDetailBean bean : list) {
 				if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-					bean.setBannerImgName(IMAGEHOSTURL + bean.getBannerImgName());
+					bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
 				}
 			}
 		}
@@ -700,7 +615,7 @@ public class TabSeachPageController {
 		TabSeachPagesDetailBean bean = tabSeachPageService.getDetail(Integer.parseInt(id));
 		DataSourceSelector.restore();
 		if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-			bean.setBannerImgName(IMAGEHOSTURL + bean.getBannerImgName());
+			bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
 		}
 		// List<Map<String,Object>> goodslist = null;
 		// try{
@@ -727,7 +642,7 @@ public class TabSeachPageController {
 		TabSeachPagesDetailBean bean = tabSeachPageService.getDetail(Integer.parseInt(id));
 		DataSourceSelector.restore();
 		if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-			bean.setBannerImgName(IMAGEHOSTURL + bean.getBannerImgName());
+			bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
 		}
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
@@ -775,42 +690,12 @@ public class TabSeachPageController {
 				String detail_banner_describe = request.getParameter("detail_banner_describe");
 				bean.setBannerName(detail_banner_name);
 				bean.setBannerDescribe(detail_banner_describe);
-				if (!file.isEmpty()) {
-					String originalName = file.getOriginalFilename();
-					String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-					// 上传图片文件名
-					String fileCurrName = System.currentTimeMillis() + fileSuffix;
-					// 本地服务器磁盘全路径
-					String localFilePath = LOCALPATH + sid + "/" + fileCurrName;
-					// 文件流输出到本地服务器指定路径
-					ImgDownload.writeImageToDisk(file.getBytes(), localFilePath);
-					// 本地压缩图片
-					File file2 = new File(LOCALPATHZIPIMG + sid);
-					if (!file2.exists()) {
-						file2.mkdirs();
-					}
-					// 判断图片是否da于150*150
-					boolean checked = ImageCompression.checkImgResolution(localFilePath, 1600, 1);
-					if (!checked) {
-						// 小于时直接输出到
-						CategoryResearchController.outputImage(localFilePath, LOCALPATHZIPIMG + sid + "/"
-								+ fileCurrName);
-					} else {
-						// 将图片压缩到制定的目录 并重命名图片
-//						boolean is150 = reduceImgOnlyWidth(1600, localFilePath,
-//								LOCALPATHZIPIMG + sid + "/" + fileCurrName);
-//						if (is150) {
-//							System.out.println("压缩图片成功");
-//						}
-					}
-					bean.setBannerImgName(sid + "/" + fileCurrName);
-					bean.setBannerImgUrl(IMAGESEARCHURL + fileCurrName);
-					// 支持断点续存上传图片
-					ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
-							"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + sid + "/" + fileCurrName);
-					// 远程上传到图片服务器
-					f1.start();
-				}
+
+                String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
+                if (null != imgInfo && imgInfo.length > 0) {
+                    bean.setBannerImgName(imgInfo[0]);
+                    bean.setBannerImgUrl(imgInfo[1]);
+                }
 
 				bean.setId(Integer.parseInt(id));
 				bean.setSid(Integer.parseInt(sid));
@@ -891,28 +776,13 @@ public class TabSeachPageController {
 				StringUtils.isNotBlank(startTime)?DATEFORMAT.parse(startTime):null, 
 				StringUtils.isNotBlank(endTime)?DATEFORMAT.parse(endTime):null, remark);
 
-		if (!file.isEmpty()) {
-			String originalName = file.getOriginalFilename();
-			bean.setFileName(originalName);
-			String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-			// 上传图片文件名
-			String fileCurrName = "AuthorizedFile/" + System.currentTimeMillis() + fileSuffix;
-			bean.setFileUrl(fileCurrName);
-			bean.setImgFileUrl(IMAGESEARCHURL + fileCurrName);
-			// 本地服务器磁盘全路径
-			File file2 = new File(LOCALPATHZIPIMG + "AuthorizedFile");
-			if (!file2.exists()) {
-				file2.mkdirs();
-			}
-			// 文件流输出到本地服务器指定路径
-			ImgDownload.writeImageToDisk(file.getBytes(), LOCALPATHZIPIMG + fileCurrName);
-			// 支持断点续存上传图片
-			ContinueFTP2 f1 = new ContinueFTP2(ftpURL, ftpUserName, ftpPassword, ftpPort,
-					"/stock_picture/researchimg/" + fileCurrName, LOCALPATHZIPIMG + fileCurrName);
-//			// 远程上传到图片服务器
-			f1.start();
-		}
-		//保存
+        String[] imgInfo = SearchFileUtils.comFileUpload(file, "AuthorizedFile", null, null, null, 0);
+        if (null != imgInfo && imgInfo.length > 0) {
+            bean.setFileUrl(imgInfo[0]);
+            bean.setImgFileUrl(imgInfo[1]);
+            bean.setFileName(imgInfo[2]);
+        }
+
 		DataSourceSelector.set("dataSource28hop");
 		long count = tabSeachPageService.updateAuthorizedInfo(bean);
 		DataSourceSelector.restore();
@@ -951,7 +821,7 @@ public class TabSeachPageController {
 				result.put("message", "未找到");
 			} else {
 				if (StringUtils.isNotBlank(bean.getFileUrl())) {
-					bean.setFileUrl(IMAGEHOSTURL + bean.getFileUrl());
+					bean.setFileUrl(SearchFileUtils.IMAGEHOSTURL + bean.getFileUrl());
 				}
 				result.put("status", true);
 				result.put("bean", bean);
@@ -964,57 +834,6 @@ public class TabSeachPageController {
 		return result;	
 	}
 	
-//	/**
-//	 * 根据宽度压缩图片，高度等比例压缩
-//	 *
-//	 * @param width
-//	 *            压缩宽度，必填
-//	 * @param imgUrl
-//	 *            源图片地址
-//	 * @param targetImgUrl
-//	 *            目标图片地址
-//	 */
-//	public static boolean reduceImgOnlyWidth(int width, String imgUrl, String targetImgUrl) {
-//		boolean is = false;
-//		FileOutputStream out = null;
-//		try {
-//			int height;
-//			File srcfile = new File(imgUrl);
-//			// 检查图片文件是否存在
-//			if (!srcfile.exists()) {
-//				System.out.println("文件不存在");
-//			}
-//			// 获得源图片的宽高存入数组中
-//			int[] results = CategoryResearchController.getImgWidth(srcfile);
-//			if (results == null || results[0] == 0 || results[1] == 0) {
-//				return false;
-//			} else {
-//				height = (int) (width * results[1] / results[0]);
-//			}
-//			// 开始读取文件并进行压缩
-//			Image src = javax.imageio.ImageIO.read(srcfile);
-//			BufferedImage tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//			tag.getGraphics().drawImage(src.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-//			out = new FileOutputStream(targetImgUrl);
-//			JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//			encoder.encode(tag);
-//			is = true;
-//
-//		} catch (IOException ex) {
-//			ex.getStackTrace();
-//			System.out.println("imgUrl:" + imgUrl + ",targetImgUrl" + targetImgUrl);
-//			System.out.print(ex.getMessage());
-//		} finally {
-//			if (out != null) {
-//				try {
-//					out.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		return is;
-//	}
 
 	/**
 	 * 关键词专页预览
@@ -1035,7 +854,7 @@ public class TabSeachPageController {
 		if (list != null && list.size() > 0) {
 			for (TabSeachPagesDetailBean bean : list) {
 				if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-					bean.setBannerImgName(IMAGEHOSTURL + bean.getBannerImgName());
+					bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
 				}
 			}
 			result = "{\"status\":true}";
@@ -1122,6 +941,42 @@ public class TabSeachPageController {
 		out.close();
 	}
 
+    /**
+     * 按照指定格式生成title keywords description
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    @RequestMapping("/createTitleAndKey")
+    public void createTitleAndKey(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/json;charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        String sid = request.getParameter("sid");
+        String result;
+
+        try {
+
+            DataSourceSelector.set("dataSource127hop");
+            boolean boo = tabSeachPageService.updateTitleAndKey(Integer.parseInt(sid));
+            DataSourceSelector.restore();
+
+            if (boo) {
+                result = "{\"status\":true,\"message\":\"生成成功\"}";
+            } else {
+                result = "{\"status\":false,\"message\":\"主商品列表无数据\"}";
+            }
+        } catch (Exception e){
+            LOG.error(e.toString());
+            result = "{\"status\":false,\"message\":\"内部异常\"}";
+        }
+
+        PrintWriter out = response.getWriter();
+        JSONObject jsonob = JSONObject.fromObject(result);
+        out.print(jsonob);
+        out.close();
+    }
+
 	/**
 	 * 启用或停用关键词专页
 	 * 
@@ -1195,7 +1050,7 @@ public class TabSeachPageController {
 				keyword = keyword.replace(" ", "%20");
 			}
 
-			url = importexpressPath + "/goodslistInterface?keyword=" + keyword + "&catid=" + catid;
+			url = SearchFileUtils.importexpressPath + "/goodslistInterface?keyword=" + keyword + "&catid=" + catid;
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			if (StringUtil.isNotBlank(unkey)) {
 				params.add(new BasicNameValuePair("unkey", unkey.replace(";", ",")));
@@ -1239,7 +1094,7 @@ public class TabSeachPageController {
 				map.put("goods_image", jsonob.getString("goods_image"));
 				String goods_url = jsonob.getString("goods_url");
 				if (!goods_url.startsWith("http")) {
-					goods_url = importexpressPath + goods_url;
+					goods_url = SearchFileUtils.importexpressPath + goods_url;
 				}
 				map.put("goods_url", goods_url);
 				map.put("goods_price", jsonob.getString("goods_price"));
@@ -1316,10 +1171,6 @@ public class TabSeachPageController {
 	/**
 	 * 得到产品单页静态化页面的名称
 	 * 
-	 * @param goodname
-	 * @param goodsid
-	 * @param catid
-	 * @return
 	 */
 	public static String filterKeyWord(String keyword) {
 		keyword = keyword.indexOf("<") == 0 ? keyword.substring(1) : keyword;

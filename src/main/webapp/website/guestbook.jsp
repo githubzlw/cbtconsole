@@ -266,7 +266,7 @@ function updateReply(){
 function doReset(){
 	$('#query_form').form('clear');
 	$('#status').combobox('setValue','-1');
-	$('#questionType').combobox('setValue','0');
+	$('#questionType').combobox('setValue','2');
 }
 
 //回复留言问题
@@ -355,7 +355,9 @@ $(function(){
     if(getUrlParam("adminId") != undefined && getUrlParam("adminId") != 'null') {
         $('#adminId').combobox("setValue", getUrlParam("adminId"));
     }
-    $("#questionType").combobox('select',getUrlParam("questionType"));
+    if(getUrlParam("questionType") != undefined && getUrlParam("questionType") != 'null') {
+        $("#questionType").combobox('select',getUrlParam("questionType"));
+    }
     doQuery(1);
 })
 
@@ -401,9 +403,9 @@ $(function(){
 				<option value="1">已回复</option>
 				</select>
 				<select class="easyui-combobox" name="questionType" id="questionType" style="width:15%;height: 30px;" data-options="label:'type:',panelHeight:'auto'">
-				<option value="0" selected>全部</option>
+				<option value="0">全部</option>
 				<option value="1">问题</option>
-				<option value="2">商业折扣</option>
+				<option value="2" selected>商业折扣</option>
 				<option value="3">定制</option>
 				</select>
 				<span style="font-weight: bold;">日期:</span>
