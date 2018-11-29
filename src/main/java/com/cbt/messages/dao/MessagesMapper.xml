@@ -591,7 +591,7 @@
 		</if>
 		) countAll  ,
 		(SELECT count(*) from preferential_application 
-		<if test="adminid == 1 or adminid == 83">
+		<if test="adminid == 1 or adminid == 83 or adminid == 84">
 			where state=0 
 		</if>
 		<if test="adminid != 1">
@@ -599,7 +599,7 @@
 			and aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		) noDeleteCount
-		<if test="adminid==1 or adminid==83">
+		<if test="adminid==1 or adminid==83 or adminid==84">
 		, (SELECT count(*) from preferential_application pa left JOIN admin_r_user aru on pa.userid=aru.userid where aru.adminid is null ) noArrgCount
 		</if>
 			
@@ -608,16 +608,16 @@
 	   SELECT
 			prea.status state,
 			count(prea.id) countAll,
-			<if test="adminid == 1 or adminid == 83">
+			<if test="adminid == 1 or adminid == 83 or adminid == 84">
 			sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noArrgCount
 			</if>
-			<if test="adminid != 1 and adminid != 83" >
+			<if test="adminid != 1 and adminid != 83 and adminid != 84" >
 				sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	0	ELSE 1	END	)) noDeleteCount
 			</if>
 		FROM
 			busiess prea
 		LEFT JOIN admin_r_user aru ON prea.email = aru.useremail
-		<if test="adminid != 1 and adminid != 83" >
+		<if test="adminid != 1 and adminid != 83 and adminid != 84" >
 		  AND aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		GROUP BY
