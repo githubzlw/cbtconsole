@@ -1836,7 +1836,7 @@ public class NewOrderDetailsCtr {
 			LOG.error(e.getMessage());
 		}
 
-		if ("Ling".equalsIgnoreCase(admName) || "emmaxie".equalsIgnoreCase(admName)) {
+		if ("Ling".equalsIgnoreCase(admName) || "emmaxie".equalsIgnoreCase(admName) || "admin1".equalsIgnoreCase(admName)) {
 			return "paymentConfirm";
 		} else {
 			return "paymentConfirm1";
