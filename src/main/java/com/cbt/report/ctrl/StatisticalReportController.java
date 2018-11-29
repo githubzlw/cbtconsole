@@ -1551,14 +1551,15 @@ public class StatisticalReportController {
 		int start = 0;
 		int end = 0;
 		int DeliveryDate = 0;
-		startdate=StringUtils.isStrNull(startdate)?null:startdate;
+		startdate=StringUtils.isStrNull(startdate) ||"0".equals(startdate)?null:startdate;
 		paystartdate=StringUtils.isStrNull(paystartdate)?null:paystartdate;
 		enddate=!StringUtils.isStrNull(enddate)?enddate + " 23:59:59":null;
 		payenddate=!StringUtils.isStrNull(payenddate)?payenddate + " 23:59:59":null;
 		orderid=StringUtils.isStrNull(orderid)?null:orderid;
 		myorderid=StringUtils.isStrNull(myorderid)?null:myorderid;
-		orderstatus=StringUtils.isStrNull(orderstatus)?null:orderstatus;
+		orderstatus=StringUtils.isStrNull(orderstatus) || "0".equals(orderstatus)?null:orderstatus;
 		orderSource=orderSource.equals("-1")?null:orderSource;
+		isCompany="0".equals(isCompany)?null:isCompany;
 		procurementAccount=procurementAccount.equals("0")?null:procurementAccount;
 		if (noCycle.equals("0")) {
 			noCycle = null;
