@@ -23,6 +23,7 @@ import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.AdminRUserExample;
 import com.importExpress.pojo.AdminRUserExample.Criteria;
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
@@ -62,13 +63,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 //		BasicDBObject s = new BasicDBObject("create_time",-1);
 		List<String> documents = 
 				instance.findAny("data",q,null);
-		List<CustomerDisputeBean> list = new ArrayList<CustomerDisputeBean>();
-		CustomerDisputeBean bean ;
+		List<CustomerDisputeVO> list = new ArrayList<CustomerDisputeVO>();
+		CustomerDisputeVO bean ;
 		long total = 0L;
 		List<String> filter = new ArrayList<String>();
 		try {
 	    	for(String content : documents) {
-	    		bean = new CustomerDisputeBean();
+	    		bean = new CustomerDisputeVO();
 	    		if(StringUtils.indexOf(content,"dispute_id") > -1) {
 	    			JSONObject document = JSONObject.parseObject(content);
 	    			JSONObject  resource = (JSONObject)document.get("resource");
@@ -81,7 +82,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setValue(disputeAmount.getString("value") + disputeAmount.getString("currency_code"));
 	    			bean.setReason(resource.getString("reason"));
 	    			bean.setStatus(resource.getString("status"));
-	    			bean.setType("Paypal");
+	    			bean.setApiType("Paypal");
 	    			JSONArray disputedTransactions = (JSONArray)resource.get("disputed_transactions");
 	    			JSONObject disputedTransaction = (JSONObject)disputedTransactions.get(0);
 	    			JSONObject seller = (JSONObject)disputedTransaction.get("seller");
@@ -115,7 +116,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
                     bean.setUpdateTime(sdf.format(dispute.getCreated() * 1000L));
                     bean.setReason(dispute.getReason());
 	    			bean.setStatus(dispute.getStatus());
-	    			bean.setType("stripe");
+	    			bean.setApiType("stripe");
 	    			list.add(bean);
 	    		}
 				
@@ -214,10 +215,6 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public int confirm(CustomerDisputeBean customer) {
 		
 		return customerDisputeMapper.insert(customer);
-		/*if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
-		}else {
-			return customerDisputeMapper.update(customer);
-		}*/
 	}
 	@Override
 	public int count(String disputeID,String status) {
@@ -233,6 +230,21 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public int updateStatus(String disputeId, String status) {
 		// TODO Auto-generated method stub
 		return customerDisputeMapper.updateStatus(disputeId, status);
+	}
+	@Override
+	public CustomerDisputeBean getComfirmByDisputeID(String disputeid) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.getComfirmByDisputeID(disputeid);
+	}
+	@Override
+	public Integer updateRefuseReason(String disputeid, String refuseReason) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateRefuseReason(disputeid, refuseReason);
+	}
+	@Override
+	public Integer updateRefund(String disputeid, String refundedAmount) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateRefund(disputeid, refundedAmount);
 	}
 
 }

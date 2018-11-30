@@ -3,8 +3,6 @@ package com.importExpress.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.importExpress.pojo.CustomerDisputeBean;
 
 public interface CustomerDisputeService {
@@ -58,5 +56,25 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	int updateStatus(String disputeId,String status);
+	/**获取申诉退款信息
+	 * @param disputeid
+	 * @return
+	 */
+	CustomerDisputeBean getComfirmByDisputeID(String disputeid);
+	
+	/**拒绝退款更新
+	 * @param disputeid
+	 * @param refuseReason
+	 * @return
+	 */
+	Integer updateRefuseReason(String disputeid,String refuseReason);
+	
+	
+	/**退款成功
+	 * @param refundedAmount
+	 * @param state
+	 * @return
+	 */
+	Integer updateRefund(String disputeid,String refundedAmount);
 	
 }

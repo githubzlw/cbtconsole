@@ -94,7 +94,6 @@
         }
     </style>
     <script>
-    
         $(document).ready(function () {
             setDatagrid();
         });
@@ -125,8 +124,6 @@
                 onLoadSuccess: function (data) {
                     if (!data.success) {
                         showMessage(data.message);
-                    }else{
-                    	$("#oprator").val(data.message);
                     }
                 }
             });
@@ -164,16 +161,24 @@
 	}
         
         function formatAction(val, row, index) {
-        		var oprator = $("#oprator").val();
-	        	if(row.status == '1'){
-	        		return "已确认";
+	        	if(row.status == '2'){
+	        		return "已完结";
+	        	}else if(row.status == '-1'){
+	        		return "拒绝";
 	        	}else{
-	        		if(oprator == '1'){
-		    		  return '<input type="button" onclick="comfirm(\''+row.disputeID+'\')" value="确认">';
+	        		if(row.adminRolyType == '0'){
+		    		  return '<input type="button" onclick="comfirm(\''+row.disputeID+'\')" value="确定退款">'+
+		    		  '<input type="button" onclick="refuse(\''+row.disputeID+'\')" value="拒绝退款">';
 	        		}else{
-	        			return "等待确认";
+	        			return "等待退款";
 	        		}
 	        	}
+    	}
+        function formatPP(val, row, index) {
+        	if(row.merchantID=='584JZVFU6PPVU'){
+        		return '老账号';
+        	}
+    		return '新账号';
     	}
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
@@ -226,9 +231,10 @@
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 			</span> -->&nbsp;&nbsp;&nbsp;&nbsp; 
         <span> 状态: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
-            <option value="-1">全部</option>
+            <option value="-2">全部</option>
+            <option value="-1">拒绝退款</option>
             <option value="0">等待退款</option>
-            <option value="1">已完成退款</option>
+            <option value="1">已完结</option>
         </select></span>
         &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
                                               class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -241,14 +247,16 @@
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
-        <!-- <th data-options="field:'type',width:'30px'">来源</th> -->
-        <th data-options="field:'disputeID',width:'80px',formatter:formatdispute">事件号</th>
-        <th data-options="field:'status',align:'center',width:'80px'">状态</th>
+        <th data-options="field:'apiType',width:'35px'">来源</th>
+        <th data-options="field:'disputeID',width:'150px',formatter:formatdispute">事件号</th>
+        <th data-options="field:'transactionID',width:'100px'">交易号</th>
+        <th data-options="field:'merchantID',width:'35px',formatter:formatPP">pp账号</th>
+        <th data-options="field:'amount',width:'100px'">退款金额</th>
         <th data-options="field:'userid',align:'center',width:'80px'">用户</th>
-        <th data-options="field:'remark',align:'left',width:'310px'">备注</th>
+        <th data-options="field:'remark',align:'left',width:'200px'">备注</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
-        <th data-options="field:'orderNo',align:'center',width:'130px',formatter:formatOrder">订单号</th>
-        <!-- <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">确定退款</th> -->
+        <th data-options="field:'orderNo',align:'center',width:'100px',formatter:formatOrder">订单号</th>
+        <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
     </tr>
     </thead>
     <tbody>

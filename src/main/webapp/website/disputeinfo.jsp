@@ -96,7 +96,7 @@
     display: none;
     }
 	</style>
-
+<!--  
 <script type="text/template" id="qq-template-manual-trigger">
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Please upload a file here" style="min-height: 45px;">
             <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -161,7 +161,9 @@
             </dialog>
         </div>
     </script>
+-->
 </head>
+
 <body>
 <c:if test="${success ==0}">
 
@@ -291,19 +293,19 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
-<c:if test="${confim==0 && role == 0 }">
+<%-- <c:if test="${confim==0 && role == 0 }">
 <input type="submit" value="确认退款" id="confirmrefundRadio">
-</c:if>
+</c:if> --%>
 
-<c:if test="${buyerOfferFlag== 0 && resonFlag == 0 && role == 1}">
+<c:if test="${buyerOfferFlag== 0 && resonFlag == 0 && confim==0}">
 <input type="button" value="Refund and Close" id="refundCloseRadio">
 </c:if>
 
-<c:if test="${buyerOfferFlag==0 && resonFlag == 1 && role == 1}">
+<c:if test="${buyerOfferFlag==0 && resonFlag == 1 && confim==0}">
 <input type="button" value="Offer Full Refund" id="refundCloseRadio">
 </c:if>
 
-<c:if test="${buyerOfferFlag==0 && resonFlag == 0 && disputeLifeCycleFlag!=0  && role == 1}">
+<c:if test="${buyerOfferFlag==0 && resonFlag == 0 && disputeLifeCycleFlag!=0 && confim==0}">
 <input type="button" value="Send an Offer" id="offerRadio">
 </c:if>
 
@@ -582,6 +584,7 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <input type="button" name="secondary" value="Cancel" class="cancel_button" >
 </form>
 </div>
+
 <div style="margin-left: 60px;"  class="panel sendmessage_form message_form hide">
 <form method="post" action="/cbtconsole/customer/dispute/sendmessage" >
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
@@ -613,6 +616,10 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <div style="margin-left: 60px;"  class="panel refund_form message_form hide">
 <!-- 退款 -->
 <form method="post" action="${resonFlag == 1?'/cbtconsole/customer/dispute/offer': '/cbtconsole/customer/dispute/acceptClaim'}" >
+<input type="hidden" name="gross_amount" id="gross_amount" value="${result.disputed_transactions[0].gross_amount.value }">
+<input type="hidden" name="buyer_request_amount" value="${result.offer.buyer_requested_amount.value }">
+<input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
+<input type="hidden" name="userid" value="${userid}" readonly="readonly">
 <c:if test="${resonFlag == 1}">
 <input type="hidden" name="offerType" id="offer_type" value="REFUND">
 </c:if>
@@ -621,8 +628,14 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <c:if test="${resonFlag == 0}">
 <input type="hidden" name="accept_claim_reason" value="DID_NOT_SHIP_ITEM">
+<c:if test="${empty  result.offer.buyer_requested_amount.value}">
+<input type="hidden" name="refundAmount" value="${result.disputed_transactions[0].gross_amount.value }">
+<input type="hidden" name="refundCurrency" value="${result.disputed_transactions[0].gross_amount.currency_code }">
+</c:if>
+<c:if test="${not empty  result.offer.buyer_requested_amount.value}">
 <input type="hidden" name="refundAmount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.offer.buyer_requested_amount.currency_code }">
+</c:if>
 </c:if>
 <c:if test="${resonFlag == 1}">
 <input type="hidden" name="refundAmount" value="${result.dispute_amount.value }">
@@ -633,7 +646,7 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <div>
 <c:if test="${buyerOfferFlag==0 && resonFlag == 0}"></c:if>
 <c:if test="${resonFlag == 0}">
-<c:if test="${disputeLifeCycleFlag!=2 }">
+<c:if test="${disputeLifeCycleFlag!=2 && not empty result.offer.buyer_requested_amount.value}">
 <label>Accept buyer's offer</label>
 <p>
 ${result.disputed_transactions[0].buyer.name }  has requested a refund 
@@ -645,7 +658,7 @@ This case will be closed once you send the refund to the buyer.
 </p>
 </c:if>
 
-<c:if test="${disputeLifeCycleFlag==2 }">
+<c:if test="${disputeLifeCycleFlag==2 || empty result.offer.buyer_requested_amount.value}">
 <label>Full refund without return</label>
 <p>You're refunding an amount of $${result.dispute_amount.value }&nbsp;${result.dispute_amount.currency_code }.</p>
 
@@ -693,7 +706,7 @@ this problem will be resolved and closed.
  
  </option>
 <option value="custom">Other Adress</option></select>
-<span class="others-info hide">If the address isn't available in the list, you may enter it in the notes field.</span>
+<span class="others-info">If the address isn't available in the list, you may enter it in the notes field.</span>
 </div><p class="status-text">The refund will be processed once you confirm that you've received the item from the buyer.</p><div class="form-group ">
 <textarea class="form-control" id="messageBodyForSellerFullOffer" rows="7" cols="72" maxlength="2000" placeholder="Enter your offer details"></textarea>
 </div><div class="button-group">
@@ -718,7 +731,7 @@ this problem will be resolved and closed.
 <div class="more-options">
 <div class="form-group input-group ">
 <input type="text" placeholder="Enter refund amount" size="20" value="" class="partial-amount partialOnly" style="width:110px;height:24px;">
-<label class="input-group-addon">${result.offer.buyer_requested_amount.currency_code } </label></div></div>
+<label class="input-group-addon">${result.dispute_amount.currency_code } </label></div></div>
 </div>
 <div class="option-item">
 <div class="form-group radio">
@@ -739,7 +752,7 @@ this problem will be resolved and closed.
  </option>
 <option value="custom">Other Adress</option>
 </select>
-<span class="others-info hide">如果地址不在列表中，您可以在备注栏中输入。</span></div>
+<span class="others-info">If the address isn't available in the list, you may enter it in the notes field.</span></div>
 </div></div><div class="option-item">
 <div class="form-group radio">
 <input type="radio" name="partialOfferType" value="partialReplace" id="partialReplaceRadio" class="offer-type">
@@ -940,6 +953,10 @@ this problem will be resolved and closed.
 
 </form>
 <form action="/cbtconsole/customer/dispute/offer" method="post" id="makeoffer_form" style="display:none;">
+<input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
+<input type="hidden" name="userid" value="${userid}" readonly="readonly">
+<input type="hidden" name="gross_amount" value="${result.disputed_transactions[0].gross_amount.value }">
+<input type="hidden" name="buyer_request_amount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 <input type="hidden" name="merchant" value="${merchant }">
@@ -953,7 +970,6 @@ this problem will be resolved and closed.
 <input type="hidden" name="admin_area_2" id="admin_area_2" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_2}">
 <input type="hidden" name="admin_area_1" id="admin_area_1" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_1}">
 <input type="hidden" name="country_code" id="country_code" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.country_code}">
-
 <input type="hidden" name="offerType" id="offer_type" value="">
 <input type="hidden" name="messageBodyForGeneric" id="note" value="">
 <input type="hidden" name="refundAmount" id="refundAmount" value="">
@@ -1135,7 +1151,7 @@ function submit(){
 }
 </script>
 	<script>
-	 var manualUploader = new qq.FineUploader({
+	/*  var manualUploader = new qq.FineUploader({
          element: document.getElementById('fine-uploader-manual-trigger'),
          template: 'qq-template-manual-trigger',
          request: {
@@ -1156,13 +1172,13 @@ function submit(){
              accept:"image/jpg, image/gif , image/png, file/pdf"
          },
          callbacks: {
-         	/* 开始上传 */
+         	开始上传 
              onUpload: function (id, name) {
              },
-             /* 选择文件后 */
+              选择文件后 
              onSubmitted: function (id, name) {
              },
-             /* 上传完成 */
+             上传完成 
              onComplete : function(id, name, responseJSON) {
             	 var str="";
             	 if(responseJSON.success){
@@ -1189,7 +1205,7 @@ function submit(){
 
      qq(document.getElementById("trigger-upload")).attach("click", function() {
     	 manualUploader.uploadStoredFiles();
-     });
+     }); */
      
      function fnsubmint(){
     		
