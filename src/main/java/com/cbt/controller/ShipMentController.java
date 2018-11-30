@@ -416,7 +416,7 @@ public class ShipMentController {
 		}else{
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype();
-			if("0".equals(strm) || "sales2".equals(user.getAdmName().toLowerCase())){
+			if("0".equals(strm) || "yangyunyun".equals(user.getAdmName().toLowerCase())){
 				res = 1;
 			}
 		}

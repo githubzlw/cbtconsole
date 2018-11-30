@@ -294,7 +294,7 @@ function fn(va) {
 	$("#page").html(page);
     $("#adminusersc").val(buyuser);
 	admName='<%=request.getAttribute("admName")%>';
-	if(admName!="Ling"  && admName!="Sales1" && admName!="Sales2" && admName!="emmaxie"){
+	if(admName!="Ling"  && admName!="Sales1" && admName!="yangyunyun" && admName!="emmaxie"){
         $("#adminusersc").val(admuserid);
 	}
 	//如果只有一条数据，则打开该订单详情页面
@@ -352,7 +352,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 	}
 	buysrt = buysrt + '<option value="0">全部</option>';
 	for (var i = 0; i < sellAdm.length; i++) {
-		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie"){
+		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="yangyunyun" || adminName=="emmaxie"){
 			if(str=='') {
 				str = str + '<option value="0" ' + change + ' >全部</option>';
 			}
@@ -375,7 +375,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 
 		str_personCharge = str.replace("全部", "");
 		$('#adminusersc').html(str);
-		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie")){
+		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="yangyunyun" || adminName=="emmaxie")){
 			$('#adminusersc').attr('disabled', 'disabled');
 		}
 		$('#buyuser').html(buysrt);

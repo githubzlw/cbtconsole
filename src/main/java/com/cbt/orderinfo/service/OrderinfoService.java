@@ -1176,6 +1176,8 @@ public class OrderinfoService implements IOrderinfoService {
 		}
 		if(countryid==37 && "epacket".equals(shippingMethod.toLowerCase())){
 			shippingMethod="China Post Packet(no tracking,unstable)";
+		}else if(countryid ==29 && "TNT Cargo Shipping (Duty Paid)".toLowerCase().equals(shippingMethod.toLowerCase())){
+			shippingMethod="TNT Cargo Shipping (DDP)";
 		}
 		double normalBaseWeight = 0d;
 		BigDecimal normalBasePrice = new BigDecimal(0);

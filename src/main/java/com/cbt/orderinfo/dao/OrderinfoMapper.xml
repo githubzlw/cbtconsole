@@ -823,7 +823,7 @@
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
-        ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,cbr.ali_sellunit,
+        ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,od.seilUnit as ali_sellunit,
         cbr.bm_flag,cbr.isBenchmark,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
         from order_details od
         left join order_address adr on od.orderid=adr.orderNo
@@ -1378,7 +1378,7 @@
     <select id="getFlushOrderFreightOrder" resultType="com.cbt.bean.OrderBean">
         SELECT order_no AS orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
         WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1) AND od.goodsid != '1400'
-        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime)
+        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QB29917379468058'
         GROUP BY oi.order_no  ORDER BY oi.orderid DESC;
     </select>
     <select id="getAllOrderInfo" resultType="com.cbt.bean.OrderBean">
