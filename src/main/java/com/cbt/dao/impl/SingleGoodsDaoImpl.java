@@ -1113,7 +1113,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     public int insertIntoSingleGoodsByIsCheck(String pid) {
 
         Connection conn31 = DBHelper.getInstance().getConnection6();
-        String selectSql = "insert ignore into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku," +
+        String selectSql = "insert into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku," +
                 "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime, " +
                 "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag) " +
                 "select goods_name, price,shop_id,bargain_number, standard, sku," +
