@@ -17,6 +17,9 @@ import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,7 @@ public class ShopUrlController {
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
+    private static final String ACCESS_URL = "http://192.168.1.31:8088/syncGoodsToOnline/shopImg/replaceMainImg?pid=";
 
     @Autowired
     private IShopUrlService shopUrlService;
@@ -175,12 +179,12 @@ public class ShopUrlController {
         } else {
             page = Integer.parseInt(str);
         }
-        int start = (page - 1) * 25;
+        int start = (page - 1) * 50;
         String shopids="";
         if(StringUtil.isNotBlank(admName)){
             shopids=shopUrlService.getShopList(admName,days);
         }
-        List<ShopUrl> findAll = shopUrlService.findAll(shopId, shopUserName, date, start, 25, timeFrom, timeTo, isOn,
+        List<ShopUrl> findAll = shopUrlService.findAll(shopId, shopUserName, date, start, 50, timeFrom, timeTo, isOn,
                 state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids);
         int total = shopUrlService.total(shopId, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
                 authorizedFileFlag,ennameBrandFlag,shopids);
@@ -1179,6 +1183,39 @@ public class ShopUrlController {
         }
         return json;
     }
+
+
+    @ResponseBody
+    @RequestMapping("/deleteGoodsByPid.do")
+    public JsonResult deleteGoodsByPid(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+        try {
+            shopUrlService.deleteGoodsByPid(pid);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("执行失败，原因：" + e.getMessage());
+            System.err.println("pid:" + pid + ",deleteShopGoods error:" + e.getMessage());
+            LOG.error("pid:" + pid + ",deleteShopGoods error:" + e.getMessage());
+        }
+        return json;
+    }
+
+
 
     /**
      * @param request
@@ -2645,6 +2682,34 @@ public class ShopUrlController {
             }
             boolean success = shopUrlService.saveEditGoods(cgp, shopId, user.getId());
             if (success) {
+                // 设置橱窗图为主图，执行判断逻辑
+                if(StringUtils.isNotBlank(orGoods.getImg())){
+                    // 获取原始橱窗图信息，判断新的橱窗图和老的橱窗图是否一致，如果不一致，替换搜索图片
+                    List<String> orImgList = deal1688GoodsImg(orGoods, orGoods.getLocalpath());
+                    String editedImg = request.getParameter("imgInfo");
+                    String[] editImgList = editedImg.split(";");
+                    if(!editImgList[0].equals(orImgList.get(0))){
+                        System.err.println("pid:" + cgp.getPid() + ",重新刷新搜索图");
+                        OkHttpClient okHttpClient = new OkHttpClient();
+                        Request okHttpReq = new Request.Builder().url(ACCESS_URL + cgp.getPid()).build();
+                        Response okHttpResponse = okHttpClient.newCall(okHttpReq).execute();
+                        String resultStr = okHttpResponse.body().string();
+                        JSONObject jsonObject = JSONObject.fromObject(resultStr);
+
+                        if (jsonObject.getBoolean("ok")) {
+                            System.out.println("设置搜索图成功!!!");
+                        } else {
+                            // 还原img信息
+                            cgp.setImg(orGoods.getImg());
+                            shopUrlService.saveEditGoods(cgp, shopId, user.getId());
+                            // 打印错误日志
+                            System.err.println("pid:" + cgp.getPid() + ",设置搜索图失败:" + jsonObject.getString("message"));
+                            json.setOk(false);
+                            json.setMessage("设置搜索图失败:" + jsonObject.getString("message") + ",请重试");
+                            return json;
+                        }
+                    }
+                }
                 if (weightStr.equals(orFinalWeight)) {
                     json.setOk(true);
                     json.setMessage("更新成功");

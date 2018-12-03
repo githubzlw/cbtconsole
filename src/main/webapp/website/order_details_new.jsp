@@ -233,7 +233,7 @@ $(document).ready(function(){
     getAllBuyuser();
     fnGetAddress();
     var adminName = '<%=user.getAdmName()%>';
-    if(adminName !="Ling" && adminName !="emmaxie"){
+    if(adminName !="Ling" && adminName !="emmaxie" && adminName !="admin1"){
         // $("#buyuser1").attr("disabled",true);
         $("#buy_but").attr("disabled",true);
         $("#saler").attr("disabled",true);
@@ -1312,7 +1312,7 @@ em {
 
 											<c:if test="${order.state==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1419,7 +1419,7 @@ em {
 									</c:if>
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus==1}">
 									 <!-- yyl 评论start -->
-										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 										 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 											<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1512,35 +1512,35 @@ em {
 								</c:if>
 							</td>
 							<td
-								style="word-wrap: break-word; word-break: break-all; width: 240px; color: red">
-								<font color="red" class="newsourceurl">
+								style="word-wrap: break-word; word-break: break-all; width: 240px;">
+								<font  class="newsourceurl">
 
 
 								<a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
 
-								<span id="spanurl${sd.index}">
+								<span id="spanurl${sd.index}" style="color:red;">
 									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
 								</span>
-								<span id="spanurl${sd.index}">
+								<span id="spanurl${sd.index}" style="color:red;">
 									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
 								</span>
 								<span id="spanurl${sd.index}">
 									<p style="width:200px;">采购货源标题: ${orderd.goodsPName}</p>
 								</span>
-								<span id="spanurl${sd.index}">
+								<span id="spanurl${sd.index}" style="color:red;">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
 								</span>
 								<%--<span id="spanurl${sd.index}">--%>
 									<%--<p style="width:200px;">产品总重量(kg): ${orderd.final_weight}</p>--%>
 								<%--</span>--%>
 
-								<span id="spanurl${sd.index}">
+								<span >
 									<p>采购数量: ${orderd.buycount}</p>
 								</span>
-								<span id="spanurl${sd.index}">
+								<span >
 									<p>供应商ID： <a target="_blank" style="color:red;" title="查看该供应商采购历史记录" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${orderd.shop_id}">${orderd.shop_id}</a></p>
 								</span>
-								<span id="spanurl${sd.index}">
+								<span >
 										<p>实际采购价格(RMB):${orderd.sourc_price}</p>
 									<c:if test="${orderd.pidInventory >0}">
 										<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${orderd.goods_pid}">有类似库存但规格不一致</a><br>
@@ -1631,7 +1631,7 @@ em {
 
 												<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1743,7 +1743,7 @@ em {
 												<%-- ${order.state==4?'完结':'' } --%>
 													<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling'  || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1784,7 +1784,7 @@ em {
 												</c:if>
 											</c:if> <c:if test="${ostate==1 && orderd.checked==1}">
 										<!-- yyl 评论start -->
-											<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' }"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if>
+											<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' || admuserinfo.admName=='admin1' }"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if>
 											<button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 												<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${goods_url }"/>
@@ -1846,7 +1846,7 @@ em {
 									</td>
 									<!-- 添加列 -->
 									<td style="word-wrap: break-word; word-break: break-all; width: 180px; color: red; width: 10%;">
-										<font color="red" class="newsourceurl">
+										<font  class="newsourceurl">
 
 										<a href="http://192.168.1.34:8086/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
 										<span id="spanurl${sd.index}">

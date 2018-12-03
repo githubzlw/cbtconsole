@@ -294,7 +294,7 @@ function fn(va) {
 	$("#page").html(page);
     $("#adminusersc").val(buyuser);
 	admName='<%=request.getAttribute("admName")%>';
-	if(admName!="Ling"  && admName!="Sales1" && admName!="Sales2" && admName!="emmaxie"){
+	if(admName!="Ling"  && admName!="Sales1" && admName!="Sales2" && admName!="emmaxie" && admName!="admin1"){
         $("#adminusersc").val(admuserid);
 	}
 	//如果只有一条数据，则打开该订单详情页面
@@ -352,7 +352,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 	}
 	buysrt = buysrt + '<option value="0">全部</option>';
 	for (var i = 0; i < sellAdm.length; i++) {
-		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie"){
+		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie" || adminName=="admin1"){
 			if(str=='') {
 				str = str + '<option value="0" ' + change + ' >全部</option>';
 			}
@@ -375,7 +375,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 
 		str_personCharge = str.replace("全部", "");
 		$('#adminusersc').html(str);
-		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie")){
+		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie" || adminName=="admin1")){
 			$('#adminusersc').attr('disabled', 'disabled');
 		}
 		$('#buyuser').html(buysrt);
@@ -383,8 +383,8 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 $(document).ready(function(){ 
 	fn(1);
 	fnGetStatistic();
-	fnGetMessage(<%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>); //获取各种消息数量
-    uidTem = <%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>;
+	fnGetMessage(<%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1") ? 1 : uid%>); //获取各种消息数量
+    uidTem = <%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1") ? 1 : uid%>;
 }); 
 
 </script>
@@ -415,7 +415,7 @@ $(document).ready(function(){
 					target="_blank">综合采购</a> <c:if test="${admuserid == 0}"><a href="/cbtconsole/website/shipmentcount.jsp"
 					target="_blank">30天完成出货订单统计</a></c:if>
 			</div>
-			<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
+			<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1"))){%>
 				<!-- 载入消息提醒jsp页面 -->
 				<jsp:include page="message_notification.jsp"></jsp:include>
 			<%}  %>
@@ -487,14 +487,20 @@ $(document).ready(function(){
 										id="shopcarmarket1" class="btn btn-warning btnto"></span>
 								</span> <input type="hidden" id="type" value="shopcarmarket"></td>
 
-								<td><span id="busquer"> <input type="hidden"
-										id="style" value="noArrage"> <span id="businquiries"
-										class="btn btn-primary btnto"></span>
-								</span> <span> <input type="hidden" id="style" value="noDelete">
+                                <!-- 商业询盘 -->
+								<td>
+                                    <%--<span id="busquer"> <input type="hidden" id="style" value="noArrage">
+                                        <span id="businquiries" class="btn btn-primary btnto"></span>
+								    </span>--%>
+                                    <span>
+                                        <input type="hidden" id="style" value="noDelete">
 										<span id="businquiries1" class="btn btn-success btnto"></span>
-								</span> <span> <span id="businquiries2"
-										class="btn btn-warning btnto"></span>
-								</span> <input type="hidden" id="type" value="businquiries"></td>
+								    </span>
+                                    <%--<span>
+                                        <span id="businquiries2" class="btn btn-warning btnto"></span>
+								    </span>--%>
+                                    <input type="hidden" id="type" value="businquiries">
+                                </td>
 								<!-- <td><span id="bat"> <input type="hidden" id="style"
 										value="noArrage"> <span id="batapply"
 										class="btn btn-primary btnto"></span>

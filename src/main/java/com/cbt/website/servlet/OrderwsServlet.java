@@ -142,7 +142,7 @@ public class OrderwsServlet extends HttpServlet {
 		request.setAttribute("actual_ffreight_",
 				Utility.getIsDouble(order.getActual_ffreight()) ? Double.parseDouble(order.getActual_ffreight()) : 0);
 		request.setAttribute("userId", userId);
-		if (admName == "Ling" || "Ling".equals(admName) || "emmaxie".equals(admName)) {
+		if (admName == "Ling" || "Ling".equals(admName) || "emmaxie".equals(admName) || "admin1".equals(admName)) {
 			request.getRequestDispatcher("website/paymentConfirm.jsp").forward(request, response);
 		} else {
 			request.getRequestDispatcher("website/paymentConfirm1.jsp").forward(request, response);
