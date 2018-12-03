@@ -200,6 +200,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
                 $("#spjg1"+h_orderid).html("可以出运");
                 $("#yjremark"+order_no).attr('disabled',true);
                 $("#inRemark"+order_no+"").attr('disabled',true);
+                $("#plckid").attr('disabled',false);
 			}
 		}
 	});
