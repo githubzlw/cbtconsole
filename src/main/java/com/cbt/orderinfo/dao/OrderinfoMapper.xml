@@ -1020,7 +1020,6 @@
 		 car_img,car_url, od.goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
 		 od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(purchase_time,'') as purchase_time,purchase_confirmation,car_type,
 		 date_format(od.createtime,'%Y-%m-%d') as create_time,od.car_img goods_typeimg, 	ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,IFNULL(pa.sprice,0) AS sprice,dropshipid,checked,id.goodstatus,
--- 		 gc.freight ,
 		 od.goods_pid
 		,cbr.weight cbrWeight,cbr.wholesale_price cbrPrice,od.car_urlMD5  from order_details od
 		 left join order_address adr on od.orderid=adr.orderNo
