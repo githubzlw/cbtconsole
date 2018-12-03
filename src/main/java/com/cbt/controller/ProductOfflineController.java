@@ -64,8 +64,9 @@ public class ProductOfflineController {
 		List<ConfirmUserInfo> AllAdm = dao.getAllByOperations();
 		List<ConfirmUserInfo> newAdms = new ArrayList<ConfirmUserInfo>();
 		for (ConfirmUserInfo userInfo : AllAdm) {
-			if (userInfo.getRole() == 0) {
-				if (userInfo.getConfirmusername().equalsIgnoreCase("Ling") || userInfo.getConfirmusername().equalsIgnoreCase("emmaxie") || userInfo.getConfirmusername().equalsIgnoreCase("admin1")) {
+				if (userInfo.getRole() == 0) {
+				if (userInfo.getConfirmusername().equalsIgnoreCase("Ling") || userInfo.getConfirmusername().equalsIgnoreCase("emmaxie")
+						|| userInfo.getConfirmusername().equalsIgnoreCase("admin1")) {
 					newAdms.add(userInfo);
 				} else if (userInfo.getConfirmusername().equalsIgnoreCase("testAdm")) {
 					newAdms.add(userInfo);

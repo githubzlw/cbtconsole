@@ -203,8 +203,8 @@ public class WarehouseCtrl {
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
-
-		if(adm.getId()==1 || adm.getId()==83  || adm.getId()==84){
+		
+		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");

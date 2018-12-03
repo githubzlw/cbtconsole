@@ -2570,7 +2570,7 @@
 		inner join order_details od on id.orderid=od.orderid and id.odid=od.id
 		inner join orderinfo oi on od.orderid=oi.order_no
 		WHERE
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
+		<if test="admuserid != 1 and admuserid != 83  and admuserid != 84">
 			g.admuserid='${admuserid}' and
 		</if>
 		g.orderid=#{orderid} and id.goodstatus&lt;>1 and id.is_replenishment=1 and id.is_delete=0 and od.state&lt;2 and oi.state between 1 and 5
@@ -2584,7 +2584,7 @@
 			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm' )
 		</if>
 		where g.orderid=#{orderid}
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
+		<if test="admuserid != 1 and admuserid != 83  and admuserid != 84">
 			and g.admuserid='${admuserid}'
 		</if>
 		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
@@ -2720,7 +2720,7 @@
 	</select>
 	<select id="getAllBuyer" resultType="com.cbt.pojo.AdmuserPojo">
 		SELECT * FROM admuser  WHERE STATUS =1 AND roleType IN (3,5)
-		<if test="admuserid != 1 and admuserid != 84 and admuserid != 83">
+		<if test="admuserid != 1 and admuserid != 9 and admuserid != 83 and admuserid != 84">
 			and id=${admuserid}
 		</if>
 		order by admName asc
@@ -3315,7 +3315,7 @@
 		<if test="goods_id != null">
 			and (i.goods_id=#{goods_id} or i.odid=#{goods_id})
 		</if>
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
+		<if test="admuserid != 1 and admuserid != 83  and admuserid != 84">
 			and g.admuserid=#{admuserid}
 		</if>
 		<if test="times != null and times == 1">
