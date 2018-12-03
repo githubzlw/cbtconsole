@@ -1,14 +1,21 @@
 package com.cbt.messages.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cbt.messages.dao.MessagesMapper;
 import com.cbt.messages.vo.AdminRUser;
 import com.cbt.messages.vo.MessagesCountVo;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Messages;
 import com.cbt.pojo.page.Page;
+import com.importExpress.mapper.CustomerDisputeMapper;
+import com.importExpress.utli.MongoDBHelp;
+import com.mongodb.BasicDBObject;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +26,8 @@ public class MessagesServiceImpl implements MessagesService{
 
 	@Autowired
 	private MessagesMapper messagesDao;
+	@Autowired
+	private CustomerDisputeMapper customerDisputeMapper;
 
 	@Override
 	public int insertSelective(Messages record) {
@@ -190,8 +199,31 @@ public class MessagesServiceImpl implements MessagesService{
 		MessagesCountVo questionnum = messagesDao.selectQuestionNum(admuserid);
 		Integer count1073 = questionnum.getNoDeleteCount();
 		
+		//申诉未读消息
+		MongoDBHelp instance = MongoDBHelp.INSTANCE;
+		BasicDBObject q = new BasicDBObject();
+		q.put("resource_type", "dispute");
+		List<String> documents = 
+				instance.findAny("data",q,null);
+		List<String> disputeList = new ArrayList<String>();
+		for(String content : documents) {
+    		if(StringUtils.indexOf(content,"dispute_id") > -1) {
+    			JSONObject document = JSONObject.parseObject(content);
+    			JSONObject  resource = (JSONObject)document.get("resource");
+    			String dispute_id = resource.getString("dispute_id");
+    			if(disputeList.contains(dispute_id)) {
+    				continue;
+    			}
+    			disputeList.add(dispute_id);
+    		}
+    	}
+		Integer count1114 = customerDisputeMapper.countMessage(null, admuserid);
+		count1114 = count1114 == null ? 0 : count1114;
+		count1114 = disputeList.size() - count1114;
+		
+		
 		//查询需要加待处理消息数量入口的名称，用于入口页面中搜索入口按钮及拼接对应数量
-		List<HashMap<String, String>> result = messagesDao.queryAuthNameByIds(Arrays.asList(new String[]{"19","29","1073","1078","1027"}));
+		List<HashMap<String, String>> result = messagesDao.queryAuthNameByIds(Arrays.asList(new String[]{"19","29","1073","1078","1027","1114"}));
 		for (HashMap<String, String> bean : result) {
 			String id = String.valueOf(bean.get("authId"));
 			switch (id) {
@@ -209,6 +241,9 @@ public class MessagesServiceImpl implements MessagesService{
 				break;
 			case "1027":
 				bean.put("count", String.valueOf(count1027));
+				break;
+			case "1114":
+				bean.put("count", String.valueOf(count1114));
 				break;
 			}
 		}

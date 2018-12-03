@@ -18,10 +18,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.importExpress.mapper.AdminRUserMapper;
 import com.importExpress.mapper.CustomerDisputeMapper;
-import com.importExpress.mapper.UserNewMapper;
 import com.importExpress.pojo.AdminRUser;
-import com.importExpress.pojo.AdminRUserExample;
-import com.importExpress.pojo.AdminRUserExample.Criteria;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomerDisputeService;
@@ -34,8 +31,6 @@ import com.stripe.net.APIResource;
 public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
-	@Autowired
-	private UserNewMapper userNewMapper;
 	@Autowired
 	private CustomerDisputeMapper customerDisputeMapper;
 	@Autowired
@@ -245,6 +240,16 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public Integer updateRefund(String disputeid, String refundedAmount) {
 		// TODO Auto-generated method stub
 		return customerDisputeMapper.updateRefund(disputeid, refundedAmount);
+	}
+	@Override
+	public Integer insertMessage(String disputeId, int admId) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.insertMessage(disputeId, admId);
+	}
+	@Override
+	public Integer countMessage(String disputeId,int admId) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.countMessage(disputeId,admId);
 	}
 
 }

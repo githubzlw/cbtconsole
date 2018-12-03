@@ -28,7 +28,7 @@
   </resultMap>
   
   <insert id="insert" parameterType="com.importExpress.pojo.CustomerDisputeBean">
-    insert into customer_dispute (
+    insert into customer_dispute_refund (
     dispute_id,user_id, order_no, merchant_id,
       transaction_id, remark,refund_type,return_shipping_address,
       gross_amount,buyer_request_amount,seller_offered_amount,currency_code,
@@ -41,14 +41,21 @@
     #{oprateAdm},now(),now()
       )
   </insert>
+  <insert id="insertMessage" >
+    insert into customer_dispute_message (
+    dispute_id,adm_id,create_time,update_time
+      )
+    values (#{disputeId},#{admId},now(),now()
+      )
+  </insert>
   
    <update id="updateStatus">
-    update customer_dispute set status=#{status},update_time=now()
+    update customer_dispute_refund set status=#{status},update_time=now()
     where dispute_id = #{disputeID}
   </update>
   
   <select id="count"  resultType="java.lang.Integer">
-    select  count(id) from customer_dispute where  1=1 
+    select  count(id) from customer_dispute_refund where  1=1 
     <if test="disputeId != null">
      and dispute_id = #{disputeId}
     </if>
@@ -57,6 +64,13 @@
     
     </if>
     
+  </select>
+  <select id="countMessage"  resultType="java.lang.Integer">
+    select  count(id) from customer_dispute_message where  1=1 
+    <if test="disputeId != null">
+     and dispute_id = #{disputeId}
+    </if>
+     and adm_id = #{admId}
   </select>
  
   <select id="confirmList"  resultMap="BaseResultMap">
@@ -67,7 +81,7 @@
 	currency_code,offer_type,accept_claim_reason,create_time,
 	update_time,oprate_adm,api_type,refuse_reason
     
-     from customer_dispute 
+     from customer_dispute_refund 
        where 1=1
      <if test="disputeid != null">
      and dispute_id = #{disputeid}
@@ -86,17 +100,19 @@
 	gross_amount,buyer_request_amount,seller_offered_amount,amount_refunded,
 	currency_code,offer_type,accept_claim_reason,create_time,
 	update_time,oprate_adm,api_type,refuse_reason from 
-	customer_dispute where dispute_id = #{disputeid} limit 1;
+	customer_dispute_refund where dispute_id = #{disputeid} limit 1;
   </select>
  
  <update id="updateRefuseReason">
- update customer_dispute set refuse_reason=#{refuseReason},state=-1,update_time=now()
+ update customer_dispute_refund set refuse_reason=#{refuseReason},status=-1,update_time=now()
   where dispute_id = #{disputeid}
  </update>
  <update id="updateRefund">
- update customer_dispute set amount_refunded=#{refundedAmount},state=2,update_time=now()
+ update customer_dispute_refund set amount_refunded=#{refundedAmount},status=2,update_time=now()
   where dispute_id = #{disputeid}
  </update>
+ 
+ 
  
  
 </mapper>

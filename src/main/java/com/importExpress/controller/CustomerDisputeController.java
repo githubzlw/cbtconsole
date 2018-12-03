@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,7 +13,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.bcel.generic.NEW;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -176,7 +174,7 @@ public class CustomerDisputeController {
 			if(StringUtils.isBlank(showDisputeDetails)) {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
 			}	
-			System.out.println(showDisputeDetails);
+			LOG.info(showDisputeDetails);
 			if(StringUtils.isNotEmpty(showDisputeDetails)) {
 				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
 			}
@@ -231,6 +229,10 @@ public class CustomerDisputeController {
 			mv.addObject("message", e.getMessage());
 			mv.addObject("success", 0);
 		}
+		Integer countMessage = customerDisputeService.countMessage(disputeID, adm.getId());
+		if(countMessage == null || countMessage == 0) {
+			customerDisputeService.insertMessage(disputeID, adm.getId());
+		}
     	return mv;
     }
    
@@ -266,7 +268,7 @@ public class CustomerDisputeController {
 					data.put("message", content);
 					result = apiService.sendMessage(disputeID,merchant, data);
 //				}
-				System.out.println(result);
+				LOG.info(result);
 				attr.addFlashAttribute("sendResult", "Successed");
 			}
 		} catch (Exception e) {
@@ -458,7 +460,7 @@ public class CustomerDisputeController {
     	String content = request.getParameter("messageBodyForGeneric");
     	String fileLocation = request.getParameter("fileLocation");
     	
-    	System.out.println("fileLocation:"+fileLocation);
+    	LOG.info("fileLocation:"+fileLocation);
     	File file = new File(fileLocation);
     	
     	//数据
@@ -501,7 +503,7 @@ public class CustomerDisputeController {
 			result = e.getMessage();
 //			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
 		}
-    	System.out.println(result);
+    	LOG.info(result);
     	
     	return result;
     }
@@ -534,7 +536,7 @@ public class CustomerDisputeController {
     		result = e.getMessage();
     		attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
     	}
-//    	System.out.println(result);
+//    	LOG.info(result);
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }
@@ -558,7 +560,7 @@ public class CustomerDisputeController {
 		saveFileUrl = saveFileUrl + "/" + System.currentTimeMillis() + "/";
 		
 		File headPath = new File(saveFileUrl);//获取文件夹路径
-//		//System.out.println(getRootPath(multipartRequest));
+//		//LOG.info(getRootPath(multipartRequest));
         if(!headPath.exists()){//判断文件夹是否创建，没有创建则创建新文件夹
         	headPath.mkdirs();
         }
@@ -569,7 +571,7 @@ public class CustomerDisputeController {
 		while (itr.hasNext()) {
 			//取出文件
 			mpf = multipartRequest.getFile(itr.next());
-			System.out.println(mpf.getOriginalFilename() + " 开始上传! 队列:" + files.size());
+			LOG.info(mpf.getOriginalFilename() + " 开始上传! 队列:" + files.size());
 			//如果上传文件数大于10,则移除第一个文件
 			if (files.size() >= 10)
 				files.pop();
@@ -645,7 +647,7 @@ public class CustomerDisputeController {
     			c.setAmount(c.getSellerOfferedAmount()+" "+c.getCurrencyCode());
     			c.setAdminRolyType(adm.getRoletype());
     			if(StringUtils.equals(c.getStatus(), "-1")) {
-    				c.setRemark(c.getRemark()+"<br>Refuse Reason:"+c.getRefuseReason());
+    				c.setRemark("Send Message To Buyer:"+c.getRemark()+"<br><br>Refuse Reason:"+c.getRefuseReason());
     			}
     		});
     		
@@ -668,13 +670,28 @@ public class CustomerDisputeController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/update")
-    public String refund(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
-    	attr.addFlashAttribute("sendResult", "Failed");
+    @RequestMapping(value = "/refund")
+    @ResponseBody
+    public Map<String,Object> refund(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> result = new HashMap<String, Object>();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+    	if (StringUtil.isBlank(admuserJson)) {
+    		result.put("state", false);
+    		result.put("message", "请登录");
+        	return  result;
+        }
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        if(!StringUtils.equals(adm.getRoletype(), "0")) {
+    		result.put("state", false);
+    		result.put("message", "没有权限退款，请重新登录");
+        	return  result;
+    	}
     	String disputeid = request.getParameter("disputeid");
     	CustomerDisputeBean comfirmByDisputeID = customerDisputeService.getComfirmByDisputeID(disputeid);
     	if(comfirmByDisputeID == null) {
-    		return "redirect:/apa/disputerefund.html";
+    		result.put("state", false);
+    		result.put("message",  "没有该退款信息，无法完成退款");
+        	return  result;
     	}
     	//退款类型  0-接受paypal买家索赔accept claim   1-paypal卖家提议退款offer
     	String refundType = comfirmByDisputeID.getRefundType();
@@ -683,54 +700,94 @@ public class CustomerDisputeController {
     	String content = comfirmByDisputeID.getRemark();
     	String offerAmount = comfirmByDisputeID.getSellerOfferedAmount();
     	String currencyCode = comfirmByDisputeID.getCurrencyCode();
+    	String admName = adm.getAdmName().toLowerCase();
     	
-    	
-    	String invoice_id = comfirmByDisputeID.getTransactionID();
-    	if(StringUtils.isBlank(content)) {
-    		return "redirect:/customer/dispute/info?disputeid="+disputeID;
-    	}
-    	//数据
-    	JSONObject data = new JSONObject();
-    	data.put("note", content);
-    	if(StringUtils.isNotBlank(offerAmount)) {
-    		JSONObject Amount = new JSONObject();
-    		Amount.put("value", offerAmount);
-    		Amount.put("currency_code", currencyCode);
-    		data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
-    	}
     	try {
-    		customerDisputeService.updateStatus(disputeID, "1");
-    		String result = null;
-    		if(StringUtils.equals(refundType, "0")) {
-    			
-            	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
-            	data.put("invoice_id", invoice_id);
-        		System.out.println("claim : "+JSONObject.toJSONString(data));
-            	result = apiService.acceptClaim(disputeID, merchant, data);
-        	}else {
-//            	data.put("invoice_id", invoice_id);
-        		String offerType = comfirmByDisputeID.getOfferType();
-        		data.put("offer_type", offerType);
-        		
-        		String returnShippingAddress = comfirmByDisputeID.getReturnShippingAddress();
-            	if(StringUtils.equals(offerType,"REFUND_WITH_RETURN")
-            			&& StringUtils.isNotBlank(returnShippingAddress)){
-            		JSONObject address = JSONObject.parseObject(returnShippingAddress);
-            		data.put("return_shipping_address", address);
-            	}
-            	
-            	System.out.println("offer:"+JSONObject.toJSONString(data));
-            	result = apiService.makeOffer(disputeID,merchant, data);
-        	}
-    		attr.addFlashAttribute("sendResult", "Successed");
-    		System.out.println(result);
-    		
+    		if(StringUtils.equals(admName, "emma") || (StringUtils.equals(admName, "mindy") && Double.valueOf(offerAmount)<500.0099999)) {
+    			String invoice_id = comfirmByDisputeID.getTransactionID();
+        		if(StringUtils.isBlank(content)) {
+        			result.put("state", false);
+            		result.put("message",    "退款无法完成,缺少退款备注");
+        		}else {
+        			//数据
+            		JSONObject data = new JSONObject();
+            		data.put("note", content);
+            		if(StringUtils.isNotBlank(offerAmount)) {
+            			JSONObject Amount = new JSONObject();
+            			Amount.put("value", offerAmount);
+            			Amount.put("currency_code", currencyCode);
+            			data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
+            		}
+            		customerDisputeService.updateStatus(disputeID, "1");
+            		String refundResult = null;
+            		if(StringUtils.equals(refundType, "0")) {
+            			
+                    	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
+                    	data.put("invoice_id", invoice_id);
+                		LOG.info("claim : "+JSONObject.toJSONString(data));
+                    	refundResult = apiService.acceptClaim(disputeID, merchant, data);
+                	}else {
+//                    	data.put("invoice_id", invoice_id);
+                		String offerType = comfirmByDisputeID.getOfferType();
+                		data.put("offer_type", offerType);
+                		
+                		String returnShippingAddress = comfirmByDisputeID.getReturnShippingAddress();
+                    	if(StringUtils.equals(offerType,"REFUND_WITH_RETURN")
+                    			&& StringUtils.isNotBlank(returnShippingAddress)){
+                    		JSONObject address = JSONObject.parseObject(returnShippingAddress);
+                    		data.put("return_shipping_address", address);
+                    	}
+                    	
+                    	LOG.info("offer:"+JSONObject.toJSONString(data));
+                    	refundResult = apiService.makeOffer(disputeID,merchant, data);
+                	}
+            		result.put("state", true);
+            		result.put("message",   "退款完成");
+            		LOG.info(content);
+        		}
+    		}else {
+    			result.put("state", false);
+        		result.put("message",   "该用户没有权限退款，请重新登录");
+    		}
 		} catch (Exception e) {
 			e.printStackTrace();
-			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
+			result.put("state", false);
+			result.put("message",  "Error:"+e.getMessage());
 		}
-    	
-		return "redirect:/customer/dispute/info?disputeid="+disputeID;
+    	return  result;
+    }
+    /**退款确定
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/refuse")
+    @ResponseBody
+    public Map<String,Object> refuse(HttpServletRequest request, HttpServletResponse response) {
+    	Map<String,Object> result = new HashMap<String, Object>();
+    	String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+    	if (StringUtil.isBlank(admuserJson)) {
+    		result.put("state", false);
+    		result.put("message", "请登录");
+        	return  result;
+        }
+        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        if(!StringUtils.equals(adm.getRoletype(), "0")) {
+    		result.put("state", false);
+    		result.put("message", "没有权限退款，请重新登录");
+        	return  result;
+    	}
+    	String disputeid = request.getParameter("disputeid");
+    	String refuseReason = request.getParameter("reason");
+    	if(StringUtils.isBlank(disputeid) || StringUtils.isBlank(refuseReason)) {
+    		result.put("state", false);
+    		result.put("message", "备注内容不能为空");
+        	return  result;
+    	}
+    	Integer updateRefuseReason = customerDisputeService.updateRefuseReason(disputeid, refuseReason);
+    	result.put("state", updateRefuseReason != null && updateRefuseReason > 0 ?true : false);
+    	result.put("message", updateRefuseReason != null && updateRefuseReason > 0 ? "操作成功" : "操作失败");
+    	return  result;
     }
     /**提议
      * @param request
