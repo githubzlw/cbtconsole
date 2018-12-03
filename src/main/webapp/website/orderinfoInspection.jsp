@@ -559,7 +559,7 @@
 			</form>
 		</div>
 
-		<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
+		<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1"))){%>
 		<!-- 载入消息提醒jsp页面 -->
 		<jsp:include page="message_notification.jsp"></jsp:include>
 		<%}  %>

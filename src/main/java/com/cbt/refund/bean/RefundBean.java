@@ -150,23 +150,23 @@ public class RefundBean {
 
     public void setStatus(Integer status) {
         this.status = status;
-        //状态 0-申请退款 1-销售同意退款 2-退款完结 3-管理员同意退款  -1-销售驳回退款 -2 -客户取消退款 -3-管理员拒绝退款 -4-退款失败
+        //0-新申请 1-销售审批 2-主管审批 3-财务确认 4-已经完结 9驳回  -1客户取消
         if (status == 0) {
-            this.statusDesc = "申请退款";
+            this.statusDesc = "新申请";
         } else if (status == 1) {
-            this.statusDesc = "销售同意退款";
+            this.statusDesc = "销售审批";
         } else if (status == 2) {
-            this.statusDesc = "退款完结";
+            this.statusDesc = "主管审批";
         } else if (status == 3) {
-            this.statusDesc = "管理员同意退款";
+            this.statusDesc = "财务确认";
+        } else if (status == 4) {
+            this.statusDesc = "已经完结";
+        } else if (status == 9) {
+            this.statusDesc = "驳回";
         } else if (status == -1) {
-            this.statusDesc = "销售驳回退款";
-        } else if (status == -2) {
-            this.statusDesc = "客户取消退款";
-        } else if (status == -3) {
-            this.statusDesc = "管理员拒绝退款";
-        } else if (status == -4) {
-            this.statusDesc = "退款失败";
+            this.statusDesc = "客户取消";
+        } else {
+            this.statusDesc = "";
         }
     }
 
