@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +71,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
         REFUNDLOG.info("createPayment():[{total:"+total+"}],[{currency:"+currency+"}],[{method:"+method+"}],[intent:{"
                     +intent+"}],[{description:"+description+"}],[{cancelUrl:"+cancelUrl+"}],[{successUrl:"+successUrl+"}]");
 
-        APIContext apiContext = getApiContext();
+        APIContext apiContext = getApiContext(0);
 
         // ###Details
         Details details = new Details();
@@ -131,18 +134,20 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
         PaymentExecution paymentExecute = new PaymentExecution();
         paymentExecute.setPayerId(payerId);
 
-        return payment.execute(getApiContext(), paymentExecute);
+        return payment.execute(getApiContext(0), paymentExecute);
 
     }
 
-    private APIContext getApiContext() {
+    private APIContext getApiContext(int isOld) {
 
         REFUNDLOG.info("getApiContext()");
         Map<String, String> sdkConfig = new HashMap<>(1);
         sdkConfig.put("mode", PayPalConfig.mode);
-        return new APIContext(PayPalConfig.clientId, PayPalConfig.clientSecret, PayPalConfig.mode, sdkConfig);
-
-
+        if("live".equals(PayPalConfig.mode) && isOld > 0){
+            return new APIContext(PayPalConfig.clientIdOld, PayPalConfig.clientSecretOld, PayPalConfig.mode, sdkConfig);
+        }else{
+            return new APIContext(PayPalConfig.clientId, PayPalConfig.clientSecret, PayPalConfig.mode, sdkConfig);
+        }
         /*sdkConfig.put("mode", "sandbox");
         return new APIContext("AaYrawhmyep4w1VQ_Q8r9ubzt09tBJevuCJ2rGbOHUfNRhbQt3rh9Dl1VsTGjKo4pei1uap-dq2j1cJO",
                 "EJpfYpI3Ym3iuFgG8yK8JwUVdkhiU0DrxUMcQ8h62dS96pZ8V3_ws8yL4r6QnBCuKQJ_PjUXDh8HE2mp",
@@ -151,7 +156,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
     }
 
     @Override
-    public DetailedRefund reFund(String saleId, String amountMoney) throws PayPalRESTException {
+    public DetailedRefund reFund(String saleId, String amountMoney,int isOld) throws PayPalRESTException {
         REFUNDLOG.info("reFund():[{saleId:"+saleId+"}],[{amountMoney:"+amountMoney+"}]");
 
         Sale sale = new Sale();
@@ -163,7 +168,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
         amount.setCurrency("USD");
         amount.setTotal(amountMoney);
         refund.setAmount(amount);
-        return sale.refund(getApiContext(), refund);
+        return sale.refund(getApiContext(isOld), refund);
     }
 
     @Override
@@ -208,7 +213,15 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
                         refundResultInfoMapper.insertSelective(refundResultInfo);
 
-                        DetailedRefund detailedRefund = reFund(saleId, amountMoney);
+                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        LocalDateTime payTime = LocalDateTime.parse(paymentInfo.get("payAmount").toString(),df);
+                        LocalDateTime changeTime = LocalDateTime.parse("2018-10-10",df);
+                        DetailedRefund detailedRefund;
+                        if(payTime.isBefore(changeTime)){
+                            detailedRefund = reFund(saleId, amountMoney,1);
+                        }else{
+                             detailedRefund = reFund(saleId, amountMoney,0);
+                        }
 
                         if (detailedRefund != null) {
                             refundResultInfo.setRefundFromTransactionFee(detailedRefund.getRefundFromTransactionFee().getValue());

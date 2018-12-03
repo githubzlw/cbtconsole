@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>交易号退款</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script>
+        function refundByPayNo() {
+            var payNo = $("#pay_no").val();
+            var payType = $("#pay_type").val();
+            var adminId = $("#admin_id").val();
+            var validPassWord = $("#second_valid_pwd").val();
+            var remark = $("#remark").val();
+
+            if(payNo == null || payNo == ""){
+                alert("请输入交易号");
+                return false
+            }
+            if(validPassWord == null || validPassWord == ""){
+                alert("请输入验证密码");
+                return false
+            }
+            if(remark == null || remark == ""){
+                alert("请输入备注");
+                return false
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/refundCtr/refundByPayNo',
+                data: {
+                    payNo: payNo,
+                    payType: payType,
+                    adminId: adminId,
+                    password: validPassWord,
+                    remark: remark
+                },
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    if (json.ok) {
+                        $.messager.alert("操作提示", "执行成功，请关闭页面");
+                    } else {
+                        $.messager.alert("操作提示", json.message);
+                    }
+                },
+                error: function () {
+                    $.messager.alert("操作提示", "执行失败,请联系管理员");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<div id="div_second_valid">
+    <table style="border-color: #99e86c;" border="1" cellpadding="1" cellspacing="0" align="center">
+        <caption id="set_title" style="font-size: 18px;">进行交易号退款</caption>
+        <tr>
+            <td>类型:</td>
+            <td><select id="pay_type" style="width: 260px;height: 28px;">
+                <option value="1" selected="selected">PayPal</option>
+                <option value="2">Stripe</option>
+            </select>
+        </tr>
+        <tr>
+            <td>交易号:</td>
+            <td><input type="text" id="pay_no" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>用户:</td>
+            <td><select id="admin_id" disabled="disabled" style="width: 260px;;height: 28px;">
+                <option value="1" selected="selected">Ling</option>
+                <option value="8">Mandy</option>
+                <option value="83">EmmaXie</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>验证密码:</td>
+            <td><input type="password" id="second_valid_pwd" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td><textarea id="remark" style="width: 260px;height: 80px;"></textarea></td>
+        </tr>
+        <tr style="text-align: center">
+            <td colspan="2"><input type="button" value="确定" onclick="refundByPayNo()"/></td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>

@@ -80,10 +80,11 @@ public interface PayPalService {
      *
      * @param saleId
      * @param amountMoney
+     * @param isOld 判断收款账号是否是老账号标识 1老账号 0新账号
      * @return
      * @throws PayPalRESTException
      */
-    DetailedRefund reFund(String saleId, String amountMoney) throws PayPalRESTException;
+    DetailedRefund reFund(String saleId, String amountMoney,int isOld) throws PayPalRESTException;
     /**
      * @Title: reFundNew
      * @Author: cjc

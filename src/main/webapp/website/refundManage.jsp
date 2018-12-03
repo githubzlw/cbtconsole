@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=utf-8"
+`<%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -339,7 +339,8 @@
             <td>账号：<input type="hidden" id="option_admin_id" value=""></td>
             <td><select id="select_op_id" disabled="disabled">
                 <option value="1" selected="selected">Ling</option>
-                <option value="84" selected="selected">admin1</option>
+                <option value="8" selected="selected">Mandy</option>
+                <option value="83" selected="selected">EmmaXie</option>
             </select></td>
         </tr>
         <tr id="second_pwd">
