@@ -1061,7 +1061,7 @@
 		SELECT orderid,id,goodsid,${adminid},NOW(),goodscatid,goods_pid   FROM order_details WHERE orderid=#{orderNo}
 	</insert>
     <select id="getAllSalesAndBuyer" resultType="com.cbt.website.bean.ConfirmUserInfo">
-		SELECT id,admName as confirmusername,roleType as role FROM admuser  WHERE STATUS =1 AND roleType IN (3,4) or id=18
+		SELECT id,admName as confirmusername,roleType as role FROM admuser  WHERE STATUS =1 AND roleType IN (3,4) or id=18 or id=62
 	</select>
     <select id="getBuyerAndAll" resultType="com.cbt.pojo.Admuser">
 		SELECT id,admName,admName as admname FROM admuser  WHERE STATUS =1 AND roleType IN (3,5) or id=61
