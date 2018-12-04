@@ -56,11 +56,20 @@ public class ComplainServiceImpl implements IComplainService{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName,int check) {
 		// TODO Auto-generated method stub
-		return complainDao.searchComplainByParam(t, username,page,admName);
+		return complainDao.searchComplainByParam(t, username,page,admName,check);
 	}
 	
-	
+	@Override
+	public int updateGoodsid(int id, String orderid, String goodsid) {
+		// TODO Auto-generated method stub
+		return complainDao.updateGoodsid(id, orderid, goodsid);
+	}
+	@Override
+	public int updateDisputeid(int id,String disputeid,String merchantid) {
+		// TODO Auto-generated method stub
+		return complainDao.updateDisputeid(id, disputeid,merchantid);
+	}
 
 }

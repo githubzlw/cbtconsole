@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface IComplainDao extends BaseDao<Complain> {
 	
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName);
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int check);
 
 	public ComplainVO getComplainByCid(Integer cid);
 
@@ -25,6 +25,21 @@ public interface IComplainDao extends BaseDao<Complain> {
 	public Integer closeComplain(Integer complainid);
 	
 	public List<ComplainFile> getImgsByCid(Integer complainId);
+	
+	/**录入关联产品
+	 * @param id
+	 * @param orderid
+	 * @param goodsid
+	 * @return
+	 */
+	int updateGoodsid(int id,String orderid,String goodsid);
+	/**录入申诉事件号
+	 * @param id
+	 * @param disputeid
+	 * @param merchantid
+	 * @return
+	 */
+	int updateDisputeid(int id,String disputeid,String merchantid);
 	
 	
 }

@@ -9,6 +9,9 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.page.Page;
 import com.cbt.util.SqlSplitUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.google.common.collect.ArrayTable;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -16,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -305,11 +309,11 @@ public class ComplainDaoImpl implements IComplainDao{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int check) {
 		int start= (page.getStartIndex()-1) *20;
 		ArrayList<ComplainVO> rfbList = new ArrayList<ComplainVO>();
 		StringBuilder sb = new StringBuilder("SELECT c.id,c.userid,c.userEmail,c.complainType,"
-				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,"
+				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,c.ref_goodsid,c.dispute_id,c.merchant_id,"
 				+ "c.complainState,c.dealAdmin,c.dealAdminid,u.admName,"
 				+" (SELECT COUNT(id) FROM tb_complain_chat WHERE complainid=c.id AND readorno=0 and flag=0) AS counts," +
 				" (SELECT COUNT(id)+1 FROM tb_complain_chat WHERE complainid=c.id  and flag=0) AS customSum , "
@@ -328,6 +332,10 @@ public class ComplainDaoImpl implements IComplainDao{
 		if(admName!=null&&!"Ling".equalsIgnoreCase(admName) && !"Sales1".equalsIgnoreCase(admName) && !"kara".equalsIgnoreCase(admName) && !"emmaxie".equalsIgnoreCase(admName)
 				&& !"admin1".equalsIgnoreCase(admName)){
 			sb.append(" and u.admName='"+admName+"'" ); 
+		}
+		if(check == 1) {
+			
+			sb.append(" and (c.ref_goodsid='' or c.ref_goodsid is null)");
 		}
 		if(t.getUserid()!=0){
 			sb.append(" and c.userid="+t.getUserid());
@@ -363,7 +371,14 @@ public class ComplainDaoImpl implements IComplainDao{
 				if(rs.getString("closeTime")!="" &&rs.getString("closeTime")!=null){
 					rfb.setCloseTime(rs.getString("closeTime").substring(0, 19));
 				}
-				rfb.setRefOrderId(rs.getString("ref_orderid"));
+				String ref_orderid = rs.getString("ref_orderid");
+				rfb.setRefOrderId(ref_orderid);
+				if(StringUtils.isNotBlank(ref_orderid)) {
+					rfb.setOrderIdList(Arrays.asList(ref_orderid.split(",")));
+				}
+				rfb.setDisputeId(rs.getString("dispute_id"));
+				rfb.setMerchantId(rs.getString("merchant_id"));
+				rfb.setRefGoodsId(rs.getString("ref_goodsid"));
 				rfb.setComplainState(rs.getInt("complainState"));
 				rfb.setDealAdmin(rs.getString("dealAdmin"));
 				rfb.setDealAdminid(rs.getInt("dealAdminid"));
@@ -404,5 +419,60 @@ public class ComplainDaoImpl implements IComplainDao{
 		}
 		return page;
 	}
+	@Override
+	public int updateGoodsid(int id, String orderid, String goodsid) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		int rs = 0;
+		String sql = "update  tb_complain set ref_goodsid=?,ref_orderid=? where id=?";
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, goodsid);
+			stmt.setString(2, orderid);
+			stmt.setInt(3, id);
+			rs = stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 
+		DBHelper.getInstance().closeConnection(conn);
+		return rs;
+	}
+	@Override
+	public int updateDisputeid(int id,String disputeid,String merchantid) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		int rs = 0;
+		String sql = "update  tb_complain set dispute_id=?,merchant_id=? where id=?";
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, disputeid);
+			stmt.setString(2, merchantid);
+			stmt.setInt(3, id);
+			rs = stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		DBHelper.getInstance().closeConnection(conn);
+		return rs;
+	}
 }
