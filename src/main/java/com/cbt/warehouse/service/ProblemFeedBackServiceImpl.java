@@ -23,8 +23,7 @@ public class ProblemFeedBackServiceImpl implements ProblemFeedBackService {
 	@Override
 	public List<ProblemFeedBackBean> queryForList(int type, String beginDate,
 			String endDate,int adminId, int pageNo,String is_report) {
-		List<ProblemFeedBackBean> list=problemFeedBackDao.queryForList(type, beginDate, endDate,adminId, pageNo,is_report);
-		return list;
+		return problemFeedBackDao.queryForList(type, beginDate, endDate,adminId, pageNo,is_report);
 	}
 
 	@Override

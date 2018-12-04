@@ -62,7 +62,6 @@ public interface MessagesService {
 	int selectDelOrderessNum(int adminid);
 
 	List<HashMap<String, String>> findCustomerMessages(int admuserid);
-
+	
     MessagesCountVo selectBusiessNumNew(int admuserid);
-
 }

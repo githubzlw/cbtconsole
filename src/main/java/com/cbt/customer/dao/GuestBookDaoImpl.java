@@ -208,7 +208,7 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		if (userId != 0) {
 			sql += " and m.user_id="+userId+"";
 		}
-		if (adminid != 0 && adminid != 1) {
+		if (adminid != 0) {
 			sql += " AND m.user_id IN (SELECT userid FROM admin_r_user aru,guestbook gb WHERE aru.userid = gb.user_id AND aru.adminid = "+adminid+")";
 		}
 		if (timeFrom != null && !"".equals(timeFrom)) {
@@ -471,7 +471,7 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		if (userId != 0) {
 			sql += " and g.user_id="+userId+"";
 		}
-		if (adminid != 1 && adminid != 0) {
+		if (adminid != 1) {
 			sql += " AND g.user_id IN (SELECT userid FROM admin_r_user aru,guestbook gb WHERE aru.userid = gb.user_id AND aru.adminid = "+adminid+")";
 		}
 		if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {

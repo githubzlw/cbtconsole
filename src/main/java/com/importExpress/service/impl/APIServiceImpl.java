@@ -174,7 +174,7 @@ public class APIServiceImpl implements APIService {
 		//请求
 		String mediaType = "application/json; charset=utf-8";//application/json; charset=utf-8 application/x-www-form-urlencoded
 		String param1 = JSONObject.toJSONString(param);
-		System.out.println("aaaaaaaaa="+param1);
+//		System.out.println("aaaaaaaaa="+param1);
 		String response = okHttpUtils.post(url, header, mediaType , param1);
 		return 	response;
 	}

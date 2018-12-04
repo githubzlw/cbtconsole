@@ -140,7 +140,7 @@
   		  					html_+='<input type="hidden" id="email'+i+'" value="'+preferential.email+'"/>';
 			    			html_+='<input type="hidden" id="userid'+i+'" value="'+preferential.userid+'"/>';
   		  					$("#table tr:eq("+j+") td:eq(1)").after('<td colspan="3" class="fenpei">负责人：<select id="todo'+i+'" class="todo'+preferential.userid+'" onchange="distributionMessages(this,\''+preferential.userid+'\',\''+preferential.email+'\')">'+admins+'</select>'+html_+'</td>');
-  		  				   }else if(adminName!='Ling' && adminName!='emmaxie' && adminName!='admin1' &&preferential.admname !=''){
+  		  				   }else if(adminName!='Ling' && adminName!='emmaxie' &&preferential.admname !=''){
   		  					  //有负责人，且当前用户不为Ling
   		  					$("#table tr:eq("+j+") td:eq(1)").after('<td colspan="3">负责人:<strong>'+preferential.admname+'</strong></td>');
   		  				  }else{
