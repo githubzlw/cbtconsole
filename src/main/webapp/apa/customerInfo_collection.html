@@ -12,6 +12,38 @@
         var r = window.location.search.substr(1).match(reg); //匹配目标参数
         if (r != null) return unescape(r[2]); return null; //返回参数值
     }
+    /*当前地址 带参数 flag=0 全参数，flag=1 不带typeSelect*/
+    function getTarUrl(flag) {
+        var tarUrl = '?';
+        var isReport = getUrlParam("is_report");
+        var adminId = getUrlParam("adminId");
+        var typeSelect = getUrlParam("typeSelect");
+        if(isReport != null && isReport != 'isReport' && isReport != undefined){
+            tarUrl += "&is_report=" + isReport;
+        }
+        if(adminId != null && adminId != 'isReport' && adminId != undefined){
+            tarUrl += "&adminId=" + adminId;
+        }
+        if(flag == 0){
+            if(typeSelect != null && typeSelect != 'isReport' && typeSelect != undefined){
+                tarUrl += "&typeSelect=" + typeSelect;
+            }
+        }
+        if(tarUrl == '?'){
+            if(flag == 0){
+                return '';
+            } else {
+                return '?typeSelect=';
+            }
+        } else {
+            if(flag == 0){
+                return tarUrl.replace("?&", "?");
+            } else {
+                return tarUrl.replace("?&", "?") + '&typeSelect=';
+            }
+        }
+    }
+
 	function showResault(order, num, obj) {
 		$(".main_ul li").click(function() {
 			$(this).addClass('selected') //为选中项添加高亮
@@ -21,8 +53,7 @@
 		$(".div_content").empty();
 		var div_iframe = "";
 		if (order == 1) {
-			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html?is_report='
-                + getUrlParam("is_report") + '&typeSelect=' + getUrlParam("typeSelect") + '&adminId=' + getUrlParam("adminId") + '"></iframe>';
+			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/ProblemFeedBack.html' + getTarUrl(0) + '"></iframe>';
 		}
 		/*else if (order == 2) {
 			div_iframe = '<iframe class="div_iframe" id="resault_iframe" src="/cbtconsole/apa/questionnaire.html"></iframe>';
@@ -58,8 +89,10 @@
 	height: 880px;
 }
 #warning_info span{
-    color: red;
     font-weight: bolder;
+}
+#warning_info span a{
+    color: red;
 }
 </style>
 <title>购物车&支付页面问题统计</title>
@@ -95,15 +128,16 @@
                     $.each(msg, function (key,val) {
                         total += parseInt(val);
                     });
-                    $("#warning_info").html("总条数(<span>" + total
-                        + "</span>). 其中 注册页面(<span>" + (msg.type1 == undefined?"0":msg.type1)
-                        + "</span>),购物车(<span>" + (msg.type2 == undefined?"0":msg.type2)
-                        + "</span>),支付页面(<span>" + (msg.type3 == undefined?"0":msg.type3)
-                        + "</span>),搜索结果(<span>" + (msg.type4 == undefined?"0":msg.type4)
-                        + "</span>),产品单页(<span>" + (msg.type5 == undefined?"0":msg.type5)
-                        + "</span>),个人中心(<span>" + (msg.type6 == undefined?"0":msg.type6)
-                        + "</span>),交期选择(<span>" + (msg.type7 == undefined?"0":msg.type7)
-                        + "</span>)");
+                    var tarUrl = location.pathname + getTarUrl(1);
+                    $("#warning_info").html("总条数(<span><a href='" + tarUrl + "0'>" + total
+                        + "</a></span>). 其中 注册页面(<span><a href='" + tarUrl + "1'>" + (msg.type1 == undefined?"0":msg.type1)
+                        + "</a></span>),购物车(<span><a href='" + tarUrl + "2'>" + (msg.type2 == undefined?"0":msg.type2)
+                        + "</a></span>),支付页面(<span><a href='" + tarUrl + "3'>" + (msg.type3 == undefined?"0":msg.type3)
+                        + "</a></span>),搜索结果(<span><a href='" + tarUrl + "4'>" + (msg.type4 == undefined?"0":msg.type4)
+                        + "</a></span>),产品单页(<span><a href='" + tarUrl + "5'>" + (msg.type5 == undefined?"0":msg.type5)
+                        + "</a></span>),个人中心(<span><a href='" + tarUrl + "6'>" + (msg.type6 == undefined?"0":msg.type6)
+                        + "</a></span>),交期选择(<span><a href='" + tarUrl + "7'>" + (msg.type7 == undefined?"0":msg.type7)
+                        + "</a></span>)");
                 }
             }
         });

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -204,7 +205,8 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		int admuserid = adminid;
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
+				|| user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
 
@@ -268,31 +270,33 @@ public class MessagesController {
 		cartMarketing.setNoArrgCount(noArrgCartNum);
 		messagesCountVoListAll.add(cartMarketing);
 		// 查询商业询盘数量businquiries
-		List<MessagesCountVo> busiessNumList = messagesService.selectBusiessNum(messagesCountVo);
-		MessagesCountVo busiessNum = new MessagesCountVo();
-		busiessNum.setType(CommonConstants.BUSINQUIRIES);
-		int countAll = 0;
-		int noArrgCount = 0;
-		if (adminid == 1 || adminid == 83) {
-			for (MessagesCountVo count : busiessNumList) {
-				countAll += count.getCountAll();
-				noArrgCount += count.getNoArrgCount();
-				if (count.getState() == 0) {// state为0 表示未处理
-					busiessNum.setNoDeleteCount(count.getCountAll());
-				}
-			}
-			busiessNum.setCountAll(countAll);
-			busiessNum.setNoArrgCount(noArrgCount);
-		} else {
-			for (MessagesCountVo count : busiessNumList) {
-				countAll += count.getNoDeleteCount();// state 为1,2 表示已处理
-				if (count.getState() == 0) {// state为0 表示未处理
-					busiessNum.setNoDeleteCount(count.getNoDeleteCount());
-				}
-			}
-			busiessNum.setCountAll(countAll);
-		}
-		messagesCountVoListAll.add(busiessNum);
+        MessagesCountVo busiessNumList = messagesService.selectBusiessNumNew(admuserid);
+        messagesCountVoListAll.add(busiessNumList);
+//		List<MessagesCountVo> busiessNumList = messagesService.selectBusiessNum(messagesCountVo);
+//		MessagesCountVo busiessNum = new MessagesCountVo();
+//		busiessNum.setType(CommonConstants.BUSINQUIRIES);
+//		int countAll = 0;
+//		int noArrgCount = 0;
+//		if (adminid == 1 || adminid == 83) {
+//			for (MessagesCountVo count : busiessNumList) {
+//				countAll += count.getCountAll();
+//				noArrgCount += count.getNoArrgCount();
+//				if (count.getState() == 0) {// state为0 表示未处理
+//					busiessNum.setNoDeleteCount(count.getCountAll());
+//				}
+//			}
+//			busiessNum.setCountAll(countAll);
+//			busiessNum.setNoArrgCount(noArrgCount);
+//		} else {
+//			for (MessagesCountVo count : busiessNumList) {
+//				countAll += count.getNoDeleteCount();// state 为1,2 表示已处理
+//				if (count.getState() == 0) {// state为0 表示未处理
+//					busiessNum.setNoDeleteCount(count.getNoDeleteCount());
+//				}
+//			}
+//			busiessNum.setCountAll(countAll);
+//		}
+//		messagesCountVoListAll.add(busiessNum);
 
 		if (messagesCountVoListAll.size() > 0) {
 			json.setOk(true);
@@ -321,7 +325,8 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
 		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")
+				|| user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
 		

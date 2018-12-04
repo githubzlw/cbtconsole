@@ -325,13 +325,14 @@ public class ComplainDaoImpl implements IComplainDao{
 		ResultSet rs1 = null;
 		PreparedStatement stmt1 = null;
 		//ling,Sales1可以看所有的投诉
-		if(admName!=null&&!"Ling".equalsIgnoreCase(admName) && !"Sales1".equalsIgnoreCase(admName) && !"Sales2".equalsIgnoreCase(admName) && !"emmaxie".equalsIgnoreCase(admName)){
+		if(admName!=null&&!"Ling".equalsIgnoreCase(admName) && !"Sales1".equalsIgnoreCase(admName) && !"kara".equalsIgnoreCase(admName) && !"emmaxie".equalsIgnoreCase(admName)
+				&& !"admin1".equalsIgnoreCase(admName)){
 			sb.append(" and u.admName='"+admName+"'" ); 
 		}
 		if(t.getUserid()!=0){
 			sb.append(" and c.userid="+t.getUserid());
 		}
-		if(t.getCreatTime()!=null &&t.getCreatTime()!=""){
+		if(StringUtil.isNotBlank(t.getCreatTime())){
 			 sb.append(" and c.createTime like \"%"+t.getCreatTime()+"%\"");
 		}
 		if(StringUtil.isNotBlank(t.getComplainType())){

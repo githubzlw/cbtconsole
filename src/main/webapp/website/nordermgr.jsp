@@ -294,7 +294,7 @@ function fn(va) {
 	$("#page").html(page);
     $("#adminusersc").val(buyuser);
 	admName='<%=request.getAttribute("admName")%>';
-	if(admName!="Ling"  && admName!="Sales1" && admName!="Sales2" && admName!="emmaxie"){
+	if(admName!="Ling"  && admName!="Sales1" && admName!="kara" && admName!="emmaxie"){
         $("#adminusersc").val(admuserid);
 	}
 	//如果只有一条数据，则打开该订单详情页面
@@ -352,7 +352,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 	}
 	buysrt = buysrt + '<option value="0">全部</option>';
 	for (var i = 0; i < sellAdm.length; i++) {
-		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie"){
+		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="kara" || adminName=="emmaxie"){
 			if(str=='') {
 				str = str + '<option value="0" ' + change + ' >全部</option>';
 			}
@@ -375,7 +375,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 
 		str_personCharge = str.replace("全部", "");
 		$('#adminusersc').html(str);
-		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="Sales2" || adminName=="emmaxie")){
+		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="kara" || adminName=="emmaxie")){
 			$('#adminusersc').attr('disabled', 'disabled');
 		}
 		$('#buyuser').html(buysrt);
@@ -432,24 +432,25 @@ $(document).ready(function(){
 								<td class="nomesname"><span style="font-size: 16px;">产品单页客户<br />折扣和定制需求<br />(Business inquiries)</span></td>
 								<td class="nomesname"><span style="font-size: 16px;">购物车&支付<br />页面问题统计<br />(ask here)</span></td>
 								<td class="nomesname"><span style="font-size: 16px;">产品单页用户<br />留言(Customer <br />Questions & Answers)</span></td>
+                                <td class="nomesname"><span style="font-size: 16px;">订单需沟通<br />条数</span></td>
 								<td class="nomesname">购物车营销(暂停用)</td>
 								<td class="nomesname">商业询盘</td>
 								<!-- <td class="nomesname">批量优惠申请(暂停用)</td> -->
 								<td class="nomesname">投诉管理</td>
 								<td class="nomesname">未确认进账订单</td>
 <!-- 								<td class="nomesname">到账但未生成的订单</td> -->
-								<td class="nomesname"><span style="font-size: 16px;">订单需沟通<br />条数</span></td>
 								<td class="nomesname">注(颜色表示)</td>
 								<td class="nomesname" ><span style="font-size: 16px;">清除表头session</br>信息并刷新数据</span></td>
 							</tr>
 							<tr>
 
-								<td><span> <input type="hidden" id="style"
-										value="noDelete"> <span id="propagemessage"
-										class="btn btn-success btnto"></span>
-								</span> <span> <span style="font-size: 12px;">最近1月</span> <span
-										id="propagemessage1" class="btn btn-warning btnto"></span>
-								</span> <input type="hidden" id="type" value="propagemessage">
+                                <!-- 产品单页客户折扣和定制需求 -->
+								<td>
+                                    <span>
+                                        <input type="hidden" id="style" value="noDelete">
+                                        <span id="propagemessage" class="btn btn-success btnto"></span>
+								    </span>
+								    <input type="hidden" id="type" value="propagemessage">
 								</td>
 								
 								<!-- 购物车&支付页面问题统计 -->
@@ -457,10 +458,6 @@ $(document).ready(function(){
 									<span>
 										<input type="hidden" id="style" value="noDelete"> 
 										<span id="customerInfoCollection" class="btn btn-success btnto"></span>
-									</span> 
-									<span> 
-										<span style="font-size: 12px;">最近1月</span> 
-										<span id="customerInfoCollection1" class="btn btn-warning btnto"></span>
 									</span> 
 									<input type="hidden" id="type" value="customerInfoCollection">
 								</td>
@@ -471,12 +468,17 @@ $(document).ready(function(){
 										<input type="hidden" id="style" value="noDelete"> 
 										<span id="questionnum" class="btn btn-success btnto"></span>
 									</span> 
-									<span> 
-										<span style="font-size: 12px;">最近1月</span> 
-										<span id="questionnum1" class="btn btn-warning btnto"></span>
-									</span> 
 									<input type="hidden" id="type" value="questionnum">
 								</td>
+
+                                <!-- 订单需沟通条数 -->
+                                <td>
+                                    <span>
+                                        <input type="hidden" id="style" value="ordermessage">
+                                        <span id="ordermessage" class="btn btn-success btnto"></span>
+								    </span>
+                                    <input type="hidden" id="type" value="ordermessage">
+                                </td>
 
 								<td><span> <input type="hidden" id="style"
 										value="noDelete"> <span id="shopcarmarket"
@@ -485,14 +487,20 @@ $(document).ready(function(){
 										id="shopcarmarket1" class="btn btn-warning btnto"></span>
 								</span> <input type="hidden" id="type" value="shopcarmarket"></td>
 
-								<td><span id="busquer"> <input type="hidden"
-										id="style" value="noArrage"> <span id="businquiries"
-										class="btn btn-primary btnto"></span>
-								</span> <span> <input type="hidden" id="style" value="noDelete">
+                                <!-- 商业询盘 -->
+								<td>
+                                    <%--<span id="busquer"> <input type="hidden" id="style" value="noArrage">
+                                        <span id="businquiries" class="btn btn-primary btnto"></span>
+								    </span>--%>
+                                    <span>
+                                        <input type="hidden" id="style" value="noDelete">
 										<span id="businquiries1" class="btn btn-success btnto"></span>
-								</span> <span> <span id="businquiries2"
-										class="btn btn-warning btnto"></span>
-								</span> <input type="hidden" id="type" value="businquiries"></td>
+								    </span>
+                                    <%--<span>
+                                        <span id="businquiries2" class="btn btn-warning btnto"></span>
+								    </span>--%>
+                                    <input type="hidden" id="type" value="businquiries">
+                                </td>
 								<!-- <td><span id="bat"> <input type="hidden" id="style"
 										value="noArrage"> <span id="batapply"
 										class="btn btn-primary btnto"></span>
@@ -527,14 +535,9 @@ $(document).ready(function(){
 <!-- 										class="btn btn-primary btnto"> </span> -->
 <!-- 								</span> <input type="hidden" id="type" value="systemfailure"> -->
 <!-- 								<input type="hidden" id="style"  value="systemfailure"></td> -->
-								<td><span> <input type="hidden" id="style"
-										value="ordermessage"> <span id="ordermessage"
-										class="btn btn-success btnto"></span>
-								</span> <span> <span id="ordermessage1"
-										class="btn btn-warning btnto"></span>
-								</span> <input type="hidden" id="type" value="ordermessage"></td>
-								<td><span class="bt btn-success">未处理数量</span><br /> <span
-									class="bt btn-primary">未布置数量</span><br /> <span
+
+								<td><span class="bt btn-success">未处理数量(待办)</span><br /> <span
+									class="bt btn-primary">未布置数量(处理中)</span><br /> <span
 									class="bt btn-warning">所有数量</span></td>
 								<td><input type="button" value="刷新" onclick="reFreshoDate()"></td>
 							</tr>

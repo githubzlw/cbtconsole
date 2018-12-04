@@ -3,6 +3,7 @@ package com.importExpress.controller;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.service.QueryUserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -237,7 +238,75 @@ public class QueryUserController {
 		}
 		return null;
 	}
-	
+
+    /**
+     * ly  2018/11/30 17:10
+     * 查询测试账号余额
+     * http://127.0.0.1:8086/cbtconsole/queryuser/queryAvailable.do?email=20180202@qq.com
+     */
+    @RequestMapping("/queryAvailable")
+    @ResponseBody
+    public Map<String, Object> queryAvailable(String email) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            if (!(StringUtils.isBlank(email)
+                    || email.indexOf("@qq") != -1
+                    || email.indexOf("qq.") != -1
+                    || email.indexOf("test") != -1)){
+                result.put("status", false);
+                result.put("message", "email账号非测试账号!");
+                return result;
+            }
+            String available = queryUserService.queryAvailable(email);
+            if (StringUtils.isBlank(available)){
+                result.put("status", false);
+                result.put("message", "未找到该用户信息!");
+            } else {
+                result.put("status", true);
+                result.put("available", available);
+            }
+            return result;
+        } catch (Exception e){
+            result.put("status", false);
+            result.put("message", "内部异常");
+        }
+        return result;
+    }
+
+    /**
+     * ly  2018/11/30 17:10
+     * 更新测试账号余额
+     * http://127.0.0.1:8086/cbtconsole/queryuser/updateAvailable.do?email=20180202@qq.com&available=12.0
+     */
+    @RequestMapping("/updateAvailable")
+    @ResponseBody
+    public Map<String, Object> updateAvailable(String email, Double available) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            if (!(StringUtils.isBlank(email)
+                    || email.indexOf("@qq") != -1
+                    || email.indexOf("qq.") != -1
+                    || email.indexOf("test") != -1
+                    || null == available)){
+                result.put("status", false);
+                result.put("message", "email账号非测试账号 或 修改金额问题!");
+                return result;
+            }
+            long count = queryUserService.updateAvailable(email, available);
+            if (count < 1){
+                result.put("status", false);
+                result.put("message", "修改失败");
+            } else {
+                result.put("status", true);
+                result.put("message", "修改成功");
+            }
+            return result;
+        } catch (Exception e){
+            result.put("status", false);
+            result.put("message", "内部异常");
+        }
+        return result;
+    }
 	
 	
 }

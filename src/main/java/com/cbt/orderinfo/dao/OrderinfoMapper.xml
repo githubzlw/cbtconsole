@@ -599,6 +599,12 @@
             </when>
             <otherwise>  where 1=1  </otherwise>
         </choose>
+        and o.user_id in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') and o.user_id !='26018' and o.user_id!='25913'
         <if test="userID != 0">
             and o.user_ID=#{userID}
         </if>
@@ -709,7 +715,7 @@
         INNER JOIN order_details de 	ON  cgd.orderno=de.orderid AND  cgd.aliurl=de.car_url  AND de.state!=13
         where 1=1
         <if test="admuserid != 0">
-            aru.adminid=#{admuserid}
+            and aru.adminid=#{admuserid}
         </if>
         AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
@@ -728,9 +734,12 @@
         union all
         SELECT 'notshipping' as state, COUNT(DISTINCT order_no)as counts  from  orderinfo o
         <if test="admuserid != 0">
-            left  join admin_r_user  aru on  aru.userid=o.user_id and aru.adminid=#{admuserid}
+            left  join admin_r_user  aru on  aru.userid=o.user_id where aru.adminid=#{admuserid}
         </if>
-        where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND isDropshipOrder IN (0,1)
+        <if test="admuserid == 0">
+            where 1=1
+        </if>
+        and o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND isDropshipOrder IN (0,1)
         AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
         email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
@@ -810,12 +819,12 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
-        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0) AS pidInventory,
+        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
-        ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,cbr.ali_sellunit,
-        cbr.bm_flag,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
+        ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,od.seilUnit as ali_sellunit,
+        cbr.bm_flag,cbr.isBenchmark,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
         from order_details od
         left join order_address adr on od.orderid=adr.orderNo
         left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
@@ -869,7 +878,7 @@
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
         a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
-        (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,
+        (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,a.street,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
         actual_ffreight,arrive_time,actual_allincost,service_fee, applicable_credit,extra_freight,order_ac,date_format(o.create_time,'%Y-%m-%d') as createtime,
         recipients,pay_price_three,pay_price,foreign_freight,o.currency,discount_amount,product_cost,
@@ -1369,7 +1378,7 @@
     <select id="getFlushOrderFreightOrder" resultType="com.cbt.bean.OrderBean">
         SELECT order_no AS orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
         WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1) AND od.goodsid != '1400'
-        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime)
+        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QB29917379468058'
         GROUP BY oi.order_no  ORDER BY oi.orderid DESC;
     </select>
     <select id="getAllOrderInfo" resultType="com.cbt.bean.OrderBean">

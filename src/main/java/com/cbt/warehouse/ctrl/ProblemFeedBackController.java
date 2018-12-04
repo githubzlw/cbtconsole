@@ -3,6 +3,9 @@ package com.cbt.warehouse.ctrl;
 import com.cbt.common.StringUtils;
 import com.cbt.customer.service.GuestBookServiceImpl;
 import com.cbt.customer.service.IGuestBookService;
+import com.cbt.pojo.Admuser;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.pojo.ProblemFeedBackBean;
 import com.cbt.warehouse.service.ProblemFeedBackService;
 import com.cbt.website.util.JsonResult;
@@ -126,11 +129,24 @@ public class ProblemFeedBackController {
      *
      * @return
      */
-    @RequestMapping("/queryWarningNum")
+	@RequestMapping("/queryWarningNum")
     @ResponseBody
-    public Map<String, String> queryWarningNum() {
+    public Map<String, String> queryWarningNum(HttpServletRequest request) {
         try {
-            Map<String, String> result = problemFeedBackService.queryWarningNum();
+            String admJson = Redis.hget(request.getSession().getId(), "admuser");
+            if (admJson == null) {
+                return null;
+            }
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(admJson, Admuser.class);
+            int admuserid = user.getId();
+            int strm = user.getRoletype();
+            //临时添加Sales1账号查看投诉管理统计数据
+            if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
+                    || user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")
+		            || user.getAdmName().equalsIgnoreCase("admin1")) {
+                admuserid = 0;
+            }
+            Map<String, String> result = problemFeedBackService.queryWarningNum(admuserid);
             return result;
         } catch (Exception e) {
             LOG.error("The queryWarningNum query fails, the reason is :" + e.getMessage());

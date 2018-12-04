@@ -265,8 +265,20 @@ public class QueryUserServiceImpl implements QueryUserService {
 	public AuthInfo queryAuthInfo(Integer authId) {
 		return queryUserMapper.queryAuthInfo(authId);
 	}
-	
-    
 
+    @Override
+    public String queryAvailable(String email) {
+        DataSourceSelector.set("dataSource127hop");
+        String available = queryUserMapper.queryAvailable(email);
+        DataSourceSelector.restore();
+        return available;
+    }
 
+    @Override
+    public long updateAvailable(String email, Double available) {
+        DataSourceSelector.set("dataSource127hop");
+        long count = queryUserMapper.updateAvailable(email, available);
+        DataSourceSelector.restore();
+        return count;
+    }
 }
