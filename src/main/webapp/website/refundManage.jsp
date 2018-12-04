@@ -266,7 +266,7 @@
                     <%--Emma可以进行线下转账操作--%>
                     <c:if test="${refund.state == 3}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a>
-                        <c:if test="operatorId == 83">
+                        <c:if test="${operatorId == 83}">
                             <br><br>
                             <input type="button" value="执行退款" class="btn_sty"
                                onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
