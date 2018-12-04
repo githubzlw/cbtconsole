@@ -436,7 +436,7 @@ public class MessagesController {
 		page.setCurrentPage(1);
 		page.setStartIndex(1);
 
-		page = complainService.searchComplainByParam(t, null, page, admName);
+		page = complainService.searchComplainByParam(t, null, page, admName,0);
 		if (page.getList() == null) {
 			json.setOk(false);
 		} else {
