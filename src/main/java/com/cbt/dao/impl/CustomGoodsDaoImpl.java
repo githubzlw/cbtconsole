@@ -2689,7 +2689,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         String querySql = "SELECT goods_pid FROM hot_selling_goods"; //热卖区商品
         
         Connection conn2 = DBHelper.getInstance().getConnection(); //27
-        String querySql2 = "SELECT pid FROM custom_benchmark_ready WHERE is_edited=3"; //永不下架商品
+        String querySql2 = "SELECT pid FROM custom_benchmark_ready WHERE is_edited=3 UNION SELECT pid FROM custom_goods_edit WHERE never_off_flag=1"; //永不下架商品
         
         PreparedStatement stmt = null;
         ResultSet rs = null;
