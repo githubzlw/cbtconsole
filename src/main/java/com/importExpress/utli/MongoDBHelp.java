@@ -3,9 +3,11 @@ package com.importExpress.utli;
 import com.cbt.util.SysParamUtil;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.*;
+import com.mongodb.client.result.UpdateResult;
 
 import org.slf4j.LoggerFactory;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,5 +131,24 @@ public enum MongoDBHelp {
     public static void main(String[] args){
         //System.out.println(MongoDBHelp.INSTANCE.findOne("webhook_test","id","WH-1RD175966K076994H-53R00852K9690533R"));
         System.out.println(MongoDBHelp.INSTANCE.findAny("webhook_test","id","WH*"));
+    }
+    /**更新mongodb
+     * @param collectionName
+     * @param filter
+     * @param update
+     * @return
+     */
+    public long update(String collectionName,Bson filter,Bson update){
+        this.getConnection();
+        long result = 0;
+        if(mongoDatabase!=null){
+			UpdateResult updateMany = mongoDatabase.getCollection(collectionName).updateMany(filter, update);
+			result = updateMany.getModifiedCount();
+        }else{
+            logger.error("mongoDatabase is null");
+        }
+
+        this.closeConnection();
+        return result;
     }
 }

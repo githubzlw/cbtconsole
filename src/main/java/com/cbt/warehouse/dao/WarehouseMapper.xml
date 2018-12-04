@@ -3958,8 +3958,9 @@
 		limit ${page},40;
 	</select>
 	<select id="getUserOrderInfoByOrderNo" resultType="com.cbt.bean.OrderBean">
-		 SELECT oi.order_no,u.email,u.id,ad.Email as adminemail
+		 SELECT oi.order_no,u.email,u.id,ad.Email AS adminemail,oa.country,oa.statename,oa.address AS addresss,oa.address2,oa.phoneNumber AS phonenumber,oa.recipients,oa.street,oa.zipCode AS zipcode
 		 FROM orderinfo oi
+		 INNER JOIN order_address oa ON oi.order_No=oa.orderNo
 		 INNER JOIN USER u ON oi.user_id=u.id
 		 INNER JOIN admin_r_user a ON u.id=a.userid
 		 INNER JOIN admuser ad ON a.adminid=ad.id
