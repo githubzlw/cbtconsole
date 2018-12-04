@@ -22,12 +22,13 @@ import com.importExpress.utli.GoodsPriceUpdateUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.commons.logging.Log;import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -50,6 +50,7 @@ import java.util.Map;
 public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
+    private static final String GET_MIN_FREIGHT_URL = "http://127.0.0.1:8087/shopCartMarketingCtr/getMinFreightByUserId";
 
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
@@ -184,7 +185,7 @@ public class ShopCarMarketingController {
 
     @RequestMapping("/sendEmailCarInfoByUserId")
     public ModelAndView sendEmailCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
-        Map<String,Object> model = new HashedMap();
+        Map<String, Object> model = new HashedMap();
         ModelAndView mv = new ModelAndView("goodsCarInfoEmail");
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
@@ -262,7 +263,7 @@ public class ShopCarMarketingController {
                 model.put("sourceList", sourceList);
                 JSONObject jsonObject = JSONObject.fromObject(model);
                 String modeStr = jsonObject.toString();
-                mv.addObject("modeStr",modeStr);
+                mv.addObject("modeStr", modeStr);
             } else {
                 mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
                 mv.addObject("success", 0);
@@ -355,17 +356,17 @@ public class ShopCarMarketingController {
             //3.发送邮件给客户
             //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
             boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
-            if(modelB){
+            if (modelB) {
                 String modelStr = request.getParameter("model");
-                Map<String,Object> model = SerializeUtil.JsonToMapStr(modelStr);
+                Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
                 sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
-            }else {
+            } else {
                 sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
             //End：
             //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             //4.更新跟进信息
-            shopCarMarketingService.updateAndInsertUserFollowInfo(userId,user.getId(),emailContent);
+            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), emailContent);
             json.setOk(true);
             json.setMessage("发送邮件成功！");
         } catch (Exception e) {
@@ -544,8 +545,8 @@ public class ShopCarMarketingController {
             json.setSuccess(false);
             json.setMessage("用户未登陆");
             return json;
-        }else{
-            if(!"0".equals(admuser.getRoletype())){
+        } else {
+            if (!"0".equals(admuser.getRoletype())) {
                 statistic.setFollowAdminId(admuser.getId());
             }
         }
@@ -576,7 +577,7 @@ public class ShopCarMarketingController {
         }
 
         String userEmail = request.getParameter("userEmail");
-         if (StringUtils.isNotBlank(userEmail)) {
+        if (StringUtils.isNotBlank(userEmail)) {
             statistic.setUserEmail(userEmail);
         }
 
@@ -713,6 +714,11 @@ public class ShopCarMarketingController {
                 //计算利润率
                 totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
             }
+            // 如果总运费totalFreight为0，则重新获取总运费(调用线上的接口)
+            if (totalFreight < 0.1) {
+                //totalFreight = getMinFreightByUserId(userId);
+            }
+            totalFreight = getMinFreightByUserId(userId,carUserStatistic);
             estimateProfit = (totalPrice - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
             carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
             carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
@@ -733,10 +739,36 @@ public class ShopCarMarketingController {
         return mv;
     }
 
+    private double getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic) {
+
+        double freight = 0;
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
+        Request request = new Request.Builder().url(GET_MIN_FREIGHT_URL).post(formBody).build();
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            String resultStr = response.body().string();
+            JSONObject json = JSONObject.fromObject(resultStr);
+            if (json.getBoolean("ok")) {
+                System.out.println("getMinFreightByUserId success !!!");
+                freight = json.getJSONObject("data").getDouble("totalFreight");
+                carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+            } else {
+                System.err.println("getMinFreightByUserId error :<:<:<");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            logger.error("getMinFreightByUserId error:" + e.getMessage());
+        }
+        return freight;
+    }
+
 
     @RequestMapping("/genShopCarInfoByUserId")
     @ResponseBody
-    public Map<String,Object> genShopCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> genShopCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<>();
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
@@ -876,7 +908,6 @@ public class ShopCarMarketingController {
     }
 
 
-
     //计算商品运费
 
     public double genFreightByPid(String modeTransport, String catid, double odWeight, int countryId) {
@@ -913,8 +944,6 @@ public class ShopCarMarketingController {
         esFreight += (freight1 + freight2);
         return esFreight / GoodsPriceUpdateUtil.EXCHANGE_RATE;
     }
-
-
 
 
     @RequestMapping("/queryTrackingList")
@@ -986,10 +1015,9 @@ public class ShopCarMarketingController {
     }
 
 
-
     @RequestMapping("/exportTrackingExcel")
-	@ResponseBody
-	public void exportTrackingExcel(HttpServletRequest request, HttpServletResponse response) {
+    @ResponseBody
+    public void exportTrackingExcel(HttpServletRequest request, HttpServletResponse response) {
 
         ShopTrackingBean param = new ShopTrackingBean();
 
@@ -1043,7 +1071,7 @@ public class ShopCarMarketingController {
         }
     }
 
-	private HSSFWorkbook genTrackingExcel(List<ShopTrackingBean> res, String title) {
+    private HSSFWorkbook genTrackingExcel(List<ShopTrackingBean> res, String title) {
 
         // 第一步，创建一个webbook，对应一个Excel文件
         HSSFWorkbook wb = new HSSFWorkbook();
