@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -144,41 +143,39 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    				c.setOprateAdm(adminRUser.getAdmname());
 	    			}
 	    		});
-	    		
-	    		long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
-		    	
-		    	long etimeTemp = 0L;
-				if(StringUtils.isNotBlank(endTime)) {
-					etimeTemp  = sdf.parse(endTime).getTime();
-		    	}else {
-		    		Calendar rightNow = Calendar.getInstance();
-		    		rightNow.setTime(new Date());
-		    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
-		    		etimeTemp = rightNow.getTime().getTime();
-		    	}
-		    	long etime = etimeTemp;
-		    	
-		    	list = list.stream().filter(b->{
-		    		if(filter.contains(b.getDisputeID())) {
-		    			return false;
-		    		}else {
-		    			filter.add(b.getDisputeID());
-		    			boolean fl = true;
-		    			if(StringUtils.isNotBlank(disputeID)) {
-		    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
-		    			}
-		    			if(StringUtils.isNotBlank(status)) {
-		    				fl = fl && StringUtils.equals(b.getStatus(), status);
-		    			}
-		    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
-		    		}
-		    	}).collect(Collectors.toList());
-		    	
-		    	total = list.stream().count();
-		    			
-		    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
-		    	
 	    	}
+	    	long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
+	    	
+	    	long etimeTemp = 0L;
+	    	if(StringUtils.isNotBlank(endTime)) {
+	    		etimeTemp  = sdf.parse(endTime).getTime();
+	    	}else {
+	    		Calendar rightNow = Calendar.getInstance();
+	    		rightNow.setTime(new Date());
+	    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
+	    		etimeTemp = rightNow.getTime().getTime();
+	    	}
+	    	long etime = etimeTemp;
+	    	
+	    	list = list.stream().filter(b->{
+	    		if(filter.contains(b.getDisputeID())) {
+	    			return false;
+	    		}else {
+	    			filter.add(b.getDisputeID());
+	    			boolean fl = true;
+	    			if(StringUtils.isNotBlank(disputeID)) {
+	    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
+	    			}
+	    			if(StringUtils.isNotBlank(status)) {
+	    				fl = fl && StringUtils.equals(b.getStatus(), status);
+	    			}
+	    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
+	    		}
+	    	}).collect(Collectors.toList());
+	    	
+	    	total = list.stream().count();
+	    	
+	    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
 	    	
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
