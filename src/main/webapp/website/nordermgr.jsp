@@ -383,8 +383,8 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 $(document).ready(function(){ 
 	fn(1);
 	fnGetStatistic();
-	fnGetMessage(<%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>); //获取各种消息数量
-    uidTem = <%= user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>;
+	fnGetMessage(<%= user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>); //获取各种消息数量
+    uidTem = <%= user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>;
 }); 
 
 </script>
@@ -415,7 +415,7 @@ $(document).ready(function(){
 					target="_blank">综合采购</a> <c:if test="${admuserid == 0}"><a href="/cbtconsole/website/shipmentcount.jsp"
 					target="_blank">30天完成出货订单统计</a></c:if>
 			</div>
-			<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
+			<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
 				<!-- 载入消息提醒jsp页面 -->
 				<jsp:include page="message_notification.jsp"></jsp:include>
 			<%}  %>
