@@ -204,9 +204,7 @@ public class MessagesController {
 		Admuser user = (Admuser) SerializeUtil.JsonToObj(admJson, Admuser.class);
 		int strm = user.getRoletype();
 		int admuserid = adminid;
-		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1")) {
+		if (strm == 0) {
 			admuserid = 0;
 		}
 
@@ -324,9 +322,7 @@ public class MessagesController {
 		int admuserid = user.getId();
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")
-				|| user.getAdmName().equalsIgnoreCase("admin1")) {
+		if (strm == 0) {
 			admuserid = 0;
 		}
 		
@@ -430,13 +426,14 @@ public class MessagesController {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		String admName = adm.getAdmname();
+		int roleType=adm.getRoletype();
 		Complain t = new Complain();
 		t.setComplainState(0);
 		Page<ComplainVO> page = new Page<ComplainVO>();
 		page.setCurrentPage(1);
 		page.setStartIndex(1);
 
-		page = complainService.searchComplainByParam(t, null, page, admName);
+		page = complainService.searchComplainByParam(t, null, page, admName,roleType);
 		if (page.getList() == null) {
 			json.setOk(false);
 		} else {

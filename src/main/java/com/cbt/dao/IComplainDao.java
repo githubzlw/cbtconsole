@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface IComplainDao extends BaseDao<Complain> {
 	
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName);
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType);
 
 	public ComplainVO getComplainByCid(Integer cid);
 
