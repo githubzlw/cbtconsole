@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -242,14 +243,15 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		return customerDisputeMapper.updateRefund(disputeid, refundedAmount);
 	}
 	@Override
-	public Integer insertMessage(String disputeId, int admId) {
-		// TODO Auto-generated method stub
-		return customerDisputeMapper.insertMessage(disputeId, admId);
-	}
-	@Override
-	public Integer countMessage(String disputeId,int admId) {
-		// TODO Auto-generated method stub
-		return customerDisputeMapper.countMessage(disputeId,admId);
+	public long updateMessage(String disputeId) {
+		MongoDBHelp instance = MongoDBHelp.INSTANCE;
+		BasicDBObject filter = new BasicDBObject();
+		filter.put("resource_type", "dispute");
+		filter.put("resource.dispute_id", disputeId);
+		BasicDBObject update = new BasicDBObject("$set",new BasicDBObject("isRead",true));
+		long result = instance.update("data", filter, update ); 
+		
+		return result;
 	}
 
 }

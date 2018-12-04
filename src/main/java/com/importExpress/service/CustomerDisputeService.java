@@ -79,18 +79,12 @@ public interface CustomerDisputeService {
 	 */
 	Integer updateRefund(String disputeid,String refundedAmount);
 	
-	/**插入数据
+	/**更新mongodb
 	 * @param disputeId
 	 * @param admId
 	 * @return
 	 */
-	Integer insertMessage(String disputeId,int admId);
-	
-	/**统计消息
-	 * @param admId
-	 * @return
-	 */
-	Integer countMessage(String disputeId,int admId);
+	long updateMessage(String disputeId);
 	
 	
 }

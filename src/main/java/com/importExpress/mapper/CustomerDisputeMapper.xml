@@ -41,13 +41,6 @@
     #{oprateAdm},now(),now()
       )
   </insert>
-  <insert id="insertMessage" >
-    insert into customer_dispute_message (
-    dispute_id,adm_id,create_time,update_time
-      )
-    values (#{disputeId},#{admId},now(),now()
-      )
-  </insert>
   
    <update id="updateStatus">
     update customer_dispute_refund set status=#{status},update_time=now()
@@ -64,13 +57,6 @@
     
     </if>
     
-  </select>
-  <select id="countMessage"  resultType="java.lang.Integer">
-    select  count(id) from customer_dispute_message where  1=1 
-    <if test="disputeId != null">
-     and dispute_id = #{disputeId}
-    </if>
-     and adm_id = #{admId}
   </select>
  
   <select id="confirmList"  resultMap="BaseResultMap">

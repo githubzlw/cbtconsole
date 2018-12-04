@@ -223,15 +223,13 @@ public class CustomerDisputeController {
 				mv.addObject("merchant", merchant);
 				
 			}
+			long updateMessage = customerDisputeService.updateMessage(disputeID);
+			LOG.info("updateMessage:"+updateMessage);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			mv.addObject("message", e.getMessage());
 			mv.addObject("success", 0);
-		}
-		Integer countMessage = customerDisputeService.countMessage(disputeID, adm.getId());
-		if(countMessage == null || countMessage == 0) {
-			customerDisputeService.insertMessage(disputeID, adm.getId());
 		}
     	return mv;
     }
@@ -686,6 +684,7 @@ public class CustomerDisputeController {
     		result.put("message", "没有权限退款，请重新登录");
         	return  result;
     	}
+        
     	String disputeid = request.getParameter("disputeid");
     	CustomerDisputeBean comfirmByDisputeID = customerDisputeService.getComfirmByDisputeID(disputeid);
     	if(comfirmByDisputeID == null) {
@@ -700,54 +699,54 @@ public class CustomerDisputeController {
     	String content = comfirmByDisputeID.getRemark();
     	String offerAmount = comfirmByDisputeID.getSellerOfferedAmount();
     	String currencyCode = comfirmByDisputeID.getCurrencyCode();
-    	String admName = adm.getAdmName().toLowerCase();
     	
+    	boolean isPremint = Double.valueOf(offerAmount)<500.0099999;
+    	if(adm.getId() != 8 || !(adm.getId() == 1 && isPremint) || !(adm.getId() == 71 && isPremint) || adm.getId() != 18) {
+        	result.put("state", false);
+    		result.put("message", "该用户没有权限退款，请重新登录");
+        	return  result;
+        }
     	try {
-    		if(StringUtils.equals(admName, "emma") || (StringUtils.equals(admName, "mindy") && Double.valueOf(offerAmount)<500.0099999)) {
-    			String invoice_id = comfirmByDisputeID.getTransactionID();
-        		if(StringUtils.isBlank(content)) {
-        			result.put("state", false);
-            		result.put("message",    "退款无法完成,缺少退款备注");
-        		}else {
-        			//数据
-            		JSONObject data = new JSONObject();
-            		data.put("note", content);
-            		if(StringUtils.isNotBlank(offerAmount)) {
-            			JSONObject Amount = new JSONObject();
-            			Amount.put("value", offerAmount);
-            			Amount.put("currency_code", currencyCode);
-            			data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
-            		}
-            		customerDisputeService.updateStatus(disputeID, "1");
-            		String refundResult = null;
-            		if(StringUtils.equals(refundType, "0")) {
-            			
-                    	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
-                    	data.put("invoice_id", invoice_id);
-                		LOG.info("claim : "+JSONObject.toJSONString(data));
-                    	refundResult = apiService.acceptClaim(disputeID, merchant, data);
-                	}else {
-//                    	data.put("invoice_id", invoice_id);
-                		String offerType = comfirmByDisputeID.getOfferType();
-                		data.put("offer_type", offerType);
-                		
-                		String returnShippingAddress = comfirmByDisputeID.getReturnShippingAddress();
-                    	if(StringUtils.equals(offerType,"REFUND_WITH_RETURN")
-                    			&& StringUtils.isNotBlank(returnShippingAddress)){
-                    		JSONObject address = JSONObject.parseObject(returnShippingAddress);
-                    		data.put("return_shipping_address", address);
-                    	}
-                    	
-                    	LOG.info("offer:"+JSONObject.toJSONString(data));
-                    	refundResult = apiService.makeOffer(disputeID,merchant, data);
-                	}
-            		result.put("state", true);
-            		result.put("message",   "退款完成");
-            		LOG.info(content);
-        		}
-    		}else {
+    		String invoice_id = comfirmByDisputeID.getTransactionID();
+    		if(StringUtils.isBlank(content)) {
     			result.put("state", false);
-        		result.put("message",   "该用户没有权限退款，请重新登录");
+        		result.put("message",    "退款无法完成,缺少退款备注");
+    		}else {
+    			//数据
+        		JSONObject data = new JSONObject();
+        		data.put("note", content);
+        		if(StringUtils.isNotBlank(offerAmount)) {
+        			JSONObject Amount = new JSONObject();
+        			Amount.put("value", offerAmount);
+        			Amount.put("currency_code", currencyCode);
+        			data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
+        		}
+        		customerDisputeService.updateStatus(disputeID, "1");
+        		String refundResult = null;
+        		if(StringUtils.equals(refundType, "0")) {
+        			
+                	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
+                	data.put("invoice_id", invoice_id);
+            		LOG.info("claim : "+JSONObject.toJSONString(data));
+                	refundResult = apiService.acceptClaim(disputeID, merchant, data);
+            	}else {
+//                	data.put("invoice_id", invoice_id);
+            		String offerType = comfirmByDisputeID.getOfferType();
+            		data.put("offer_type", offerType);
+            		
+            		String returnShippingAddress = comfirmByDisputeID.getReturnShippingAddress();
+                	if(StringUtils.equals(offerType,"REFUND_WITH_RETURN")
+                			&& StringUtils.isNotBlank(returnShippingAddress)){
+                		JSONObject address = JSONObject.parseObject(returnShippingAddress);
+                		data.put("return_shipping_address", address);
+                	}
+                	
+                	LOG.info("offer:"+JSONObject.toJSONString(data));
+                	refundResult = apiService.makeOffer(disputeID,merchant, data);
+            	}
+        		result.put("state", true);
+        		result.put("message",   "退款完成");
+        		LOG.info(content);
     		}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -777,6 +776,11 @@ public class CustomerDisputeController {
     		result.put("message", "没有权限退款，请重新登录");
         	return  result;
     	}
+    	if(adm.getId() != 8 || adm.getId() != 1  || adm.getId() != 71 || adm.getId() != 18) {
+        	result.put("state", false);
+    		result.put("message", "该用户没有权限退款，请重新登录");
+        	return  result;
+        }
     	String disputeid = request.getParameter("disputeid");
     	String refuseReason = request.getParameter("reason");
     	if(StringUtils.isBlank(disputeid) || StringUtils.isBlank(refuseReason)) {

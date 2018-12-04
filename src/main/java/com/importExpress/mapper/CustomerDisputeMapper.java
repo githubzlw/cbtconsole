@@ -58,17 +58,5 @@ public interface CustomerDisputeMapper {
 	 */
 	Integer updateRefund(@Param("disputeid")String disputeid,@Param("refundedAmount")String refundedAmount);
 	
-	/**插入数据
-	 * @param disputeId
-	 * @param admId
-	 * @return
-	 */
-	Integer insertMessage(@Param("disputeId")String disputeId,@Param("admId")int admId);
-	
-	/**统计消息
-	 * @param admId
-	 * @return
-	 */
-	Integer countMessage(@Param("disputeId")String disputeId,@Param("admId")int admId);
 	
 }
