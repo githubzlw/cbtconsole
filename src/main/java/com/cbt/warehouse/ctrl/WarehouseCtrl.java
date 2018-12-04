@@ -203,14 +203,14 @@ public class WarehouseCtrl {
 		System.out.println("登录人ID："+adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		System.out.println("采购人长度："+list.size());
-
+		
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
-
-		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
+		
+		if(adm.getId()==1 || adm.getId()==83){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -906,7 +906,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && !"emmaxie".equals(adm) && !"admin1".equals(adm)?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -1228,7 +1228,7 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult monthSalesEffortsList(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, String> map = new HashMap<String, String>();
-		String pages=request.getParameter("page");
+		String pages=request.getParameter("pages");
 		if(StringUtil.isBlank(pages)){
 			pages="1";
 		}
@@ -3928,7 +3928,7 @@ public class WarehouseCtrl {
 		request.setAttribute("orderPos", orderPos);
 		return "orderinfoInspection";
 	}
-
+	
 	// 出库验货 查询全部订单  2018/07/20 10:45  ly
 	@RequestMapping(value = "/getOrderInfoInspectionall.do", method = RequestMethod.GET)
 	public String getOrderInfoInspectionall(HttpServletRequest request, Model model) {

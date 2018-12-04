@@ -1,8 +1,6 @@
 package com.cbt.controller;
 
 import com.cbt.bean.FileMeta;
-import com.cbt.util.FtpConfig;
-import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.RandomUtil;
 import com.cbt.util.SysParamUtil;
 import org.slf4j.Logger;
@@ -31,7 +29,7 @@ import java.util.Map;
 public class fineuploader {
 	
 	private static Logger log = LoggerFactory.getLogger(fineuploader.class);
-	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+	
 	LinkedList<FileMeta> files = new LinkedList<FileMeta>();
 	FileMeta fileMeta = null;
 	
@@ -74,11 +72,7 @@ public class fineuploader {
 			map.put("data", "无文件上传");
 			return map;
 		}
-		if (ftpConfig == null) {
-			ftpConfig = GetConfigureInfo.getFtpConfig();
-		}
-		String localDiskPath = ftpConfig.getLocalDiskPath();
-		String uploadPath =localDiskPath;// SysParamUtil.getParam("uploadPath");
+		String uploadPath = SysParamUtil.getParam("uploadPath");
 		String saveFileUrl = uploadPath.endsWith("/")?uploadPath:uploadPath+"/invoice";
 		saveFileUrl = saveFileUrl + "/" + System.currentTimeMillis() + "/";
 		

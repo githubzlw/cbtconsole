@@ -109,22 +109,21 @@
 		roastingImg();
 		//删除橱窗图
 		$('#delete_pic').click(function() {
-		    $('.ul_pic li').each(function(i) {
-				if ($('.ul_pic li').eq(i).hasClass('red_border')) {
-					$(this).remove();
-					$('.ul_pic li').eq(0).trigger('click');
-				}
-				if (!$('.ul_pic li').length) {
-					var mainImg = $("#goods_main_img").val();
-					$('.init_img').attr("src",mainImg);
-				}
-				roastingImg();
-			});
-			/*$.messager.confirm('系统提醒', '是否删除，删除保存后数据不可恢复', function(r){
+			$.messager.confirm('系统提醒', '是否删除，删除保存后数据不可恢复', function(r){
 				if (r){
-
+					$('.ul_pic li').each(function(i) {
+						if ($('.ul_pic li').eq(i).hasClass('red_border')) {
+							$(this).remove();
+							$('.ul_pic li').eq(0).trigger('click');
+						}
+						if (!$('.ul_pic li').length) {
+							var mainImg = $("#goods_main_img").val();
+							$('.init_img').attr("src",mainImg);
+						}
+						roastingImg();
+					});
 				}
-			});*/
+			});	
 		});
 
 		//点击尺码图
@@ -180,7 +179,7 @@
 			$l += 90;
 			$(".ul_pic").stop().animate({
 				left : ($l + 25) + "px"
-			});
+			})
 			setTimeout(function() {
 				if ($l >= 0) {
 					$l = 0;
@@ -189,7 +188,7 @@
 					})
 				}
 			}, 100)
-		});
+		})
 		$(".next").click(function() {
 			$l -= 90;
 			$(".ul_pic").stop().animate({

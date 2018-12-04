@@ -159,7 +159,7 @@
 	
 	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
 	<select id="queryStaticizeAll" resultMap="BaseResultMap">
-		select id,keyword from tab_seach_pages where sate = 0 AND pid != 0
+		select id,keyword from tab_seach_pages where isshow = 1 AND pid != 0
 	</select>
 	
 
