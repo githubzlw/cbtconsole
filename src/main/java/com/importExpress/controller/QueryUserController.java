@@ -4,6 +4,7 @@ import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.service.QueryUserService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +21,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/queryuser")
 public class QueryUserController {
-	
-	@Autowired
+
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(QueryUserController.class);
+
+    @Autowired
 	private QueryUserService queryUserService;
 	
 	/**
@@ -249,12 +252,9 @@ public class QueryUserController {
     public Map<String, Object> queryAvailable(String email) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            if (!(StringUtils.isBlank(email)
-                    || email.indexOf("@qq") != -1
-                    || email.indexOf("qq.") != -1
-                    || email.indexOf("test") != -1)){
+            if (StringUtils.isBlank(email) || !checkTestAccounts(email)){
                 result.put("status", false);
-                result.put("message", "email账号非测试账号!");
+                result.put("message", "email账号为空或者非测试账号!");
                 return result;
             }
             String available = queryUserService.queryAvailable(email);
@@ -269,6 +269,7 @@ public class QueryUserController {
         } catch (Exception e){
             result.put("status", false);
             result.put("message", "内部异常");
+            LOG.error("QueryUserController.queryAvailable error, email:" + email + ", result:" + result + ", e:" + e);
         }
         return result;
     }
@@ -283,19 +284,15 @@ public class QueryUserController {
     public Map<String, Object> updateAvailable(String email, Double available) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            if (!(StringUtils.isBlank(email)
-                    || email.indexOf("@qq") != -1
-                    || email.indexOf("qq.") != -1
-                    || email.indexOf("test") != -1
-                    || null == available)){
+            if (StringUtils.isBlank(email) || !checkTestAccounts(email) || null == available){
                 result.put("status", false);
-                result.put("message", "email账号非测试账号 或 修改金额问题!");
+                result.put("message", "email账号为空或非测试账号 或 修改金额问题!");
                 return result;
             }
             long count = queryUserService.updateAvailable(email, available);
             if (count < 1){
                 result.put("status", false);
-                result.put("message", "修改失败");
+                result.put("message", "未找到该用户,修改失败");
             } else {
                 result.put("status", true);
                 result.put("message", "修改成功");
@@ -304,8 +301,23 @@ public class QueryUserController {
         } catch (Exception e){
             result.put("status", false);
             result.put("message", "内部异常");
+            LOG.error("QueryUserController.updateAvailable error, email:" + email + ", result:" + result + ", e:" + e);
         }
         return result;
+    }
+
+    /**
+     * 判断邮箱是否是测试账号(这里测试账号需要包含 test 或者 @qq 或者 qq.)
+     * @param email 被检测的邮箱
+     * @return 如果是测试账号则返回true, 否则返回false
+     */
+    public static boolean checkTestAccounts(String email){
+        if (email.indexOf("@qq") != -1
+                || email.indexOf("qq.") != -1
+                || email.indexOf("test") != -1){
+            return true;
+        }
+        return false;
     }
 	
 	
