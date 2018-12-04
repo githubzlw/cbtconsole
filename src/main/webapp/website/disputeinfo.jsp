@@ -207,7 +207,7 @@ Amount Refunded:${result.dispute_outcome.amount_refunded.value } ${result.disput
 </c:if>
 </strong></p>
 <br>
-<p><strong><span>User:&nbsp;&nbsp;${userid } </span>
+<p><strong><span>User:&nbsp;&nbsp;<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${userid }">${userid } </a></span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <span>Order.No:&nbsp;&nbsp;
 <a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${orderNo }">${orderNo }</a></span>

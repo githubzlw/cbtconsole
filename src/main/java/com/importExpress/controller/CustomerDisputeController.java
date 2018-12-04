@@ -168,7 +168,7 @@ public class CustomerDisputeController {
     	int disputeLifeCycleFlag = 0;
     	mv.addObject("success", 1);
 		try {
-			int confim = customerDisputeService.count(disputeID,"-1");
+			int confim = customerDisputeService.count(disputeID,"0");
 			mv.addObject("confim", confim);
 			String showDisputeDetails = "";//
 			if(StringUtils.isBlank(showDisputeDetails)) {
