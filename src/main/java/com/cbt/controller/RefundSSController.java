@@ -555,7 +555,7 @@ public class RefundSSController {
                     status = 2;
                 }
                 // 其他销售备注不更改状态,ling备注更改状态
-                if (agreepeople != null && !agreepeople.toLowerCase().equals("ling") && !agreepeople.toLowerCase().equals("emmaxie") && !agreepeople.toLowerCase().equals("admin1")) {
+                if (agreepeople != null && !agreepeople.toLowerCase().equals("ling") && !agreepeople.toLowerCase().equals("emmaxie") && !agreepeople.toLowerCase().equals("admin1") && !agreepeople.toLowerCase().equals("kara")) {
                     status = 0;
                 }
                 int resInt = refundService.addRemark(double_account, id, remark, agreepeople, additionId, status, resontype);
@@ -646,7 +646,7 @@ public class RefundSSController {
                 }
 
                 // 其他销售备注不更改状态,ling备注更改状态
-                if (agreepeople != null && !agreepeople.toLowerCase().equals("ling")  && !agreepeople.toLowerCase().equals("emmaxie") && !agreepeople.toLowerCase().equals("admin1")) {
+                if (agreepeople != null && !agreepeople.toLowerCase().equals("ling")  && !agreepeople.toLowerCase().equals("emmaxie") && !agreepeople.toLowerCase().equals("admin1") && !agreepeople.toLowerCase().equals("kara")) {
                     status = 0;
                 }
                 int resInt = refundService.addRemark(double_account, id, remark, agreepeople, additionId, status,

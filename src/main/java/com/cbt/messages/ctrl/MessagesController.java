@@ -205,7 +205,7 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		int admuserid = adminid;
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
+		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("kara")
 				|| user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
@@ -325,7 +325,7 @@ public class MessagesController {
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
 		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")
+				|| user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie")
 				|| user.getAdmName().equalsIgnoreCase("admin1")) {
 			admuserid = 0;
 		}
@@ -449,12 +449,15 @@ public class MessagesController {
 	}
 
 	@RequestMapping(value = "/getBusiess")
-	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav, @Param("status") int status,
-                                   @Param("adminid") int adminid) throws ParseException {
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav,
+                                   @RequestParam(value = "status", required = false, defaultValue = "0") int status,
+                                   @RequestParam(value = "state", required = false, defaultValue = "-1") int state,
+                                   @RequestParam("adminid") int adminid) throws ParseException {
+		/*String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		adminid = adm.getId();
+		adminid = adm.getId();*/
 		mav.addObject("status", status);
+		mav.addObject("state", state);
 		mav.addObject("adminid", adminid);
 		//负责人列表
         List<Admuser> admuserLis = admuserService.selectAdmuser();
