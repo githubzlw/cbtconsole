@@ -868,6 +868,11 @@ public class OrderInfoController{
 		return list_map;
 	}
 	
+	@RequestMapping(value = "/getSizeChart")
+	public @ResponseBody List<Map<String,Object>> getSizeChart(HttpServletRequest request){
+		return purchaseService.getSizeChart();
+	}
+	
 	/**
      * 
      * @Title searchProductLog 

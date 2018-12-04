@@ -332,4 +332,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
             #{item}
         </foreach>
     </update>
+    
+    <select id="getSizeChart" resultType="java.util.Map">
+select cat.name,ocr.remotpath,ocr.pid  from ocr_img_sizechart  ocr
+left join 1688_category  cat on ocr.catid = cat.category_id
+where ocr.sizechart=2 and ocr.catid=1037192
+</select>
 </mapper>

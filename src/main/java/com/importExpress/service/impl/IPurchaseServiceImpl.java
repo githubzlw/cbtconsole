@@ -1554,6 +1554,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public List<Map<String,Object>> getComfirmedSourceGoods() {
 		return pruchaseMapper.getComfirmedSourceGoods();
 	}
+	
+	@Override
+	public List<Map<String,Object>> getSizeChart() {
+		return pruchaseMapper.getSizeChart();
+	}
 
 	@Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {

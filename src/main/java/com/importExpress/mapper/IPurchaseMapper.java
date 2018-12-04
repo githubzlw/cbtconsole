@@ -372,4 +372,6 @@ public interface IPurchaseMapper {
 	List<Map<String,Object>> getComfirmedSourceGoods();
 
 	int updateAutoOrderFlag(@Param("idsList") List<Integer> idsList);
+	
+	public List<Map<String,Object>> getSizeChart();
 }

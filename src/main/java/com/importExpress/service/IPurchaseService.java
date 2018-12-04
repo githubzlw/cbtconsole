@@ -175,4 +175,6 @@ public interface IPurchaseService {
 
 	int updateAutoOrderFlag(List<Integer> idsList);
 
+	List<Map<String, Object>> getSizeChart();
+
 }
