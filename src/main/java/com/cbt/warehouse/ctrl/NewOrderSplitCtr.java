@@ -526,6 +526,7 @@ public class NewOrderSplitCtr {
 	public String genOrderSplitEmail(HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("genOrderSplitEmail start sendEmailInfo");
 		Map<String, Object> model =new HashMap<>();
+		String message = "success!";
 		String email = request.getParameter("email");
 		if(StringUtils.isNotBlank(email)){
 			String regex = "[a-zA-Z0-9_-]+@\\w+\\.[a-z]+(\\.[a-z]+)?";
@@ -600,8 +601,9 @@ public class NewOrderSplitCtr {
 				model.put("autoUrl", autoUrl);
 				// 获取用户email
 				IOrderSplitServer splitServer = new OrderSplitServer();
-				request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
-				model.put("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
+				String userEmailByUserName = splitServer.getUserEmailByUserName(oldOrderBean.getUserid());
+				request.setAttribute("email", userEmailByUserName);
+				model.put("email", userEmailByUserName);
 				List<Object[]> orderDetails = orderSplitDao.queryLocalOrderDetails(orderNo);
 				List<Object[]> nwOrderDetails = new ArrayList<Object[]>();// 拆分的订单
 				List<Object[]> oldOrderDetails = new ArrayList<Object[]>();// 剩余的订单
@@ -806,22 +808,20 @@ public class NewOrderSplitCtr {
 				String liveChatLink = "http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service";
 				model.put("here",liveChatLink);
 			}
-
+			JSONObject jsonObject = JSONObject.fromObject(model);
+			String modeStr = jsonObject.toString();
+			try {
+				sendMailFactory.sendMail(String.valueOf(model.get("email")), email, "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING);
+			} catch (Exception e) {
+				e.printStackTrace();
+				LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
+				message = "Failed to send mail, please contact the developer by screen, thank you！"+ e.getMessage();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("genOrderSplitEmail:" + e.getMessage());
 		}
 		LOG.info("getOrderSplit sendEmailInfo end");
-		JSONObject jsonObject = JSONObject.fromObject(model);
-		String modeStr = jsonObject.toString();
-		String message = "success!";
-		try {
-			sendMailFactory.sendMail(String.valueOf(model.get("email")), email, "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING);
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
-			message = "发送邮件失败,请截屏联系开发人员,谢谢！"+ e.getMessage();
-		}
 		return message;
 	}
 	@RequestMapping("/sendEmailTest")
