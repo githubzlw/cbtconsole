@@ -19,7 +19,7 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	Map<String,Object> list(String disputeID,int startNum,int limitNum,
-			String startTime,String endTime,String status,int admID);
+			String startTime,String endTime,String status,int admID,String roleType);
 	
 	
 	

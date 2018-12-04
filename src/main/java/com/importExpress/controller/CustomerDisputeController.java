@@ -115,7 +115,7 @@ public class CustomerDisputeController {
         	json.setMessage(String.valueOf(count));
         	
         	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, 
-        			sttime, edtime, status,adm.getId());
+        			sttime, edtime, status,adm.getId(),adm.getRoletype());
         	long total = 0;
         	if(map != null && !map.isEmpty() ) {
         		total = (Long)map.get("total");

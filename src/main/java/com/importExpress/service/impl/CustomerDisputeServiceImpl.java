@@ -41,7 +41,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private AdminRUserMapper adminRUserMapper;
 	@Override
 	public Map<String, Object> list(String disputeID,int startNum, int limitNum,
-			String startTime, String endTime, String status,int admID) {
+			String startTime, String endTime, String status,int admID,String roleType) {
 		Map<String, Object> result = new HashMap<String,Object>();
 		
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
@@ -134,7 +134,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    	
 	    	if(!useridList.isEmpty()) {
 	    		Map<String,AdminRUser> useridMap = new HashMap<String,AdminRUser>();
-	    		int admid = admID == 1 || admID == 8 || admID == 18? 0 : admID;
+	    		int admid = "0".equalsIgnoreCase(roleType)? 0 : admID;
 	    		List<AdminRUser> selectByUserID = adminRUserMapper.selectByUserID(useridList,admid);
 	    		selectByUserID.stream().forEach(m -> {
 	    			useridMap.put(String.valueOf(m.getUserid()), m);
