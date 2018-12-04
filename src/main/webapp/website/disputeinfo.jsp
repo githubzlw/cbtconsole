@@ -705,7 +705,7 @@ this problem will be resolved and closed.
  ${result.extensions.merchandize_dispute_properties.return_shipping_address.postal_code }
  
  </option>
-<option value="custom">Other Adress</option></select>
+<option value="custom">Other Adress</option></select> 
 <span class="others-info">If the address isn't available in the list, you may enter it in the notes field.</span>
 </div><p class="status-text">The refund will be processed once you confirm that you've received the item from the buyer.</p><div class="form-group ">
 <textarea class="form-control" id="messageBodyForSellerFullOffer" rows="7" cols="72" maxlength="2000" placeholder="Enter your offer details"></textarea>
