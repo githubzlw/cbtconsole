@@ -269,7 +269,7 @@ public class QueryUserController {
         } catch (Exception e){
             result.put("status", false);
             result.put("message", "内部异常");
-            LOG.error("QueryUserController.queryAvailable error, email:" + email + ", result:" + result + ", e:" + e);
+            LOG.error("QueryUserController.queryAvailable error, email:" + email + ", result:" + result, e);
         }
         return result;
     }
@@ -301,7 +301,7 @@ public class QueryUserController {
         } catch (Exception e){
             result.put("status", false);
             result.put("message", "内部异常");
-            LOG.error("QueryUserController.updateAvailable error, email:" + email + ", result:" + result + ", e:" + e);
+            LOG.error("QueryUserController.updateAvailable error, email:" + email + ", result:" + result, e);
         }
         return result;
     }
