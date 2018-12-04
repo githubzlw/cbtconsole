@@ -49,11 +49,11 @@ public class PayPalConfig {
             clientSecret = SANDBOX_CLIENT_SECRET;
             mode = "sandbox";
         } else {
-            clientId = LIVE_CLIENT_OLD_ID;
-            clientSecret = LIVE_CLIENT_OLD_SECRET;
+            clientId = LIVE_CLIENT_NEW_ID;
+            clientSecret = LIVE_CLIENT_NEW_SECRET;
             mode = "live";
         }
-        clientIdOld = LIVE_CLIENT_NEW_ID;
-        clientSecretOld = LIVE_CLIENT_NEW_SECRET;
+        clientIdOld = LIVE_CLIENT_OLD_ID;
+        clientSecretOld = LIVE_CLIENT_OLD_SECRET;
     }
 }

@@ -214,8 +214,8 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         refundResultInfoMapper.insertSelective(refundResultInfo);
 
                         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                        LocalDateTime payTime = LocalDateTime.parse(paymentInfo.get("payAmount").toString(),df);
-                        LocalDateTime changeTime = LocalDateTime.parse("2018-10-10",df);
+                        LocalDateTime payTime = LocalDateTime.parse(paymentInfo.get("payTime").toString(),df);
+                        LocalDateTime changeTime = LocalDateTime.parse("2018-09-20 00:00:00",df);
                         DetailedRefund detailedRefund;
                         if(payTime.isBefore(changeTime)){
                             detailedRefund = reFund(saleId, amountMoney,1);
@@ -239,7 +239,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
                             json.setData(detailedRefund);
-                            json.setMessage(detailedRefund.getId());
+                            json.setMessage("交易号[" + detailedRefund.getId() + "]");
                         } else {
                             json.setOk(false);
                             json.setMessage("API无返回信息");
@@ -275,7 +275,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
                             json.setData(detailedRefund);
-                            json.setMessage(detailedRefund.getId());
+                            json.setMessage("交易号[" + detailedRefund.getId() + "]");
                         } else {
                             json.setOk(false);
                             json.setMessage("API无返回信息");
@@ -291,6 +291,80 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
             } else {
                 json.setOk(false);
                 json.setMessage("没有查询到该订单!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("API退款失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @Override
+    public JsonResult refundByPayNo(String payNo, String payType,String refundAmount, String remark, int adminId) {
+        //先查询这个订单是否存在
+        JsonResult json = new JsonResult();
+        try {
+            if ("1".equals(payType)) {
+                RefundResultInfo refundResultInfo = new RefundResultInfo();
+                refundResultInfo.setTotalRefundedAmount(refundAmount);
+                refundResultInfo.setState("readyRefund");
+
+                REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
+                refundResultInfoMapper.insertSelective(refundResultInfo);
+
+                DetailedRefund detailedRefund = reFund(payNo, refundAmount, 0);
+
+                if (detailedRefund != null) {
+                    refundResultInfo.setRefundFromTransactionFee(detailedRefund.getRefundFromTransactionFee().getValue());
+                    refundResultInfo.setRefundFromReceivedAmount(detailedRefund.getRefundFromReceivedAmount().getValue());
+                    refundResultInfo.setTotalRefundedAmount(detailedRefund.getTotalRefundedAmount().getValue());
+                    refundResultInfo.setRefundid(detailedRefund.getId());
+                    refundResultInfo.setAmountTotal(detailedRefund.getAmount().getTotal());
+                    refundResultInfo.setState(detailedRefund.getState());
+                    refundResultInfo.setSaleId(detailedRefund.getSaleId());
+                    refundResultInfo.setParentPayment(detailedRefund.getParentPayment());
+                    refundResultInfo.setCreateTime(detailedRefund.getCreateTime());
+                    refundResultInfo.setUpdateTime(detailedRefund.getUpdateTime());
+                    refundResultInfo.setInfo(detailedRefund.toString().getBytes());
+                    REFUNDLOG.info("refund result:" + refundResultInfo.toString());
+                    refundResultInfoMapper.insertSelective(refundResultInfo);
+                    json.setOk(true);
+                    json.setData(detailedRefund.getId());
+                } else {
+                    json.setOk(false);
+                    json.setMessage("API无返回信息");
+                }
+            } else if ("2".equals(payType)) {
+                RefundResultInfo refundResultInfo = new RefundResultInfo();
+                refundResultInfo.setTotalRefundedAmount(refundAmount);
+                refundResultInfo.setState("readyRefund");
+
+                REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
+                refundResultInfoMapper.insertSelective(refundResultInfo);
+
+                Double amountDouble = Double.valueOf(refundAmount) * 100D;
+                StripeService stripeService = new StripeServiceImpl();
+                com.stripe.model.Refund detailedRefund = stripeService.refund(payNo, amountDouble.longValue());
+
+                if (detailedRefund != null) {
+                    refundResultInfo.setRefundid(detailedRefund.getId());
+                    refundResultInfo.setAmountTotal(detailedRefund.getAmount().toString());
+                    refundResultInfo.setState(detailedRefund.getStatus());
+                    refundResultInfo.setSaleId(detailedRefund.getId());
+                    refundResultInfo.setInfo(detailedRefund.toString().getBytes());
+                    REFUNDLOG.info("refund result:" + refundResultInfo.toString());
+                    refundResultInfoMapper.insertSelective(refundResultInfo);
+                    json.setOk(true);
+                    json.setData(detailedRefund);
+                    json.setMessage(detailedRefund.getId());
+                } else {
+                    json.setOk(false);
+                    json.setMessage("API无返回信息");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("无支付信息，请确认支付类型");
             }
         } catch (Exception e) {
             e.printStackTrace();

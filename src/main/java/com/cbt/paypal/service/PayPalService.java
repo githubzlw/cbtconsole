@@ -94,4 +94,17 @@ public interface PayPalService {
      * @Return: java.lang.String
      */
     JsonResult reFundNew(String orderNo, String amountMoney);
+
+
+    /**
+     * 根据交易号退款
+     *
+     * @param payNo
+     * @param payType
+     * @param refundAmount
+     * @param remark
+     * @param adminId
+     * @return
+     */
+    JsonResult refundByPayNo(String payNo, String payType, String refundAmount, String remark, int adminId);
 }
