@@ -838,31 +838,59 @@ em {
 				<tr>
 				  <c:if test="${order.state == 3 || order.state == 4 || order.state == 1 || order.state == 5 || order.state == 2}">
 				  	<td class="ormtittd1" colspan="3">
-				  		商品总金额 <span class="ormtittdred">（<fmt:formatNumber value="${order.product_cost+preferential_price}" pattern="#0.00" type="number" maxFractionDigits="2" />）
-						</span> + 订单实收运费<span class="ormtittdred">（${actual_ffreight_+order.foreign_freight}）</span>
-							+ 服务费 <span class="ormtittdred">（${order.service_fee}）</span>
-						+ 手续费 <span class="ormtittdred">（${order.processingfee}）</span>
-						+ 质检费 <span class="ormtittdred">（${order.actual_lwh}）</span>
-						+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
-						+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
-							-  <c:if test="${order.order_ac != 0}">
-							批量优惠金额<span class="ormtittdred">（${preferential_price}） </span>
-							</c:if> -混批优惠金额<span class="ormtittdred">（${order.discount_amount}）</span>
+				  		商品总金额 <span class="ormtittdred">（<fmt:formatNumber value="${order.product_cost+preferential_price}" pattern="#0.00" type="number" maxFractionDigits="2" />）</span>
+						<c:if test="${actual_ffreight_+foreign_freight>0}">
+							+ 订单实收运费<span class="ormtittdred">（${actual_ffreight_+foreign_freight}）</span>
+						</c:if>
+						<c:if test="${service_fee>0}">
+							+ 服务费 <span class="ormtittdred">（${service_fee}）</span>
+						</c:if>
+						<c:if test="${order.processingfee>0}">
+							+ 手续费 <span class="ormtittdred">（${order.processingfee}）</span>
+						</c:if>
+						<c:if test="${actual_lwh>0}">
+							+ 质检费 <span class="ormtittdred">（${actual_lwh}）</span>
+						</c:if>
+						<c:if test="${order.vatBalance>0}">
+							+双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
+						</c:if>
+						<c:if test="${order.memberFee>0}">
+							+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
+						</c:if>
+						<c:if test="${order.extra_freight>0}">
+							+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
+						</c:if>
+						<c:if test="${order.actual_freight_c>0}">
+							+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
+						</c:if>
+						 <c:if test="${order.order_ac != 0}">
+							 - 批量优惠金额<span class="ormtittdred">（${preferential_price}） </span>
+						</c:if>
+						<c:if test="${order.discount_amount>0}">
+							-混批优惠金额<span class="ormtittdred">（${order.discount_amount}）</span>
+						</c:if>
+						<c:if test="${order.cashback>0}">
 							-订单满200减免<span class="ormtittdred">（ ${order.cashback}） </span>
-							-手动优惠<span class="ormtittdred">（ ${order.extra_discount}）
-						</span> -分享折扣<span class="ormtittdred">（ ${order.share_discount}）
-						</span>  -新用户赠送运费<span class="ormtittdred">(0)
-						<%--（${order.order_ac}） --%>
-					</span> -返单优惠<span class="ormtittdred">（
-								${order.coupon_discount}） </span> -${order.gradeName}<span class="ormtittdred">（
-								${order.gradeDiscount}） </span>
-								+双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
-								-首单优惠<span class="ormtittdred">（${order.firstdiscount}） </span>
-								+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
-								=<b>实收金额</b><span
-							class="ormtittdred ormtittdb"> （<fmt:formatNumber
-							value="${(order.product_cost+actual_ffreight_+order.foreign_freight+order.processingfee+order.actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-order.firstdiscount+order.actual_freight_c) >0 ?
-									(order.product_cost+actual_ffreight_+order.foreign_freight+order.processingfee+order.extra_freight+order.actual_lwh+order.memberFee-order.discount_amount+order.service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-order.gradeDiscount + order.vatBalance - order.firstdiscount + order.actual_freight_c) : 0.00 }"
+						</c:if>
+						<c:if test="${order.extra_discount>0}">
+							-手动优惠<span class="ormtittdred">（ ${order.extra_discount}）</span>
+						</c:if>
+						<c:if test="${order.share_discount>0}">
+							-分享折扣<span class="ormtittdred">（ ${order.share_discount}）</span>
+						</c:if>
+						<c:if test="${order.coupon_discount>0}">
+							-返单优惠<span class="ormtittdred">（${order.coupon_discount}） </span>
+						</c:if>
+						<c:if test="${order.gradeDiscount>0}">
+							-${order.gradeName}<span class="ormtittdred">（${order.gradeDiscount}） </span>
+						</c:if>
+						<c:if test="${firstdiscount>0}">
+							-首单优惠<span class="ormtittdred">（${firstdiscount}） </span>
+						</c:if>
+						=<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
+							value="${(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount) >0 ?
+									(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+order.extra_freight+actual_lwh+order.memberFee-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-
+									order.gradeDiscount + order.vatBalance - firstdiscount + order.actual_freight_c) : 0.00 }"
 									pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span>
 						 <a href="/cbtconsole/orderDetails/orderPayDetails.do?orderNo=${order.orderNo}&userId=${order.userid}" target="_blank" style="text-decoration: none;">【到账详情 】</a>
@@ -925,7 +953,7 @@ em {
 							<input type="button" style="position: fixed; bottom: 520px; right: 50px; width: 150px; height: 30px;" id="closeOrder"
 							onclick="fnCloseOrder('${order.orderNo}',${order.userid},${order.pay_price},
 							'${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
-							${order.product_cost+preferential_price},${actual_ffreight_+order.foreign_freight},
+							${order.product_cost+preferential_price},${actual_ffreight_+foreign_freight},
 							${order.actual_weight_estimate},${isDropshipOrder })"value="取消订单">&nbsp;&nbsp;
 						</c:if>
 						<c:if test="${count==1 }">

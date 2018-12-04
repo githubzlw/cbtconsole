@@ -1882,7 +1882,7 @@
     <select id="getUserProfitByMonth" resultType="com.cbt.pojo.OrderSalesAmountPojo">
         SELECT aa.*,bb.totalprice AS freight FROM (
         SELECT LEFT(a.orderpaytime,7) AS times,a.id,a.email,a.grade,COUNT(a.order_no) AS orderCount,
-        CAST(SUM(a.pay_price*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
+        CAST(SUM(if(a.memberFee>=10,a.pay_price-a.memberFee,a.pay_price)*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
         SUM((SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops
         INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
         AND od.state IN (0,1) WHERE od.orderid=a.order_no)) AS buyAmount,
@@ -1897,7 +1897,7 @@
         ,GROUP_CONCAT(a.order_no,'@',a.flag) AS orderids,SUM(a.actual_weight_estimate) AS custom_freight,sum(a.esBuyPrice) as esBuyPrice,
         GROUP_CONCAT((SELECT GROUP_CONCAT(sp.expressno,'@',IF(CAST(sweight AS DECIMAL(10,2))>CAST(volumeweight AS DECIMAL(10,2)),sweight,volumeweight),'@',CAST(sp.estimatefreight*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS DECIMAL(10,2))) FROM shipping_package sp WHERE a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid))) AS shipnos
         FROM (
-        SELECT oi.actual_weight_estimate,ifnull(ow.flag,0) as flag,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
+        SELECT oi.memberFee,oi.actual_weight_estimate,ifnull(ow.flag,0) as flag,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
         FROM orderinfo oi
         INNER JOIN USER u ON oi.user_id=u.id
         INNER JOIN user_grade ug ON u.grade=ug.id
