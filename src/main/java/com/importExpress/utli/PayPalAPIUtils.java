@@ -307,8 +307,12 @@ public class PayPalAPIUtils {
 		return 	response;
 	}
 	
-	
 	public static void main(String[] args) throws Exception {
+		PayPalAPIUtils t = new PayPalAPIUtils();
+		t.showDisputeDetails(t.GetAccessToken(), "000-043-593-785");
+	}
+	
+	/*public static void main(String[] args) throws Exception {
 		
 		//数据
     	JSONObject data = new JSONObject();
@@ -382,13 +386,13 @@ public class PayPalAPIUtils {
         		.headers(mHeaders).post(requestBody.build()).build();
         OkHttpClient client = new OkHttpClient();
 		Response response = client.newBuilder()
-				/*.connectTimeout(50, TimeUnit.SECONDS)
-				.readTimeout(10, TimeUnit.SECONDS)*/
+				.connectTimeout(50, TimeUnit.SECONDS)
+				.readTimeout(10, TimeUnit.SECONDS)
 				.build().newCall(request).execute();
 		System.out.println(response.body().string());
 		
 //	utils.updateDisputeStatus(accessToken, disputeID);
 		
-	}
+	}*/
 
 }

@@ -15,6 +15,11 @@
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
     <style>
+    .easyui-fluid{
+        position: relative;
+    z-index: 999;
+}
+    }
         .datagrid-htable {
             text-align: center;
             height: 30px;
@@ -92,9 +97,10 @@
         .td_sty {
             width: 130px;
         }
+        .hide{
+        display: none;}
     </style>
     <script>
-    
         $(document).ready(function () {
             setDatagrid();
         });
@@ -125,8 +131,6 @@
                 onLoadSuccess: function (data) {
                     if (!data.success) {
                         showMessage(data.message);
-                    }else{
-                    	$("#oprator").val(data.message);
                     }
                 }
             });
@@ -164,16 +168,24 @@
 	}
         
         function formatAction(val, row, index) {
-        		var oprator = $("#oprator").val();
-	        	if(row.status == '1'){
-	        		return "已确认";
+	        	if(row.status == '2'){
+	        		return "已完结";
+	        	}else if(row.status == '-1'){
+	        		return "已拒绝";
 	        	}else{
-	        		if(oprator == '1'){
-		    		  return '<input type="button" onclick="comfirm(\''+row.disputeID+'\')" value="确认">';
+	        		if(row.adminRolyType == '0'){
+		    		  return '<input type="button" onclick="comfirm(\''+row.disputeID+'\')" value="确定退款">'+
+		    		  '<input type="button" onclick="refuse(\''+row.disputeID+'\')" value="拒绝退款">';
 	        		}else{
-	        			return "等待确认";
+	        			return "等待退款";
 	        		}
 	        	}
+    	}
+        function formatPP(val, row, index) {
+        	if(row.merchantID=='584JZVFU6PPVU'){
+        		return '老账号';
+        	}
+    		return '新账号';
     	}
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
@@ -188,9 +200,50 @@
     	}
         
         function comfirm(disputeid){
-        	$("#form_dispute").val(disputeid);
-        	$("#form_submit").submit();
+       	    $.ajax({
+    			type:'POST',
+    			dataType:'json',
+    			url:'/cbtconsole/customer/dispute/refund',
+    			data:{disputeid:disputeid},
+    			success:function(res){
+    					alert(res.message);
+    					window.location.href ="/cbtconsole/apa/disputerefund.html";
+    			},
+    			error:function(XMLResponse){
+    				alert('error');
+    			}
+    		}); 
         }
+        
+        function refuse(disputeid){
+        	$("#form_dispute_refuse").val(disputeid);
+        	$(".refuse_form_div").show();
+        }
+        function cfuse(){
+        	var refusereason = $("#form_dispute_refuse_reason").val();
+        	var disputeid = $("#form_dispute_refuse").val();
+       	    $.ajax({
+    			type:'POST',
+    			dataType:'json',
+    			url:'/cbtconsole/customer/dispute/refuse',
+    			data:{disputeid:disputeid,reason:refusereason},
+    			success:function(res){
+    				alert(res);
+    				alert(res.message);
+    				window.location.href  ="/cbtconsole/apa/disputerefund.html";
+    			},
+    			error:function(XMLResponse){
+    				alert('error');
+    			}
+    		}); 
+       	
+        }
+        
+        function closeform(){
+        	$(".refuse_form_div").hide();
+        	$("#form_dispute_refuse").val('');
+        }
+        
         /**
          * 消息提醒弹框
          * @param message
@@ -212,8 +265,23 @@
 
 </head>
 <body>
+<div class="hide refuse_form_div" 
+style="border:3px solid #00F;width: 300px;z-index: 99999;position: absolute;margin-left: 400px;background: #eeeeee;margin-top: 200px;">
+<span style="width: 200px;margin-left: 100px;">拒绝退款</span><span class="rfuse_close" style="margin-left: 100px;" onclick="closeform()">X</span>
+<br>
+<span>事件号:<input type="text" style="width: 230px;" id="form_dispute_refuse" value="" name="disputeid" readonly="readonly"></span>
+<br>
+<span><span>备&nbsp;&nbsp;&nbsp;注:</span><input type="text" style="width: 230px;height:100px;    margin-left: 2px;"  id="form_dispute_refuse_reason" name="reason"></span>
+<br>
+<input style="margin-left: 50px;width: 110px;" type="submit" value="submit" onclick="cfuse()">
+<input style="margin-left: 20px;width: 110px;" type="submit" value="cancel" onclick="closeform()">
+
+</div>
+
+
 <input type="hidden" value="" id="oprator">
-<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
+
+<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto;">
     <form id="groupbuy_query_form" action="#" onsubmit="return false;">
 			<span> 事件号: <input type="text" id="pid_id"
                                 style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -226,37 +294,42 @@
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 			</span> -->&nbsp;&nbsp;&nbsp;&nbsp; 
         <span> 状态: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
-            <option value="-1">全部</option>
+            <option value="-2">全部</option>
+            <option value="-1">拒绝退款</option>
             <option value="0">等待退款</option>
-            <option value="1">已完成退款</option>
+            <option value="1">已完结</option>
         </select></span>
         &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
                                               class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       
     </form>
 </div>
-
+<br>
 <table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
        class="easyui-datagrid">
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
-        <!-- <th data-options="field:'type',width:'30px'">来源</th> -->
-        <th data-options="field:'disputeID',width:'80px',formatter:formatdispute">事件号</th>
-        <th data-options="field:'status',align:'center',width:'80px'">状态</th>
+        <th data-options="field:'apiType',width:'35px'">来源</th>
+        <th data-options="field:'disputeID',width:'150px',formatter:formatdispute">事件号</th>
+        <th data-options="field:'transactionID',width:'100px'">交易号</th>
+        <th data-options="field:'merchantID',width:'35px',formatter:formatPP">pp账号</th>
+        <th data-options="field:'amount',width:'100px'">退款金额</th>
         <th data-options="field:'userid',align:'center',width:'80px'">用户</th>
-        <th data-options="field:'remark',align:'left',width:'310px'">备注</th>
+        <th data-options="field:'remark',align:'left',width:'200px'">备注</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
-        <th data-options="field:'orderNo',align:'center',width:'130px',formatter:formatOrder">订单号</th>
-        <!-- <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">确定退款</th> -->
+        <th data-options="field:'orderNo',align:'center',width:'100px',formatter:formatOrder">订单号</th>
+        <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
     </tr>
     </thead>
     <tbody>
     </tbody>
 </table>
-<form action="/cbtconsole/customer/dispute/update" method="post" id="form_submit" style="display: none;">
+
+<form action="/cbtconsole/customer/dispute/refund" method="post" id="form_submit" style="display: none;">
 <input type="hidden" id="form_dispute" value="" name="disputeid">
 <input type="submit" value="submit">
 </form>
+
 </body>
 </html>

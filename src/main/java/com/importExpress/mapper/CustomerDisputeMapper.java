@@ -36,4 +36,27 @@ public interface CustomerDisputeMapper {
 	 * @return
 	 */
 	List<CustomerDisputeBean> confirmList(@Param("disputeid")String disputeid,@Param("status")String status,@Param("startNum")int startNum,@Param("limitNum")int limitNum);
+	
+	/**获取申诉退款信息
+	 * @param disputeid
+	 * @return
+	 */
+	CustomerDisputeBean getComfirmByDisputeID(@Param("disputeid")String disputeid);
+	
+	/**拒绝退款更新
+	 * @param disputeid
+	 * @param refuseReason
+	 * @return
+	 */
+	Integer updateRefuseReason(@Param("disputeid")String disputeid,@Param("refuseReason")String refuseReason);
+	
+	
+	/**退款成功
+	 * @param refundedAmount
+	 * @param state
+	 * @return
+	 */
+	Integer updateRefund(@Param("disputeid")String disputeid,@Param("refundedAmount")String refundedAmount);
+	
+	
 }

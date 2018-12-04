@@ -16,60 +16,7 @@ table td {
 	text-align:center;
 }
 </style>
-<script type="text/javascript">
-    function queryAvailable() {
-        $("#a_message").text('');
-        var email = $("#a_email").val();
-        if(email == '' || email == undefined){
-            $("#a_message").text('未输入邮箱账号');
-            return;
-        }
-        $.ajax({
-            type: "GET",
-            url: "/cbtconsole/queryuser/queryAvailable.do?email=" + email,
-            dataType:"json",
-            success: function(msg){
-                if(msg.status){
-                    $("#a_available").val(msg.available);
-                } else {
-                    $("#a_message").text(msg.message);
-                }
-            }
-        });
-    }
-    function updateAvailable() {
-        $("#a_message").text('');
-        var email = $("#a_email").val();
-        var available = $("#a_available").val();
-        if(email == '' || email == undefined || available == '' || available == undefined){
-            $("#a_message").text('未输入邮箱账号或需要修改的余额');
-            return;
-        }
-        $.ajax({
-            type: "GET",
-            url: "/cbtconsole/queryuser/updateAvailable.do?email=" + email + "&available=" + available,
-            dataType:"json",
-            success: function(msg){
-                if(msg != null && msg != undefined){
-                    $("#a_message").text(msg.message);
-                }
-            },
-            error:function (msg) {
-                $("#a_message").text('修改异常');
-            }
-        });
-    }
-</script>
 <body>
-    <div>
-        <h5>测试账号余额修改(邮箱包含test,@qq,qq.关键字)</h5>
-        用户邮箱:<input type="text" id="a_email" />
-        余额/修改的金额:<input type="text" id="a_available" />
-        <span style="color: red;" id="a_message"></span><br />
-        <input type="button" value="查询" onclick="queryAvailable()"/>
-        <input type="button" value="修改" onclick="updateAvailable()"/>
-    </div>
-    <br />
 	<div id="message_id"><h5>购物车相关随机客户查询中...</h5></div>
 	<h5 id="message_id2">总消费金额1000$以上客户查询中...</h5>
 	<table id="date_id2">
@@ -83,7 +30,9 @@ table td {
 	    if (r != null) return unescape(r[2]); return null; //返回参数值
 	}
 	function addTableData(tableId, item) {
-		$("#" + tableId).append("<tr><td>" + getUrlParam(item, "password")
+		console.log(getUrlParam(item, "time"));
+		console.log(getUrlParam(item, "password"));
+		$("#" + tableId).append("<tr><td>" + getUrlParam(item, "password") 
 				+ "</td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "").replace("https://www.import-express.com", "http://beta.importx.com") 
 				+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "") 
 				+ "\">跳转线上</a></td><td>" + getUrlParam(item, "time") + "</td></tr>");
