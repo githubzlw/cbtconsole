@@ -14,6 +14,9 @@ import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.customer.service.GuestBookServiceImpl;
 import com.cbt.customer.service.IGuestBookService;
 import com.cbt.fee.service.IZoneServer;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.cbt.bean.OrderBean;
 import com.cbt.fee.service.ZoneServer;
 import com.cbt.jcys.bean.*;
 import com.cbt.jcys.util.HttpUtil;
@@ -69,6 +72,7 @@ import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -151,6 +155,8 @@ public class WarehouseCtrl {
 	private GeneralReportService generalReportService;
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
+	@Autowired
+	private SendMailFactory sendMailFactory;
 
 	@Autowired
 	private MabangshipmentService mabangshipmentService;
@@ -203,7 +209,7 @@ public class WarehouseCtrl {
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
-		
+
 		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
@@ -7303,6 +7309,28 @@ public class WarehouseCtrl {
 //					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
 			}
+			//发送邮件给客户提示发货
+			for (int i = 0; i < cont; i++) {
+				Map<String, Object> declares = sbxxList.get(i);
+				String orderid = (String) declares.get("orderid");
+				//发送邮件给客户告知已经发货
+				IGuestBookService ibs = new GuestBookServiceImpl();
+				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+				int updateReplyContent=ibs.SendEmailForBatck(ob);
+				Map<String,Object> modelM = new HashedMap();
+				modelM.put("name",ob.getEmail());
+				modelM.put("orderid",orderid);
+				modelM.put("recipients",ob.getRecipients());
+				modelM.put("street",ob.getStreet());
+				modelM.put("street1","");
+				modelM.put("city",ob.getAddress2());
+				modelM.put("state",ob.getStatename());
+				modelM.put("country",ob.getCountry());
+				modelM.put("zipCode",ob.getZipcode());
+				modelM.put("phone",ob.getPhonenumber());
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+			}
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
