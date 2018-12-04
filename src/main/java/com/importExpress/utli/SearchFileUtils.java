@@ -202,6 +202,19 @@ public class SearchFileUtils {
         }
         return boo;
     }
+    /**
+     * 获取文件大小
+     *
+     * @return 返回文件大小
+     */
+    public static Long getImgSize(String fileName) {
+        File file = new File(LOCALPATHZIPIMG, fileName);
+        if (file.exists() && file.isFile()) {
+            return file.length();
+        }
+        return 0L;
+    }
+
 
     /**
      * @param file

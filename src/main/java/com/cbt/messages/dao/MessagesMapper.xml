@@ -286,12 +286,6 @@
 			 left join  paymentconfirm pay on pay.orderno=oi.order_no 
 			WHERE
 				oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
-      AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-      email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-      email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-      email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-      email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-      email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
 		group by order_no
 		
 		) oi 
@@ -310,6 +304,39 @@
 	WHERE
 		oi.state =5 ]]> -->
    </select>
+    <select id="selectOrderessNum"  resultMap="messagesResultMap" parameterType="int">	    
+		  	<!-- select  
+		  	     'ordermessage' as type,
+		          count(o.orderid) as countAll
+			  	  from    orderinfo    o  
+			  	   <if test="adminid != 0">
+				  left  join admin_r_user  aru on  aru.userid=o.user_id 
+				  </if>
+			      where orderremark != ''  and state in(1,2,3,4,5)
+			       <if test="adminid != 0">
+				  	and adminid = #{adminid}
+				  </if> -->
+		SELECT  
+			'ordermessage' as type,
+		(
+			SELECT
+				COUNT(DISTINCT oc.orderNo)
+			FROM
+				order_change oc
+			INNER JOIN order_details od ON oc.orderNo = od.orderid AND oc.goodId = od.goodsid
+			INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
+			WHERE oc.ropType =5 AND od.state IN(0,1) 
+		) AS countAll,
+		(
+			SELECT
+				COUNT(DISTINCT oc.orderNo)
+			FROM
+				order_change oc
+			INNER JOIN order_details od ON oc.orderNo = od.orderid AND oc.goodId = od.goodsid
+			INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
+			WHERE oc.ropType =5 AND oc.del_state = 0 AND od.state IN(0,1) AND oi.state IN (1,5)
+		) AS noArrgCount
+   </select>
    <select id="selectDelOrderessNum"  resultType="Integer" parameterType="int">
 		  	 	select  count(o.orderid)
 			  	  from    orderinfo    o   left join payment pay on pay.orderid=o.order_no
@@ -317,39 +344,10 @@
 				  left  join admin_r_user  aru on  aru.userid=o.user_id 
 				  </if>
 			      where orderremark != '' and (date_add(pay.createtime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)
-       AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-       email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-       email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-       email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-       email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-       email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
 			       <if test="adminid != 0">
 				  	and adminid = #{adminid}
 				  </if>
    </select>
-    <select id="selectOrderessNum"  resultMap="messagesResultMap" parameterType="int">
-        SELECT
-        'ordermessage' as type,
-        (
-        SELECT
-        COUNT(DISTINCT oc.orderNo)
-        FROM
-        order_change oc
-        INNER JOIN order_details od ON oc.orderNo = od.orderid AND oc.goodId = od.goodsid
-        INNER JOIN orderinfo oi	ON oc.orderNo = oi.order_no
-        INNER JOIN admin_r_user a ON od.userid = a.userid
-        WHERE oc.ropType =5 AND oc.del_state = 0 AND od.state IN(0,1) AND oi.state IN (1,5)
-        AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-        email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
-        <if test="adminid != 1 and adminid != 0" >
-            and a.adminid = #{adminid,jdbcType=INTEGER}
-        </if>
-        ) AS noArrgCount
-    </select>
 <!--  <select id="selectOrderessNum"  resultMap="messagesResultMap" >	    
 		  	select  
 		  	     'ordermessage' as type,
@@ -493,74 +491,64 @@
 				type
 		) tab1 ON tab1.type1 = sc.code_value_code
    </select>
-
-    <!--产品单页客户折扣和定制需求(Business inquiries)-->
-    <select id="selectGuestbookNum" resultMap="messagesResultMap" >
-        SELECT
-        'propagemessage' as type,
-        COUNT(1) noDeleteCount
-        FROM
-        guestbook g
-        LEFT JOIN USER u ON g.user_id = u.id
-        LEFT JOIN admin_r_user au ON u.email = au.useremail
-        WHERE
-        g.status = 0
-        AND g.questionType = 2
-        <if test="adminid != 1 and adminid != 0" >
-            AND g.user_id IN (
-            SELECT
-            userid
-            FROM
-            admin_r_user aru,
-            guestbook gb
-            WHERE
-            aru.userid = gb.user_id
-            AND aru.adminid = #{adminid,jdbcType=INTEGER}
-            )
-        </if>
-    </select>
-
-    <!--购物车&支付页面问题统计(ask here)-->
-    <select id="selectCustomerInfoCollectionNum" resultMap="messagesResultMap" >
-        SELECT
-        'customerInfoCollection' as type,
-        COUNT(1) noDeleteCount
-        FROM
-        problem_report,
-        admin_r_user
-        WHERE
-        problem_report.email = admin_r_user.useremail
-        AND (
-        reply_content IS NULL
-        OR reply_content = ''
-        )
-        <if test="adminid != 1 and adminid != 0" >
-            and admin_r_user.adminid = #{adminid,jdbcType=INTEGER}
-        </if>
-    </select>
-
-    <!--产品单页用户留言(Customer Questions & Answers)-->
-    <select id="selectQuestionNum" resultMap="messagesResultMap" >
-        SELECT
-        'questionnum' as type,
-        COUNT(1) noDeleteCount
-        FROM
-        question_answer q
-        LEFT JOIN custom_benchmark_ready c ON q.pid = c.pid
-        LEFT JOIN admuser b ON q.reply_name = b.id
-        LEFT JOIN admin_r_user a ON q.userid = a.userid
-        LEFT JOIN admuser ad ON a.adminid = ad.id
-        WHERE
-        q.is_delete = 0
-        AND (
-        q.reply_name IS NULL
-        OR q.reply_name = ''
-        )
-        <if test="adminid != 1 and adminid != 0" >
-            and ad.id=#{adminid,jdbcType=INTEGER}
-        </if>
-    </select>
-
+   
+   
+   <select id="selectGuestbookNum" resultMap="messagesResultMap" >
+		<!--  SELECT
+			'propagemessage' as type,
+			count(gb.id) countAll,
+      		ifnull(sum(IF(gbk.status=0,1,0)),0) noDeleteCount
+		from guestbook gb
+			left join guestbook gbk ON gb.id=gbk.id
+			AND gbk.STATUS = 0 where -->
+			SELECT
+				'propagemessage' as type,
+				COUNT(1) countAll,
+				COUNT(DISTINCT user_id) as noDeleteCount
+			FROM
+				guestbook gb
+			WHERE gb.`status` = 0
+			and gb.user_id IN (
+				SELECT
+					userid
+				FROM
+					admin_r_user aru,
+					guestbook gb
+				WHERE
+					aru.userid = gb.user_id
+				AND aru.adminid = 18
+			)
+			and
+			<if test="adminid == 1 or adminid == 0" >
+			   gb.create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+			</if>
+		<if test="adminid != 1 and adminid != 0" >
+			  gb.user_id in(select aru.userid from admin_r_user aru,guestbook gu where aru.userid=gu.user_id
+			  and aru.adminid=#{adminid,jdbcType=INTEGER})
+			  and  gb.create_time >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+		 </if> 
+   </select>
+   <select id="selectCustomerInfoCollectionNum" resultMap="messagesResultMap" >
+		SELECT
+			'customerInfoCollection' as type,
+			COUNT(1) countAll,
+			COUNT(DISTINCT uid) as noDeleteCount
+		FROM
+			problem_report a,admin_r_user b
+		WHERE a.email = b.useremail 
+		  AND (a.reply_content is null or a.reply_content = '')
+		  AND date(a.createtime) >= date(DATE_SUB(NOW(), INTERVAL 30 DAY))
+   </select>
+   <select id="selectQuestionNum" resultMap="messagesResultMap" >
+		SELECT
+			'questionnum' as type,
+			COUNT(1) countAll,
+			COUNT(DISTINCT userid) as noDeleteCount
+		FROM
+			question_answer
+		WHERE is_delete=0 and reply_status=1
+		AND date(create_time) >= date(DATE_SUB(NOW(), INTERVAL 30 DAY))
+   </select>
    <select id="selectSystemFailure" parameterType="com.cbt.messages.vo.MessagesCountVo" resultMap="messagesResultMap">
        SELECT 'systemfailure' AS TYPE,COUNT(DISTINCT pri.orderid)  AS noDeleteCount FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0
    </select>
@@ -591,7 +579,7 @@
 		</if>
 		) countAll  ,
 		(SELECT count(*) from preferential_application 
-		<if test="adminid == 1 or adminid == 83 or adminid == 84">
+		<if test="adminid == 1 or adminid == 83">
 			where state=0 
 		</if>
 		<if test="adminid != 1">
@@ -599,7 +587,7 @@
 			and aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		) noDeleteCount
-		<if test="adminid==1 or adminid==83 or adminid==84">
+		<if test="adminid==1 or adminid==83">
 		, (SELECT count(*) from preferential_application pa left JOIN admin_r_user aru on pa.userid=aru.userid where aru.adminid is null ) noArrgCount
 		</if>
 			
@@ -608,16 +596,16 @@
 	   SELECT
 			prea.status state,
 			count(prea.id) countAll,
-			<if test="adminid == 1 or adminid == 83 or adminid == 84">
+			<if test="adminid == 1 or adminid == 83">
 			sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noArrgCount
 			</if>
-			<if test="adminid != 1 and adminid != 83 and adminid != 84" >
+			<if test="adminid != 1 and adminid != 83" >
 				sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	0	ELSE 1	END	)) noDeleteCount
 			</if>
 		FROM
 			busiess prea
 		LEFT JOIN admin_r_user aru ON prea.email = aru.useremail
-		<if test="adminid != 1 and adminid != 83 and adminid != 84" >
+		<if test="adminid != 1 and adminid != 83" >
 		  AND aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		GROUP BY

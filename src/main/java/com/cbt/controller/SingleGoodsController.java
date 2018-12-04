@@ -374,7 +374,7 @@ public class SingleGoodsController {
         for (ConfirmUserInfo userInfo : admList) {
             String userName = userInfo.getConfirmusername();
             if (userInfo.getRole() == 0) {
-                if (userName.equalsIgnoreCase("Ling") || userName.equalsIgnoreCase("emmaxie") || userName.equalsIgnoreCase("admin1")) {
+                if (userName.equalsIgnoreCase("Ling") || userName.equalsIgnoreCase("emmaxie")) {
                     allAdms.add(userInfo);
                 } else if (userName.equalsIgnoreCase("testAdm")) {
                     allAdms.add(userInfo);

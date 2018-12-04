@@ -24,8 +24,6 @@ import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
@@ -1893,7 +1891,7 @@ public class OrderwsDao implements IOrderwsDao {
     @Override
     public List<OrderBean> getListOrders(String orderNo) {
 
-        String sql = "SELECT order_no,pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
+        String sql = "SELECT order_no,if(memberFee>=10,pay_price-memberFee,pay_price) as pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
                 + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
@@ -2545,14 +2543,9 @@ public class OrderwsDao implements IOrderwsDao {
 //        }
 //        return result;
     	//更新线上数据改为mq方式
-    	try{
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel("update orderinfo set state="+ orderStatus +" where order_no='" + orderNo + "'"));
-            sendMQ.closeConn();
-        }catch (Exception e){
-    	    e.printStackTrace();
-        }
-    	return 1;
+    	String sql = "update orderinfo set state="+ orderStatus +" where order_no='" + orderNo + "'";
+    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+    	return sendMQ.runSqlOnline(orderNo, sql);
     }
 
     @Override
@@ -2579,14 +2572,9 @@ public class OrderwsDao implements IOrderwsDao {
 //        }
 //        return result;
         //更新线上数据改为mq方式
-        try{
-            String sql = "update orderinfo set state =2 where order_no='" + orderNo + "' and ( select count(id) from order_details where orderid=order_no and state=0)=0";
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    	return 1;
+    	String sql = "update orderinfo set state =2 where order_no='" + orderNo + "' and ( select count(id) from order_details where orderid=order_no and state=0)=0";
+    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+    	return sendMQ.runSqlOnline(orderNo, sql);
     }
 
     @Override
@@ -2605,10 +2593,8 @@ public class OrderwsDao implements IOrderwsDao {
 //            stmt1.setString(1, orderNo);
 //            result = stmt1.executeUpdate();
             //更新线上数据改为mq方式
-        	SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel("update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0"));
-//        	return sendMQ.runSqlOnline(orderNo, "update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0");
-            sendMQ.closeConn();
+        	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+        	return sendMQ.runSqlOnline(orderNo, "update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -6122,7 +6108,7 @@ public class OrderwsDao implements IOrderwsDao {
         double es_price=0.00;
         double weight=0.00;
         try{
-            String sql="SELECT cast(oi.pay_price*if(oi.exchange_rate<=0,6.3,oi.exchange_rate) as decimal(10,2)) AS pay_price," +
+            String sql="SELECT cast(if(oi.memberFee>=10,oi.pay_price-oi.memberFee,oi.pay_price)*if(oi.exchange_rate<=0,6.3,oi.exchange_rate) as decimal(10,2)) AS pay_price," +
                     "SUM(ops.goods_p_price*ops.buycount) as sumPrice,COUNT(DISTINCT od.goods_pid)*5 as pidAmount FROM orderinfo oi " +
                     " INNER JOIN order_details od ON oi.order_no=od.orderid" +
                     " LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid" +
