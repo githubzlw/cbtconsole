@@ -54,4 +54,8 @@ public interface QueryUserMapper {
 
 	AuthInfo queryAuthInfo(@Param("authId") Integer authId);
 
+    String queryAvailable(@Param("email") String email);
+
+    long updateAvailable(@Param("email") String email, @Param("available") Double available);
+
 }

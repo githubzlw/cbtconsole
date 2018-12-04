@@ -58,5 +58,33 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	int updateStatus(String disputeId,String status);
+	/**获取申诉退款信息
+	 * @param disputeid
+	 * @return
+	 */
+	CustomerDisputeBean getComfirmByDisputeID(String disputeid);
+	
+	/**拒绝退款更新
+	 * @param disputeid
+	 * @param refuseReason
+	 * @return
+	 */
+	Integer updateRefuseReason(String disputeid,String refuseReason);
+	
+	
+	/**退款成功
+	 * @param refundedAmount
+	 * @param state
+	 * @return
+	 */
+	Integer updateRefund(String disputeid,String refundedAmount);
+	
+	/**更新mongodb
+	 * @param disputeId
+	 * @param admId
+	 * @return
+	 */
+	long updateMessage(String disputeId);
+	
 	
 }

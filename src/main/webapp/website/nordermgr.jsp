@@ -51,7 +51,7 @@ function fn(va) {
 	var strRoletype =<%=request.getAttribute("strm")%>;
 	 var strAdmid = <%=request.getAttribute("strname")%>;
 	 var adminName = '<%=request.getAttribute("admName")%>';
-	 getAllAdmuser(strm,strname,adminName);
+	 getAllAdmuser(strm,strname,adminName);	
 	 var admid=<%=uid%>;
 	var json = <%=request.getAttribute("orderws")%>;
 	var intadmid;

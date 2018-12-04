@@ -426,14 +426,13 @@ public class MessagesController {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		String admName = adm.getAdmname();
-		int roleType=adm.getRoletype();
 		Complain t = new Complain();
 		t.setComplainState(0);
 		Page<ComplainVO> page = new Page<ComplainVO>();
 		page.setCurrentPage(1);
 		page.setStartIndex(1);
 
-		page = complainService.searchComplainByParam(t, null, page, admName,roleType);
+		page = complainService.searchComplainByParam(t, null, page, admName);
 		if (page.getList() == null) {
 			json.setOk(false);
 		} else {
@@ -446,12 +445,15 @@ public class MessagesController {
 	}
 
 	@RequestMapping(value = "/getBusiess")
-	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav, @Param("status") int status,
-                                   @Param("adminid") int adminid) throws ParseException {
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav,
+                                   @RequestParam(value = "status", required = false, defaultValue = "0") int status,
+                                   @RequestParam(value = "state", required = false, defaultValue = "-1") int state,
+                                   @RequestParam("adminid") int adminid) throws ParseException {
+		/*String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		adminid = adm.getId();
+		adminid = adm.getId();*/
 		mav.addObject("status", status);
+		mav.addObject("state", state);
 		mav.addObject("adminid", adminid);
 		//负责人列表
         List<Admuser> admuserLis = admuserService.selectAdmuser();

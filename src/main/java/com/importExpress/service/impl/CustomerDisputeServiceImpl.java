@@ -18,11 +18,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.importExpress.mapper.AdminRUserMapper;
 import com.importExpress.mapper.CustomerDisputeMapper;
-import com.importExpress.mapper.UserNewMapper;
 import com.importExpress.pojo.AdminRUser;
-import com.importExpress.pojo.AdminRUserExample;
-import com.importExpress.pojo.AdminRUserExample.Criteria;
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
@@ -33,8 +31,6 @@ import com.stripe.net.APIResource;
 public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
-	@Autowired
-	private UserNewMapper userNewMapper;
 	@Autowired
 	private CustomerDisputeMapper customerDisputeMapper;
 	@Autowired
@@ -62,13 +58,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 //		BasicDBObject s = new BasicDBObject("create_time",-1);
 		List<String> documents = 
 				instance.findAny("data",q,null);
-		List<CustomerDisputeBean> list = new ArrayList<CustomerDisputeBean>();
-		CustomerDisputeBean bean ;
+		List<CustomerDisputeVO> list = new ArrayList<CustomerDisputeVO>();
+		CustomerDisputeVO bean ;
 		long total = 0L;
 		List<String> filter = new ArrayList<String>();
 		try {
 	    	for(String content : documents) {
-	    		bean = new CustomerDisputeBean();
+	    		bean = new CustomerDisputeVO();
 	    		if(StringUtils.indexOf(content,"dispute_id") > -1) {
 	    			JSONObject document = JSONObject.parseObject(content);
 	    			JSONObject  resource = (JSONObject)document.get("resource");
@@ -81,7 +77,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setValue(disputeAmount.getString("value") + disputeAmount.getString("currency_code"));
 	    			bean.setReason(resource.getString("reason"));
 	    			bean.setStatus(resource.getString("status"));
-	    			bean.setType("Paypal");
+	    			bean.setApiType("Paypal");
 	    			JSONArray disputedTransactions = (JSONArray)resource.get("disputed_transactions");
 	    			JSONObject disputedTransaction = (JSONObject)disputedTransactions.get(0);
 	    			JSONObject seller = (JSONObject)disputedTransaction.get("seller");
@@ -115,7 +111,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
                     bean.setUpdateTime(sdf.format(dispute.getCreated() * 1000L));
                     bean.setReason(dispute.getReason());
 	    			bean.setStatus(dispute.getStatus());
-	    			bean.setType("stripe");
+	    			bean.setApiType("stripe");
 	    			list.add(bean);
 	    		}
 				
@@ -147,41 +143,39 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    				c.setOprateAdm(adminRUser.getAdmname());
 	    			}
 	    		});
-	    		
-	    		long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
-		    	
-		    	long etimeTemp = 0L;
-				if(StringUtils.isNotBlank(endTime)) {
-					etimeTemp  = sdf.parse(endTime).getTime();
-		    	}else {
-		    		Calendar rightNow = Calendar.getInstance();
-		    		rightNow.setTime(new Date());
-		    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
-		    		etimeTemp = rightNow.getTime().getTime();
-		    	}
-		    	long etime = etimeTemp;
-		    	
-		    	list = list.stream().filter(b->{
-		    		if(filter.contains(b.getDisputeID())) {
-		    			return false;
-		    		}else {
-		    			filter.add(b.getDisputeID());
-		    			boolean fl = true;
-		    			if(StringUtils.isNotBlank(disputeID)) {
-		    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
-		    			}
-		    			if(StringUtils.isNotBlank(status)) {
-		    				fl = fl && StringUtils.equals(b.getStatus(), status);
-		    			}
-		    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
-		    		}
-		    	}).collect(Collectors.toList());
-		    	
-		    	total = list.stream().count();
-		    			
-		    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
-		    	
 	    	}
+	    	long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
+	    	
+	    	long etimeTemp = 0L;
+	    	if(StringUtils.isNotBlank(endTime)) {
+	    		etimeTemp  = sdf.parse(endTime).getTime();
+	    	}else {
+	    		Calendar rightNow = Calendar.getInstance();
+	    		rightNow.setTime(new Date());
+	    		rightNow.add(Calendar.DAY_OF_YEAR,1);//日期加1天
+	    		etimeTemp = rightNow.getTime().getTime();
+	    	}
+	    	long etime = etimeTemp;
+	    	
+	    	list = list.stream().filter(b->{
+	    		if(filter.contains(b.getDisputeID())) {
+	    			return false;
+	    		}else {
+	    			filter.add(b.getDisputeID());
+	    			boolean fl = true;
+	    			if(StringUtils.isNotBlank(disputeID)) {
+	    				fl = StringUtils.equals(b.getDisputeID(), disputeID); 
+	    			}
+	    			if(StringUtils.isNotBlank(status)) {
+	    				fl = fl && StringUtils.equals(b.getStatus(), status);
+	    			}
+	    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
+	    		}
+	    	}).collect(Collectors.toList());
+	    	
+	    	total = list.stream().count();
+	    	
+	    	list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
 	    	
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -214,10 +208,6 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public int confirm(CustomerDisputeBean customer) {
 		
 		return customerDisputeMapper.insert(customer);
-		/*if(customerDisputeMapper.count(customer.getDisputeID()) == 0) {
-		}else {
-			return customerDisputeMapper.update(customer);
-		}*/
 	}
 	@Override
 	public int count(String disputeID,String status) {
@@ -233,6 +223,32 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public int updateStatus(String disputeId, String status) {
 		// TODO Auto-generated method stub
 		return customerDisputeMapper.updateStatus(disputeId, status);
+	}
+	@Override
+	public CustomerDisputeBean getComfirmByDisputeID(String disputeid) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.getComfirmByDisputeID(disputeid);
+	}
+	@Override
+	public Integer updateRefuseReason(String disputeid, String refuseReason) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateRefuseReason(disputeid, refuseReason);
+	}
+	@Override
+	public Integer updateRefund(String disputeid, String refundedAmount) {
+		// TODO Auto-generated method stub
+		return customerDisputeMapper.updateRefund(disputeid, refundedAmount);
+	}
+	@Override
+	public long updateMessage(String disputeId) {
+		MongoDBHelp instance = MongoDBHelp.INSTANCE;
+		BasicDBObject filter = new BasicDBObject();
+		filter.put("resource_type", "dispute");
+		filter.put("resource.dispute_id", disputeId);
+		BasicDBObject update = new BasicDBObject("$set",new BasicDBObject("isRead",true));
+		long result = instance.update("data", filter, update ); 
+		
+		return result;
 	}
 
 }
