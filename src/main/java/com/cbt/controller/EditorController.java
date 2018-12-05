@@ -213,7 +213,11 @@ public class EditorController {
             if (goods.getSoldFlag() > 0) {
                 //先取range_price 为空则再取feeprice
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if(goods.getRangePrice().contains("-")){
+                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    }else{
+                        singlePriceStr = goods.getRangePrice().trim();
+                    }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
                     if (singlePriceStr.contains("\\$")) {
@@ -227,7 +231,11 @@ public class EditorController {
             } else {
                 //先取range_price 为空则wprice 再为空取price
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if(goods.getRangePrice().contains("-")){
+                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    }else{
+                        singlePriceStr = goods.getRangePrice().trim();
+                    }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
                     if (singlePriceStr.contains("\\$")) {
@@ -241,7 +249,7 @@ public class EditorController {
                     singlePriceStr = goods.getPrice();
                 }
             }
-            singlePriceStr = singlePriceStr.replace("]", "");
+            singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
             //获取1piece的最高价格
             if (singlePriceStr.contains("-")) {
                 singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
