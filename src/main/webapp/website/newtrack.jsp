@@ -328,7 +328,7 @@
 	<div class="mod_pay6" style="display: none;" id="big_img">
 
 	</div>
-	<%  if(!(adm.getId() ==1 || adm.getAdmName().equalsIgnoreCase("Ling") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("kara") || adm.getAdmName().equalsIgnoreCase("admin1"))){%>
+	<%  if(!"0".equals(adm.getRoletype())){%>
 	<!-- 载入消息提醒jsp页面 -->
 	<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>

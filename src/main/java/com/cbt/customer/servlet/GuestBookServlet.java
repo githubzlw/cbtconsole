@@ -145,7 +145,7 @@ public class GuestBookServlet extends HttpServlet {
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		int adminid = adm.getId();
 		//临时增加Sales1账号查看所有客户留言权限
-		if(adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("admin1") || adm.getAdmName().equalsIgnoreCase("kara")){
+		if(adm.getRoletype() == 0){
 			adminid =1;
 		}
 		try {

@@ -134,7 +134,7 @@
     <div class="span_div" style="text-align: left;">
 
         <span style="margin-left: 100px;"><a href="/cbtconsole/refundss/rlist" target="_blank">未匹配用户申诉记录</a></span>
-        <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling' || operatorName=='admin1' || operatorName=='kara')}">
+        <c:if test="${roleType == '0' }">
             <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})" value="二次验证密码" class="btn_sty"></span>
         </c:if>
         <span class="sp_style ${chooseState == -1 ? ' is_choose':''}" onclick="changeAndQuery(-1)">全部</span>

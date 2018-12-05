@@ -345,7 +345,7 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
-        <if test="adminid != 1 and adminid != 0" >
+        <if test=" adminid != 0" >
             and a.adminid = #{adminid,jdbcType=INTEGER}
         </if>
         ) AS noArrgCount
@@ -506,7 +506,7 @@
         WHERE
         g.status = 0
         AND g.questionType = 2
-        <if test="adminid != 1 and adminid != 0" >
+        <if test="adminid != 0" >
             AND g.user_id IN (
             SELECT
             userid
@@ -534,7 +534,7 @@
         reply_content IS NULL
         OR reply_content = ''
         )
-        <if test="adminid != 1 and adminid != 0" >
+        <if test="adminid != 0" >
             and admin_r_user.adminid = #{adminid,jdbcType=INTEGER}
         </if>
     </select>
@@ -556,7 +556,7 @@
         q.reply_name IS NULL
         OR q.reply_name = ''
         )
-        <if test="adminid != 1 and adminid != 0" >
+        <if test="adminid != 0" >
             and ad.id=#{adminid,jdbcType=INTEGER}
         </if>
     </select>
@@ -591,7 +591,7 @@
 		</if>
 		) countAll  ,
 		(SELECT count(*) from preferential_application 
-		<if test="adminid == 1 or adminid == 83 or adminid == 84">
+		<if test="adminid == 1 ">
 			where state=0 
 		</if>
 		<if test="adminid != 1">
@@ -599,7 +599,7 @@
 			and aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		) noDeleteCount
-		<if test="adminid==1 or adminid==83 or adminid==84">
+		<if test="adminid==1">
 		, (SELECT count(*) from preferential_application pa left JOIN admin_r_user aru on pa.userid=aru.userid where aru.adminid is null ) noArrgCount
 		</if>
 			
@@ -608,16 +608,16 @@
 	   SELECT
 			prea.status state,
 			count(prea.id) countAll,
-			<if test="adminid == 1 or adminid == 83 or adminid == 84">
+			<if test="adminid == 0">
 			sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	1	ELSE 0	END	)) noArrgCount
 			</if>
-			<if test="adminid != 1 and adminid != 83 and adminid != 84" >
+			<if test="adminid != 0" >
 				sum((CASE IFNULL(aru.id, 0)WHEN 0 THEN	0	ELSE 1	END	)) noDeleteCount
 			</if>
 		FROM
 			busiess prea
 		LEFT JOIN admin_r_user aru ON prea.email = aru.useremail
-		<if test="adminid != 1 and adminid != 83 and adminid != 84" >
+		<if test="adminid != 0" >
 		  AND aru.adminid = #{adminid,jdbcType=INTEGER}
 		</if>
 		GROUP BY

@@ -905,7 +905,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && !"emmaxie".equals(adm) && !"kara".equals(adm) && !"admin1".equals(adm)?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && adm.getRoletype() != 0?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
