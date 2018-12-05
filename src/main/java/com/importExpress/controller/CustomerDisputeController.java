@@ -645,7 +645,9 @@ public class CustomerDisputeController {
     			c.setAmount(c.getSellerOfferedAmount()+" "+c.getCurrencyCode());
     			c.setAdminRolyType(adm.getRoletype());
     			if(StringUtils.equals(c.getStatus(), "-1")) {
-    				c.setRemark("Send Message To Buyer:"+c.getRemark()+"<br><br>Refuse Reason:"+c.getRefuseReason());
+    				c.setRemark("Send Message To Buyer:"+c.getRemark()+"<br><br>(内部查看)Refuse Reason:"+c.getRefuseReason());
+    			}else {
+    				c.setRemark("Send Message To Buyer:"+c.getRemark());
     			}
     		});
     		
@@ -701,11 +703,11 @@ public class CustomerDisputeController {
     	String currencyCode = comfirmByDisputeID.getCurrencyCode();
     	
     	boolean isPremint = Double.valueOf(offerAmount)<500.0099999;
-    	if(adm.getId() != 8 || !(adm.getId() == 1 && isPremint) || !(adm.getId() == 71 && isPremint) || adm.getId() != 18) {
-        	result.put("state", false);
+    	if(!((adm.getId() == 1 && isPremint)||(adm.getId() == 8 && isPremint)||(adm.getId()==83))) {
+    		result.put("state", false);
     		result.put("message", "该用户没有权限退款，请重新登录");
         	return  result;
-        }
+    	}
     	try {
     		String invoice_id = comfirmByDisputeID.getTransactionID();
     		if(StringUtils.isBlank(content)) {
@@ -776,11 +778,12 @@ public class CustomerDisputeController {
     		result.put("message", "没有权限退款，请重新登录");
         	return  result;
     	}
-    	if(adm.getId() != 8 || adm.getId() != 1  || adm.getId() != 71 || adm.getId() != 18) {
-        	result.put("state", false);
-    		result.put("message", "该用户没有权限退款，请重新登录");
+        if(!(adm.getId() == 1||adm.getId() == 8||adm.getId()==83)) {
+    		result.put("state", false);
+    		result.put("message", "该用户没有权限操作，请重新登录");
         	return  result;
-        }
+    	}
+    	
     	String disputeid = request.getParameter("disputeid");
     	String refuseReason = request.getParameter("reason");
     	if(StringUtils.isBlank(disputeid) || StringUtils.isBlank(refuseReason)) {
