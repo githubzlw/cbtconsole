@@ -683,21 +683,24 @@ public class SingleGoodsController {
             queryPm.setStartNum(startNum);
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
 
-            if(!(res == null || res.isEmpty())){
+            if(!(res == null || res.isEmpty())) {
                 List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
-                if(!(pids == null || pids.isEmpty())){
-                    boolean isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                boolean isSuccess = false;
+                if (!(pids == null || pids.isEmpty())) {
+                    isSuccess = sgGsService.deleteSingleOffersByPids(pids);
                     pids.clear();
-                    if(isSuccess){
-                        for(SingleGoodsCheck goodsCheck : res){
-                            if(goodsCheck.getIsPass() == 0){
-                                sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
-                            }
+                } else {
+                    isSuccess = true;
+                }
+                if (isSuccess) {
+                    for (SingleGoodsCheck goodsCheck : res) {
+                        if (goodsCheck.getIsPass() == 0) {
+                            sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
                         }
-                    }else{
-                        json.setOk(false);
-                        json.setMessage("执行失败，请重试");
                     }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("执行失败，请重试");
                 }
                 res.clear();
             }
@@ -747,21 +750,25 @@ public class SingleGoodsController {
             if("0".equals(type)){
                 //全过
                 if(!(res == null || res.isEmpty())) {
+                    boolean isSuccess = false;
                     List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
                     if (!(pids == null || pids.isEmpty())) {
-                        boolean isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                        isSuccess = sgGsService.deleteSingleOffersByPids(pids);
                         pids.clear();
-                        if (isSuccess) {
-                            for (SingleGoodsCheck goodsCheck : res) {
-                                if (goodsCheck.getIsPass() == 0) {
-                                    sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
-                                }
-                            }
-                        }else{
-                            json.setOk(false);
-                            json.setMessage("执行失败，请重试");
-                        }
+                    } else {
+                        isSuccess = true;
                     }
+                    if (isSuccess) {
+                        for (SingleGoodsCheck goodsCheck : res) {
+                            if (goodsCheck.getIsPass() == 0) {
+                                sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                            }
+                        }
+                    } else {
+                        json.setOk(false);
+                        json.setMessage("执行失败，请重试");
+                    }
+                    res.clear();
                 }
             }else if("1".equals(type)){
                 //全否
