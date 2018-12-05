@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>交易号退款</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script>
+        function refundByPayNo() {
+            $("#show_notice").text("正在执行退款，请等待...");
+            var payNo = $("#pay_no").val();
+            var payType = $("#pay_type").val();
+            var refundAmount = $("#refund_amount").val();
+            var adminId = $("#admin_id").val();
+            var validPassWord = $("#second_valid_pwd").val();
+            var remark = $("#remark").val();
+
+            if (payNo == null || payNo == "") {
+                alert("请输入交易号");
+                return false
+            }
+            if (validPassWord == null || validPassWord == "") {
+                alert("请输入验证密码");
+                return false
+            }
+            if (remark == null || remark == "") {
+                alert("请输入备注");
+                return false
+            }
+            $("#show_notice").show();
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/refundCtr/refundByPayNo',
+                data: {
+                    payNo: payNo,
+                    payType: payType,
+                    refundAmount: refundAmount,
+                    adminId: adminId,
+                    validPassWord: validPassWord,
+                    remark: remark
+                },
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+
+                    if (json.ok) {
+                        $("#show_notice").css("color", "green");
+                        $("#show_notice").text("执行成功，退款交易号：" + json.data);
+                        //alert("执行成功，退款交易号：" + json.data);
+                    } else {
+                        $("#show_notice").text(json.message);
+                        //alert(json.message);
+                    }
+                },
+                error: function () {
+                    $("#show_notice").text("执行失败,请联系管理员");
+                    //alert("执行失败,请联系管理员");
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .btn {
+            width: 140px;
+            height: 30px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div id="div_second_valid">
+    <table style="border-color: #99e86c;" border="1" cellpadding="1" cellspacing="0" align="center">
+        <caption id="set_title" style="font-size: 18px;">进行交易号退款</caption>
+        <tr>
+            <td>类型:</td>
+            <td><select id="pay_type" style="width: 260px;height: 28px;">
+                <option value="1" selected="selected">PayPal</option>
+                <option value="2">Stripe</option>
+            </select>
+        </tr>
+        <tr>
+            <td>交易号:</td>
+            <td><input type="text" id="pay_no" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>退款金额:</td>
+            <td><input type="number" id="refund_amount" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>用户:</td>
+            <td><select id="admin_id" style="width: 260px;;height: 28px;">
+                <option value="1" selected="selected">Ling</option>
+                <option value="8">Mandy</option>
+                <option value="83">EmmaXie</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>验证密码:</td>
+            <td><input type="password" id="second_valid_pwd" value="" style="width: 260px;;height: 28px;"/></td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td><textarea id="remark" style="width: 260px;height: 80px;"></textarea></td>
+        </tr>
+        <tr style="text-align: center">
+            <td colspan="2"><input type="button" class="btn" value="确定" onclick="refundByPayNo()"/>
+                <span id="show_notice" style="display: none;color: red;">正在执行退款，请等待...</span>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>

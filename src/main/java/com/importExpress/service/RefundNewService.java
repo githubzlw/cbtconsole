@@ -5,6 +5,7 @@ import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.PaymentDetails;
 import com.importExpress.pojo.RefundDetailsBean;
 import com.importExpress.pojo.RefundNewBean;
+import com.importExpress.pojo.RefundResultInfo;
 
 import java.util.List;
 
@@ -104,4 +105,17 @@ public interface RefundNewService {
      */
     List<PaymentDetails> queryPaymentInfoByOrderNoOrUserId(int userId, String orderNo);
 
+    /**
+     * 分页查询退款结果数据
+     * @param resultInfo
+     * @return
+     */
+    List<RefundResultInfo> queryForRefundResultList(RefundResultInfo resultInfo);
+
+    /**
+     * 查询款结果数据总数
+     * @param resultInfo
+     * @return
+     */
+    int queryForRefundResultListCount(RefundResultInfo resultInfo);
 }

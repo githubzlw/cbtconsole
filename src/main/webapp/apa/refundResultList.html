@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API退款结果列表</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #refund_result_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #refund_result_top_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        .enter_btn {
+            width: 140px;
+            height: 30px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+        });
+
+        function setDatagrid() {
+            $('#refund_result_easyui-datagrid').datagrid({
+                title: 'API退款结果列表',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#refund_result_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/refundCtr/queryForRefundResultList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 50,//默认选择的分页是每页50行数据
+                pageList: [50, 100],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+
+
+        function doQuery() {
+            var orderNo = $("#query_order_no").val();
+            if (orderNo == null || orderNo == "") {
+                orderNo = "";
+            }
+            var userId = $("#query_user_id").val();
+            if (userId == null || userId == "") {
+                userId = "";
+            }
+            var refundId = $("#query_refund_id").val();
+            if (refundId == null || refundId == "") {
+                refundId = "";
+            }
+            var saleId = $("#query_sale_id").val();
+            if (saleId == null || saleId == "") {
+                saleId = "";
+            }
+            $("#refund_result_easyui-datagrid").datagrid("load", {
+                "orderNo": orderNo,
+                "userId": userId,
+                "refundId": refundId,
+                "saleId": saleId
+            });
+        }
+
+    </script>
+
+</head>
+<body>
+
+
+<div id="refund_result_top_toolbar" style="padding: 5px; height: auto">
+    <form id="refund_result_query_form" action="#" onsubmit="return false;">
+        <span> 客户ID: <input type="text" id="query_user_id"
+                            style="width: 100px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span> 订单号: <input type="text" id="query_order_no"
+                           style="width: 180px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+
+        <span> 退款成功ID: <input type="text" id="query_refund_id"
+                            style="width: 180px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span> 原订单交易号: <input type="text" id="query_sale_id"
+                              style="width: 180px; height: 24px" value=""/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
+                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="refund_result_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userid',align:'center',width:'120px'">客户ID</th>
+        <th data-options="field:'orderno',align:'center',width:'150px'">订单号</th>
+        <th data-options="field:'refundid',align:'center',width:'150px'">退款成功ID</th>
+        <th data-options="field:'amountTotal',align:'center',width:'100px'">退款金额(USD)</th>
+        <th data-options="field:'state',align:'center',width:'200px'">退款状态</th>
+        <th data-options="field:'saleId',align:'center',width:'120px'">原订单交易号</th>
+        <th data-options="field:'createTime',align:'center',width:'150px'">创建时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+</body>
+</html>
