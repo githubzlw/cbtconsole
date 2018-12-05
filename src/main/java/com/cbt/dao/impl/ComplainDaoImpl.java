@@ -268,7 +268,7 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public List<ComplainFile> getImgsByCid(Integer complainId) {
-		String sql="SELECT cf.imgUrl from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
+		String sql="SELECT group_concat(cf.imgUrl) from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
