@@ -228,7 +228,6 @@
     			url:'/cbtconsole/customer/dispute/refuse',
     			data:{disputeid:disputeid,reason:refusereason},
     			success:function(res){
-    				alert(res);
     				alert(res.message);
     				window.location.href  ="/cbtconsole/apa/disputerefund.html";
     			},
@@ -271,7 +270,7 @@ style="border:3px solid #00F;width: 300px;z-index: 99999;position: absolute;marg
 <br>
 <span>事件号:<input type="text" style="width: 230px;" id="form_dispute_refuse" value="" name="disputeid" readonly="readonly"></span>
 <br>
-<span><span>备&nbsp;&nbsp;&nbsp;注:</span><input type="text" style="width: 230px;height:100px;    margin-left: 2px;"  id="form_dispute_refuse_reason" name="reason"></span>
+<span><span>备&nbsp;&nbsp;&nbsp;注:</span><input type="text" style="width: 230px;height:100px;    margin-left: 2px;"  id="form_dispute_refuse_reason" name="reason" placeholder="可输入中文(内部查看)"></span>
 <br>
 <input style="margin-left: 50px;width: 110px;" type="submit" value="submit" onclick="cfuse()">
 <input style="margin-left: 20px;width: 110px;" type="submit" value="cancel" onclick="closeform()">
