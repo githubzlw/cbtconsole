@@ -288,6 +288,10 @@ public class NewOrderDetailsCtr {
 			// 实际运费
 			Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
 			request.setAttribute("actual_ffreight_", actual_ffreight_);
+			request.setAttribute("foreign_freight", StringUtil.isNotBlank(orderInfo.getForeign_freight())?Double.parseDouble(orderInfo.getForeign_freight()):0.00);
+			request.setAttribute("service_fee",StringUtil.isNotBlank(orderInfo.getService_fee())?Double.parseDouble(orderInfo.getService_fee()):0.00);
+			request.setAttribute("actual_lwh",StringUtil.isNotBlank(orderInfo.getActual_lwh())?Double.parseDouble(orderInfo.getActual_lwh()):0.00);
+			request.setAttribute("firstdiscount",StringUtil.isNotBlank(orderInfo.getFirstdiscount())?Double.parseDouble(orderInfo.getFirstdiscount()):0.00);
 			// service_fee是从数据表读取的
 			request.setAttribute("service_fee", Utility.getIsDouble(orderInfo.getService_fee())? Double.parseDouble(orderInfo.getService_fee()) : 0);
 			request.setAttribute("cashback", orderInfo.getCashback());
@@ -365,6 +369,9 @@ public class NewOrderDetailsCtr {
 				}
 			}
 			double sale =orderInfo.getPay_price() * rate;
+			if(orderInfo.getMemberFee()>10){
+				sale-=orderInfo.getMemberFee();
+			}
 			double buy = 0.0;
 			double volume = 0.0;
 			double weight = 0.0;

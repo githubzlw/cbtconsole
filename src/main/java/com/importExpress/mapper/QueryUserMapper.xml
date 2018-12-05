@@ -93,7 +93,7 @@
     	SELECT 
 		concat(<![CDATA[ "https://www.import-express.com/simulateLogin/login?userName=" ]]>, a.user_id, <![CDATA[ "&password=" ]]>, tem.name, <![CDATA[ "&total=" ]]>, a.total, <![CDATA[ "&currency=USD" ]]>) loginurl 
 		FROM
-		(SELECT user_id,SUM(pay_price) total FROM orderinfo WHERE state > 0 GROUP BY user_id HAVING SUM(pay_price) >= #{price}) a,
+		(SELECT user_id,SUM(if(memberFee>=10,pay_price-memberFee,pay_price)) total FROM orderinfo WHERE state > 0 GROUP BY user_id HAVING SUM(pay_price) >= #{price}) a,
 		`user` tem 
 		WHERE a.user_id = tem.id
 		AND
