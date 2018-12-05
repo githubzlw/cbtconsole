@@ -154,6 +154,8 @@ public class OrderInfoImpl implements OrderInfoDao {
 				order.setIsDropshipOrder(rs.getInt("isDropshipOrder"));
 				order.setShare_discount(rs.getDouble("share_discount"));//分享折扣
 				order.setExtra_discount(rs.getDouble("extra_discount"));//手动优惠 1/19
+				
+				order.setProcessingfee(rs.getDouble("processingfee"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
