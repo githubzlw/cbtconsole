@@ -10,6 +10,10 @@
             src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+            <script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css"
@@ -165,9 +169,14 @@
     		return '新账号';
     	}
         function formatAction(val, row, index) {
-    		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-    					+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
+        	var actionHtml = '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
+        	if(!row.complainId !=''){
+        		actionHtml +='<input type="button" value="关联投诉" onclick="linkComplain(\''+row.userid+'\',\''+row.disputeID+'\',\''+row.merchantID+'\')">';
+        	}
+    		return actionHtml;
     	}
+        
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
         		return 'undefind';
@@ -195,6 +204,65 @@
                     bottom: ''
                 }
             });
+        }
+        function linkComplain(userid,disputeID,merchantID){
+        	
+        	$.ajax({
+    			type:'POST',
+    			dataType:'text',
+    			url:'/cbtconsole/complain/dispute/list',
+    			data:{userid:userid},
+    			success:function(res){
+    				var result = eval('(' + res + ')')
+    				alert(res)
+    				var html = '该用户没有投诉';
+    				if(result.status){
+    					html = "<table>";
+    					var json = result.data;
+    					for(var i=0;i<json.length;i++){
+    						var complain = json[i];
+    						html +='<tr><td><input type="radio" class='+'></td><td>'+complain.id+'</td><td>'+complain.complainText+'</td></tr>';
+    					}
+    				}
+    				
+    				$.dialog({
+						title : '关联投诉',
+						content : html,
+						max : false,
+						min : false,
+						lock : true,
+						drag : false,
+						fixed : false,
+						ok : function() {
+							var id = "";
+							var href = window.location.href;
+							if(disputeid !='' && merchantid!=''){
+							  $.ajax({
+									type:'POST',
+									dataType:'text',
+									url:'/cbtconsole/complain/dispute/update',
+									data:{id:id,disputeid:disputeid,merchantid:merchantid},
+									success:function(res){
+										
+									},
+									error:function(XMLResponse){
+										alert('error');
+									}
+								}); 
+							}
+							
+						},
+						cancel : function() {
+						}
+					});
+    				
+    				
+    			},
+    			error:function(XMLResponse){
+    				alert('error');
+    			}
+    		}); 
+        	
         }
         </script>
 

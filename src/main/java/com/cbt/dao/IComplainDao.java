@@ -40,6 +40,16 @@ public interface IComplainDao extends BaseDao<Complain> {
 	 * @return
 	 */
 	int updateDisputeid(int id,String disputeid,String merchantid);
+	/**获取申诉号对应的投诉
+	 * @param disputeIdList
+	 * @return
+	 */
+	List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList);
+	/**获取用户的投诉
+	 * @param disputeIdList
+	 * @return
+	 */
+	List<ComplainVO> getComplainByUserId(String userId);
 	
 	
 }

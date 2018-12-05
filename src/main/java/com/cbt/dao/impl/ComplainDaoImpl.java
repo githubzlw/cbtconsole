@@ -415,6 +415,20 @@ public class ComplainDaoImpl implements IComplainDao{
 					e.printStackTrace();
 				}
 			}
+			if (rs1 != null) {
+				try {
+					rs1.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt1 != null) {
+				try {
+					stmt1.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return page;
@@ -474,5 +488,95 @@ public class ComplainDaoImpl implements IComplainDao{
 		
 		DBHelper.getInstance().closeConnection(conn);
 		return rs;
+	}
+
+	@Override
+	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
+		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText from tb_complain where dispute_id in (");
+
+		for(String disputeId : disputeIdList) {
+			sb.append("\"").append(disputeId).append("\",");
+		}
+		sb.append("\"0\"").append(")");
+		Connection conn = DBHelper.getInstance().getConnection();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+	
+		try {
+			stmt = conn.prepareStatement(sb.toString());
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				ComplainVO rfb = new ComplainVO();
+				rfb.setId(rs.getInt("id"));
+				rfb.setUserid((rs.getInt("userid")));
+				rfb.setComplainText(rs.getString("complainText"));
+				rfb.setDisputeId(rs.getString("dispute_id"));
+				rfb.setMerchantId(rs.getString("merchant_id"));
+				rfbList.add(rfb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return rfbList;
+	}
+
+	@Override
+	public List<ComplainVO> getComplainByUserId(String userId) {
+		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText "
+				+ "from tb_complain where userid=? order by id desc limit 30");
+
+		Connection conn = DBHelper.getInstance().getConnection();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+	
+		try {
+			stmt = conn.prepareStatement(sb.toString());
+			stmt.setString(1, userId);
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				ComplainVO rfb = new ComplainVO();
+				rfb.setId(rs.getInt("id"));
+				rfb.setUserid((rs.getInt("userid")));
+				rfb.setComplainText(rs.getString("complainText"));
+				rfbList.add(rfb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return rfbList;
 	}
 }

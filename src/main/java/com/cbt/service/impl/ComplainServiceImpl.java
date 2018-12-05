@@ -72,4 +72,23 @@ public class ComplainServiceImpl implements IComplainService{
 		return complainDao.updateDisputeid(id, disputeid,merchantid);
 	}
 
+
+	@Override
+	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
+		if(disputeIdList == null || disputeIdList.isEmpty()) {
+			return null;
+		}
+		// TODO Auto-generated method stub
+		return complainDao.getComplainByDisputeId(disputeIdList);
+	}
+
+
+	@Override
+	public List<ComplainVO> getComplainByUserId(String userId) {
+		// TODO Auto-generated method stub
+		return complainDao.getComplainByUserId(userId);
+	}
+	
+	
+
 }

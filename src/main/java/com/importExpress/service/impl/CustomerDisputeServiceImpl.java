@@ -141,6 +141,10 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			if(adminRUser != null) {
 	    				c.setEmail(adminRUser.getUseremail());
 	    				c.setOprateAdm(adminRUser.getAdmname());
+	    			}else {
+	    				c.setEmail("");
+	    				c.setOprateAdm("testAdm");
+	    				
 	    			}
 	    		});
 	    	}
@@ -334,5 +338,5 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		
 		return result;
 	}
-
 }
+

@@ -114,7 +114,7 @@ public class ComplainController {
 				for(String o : corderIdList) {
 					o = o.split("_")[0];
 					CustomerDisputeBean cDisputeBean = (CustomerDisputeBean)dispute.get(o);
-					if(cDisputeBean != null) {
+					if(cDisputeBean != null && StringUtils.equals(String.valueOf(c.getUserid()), cDisputeBean.getUserid())) {
 						c.setDisputeId(cDisputeBean.getDisputeID());
 						c.setMerchantId(cDisputeBean.getMerchantID());
 						break;
@@ -225,8 +225,8 @@ public class ComplainController {
 		String id = request.getParameter("id");
 		String orderid = request.getParameter("orderid");
 		String goodsid = request.getParameter("goodsid");
-		complainService.updateGoodsid(Integer.valueOf(id), orderid, goodsid);
-		map.put("status", true);
+		int updateGoodsid = complainService.updateGoodsid(Integer.valueOf(id), orderid, goodsid);
+		map.put("status", updateGoodsid > 0);
 		return map;
 	}
 	@RequestMapping(value = "/dispute/update", method = RequestMethod.POST)
@@ -241,7 +241,20 @@ public class ComplainController {
 		map.put("status", true);
 		return map;
 	}
-	
+	@RequestMapping(value = "/dispute/list", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object>  disputelist(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("status", false);
+		
+		String userid = request.getParameter("userid");
+		if(StringUtils.isNotBlank(userid) && !StringUtils.equals(userid, "0")) {
+			List<ComplainVO> complainByUserId = complainService.getComplainByUserId(userid);
+			map.put("data", complainByUserId);
+			map.put("status", complainByUserId != null && !complainByUserId.isEmpty());
+		}
+		return map;
+	}
 	
 	
 }

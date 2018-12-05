@@ -5,6 +5,13 @@ public class CustomerDisputeVO extends CustomerDisputeBean {
 	private String email;//用户邮箱
 	private String value;//申诉订单金额
 	private String reason;//申诉理由
+	private String complainId;//投诉id
+	public String getComplainId() {
+		return complainId;
+	}
+	public void setComplainId(String complainId) {
+		this.complainId = complainId;
+	}
 	public long getTime() {
 		return time;
 	}

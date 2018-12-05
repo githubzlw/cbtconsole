@@ -1065,7 +1065,8 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		String sql = "select  distinct userid,orderid,goods_pid,car_img from  "
-				+ "order_details  where state!=2 and userid=? order by id desc";
+				+ "order_details  where state!=2 and userid=? "
+				+ "and TO_DAYS(NOW()) - TO_DAYS(createtime) <= 180　order by id desc";
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, userid);

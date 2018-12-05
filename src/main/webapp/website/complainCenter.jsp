@@ -401,7 +401,7 @@ function linkGoods(id,userid){
 				html+='</ul></div><div style="clear:both"></div></div>';
 			}
 			if(html ==''){
-				html = "该用户没有订单";
+				html = "该用户没有可选择订单";
 			}
 			 $.dialog({
 					title : '关联订单产品',
