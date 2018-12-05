@@ -605,7 +605,7 @@ public class OrderInfoController{
 		}
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String strm=user.getRoletype(); int admuserid=user.getId();
-		if("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("Sales2")){
+		if("0".equals(strm)){
 			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 		}
 		Date startdate =null;
@@ -666,6 +666,7 @@ public class OrderInfoController{
 		request.setAttribute("buyuser", buyuser);
 		request.setAttribute("strname", admuserid);
 		request.setAttribute("admName", user.getAdmName());
+		request.setAttribute("roletype", user.getRoletype());
 		request.setAttribute("strm", strm);
 		request.setAttribute("showUnpaid", showUnpaid);
 		request.setAttribute("email", email);
@@ -708,7 +709,7 @@ public class OrderInfoController{
 			String admJson = Redis.hget(request.getSession().getId(), "admuser");
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype(); int admuserid=user.getId();
-			if("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("Sales2") || user.getAdmName().equalsIgnoreCase("emmaxie")){
+			if("0".equals(strm)){
 				//临时添加Sales1查看所有订单列表的统计
 				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			}

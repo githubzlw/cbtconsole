@@ -305,7 +305,7 @@ public class ComplainDaoImpl implements IComplainDao{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType) {
 		int start= (page.getStartIndex()-1) *20;
 		ArrayList<ComplainVO> rfbList = new ArrayList<ComplainVO>();
 		StringBuilder sb = new StringBuilder("SELECT c.id,c.userid,c.userEmail,c.complainType,"
@@ -325,8 +325,7 @@ public class ComplainDaoImpl implements IComplainDao{
 		ResultSet rs1 = null;
 		PreparedStatement stmt1 = null;
 		//ling,Sales1可以看所有的投诉
-		if(admName!=null&&!"Ling".equalsIgnoreCase(admName) && !"Sales1".equalsIgnoreCase(admName) && !"kara".equalsIgnoreCase(admName) && !"emmaxie".equalsIgnoreCase(admName)
-				&& !"admin1".equalsIgnoreCase(admName)){
+		if(admName!=null&& roleType !=0){
 			sb.append(" and u.admName='"+admName+"'" ); 
 		}
 		if(t.getUserid()!=0){

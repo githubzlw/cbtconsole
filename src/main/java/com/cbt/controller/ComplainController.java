@@ -72,7 +72,7 @@ public class ComplainController {
 		}
 		page.setCurrentPage(aa);
 		page.setStartIndex(toPage);
-		page = complainService.searchComplainByParam(t,username,page,admName);
+		page = complainService.searchComplainByParam(t,username,page,admName,Integer.valueOf(adm.getRoletype()));
 		List<ComplainVO> list = page.getList();
 		//投诉是否有退款申请
 		String useridList = "";

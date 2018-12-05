@@ -350,7 +350,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 			<!-- <input id="showCqOrder" type="button" value="显示差钱订单" onclick="isKq()"/>&nbsp;&nbsp;(<span id="yccont"></span>) -->
 	</div>  
 	
-	<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
+	<%  if(!"0".equals(user.getRoletype())){%>
 		<!-- 载入消息提醒jsp页面 -->
 		<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>
