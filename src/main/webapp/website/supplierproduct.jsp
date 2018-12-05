@@ -61,6 +61,7 @@
 					<td>质量</td> 
 					<td>备注</td>
 					 <td>编辑人</td>
+					<td>编辑时间</td>
 					<td>操作</td>
 				</tr>
 	 			
@@ -76,6 +77,7 @@
 						<textarea id="111${status.index }remarks" name="remarks" rows="10" cols="15">${supplierproduct.remarks }</textarea>
 							</td>
 	 				<td>${supplierproduct.userName } </td>
+					<td>${supplierproduct.createtime } </td>
 					<td><input type="button" onclick="updateRemark('111${status.index }','${supplierproduct.id}')" value="保存评分">
 						<input type="button" onclick="lookQuestion('${supplierproduct.goodsPid}')" value="查看问答">
 						<%--<input type="button" onclick="lookCustom('${supplierproduct.goodsPid}')" value="查看收货评价">--%>
@@ -103,6 +105,7 @@
 					</td>
 					<td><textarea id="${status.index }remarks" name="remarks" rows="10" cols="15">${supplierProductsBean.remarks }</textarea></td>
 	 				<td>${supplierProductsBean.userName } </td>
+						<td>-- </td>
 					<td>
 						<input type="button" onclick="toSubmit(0,'${status.index }','${supplierProductsBean.shopId}','${supplierProductsBean.goodsPid}')" value="保存评分">
 						<input type="button" onclick="lookQuestion('${supplierProductsBean.goodsPid}')" value="查看问答">
