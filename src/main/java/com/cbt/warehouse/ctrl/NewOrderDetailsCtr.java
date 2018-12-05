@@ -1843,7 +1843,7 @@ public class NewOrderDetailsCtr {
 			LOG.error(e.getMessage());
 		}
 
-		if ("Ling".equalsIgnoreCase(admName) || "emmaxie".equalsIgnoreCase(admName) || "admin1".equalsIgnoreCase(admName)) {
+		if (adm.getRoletype() == 0) {
 			return "paymentConfirm";
 		} else {
 			return "paymentConfirm1";

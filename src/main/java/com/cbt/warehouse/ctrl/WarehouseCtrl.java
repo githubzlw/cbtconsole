@@ -5,6 +5,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -14,9 +15,6 @@ import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.customer.service.GuestBookServiceImpl;
 import com.cbt.customer.service.IGuestBookService;
 import com.cbt.fee.service.IZoneServer;
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
-import com.cbt.bean.OrderBean;
 import com.cbt.fee.service.ZoneServer;
 import com.cbt.jcys.bean.*;
 import com.cbt.jcys.util.HttpUtil;
@@ -65,6 +63,8 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.importExpress.controller.TabSeachPageController;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -157,7 +157,6 @@ public class WarehouseCtrl {
 	private IOrderinfoService iOrderinfoService;
 	@Autowired
 	private SendMailFactory sendMailFactory;
-
 	@Autowired
 	private MabangshipmentService mabangshipmentService;
 
@@ -203,14 +202,14 @@ public class WarehouseCtrl {
 		System.out.println("登录人ID："+adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		System.out.println("采购人长度："+list.size());
-		
+
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
 		
-		if(adm.getId()==1 || adm.getId()==83){
+		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -906,7 +905,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && adm.getRoletype() != 0?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -1228,7 +1227,7 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult monthSalesEffortsList(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, String> map = new HashMap<String, String>();
-		String pages=request.getParameter("pages");
+		String pages=request.getParameter("page");
 		if(StringUtil.isBlank(pages)){
 			pages="1";
 		}
@@ -3928,7 +3927,7 @@ public class WarehouseCtrl {
 		request.setAttribute("orderPos", orderPos);
 		return "orderinfoInspection";
 	}
-	
+
 	// 出库验货 查询全部订单  2018/07/20 10:45  ly
 	@RequestMapping(value = "/getOrderInfoInspectionall.do", method = RequestMethod.GET)
 	public String getOrderInfoInspectionall(HttpServletRequest request, Model model) {
@@ -7209,6 +7208,26 @@ public class WarehouseCtrl {
 //		return strs;
 //
 //	}
+@RequestMapping(value = "/testSendEmail")
+	public String testSendEmail(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> model = new HashedMap();
+		StringBuilder msg=new StringBuilder();
+		String chatText= msg.toString();
+		model.put("chatText",chatText);
+		model.put("name","919923437@qq.com");
+		model.put("email","919923437@qq.com");
+	    model.put("orderid","123456788");
+	    model.put("recipients","Jones Drugs");
+		model.put("street","959 East Main St");
+		model.put("street1","");
+		model.put("city","Prattville");
+		model.put("state","Alabama");
+		model.put("country","UAS");
+		model.put("zipCode","36066");
+		model.put("phone","3343581630");
+		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Order delivery notice", model, TemplateType.BATCK);
+		return "1";
+	}
 
 	@RequestMapping(value = "/batchCk", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
@@ -7303,10 +7322,6 @@ public class WarehouseCtrl {
 					}
 					bgMap.put("expressno", expressNo); // 添加包裹号
 					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
-					//发送邮件给客户告知已经发货
-//					IGuestBookService ibs = new GuestBookServiceImpl();
-//					OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
-//					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
 			}
 			//发送邮件给客户提示发货
@@ -7330,7 +7345,6 @@ public class WarehouseCtrl {
 				modelM.put("phone",ob.getPhonenumber());
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 			}
-
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -7343,6 +7357,8 @@ public class WarehouseCtrl {
 		ret = updateBgState(bgList, ret);
 		return String.valueOf(ret);
 	}
+
+
 
 	private void saveUod(List<ProductBean> lpb, Map<String, String> bgMap, UserOrderDetails uod) {
 		uod.setShipmentno((String) bgMap.get("shipmentno"));

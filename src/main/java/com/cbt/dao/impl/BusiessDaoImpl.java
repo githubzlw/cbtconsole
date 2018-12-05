@@ -471,7 +471,7 @@ public class BusiessDaoImpl implements BusiessDao {
 			sqlIf.append(" and userid='" + userid + "'");
 		}
 		//分配的账户
-		if (adminid != null && adminid != 1 && adminid != 0) {
+		if (adminid != 0) {
 			sqlIf.append(" and ( busiess.email in (select aru.useremail from admin_r_user aru,busiess bu where aru.userid = bu.userid and aru.adminid=\'")
 					.append(adminid)
 					.append("\')");

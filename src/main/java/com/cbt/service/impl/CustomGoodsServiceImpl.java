@@ -226,7 +226,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
-        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 0,remark);
+        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
     }
 
     @Override
