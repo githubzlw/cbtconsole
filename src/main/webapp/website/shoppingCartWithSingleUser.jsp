@@ -204,6 +204,16 @@
             window.open(url);
         }
 
+        function  openSendEmail(userId) {
+            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId;
+            var iWidth = 1680; //弹出窗口的宽度;
+            var iHeight = 880; //弹出窗口的高度;
+            var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+            var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+            var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+            window.open(url, 'windows', param);
+        }
+
         function showMessage(message) {
             $.messager.show({
                 title: '提醒',
@@ -283,9 +293,10 @@
             <tr>
                 <td colspan="4">
                     <div style="text-align: center">
-                        <input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
+                        <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>
+                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
+                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="openSendEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
                         &nbsp;&nbsp;

@@ -183,102 +183,6 @@ public class ShopCarMarketingController {
     }
 
 
-    @RequestMapping("/sendEmailCarInfoByUserId")
-    public ModelAndView sendEmailCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> model = new HashedMap();
-        ModelAndView mv = new ModelAndView("goodsCarInfoEmail");
-        String userJson = Redis.hget(request.getSession().getId(), "admuser");
-        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
-        if (user == null || user.getId() == 0) {
-            mv.addObject("message", "用户未登录");
-            mv.addObject("success", 0);
-            return mv;
-        }
-        String userIdStr = request.getParameter("userId");
-        if (StringUtils.isBlank(userIdStr)) {
-            mv.addObject("message", "获取用户ID失败");
-            mv.addObject("success", 0);
-            return mv;
-        } else {
-            mv.addObject("userId", userIdStr);
-        }
-        try {
-            //查询客户信息
-            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
-            mv.addObject("userEmail", listu.get("email"));
-            model.put("userEmail", listu.get("email"));
-            listu.clear();
-            //查询当前客户存在的购物车数据
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
-            //格式化处理规格数据
-            double productCost = 0;
-            double actualCost = 0;
-            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
-            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
-            for (ShopCarMarketing shopCar : shopCarMarketingList) {
-                String tempType = "";
-                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
-                    String[] splitFirst = shopCar.getGoodsType().split(",");
-                    for (String spCh : splitFirst) {
-                        String[] spScList = spCh.split("@");
-                        tempType += spScList[0] + ";";
-                        spScList = null;
-                    }
-                    splitFirst = null;
-                }
-                if (tempType.length() > 0) {
-                    shopCar.setGoodsType(tempType);
-                }
-                if (shopCar.getPrice1() > 0) {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                    actualCost += totalPrice;
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    resultList.add(shopCar);
-                } else {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    sourceList.add(shopCar);
-                }
-            }
-            shopCarMarketingList.clear();
-            if (resultList.size() > 0) {
-                double offCost = productCost - actualCost;
-                mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
-                mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
-                mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
-                mv.addObject("success", 1);
-                mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                mv.addObject("updateList", resultList);
-                mv.addObject("sourceList", sourceList);
-                model.put("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
-                model.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
-                model.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
-                model.put("success", 1);
-                model.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                model.put("updateList", resultList);
-                model.put("sourceList", sourceList);
-                JSONObject jsonObject = JSONObject.fromObject(model);
-                String modeStr = jsonObject.toString();
-                mv.addObject("modeStr", modeStr);
-            } else {
-                mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
-                mv.addObject("success", 0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("sendEmailCarInfoByUserId error:" + e.getMessage());
-            logger.error("sendEmailCarInfoByUserId error:" + e.getMessage());
-            mv.addObject("message", "执行过程失败，原因：" + e.getMessage());
-            mv.addObject("success", 0);
-        }
-        return mv;
-    }
-
-
     @RequestMapping("/confirmAndSendEmail")
     @ResponseBody
     public JsonResult confirmAndSendEmail(HttpServletRequest request, HttpServletResponse response) {
@@ -1128,6 +1032,89 @@ public class ShopCarMarketingController {
             logger.error("查询失败，原因 :" + e.getMessage());
         }
         return list;
+    }
+
+
+    @RequestMapping("/genShoppingCarMarketingEmail")
+    public ModelAndView genShoppingCarMarketingEmail(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("shopCartMarketingEmail");
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("message", "用户未登录");
+            mv.addObject("success", 0);
+            return mv;
+        }else{
+            mv.addObject("adminName", user.getAdmName());
+            mv.addObject("adminEmail", user.getEmail());
+        }
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isBlank(userIdStr)) {
+            mv.addObject("message", "获取用户ID失败");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("userId", userIdStr);
+        }
+        try {
+            //查询当前客户存在的购物车数据
+            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
+            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
+            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+            //格式化处理规格数据
+            double productCost = 0;
+            double actualCost = 0;
+            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
+            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
+            for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                String tempType = "";
+                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
+                    String[] splitFirst = shopCar.getGoodsType().split(",");
+                    for (String spCh : splitFirst) {
+                        String[] spScList = spCh.split("@");
+                        tempType += spScList[0] + ";";
+                    }
+                }
+                if (tempType.length() > 0) {
+                    shopCar.setGoodsType(tempType);
+                }
+                if (shopCar.getPrice1() > 0) {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    actualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    resultList.add(shopCar);
+                } else {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    productCost += totalPrice;
+                    actualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    sourceList.add(shopCar);
+                }
+            }
+            shopCarMarketingList.clear();
+            if (resultList.size() > 0) {
+                double offCost = productCost - actualCost;
+                mv.addObject("success", "1");
+                mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
+                mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+                mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+                resultList.clear();
+                sourceList.clear();
+            } else {
+                mv.addObject("success", "0");
+                mv.addObject("message", "未进行商品改价");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("genShoppingCarMarketingEmail error:" + e.getMessage());
+            logger.error("genShoppingCarMarketingEmail error:" + e.getMessage());
+            mv.addObject("message", "执行过程失败，原因：" + e.getMessage());
+            mv.addObject("success", 0);
+        }
+        return mv;
     }
 
 
