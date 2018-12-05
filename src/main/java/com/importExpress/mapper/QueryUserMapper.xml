@@ -272,5 +272,19 @@
         SET available_m = #{available}
         WHERE email = #{email} OR name = #{email}
     </update>
-	
+
+    <!--long queryAdmUserByAdmNameAndPwd(@Param("admName") String admName, @Param("oldPwd") String oldPwd);-->
+    <select id="queryAdmUserByAdmNameAndPwd" resultType="long">
+        SELECT count(1)
+        FROM admuser
+        WHERE admName = #{admName} and password = md5(#{oldPwd})
+    </select>
+
+    <!--void updatePasswordByAdmName(@Param("admName") String admName, @Param("newPwd") String newPwd);-->
+    <update id="updatePasswordByAdmName">
+        UPDATE admuser
+        SET password = md5(#{newPwd})
+        WHERE admName = #{admName}
+    </update>
+
 </mapper>

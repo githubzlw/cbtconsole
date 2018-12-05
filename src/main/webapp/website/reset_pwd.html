@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>密码修改</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    //获取url中参数
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|[&?])" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+    jQuery(function($){
+        $("#admName").text(getUrlParam("admName"));
+
+
+    });
+    function submitResetPwd() {
+        $("#message").text("");
+        var oldPwd = $("#old_pwd").val();
+        if($.isEmptyObject(oldPwd)){
+            $("#message").text("未输入旧密码!");
+            return;
+        }
+        var newPwd = $("#new_pwd").val();
+        var newPwd2 = $("#new_pwd2").val();
+        if($.isEmptyObject(newPwd) || $.isEmptyObject(newPwd2)){
+            $("#message").text("新密码和确认新密码为空!");
+            return;
+        }
+        if(newPwd == oldPwd){
+            $("#message").text("新密码请与旧密码相同了!");
+            return;
+        }
+        if(newPwd != newPwd2){
+            $("#message").text("新密码和确认新密码不相同!");
+            return;
+        }
+        var admName = $("#admName").text();
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/userLogin/resetPwd.do",
+            data: {
+                admName:admName,
+                oldPwd:oldPwd,
+                newPwd:newPwd
+            },
+            dataType:"json",
+            success: function(msg){
+                $("#message").text(msg.message);
+            }
+        });
+
+    }
+</script>
+<form >
+    <table>
+        <tr>
+            <td>当前登录用户:</td>
+            <td id="admName"></td>
+        </tr>
+        <tr>
+            <td>旧密码:</td>
+            <td><input type="password" id="old_pwd"/></td>
+        </tr>
+        <tr>
+            <td>新密码:</td>
+            <td><input type="password" id="new_pwd"/></td>
+        </tr>
+        <tr>
+            <td>确认新密码:</td>
+            <td><input type="password" id="new_pwd2"/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="button" onclick="submitResetPwd()" value="提交"/>&nbsp;
+                <input type="reset" value="重置"/>
+                <span id="message" style="color: red;"></span>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
