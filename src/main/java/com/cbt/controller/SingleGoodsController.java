@@ -682,10 +682,24 @@ public class SingleGoodsController {
             queryPm.setLimitNum(limitNum);
             queryPm.setStartNum(startNum);
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
-            for(SingleGoodsCheck goodsCheck : res){
-                if(goodsCheck.getIsPass() == 0){
-                    sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+
+            if(!(res == null || res.isEmpty())){
+                List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
+                if(!(pids == null || pids.isEmpty())){
+                    boolean isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                    pids.clear();
+                    if(isSuccess){
+                        for(SingleGoodsCheck goodsCheck : res){
+                            if(goodsCheck.getIsPass() == 0){
+                                sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                            }
+                        }
+                    }else{
+                        json.setOk(false);
+                        json.setMessage("执行失败，请重试");
+                    }
                 }
+                res.clear();
             }
             json.setOk(true);
         } catch (Exception e) {
@@ -732,9 +746,21 @@ public class SingleGoodsController {
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
             if("0".equals(type)){
                 //全过
-                for(SingleGoodsCheck goodsCheck : res){
-                    if(goodsCheck.getIsPass() == 0){
-                        sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                if(!(res == null || res.isEmpty())) {
+                    List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
+                    if (!(pids == null || pids.isEmpty())) {
+                        boolean isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                        pids.clear();
+                        if (isSuccess) {
+                            for (SingleGoodsCheck goodsCheck : res) {
+                                if (goodsCheck.getIsPass() == 0) {
+                                    sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                                }
+                            }
+                        }else{
+                            json.setOk(false);
+                            json.setMessage("执行失败，请重试");
+                        }
                     }
                 }
             }else if("1".equals(type)){
