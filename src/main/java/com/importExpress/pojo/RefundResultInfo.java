@@ -33,6 +33,9 @@ public class RefundResultInfo {
 
     private byte[] info;
 
+    private int limitNum;
+    private int startNum;
+
     public Integer getId() {
         return id;
     }
@@ -151,6 +154,22 @@ public class RefundResultInfo {
 
     public void setInfo(byte[] info) {
         this.info = info;
+    }
+
+    public int getLimitNum() {
+        return limitNum;
+    }
+
+    public void setLimitNum(int limitNum) {
+        this.limitNum = limitNum;
+    }
+
+    public int getStartNum() {
+        return startNum;
+    }
+
+    public void setStartNum(int startNum) {
+        this.startNum = startNum;
     }
 
     @Override

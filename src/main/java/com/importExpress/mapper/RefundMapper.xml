@@ -81,6 +81,23 @@
         <result column="create_time" property="createtime"/>
     </resultMap>
 
+    <resultMap id="refundResultInfoResultMap" type="com.importExpress.pojo.RefundResultInfo">
+        <id column="id" property="id"/>
+        <result column="orderno" property="orderno"/>
+        <result column="userId" property="userid"/>
+        <result column="payprice" property="payprice"/>
+        <result column="refund_from_transaction_fee" property="refundFromTransactionFee"/>
+        <result column="refund_from_received_amount" property="refundFromReceivedAmount"/>
+        <result column="total_refunded_amount" property="totalRefundedAmount"/>
+        <result column="refundid" property="refundid"/>
+        <result column="amount_total" property="amountTotal"/>
+        <result column="state" property="state"/>
+        <result column="sale_id" property="saleId"/>
+        <result column="parent_payment" property="parentPayment"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
     <select id="queryForList" resultMap="refundNewResultMap">
         select r.id,r.userid,r.appcount,
         r.status,r.refuse,date_format(r.apptime,'%Y-%m-%d %H:%i:%s') as apptime,r.account,r.type,r.orderid,r.payid,
@@ -269,6 +286,52 @@
             and orderid like concat(#{orderNo},'%')
         </if>
         order by createtime desc
+    </select>
+
+    <select id="queryForRefundResultList" parameterType="com.importExpress.pojo.RefundResultInfo"
+            resultMap="refundResultInfoResultMap">
+        select id,orderno,userId,payprice,refund_from_transaction_fee,refund_from_received_amount,total_refunded_amount,
+        refundid,amount_total,state,sale_id,parent_payment,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as
+        update_time
+        from refund_result_info
+        where 1=1
+        <if test="orderno != null">
+            and orderno = #{orderno}
+        </if>
+        <if test="userid != null">
+            and userid = #{userid}
+        </if>
+        <if test="refundid != null">
+            and refundid = #{refundid}
+        </if>
+        <if test="saleId != null">
+            and sale_id = #{saleId}
+        </if>
+        order by update_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryForRefundResultListCount" parameterType="com.importExpress.pojo.RefundResultInfo"
+            resultType="java.lang.Integer">
+        select count(1)
+        from refund_result_info
+        where 1=1
+        <if test="orderno != null">
+            and orderno = #{orderno}
+        </if>
+        <if test="userid != null">
+            and userid = #{userid}
+        </if>
+        <if test="refundid != null">
+            and refundid = #{refundid}
+        </if>
+        <if test="saleId != null">
+            and sale_id = #{saleId}
+        </if>
     </select>
 
 </mapper>
