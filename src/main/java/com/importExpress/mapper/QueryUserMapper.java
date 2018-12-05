@@ -58,4 +58,8 @@ public interface QueryUserMapper {
 
     long updateAvailable(@Param("email") String email, @Param("available") Double available);
 
+    long queryAdmUserByAdmNameAndPwd(@Param("admName") String admName, @Param("oldPwd") String oldPwd);
+
+    void updatePasswordByAdmName(@Param("admName") String admName, @Param("newPwd") String newPwd);
+
 }

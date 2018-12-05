@@ -1,6 +1,7 @@
 package com.importExpress.service;
 
 import com.cbt.website.userAuth.bean.AuthInfo;
+import com.cbt.website.util.JsonResult;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +31,5 @@ public interface QueryUserService {
 
     long updateAvailable(String email, Double available);
 
+    JsonResult resetPwd(String admName, String oldPwd, String newPwd);
 }
