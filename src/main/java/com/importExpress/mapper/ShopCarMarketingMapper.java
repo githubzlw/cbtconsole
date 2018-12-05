@@ -51,7 +51,7 @@ public interface ShopCarMarketingMapper {
      * @param userId
      * @return
      */
-    int updateUserFollowTime(@Param("userId") int userId);
+    int updateUserFollowTime(@Param("userId") int userId,@Param("adminId") int adminId);
 
     /**
      * 插入跟进日志

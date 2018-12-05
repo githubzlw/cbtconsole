@@ -236,7 +236,7 @@ public class ShopCarMarketingController {
                 activeList.add(genActiveBeanByShopCar(shopCar));
             }
 
-            String emailTitle = "We have reduced price for your ImportExpress shopping cart selection!";
+            String emailTitle = "Your shopping cart misses you!";
             if (emailContent.contains("noticed that you have over")) {
                 emailTitle = "";
             }
@@ -468,10 +468,16 @@ public class ShopCarMarketingController {
         }
 
 
-        String isFollowStr = request.getParameter("isFollow");
-        int isFollow = -1;
-        if (StringUtils.isNotBlank(isFollowStr)) {
-            isFollow = Integer.parseInt(isFollowStr);
+        String followIdStr = request.getParameter("followId");
+        int followId = 0;
+        if (StringUtils.isNotBlank(followIdStr)) {
+            followId = Integer.parseInt(followIdStr);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        int adminId = 0;
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            adminId = Integer.parseInt(adminIdStr);
         }
 
         String userIdStr = request.getParameter("userId");
@@ -511,7 +517,8 @@ public class ShopCarMarketingController {
 
         try {
 
-            statistic.setIsFollow(isFollow);
+            statistic.setFollowAdminId(followId);
+            statistic.setSaleId(adminId);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);
             statistic.setBeginMoney(beginMoney);
@@ -1044,7 +1051,7 @@ public class ShopCarMarketingController {
             mv.addObject("message", "用户未登录");
             mv.addObject("success", 0);
             return mv;
-        }else{
+        } else {
             mv.addObject("adminName", user.getAdmName());
             mv.addObject("adminEmail", user.getEmail());
         }
@@ -1057,6 +1064,10 @@ public class ShopCarMarketingController {
             mv.addObject("userId", userIdStr);
         }
         try {
+            //查询客户信息
+            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
+            mv.addObject("userEmail", listu.get("email"));
+            listu.clear();
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
             ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
@@ -1065,8 +1076,11 @@ public class ShopCarMarketingController {
             //格式化处理规格数据
             double productCost = 0;
             double actualCost = 0;
+            double totalProductCost = 0;
+            double totalActualCost = 0;
             List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
             List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
+            int sourceCount = 0;
             for (ShopCarMarketing shopCar : shopCarMarketingList) {
                 String tempType = "";
                 if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
@@ -1074,7 +1088,9 @@ public class ShopCarMarketingController {
                     for (String spCh : splitFirst) {
                         String[] spScList = spCh.split("@");
                         tempType += spScList[0] + ";";
+                        spScList = null;
                     }
+                    splitFirst = null;
                 }
                 if (tempType.length() > 0) {
                     shopCar.setGoodsType(tempType);
@@ -1083,29 +1099,36 @@ public class ShopCarMarketingController {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
                     productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
                     actualCost += totalPrice;
+                    totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    totalActualCost += totalPrice;
                     shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
                     resultList.add(shopCar);
                 } else {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    productCost += totalPrice;
-                    actualCost += totalPrice;
+                    totalProductCost += totalPrice;
+                    totalActualCost += totalPrice;
                     shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    sourceList.add(shopCar);
+                    if(sourceCount < 5){
+                        sourceList.add(shopCar);
+                        sourceCount ++;
+                    }
                 }
             }
             shopCarMarketingList.clear();
             if (resultList.size() > 0) {
                 double offCost = productCost - actualCost;
-                mv.addObject("success", "1");
                 mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
                 mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+                mv.addObject("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
+                mv.addObject("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
                 mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                mv.addObject("success", 1);
                 mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                resultList.clear();
-                sourceList.clear();
+                mv.addObject("updateList", resultList);
+                mv.addObject("sourceList", sourceList);
             } else {
-                mv.addObject("success", "0");
-                mv.addObject("message", "未进行商品改价");
+                mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
+                mv.addObject("success", 0);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -296,7 +296,7 @@
                         <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
-                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="openSendEmail(${userId})"/>
+                        <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
                         &nbsp;&nbsp;

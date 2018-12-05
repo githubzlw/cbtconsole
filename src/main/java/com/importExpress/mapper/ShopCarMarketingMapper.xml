@@ -117,9 +117,11 @@
         <result column ="total_price" property="totalPrice"/>
         <result column ="average_price" property="averagePrice"/>
         <result column ="currency" property="currency"/>
-        <result column ="adminid" property="followAdminId"/>
-        <result column ="admName" property="followAdminName"/>
+        <result column ="follow_admin_id" property="followAdminId"/>
+        <result column ="follow_admin_name" property="followAdminName"/>
         <result column ="follow_time" property="followTime"/>
+        <result column ="adminid" property="saleId"/>
+        <result column ="admName" property="saleName"/>
     </resultMap>
 
 
@@ -1627,7 +1629,7 @@
     </select>
 
     <update id="updateUserFollowTime">
-        update goods_carconfig set follow_time = now()
+        update goods_carconfig set follow_time = now(),follow_admin_id = #{adminId}
         where userid = #{userId}
     </update>
 
@@ -1641,7 +1643,7 @@
         select gcf.userid,us.email,scm.total_catid,DATE_FORMAT(gcf.updateTime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(scm.total_price,decimal(10,2)) as total_price,convert(scm.average_price,decimal(10,2)) as average_price,
         us.countryId,zone.country,us.currency,au.adminid,au.admName,
-        '' as last_login_time,
+        '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
         DATE_FORMAT(gcf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
         from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
@@ -1653,6 +1655,7 @@
         where admin_r_user.adminid = admuser.id
         ) au on gcf.userid=au.userid
         left join zone on us.countryId = zone.id
+        left join admuser adm on gcf.follow_admin_id = adm.id
         where 1=1
         <if test="userId > 0">
             and gcf.userid = #{userId}
@@ -1667,13 +1670,10 @@
             and gcf.userid in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="followAdminId > 0">
-            and au.adminid = #{followAdminId}
+            and gcf.follow_admin_id = #{followAdminId}
         </if>
-        <if test="isFollow == 0">
-            and follow_time is null
-        </if>
-        <if test="isFollow == 1">
-            and follow_time is not null
+        <if test="saleId > 0">
+            and au.adminid = #{saleId}
         </if>
         <if test="beginMoney > 0">
             and scm.total_price &gt;= #{beginMoney}
@@ -1703,6 +1703,7 @@
         where admin_r_user.adminid = admuser.id
         ) au on gcf.userid=au.userid
         left join zone on us.countryId = zone.id
+        left join admuser adm on gcf.follow_admin_id = adm.id
         where 1=1
         <if test="userId > 0">
             and gcf.userid = #{userId}
@@ -1717,13 +1718,10 @@
             and gcf.userid in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="followAdminId > 0">
-            and au.adminid = #{followAdminId}
+            and gcf.follow_admin_id = #{followAdminId}
         </if>
-        <if test="isFollow == 0">
-            and follow_time is null
-        </if>
-        <if test="isFollow == 1">
-            and follow_time is not null
+        <if test="saleId > 0">
+            and au.adminid = #{saleId}
         </if>
         <if test="beginMoney > 0">
             and scm.total_price &gt;= #{beginMoney}

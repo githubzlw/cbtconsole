@@ -62,6 +62,7 @@
         $(document).ready(function () {
             setDatagrid();
             queryAllCountry();
+            getAdminList();
         });
 
         function setDatagrid() {
@@ -129,7 +130,8 @@
             var isOrder = $("#query_is_order").val();
             var userId = $("#query_user_id").val();
             var userEmail = $("#query_user_email").val();
-            var isFollow = $("#query_is_follow").val();
+            var followId = $("#query_follow_id").val();
+            var adminId = $("#query_admin_id").val();
             //var countryId = $("#query_country_id").val();
             var countryId = $('#query_country_id').combobox('getValue');
             var beginMoney = $("#query_begin_money").val();
@@ -138,7 +140,8 @@
                 "isOrder": isOrder,
                 "userId": userId,
                 "userEmail": userEmail,
-                "isFollow": isFollow,
+                "followId": followId,
+                "adminId": adminId,
                 "countryId": countryId,
                 "beginMoney": beginMoney,
                 "endMoney": endMoney
@@ -147,6 +150,32 @@
 
         function doResetForm() {
             $("#shop_marketing_query_form")[0].reset();
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        $("#query_follow_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                        $("#query_follow_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
         }
 
         function formatUserId(val, row, index) {
@@ -183,11 +212,12 @@
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">未下单</option>
                     <option value="1">已下单</option>
-			</select></span>&nbsp;&nbsp;<span>是否跟进: <select id="query_is_follow"
+			</select></span>&nbsp;&nbsp;<span>销售: <select id="query_admin_id"
                                                             style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
-                    <option value="0">未跟进</option>
-                    <option value="1">已跟进</option>
+            </select></span>&nbsp;&nbsp;<span>跟进人: <select id="query_follow_id"
+                                                                style="font-size: 16px; height: 26px; width: 90px;">
+                        <option value="-1" selected="selected">全部</option>
 			</select></span>&nbsp;&nbsp;
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
@@ -207,7 +237,8 @@
         <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">总金额</th>
         <th data-options="field:'averagePrice',align:'center',width:'100px'">均价</th>
         <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">最后添加时间</th>
-        <th data-options="field:'lastLoginTime',align:'center',width:'130px'">最后登录时间</th>
+        <!--<th data-options="field:'lastLoginTime',align:'center',width:'130px'">最后登录时间</th>-->
+        <th data-options="field:'saleName',align:'center',width:'100px'">销售</th>
         <th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>
         <th data-options="field:'followTime',align:'center',width:'130px'">跟进时间</th>
         <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>

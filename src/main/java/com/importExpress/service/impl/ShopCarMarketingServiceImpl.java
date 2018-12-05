@@ -114,7 +114,7 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
         shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
-        return shopCarMarketingMapper.updateUserFollowTime(userId);
+        return shopCarMarketingMapper.updateUserFollowTime(userId,adminId);
     }
 
     @Override
