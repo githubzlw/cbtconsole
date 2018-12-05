@@ -56,3 +56,4 @@ bin/
 .svn/
 Thumbs.db
 *.DS_Store
+*.scc
