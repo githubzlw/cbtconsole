@@ -422,7 +422,7 @@ public class NewOrderSplitCtr {
 			odbeanNew.setOrderDetail(nwOrderDetails);
 			// 计算新订单支付金额
 			odbeanNew.setProcessingfee(proces_singfee_new);
-			odbeanNew.setActual_lwh(String.valueOf(actual_lwh_new));
+			odbeanNew.setActual_lwh(new BigDecimal(actual_lwh_new).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
 			
 			totalPayPriceNew = new BigDecimal(odbeanNew.getProduct_cost())
 			.subtract(new BigDecimal(odbeanNew.getCoupon_discount()))
