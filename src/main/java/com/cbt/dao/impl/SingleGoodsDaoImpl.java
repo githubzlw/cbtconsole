@@ -1283,4 +1283,70 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         return rs;
     }
 
+    @Override
+    public List<String> queryIsExistsPidFromSingleOffers(List<SingleGoodsCheck> pidList) {
+
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        String sqlBegin = "select goods_pid from single_goods_offers where goods_pid in(";
+        StringBuffer updateSql = new StringBuffer("");
+        Statement stmt31 = null;
+        ResultSet rs = null;
+        List<String> list = new ArrayList<>();
+        try {
+            for (SingleGoodsCheck goodsCheck : pidList) {
+                if(goodsCheck.getIsPass() == 0){
+                    if (StringUtils.isNotBlank(goodsCheck.getPid())) {
+                        updateSql.append(",'" + goodsCheck.getPid() + "'");
+                    }
+                }
+            }
+            String exSql = sqlBegin + updateSql.toString().substring(1) + ")";
+            stmt31 = conn31.createStatement();
+            System.err.println(exSql);
+            rs = stmt31.executeQuery(exSql);
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("queryIsExistsPidFromSingleOffers error :" + e.getMessage());
+            LOG.error("queryIsExistsPidFromSingleOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt31);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return list;
+    }
+
+    @Override
+    public boolean deleteSingleOffersByPids(List<String> pidList) {
+
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        String sqlOffersBegin = "delete from single_goods_offers where goods_pid in(";
+        String sqlReadyBegin = "delete from useful_data.single_goods_ready where pid in(";
+        StringBuffer updateSql = new StringBuffer("");
+        Statement stmt31 = null;
+        int rs = 0;
+        try {
+            stmt31 = conn31.createStatement();
+            for (String pid : pidList) {
+                if (StringUtils.isNotBlank(pid)) {
+                    updateSql.append(",'" + pid + "'");
+                }
+            }
+            stmt31.addBatch(sqlOffersBegin + updateSql.toString().substring(1) + ")");
+            stmt31.addBatch(sqlReadyBegin + updateSql.toString().substring(1) + ")");
+            rs = stmt31.executeBatch().length;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("deleteSingleOffersByPids error :" + e.getMessage());
+            LOG.error("deleteSingleOffersByPids error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return rs > 0;
+    }
+
 }

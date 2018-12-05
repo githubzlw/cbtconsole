@@ -605,8 +605,7 @@ public class OrderInfoController{
 		}
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String strm=user.getRoletype(); int admuserid=user.getId();
-		if("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("kara")
-				|| user.getAdmName().equalsIgnoreCase("admin1")){
+		if("0".equals(strm)){
 			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 		}
 		Date startdate =null;
@@ -641,7 +640,7 @@ public class OrderInfoController{
 					list.get(i).put("problem", problem);
 				}
 			}
-		int count = getCount(showUnpaid, orderno, email, type, status_, buyuser, userID, state, admuserid, startdate, enddate, list);
+		int count = getCount(showUnpaid, orderno, email, type, status_, buyuser, userID, state, admuserid, startdate_req, enddate_req, list);
 		//获取订单号
 		StringBuilder sb = new StringBuilder();
 		if(list!=null && list.size()>0){
@@ -667,6 +666,7 @@ public class OrderInfoController{
 		request.setAttribute("buyuser", buyuser);
 		request.setAttribute("strname", admuserid);
 		request.setAttribute("admName", user.getAdmName());
+		request.setAttribute("roletype", user.getRoletype());
 		request.setAttribute("strm", strm);
 		request.setAttribute("showUnpaid", showUnpaid);
 		request.setAttribute("email", email);
@@ -676,7 +676,7 @@ public class OrderInfoController{
 		return "nordermgr";
 	}
 
-	private int getCount(int showUnpaid, String orderno, String email, String type, int status_, int buyuser, int userID, int state, int admuserid, Date startdate, Date enddate, List<Map<String, String>> list) {
+	private int getCount(int showUnpaid, String orderno, String email, String type, int status_, int buyuser, int userID, int state, int admuserid, String startdate, String enddate, List<Map<String, String>> list) {
 		int count = 0;
 		if(list!=null&&!list.isEmpty() && !"order_pending".equals(type)){
 			count = iOrderinfoService.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyuser, showUnpaid, type,status_ );
@@ -709,8 +709,7 @@ public class OrderInfoController{
 			String admJson = Redis.hget(request.getSession().getId(), "admuser");
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype(); int admuserid=user.getId();
-			if("0".equals(strm) || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("kara")
-					|| user.getAdmName().equalsIgnoreCase("emmaxie") || user.getAdmName().equalsIgnoreCase("admin1")){
+			if("0".equals(strm)){
 				//临时添加Sales1查看所有订单列表的统计
 				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			}

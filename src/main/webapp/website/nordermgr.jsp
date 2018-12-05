@@ -294,7 +294,8 @@ function fn(va) {
 	$("#page").html(page);
     $("#adminusersc").val(buyuser);
 	admName='<%=request.getAttribute("admName")%>';
-	if(admName!="Ling"  && admName!="Sales1" && admName!="kara" && admName!="emmaxie"){
+	var roletype='<%=request.getAttribute("roletype")%>';
+	if(roletype != "0"){
         $("#adminusersc").val(admuserid);
 	}
 	//如果只有一条数据，则打开该订单详情页面
@@ -352,7 +353,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 	}
 	buysrt = buysrt + '<option value="0">全部</option>';
 	for (var i = 0; i < sellAdm.length; i++) {
-		if(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="kara" || adminName=="emmaxie"){
+		if(strRoletype==0){
 			if(str=='') {
 				str = str + '<option value="0" ' + change + ' >全部</option>';
 			}
@@ -375,7 +376,7 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 
 		str_personCharge = str.replace("全部", "");
 		$('#adminusersc').html(str);
-		if(!(strRoletype==0 || adminName=="Ling"  || adminName=="Sales1" || adminName=="kara" || adminName=="emmaxie")){
+		if(strRoletype !=0){
 			$('#adminusersc').attr('disabled', 'disabled');
 		}
 		$('#buyuser').html(buysrt);
@@ -383,8 +384,8 @@ function getAllAdmuser(strRoletype,strAdmid,adminName) {
 $(document).ready(function(){ 
 	fn(1);
 	fnGetStatistic();
-	fnGetMessage(<%= user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>); //获取各种消息数量
-    uidTem = <%= user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie") ? 1 : uid%>;
+	fnGetMessage(<%=  "0".equalsIgnoreCase(user.getRoletype())? 1 : uid%>); //获取各种消息数量
+    uidTem = <%= "0".equalsIgnoreCase(user.getRoletype()) ? 1 : uid%>;
 }); 
 
 </script>
@@ -415,7 +416,7 @@ $(document).ready(function(){
 					target="_blank">综合采购</a> <c:if test="${admuserid == 0}"><a href="/cbtconsole/website/shipmentcount.jsp"
 					target="_blank">30天完成出货订单统计</a></c:if>
 			</div>
-			<%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("kara") || user.getAdmName().equalsIgnoreCase("emmaxie"))){%>
+			<%  if(!"0".equals(user.getRoletype())){%>
 				<!-- 载入消息提醒jsp页面 -->
 				<jsp:include page="message_notification.jsp"></jsp:include>
 			<%}  %>

@@ -126,8 +126,10 @@ var adminid = ${order.adminid};
 	String userJson = Redis.hget(sessionId, "admuser");
 	Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
 	int uid =0;
+	String roleType="";
 	if(user !=null){
 		uid = user.getId();
+		roleType=user.getRoletype();
 	}else{
 		user = new Admuser();
 		user.setId(0);
@@ -233,7 +235,8 @@ $(document).ready(function(){
     getAllBuyuser();
     fnGetAddress();
     var adminName = '<%=user.getAdmName()%>';
-    if(adminName !="Ling" && adminName !="emmaxie" && adminName !="admin1" && adminName !="kara"){
+    var roleType='<%=user.getRoletype()%>';
+    if(roleType == 0){
         // $("#buyuser1").attr("disabled",true);
         $("#buy_but").attr("disabled",true);
         $("#saler").attr("disabled",true);
@@ -1340,7 +1343,7 @@ em {
 
 											<c:if test="${order.state==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling'  || admuserinfo.admName=='kara' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==0 }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1447,7 +1450,7 @@ em {
 									</c:if>
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus==1}">
 									 <!-- yyl 评论start -->
-										<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='kara' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+										<c:if test="${admuserinfo.roletype==0}"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 										 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 											<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1659,7 +1662,7 @@ em {
 
 												<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='kara' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==0}"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1771,7 +1774,7 @@ em {
 												<%-- ${order.state==4?'完结':'' } --%>
 													<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
-															<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='kara' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling'  || admuserinfo.admName=='admin1' }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
+															<c:if test="${admuserinfo.roletype==0 }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
 															 <button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 																<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 																<input type="hidden" id="goods_url${orderd.goods_pid }" value="${orderd.goods_url }"/>
@@ -1812,7 +1815,7 @@ em {
 												</c:if>
 											</c:if> <c:if test="${ostate==1 && orderd.checked==1}">
 										<!-- yyl 评论start -->
-											<c:if test="${admuserinfo.roletype==1 || admuserinfo.admName=='Ling' || admuserinfo.admName=='kara' || admuserinfo.admName=='emmaxie' || admuserinfo.admName=='ling' || admuserinfo.admName=='admin1' }"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if>
+											<c:if test="${admuserinfo.roletype==0}"><button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button></c:if>
 											<button onclick="seeAllComments('${orderd.goods_pid }','${order.orderNo}')">查看所有评论
 												<input type="hidden" id="goods_img${orderd.goods_pid }" value="${orderd.goods_img}"/>
 											<input type="hidden" id="goods_url${orderd.goods_pid }" value="${goods_url }"/>

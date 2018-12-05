@@ -974,7 +974,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     public int updateState(int state, String pid, int adminid) {
         String sql = "update custom_goods_edit a,custom_benchmark_ready b set b.goodsstate=?,a.admin_id=?,b.valid=1";
         if (state == 4) {
-            sql += ",a.bm_flag=1,b.is_edited='1',a.publish_time=now()";
+            sql += ",b.bm_flag=1,a.is_edited=1,a.publish_time=now()";
         }else if(state == 2){
             sql += ",a.off_time=now()";
         }
