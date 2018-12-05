@@ -636,7 +636,7 @@
         ]]>
         </if>
 
-        <if test="enddate != null">
+        <if test="enddate !=null">
             <![CDATA[
         	and  o.orderpaytime <=#{enddate}
        ]]>
