@@ -672,7 +672,7 @@ this problem will be resolved and closed.
 </c:if>
 </div>
 
-<textarea class="form-controltext " name="messageBodyForGeneric" id="messageBody" rows="10" cols="100" maxlength="2000" placeholder="Enter your offer details"></textarea>
+<textarea class="form-controltext " name="messageBodyForGeneric" id="messageBody" rows="10" cols="100" maxlength="2000" placeholder="请输入英文(提供给客户看的信息)"></textarea>
 <input type="hidden" name="solution" value="generic"></div></div>
 <div style="clear: both;"></div>
 <br>
@@ -708,7 +708,7 @@ this problem will be resolved and closed.
 <option value="custom">Other Adress</option></select> 
 <span class="others-info">If the address isn't available in the list, you may enter it in the notes field.</span>
 </div><p class="status-text">The refund will be processed once you confirm that you've received the item from the buyer.</p><div class="form-group ">
-<textarea class="form-control" id="messageBodyForSellerFullOffer" rows="7" cols="72" maxlength="2000" placeholder="Enter your offer details"></textarea>
+<textarea class="form-control" id="messageBodyForSellerFullOffer" rows="7" cols="72" maxlength="2000" placeholder="请输入英文(提供给客户看的信息)"></textarea>
 </div><div class="button-group">
 <input type="submit" name="continueOffer" value="Send Offer" class="button offer_send">
 <input type="button" name="resetOffer" value="Cancel" class="secondary button cancel-offer" ></div>
@@ -771,7 +771,7 @@ this problem will be resolved and closed.
  ${result.extensions.merchandize_dispute_properties.return_shipping_address.postal_code }
 </label>
 </div></div></div></div><div class="form-group ">
-<textarea class="form-control" id="messageBodyForSellerPartialOffer" rows="7" cols="72" maxlength="2000" placeholder="Enter your offer details"></textarea></div>
+<textarea class="form-control" id="messageBodyForSellerPartialOffer" rows="7" cols="72" maxlength="2000" placeholder="请输入英文(提供给客户看的信息)"></textarea></div>
 <div class="button-group"><input type="submit" name="continueOffer" value="Send Offer" class="button offer_send">
 <input type="button" name="resetOffer" value="Cancel" class="secondary button cancel-offer"></div></div></li>
 
@@ -794,7 +794,7 @@ this problem will be resolved and closed.
 </div>
 <p class="status-text">Once buyer test accepts your offer, you can send the replacement item. This case will be closed once the buyer confirms the delivery of item.</p>
 <div class="form-group ">
-<textarea class="form-control" id="messageBodyForSellerReplacementOffer" rows="7" cols="72" maxlength="2000" placeholder="Enter your offer details"></textarea>
+<textarea class="form-control" id="messageBodyForSellerReplacementOffer" rows="7" cols="72" maxlength="2000" placeholder="请输入英文(提供给客户看的信息)"></textarea>
 </div>
 <div class="button-group">
 <input type="submit" name="continueOffer" value="Send Offer" class="button offer_send" >

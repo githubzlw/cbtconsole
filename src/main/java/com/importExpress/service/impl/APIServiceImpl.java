@@ -42,8 +42,8 @@ public class APIServiceImpl implements APIService {
 			SECRET = resource.getString("SANDBOX_CLIENT_SECRET");
 			URL = resource.getString("SANDBOX_ENDPOINT");
 		}else {
-			CLIENT_ID = resource.getString("LIVE_CLIENT_ID");
-			SECRET = resource.getString("LIVE_CLIENT_SECRET");
+			CLIENT_ID = resource.getString("LIVE_CLIENT_NEW_ID");
+			SECRET = resource.getString("LIVE_CLIENT_NEW_SECRET");
 			URL = resource.getString("LIVE_ENDPOINT");
 		}
 		TOKEN_URL = URL +"/v1/oauth2/token";
@@ -54,8 +54,9 @@ public class APIServiceImpl implements APIService {
 	public String getAccessToken(String merchantID) throws Exception {
 		String authorization = CLIENT_ID + ":" + SECRET;
 		if(StringUtils.equals(merchantID, "584JZVFU6PPVU")) {
-			authorization = "Aap97fKTuvW4Fu11jGXs2lGRG20I_nhYrQxJhFz165AQwZ-YXlaAzSy4Lv3TIoTdHTCzYrwXrmzbnlWE:"
-					+ "ECjebKSWXfuDtCIPXXf58v3w-gd70JctE4bphIbcpVkkoL8jOajiEDFaC6FlnaYaOayWIkN6eLGkH1VZ";
+			ResourceBundle resource = ResourceBundle.getBundle("paypal",Locale.getDefault());
+			authorization = resource.getString("LIVE_CLIENT_OLD_ID")+":"
+					+ resource.getString("LIVE_CLIENT_OLD_SECRET");
 		}
     	authorization = Base64.encodeBase64String(authorization.getBytes());
     	
