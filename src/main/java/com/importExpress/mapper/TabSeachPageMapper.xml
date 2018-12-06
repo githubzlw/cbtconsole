@@ -128,39 +128,49 @@
 	</update>
 	
 	<!-- public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean); -->
-	<insert id="updateAuthorizedInfo" parameterType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
+	<update id="updateAuthorizedInfo" parameterType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
 		<choose>
 		    <when test="fileUrl == null">
-		        INSERT INTO alidata.shop_url_authorized_info 
-				(shop_id, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime) 
-				VALUES (#{shopId}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW()) 
-				ON DUPLICATE KEY UPDATE 
-				admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
+		        UPDATE alidata.shop_url_authorized_info
+				SET admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
 				end_time = #{endTime}, remark = #{remark}, valid= #{valid}, updatetime=NOW()
+                WHERE id = #{id}
 		    </when>
 		    <otherwise>
-		        INSERT INTO alidata.shop_url_authorized_info 
-				(shop_id, file_name, file_url, img_file_url, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime)
-				VALUES (#{shopId}, #{fileName}, #{fileUrl}, #{imgFileUrl}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW())
-				ON DUPLICATE KEY UPDATE 
-				file_name = #{fileName}, file_url = #{fileUrl}, img_file_url = #{imgFileUrl}, admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
+                UPDATE alidata.shop_url_authorized_info
+				SET file_name = #{fileName}, file_url = #{fileUrl}, img_file_url = #{imgFileUrl}, admin_id = #{adminId}, admuser = #{admuser}, start_time = #{startTime},
 				end_time = #{endTime}, remark = #{remark}, valid= #{valid}, updatetime=NOW()
+                WHERE id = #{id}
 		    </otherwise>
 		</choose>
+	</update>
+
+	<!-- long insertAuthorizedInfo(ShopUrlAuthorizedInfoPO bean); -->
+	<insert id="insertAuthorizedInfo" parameterType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
+        INSERT INTO alidata.shop_url_authorized_info
+        (shop_id, file_name, file_url, img_file_url, admin_id, admuser, start_time, end_time, remark, valid, createtime, updatetime)
+        VALUES (#{shopId}, #{fileName}, #{fileUrl}, #{imgFileUrl}, #{adminId}, #{admuser},#{startTime}, #{endTime}, #{remark}, #{valid}, NOW(), NOW())
 	</insert>
-	
+
 	<!-- public ShopUrlAuthorizedInfoPO queryAuthorizedInfo(@Param("shopId") String shopId); -->
 	<select id="queryAuthorizedInfo" resultType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
 		SELECT id, shop_id shopId, file_name fileName, file_url fileUrl, admin_id adminId, admuser,
 			start_time startTime, end_time endTime, remark, valid 
 		FROM alidata.shop_url_authorized_info
-		WHERE shop_id = #{shopId}
+		WHERE shop_id = #{shopId} AND valid != 3
+		LIMIT 1
 	</select>
 	
 	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
 	<select id="queryStaticizeAll" resultMap="BaseResultMap">
 		select id,keyword from tab_seach_pages where sate = 0 AND pid != 0
 	</select>
-	
+
+    <!--long updateAuthorizedInfoValid(@Param("shopId") String shopId, @Param("valid") int valid);-->
+    <update id="updateAuthorizedInfoValid">
+        UPDATE alidata.shop_url_authorized_info
+        SET valid = #{valid}
+        WHERE shop_id = #{shopId} AND valid != #{valid}
+    </update>
 
 </mapper>
