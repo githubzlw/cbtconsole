@@ -36,6 +36,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
     private final static org.slf4j.Logger REFUNDLOG = LoggerFactory.getLogger("refund");
     @Autowired
     private RefundResultInfoMapper refundResultInfoMapper;
+    private OrderInfoDao orderInfoDao = new OrderInfoImpl();
 
     @Override
     public Payment createPayment(
@@ -173,7 +174,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
 
     @Override
     public JsonResult reFundNew(String orderNo, String amountMoney) {
-        OrderInfoDao orderInfoDao = new OrderInfoImpl();
+
 
         //先查询这个订单是否存在
         JsonResult json = new JsonResult();
@@ -213,11 +214,21 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                         REFUNDLOG.info("begin refund:" + refundResultInfo.toString());
                         refundResultInfoMapper.insertSelective(refundResultInfo);
 
-                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        DetailedRefund detailedRefund;
+
+                        /*DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                         LocalDateTime payTime = LocalDateTime.parse(paymentInfo.get("payTime").toString(),df);
                         LocalDateTime changeTime = LocalDateTime.parse("2018-09-20 00:00:00",df);
-                        DetailedRefund detailedRefund;
+
                         if(payTime.isBefore(changeTime)){
+                            detailedRefund = reFund(saleId, amountMoney,1);
+                        }else{
+                             detailedRefund = reFund(saleId, amountMoney,0);
+                        }*/
+
+                        // 新的判断新老账号方法
+                        boolean isOld = orderInfoDao.checkIsOldPayPal(orderNo);
+                        if(isOld){
                             detailedRefund = reFund(saleId, amountMoney,1);
                         }else{
                              detailedRefund = reFund(saleId, amountMoney,0);
@@ -299,6 +310,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
         }
         return json;
     }
+
 
     @Override
     public JsonResult refundByPayNo(String payNo, String payType,String refundAmount, String remark, int adminId) {
