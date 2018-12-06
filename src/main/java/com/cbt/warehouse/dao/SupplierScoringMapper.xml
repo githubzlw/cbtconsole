@@ -47,7 +47,7 @@
 	</select>
 	<select id="querySupplierScoringByPage" resultMap="supplierScoringMap">
 		SELECT a.shopId,b.en_name as category,a.address,a.id,a.quality_avg,a.service_avg,a.level,a.inventory_agreement,a.return_days,a.counts,a.allcounts,a.shopType,a.authorizedFlag,a.noSupplier FROM (
-		SELECT c.shop_id AS shopId,func_get_split_string(c.path_catid,',',1) AS catid,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,COUNT(c.pid) AS counts,
+		SELECT c.shop_id AS shopId,c.catid1 AS catid,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,COUNT(c.pid) AS counts,
 		(SELECT count(distinct od.goods_pid) FROM custom_benchmark_ready cb
 		INNER JOIN order_details od ON cb.pid=od.goods_pid
 		LEFT JOIN supplier_product s ON s.goods_pid=od.goods_pid
@@ -122,11 +122,12 @@
 	
 	<select id="querySupplierRecord" resultType="java.lang.Integer">
 		select count(a.shopId) from (
-		SELECT c.shop_id AS shopId,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,count(c.pid) as counts,
-		(SELECT COUNT(1) FROM custom_benchmark_ready WHERE shop_id=c.shop_id) AS allcounts,
-		su.shop_type as shopType,su.authorized_flag as authorizedFlag
+		SELECT c.shop_id AS shopId
+-- 		,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,count(c.pid) as counts,
+-- 		(SELECT COUNT(1) FROM custom_benchmark_ready WHERE shop_id=c.shop_id) AS allcounts,
+-- 		su.shop_type as shopType,su.authorized_flag as authorizedFlag
 		FROM custom_benchmark_ready c
-		LEFT JOIN shop_addr_spider sa ON sa.shop_id=c.shop_id
+-- 		LEFT JOIN shop_addr_spider sa ON sa.shop_id=c.shop_id
 		LEFT JOIN supplier_scoring s ON c.shop_id=s.shop_id
 		left join shop_url_bak su on su.shop_id=c.shop_id
 		WHERE c.shop_id IS NOT NULL AND c.shop_id !='' AND c.valid=1
@@ -284,7 +285,7 @@
 		SELECT shop_id as shopId,quality,service,username as userName,createtime FROM supplier_product WHERE shop_id=#{shop_id} AND goods_pid=#{shop_id}
 	</select>
 	<select id="getAllShopGoodsInfo" resultType="com.cbt.warehouse.pojo.SupplierProductsBean">
-		SELECT c.shop_id as shopId,c.pid as goodsPid,s.remark as remarks,c.remotpath,c.custom_main_image,s.quality,s.service,s.username as userName,s.id
+		SELECT c.shop_id as shopId,c.pid as goodsPid,s.remark as remarks,c.remotpath,c.custom_main_image,s.quality,s.service,s.username as userName,s.id,s.createtime
 		FROM custom_benchmark_ready c
 		inner JOIN supplier_product s ON c.shop_id=s.shop_id AND c.pid=s.goods_pid and s.goods_pid&lt;>#{shop_id}
 		WHERE c.valid=1 AND c.shop_id=#{shop_id}

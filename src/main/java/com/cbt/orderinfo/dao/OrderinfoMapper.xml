@@ -531,7 +531,6 @@
                 inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno =  order_no    where o.state in (5,2,1)
             </when>
             <when test="type == 'notshipping'">
-                <!-- left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no    -->
                 where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND o.isDropshipOrder&lt;>3
             </when>
             <when test="type == 'systemfailure'">
@@ -540,62 +539,34 @@
             <when test="type == 'purchasewarning'">
                 where  (date_add(orderpaytime, INTERVAL 2 day) &lt; now() and state in (5)) AND o.isDropshipOrder&lt;>3
             </when>
-
             <when test="type == 'storagewarning'">
                 where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and state = 1) AND o.isDropshipOrder&lt;>3
             </when>
             <when test="type == 'shipmentwarning'">
                 where  o.isDropshipOrder&lt;>3 and (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
             </when>
-
             <when test="type == 'cacle'">
-                <![CDATA[
-  		where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) <= 10  and  orderpaytime is not null
-  	]]>
+  		      where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) &lt;= 10  and  orderpaytime is not null
             </when>
             <when test="type == 'cy'">
-                <![CDATA[
-  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
-  	]]>
+  		    where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null
             </when>
             <when test="type == 'cyw'">
-                <![CDATA[
-  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
-  		 AND order_no in(
-			SELECT
-				sp.orderid
-			FROM
-				(SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
-				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
-			WHERE
+  		       where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null AND order_no in(
+			   SELECT sp.orderid FROM (SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
+				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no WHERE
 				((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
-				((datediff(ti.updat_date,ti.track_update) IS null
-				OR datediff(ti.updat_date,ti.track_update) > 3
-				OR now() > ti.order_deliverDate))
-				OR ti.track_state IN (4,5,6)))
-			)
-  	]]>
+				((datediff(ti.updat_date,ti.track_update) IS null OR datediff(ti.updat_date,ti.track_update) > 3 OR now() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6))))
             </when>
             <when test="type == 'latelyOrdermessage'">
-                <![CDATA[
-  		where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
-  	]]>
+  		      where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
             </when>
             <when test="type == 'ordermessage'">
                 where orderremark != '' and state in(1,2,3,4,5)
             </when>
             <when test="type == 'ordermeg'">
-                LEFT JOIN
-                (
-                SELECT
-                order_no, count(payc.id) sl
-                FROM
-                orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
-                WHERE
-                oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
-                group by order_no
-                ) cc on cc.order_no=o.order_no
-                where  cc.sl=0 and LENGTH(o.order_no)&lt;>18
+                LEFT JOIN (SELECT order_no, count(payc.id) sl FROM orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
+                WHERE oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3  group by order_no) cc on cc.order_no=o.order_no where  cc.sl=0 and LENGTH(o.order_no)&lt;>18
             </when>
             <otherwise>  where 1=1  </otherwise>
         </choose>
@@ -615,7 +586,7 @@
                 and ( o.state=-1 or  o.state=6 )
             </when>
             <when test="state == 7 ">
-                and o.state=3 AND <![CDATA[ od.state<2 ]]>
+                and o.state=3 AND od.state&lt;2
             </when>
             <when test="state != -2">
                 and o.state=#{state}
@@ -624,22 +595,14 @@
         <if test="admuserid != 0">
             and aru.adminid=#{admuserid}
         </if>
-        <!--  <if test="buyid != 0">
-                 and order_buy.buyid=#{buyid}
-        </if> -->
         <if test="showUnpaid == 0">
             and o.state != 0
         </if>
-        <if test="startdate != null ">
-            <![CDATA[
+        <if test="startdate != null and startdate != 0">
         	and  o.orderpaytime >=#{startdate}
-        ]]>
         </if>
-
-        <if test="enddate !=null">
-            <![CDATA[
-        	and  o.orderpaytime <=#{enddate}
-       ]]>
+        <if test="enddate !=null and enddate!=0">
+        	and  o.orderpaytime &lt;=#{enddate}
         </if>
         <if test="email != null and email != ''">
             and email = #{email}
