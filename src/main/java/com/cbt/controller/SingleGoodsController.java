@@ -77,11 +77,17 @@ public class SingleGoodsController {
         }
 
         int startNum = 0;
-        int limitNum = 20;
+        int limitNum = 40;
+        String rowStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowStr) || "0".equals(rowStr))) {
+            limitNum = Integer.valueOf(rowStr);
+        }
+
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
             startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
         }
+
         String pid = request.getParameter("pid");
         if (pid == null || "".equals(pid)) {
             pid = "";
@@ -132,6 +138,11 @@ public class SingleGoodsController {
             queryPm.setDrainageFlag(drainageFlag);
             queryPm.setGoodsType(goodsType);
             List<SameTypeGoodsBean> res = sgGsService.queryForList(queryPm);
+            for(SameTypeGoodsBean goodsBean : res){
+                if(StringUtils.isNotBlank(goodsBean.getShopId())){
+                    goodsBean.setShopGoodsNum(sgGsService.queryOnlineGoodsCountByShopId(goodsBean.getShopId()));
+                }
+            }
             int count = sgGsService.queryForListCount(queryPm);
             if (res.size() > 0) {
                 dealRalationAdmin(res);

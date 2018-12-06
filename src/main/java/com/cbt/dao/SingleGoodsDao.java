@@ -214,4 +214,6 @@ public interface SingleGoodsDao {
 	 */
 	boolean deleteSingleOffersByPids(List<String> pidList);
 
+	int queryOnlineGoodsCountByShopId(String shopId);
+
 }
