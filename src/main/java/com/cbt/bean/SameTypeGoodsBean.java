@@ -35,6 +35,8 @@ public class SameTypeGoodsBean {
 	private int opFlag;//操作标识 0 1 2
 	private int drainageFlag;//引流标识 0非引流 1引流
 	private int goodsType;//对标类型 0默认 1阿里对标商品 2亚马逊对标商品
+	private String shopId;// 店铺ID
+	private int shopGoodsNum;// 店铺数量
 
 	public int getId() {
 		return id;
@@ -253,5 +255,21 @@ public class SameTypeGoodsBean {
 
 	public void setGoodsType(int goodsType) {
 		this.goodsType = goodsType;
+	}
+
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
+	}
+
+	public int getShopGoodsNum() {
+		return shopGoodsNum;
+	}
+
+	public void setShopGoodsNum(int shopGoodsNum) {
+		this.shopGoodsNum = shopGoodsNum;
 	}
 }

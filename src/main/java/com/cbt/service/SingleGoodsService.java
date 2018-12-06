@@ -144,4 +144,6 @@ public interface SingleGoodsService {
 	 */
 	boolean deleteSingleOffersByPids(List<String> pidList);
 
+	int queryOnlineGoodsCountByShopId(String shopId);
+
 }
