@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cbt.bean.ComplainVO;
+import com.cbt.dao.IComplainDao;
 import com.importExpress.mapper.AdminRUserMapper;
 import com.importExpress.mapper.CustomerDisputeMapper;
 import com.importExpress.pojo.AdminRUser;
@@ -35,6 +37,8 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private CustomerDisputeMapper customerDisputeMapper;
 	@Autowired
 	private AdminRUserMapper adminRUserMapper;
+	@Autowired
+	private IComplainDao complainDao;
 	@Override
 	public Map<String, Object> list(String disputeID,int startNum, int limitNum,
 			String startTime, String endTime, String status,int admID) {
@@ -122,32 +126,47 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    	}).collect(Collectors.toList());
 	    	
 	    	List<String> useridList = new ArrayList<String>();
+	    	List<String> disputeIdList = new ArrayList<String>();
 	    	list.stream().forEach(c->{
 	    		if(!StringUtils.isBlank(c.getUserid()) && !useridList.contains(c.getUserid())) {
 	    			useridList.add(c.getUserid());
 	    		}
+	    		if(!StringUtils.isBlank(c.getDisputeID()) && !disputeIdList.contains(c.getDisputeID())) {
+	    			disputeIdList.add(c.getDisputeID());
+	    		}
+	    		
+	    	});
+	    	List<ComplainVO> complainByDisputeId = complainDao.getComplainByDisputeId(disputeIdList);
+	    	Map<String,ComplainVO> disputeMap = new HashMap<String,ComplainVO>();
+	    	complainByDisputeId.stream().forEach(c -> {
+	    		disputeMap.put(c.getDisputeId(), c);
 	    	});
 	    	
+	    	Map<String,AdminRUser> useridMap = new HashMap<String,AdminRUser>();
 	    	if(!useridList.isEmpty()) {
-	    		Map<String,AdminRUser> useridMap = new HashMap<String,AdminRUser>();
 	    		int admid = admID == 1 || admID == 8 || admID == 18? 0 : admID;
 	    		List<AdminRUser> selectByUserID = adminRUserMapper.selectByUserID(useridList,admid);
 	    		selectByUserID.stream().forEach(m -> {
 	    			useridMap.put(String.valueOf(m.getUserid()), m);
 	    		});
-	    		
-	    		list.stream().forEach(c->{
-	    			AdminRUser adminRUser = useridMap.get(c.getUserid());
-	    			if(adminRUser != null) {
-	    				c.setEmail(adminRUser.getUseremail());
-	    				c.setOprateAdm(adminRUser.getAdmname());
-	    			}else {
-	    				c.setEmail("");
-	    				c.setOprateAdm("testAdm");
-	    				
-	    			}
-	    		});
 	    	}
+	    	list.stream().forEach(c->{
+	    		AdminRUser adminRUser = useridMap.get(c.getUserid());
+	    		if(adminRUser != null) {
+	    			c.setEmail(adminRUser.getUseremail());
+	    			c.setOprateAdm(adminRUser.getAdmname());
+	    		}else {
+	    			c.setEmail("");
+	    			c.setOprateAdm("testAdm");
+	    		}
+	    		ComplainVO complainVO = disputeMap.get(c.getDisputeID());
+	    		c.setComplainId("");
+	    		if(complainVO != null) {
+	    			c.setComplainId(String.valueOf(complainVO.getId()));
+	    		}
+	    		
+	    	});
+	    	
 	    	long sTime = StringUtils.isNotBlank(startTime) ? sdf.parse(startTime).getTime() : 0;
 	    	
 	    	long etimeTemp = 0L;

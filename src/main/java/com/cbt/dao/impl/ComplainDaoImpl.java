@@ -493,7 +493,8 @@ public class ComplainDaoImpl implements IComplainDao{
 	@Override
 	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
 		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
-		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText from tb_complain where dispute_id in (");
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText,dispute_id,"
+				+ "merchant_id from tb_complain where dispute_id in (");
 
 		for(String disputeId : disputeIdList) {
 			sb.append("\"").append(disputeId).append("\",");

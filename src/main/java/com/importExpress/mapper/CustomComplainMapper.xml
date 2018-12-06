@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.CustomComplainMapper" >
+  
+  
+  <insert id="insertPidList">
+  insert into custom_benchmark_complain (pid,complain_count) values
+   <foreach collection="list" separator="," item="item" >
+   (#{item},1)
+  </foreach>
+  </insert>
+  
+  <update id="updateComplainCount">
+  update custom_benchmark_complain set complain_count = complain_count+1  where 
+  pid in 
+  <foreach collection="list" separator="," item="item" open="(" close=")">
+  #{item}
+  </foreach>
+  </update>
+  
+  <select id="selectByPidList" resultType="String">
+  select  pid from custom_benchmark_complain where pid in 
+  <foreach collection="list" separator="," item="item" open="(" close=")">
+  #{item}
+  </foreach>
+  
+  </select>
+  
+  
+</mapper>

@@ -96,6 +96,8 @@
         .td_sty {
             width: 130px;
         }
+        .complain_id{width:100px;}
+        .complain_txt{width:300px;margin-left: 50px;}
     </style>
     <script>
         $(document).ready(function () {
@@ -168,13 +170,16 @@
         	}
     		return '新账号';
     	}
-        function formatAction(val, row, index) {
-        	var actionHtml = '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-				+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
-        	if(!row.complainId !=''){
-        		actionHtml +='<input type="button" value="关联投诉" onclick="linkComplain(\''+row.userid+'\',\''+row.disputeID+'\',\''+row.merchantID+'\')">';
+        function formatComplain(val, row, index) {
+        	var actionHtml = row.complainId;
+        	if(row.complainId ==''){
+        		actionHtml ='<input type="button" value="关联投诉" onclick="linkComplain(\''+row.userid+'\',\''+row.disputeID+'\',\''+row.merchantID+'\')">';
         	}
     		return actionHtml;
+    	}
+        function formatAction(val, row, index) {
+        	return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
     	}
         
         function formatOrder(val, row, index) {
@@ -214,15 +219,15 @@
     			data:{userid:userid},
     			success:function(res){
     				var result = eval('(' + res + ')')
-    				alert(res)
-    				var html = '该用户没有投诉';
+    				var html = '该用户没有投诉,点击confirm按钮，创建一条投诉消息';
     				if(result.status){
-    					html = "<table>";
+    					html = '<div><div><span></span><span  class="complain_id">id</span><span  class="complain_txt">投诉内容</span></div>';
     					var json = result.data;
     					for(var i=0;i<json.length;i++){
     						var complain = json[i];
-    						html +='<tr><td><input type="radio" class='+'></td><td>'+complain.id+'</td><td>'+complain.complainText+'</td></tr>';
+    						html +='<div><span><input type="radio" class="c_radio" value="'+complain.id+'"></span><span class="complain_id">'+complain.id+'</span><span class="complain_txt">'+complain.complainText+'</span></div>';
     					}
+    					html +='</div>';
     				}
     				
     				$.dialog({
@@ -235,15 +240,20 @@
 						fixed : false,
 						ok : function() {
 							var id = "";
+							$(".c_radio").each(function(){
+								if($(this).is(":checked")){
+									id = $(this).val();
+								}
+							})
 							var href = window.location.href;
-							if(disputeid !='' && merchantid!=''){
+							if(disputeID !='' && merchantID!='' && id !=''){
 							  $.ajax({
 									type:'POST',
 									dataType:'text',
 									url:'/cbtconsole/complain/dispute/update',
-									data:{id:id,disputeid:disputeid,merchantid:merchantid},
+									data:{id:id,disputeid:disputeID,merchantid:merchantID},
 									success:function(res){
-										
+										window.location.href = href;
 									},
 									error:function(XMLResponse){
 										alert('error');
@@ -300,7 +310,8 @@
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
-        <th data-options="field:'type',width:'30px'">来源</th>
+        <th data-options="field:'apiType',width:'30px'">来源</th>
+        <th data-options="field:'complainId',width:'80px',formatter:formatComplain">投诉号</th>
         <th data-options="field:'disputeID',width:'80px'">事件号</th>
         <th data-options="field:'reason',align:'left',width:'210px'">原因</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>

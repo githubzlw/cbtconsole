@@ -1,11 +1,27 @@
 package com.cbt.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
 import com.cbt.bean.Complain;
 import com.cbt.bean.ComplainFile;
 import com.cbt.bean.ComplainVO;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
-import com.cbt.orderinfo.service.OrderinfoService;
 import com.cbt.pojo.page.Page;
 import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.service.AdditionalBalanceService;
@@ -16,23 +32,8 @@ import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.service.CustomComplainService;
 import com.importExpress.service.CustomerDisputeService;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/complain")
@@ -43,6 +44,8 @@ public class ComplainController {
 	private CustomerDisputeService customerDisputeService;
 	@Autowired
 	private IComplainService complainService;
+	@Autowired
+	private CustomComplainService customComplainService;
 	
 	@Autowired
 	private RefundSSService refundService;
@@ -225,8 +228,27 @@ public class ComplainController {
 		String id = request.getParameter("id");
 		String orderid = request.getParameter("orderid");
 		String goodsid = request.getParameter("goodsid");
-		int updateGoodsid = complainService.updateGoodsid(Integer.valueOf(id), orderid, goodsid);
-		map.put("status", updateGoodsid > 0);
+		map.put("status", false);
+		if(StringUtils.isNotBlank(orderid) && StringUtils.isNotBlank(goodsid)) {
+			int updateGoodsid = complainService.updateGoodsid(Integer.valueOf(id), orderid, goodsid);
+			
+			goodsid = goodsid.endsWith(",") ? goodsid.substring(0, goodsid.length()-1) : goodsid;
+			List<String> asList = Arrays.asList(goodsid.split(","));
+			List<String> updateList = customComplainService.selectByPidList(asList);
+			if(updateList != null && !updateList.isEmpty()) {
+				customComplainService.updateComplainCount(updateList);
+			}
+			List<String> insertList = new ArrayList<String>();
+			asList.stream().forEach(a -> {
+				if(!updateList.contains(a)) {
+					insertList.add(a);
+				}
+			});
+			if(insertList != null && !insertList.isEmpty()) {
+				customComplainService.insertPidList(insertList);
+			}
+			map.put("status", updateGoodsid > 0);
+		}
 		return map;
 	}
 	@RequestMapping(value = "/dispute/update", method = RequestMethod.POST)
@@ -255,6 +277,5 @@ public class ComplainController {
 		}
 		return map;
 	}
-	
 	
 }
