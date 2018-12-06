@@ -191,8 +191,13 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public List<ComplainVO> getCommunicatingByCidBG(Integer complainId) {
-		String sql="SELECT cc.id,cc.complainid,cc.chatText,cc.chatAdmin,cc.chatTime,cc.flag,(select admName from admuser where id=( SELECT adminid from admin_r_user where userid=( SELECT userid from tb_complain where id=?) limit 1) limit 1) as admName,f.imgUrl"
-				+ " from tb_complain_chat cc LEFT JOIN tb_complain_file f ON cc.id=f.complainChatid AND f.flag=1 WHERE cc.complainid = ? ORDER BY chatTime ";
+		String sql="SELECT cc.id,cc.complainid,cc.chatText,cc.chatAdmin," + 
+				"cc.chatTime,cc.flag,ifnull(admin_r_user.admName,'') admName, ifnull(f.imgUrl,'') imgUrl " + 
+				"from tb_complain_chat cc " + 
+				"inner join tb_complain  on  tb_complain.id=cc.complainid " + 
+				"left join admin_r_user on tb_complain.userid=admin_r_user.userid " + 
+				"LEFT JOIN tb_complain_file f ON cc.id=f.complainChatid AND f.flag=1 " + 
+				"WHERE cc.complainid = ? ORDER BY chatTime";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -200,7 +205,6 @@ public class ComplainDaoImpl implements IComplainDao{
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, complainId);
-			stmt.setInt(2, complainId);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				ComplainVO rfb = new ComplainVO();

@@ -84,9 +84,28 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int uglyFlag;//难看标识
     private int repairedFlag;//修复标识
     private int weightIsEdit;//重量手动更新标识 1产品编辑更新,2入库称重
+    
+    private String complainId;//投诉id
+    private List<String> complain;
 
 
-    public String getAliGoodsPrice() {
+    public List<String> getComplain() {
+		return complain;
+	}
+
+	public void setComplain(List<String> complain) {
+		this.complain = complain;
+	}
+
+	public String getComplainId() {
+		return complainId;
+	}
+
+	public void setComplainId(String complainId) {
+		this.complainId = complainId;
+	}
+
+	public String getAliGoodsPrice() {
         return aliGoodsPrice;
     }
 

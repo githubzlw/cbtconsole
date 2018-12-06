@@ -262,6 +262,11 @@ b {
             queryParams.isSort = isSort;
             $("#query_is_sort").val(isSort);
         }
+        var isComplain = sessionStorage.getItem("isComplain");
+        if(!(isComplain == null || isComplain == "" || isComplain != '1')){
+            queryParams.isComplain = isComplain;
+            $("#is_complain").attr("checked",'true');//全选 
+        }
 
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -338,6 +343,7 @@ b {
 		var price1688Begin = $("#query_1688_price_begin").val();
 		var price1688End = $("#query_1688_price_end").val();
 		var isSort = $("#query_is_sort").val();
+		var isComplain = $("#is_complain").is(":checked")?"1":"0";
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -369,6 +375,7 @@ b {
         queryParams.price1688Begin = price1688Begin;
         queryParams.price1688End = price1688End;
         queryParams.isSort = isSort;
+        queryParams.isComplain = isComplain;
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -412,6 +419,7 @@ b {
             sessionStorage.setItem("price1688Begin", queryParams.price1688Begin);
             sessionStorage.setItem("price1688End", queryParams.price1688End);
             sessionStorage.setItem("isSort", queryParams.isSort);
+            sessionStorage.setItem("isComplain", queryParams.isComplain);
 
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
@@ -424,7 +432,7 @@ b {
 			+ "&onlineTime=" + queryParams.onlineTime + "&offlineTime=" + queryParams.offlineTime
 			+ "&editBeginTime=" + queryParams.editBeginTime + "&editEndTime=" + queryParams.editEndTime + "&weight1688Begin="
 			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
-			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort;
+			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -671,7 +679,7 @@ b {
 							<option value="2">点击次数倒排序</option>
 							<%--<option value="3">已点击商品倒排序</option>--%>
 							<option value="4">按照类别排序</option>
-					</select>&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+					</select><br>&nbsp;&nbsp;<input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
 						value="查询" style="height: 30px; width: 60px;" class="btn" />
 						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
 						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" /></td>

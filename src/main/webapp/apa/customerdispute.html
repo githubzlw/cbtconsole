@@ -171,9 +171,11 @@
     		return '新账号';
     	}
         function formatComplain(val, row, index) {
-        	var actionHtml = row.complainId;
+        	var actionHtml = '';
         	if(row.complainId ==''){
         		actionHtml ='<input type="button" value="关联投诉" onclick="linkComplain(\''+row.userid+'\',\''+row.disputeID+'\',\''+row.merchantID+'\')">';
+        	}else{
+        		actionHtml = '<a target="_blank" href="/cbtconsole/complain/getComplainByCid?cid='+row.complainId+'">'+row.complainId+'</a>';
         	}
     		return actionHtml;
     	}
