@@ -448,7 +448,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		// + "from orderinfo where order_no=?";
 		// --cjc20161105
 		String sql = "select order_no,user_id,product_cost,packag_style,state,delivery_time,service_fee,ip,mode_transport,create_time,"
-				+ "details_number,actual_lwh,processingfee,pay_price_three,remaining_price,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,"
+				+ "details_number,pay_price_three,remaining_price,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,"
 				+ "order_ac,pay_price,purchase_number,server_update,client_update,cashback,extra_freight,share_discount,extra_discount,coupon_discount,grade_discount,exchange_rate,"
 				+ "(select max(order_no) from orderinfo where order_no like '" + orderno
 				+ "%' and length(order_no) < 21) maxSplitOrder,"
@@ -491,7 +491,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				ob.setClient_update(rs.getInt("client_update"));
 				ob.setMaxSplitOrder(rs.getString("maxSplitOrder"));
 				ob.setDetails_pay(rs.getString("paytime"));
-				ob.setActual_lwh(rs.getString("actual_lwh"));
 				ob.setRemaining_price(rs.getDouble("remaining_price"));
 				ob.setCashback(rs.getDouble("cashback"));// 获得10美元减免--cjc20161105
 				ob.setExtra_freight(rs.getDouble("extra_freight"));// 获取额外运费的金额，就是加急的运费的金额；<一般要求在5天之内到的需要付额外的费用>--cjc20161105
@@ -500,7 +499,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				ob.setCoupon_discount(rs.getDouble("coupon_discount"));// 返单优惠 2.20
 				ob.setGradeDiscount(rs.getFloat("grade_discount"));
 				ob.setExchange_rate(rs.getString("exchange_rate"));
-				ob.setProcessingfee(rs.getDouble("processingfee"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2969,7 +2967,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				.append("state,cancel_obj,expect_arrive_time,arrive_time,create_time,client_update,server_update,ip,order_ac,")
 				.append("purchase_number,details_number,ipnaddress,currency,discount_amount,purchase_days,actual_lwh,")
 				.append("actual_weight_estimate,actual_freight_c,extra_freight,order_show,packag_number,orderRemark,")
-				.append("orderpaytime,cashback,isDropshipOrder,share_discount,extra_discount,coupon_discount,grade_discount,exchange_rate,processingfee)")
+				.append("orderpaytime,cashback,isDropshipOrder,share_discount,extra_discount,coupon_discount,grade_discount,exchange_rate)")
 				.append(" select '" + odbeanNew.getOrderNo() + "' as order_no,")
 				.append("user_id,address_id,delivery_time,packag_style,mode_transport,'0' as service_fee,'")
 				.append(odbeanNew.getProduct_cost() + "' as product_cost,")
@@ -2979,12 +2977,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						+ "'0' as custom_discuss_fright,transport_time,")
 				.append("state,cancel_obj,expect_arrive_time,arrive_time,create_time,client_update,server_update,ip,0 as order_ac,")
 				.append("0 as purchase_number,"+ odbeanNew.getOrderDetail().size() +" as details_number,ipnaddress,currency," + odbeanNew.getDiscount_amount())
-				.append(" as discount_amount,purchase_days,"+odbeanNew.getActual_lwh()+" as actual_lwh,")
+				.append(" as discount_amount,purchase_days,actual_lwh,")
 				.append("actual_weight_estimate,0 as actual_freight_c,"+odbeanNew.getExtra_freight()+" as extra_freight,order_show,0 as packag_number,orderRemark,")
 				.append("orderpaytime," + odbeanNew.getCashback() + " as cashback,isDropshipOrder," + odbeanNew.getShare_discount()
 						+ " as share_discount,")
 				.append(odbeanNew.getExtra_discount() + " as extra_discount," + odbeanNew.getCoupon_discount())
-				.append(" as coupon_discount," + odbeanNew.getGradeDiscount() + " as grade_discount,"+odbeanNew.getExchange_rate()+","+odbeanNew.getProcessingfee()+" as processingfee")
+				.append(" as coupon_discount," + odbeanNew.getGradeDiscount() + " as grade_discount,"+odbeanNew.getExchange_rate()+"")
 				.append(" from orderinfo where order_no = '" + orderNoOld + "'");
 
 		sqlList.add(insertOrderSql.toString());
@@ -2996,8 +2994,6 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ orderBeanTemp.getExtra_discount() + ",coupon_discount=" + orderBeanTemp.getCoupon_discount()
 				+ ",grade_discount=" + orderBeanTemp.getGradeDiscount() + ",cashback=" + orderBeanTemp.getCashback()
 				+ ",extra_freight=" + orderBeanTemp.getExtra_freight()
-				+ ",actual_lwh=" + orderBeanTemp.getActual_lwh()
-				+ ",processingfee=" + orderBeanTemp.getProcessingfee()
 				+ " where order_no = '"
 				+ orderBeanTemp.getOrderNo() + "'";
 		sqlList.add(updateOrSql);
