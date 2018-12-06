@@ -20,29 +20,29 @@
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
         <h2>邮件预览</h2>
     </div>
-    <div style="height: auto" id="email_content">
-        <div>
+    <div style="height: auto;font-size:20px;" id="email_content">
+        <div style="font-family: Times New Roman;">
             <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
             <p style="margin-bottom: 10px;">
-            <span style="display: inline-block;width: 800px;margin-bottom: 20px;">Dear customer,
-            <br>I'm ${adminName} of ImportExpress.</span>
-                <br>
-                <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
-                <br>
-                <span>Is there anything I could help you with?</span>
-                <br>
-                <span>Here's your shopping cart list</span>
+            <h3 style="font-family: Times New Roman;margin-bottom:20px;">Dear customer,</h3>
+            <span>I'm ${adminName} of ImportExpress.</span>
+            <br>
+            <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
+            <br>
+            <span>Is there anything I could help you with?</span>
+            <br>
+            <span>Here's your shopping cart list</span>
             </p>
 
-            <table style="width: 820px;font-size: 12px; border-color: #b6ff00;" id="email_update_table" border="1"
+            <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
                    cellpadding="1" cellspacing="0">
-                <caption style="float: left;font-weight: bold;font-size: 18px;">Price reduced items</caption>
+                <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Price reduced items</caption>
                 <tbody>
                 <tr>
                     <td colspan="6" style="border-top: 1px solid;"></td>
                 </tr>
-                <tr style="font-weight: bold;font-size: 12px;">
+                <tr style="font-weight: bold;">
                     <td align="center" width="350px">Item Name &amp; Details</td>
                     <td align="center" width="140px">Item Price</td>
                     <td align="center" width="140px">Quantity</td>
@@ -74,7 +74,7 @@
                 </tbody>
             </table>
 
-            <table style="width: 820px;font-size: 12px;text-align: right">
+            <table style="width: 820px;font-size: 18px;text-align: right">
                 <tbody>
                 <tr>
                     <td>Products Cart Total:</td>
@@ -89,9 +89,10 @@
 
             <c:if test="${fn:length(sourceList) > 0}">
                 <br>
-                <table style="width: 820px;font-size: 12px; border-color: #b6ff00;" id="email_old_table" border="1"
+                <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_old_table" border="1"
                        cellpadding="1" cellspacing="0">
-                    <caption style="float: left;font-weight: bold;font-size: 18px;width: 360px;">Others Items in your shopping Cart
+                    <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Others Items in your
+                        shopping Cart
                     </caption>
                     <tbody>
                     <tr>
@@ -127,12 +128,12 @@
                     </c:forEach>
                     </tbody>
                 </table>
-                <div>
-                    <a style="color: #0070C0" href="https://www.import-express.com/Goods/getShopCar" target="_blank">View
+                <div style="margin-top:10px;">
+                    <a style="color: #0070C0;" href="https://www.import-express.com/Goods/getShopCar" target="_blank">View
                         More...</a>
                 </div>
             </c:if>
-            <table style="width: 820px;font-size: 12px;text-align: right">
+            <table style="width: 820px;font-size: 18px;text-align: right">
                 <tbody>
                 <tr>
                     <td>Shop Cart Total:</td>
@@ -145,41 +146,40 @@
                 </tbody>
             </table>
 
-            <div>
-                <span style="font-weight: bold;font-size: 12px;">You have saved :USD&nbsp;${offCost}&nbsp;&nbsp;(${offRate}% Off)</span>
+            <div style="width:500px;position:relative;top:-30px;">
+                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;${offCost}&nbsp;&nbsp;(${offRate}% Off)</span>
                 <span><a href="https://www.import-express.com" target="_blank"
-                         tyle="border-color: #2e6da4;font-size: 16px;border-radius: 5px;color: #26ef19;background-color: #2e6da4;">BUY NOW</a></span>
+                         style="font-size: 16px;border-radius: 4px;color: #fff;background-color: #3e9eea;padding:4px 8px;text-decoration: none;">BUY NOW</a></span>
             </div>
         </div>
-        <br>
-        <br>
-        <div>
-            <span>If you have any further concerns or questions please feel free to ask me by responding to this Email</span>
-            <br><span>Yours Sincerely,</span>
-            <br><span>${adminName} | Marketing Manager</span>
-            <br><span>Marketing Department</span>
-            <br><span>E: ${adminEmail}</span>
-            <br><span>WhatsApp: +86 136 3644 5063</span>
-        </div>
-        <br>
-        <div>
-            <span>ImportExpress CHINA</span>
-            <br><span>Best product source for small business!</span>
-            <br><span><a href="https://www.import-express.com/" target="_blank">import-express</a></span>
-            <p class="footer_link">
-                <span>FOLLOW US:</span>
-                <a href="https://www.facebook.com/importexpressofficial/"
-                   style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/index_spritesheet.png);background-repeat: no-repeat;display: inline-block;"></a>
-                <a href="https://www.pinterest.com/importexpressofficial"
-                style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png);background-repeat: no-repeat;display: inline-block;"></a>
-                <a href="https://www.youtube.com/channel/UCQ1BcpyhuJdpCXzJuOswOKw"
-                style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png);background-repeat: no-repeat;display: inline-block;"></a>
-                <a href="https://twitter.com/importexpresss"
-                style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png);background-repeat: no-repeat;display: inline-block;"></a>
-                <a href="https://www.instagram.com/importexpressofficial/"
-                style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png);background-repeat: no-repeat;display: inline-block;"></a>
-                <a href="http://clothing-wholesaler.com/"
-                style="background-image: url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png);background-repeat: no-repeat;display: inline-block;"></a></p>
+        <div style="font-family: Times New Roman;">
+            <div>
+                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel free to ask me by responding to this Email</p>
+                <p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><b>${adminName}</b> | Marketing Manager</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><b >Marketing Department</b></p>
+                <p style="margin-bottom: 5px;margin-top:0;">E: ${adminEmail}</p>
+            </div>
+            <div>
+                <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
+                <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><a href="https://www.import-express.com/" target="_blank" style="color:#01a4ef;font-size:28px;"><b>www.import-express.com</b></a></p>
+                <p>
+                    <p style="font-weight: 700;">FOLLOW US:</p>
+                    <a href="https://www.facebook.com/importexpressofficial/"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/index_spritesheet.png) -781px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                    <a href="https://www.pinterest.com/importexpressofficial"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -109px -102px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                    <a href="https://www.youtube.com/channel/UCQ1BcpyhuJdpCXzJuOswOKw"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -161px -109px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                    <a href="https://twitter.com/importexpresss"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -177px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                    <a href="https://www.instagram.com/importexpressofficial/"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -5px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                    <a href="http://clothing-wholesaler.com/"
+                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -57px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                </p>
+            </div>
         </div>
     </div>
 </c:if>
