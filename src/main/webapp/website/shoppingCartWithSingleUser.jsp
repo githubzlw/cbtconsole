@@ -96,7 +96,9 @@
                 success: function (data) {
                     var json = eval("(" + data + ")");
                     if (json.ok) {
-                        window.location.reload();
+                        // window.location.reload();
+                        $(obj).parent().parent().find("td").eq(7).text(goodsPrice);
+                        $(obj).parent().parent().find("td").eq(8).text(newPrice);
                     } else {
                         $.messager.alert("提醒", json.message, "info");
                     }

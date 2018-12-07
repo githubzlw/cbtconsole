@@ -18,6 +18,7 @@
     <div>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
+        <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
         <h2>邮件预览</h2>
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
@@ -37,7 +38,8 @@
 
             <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
                    cellpadding="1" cellspacing="0">
-                <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Price reduced items</caption>
+                <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Price reduced items
+                </caption>
                 <tbody>
                 <tr>
                     <td colspan="6" style="border-top: 1px solid;"></td>
@@ -154,30 +156,36 @@
         </div>
         <div style="font-family: Times New Roman;">
             <div>
-                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel free to ask me by responding to this Email</p>
+                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel
+                    free to ask me by responding to this Email</p>
                 <p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>
                 <p style="margin-bottom: 5px;margin-top:0;"><b>${adminName}</b> | Marketing Manager</p>
-                <p style="margin-bottom: 5px;margin-top:0;"><b >Marketing Department</b></p>
-                <p style="margin-bottom: 5px;margin-top:0;">E: ${adminEmail}</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>
+                <p style="margin-bottom: 5px;margin-top:0;">Email: ${adminEmail}</p>
+                <p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input
+                        id="whats_app_span_temp" value="+86 136 3644 5063"/></p>
+                <p id="whats_app_pp" style="margin-bottom: 5px;margin-top:0;display: none;"></p>
             </div>
             <div>
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
                 <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
-                <p style="margin-bottom: 5px;margin-top:0;"><a href="https://www.import-express.com/" target="_blank" style="color:#01a4ef;font-size:28px;"><b>www.import-express.com</b></a></p>
+                <p style="margin-bottom: 5px;margin-top:0;"><a href="https://www.import-express.com/" target="_blank"
+                                                               style="color:#01a4ef;font-size:28px;"><b>www.import-express.com</b></a>
+                </p>
                 <p>
-                    <p style="font-weight: 700;">FOLLOW US:</p>
-                    <a href="https://www.facebook.com/importexpressofficial/"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/index_spritesheet.png) -781px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
-                    <a href="https://www.pinterest.com/importexpressofficial"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -109px -102px no-repeat;display: inline-block;width:42px;height:42px;"></a>
-                    <a href="https://www.youtube.com/channel/UCQ1BcpyhuJdpCXzJuOswOKw"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -161px -109px no-repeat;display: inline-block;width:42px;height:42px;"></a>
-                    <a href="https://twitter.com/importexpresss"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -177px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
-                    <a href="https://www.instagram.com/importexpressofficial/"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -5px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
-                    <a href="http://clothing-wholesaler.com/"
-                       style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -57px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <p style="font-weight: 700;">FOLLOW US:</p>
+                <a href="https://www.facebook.com/importexpressofficial/"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/index_spritesheet.png) -781px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <a href="https://www.pinterest.com/importexpressofficial"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -109px -102px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <a href="https://www.youtube.com/channel/UCQ1BcpyhuJdpCXzJuOswOKw"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -161px -109px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <a href="https://twitter.com/importexpresss"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -177px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <a href="https://www.instagram.com/importexpressofficial/"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -5px -57px no-repeat;display: inline-block;width:42px;height:42px;"></a>
+                <a href="http://clothing-wholesaler.com/"
+                   style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -57px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
                 </p>
             </div>
         </div>
@@ -188,26 +196,36 @@
     function confirmAndSendEmail(userId, userEmail) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
-            var emailContent = $("#email_content").html();
-            var model = $("#modeStr").html();
-            $.ajax({
-                type: 'POST',
-                dataType: 'text',
-                url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
-                data: {
-                    "userEmail": userEmail,
-                    "userId": userId,
-                    "emailContent": emailContent,
-                    "model": model
-                },
-                success: function (data) {
-                    var json = eval("(" + data + ")");
-                    alert(json.message);
-                },
-                error: function () {
-                    alert("执行失败,请联系管理员");
-                }
-            });
+            var whatsApp = $("#whats_app_span_temp").val();
+            if (whatsApp) {
+                $("#whats_app_pp_temp").remove();
+                $("#whats_app_pp").text("WhatsApp: " + whatsApp).show();
+
+                $("#show_notice").show();
+                var emailContent = $("#email_content").html();
+                var model = $("#modeStr").html();
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'text',
+                    url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
+                    data: {
+                        "userEmail": userEmail,
+                        "userId": userId,
+                        "emailContent": emailContent,
+                        "model": model
+                    },
+                    success: function (data) {
+                        var json = eval("(" + data + ")");
+                        $("#show_notice").text(json.message);
+                    },
+                    error: function () {
+                        $("#show_notice").text("执行失败,请联系管理员");
+                    }
+                });
+            } else {
+                $("#show_notice").text("请输入WhatsApp").show();
+            }
+
         } else {
             return false;
         }
