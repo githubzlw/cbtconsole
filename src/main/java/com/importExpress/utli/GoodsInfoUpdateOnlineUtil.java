@@ -46,19 +46,19 @@ public class GoodsInfoUpdateOnlineUtil {
      */
     public static void publishToOnlineByMq(CustomGoodsPublish bean) {
         StringBuffer mqSql = new StringBuffer();
-        mqSql.append(",keyword='" + bean.getKeyword() + "')" +
-                ".append(,eninfo='" + checkAndReplaceQuotes(bean.getEninfo()) + "')" +
-                ".append(,enname='" + checkAndReplaceQuotes(bean.getEnname()) + "')" +
-                ".append(,weight='" + bean.getWeight() + "')" +
-                ".append(,img='" + bean.getImg() + "')" +
-                ".append(,endetail='" + checkAndReplaceQuotes(bean.getEndetail()) + "')" +
-                ".append(,revise_weight='" + bean.getReviseWeight() + "')" +
-                ".append(,final_weight='" + bean.getFinalWeight() + "')" +
-                ".append(,price='" + bean.getPrice() + "')" +
-                ".append(,wprice='" + bean.getWprice() + "')" +
-                ".append(,range_price='" + bean.getRangePrice() + "')" +
-                ".append(,sku='" + bean.getSku() + "')" +
-                ".append(),cur_time=now(),bm_flag=1,goodsstate=4");
+        mqSql.append(",keyword='" + bean.getKeyword() + "'")
+                .append(",eninfo='" + checkAndReplaceQuotes(bean.getEninfo()) + "'")
+                .append(",enname='" + checkAndReplaceQuotes(bean.getEnname()) + "'")
+                .append(",weight='" + bean.getWeight() + "'")
+                .append(",img='" + bean.getImg() + "'")
+                .append(",endetail='" + checkAndReplaceQuotes(bean.getEndetail()) + "'")
+                .append(",revise_weight='" + bean.getReviseWeight() + "'")
+                .append(",final_weight='" + bean.getFinalWeight() + "'")
+                .append(",price='" + bean.getPrice() + "'")
+                .append(",wprice='" + bean.getWprice() + "'")
+                .append(",range_price='" + bean.getRangePrice() + "'")
+                .append(",sku='" + bean.getSku() + "'")
+                .append(",cur_time=now(),bm_flag=1,goodsstate=4");
 
         if (bean.getIsEdited() == 1) {
             mqSql.append(",finalName='" + checkAndReplaceQuotes(bean.getEnname()) + "'");
