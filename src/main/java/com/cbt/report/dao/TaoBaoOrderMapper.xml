@@ -326,11 +326,14 @@
       <if test="barcode!=null">
        and i.barcode=#{barcode}
      </if>
-      <if test="valid!=null and valid !=2">
+      <if test="valid!=null and valid !=2 and valid !=3">
           and c.valid=${valid}
       </if>
       <if test="valid  == 2">
           and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
+      <if test="valid  == 3">
+          and i.type=1
       </if>
       <if test="goods_pid!=null">
           and i.goods_pid=#{goods_pid}
@@ -404,11 +407,14 @@
       <if test="barcode!=null">
           and i.barcode=#{barcode}
       </if>
-      <if test="valid!=null and valid !=2">
+      <if test="valid!=null and valid !=2 and valid !=3">
           and c.valid=${valid}
       </if>
       <if test="valid  == 2">
           and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
+      <if test="valid  == 3">
+          and i.type=1
       </if>
       <if test="goods_pid!=null">
           and i.goods_pid=#{goods_pid}
@@ -2142,5 +2148,12 @@
     <select id="getPidValidState"  resultType="hashmap">
         SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
     </select>
+    <select id="getInventoryByPid" resultType="com.cbt.pojo.Inventory">
+        select id,type from inventory where goods_pid=#{pid} and type=1
+    </select>
+    <insert id="insertInventoryYmx">
+        insert into inventory(goods_url,new_remaining,can_remaining,barcode,goods_p_url,new_inventory_amount,car_img,flag,goods_pid,createtime,updatetime,remark,type,goods_p_price,remaining,good_name) VALUES
+        (#{goods_url},#{count},#{count},#{barcode},#{goods_p_url},#{new_inventory_amount},#{img},1,#{itmeid},now(),now(),#{remark},1,#{goods_p_price},0,#{good_name})
+    </insert>
 </mapper>
 

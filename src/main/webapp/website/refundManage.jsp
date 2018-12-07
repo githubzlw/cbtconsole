@@ -264,12 +264,14 @@
                     <%--Emma可以进行线下转账操作--%>
                     <c:if test="${refund.state == 3}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a>
-                        <c:if test="${operatorId == 83}">
+                        <c:if test="${operatorId == 83 || operatorId == 8}">
                             <br><br>
                             <input type="button" value="执行退款" class="btn_sty"
                                onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
-                            <input type="button" value="线下转账" class="btn_sty"
+                            <c:if test="${operatorId == 83}">
+                                <input type="button" value="线下转账" class="btn_sty"
                                    onclick="offLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/>
+                            </c:if>
                         </c:if>
                     </c:if>
                     <c:if test="${refund.state == 4}">
@@ -353,7 +355,7 @@
             <td><input type="password" id="secvlid_pwd" value="" style="width: 265px;"/></td>
         </tr>
         <tr>
-            <td colspan="2" style="text-align: center;"><input type="button" class="btn_sty" value="确定" onclick="setAndRemark(this)"/>
+            <td colspan="2" style="text-align: center;"><input type="button" id="refund_bnt_enter" class="btn_sty" value="确定" onclick="setAndRemark()"/>
                 <input type="button" class="btn_sty" value="取消" onclick="hideDivRemark()"/>
             <span id="show_notice" style="color: red;display: none;">正在执行,请等待...</span></td>
         </tr>
@@ -397,7 +399,7 @@
                         }
                     }else if(state == 2){
                         //EMMA退款
-                        if(operatorId == 8){
+                        if(operatorId == 8 || operatorId == 83){
                             showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
                         }else{
                             $.messager.alert("操作提示","需要EMMA同意，您无权限操作！");
@@ -425,7 +427,7 @@
         }
     }
 
-    function setAndRemark(ojb) {
+    function setAndRemark() {
         var refundId = $("#refund_id").val();
         var type = $("#refund_type").val();
         var state = $("#refund_state").val();
@@ -456,7 +458,7 @@
                 title: '正在执行',
                 msg: '请等待...'
             });*/
-            $(ojb).prop("disabled",true);
+            $("#refund_bnt_enter").prop("disabled",true);
             $("#show_notice").show();
             $.ajax({
                 type: 'POST',
@@ -476,6 +478,8 @@
                 },
                 success: function (data) {
                     //$.messager.progress('close');
+                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#show_notice").hide();
                     var json = eval("(" + data + ")");
                     if (json.ok) {
                         //$.messager.alert("操作提示","执行成功");
@@ -491,6 +495,8 @@
                     }
                 },
                 error: function () {
+                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#show_notice").hide();
                     //$.messager.progress('close');
                     alert("执行失败,请联系管理员");
                 }
@@ -731,6 +737,8 @@
         $("#refund_remark").val("");
         $("#option_admin_id").val("");
         $("#div_secvlid").hide();
+        $("#refund_bnt_enter").prop("disabled",false);
+        $("#show_notice").hide();
     }
     
     function hideTrChoose() {

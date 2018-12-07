@@ -784,7 +784,7 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
-        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
+        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND IFNULL(sku,'---')!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,

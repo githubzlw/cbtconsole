@@ -849,7 +849,7 @@ em {
 							+ 服务费 <span class="ormtittdred">（${service_fee}）</span>
 						</c:if>
 						<c:if test="${order.processingfee>0}">
-							+ 手续费 <span class="ormtittdred">（${order.processingfee}）</span>
+							+ 店铺金额低于15手续费 <span class="ormtittdred">（${order.processingfee}）</span>
 						</c:if>
 						<c:if test="${actual_lwh>0}">
 							+ 质检费 <span class="ormtittdred">（${actual_lwh}）</span>
@@ -861,7 +861,7 @@ em {
 							+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
 						</c:if>
 						<c:if test="${order.extra_freight>0}">
-							+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
+							+运费<span class="ormtittdred">(${order.extra_freight})</span>
 						</c:if>
 						<c:if test="${order.actual_freight_c>0}">
 							+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
