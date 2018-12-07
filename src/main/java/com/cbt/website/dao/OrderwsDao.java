@@ -6035,7 +6035,7 @@ public class OrderwsDao implements IOrderwsDao {
             stmt=conn.prepareStatement(sql);
             stmt.setString(1,orderNo);
             rs=stmt.executeQuery();
-            if(rs.next() && rs.getString("orderdesc").contains("余额足够抵扣订单金额")){
+            if(rs.next() && StringUtil.isNotBlank(rs.getString("orderdesc")) && rs.getString("orderdesc").contains("余额足够抵扣订单金额")){
                 status=1;
             }else{
                 sql="select id from ipn_info where paymentStatus = 1 and orderNo=?";
