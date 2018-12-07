@@ -236,7 +236,7 @@ public class ComplainController {
 			List<String> asList = Arrays.asList(goodsid.split(","));
 			List<String> updateList = customComplainService.selectByPidList(asList);
 			if(updateList != null && !updateList.isEmpty()) {
-				customComplainService.updateComplainCount(updateList);
+				customComplainService.updateComplainCount(updateList,id);
 			}
 			List<String> insertList = new ArrayList<String>();
 			asList.stream().forEach(a -> {
@@ -245,7 +245,7 @@ public class ComplainController {
 				}
 			});
 			if(insertList != null && !insertList.isEmpty()) {
-				customComplainService.insertPidList(insertList);
+				customComplainService.insertPidList(insertList,id);
 			}
 			map.put("status", updateGoodsid > 0);
 		}

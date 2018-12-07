@@ -13,15 +13,15 @@ public class CustomComplainServiceImpl implements CustomComplainService {
 	private CustomComplainMapper customComplainMapper;
 
 	@Override
-	public Integer insertPidList(List<String> pidList) {
+	public Integer insertPidList(List<String> pidList,String complainId) {
 		// TODO Auto-generated method stub
-		return customComplainMapper.insertPidList(pidList);
+		return customComplainMapper.insertPidList(pidList,complainId);
 	}
 
 	@Override
-	public Integer updateComplainCount(List<String> pidList) {
+	public Integer updateComplainCount(List<String> pidList,String complainId) {
 		// TODO Auto-generated method stub
-		return customComplainMapper.updateComplainCount(pidList);
+		return customComplainMapper.updateComplainCount(pidList,complainId);
 	}
 
 	@Override

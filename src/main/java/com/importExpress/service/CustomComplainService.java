@@ -8,13 +8,13 @@ public interface CustomComplainService {
 	 * @param pidList
 	 * @return
 	 */
-	Integer insertPidList(List<String> pidList);
+	Integer insertPidList(List<String> pidList,String complainId);
 	
 	/**批量更新投诉次数
 	 * @param pidList
 	 * @return
 	 */
-	Integer updateComplainCount(List<String> pidList);
+	Integer updateComplainCount(List<String> pidList,String complainId);
 	
 	
 	/**获取列表

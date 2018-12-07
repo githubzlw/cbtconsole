@@ -4,14 +4,14 @@
   
   
   <insert id="insertPidList">
-  insert into custom_benchmark_complain (pid,complain_count) values
+  insert into custom_benchmark_complain (pid,complain_count,complain_id) values
    <foreach collection="list" separator="," item="item" >
-   (#{item},1)
+   (#{item},1,#{complainId})
   </foreach>
   </insert>
   
   <update id="updateComplainCount">
-  update custom_benchmark_complain set complain_count = complain_count+1  where 
+  update custom_benchmark_complain set complain_count = complain_count+1,complain_id=CONCAT_WS(",",complain_id,#{complainId})  where 
   pid in 
   <foreach collection="list" separator="," item="item" open="(" close=")">
   #{item}
