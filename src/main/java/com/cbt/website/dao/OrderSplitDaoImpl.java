@@ -2979,7 +2979,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 						+ "'0' as custom_discuss_fright,transport_time,")
 				.append("state,cancel_obj,expect_arrive_time,arrive_time,create_time,client_update,server_update,ip,0 as order_ac,")
 				.append("0 as purchase_number,"+ odbeanNew.getOrderDetail().size() +" as details_number,ipnaddress,currency," + odbeanNew.getDiscount_amount())
-				.append(" as discount_amount,purchase_days,"+odbeanNew.getActual_lwh()+"as actual_lwh,")
+				.append(" as discount_amount,purchase_days,"+odbeanNew.getActual_lwh()+" as actual_lwh,")
 				.append("actual_weight_estimate,0 as actual_freight_c,"+odbeanNew.getExtra_freight()+" as extra_freight,order_show,0 as packag_number,orderRemark,")
 				.append("orderpaytime," + odbeanNew.getCashback() + " as cashback,isDropshipOrder," + odbeanNew.getShare_discount()
 						+ " as share_discount,")
