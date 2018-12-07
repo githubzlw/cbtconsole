@@ -82,12 +82,25 @@
 			WHERE p.id=${report_id}
 	</select>
 
-    <!--List<Map<String,String>> queryWarningNum();-->
+    <!--List<Map<String,String>> queryWarningNum(@Param("adminid") int adminid);-->
     <select id="queryWarningNum" resultType="java.util.HashMap">
-        SELECT type,COUNT(1) total FROM problem_report,admin_r_user
-        WHERE problem_report.email = admin_r_user.useremail
-        AND (reply_content is null or reply_content = '')
-        GROUP BY type
+        SELECT
+        type,
+        COUNT(1) total
+        FROM
+        problem_report,
+        admin_r_user
+        WHERE
+        problem_report.email = admin_r_user.useremail
+        AND (
+        reply_content IS NULL
+        OR reply_content = ''
+        )
+        <if test="adminid != 1 and adminid != 0" >
+            and admin_r_user.adminid = #{adminid,jdbcType=INTEGER}
+        </if>
+        GROUP BY
+        type
     </select>
 
 </mapper>

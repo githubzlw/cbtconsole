@@ -49,6 +49,7 @@
     <result column="sku" property="sku" jdbcType="VARCHAR" />
     <result column="itemPrice" property="itemPrice" jdbcType="VARCHAR" />
     <result column="short_term" property="short_term" jdbcType="VARCHAR"/>
+    <result column="types" property="types" jdbcType="VARCHAR"/>
    </resultMap>
    
    <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
@@ -76,12 +77,16 @@
     <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
     <result column="onLine" property="onLine" jdbcType="VARCHAR" />
      <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+       <result column="pid" property="pid" jdbcType="VARCHAR" />
+       <result column="online_flag" property="online_flag" jdbcType="VARCHAR" />
+       <result column="db_flag" property="db_flag" jdbcType="VARCHAR"/>
    </resultMap>
  
   <select id="selectTaoBaoOrder" resultMap="BaseResultMap" >
      	SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
        AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+       id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01'  and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -148,16 +153,17 @@
      <if test="myorderid!=null">
         and ops.orderid=#{myorderid}
      </if>
-     GROUP BY t.orderid 
+     GROUP BY t.orderid
       <if test="page!=-1">
       limit #{page},20
       </if>
   </select>
   
   <select id="selectAllCount" resultMap="BaseResultMap">
-     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate 
-    AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
-   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2016-08-03'
+     SELECT t.orderid AS orderid,t.totalprice AS totalprice,SUM(t.itemqty) AS totalqty,SUM(ops.buycount) as buycount,t.shipno AS shipno,t.username AS username,t.orderdate
+      AS orderdate,t.orderstatus AS orderstatus,COUNT(i.id) AS iid,ops.orderid AS opsorderid,t.preferential as preferential,t.paydata as paydata FROM taobao_1688_order_history t LEFT JOIN
+   id_relationtable i ON t.orderid=i.tborderid LEFT JOIN order_product_source ops ON t.itemid=ops.tb_1688_itemid WHERE 1=1 and t.orderdate>'2017-06-01' and t.tbOr1688=1
+      and t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1
       <if test="DeliveryDate==15">
        <![CDATA[
         and i.id IS NULL AND TO_DAYS( NOW( ) ) - TO_DAYS(t.orderdate)<=#{DeliveryDate} 
@@ -260,7 +266,7 @@
   </select>
   
   <select id="getIinOutDetails" resultMap="InoutResultMap">
-      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS TYPE,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
+      SELECT g.orderid,g.goodsid,od.car_img,od.yourorder,od.car_type,CASE WHEN g.type=1 THEN '入库' ELSE '出库' END AS types,g.createtime,g.counts,od.goods_pid,g.admName,g.barcode,ifnull(g.remark,'-') as remark
       FROM goods_inventory_whj g INNER JOIN order_details od
       ON g.orderid=od.orderid AND g.goodsid=od.goodsid
       INNER JOIN order_product_source ops ON od.orderid=ops.orderid AND od.goodsid=ops.goodsid
@@ -312,7 +318,7 @@
       where 1=1
     and if(i.flag=1,i.new_remaining,i.remaining)>0
      <if test="goodinfo!=null">
-       and LOCATE(#{goodinfo},i.good_name)
+         and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
      </if>
      <if test="sku!=null">
         and LOCATE(#{sku},i.sku)
@@ -320,11 +326,14 @@
       <if test="barcode!=null">
        and i.barcode=#{barcode}
      </if>
-      <if test="valid!=null and valid !=2">
+      <if test="valid!=null and valid !=2 and valid !=3">
           and c.valid=${valid}
       </if>
       <if test="valid  == 2">
           and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
+      <if test="valid  == 3">
+          and i.type=1
       </if>
       <if test="goods_pid!=null">
           and i.goods_pid=#{goods_pid}
@@ -365,9 +374,13 @@
          </otherwise>
        </choose>
      </if>
-     <if test="goodscatid!=null">
-        and i.goodscatid=#{goodscatid}
-     </if>
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
+      </if>
+
      <if test="startdate!=null">
         and i.updatetime>=#{startdate}
      </if>
@@ -386,7 +399,7 @@
       where 1=1
       and if(i.flag=1,i.new_remaining,i.remaining)>0
       <if test="goodinfo!=null">
-          and LOCATE(#{goodinfo},i.good_name)
+          and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
       </if>
       <if test="sku!=null">
           and LOCATE(#{sku},i.sku)
@@ -394,11 +407,14 @@
       <if test="barcode!=null">
           and i.barcode=#{barcode}
       </if>
-      <if test="valid!=null and valid !=2">
+      <if test="valid!=null and valid !=2 and valid !=3">
           and c.valid=${valid}
       </if>
       <if test="valid  == 2">
           and i.goods_url like '%aliexpress%' and c.valid is null
+      </if>
+      <if test="valid  == 3">
+          and i.type=1
       </if>
       <if test="goods_pid!=null">
           and i.goods_pid=#{goods_pid}
@@ -439,8 +455,11 @@
               </otherwise>
           </choose>
       </if>
-      <if test="goodscatid!=null">
-          and i.goodscatid=#{goodscatid}
+      <if test="goodscatid == 'bcd'">
+          and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+      </if>
+      <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+          and replace(i.goodscatid,"'","")=#{goodscatid}
       </if>
       <if test="startdate!=null">
           and i.updatetime>=#{startdate}
@@ -1526,13 +1545,16 @@
 	) b
   </select>
   <delete id="deleteInventory">
-    INSERT INTO inventory_delete_details SELECT * FROM inventory WHERE id= ${id};
+    INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
     delete from inventory where id=${id};
   </delete>
   <select id="queryInById" resultType="com.cbt.pojo.Inventory">
     select * from inventory where id=#{id}
   </select>
-  <update id="updateIsStockFlag">
+    <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
+        SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
+    </select>
+    <update id="updateIsStockFlag">
     update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
   </update>
     <update id="updateIsStockFlag1">
@@ -1866,7 +1888,7 @@
     <select id="getUserProfitByMonth" resultType="com.cbt.pojo.OrderSalesAmountPojo">
         SELECT aa.*,bb.totalprice AS freight FROM (
         SELECT LEFT(a.orderpaytime,7) AS times,a.id,a.email,a.grade,COUNT(a.order_no) AS orderCount,
-        CAST(SUM(a.pay_price*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
+        CAST(SUM(if(a.memberFee>=10,a.pay_price-a.memberFee,a.pay_price)*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate)) AS DECIMAL(10,2)) AS salesAmount,
         SUM((SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops
         INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
         AND od.state IN (0,1) WHERE od.orderid=a.order_no)) AS buyAmount,
@@ -1881,7 +1903,7 @@
         ,GROUP_CONCAT(a.order_no,'@',a.flag) AS orderids,SUM(a.actual_weight_estimate) AS custom_freight,sum(a.esBuyPrice) as esBuyPrice,
         GROUP_CONCAT((SELECT GROUP_CONCAT(sp.expressno,'@',IF(CAST(sweight AS DECIMAL(10,2))>CAST(volumeweight AS DECIMAL(10,2)),sweight,volumeweight),'@',CAST(sp.estimatefreight*IF(a.exchange_rate&lt;=0,6.3,a.exchange_rate) AS DECIMAL(10,2))) FROM shipping_package sp WHERE a.order_no=sp.orderid OR (LOCATE(CONCAT(a.order_no,','),sp.remarks)>0 AND a.order_no != sp.orderid))) AS shipnos
         FROM (
-        SELECT oi.actual_weight_estimate,ifnull(ow.flag,0) as flag,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
+        SELECT oi.memberFee,oi.actual_weight_estimate,ifnull(ow.flag,0) as flag,oi.esBuyPrice,oi.order_no,oi.exchange_rate,oi.user_id AS id,u.email,ug.grade,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email AS userEmail
         FROM orderinfo oi
         INNER JOIN USER u ON oi.user_id=u.id
         INNER JOIN user_grade ug ON u.grade=ug.id
@@ -2126,5 +2148,12 @@
     <select id="getPidValidState"  resultType="hashmap">
         SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
     </select>
+    <select id="getInventoryByPid" resultType="com.cbt.pojo.Inventory">
+        select id,type from inventory where goods_pid=#{pid} and type=1
+    </select>
+    <insert id="insertInventoryYmx">
+        insert into inventory(goods_url,new_remaining,can_remaining,barcode,goods_p_url,new_inventory_amount,car_img,flag,goods_pid,createtime,updatetime,remark,type,goods_p_price,remaining,good_name) VALUES
+        (#{goods_url},#{count},#{count},#{barcode},#{goods_p_url},#{new_inventory_amount},#{img},1,#{itmeid},now(),now(),#{remark},1,#{goods_p_price},0,#{good_name})
+    </insert>
 </mapper>
 

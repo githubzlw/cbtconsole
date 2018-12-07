@@ -226,7 +226,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
-        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 0,remark);
+        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
     }
 
     @Override
@@ -424,6 +424,20 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         } else {
             json.setOk(false);
             json.setMessage("执行错误，请重试");
+        }
+        return json;
+    }
+
+    @Override
+    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight) {
+        JsonResult json = setGoodsWeightByWeigher(pid, newWeight);
+        if (json.isOk()) {
+            CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+            boolean isSuccess = refreshPriceRelatedData(orGoods);
+            if (!isSuccess) {
+                json.setOk(false);
+                json.setMessage("更新数据失败");
+            }
         }
         return json;
     }

@@ -154,6 +154,8 @@ public class OrderInfoImpl implements OrderInfoDao {
 				order.setIsDropshipOrder(rs.getInt("isDropshipOrder"));
 				order.setShare_discount(rs.getDouble("share_discount"));//分享折扣
 				order.setExtra_discount(rs.getDouble("extra_discount"));//手动优惠 1/19
+				
+				order.setProcessingfee(rs.getDouble("processingfee"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -358,8 +360,8 @@ public class OrderInfoImpl implements OrderInfoDao {
 
 	@Override
 	public Map<String, Object> queryPaymentInfoByOrderNo(String orderNo) {
-		String sql = "select a.pay_info,b.paytype from pay_result_info a,payment b where a.orderid = b.orderid  " +
-				"and b.paytype in(0,1,5) and a.orderid = ? limit 1";
+		String sql = "select a.pay_info,b.paytype,DATE_FORMAT(b.createtime,'%Y-%m-%d %H:%i:%s') as createtime from pay_result_info a,payment b " +
+				"where a.orderid = b.orderid and b.paytype in(0,1,5) and a.orderid = ? limit 1";
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -371,6 +373,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 			if (rs.next()) {
 				int payType = rs.getInt("paytype");
 				String paymentInfo = rs.getString("pay_info");
+				resultMap.put("payTime", rs.getString("createtime"));
 				if (payType == 0 || payType == 1) {
 					JSONObject jsonObject = JSONArray.fromObject("[" + paymentInfo + "]")
 							.getJSONObject(0)

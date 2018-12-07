@@ -528,6 +528,11 @@ public interface TaobaoOrderService {
    public int createCouponSubsidiary(List<Map<String, Object>> list);
 
    public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+   /**
+    * 获取库存产品所有类别
+    * @return
+    */
+   public List<Inventory> getAllInventory();
 
    public List<Inventory> searchGoodsInventoryDeleteInfo(Map<Object, Object> map);
 
@@ -670,7 +675,7 @@ public interface TaobaoOrderService {
     * @return
     * @return int
     */
-   public int deleteInventory(int id);
+   public int deleteInventory(int id,String dRemark);
 
    /**
     * 查询order_details
@@ -678,6 +683,20 @@ public interface TaobaoOrderService {
     * @return
     */
    public OrderDetailsBean findOrderDetails(Map<Object, Object> map);
+
+   /**
+    * 根据亚马逊录入的pid去查询是否存在库存
+    * @param map
+    * @return
+    */
+   public Inventory getInventoryByPid(Map<String,String> map);
+
+   /**
+    * 录入的库存是新的亚马逊库存,做插入操作
+    * @param map
+    * @return
+    */
+   public int insertInventoryYmx(Map<String,String> map);
 
    /**
     * 手动录入库存

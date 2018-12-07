@@ -93,7 +93,7 @@
     	SELECT 
 		concat(<![CDATA[ "https://www.import-express.com/simulateLogin/login?userName=" ]]>, a.user_id, <![CDATA[ "&password=" ]]>, tem.name, <![CDATA[ "&total=" ]]>, a.total, <![CDATA[ "&currency=USD" ]]>) loginurl 
 		FROM
-		(SELECT user_id,SUM(pay_price) total FROM orderinfo WHERE state > 0 GROUP BY user_id HAVING SUM(pay_price) >= #{price}) a,
+		(SELECT user_id,SUM(if(memberFee>=10,pay_price-memberFee,pay_price)) total FROM orderinfo WHERE state > 0 GROUP BY user_id HAVING SUM(pay_price) >= #{price}) a,
 		`user` tem 
 		WHERE a.user_id = tem.id
 		AND
@@ -260,5 +260,31 @@
     	FROM tbl_auth_info 
     	WHERE authId = #{authId}
     </select>
-	
+
+    <!--String queryAvailable(@Param("email") String email);-->
+    <select id="queryAvailable" resultType="String">
+        SELECT available_m FROM `user` WHERE email = #{email} OR name = #{email} limit 1
+    </select>
+
+    <!--long updateAvailable(@Param("email") String email, @Param("available") Double available);-->
+    <update id="updateAvailable">
+        UPDATE `user`
+        SET available_m = #{available}
+        WHERE email = #{email} OR name = #{email}
+    </update>
+
+    <!--long queryAdmUserByAdmNameAndPwd(@Param("admName") String admName, @Param("oldPwd") String oldPwd);-->
+    <select id="queryAdmUserByAdmNameAndPwd" resultType="long">
+        SELECT count(1)
+        FROM admuser
+        WHERE admName = #{admName} and password = md5(#{oldPwd})
+    </select>
+
+    <!--void updatePasswordByAdmName(@Param("admName") String admName, @Param("newPwd") String newPwd);-->
+    <update id="updatePasswordByAdmName">
+        UPDATE admuser
+        SET password = md5(#{newPwd})
+        WHERE admName = #{admName}
+    </update>
+
 </mapper>

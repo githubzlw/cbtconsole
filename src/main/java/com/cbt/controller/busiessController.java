@@ -71,6 +71,8 @@ public class busiessController {
 		return map;
 	}
 
+	// type = 1   Busiess 询盘   其他取值的暂时不用
+    // pagenum 当前页码
 	@RequestMapping(value = "/queryByChoice", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> queryByChoice(HttpServletRequest request, BusiessBean busiessBean,

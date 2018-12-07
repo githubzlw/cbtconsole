@@ -622,7 +622,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     @Override
     public List<SameTypeGoodsBean> queryForList(SingleQueryGoodsParam queryPm) {
         Connection conn28 = DBHelper.getInstance().getConnection6();
-        String querySql = "select sgo.goods_pid,sgo.create_time,sgo.good_url,sgo.admin_id,sgo.goods_name,"
+        String querySql = "select sgo.goods_pid,sgo.create_time,sgo.good_url,sgo.admin_id,sgo.goods_name,sgo.shop_id,"
                 + "sgo.pic as img_1688,sgo.crawl_flag,sgo.set_weight,sgo.clear_flag,sgo.goods_type,ifnull(sgr.remotpath,'') as remotpath,"
                 + "ifnull(sgr.enname,'') as express_name,ifnull(sgr.custom_main_image,'') as express_img,ifnull(sgr.valid,0) as valid,"
                 + "ifnull(sgr.sync_flag,0) as sync_flag,ifnull(sgr.sync_remark,'') as sync_remark,sgo.drainage_flag from single_goods_offers sgo "
@@ -710,6 +710,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
                 goods.setAveWeight(rss.getDouble("set_weight"));
                 goods.setDrainageFlag(rss.getInt("drainage_flag"));
                 goods.setGoodsType(rss.getInt("goods_type"));
+                goods.setShopId(rss.getString("shop_id"));
                 list.add(goods);
             }
 
@@ -1281,6 +1282,100 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             DBHelper.getInstance().closeConnection(conn31);
         }
         return rs;
+    }
+
+    @Override
+    public List<String> queryIsExistsPidFromSingleOffers(List<SingleGoodsCheck> pidList) {
+
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        String sqlBegin = "select goods_pid from single_goods_offers where goods_pid in(";
+        StringBuffer updateSql = new StringBuffer("");
+        Statement stmt31 = null;
+        ResultSet rs = null;
+        List<String> list = new ArrayList<>();
+        try {
+            for (SingleGoodsCheck goodsCheck : pidList) {
+                if(goodsCheck.getIsPass() == 0){
+                    if (StringUtils.isNotBlank(goodsCheck.getPid())) {
+                        updateSql.append(",'" + goodsCheck.getPid() + "'");
+                    }
+                }
+            }
+            String exSql = sqlBegin + updateSql.toString().substring(1) + ")";
+            stmt31 = conn31.createStatement();
+            System.err.println(exSql);
+            rs = stmt31.executeQuery(exSql);
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("queryIsExistsPidFromSingleOffers error :" + e.getMessage());
+            LOG.error("queryIsExistsPidFromSingleOffers error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt31);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return list;
+    }
+
+    @Override
+    public boolean deleteSingleOffersByPids(List<String> pidList) {
+
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        String sqlOffersBegin = "delete from single_goods_offers where goods_pid in(";
+        String sqlReadyBegin = "delete from useful_data.single_goods_ready where pid in(";
+        StringBuffer updateSql = new StringBuffer("");
+        Statement stmt31 = null;
+        int rs = 0;
+        try {
+            stmt31 = conn31.createStatement();
+            for (String pid : pidList) {
+                if (StringUtils.isNotBlank(pid)) {
+                    updateSql.append(",'" + pid + "'");
+                }
+            }
+            stmt31.addBatch(sqlOffersBegin + updateSql.toString().substring(1) + ")");
+            stmt31.addBatch(sqlReadyBegin + updateSql.toString().substring(1) + ")");
+            rs = stmt31.executeBatch().length;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("deleteSingleOffersByPids error :" + e.getMessage());
+            LOG.error("deleteSingleOffersByPids error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return rs > 0;
+    }
+
+    @Override
+    public int queryOnlineGoodsCountByShopId(String shopId) {
+
+        Connection conn27 = DBHelper.getInstance().getConnection();
+        String sql = "select count(1) from custom_benchmark_ready where shop_id = ? and valid = 1 ";
+        //System.err.println("select count(1) from custom_benchmark_ready where shop_id = '"+shopId+"' and valid = 1 ");
+        PreparedStatement stmt27 = null;
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            stmt27 = conn27.prepareStatement(sql);
+            stmt27.setString(1,shopId);
+            rs = stmt27.executeQuery();
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("queryOnlineGoodsCountByShopId error :" + e.getMessage());
+            LOG.error("queryOnlineGoodsCountByShopId error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt27);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn27);
+        }
+        return count;
     }
 
 }

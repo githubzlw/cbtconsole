@@ -5,6 +5,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -52,7 +53,6 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.servlet.ExpressTrackServlet;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
@@ -63,12 +63,16 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.importExpress.controller.TabSeachPageController;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -76,8 +80,6 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-
-import org.slf4j.LoggerFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -91,6 +93,7 @@ import org.jbarcode.encode.Code128Encoder;
 import org.jbarcode.encode.InvalidAtributeException;
 import org.jbarcode.paint.EAN13TextPainter;
 import org.jbarcode.paint.WidthCodedPainter;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -152,7 +155,8 @@ public class WarehouseCtrl {
 	private GeneralReportService generalReportService;
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	@Autowired
 	private MabangshipmentService mabangshipmentService;
 
@@ -198,14 +202,14 @@ public class WarehouseCtrl {
 		System.out.println("登录人ID："+adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		System.out.println("采购人长度："+list.size());
-		
+
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
 		
-		if(adm.getId()==1 || adm.getId()==83){
+		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -901,7 +905,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && !"emmaxie".equals(adm)?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && adm.getRoletype() != 0?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -1223,7 +1227,7 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult monthSalesEffortsList(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, String> map = new HashMap<String, String>();
-		String pages=request.getParameter("pages");
+		String pages=request.getParameter("page");
 		if(StringUtil.isBlank(pages)){
 			pages="1";
 		}
@@ -3793,6 +3797,43 @@ public class WarehouseCtrl {
 		}
 		return json;
 	}
+	/**
+	 *
+	 * @Title getAllBuyer
+	 * @Description 获取所有采购人
+	 * @param request 客户端请求
+	 * @param response 返回客户端参数
+	 * @return
+	 * @throws ServletException servlet异常
+	 * @throws IOException 输入输出流异常
+	 * @throws ParseException
+	 * @return com.alibaba.fastjson.JSONArray 返回结果类型
+	 */
+	@RequestMapping(value = "/getAllBuyerInsp", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllBuyerInsp(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(1);
+		System.out.println("采购人长度："+list.size());
+
+		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
+		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
+		admuser.setId(1);
+		admuser.setAdmName("全部");
+		result.add(admuser);
+
+		if(1==1){
+			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
+			a.setId(1);
+			a.setAdmName("Ling");
+			result.add(a);
+		}
+		result.addAll(list);
+		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
+		return jsonArr;
+	}
+
+
 
 	private void saveValueToMap(HttpServletRequest request, Map<String, String> map) {
 		String page=request.getParameter("page");
@@ -3886,7 +3927,7 @@ public class WarehouseCtrl {
 		request.setAttribute("orderPos", orderPos);
 		return "orderinfoInspection";
 	}
-	
+
 	// 出库验货 查询全部订单  2018/07/20 10:45  ly
 	@RequestMapping(value = "/getOrderInfoInspectionall.do", method = RequestMethod.GET)
 	public String getOrderInfoInspectionall(HttpServletRequest request, Model model) {
@@ -7167,6 +7208,26 @@ public class WarehouseCtrl {
 //		return strs;
 //
 //	}
+@RequestMapping(value = "/testSendEmail")
+	public String testSendEmail(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> model = new HashedMap();
+		StringBuilder msg=new StringBuilder();
+		String chatText= msg.toString();
+		model.put("chatText",chatText);
+		model.put("name","919923437@qq.com");
+		model.put("email","919923437@qq.com");
+	    model.put("orderid","123456788");
+	    model.put("recipients","Jones Drugs");
+		model.put("street","959 East Main St");
+		model.put("street1","");
+		model.put("city","Prattville");
+		model.put("state","Alabama");
+		model.put("country","UAS");
+		model.put("zipCode","36066");
+		model.put("phone","3343581630");
+		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Order delivery notice", model, TemplateType.BATCK);
+		return "1";
+	}
 
 	@RequestMapping(value = "/batchCk", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
@@ -7261,11 +7322,28 @@ public class WarehouseCtrl {
 					}
 					bgMap.put("expressno", expressNo); // 添加包裹号
 					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
-					//发送邮件给客户告知已经发货
-//					IGuestBookService ibs = new GuestBookServiceImpl();
-//					OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
-//					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
+			}
+			//发送邮件给客户提示发货
+			for (int i = 0; i < cont; i++) {
+				Map<String, Object> declares = sbxxList.get(i);
+				String orderid = (String) declares.get("orderid");
+				//发送邮件给客户告知已经发货
+				IGuestBookService ibs = new GuestBookServiceImpl();
+				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+				int updateReplyContent=ibs.SendEmailForBatck(ob);
+				Map<String,Object> modelM = new HashedMap();
+				modelM.put("name",ob.getEmail());
+				modelM.put("orderid",orderid);
+				modelM.put("recipients",ob.getRecipients());
+				modelM.put("street",ob.getStreet());
+				modelM.put("street1","");
+				modelM.put("city",ob.getAddress2());
+				modelM.put("state",ob.getStatename());
+				modelM.put("country",ob.getCountry());
+				modelM.put("zipCode",ob.getZipcode());
+				modelM.put("phone",ob.getPhonenumber());
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -7279,6 +7357,8 @@ public class WarehouseCtrl {
 		ret = updateBgState(bgList, ret);
 		return String.valueOf(ret);
 	}
+
+
 
 	private void saveUod(List<ProductBean> lpb, Map<String, String> bgMap, UserOrderDetails uod) {
 		uod.setShipmentno((String) bgMap.get("shipmentno"));
@@ -9692,7 +9772,7 @@ public class WarehouseCtrl {
 		int minute = c.get(Calendar.MINUTE);
 		int second = c.get(Calendar.SECOND);
 		//上传文件目录
-		String relatDir = TabSeachPageController.LOCALPATHZIPIMG;
+		String relatDir = SearchFileUtils.LOCALPATHZIPIMG;
 		//文件夹不存在则创建
 		File fdir = new File(relatDir);
 		File fdirExi = new File(relatDir + time + "/");
@@ -9748,7 +9828,7 @@ public class WarehouseCtrl {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("uploadImgList", uploadImgList);
 		result.put("orderid", orderid);
-        result.put("imagehost", TabSeachPageController.IMAGEHOSTURL);
+        result.put("imagehost", SearchFileUtils.IMAGEHOSTURL);
 		return result;
 	}
 

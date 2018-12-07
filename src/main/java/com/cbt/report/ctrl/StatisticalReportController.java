@@ -1355,7 +1355,7 @@ public class StatisticalReportController {
 		String mouth = request.getParameter("mouth");
 		String scope = request.getParameter("scope");
 		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("type_");
+		String goodscatid = request.getParameter("goodscatid");
 		String have_barcode=request.getParameter("have_barcode");
 		String barcode = request.getParameter("barcode");
 		String startdate=request.getParameter("startdate");
@@ -1375,8 +1375,11 @@ public class StatisticalReportController {
 		} else if (year != null) {
 			buyTime = year + "-" + mouth;
 		}
-		if ("0".equals(goodscatid)) {
-			goodscatid = null;
+		goodscatid="0".equals(goodscatid)?null:goodscatid;
+		if("全部".equals(goodscatid)){
+			goodscatid="abc";
+		}else if("其他".equals(goodscatid)){
+			goodscatid="bcd";
 		}
 		if ("-1".equals(flag)) {
 			flag = null;
@@ -1548,14 +1551,15 @@ public class StatisticalReportController {
 		int start = 0;
 		int end = 0;
 		int DeliveryDate = 0;
-		startdate=StringUtils.isStrNull(startdate)?null:startdate;
+		startdate=StringUtils.isStrNull(startdate) ||"0".equals(startdate)?null:startdate;
 		paystartdate=StringUtils.isStrNull(paystartdate)?null:paystartdate;
 		enddate=!StringUtils.isStrNull(enddate)?enddate + " 23:59:59":null;
 		payenddate=!StringUtils.isStrNull(payenddate)?payenddate + " 23:59:59":null;
 		orderid=StringUtils.isStrNull(orderid)?null:orderid;
 		myorderid=StringUtils.isStrNull(myorderid)?null:myorderid;
-		orderstatus=StringUtils.isStrNull(orderstatus)?null:orderstatus;
+		orderstatus=StringUtils.isStrNull(orderstatus) || "0".equals(orderstatus)?null:orderstatus;
 		orderSource=orderSource.equals("-1")?null:orderSource;
+		isCompany="0".equals(isCompany)?null:isCompany;
 		procurementAccount=procurementAccount.equals("0")?null:procurementAccount;
 		if (noCycle.equals("0")) {
 			noCycle = null;
@@ -1685,6 +1689,60 @@ public class StatisticalReportController {
 	}
 
 	/**
+	 * 手动录入亚马逊库存
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/inventoryYmxEntry")
+	@ResponseBody
+	protected JsonResult inventoryYmxEntry(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		Map<String, String> map = new HashMap<String, String>();
+		String itmeid = request.getParameter("itmeid");
+		String count = request.getParameter("ymx_count");
+		String img = request.getParameter("ymx_img");
+		String good_name = request.getParameter("good_name");
+		String remark = request.getParameter("remark_ymx");
+		String goods_p_price = request.getParameter("goods_p_price");
+		String barcode = request.getParameter("ymx_barcode2");
+		double new_inventory_amount=0.00;
+		if(StringUtil.isNotBlank(goods_p_price)){
+			new_inventory_amount=Double.parseDouble(goods_p_price)*Integer.valueOf(count);
+		}
+		map.put("goods_pid", itmeid);
+		map.put("count", count);
+		map.put("img", StringUtil.isBlank(img)?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":img);
+		map.put("good_name", StringUtil.isBlank(good_name)?"亚马逊商品库存录入":good_name);
+		map.put("remark", remark);
+		map.put("barcode", barcode);
+		map.put("itmeid",itmeid);
+		map.put("goods_p_price",goods_p_price);
+		map.put("new_inventory_amount",String.valueOf(new_inventory_amount));
+		map.put("goods_url","https://www.import-express.com/goodsinfo/cbtconsole-1"+itmeid+".html");
+		map.put("goods_p_url","https://detail.1688.com/offer/"+itmeid+".html");
+		//判断该pid商品是否已在库存中
+		Inventory i=taoBaoOrderService.getInventoryByPid(map);
+		int row=0;
+		if(i == null){
+			//此次录入的库存是新的亚马逊库存,做插入操作
+			row=taoBaoOrderService.insertInventoryYmx(map);
+		}else{
+			//之前有录入过该1688链接的亚马逊库存,让采购更新这里不做操作
+//			map.put("id",String.valueOf(i.getId()));
+//			row=taoBaoOrderService.updateInventoryYmx();
+		}
+		list.setAllCount(row);
+		json.setData(list);
+		return json;
+	}
+
+	/**
 	 * 手动录入库存
 	 *
 	 * @param request
@@ -1797,7 +1855,8 @@ public class StatisticalReportController {
 //		String sku=request.getParameter("sku");
 		String barcode=request.getParameter("barcode");
 //		String amount=request.getParameter("amount");
-		int count = taoBaoOrderService.deleteInventory(id);
+		String dRemark=request.getParameter("dRemark");
+		int count = taoBaoOrderService.deleteInventory(id,dRemark);
 		if(count>0){
 			list.setAllCount(count);
 			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -3793,13 +3852,9 @@ public class StatisticalReportController {
 		// 用户问题类型
 		int qtype = StrUtils.isNotNullEmpty(type) == true ? Integer.parseInt(type) : 0;
 		// 获取登录用户
-//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-//		int adminid = adm.getId();
-		// 临时增加Sales1账号查看所有客户留言权限
-		/*if (adm.getAdmName().equalsIgnoreCase("Sales1") || adm.getAdmName().equalsIgnoreCase("emmaxie") || adm.getAdmName().equalsIgnoreCase("Sales2") || adm.getAdmName().equalsIgnoreCase("Sales5")) {
-			adminid = 1;
-		}*/
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		int adminid = adm.getId();
 		try {
 			if (date != null && !"".equals(date)) {
 				parse = date;
@@ -3813,7 +3868,7 @@ public class StatisticalReportController {
 			state = Integer.parseInt(s);
 		}
 		String strAdminId = request.getParameter("adminId");
-		int adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
+		 adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
 		String su = request.getParameter("userId");
 		int userId = 0;
 		if (su != null && !"".equals(su)) {
@@ -4120,7 +4175,7 @@ public class StatisticalReportController {
 		String mouth = request.getParameter("mouth");
 		String scope = request.getParameter("scope");
 		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("type_");
+		String goodscatid = request.getParameter("goodscatid");
 		String have_barcode=request.getParameter("have_barcode");
 		String barcode = request.getParameter("barcode");
 		String startdate=request.getParameter("startdate");
@@ -4144,6 +4199,11 @@ public class StatisticalReportController {
 			buyTime = year + "-" + mouth;
 		}
 		goodscatid="0".equals(goodscatid)?null:goodscatid;
+		if("全部".equals(goodscatid)){
+			goodscatid="abc";
+		}else if("其他".equals(goodscatid)){
+			goodscatid="bcd";
+		}
 		flag="-1".equals(flag)?null:flag;
 		page=page>0?(page - 1) * 20:page;
 		goodinfo=StringUtils.isStrNull(goodinfo)?null:goodinfo;
@@ -4186,6 +4246,22 @@ public class StatisticalReportController {
 		json.setTotal(toryListCount.size());
 		return json;
 	}
+
+	@RequestMapping(value = "/getAllInventory", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<Inventory> list=taoBaoOrderService.getAllInventory();
+		Inventory i=new Inventory();
+		i.setGoodscatid("全部");
+		list.add(0,i);
+		Inventory ii=new Inventory();
+		ii.setGoodscatid("其他");
+		list.add(list.size()-1,ii);
+		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(list));
+		return jsonArr;
+	}
+
 
 	/**
 	 * 查询出入库明细报表

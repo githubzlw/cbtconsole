@@ -134,8 +134,10 @@
     <div class="span_div" style="text-align: left;">
 
         <span style="margin-left: 100px;"><a href="/cbtconsole/refundss/rlist" target="_blank">未匹配用户申诉记录</a></span>
-        <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling')}">
+        <c:if test="${roleType == '0' && (operatorName=='emmaxie' || operatorName=='Ling' || operatorName=='Mandy')}">
             <span style="margin-left: 65px;"><input type="button" onclick="showSecondValid(${operatorId})" value="二次验证密码" class="btn_sty"></span>
+            <span><input type="button" onclick="openWindow('/cbtconsole/apa/refundByPayNo.html')" value="交易号退款" class="btn_sty"></span>
+            &nbsp;&nbsp;&nbsp;<span><a href="/cbtconsole/apa/refundResultList.html" target="_blank">API退款结果列表</a> </span>
         </c:if>
         <span class="sp_style ${chooseState == -1 ? ' is_choose':''}" onclick="changeAndQuery(-1)">全部</span>
         <span class="sp_style ${chooseState == 0 ? ' is_choose':''}" onclick="changeAndQuery(0)">待审批</span>
@@ -246,26 +248,31 @@
                 <td style="width: 80px;">
                     <c:if test="${refund.state == 0}">
                         <input type="button" value="确认" class="btn_sty"
-                               onclick="beforeSetAndRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.appliedAmount},'${refund.orderNo}',${operatorId},1,this)"/>
+                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.appliedAmount},'${refund.orderNo}',${operatorId},1,this)"/>
                         <br>
                         <input type="button" value="驳回" class="refuse_sty"
-                               onclick="beforeSetAndRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.appliedAmount},'${refund.orderNo}',${operatorId},-1,this)"/>
+                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.appliedAmount},'${refund.orderNo}',${operatorId},-1,this)"/>
                     </c:if>
                     <c:if test="${refund.state == 1 || refund.state == 2}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a><br><br>
                         <input type="button" value="确认" class="btn_sty"
-                               onclick="beforeSetAndRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},1,this)"/>
+                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},1,this)"/>
                         <br>
                         <input type="button" value="驳回" class="refuse_sty"
-                               onclick="beforeSetAndRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},-1,this)"/>
+                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},-1,this)"/>
                     </c:if>
                     <%--Emma可以进行线下转账操作--%>
-                    <c:if test="${refund.state == 3 && operatorId == 8}">
-                        <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a><br><br>
-                        <input type="button" value="执行退款" class="btn_sty"
-                               onclick="beforeSetAndRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
-                        <input type="button" value="线下转账" class="btn_sty"
-                               onclick="offLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/>
+                    <c:if test="${refund.state == 3}">
+                        <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a>
+                        <c:if test="${operatorId == 83 || operatorId == 8}">
+                            <br><br>
+                            <input type="button" value="执行退款" class="btn_sty"
+                               onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
+                            <c:if test="${operatorId == 83}">
+                                <input type="button" value="线下转账" class="btn_sty"
+                                   onclick="offLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/>
+                            </c:if>
+                        </c:if>
                     </c:if>
                     <c:if test="${refund.state == 4}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a><br><br>
@@ -339,7 +346,8 @@
             <td>账号：<input type="hidden" id="option_admin_id" value=""></td>
             <td><select id="select_op_id" disabled="disabled">
                 <option value="1" selected="selected">Ling</option>
-                <option value="83" selected="selected">emmaxie</option>
+                <option value="8" selected="selected">Mandy</option>
+                <option value="83" selected="selected">EmmaXie</option>
             </select></td>
         </tr>
         <tr id="second_pwd">
@@ -347,8 +355,9 @@
             <td><input type="password" id="secvlid_pwd" value="" style="width: 265px;"/></td>
         </tr>
         <tr>
-            <td colspan="2" style="text-align: center;"><input type="button" class="btn_sty" value="确定" onclick="setAndRemark()"/>
-                <input type="button" class="btn_sty" value="取消" onclick="hideDivRemark()"/></td>
+            <td colspan="2" style="text-align: center;"><input type="button" id="refund_bnt_enter" class="btn_sty" value="确定" onclick="setAndRemark()"/>
+                <input type="button" class="btn_sty" value="取消" onclick="hideDivRemark()"/>
+            <span id="show_notice" style="color: red;display: none;">正在执行,请等待...</span></td>
         </tr>
     </table>
 </div>
@@ -356,7 +365,7 @@
 <script>
 
 
-    function beforeSetAndRemark(refundId, state, type,userId,amount,orderNo,operatorId, actionFlag,obj) {
+    function beforeAddRemark(refundId, state, type,userId,amount,orderNo,operatorId, actionFlag,obj) {
         //背景色变色
         setChooseTr(obj);
 
@@ -390,7 +399,7 @@
                         }
                     }else if(state == 2){
                         //EMMA退款
-                        if(operatorId == 8){
+                        if(operatorId == 8 || operatorId == 83){
                             showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
                         }else{
                             $.messager.alert("操作提示","需要EMMA同意，您无权限操作！");
@@ -445,10 +454,12 @@
             $.messager.alert("操作提示","获取密码失败");
             return false;
         }else{
-            $.messager.progress({
+            /*$.messager.progress({
                 title: '正在执行',
                 msg: '请等待...'
-            });
+            });*/
+            $("#refund_bnt_enter").prop("disabled",true);
+            $("#show_notice").show();
             $.ajax({
                 type: 'POST',
                 dataType: 'text',
@@ -466,18 +477,28 @@
                     "secvlidPwd":secvlidPwd
                 },
                 success: function (data) {
-                    $.messager.progress('close');
+                    //$.messager.progress('close');
+                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#show_notice").hide();
                     var json = eval("(" + data + ")");
                     if (json.ok) {
                         //$.messager.alert("操作提示","执行成功");
+                        hideDivRemark();
+                        if(json.message == null || json.message == ""){
+                            alert("执行成功");
+                        }else{
+                            alert("执行成功," + json.message);
+                        }
                         window.location.reload();
                     } else {
-                        $.messager.alert("操作提示",json.message);
+                        alert("执行失败," + json.message);
                     }
                 },
                 error: function () {
-                    $.messager.progress('close');
-                    $.messager.alert("操作提示","执行失败,请联系管理员");
+                    $("#refund_bnt_enter").prop("disabled",false);
+                    $("#show_notice").hide();
+                    //$.messager.progress('close');
+                    alert("执行失败,请联系管理员");
                 }
             });
         }
@@ -716,6 +737,8 @@
         $("#refund_remark").val("");
         $("#option_admin_id").val("");
         $("#div_secvlid").hide();
+        $("#refund_bnt_enter").prop("disabled",false);
+        $("#show_notice").hide();
     }
     
     function hideTrChoose() {
@@ -740,7 +763,12 @@
     
     function showSecondValid(operatorId) {
         var url = "/cbtconsole/apa/secondaryValidation.html?operatorId="+operatorId;
-        var param = "height=460,width=680,top=225,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        var param = "height=460,width=680,top=235,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open(url, "windows", param);
+    }
+
+    function openWindow(url) {
+        var param = "height=460,width=710,top=235,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open(url, "windows", param);
     }
 

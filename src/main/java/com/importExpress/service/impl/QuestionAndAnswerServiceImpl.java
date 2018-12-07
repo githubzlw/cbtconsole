@@ -23,6 +23,11 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 			if(StringUtil.isNotBlank(q.getReply_content())){
 				q.setReply_content(q.getReply_content().replace("\n",""));
 			}
+			String flag="0";
+			if(StringUtil.isBlank(q.getReply_content())){
+				flag="1";
+			}
+			q.setContextFlag(flag);
 		}
 		return list;
 	}

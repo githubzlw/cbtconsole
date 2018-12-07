@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -203,8 +204,7 @@ public class MessagesController {
 		Admuser user = (Admuser) SerializeUtil.JsonToObj(admJson, Admuser.class);
 		int strm = user.getRoletype();
 		int admuserid = adminid;
-		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+		if (strm == 0) {
 			admuserid = 0;
 		}
 
@@ -268,31 +268,33 @@ public class MessagesController {
 		cartMarketing.setNoArrgCount(noArrgCartNum);
 		messagesCountVoListAll.add(cartMarketing);
 		// 查询商业询盘数量businquiries
-		List<MessagesCountVo> busiessNumList = messagesService.selectBusiessNum(messagesCountVo);
-		MessagesCountVo busiessNum = new MessagesCountVo();
-		busiessNum.setType(CommonConstants.BUSINQUIRIES);
-		int countAll = 0;
-		int noArrgCount = 0;
-		if (adminid == 1 || adminid == 83) {
-			for (MessagesCountVo count : busiessNumList) {
-				countAll += count.getCountAll();
-				noArrgCount += count.getNoArrgCount();
-				if (count.getState() == 0) {// state为0 表示未处理
-					busiessNum.setNoDeleteCount(count.getCountAll());
-				}
-			}
-			busiessNum.setCountAll(countAll);
-			busiessNum.setNoArrgCount(noArrgCount);
-		} else {
-			for (MessagesCountVo count : busiessNumList) {
-				countAll += count.getNoDeleteCount();// state 为1,2 表示已处理
-				if (count.getState() == 0) {// state为0 表示未处理
-					busiessNum.setNoDeleteCount(count.getNoDeleteCount());
-				}
-			}
-			busiessNum.setCountAll(countAll);
-		}
-		messagesCountVoListAll.add(busiessNum);
+        MessagesCountVo busiessNumList = messagesService.selectBusiessNumNew(admuserid);
+        messagesCountVoListAll.add(busiessNumList);
+//		List<MessagesCountVo> busiessNumList = messagesService.selectBusiessNum(messagesCountVo);
+//		MessagesCountVo busiessNum = new MessagesCountVo();
+//		busiessNum.setType(CommonConstants.BUSINQUIRIES);
+//		int countAll = 0;
+//		int noArrgCount = 0;
+//		if (adminid == 1 || adminid == 83) {
+//			for (MessagesCountVo count : busiessNumList) {
+//				countAll += count.getCountAll();
+//				noArrgCount += count.getNoArrgCount();
+//				if (count.getState() == 0) {// state为0 表示未处理
+//					busiessNum.setNoDeleteCount(count.getCountAll());
+//				}
+//			}
+//			busiessNum.setCountAll(countAll);
+//			busiessNum.setNoArrgCount(noArrgCount);
+//		} else {
+//			for (MessagesCountVo count : busiessNumList) {
+//				countAll += count.getNoDeleteCount();// state 为1,2 表示已处理
+//				if (count.getState() == 0) {// state为0 表示未处理
+//					busiessNum.setNoDeleteCount(count.getNoDeleteCount());
+//				}
+//			}
+//			busiessNum.setCountAll(countAll);
+//		}
+//		messagesCountVoListAll.add(busiessNum);
 
 		if (messagesCountVoListAll.size() > 0) {
 			json.setOk(true);
@@ -320,8 +322,7 @@ public class MessagesController {
 		int admuserid = user.getId();
 		int strm = user.getRoletype();
 		//临时添加Sales1账号查看投诉管理统计数据
-		if (strm == 0 || user.getAdmName().equalsIgnoreCase("Ling") || user.getAdmName().equalsIgnoreCase("Sales1")
-				|| user.getAdmName().equalsIgnoreCase("Sales5") || user.getAdmName().equalsIgnoreCase("emmaxie")) {
+		if (strm == 0) {
 			admuserid = 0;
 		}
 		
@@ -431,7 +432,7 @@ public class MessagesController {
 		page.setCurrentPage(1);
 		page.setStartIndex(1);
 
-		page = complainService.searchComplainByParam(t, null, page, admName);
+		page = complainService.searchComplainByParam(t, null, page, admName,adm.getRoletype());
 		if (page.getList() == null) {
 			json.setOk(false);
 		} else {
@@ -444,12 +445,15 @@ public class MessagesController {
 	}
 
 	@RequestMapping(value = "/getBusiess")
-	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav, @Param("status") int status,
-                                   @Param("adminid") int adminid) throws ParseException {
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+	public ModelAndView getBusiess(HttpServletRequest request, ModelAndView mav,
+                                   @RequestParam(value = "status", required = false, defaultValue = "0") int status,
+                                   @RequestParam(value = "state", required = false, defaultValue = "-1") int state,
+                                   @RequestParam("adminid") int adminid) throws ParseException {
+		/*String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		adminid = adm.getId();
+		adminid = adm.getId();*/
 		mav.addObject("status", status);
+		mav.addObject("state", state);
 		mav.addObject("adminid", adminid);
 		//负责人列表
         List<Admuser> admuserLis = admuserService.selectAdmuser();

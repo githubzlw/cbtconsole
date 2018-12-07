@@ -296,7 +296,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public List<AdminUserBean> getAllAdmUser() {
 		List<AdminUserBean> aubList = new ArrayList<AdminUserBean>();
 		String sql = "select * from admuser where status = 1 and roleType=0";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		try {
@@ -789,7 +789,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public double getApplyRefund(int id) {
 		String sql = "select r.userid, sum(r.account/e.exchange_rate)  as usdappcount "
 				+ "from refund r,exchange_rate e where r.currency=e.country  and r.valid=1  "
-				+ "and (r.status=0 or r.status=1 or r.status=2) and r.userid=?";
+				+ "and (r.status=0 or r.status=1 or r.status=2 or r.status=3 or r.status=4) and r.userid=?";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -865,7 +865,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 	public double getRefundByUserid(int userid) {
 		String sql = "select r.userid, sum(r.account/e.exchange_rate)  as usdappcount "
 				+ "from refund r,exchange_rate e where r.currency=e.country  and r.valid=1  "
-				+ "and (r.status=2) and r.userid=?";
+				+ "and (r.status=4) and r.userid=?";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;

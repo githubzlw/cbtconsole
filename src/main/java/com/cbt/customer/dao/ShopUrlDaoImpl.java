@@ -4,9 +4,8 @@ import com.cbt.bean.*;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.util.StringUtil;
-import com.importExpress.controller.TabSeachPageController;
+import com.importExpress.utli.SearchFileUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -110,9 +109,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                                  int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
-        String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b where b.shop_id =a.shop_id and b.valid=1) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, au.admuser au_admuser, au.start_time au_start_time, au.end_time au_end_time, au.remark au_remark, au.valid au_valid from shop_url_bak a ";
-        sql += "LEFT JOIN shop_url_authorized_info au ON a.shop_id = au.shop_id ";
-        sql += "where 1=1 ";
+        String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b " +
+                "where b.shop_id =a.shop_id and b.valid=1) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, " +
+                "au.admuser au_admuser, au.start_time au_start_time, au.end_time au_end_time, au.remark au_remark, au.valid au_valid," +
+                "ifnull(scs.shop_state,0) as shop_state,ifnull(scs.online_state,0) as online_state " +
+                "from shop_url_bak a LEFT JOIN shop_url_authorized_info au ON a.shop_id = au.shop_id AND au.valid != 3 " +
+                "left join shop_clear_state scs on a.shop_id = scs.shop_id";
+        sql += " where 1=1 ";
         if (shopId != null && !"".equals(shopId)) {
             sql += " and a.shop_id='" + shopId + "'";
         }
@@ -151,13 +154,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
 			case 1: //已授权但无授权文件
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = ''))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = ''))";
 				break;
 			case 2: //授权文件到期
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.end_time IS NOT NULL AND b.end_time < NOW()))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.end_time IS NOT NULL AND temb.end_time < NOW()))";
 				break;
 			case 3: //1+2
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = '' OR (b.end_time IS NOT NULL AND b.end_time < NOW())))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = '' OR (temb.end_time IS NOT NULL AND temb.end_time < NOW())))";
 				break;
 			default:
 				break;
@@ -219,7 +222,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setInputShopBrand(rs.getString("shop_brand"));
                 su.getAuthorizedInfo().setFileName(rs.getString("au_file_name"));
                 if (StringUtils.isNotBlank(rs.getString("au_file_url"))) {
-                	su.getAuthorizedInfo().setFileUrl(TabSeachPageController.IMAGEHOSTURL + rs.getString("au_file_url"));
+                	su.getAuthorizedInfo().setFileUrl(SearchFileUtils.IMAGEHOSTURL + rs.getString("au_file_url"));
 				}
                 su.getAuthorizedInfo().setAdmuser(rs.getString("au_admuser"));
                 su.getAuthorizedInfo().setStartTime(rs.getTimestamp("au_start_time"));
@@ -241,8 +244,16 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 } else if (onlineStatus == 1) {
                     su.setOnlineStatusView("详细信息已下载");
                 } else if (onlineStatus == 2) {
-                    su.setOnlineStatusView("<a href=\"/cbtconsole/ShopUrlC/jumpGoodsReady.do?shopId=" + su.getShopId()
-                            + "\" target=\"_blank\">详情图片已下载(点击进入数据准备/清洗)</a>");
+                    String showTitle = "<a href=\"/cbtconsole/ShopUrlC/jumpGoodsReady.do?shopId=" + su.getShopId()
+                            + "\" target=\"_blank\">";
+                    if(rs.getInt("shop_state") == 0){
+                        showTitle += "详情图片已下载(待处理)</a>";
+                    }else if(rs.getInt("shop_state") == 1){
+                        showTitle += "详情图片已下载(正在清洗)</a>";
+                    }else if(rs.getInt("shop_state") == 2){
+                        showTitle += "详情图片已下载(清洗完成)</a>";
+                    }
+                    su.setOnlineStatusView(showTitle);
                 } else if (onlineStatus == 3) {
                     su.setOnlineStatusView("图片已上传美服");
                 } else if (onlineStatus == 4) {
@@ -384,13 +395,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
 			case 1: //已授权但无授权文件
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = ''))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = ''))";
 				break;
 			case 2: //授权文件到期
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.end_time IS NOT NULL AND b.end_time < NOW()))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.end_time IS NOT NULL AND temb.end_time < NOW()))";
 				break;
 			case 3: //1+2
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = '' OR (b.end_time IS NOT NULL AND b.end_time < NOW())))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = '' OR (temb.end_time IS NOT NULL AND temb.end_time < NOW())))";
 				break;
 			default:
 				break;
@@ -3225,6 +3236,37 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             DBHelper.getInstance().closeConnection(conn27);
         }
         return rsMap;
+    }
+
+    @Override
+    public boolean deleteGoodsByPid(String pid) {
+        Connection conn = DBHelper.getInstance().getConnection7();
+        PreparedStatement stmt = null;
+        String upSql = "update shop_goods_ready set p_d_flag = 2 where pid = ? ";
+        int rs = 0;
+        try {
+            stmt = conn.prepareStatement(upSql);
+            stmt.setString(1, pid);
+            rs = stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("pid:" + pid + ",deleteGoodsByPid error: " + e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return rs > 0;
     }
 
 }

@@ -134,6 +134,9 @@ public class JsonTest {
         Charge charge=(Charge)event.getData().getObject();
         //System.out.println(charge);
 
+        //
+
+        //
         String country = JSONObject.fromObject(substring).getJSONObject("data").getJSONObject("object").getJSONObject("source").getString("country");
         System.out.println(country);
 

@@ -6,6 +6,7 @@ import com.cbt.website.bean.PaymentDetails;
 import com.importExpress.mapper.RefundMapper;
 import com.importExpress.pojo.RefundDetailsBean;
 import com.importExpress.pojo.RefundNewBean;
+import com.importExpress.pojo.RefundResultInfo;
 import com.importExpress.service.RefundNewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,16 @@ public class RefundNewServiceImpl implements RefundNewService {
     @Override
     public List<PaymentDetails> queryPaymentInfoByOrderNoOrUserId(int userId, String orderNo) {
         return refundMapper.queryPaymentInfoByOrderNoOrUserId(userId, orderNo);
+    }
+
+    @Override
+    public List<RefundResultInfo> queryForRefundResultList(RefundResultInfo resultInfo) {
+        return refundMapper.queryForRefundResultList(resultInfo);
+    }
+
+    @Override
+    public int queryForRefundResultListCount(RefundResultInfo resultInfo) {
+        return refundMapper.queryForRefundResultListCount(resultInfo);
     }
 
 }

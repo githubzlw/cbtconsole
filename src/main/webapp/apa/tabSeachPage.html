@@ -252,9 +252,13 @@ function detail(id) {
 			var res = data;
 			if(res) {
 				$("#keyword_neirong_div").html("<table id=\"keyword_neirong\" style=\"width:auto;\"></table>");
-				$('#keyword_neirong').propertygrid({   
-				    showGroup: false,  
-				    scrollbarSize: 0
+				$('#keyword_neirong').propertygrid({
+				    showGroup: false,
+				    scrollbarSize: 0,
+                    columns:[[
+                        {field:'name',title:'name',width:'16%',sortable:true},
+                        {field:'value',title:'value',width:'80%',sortable:true}
+                    ]],
 				});
 				var row = {'name':'主热搜词','value':res.keyword};
 				$('#keyword_neirong').propertygrid('appendRow',row);
@@ -265,6 +269,15 @@ function detail(id) {
 				var isshowstr = res.isshow == 1 ? '已启用' : '未启用';
 				row = {'name':'是否启用','value':isshowstr};
 				$('#keyword_neirong').propertygrid('appendRow',row);
+                var row = {'name':'页面title','value':res.pageTitle};
+                $('#keyword_neirong').propertygrid('appendRow',row);
+                var row = {'name':'页面keywords','value':res.pageKeywords};
+                $('#keyword_neirong').propertygrid('appendRow',row);
+                var row = {'name':'页面description','value':res.pageDescription};
+                $('#keyword_neirong').propertygrid('appendRow',row);
+                var bannerImg = (res.pageBannerName != undefined && res.pageBannerName != '') ? "<img onerror=\'imgError(this,\\\"" + res.pageBannerUrl + "\\\")\' src=\'" + res.pageBannerName + "\' style=\'height: 20px\'>":"";
+                var row = {'name':'底部banner图片','value':bannerImg};
+                $('#keyword_neirong').propertygrid('appendRow',row);
 				
 				var buttonstr = "<input id='staticize_button' onclick='toStaticize("+res.id+",\""+res.keyword+"\")' type='button' value='生成关键词专页静态页'>&nbsp;&nbsp;&nbsp;&nbsp;<input onclick='preview("+res.id+",\""+res.importPath+"\")' type='button' value='预览关键词专页'>";
 				
@@ -273,8 +286,10 @@ function detail(id) {
 				}else{
 					buttonstr += "&nbsp;&nbsp;&nbsp;&nbsp;<input id='staticize_button' onclick='isshow("+res.id+",1)' type='button' value='启用'>";
 				}
-				
-				$("#keyword_neirong_div").append(buttonstr);
+
+                buttonstr += "&nbsp;&nbsp;&nbsp;&nbsp;<input onclick='createTitleAndKey("+res.id+",\""+res.keyword+"\")' type='button' value='生成title、keywords、description'>";
+
+                $("#keyword_neirong_div").append(buttonstr);
 			
 				detailList(res.id);
 				
@@ -377,6 +392,27 @@ function toStaticizeAll() {
 		}
 	});
 }
+//按照指定格式生成title keywords description
+function createTitleAndKey(id,keyword) {
+    $.ajax({
+        url : '../tabseachpage/createTitleAndKey.do',
+        method : 'post',
+        data: {sid : id,keyword:keyword},
+        dataType:'json',
+        success : function(data) {
+            var res = data;
+            if(res.status){
+                detail(keyword_id);
+                $.messager.alert('message',res.message);
+            }else{
+                $.messager.alert('message',res.message);
+            }
+        },
+        error: function (msg) {
+            alert(msg);
+        }
+    });
+}
 
 function addKeyword() {
 	$("#btnaddKeyword").linkbutton('disable'); 
@@ -468,7 +504,17 @@ function update_show(){
 				$("#update_keyword1").val(res.keyword1);
 				$("#update_filename").val(res.filename);
 				$('#parentId_update').combobox('setValue', res.parentId);
-				$('#keyword_update_win').window('open');
+                $("#update_pageTitle").val(res.pageTitle);
+                $("#update_pageKeywords").val(res.pageKeywords);
+                $("#update_pageDescription").val(res.pageDescription);
+                if(res.pageBannerName != undefined && res.pageBannerName != ''){
+                    $("#update_pageBannerName").attr('src',res.pageBannerName); ;//图片
+                    $("#update_pageBannerName").attr('onerror',"imgError(this, \""+ res.pageBannerUrl + "\")");
+                } else {
+                    $("#update_pageBannerName").attr('src','');//图片
+                    $("#update_pageBannerName").attr('onerror','');
+                }
+                $('#keyword_update_win').window('open');
 			}
 			
 		},
@@ -904,7 +950,7 @@ function updateDetail() {
 		  </div>    
 	    <div data-options="region:'center',title:'编辑'" style="padding:5px;background:#eee;">
 	    	<div id="bb" class="easyui-layout" style="width:100%;height:100%;">   
-			    <div data-options="region:'north',title:'主热搜词详情'" style="height:30%;">
+			    <div data-options="region:'north',title:'主热搜词详情'" style="height:36%;">
     				<a id="btn" href="#" onclick="add_show()" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增热搜词</a>
     				<a id="btn" href="#" onclick="update_show()" class="easyui-linkbutton" data-options="iconCls:'icon-save'">修改热搜词</a>
     				<a id="btn" href="#" onclick="delKeyword()" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除热搜词</a>
@@ -924,7 +970,7 @@ function updateDetail() {
 	    </div> 
 	</div>
 	<!-- 弹框 -->
-	<div id="keyword_add_win" class="easyui-window" title="新增热搜词" style="width:700px;height:300px;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+	<div id="keyword_add_win" class="easyui-window" title="新增热搜词" style="width:auto;height:auto;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
 		<form id="keyword_add" method="post" enctype="multipart/form-data"> 
 			<table cellpadding="5px">
 				<tr>
@@ -939,13 +985,42 @@ function updateDetail() {
 					<td><label for="parentId">所属类别:</label></td>
 					<td><input id="parentId" class="easyui-combobox" type="text" name="parentId" data-options="required:false" maxlength="255" style="width:400px;height:20px"/></td>
 				</tr>
+                <tr>
+                    <td><label for="pageTitle">页面title(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" name="pageTitle" data-options="required:false" maxlength="250" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="pageKeywords">页面keywords(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" name="pageKeywords" data-options="required:false" maxlength="450" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="pageDescription">页面description(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" name="pageDescription" data-options="required:false" maxlength="950" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="pageBannerName">底部banner图片(可不上传):</label></td>
+                    <td>
+                        <input
+                                id="pageBannerName" name="uploadfile" class="easyui-filebox"
+                                data-options="prompt:'请上传适合尺寸的大小在100k内的图片'"
+                                style="width: 400px"></td>
+                </tr>
 				<tr>
 					<td colspan="2"><a id="btnaddKeyword" href="#" onclick="addKeyword();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a></td>
 				</tr> 
 			</table>
 		</form>
 	</div>
-	<div id="keyword_update_win" class="easyui-window" title="修改热搜词" style="width:700px;height:300px" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
+	<div id="keyword_update_win" class="easyui-window" title="修改热搜词" style="width:auto;height:auto;" align="center" data-options="iconCls:'icon-save',modal:true,closed:true">
 		<form id="keyword_update" method="post" enctype="multipart/form-data">
 			<input type="hidden" id="update_id" name="update_id"> 
 			<table cellpadding="5px">
@@ -961,6 +1036,37 @@ function updateDetail() {
 					<td><label for="parentId">所属类别:</label></td>
 					<td><input id="parentId_update" class="easyui-combobox" type="text" name="parentId" data-options="required:false" maxlength="255" style="width:400px;height:20px"/></td>
 				</tr>
+                <tr>
+                    <td><label for="update_pageTitle">页面title(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" id="update_pageTitle" name="update_pageTitle" data-options="required:false" maxlength="250" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="update_pageKeywords">页面keywords(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" id="update_pageKeywords" name="update_pageKeywords" data-options="required:false" maxlength="450" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="update_pageDescription">页面description(可不输入):</label></td>
+                    <td>
+                        <input class="easyui-validatebox" type="text" id="update_pageDescription" name="update_pageDescription" data-options="required:false" maxlength="950" style="width:400px;height:20px"/>
+                        <font color="red">不输入则按照原方式显示.</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="update_pageBannerName">底部banner图片(可不上传):</label></td>
+                    <td>
+                        <img id="update_pageBannerName" src="" style="height: 100px" />
+                        <input name="uploadfile" class="easyui-filebox"
+                                data-options="prompt:'请上传适合尺寸的大小在100k内的图片'"
+                                style="width: 400px" />
+                        <input type="checkbox" name="del_pageBannerName" >勾选则删除已上传的底部banner图片
+                    </td>
+                </tr>
 				<tr>
 					<td colspan="2"><a id="btn" href="#" onclick="updateKeyword();" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a></td>
 				</tr>
@@ -1008,7 +1114,7 @@ function updateDetail() {
 					<td>
 						<input
 						id="detail_banner_img" name="uploadfile" class="easyui-filebox"
-						data-options="prompt:'请上传1200宽度的图片'"
+						data-options="prompt:'请上传适合尺寸的大小在100k内的图片'"
 						style="width: 360px"></td>
 				</tr>
 				<tr>
@@ -1066,7 +1172,7 @@ function updateDetail() {
 					<td>
 						<img id="detail_update_banner_img" src="" style="height: 100px">
 						<input name="uploadfile" class="easyui-filebox"
-						data-options="prompt:'请上传1200宽度的图片'"
+						data-options="prompt:'请上传适合尺寸的大小在100k内的图片'"
 						style="width: 360px"></td>
 				</tr>
 				<tr>

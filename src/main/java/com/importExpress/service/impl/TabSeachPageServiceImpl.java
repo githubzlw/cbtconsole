@@ -5,12 +5,15 @@ import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class TabSeachPageServiceImpl implements TabSeachPageService {
@@ -67,7 +70,33 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 		return tabSeachPageMapper.detailList(sid);
 	}
 
-	@Override
+    @Override
+    public boolean updateTitleAndKey(int sid) {
+        List<TabSeachPagesDetailBean> detailList = detailList(sid);
+        if (detailList == null || detailList.size() == 0){
+            return false;
+        }
+        TabSeachPageBean tabSeachPageBean = get(sid);
+        String title = "Promotion " + tabSeachPageBean.getKeyword() + " Shopping Festival-China Wholesale Online, Buying Chinese Products|Import-Express.com";
+        StringBuffer keywords = new StringBuffer();
+        StringBuffer description = new StringBuffer();
+        for (TabSeachPagesDetailBean bean : detailList) {
+            keywords.append(bean.getName().trim()).append(",");
+            description.append(bean.getKeyword().replace(";", ",").replace("；", ",")).append(",");
+            if (description.toString().indexOf(bean.getName().trim() + ",") == -1){
+                description.append(bean.getName().trim()).append(",");
+            }
+        }
+        tabSeachPageBean.setPageTitle(title);
+        tabSeachPageBean.setPageKeywords(keywords.toString().substring(0,keywords.toString().length() - 1));
+        tabSeachPageBean.setPageDescription("China Wholesale Online, Buying Chinese Products "
+                + description.toString().substring(0, description.toString().length() - 1)
+                + " Choose the best products from China, Pick coupons, Find your favorite products, Get the best prices!");
+        update(tabSeachPageBean);
+        return true;
+    }
+
+    @Override
 	public int updateDetail(TabSeachPagesDetailBean bean) {
 		// TODO Auto-generated method stub
 		return tabSeachPageMapper.updateDetail(bean);
@@ -132,7 +161,10 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 
 	@Override
 	public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean) {
-		return tabSeachPageMapper.updateAuthorizedInfo(bean);
+	    if (bean.getId() != null){
+            return tabSeachPageMapper.updateAuthorizedInfo(bean);
+        }
+        return tabSeachPageMapper.insertAuthorizedInfo(bean);
 	}
 
 	@Override
@@ -145,6 +177,8 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 		return tabSeachPageMapper.queryStaticizeAll();
 	}
 
-	
-
+    @Override
+    public long updateAuthorizedInfoValid(String shopId, int valid) {
+        return tabSeachPageMapper.updateAuthorizedInfoValid(shopId, valid);
+    }
 }

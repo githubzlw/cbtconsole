@@ -9,11 +9,15 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.userAuth.impl.AdmUserDaoImpl;
 import com.cbt.website.userAuth.impl.UserAuthDaoImpl;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.service.QueryUserService;
 import net.sf.json.JSONArray;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +30,8 @@ import java.util.List;
 @RequestMapping("/userLogin")
 public class UserLoginController {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(HotGoodsCtrl.class);
-
+    @Autowired
+    private QueryUserService userService;
 	/**
 	 * 判断用户信息
 	 * 
@@ -157,5 +162,44 @@ public class UserLoginController {
 
 		return json;
 	}
+
+    /**
+     * ly  2018/12/05 13:07
+     * 用户密码修改
+     *
+     */
+    @RequestMapping(value = "/resetPwd.do", method = RequestMethod.POST)
+    @ResponseBody
+    public JsonResult resetPwd(HttpServletRequest request, String admName, String oldPwd, String newPwd) {
+        JsonResult json = new JsonResult();
+        try {
+            //数据校验
+            if (StringUtils.isBlank(admName) || StringUtils.isBlank(oldPwd) || StringUtils.isBlank(newPwd)){
+                json.setOk(false);
+                json.setMessage("旧密码或者新密码或者待修改的用户为空!");
+                return json;
+            }
+            //登录的用户校验
+            HttpSession session = request.getSession();
+            String userJson = Redis.hget(session.getId(), "admuser");
+            if (StringUtils.isBlank(userJson)) {
+                json.setOk(false);
+                json.setMessage("登录超时,请重新登录!");
+                return json;
+            }
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+            if (StringUtils.isBlank(admName) || null == user || !admName.equalsIgnoreCase(user.getAdmName())){
+                json.setOk(false);
+                json.setMessage("修改用户非本人!");
+                return json;
+            }
+            json = userService.resetPwd(admName, oldPwd, newPwd);
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("密码修改失败，原因:" + e.getMessage());
+            LOG.error("UserLoginController.resetPwd error", e);
+        }
+        return json;
+    }
 
 }

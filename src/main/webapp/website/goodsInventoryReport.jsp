@@ -123,6 +123,7 @@ $(function(){
 	});
 	$('#dlg').dialog('close');
 	$('#dlg1').dialog('close');
+    $('#dlg3').dialog('close');
 // 	var opts = $("#easyui-datagrid").datagrid("options");
 // 	opts.url = "/cbtconsole/StatisticalReport/searchGoodsInventoryInfo";
 	
@@ -196,6 +197,7 @@ function setDatagrid() {
 function doQuery(page) {
 	var have_barcode=$('#have_barcode').combobox('getValue');
     var valid=$('#valid').combobox('getValue');
+    var goodscatid=$('#goodscatid').combobox('getValue');
 	var flag =$('#flag').val();
 	var type =$('#type').val();
 	var goodinfo =$('#goodinfo').val();
@@ -225,8 +227,10 @@ function doQuery(page) {
   	  "startdate":startdate,
   	  "enddate":enddate,
 	  "goods_pid":goods_pid,
-		"valid":valid
-	});
+        "valid":valid,
+        "goodscatid":goodscatid
+
+    });
 }
 
 function doReset(){
@@ -247,6 +251,7 @@ function doReset(){
     $('#valid').combobox('setValue','-1');
 	$("#startdate").val("");
 	$("#enddate").val("");
+    $('#goodscatid').combobox('setValue','全部');
 }
 
 function update_inventory(flag,id,barcode,old_remaining,remark) {
@@ -260,30 +265,6 @@ function update_inventory(flag,id,barcode,old_remaining,remark) {
 	});
 }
 
-function delete_inventory(id,goods_pid,barcode,amount){
-	jQuery.ajax({
-	       url:"/cbtconsole/StatisticalReport/deleteInventory",
-	       data:{
-	       	  "id":id,
-	       	  "goods_pid":goods_pid,
-	       	  "barcode":barcode,
-	       	  "amount":amount
-	       	  },
-	       type:"post",
-	       success:function(data){
-	       	var allCount=data.data.allCount;
-	       	if(allCount>0){
-	       		topCenter("删除库存成功");
-	       		$('#easyui-datagrid').datagrid('reload');
-	       	}else{
-	       		topCenter("删除库存失败");
-	       	}
-	       },
-	   	error:function(e){
-	   		topCenter("删除库存失败");
-	   	}
-	   });
-}
 
 function problem_inventory(id){
 	 $.messager.confirm('继续操作', '确定要讲该库存标记为问题库存吗?',         
@@ -392,18 +373,22 @@ function exportData(){
 	var type_="0";
 	var startdate = $("#startdate").val();
 	var enddate = $("#enddate").val();
+    var goodscatid=$('#goodscatid').combobox('getValue');
 	if(type1!=null){
 		type_=type1;
 	}
-	window.location.href ="/cbtconsole/StatisticalReport/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag;
+	window.location.href ="/cbtconsole/StatisticalReport/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag+"&goodscatid="+goodscatid;
 }
 
 function openInventoryEntryView(){
 	$('#dlg1').dialog('open');
 }
 
+function openYmxInventoryEntryView(){
+    $('#dlg3').dialog('open');
+}
+
 function inventoryEntry(){
-// 	var orderid=$("#orderid").val();
 	var goodsid=$("#goodsid").val();
 	var count=$("#count_").val();
 	var in_barcode = $('#new_barcode2').combobox('getValue');
@@ -411,7 +396,6 @@ function inventoryEntry(){
 	jQuery.ajax({
 	       url:"/cbtconsole/StatisticalReport/inventoryEntry",
 	       data:{
-// 	       	  "orderid":orderid,
 	       	  "goodsid":goodsid,
 	       	  "count":count,
 	       	  "in_barcode":in_barcode,
@@ -441,12 +425,62 @@ function inventoryEntry(){
 	   });
 }
 
+function inventoryYmxEntry(){
+    var itmeid=$("#itmeid").val();
+    var ymx_count=$("#ymx_count").val();
+    var goods_p_price=$("#goods_p_price").val();
+    var ymx_barcode2 = $('#ymx_barcode2').combobox('getValue');
+    var remark_ymx=$("#remark_ymx").val();
+    var ymx_img=$("#ymx_img").val();
+    var ymx_name=$("#ymx_name").val();
+    jQuery.ajax({
+        url:"/cbtconsole/StatisticalReport/inventoryYmxEntry",
+        data:{
+            "itmeid":itmeid,
+            "ymx_count":ymx_count,
+            "ymx_barcode2":ymx_barcode2,
+            "remark_ymx":remark_ymx,
+            "ymx_img":ymx_img,
+			"ymx_name":ymx_name,
+			"goods_p_price":goods_p_price
+        },
+        type:"post",
+        success:function(data){
+            var allCount=data.data.allCount;
+            if(allCount>0){
+                topCenter("亚马逊库存录入成功");
+                cance3();
+                setTimeout(function(){
+                    var pages=$('#easyui-datagrid').datagrid('options').pageNumber;
+                    doQuery(pages);
+                }, 1000)
+            }else{
+                topCenter("亚马逊库存录入失败");
+            }
+        },
+        error:function(e){
+            topCenter("亚马逊库存录入失败");
+        }
+    });
+}
+
 function cance1(){
 	$('#dlg1').dialog('close');
 	$("#goodsid").textbox('setValue','');
 	$("#count_").textbox('setValue','');
 	$("#remark_").textbox('setValue','');
 	$('#new_barcode2').combobox('setValue','');
+}
+
+function cance3(){
+    $('#dlg3').dialog('close');
+    $("#itmeid").textbox('setValue','');
+    $("#ymx_count").textbox('setValue','');
+    $("#goods_p_price").textbox('setValue','');
+    $("#ymx_img").textbox('setValue','');
+    $("#ymx_name").textbox('setValue','');
+    $("#remark_ymx").textbox('setValue','');
+    $('#ymx_barcode2').combobox('setValue','');
 }
 
 function cance(){
@@ -518,11 +552,80 @@ function initData(){
         }});
 }
 
+function cance2(){
+    $("#delRemark").textbox('setValue','');
+    $('#dlg2').dialog('close');
+    $("#dId").val("");
+    $("#dPid").val("");
+    $("#dBarcode").val("");
+    $("#dAmount").val("");
+}
+
+function delInventorySources(){
+   var dId=$("#dId").val();
+   var dPid= $("#dPid").val();
+   var dBarcode= $("#dBarcode").val();
+   var dAmount= $("#dAmount").val();
+    var delRemark=$("#delRemark").val();
+    if(delRemark == null || delRemark == ""){
+        topCenter("请输入删除备注");
+        return;
+	}
+    jQuery.ajax({
+        url:"/cbtconsole/StatisticalReport/deleteInventory",
+        data:{
+            "id":dId,
+            "goods_pid":dPid,
+            "barcode":dBarcode,
+            "amount":dAmount,
+			"dRemark":delRemark
+        },
+        type:"post",
+        success:function(data){
+            var allCount=data.data.allCount;
+            if(allCount>0){
+                topCenter("删除库存成功");
+                cance2();
+                $('#easyui-datagrid').datagrid('reload');
+            }else{
+                topCenter("删除库存失败");
+            }
+        },
+        error:function(e){
+            topCenter("删除库存失败");
+        }
+    });
+}
+
+function delete_inventory(id,goods_pid,barcode,amount){
+ 	 $("#dId").val(id);
+    $("#dPid").val(goods_pid);
+    $("#dBarcode").val(barcode);
+    $("#dAmount").val(amount);
+    $('#dlg2').dialog('open');
+    $("#delRemark").textbox('setValue','');
+}
+
 </script>
 </head>
-<body text="#000000" onload="$('#dlg').dialog('close');$('#dlg1').dialog('close')">
+<body text="#000000" onload="$('#dlg').dialog('close');$('#dlg1').dialog('close');$('#dlg2').dialog('close');$('#dlg3').dialog('close'); doQuery(1);">
     	<div class="mod_pay3" style="display: none;" id="big_img">
 			
+		</div>
+		<div id="dlg2" class="easyui-dialog"  title="库存删除" data-options="modal:true" style="width:400px;height:200px;padding:10px;autoOpen:false;closed:true;display: none;">
+			<form id="ff2" method="post" style="height:100%;">
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input type="hidden" id="dId">
+					<input type="hidden" id="dPid">
+					<input type="hidden" id="dBarcode">
+					<input type="hidden" id="dAmount">
+					<input class="easyui-textbox" name="delRemark" id="delRemark"  style="width:70%;"  data-options="label:'盘点备注:'">
+				</div>
+				<div style="text-align:center;padding:5px 0">
+					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="delInventorySources()" style="width:80px">提交</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="cance2()" style="width:80px">取消</a>
+				</div>
+			</form>
 		</div>
 	<div id="dlg" class="easyui-dialog"  title="库存盘点" data-options="modal:true" style="width:400px;height:400px;padding:10px;autoOpen:false;closed:true;display: none;">
 	<form id="ff" method="post" style="height:100%;">
@@ -557,9 +660,6 @@ function initData(){
 	</div>
 	<div id="dlg1" class="easyui-dialog" title="手动录入库存" data-options="modal:true" style="width:400px;height:400px;padding:10px;autoOpen:false;;closed:true;display: none;">
 	<form  method="post" style="height:100%;">
-<!-- 			<div style="margin-bottom:20px;margin-left:35px;"> -->
-<!-- 				<input class="easyui-textbox" name="orderid" id="orderid"   style="width:70%;"  data-options="label:'订单号:',required:true"> -->
-<!-- 			</div> -->
 			<div style="margin-bottom:20px;margin-left:35px;">
 				<input class="easyui-numberbox" name="goodsid" id="goodsid"  style="width:70%;"  data-options="label:'商品号:',required:true">
 			</div>
@@ -582,6 +682,39 @@ function initData(){
 		</div>
 		</form>
 	</div>
+		<div id="dlg3" class="easyui-dialog" title="手动录入亚马逊库存" data-options="modal:true" style="width:400px;height:450px;padding:10px;autoOpen:false;;closed:true;display: none;">
+			<form  method="post" style="height:100%;">
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-numberbox" name="itmeid" id="itmeid"  style="width:90%;"  data-options="label:'商品pid:',required:true">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-numberbox" name="goods_p_price" id="goods_p_price"  style="width:90%;"  data-options="label:'商品价格:'">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-numberbox" name="ymx_count" id="ymx_count"  style="width:90%;"  data-options="label:'库存数量:',required:true">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-textbox" name="ymx_img" id="ymx_img"  style="width:90%;"  data-options="label:'商品图片:'">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-textbox" name="ymx_name" id="ymx_name"  style="width:90%;"  data-options="label:'商品名称:'">
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<select class="easyui-combobox" name="ymx_barcode2" id="ymx_barcode2" style="width:90%;" data-options="label:'库存库位:',required:true,valueField: 'id',
+                    textField: 'path', value:'',
+                    url: '/cbtconsole/StatisticalReport/getNewBarcode',
+                    method:'get'">
+					</select>
+				</div>
+				<div style="margin-bottom:20px;margin-left:35px;">
+					<input class="easyui-textbox" name="remark_ymx" id="remark_ymx"  style="width:90%;"  data-options="label:'盘点备注:'">
+				</div>
+				<div style="text-align:center;padding:5px 0">
+					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="inventoryYmxEntry()" style="width:80px">提交</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton" onclick="cance3()" style="width:80px">取消</a>
+				</div>
+			</form>
+		</div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div style="margin-left:10px;">
 			<span style="font-size:13px;font-weight:bold">最近30天新产生的库存(数量/金额):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tj_info_1" style="font-size:20px;width:35px;margin-right:100px">0</span>
@@ -623,10 +756,13 @@ function initData(){
 						<option value="1">上架</option>
 						<option value="0">下架</option>
 						<option value="2">ali商品</option>
+						<option value="3">亚马逊商品</option>
 					</select>
-	                      <%--分类：<select name="" id="type1">--%>
-	                   <%--<option value="0">请选择商品类别</option>--%>
-	              <%--</select>--%>
+				<select class="easyui-combobox" name="goodscatid" id="goodscatid" style="width:15%;" data-options="label:'库存商品类别:',Height:'2000px',valueField: 'goodscatid',
+                    textField: 'goodscatid', value:'全部',selected:true,
+                    url: '/cbtconsole/StatisticalReport/getAllInventory',
+                    method:'get'">
+				</select>
 	         <div id="pandian_time" style="display: none">
 	              	              盘点时间:<input id="startdate"
 						name="startdate" readonly="readonly"
@@ -644,6 +780,7 @@ function initData(){
 		</div>
 		<a href="javascript:exportData();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">导出</a>
 		<a href="javascript:openInventoryEntryView();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存录入</a>
+		<a href="javascript:openYmxInventoryEntryView();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">亚马逊库存录入</a>
 		<a href="/cbtconsole/website/inventory_update_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存盘点日志</a>
 <!-- 		<a href="/cbtconsole/website/inventory_update_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存盘点记录</a> -->
 		<a href="/cbtconsole/website/inventory_delete_log.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">库存删除记录</a>
@@ -653,7 +790,7 @@ function initData(){
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1200px;height:900px">
 		<thead>	
 			<tr>
-				<%--<th data-options="field:'goodscatid',width:50,align:'center'">商品品类</th>--%>
+				<th data-options="field:'goodscatid',width:50,align:'center'">商品品类</th>
 				<th data-options="field:'onLine',width:50,align:'center'">是否上架</th>
 				<th data-options="field:'good_name',width:50,align:'center'">商品名称</th>
 				<th data-options="field:'barcode',width:80,align:'center'">商品库位</th>
@@ -668,6 +805,7 @@ function initData(){
 				<th data-options="field:'createtime',width:60,align:'center'">首次库存录入时间</th>
 				<th data-options="field:'updatetime',width:60,align:'center'">最后更新库存时间</th>
 				<th data-options="field:'remark',width:60,align:'center'">备注</th>
+				<th data-options="field:'editLink',width:60,align:'center'">产品编辑链接</th>
 				<th data-options="field:'unsellableReason',width:60,align:'center'">下架原因</th>
 				<th data-options="field:'operation',width:50,align:'center'">盘点</th>
 			</tr>

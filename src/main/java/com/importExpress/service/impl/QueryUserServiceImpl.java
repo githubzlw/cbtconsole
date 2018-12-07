@@ -2,6 +2,7 @@ package com.importExpress.service.impl;
 
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.website.userAuth.bean.AuthInfo;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
 import com.importExpress.pojo.GoodsInfoSpiderPO;
 import com.importExpress.pojo.ItemStaticFile;
@@ -265,8 +266,37 @@ public class QueryUserServiceImpl implements QueryUserService {
 	public AuthInfo queryAuthInfo(Integer authId) {
 		return queryUserMapper.queryAuthInfo(authId);
 	}
-	
-    
 
+    @Override
+    public String queryAvailable(String email) {
+        DataSourceSelector.set("dataSource127hop");
+        String available = queryUserMapper.queryAvailable(email);
+        DataSourceSelector.restore();
+        return available;
+    }
 
+    @Override
+    public long updateAvailable(String email, Double available) {
+        DataSourceSelector.set("dataSource127hop");
+        long count = queryUserMapper.updateAvailable(email, available);
+        DataSourceSelector.restore();
+        return count;
+    }
+
+    @Override
+    public JsonResult resetPwd(String admName, String oldPwd, String newPwd) {
+        JsonResult json = new JsonResult();
+        //旧密码校验
+        long count = queryUserMapper.queryAdmUserByAdmNameAndPwd(admName, oldPwd);
+        if (count == 0){
+            json.setOk(false);
+            json.setMessage("旧密码输入错误!");
+            return json;
+        }
+        //新密码更新
+        queryUserMapper.updatePasswordByAdmName(admName,newPwd);
+        json.setOk(true);
+        json.setMessage("密码修改成功,下次登录请使用新密码!");
+        return json;
+    }
 }

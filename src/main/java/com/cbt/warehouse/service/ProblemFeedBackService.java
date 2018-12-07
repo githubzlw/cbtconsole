@@ -22,5 +22,5 @@ public interface ProblemFeedBackService {
 	 */
 	public List<ProblemFeedBackBean> getReportProblem(String report_id);
 
-    Map<String,String> queryWarningNum();
+    Map<String,String> queryWarningNum(int admuserid);
 }

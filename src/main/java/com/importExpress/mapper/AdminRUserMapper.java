@@ -28,4 +28,14 @@ public interface AdminRUserMapper {
     int updateByPrimaryKeySelective(AdminRUser record);
 
     int updateByPrimaryKey(AdminRUser record);
+    
+    
+    /**
+     * @param adminID
+     * @return
+     */
+    List<AdminRUser> selectByUserID(@Param("list")List<String> list,@Param("admid")int admid);
+    
+    
+    
 }

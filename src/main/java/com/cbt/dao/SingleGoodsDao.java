@@ -199,4 +199,21 @@ public interface SingleGoodsDao {
 	 */
 	int setMainImgByShopId(String shopId, String imgUrl);
 
+
+	/**
+	 * 查询singleOffers表存在的PID信息
+	 * @param pidList
+	 * @return
+	 */
+	List<String> queryIsExistsPidFromSingleOffers(List<SingleGoodsCheck> pidList);
+
+	/**
+	 * 删除single offers表和ready表PID信息
+	 * @param pidList
+	 * @return
+	 */
+	boolean deleteSingleOffersByPids(List<String> pidList);
+
+	int queryOnlineGoodsCountByShopId(String shopId);
+
 }

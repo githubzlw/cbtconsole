@@ -32,6 +32,15 @@ public class QueAns implements Serializable{
 	private String shop_id;//产品店铺名称
 	private String c_shop_id;
 	private String admName;//销售
+	private String contextFlag;
+	public String getContextFlag() {
+		return contextFlag;
+	}
+
+	public void setContextFlag(String contextFlag) {
+		this.contextFlag = contextFlag;
+	}
+
 	public String getAdmName() {
 		return admName;
 	}

@@ -629,7 +629,7 @@
 	</select>
 
 	<select id="queryOrderSales" resultMap="orderInfoResultMap">
-		select oi.exchange_rate,oi.order_no,oi.user_id,oi.pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email as userEmail
+		select oi.exchange_rate,oi.order_no,oi.user_id,if(oi.memberFee>=10,oi.pay_price-oi.memberFee,oi.pay_price) as pay_price,oi.create_time,oi.state,oi.orderpaytime,u.email as userEmail
 		,(SELECT CAST(SUM(ops.buycount*ops.goods_p_price) AS DECIMAL(10,2)) FROM order_product_source ops 
 		INNER JOIN order_details od WHERE ops.orderid=od.orderid AND ops.goodsid=od.goodsid
 		AND od.state IN (0,1) AND od.orderid=oi.order_no) as buyAmount,
@@ -643,7 +643,7 @@
 
 		(SELECT GROUP_CONCAT(IFNULL(sp.expressno,'')) FROM shipping_package sp WHERE (oi.order_no=sp.orderid
 		OR (LOCATE(CONCAT(oi.order_no,','),sp.remarks)>0 AND oi.order_no&lt;>sp.orderid) )) AS expressNo
-		, (SELECT estimatefreight FROM shipping_package sp WHERE oi.order_no = sp.orderid) AS estimatefreight
+		, (SELECT sum(estimatefreight) FROM shipping_package sp WHERE oi.order_no = sp.orderid) AS estimatefreight
 		from
 		orderinfo oi inner join user u on oi.user_id=u.id
 		where 1=1 and oi.state in(1,2,3,4,5)

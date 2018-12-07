@@ -79,6 +79,72 @@ public class Inventory {
 	private String goodsid;
 	private String onLine;//是否上架
 	private String unsellableReason;//下架原因
+	private String pid;
+	private String online_flag;
+	private String db_flag;
+	private String editLink;
+	private String name;
+	private int type;
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+
+
+	public String getDelRemark() {
+		return delRemark;
+	}
+
+	public void setDelRemark(String delRemark) {
+		this.delRemark = delRemark;
+	}
+
+	private String delRemark;
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEditLink() {
+		return editLink;
+	}
+
+
+	public void setEditLink(String editLink) {
+		this.editLink = editLink;
+	}
+
+	public String getPid() {
+		return pid;
+	}
+
+	public void setPid(String pid) {
+		this.pid = pid;
+	}
+
+	public String getOnline_flag() {
+		return online_flag;
+	}
+
+	public void setOnline_flag(String online_flag) {
+		this.online_flag = online_flag;
+	}
+
+	public String getDb_flag() {
+		return db_flag;
+	}
+
+	public void setDb_flag(String db_flag) {
+		this.db_flag = db_flag;
+	}
+
 	public String getUnsellableReason() {
 		return unsellableReason;
 	}

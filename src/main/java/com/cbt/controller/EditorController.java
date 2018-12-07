@@ -213,7 +213,11 @@ public class EditorController {
             if (goods.getSoldFlag() > 0) {
                 //先取range_price 为空则再取feeprice
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if(goods.getRangePrice().contains("-")){
+                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    }else{
+                        singlePriceStr = goods.getRangePrice().trim();
+                    }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
                     if (singlePriceStr.contains("\\$")) {
@@ -227,7 +231,11 @@ public class EditorController {
             } else {
                 //先取range_price 为空则wprice 再为空取price
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    if(goods.getRangePrice().contains("-")){
+                        singlePriceStr = goods.getRangePrice().split("-")[1].trim();
+                    }else{
+                        singlePriceStr = goods.getRangePrice().trim();
+                    }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
                     singlePriceStr = goods.getFeeprice().split(",")[0];
                     if (singlePriceStr.contains("\\$")) {
@@ -241,7 +249,7 @@ public class EditorController {
                     singlePriceStr = goods.getPrice();
                 }
             }
-            singlePriceStr = singlePriceStr.replace("]", "");
+            singlePriceStr = singlePriceStr.replace("[", "").replace("]", "");
             //获取1piece的最高价格
             if (singlePriceStr.contains("-")) {
                 singlePrice = Double.valueOf(singlePriceStr.split("-")[1].trim());
@@ -2419,16 +2427,7 @@ public class EditorController {
             json.setMessage("获取商品重量失败");
             return json;
         }
-        json = customGoodsService.setGoodsWeightByWeigher(pid, newWeight);
-        if (json.isOk()) {
-            CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pid, 0);
-            boolean isSuccess = customGoodsService.refreshPriceRelatedData(orGoods);
-            if (!isSuccess) {
-                json.setOk(false);
-                json.setMessage("更新数据失败");
-            }
-        }
-        return json;
+        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight);
     }
 
 
@@ -2543,6 +2542,44 @@ public class EditorController {
 
         try {
             List<GoodsEditBean> editList = customGoodsService.queryGoodsEditBean(editBean);
+            Map<String, List<String>> pidMapNews = new HashMap<>(limitNum + 1);
+            Map<String, List<String>> pidMapOlds = new HashMap<>(limitNum + 1);
+            for (GoodsEditBean gdEd : editList) {
+                if(StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())){
+                    if(gdEd.getNew_title().equals(gdEd.getOld_title())){
+                        gdEd.setNew_title("");
+                    }
+                }
+                if (pidMapOlds.containsKey(gdEd.getPid())) {
+                    if (StringUtils.isNotBlank(gdEd.getOld_title())) {
+                        if (checkListContains(pidMapOlds.get(gdEd.getPid()),gdEd.getOld_title())) {
+                            gdEd.setOld_title("");
+                        } else {
+                            pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
+                        }
+                    }
+                } else {
+                    List<String> titleList = new ArrayList<>();
+                    titleList.add(gdEd.getOld_title());
+                    pidMapOlds.put(gdEd.getPid(), titleList);
+                }
+                if (pidMapNews.containsKey(gdEd.getPid())) {
+                    if (StringUtils.isNotBlank(gdEd.getNew_title())) {
+                        if (checkListContains(pidMapNews.get(gdEd.getPid()),gdEd.getNew_title())) {
+                            gdEd.setNew_title("");
+                        } else {
+                            pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
+                        }
+                    }
+                } else {
+                    List<String> titleList = new ArrayList<>();
+                    titleList.add(gdEd.getNew_title());
+                    pidMapNews.put(gdEd.getPid(), titleList);
+                }
+
+            }
+            pidMapNews.clear();
+            pidMapOlds.clear();
             int total = customGoodsService.queryGoodsEditBeanCount(editBean);
             json.setSuccess(true);
             json.setRows(editList);
@@ -2557,5 +2594,19 @@ public class EditorController {
         return json;
     }
 
+    private boolean checkListContains(List<String> list,String str){
+        boolean isOk = false;
+        if(list == null || list.isEmpty() || StringUtils.isBlank(str)){
+            return isOk;
+        }else{
+            for(String tempStr : list){
+                if(str.equals(tempStr)){
+                    isOk = true;
+                    break;
+                }
+            }
+        }
+        return isOk;
+    }
 
 }

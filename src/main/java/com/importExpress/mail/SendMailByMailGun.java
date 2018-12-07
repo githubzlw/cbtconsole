@@ -66,7 +66,7 @@ public class SendMailByMailGun implements SendMail {
         formData.field("html", BODY);
         int res = webResource.type(MediaType.MULTIPART_FORM_DATA_TYPE).post(ClientResponse.class, formData).getStatus();
         if (res != 200) {
-            logger.error("Send email faild:" + SUBJECT);
+            logger.error("Send email faild:" + SUBJECT +" TO:"+TO);
             throw new RuntimeException("Send email faild");
         }
     }

@@ -255,4 +255,16 @@
       flag = #{flag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="selectByUserID" resultMap="BaseResultMap">
+  select  userid,adminid,admName,useremail,username from admin_r_user where userid in
+  <foreach collection="list" close=")" open="(" separator="," item="item" index="index">
+  #{item}
+  </foreach>
+  <if test="admid != 0">
+  and adminid=#{admid}
+  </if>
+  </select>
+  
+  
 </mapper>

@@ -1354,6 +1354,20 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 				}else {
 					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
 				}
+				if("1".equals(inventory.getDb_flag())){
+					inventory.setEditLink("<a target='_blank' href='/cbtconsole/editc/detalisEdit?pid="+inventory.getPid()+"'>产品编辑链接</a>");
+				}else{
+					inventory.setEditLink("--");
+				}
+				if("4".equals(inventory.getOnline_flag())){
+					String car_img=inventory.getCar_img();
+					String imgs[]=car_img.split("kf");
+					String one=imgs[0];
+					String two=imgs[1].replace(".jpg_50x50.jpg","");
+					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
+				}else if("1".equals(inventory.getOnline_flag())){
+					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
+				}
 				inventory.setCar_img("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
 						+ "<img  src='"+ (inventory.getCar_img().indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":inventory.getCar_img()) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ inventory.getCar_img() + "')\" height='100' width='100'></a>");
 				if(!StringUtils.isStrNull(inventory.getGoods_p_url())){
@@ -1370,6 +1384,10 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 				}else{
 					inventory.setRemaining("<span>"+inventory.getRemaining()+"</span>");
 				}
+			}
+			String goodscatid=inventory.getGoodscatid();
+			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
+				inventory.setGoodscatid("其他");
 			}
 		}
 		return toryList;
@@ -1612,6 +1630,10 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.getSourceValidationCount(buyer,account,page,startdate,enddate);
 	}
+	@Override
+	public List<Inventory> getAllInventory() {
+		return taoBaoOrderMapper.getAllInventory();
+	}
 
 	@Override
 	public List<String> getNewBarcode() {
@@ -1622,9 +1644,9 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	 * 根据ID删除库存数据
 	 */
 	@Override
-	public int deleteInventory(int id) {
+	public int deleteInventory(int id,String dRemark) {
 
-		return taoBaoOrderMapper.deleteInventory(id);
+		return taoBaoOrderMapper.deleteInventory(id,dRemark);
 	}
 
 	@Override
@@ -1645,6 +1667,17 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.findOrderDetails(map);
 	}
+
+	@Override
+	public Inventory getInventoryByPid(Map<String, String> map) {
+		return taoBaoOrderMapper.getInventoryByPid(map);
+	}
+
+	@Override
+	public int insertInventoryYmx(Map<String, String> map) {
+		return taoBaoOrderMapper.insertInventoryYmx(map);
+	}
+
 	/**
 	 * 手动录入库存
 	 * @param map

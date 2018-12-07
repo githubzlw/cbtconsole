@@ -124,6 +124,8 @@
                 onLoadSuccess: function (data) {
                     if (!data.success) {
                         showMessage(data.message);
+                    }else{
+                    	$("#confirm_count").html(data.message);
                     }
                 }
             });
@@ -156,9 +158,15 @@
             });
         }
         
+        function formatPP(val, row, index) {
+        	if(row.merchant=='584JZVFU6PPVU'){
+        		return '老账号';
+        	}
+    		return '新账号';
+    	}
         function formatAction(val, row, index) {
     		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-    					+ row.disputeID + '">查看</a>';
+    					+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
     	}
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
@@ -171,6 +179,23 @@
 	    					+ row.orderNo + '">'+row.orderNo+'</a>';
 	        	}
     	}
+        /**
+         * 消息提醒弹框
+         * @param message
+         */
+        function showMessage(message) {
+            $.messager.show({
+                title: '提醒',
+                msg: message,
+                timeout: 10000,
+                showType: 'slide',
+                style: {
+                    right: '',
+                    top: ($(window).height() * 0.15),
+                    bottom: ''
+                }
+            });
+        }
         </script>
 
 </head>
@@ -197,6 +222,8 @@
         &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
                                               class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       
+      <span>等待退款(<a target="_blank" href="/cbtconsole/apa/disputerefund.html" id="confirm_count">0</a>)</span>
+      
     </form>
 </div>
 
@@ -205,14 +232,17 @@
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
+        <th data-options="field:'type',width:'30px'">来源</th>
         <th data-options="field:'disputeID',width:'80px'">事件号</th>
-        <th data-options="field:'reason',align:'left',width:'200px'">原因</th>
-        <th data-options="field:'updateTime',align:'center',width:'100px'">最后更新时间</th>
-        <th data-options="field:'status',align:'center',width:'190px'">状态</th>
+        <th data-options="field:'reason',align:'left',width:'210px'">原因</th>
+        <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
+        <th data-options="field:'status',align:'center',width:'150px'">状态</th>
         <th data-options="field:'value',align:'center',width:'100px'">金额</th>
         <th data-options="field:'userid',align:'center',width:'50px'">用户</th>
         <th data-options="field:'email',align:'center',width:'120px'">邮箱</th>
         <th data-options="field:'orderNo',align:'center',width:'130px',formatter:formatOrder">订单号</th>
+        <th data-options="field:'merchantID',align:'center',width:'100px',formatter:formatPP">pp账号</th>
+        <th data-options="field:'oprateAdm',align:'center',width:'100px'">销售</th>
         <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
     </tr>
     </thead>
