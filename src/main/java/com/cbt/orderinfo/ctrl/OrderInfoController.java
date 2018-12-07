@@ -679,6 +679,8 @@ public class OrderInfoController{
 	private int getCount(int showUnpaid, String orderno, String email, String type, int status_, int buyuser, int userID, int state, int admuserid, String startdate, String enddate, List<Map<String, String>> list) {
 		int count = 0;
 		if(list!=null&&!list.isEmpty() && !"order_pending".equals(type)){
+			startdate="0".equals(startdate)?null:startdate;
+			enddate="0".equals(enddate)?null:enddate;
 			count = iOrderinfoService.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyuser, showUnpaid, type,status_ );
 		}else{
 			count=list.size();

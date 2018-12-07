@@ -1816,7 +1816,7 @@ public class NewOrderDetailsCtr {
 			// 订单支付确认信息回显
 			PaymentConfirm paymentConfirm = server.queryForPaymentConfirm(orderNo);
 			// 是否为黑名单
-			int row = server.isTblack(payList.size() > 0 ? payList.get(0).getUsername() : "");
+			int row = server.isTblack(payList.size()  > 0 && StringUtil.isNotBlank(payList.get(0).getUsername())? payList.get(0).getUsername() : "----");
 			if (row > 0) {
 				request.setAttribute("isTblack", "该用户为黑名单用户");
 			}
