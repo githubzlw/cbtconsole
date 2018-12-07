@@ -22,21 +22,24 @@ import com.importExpress.utli.GoodsPriceUpdateUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import okhttp3.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.commons.logging.Log;import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +50,7 @@ import java.util.Map;
 public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
+    private static final String GET_MIN_FREIGHT_URL = "http://127.0.0.1:8087/shopCartMarketingCtr/getMinFreightByUserId";
 
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
@@ -179,102 +183,6 @@ public class ShopCarMarketingController {
     }
 
 
-    @RequestMapping("/sendEmailCarInfoByUserId")
-    public ModelAndView sendEmailCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
-        Map<String,Object> model = new HashedMap();
-        ModelAndView mv = new ModelAndView("goodsCarInfoEmail");
-        String userJson = Redis.hget(request.getSession().getId(), "admuser");
-        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
-        if (user == null || user.getId() == 0) {
-            mv.addObject("message", "用户未登录");
-            mv.addObject("success", 0);
-            return mv;
-        }
-        String userIdStr = request.getParameter("userId");
-        if (StringUtils.isBlank(userIdStr)) {
-            mv.addObject("message", "获取用户ID失败");
-            mv.addObject("success", 0);
-            return mv;
-        } else {
-            mv.addObject("userId", userIdStr);
-        }
-        try {
-            //查询客户信息
-            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
-            mv.addObject("userEmail", listu.get("email"));
-            model.put("userEmail", listu.get("email"));
-            listu.clear();
-            //查询当前客户存在的购物车数据
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
-            //格式化处理规格数据
-            double productCost = 0;
-            double actualCost = 0;
-            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
-            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
-            for (ShopCarMarketing shopCar : shopCarMarketingList) {
-                String tempType = "";
-                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
-                    String[] splitFirst = shopCar.getGoodsType().split(",");
-                    for (String spCh : splitFirst) {
-                        String[] spScList = spCh.split("@");
-                        tempType += spScList[0] + ";";
-                        spScList = null;
-                    }
-                    splitFirst = null;
-                }
-                if (tempType.length() > 0) {
-                    shopCar.setGoodsType(tempType);
-                }
-                if (shopCar.getPrice1() > 0) {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                    actualCost += totalPrice;
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    resultList.add(shopCar);
-                } else {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    sourceList.add(shopCar);
-                }
-            }
-            shopCarMarketingList.clear();
-            if (resultList.size() > 0) {
-                double offCost = productCost - actualCost;
-                mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
-                mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
-                mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
-                mv.addObject("success", 1);
-                mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                mv.addObject("updateList", resultList);
-                mv.addObject("sourceList", sourceList);
-                model.put("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
-                model.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
-                model.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
-                model.put("success", 1);
-                model.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                model.put("updateList", resultList);
-                model.put("sourceList", sourceList);
-                JSONObject jsonObject = JSONObject.fromObject(model);
-                String modeStr = jsonObject.toString();
-                mv.addObject("modeStr",modeStr);
-            } else {
-                mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
-                mv.addObject("success", 0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("sendEmailCarInfoByUserId error:" + e.getMessage());
-            logger.error("sendEmailCarInfoByUserId error:" + e.getMessage());
-            mv.addObject("message", "执行过程失败，原因：" + e.getMessage());
-            mv.addObject("success", 0);
-        }
-        return mv;
-    }
-
-
     @RequestMapping("/confirmAndSendEmail")
     @ResponseBody
     public JsonResult confirmAndSendEmail(HttpServletRequest request, HttpServletResponse response) {
@@ -328,7 +236,7 @@ public class ShopCarMarketingController {
                 activeList.add(genActiveBeanByShopCar(shopCar));
             }
 
-            String emailTitle = "We have reduced price for your ImportExpress shopping cart selection!";
+            String emailTitle = "Your shopping cart misses you!";
             if (emailContent.contains("noticed that you have over")) {
                 emailTitle = "";
             }
@@ -352,17 +260,17 @@ public class ShopCarMarketingController {
             //3.发送邮件给客户
             //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
             boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
-            if(modelB){
+            if (modelB) {
                 String modelStr = request.getParameter("model");
-                Map<String,Object> model = SerializeUtil.JsonToMapStr(modelStr);
+                Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
                 sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
-            }else {
+            } else {
                 sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
             //End：
             //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             //4.更新跟进信息
-            shopCarMarketingService.updateAndInsertUserFollowInfo(userId,user.getId(),emailContent);
+            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), emailContent);
             json.setOk(true);
             json.setMessage("发送邮件成功！");
         } catch (Exception e) {
@@ -541,8 +449,8 @@ public class ShopCarMarketingController {
             json.setSuccess(false);
             json.setMessage("用户未登陆");
             return json;
-        }else{
-            if(!"0".equals(admuser.getRoletype())){
+        } else {
+            if (!"0".equals(admuser.getRoletype())) {
                 statistic.setFollowAdminId(admuser.getId());
             }
         }
@@ -560,10 +468,16 @@ public class ShopCarMarketingController {
         }
 
 
-        String isFollowStr = request.getParameter("isFollow");
-        int isFollow = -1;
-        if (StringUtils.isNotBlank(isFollowStr)) {
-            isFollow = Integer.parseInt(isFollowStr);
+        String followIdStr = request.getParameter("followId");
+        int followId = 0;
+        if (StringUtils.isNotBlank(followIdStr)) {
+            followId = Integer.parseInt(followIdStr);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        int adminId = 0;
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            adminId = Integer.parseInt(adminIdStr);
         }
 
         String userIdStr = request.getParameter("userId");
@@ -573,7 +487,7 @@ public class ShopCarMarketingController {
         }
 
         String userEmail = request.getParameter("userEmail");
-         if (StringUtils.isNotBlank(userEmail)) {
+        if (StringUtils.isNotBlank(userEmail)) {
             statistic.setUserEmail(userEmail);
         }
 
@@ -583,11 +497,33 @@ public class ShopCarMarketingController {
             isOrder = Integer.parseInt(isOrderStr);
         }
 
+        double beginMoney = 0;
+        String beginMoneyStr = request.getParameter("beginMoney");
+        if (StringUtils.isNotBlank(beginMoneyStr)) {
+            beginMoney = Double.parseDouble(beginMoneyStr);
+        }
+
+        double endMoney = 0;
+        String endMoneyStr = request.getParameter("endMoney");
+        if (StringUtils.isNotBlank(endMoneyStr)) {
+            endMoney = Double.parseDouble(endMoneyStr);
+        }
+
+        int countryId = 0;
+        String countryIdStr = request.getParameter("countryId");
+        if (StringUtils.isNotBlank(countryIdStr)) {
+            countryId = Integer.parseInt(countryIdStr);
+        }
+
         try {
 
-            statistic.setIsFollow(isFollow);
+            statistic.setFollowAdminId(followId);
+            statistic.setSaleId(adminId);
             statistic.setIsOrder(isOrder);
             statistic.setUserId(userId);
+            statistic.setBeginMoney(beginMoney);
+            statistic.setEndMoney(endMoney);
+            statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
             List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
@@ -689,6 +625,11 @@ public class ShopCarMarketingController {
                 //计算利润率
                 totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
             }
+            // 如果总运费totalFreight为0，则重新获取总运费(调用线上的接口)
+            if (totalFreight < 0.1) {
+                //totalFreight = getMinFreightByUserId(userId);
+            }
+            totalFreight = getMinFreightByUserId(userId,carUserStatistic);
             estimateProfit = (totalPrice - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
             carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
             carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
@@ -709,10 +650,36 @@ public class ShopCarMarketingController {
         return mv;
     }
 
+    private double getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic) {
+
+        double freight = 0;
+        OkHttpClient okHttpClient = new OkHttpClient();
+
+        RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
+        Request request = new Request.Builder().url(GET_MIN_FREIGHT_URL).post(formBody).build();
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            String resultStr = response.body().string();
+            JSONObject json = JSONObject.fromObject(resultStr);
+            if (json.getBoolean("ok")) {
+                System.out.println("getMinFreightByUserId success !!!");
+                freight = json.getJSONObject("data").getDouble("totalFreight");
+                carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+            } else {
+                System.err.println("getMinFreightByUserId error :<:<:<");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            logger.error("getMinFreightByUserId error:" + e.getMessage());
+        }
+        return freight;
+    }
+
 
     @RequestMapping("/genShopCarInfoByUserId")
     @ResponseBody
-    public Map<String,Object> genShopCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> genShopCarInfoByUserId(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<>();
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
@@ -852,7 +819,6 @@ public class ShopCarMarketingController {
     }
 
 
-
     //计算商品运费
 
     public double genFreightByPid(String modeTransport, String catid, double odWeight, int countryId) {
@@ -888,6 +854,290 @@ public class ShopCarMarketingController {
         }
         esFreight += (freight1 + freight2);
         return esFreight / GoodsPriceUpdateUtil.EXCHANGE_RATE;
+    }
+
+
+    @RequestMapping("/queryTrackingList")
+    @ResponseBody
+    public EasyUiJsonResult queryTrackingList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        ShopTrackingBean param = new ShopTrackingBean();
+        String adminUserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(adminUserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (StringUtils.isNotBlank(pageStr)) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            param.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String orderNo = request.getParameter("orderNo");
+        if (StringUtils.isNotBlank(orderNo)) {
+            param.setOrderNo(orderNo);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            param.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String orderPayBeginTime = request.getParameter("orderPayBeginTime");
+        if (StringUtils.isNotBlank(orderPayBeginTime)) {
+            param.setOrderPayTime(orderPayBeginTime);
+        }
+
+        String orderPayEndTime = request.getParameter("orderPayEndTime");
+        if (StringUtils.isNotBlank(orderPayEndTime)) {
+            param.setOrderPayEndTime(orderPayEndTime);
+        }
+
+        try {
+
+            param.setStartNum(startNum);
+            param.setLimitNum(limitNum);
+            List<ShopTrackingBean> res = shopCarMarketingService.queryTrackingList(param);
+            int count = shopCarMarketingService.queryTrackingListCount(param);
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/exportTrackingExcel")
+    @ResponseBody
+    public void exportTrackingExcel(HttpServletRequest request, HttpServletResponse response) {
+
+        ShopTrackingBean param = new ShopTrackingBean();
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            param.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String orderNo = request.getParameter("orderNo");
+        if (StringUtils.isNotBlank(orderNo)) {
+            param.setOrderNo(orderNo);
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr)) {
+            param.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String orderPayBeginTime = request.getParameter("orderPayBeginTime");
+        if (StringUtils.isNotBlank(orderPayBeginTime)) {
+            param.setOrderPayTime(orderPayBeginTime);
+        }
+
+        String orderPayEndTime = request.getParameter("orderPayEndTime");
+        if (StringUtils.isNotBlank(orderPayEndTime)) {
+            param.setOrderPayEndTime(orderPayEndTime);
+        }
+        OutputStream ouputStream = null;
+        try {
+            List<ShopTrackingBean> res = shopCarMarketingService.queryTrackingList(param);
+
+            HSSFWorkbook wb = genTrackingExcel(res, "购物车营销追踪详情");
+            response.setContentType("application/vnd.ms-excel");
+            String headerTitle = "attachment;filename=" + (StringUtils.isNotBlank(adminIdStr) ? res.get(0).getAdminName() : "")
+                    + "-shopCartMarketingTracking.xls";
+            response.setHeader("Content-disposition", headerTitle);
+            response.setCharacterEncoding("utf-8");
+            ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ouputStream != null) {
+                    ouputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private HSSFWorkbook genTrackingExcel(List<ShopTrackingBean> res, String title) {
+
+        // 第一步，创建一个webbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+        HSSFSheet sheet = wb.createSheet(title);
+        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+        HSSFRow row = sheet.createRow((int) 0);
+        // 第四步，创建单元格，并设置值表头 设置表头居中
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+
+        HSSFCell cell = row.createCell(0);
+        cell.setCellValue("用户ID");
+        cell.setCellStyle(style);
+        cell = row.createCell(1);
+        cell.setCellValue("订单号");
+        cell.setCellStyle(style);
+        cell = row.createCell(2);
+        cell.setCellValue("下单时间");
+        cell.setCellStyle(style);
+        cell = row.createCell(3);
+        cell.setCellValue("下单金额(USD)");
+        cell.setCellStyle(style);
+        cell = row.createCell(4);
+        cell.setCellValue("销售");
+        cell.setCellStyle(style);
+        cell = row.createCell(5);
+        cell.setCellValue("跟进时间");
+        cell.setCellStyle(style);
+
+        for (int i = 0; i < res.size(); i++) {
+            row = sheet.createRow((int) i + 1);
+            // 第四步，创建单元格，并设置值
+            row.createCell(0).setCellValue(res.get(i).getUserId());
+            row.createCell(1).setCellValue(res.get(i).getOrderNo());
+            row.createCell(2).setCellValue(res.get(i).getOrderPayTime());
+            row.createCell(3).setCellValue(res.get(i).getOrderPayAmount());
+            row.createCell(4).setCellValue(res.get(i).getAdminName());
+            row.createCell(5).setCellValue(res.get(i).getFollowTime());
+        }
+        return wb;
+    }
+
+
+    @RequestMapping("/queryAllCountry")
+    @ResponseBody
+    public List<ZoneBean> queryAllCountry(HttpServletRequest request, HttpServletResponse response) {
+
+        List<ZoneBean> list = new ArrayList<>();
+        try {
+            list = shopCarMarketingService.queryAllCountry();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+        }
+        return list;
+    }
+
+
+    @RequestMapping("/genShoppingCarMarketingEmail")
+    public ModelAndView genShoppingCarMarketingEmail(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("shopCartMarketingEmail");
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("message", "用户未登录");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("adminName", user.getAdmName());
+            mv.addObject("adminEmail", user.getEmail());
+        }
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isBlank(userIdStr)) {
+            mv.addObject("message", "获取用户ID失败");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("userId", userIdStr);
+        }
+        try {
+            //查询客户信息
+            Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
+            mv.addObject("userEmail", listu.get("email"));
+            listu.clear();
+            //查询当前客户存在的购物车数据
+            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
+            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
+            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+            //格式化处理规格数据
+            double productCost = 0;
+            double actualCost = 0;
+            double totalProductCost = 0;
+            double totalActualCost = 0;
+            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
+            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
+            int sourceCount = 0;
+            for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                String tempType = "";
+                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
+                    String[] splitFirst = shopCar.getGoodsType().split(",");
+                    for (String spCh : splitFirst) {
+                        String[] spScList = spCh.split("@");
+                        tempType += spScList[0] + ";";
+                        spScList = null;
+                    }
+                    splitFirst = null;
+                }
+                if (tempType.length() > 0) {
+                    shopCar.setGoodsType(tempType);
+                }
+                if (shopCar.getPrice1() > 0) {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    actualCost += totalPrice;
+                    totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    totalActualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    resultList.add(shopCar);
+                } else {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    totalProductCost += totalPrice;
+                    totalActualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    if(sourceCount < 5){
+                        sourceList.add(shopCar);
+                        sourceCount ++;
+                    }
+                }
+            }
+            shopCarMarketingList.clear();
+            if (resultList.size() > 0) {
+                double offCost = productCost - actualCost;
+                mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
+                mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+                mv.addObject("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
+                mv.addObject("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
+                mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                mv.addObject("success", 1);
+                mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+                mv.addObject("updateList", resultList);
+                mv.addObject("sourceList", sourceList);
+            } else {
+                mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
+                mv.addObject("success", 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("genShoppingCarMarketingEmail error:" + e.getMessage());
+            logger.error("genShoppingCarMarketingEmail error:" + e.getMessage());
+            mv.addObject("message", "执行过程失败，原因：" + e.getMessage());
+            mv.addObject("success", 0);
+        }
+        return mv;
     }
 
 
