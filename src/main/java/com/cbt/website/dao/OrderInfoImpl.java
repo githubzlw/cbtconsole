@@ -10,6 +10,7 @@ import com.cbt.warehouse.util.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -399,4 +400,34 @@ public class OrderInfoImpl implements OrderInfoDao {
 		}
 		return resultMap;
 	}
+
+	@Override
+	public boolean checkIsOldPayPal(String orderNo) {
+		String sql = "select ipnInfo from ipn_info where orderNo = ? and paymentStatus = 1 limit 1";
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		boolean isOld = false;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, orderNo);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				String ipnInfo = rs.getString(1);
+				if (StringUtils.isNotBlank(ipnInfo)) {
+					if (ipnInfo.contains("=584JZVFU6PPVU")) {
+						isOld = true;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+		} finally {
+			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeResultSet(rs);
+		}
+		return isOld;
+	}
+
 }
