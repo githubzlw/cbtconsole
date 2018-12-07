@@ -11,6 +11,8 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -71,6 +73,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             List<CustomBenchmarkSkuNew> insertList = new ArrayList<>();
             JSONArray sku_json = JSONArray.fromObject(bean.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+
             for (ImportExSku exSku : skuList) {
                 CustomBenchmarkSkuNew skuNew = new CustomBenchmarkSkuNew();
                 skuNew.setFinalWeight(bean.getFinalWeight());
@@ -87,20 +90,29 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 skuValPO.setSkuCalPrice(Double.valueOf(exSku.getSkuVal().getSkuCalPrice()));
                 skuNew.setSkuVal(skuValPO);
                 insertList.add(skuNew);
+
             }
             if (insertList.size() > 0) {
+                // 更新27和28表数据
                 customGoodsDao.updateCustomBenchmarkSkuNew(bean.getPid(), insertList);
+                // 使用MQ更新AWS服务器数据
+                GoodsInfoUpdateOnlineUtil.updateCustomBenchmarkSkuNewByMq(bean.getPid(),insertList);
                 insertList.clear();
             }
         }
 
-        int res = customGoodsDao.publish(bean);
+        // 屏蔽使用jdbc更新AWS数据
+        //int res = customGoodsDao.publish(bean);
+        // 使用MQ更新AWS服务器数据
+        GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
+        int res = 1;
         if (res > 0) {
             int count = customGoodsDao.publishTo28(bean);
             if (count == 0) {
                 customGoodsDao.publishTo28(bean);
             }
         }
+
         //更新SkuGoodsOffers和SingleOffersChild信息
         int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
         //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers
@@ -112,6 +124,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         }
         return res;
     }
+
+
+
+
 
     @Override
     public String getGoodsInfo(String pid) {
@@ -152,7 +168,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public boolean updateStateList(int state, String pids, int adminid) {
-
+        // AWS更新
+        GoodsInfoUpdateOnlineUtil.batchUpdateGoodsState(state, pids, adminid);
+        // 本地更新
         return customGoodsDao.updateStateList(state, pids, adminid);
     }
 
@@ -226,6 +244,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
+        // AWS更新
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
     }
 
