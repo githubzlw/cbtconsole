@@ -96,4 +96,9 @@ public class SingleGoodsServiceImpl implements SingleGoodsService {
 		return sgGdDao.deleteSingleOffersByPids(pidList);
 	}
 
+	@Override
+	public int queryOnlineGoodsCountByShopId(String shopId) {
+		return sgGdDao.queryOnlineGoodsCountByShopId(shopId);
+	}
+
 }

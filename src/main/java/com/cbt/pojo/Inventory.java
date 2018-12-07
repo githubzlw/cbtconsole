@@ -84,6 +84,16 @@ public class Inventory {
 	private String db_flag;
 	private String editLink;
 	private String name;
+	private int type;
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+
 
 	public String getDelRemark() {
 		return delRemark;
