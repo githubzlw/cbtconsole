@@ -1667,6 +1667,17 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.findOrderDetails(map);
 	}
+
+	@Override
+	public Inventory getInventoryByPid(Map<String, String> map) {
+		return taoBaoOrderMapper.getInventoryByPid(map);
+	}
+
+	@Override
+	public int insertInventoryYmx(Map<String, String> map) {
+		return taoBaoOrderMapper.insertInventoryYmx(map);
+	}
+
 	/**
 	 * 手动录入库存
 	 * @param map

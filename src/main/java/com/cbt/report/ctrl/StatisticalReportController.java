@@ -1689,6 +1689,60 @@ public class StatisticalReportController {
 	}
 
 	/**
+	 * 手动录入亚马逊库存
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/inventoryYmxEntry")
+	@ResponseBody
+	protected JsonResult inventoryYmxEntry(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		Map<String, String> map = new HashMap<String, String>();
+		String itmeid = request.getParameter("itmeid");
+		String count = request.getParameter("ymx_count");
+		String img = request.getParameter("ymx_img");
+		String good_name = request.getParameter("good_name");
+		String remark = request.getParameter("remark_ymx");
+		String goods_p_price = request.getParameter("goods_p_price");
+		String barcode = request.getParameter("ymx_barcode2");
+		double new_inventory_amount=0.00;
+		if(StringUtil.isNotBlank(goods_p_price)){
+			new_inventory_amount=Double.parseDouble(goods_p_price)*Integer.valueOf(count);
+		}
+		map.put("goods_pid", itmeid);
+		map.put("count", count);
+		map.put("img", StringUtil.isBlank(img)?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":img);
+		map.put("good_name", StringUtil.isBlank(good_name)?"亚马逊商品库存录入":good_name);
+		map.put("remark", remark);
+		map.put("barcode", barcode);
+		map.put("itmeid",itmeid);
+		map.put("goods_p_price",goods_p_price);
+		map.put("new_inventory_amount",String.valueOf(new_inventory_amount));
+		map.put("goods_url","https://www.import-express.com/goodsinfo/cbtconsole-1"+itmeid+".html");
+		map.put("goods_p_url","https://detail.1688.com/offer/"+itmeid+".html");
+		//判断该pid商品是否已在库存中
+		Inventory i=taoBaoOrderService.getInventoryByPid(map);
+		int row=0;
+		if(i == null){
+			//此次录入的库存是新的亚马逊库存,做插入操作
+			row=taoBaoOrderService.insertInventoryYmx(map);
+		}else{
+			//之前有录入过该1688链接的亚马逊库存,让采购更新这里不做操作
+//			map.put("id",String.valueOf(i.getId()));
+//			row=taoBaoOrderService.updateInventoryYmx();
+		}
+		list.setAllCount(row);
+		json.setData(list);
+		return json;
+	}
+
+	/**
 	 * 手动录入库存
 	 *
 	 * @param request

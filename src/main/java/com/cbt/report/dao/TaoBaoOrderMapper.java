@@ -685,6 +685,18 @@ public interface TaoBaoOrderMapper {
      */
     public OrderDetailsBean findOrderDetails(Map<Object, Object> map);
 	/**
+	 * 根据亚马逊录入的pid去查询是否存在库存
+	 * @param map
+	 * @return
+	 */
+	public Inventory getInventoryByPid(Map<String,String> map);
+	/**
+	 * 录入的库存是新的亚马逊库存,做插入操作
+	 * @param map
+	 * @return
+	 */
+	public int insertInventoryYmx(Map<String,String> map);
+	/**
 	 * 分配给采购的商品实际没有采购
 	 * @param map
 	 * @return
