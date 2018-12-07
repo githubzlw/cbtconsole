@@ -127,8 +127,8 @@
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 rownumbers: true,
                 nowrap:false,
-                pageSize: 20,//默认选择的分页是每页50行数据
-                pageList: [20, 30, 50],//可以选择的分页集合
+                pageSize: 40,//默认选择的分页是每页50行数据
+                pageList: [40,60],//可以选择的分页集合
                 pagination: true,//分页
                 style: {
                     padding: '8 8 10 8'
@@ -289,6 +289,10 @@
                     + row.goodsPid + '.html" target="_blank">线上预览</a><br>';
             }
             return content;
+        }
+
+        function formatShopNum(val, row, index) {
+            return '<span>'+val + '(<b style="color: red;">'+ row.shopGoodsNum +'</b>)</span>';
         }
 
         function closeDialog() {
@@ -537,8 +541,9 @@
         <th
                 data-options="field:'goodsImg',width:'220px',formatter:formatImg">1688图片
         </th>
-        <th data-options="field:'goodsName',width:'500px'">1688产品名称</th>
-        <th data-options="field:'aveWeight',align:'center',width:'150px'">设定重量(KG)</th>
+        <th data-options="field:'goodsName',width:'440px'">1688产品名称</th>
+        <th data-options="field:'aveWeight',align:'center',width:'140px'">设定重量(KG)</th>
+        <th data-options="field:'shopId',width:'200px',formatter:formatShopNum">店铺商品数</th>
         <th
                 data-options="field:'syncFlag',width:'200px',formatter:formatUploadResult">产品上传结果
         </th>
@@ -547,7 +552,7 @@
         <th data-options="field:'adminName',align:'center',width:'100px'">录入人</th>
         <th data-options="field:'createTime',align:'center',width:'180px'">创建时间</th>
         <th
-                data-options="field:'opFlag',align:'center',width:'310px',formatter:formatOperation">操作
+                data-options="field:'opFlag',align:'center',width:'240px',formatter:formatOperation">操作
         </th>
     </tr>
     </thead>
