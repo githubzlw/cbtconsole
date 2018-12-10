@@ -221,7 +221,7 @@
     			data:{userid:userid},
     			success:function(res){
     				var result = eval('(' + res + ')')
-    				var html = '该用户没有投诉,点击confirm按钮，创建一条投诉消息';
+    				var html = '该用户没有投诉,无法关联';
     				if(result.status){
     					html = '<div><div><span></span><span  class="complain_id">id</span><span  class="complain_txt">投诉内容</span></div>';
     					var json = result.data;
