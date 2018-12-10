@@ -1,20 +1,24 @@
 package com.cbt.method.dao;
 
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.common.StringUtils;
-import com.cbt.jdbc.DBHelper;
-import com.cbt.util.Md5Util;
-import com.mysql.jdbc.Statement;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.common.StringUtils;
+import com.cbt.jdbc.DBHelper;
+import com.cbt.util.Md5Util;
+import com.mysql.jdbc.Statement;
 
 public class OrderDetailsDao implements IOrderDetailsDao {
 
@@ -1054,4 +1058,56 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 		return row;
 	}
 
+	@Override
+	public List<Map<String,Object>> getOrderDetailByUser(int userid) {
+		List<Map<String,Object>>  result = new ArrayList<Map<String,Object>>();
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql = "select  distinct userid,orderid,goods_pid,car_img from  "
+				+ "order_details  where state!=2 and userid=? "
+				+ " order by id desc";
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, userid);
+			rs = stmt.executeQuery();
+			Map<String,Object> map = new HashMap<String,Object>();
+			while (rs.next()) {
+				List<OrderDetailsBean> list = (List<OrderDetailsBean>)map.get(rs.getString("orderid"));
+				OrderDetailsBean bean = new OrderDetailsBean();
+				bean.setCar_img(rs.getString("car_img"));
+				bean.setGoods_pid(rs.getString("goods_pid"));
+				if(list == null) {
+					list = new ArrayList<OrderDetailsBean>();
+				}
+				list.add(bean);
+				map.put( rs.getString("orderid"), list);
+			}
+			Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator.next();
+				Map<String,Object> map2 = new HashMap<String,Object>();
+				map2.put( "orderid", entry.getKey());
+				map2.put( "orderdetail", entry.getValue());
+				result.add(map2);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		try {
+			if (stmt != null) {
+				stmt.close();
+			}
+			if (rs != null) {
+				rs.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		DBHelper.getInstance().closeConnection(conn);
+		return result;
+	}
 }
