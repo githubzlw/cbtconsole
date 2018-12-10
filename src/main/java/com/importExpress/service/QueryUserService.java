@@ -30,4 +30,5 @@ public interface QueryUserService {
 
     long updateAvailable(String email, Double available);
 
+    long updateAuthInfo(AuthInfo authInfo, String url, String urlFlag, String colorFlag);
 }

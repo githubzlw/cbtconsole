@@ -58,4 +58,9 @@ public interface QueryUserMapper {
 
     long updateAvailable(@Param("email") String email, @Param("available") Double available);
 
+    long insertAuthInfo(AuthInfo authInfo);
+
+    long updateAuthInfo(AuthInfo authInfo);
+
+    Integer queryOrderNoByModuleType(@Param("moduleType") int moduleType);
 }
