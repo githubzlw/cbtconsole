@@ -706,7 +706,7 @@ public class CustomerDisputeController {
     	if(!((adm.getId() == 1 && isPremint)||(adm.getId() == 8 && isPremint)||(adm.getId()==83))) {
     		result.put("state", false);
     		result.put("message", "该用户没有权限退款，请重新登录");
-        	return  result;
+    		return  result;
     	}
     	try {
     		String invoice_id = comfirmByDisputeID.getTransactionID();
@@ -778,6 +778,7 @@ public class CustomerDisputeController {
     		result.put("message", "没有权限退款，请重新登录");
         	return  result;
     	}
+
         if(!(adm.getId() == 1||adm.getId() == 8||adm.getId()==83)) {
     		result.put("state", false);
     		result.put("message", "该用户没有权限操作，请重新登录");
