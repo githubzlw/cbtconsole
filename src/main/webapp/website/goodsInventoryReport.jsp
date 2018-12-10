@@ -22,7 +22,7 @@
 <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <script src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
 <script type="text/javascript">
-var updateSourcesUrl = "/cbtconsole/StatisticalReport/updateSources"; //盘点库存
+var updateSourcesUrl = "/cbtconsole/inventory/updateSources"; //盘点库存
 </script>
 <style type="text/css">
 .displaynone{display:none;}
@@ -439,7 +439,7 @@ function inventoryYmxEntry(){
     var ymx_img=$("#ymx_img").val();
     var ymx_name=$("#ymx_name").val();
     jQuery.ajax({
-        url:"/cbtconsole/StatisticalReport/inventoryYmxEntry",
+        url:"/cbtconsole/inventory/inventoryYmxEntry",
         data:{
             "itmeid":itmeid,
             "ymx_count":ymx_count,
@@ -511,7 +511,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getNewInventory',
+        url:'/cbtconsole/inventory/getNewInventory',
         data:{},
         success:function(data){
             $("#tj_info_1").html(data);
@@ -521,7 +521,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getSaleInventory',
+        url:'/cbtconsole/inventory/getSaleInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -534,7 +534,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getLossInventory',
+        url:'/cbtconsole/inventory/getLossInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -547,7 +547,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getDeleteInventory',
+        url:'/cbtconsole/inventory/getDeleteInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -577,7 +577,7 @@ function delInventorySources(){
         return;
 	}
     jQuery.ajax({
-        url:"/cbtconsole/StatisticalReport/deleteInventory",
+        url:"/cbtconsole/inventory/deleteInventory",
         data:{
             "id":dId,
             "goods_pid":dPid,

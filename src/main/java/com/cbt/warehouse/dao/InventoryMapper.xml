@@ -37,7 +37,29 @@
         <result column="category" property="category" jdbcType="VARCHAR" />
         <result column="time" property="time" jdbcType="VARCHAR" />
     </resultMap>
-
+    <select id="isExitBarcode" resultType="java.lang.Integer">
+        SELECT COUNT(id) FROM storage_location WHERE barcode=#{barcode}
+    </select>
+    <insert id="recordLossInventory">
+        insert into lossInventory (in_id,new_remaining,old_remaining,loss_inventory,old_barcode,new_barcode,loss_amount,loss_price,createtime,admName) values
+        (#{in_id},#{new_remaining},#{old_remaining},#{loss_inventory},#{old_barcode},#{new_barcode},#{loss_amount},#{loss_price},now(),#{admName})
+    </insert>
+    <insert id="insertChangeBarcode">
+        insert into change_barcode (in_id,init_barcode) select #{id},#{old_barcode} FROM DUAL WHERE NOT EXISTS (SELECT * FROM change_barcode WHERE in_id=#{id})
+    </insert>
+    <select id="queryInById" resultType="com.cbt.pojo.Inventory">
+        select * from inventory where id=#{id}
+    </select>
+    <insert id="updateSourcesLog">
+        INSERT INTO inventory_log_info (in_id,create_time,admName,old_inventory,new_inventroy,old_barcode,new_barcode,remark) VALUES
+        (#{in_id},now(),#{name},#{old_remaining},#{new_remaining},#{old_barcode},#{new_barcode},#{remark})
+    </insert>
+    <update id="updateIsStockFlag">
+        update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
+    </update>
+    <update id="updateIsStockFlag1">
+        update custom_benchmark_ready_newest set is_stock_flag=0 where pid=#{goods_pid};
+    </update>
     <select id="getIinOutInventory" resultMap="InventoryResultMap">
         SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine,c.unsellableReason FROM inventory i
         left join storage_outbound_details s on i.id=s.in_id and s.type=1
@@ -53,11 +75,14 @@
         <if test="barcode!=null">
             and i.barcode=#{barcode}
         </if>
-        <if test="valid!=null and valid !=2">
+        <if test="valid!=null and valid !=2 and valid !=3">
             and c.valid=${valid}
         </if>
         <if test="valid  == 2">
             and i.goods_url like '%aliexpress%' and c.valid is null
+        </if>
+        <if test="valid  == 3">
+            and i.type=1
         </if>
         <if test="goods_pid!=null">
             and i.goods_pid=#{goods_pid}
@@ -131,11 +156,14 @@
         <if test="barcode!=null">
             and i.barcode=#{barcode}
         </if>
-        <if test="valid!=null and valid !=2">
+        <if test="valid!=null and valid !=2 and valid !=3">
             and c.valid=${valid}
         </if>
         <if test="valid  == 2">
             and i.goods_url like '%aliexpress%' and c.valid is null
+        </if>
+        <if test="valid  == 3">
+            and i.type=1
         </if>
         <if test="goods_pid!=null">
             and i.goods_pid=#{goods_pid}
@@ -235,4 +263,41 @@
             </otherwise>
         </choose>
     </update>
+    <select id="getInventoryByPid" resultType="com.cbt.pojo.Inventory">
+        select id,type from inventory where goods_pid=#{pid} and type=1
+    </select>
+    <insert id="insertInventoryYmx">
+        insert into inventory(goods_url,new_remaining,can_remaining,barcode,goods_p_url,new_inventory_amount,car_img,flag,goods_pid,createtime,updatetime,remark,type,goods_p_price,remaining,good_name) VALUES
+        (#{goods_url},#{count},#{count},#{barcode},#{goods_p_url},#{new_inventory_amount},#{img},1,#{itmeid},now(),now(),#{remark},1,#{goods_p_price},0,#{good_name})
+    </insert>
+    <select id="getNewInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+        SELECT SUM(IF(flag=0,remaining,new_remaining)) AS admName,SUM(IF(flag=0,inventory_amount,new_inventory_amount)) AS pid
+        FROM inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
+    </select>
+    <select id="getSaleInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+        SELECT COUNT(lock_remaining)  AS admName,SUM(lock_inventory_amount) AS pid FROM lock_inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)  AND is_use=1 AND flag=1 and is_delete=0
+    </select>
+    <select id="getLossInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+        SELECT SUM(old_remaining-new_remaining)  AS admName,SUM(loss_amount) AS pid FROM lossInventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
+    </select>
+    <select id="getDeleteInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
+        SELECT SUM(IF(idd.flag=0,idd.remaining,idd.new_remaining)) AS admName,SUM(IF(idd.flag=0,idd.inventory_amount,idd.new_inventory_amount)) AS pid
+        FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
+        WHERE ili.remark='库存删除'  AND DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(idd.createtime)
+    </select>
+    <delete id="deleteInventory">
+        INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
+        delete from inventory where id=${id};
+    </delete>
+    <update id="updateIsStockFlag2">
+        update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
+    </update>
+    <select id="findOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
+        select od.*,ops.goods_p_price from order_details od inner join order_product_source ops ON od.goodsid=ops.goodsid where od.goodsid=#{goodsid} limit 1
+    </select>
+    <insert id="inventoryEntry">
+        insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_amount,car_img,goods_pid,car_urlMD5,createtime,goods_p_price,remark,flag,updatetime,new_inventory_amount,new_remaining)
+        values (#{goods_url},#{count},#{count},#{goods_name},#{sku},#{in_barcode},(SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=#{goodscatid}),
+        #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
+    </insert>
 </mapper>

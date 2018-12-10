@@ -653,52 +653,12 @@ public interface TaobaoOrderService {
 
    public List<String> getNewBarcode();
 
-   public int isExitBarcode(String barcode);
-
-   /**
-    * 获取库存信息
-    * @Title queryInById
-    * @Description TODO
-    * @param id
-    * @return
-    * @return Inventory
-    */
-   public Inventory queryInById(String id);
-
-   /**
-    * 根据id删除库存数据
-    * @Title deleteInventory
-    * @Description TODO
-    * @param id
-    * @return
-    * @return int
-    */
-   public int deleteInventory(int id,String dRemark);
-
-
-
-
    /**
     * 更新库存
     * @param map
     * @return
     */
    public int updateInventory(Map<Object, Object> map);
-
-
-
-
-   public int updateIsStockFlag(String goods_pid);
-
-   public int updateIsStockFlag1(String goods_pid);
-
-   public int updateIsStockFlag2(String goods_pid);
-
-
-
-   public int updateSourcesLog(int in_id, String name, String old_sku, String old_url, String new_barcode, String old_barcode, int new_remaining, int old_remaining, String remark);
-
-
    /**
     * 添加未入库采购订单备注
     * @param map
@@ -715,21 +675,4 @@ public interface TaobaoOrderService {
 
    public String getOperationRemark(Map<Object, Object> map);
 
-   /**
-    *盘点库存库位变更
-    * @param id
-    * @param old_barcode
-    * @param new_barcode
-    * @return
-    */
-   public int insertChangeBarcode(int id, String old_barcode, String new_barcode);
-   /**
-    * 损耗库存记录
-    * @Title recordLossInventory 
-    * @Description TODO
-    * @param map
-    * @return
-    * @return int
-    */
-   public int recordLossInventory(Map<Object, Object> map);
 }

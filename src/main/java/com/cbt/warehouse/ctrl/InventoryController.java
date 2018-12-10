@@ -3,18 +3,27 @@ package com.cbt.warehouse.ctrl;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.common.StringUtils;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoInfoList;
+import com.cbt.report.ctrl.StatisticalReportController;
 import com.cbt.report.service.GeneralReportService;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.service.InventoryService;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
@@ -23,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -135,6 +145,98 @@ public class InventoryController {
 		return json;
 	}
 
+	/**
+	 * 库存盘点
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 *             whj 2017-04-25
+	 */
+	@RequestMapping(value = "/updateSources")
+	@ResponseBody
+	protected JsonResult updateSources(HttpServletRequest request, HttpServletResponse response)
+			throws Exception{
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+//		String old_sku = request.getParameter("old_sku");
+//		String goods_pid = request.getParameter("goods_pid");
+//		String car_urlMD5 = request.getParameter("car_urlMD5");
+		String new_barcode = request.getParameter("new_barcode");//盘点后库位
+		String old_barcode = request.getParameter("old_barcode");//盘点前库位
+		String new_remaining = request.getParameter("new_remaining");//盘点后库存
+		String old_remaining = request.getParameter("old_remaining");//盘点前库存
+		String flag = request.getParameter("flag");
+		String remark = request.getParameter("remark");
+		String pd_id = request.getParameter("pd_id");
+		if (new_barcode == null || new_barcode.equals("")) {
+			new_barcode = old_barcode;
+		}
+		// 判断新的库位是否存在
+		int isExit = inventoryService.isExitBarcode(new_barcode);
+		Inventory i = inventoryService.queryInById(pd_id);
+		double goods_p_price=0.00;
+		if (isExit > 0 && new_remaining != null && !new_remaining.equals("") && i!=null) {
+			String price = i.getGoods_p_price();
+			double new_inventory_amount = 0.00;
+			if (price.indexOf(",") > -1) {
+				String prices[] = price.split(",");
+				goods_p_price=Utility.getMaxPrice(prices);
+				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
+			} else {
+				goods_p_price=Double.valueOf(price);
+				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
+			}
+			if (remark != null && !"".equals(remark)) {
+				//remark = (StringUtils.isStrNull(i.getRemark())?"":i.getRemark()) + remark;
+			} else {
+				remark ="";// i.getRemark();
+			}
+			isExit = inventoryService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
+					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
+			if (isExit > 0) {
+				if(Integer.valueOf(new_remaining)<=0){
+					//如果库存为0则更改库存标识
+					inventoryService.updateIsStockFlag(i.getGoods_pid());
+					DataSourceSelector.set("dataSource28_corss");
+					inventoryService.updateIsStockFlag1(i.getGoods_pid());
+					DataSourceSelector.restore();
+					SendMQ sendMQ = new SendMQ();
+					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
+					sendMQ.closeConn();
+				}
+				// 记录更改货源记录日志
+				inventoryService.updateSourcesLog(i.getId(), adm.getAdmName(),StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), new_barcode,
+						old_barcode, Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark);
+				inventoryService.insertChangeBarcode(i.getId(), old_barcode, new_barcode);
+				if(Integer.valueOf(new_remaining)<Integer.valueOf(old_remaining)){
+					//记录损耗的库存记录
+					map.put("new_remaining", new_remaining);
+					map.put("old_remaining", old_remaining);
+					map.put("new_barcode", new_barcode);
+					map.put("old_barcode", old_barcode);
+					map.put("in_id", i.getId());
+					double loss_amount=goods_p_price*(Integer.valueOf(new_remaining)-Integer.valueOf(old_remaining));
+					BigDecimal bg = new BigDecimal(loss_amount);
+					double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+					map.put("loss_amount",f1);//损耗金额
+					map.put("loss_price", goods_p_price);
+					map.put("admName", adm.getAdmName());
+					inventoryService.recordLossInventory(map);
+				}
+			}
+		}
+		list.setAllCount(isExit);
+		json.setData(list);
+		return json;
+	}
+
 	@RequestMapping(value = "/problem_inventory")
 	@ResponseBody
 	protected void problem_inventory(HttpServletRequest request, HttpServletResponse response)
@@ -149,6 +251,74 @@ public class InventoryController {
 		out.flush();
 		out.close();
 	}
+
+	/**
+	 * 手动录入亚马逊库存
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/inventoryYmxEntry")
+	@ResponseBody
+	protected JsonResult inventoryYmxEntry(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		Map<String, String> map = new HashMap<String, String>();
+		String itmeid = request.getParameter("itmeid");
+		String count = request.getParameter("ymx_count");
+		String img = request.getParameter("ymx_img");
+		String good_name = request.getParameter("good_name");
+		String remark = request.getParameter("remark_ymx");
+		String goods_p_price = request.getParameter("goods_p_price");
+		String barcode = request.getParameter("ymx_barcode2");
+		double new_inventory_amount=0.00;
+		if(StringUtil.isNotBlank(goods_p_price)){
+			new_inventory_amount=Double.parseDouble(goods_p_price)*Integer.valueOf(count);
+		}
+		map.put("goods_pid", itmeid);
+		map.put("count", count);
+		map.put("img", StringUtil.isBlank(img)?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":img);
+		map.put("good_name", StringUtil.isBlank(good_name)?"亚马逊商品库存录入":good_name);
+		map.put("remark", remark);
+		map.put("barcode", barcode);
+		map.put("itmeid",itmeid);
+		map.put("goods_p_price",goods_p_price);
+		map.put("new_inventory_amount",String.valueOf(new_inventory_amount));
+		map.put("goods_url","https://www.import-express.com/goodsinfo/cbtconsole-1"+itmeid+".html");
+		map.put("goods_p_url","https://detail.1688.com/offer/"+itmeid+".html");
+		//判断该pid商品是否已在库存中
+		Inventory i=inventoryService.getInventoryByPid(map);
+		int row=0;
+		if(i == null){
+			//此次录入的库存是新的亚马逊库存,做插入操作
+			row=inventoryService.insertInventoryYmx(map);
+		}else{
+			//之前有录入过该1688链接的亚马逊库存,让采购更新这里不做操作
+//			map.put("id",String.valueOf(i.getId()));
+//			row=taoBaoOrderService.updateInventoryYmx();
+		}
+		list.setAllCount(row);
+		json.setData(list);
+		return json;
+	}
+
+	/**
+	 * 库存管理页面统计最近30天新产生的库存
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getNewInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getNewInventory(HttpServletRequest request, Model model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		return inventoryService.getNewInventory() + "";
+	}
+
 
 	/**
 	 * 查询库存统计报表
@@ -346,5 +516,123 @@ public class InventoryController {
 		list.setAllCount(row);
 		json.setData(list);
 		return json;
+	}
+
+	/**
+	 * 库存管理页面统计最近30天新产生的库存
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getSaleInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getSaleInventory(HttpServletRequest request, Model model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		return inventoryService.getSaleInventory() + "";
+	}
+
+	/**
+	 * 最近30天 产生的 库存损耗
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getLossInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getLossInventory(HttpServletRequest request, Model model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		return inventoryService.getLossInventory() + "";
+	}
+
+	/**
+	 *最近30天 产生的 库存删除
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getDeleteInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getDeleteInventory(HttpServletRequest request, Model model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		return inventoryService.getDeleteInventory() + "";
+	}
+
+	/**
+	 * 删除库存
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 *             whj 2017-04-25
+	 */
+	@RequestMapping(value = "/deleteInventory")
+	@ResponseBody
+	protected JsonResult deleteInventory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		JsonResult json = new JsonResult();
+		TaoBaoInfoList list = new TaoBaoInfoList();
+		int id=Integer.valueOf(request.getParameter("id"));
+		String goods_pid=request.getParameter("goods_pid");
+//		String sku=request.getParameter("sku");
+		String barcode=request.getParameter("barcode");
+//		String amount=request.getParameter("amount");
+		String dRemark=request.getParameter("dRemark");
+		int count = inventoryService.deleteInventory(id,dRemark);
+		if(count>0){
+			list.setAllCount(count);
+			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+			//如果库存为0则更改库存标识
+
+			InventoryController.UpdateIsStockFlagThread u=new InventoryController.UpdateIsStockFlagThread(String.valueOf(adm.getId()), goods_pid, id, barcode,adm.getAdmName());
+			u.start();
+		}else{
+			list.setAllCount(0);
+		}
+		json.setData(list);
+		return json;
+	}
+
+	class UpdateIsStockFlagThread extends Thread{
+		private String goods_pid;
+		private String adm_id;
+		private int id;
+		private String barcode;
+		private String admName;
+
+		public UpdateIsStockFlagThread(String adm_id,String goods_pid,int id,String barcode,String admName){
+			this.adm_id = adm_id;
+			this.goods_pid = goods_pid;
+			this.id = id;
+			this.barcode=barcode;
+			this.admName=admName;
+		}
+
+		@Override
+		public void run() {
+			try{
+				SendMQ sendMQ = new SendMQ();
+				inventoryService.updateIsStockFlag2(goods_pid);
+				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'"));
+				//如果库存为0则更改库存标识
+				inventoryService.updateIsStockFlag(goods_pid);
+				DataSourceSelector.set("dataSource28_corss");
+				inventoryService.updateIsStockFlag1(goods_pid);
+				DataSourceSelector.restore();
+				//记录删除该库存的人
+				String admuserJson = Redis.hget(adm_id, "admuser");
+				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+				inventoryService.updateSourcesLog(id, admName, "", goods_pid, "",barcode, 0, 0, "库存删除");
+				sendMQ.closeConn();
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally {
+				DataSourceSelector.restore();
+			}
+		}
+
 	}
 }

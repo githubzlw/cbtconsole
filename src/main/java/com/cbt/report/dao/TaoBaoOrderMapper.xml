@@ -292,17 +292,6 @@
   <select id="selectStatus" resultType="String">
      SELECT DISTINCT orderstatus FROM taobao_1688_order_history
   </select>
-  
-  <select id="isExitBarcode" resultType="java.lang.Integer">
-   SELECT COUNT(id) FROM storage_location WHERE barcode=#{barcode}
-  </select>
-  <insert id="insertChangeBarcode">
-     insert into change_barcode (in_id,init_barcode) select #{id},#{old_barcode} FROM DUAL WHERE NOT EXISTS (SELECT * FROM change_barcode WHERE in_id=#{id})
-  </insert>
-  <insert id="updateSourcesLog">
-    INSERT INTO inventory_log_info (in_id,create_time,admName,old_inventory,new_inventroy,old_barcode,new_barcode,remark) VALUES 
-	(#{in_id},now(),#{name},#{old_remaining},#{new_remaining},#{old_barcode},#{new_barcode},#{remark})
-  </insert>
 
   <select id="getNewBarcode" resultType="String">
      SELECT barcode FROM storage_location WHERE is_company=3
@@ -560,14 +549,6 @@
   <update id="addTbOrderRemark">
     update taobao_1688_order_history set remark=#{new_remark} where id=#{id}
   </update>
-  <select id="findOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
-    select od.*,ops.goods_p_price from order_details od inner join order_product_source ops ON od.goodsid=ops.goodsid where od.goodsid=#{goodsid} limit 1
-  </select>
-  <insert id="inventoryEntry">
-     insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_amount,car_img,goods_pid,car_urlMD5,createtime,goods_p_price,remark,flag,updatetime,new_inventory_amount,new_remaining)
-     values (#{goods_url},#{count},#{count},#{goods_name},#{sku},#{in_barcode},(SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=#{goodscatid}),
-     #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
-  </insert>
   <update id="updateInventory">
 
   </update>
@@ -1339,25 +1320,9 @@
 	(SELECT DISTINCT sessionid FROM behavior_record WHERE ACTION='Add To Cart' AND view_date_time&lt;#{startTime}) GROUP BY itemId,goods_type) a
 	) b
   </select>
-  <delete id="deleteInventory">
-    INSERT INTO inventory_delete_details SELECT *,#{dRemark} FROM inventory WHERE id= ${id};
-    delete from inventory where id=${id};
-  </delete>
-  <select id="queryInById" resultType="com.cbt.pojo.Inventory">
-    select * from inventory where id=#{id}
-  </select>
     <select id="getAllInventory" resultType="com.cbt.pojo.Inventory">
         SELECT DISTINCT REPLACE(goodscatid,"'","") AS goodscatid FROM inventory WHERE can_remaining>0 AND goodscatid IS NOT NULL AND goodscatid !='' AND goodscatid&lt;>'0' ORDER BY goodscatid ASC
     </select>
-    <update id="updateIsStockFlag">
-    update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
-  </update>
-    <update id="updateIsStockFlag1">
-   update custom_benchmark_ready_newest set is_stock_flag=0 where pid=#{goods_pid};
-  </update>
-    <update id="updateIsStockFlag2">
-   update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
-  </update>
   <select id="searchGoodsInventoryDeleteInfo" resultType="com.cbt.pojo.Inventory">
  	 SELECT ili.admName,ili.create_time,idd.* FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
 	WHERE ili.remark='库存删除' 
@@ -1476,10 +1441,6 @@
 	  and od.goods_pid=#{goods_pid}
 	</if>
   </select>
-  <insert id="recordLossInventory">
-    insert into lossInventory (in_id,new_remaining,old_remaining,loss_inventory,old_barcode,new_barcode,loss_amount,loss_price,createtime,admName) values
-    (#{in_id},#{new_remaining},#{old_remaining},#{loss_inventory},#{old_barcode},#{new_barcode},#{loss_amount},#{loss_price},now(),#{admName})
-  </insert>
   <select id="searchLossInventory" resultType="com.cbt.pojo.LossInventoryPojo">
     select l.*,i.car_img,i.goods_p_url,ifnull(i.remark,'无') as remark,i.sku from lossInventory l 
     inner join inventory i on l.in_id=i.id

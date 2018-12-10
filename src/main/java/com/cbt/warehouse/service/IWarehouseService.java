@@ -243,29 +243,7 @@ public interface IWarehouseService {
 	//获取当日采购分配种类
 	public String getDistributionCount(Map<String, Object> map);
 
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @return
-	 */
-	public String getNewInventory();
 
-	/**
-	 * 最近30天销售掉的库存
-	 * @return
-	 */
-	public String getSaleInventory();
-
-	/**
-	 * 最近30天 产生的 库存损耗
-	 * @return
-	 */
-	public String getLossInventory();
-
-	/**
-	 * 最近30天 产生的 库存删除
-	 * @return
-	 */
-	public String getDeleteInventory();
 	//获得实际采购数量
 	public String getSjCgCount(Map<String, Object> map);
 	//添加订单采购商品备注

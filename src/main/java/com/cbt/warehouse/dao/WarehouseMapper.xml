@@ -3817,21 +3817,6 @@
 		email NOT LIKE 'zhouxueyun%')
 		AND a.admName=#{admName}
 	</select>
-	<select id="getNewInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT SUM(IF(flag=0,remaining,new_remaining)) AS admName,SUM(IF(flag=0,inventory_amount,new_inventory_amount)) AS pid
-		FROM inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
-	</select>
-	<select id="getSaleInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT COUNT(lock_remaining)  AS admName,SUM(lock_inventory_amount) AS pid FROM lock_inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)  AND is_use=1 AND flag=1 and is_delete=0
-	</select>
-	<select id="getLossInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT SUM(old_remaining-new_remaining)  AS admName,SUM(loss_amount) AS pid FROM lossInventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
-	</select>
-	<select id="getDeleteInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-        SELECT SUM(IF(idd.flag=0,idd.remaining,idd.new_remaining)) AS admName,SUM(IF(idd.flag=0,idd.inventory_amount,idd.new_inventory_amount)) AS pid
-        FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
-        WHERE ili.remark='库存删除'  AND DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(idd.createtime)
-	</select>
 	<select id="getPriorityCategory" resultType="com.cbt.website.bean.ShopManagerPojo">
 		SELECT  p.id,p.keyword,p.category,p.status,p.minPrice,p.maxPrice,c.en_name as enName
 		FROM priority_category p

@@ -2856,57 +2856,7 @@ public class WarehouseCtrl {
 		return iWarehouseService.getDistributionCount(map) + "";
 	}
 
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @param request
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/getNewInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getNewInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return iWarehouseService.getNewInventory() + "";
-	}
 
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @param request
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/getSaleInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getSaleInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return iWarehouseService.getSaleInventory() + "";
-	}
-
-	/**
-	 * 最近30天 产生的 库存损耗
-	 * @param request
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/getLossInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getLossInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return iWarehouseService.getLossInventory() + "";
-	}
-
-	/**
-	 *最近30天 产生的 库存删除
-	 * @param request
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/getDeleteInventory", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getDeleteInventory(HttpServletRequest request, Model model) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		return iWarehouseService.getDeleteInventory() + "";
-	}
 
 	/**
 	 *

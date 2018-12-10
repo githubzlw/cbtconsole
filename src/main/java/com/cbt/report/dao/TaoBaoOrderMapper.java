@@ -572,27 +572,6 @@ public interface TaoBaoOrderMapper {
 	public int inStorage(Map<Object, Object> map);
 	public String getOperationRemark(Map<Object, Object> map);
     public List<String> getNewBarcode();
-	/**
-	 * 根据ID删除库存数据
-	 */
-	public int deleteInventory(@Param("id") int id,@Param("dRemark") String dRemark);
-    /**
-     *盘点库存库位变更
-     * @param id
-     * @param old_barcode
-     * @param new_barcode
-     * @return
-     */
-    public int insertChangeBarcode(@Param("id") int id, @Param("old_barcode") String old_barcode, @Param("new_barcode") String new_barcode);
-    /**
-     * 损耗库存记录
-     * @Title recordLossInventory
-     * @Description TODO
-     * @param map
-     * @return
-     * @return int
-     */
-    public int recordLossInventory(Map<Object, Object> map);
     /**
      * 获取采购订单备注信息
      * @param id
@@ -664,11 +643,8 @@ public interface TaoBaoOrderMapper {
 
     public int getSourceValidationCount(@Param("buyer") String buyer, @Param("account") String account, @Param("page") int page, @Param("startdate") String startdate, @Param("enddate") String enddate);
 
-    public int isExitBarcode(@Param("barcode") String barcode);
-	/**
-	 * 根据ID获取库存
-	 */
-	public Inventory queryInById(@Param("id") String id);
+
+
 	/**
 	 * 根据亚马逊录入的pid去查询是否存在库存
 	 * @param map
@@ -710,12 +686,6 @@ public interface TaoBaoOrderMapper {
 	 * @return
 	 */
 	public String getBuyOrderId(@Param("shipnos") String shipnos);
-    public int updateIsStockFlag(@Param("goods_pid") String goods_pid);
-
-    public int updateIsStockFlag1(@Param("goods_pid") String goods_pid);
-
-    public int updateIsStockFlag2(@Param("goods_pid") String goods_pid);
-
 	   /**
 	    * 更新库存
 	    * @param map
@@ -723,10 +693,4 @@ public interface TaoBaoOrderMapper {
 	    */
 	public int updateInventory(Map<Object, Object> map);
 
-
-
-
-
-
-    public int updateSourcesLog(@Param("in_id") int in_id, @Param("name") String name, @Param("old_sku") String old_sku, @Param("old_url") String old_url, @Param("new_barcode") String new_barcode, @Param("old_barcode") String old_barcode, @Param("new_remaining") int new_remaining, @Param("old_remaining") int old_remaining, @Param("remark") String remark);
  }

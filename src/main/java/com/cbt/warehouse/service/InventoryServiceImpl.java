@@ -7,6 +7,7 @@ import com.cbt.pojo.Inventory;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,28 @@ public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
 	private InventoryMapper inventoryMapper;
 
+	/**
+	 * 根据ID获取库存
+	 */
+	@Override
+	public Inventory queryInById(String id) {
 
+		return inventoryMapper.queryInById(id);
+	}
+	@Override
+	public int recordLossInventory(Map<Object, Object> map) {
+
+		return inventoryMapper.recordLossInventory(map);
+	}
+	@Override
+	public Inventory getInventoryByPid(Map<String, String> map) {
+		return inventoryMapper.getInventoryByPid(map);
+	}
+
+	@Override
+	public int insertInventoryYmx(Map<String, String> map) {
+		return inventoryMapper.insertInventoryYmx(map);
+	}
 	@Override
 	public List<Inventory> getIinOutInventory(Map<Object, Object> map) {
 		List<Inventory> toryList=inventoryMapper.getIinOutInventory(map);
@@ -120,6 +142,12 @@ public class InventoryServiceImpl implements  InventoryService{
 
 		return inventoryMapper.queryInId(old_sku,old_url,old_barcode,car_urlMD5,flag);
 	}
+	@Override
+	public int insertChangeBarcode(int id, String old_barcode,
+	                               String new_barcode) {
+
+		return inventoryMapper.insertChangeBarcode(id,old_barcode,new_barcode);
+	}
 
 	@Override
 	public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map) {
@@ -136,6 +164,35 @@ public class InventoryServiceImpl implements  InventoryService{
 	public OrderDetailsBean findOrderDetails(Map<Object, Object> map) {
 
 		return inventoryMapper.findOrderDetails(map);
+	}
+
+	@Override
+	public int isExitBarcode(String barcode) {
+
+		return inventoryMapper.isExitBarcode(barcode);
+	}
+	@Override
+	public int updateIsStockFlag(String goods_pid) {
+
+		return inventoryMapper.updateIsStockFlag(goods_pid);
+	}
+	@Override
+	public int updateIsStockFlag2(String goods_pid) {
+
+		return inventoryMapper.updateIsStockFlag2(goods_pid);
+	}
+	@Override
+	public int updateSourcesLog(int in_id,String name,String old_sku, String old_url,
+	                            String new_barcode, String old_barcode, int new_remaining,
+	                            int old_remaining, String remark) {
+
+		return inventoryMapper.updateSourcesLog(in_id,name,old_sku,old_url,new_barcode,old_barcode,new_remaining,old_remaining,remark);
+	}
+
+	@Override
+	public int updateIsStockFlag1(String goods_pid) {
+
+		return inventoryMapper.updateIsStockFlag1(goods_pid);
 	}
 	/**
 	 * 手动录入库存
@@ -154,5 +211,71 @@ public class InventoryServiceImpl implements  InventoryService{
 	                         int old_remaining, String remark,double new_inventory_amount) {
 
 		return inventoryMapper.updateSources(flag,old_sku,goods_pid,car_urlMD5,new_barcode,old_barcode,new_remaining,old_remaining,remark,new_inventory_amount);
+	}
+	/**
+	 * 根据ID删除库存数据
+	 */
+	@Override
+	public int deleteInventory(int id,String dRemark) {
+
+		return inventoryMapper.deleteInventory(id,dRemark);
+	}
+	@Override
+	public String getNewInventory() {
+		PurchaseSamplingStatisticsPojo p=inventoryMapper.getNewInventory();
+		StringBuilder str=new StringBuilder();
+		if(p != null){
+			if(StringUtil.isNotBlank(p.getAdmName())){
+				str.append(p.getAdmName()).append("/");
+			}else{
+				str.append("0/");
+			}
+			if(StringUtil.isNotBlank(p.getPid())){
+				str.append(p.getPid());
+			}else{
+				str.append("0");
+			}
+		}
+		return str.toString();
+	}
+	@Override
+	public String getLossInventory() {
+		PurchaseSamplingStatisticsPojo p=inventoryMapper.getLossInventory();
+		return getDate(p,2);
+	}
+
+	@Override
+	public String getSaleInventory() {
+		PurchaseSamplingStatisticsPojo p=inventoryMapper.getSaleInventory();
+		return getDate(p,1);
+	}
+	@Override
+	public String getDeleteInventory() {
+		PurchaseSamplingStatisticsPojo p=inventoryMapper.getDeleteInventory();
+		return getDate(p,3);
+	}
+	public String getDate(PurchaseSamplingStatisticsPojo p, int type){
+		StringBuilder str=new StringBuilder();
+		if(p != null){
+			if(StringUtil.isNotBlank(p.getAdmName())){
+				if(type == 1){
+					str.append("<a target='_blank' href='/cbtconsole/website/saleInventory.jsp?times=2000&amount="+(StringUtil.isNotBlank(p.getPid())?p.getPid().replace("-",""):0)+"' title='查看使用库存商品的商品'>"+p.getAdmName()+"</a>").append("/");
+				}else if(type == 2){
+					str.append("<a target='_blank' href='/cbtconsole/website/loss_inventory_log.jsp?times=2000' title='查看库存损耗的商品'>"+p.getAdmName()+"</a>").append("/");
+				}else if(type == 3){
+					str.append("<a target='_blank' href='/cbtconsole/website/inventory_delete_log.jsp?times=2000' title='查看删除库存的商品'>"+p.getAdmName()+"</a>").append("/");
+				}else{
+					str.append(p.getAdmName()).append("/");
+				}
+			}else{
+				str.append("0/");
+			}
+			if(StringUtil.isNotBlank(p.getPid())){
+				str.append(p.getPid().replace("-",""));
+			}else{
+				str.append("0");
+			}
+		}
+		return str.toString();
 	}
 }

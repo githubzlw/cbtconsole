@@ -112,6 +112,17 @@ public class Utility {
 		return unsellableReason;
 	}
 
+	public static double getMaxPrice(String[] prices) {
+		double maxPrice = 0.00;
+		for (int i = 0; i < prices.length; i++) {
+			double price = Double.valueOf(prices[i].toString());
+			if (maxPrice < price) {
+				maxPrice = price;
+			}
+		}
+		return maxPrice;
+	}
+
 	public static String getItemid(String u) {
 		if (u.length() < 12) {// http://aaa&123
 			return "0";

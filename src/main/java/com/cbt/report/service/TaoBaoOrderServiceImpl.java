@@ -1325,28 +1325,12 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.getOperationRemark(map);
 	}
 	@Override
-	public int insertChangeBarcode(int id, String old_barcode,
-	                               String new_barcode) {
-
-		return taoBaoOrderMapper.insertChangeBarcode(id,old_barcode,new_barcode);
-	}
-	@Override
-	public int recordLossInventory(Map<Object, Object> map) {
-
-		return taoBaoOrderMapper.recordLossInventory(map);
-	}
-	@Override
 	public List<TaoBaoOrderInfo> queryBuyCount(String torderid,
 	                                           String opsorderid) {
 
 		return taoBaoOrderMapper.queryBuyCount(torderid,opsorderid);
 	}
 
-	@Override
-	public List<AliCategory> searchAliCategory(String type,String cid) {
-
-		return taoBaoOrderMapper.searchAliCategory(type,cid);
-	}
 
 	@Override
 	public List<OrderProductSource> getSourceValidation(String buyer, String account, int page, String startdate, String enddate) {
@@ -1518,49 +1502,6 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.getNewBarcode();
 	}
 	/**
-	 * 根据ID删除库存数据
-	 */
-	@Override
-	public int deleteInventory(int id,String dRemark) {
-
-		return taoBaoOrderMapper.deleteInventory(id,dRemark);
-	}
-
-	@Override
-	public int isExitBarcode(String barcode) {
-
-		return taoBaoOrderMapper.isExitBarcode(barcode);
-	}
-	/**
-	 * 根据ID获取库存
-	 */
-	@Override
-	public Inventory queryInById(String id) {
-
-		return taoBaoOrderMapper.queryInById(id);
-	}
-
-
-
-	@Override
-	public int updateIsStockFlag(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag(goods_pid);
-	}
-
-	@Override
-	public int updateIsStockFlag1(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag1(goods_pid);
-	}
-
-	@Override
-	public int updateIsStockFlag2(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag2(goods_pid);
-	}
-
-	/**
 	 * 更新库存
 	 * @param map
 	 * @return
@@ -1569,20 +1510,6 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	public int updateInventory(Map<Object, Object> map) {
 
 		return taoBaoOrderMapper.updateInventory(map);
-	}
-
-	@Override
-	public int updateSourcesLog(int in_id,String name,String old_sku, String old_url,
-	                            String new_barcode, String old_barcode, int new_remaining,
-	                            int old_remaining, String remark) {
-
-		return taoBaoOrderMapper.updateSourcesLog(in_id,name,old_sku,old_url,new_barcode,old_barcode,new_remaining,old_remaining,remark);
-	}
-
-	@Override
-	public Inventory queryInId(String old_sku, String old_url, String old_barcode,String car_urlMD5,String flag) {
-
-		return taoBaoOrderMapper.queryInId(old_sku,old_url,old_barcode,car_urlMD5,flag);
 	}
 
 }
