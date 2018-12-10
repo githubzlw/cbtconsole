@@ -527,7 +527,6 @@ public interface TaobaoOrderService {
     */
    public int createCouponSubsidiary(List<Map<String, Object>> list);
 
-   public List<Inventory> getIinOutInventory(Map<Object, Object> map);
    /**
     * 获取库存产品所有类别
     * @return
@@ -574,7 +573,6 @@ public interface TaobaoOrderService {
     */
    public List<Inventory> searchGoodsInventoryUpdateInfoCount(Map<Object, Object> map);
 
-   public List<AliCategory> searchAliCategory(String type, String cid);
 
    public List<OrderProductSource> getSourceValidation(String buyer, String account, int page, String startdate, String enddate);
 
@@ -677,19 +675,8 @@ public interface TaobaoOrderService {
     */
    public int deleteInventory(int id,String dRemark);
 
-   /**
-    * 查询order_details
-    * @param map
-    * @return
-    */
-   public OrderDetailsBean findOrderDetails(Map<Object, Object> map);
 
-   /**
-    * 手动录入库存
-    * @param map
-    * @return
-    */
-   public int inventoryEntry(Map<Object, Object> map);
+
 
    /**
     * 更新库存
@@ -699,7 +686,7 @@ public interface TaobaoOrderService {
    public int updateInventory(Map<Object, Object> map);
 
 
-   public int updateSources(String flag, String old_sku, String goods_pid, String car_urlMD5, String new_barcode, String old_barcode, int new_remaining, int old_remaining, String remark, double new_inventory_amount);
+
 
    public int updateIsStockFlag(String goods_pid);
 
@@ -707,11 +694,10 @@ public interface TaobaoOrderService {
 
    public int updateIsStockFlag2(String goods_pid);
 
-   public Inventory queryInId(String old_sku, String old_url, String old_barcode, String car_urlMD5, String flag);
+
 
    public int updateSourcesLog(int in_id, String name, String old_sku, String old_url, String new_barcode, String old_barcode, int new_remaining, int old_remaining, String remark);
 
-   public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
 
    /**
     * 添加未入库采购订单备注
@@ -719,15 +705,7 @@ public interface TaobaoOrderService {
     * @return
     */
    public int updateReply(Map<Object, Object> map);
-   /**
-    * 标记库存为问题库存
-    * @Title problem_inventory
-    * @Description TODO
-    * @param in_id
-    * @return
-    * @return int
-    */
-   public int problem_inventory(Map<Object, Object> map);
+
    /**
     * 强制入库
     * @param map

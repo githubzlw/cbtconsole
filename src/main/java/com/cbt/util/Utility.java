@@ -7,6 +7,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utility {
 	
@@ -79,7 +81,100 @@ public class Utility {
             }  
         }  
         return ip;  
-    }   
+    }
+
+	/**
+	 * 商品下架原因
+	 * @param type
+	 * @param unsellableReason
+	 * @return
+	 */
+	public static String getUnsellableReason(String type,String unsellableReason){
+		if("1".equals(type)){
+			unsellableReason="1688货源下架";
+		}else if("4".equals(type)){
+			unsellableReason="页面404";
+		}else if("6".equals(type)){
+			unsellableReason="IP问题或运营直接下架";
+		}else if("8".equals(type)){
+			unsellableReason="采样不合格";
+		}else if("9".equals(type)){
+			unsellableReason="有质量问题";
+		}else if("10".equals(type)){
+			unsellableReason="商品侵权";
+		}else if("11".equals(type)){
+			unsellableReason="店铺侵权";
+		}else if("14".equals(type)){
+			unsellableReason="1688商品货源变更";
+		}else{
+			unsellableReason="其他原因";
+		}
+		return unsellableReason;
+	}
+
+	public static String getItemid(String u) {
+		if (u.length() < 12) {// http://aaa&123
+			return "0";
+		}
+		String ret = "";
+		Pattern p = Pattern.compile("\\d{2,}");// 这个2是指连续数字的最少个数
+		String maxStr = "";
+		Matcher m = p.matcher(u);
+		int i = 0;
+		while (m.find()) {
+			String temp = m.group();
+			int c = u.indexOf(temp);
+			int len = c + m.group().length() + 5;
+			if (len > u.length()) {
+				len = c + m.group().length();
+			}
+			temp = u.substring(c - 4, len);
+			if (temp.indexOf("?id=") != -1 || temp.indexOf("&id=") != -1 || temp.indexOf(".html") != -1) {
+				if (m.group().length() > maxStr.length()) {
+					maxStr = m.group();
+				}
+			}
+			i++;
+		}
+		ret = maxStr;
+		return ret;
+	}
+
+	/**
+	 * 根据简写的库位拼装新的库位
+	 *
+	 * @param barcode
+	 *            简写库位
+	 * @return
+	 */
+	public static String getBarcode(String barcode) {
+		StringBuffer bar = new StringBuffer("sh");
+		if (barcode.length() == 5) {
+			for (int i = 0; i < barcode.length(); i++) {
+				char item = barcode.charAt(i);
+				if (i < 2) {
+					bar.append(item);
+				} else {
+					bar.append("00").append(item);
+				}
+			}
+		} else if (barcode.length() == 6) {
+			for (int i = 0; i < barcode.length(); i++) {
+				char item = barcode.charAt(i);
+				if (i < 2) {
+					bar.append(item);
+				} else if (i == 2 || i == 3) {
+					bar.append(item);
+				} else {
+					bar.append("00").append(item);
+				}
+				if (i == 1) {
+					bar.append("0");
+				}
+			}
+		}
+		return bar.toString();
+	}
     
     public static String  getForm(String username, String orderNo, String amount, String sign, String custom, String payglag,String type,String currency){
     	StringBuffer sb=new StringBuffer();

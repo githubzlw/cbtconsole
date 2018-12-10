@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.InventoryMapper" >
+    <resultMap id="InventoryResultMap" type="com.cbt.pojo.Inventory" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="goods_url" property="goods_url" jdbcType="VARCHAR" />
+        <result column="add_goods" property="add_goods" jdbcType="INTEGER" />
+        <result column="out_goods" property="out_goods" jdbcType="INTEGER" />
+        <result column="remaining" property="remaining" jdbcType="INTEGER" />
+        <result column="last_add_time" property="last_add_time" jdbcType="VARCHAR" />
+        <result column="last_out_time" property="last_out_time" jdbcType="VARCHAR" />
+        <result column="itemid" property="itemid" jdbcType="VARCHAR" />
+        <result column="sku" property="sku" jdbcType="VARCHAR" />
+        <result column="good_name" property="good_name" jdbcType="VARCHAR" />
+        <result column="goodscatid" property="goodscatid" jdbcType="VARCHAR" />
+        <result column="inventory_amount" property="inventory_amount" jdbcType="INTEGER" />
+        <result column="car_img" property="car_img" jdbcType="VARCHAR" />
+        <result column="userName" property="userName" jdbcType="VARCHAR" />
+        <result column="goods_p_price" property="goods_p_price" jdbcType="VARCHAR" />
+        <result column="goodsprice" property="goodsprice" jdbcType="VARCHAR" />
+        <result column="flag" property="flag" jdbcType="INTEGER" />
+        <result column="new_inventory_amount" property="new_inventory_amount" jdbcType="INTEGER" />
+        <result column="new_barcode" property="new_barcode" jdbcType="VARCHAR" />
+        <result column="new_remaining" property="new_remaining" jdbcType="INTEGER" />
+        <result column="can_remaining" property="can_remaining" jdbcType="INTEGER" />
+        <result column="goodsid" property="goodsid" jdbcType="VARCHAR" />
+        <result column="onLine" property="onLine" jdbcType="VARCHAR" />
+        <result column="unsellableReason" property="unsellableReason" jdbcType="VARCHAR"/>
+        <result column="pid" property="pid" jdbcType="VARCHAR" />
+        <result column="online_flag" property="online_flag" jdbcType="VARCHAR" />
+        <result column="db_flag" property="db_flag" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="com.cbt.Specification.bean.AliCategory" id="AliCategoryMap">
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="cid" property="cid" jdbcType="VARCHAR" />
+        <result column="path" property="path" jdbcType="VARCHAR" />
+        <result column="category" property="category" jdbcType="VARCHAR" />
+        <result column="time" property="time" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="getIinOutInventory" resultMap="InventoryResultMap">
+        SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine,c.unsellableReason FROM inventory i
+        left join storage_outbound_details s on i.id=s.in_id and s.type=1
+        left join custom_benchmark_ready c on i.goods_pid=c.pid
+        where 1=1
+        and if(i.flag=1,i.new_remaining,i.remaining)>0
+        <if test="goodinfo!=null">
+            and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
+        </if>
+        <if test="sku!=null">
+            and LOCATE(#{sku},i.sku)
+        </if>
+        <if test="barcode!=null">
+            and i.barcode=#{barcode}
+        </if>
+        <if test="valid!=null and valid !=2">
+            and c.valid=${valid}
+        </if>
+        <if test="valid  == 2">
+            and i.goods_url like '%aliexpress%' and c.valid is null
+        </if>
+        <if test="goods_pid!=null">
+            and i.goods_pid=#{goods_pid}
+        </if>
+        <if test="flag!=null">
+            and i.flag=#{flag}
+        </if>
+        <if test="scope==1">
+            <choose>
+                <when test="type == 'remaining'">
+                    and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+
+        </if>
+        <if test="scope==2">
+            <choose>
+                <when test="type == 'remaining'">
+                    and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+        </if>
+        <if test="scope==3">
+            <choose>
+                <when test="type == 'remaining'">
+                    <![CDATA[
+               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count})
+                ]]>
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+        </if>
+        <if test="goodscatid == 'bcd'">
+            and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+        </if>
+        <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+            and replace(i.goodscatid,"'","")=#{goodscatid}
+        </if>
+
+        <if test="startdate!=null">
+            and i.updatetime>=#{startdate}
+        </if>
+        <if test="enddate!=null">
+            and i.updatetime&lt;=#{enddate}
+        </if>
+        order by i.id desc,i.can_remaining desc
+        <if test="page!=-1">
+            limit #{page},20
+        </if>
+    </select>
+    <select id="getIinOutInventoryCount" resultMap="InventoryResultMap">
+        SELECT distinct i.*,s.goodsid,ifnull(c.valid,'2') AS onLine,c.unsellableReason FROM inventory i
+        left join storage_outbound_details s on i.id=s.in_id and s.type=1
+        left join custom_benchmark_ready c on i.goods_pid=c.pid
+        where 1=1
+        and if(i.flag=1,i.new_remaining,i.remaining)>0
+        <if test="goodinfo!=null">
+            and (LOCATE(#{goodinfo},i.good_name) or LOCATE(#{goodinfo},c.name))
+        </if>
+        <if test="sku!=null">
+            and LOCATE(#{sku},i.sku)
+        </if>
+        <if test="barcode!=null">
+            and i.barcode=#{barcode}
+        </if>
+        <if test="valid!=null and valid !=2">
+            and c.valid=${valid}
+        </if>
+        <if test="valid  == 2">
+            and i.goods_url like '%aliexpress%' and c.valid is null
+        </if>
+        <if test="goods_pid!=null">
+            and i.goods_pid=#{goods_pid}
+        </if>
+        <if test="flag!=null">
+            and i.flag=#{flag}
+        </if>
+        <if test="scope==1">
+            <choose>
+                <when test="type == 'remaining'">
+                    and ((i.${type}>#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+
+        </if>
+        <if test="scope==2">
+            <choose>
+                <when test="type == 'remaining'">
+                    and ((i.${type}=#{count} and i.new_remaining=0) or i.new_remaining=#{count})
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+        </if>
+        <if test="scope==3">
+            <choose>
+                <when test="type == 'remaining'">
+                    <![CDATA[
+               and ((i.${type}<#{count} and i.new_remaining=0) or i.new_remaining<#{count})
+                ]]>
+                </when>
+                <otherwise>
+                    and 1=1
+                </otherwise>
+            </choose>
+        </if>
+        <if test="goodscatid == 'bcd'">
+            and (i.goodscatid is null or i.goodscatid ='' or i.goodscatid =0)
+        </if>
+        <if test="goodscatid !='bcd' and goodscatid != 'abc'">
+            and replace(i.goodscatid,"'","")=#{goodscatid}
+        </if>
+        <if test="startdate!=null">
+            and i.updatetime>=#{startdate}
+        </if>
+        <if test="enddate!=null">
+            and i.updatetime&lt;=#{enddate}
+        </if>
+    </select>
+    <update id="problem_inventory">
+        update inventory set flag=2 where id=${in_id}
+    </update>
+    <select id="searchAliCategory" resultMap="AliCategoryMap">
+        <if test="type=='type1'">
+            SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid
+        </if>
+        <if test="type=='type2'">
+            SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',2),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND SUBSTRING_INDEX(ac.path, ',',1)=#{cid};
+        </if>
+        <if test="type=='type3'">
+            SELECT DISTINCT a.cid as cid,a.category as category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',3),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=2 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',2),',',-1)=#{cid};
+        </if>
+        <if test="type=='type4'">
+            SELECT DISTINCT a.cid AS cid,a.category AS category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',4),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=3 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',3),',',-1)=#{cid};
+        </if>
+        <if test="type=='type5'">
+            SELECT DISTINCT a.cid AS cid,a.category AS category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',5),',',-1)=a.cid WHERE LOCATE(',',ac.path)>0 AND CHAR_LENGTH(ac.path)-CHAR_LENGTH(REPLACE(ac.path, ',', '' ))=4 AND SUBSTRING_INDEX(SUBSTRING_INDEX(ac.path, ',',4),',',-1)=#{cid};
+        </if>
+    </select>
+    <select id="queryInId" resultMap="InventoryResultMap">
+        SELECT * FROM inventory WHERE goods_pid=#{goods_pid} AND IFNULL(sku,'')=#{old_sku} AND barcode=#{old_barcode}
+        <if test="car_urlMD5 != null">
+            AND car_urlMD5=#{car_urlMD5}
+        </if>
+    </select>
+    <update id="updateSources">
+        <choose>
+            <when test="flag==1">
+                update inventory set new_remaining=#{new_remaining},can_remaining=#{new_remaining},updatetime=now(),barcode=#{new_barcode},new_inventory_amount=#{new_inventory_amount},flag=1,remark=#{remark} where
+                IFNULL(sku,'')=#{old_sku}
+                <if test="car_urlMD5 != null">
+                    and car_urlMD5=#{car_urlMD5}
+                </if>
+                and goods_pid=#{goods_pid} and barcode=#{old_barcode}
+            </when>
+            <otherwise>
+                update inventory set new_remaining=#{new_remaining},can_remaining=#{new_remaining},updatetime=now(),barcode=#{new_barcode},new_inventory_amount=#{new_inventory_amount},flag=1,remark=#{remark} where
+                IFNULL(sku,'')=#{old_sku}
+                <if test="car_urlMD5 != null">
+                    and car_urlMD5=#{car_urlMD5}
+                </if>
+                and goods_pid=#{goods_pid} and barcode=#{old_barcode}
+            </otherwise>
+        </choose>
+    </update>
+</mapper>
