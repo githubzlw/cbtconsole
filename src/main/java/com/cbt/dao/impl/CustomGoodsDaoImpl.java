@@ -974,7 +974,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     public int updateState(int state, String pid, int adminid) {
         String sql = "update custom_goods_edit a,custom_benchmark_ready b set b.goodsstate=?,a.admin_id=?,b.valid=1";
         if (state == 4) {
-            sql += ",a.bm_flag=1,b.is_edited='1',a.publish_time=now()";
+            sql += ",b.bm_flag=1,a.is_edited=1,a.publish_time=now()";
         }else if(state == 2){
             sql += ",a.off_time=now()";
         }
@@ -2689,7 +2689,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         String querySql = "SELECT goods_pid FROM hot_selling_goods"; //热卖区商品
         
         Connection conn2 = DBHelper.getInstance().getConnection(); //27
-        String querySql2 = "SELECT pid FROM custom_benchmark_ready WHERE is_edited=3 UNION SELECT pid FROM custom_goods_edit WHERE never_off_flag=1"; //永不下架商品
+        String querySql2 = "SELECT pid FROM custom_benchmark_ready WHERE is_edited=3"; //永不下架商品
         
         PreparedStatement stmt = null;
         ResultSet rs = null;

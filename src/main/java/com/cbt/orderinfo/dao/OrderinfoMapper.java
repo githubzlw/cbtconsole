@@ -41,7 +41,7 @@ public interface OrderinfoMapper {
 	 * 订单数量
 	 * @return
 	 */
-	public int getOrdersCount(@Param("userID") int userID, @Param("state") int state, @Param("startdate") Date startdate, @Param("enddate") Date enddate, @Param("email") String email,
+	public int getOrdersCount(@Param("userID") int userID, @Param("state") int state, @Param("startdate") String startdate, @Param("enddate") String enddate, @Param("email") String email,
                               @Param("orderno") String orderno, @Param("admuserid") int admuserid, @Param("buyid") int buyid, @Param("showUnpaid") int showUnpaid, @Param("type") String type, @Param("status") int status);
 	/**
 	 * 订单信息

@@ -462,7 +462,7 @@ public interface IOrderinfoService {
 	//有订单留言的订单
 	public List<Map<String, String>> getOrders1(int userID, int state, Date startdate, Date enddate, String email,
                                                 String orderno, int startpage, int page, int admuserid, int buyid, int showUnpaid, String type, int status);
-	public int getOrdersCount(int userID, int state, Date startdate, Date enddate, String email,
+	public int getOrdersCount(int userID, int state, String startdate, String enddate, String email,
                               String orderno, int admuserid, int buyid, int showUnpaid, String type, int status);
 	
 	/**

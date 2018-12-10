@@ -56,9 +56,9 @@ public class ComplainServiceImpl implements IComplainService{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName,int check) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName,int roleType,int check) {
 		// TODO Auto-generated method stub
-		return complainDao.searchComplainByParam(t, username,page,admName,check);
+		return complainDao.searchComplainByParam(t, username,page,admName,roleType,check);
 	}
 	
 	@Override

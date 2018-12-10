@@ -1,4 +1,4 @@
-`<%@ page language="java" contentType="text/html; charset=utf-8"
+<%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -126,8 +126,6 @@
             <span><input type="submit" class="btn_sty" value="查询" onclick="doQuery()"/></span>
         <span>&nbsp;&nbsp;&nbsp;操作人：${operatorName}</span></div>
         <%--<input type="hidden" id="query_state" value="${state}" name="state">--%>
-
-
         <input type="hidden" id="query_current_page" value="${page}" name="page">
         <input type="hidden" id="query_choose_state" value="${chooseState}" name="chooseState">
 
@@ -266,7 +264,7 @@
                     <%--Emma可以进行线下转账操作--%>
                     <c:if test="${refund.state == 3}">
                         <a href="javascript:void(0);" onclick="openDetails(${refund.id},this)" title="查看流程详细">查看流程详细</a>
-                        <c:if test="operatorId == 83">
+                        <c:if test="${operatorId == 83}">
                             <br><br>
                             <input type="button" value="执行退款" class="btn_sty"
                                onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>

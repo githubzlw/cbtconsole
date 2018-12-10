@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface IComplainService{
 	
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int check);
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType,int check);
 
 	public ComplainVO getComplainByCid(Integer cid);
 

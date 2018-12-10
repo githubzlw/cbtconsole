@@ -113,7 +113,7 @@ public class CustomerDisputeController {
         	json.setMessage(String.valueOf(count));
         	
         	Map<String, Object> map = customerDisputeService.list(disputeid,startNum, limitNum, 
-        			sttime, edtime, status,adm.getId());
+        			sttime, edtime, status,adm.getId(),adm.getRoletype());
         	long total = 0;
         	if(map != null && !map.isEmpty() ) {
         		total = (Long)map.get("total");
@@ -648,7 +648,6 @@ public class CustomerDisputeController {
     				c.setRemark("Send Message To Buyer:"+c.getRemark()+"<br><br>(内部查看)Refuse Reason:"+c.getRefuseReason());
     			}else {
     				c.setRemark("Send Message To Buyer:"+c.getRemark());
-    				
     			}
     		});
     		
@@ -704,7 +703,7 @@ public class CustomerDisputeController {
     	String currencyCode = comfirmByDisputeID.getCurrencyCode();
     	
     	boolean isPremint = Double.valueOf(offerAmount)<500.0099999;
-    	if(!((adm.getId() == 1 && isPremint) || (adm.getId() == 8 && isPremint) || adm.getId() == 83)) {
+    	if(!((adm.getId() == 1 && isPremint)||(adm.getId() == 8 && isPremint)||(adm.getId()==83))) {
     		result.put("state", false);
     		result.put("message", "该用户没有权限退款，请重新登录");
     		return  result;
@@ -779,11 +778,13 @@ public class CustomerDisputeController {
     		result.put("message", "没有权限退款，请重新登录");
         	return  result;
     	}
-        if(!(adm.getId() == 1 || adm.getId() == 8 || adm.getId() == 83)) {
+
+        if(!(adm.getId() == 1||adm.getId() == 8||adm.getId()==83)) {
     		result.put("state", false);
-    		result.put("message", "该用户没有权限退款，请重新登录");
-    		return  result;
+    		result.put("message", "该用户没有权限操作，请重新登录");
+        	return  result;
     	}
+    	
     	String disputeid = request.getParameter("disputeid");
     	String refuseReason = request.getParameter("reason");
     	if(StringUtils.isBlank(disputeid) || StringUtils.isBlank(refuseReason)) {
