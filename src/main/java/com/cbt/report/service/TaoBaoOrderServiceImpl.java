@@ -1301,126 +1301,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.searchGoodsInventoryUpdateInfoCount(map);
 	}
 
-	@Override
-	public List<Inventory> getIinOutInventory(Map<Object,Object> map) {
-		List<Inventory> toryList=taoBaoOrderMapper.getIinOutInventory(map);
-		StringBuilder pids=new StringBuilder();
-		for (Inventory inventory : toryList) {
-			inventory.setGoods_url(StringUtil.isBlank(inventory.getGoods_url())?"":inventory.getGoods_url());
-			inventory.setCar_urlMD5(StringUtil.isBlank(inventory.getCar_urlMD5())?"":inventory.getCar_urlMD5());
-			pids.append("'").append(inventory.getGoods_pid()).append("',");
-			String valid=inventory.getOnLine();
-			String onLine="状态错误";
-			String unsellableReason="--";
-			if("1".equals(valid)){
-				onLine="上架";
-			}else if("0".equals(valid)){
-				onLine="下架";
-				unsellableReason=getUnsellableReason(inventory.getUnsellableReason(),unsellableReason);
-				inventory.setUnsellableReason(unsellableReason);
-			}else if("2".equals(valid) && (inventory.getGoods_url().indexOf("aliexpress")>-1 || inventory.getCar_urlMD5().startsWith("A"))){
-				onLine="ali产品实时抓取";
-			}else{
-				onLine="商品已删除";
-			}
-			inventory.setOnLine(onLine);
-			if("0".equals(map.get("export"))){
-				if (inventory.getFlag() == 1) {
-					if(map.get("flag")==null || "".equals(map.get("flag"))){
-						inventory.setOperation(("<a style='color:red' id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getNew_remaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark()) + "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}else{
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getNew_remaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark()) + "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}
-				} else{
-					inventory.setNew_remaining("");
-					if(inventory.getFlag()==0){
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getRemaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark())+ "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>|<a onclick=\"problem_inventory("+inventory.getId()+")\">问题库存</a>").replaceAll("\n", ""));
-					}else{
-						inventory.setOperation(("<a id='pd_"+inventory.getId()+"' onclick=\"update_inventory("+inventory.getFlag()+","+inventory.getId()+",'" + inventory.getBarcode()+ "','" + inventory.getRemaining() + "','" + (StringUtils.isStrNull(inventory.getRemark())?"":inventory.getRemark())+ "')\">盘点</a>|<a onclick=\"delete_inventory("+inventory.getId()+",'"+inventory.getGoods_pid()+"','"+(StringUtils.isStrNull(inventory.getNew_barcode())?inventory.getBarcode():inventory.getNew_barcode())+"','"+(inventory.getNew_inventory_amount()>0?inventory.getNew_inventory_amount():inventory.getInventory_amount())+"')\">删除</a>").replaceAll("\n", ""));
-					}
-				}
-				// }
-				String url="";
-				if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("A")){
-					url="https://www.import-express.com/goodsinfo/a-2"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("D")){
-					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && inventory.getCar_urlMD5().startsWith("N")){
-					url="https://www.import-express.com/goodsinfo/a-3"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getGoods_url()) && inventory.getGoods_url().contains("ali")){
-					url="https://www.import-express.com/goodsinfo/a-2"+inventory.getGoods_pid()+".html";
-				}else if(!StringUtils.isStrNull(inventory.getCar_urlMD5()) && !StringUtils.isStrNull(inventory.getGoods_pid())){
-					url="https://www.import-express.com/spider/detail?&source="+inventory.getCar_urlMD5()+"&item="+inventory.getGoods_pid()+"";
-				}else {
-					url="https://www.import-express.com/goodsinfo/a-1"+inventory.getGoods_pid()+".html";
-				}
-				if("1".equals(inventory.getDb_flag())){
-					inventory.setEditLink("<a target='_blank' href='/cbtconsole/editc/detalisEdit?pid="+inventory.getPid()+"'>产品编辑链接</a>");
-				}else{
-					inventory.setEditLink("--");
-				}
-				if("4".equals(inventory.getOnline_flag())){
-					String car_img=inventory.getCar_img();
-					String imgs[]=car_img.split("kf");
-					String one=imgs[0];
-					String two=imgs[1].replace(".jpg_50x50.jpg","");
-					url="https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType="+one+"&imageAddress=kf"+two+"";
-				}else if("1".equals(inventory.getOnline_flag())){
-					url="https://www.aliexpress.com/item/a/"+inventory.getGoods_pid()+".html";
-				}
-				inventory.setCar_img("<a href='"+url+"' title='跳转到网站链接' target='_blank'>"
-						+ "<img  src='"+ (inventory.getCar_img().indexOf("1.png")>-1?"/cbtconsole/img/yuanfeihang/loaderTwo.gif":inventory.getCar_img()) + "' onmouseout=\"closeBigImg();\" onmouseover=\"BigImg('"+ inventory.getCar_img() + "')\" height='100' width='100'></a>");
-				if(!StringUtils.isStrNull(inventory.getGoods_p_url())){
-					url=inventory.getGoods_p_url();
-					inventory.setGood_name("<a href='"+url+"' target='_blank' title='"+(StringUtils.isStrNull(url)?"未匹配到1688链接":"跳转到1688链接")+"'>"
-							+ inventory.getGood_name().substring(0, inventory.getGood_name().length() / 3) + "</a>");
-				}else{
-					inventory.setGood_name("<span'>"+ inventory.getGood_name().substring(0, inventory.getGood_name().length() / 3) + "</span>");
 
-				}
-				inventory.setSku("<a title='查看出入库明细' href='/cbtconsole/website/in_out_details.jsp?in_id="+inventory.getId()+"' target='_blank'>"+(StringUtils.isStrNull(inventory.getSku())?"无规格":inventory.getSku())+"</a>");
-				if(!StringUtils.isStrNull(inventory.getGoodsid())){
-					inventory.setRemaining("<a title='跳转到入库记录页面' style='color:red;text-decoration-line:underline' target='_blank' href='/cbtconsole/warehouse/getOrderinfoPage.do?goodid="+inventory.getGoodsid()+"'>"+inventory.getRemaining()+"</a>");
-				}else{
-					inventory.setRemaining("<span>"+inventory.getRemaining()+"</span>");
-				}
-			}
-			String goodscatid=inventory.getGoodscatid();
-			if(StringUtil.isBlank(goodscatid) || "0".equals(goodscatid)){
-				inventory.setGoodscatid("其他");
-			}
-		}
-		return toryList;
-	}
-
-	public String getUnsellableReason(String type,String unsellableReason){
-		if("1".equals(type)){
-			unsellableReason="1688货源下架";
-		}else if("4".equals(type)){
-			unsellableReason="页面404";
-		}else if("6".equals(type)){
-			unsellableReason="IP问题或运营直接下架";
-		}else if("8".equals(type)){
-			unsellableReason="采样不合格";
-		}else if("9".equals(type)){
-			unsellableReason="有质量问题";
-		}else if("10".equals(type)){
-			unsellableReason="商品侵权";
-		}else if("11".equals(type)){
-			unsellableReason="店铺侵权";
-		}else if("14".equals(type)){
-			unsellableReason="1688商品货源变更";
-		}else{
-			unsellableReason="其他原因";
-		}
-		return unsellableReason;
-	}
-
-	@Override
-	public List<Inventory> getIinOutInventoryCount(Map<Object,Object> map) {
-
-		return taoBaoOrderMapper.getIinOutInventoryCount(map);
-	}
 	/**
 	 * 添加未入库采购订单备注
 	 */
@@ -1429,11 +1310,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.updateReply(map);
 	}
-	@Override
-	public int problem_inventory(Map<Object, Object> map) {
 
-		return taoBaoOrderMapper.problem_inventory(map);
-	}
 	/**
 	 * 强制入库
 	 */
@@ -1448,28 +1325,12 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.getOperationRemark(map);
 	}
 	@Override
-	public int insertChangeBarcode(int id, String old_barcode,
-	                               String new_barcode) {
-
-		return taoBaoOrderMapper.insertChangeBarcode(id,old_barcode,new_barcode);
-	}
-	@Override
-	public int recordLossInventory(Map<Object, Object> map) {
-
-		return taoBaoOrderMapper.recordLossInventory(map);
-	}
-	@Override
 	public List<TaoBaoOrderInfo> queryBuyCount(String torderid,
 	                                           String opsorderid) {
 
 		return taoBaoOrderMapper.queryBuyCount(torderid,opsorderid);
 	}
 
-	@Override
-	public List<AliCategory> searchAliCategory(String type,String cid) {
-
-		return taoBaoOrderMapper.searchAliCategory(type,cid);
-	}
 
 	@Override
 	public List<OrderProductSource> getSourceValidation(String buyer, String account, int page, String startdate, String enddate) {
@@ -1641,81 +1502,6 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.getNewBarcode();
 	}
 	/**
-	 * 根据ID删除库存数据
-	 */
-	@Override
-	public int deleteInventory(int id,String dRemark) {
-
-		return taoBaoOrderMapper.deleteInventory(id,dRemark);
-	}
-
-	@Override
-	public int isExitBarcode(String barcode) {
-
-		return taoBaoOrderMapper.isExitBarcode(barcode);
-	}
-	/**
-	 * 根据ID获取库存
-	 */
-	@Override
-	public Inventory queryInById(String id) {
-
-		return taoBaoOrderMapper.queryInById(id);
-	}
-	@Override
-	public OrderDetailsBean findOrderDetails(Map<Object, Object> map) {
-
-		return taoBaoOrderMapper.findOrderDetails(map);
-	}
-
-	@Override
-	public Inventory getInventoryByPid(Map<String, String> map) {
-		return taoBaoOrderMapper.getInventoryByPid(map);
-	}
-
-	@Override
-	public int insertInventoryYmx(Map<String, String> map) {
-		return taoBaoOrderMapper.insertInventoryYmx(map);
-	}
-
-	/**
-	 * 手动录入库存
-	 * @param map
-	 * @return
-	 */
-	@Override
-	public int inventoryEntry(Map<Object, Object> map) {
-
-		return taoBaoOrderMapper.inventoryEntry(map);
-	}
-
-	@Override
-	public int updateSources(String flag,String old_sku, String goods_pid,String car_urlMD5,
-	                         String new_barcode, String old_barcode, int new_remaining,
-	                         int old_remaining, String remark,double new_inventory_amount) {
-
-		return taoBaoOrderMapper.updateSources(flag,old_sku,goods_pid,car_urlMD5,new_barcode,old_barcode,new_remaining,old_remaining,remark,new_inventory_amount);
-	}
-
-	@Override
-	public int updateIsStockFlag(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag(goods_pid);
-	}
-
-	@Override
-	public int updateIsStockFlag1(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag1(goods_pid);
-	}
-
-	@Override
-	public int updateIsStockFlag2(String goods_pid) {
-
-		return taoBaoOrderMapper.updateIsStockFlag2(goods_pid);
-	}
-
-	/**
 	 * 更新库存
 	 * @param map
 	 * @return
@@ -1724,20 +1510,6 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	public int updateInventory(Map<Object, Object> map) {
 
 		return taoBaoOrderMapper.updateInventory(map);
-	}
-
-	@Override
-	public int updateSourcesLog(int in_id,String name,String old_sku, String old_url,
-	                            String new_barcode, String old_barcode, int new_remaining,
-	                            int old_remaining, String remark) {
-
-		return taoBaoOrderMapper.updateSourcesLog(in_id,name,old_sku,old_url,new_barcode,old_barcode,new_remaining,old_remaining,remark);
-	}
-
-	@Override
-	public Inventory queryInId(String old_sku, String old_url, String old_barcode,String car_urlMD5,String flag) {
-
-		return taoBaoOrderMapper.queryInId(old_sku,old_url,old_barcode,car_urlMD5,flag);
 	}
 
 }

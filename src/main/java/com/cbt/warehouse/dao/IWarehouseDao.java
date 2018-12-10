@@ -233,26 +233,6 @@ public interface IWarehouseDao {
 	public String getCgCount(Map<String, Object> map);
 	//当日分配采购种类
 	public String getDistributionCount(Map<String, Object> map);
-	/**
-	 * 最近30天 产生的 库存损耗
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getLossInventory();
-	/**
-	 * 最近30天 产生的 库存删除
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getDeleteInventory();
-	/**
-	 * 最近30天销售掉的库存
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getSaleInventory();
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getNewInventory();
 	//当月分配采购种类
 	public String getfpCount(Map<String, Object> map);
 	/**

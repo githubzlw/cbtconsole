@@ -22,7 +22,7 @@
 <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <script src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
 <script type="text/javascript">
-var updateSourcesUrl = "/cbtconsole/StatisticalReport/updateSources"; //盘点库存
+var updateSourcesUrl = "/cbtconsole/inventory/updateSources"; //盘点库存
 </script>
 <style type="text/css">
 .displaynone{display:none;}
@@ -103,7 +103,7 @@ $(function(){
         doQuery(1);
     }
 	$.ajax({
-		url : "/cbtconsole/StatisticalReport/searchAliCategory",
+		url : "/cbtconsole/inventory/searchAliCategory",
 		data:{
         	  "type":"type1",
         	  "cid":"0"
@@ -146,7 +146,7 @@ function selecType2(type,cid){
 			$("#type5").html("");
 		}
 		$.ajax({
-			url : "/cbtconsole/StatisticalReport/searchAliCategory",
+			url : "/cbtconsole/inventory/searchAliCategory",
 			data:{
 	        	  "type":type,
 	        	  "cid":cid
@@ -181,7 +181,7 @@ function setDatagrid() {
 			striped : true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮
 			toolbar : "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-			url : '/cbtconsole/StatisticalReport/searchGoodsInventoryInfo',//url调用Action方法
+			url : '/cbtconsole/inventory/searchGoodsInventoryInfo',//url调用Action方法
 			loadMsg : '数据装载中......',
 			singleSelect : false,//为true时只能选择单行
 			fitColumns : true,//允许表格自动缩放，以适应父容器
@@ -272,7 +272,7 @@ function problem_inventory(id){
 				 if (r){
 				  	 var params = {"in_id":id};
 				  	 $.ajax({  
-				           url:'/cbtconsole/StatisticalReport/problem_inventory',  
+				           url:'/cbtconsole/inventory/problem_inventory',
 				           type:"post",  
 				           data:params,  
 				           success:function(data){
@@ -377,7 +377,12 @@ function exportData(){
 	if(type1!=null){
 		type_=type1;
 	}
-	window.location.href ="/cbtconsole/StatisticalReport/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag+"&goodscatid="+goodscatid;
+	if(goodscatid == "全部"){
+        goodscatid="abc";
+	}else if(goodscatid == "其他"){
+        goodscatid="bcd"
+	}
+	window.location.href ="/cbtconsole/inventory/exportGoodsInventory?startdate="+startdate+"&enddate="+enddate+"&type="+type+"&goodinfo="+goodinfo+"&scope="+scope+"&count="+count+"&sku="+sku+"&type_="+type_+"&barcode="+barcode+"&flag="+flag+"&goodscatid="+goodscatid;
 }
 
 function openInventoryEntryView(){
@@ -394,7 +399,7 @@ function inventoryEntry(){
 	var in_barcode = $('#new_barcode2').combobox('getValue');
 	var remark=$("#remark_").val();
 	jQuery.ajax({
-	       url:"/cbtconsole/StatisticalReport/inventoryEntry",
+	       url:"/cbtconsole/inventory/inventoryEntry",
 	       data:{
 	       	  "goodsid":goodsid,
 	       	  "count":count,
@@ -434,7 +439,7 @@ function inventoryYmxEntry(){
     var ymx_img=$("#ymx_img").val();
     var ymx_name=$("#ymx_name").val();
     jQuery.ajax({
-        url:"/cbtconsole/StatisticalReport/inventoryYmxEntry",
+        url:"/cbtconsole/inventory/inventoryYmxEntry",
         data:{
             "itmeid":itmeid,
             "ymx_count":ymx_count,
@@ -506,7 +511,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getNewInventory',
+        url:'/cbtconsole/inventory/getNewInventory',
         data:{},
         success:function(data){
             $("#tj_info_1").html(data);
@@ -516,7 +521,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getSaleInventory',
+        url:'/cbtconsole/inventory/getSaleInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -529,7 +534,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getLossInventory',
+        url:'/cbtconsole/inventory/getLossInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -542,7 +547,7 @@ function initData(){
         type:'post',
         dataType:"text",
         async:true,
-        url:'/cbtconsole/warehouse/getDeleteInventory',
+        url:'/cbtconsole/inventory/getDeleteInventory',
         data:{},
         success:function(data){
             if(data=='null'){
@@ -572,7 +577,7 @@ function delInventorySources(){
         return;
 	}
     jQuery.ajax({
-        url:"/cbtconsole/StatisticalReport/deleteInventory",
+        url:"/cbtconsole/inventory/deleteInventory",
         data:{
             "id":dId,
             "goods_pid":dPid,

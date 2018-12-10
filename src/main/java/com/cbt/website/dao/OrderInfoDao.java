@@ -86,4 +86,11 @@ public interface OrderInfoDao {
 	 * @return
 	 */
 	Map<String,Object> queryPaymentInfoByOrderNo(String orderNo);
+
+	/**
+	 * 根据订单号判断支付账号是否是老账号
+	 * @param orderNo
+	 * @return
+	 */
+	boolean checkIsOldPayPal(String orderNo);
 }
