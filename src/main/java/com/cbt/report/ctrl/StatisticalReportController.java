@@ -1651,8 +1651,8 @@ public class StatisticalReportController {
 			} else {
 				remark ="";// i.getRemark();
 			}
-			isExit = 0;//taoBaoOrderService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
-					//Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
+			isExit = taoBaoOrderService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
+					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
 			if (isExit > 0) {
 				if(Integer.valueOf(new_remaining)<=0){
 					//如果库存为0则更改库存标识
@@ -1889,41 +1889,41 @@ public class StatisticalReportController {
 		return json;
 	}
 
-//	/**
-//	 * 根据简写的库位拼装新的库位
-//	 *
-//	 * @param barcode
-//	 *            简写库位
-//	 * @return
-//	 */
-//	public String getBarcode(String barcode) {
-//		StringBuffer bar = new StringBuffer("sh");
-//		if (barcode.length() == 5) {
-//			for (int i = 0; i < barcode.length(); i++) {
-//				char item = barcode.charAt(i);
-//				if (i < 2) {
-//					bar.append(item);
-//				} else {
-//					bar.append("00").append(item);
-//				}
-//			}
-//		} else if (barcode.length() == 6) {
-//			for (int i = 0; i < barcode.length(); i++) {
-//				char item = barcode.charAt(i);
-//				if (i < 2) {
-//					bar.append(item);
-//				} else if (i == 2 || i == 3) {
-//					bar.append(item);
-//				} else {
-//					bar.append("00").append(item);
-//				}
-//				if (i == 1) {
-//					bar.append("0");
-//				}
-//			}
-//		}
-//		return bar.toString();
-//	}
+	/**
+	 * 根据简写的库位拼装新的库位
+	 *
+	 * @param barcode
+	 *            简写库位
+	 * @return
+	 */
+	public String getBarcode(String barcode) {
+		StringBuffer bar = new StringBuffer("sh");
+		if (barcode.length() == 5) {
+			for (int i = 0; i < barcode.length(); i++) {
+				char item = barcode.charAt(i);
+				if (i < 2) {
+					bar.append(item);
+				} else {
+					bar.append("00").append(item);
+				}
+			}
+		} else if (barcode.length() == 6) {
+			for (int i = 0; i < barcode.length(); i++) {
+				char item = barcode.charAt(i);
+				if (i < 2) {
+					bar.append(item);
+				} else if (i == 2 || i == 3) {
+					bar.append(item);
+				} else {
+					bar.append("00").append(item);
+				}
+				if (i == 1) {
+					bar.append("0");
+				}
+			}
+		}
+		return bar.toString();
+	}
 
 	/**
 	 * 查询优惠券信息
@@ -3878,7 +3878,100 @@ public class StatisticalReportController {
 		return json;
 	}
 
-
+	/**
+	 * 查询库存统计报表
+	 *
+	 * @param request
+	 * @param reportYear
+	 * @param reportMonth
+	 * @return
+	 */
+	@RequestMapping(value = "/searchGoodsInventoryInfo")
+	@ResponseBody
+	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<Object, Object> map = new HashMap<Object, Object>();
+		int page = Integer.valueOf(request.getParameter("page"));// 当前页
+		String type = request.getParameter("type");
+		String type11 = request.getParameter("type11");
+		String goodinfo = request.getParameter("goodinfo");
+		String year = request.getParameter("year");
+		String flag = request.getParameter("flag");
+		String mouth = request.getParameter("mouth");
+		String scope = request.getParameter("scope");
+		String scope11 = request.getParameter("scope11");
+		String goodscatid = request.getParameter("goodscatid");
+		String have_barcode=request.getParameter("have_barcode");
+		String barcode = request.getParameter("barcode");
+		String startdate=request.getParameter("startdate");
+		String goods_pid=request.getParameter("goods_pid");
+		String enddate=request.getParameter("enddate");
+		String valid=request.getParameter("valid");
+		goods_pid=StringUtil.isBlank(goods_pid)?null:goods_pid;
+		int count = Integer.valueOf(request.getParameter("count") != null && !"".equals(request.getParameter("count"))
+				? request.getParameter("count").toString() : "0");
+		int count11 = Integer
+				.valueOf(request.getParameter("count11") != null && !"".equals(request.getParameter("count11"))
+						? request.getParameter("count11").toString() : "0");
+		String goodsurl = request.getParameter("goodsurl");
+		String sku = request.getParameter("sku");
+		String buyTime = "";
+		if (year != null && year.equals("0")) {
+			buyTime = null;
+		} else if (year != null && mouth.equals("0")) {
+			buyTime = year;
+		} else if (year != null) {
+			buyTime = year + "-" + mouth;
+		}
+		goodscatid="0".equals(goodscatid)?null:goodscatid;
+		if("全部".equals(goodscatid)){
+			goodscatid="abc";
+		}else if("其他".equals(goodscatid)){
+			goodscatid="bcd";
+		}
+		flag="-1".equals(flag)?null:flag;
+		page=page>0?(page - 1) * 20:page;
+		goodinfo=StringUtils.isStrNull(goodinfo)?null:goodinfo;
+		goodsurl=StringUtils.isStrNull(goodsurl)?null:goodsurl;
+		sku=StringUtils.isStrNull(sku)?null:sku;
+		startdate=StringUtils.isStrNull(startdate)?null:(startdate+" 00:00:00");
+		enddate=StringUtils.isStrNull(enddate)?null:(enddate+" 23:59:59");
+		if(!"全部".equals(have_barcode)){
+			barcode=have_barcode;
+		}else if ("全部".equals(have_barcode) && barcode != null && !"".equals(barcode) && barcode.indexOf("STK") <= -1) {
+			barcode = getBarcode(barcode);
+		} else if (barcode == null || "".equals(barcode)) {
+			barcode = null;
+		}
+		if (scope != null && scope.equals("0")) {
+			scope = null;
+		}
+		map.put("buyTime", buyTime);
+		map.put("goodinfo", goodinfo);
+		map.put("sku", sku);
+		map.put("goodsurl", goodsurl);
+		map.put("type", type);
+		map.put("type11", type11);
+		map.put("scope11", scope11);
+		map.put("count11", count11);
+		map.put("scope", scope);
+		map.put("count", count);
+		map.put("goodscatid", goodscatid);
+		map.put("barcode", barcode);
+		map.put("page", page);
+		map.put("flag", flag);
+		map.put("enddate", enddate);
+		map.put("startdate", startdate);
+		map.put("export", "0");
+		map.put("goods_pid",goods_pid);
+		map.put("valid","-1".equals(valid)?null:valid);
+		List<Inventory> toryList = taoBaoOrderService.getIinOutInventory(map);
+		List<Inventory> toryListCount = taoBaoOrderService.getIinOutInventoryCount(map);
+		json.setRows(toryList);
+		json.setTotal(toryListCount.size());
+		return json;
+	}
 
 	@RequestMapping(value = "/getAllInventory", method = RequestMethod.GET)
 	@ResponseBody
@@ -4001,7 +4094,20 @@ public class StatisticalReportController {
 		out.close();
 	}
 
-
+	@RequestMapping(value = "/problem_inventory")
+	@ResponseBody
+	protected void problem_inventory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		Map<Object,Object> map = new HashMap<Object,Object>();
+		response.setCharacterEncoding("utf-8");
+		String id = request.getParameter("in_id");
+		map.put("in_id", id);
+		int row=taoBaoOrderService.problem_inventory(map);
+		PrintWriter out = response.getWriter();
+		out.print(row+"");
+		out.flush();
+		out.close();
+	}
 
 	/**
 	 * 强制入库

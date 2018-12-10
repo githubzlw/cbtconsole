@@ -1342,6 +1342,11 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.queryBuyCount(torderid,opsorderid);
 	}
 
+	@Override
+	public List<AliCategory> searchAliCategory(String type,String cid) {
+
+		return taoBaoOrderMapper.searchAliCategory(type,cid);
+	}
 
 	@Override
 	public List<OrderProductSource> getSourceValidation(String buyer, String account, int page, String startdate, String enddate) {
@@ -1574,6 +1579,10 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		return taoBaoOrderMapper.updateSourcesLog(in_id,name,old_sku,old_url,new_barcode,old_barcode,new_remaining,old_remaining,remark);
 	}
 
+	@Override
+	public Inventory queryInId(String old_sku, String old_url, String old_barcode,String car_urlMD5,String flag) {
 
+		return taoBaoOrderMapper.queryInId(old_sku,old_url,old_barcode,car_urlMD5,flag);
+	}
 
 }

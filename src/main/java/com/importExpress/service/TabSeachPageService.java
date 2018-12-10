@@ -52,4 +52,6 @@ public interface TabSeachPageService {
 	public List<TabSeachPageBean> queryStaticizeAll();
 
     boolean updateTitleAndKey(int sid);
+
+    long updateAuthorizedInfoValid(String shopId, int valid);
 }

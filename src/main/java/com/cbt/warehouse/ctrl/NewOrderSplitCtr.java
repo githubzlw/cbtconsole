@@ -396,6 +396,13 @@ public class NewOrderSplitCtr {
 			
 			double vatBalanceOld = orderBean.getVatBalance();//双清包税价格
 			double vatBalanceNew = vatBalanceOld * splitRatio;//新双清包税价格
+			
+			double proces_singfee_old = orderBean.getProcessingfee();// 店铺处理费
+			double proces_singfee_new = proces_singfee_old * splitRatio;
+
+			double actual_lwh_old = genDoubleWidthTwoDecimalPlaces(Double.parseDouble(orderBean.getActual_lwh()==null?"0.00":orderBean.getActual_lwh()));// 质检费
+			double actual_lwh_new = actual_lwh_old * splitRatio;
+			
 			// 新生成订单信息
 			OrderBean odbeanNew = new OrderBean();
 			odbeanNew.setVatBalance(vatBalanceNew);
@@ -412,10 +419,22 @@ public class NewOrderSplitCtr {
 			odbeanNew.setCashback(cash_back_new);
 			odbeanNew.setExtra_freight(extra_freight_new);
 			odbeanNew.setOrderDetail(nwOrderDetails);
+			
+			odbeanNew.setProcessingfee(proces_singfee_new);
+			odbeanNew.setActual_lwh(new BigDecimal(actual_lwh_new).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
 			// 计算新订单支付金额
-			totalPayPriceNew = totalGoodsCostNew - coupon_discount_new - share_discount_new - discount_amount_new
-					- grade_discount_new-cash_back_new + extra_freight_new;
-			odbeanNew.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceNew));
+			totalPayPriceNew = new BigDecimal(odbeanNew.getProduct_cost())
+			.subtract(new BigDecimal(odbeanNew.getCoupon_discount()))
+			.subtract(new BigDecimal(odbeanNew.getShare_discount()))
+			.subtract(new BigDecimal(odbeanNew.getDiscount_amount()))
+			.subtract(new BigDecimal(odbeanNew.getGradeDiscount()))
+			.subtract(new BigDecimal(odbeanNew.getCashback()))
+			.subtract(new BigDecimal(odbeanNew.getExtra_discount()))
+			.add(new BigDecimal(odbeanNew.getExtra_freight()))
+			.add(new BigDecimal(odbeanNew.getProcessingfee()))
+			.add(new BigDecimal(odbeanNew.getActual_lwh())).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			odbeanNew.setPay_price(totalPayPriceNew);
+			
 			// 原始订单减去拆分比例后的值
 			orderBeanTemp.setVatBalance(vatBalanceOld - vatBalanceNew);
 			orderBeanTemp.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_old - coupon_discount_new));
@@ -426,9 +445,30 @@ public class NewOrderSplitCtr {
 			orderBeanTemp.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_old - discount_amount_new));
 			orderBeanTemp.setProduct_cost(
 					String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostOld - totalGoodsCostNew)));
-			orderBeanTemp.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceOld - totalPayPriceNew));
 			orderBeanTemp.setCashback(genDoubleWidthTwoDecimalPlaces(cash_back_old - cash_back_new));
 			orderBeanTemp.setExtra_freight(genDoubleWidthTwoDecimalPlaces(extra_freight_old - extra_freight_new));
+			
+			orderBeanTemp.setProcessingfee(genDoubleWidthTwoDecimalPlaces(proces_singfee_old - proces_singfee_new));
+			orderBeanTemp.setActual_lwh(String.valueOf(genDoubleWidthTwoDecimalPlaces(actual_lwh_old - actual_lwh_new)));
+			
+			//拆单前订单payprice = 订单1payprice + 订单2 payprice
+			orderBeanTemp.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceOld - totalPayPriceNew));
+			//理论上payprice
+			BigDecimal needPay = new BigDecimal(orderBeanTemp.getProduct_cost())
+					.subtract(new BigDecimal(orderBeanTemp.getCoupon_discount()))
+					.subtract(new BigDecimal(orderBeanTemp.getShare_discount()))
+					.subtract(new BigDecimal(orderBeanTemp.getDiscount_amount()))
+					.subtract(new BigDecimal(orderBeanTemp.getGradeDiscount()))
+					.subtract(new BigDecimal(orderBeanTemp.getCashback()))
+					.subtract(new BigDecimal(orderBeanTemp.getExtra_discount()))
+					.add(new BigDecimal(orderBeanTemp.getExtra_freight()))
+					.add(new BigDecimal(orderBeanTemp.getProcessingfee()))
+					.add(new BigDecimal(orderBeanTemp.getActual_lwh()));
+			// 排除计算误差
+			orderBeanTemp.setExtra_freight(new BigDecimal(orderBeanTemp.getExtra_freight())
+					.add(new BigDecimal(orderBeanTemp.getPay_price()).subtract(needPay))
+					.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+			
 			// 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
 			List<OrderBean> orderBeans = new ArrayList<OrderBean>();
 			orderBeans.add(odbeanNew);
@@ -601,9 +641,8 @@ public class NewOrderSplitCtr {
 				model.put("autoUrl", autoUrl);
 				// 获取用户email
 				IOrderSplitServer splitServer = new OrderSplitServer();
-				String userEmailByUserName = splitServer.getUserEmailByUserName(oldOrderBean.getUserid());
-				request.setAttribute("email", userEmailByUserName);
-				model.put("email", userEmailByUserName);
+				request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
+				model.put("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
 				List<Object[]> orderDetails = orderSplitDao.queryLocalOrderDetails(orderNo);
 				List<Object[]> nwOrderDetails = new ArrayList<Object[]>();// 拆分的订单
 				List<Object[]> oldOrderDetails = new ArrayList<Object[]>();// 剩余的订单
@@ -782,7 +821,10 @@ public class NewOrderSplitCtr {
 
 					double extra_freight = obBean_.getExtra_freight();// 额外运费
 					double vatBalance = obBean_.getVatBalance();//双清包税价格
-
+					
+					double qualityFee = Double.parseDouble(obBean_.getActual_lwh()==null?"0.00":obBean_.getActual_lwh());
+                    double processFee = obBean_.getProcessingfee();
+                    
 					double totalDisCount = coupon_discount + extra_discount + grade_discount + share_discount + discount_amount + cash_back;
 					if(totalDisCount > 0.01){
 						request.setAttribute("totalDisCount", orderBeans.get(0).getCurrency() + " -" + (BigDecimalUtil.truncateDouble(totalDisCount,2)));
@@ -792,7 +834,7 @@ public class NewOrderSplitCtr {
 						model.put("totalDisCount", "--");
 					}
 
-					double totalExtraFree = extra_freight + vatBalance;
+					double totalExtraFree = extra_freight + vatBalance+qualityFee+processFee;
 					if(totalExtraFree > 0.01){
 						request.setAttribute("totalExtraFree", orderBeans.get(0).getCurrency() + " " + BigDecimalUtil.truncateDouble(totalExtraFree,2));
 						model.put("totalExtraFree", orderBeans.get(0).getCurrency() + " " + BigDecimalUtil.truncateDouble(totalExtraFree,2));

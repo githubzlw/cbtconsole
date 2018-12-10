@@ -51,11 +51,13 @@ public class ComplainController {
 			t.setUserid(userid);
 			mv.addObject("userid",userid);
 		}
-		if(StringUtil.isNotBlank(creatTime)){
+		if(creatTime!=null && creatTime!=""){
 			t.setCreatTime(creatTime);
 			mv.addObject("appdate",creatTime);
 		}
-		t.setComplainState(complainState);
+//		if(complainState!=-1){ //不要加判断条件，否则当complainState==-1时不赋值，complainState属性默认为0，-1状态也是查询0
+			t.setComplainState(complainState);
+//		}
 		t.setComplainType(type);
 		if(StringUtil.isNotBlank(username)){
 			mv.addObject("username",username);
@@ -65,7 +67,7 @@ public class ComplainController {
 		}
 		Page<ComplainVO> page = new Page<ComplainVO>();
 		int aa =1;
-		if(StringUtil.isNotBlank(currentPage)){
+		if(currentPage!=""||!currentPage.equals("")){
 			aa =Integer.parseInt(currentPage);
 		}
 		page.setCurrentPage(aa);

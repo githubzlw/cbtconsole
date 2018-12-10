@@ -96,7 +96,9 @@
                 success: function (data) {
                     var json = eval("(" + data + ")");
                     if (json.ok) {
-                        window.location.reload();
+                        // window.location.reload();
+                        $(obj).parent().parent().find("td").eq(7).text(goodsPrice);
+                        $(obj).parent().parent().find("td").eq(8).text(newPrice);
                     } else {
                         $.messager.alert("提醒", json.message, "info");
                     }
@@ -122,7 +124,7 @@
             var content = 'Hello, we noticed that you have over xx products in your shopping cart, '
                 + 'but haven’t placed orders.Could you please let us know the reason?  '
                 + 'If you have any questions or concerns, please do let us know.';
-            $("#simle_email_content").text(content);
+            $("#simple_email_content").text(content);
             $("#simple_email_div").dialog('open');
             $('#simple_email_div').window('center');//使Dialog居中显示
         }
@@ -155,7 +157,7 @@
         }
 
         function confirmAndSendEmail(userId, userEmail, emailContentId,type) {
-            var emailContent = $("#" + emailContentId).text();
+            var emailContent = $("#" + emailContentId).val();
                 if (emailContent == null || emailContent == "") {
                     $.messager.alert("提醒", "获取邮件内容失败", "info");
                     return false;
@@ -199,6 +201,21 @@
             window.open(url, 'windows', param);
         }
 
+        function openUserInfo(userId) {
+            var url = "/cbtconsole/userinfo/getUserInfo.do?userId=" + userId;
+            window.open(url);
+        }
+
+        function  openSendEmail(userId) {
+            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId;
+            var iWidth = 1680; //弹出窗口的宽度;
+            var iHeight = 880; //弹出窗口的高度;
+            var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
+            var iLeft = (window.screen.availWidth - 10 - iWidth) / 2; //获得窗口的水平位置;
+            var param = "height=" + iHeight + ",width=" + iWidth + ",top=" + iTop + ",left=" + iLeft + ",toolbar=no,menubar=no,scrollbars=yes, resizable=yes,location=no, status=no";
+            window.open(url, 'windows', param);
+        }
+
         function showMessage(message) {
             $.messager.show({
                 title: '提醒',
@@ -224,12 +241,12 @@
     <div id="simple_email_div" class="easyui-dialog" title="发送邮件(简单跟进)"
          data-options="modal:true" style="width: 750px; height: 463px;">
         <form id="simple_form_enter" action="#" onsubmit="return false">
-        <textarea id="simle_email_content" style="height: 91%;width: 99%;font-size: 22px;">
+        <textarea id="simple_email_content" style="height: 91%;width: 99%;font-size: 22px;">
         </textarea>
             <div style="text-align: center;">
                 <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                    class="easyui-linkbutton"
-                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simle_email_content',1)"
+                   onclick=" confirmAndSendEmail(${userId},'${userInfo.userEmail}','simple_email_content',1)"
                    style="width: 80px">发送</a>
                 <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                    class="easyui-linkbutton" onclick="closeDialog('simple_email_div','simple_form_enter')"
@@ -278,11 +295,14 @@
             <tr>
                 <td colspan="4">
                     <div style="text-align: center">
-                        <input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
+                        <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
-                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>
+                        <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
+                        <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
+                        &nbsp;&nbsp;
+                        <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId})"/>
                     </div>
                 </td>
             </tr>
@@ -294,7 +314,7 @@
 
         <table style="border-color: #0cc960;font-size: 18px;" border="1" cellpadding="1" cellspacing="0" align="center">
             <caption style="font-size: 20px;">
-                <b style="color: #0cc960;">商品信息</b>(<b style="color: red;">点击图片跳转对应的货源网站</b>)
+                <b style="color: #0cc960;">商品信息</b>(<span style="color: red;">点击PID进入商品编辑界面;点击产品标题进入电商网站产品单页;点击图片进入对应的货源网站</span>)
             </caption>
             <thead>
             <tr align="center">

@@ -113,32 +113,6 @@
 
 	}
 
-	function deleteGoodsByPid(pid) {
-		$.messager.confirm('系统提醒', '是否删除，删除保存后数据不可恢复', function(r) {
-			if (r) {
-				$.ajax({
-					type : 'POST',
-					dataType : 'json',
-					url : '/cbtconsole/ShopUrlC/deleteGoodsByPid.do',
-					data : {
-						pid : pid
-					},
-					success : function(data) {
-						if (data.ok) {
-							$.messager.alert("提醒", "执行成功", "info");
-							window.location.reload();
-						} else {
-							$.messager.alert("提醒", data.message, "error");
-						}
-					},
-					error : function(XMLResponse) {
-						$.messager.alert("提醒", "保存错误，请联系管理员", "error");
-					}
-				});
-			}
-		});
-    }
-
 	function publishGoods(shopId) {
 		$.messager.confirm('系统提醒', '是否发布店铺商品到线上？', function(r) {
 			if (r) {
@@ -303,7 +277,6 @@
 								<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:${goods.valid == 1 ? '有效数据' : '无效数据'}</span>
 								<br>
 								<span style="color:${goods.syncFlag == 1 ? 'green':'red'};">商品状态:${goods.syncDescribe}</span>
-								&nbsp;&nbsp;<input class="del_btn" type="button" value="删除此商品" onclick="deleteGoodsByPid('${goods.pid}')"/>
 								<br>
 								<c:if test="${goods.onlineFlag > 0}">
 									<b style="color:red;">已经在线上状态:[${goods.onlineValid > 0 ? '上架':'下架'}-${goods.onlineEdit > 0 ? '已编辑':'未编辑'}]</b>
@@ -363,7 +336,6 @@
 								<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:${goods.valid == 1 ? '有效数据' : '无效数据'}</span>
 								<br>
 								<span style="color:${goods.syncFlag == 1 ? 'green':'red'};">商品状态:${goods.syncDescribe}</span>
-								&nbsp;&nbsp;<input class="del_btn" type="button" value="删除此商品" onclick="deleteGoodsByPid('${goods.pid}')"/>
 								<br>
 								<c:if test="${goods.onlineFlag > 0}">
 									<b style="color:red;">已经在线上状态:[${goods.onlineValid > 0 ? '上架':'下架'}-${goods.onlineEdit > 0 ? '已编辑':'未编辑'}]</b>
@@ -422,7 +394,6 @@
 								<span style="color:${goods.valid == 1 ? 'green':'red'};">数据清洗:${goods.valid == 1 ? '有效数据' : '无效数据'}</span>
 								<br>
 								<span style="color:${goods.syncFlag == 1 ? 'green':'red'};">商品状态:${goods.syncDescribe}</span>
-								&nbsp;&nbsp;<input class="del_btn" type="button" value="删除此商品" onclick="deleteGoodsByPid('${goods.pid}')"/>
 								<br>
 								<c:if test="${goods.onlineFlag > 0}">
 									<b style="color:red;">已经在线上状态:[${goods.onlineValid > 0 ? '上架':'下架'}-${goods.onlineEdit > 0 ? '已编辑':'未编辑'}]</b>
