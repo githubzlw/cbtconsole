@@ -114,5 +114,5 @@ public interface IGuestBookService {
 	 * @return
 	 */
 	public int total(int userId, String date, int state, String userName, String pname, int start,
-                     int end, String timeFrom, String timeTo, int adminid, int qtype);
+                     int end, String useremail, String timeFrom, String timeTo, int adminid, int qtype);
 }

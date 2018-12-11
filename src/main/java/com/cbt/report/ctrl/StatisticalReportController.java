@@ -3478,7 +3478,7 @@ public class StatisticalReportController {
 				gBean.setPname(ppName);
 			}
 		}
-		int total = ibs.total(userId, parse, state, userName, pname, start, 30, timeFrom, timeTo, adminid, qtype);
+		int total = ibs.total(userId, parse, state, userName, pname, start, 30, useremail, timeFrom, timeTo, adminid, qtype);
 		json.setRows(findAll);
 		json.setTotal(total);
 		return json;

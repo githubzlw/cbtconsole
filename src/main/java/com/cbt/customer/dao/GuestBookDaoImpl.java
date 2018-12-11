@@ -208,7 +208,7 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		if (userId != 0) {
 			sql += " and m.user_id="+userId+"";
 		}
-		if (adminid != 0) {
+		if (adminid != 0 && adminid != 1) {
 			sql += " AND m.user_id IN (SELECT userid FROM admin_r_user aru,guestbook gb WHERE aru.userid = gb.user_id AND aru.adminid = "+adminid+")";
 		}
 		if (timeFrom != null && !"".equals(timeFrom)) {
@@ -461,37 +461,61 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 
 	@Override
 	public int total(int userId, String date, int state, String userName, String pname, int start, int end,
-			String timeFrom, String timeTo, int adminid,int type) {
+			String useremail,String timeFrom, String timeTo, int adminid,int type) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		int result = 0;
-		String sql = "select count(*) from guestbook  g left join user  u  on  g.user_id=u.id "
-				+ "left join admin_r_user  au on  u.email=au.useremail where 1=1";	
-		if (userId != 0) {
-			sql += " and g.user_id="+userId+"";
-		}
-		if (adminid != 1) {
-			sql += " AND g.user_id IN (SELECT userid FROM admin_r_user aru,guestbook gb WHERE aru.userid = gb.user_id AND aru.adminid = "+adminid+")";
-		}
-		if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {
-			sql += " and g.create_time>='"+timeFrom+"' AND g.create_time<='"+timeTo+"'";
-		}
-		if (date != null && !"".equals(date)) {
-			sql += " and g.create_time = '"+date+"'";
-		}
-		if (state != -1) {
-			sql += " and g.status="+state+"";
-		}
-		if (userName != null && !"".equals(userName)) {
-			sql += " and g.user_name='"+userName+"'";
-		}
-		if (pname != null && !"".equals(pname)) {
-			sql += " and g.pname like '%"+pname+"%'";
-		}
-		if(type>0){
-			sql +=" and g.questionType = "+type+" ";
-		}
+        String sql = "select COUNT(1) from (select g.picPath,g.id,g.user_id,g.user_name,g.pid,g.pname,g.price,g.purl,g.pimg,g.questionType,";
+        if(type==0){ // 全部
+            sql+="g.content,g.orderQuantity,g.customizationNeed,g.targetPrice";
+        }
+        if(type==1){ //qustion
+            sql+="REPLACE(REPLACE(g.content, CHAR(10), ''), CHAR(13), '') as content" ;
+        }if(type==2){ //Request Business Discount
+            sql+="CONCAT('orderQuantity: ',g.orderQuantity,';  targetPrice: ',g.targetPrice) as  content";
+        }if(type==3){ //Request Customization
+            sql+="CONCAT('orderQuantity: ',g.orderQuantity,';  customizationNeed: ',g.customizationNeed) as  content";
+        }
+        sql+=",g.create_time,g.reply_content,"
+                + "g.reply_time,g.status,ifnull(u.email,'') useremail ,ifnull(u.businessName,'') as bname ,"
+                + "ifnull(ad.admName ,'')  admName ,ifnull(er.id,'0')eid,g.online_url from guestbook  g left join user  u  on  g.user_id=u.id "
+                + "left join admin_r_user  au ON  u.id=au.userid "
+                + "LEFT JOIN admuser ad ON au.adminid=ad.id "
+                + " left join email_receive er  on er.question_id=g.id)m "
+                + "left join (select question_id,max(id) eid from email_receive order by question_id)n on m.id=n.question_id where 1=1";
+
+        if (userId != 0) {
+            sql += " and m.user_id="+userId+"";
+        }
+        if (adminid != 0 && adminid != 1) {
+            sql += " AND m.user_id IN (SELECT userid FROM admin_r_user aru,guestbook gb WHERE aru.userid = gb.user_id AND aru.adminid = "+adminid+")";
+        }
+        if (timeFrom != null && !"".equals(timeFrom)) {
+            sql += " and m.create_time >='"+timeFrom+" 00:00:00'";
+        }
+        if (timeTo != null && !"".equals(timeTo)) {
+            sql += " and m.create_time<='"+timeTo+" 23:59:59'";
+        }
+		/*if (date != null && !"".equals(date)) {
+			sql += " and m.create_time = '"+date+"'";
+		}*/
+        if (state != -1) {
+            sql += " and m.status="+state+"";
+        }
+        if (userName != null && !"".equals(userName)) {
+            sql += " and m.user_name='"+userName+"'";
+        }
+        if (pname != null && !"".equals(pname)) {
+            sql += " and m.pname like '%"+pname+"%'";
+        }
+        if (useremail != null && !useremail.equals("")) {
+            sql += " and m.useremail='"+useremail+"'";
+        }
+        if(type>0){
+            sql += " and m.questionType = "+type+" ";
+        }
+        sql += " and m.status < 2 " ;
 		conn = DBHelper.getInstance().getConnection();
 		try {
 			stmt = conn.prepareStatement(sql);
