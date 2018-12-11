@@ -287,4 +287,23 @@
         WHERE admName = #{admName}
     </update>
 
+    <!--Integer queryOrderNoByModuleType(@Param("moduleType") int moduleType);-->
+    <select id="queryOrderNoByModuleType" resultType="Integer">
+        SELECT MAX(orderNo)
+        FROM tbl_auth_info
+        WHERE module_type = #{moduleType}
+    </select>
+    <!--long insertAuthInfo(@Param("authInfo") AuthInfo authInfo);-->
+    <insert id="insertAuthInfo" parameterType="com.cbt.website.userAuth.bean.AuthInfo">
+        INSERT INTO tbl_auth_info (authName, url, reMark, del, orderNo, module_type)
+        VALUES (#{authName}, #{url}, #{reMark}, '0', #{orderNo}, #{moduleType})
+    </insert>
+
+    <!--long updateAuthInfo(@Param("authInfo") AuthInfo authInfo);-->
+    <update id="updateAuthInfo" parameterType="com.cbt.website.userAuth.bean.AuthInfo">
+        UPDATE tbl_auth_info
+        SET authName=#{authName}, url=#{url}, reMark=#{reMark}, module_type=#{moduleType}
+        WHERE authId=#{authId}
+    </update>
+	
 </mapper>
