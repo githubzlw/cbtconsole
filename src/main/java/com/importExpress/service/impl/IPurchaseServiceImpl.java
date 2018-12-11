@@ -10,6 +10,8 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.common.StringUtils;
+import com.cbt.customer.service.GuestBookServiceImpl;
+import com.cbt.customer.service.IGuestBookService;
 import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.parse.service.StrUtils;
@@ -19,6 +21,7 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -32,12 +35,15 @@ import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.ibm.icu.math.BigDecimal;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,7 +69,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
 	@Autowired
+	private SendMailFactory sendMailFactory;
+	@Autowired
 	private IOrderinfoService iOrderinfoService;
+	@Autowired
+	private IWarehouseDao dao;
 	int total;
 	int goodsnum = 0;
 
@@ -386,6 +396,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		try{
 			SendMQ sendMQ=new SendMQ();
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
+			int isSendEmail=pruchaseMapper.getIsSendEmail(orderid);
 			//查询可以确认采购的商品信息
 			List<Map<String,String>> mapList=pruchaseMapper.getAlCgGoodsInfos(orderid,adminid);
 			for(Map<String,String> gmap:mapList){
@@ -430,6 +441,26 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			datas = bf.toString().length() > 0 ? bf.toString().substring(0,bf.toString().length() - 1) : "";
 			map.clear();
 			sendMQ.closeConn();
+			if(isSendEmail<=0){
+				//发送邮件给客户告知已经发货
+				IGuestBookService ibs = new GuestBookServiceImpl();
+				OrderBean ob=dao.getUserOrderInfoByOrderNo(orderid);
+				Map<String,Object> modelM = new HashedMap();
+				modelM.put("name",ob.getEmail());
+				modelM.put("orderid",orderid);
+				modelM.put("recipients",ob.getRecipients());
+				modelM.put("street",ob.getStreet());
+				modelM.put("street1","");
+				modelM.put("city",ob.getAddress2());
+				modelM.put("state",ob.getStatename());
+				modelM.put("country",ob.getCountry());
+				modelM.put("zipCode",ob.getZipcode());
+				modelM.put("phone",ob.getPhonenumber());
+				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
+				//插入发送邮件记录
+				pruchaseMapper.insertPurchaseEmail(orderid);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}

@@ -96,6 +96,8 @@ public interface IPurchaseMapper {
 
 	public List<Map<String,String>> getAlCgGoodsInfos(@Param("orderid") String orderid, @Param("adminid") int adminid);
 
+	public int getIsSendEmail(@Param("orderid") String orderid);
+
 	public List<String> getIdList(@Param("orderid") String orderid, @Param("odid") String odid);
 
 	public int udpateLog(@Param("adminid") int adminid, @Param("orderid") String orderid, @Param("odid") String odid, @Param("msg") String msg);
@@ -107,6 +109,13 @@ public interface IPurchaseMapper {
 	public String getDpOrderInfo(@Param("orderid") String orderid);
 
 	public int updateDpOrderState(@Param("dropshipid") String dropshipid);
+
+	/**
+	 * 插入发送邮件记录
+	 * @param orderid
+	 * @return
+	 */
+	public int insertPurchaseEmail(@Param("orderid") String orderid);
 
 	public int updateOrderInfoState(@Param("orderid") String orderid);
 

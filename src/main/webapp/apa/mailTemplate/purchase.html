@@ -181,7 +181,7 @@
                 <td>
                   <table class="soapbox">
                     <tr>
-                      <td class="soapbox-title">Shipping Notification - Import Express</td>
+                      <td class="soapbox-title">Order delivery notice</td>
                     </tr>
                   </table>
                   
@@ -189,8 +189,9 @@
                     <tr>
                       <td class="body-padding"></td>
                       <td class="body-padded">
-                        <div class="body-title">Dear Sir/Madam, </div>
-                        Your Order <i th:text="${orderid}"></i> has been shipped out today and it is on the way to you.<br><br>
+                        <div class="body-title">Dear customer,</div>
+                        Your Order <i th:text="${orderid}"></i> is being processed. We would keep you informed when it is ready for shipment.<br><br>
+                        To make sure you will receive the goods safely, please confirm the delivery address as follow:<br>
                         Recipients:<i th:text="${recipients}"></i><br>
                         Street:<i th:text="${street}"></i><br><i th:text="${street1}"></i><br>
                         City:<i th:text="${city}"></i><br>
@@ -198,8 +199,9 @@
                         Country:<i th:text="${country}"></i><br>
                         Zip Code:<i th:text="${zipCode}"></i><br>
                         Phone:<i th:text="${phone}"></i><br>
-                        You will find the tracking information as below:<br><a target="_blank" href="" th:href="${toHref}">https://www.import-express.com/apa/tracking.html?loginflag=true&orderNo=<i th:text="${orderid}</a><br>
-                        Should you have any questions, please contact our <a target="_blank" href="https://www.import-express.com/cbt/servicerequest.jsp">Customer Service.</a>
+                        You can track the package through:<a target="_blank" href="https://www.import-express.com" th:href="${toHref}">https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=<i th:text="${orderid}"></i></a><br>
+                        Any more questions please fill our online Customer Contact Form: <a target="_blank" href="https://www.import-express.com/cbt/servicerequest.jsp">Customer Service.</a><br>
+                        Thanks for your confirmation and have a nice day!
                         <table class="body-signature-block">
                           <tr>
                             <td class="body-signature-cell">
