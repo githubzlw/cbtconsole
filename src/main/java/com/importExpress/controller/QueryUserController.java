@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -319,6 +320,53 @@ public class QueryUserController {
         }
         return false;
     }
-	
-	
+
+    /**
+     * ly  2018/12/06 13:45
+     * 创建/修改后台功能入口
+     * http://127.0.0.1:8086/cbtconsole/queryuser/updateAuthInfo.do
+     */
+    @RequestMapping(value = "/updateAuthInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateAuthInfo(String authName, String url, Integer moduleType,
+                                              @RequestParam(value = "authId", required = false) Integer authId,
+                                              @RequestParam(value = "reMark", required = false) String reMark,
+                                              @RequestParam(value = "urlFlag", required = false) String urlFlag,
+                                              @RequestParam(value = "colorFlag", required = false) String colorFlag) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        AuthInfo authInfo = new AuthInfo();
+        try {
+            //参数校验
+            if (StringUtils.isBlank(authName) || StringUtils.isBlank(url) || null == moduleType){
+                result.put("status", false);
+                result.put("message", "入口名称或入口链接未输入!");
+                return result;
+            }
+            if (authId != null){
+                authInfo.setAuthId(authId);
+            }
+            authInfo.setAuthName(authName);
+            authInfo.setModuleType(moduleType);
+            if (StringUtils.isNotBlank(reMark)){
+                authInfo.setReMark(reMark);
+            }
+            //新增/修改
+            long count = queryUserService.updateAuthInfo(authInfo, url, urlFlag, colorFlag);
+            if (count > 0){
+                result.put("status", true);
+                result.put("message", "新增/修改后台入口成功!");
+            } else {
+                result.put("status", false);
+                result.put("message", "新增/修改后台入口失败!");
+            }
+        } catch (Exception e){
+            result.put("status", false);
+            result.put("message", "内部异常");
+            LOG.error("QueryUserController.updateAvailable error, authInfo:" + authInfo, e);
+        }
+        return result;
+    }
+
+
+
 }

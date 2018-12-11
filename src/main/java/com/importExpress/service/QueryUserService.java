@@ -32,4 +32,7 @@ public interface QueryUserService {
     long updateAvailable(String email, Double available);
 
     JsonResult resetPwd(String admName, String oldPwd, String newPwd);
+
+    long updateAuthInfo(AuthInfo authInfo, String url, String urlFlag, String colorFlag);
+
 }

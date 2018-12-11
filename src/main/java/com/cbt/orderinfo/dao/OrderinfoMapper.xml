@@ -598,10 +598,10 @@
         <if test="showUnpaid == 0">
             and o.state != 0
         </if>
-        <if test="startdate != null and startdate != 0">
+        <if test="startdate != null">
         	and  o.orderpaytime >=#{startdate}
         </if>
-        <if test="enddate !=null and enddate!=0">
+        <if test="enddate !=null">
         	and  o.orderpaytime &lt;=#{enddate}
         </if>
         <if test="email != null and email != ''">
@@ -1341,8 +1341,8 @@
     </insert>
     <select id="getFlushOrderFreightOrder" resultType="com.cbt.bean.OrderBean">
         SELECT order_no AS orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
-        WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1) AND od.goodsid != '1400'
-        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QB29917379468058'
+        WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1,2) AND od.goodsid != '1400'
+        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QC07665001343198'
         GROUP BY oi.order_no  ORDER BY oi.orderid DESC;
     </select>
     <select id="getAllOrderInfo" resultType="com.cbt.bean.OrderBean">

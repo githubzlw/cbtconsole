@@ -62,4 +62,10 @@ public interface QueryUserMapper {
 
     void updatePasswordByAdmName(@Param("admName") String admName, @Param("newPwd") String newPwd);
 
+    long insertAuthInfo(AuthInfo authInfo);
+
+    long updateAuthInfo(AuthInfo authInfo);
+
+    Integer queryOrderNoByModuleType(@Param("moduleType") int moduleType);
+    
 }
