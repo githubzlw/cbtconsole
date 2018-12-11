@@ -332,4 +332,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
             #{item}
         </foreach>
     </update>
+    <select id="getDetailsChangeInfo" resultType="com.cbt.warehouse.pojo.ChangeGoodsLogPojo">
+        SELECT old_url,old_goodsPrice,new_url,new_goodsPrice,createtime,admName as admuserid FROM ChangeGoodsLog  WHERE orderid=#{orderid} AND old_goodsid=#{goodsid}
+        UNION
+        SELECT c.old_url,c.old_goodsPrice,c.new_url,c.new_goodsPrice,c.createtime,c.admName as admuserid FROM ChangeGoodsLog c
+        INNER JOIN change_details_log d ON c.old_goodsid=d.old_goodsid AND c.orderid=d.orderid WHERE d.new_goodsid=#{goodsid} AND d.orderid=#{orderid}
+    </select>
 </mapper>

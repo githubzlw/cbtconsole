@@ -1559,7 +1559,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map) {
         List<PrePurchasePojo> list=dao.getPrePurchaseForTB(map);
         for (PrePurchasePojo p : list) {
-            p.setStatus("<a target='_blank' href='/cbtconsole/website/purchase_order_details.jsp?orderid="+p.getOrderid()+"&id="+map.get("admuserid")+"'>处理</a>");
+            if(p.getRemark().contains("</br>")){
+                p.setStatus("<a target='_blank' style='color:red' href ='javascript:return false;' onclick='return false;'>已处理</a>");
+            }else{
+                p.setStatus("<a target='_blank' href='/cbtconsole/website/purchase_order_details.jsp?orderid="+p.getOrderid()+"&id="+map.get("admuserid")+"'>处理</a>");
+            }
         }
         return list;
     }
@@ -2617,6 +2621,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int updateAllDetailsState(Map<String, String> map) {
 
         return dao.updateAllDetailsState(map);
+    }
+
+    @Override
+    public int updateTbState(Map<String, String> map) {
+        return dao.updateTbState(map);
     }
 
     @Override

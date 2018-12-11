@@ -590,6 +590,11 @@
         rfddd.style.display = "none";
         $("#replenishment tbody").html("");
     }
+    function displayChangeLogInfo(){
+        var rfddd = document.getElementById("displayChangeLog");
+        rfddd.style.display = "none";
+        $("#displayChangeLogs tbody").html("");
+	}
     function FncloseBuyInfo(){
         var rfddd = document.getElementById("displayBuyInfo");
         rfddd.style.display = "none";
@@ -2882,6 +2887,34 @@
         }
     }
 
+    /**
+	 显示商品替换日志
+     */
+    function getDetailsChangeInfo(orderid,goodsid){
+        $.ajax({
+            type:"post",
+            url:"/cbtconsole/purchase/getDetailsChangeInfo",
+            dataType:"text",
+            data:{"orderid":orderid,"goodsid":goodsid},
+            success : function(data){
+                // console.log("=============="+data);
+                var objlist = eval("("+data+")");
+                var html="";
+                for(var i=0; i<objlist.length; i++){
+                    html +="<tr><td width='11%'>" + objlist[i].old_goodsPrice + "</td><td width='11%'><a target='_blank' href='"+objlist[i].old_url+"'>" + objlist[i].old_url + "</a></td><td width='10%'>" + objlist[i].new_goodsPrice + "</td><td width='11%'><a target='_blank' href='"+objlist[i].new_url+"'>" + objlist[i].new_url + "</a></td>"
+                        + "<td width='11%'>" + objlist[i].createtime + "</td><td width='11%'>" + objlist[i].admuserid + "</td></tr>";
+                }
+                if(objlist.length<=0){
+                    html += "<tr><td colspan='6' align='center'>暂无替换记录。</td></tr>";
+                }
+                html +="</table>";
+                var rfddd = document.getElementById("displayChangeLog");
+                rfddd.style.display = "block";
+                $("#displayChangeLogs").append(html);
+            }
+        });
+	}
+
     function displayBuyLog(goods_pid,car_urlMD5){
         console.log("pid="+goods_pid);
         console.log("MD5="+car_urlMD5);
@@ -2889,7 +2922,7 @@
             type:"post",
             url:"/cbtconsole/warehouse/displayBuyLog",
             dataType:"text",
-            data:{goods_pid:goods_pid,car_urlMD5:car_urlMD5},
+            data:{"goods_pid":goods_pid,"car_urlMD5":car_urlMD5},
             success : function(data){  //返回受影响的行数
                 var objlist = eval("("+data+")");
                 var html="";
@@ -2904,7 +2937,6 @@
                 var rfddd = document.getElementById("displayBuyInfo");
                 rfddd.style.display = "block";
                 $("#displayBuyInfos").append(html);
-
             }
         });
     }
@@ -3576,7 +3608,7 @@
 							<div style="background-color: #E4F2FF;">
 								<input type='hidden' name='pagenum' value='${pb.orderid}'>
 								<span class="d">订单号：</span><span class="c">${pb.orderNo}</span>
-								<input type="checkbox" id="ck_${pb.orderNo}" style="width: 15px; height: 15px;" onclick="AllChoose('${pb.orderNo}')">全选|<input type="button" onclick="open_off_pay_div('${pb.orderNo}')" value="线下申请付款" />
+								<%--<input type="checkbox" id="ck_${pb.orderNo}" style="width: 15px; height: 15px;" onclick="AllChoose('${pb.orderNo}')">全选|<input type="button" onclick="open_off_pay_div('${pb.orderNo}')" value="线下申请付款" />--%>
 								<c:if test="${cgid == 52}">
 									<a href="/cbtconsole/customerServlet?action=findOrdersPurchaseInfo&className=OrdersPurchaseServlet&orderNo=${pb.orderNo}&purchaseId=1" target="_blank" style="text-decoration: none"></a>
 								</c:if>
@@ -3678,8 +3710,8 @@
 								<a href="${pb.importExUrl}" target="_blank">电商网站链接</a>
 								<br>
 							</c:if>
-							<input type="checkbox" name="${pb.orderNo}" value="${pb.orderNo},${pb.od_id}"><span style="color: red">线下申请付款</span>
-							<input style="margin-left:55px;" type="checkbox" id="fp_${pb.orderNo}" name="fp_${pb.orderNo}" value="${pb.od_id}">
+							<%--<input type="checkbox" name="${pb.orderNo}" value="${pb.orderNo},${pb.od_id}"><span style="color: red">线下申请付款</span>--%>
+							<%--<input style="margin-left:55px;" type="checkbox" id="fp_${pb.orderNo}" name="fp_${pb.orderNo}" value="${pb.od_id}">--%>
 							<br>
 							<c:if test="${admid==999}">
 								采购调整:<select
@@ -3805,13 +3837,29 @@
 									</script>
 								</c:if>
 								<div style="width: 100%; word-wrap: break-word; word-break: break-all">
-									<c:if test="${pb.lastValue!=null}">
-										<a href="${pb.lastValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.lastValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
-										<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.lastValue}"></input>
+									<c:if test="${pb.shopFlag==1}">
+										采购链接/原始货源链接:
+										<c:if test="${pb.lastValue!=null}">
+											<a href="${pb.lastValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.lastValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
+											<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.lastValue}"></input>
+										</c:if>
+										<c:if test="${pb.lastValue==null}">
+											<a href="${pb.newValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.newValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
+											<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.newValue}">
+										</c:if>
 									</c:if>
-									<c:if test="${pb.lastValue==null}">
-										<a href="${pb.newValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.newValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
-										<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.newValue}">
+									<c:if test="${pb.shopFlag!=1}">
+										原始货源链接:
+										<a target="_blank" href="https://detail.1688.com/offer/${pb.goods_pid}.html">https://detail.1688.com/offer/${pb.goods_pid}.html</a><br>
+										采购货源链接:
+										<c:if test="${pb.lastValue!=null}">
+											<a href="${pb.lastValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.lastValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
+											<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.lastValue}"></input>
+										</c:if>
+										<c:if test="${pb.lastValue==null}">
+											<a href="${pb.newValue}" target="_blank" onclick="changImgOrUrl('${pbsi.index+1}');"> <span id="chk_${pb.orderNo}${pb.od_id}"> ${pb.newValue}<input type="hidden" value="${pb.goods_title }" /></span></a>
+											<input type="hidden" id="chk1_${pb.orderNo}${pb.od_id}" value="${pb.newValue}">
+										</c:if>
 									</c:if>
 									<br>
 										${pb.support_info}
@@ -3880,8 +3928,9 @@
 							<div style="width: 100%; word-wrap: break-word;">
 								库存备注： <font class="cc"><span>${pb.inventoryRemark}</span></font> <br>
 							</div>
-							<div style="width: 100%; word-wrap: break-word;">
-								供应商地址： 【${pb.shopAddress}】<font class="cc"><span style="color:red">
+							<c:if test="${pb.shopFlag==1}">
+								<div style="width: 100%; word-wrap: break-word;">
+									供应商地址： 【${pb.shopAddress}】<font class="cc"><span style="color:red">
 									<c:if test="${pb.straight_flag==1}">
 										广东【建议直发】
 									</c:if>
@@ -3889,20 +3938,19 @@
 										广东【确认直发】【${pb.straight_time}】<a href="/cbtconsole/website/straight_hair_list.jsp?goods_pid=${pb.goods_pid}" target="_blank">直发列表</a>
 									</c:if>
 									</span></font>
-								<c:if test="${pb.straight_flag==1}">
-									<button onclick="determineStraighthair('${pb.orderNo}','${pb.od_id}','${pb.od_id}')">直发</button>
-								</c:if>
-							</div>
-							<div style="width: 100%; word-wrap: break-word;">
-								供应商授权信息：<span>${pb.authorizedFlag}</span> <br>
-							</div>
-							<div style="width: 100%; word-wrap: break-word;">
-								供应商级别： <span id="level">${pb.level}</span> <br>
-							</div>
-							<div style="width: 100%; word-wrap: break-word;">
-								供应商评分： <font class="cc"> <span>${pb.quality}</span></font> <br>
-							</div>
-							<c:if test="${pb.shopFlag==1}">
+									<c:if test="${pb.straight_flag==1}">
+										<button onclick="determineStraighthair('${pb.orderNo}','${pb.od_id}','${pb.od_id}')">直发</button>
+									</c:if>
+								</div>
+								<div style="width: 100%; word-wrap: break-word;">
+									供应商授权信息：<span>${pb.authorizedFlag}</span> <br>
+								</div>
+								<div style="width: 100%; word-wrap: break-word;">
+									供应商级别： <span id="level">${pb.level}</span> <br>
+								</div>
+								<div style="width: 100%; word-wrap: break-word;">
+									供应商评分： <font class="cc"> <span><a target="_blank" href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${pb.goodsShop}&goodsPid=${pb.goods_pid}&flag=0">${pb.quality}</a></span></font> <br>
+								</div>
 								<div style="width: 100%; word-wrap: break-word;">
 									供应商ID： <a target="_blank" style="color:red;" title="查看该供应商采购历史记录" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${pb.goodsShop}">${pb.goodsShop}</a><br>
 								</div>
@@ -4032,8 +4080,7 @@
 								<c:otherwise>
 								</c:otherwise>
 							</c:choose>
-								<%--<button id="comm_${pb.od_id}" onclick="showcomm('${pb.od_id}')">模拟客户评论</button>--%>
-								<%--<button id="comm_${pb.od_id}" onclick="showQualityComm('${pb.od_id}','${pb.orderNo}','${pb.goodsid}')">质量评论</button>--%>
+							<input type="button" onclick="getDetailsChangeInfo('${pb.orderNo}','${pb.goodsid}');" value="显示采购替换信息" />
 						</td>
 						<td width="12%">
 							<div style="overflow-y: scroll; height: 250px;">
@@ -4142,6 +4189,28 @@ ${keepValue}
 				<td width='10%'>补货人</td>
 				<td width='18%'>补货链接</td>
 				<td width=''>补货原因</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</center>
+</div>
+<div class="mod_pay4" style="display: none;" id="displayChangeLog">
+	<div>
+		<a href="javascript:void(0)" class="show_x" onclick="displayChangeLogInfo()">╳</a>
+	</div>
+	<center>
+		<h3 class="show_h3">商品替换记录</h3>
+		<table id="displayChangeLogs" class="imagetable">
+			<thead>
+			<tr>
+				<td width='11%'>原始销售价格($)</td>
+				<td width='11%'>原始货源链接</td>
+				<td width='11%'>替换后销售价格(￥)</td>
+				<td width='11%'>替换后货源链接</td>
+				<td width='11%'>替换时间</td>
+				<td width='11%'>替换负责人</td>
 			</tr>
 			</thead>
 			<tbody>

@@ -19,6 +19,7 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.PurchasesBean;
@@ -602,6 +603,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Override
 	public String getUserName(int adminid) {
 		return pruchaseMapper.getUserName(adminid);
+	}
+
+	@Override
+	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String, String> map) {
+		return pruchaseMapper.getDetailsChangeInfo(map);
 	}
 
 	@Override
