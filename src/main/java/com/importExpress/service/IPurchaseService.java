@@ -3,6 +3,7 @@ package com.importExpress.service;
 import com.alibaba.trade.param.AlibabaTradeFastCreateOrderResult;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.dao2.Page;
 
@@ -32,6 +33,13 @@ public interface IPurchaseService {
 	 */
 	public Page findPageByCondition(String pagenum, String orderid, String admid, String userid, String orderno, String goodid, String date,
                                     String days, String state, int unpaid, int pagesize, String orderid_no_array, String goodsid, String goodname, String orderarrs, String search_state);
+
+	/**
+	 * 采购详情查询山沟替换日志
+	 * @param map
+	 * @return
+	 */
+	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String,String> map);
 
 	/**
 	 * 获取订单备注

@@ -8,6 +8,8 @@ import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.DisplayBuyInfo;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
@@ -24,7 +26,9 @@ import net.sf.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
@@ -63,6 +67,19 @@ public class PurchaseController {
 		out.print(row);
 		out.flush();
 		out.close();
+	}
+
+	@RequestMapping(value = "/getDetailsChangeInfo", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getDetailsChangeInfo(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("goodsid", goodsid);
+		map.put("orderid", orderid);
+		List<ChangeGoodsLogPojo> list = iPurchaseService.getDetailsChangeInfo(map);
+		return JSONArray.fromObject(list).toString();
 	}
 
 	/**

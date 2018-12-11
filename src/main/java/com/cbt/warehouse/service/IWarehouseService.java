@@ -353,6 +353,12 @@ public interface IWarehouseService {
 
 	int insertRemark(Map<String, String> map);
 
+	/**
+	 * 1688订单退货状态更改
+	 * @param map
+	 * @return
+	 */
+	int updateTbState(Map<String, String> map);
 	int queryOrderState(Map<String, String> map);
 
 	int updateOrderState(Map<String, String> map);

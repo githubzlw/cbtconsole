@@ -1389,7 +1389,12 @@ public interface IWarehouseDao {
     public int updateOrderState(Map<String, String> map);
 
     public int updateAllDetailsState(Map<String, String> map);
-
+	/**
+	 * 1688订单退货状态更改
+	 * @param map
+	 * @return
+	 */
+	int updateTbState(Map<String, String> map);
     public int insertRemark(Map<String, String> map);
 
     public List<String> allLibraryCount();

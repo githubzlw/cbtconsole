@@ -1487,6 +1487,7 @@ public class WarehouseCtrl {
 		String state=request.getParameter("state");
 		String admuserid=request.getParameter("admuserid");
 		String goods_name=request.getParameter("goods_name");
+		String goods_pid=request.getParameter("goods_pid");
 		String type=request.getParameter("type");
 		if (page > 0) {
 			page = (page - 1) * 40;
@@ -1504,6 +1505,7 @@ public class WarehouseCtrl {
 		map.put("goodsid", goodsid==null || "".equals(goodsid)?null:goodsid);
 		map.put("state", "-1".equals(state)?null:state);
 		map.put("goods_name", goods_name==null || "".equals(goods_name)?null:goods_name);
+		map.put("goods_pid",StringUtil.isNotBlank(goods_pid)?goods_pid:null);
 		if("6".equals(type) ){
 			if(!StringUtils.isStrNull(orderid)){
 				list=iWarehouseService.getPrePurchaseForTB(map);
@@ -6724,6 +6726,34 @@ public class WarehouseCtrl {
 		json.setRows(list);
 		json.setTotal(acount);
 		return json;
+	}
+
+	/**
+	 * 1688订单退货状态更改
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/updateTbState", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updateTbState(HttpServletRequest request,
+	                           HttpServletResponse response) {
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");// 获取登录用户
+		Admuser user = (Admuser) SerializeUtil
+				.JsonToObj(admJson, Admuser.class);
+		String orderid = request.getParameter("orderid");
+		String sku = request.getParameter("sku");
+		String remark = request.getParameter("remark");
+		String old_remark = request.getParameter("old_remark");
+		Map<String, String> map = new HashMap<String, String>();
+		if (old_remark == null || "".equals(old_remark)) {
+			old_remark = "";
+		}
+		map.put("orderid", orderid);
+		map.put("sku", sku);
+		map.put("remark", remark);
+		int row = iWarehouseService.updateTbState(map);
+		return "" + row;
 	}
 
 	@RequestMapping(value = "/insertRemark", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")

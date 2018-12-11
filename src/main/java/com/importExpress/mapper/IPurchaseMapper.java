@@ -4,6 +4,7 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.StraightHairPojo;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -48,7 +49,12 @@ public interface IPurchaseMapper {
 	 */
 	public OrderProductSource ShowRmark(@Param("orderNo") String orderNo, @Param("goodsdataid") int goodsdataid, @Param("goodid") int goodid, @Param("odid") String odid);
 	public String getUserName(@Param("adminid") int adminid);
-
+	/**
+	 * 采购详情查询山沟替换日志
+	 * @param map
+	 * @return
+	 */
+	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String,String> map);
 	/**
 	 * 获取需要确认货源的商品信息
 	 * @param orderid

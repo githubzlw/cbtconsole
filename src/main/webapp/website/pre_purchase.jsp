@@ -111,6 +111,7 @@
             var orderid = $("#orderid").val();
             var goodsid = $("#goodsid").val();
             var goods_name = $("#goods_name").val();
+            var goods_pid=$("#goods_pid").val();
             var admuserid=$('#admuserid').combobox('getValue');
             var state=$('#state').combobox('getValue');
             var days=$('#days').combobox('getValue');
@@ -129,6 +130,7 @@
                 "admuserid":admuserid,
                 "state":state,
                 "goods_name":goods_name,
+				"goods_pid":goods_pid,
                 "type":type
             });
             initData();
@@ -141,6 +143,7 @@
             $("#iduserid").textbox('setValue','');
             $('#days').combobox('setValue','1');
             $('#state').combobox('setValue','-1');
+            $("#goods_pid").textbox('setValue','');
             $('#admuserid').combobox('setValue','<%=adm.getId()%>');
         }
 
@@ -497,6 +500,7 @@
 				<option value="8">订单取消</option>
 				<option value="9">采样订单</option>
 				<!-- 						<option value=fff"10">采购数    量大于订单数量</option> -->
+				<option value="11">历史替换</option>
 			</select>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<select class="easyui-combobox" name="days" id="days" style="width:8%;" data-options="label:'商品分配时间:',panelHeight:'auto'">
@@ -517,10 +521,11 @@
                     method:'get'">
 			</select>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="iduserid" id="iduserid" style="width:10%;margin-top: 10px;"  data-options="label:'客户编号(ID):'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:12%;margin-top: 10px;"  data-options="label:'商品编号/购物车id:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="orderid" id="orderid" style="width:12%;margin-top: 10px;"  data-options="label:'客户订单号:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="goods_name" id="goods_name" style="width:10%;margin-top: 10px;"  data-options="label:'产品名称:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input class="easyui-textbox" name="iduserid" id="iduserid" style="width:10%;margin-top: 10px;"  data-options="label:'客户编号(ID):'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:12%;margin-top: 10px;"  data-options="label:'商品编号/购物车id:'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goods_pid" id="goods_pid" style="width:12%;margin-top: 10px;"  data-options="label:'商品pid:'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="orderid" id="orderid" style="width:12%;margin-top: 10px;"  data-options="label:'客户订单号:'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goods_name" id="goods_name" style="width:10%;margin-top: 10px;"  data-options="label:'产品名称:'">&nbsp;&nbsp;
 			<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)">
 			<input class="but_color" type="button" value="重置" onclick="doReset()">
 		</form>
@@ -529,7 +534,7 @@
 		<a href="javascript:purchasing_allocation();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">订单采购分配</a>
 	</c:if>
 	<a target="_blank" href="/cbtconsole/website/purchase_order_details.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">问题包裹反查</a>
-	<a target="_blank" href="/cbtconsole/website/comfirmOrderAndGenerate.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">一键生成1688未付款订单</a>
+	<%--<a target="_blank" href="/cbtconsole/website/comfirmOrderAndGenerate.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">一键生成1688未付款订单</a>--%>
 </div>
 <table class="easyui-datagrid" id="easyui-datagrid"
 	   style="width: 1800px; height: 900px">

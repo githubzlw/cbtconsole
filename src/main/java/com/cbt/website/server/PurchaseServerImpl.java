@@ -7,6 +7,7 @@ import com.cbt.common.StringUtils;
 import com.cbt.pojo.StraightHairPojo;
 import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.report.dao.TaoBaoOrderMapper;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.PreferentialPrice;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.*;
@@ -456,6 +457,8 @@ public class PurchaseServerImpl implements PurchaseServer {
 		
 		return phDao.determineStraighthair(map);
 	}
+
+
 	/**
 	 * 采购是否使用库存
 	 */
