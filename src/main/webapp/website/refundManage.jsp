@@ -268,10 +268,8 @@
                             <br><br>
                             <input type="button" value="执行退款" class="btn_sty"
                                onclick="beforeAddRemark(${refund.id},${refund.state},${refund.type},${refund.userId},${refund.agreeAmount},'${refund.orderNo}',${operatorId},3,this)"/>
-                            <c:if test="${operatorId == 83}">
-                                <input type="button" value="线下转账" class="btn_sty"
+                            <input type="button" value="线下转账" class="btn_sty"
                                    onclick="offLineRefund(${refund.id},${refund.type},${refund.userId},'${refund.orderNo}',${operatorId},this)"/>
-                            </c:if>
                         </c:if>
                     </c:if>
                     <c:if test="${refund.state == 4}">
@@ -382,7 +380,7 @@
                     //销售同意退款
                     showDivSecvlid(refundId,type,state,1,userId,amount,orderNo,operatorId);
                 }else{
-                    $.messager.alert("操作提示","需要销售同意，您无权限操作！");
+                    alert("需要销售同意，您无权限操作！");
                     hideDivRemark();
                     return false;
                 }
@@ -392,26 +390,26 @@
 
                     if(state == 1){
                         //Ling退款
-                        if(operatorId == 1){
+                        if(operatorId == 1 || operatorId == 8){
                             showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
                         }else{
-                            $.messager.alert("操作提示","需要Ling同意，您无权限操作！");
+                            alert("需要Ling或者Mandy同意，您无权限操作！");
                         }
                     }else if(state == 2){
                         //EMMA退款
                         if(operatorId == 8 || operatorId == 83){
                             showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
                         }else{
-                            $.messager.alert("操作提示","需要EMMA同意，您无权限操作！");
+                            alert("需要EMMA或者Mandy同意，您无权限操作！");
                         }
                     }
                 }else{
-                    $.messager.alert("操作提示","需要主管同意，您无权限操作！");
+                    alert("需要主管同意，您无权限操作！");
                     hideDivRemark();
                     return false;
                 }
             } else {
-                $.messager.alert("操作提示","无权限操作！");
+                alert("无权限操作！");
                 hideDivRemark();
                 return false;
             }
@@ -420,7 +418,7 @@
                 //执行退款操作
                 showDivSecvlid(refundId,type,state,4,userId,amount,orderNo,operatorId);
             }else{
-                $.messager.alert("操作提示","无权限操作！");
+                alert("无权限操作！");
                 hideDivRemark();
                 return false;
             }
@@ -442,16 +440,16 @@
         var secvlidPwd = $("#secvlid_pwd").val();
         var remark = $("#refund_remark").val();
         if(orderNo == null || orderNo == ""){
-            $.messager.alert("操作提示","获取订单号失败");
+            alert("获取订单号失败");
             return false;
         }else if(refundAmount == null || refundAmount == "" || refundAmount <= 0){
-            $.messager.alert("操作提示","获取退款金额失败");
+            alert("获取退款金额失败");
             return false;
         }else if(remark == null || remark == ""){
-            $.messager.alert("操作提示","获取备注信息失败");
+            alert("获取备注信息失败");
             return false;
-        }else if(actionFlag > 1 && (secvlidPwd == null || secvlidPwd == "")){
-            $.messager.alert("操作提示","获取密码失败");
+        }else if(actionFlag > 1 && operatorId !=1 && (secvlidPwd == null || secvlidPwd == "")){
+            alert("获取密码失败");
             return false;
         }else{
             /*$.messager.progress({
@@ -482,7 +480,7 @@
                     $("#show_notice").hide();
                     var json = eval("(" + data + ")");
                     if (json.ok) {
-                        //$.messager.alert("操作提示","执行成功");
+                        //alert("执行成功");
                         hideDivRemark();
                         if(json.message == null || json.message == ""){
                             alert("执行成功");
@@ -533,15 +531,15 @@
                 $.messager.progress('close');
                 var json = eval("(" + data + ")");
                 if (json.ok) {
-                    //$.messager.alert("操作提示","执行成功");
+                    //alert("执行成功");
                     window.location.reload();
                 } else {
-                    $.messager.alert("操作提示",json.message);
+                    alert(json.message);
                 }
             },
             error: function () {
                 $.messager.progress('close');
-                $.messager.alert("操作提示","执行失败,请联系管理员");
+                alert("执行失败,请联系管理员");
             }
         });
     }
@@ -575,15 +573,15 @@
                     $.messager.progress('close');
                     var json = eval("(" + data + ")");
                     if (json.ok) {
-                        //$.messager.alert("操作提示","执行成功");
+                        //alert("执行成功");
                         window.location.reload();
                     } else {
-                        $.messager.alert("操作提示",json.message);
+                        alert(json.message);
                     }
                 },
                 error: function () {
                     $.messager.progress('close');
-                    $.messager.alert("操作提示","执行失败,请联系管理员");
+                    alert("执行失败,请联系管理员");
                 }
             });
         }else{
@@ -604,9 +602,9 @@
         var refundType = $("#refund_type").val();
 
         if(userId == 0){
-            $.messager.alert("操作提示","获取用户ID失败");
+            alert("获取用户ID失败");
         }else if(refundAmount == null || refundAmount == "" || refundAmount == 0){
-            $.messager.alert("操作提示","获取退款金额失败");
+            alert("获取退款金额失败");
         }else{
             if(refundType == 0){
                 $.ajax({
@@ -633,14 +631,14 @@
                                 }
                                 $("#select_order_no").append(context);
                             }else{
-                                $.messager.alert("操作提示","无匹配的订单可用");
+                                alert("无匹配的订单可用");
                             }
                         } else {
-                            $.messager.alert("操作提示",data.message);
+                            alert(data.message);
                         }
                     },
                     error: function (XMLResponse) {
-                        $.messager.alert("操作提示","网络链接失败！");
+                        alert("网络链接失败！");
                     }
                 });
             }
@@ -675,7 +673,7 @@
             $("#query_current_page").val(nextPage);
             doQuery();
         }else{
-            $.messager.alert("操作提示","无法翻页！");
+            alert("无法翻页！");
             return false;
         }
     }
@@ -684,21 +682,21 @@
 
         var nextPage = $("#jump_page").val();
         if(nextPage == null || nextPage == "" || nextPage < 1){
-            $.messager.alert("操作提示","请输入跳转页");
+            alert("请输入跳转页");
             return false;
         }else{
             if(nextPage >0 && nextPage <=totalPage){
                 $("#query_current_page").val(nextPage);
                 doQuery();
             }else{
-                $.messager.alert("操作提示","无法翻页！");
+                alert("无法翻页！");
                 return false;
             }
         }
     }
 
     function showDivSecvlid(refundId,type,state,actionFlag,userId,amount,orderNo,operatorId) {
-        if(actionFlag == 1){
+        if(actionFlag == 1 || operatorId == 1){
             $("#second_admid").css("display","none");
             $("#second_pwd").css("display","none");
         }
