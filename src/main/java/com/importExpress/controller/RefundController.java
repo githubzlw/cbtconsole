@@ -325,6 +325,10 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取订单号失败,请重试");
                 return json;
+            }else if(orderNo.contains("_")){
+                json.setOk(false);
+                json.setMessage("拆单或者补货订单号，不可退款");
+                return json;
             }
 
             String operatorIdStr = request.getParameter("operatorId");
@@ -367,7 +371,7 @@ public class RefundController {
             }
 
             boolean isCheck = false;
-            if (actionFlag == 1) {
+            if (actionFlag == 1 || operatorId == 1) {
                 //操作状态是1的说明是销售，不需要校检密码
                 isCheck = true;
             } else {
@@ -391,7 +395,7 @@ public class RefundController {
                 //判断是否是主管同意状态，如果是，并且金额<=50则直接退款给客户，并且完结订单
                 if (user.getId() == 1 && "0".equals(user.getRoletype())) {
                     //判断是Ling账号
-                    if (actionFlag == 2 && refundAmount <= 50) {
+                    /*if (actionFlag == 2 && refundAmount <= 50) {
                         //主管同意状态,并且金额小于等于50美元,自动设置到财务确认状态
                         detailsBean.setRefundState(3);
                         detailsBean.setRemark("退款金额小于等于50美金,系统自动确认为财务确认状态");
@@ -400,7 +404,7 @@ public class RefundController {
                         updateOnlineRefundState(detailsBean);
                         //退款操作
                         json = refundByUserId(detailsBean, type, user.getAdmName());
-                    }
+                    }*/
                 } else if ((user.getId() == 8 || user.getId() == 83) && "0".equals(user.getRoletype())) {
                     //判断是EMMA或者Mandy
                     if (actionFlag == 2 || actionFlag == 3) {

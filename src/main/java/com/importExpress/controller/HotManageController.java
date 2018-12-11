@@ -13,6 +13,7 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.Utility;
 import com.importExpress.service.HotManageService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -448,7 +449,7 @@ public class HotManageController {
                 if (hotCategory.getHotType() == 2) {
                     goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) * (1 + goods.getDiscountPercentage() / 100D), 2));
                 }
-                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + goods.getShowName() + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
+                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + Utility.StringFilter(goods.getShowName()) + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }
             mv.addObject("isOnTotal", isOnTotal);
             mv.addObject("allTotal", goodsList.size());
