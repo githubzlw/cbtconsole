@@ -65,6 +65,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -159,7 +160,8 @@ public class WarehouseCtrl {
 	private SendMailFactory sendMailFactory;
 	@Autowired
 	private MabangshipmentService mabangshipmentService;
-
+	@Autowired
+	private IPurchaseMapper pruchaseMapper;
 	@Autowired
 	private SkuinfoService skuinfoService;
 
@@ -7205,7 +7207,7 @@ public class WarehouseCtrl {
 		model.put("country","UAS");
 		model.put("zipCode","36066");
 		model.put("phone","3343581630");
-		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Order delivery notice", model, TemplateType.BATCK);
+		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Shipping Notification - Import Express", model, TemplateType.BATCK);
 		return "1";
 	}
 
@@ -7311,7 +7313,6 @@ public class WarehouseCtrl {
 				//发送邮件给客户告知已经发货
 				IGuestBookService ibs = new GuestBookServiceImpl();
 				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
-				int updateReplyContent=ibs.SendEmailForBatck(ob);
 				Map<String,Object> modelM = new HashedMap();
 				modelM.put("name",ob.getEmail());
 				modelM.put("orderid",orderid);
@@ -7323,6 +7324,7 @@ public class WarehouseCtrl {
 				modelM.put("country",ob.getCountry());
 				modelM.put("zipCode",ob.getZipcode());
 				modelM.put("phone",ob.getPhonenumber());
+				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 			}
 		}catch (Exception e){
@@ -8034,25 +8036,18 @@ public class WarehouseCtrl {
 	@RequestMapping(value = "/purchaseConfirm", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String purchaseConfirm(HttpServletRequest request) {
-
-		// jxw 2017-4-13 记录操作人
-		String admuserJson = Redis
-				.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,
-				Admuser.class);
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 		// 判断是否登录失效，失效则不能执行
 		if (adm != null) {
-
 			String orderid = request.getParameter("orderno");
 			String odid = request.getParameter("odid");
 			String purchase_state = request.getParameter("purchase_state"); // child_order_no,isDropshipOrder
 			String child_order_no = request.getParameter("child_order_no");// dropship的订单号
 			String isDropshipOrder = request.getParameter("isDropshipOrder");// 是否是dropship的订单，0不是，1是2/15
-
 			// 确认采购流程：两种判断，一种是判断订单状态有没有取消，另外一种是其中的商品被取消了
 			// 符合条件的告知不能操作，请刷新界面
-			boolean isPass = checkOrderInfoStateAndOrderDetailsState(orderid,
-					Integer.valueOf(odid));
+			boolean isPass = checkOrderInfoStateAndOrderDetailsState(orderid,Integer.valueOf(odid));
 			if (isPass) {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("orderid", orderid);
@@ -8067,7 +8062,6 @@ public class WarehouseCtrl {
 				// 修改order_product_source 状态 为采购，修改采购时间，本地状态
 				// 修改 order_details 的字段 purchase_state，本地状态
 				iWarehouseService.updateODPState(map);
-
 				int ret = iWarehouseService.updateOpsState(map);
 				// 同上，线上数据库也修改一份
 				// DataSourceSelector.set("dataSource127hop");
@@ -8076,19 +8070,37 @@ public class WarehouseCtrl {
 				// 同上，线上数据库也修改一份 异步更新12.15
 				PurchaseConfirmThread thread = new PurchaseConfirmThread(map);
 				thread.start();
-
 				if (ret > 0) {
 					// 修改订单数量，本地
 					ret = iWarehouseService.updateOrderinfoNumber(map);
 				}
 				if (ret > 0) {
-
+					int isSendEmail=pruchaseMapper.getIsSendEmail(orderid);
+					if(isSendEmail<=0){
+						//发送邮件给客户告知已经发货
+						IGuestBookService ibs = new GuestBookServiceImpl();
+						OrderBean ob=dao.getUserOrderInfoByOrderNo(orderid);
+						Map<String,Object> modelM = new HashedMap();
+						modelM.put("name",ob.getEmail());
+						modelM.put("orderid",orderid);
+						modelM.put("recipients",ob.getRecipients());
+						modelM.put("street",ob.getStreet());
+						modelM.put("street1","");
+						modelM.put("city",ob.getAddress2());
+						modelM.put("state",ob.getStatename());
+						modelM.put("country",ob.getCountry());
+						modelM.put("zipCode",ob.getZipcode());
+						modelM.put("phone",ob.getPhonenumber());
+						modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+						sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
+						//插入发送邮件记录
+						pruchaseMapper.insertPurchaseEmail(orderid);
+					}
                     //查询客户ID和订单状态
                     Map<String,Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(map.get("orderid"));
                     map.put("old_state",orderinfoMap.get("old_state").toString());
                     map.put("user_id",orderinfoMap.get("user_id").toString());
                     orderinfoMap.clear();
-
 					// 修改订单状态，
 					// 逻辑:当前订单的下的所有商品如果都是已经采购，那么修改订单状态为1 采购中，本地
 					// 新逻辑：当前订单下的商品只要有1个商品在采购中，当前的订单状态更改为1，采购中。
@@ -8102,11 +8114,9 @@ public class WarehouseCtrl {
 					int state = iWarehouseService.GetSetOrdrerState(map);
 					map.put("state", state + "");
 					mapc.put("state", state + "");
-
 					map.put("adminId", adm.getId() + "");
 					mapc.put("adminId", adm.getId() + "");
 					// jxw 2017-4-13
-
 					// 线上
 					// DataSourceSelector.set("dataSource127hop");
 					// iWarehouseService.updateOrder(map);

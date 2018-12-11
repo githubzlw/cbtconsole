@@ -338,4 +338,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         SELECT c.old_url,c.old_goodsPrice,c.new_url,c.new_goodsPrice,c.createtime,c.admName as admuserid FROM ChangeGoodsLog c
         INNER JOIN change_details_log d ON c.old_goodsid=d.old_goodsid AND c.orderid=d.orderid WHERE d.new_goodsid=#{goodsid} AND d.orderid=#{orderid}
     </select>
+    <select id="getIsSendEmail" resultType="INTEGER">
+        select count(1) from purchaseEmail where orderid=#{orderid}
+    </select>
+    <insert id="insertPurchaseEmail">
+        insert into purchaseEmail(orderid,createtime) values(#{orderid},now())
+    </insert>
 </mapper>
