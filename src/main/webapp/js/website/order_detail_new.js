@@ -271,23 +271,6 @@ function fnSplitOrder(orderno, email, paytime) {
 					} else {
 						time_ = $("#ch_date1").val();
 					}
-					
-					/*if (confirm("拆单成功,是否发送邮件?")) {
-						var url = "/cbtconsole/orderSplit/genOrderSplitEmail.do?orderno="
-								+ orderno
-								+ "&ordernoNew="
-								+ orderNew
-								+ "&odids="
-								+ odids
-								+ "&time_="
-								+ time_
-								+ "&state="
-								+ state
-								+ "&email=" + email;
-						var param = "height=900,width=1100,top=200,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
-						window.open(url, "windows", param);
-					}*/
-
 					$.ajax({
 						type : 'POST',
 						url : '/cbtconsole/orderSplit/doSplit.do',
@@ -419,26 +402,6 @@ function fnSplitDropShipOrder(orderno, email, paytime) {
                             if (data.ok) {
                             	alert("拆单成功，请等待数据同步");
                                 window.location.reload();
-                                /*if (confirm("拆单成功,是否发送邮件?")) {
-                                    window.location.reload();
-                                    var orderNew = data.data;
-                                    var url = "/cbtconsole/orderSplit/genOrderSplitEmail.do?orderno="
-                                        + orderno
-                                        + "&ordernoNew="
-                                        + orderNew
-                                        + "&odids="
-                                        + odids
-                                        + "&time_="
-                                        + time_
-                                        + "&state="
-                                        + state
-                                        + "&email=" + email;
-                                    var param = "height=900,width=1100,top=200,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
-                                    window.open(url, "windows", param);
-                                } else {
-                                    window.location.reload();
-                                }*/
-
                             } else {
                                 alert(data.message);
                                 $("#split_order_btn").show();
