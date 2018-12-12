@@ -4,7 +4,11 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.StraightHairPojo;
+import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.website.bean.PrePurchasePojo;
+import com.cbt.website.bean.PurchasesBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -56,6 +60,11 @@ public interface IPurchaseMapper {
 	 */
 	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String,String> map);
 	/**
+	 * 通过id查询采购账号名称
+	 * @return
+	 */
+	public String queryBuyCount(@Param("admuserid") int admuserid);
+	/**
 	 * 获取需要确认货源的商品信息
 	 * @param orderid
 	 * @param adminid
@@ -79,10 +88,112 @@ public interface IPurchaseMapper {
 	public int updateCustomSstockFlag(Map<String, String> map);
 
 	public int updateDetailsRemark(Map<String, String> map);
-
+	/**
+	 * 获取某个采购的订单采购商品数量
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int getPurchaseCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	/**
+	 * 获取某个采购的订单分配商品数量
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int getFpCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	/**
+	 * 获取该订单采购与销售的沟通
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int getGoodsInfo(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	List<String> getNoShipInfoOrder(Map<String, String> map);
+	/**
+	 * 超过1天未发货
+	 * @param map
+	 * @return
+	 */
+	public String getNotShipped(Map<String, Object> map);
+	/**
+	 *发货3天未入库
+	 * @param map
+	 * @return
+	 */
+	public String getShippedNoStorage(Map<String, Object> map);
+	//当日分配采购种类
+	public String getDistributionCount(Map<String, Object> map);
+	//获得实际采购数量
+	public String getSjCgCount(Map<String, Object> map);
+	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
+	//点了采购确认
+	List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map);
+	List<PurchasesBean> getFpOrderDetails(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	/**
+	 * 获取入库没有匹配到商品的订单
+	 * @Title getNoMatchOrderByTbShipno
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return OrderInfoCountPojo
+	 */
+	OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map);
+	/**
+	 * 获取验货有问题数量
+	 * @param orderid
+	 * @return
+	 */
+	List<String> getProblem(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	//当月分配采购种类
+	public String getfpCount(Map<String, Object> map);
+	//获得每月采购数量cjc 1-11
+	public String getMCgCount(Map<String, Object> map);
+	/**
+	 * 获取某个采购的订单入库商品数量
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int getStorageCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
 	public List<String> getAllGoodsisList(@Param("orderid") String orderid, @Param("adminid") int adminid);
-
+	/**
+	 * 采购前置页面数据条数
+	 * @param map
+	 * @return
+	 */
+	List<String> getPrePurchaseCount(Map<String, Object> map);
+	/**
+	 * 采购前置页面数据获取
+	 * @param map
+	 * @return
+	 */
+	List<PrePurchasePojo> getPrePurchase(Map<String, Object> map);
+	/**
+	 * 获取已经验货无误商品
+	 * @param orderid
+	 * @return
+	 */
+	int getChecked(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
 	public String getTbOrderid(@Param("shipno") String shipno);
+	/**
+	 * 根据入库未匹配到商品的订单查询订单信息
+	 * @Title getPrePurchaseForTB
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return List<PrePurchasePojo>
+	 */
+	List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map);
+	/**
+	 * 根据入库未匹配到商品的订单查询订单信息数量
+	 * @Title getPrePurchaseForTBCount
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return List<PrePurchasePojo>
+	 */
+	List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map);
 
 	public String getTbOrderId(@Param("orderid") String orderid, @Param("odid") String odid);
 
