@@ -11,9 +11,8 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
-import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
-import com.cbt.warehouse.pojo.DisplayBuyInfo;
-import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.util.Util;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
@@ -88,6 +87,82 @@ public class PurchaseController {
 		map.put("goodsid", goodsid);
 		map.put("orderid", orderid);
 		List<ChangeGoodsLogPojo> list = iPurchaseService.getDetailsChangeInfo(map);
+		return JSONArray.fromObject(list).toString();
+	}
+
+	// 采购补货
+	@RequestMapping(value = "/insertOrderReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String insertOrderReplenishment(HttpServletRequest request,
+	                                       Model model) {
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");// 获取登录用户
+		com.cbt.pojo.Admuser user = (com.cbt.pojo.Admuser) SerializeUtil
+				.JsonToObj(admJson, com.cbt.pojo.Admuser.class);
+		String userid = request.getParameter("userid");
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		String goods_url = request.getParameter("goods_url");
+		String goods_p_url = request.getParameter("goods_p_url");
+		String goods_price = request.getParameter("goods_price");
+		String buycount = request.getParameter("buycount");
+		String remark = request.getParameter("remark");
+		String rep_type = request.getParameter("rep_type");
+		String goods_title = request.getParameter("goods_title");
+		String shop_id=request.getParameter("shop_id");
+		String odid=request.getParameter("odid");
+		if (goods_p_url == null || "".equals(goods_p_url)) {
+			return "0";
+		}
+		String tb_1688_itemid = Util.getItemid(goods_p_url);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userid", userid);
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		map.put("goods_url", goods_url);
+		map.put("goods_p_url", goods_p_url);
+		map.put("goods_price", goods_price);
+		map.put("buycount", buycount);
+		map.put("remark", remark);
+		map.put("tb_1688_itemid", tb_1688_itemid);
+		map.put("rep_type", rep_type);
+		map.put("goods_title", goods_title);
+		map.put("goods_type", "0");
+		map.put("shop_id", shop_id);
+		map.put("odid",odid);
+		int ret = iPurchaseService.insertOrderReplenishment(map);
+		if (ret > 0) {
+			iPurchaseService.updateReplenishmentState(map);
+			// 添加补货记录
+			map.put("admuserid", user.getId());
+			iPurchaseService.addReplenishmentRecord(map);
+		}
+		return "" + ret;
+	}
+
+	// 采购补货
+	@RequestMapping(value = "/getIsReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getIsReplenishment(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		map.put("goods_type", "0");
+		List<Replenishment_RecordPojo> list = iPurchaseService.getIsReplenishments(map);
+		return JSONArray.fromObject(list).toString();
+	}
+
+	// 线下采购记录
+	@RequestMapping(value = "/getIsOfflinepurchase.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getIsOfflinepurchase(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		List<OfflinePurchaseRecordsPojo> list = iPurchaseService.getIsOfflinepurchase(map);
 		return JSONArray.fromObject(list).toString();
 	}
 
@@ -352,6 +427,23 @@ public class PurchaseController {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("buyid", admuserid);
 		return iPurchaseService.getDistributionCount(map) + "";
+	}
+	/**
+	 *
+	 * @Title getCgCount
+	 * @Description 获得采购数量
+	 * @param request
+	 * @param model
+	 * @return 返回某个采购的采购数量
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getCgCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getCgCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		map.put("buyid", admuserid);
+		return iPurchaseService.getCgCount(map) + "";
 	}
 	/**
 	 * 人工采购分配

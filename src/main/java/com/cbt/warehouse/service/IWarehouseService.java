@@ -206,9 +206,6 @@ public interface IWarehouseService {
 
 	int updateGoodsDistribution(Map<String, String> map);
 
-	//获得采购数量
-	public String getCgCount(Map<String, Object> map);
-
 	public int updateStateCategory(Map<String, String> map);
 
 	/**
@@ -956,25 +953,12 @@ public interface IWarehouseService {
 	List<AllProblemPojo> getAllProblem(Map<String, Object> map);
 	int getTotalNumber(Map<String, Object> map);
 	List<String> getAllProposal(Map<String, Object> map);
-
-	//补货
-	int insertOrderReplenishment(Map<String, Object> map);
 	//采购补货时将录入的店铺ID添加到28库中
 	int insertShopId(Map<String, Object> map);
-
-	//补货按钮状态改变
-	int updateReplenishmentState(Map<String, Object> map);
-
-	//添加补货记录
-	int addReplenishmentRecord(Map<String, Object> map);
 	//是否存在补货
 	List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map);
-	//查询补货记录
-	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
 	//获取采样Log
 	List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map);
-	//查询线下采购记录
-	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
 	//根据产品ID获取工厂和工厂级别
 	Map<String,String> getCompanyInfo(String goods_pid);
 	//申报信息

@@ -392,59 +392,6 @@
                 }
             }});
     }
-    function getCgCount(){
-        $.ajax({
-            type:'post',
-            dataType:"text",
-            url:'/cbtconsole/warehouse/getCgCount.do',
-            success:function(data){
-                if(data=='null'){
-                    data = 0;
-                }
-                $("#cgsl").html("("+data+")");
-            }});
-    }
-    //获取每月采购的数量
-    function getMCgCount(){
-        $.ajax({
-            type:'post',
-            dataType:"text",
-            url:'/cbtconsole/warehouse/getMCgCount.do',
-            success:function(data){
-                if(data=='null'){
-                    data = 0;
-                }
-                $("#mcgsl").html("("+data+")");
-            }});
-    }
-    function getSjCgCount(){
-        $.ajax({
-            type:'post',
-            dataType:"text",
-            url:'/cbtconsole/warehouse/getSjCgCount.do',
-            success:function(data){
-                if(data=='null'){
-                    data = 0;
-                }
-                var mydate = new Date();
-                if(data=='0'){
-                    minutes = 0;
-                }else{
-                    if (mydate.getHours()>=13) {
-                        minutes = (mydate.getHours()-10)*60+mydate.getMinutes();
-                        minutes = minutes/Number(data);
-                    } else {
-                        minutes = (mydate.getHours()-9)*60+mydate.getMinutes();
-                        minutes = minutes/Number(data);
-                    }
-
-                }
-
-                $("#minutes").html("("+minutes.toFixed()+"分钟)");
-                $("#sjcgsl").html("("+data+")");
-            }});
-    }
-
     //多货源
     function dhyby(){
         var userid = $("#bh_userid").val();
@@ -501,10 +448,6 @@
         var buycount = $("#bh_buycount").val();
         var goods_price = $("#bh_goods_price").val();
         var bh_shop_id = $("#bh_shop_id").val();
-        // if(bh_shop_id == null || bh_shop_id == ''){
-        //     alert("请输入工厂链接");
-        //     return;
-        // }
         var goods_p_url = $("#bh_goods_p_url").val();
         var remark = $("#bh_remark").val();
         var userid = $("#bh_userid").val();
@@ -515,7 +458,7 @@
         var goods_title = document.getElementById("title_"+orderid+""+odid+"").innerHTML;
         $.ajax({
             type:"post",
-            url:"/cbtconsole/warehouse/insertOrderReplenishment.do",//127
+            url:"/cbtconsole/purchase/insertOrderReplenishment.do",//127
             dataType:"text",
             data:{goods_title:goods_title,
                 rep_type:rep_type,buycount:buycount,
@@ -538,7 +481,7 @@
     function getIsOfflinepurchase(orderid,goodsid){
         $.ajax({
             type:"post",
-            url:"/cbtconsole/warehouse/getIsOfflinepurchase.do",
+            url:"/cbtconsole/purchase/getIsOfflinepurchase.do",
             dataType:"text",
             data:{orderid:orderid,goodsid:goodsid},
             success : function(data){  //返回受影响的行数
@@ -562,7 +505,7 @@
     function getIsReplenishment(orderid,goodsid){
         $.ajax({
             type:"post",
-            url:"/cbtconsole/warehouse/getIsReplenishment.do",
+            url:"/cbtconsole/purchase/getIsReplenishment.do",
             dataType:"text",
             data:{orderid:orderid,goodsid:goodsid},
             success : function(data){  //返回受影响的行数
@@ -605,7 +548,7 @@
         var rfddd = document.getElementById("supplierDiv");
         rfddd.style.display = "block";
         document.getElementById('su_shop_id').innerHTML="<a href='/cbtconsole/website/shopBuyLog.jsp?shopId="+shop_id+"' target='_blank'>"+shop_id+"</a>";// shop_id;
-        $("#hidden_shopId").val(shop_id);// shop_id;
+        $("#hidden_shopId").val(shop_id);
     }
     //在本页面弹出商品打分DIV
     function openSupplierGoodsDiv(goods_pid,shop_id){
@@ -669,7 +612,6 @@
     function saveGoodsSupplier(){
         var shop_id=document.getElementById("su_goods_p_id").innerHTML;
         var goods_pid=document.getElementById("su_goods_id").innerHTML;
-        // var service=$("#g_service").val();
         var quality=$("#g_quality").val();
         var remark=$("#su_g_remark").val();
         $.ajax({
@@ -3017,19 +2959,7 @@
         });
 	}
 
-    function productReview(goods_pid){
-        console.log("goods_pid:"+goods_pid);
-        $.ajax({
-            type:"post",
-            url:"/cbtconsole/warehouse/productReview",
-            dataType:"text",
-            data:{goods_pid:goods_pid},
-            success : function(data){
 
-            }
-        });
-
-    }
 
     //弹出评论框whj
     function showcomm(id){

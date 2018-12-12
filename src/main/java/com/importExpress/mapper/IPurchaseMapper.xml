@@ -710,6 +710,60 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         g.orderid =#{orderid} AND od.state<![CDATA[<]]>2
         AND o.state>0 AND o.state<![CDATA[<]]>6 AND od.checked=1
     </select>
+    <update id="updateReplenishmentState">
+        update order_product_source set is_replenishment=1 where od_id=#{odid} and orderid=#{orderid}
+    </update>
+    <select id="getIsOfflinepurchase" resultType="com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo">
+        select a.shipno,a.createtime,b.admName as admuserid,a.goods_p_url,a.tb_orderid from offline_purchase_records a inner join admuser b on a.admuserid=b.id where a.orderid=#{orderid} and a.goodsid=#{goodsid}
+    </select>
+    <select id="getIsReplenishments" resultType="com.cbt.warehouse.pojo.Replenishment_RecordPojo">
+        select a.acount,a.price,a.createtime,b.admName as admuserid,a.goods_p_url,a.remark from replenishment_record a inner join admuser b on a.admuserid=b.id where a.orderid=#{orderid} and a.goodsid=#{goodsid}
+        order by a.createtime
+    </select>
+    <insert id="addReplenishmentRecord">
+        INSERT INTO replenishment_record (acount,price,goods_p_url,remark,createtime,admuserid,goodsid,orderid,odid) VALUES
+        (#{buycount},#{goods_price},#{goods_p_url},#{remark},NOW(),#{admuserid},#{goodsid},#{orderid},#{odid})
+    </insert>
+    <!-- 补货 -->
+    <insert id="insertOrderReplenishment">
+        <![CDATA[
+    	insert into order_replenishment (
+    		goods_type,
+    		goods_title,
+			userid,
+			orderid,
+			goodsid,
+			goods_url,
+			goods_p_url,
+			goods_price,
+			buycount,
+			remark,
+			tb_1688_itemid,
+			rep_type,
+			createtime,
+			shop_id,
+			od_id
+			) values(#{goods_type},#{goods_title},#{userid},#{orderid},#{goodsid},#{goods_url},#{goods_p_url},#{goods_price},#{buycount},#{remark},#{tb_1688_itemid},#{rep_type},NOW(),#{shop_id},#{odid});
+   ]]>
+    </insert>
+    <!-- 当前还剩采购数量 -->
+    <select id="getCgCount" resultType="String">
+        SELECT count(*) from	(
+        SELECT gd.goods_url ,ops.goods_url as goodsurl,max(gd.orderid) orderid FROM(
+        SELECT goods_distribution.goods_url,goods_distribution.odid,goods_distribution.orderid FROM goods_distribution, order_details WHERE 1=1
+        <if test="buyid != 1 and buyid != 83 and buyid != 84">
+            and goods_distribution.admuserid = '${buyid}'
+        </if>
+        AND goods_distribution.odid = order_details.id
+        AND order_details.state  &lt; 2
+        AND order_details.userid not in (SELECT userid from	 admin_r_user where	 admin_r_user.admName ='testAdm')
+        group by goods_distribution.goods_url,goods_distribution.odid,goods_distribution.orderid
+        ) gd
+        LEFT JOIN order_product_source ops ON gd.orderid = ops.orderid AND gd.odid = ops.od_id
+        where gd.orderid not in 	 (SELECT order_no AS  gs_orderid from	 orderinfo where	 state in ('-1','6'))
+        group by gd.goods_url
+        HAVING goodsurl IS NULL) gb
+    </select>
     <!-- 当前实际采购数量 -->
     <select id="getSjCgCount" resultType="String">
         select count(distinct od.goods_pid) from order_product_source ops inner join order_details od on ops.orderid=od.orderid AND ops.goodsid=od.goodsid  inner join orderinfo o on od.orderid=o.order_no

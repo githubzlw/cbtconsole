@@ -1571,48 +1571,19 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
         return dao.getAllProposal(map);
     }
-
-    @Override
-    public int insertOrderReplenishment(Map<String, Object> map) {
-
-        map.put("goods_title", map.get("goods_title").toString().replaceAll("'", "&apos;"));
-
-        return dao.insertOrderReplenishment(map);
-    }
-    @Override
-    public int updateReplenishmentState(Map<String, Object> map) {
-
-        return dao.updateReplenishmentState(map);
-    }
     @Override
     public int insertShopId(Map<String, Object> map) {
 
         return dao.insertShopId(map);
     }
     @Override
-    public int addReplenishmentRecord(Map<String, Object> map) {
-
-        return dao.addReplenishmentRecord(map);
-    }
-    @Override
     public List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map) {
-
         return dao.getIsReplenishment(map);
-    }
-    @Override
-    public List<Replenishment_RecordPojo> getIsReplenishments(
-            Map<String, Object> map) {
-
-        return dao.getIsReplenishments(map);
     }
     @Override
     public List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map) {
 
         return dao.displayBuyLog(map);
-    }
-    @Override
-    public List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String,Object> map){
-        return dao.getIsOfflinepurchase(map);
     }
     @Override
     public Map<String, String> getCompanyInfo(String goods_pid) {
@@ -1652,12 +1623,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public String getOrderAddress(Map<String, Object> map) {
 
         return dao.getOrderAddress(map);
-    }
-
-    @Override
-    public String getCgCount(Map<String, Object> map) {
-
-        return dao.getCgCount(map);
     }
 
     @Override
