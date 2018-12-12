@@ -116,7 +116,7 @@ public interface CustomGoodsDao {
 	 * @param bean
 	 * @return
 	 */
-	public int publish(CustomGoodsPublish bean);
+	public int publish(CustomGoodsPublish bean,int isOnline);
 
 	/**
 	 * 批量发布数据到线上

@@ -1,13 +1,15 @@
 package com.cbt.controller;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.dao.CustomGoodsDao;
+import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.parse.service.DownloadMain;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.NewFtpUtil;
 import com.cbt.website.util.JsonResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
@@ -37,6 +39,7 @@ public class PublishGoodsToOnlie extends Thread {
     private CustomGoodsService customGoodsService;
     private FtpConfig ftpConfig;
     private int isUpdateImg;
+    private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
     public PublishGoodsToOnlie(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg) {
         super();
@@ -78,22 +81,28 @@ public class PublishGoodsToOnlie extends Thread {
                     List<String> windowImgs = deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
                     // 抽取含有本地上传的图片数据
                     if (windowImgs.size() > 0) {
+                        List<String> tempImgs = new ArrayList<>();
                         for (int i = 0; i < windowImgs.size(); i++) {
                             String wdImg = windowImgs.get(i);
-                            if (wdImg == null || "".equals(wdImg)) {
+                            if (StringUtils.isBlank(wdImg)) {
                                 continue;
-                            } else if (wdImg.indexOf(localShowPath) > -1) {
+                            } else if (wdImg.contains(localShowPath)) {
                                 imgList.add(wdImg);
                                 // 上面小图60x60的，下面大图400x400的
                                 imgList.add(wdImg.replace("60x60", "400x400"));
                                 // 替换本地路径为远程路径
-                                windowImgs.set(i, wdImg.replace(localShowPath, remoteShowPath));
+                                tempImgs.add(wdImg.replace(localShowPath, remoteShowPath));
+                            }else if(wdImg.contains("192.168.1")){
+                                // 清空原来服务器上传的图片数据，原因：图片路劲对应服务器本地路劲已经失效，无法再同步到服务器
+                                windowImgs.set(i, "");
+                            }else{
+                                tempImgs.add(wdImg);
                             }
                         }
                         // 重新生成橱窗图的数据保存bean中
-                        goods.setImg(windowImgs.toString().replace(remotepath, ""));
+                        goods.setImg(tempImgs.toString().replace(remotepath, ""));
                         // 获取第一张图片数据的大图
-                        firstImg = windowImgs.get(0).replace(".60x60", ".400x400");
+                        firstImg = tempImgs.get(0).replace(".60x60", ".400x400");
                     }
 
                     // 详情数据的获取和解析img数据
@@ -102,12 +111,15 @@ public class PublishGoodsToOnlie extends Thread {
                     if (imgEls.size() > 0) {
                         for (Element imel : imgEls) {
                             String imgUrl = imel.attr("src");
-                            if (imgUrl == null || "".equals(imgUrl)) {
+                            if (StringUtils.isBlank(imgUrl)) {
                                 continue;
-                            } else if (imgUrl.indexOf(localShowPath) > -1) {
+                            } else if (imgUrl.contains(localShowPath)) {
                                 imgList.add(imgUrl);
                                 // 替换本地路径为远程路径
                                 imel.attr("src", imgUrl.replace(localShowPath, remoteShowPath));
+                            }else if(imgUrl.contains("192.168.1")){
+                                // 判断本地路径非当前配置的上传图片地址，移除数据
+                                imel.remove();
                             }
                         }
                         goods.setEninfo(nwDoc.html().replace(remotepath, ""));
@@ -161,12 +173,14 @@ public class PublishGoodsToOnlie extends Thread {
                         }
                         if (isSuccess) {
                             customGoodsService.publish(goods);
+                            customGoodsDao.publish(goods,0);
                             customGoodsService.updateGoodsState(pid, 4);
                         } else {
                             customGoodsService.updateGoodsState(pid, 3);
                         }
                     } else {
                         customGoodsService.publish(goods);
+                        customGoodsDao.publish(goods,0);
                         customGoodsService.updateGoodsState(pid, 4);
                     }
 
