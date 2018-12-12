@@ -1732,7 +1732,7 @@
                                                                 href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a> <br> <a target="_blank"
                                                                                                         href="${goods.aliGoodsUrl}">速卖通原链接</a><br><br>
                 <a target="_blank"
-                   href="/cbtconsole/website/shop_manager_details.jsp?id=${shopId}">产品店铺链接</a>
+                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a>
             </div>
 
 

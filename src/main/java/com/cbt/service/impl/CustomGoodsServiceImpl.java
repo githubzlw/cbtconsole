@@ -94,7 +94,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }
         }
 
-        int res = customGoodsDao.publish(bean);
+        int res = customGoodsDao.publish(bean,1);
         if (res > 0) {
             int count = customGoodsDao.publishTo28(bean);
             if (count == 0) {
