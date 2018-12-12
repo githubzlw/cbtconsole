@@ -754,7 +754,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         PreparedStatement stmtOffer = null;
         ResultSet rsOffer = null;
         String sql28 = "select shop_id,category_id,weight_interval,jd_result as weight,first_interval_rate,"
-                + "other_interval_rate,is_choose from shop_categroy_data where shop_id = ? and id > 100583 ";
+                + "other_interval_rate,is_choose,(select count(1) from 1688_category where 1688_category.category_id = shop_categroy_data.category_id "
+                + "and 1688_category.flag = 1) as is_forbit from shop_categroy_data where shop_id = ? and id > 100583 ";
         if (!(catid == null || "".equals(catid) || "0".equals(catid))) {
             sql28 += " and category_id = ?";
         }
@@ -800,6 +801,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 }
                 spInfo.setWeightVal(Float.valueOf(weight));
                 spInfo.setIsChoose(rs28.getInt("is_choose"));
+                spInfo.setIsForbid(rs28.getInt("is_forbit"));
                 infos.add(spInfo);
             }
             offerMap.clear();
