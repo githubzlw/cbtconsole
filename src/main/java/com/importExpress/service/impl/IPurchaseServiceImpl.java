@@ -23,7 +23,9 @@ import com.cbt.util.Util;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
 import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -379,6 +381,27 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Override
 	public Map<String, Object> queryUserIdAndStateByOrderNo(String orderNo) {
 		return pruchaseMapper.queryUserIdAndStateByOrderNo(orderNo);
+	}
+	@Override
+	public int insertOrderReplenishment(Map<String, Object> map) {
+		map.put("goods_title", map.get("goods_title").toString().replaceAll("'", "&apos;"));
+		return pruchaseMapper.insertOrderReplenishment(map);
+	}
+	@Override
+	public int addReplenishmentRecord(Map<String, Object> map) {
+		return pruchaseMapper.addReplenishmentRecord(map);
+	}
+	@Override
+	public List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map) {
+		return pruchaseMapper.getIsReplenishments(map);
+	}
+	@Override
+	public List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String,Object> map){
+		return pruchaseMapper.getIsOfflinepurchase(map);
+	}
+	@Override
+	public int updateReplenishmentState(Map<String, Object> map) {
+		return pruchaseMapper.updateReplenishmentState(map);
 	}
 
 	@Override
@@ -811,6 +834,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Override
 	public String getDistributionCount(Map<String, Object> map) {
 		return pruchaseMapper.getDistributionCount(map);
+	}
+	@Override
+	public String getCgCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getCgCount(map);
 	}
 	@Override
 	public String getSjCgCount(Map<String, Object> map) {

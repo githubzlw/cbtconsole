@@ -6,7 +6,9 @@ import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.StraightHairPojo;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
 import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchasesBean;
 import org.apache.ibatis.annotations.Param;
@@ -124,6 +126,8 @@ public interface IPurchaseMapper {
 	public String getShippedNoStorage(Map<String, Object> map);
 	//当日分配采购种类
 	public String getDistributionCount(Map<String, Object> map);
+	//获得采购数量
+	public String getCgCount(Map<String, Object> map);
 	//获得实际采购数量
 	public String getSjCgCount(Map<String, Object> map);
 	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
@@ -483,9 +487,17 @@ public interface IPurchaseMapper {
 	public int updateState(@Param("orderNo") String orderNo, @Param("goodsid") String goodsid);
 
 	public Map<String,Integer> queryState(@Param("orderNo") String orderNo);
-
+	//添加补货记录
+	int addReplenishmentRecord(Map<String, Object> map);
+	//查询补货记录
+	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
+	//查询线下采购记录
+	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
+	//补货
+	int insertOrderReplenishment(Map<String, Object> map);
 	public int updateOrderInfo(@Param("orderNo") String orderNo);
-
+	//补货订单按钮状态改变
+	int updateReplenishmentState(Map<String, Object> map);
 	public int updateGoodsCommunicationInfo(@Param("orderNo") String orderNo, @Param("admin") int admin);
 
 	/**

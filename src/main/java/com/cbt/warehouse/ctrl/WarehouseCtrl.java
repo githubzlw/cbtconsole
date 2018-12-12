@@ -164,25 +164,19 @@ public class WarehouseCtrl {
 	private IPurchaseMapper pruchaseMapper;
 	@Autowired
 	private SkuinfoService skuinfoService;
-
 	@Autowired
 	private com.cbt.warehouse.service.DropshiporderService dropshiporderService;
-
 	@Autowired
 	private com.cbt.warehouse.service.OrderService orderService;
 	@Autowired
 	private ZoneShippingService zoneShippingService;
-
 	private SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 	IExpressTrackDao dao1 = new ExpressTrackDaoImpl();
 	IOrderwsServer server1 = new OrderwsServer();
-
 	@Autowired
 	private OrderinfoService orderinfoService;
-
 	@Autowired
 	private IPurchaseService iPurchaseService;
-
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -201,28 +195,18 @@ public class WarehouseCtrl {
 			throws ServletException, IOException, ParseException {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-		System.out.println("登录人ID："+adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
-		System.out.println("采购人长度："+list.size());
-
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
-		
 		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
 			result.add(a);
 		}
-		/*if(adm.getId()==9){
-			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
-			a.setId(1);
-			a.setAdmName("全部");
-			list.add(a);
-		}*/
 		if(adm.getId()==18){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(18);
@@ -339,12 +323,10 @@ public class WarehouseCtrl {
 		int row=0;
 		try{
 			String id=request.getParameter("id");
-//			String maxPrice=request.getParameter("maxPrice");
 			String minPrice=request.getParameter("minPrice");
 			String type=request.getParameter("type");
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("id", id);
-//			map.put("maxPrice", (StringUtil.isBlank(maxPrice) || Integer.valueOf(maxPrice)<=0)?"-":maxPrice);
 			map.put("minPrice", (StringUtil.isBlank(minPrice)?"-":minPrice));
 			map.put("type",type);
 			row=iWarehouseService.updateCatePrice(map);
@@ -374,12 +356,9 @@ public class WarehouseCtrl {
 	public JsonResult saveCommentContent(@RequestParam(value = "cm_odid", required = true) String cm_odid, @RequestParam(value = "comment_content_", required = true) String comment_content_,
                                          @RequestParam(value = "uploadfile", required = true) MultipartFile file, HttpServletRequest request) {
 		JsonResult json = new JsonResult();
-//		PrintWriter out = response.getWriter();
 		boolean flag=false;
 		int row=0;
 		try{
-//			String cm_odid=request.getParameter("cm_odid");
-//			String commentsContent=request.getParameter("commentsContent");
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("cm_odid", cm_odid);
 			map.put("commentsContent", comment_content_);
@@ -530,106 +509,6 @@ public class WarehouseCtrl {
         out.close();
     }
 
-	/**
-	 * 保存服装质检结果
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	@RequestMapping(value = "/saveClothingData")
-	public void saveClothingData(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		StringBuilder sb=new StringBuilder();
-		Map<String,String> map=new HashMap<String,String>(5);
-		PrintWriter out = response.getWriter();
-		String orderid=request.getParameter("orderid");
-		String goodsid=request.getParameter("goodsid");
-		String catid=request.getParameter("catid");
-		int row=0;
-		try{
-			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-			Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-			if(StringUtil.isNotBlank(orderid) && StringUtil.isNotBlank(goodsid) && StringUtil.isNotBlank(catid)){
-				sb.append("y_wg:").append(StringUtil.isBlank(request.getParameter("y_wg"))?"-":request.getParameter("y_wg")).append("&");
-				sb.append("y_bmxj:").append(StringUtil.isBlank(request.getParameter("y_bmxj"))?"-":request.getParameter("y_bmxj")).append("&");
-				sb.append("y_wgxj:").append(StringUtil.isBlank(request.getParameter("y_wgxj"))?"-":request.getParameter("y_wgxj")).append("&");
-				sb.append("y_ll:").append(StringUtil.isBlank(request.getParameter("y_ll"))?"-":request.getParameter("y_ll")).append("&");
-				sb.append("y_xt:").append(StringUtil.isBlank(request.getParameter("y_xt"))?"-":request.getParameter("y_xt")).append("&");
-				sb.append("y_zg:").append(StringUtil.isBlank(request.getParameter("y_zg"))?"-":request.getParameter("y_zg")).append("&");
-				sb.append("y_qw:").append(StringUtil.isBlank(request.getParameter("y_qw"))?"-":request.getParameter("y_qw")).append("&");
-				sb.append("y_bz:").append(StringUtil.isBlank(request.getParameter("y_bz"))?"-":request.getParameter("y_bz")).append("&");
-				sb.append("jks_value:").append(StringUtil.isBlank(request.getParameter("jks_value"))?"-":request.getParameter("jks_value")).append("&");
-				sb.append("jk_remark:").append(StringUtil.isBlank(request.getParameter("jk_remark"))?"-":request.getParameter("jk_remark")).append("&");
-				sb.append("xwb_value:").append(StringUtil.isBlank(request.getParameter("xwb_value"))?"-":request.getParameter("xwb_value")).append("&");
-				sb.append("xw_remark:").append(StringUtil.isBlank(request.getParameter("xw_remark"))?"-":request.getParameter("xw_remark")).append("&");
-				sb.append("yww_value:").append(StringUtil.isBlank(request.getParameter("yww_value"))?"-":request.getParameter("yww_value")).append("&");
-				sb.append("yw_remark:").append(StringUtil.isBlank(request.getParameter("yw_remark"))?"-":request.getParameter("yw_remark")).append("&");
-				sb.append("twh_value:").append(StringUtil.isBlank(request.getParameter("twh_value"))?"-":request.getParameter("twh_value")).append("&");
-				sb.append("tw_remark:").append(StringUtil.isBlank(request.getParameter("tw_remark"))?"-":request.getParameter("tw_remark")).append("&");
-				sb.append("xcs_value:").append(StringUtil.isBlank(request.getParameter("xcs_value"))?"-":request.getParameter("xcs_value")).append("&");
-				sb.append("xc_remark:").append(StringUtil.isBlank(request.getParameter("xc_remark"))?"-":request.getParameter("xc_remark")).append("&");
-				sb.append("yc_remark:").append(StringUtil.isBlank(request.getParameter("yc_remark"))?"-":request.getParameter("yc_remark")).append("&");
-				sb.append("yzl_value:").append(StringUtil.isBlank(request.getParameter("yzl_value"))?"-":request.getParameter("yzl_value"));
-				LOG.info("服装质检结果:"+sb.toString());
-				map.put("result",sb.toString());
-				map.put("orderid",orderid);
-				map.put("goodsid",goodsid);
-				map.put("catid",catid);
-				map.put("admName",adm.getAdmName());
-				row=iWarehouseService.saveClothingData(map);
-			}
-			out.print(row);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		out.close();
-	}
-
-	/**
-	 * 保存首饰质检结果
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	@RequestMapping(value = "/saveJewelryData")
-	public void saveJewelryData(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		StringBuilder sb=new StringBuilder();
-		Map<String,String> map=new HashMap<String,String>(5);
-		PrintWriter out = response.getWriter();
-		String orderid=request.getParameter("orderid");
-		String goodsid=request.getParameter("goodsid");
-		String catid=request.getParameter("catid");
-		int row=0;
-		try{
-			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-			Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-			if(StringUtil.isNotBlank(orderid) && StringUtil.isNotBlank(goodsid) && StringUtil.isNotBlank(catid)){
-				sb.append("s_wz:").append(StringUtil.isBlank(request.getParameter("s_wz"))?"-":request.getParameter("s_wz")).append("&");
-				sb.append("s_ks:").append(StringUtil.isBlank(request.getParameter("s_ks"))?"-":request.getParameter("s_ks")).append("&");
-				sb.append("s_ys:").append(StringUtil.isBlank(request.getParameter("s_ys"))?"-":request.getParameter("s_ys")).append("&");
-				sb.append("s_bm:").append(StringUtil.isBlank(request.getParameter("s_bm"))?"-":request.getParameter("s_bm")).append("&");
-				sb.append("s_wgxj:").append(StringUtil.isBlank(request.getParameter("s_wgxj"))?"-":request.getParameter("s_wgxj")).append("&");
-				sb.append("s_lk:").append(StringUtil.isBlank(request.getParameter("s_lk"))?"-":request.getParameter("s_lk")).append("&");
-				sb.append("s_ds:").append(StringUtil.isBlank(request.getParameter("s_ds"))?"-":request.getParameter("s_ds")).append("&");
-				sb.append("s_cz:").append(StringUtil.isBlank(request.getParameter("s_cz"))?"-":request.getParameter("s_cz")).append("&");
-				sb.append("s_bz:").append(StringUtil.isBlank(request.getParameter("s_bz"))?"-":request.getParameter("s_bz"));
-				LOG.info("首饰质检结果:"+sb.toString());
-				map.put("result",sb.toString());
-				map.put("orderid",orderid);
-				map.put("goodsid",goodsid);
-				map.put("catid",catid);
-				map.put("admName",adm.getAdmName());
-				row=iWarehouseService.saveClothingData(map);
-			}
-			out.print(row);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		out.close();
-	}
 
 	/**
 	 * 验货图片编辑页面增加评论
@@ -761,216 +640,7 @@ public class WarehouseCtrl {
 		out.close();
 	}
 
-	/**
-	 * 获取采购质量评论内容
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "/getQualityEvaluation")
-	@ResponseBody
-	public JsonResult getQualityEvaluation(HttpServletRequest request, HttpServletResponse response) {
-		JsonResult json = new JsonResult();
-		Map<String,String> map=new HashMap<String,String>(1);
-		String orderid=request.getParameter("orderid");
-		String goodsid=request.getParameter("goodsid");
-		String result="";
-		try{
-			if(StringUtil.isNotBlank(orderid) && StringUtil.isNotBlank(goodsid)){
-				map.put("orderid",orderid);
-				map.put("goodsid",goodsid);
-				result=iWarehouseService.getQualityEvaluation(map);
-			}
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		json.setData(result);
-		return json;
-	}
 
-	/**
-	 * 保存采购质量评论内容
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "/saveQualityData")
-	@ResponseBody
-	public JsonResult saveQualityData(HttpServletRequest request, HttpServletResponse response) {
-		JsonResult json = new JsonResult();
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
-		Map<String,String> map=new HashMap<String,String>(1);
-		String quality_orderid=request.getParameter("quality_orderid");
-		String quality_goodsid=request.getParameter("quality_goodsid");
-		String check1=request.getParameter("check1");
-		String check2=request.getParameter("check2");
-		String check3=request.getParameter("check3");
-		String check4=request.getParameter("check4");
-		String check5=request.getParameter("check5");
-		String check6=request.getParameter("check6");
-		String check7=request.getParameter("check7");
-		String check8=request.getParameter("check8");
-		String check9=request.getParameter("check9");
-		String check10=request.getParameter("check10");
-		String check11=request.getParameter("check11");
-		String check12=request.getParameter("check12");
-		String check13=request.getParameter("check13");
-		String check14=request.getParameter("check14");
-		String check15=request.getParameter("check15");
-		String check16=request.getParameter("check16");
-		try{
-			StringBuilder sb=new StringBuilder();
-			if(StringUtil.isBlank(quality_orderid) || StringUtil.isBlank(quality_goodsid)){
-				json.setOk(false);
-				return json;
-			}
-			map.put("orderid",quality_orderid);
-			map.put("goodsid",quality_goodsid);
-			if(StringUtil.isNotBlank(check1)){
-				sb.append(check1).append(",");
-			}
-			if(StringUtil.isNotBlank(check2)){
-				sb.append(check2).append(",");
-			}
-			if(StringUtil.isNotBlank(check3)){
-				sb.append(check3).append(",");
-			}
-			if(StringUtil.isNotBlank(check4)){
-				sb.append(check4).append(",");
-			}
-			if(StringUtil.isNotBlank(check5)){
-				sb.append(check5).append(",");
-			}
-			if(StringUtil.isNotBlank(check6)){
-				sb.append(check6).append(",");
-			}
-			if(StringUtil.isNotBlank(check7)){
-				sb.append(check7).append(",");
-			}
-			if(StringUtil.isNotBlank(check8)){
-				sb.append(check8).append(",");
-			}
-			if(StringUtil.isNotBlank(check9)){
-				sb.append(check9).append(",");
-			}
-			if(StringUtil.isNotBlank(check10)){
-				sb.append(check10).append(",");
-			}
-			if(StringUtil.isNotBlank(check11)){
-				sb.append(check11).append(",");
-			}
-			if(StringUtil.isNotBlank(check12)){
-				sb.append(check12).append(",");
-			}
-			if(StringUtil.isNotBlank(check13)){
-				sb.append(check13).append(",");
-			}
-			if(StringUtil.isNotBlank(check14)){
-				sb.append(check14).append(",");
-			}
-			if(StringUtil.isNotBlank(check15)){
-				sb.append(check15).append(",");
-			}
-			if(StringUtil.isNotBlank(check16)){
-				sb.append(check16).append(",");
-			}
-			if(sb.toString().length()<=0){
-				json.setOk(false);
-				return json;
-			}
-			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && adm.getRoletype() != 0?adm.getAdmName():"ling");
-			//判断该商品是否有过质量评论如果则更新没有则插入
-			String result=iWarehouseService.getQualityEvaluation(map);
-			int row=0;
-			if(StringUtil.isNotBlank(result)){
-				row=iWarehouseService.updateQualityData(map);
-			}else{
-				row=iWarehouseService.saveQualityData(map);
-			}
-			if(row>0){
-				json.setOk(true);
-			}else{
-				json.setOk(false);
-			}
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		return json;
-	}
-
-	/**
-	 * 采购商品评价
-	 * @param request
-	 * @param response
-	 * @throws Exception
-	 */
-	@RequestMapping(value = "/productReview")
-	public void productReview(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		int row=0;
-		PrintWriter out = response.getWriter();
-		try{
-		}catch (Exception e){
-			//e.printStackTrace();
-			row=0;
-		}
-		out.print(row);
-		out.close();
-	}
-
-	/**
-	 * 保存电子产品质检结果
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException
-	 */
-	@RequestMapping(value = "/saveElectronicData")
-	public void saveElectronicData(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		StringBuilder sb=new StringBuilder();
-		Map<String,String> map=new HashMap<String,String>(5);
-		PrintWriter out = response.getWriter();
-		String orderid=request.getParameter("orderid");
-		String goodsid=request.getParameter("goodsid");
-		String catid=request.getParameter("catid");
-		int row=0;
-		try{
-			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-			Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-			if(StringUtil.isNotBlank(orderid) && StringUtil.isNotBlank(goodsid) && StringUtil.isNotBlank(catid)){
-				sb.append("d_wg:").append(StringUtil.isBlank(request.getParameter("d_wg"))?"-":request.getParameter("d_wg")).append("&");
-				sb.append("d_ks:").append(StringUtil.isBlank(request.getParameter("d_ks"))?"-":request.getParameter("d_ks")).append("&");
-				sb.append("d_ys:").append(StringUtil.isBlank(request.getParameter("d_ys"))?"-":request.getParameter("d_ys")).append("&");
-				sb.append("d_wz:").append(StringUtil.isBlank(request.getParameter("d_wz"))?"-":request.getParameter("d_wz")).append("&");
-				sb.append("d_wg1:").append(StringUtil.isBlank(request.getParameter("d_wg1"))?"-":request.getParameter("d_wg1")).append("&");
-				sb.append("d_wg2:").append(StringUtil.isBlank(request.getParameter("d_wg2"))?"-":request.getParameter("d_wg2")).append("&");
-				sb.append("d_ds:").append(StringUtil.isBlank(request.getParameter("d_ds"))?"-":request.getParameter("d_ds")).append("&");
-				sb.append("d_nc:").append(StringUtil.isBlank(request.getParameter("d_nc"))?"-":request.getParameter("d_nc")).append("&");
-				sb.append("d_rl:").append(StringUtil.isBlank(request.getParameter("d_rl"))?"-":request.getParameter("d_rl")).append("&");
-				sb.append("d_pm:").append(StringUtil.isBlank(request.getParameter("d_pm"))?"-":request.getParameter("d_pm")).append("&");
-				sb.append("d_fbv:").append(StringUtil.isBlank(request.getParameter("d_fbv"))?"-":request.getParameter("d_fbv")).append("&");
-				sb.append("d_xs:").append(StringUtil.isBlank(request.getParameter("d_xs"))?"-":request.getParameter("d_xs")).append("&");
-				sb.append("d_ct:").append(StringUtil.isBlank(request.getParameter("d_ct"))?"-":request.getParameter("d_ct")).append("&");
-				sb.append("d_sms:").append(StringUtil.isBlank(request.getParameter("d_sms"))?"-":request.getParameter("d_sms")).append("&");
-				sb.append("d_bz:").append(StringUtil.isBlank(request.getParameter("d_bz"))?"-":request.getParameter("d_bz"));
-
-				LOG.info("电子质检结果:"+sb.toString());
-				map.put("result",sb.toString());
-				map.put("orderid",orderid);
-				map.put("goodsid",goodsid);
-				map.put("catid",catid);
-				map.put("admName",adm.getAdmName());
-				row=iWarehouseService.saveClothingData(map);
-			}
-			out.print(row);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		out.close();
-	}
 
 	@RequestMapping(value = "/insertStorageProblemOrder")
 	public void insertStorageProblemOrder(HttpServletRequest request, HttpServletResponse response)
@@ -1001,34 +671,6 @@ public class WarehouseCtrl {
 	}
 
 	/**
-	 * 提交采样商品反馈信息
-	 * @Description TODO
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException
-	 * @return void
-	 */
-	@RequestMapping(value = "/sheliGoods")
-	public void sheliGoods(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		PrintWriter out = response.getWriter();
-		int row=0;
-		String ali_pid="";
-		try{
-			String goods_pid=request.getParameter("goods_pid");
-			if(row>0){
-				ali_pid=iWarehouseService.getAliPid(goods_pid);
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-			row=0;
-		}
-		out.print(row+"&"+ali_pid);
-		out.close();
-	}
-
-	/**
 	 * 新品上线努力度
 	 * @Title purchaseSamplingStatistics
 	 * @Description
@@ -1052,7 +694,6 @@ public class WarehouseCtrl {
 		map.put("page", page);
 		map.put("days",days);
 		list = iWarehouseService.getPurchaseSamplingStatistics(map);
-//		List<PurchaseSamplingStatisticsPojo> counts = iWarehouseService.getPurchaseSamplingStatisticsCount(map);
 		json.setRows(list);
 		json.setTotal(list.size());
 		return json;
@@ -1639,12 +1280,6 @@ public class WarehouseCtrl {
 		map.put("admUserId", admUserId);
 		map.put("vip", vip);
 		map.put("address",StringUtil.isNotBlank(address)?address:null);
-//		map.put("wjState",StringUtil.isNotBlank(wjState)?wjState:null);
-//		map.put("cyState",StringUtil.isNotBlank(cyState)?cyState:null);
-//		map.put("shState",StringUtil.isNotBlank(shState)?shState:null);
-//		map.put("fkState",StringUtil.isNotBlank(fkState)?fkState:null);
-//		map.put("cgState",StringUtil.isNotBlank(cgState)?cgState:null);
-//		map.put("dkState",StringUtil.isNotBlank(dkState)?dkState:null);
 		wjState=StringUtil.isNotBlank(wjState)?"4":"9";
 		cyState=StringUtil.isNotBlank(cyState)?"3":"9";
 		shState=StringUtil.isNotBlank(shState)?"5":"9";
@@ -1833,23 +1468,17 @@ public class WarehouseCtrl {
 			throws ParseException {
 		String orderstatus = request.getParameter("orderstatus");
 		Calendar cal = Calendar.getInstance();
-//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 		String admsuerid=request.getParameter("admuserid");
 		// 获取采购对应的采购账号名称
 		String username = iWarehouseService.getBuyerNames(admsuerid);
 		String sql = "SELECT count(DISTINCT orderid) AS num from taobao_1688_order_history where tbOr1688 in ('0','1') and creattime>'2017-01-01' and (orderstatus like '%买家已付款%' or orderstatus like '%等待卖家发货%')";
-//		if (adm == null || orderstatus == null || "".equals(orderstatus)) {
-//			return "0";
-//		}
 		if (!"1".equals(admsuerid)) {
 			sql += " and username='" + username + "'";
 		}
 		if ("1".equals(orderstatus)) {
 			// 超过1天未发货
 			cal.add(Calendar.DATE, -1);
-			String yesterday = new SimpleDateFormat("yyyy-MM-dd ").format(cal
-					.getTime());
+			String yesterday = new SimpleDateFormat("yyyy-MM-dd ").format(cal.getTime());
 			sql += "  and orderdate<'" + (yesterday + "16:00:00") + "'";
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -1859,8 +1488,7 @@ public class WarehouseCtrl {
 	}
 
 	@RequestMapping(value = "/getById.do", method = RequestMethod.GET)
-	public String callUpdateIdrelationtable(HttpServletRequest request,
-											Model model) {
+	public String callUpdateIdrelationtable(HttpServletRequest request,Model model) {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put("orderId", request.getParameter(""));
 		param.put("goodId", request.getParameter(""));
@@ -1870,9 +1498,7 @@ public class WarehouseCtrl {
 		param.put("useridV", request.getParameter(""));
 		param.put("usernameV", request.getParameter(""));
 		param.put("tborderidV", request.getParameter(""));
-
 		iWarehouseService.callUpdateIdrelationtable(param);
-
 		return net.sf.json.JSONArray.fromObject(param).toString();
 	}
 
@@ -1893,9 +1519,6 @@ public class WarehouseCtrl {
 		String ckStartTime = (String) request.getParameter("ckStartTime");
 		String ckEndTime = (String) request.getParameter("ckEndTime");
 		String trans_method = (String) request.getParameter("trans_method");
-		// String saleOrPurchase =
-		// (String)request.getParameter("saleOrPurchase"); //只看销售或者采购
-
 		String t = request.getParameter("pageNum");
 		int pageNum=!StringUtils.isStrNull(t)?Integer.parseInt(t):1;
 		t = request.getParameter("pageSize");
@@ -2407,26 +2030,6 @@ public class WarehouseCtrl {
 		request.setAttribute("orderidQuery", orderidQuery);
 		request.setAttribute("useridQuery", useridQuery);
 		return "orderfeepage";
-	}
-
-	/**
-	 *
-	 * @Title getCgCount
-	 * @Description 获得采购数量
-	 * @param request
-	 * @param model
-	 * @return 返回某个采购的采购数量
-	 * @return String 返回值类型
-	 */
-	@RequestMapping(value = "/getCgCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getCgCount(HttpServletRequest request, Model model) {
-//		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-//		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
-		String admuserid=request.getParameter("admuserid");
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
-		map.put("buyid", admuserid);
-		return iWarehouseService.getCgCount(map) + "";
 	}
 
     /**
@@ -5236,104 +4839,6 @@ public class WarehouseCtrl {
 		return "" + ret;
 	}
 
-	// 采购补货
-	@RequestMapping(value = "/insertOrderReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String insertOrderReplenishment(HttpServletRequest request,
-										   Model model) {
-		String admJson = Redis.hget(request.getSession().getId(), "admuser");// 获取登录用户
-		Admuser user = (Admuser) SerializeUtil
-				.JsonToObj(admJson, Admuser.class);
-		String userid = request.getParameter("userid");
-		String orderid = request.getParameter("orderid");
-		String goodsid = request.getParameter("goodsid");
-		String goods_url = request.getParameter("goods_url");
-		String goods_p_url = request.getParameter("goods_p_url");
-		String goods_price = request.getParameter("goods_price");
-		String buycount = request.getParameter("buycount");
-		String remark = request.getParameter("remark");
-		String rep_type = request.getParameter("rep_type");
-		String goods_title = request.getParameter("goods_title");
-		String shop_id=request.getParameter("shop_id");
-		String odid=request.getParameter("odid");
-		if (goods_p_url == null || "".equals(goods_p_url)) {
-			return "0";
-		}
-		String tb_1688_itemid = getItemid(goods_p_url);
-
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		map.put("userid", userid);
-		map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
-		map.put("goods_url", goods_url);
-		map.put("goods_p_url", goods_p_url);
-		map.put("goods_price", goods_price);
-		map.put("buycount", buycount);
-		map.put("remark", remark);
-		map.put("tb_1688_itemid", tb_1688_itemid);
-		map.put("rep_type", rep_type);
-		map.put("goods_title", goods_title);
-		map.put("goods_type", "0");
-		map.put("shop_id", shop_id);
-		map.put("odid",odid);
-		int ret = iWarehouseService.insertOrderReplenishment(map);
-		if (ret > 0) {
-			//将店铺ID录入
-//			map.put("shop_ID", shop_id.split("\\//")[1].split("\\.")[0]);
-//			iWarehouseService.insertShopId(map);
-			iWarehouseService.updateReplenishmentState(map);
-			// 添加补货记录
-			map.put("admuserid", user.getId());
-			iWarehouseService.addReplenishmentRecord(map);
-		}
-		return "" + ret;
-	}
-
-	// 采购补货
-	@RequestMapping(value = "/insertOrderReplenishment127.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String insertOrderReplenishment127(HttpServletRequest request,
-											  Model model) {
-		String userid = request.getParameter("userid");
-		String orderid = request.getParameter("orderid");
-		String goodsid = request.getParameter("goodsid");
-		String goods_url = request.getParameter("goods_url");
-		String goods_p_url = request.getParameter("goods_p_url");
-		String goods_price = request.getParameter("goods_price");
-		String buycount = request.getParameter("buycount");
-		String remark = request.getParameter("remark");
-		String rep_type = request.getParameter("rep_type");
-		String goods_title = request.getParameter("goods_title");
-
-		if (goods_p_url == null || "".equals(goods_p_url)) {
-			return "0";
-		}
-		String tb_1688_itemid = getItemid(goods_p_url);
-
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		map.put("userid", userid);
-		map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
-		map.put("goods_url", goods_url);
-		map.put("goods_p_url", goods_p_url);
-		map.put("goods_price", goods_price);
-		map.put("buycount", buycount);
-		map.put("remark", remark);
-		map.put("tb_1688_itemid", tb_1688_itemid);
-		map.put("rep_type", rep_type);
-		map.put("goods_title", goods_title);
-		// try {
-		// Thread.sleep(5000);
-		// } catch (InterruptedException e) {
-		//
-		// e.printStackTrace();
-		// }
-		int ret = iWarehouseService.insertOrderReplenishment(map);
-
-		return "" + ret;
-	}
 
 	public String getItemid(String u) {
 		String ret = "";
@@ -5360,25 +4865,6 @@ public class WarehouseCtrl {
 		ret = maxStr;
 		return ret;
 	}
-
-	// 采购补货
-	@RequestMapping(value = "/getIsReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getIsReplenishment(HttpServletRequest request, Model model) {
-		String orderid = request.getParameter("orderid");
-		String goodsid = request.getParameter("goodsid");
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
-		map.put("goods_type", "0");
-
-		List<Replenishment_RecordPojo> list = iWarehouseService
-				.getIsReplenishments(map);
-
-		return JSONArray.fromObject(list).toString();
-	}
-
 	// 显示采样订单Log
 	@RequestMapping(value = "/displayBuyLog", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
@@ -5398,23 +4884,6 @@ public class WarehouseCtrl {
 				d.setLevel(map1.get("levels"));
 			}
 		}
-
-		return JSONArray.fromObject(list).toString();
-	}
-
-	// 线下采购记录
-	@RequestMapping(value = "/getIsOfflinepurchase.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	@ResponseBody
-	public String getIsOfflinepurchase(HttpServletRequest request, Model model) {
-		String orderid = request.getParameter("orderid");
-		String goodsid = request.getParameter("goodsid");
-
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
-
-		List<OfflinePurchaseRecordsPojo> list = iWarehouseService
-				.getIsOfflinepurchase(map);
 
 		return JSONArray.fromObject(list).toString();
 	}

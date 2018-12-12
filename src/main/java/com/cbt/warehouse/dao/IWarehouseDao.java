@@ -229,8 +229,6 @@ public interface IWarehouseDao {
 	public String getBatckInfo(@Param("pid") String pid);
 	//getAllStorageLocationByPage
 	public List<StorageLocationBean> getAllStorageLocationByPage(int startNum, int endNum);
-	//获得采购数量
-	public String getCgCount(Map<String, Object> map);
 	/**
 	 * 新增搜索词对应的优先类别
 	 * @param map
@@ -1122,24 +1120,12 @@ public interface IWarehouseDao {
 	List<AllProblemPojo> getAllProblem(Map<String, Object> map);
 	int getTotalNumber(Map<String, Object> map);
 	List<String> getAllProposal(Map<String, Object> map);
-
-
-	//补货
-	int insertOrderReplenishment(Map<String, Object> map);
-	//补货订单按钮状态改变
-	int updateReplenishmentState(Map<String, Object> map);
 	//将采购补货时录入的店铺ID添加到28库中
 	int insertShopId(Map<String, Object> map);
 	//是否存在补货
 	List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map);
-	//添加补货记录
-	int addReplenishmentRecord(Map<String, Object> map);
-	//查询补货记录
-	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
 	//获取采样记录
 	public List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map);
-	//查询线下采购记录
-	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
 	//根据1688产品获取工厂和级别
 	Map<String, String> getCompanyInfo(@Param("goods_pid") String goods_pid);
 	//申报信息

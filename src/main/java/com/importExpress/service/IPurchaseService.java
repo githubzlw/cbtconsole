@@ -5,7 +5,9 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
 import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.PurchasesBean;
@@ -63,6 +65,8 @@ public interface IPurchaseService {
 	public String getShippedNoStorage(Map<String, Object> map);
 	//获取当日采购分配种类
 	public String getDistributionCount(Map<String, Object> map);
+	//获得采购数量
+	public String getCgCount(Map<String, Object> map);
 	//获得实际采购数量
 	public String getSjCgCount(Map<String, Object> map);
 	//获得每月采购数量
@@ -111,7 +115,16 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	public String allQxQrNew(String orderid, int adminid);
-
+	//补货
+	int insertOrderReplenishment(Map<String, Object> map);
+	//添加补货记录
+	int addReplenishmentRecord(Map<String, Object> map);
+	//查询补货记录
+	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
+	//查询线下采购记录
+	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
+	//补货按钮状态改变
+	int updateReplenishmentState(Map<String, Object> map);
 	/**
 	 *采购是否使用库存
 	 * @param map
