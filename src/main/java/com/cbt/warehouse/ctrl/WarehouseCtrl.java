@@ -4780,8 +4780,8 @@ public class WarehouseCtrl {
 		String rep_type = "1";
 
 		String inId = "";
-		String tb_1688_itemid1 = getItemid(goods_p_url1);
-		String tb_1688_itemid2 = getItemid(goods_p_url2);
+		String tb_1688_itemid1 = Util.getItemid(goods_p_url1);
+		String tb_1688_itemid2 = Util.getItemid(goods_p_url2);
 		if (!"0".equals(id1) && id1 != null) {
 			inId += "'" + id1 + "'";
 		}
@@ -4814,7 +4814,7 @@ public class WarehouseCtrl {
 		map.put("tb_1688_itemid", tb_1688_itemid1);
 		map.put("buycount", buycount1);
 
-		int ret = iWarehouseService.insertOrderReplenishment(map);
+		int ret = iPurchaseService.insertOrderReplenishment(map);
 
 		map.put("goods_p_url", goods_p_url2);
 		map.put("goods_price", goods_price2);
@@ -4833,38 +4833,12 @@ public class WarehouseCtrl {
 			t = 0;
 		}
 		if (t == 1) {
-			ret += iWarehouseService.insertOrderReplenishment(map);
+			ret += iPurchaseService.insertOrderReplenishment(map);
 		}
 
 		return "" + ret;
 	}
 
-
-	public String getItemid(String u) {
-		String ret = "";
-		Pattern p = Pattern.compile("\\d{2,}");// 这个2是指连续数字的最少个数
-		String maxStr = "";
-		Matcher m = p.matcher(u);
-		int i = 0;
-		while (m.find()) {
-			String temp = m.group();
-			int c = u.indexOf(temp);
-			int len = c + m.group().length() + 5;
-			if (len > u.length()) {
-				len = c + m.group().length();
-			}
-			temp = u.substring(c - 4, len);
-			if (temp.indexOf("?id=") != -1 || temp.indexOf("&id=") != -1
-					|| temp.indexOf(".html") != -1) {
-				if (m.group().length() > maxStr.length()) {
-					maxStr = m.group();
-				}
-			}
-			i++;
-		}
-		ret = maxStr;
-		return ret;
-	}
 	// 显示采样订单Log
 	@RequestMapping(value = "/displayBuyLog", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
