@@ -46,9 +46,10 @@
 		SELECT shop_type as shopId,authorized_flag as shopUrl FROM shop_url_bak WHERE shop_id=#{shopId}
 	</select>
 	<select id="querySupplierScoringByPage" resultMap="supplierScoringMap">
-		SELECT a.shopId,b.en_name as category,a.address,a.id,a.quality_avg,a.service_avg,a.level,a.inventory_agreement,a.return_days,a.counts,a.allcounts,a.shopType,a.authorizedFlag,a.noSupplier FROM (
-		SELECT smi.shop_id AS shopId,smi.catid,smi.noSupplier,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,smi.allcounts,smi.counts,su.shop_type AS shopType,su.authorized_flag AS authorizedFlag
+-- 		SELECT a.shopId,b.en_name as category,a.address,a.id,a.quality_avg,a.service_avg,a.level,a.inventory_agreement,a.return_days,a.counts,a.allcounts,a.shopType,a.authorizedFlag,a.noSupplier FROM (
+		SELECT b.en_name as category,smi.shop_id AS shopId,smi.catid,smi.noSupplier,sa.addr AS address,s.id,s.quality_avg,s.service_avg,s.level,s.inventory_agreement,s.return_days,smi.allcounts,smi.counts,su.shop_type AS shopType,su.authorized_flag AS authorizedFlag
 		FROM shop_manager_info smi
+		INNER JOIN 1688_category b ON smi.catid=b.category_id
 		LEFT JOIN shop_addr_spider sa ON sa.shop_id=smi.shop_id
 		LEFT JOIN supplier_scoring s ON smi.shop_id=s.shop_id
 		LEFT JOIN shop_url_bak su ON su.shop_id=smi.shop_id
@@ -70,17 +71,19 @@
 		<if test="authorized != null">
 			and su.authorized_flag=${authorized}
 		</if>
+		<if test="categoryName != null">
+			and b.en_name like CONCAT('%','${categoryName}','%' )
+		</if>
 		GROUP BY smi.shop_id ORDER BY s.quality_avg DESC
 		limit #{startindex},#{pagesize}
-		) a
-		INNER JOIN 1688_category b ON a.catid=b.category_id
-
+-- 		) a
 	</select>
 	
 	<select id="querySupplierRecord" resultType="java.lang.Integer">
 		select count(a.shopId) from (
 		SELECT c.shop_id AS shopId
 		FROM shop_manager_info c
+		INNER JOIN 1688_category b ON c.catid=b.category_id
 		LEFT JOIN supplier_scoring s ON c.shop_id=s.shop_id
 		left join shop_url_bak su on su.shop_id=c.shop_id
 		WHERE 1=1
@@ -101,6 +104,9 @@
 		</if>
 		<if test="authorized != null">
 			and su.authorized_flag=${authorized}
+		</if>
+		<if test="categoryName != null">
+			and b.en_name like CONCAT('%','${categoryName}','%' )
 		</if>
 		GROUP BY c.shop_id
 		) a
