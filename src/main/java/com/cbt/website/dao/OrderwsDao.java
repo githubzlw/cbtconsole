@@ -580,7 +580,7 @@ public class OrderwsDao implements IOrderwsDao {
         }
         return t;
     }
-
+    @Override
     public void updateGoodsCarMessage(String orderNo) {
         String sql = "update order_change set is_read=1 where orderNo='" + orderNo + "'";
         Connection conn = DBHelper.getInstance().getConnection();

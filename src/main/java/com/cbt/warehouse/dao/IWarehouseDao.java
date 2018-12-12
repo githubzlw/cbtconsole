@@ -231,22 +231,6 @@ public interface IWarehouseDao {
 	public List<StorageLocationBean> getAllStorageLocationByPage(int startNum, int endNum);
 	//获得采购数量
 	public String getCgCount(Map<String, Object> map);
-	//当日分配采购种类
-	public String getDistributionCount(Map<String, Object> map);
-	//当月分配采购种类
-	public String getfpCount(Map<String, Object> map);
-	/**
-	 * 超过1天未发货
-	 * @param map
-	 * @return
-	 */
-	public String getNotShipped(Map<String, Object> map);
-	/**
-	 *发货3天未入库
-	 * @param map
-	 * @return
-	 */
-	public String getShippedNoStorage(Map<String, Object> map);
 	/**
 	 * 新增搜索词对应的优先类别
 	 * @param map
@@ -260,10 +244,6 @@ public interface IWarehouseDao {
 	 */
 	public int editKeyword(Map<String, String> map);
 	public int updateStateCategory(Map<String, String> map);
-	//获得每月采购数量cjc 1-11
-	public String getMCgCount(Map<String, Object> map);
-	//获得实际采购数量
-	public String getSjCgCount(Map<String, Object> map);
 	//添加订单采购商品备注
 	public int insertOrderRemark(Map<String, Object> map);
 	//功能订单采购备注
@@ -686,20 +666,7 @@ public interface IWarehouseDao {
 	//根据不同的状态获得订单的数量
 	OrderInfoCountPojo getOrderInfoCountByState(Map<String, Object> map);
 
-	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
-	/**
-	 * 获取入库没有匹配到商品的订单
-	 * @Title getNoMatchOrderByTbShipno
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return OrderInfoCountPojo
-	 */
-	OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map);
 	List<UserInfo> getUserInfoForPrice(Map<String, Object> map);
-	List<String> getNoShipInfoOrder(Map<String, String> map);
-    //点了采购确认
-    List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map);
 	/**
 	 * 1688采购订单建议退货管理
 	 * @param goodsid
@@ -1116,54 +1083,6 @@ public interface IWarehouseDao {
 	 */
 	int getShopManagerListDetailsCount(Map<String, Object> map);
 	/**
-	 * 根据入库未匹配到商品的订单查询订单信息
-	 * @Title getPrePurchaseForTB
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map);
-	/**
-	 * 根据入库未匹配到商品的订单查询订单信息数量
-	 * @Title getPrePurchaseForTBCount
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map);
-
-	/**
-	 * 采购前置页面数据获取
-	 * @param map
-	 * @return
-	 */
-	List<PrePurchasePojo> getPrePurchase(Map<String, Object> map);
-	/**
-	 * 采购前置页面数据条数
-	 * @param map
-	 * @return
-	 */
-	List<String> getPrePurchaseCount(Map<String, Object> map);
-	/**
-	 * 获取某个采购的订单分配商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getFpCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-
-	List<PurchasesBean> getFpOrderDetails(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取某个采购的订单入库商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getStorageCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-
-	/**
 	 * 判断用户邮箱是否为黑名单
 	 * @param email
 	 * @return
@@ -1177,37 +1096,11 @@ public interface IWarehouseDao {
 	 */
 	int getPayBackList(@Param("payName") String payName);
 	/**
-	 * 获取某个采购的订单采购商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getPurchaseCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取该订单采购与销售的沟通
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getGoodsInfo(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取已经验货无误商品
-	 * @param orderid
-	 * @return
-	 */
-	int getChecked(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
 	 * 获取订单商品数量
 	 * @param orderid
 	 * @return
 	 */
 	int getCountOd(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取验货有问题数量
-	 * @param orderid
-	 * @return
-	 */
-	List<String> getProblem(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
 	/**
 	 * 更改店铺状态
 	 * @param map
