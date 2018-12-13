@@ -525,11 +525,15 @@ public class ShopCarMarketingController {
             statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
-            List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
+            /*List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
             int count = shopCarMarketingService.queryForListCount(statistic);
-            json.setSuccess(true);
+
             json.setRows(res);
-            json.setTotal(count);
+            json.setTotal(count);*/
+
+            json.setSuccess(true);
+            json.setRows(new ArrayList<>());
+            json.setTotal(0);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查询失败，原因 :" + e.getMessage());
@@ -624,12 +628,14 @@ public class ShopCarMarketingController {
                 //计算利润率
                 totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
             }
-            // 如果总运费totalFreight为0，则重新获取总运费(调用线上的接口)
-            if (totalFreight < 0.1) {
-                totalFreight = getMinFreightByUserId(userId,carUserStatistic);
+            // 调用线上接口，获取客户支付运费
+            double onlineFreight = getMinFreightByUserId(userId,carUserStatistic);
+            // 预估总运费未0，则把客户支付的运费当做全部支付运费，计算最下利润率
+            if(totalFreight < 0.1){
+                estimateProfit = (totalPrice - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
+            }else{
+                estimateProfit = (totalPrice + onlineFreight - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
             }
-            //totalFreight = getMinFreightByUserId(userId,carUserStatistic);
-            estimateProfit = (totalPrice - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
             carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
             carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
             carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
