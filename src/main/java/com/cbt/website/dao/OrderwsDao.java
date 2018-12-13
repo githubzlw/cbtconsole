@@ -2330,7 +2330,7 @@ public class OrderwsDao implements IOrderwsDao {
                 upSql.append(","+changeType);
                 upSql.append(",'"+oldInfo+"'");
                 upSql.append(",'"+newInfo+"'");
-                upSql.append(",0");
+                upSql.append(",1");
                 upSql.append(",1)");
                 NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
                 //通知客户
