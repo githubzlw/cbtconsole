@@ -335,7 +335,7 @@ public class OrderwsServer implements IOrderwsServer {
 
 				try {
 					path = UUIDUtil.getAutoLoginPath(
-							"/processesServlet?action=emailLink&className=OrderInfo&orderNo=" + orderNo, uuid);
+							"/orderInfo/emailLink?orderNo=" + orderNo, uuid);
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
