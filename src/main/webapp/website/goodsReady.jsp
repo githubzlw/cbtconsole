@@ -374,7 +374,11 @@
                         <td>
                             <input type="checkbox" class="check_sty" onclick="chooseBox(this)" value="${shopInfo.categoryId}"/>
                         </td>
-                        <td>${shopInfo.categoryId}</td>
+                        <td>${shopInfo.categoryId}
+                        <c:if test="${shopInfo.isForbid > 0}">
+                            <br><b style="color: red;">(屏蔽类别)</b>
+                        </c:if>
+                        </td>
                         <td>${shopInfo.categoryName}</td>
                         <td>${shopInfo.goodsNum}</td>
                         <td>${shopInfo.weightInterval}</td>

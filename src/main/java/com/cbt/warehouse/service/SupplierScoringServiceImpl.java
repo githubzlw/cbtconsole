@@ -19,7 +19,7 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 	//供应商列表
 	@Override
 	public Page<SupplierScoringBean> queryList(int start , int pagesize, String shop_id, String level, String quality,
-                                               String services, String authorized, boolean flag, String userid) {
+                                               String services, String authorized, boolean flag, String userid,String categoryName) {
 		Page<SupplierScoringBean> page = new Page<SupplierScoringBean>(start, pagesize);
 		int startindex = (start-1)*pagesize;//起始位置
 		String qualitys="";
@@ -31,9 +31,9 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 			servicess=String.valueOf(Integer.valueOf(services)+1);
 		}
 		//查询总数
-		int total = supplierScoringMapper.querySupplierRecord(shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid);
+		int total = supplierScoringMapper.querySupplierRecord(shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName);
 		List<SupplierScoringBean> supplierScoringlist = supplierScoringMapper.querySupplierScoringByPage(startindex,pagesize,
-				shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid);
+				shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName);
 		for(SupplierScoringBean s:supplierScoringlist){
 			String type="非精品店铺";
 			String authorizedFlag="未授权";

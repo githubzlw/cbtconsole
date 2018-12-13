@@ -628,6 +628,7 @@ public class ShopUrlController {
                 infoKw.setShopId(tpSp.getShopId());
                 infoKw.setSuggestRate(tpSp.getSuggestRate());
                 infoKw.setWeightInterval(tpSp.getWeightInterval());
+                infoKw.setIsForbid(tpSp.getIsForbid());
                 if (tpSp.getWeightVal() == 0) {
                     float tempWeight = shopUrlService.calculateAvgWeightByCatid(shopId, tpSp.getCategoryId());
                     BigDecimal b = new BigDecimal(tempWeight);
