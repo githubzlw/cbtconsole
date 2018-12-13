@@ -24,6 +24,7 @@ public class ShopInfoBean {
 	private float maxWeight;// 最大重量
 	private int isChoose;// 是否选择原始重量 0平均重量 1原始重量
 	private String keyWeight;//关键词重量
+	private int isForbid;// 0不禁止 1禁止
 
 	public String getShopId() {
 		return shopId;
@@ -157,15 +158,34 @@ public class ShopInfoBean {
 		this.keyWeight = keyWeight;
 	}
 
-	@Override
-	public String toString() {
-		return "{\"shopId\":\"" + shopId + "\", \"categoryId\":\"" + categoryId + "\", \"categoryName\":\""
-				+ categoryName + "\", \"goodsNum\":\"" + goodsNum + "\", \"weightInterval\":\"" + weightInterval
-				+ "\", \"weightVal\":\"" + weightVal + "\", \"firstIntervalRate\":\"" + firstIntervalRate
-				+ "\", \"suggestRate\":\"" + suggestRate + "\", \"totalRate\":\"" + totalRate + "\", \"totalNum\":\""
-				+ totalNum + "\", \"otherIntervalRate\":\"" + otherIntervalRate + "\", \"adminId\":\"" + adminId
-				+ "\", \"minWeight\":\"" + minWeight + "\", \"maxWeight\":\"" + maxWeight + "\", \"isChoose\":\""
-				+ isChoose + "\"}";
+	public int getIsForbid() {
+		return isForbid;
 	}
 
+	public void setIsForbid(int isForbid) {
+		this.isForbid = isForbid;
+	}
+
+	@Override
+	public String toString() {
+		return "ShopInfoBean{" +
+				"shopId='" + shopId + '\'' +
+				", categoryId='" + categoryId + '\'' +
+				", categoryName='" + categoryName + '\'' +
+				", goodsNum=" + goodsNum +
+				", weightInterval='" + weightInterval + '\'' +
+				", weightVal=" + weightVal +
+				", firstIntervalRate=" + firstIntervalRate +
+				", suggestRate=" + suggestRate +
+				", totalRate=" + totalRate +
+				", totalNum=" + totalNum +
+				", otherIntervalRate=" + otherIntervalRate +
+				", adminId=" + adminId +
+				", minWeight=" + minWeight +
+				", maxWeight=" + maxWeight +
+				", isChoose=" + isChoose +
+				", keyWeight='" + keyWeight + '\'' +
+				", isForbid=" + isForbid +
+				'}';
+	}
 }
