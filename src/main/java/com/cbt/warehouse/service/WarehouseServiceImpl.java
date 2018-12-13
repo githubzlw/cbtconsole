@@ -10,6 +10,7 @@ import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.Util;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.ClassDiscount;
@@ -379,11 +380,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if(pics.contains("2018-05") || pics.contains("2018-04") || pics.contains("2018-03") || pics.contains("2018-02") || pics.contains("2018-01") || pics.contains("2018-05") ||
                 pics.contains("2017-03") || pics.contains("2018-04") || pics.contains("2018-05") || pics.contains("2018-06")
                 || pics.contains("2018-07") || pics.contains("2018-08") ||  pics.contains("2018-09") ||  pics.contains("2018-10") ||  pics.contains("2018-11") ||  pics.contains("2018-12")){
-            pics="https://img.import-express.com/importcsvimg/inspectionImg/"+pics+"";
+            pics= Util.PIC_URL+pics+"";
 //            pics="http://27.115.38.42:8084/"+pics+"";
         }else{
 //            pics="http://192.168.1.34:8085/"+pics+"";
-            pics="https://img.import-express.com/importcsvimg/inspectionImg/"+pics+"";
+            pics=Util.PIC_URL+pics+"";
 
         }
         return pics;
@@ -733,7 +734,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 SearchResultInfo p=ps.get(i);
                 String picture=p.getGoods_url();
                 if(!picture.contains("http")){
-                    picture="http://img.import-express.com/importcsvimg/inspectionImg/"+picture;
+                    picture=Util.PIC_URL+picture;
                 }
                 sb.append("<div class='div_box'><img src='"+picture+"' class='pic_01' onmouseout='closeBigImg();'" +
                         " onmouseover=BigImg(\""+picture+"\") style='width:220px;'></img>");
@@ -2666,7 +2667,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 if ("https:".equals(picturepath.toString().substring(0,6))) {
                     picturepaths.add(picturepath.toString());
                 } else {
-                    picturepaths.add("http://img.import-express.com/importcsvimg/inspectionImg/" + picturepath.toString());
+                    picturepaths.add(Util.PIC_URL + picturepath.toString());
                 }
             }
         }

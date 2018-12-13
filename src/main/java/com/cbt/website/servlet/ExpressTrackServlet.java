@@ -950,11 +950,11 @@ public class ExpressTrackServlet extends HttpServlet {
             //进行文件上传操作，上传到服务器tomcat中，并等比压缩
             //status = uploadImage(fileData, f, imgPath);
             //支持断点续存上传图片,ss
-            ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21", "/stock_picture/" + storePath + "", imgPath);
+            ContinueFTP2 f1 = new ContinueFTP2(Util.PIC_IP, Util.PIC_USER, Util.PIC_PASS, "21", "/stock_picture/" + storePath + "", imgPath);
             //远程上传到图片服务器
             f1.start();
             if (status == 1 && StringUtil.isNotBlank(odid)) {
-                dao.saveImgPath(storePath, orderid, odid, "https://img.import-express.com/importcsvimg/inspectionImg/" + storePath + "", false);
+                dao.saveImgPath(storePath, orderid, odid, Util.PIC_URL + storePath + "", false);
             } else if (status == 1 && (odid == null || "".equals(odid))) {
                 dao.saveImgPathForInfo("https://img.import-express.com/importcsvimg/packimg" + storePath, orderid, storePath);
             }
@@ -964,7 +964,7 @@ public class ExpressTrackServlet extends HttpServlet {
         }
         resp.put("status", status);
         resp.put("localPath", ftpConfig.getLocalShowPath()+ storePath + "");
-        resp.put("picPath", "https://img.import-express.com/importcsvimg/inspectionImg/" + storePath + "");
+        resp.put("picPath", Util.PIC_URL + storePath + "");
         WebTool.writeJson(SerializeUtil.ObjToJson(resp), response);
     }
 
@@ -1258,63 +1258,5 @@ public class ExpressTrackServlet extends HttpServlet {
         out.print(res);
         out.flush();
         out.close();
-    }
-
-
-    //重拍图片
-    protected void uploadInPicture(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String orderid = request.getParameter("orderid");
-        String goodsid = request.getParameter("goodsid");
-        //http://img.import-express.com/importcsvimg/inspectionImg/2017-08/P821325642819798_772540.jpg
-        String old_url = request.getParameter("old_url");
-        String ml = old_url.split("inspectionImg/")[1].split("/")[0];
-        SimpleDateFormat order = new SimpleDateFormat("ddHHmmss");
-        Date data = new Date();
-        String img_name = orderid + goodsid + order.format(data);
-        // 配置上传参数
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        // 设置内存临界值 - 超过后将产生临时文件并存储于临时目录中
-        factory.setSizeThreshold(MEMORY_THRESHOLD);
-        // 设置临时存储目录
-        factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        // 设置最大文件上传值
-        upload.setFileSizeMax(MAX_FILE_SIZE);
-        // 设置最大请求值 (包含文件和表单数据)
-        upload.setSizeMax(MAX_REQUEST_SIZE);
-        // 中文处理
-        upload.setHeaderEncoding("UTF-8");
-        // 构造临时路径来存储上传的文件
-        // 这个路径相对当前应用的目录
-        String uploadPath = "D:/product/" + File.separator + ml;
-        // 如果目录不存在则创建
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdir();
-        }
-        try {
-            // 解析请求的内容提取文件数据
-            @SuppressWarnings("unchecked") List<FileItem> formItems = upload.parseRequest(request);
-
-            if (formItems != null && formItems.size() > 0) {
-                // 迭代表单数据
-                for (FileItem item : formItems) {
-                    // 处理不在表单中的字段
-                    if (!item.isFormField()) {
-//                        String fileName = new File(item.getName()).getName();
-                        String filePath = uploadPath + File.separator + img_name;
-                        File storeFile = new File(filePath);
-                        // 在控制台输出文件的上传路径
-                        System.out.println(filePath);
-                        // 保存文件到硬盘
-                        item.write(storeFile);
-                        request.setAttribute("message", "文件上传成功!");
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            request.setAttribute("message", "文件上传失败!");
-        }
     }
 }

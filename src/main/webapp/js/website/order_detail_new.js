@@ -861,6 +861,66 @@ function afterReplenishment(){
     });
 }
 
+//保存或者修改评论yyl
+function saveCommentContent(){
+    var cmid = $("#cm_id").val();
+    var adminname = $("#cm_adminname").val();
+    var orderNo = $("#cm_orderNo").val();
+    var goods_pid = $("#cm_goodsPid").val();
+    var goodsSource = $("#cm_goodsSource").val();
+    var adminId = $("#cm_adminId").val();
+    var countryId = $("#cm_country").val();
+    var oid = $("#cm_oid").val();
+    var carType = $("#cm_carType").val();
+    var commentcontent = $("#comment_content_").val();
+    $.ajax({
+        type : 'POST',
+        async : false,
+        url : '/cbtconsole/goodsComment/savecomment.do',
+        data : {
+            'id':cmid,
+            'userName' : adminname,
+            'orderNo' : orderNo,
+            'goodsPid' : goods_pid,
+            'goodsSource' : goodsSource,
+            'adminId' : adminId,
+            'countryId' : countryId,
+            'oid' : oid,
+            'car_type' : carType,
+            "commentsContent":commentcontent,
+        },
+        dataType : 'json',
+        success : function(data){
+            if(data.success == true){
+                $('#commentDiv1').hide();
+                //将改页所有pid等于改pid的产品销售评论改变commentcontent
+                var button=document.getElementsByName(goods_pid+"ID");
+                for(var j=0;j<button.length;j++){
+                    button[j].innerHTML="已评论 &nbsp;&nbsp;<button cmid='"+data.cmid+"' name='but"+goods_pid+"' style='cursor:pointer' title=\""+commentcontent+"\">显示评论</button>"
+                }
+            }else{
+                alert("操作失败!")
+            }
+        }
+    });
+}
+//弹出评论框yyl
+function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
+    var controls=document.getElementsByName("but"+goods_pid);
+    $("#cm_id").val($(controls[0]).attr("cmid"));
+    $("#cm_adminname").val(adminname);
+    $("#cm_orderNo").val(orderNo);
+    $("#cm_goodsPid").val(goods_pid);
+    $("#cm_country").val(countryid);
+    $("#cm_adminId").val(admindid);
+    $("#cm_oid").val(id);
+    $("#cm_carType").val(car_type);
+    $("#comment_content_").val($(controls[0]).attr("title"));
+    var rfddd1 = document.getElementById("commentDiv1");
+    rfddd1.style.display = "block";;
+
+}
+
 //备注回复
 function doReplay1(orderid,odid){
     $("#remark_content_").val("");
@@ -891,7 +951,7 @@ function sendCutomers(orderNo, whichOne, isDropship) {
 		"isDropship" : isDropship
 	};
 	$.ajax({
-		url : '/cbtconsole/WebsiteServlet',
+		url : '/cbtconsole/order/sendCutomers',
 		type : "post",
 		data : params,
 		dataType : "json",

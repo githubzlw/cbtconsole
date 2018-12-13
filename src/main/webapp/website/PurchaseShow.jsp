@@ -2275,64 +2275,6 @@
             }
         });
 	}
-    //弹出评论框whj
-    function showcomm(id){
-        $("#comment_content_").val("");
-        $("#cm_odid").val(id);
-        var rfddd1 = document.getElementById("commentDiv11");
-        rfddd1.style.display = "block";
-    }
-    //保存或者修改评论whj
-    function saveCommentContent(){
-        var cm_odid = $("#cm_odid").val();
-        var commentcontent = $("#comment_content_").val();
-        if(commentcontent == null || commentcontent == ""){
-            $.jBox.tip('评论不能为空', 'fail');
-            return;
-        }
-        var formData = new FormData($("#uploadFileForm")[0]);
-        $.ajax({
-            url : '/cbtconsole/warehouse/saveCommentContent',
-            type : 'POST',
-            data : formData,
-            contentType : false,
-            processData : false,
-            success : function(data) {
-                if(data.ok){
-                    $("#cm_odid").val("");
-                    $('#commentDiv1').hide();
-                    $("#comment_content_").val("");
-                    document.getElementById("comm_"+cm_odid+"").style.color="red";
-                    $("#uploadFileForm")[0].reset();
-                    document.getElementById("commentDiv11").style.display = "none";
-                }else{
-                    $.jBox.tip('操作失败', 'fail');
-                }
-            },
-            error : function(XMLResponse) {
-                $.jBox.tip('操作失败', 'fail');
-            }
-        });
-
-        $.ajax({
-            type : 'POST',
-            async : false,
-            url : '/cbtconsole/warehouse/saveCommentContent',
-            data : { 'cm_odid':cm_odid,"commentsContent":commentcontent,
-            },
-            dataType : 'json',
-            success : function(data){
-                if(data>0){
-                    $("#cm_odid").val("");
-                    $('#commentDiv1').hide();
-                    $("#comment_content_").val("");
-                    document.getElementById("comm_"+cm_odid+"").style.color="red";
-                }else{
-                    $.jBox.tip('操作失败', 'fail');
-                }
-            }
-        });
-    }
     //判断checkbox是否选中
     function isCheckbox(name){
         obj = document.getElementsByName(name);
@@ -2579,33 +2521,6 @@
 			type="button" value="取消" onclick="$('#apbhdiv').hide();"
 			style="width: 90px; height: 40px;" />
 	</center>
-</div>
-<!-- 评论框 start whj-->
-<div class="mod_pay3" style="display: none;" id="commentDiv11">
-	<div>
-		<a href="javascript:void(0)" class="show_x"
-		   onclick="$('#commentDiv11').hide();" style="float: right;">╳</a>
-	</div>
-	<%--<input type="hidden" id="cm_odid" value="">--%>
-	<%--评论内容:--%>
-	<%--<textarea name="comment_content" rows="8" cols="50" style="margin-top: 20px;" id="comment_content_"></textarea>--%>
-	<%--<input type="file" name="file">--%>
-	<%--<input type="button" id="commentBtnId2" onclick="saveCommentContent()" value="提交评论">--%>
-
-
-	<form id="uploadFileForm" method="post" enctype="multipart/form-data">
-		<input type="hidden" id="cm_odid" name="cm_odid" value="">
-		<div style="margin-bottom: 20px">
-			评论内容:
-			<textarea name="comment_content_" rows="8" cols="50" style="margin-top: 20px;" id="comment_content_"></textarea><br>
-			图&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;片:<input
-				id="local_picture" name="uploadfile" class="easyui-filebox"
-				data-options="prompt:'...'"
-				style="width: 360px"><br>
-			<input type="button" id="commentBtnId2" onclick="saveCommentContent()" value="提交评论">
-		</div>
-	</form>
-
 </div>
 <!-- 评论end -->
 <div class="mod_pay3" style="display: none; background-color: #FFFFFF;"
