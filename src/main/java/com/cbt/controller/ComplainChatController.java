@@ -8,6 +8,7 @@ import com.cbt.bean.FileMeta;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.service.IComplainChatService;
 import com.cbt.service.IComplainService;
+import com.cbt.util.Util;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
@@ -174,7 +175,7 @@ public class ComplainChatController {
 			}
 			//压入栈顶
 			files.add(fileMeta);
-			ContinueFTP2 f1 = new ContinueFTP2("104.247.194.50", "importweb", "importftp@123", "21", "/stock_picture/2018-20/"+newFileName+"", headPath+"/"+newFileName);
+			ContinueFTP2 f1 = new ContinueFTP2(Util.PIC_IP, Util.PIC_USER, Util.PIC_PASS, "21", "/stock_picture/2018-20/"+newFileName+"", headPath+"/"+newFileName);
 			//远程上传到图片服务器
 			f1.start();
 		}

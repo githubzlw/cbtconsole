@@ -129,8 +129,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import com.alibaba.fastjson.JSON;
-
 @SuppressWarnings("deprecation")
 @Controller
 @RequestMapping("/warehouse")
@@ -139,11 +137,10 @@ public class WarehouseCtrl {
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
 	// 上传配置
-	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
-	private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
-	private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
+	private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;
+	private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40;
+	private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50;
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseCtrl.class);
-
 	IExpressTrackDao expressTrackDao= new ExpressTrackDaoImpl();
 
 	Lock lock = new ReentrantLock();
@@ -201,14 +198,12 @@ public class WarehouseCtrl {
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
+		com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
-			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
 			result.add(a);
-		}
-		if(adm.getId()==18){
-			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
+		}else if(adm.getId()==18){
 			a.setId(18);
 			a.setAdmName("testadm");
 			result.add(a);
@@ -229,8 +224,7 @@ public class WarehouseCtrl {
 	 * @return void
 	 */
 	@RequestMapping(value = "/addSampleRemark")
-	public void addSampleRemark(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void addSampleRemark(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		int row=0;
 		try{
@@ -258,8 +252,7 @@ public class WarehouseCtrl {
 	 * @return void
 	 */
 	@RequestMapping(value = "/deleteSource")
-	public void deleteSource(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void deleteSource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		int row=0;
 		try{
@@ -278,7 +271,7 @@ public class WarehouseCtrl {
 	}
 
 	/**
-	 * 提交采样商品反馈信息
+	 * 采购详情手动更新采购价格
 	 * @Title addSampleRemark
 	 * @Description TODO
 	 * @param request
@@ -288,8 +281,7 @@ public class WarehouseCtrl {
 	 * @return void
 	 */
 	@RequestMapping(value = "/updatePrice")
-	public void updatePrice(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void updatePrice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		int row=0;
 		try{
@@ -310,15 +302,14 @@ public class WarehouseCtrl {
 	}
 
 	/**
-	 * 更新类别的最低价格最高价
+	 * 优先类别模块更新类别的最低价格最高价
 	 * @param request
 	 * @param response
 	 * @throws ServletException
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/updateCatePrice")
-	public void updateCatePrice(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void updateCatePrice(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		int row=0;
 		try{
@@ -353,8 +344,7 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/saveCommentContent", method = { RequestMethod.POST })
 	@ResponseBody
-	public JsonResult saveCommentContent(@RequestParam(value = "cm_odid", required = true) String cm_odid, @RequestParam(value = "comment_content_", required = true) String comment_content_,
-                                         @RequestParam(value = "uploadfile", required = true) MultipartFile file, HttpServletRequest request) {
+	public JsonResult saveCommentContent(@RequestParam(value = "cm_odid", required = true) String cm_odid, @RequestParam(value = "comment_content_", required = true) String comment_content_, @RequestParam(value = "uploadfile", required = true) MultipartFile file, HttpServletRequest request) {
 		JsonResult json = new JsonResult();
 		boolean flag=false;
 		int row=0;
@@ -371,13 +361,18 @@ public class WarehouseCtrl {
 				// 本地服务器磁盘全路径
 				String localFilePath ="2020-08/" + order.format(data)+old_name+".jpg";
 				// 文件流输出到本地服务器指定路径
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				String imgPath = imgUploadPath + localFilePath;
 				System.out.println("新上传的评论图片名："+(order.format(data)+old_name+".jpg"));
-				System.out.println("新上传的评论图片路径："+("d:/product/" + localFilePath));
-				flag=ImgDownload.writeImageToDisk1(file.getBytes(), "d:/product/" + localFilePath);
-				picPath="http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"";
+				System.out.println("新上传的评论图片路径："+imgPath);
+				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
+				picPath=Util.PIC_URL+localFilePath+"";
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", localFilePath, "d:/product/" + localFilePath);
-					picPath="http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"";
+					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					picPath=Util.PIC_URL+localFilePath+"";
 				}
 			}
 			map.put("picPath",picPath);
@@ -419,8 +414,7 @@ public class WarehouseCtrl {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/getWeight")
-	public void getWeight(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void getWeight(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		try{
 			SearchResultInfo s=iWarehouseService.getWeight();
@@ -452,8 +446,7 @@ public class WarehouseCtrl {
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/saveWeight")
-	public void saveWeight(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void saveWeight(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Map<String,String> map=new HashMap<String,String>(3);
 		PrintWriter out = response.getWriter();
 		try{
@@ -462,8 +455,7 @@ public class WarehouseCtrl {
 			String weight=request.getParameter("weight");
 			String pid=request.getParameter("pid");
 			//数据校验
-			if (StringUtil.isBlank(pid) || pid.length() < 3
-					|| StringUtil.isBlank(weight) || !Pattern.compile("(\\d+([.]{1}\\d+)?)").matcher(weight).matches()) {
+			if (StringUtil.isBlank(pid) || pid.length() < 3 || StringUtil.isBlank(weight) || !Pattern.compile("(\\d+([.]{1}\\d+)?)").matcher(weight).matches()) {
 				out.print(2);
 				out.close();
 				return;
@@ -489,8 +481,7 @@ public class WarehouseCtrl {
      *  //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
      */
     @RequestMapping(value = "/saveWeightFlag")
-    public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         try{
             String pid=request.getParameter("pid");
@@ -517,8 +508,7 @@ public class WarehouseCtrl {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/insertEvaluation")
-	public void insertEvaluation(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public void insertEvaluation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int index=0;
 		PrintWriter out = response.getWriter();
 		String goods_pid=request.getParameter("goods_pid");
@@ -545,8 +535,7 @@ public class WarehouseCtrl {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/insInsp")
-	public void insInsp(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public void insInsp(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int index=0;
 		PrintWriter out = response.getWriter();
 		String goodsPid=request.getParameter("goodsPid");
@@ -8247,62 +8236,33 @@ public class WarehouseCtrl {
 						}
 					}
 					// 剩余的产品价格
-					remainPrice = new BigDecimal(dropShipOrder.getProductCost())
-							.subtract(productprice).setScale(2,
-									BigDecimal.ROUND_HALF_UP);
+					remainPrice = new BigDecimal(dropShipOrder.getProductCost()).subtract(productprice).setScale(2, BigDecimal.ROUND_HALF_UP);
 					// 剩余的产品重量
-					remainWeight = new BigDecimal(
-							dropShipOrder.getActualWeightEstimate()).subtract(
-							productweight)
-							.setScale(2, BigDecimal.ROUND_HALF_UP);
+					remainWeight = new BigDecimal(dropShipOrder.getActualWeightEstimate()).subtract(productweight).setScale(2, BigDecimal.ROUND_HALF_UP);
 					// 剩余的产品的体积
-					remainvolume = productvolume1.subtract(productvolume)
-							.setScale(2, BigDecimal.ROUND_UP);
+					remainvolume = productvolume1.subtract(productvolume).setScale(2, BigDecimal.ROUND_UP);
 					// 获取当前订单的国家id
-					String countryId = orderService
-							.getCountryIdFromOrderNo(orderNo);
+					String countryId = orderService.getCountryIdFromOrderNo(orderNo);
 					// 根据调用后台运费接口计算出剩下的产品重量对应的运费
-					List<ShippingBean> orderFreight = zone.getShippingBeans(
-							Integer.parseInt(countryId), new double[] { Double
-									.valueOf(remainWeight.toString()) },
-							new double[] { Double.valueOf(remainPrice
-									.toString()) }, new double[] { Double
-									.valueOf(remainWeight.toString()) },
-							new String[] { "0" }, new int[] { 1 });
+					List<ShippingBean> orderFreight = zone.getShippingBeans(Integer.parseInt(countryId), new double[] { Double.valueOf(remainWeight.toString()) }, new double[] { Double.valueOf(remainPrice.toString()) }, new double[] { Double.valueOf(remainWeight.toString()) }, new String[] { "0" }, new int[] { 1 });
 					String freight1 = null;
 					for (ShippingBean orderFreight_ : orderFreight) {
 						if (orderFreight_.getName().equals(fname1)) {
-							freight1 = String
-									.valueOf(orderFreight_.getResult());
+							freight1 = String.valueOf(orderFreight_.getResult());
 						}
 					}
 					// 取消的商品对应的运费
-					BigDecimal backFright = new BigDecimal(
-							dropShipOrder.getForeignFreight())
-							.subtract(new BigDecimal(freight1).setScale(2,
-									BigDecimal.ROUND_HALF_UP));
+					BigDecimal backFright = new BigDecimal(dropShipOrder.getForeignFreight()).subtract(new BigDecimal(freight1).setScale(2, BigDecimal.ROUND_HALF_UP));
 					// 统计需要退回的总金额
-					cancelTotalPrice = cancelTotalPrice.add(productprice)
-							.add(backFright)
-							.setScale(2, BigDecimal.ROUND_HALF_UP);
-
-					dropShipOrder.setModeTransport(dropShipOrder
-							.getModeTransport().replace(
-									dropShipOrder.getForeignFreight(),
-									freight1 + ""));
+					cancelTotalPrice = cancelTotalPrice.add(productprice).add(backFright).setScale(2, BigDecimal.ROUND_HALF_UP);
+					dropShipOrder.setModeTransport(dropShipOrder.getModeTransport().replace(dropShipOrder.getForeignFreight(), freight1 + ""));
 					dropShipOrder.setProductCost(remainPrice.toString());
 					dropShipOrder.setForeignFreight(freight1 + "");// 国外运费
 					dropShipOrder.setPayPriceTow(freight1 + "");// 运费
-					dropShipOrder.setPayPrice(remainPrice
-							.add(new BigDecimal(freight1))
-							.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-					dropShipOrder.setDetailsNumber(dropShipOrder
-							.getDetailsNumber() - productNum);
-					dropShipOrder.setActualWeightEstimate(remainWeight
-							.doubleValue());
-					if (dropShipOrder.getDetailsNumber() == productNum
-							&& dropShipOrder.getProductCost().equals(
-							productprice)) {
+					dropShipOrder.setPayPrice(remainPrice.add(new BigDecimal(freight1)).setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+					dropShipOrder.setDetailsNumber(dropShipOrder.getDetailsNumber() - productNum);
+					dropShipOrder.setActualWeightEstimate(remainWeight.doubleValue());
+					if (dropShipOrder.getDetailsNumber() == productNum && dropShipOrder.getProductCost().equals(productprice)) {
 						dropShipOrder.setState("-1");// 取消订单
 					}
 					// 更新子订单表(dropshiporder)
@@ -8328,8 +8288,7 @@ public class WarehouseCtrl {
                     rr.setPrice(cancelTotalPrice.doubleValue());
                     rr.setRemark_id(orderNo);
                     rr.setType(1);
-                    rr.setBalanceAfter(userAccount
-                            + cancelTotalPrice.doubleValue()); // available_m=available_m+(#{price})
+                    rr.setBalanceAfter(userAccount + cancelTotalPrice.doubleValue());
                     rr.setRemark("cancel:" + orderNo + ",goodsid:" + goodId);
                     rr.setCurrency(currency);
 					// 更新order_details信息状态为2
@@ -8359,8 +8318,7 @@ public class WarehouseCtrl {
 					int rc = 0;
 					try {
 						DataSourceSelector.set("dataSource127hop");
-						rc = orderService.upUserPrice(userId,
-								cancelTotalPrice.doubleValue());
+						rc = orderService.upUserPrice(userId, cancelTotalPrice.doubleValue());
 						LOG.info("更新用户表余额(user) :" + userId);
 						DataSourceSelector.restore();
 					} catch (Exception e) {
@@ -8373,10 +8331,7 @@ public class WarehouseCtrl {
 					String freight = dropShipOrder.getForeignFreight();
 					String price = dropShipOrder.getPayPrice();
 					int productNum = dropShipOrder.getDetailsNumber();
-					BigDecimal productweight = new BigDecimal(
-							dropShipOrder.getActualWeightEstimate()).setScale(
-							2, BigDecimal.ROUND_HALF_UP);
-
+					BigDecimal productweight = new BigDecimal(dropShipOrder.getActualWeightEstimate()).setScale(2, BigDecimal.ROUND_HALF_UP);
 					dropShipOrder.setProductCost("0.00");
 					dropShipOrder.setForeignFreight("0.00");
 					dropShipOrder.setPayPriceTow("0.00");
@@ -8407,12 +8362,8 @@ public class WarehouseCtrl {
 					List<Dropshiporder> dropshiporderList = new ArrayList<Dropshiporder>();
 					try {
 						DataSourceSelector.set("dataSource127hop");
-						dropshiporderList = dropshiporderService
-								.getDropshiporderList(
-										dropShipOrder.getParentOrderNo(),
-										userId, "5");
-						LOG.info("查看当前子订单所属的主订单下是否还有没取消的订单:"
-								+ dropShipOrder.getParentOrderNo());
+						dropshiporderList = dropshiporderService.getDropshiporderList(dropShipOrder.getParentOrderNo(), userId, "5");
+						LOG.info("查看当前子订单所属的主订单下是否还有没取消的订单:" + dropShipOrder.getParentOrderNo());
 						DataSourceSelector.restore();
 					} catch (Exception e) {
 						LOG.error("查看当前子订单所属的主订单下是否还有没取消的订单", e);
@@ -8466,8 +8417,7 @@ public class WarehouseCtrl {
 					int rc = 0;
 					try {
 						DataSourceSelector.set("dataSource127hop");
-						rc = orderService.upUserPrice(userId,
-								Double.parseDouble(price));
+						rc = orderService.upUserPrice(userId,Double.parseDouble(price));
 						LOG.info("更新用户表余额:" + dropShipOrder.getParentOrderNo());
 						DataSourceSelector.restore();
 					} catch (Exception e) {
@@ -8481,9 +8431,7 @@ public class WarehouseCtrl {
 		} else {
 			try {
 				DataSourceSelector.set("dataSource127hop");
-				deleteCtpoOrderGoods = iWarehouseService
-						.deleteOrderGoods(orderNo, goodId, userId,
-								purchase_state, null, response);
+				deleteCtpoOrderGoods = iWarehouseService.deleteOrderGoods(orderNo, goodId, userId,purchase_state, null, response);
 				LOG.info("直接取消商品:" + deleteCtpoOrderGoods[0]);
 				DataSourceSelector.restore();
 			} catch (Exception e) {
@@ -8506,12 +8454,8 @@ public class WarehouseCtrl {
 		return org.apache.commons.lang.StringUtils.upperCase(sb.toString());
 	}
 
-
-
 	private  String byteToHexString(byte ib){
-		char[] Digit={
-				'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'
-		};
+		char[] Digit={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 		char[] ob=new char[2];
 		ob[0]=Digit[(ib>>>4)& 0X0f];
 		ob[1]=Digit[ib & 0X0F];
@@ -8561,16 +8505,21 @@ public class WarehouseCtrl {
 				// 本地服务器磁盘全路径
 				String localFilePath ="2020-08/video/" +old_name;
 				// 文件流输出到本地服务器指定路径
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				String imgPath = imgUploadPath + localFilePath;
 				System.out.println("新上传的文件名："+old_name);
-				System.out.println("新上传的文件路径："+("d:/product/" + localFilePath));
-				flag=ImgDownload.writeImageToDisk1(file.getBytes(), "d:/product/" + localFilePath);
+				System.out.println("新上传的文件路径："+imgPath);
+				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
-					String ip = "104.247.194.50";// 192.168.1.29
-					String user = "importweb";// ftp29
-					String passw = "importftp@123";// 29@123
-					String remotePath = "/imgtest/";// 2017-09-12/
+					String ip =Util.PIC_IP;
+					String user = Util.PIC_USER;
+					String passw = Util.PIC_PASS;
+					String remotePath =Util.PIC_PATH;
 					String fileName = old_name;
-					String oriFilePath = "d:/product/" + localFilePath;
+					String oriFilePath = imgPath;
 					success = NewFtpUtil.uploadFileToRemote(ip, 21, user, passw, remotePath, fileName, oriFilePath);
 					System.out.println("success :" + success);
 				}
@@ -8588,34 +8537,36 @@ public class WarehouseCtrl {
 
 	@RequestMapping(value = "/uploadTypeNewPictures", method = { RequestMethod.POST })
 	@ResponseBody
-	public JsonResult uploadTypeNewPictures(@RequestParam(value = "new_pid", required = true) String new_pid,
-                                            @RequestParam(value = "uploadfile1", required = true) MultipartFile file, HttpServletRequest request) {
+	public JsonResult uploadTypeNewPictures(@RequestParam(value = "new_pid", required = true) String new_pid, @RequestParam(value = "uploadfile1", required = true) MultipartFile file, HttpServletRequest request) {
 		JsonResult json = new JsonResult();
 		boolean flag=false;
 		System.out.println("new_pid:" + new_pid);
 		try{
 			if (!file.isEmpty() && !StringUtils.isStrNull(new_pid)) {
-//				SimpleDateFormat order=new SimpleDateFormat("ddHHmm");
-//				Date data=new Date();
 				long tims=System.currentTimeMillis();
 				String dir="";
 				String old_name=new_pid+"_new.jpg";
 				// 本地服务器磁盘全路径
 				String localFilePath ="2020-08/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				String imgPath = imgUploadPath + localFilePath;
 				System.out.println("新上传的文件名："+(tims+old_name));
-				System.out.println("新上传的文件路径："+("d:/product/" + localFilePath));
-				flag=ImgDownload.writeImageToDisk1(file.getBytes(), "d:/product/" + localFilePath);
+				System.out.println("新上传的文件路径："+imgPath);
+				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", localFilePath, "d:/product/" + localFilePath);
+					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
 				}
 				int row=0;
 				if(flag){
 					//插入数据inspection_picture
-					row=iWarehouseService.insertInspectionPicture(new_pid,"http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"");
+					row=iWarehouseService.insertInspectionPicture(new_pid,Util.PIC_URL+localFilePath+"");
 					if(row>0){
 						DataSourceSelector.set("dataSource127hop");
-						row=iWarehouseService.insertInspectionPicture(new_pid,"http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"");
+						row=iWarehouseService.insertInspectionPicture(new_pid,Util.PIC_URL+localFilePath+"");
 						DataSourceSelector.restore();
 					}
 				}
@@ -8668,16 +8619,16 @@ public class WarehouseCtrl {
 				System.out.println("新上传的文件路径："+(imgUploadPath + localFilePath));
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
+					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
 				}
 				int row=0;
 				if(flag){
-					picPath="http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath;
-					row=iWarehouseService.updateQuestPicPath(gbookid,"http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"");
+					picPath=Util.PIC_URL+localFilePath;
+					row=iWarehouseService.updateQuestPicPath(gbookid,Util.PIC_URL+localFilePath+"");
 					if(row>0){
 						json.setOk(true);
 						SendMQ sendMQ=new SendMQ();
-						sendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='http://img.import-express.com/importcsvimg/inspectionImg/"+localFilePath+"' where id="+gbookid+""));
+						sendMQ.sendMsg(new RunSqlModel("update guestbook set picPath='"+Util.PIC_URL+localFilePath+"' where id="+gbookid+""));
 						sendMQ.closeConn();
 					}
 				}
@@ -8739,8 +8690,6 @@ public class WarehouseCtrl {
 		System.out.println("i_id:"+i_id);
 		try{
 			if (!file.isEmpty() && !StringUtils.isStrNull(pic)) {
-//				SimpleDateFormat order=new SimpleDateFormat("ddHHmm");
-//				Date data=new Date();
 				long tims=System.currentTimeMillis();
 				String dir="";
 				String old_name="";
@@ -8756,11 +8705,16 @@ public class WarehouseCtrl {
 				// 本地服务器磁盘全路径
 				String localFilePath ="2020-08/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				String imgPath = imgUploadPath + localFilePath;
 				System.out.println("新上传的文件名："+(tims+old_name));
-				System.out.println("新上传的文件路径："+("d:/product/" + localFilePath));
-				flag=ImgDownload.writeImageToDisk1(file.getBytes(), "d:/product/" + localFilePath);
+				System.out.println("新上传的文件路径："+imgPath);
+				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
-					flag=uploadPic(localFilePath, "d:/product/" + localFilePath,orderid,goodsid,1,i_id);
+					flag=uploadPic(localFilePath, imgPath,orderid,goodsid,1,i_id);
 				}
 				json.setOk(flag);
 			}else{
@@ -8777,7 +8731,7 @@ public class WarehouseCtrl {
 	public boolean uploadPic(String storePath,String imgPath,String orderid,String goodsid,int index,String i_id){
 		boolean flag=false;
 		try {
-			flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", storePath, imgPath);
+			flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 			if(flag){
 				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();
@@ -8785,12 +8739,12 @@ public class WarehouseCtrl {
 				String sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.goodsid = ?;";
 				try {
 					stmt = conn.prepareStatement(sql);// 仓库不用
-					stmt.setString(1, "http://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
 					stmt.setString(3, goodsid);
 					stmt.executeUpdate();
 					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, "http://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, StringUtil.isBlank(orderid)?"999999":orderid);
 					stmt.setString(3, goodsid);
 					stmt.executeUpdate();
@@ -8801,11 +8755,11 @@ public class WarehouseCtrl {
 					stmt.executeUpdate();
 					sql="update inspection_picture set pic_path=? where id=? and isdelete=0";
 					stmt = conn1.prepareStatement(sql);
-					stmt.setString(1, "http://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, i_id);
 					stmt.executeUpdate();
 					stmt = conn.prepareStatement(sql);
-					stmt.setString(1, "http://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, i_id);
 					stmt.executeUpdate();
 				} catch (SQLException e) {
@@ -8851,7 +8805,6 @@ public class WarehouseCtrl {
 		if (!fdirExi.exists()) {
 			fdirExi.mkdirs();
 		}
-
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 		List<MultipartFile> files = multipartRequest.getFiles("file");	//多图片的
 		for (MultipartFile multipartFile : files) {
@@ -8859,35 +8812,23 @@ public class WarehouseCtrl {
 			//上传文件名
 			String imgName ="";
 			if(goodid==null || "".equals(goodid)){
-//    			imgName = time + "/" + orderid + "_" + minute+ second;
-				imgName = time + "/" + orderid + "_" + (int)(Math.random() * 100000);//采用5位随机数，防止多张上传时候文件名冲突
+				imgName = time + "/" + orderid + "_" + (int)(Math.random() * 100000);
 			}else{
 				imgName = time + "/" + orderid + "_" + goodid;
 			}
-			// + ".jpg"
 			String oriName = temFile.getOriginalFilename();
 			imgName += oriName.substring(oriName.lastIndexOf("."));
-//            String newName = new Date().getTime()+"_"+oriName;
 			File tempFile = new File(fdir.getPath() + File.separator + imgName);
 			temFile.transferTo(tempFile);
-			//压缩图片
-//            ExpressTrackServlet.resize(tempFile, tempFile, 1.00, 0.9f);
-			//ExpressTrackServlet.resize(tempFile, tempFile, 600, 0.9f,true);
-			//添加到结果集
-			uploadImgList.add(imgName);
-			//上传及保存 摘自 ExpressTrackServlet.java uploadImage
-
-			//远程上传到图片服务器
-//          boolean success = NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", storePath, imgPath);
 			AddInventoryThread a= new AddInventoryThread(imgName, tempFile.getPath(), orderid, goodid, 0);
 			a.start();
 			//支持断点续存上传图片,
-			ContinueFTP2 f1=new ContinueFTP2("104.247.194.50", "importweb", "importftp@123",
+			ContinueFTP2 f1=new ContinueFTP2(Util.PIC_IP, Util.PIC_USER, Util.PIC_PASS,
 					"21", "/stock_picture/" + imgName,tempFile.getPath());
 			//远程上传到图片服务器
 			f1.start();
 			//保存数据
-			expressTrackDao.saveImgPathForInfo("https://img.import-express.com/importcsvimg/inspectionImg/" + imgName, orderid, imgName);
+			expressTrackDao.saveImgPathForInfo(Util.PIC_URL + imgName, orderid, imgName);
 
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("imgs", tempFile.getPath()));

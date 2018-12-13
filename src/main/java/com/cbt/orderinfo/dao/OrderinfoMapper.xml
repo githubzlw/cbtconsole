@@ -973,6 +973,9 @@
         left join  admin_r_user aru on aru.userid= o.user_id
         left join  paymentconfirm  pf on pf.orderno=o.child_order_no where child_order_no =#{orderid}
     </select>
+    <select id="getUserEmailByOrderNo" resultType="java.lang.String">
+        SELECT u.email FROM USER u INNER JOIN orderinfo oi ON u.id=oi.user_id WHERE oi.order_no=#{orderNo}
+    </select>
     <select id="getAllFreightByOrderid" resultType="java.lang.String">
         SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
     </select>

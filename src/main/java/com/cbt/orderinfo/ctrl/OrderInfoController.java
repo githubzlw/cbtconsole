@@ -17,10 +17,13 @@ import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.quartz.ParseOrderFreightJob;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.google.gson.Gson;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 
 import ceRong.tools.bean.SearchLog;
 import net.minidev.json.JSONArray;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,10 +47,10 @@ public class OrderInfoController{
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderInfoController.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
-	
 	@Autowired
 	private IPurchaseService purchaseService;
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	@Autowired
 	private ISpiderServer spiderService;
 
@@ -564,6 +567,41 @@ public class OrderInfoController{
 			row=iOrderinfoService.addUser(map);
 		}catch (Exception e){
 			e.printStackTrace();
+		}
+		out.print(row);
+		out.close();
+	}
+
+	/**
+	 * 订单详情-价格更新、交期偏长、定量偏低、需沟通邮件发送
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/sendCutomers")
+	public void sendCutomers(HttpServletRequest request, HttpServletResponse response)throws Exception {
+		PrintWriter out = response.getWriter();
+		String orderNo = null;
+		String orderNo1 = request.getParameter("orderNo");
+		int whichOne = Integer.parseInt(request.getParameter("whichOne"));
+		// 获取到是否是isDropship订单
+		int isDropship = Integer.parseInt(request.getParameter("isDropship"));
+		// 0不是，1是
+		if (isDropship == 1) {
+			orderNo = orderNo1.substring(0, orderNo1.indexOf("_"));
+		} else {
+			orderNo = orderNo1;
+		}
+		int row=0;
+		//根据订单号获取客户邮箱地址
+		String email=iOrderinfoService.getUserEmailByOrderNo(orderNo);
+		if(StringUtil.isNotBlank(email)){
+			Map<String,Object> modelM = new HashedMap();
+			modelM.put("orderNo",orderNo);
+			modelM.put("name",email);
+			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
+			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
+			row=1;
 		}
 		out.print(row);
 		out.close();
