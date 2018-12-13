@@ -626,9 +626,9 @@ public class ShopCarMarketingController {
             }
             // 如果总运费totalFreight为0，则重新获取总运费(调用线上的接口)
             if (totalFreight < 0.1) {
-                //totalFreight = getMinFreightByUserId(userId);
+                totalFreight = getMinFreightByUserId(userId,carUserStatistic);
             }
-            totalFreight = getMinFreightByUserId(userId,carUserStatistic);
+            //totalFreight = getMinFreightByUserId(userId,carUserStatistic);
             estimateProfit = (totalPrice - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
             carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
             carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
