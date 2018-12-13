@@ -2,10 +2,7 @@ package com.importExpress.controller;
 
 import com.cbt.orderinfo.service.OrderinfoService;
 import com.cbt.userinfo.service.IUserInfoService;
-import com.cbt.util.BigDecimalUtil;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Util;
+import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.GoodsCarActiveBeanUpdate;
 import com.cbt.website.dao.shoppingCartDao;
@@ -50,7 +47,7 @@ import java.util.Map;
 public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
-    private static final String GET_MIN_FREIGHT_URL = "http://127.0.0.1:8087/shopCartMarketingCtr/getMinFreightByUserId";
+    private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
 
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
