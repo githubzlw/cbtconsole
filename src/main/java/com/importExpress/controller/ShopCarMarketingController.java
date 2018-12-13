@@ -249,7 +249,9 @@ public class ShopCarMarketingController {
                     //使用MQ清空购物车数据
                     //redis示例
                     SendMQ sendMQ = new SendMQ();
-                    sendMQ.sendMsg(new RedisModel(new String[]{userIdStr}));
+                    RedisModel redisModel = new RedisModel(new String[]{userIdStr});
+                    redisModel.setType("3");
+                    sendMQ.sendMsg(redisModel);
                     sendMQ.closeConn();
                 } else {
                     json.setOk(false);
