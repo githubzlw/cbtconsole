@@ -597,9 +597,8 @@ public class WarehouseCtrl {
 	 * @param response
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/delInPic")
-		public void delInPic(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	  @RequestMapping(value = "/delInPic")
+	  public void delInPic(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int row=0;
 		PrintWriter out = response.getWriter();
 		try{
@@ -622,18 +621,15 @@ public class WarehouseCtrl {
 			sendMQ.closeConn();
 			row=1;
 		}catch (Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			row=0;
 		}
 		out.print(row);
 		out.close();
 	}
 
-
-
 	@RequestMapping(value = "/insertStorageProblemOrder")
-	public void insertStorageProblemOrder(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void insertStorageProblemOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		try{
 			DataSourceSelector.restore();
@@ -743,7 +739,6 @@ public class WarehouseCtrl {
 		map.put("adminId","0".equals(adminId)?null:adminId);
 		map.put("updatetime","0".equals(updatetime)?null:updatetime);
 		list = iWarehouseService.salesPerformance(map);
-//		List<PurchaseSamplingStatisticsPojo> counts = iWarehouseService.salesPerformanceCount(map);
 		json.setRows(list);
 		json.setTotal(list.size());
 		return json;
@@ -1000,11 +995,9 @@ public class WarehouseCtrl {
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<RefundSamplePojo> list = new ArrayList<RefundSamplePojo>();
 		int page = Integer.parseInt(request.getParameter("page"));
-//		String state=request.getParameter("state");
 		String t_orderid=request.getParameter("t_orderid");
 		page=page>0?(page = (page - 1) * 50):page;
 		map.put("page", page);
-//		map.put("state", state);
 		map.put("t_orderid", t_orderid);
 		list=iWarehouseService.searchRefundSample(map);
 		List<RefundSamplePojo> list_cont=iWarehouseService.searchRefundSampleCount(map);
@@ -1122,7 +1115,7 @@ public class WarehouseCtrl {
 	 */
 	public static List<String> getSubUtil(String soap, String rgex) {
 		List<String> list = new ArrayList<String>();
-		Pattern pattern = Pattern.compile(rgex);// 匹配的模式
+		Pattern pattern = Pattern.compile(rgex);
 		Matcher m = pattern.matcher(soap);
 		while (m.find()) {
 			int i = 1;
@@ -1143,11 +1136,9 @@ public class WarehouseCtrl {
 	 * @return void
 	 */
 	@RequestMapping(value = "/updateShopState")
-	public void updateShopState(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void updateShopState(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		com.cbt.website.userAuth.bean.Admuser adm = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil
-				.JsonToObj(admuserJson, com.cbt.website.userAuth.bean.Admuser.class);
+		com.cbt.website.userAuth.bean.Admuser adm = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.website.userAuth.bean.Admuser.class);
 		Map<String, Object> map = new HashMap<String, Object>();
 		String id = request.getParameter("id");
 		String state = request.getParameter("state");
@@ -1182,8 +1173,7 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/getBuyReturnManage", method = RequestMethod.POST)
 	@ResponseBody
-	public EasyUiJsonResult getBuyReturnManage(HttpServletRequest request, Model model)
-			throws ParseException {
+	public EasyUiJsonResult getBuyReturnManage(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		String goodsid=request.getParameter("goodsid");
 		String state=request.getParameter("state");
@@ -1197,11 +1187,9 @@ public class WarehouseCtrl {
 		c.setTime(new Date());
 		c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) - 15);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		System.out.println("15天前的时间：" + df.format(c.getTime()));
 		startTime=df.format(c.getTime());
 		c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH) - 90);
 		df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		System.out.println("90天前的时间：" + df.format(c.getTime()));
 		endTime=df.format(c.getTime());
 		List<TaoBaoOrderInfo> tList=iWarehouseService.getBuyReturnManage(goodsid,page,state,startTime,endTime);
 		int count=iWarehouseService.getBuyReturnManageCount(goodsid,state,startTime,endTime);
@@ -1222,10 +1210,18 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/getUserInfo.do", method = RequestMethod.POST)
 	@ResponseBody
-	public EasyUiJsonResult getUserInfo(HttpServletRequest request, Model model)
-			throws ParseException {
+	public EasyUiJsonResult getUserInfo(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
+		Map<String, Object> map = getStringObjectMap(request);
+		userInfos = iWarehouseService.getUserInfoForPrice(map);
+		List<UserInfo> userInfoCount = iWarehouseService.getUserInfoForPriceCount(map);
+		json.setRows(userInfos);
+		json.setTotal(userInfoCount.size());
+		return json;
+	}
+
+	private Map<String, Object> getStringObjectMap(HttpServletRequest request) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String userid = request.getParameter("userid");
 		String stateDate = request.getParameter("stateDate");
@@ -1268,7 +1264,7 @@ public class WarehouseCtrl {
 		map.put("paymentemail", paymentemail);
 		map.put("admUserId", admUserId);
 		map.put("vip", vip);
-		map.put("address",StringUtil.isNotBlank(address)?address:null);
+		map.put("address", StringUtil.isNotBlank(address)?address:null);
 		wjState=StringUtil.isNotBlank(wjState)?"4":"9";
 		cyState=StringUtil.isNotBlank(cyState)?"3":"9";
 		shState=StringUtil.isNotBlank(shState)?"5":"9";
@@ -1299,11 +1295,7 @@ public class WarehouseCtrl {
 		map.put("start", (stateNum - 1) * 20);
 		map.put("end", 20);
 		map.put("state",StringUtil.isBlank(state)?null:state);
-		userInfos = iWarehouseService.getUserInfoForPrice(map);
-		List<UserInfo> userInfoCount = iWarehouseService.getUserInfoForPriceCount(map);
-		json.setRows(userInfos);
-		json.setTotal(userInfoCount.size());
-		return json;
+		return map;
 	}
 
 	/**
@@ -1381,10 +1373,9 @@ public class WarehouseCtrl {
 	 * @return String 返回值类型
 	 */
 	@RequestMapping(value = "/questionnaireStatistics.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	public String questionnaireStatistics(HttpServletRequest request,
-										  Model model) throws ParseException {
+	public String questionnaireStatistics(HttpServletRequest request, Model model) throws ParseException {
 		// 问卷调查统计
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		Map<String, Object> map = new HashMap<String, Object>();
 		String sql = "(select 'A' title,first_question wt,count(first_question) cnt  from payment_completion_survey group by first_question HAVING first_question != '') union "
 				+ "(select 'B',second_question,count(second_question) from payment_completion_survey group by second_question HAVING second_question != '') union "
 				+ "(select 'C',third_question,count(third_question) from payment_completion_survey group by third_question HAVING third_question != '')";
@@ -1413,10 +1404,9 @@ public class WarehouseCtrl {
 	 * @return String 返回值类型
 	 */
 	@RequestMapping(value = "/receivingInvestigation.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
-	public String receivingInvestigation(HttpServletRequest request, Model model)
-			throws ParseException {
+	public String receivingInvestigation(HttpServletRequest request, Model model) throws ParseException {
 		// 问卷调查统计
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		Map<String, Object> map = new HashMap<String, Object>();
 		String sql = "select 'A' title,first_question wt,count(first_question) cnt  from confirm_receipt_investigation group by first_question HAVING first_question != '' ";
 		map.put("sql", sql);
 		List<AllProblemPojo> allProblem = iWarehouseService.getAllProblem(map);
@@ -1453,8 +1443,7 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/getTb1688State.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
-	public String getTb1688State(HttpServletRequest request, Model model)
-			throws ParseException {
+	public String getTb1688State(HttpServletRequest request, Model model) throws ParseException {
 		String orderstatus = request.getParameter("orderstatus");
 		Calendar cal = Calendar.getInstance();
 		String admsuerid=request.getParameter("admuserid");
@@ -1476,21 +1465,6 @@ public class WarehouseCtrl {
 		return JSONObject.fromObject(oicp).toString();
 	}
 
-	@RequestMapping(value = "/getById.do", method = RequestMethod.GET)
-	public String callUpdateIdrelationtable(HttpServletRequest request,Model model) {
-		Map<String, String> param = new HashMap<String, String>();
-		param.put("orderId", request.getParameter(""));
-		param.put("goodId", request.getParameter(""));
-		param.put("goodStatus", request.getParameter(""));
-		param.put("goodUrl", request.getParameter(""));
-		param.put("barCode", request.getParameter(""));
-		param.put("useridV", request.getParameter(""));
-		param.put("usernameV", request.getParameter(""));
-		param.put("tborderidV", request.getParameter(""));
-		iWarehouseService.callUpdateIdrelationtable(param);
-		return net.sf.json.JSONArray.fromObject(param).toString();
-	}
-
 	/**
 	 *
 	 * @Title getOrderfeeFreight
@@ -1502,7 +1476,6 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/getOrderfeeFreight.do", method = RequestMethod.GET)
 	public String getOrderfeeFreight(HttpServletRequest request, Model model) {
-		// 取查询条件参数 trans_method=${oip.trans_method}&
 		String orderid = (String) request.getParameter("orderid");
 		String userid = (String) request.getParameter("userid");
 		String ckStartTime = (String) request.getParameter("ckStartTime");
@@ -1512,8 +1485,8 @@ public class WarehouseCtrl {
 		int pageNum=!StringUtils.isStrNull(t)?Integer.parseInt(t):1;
 		t = request.getParameter("pageSize");
 		int pageSize=!StringUtils.isStrNull(t)?Integer.parseInt(t):50;
-		int startNum = pageNum * pageSize - pageSize; // 开始位置
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		int startNum = pageNum * pageSize - pageSize;
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("orderid", orderid);
 		map.put("userid", userid);
 		map.put("ckStartTime", ckStartTime);
@@ -1523,17 +1496,16 @@ public class WarehouseCtrl {
 		} else {
 			map.put("trans_method", trans_method);
 		}
-		int count = iWarehouseService.getOrderfeeFreightCount(map); // 总记录数
+		int count = iWarehouseService.getOrderfeeFreightCount(map);
 		map.put("startNum", startNum);
 		map.put("endNum", pageSize);
-		List<OrderFeePojo> list = iWarehouseService.getOrderfeeFreight(map,request); // 结果集
-		OrderInfoPage oip = new OrderInfoPage(); // 页
-		// 如果不是第一次 查询 就已经保存了 OrderInfoPage
-		oip.setOrderfeelist(list); // 一页数据
-		oip.setPageNum(pageNum); // 当前页
-		oip.setPageSize(pageSize); // 也大小
-		oip.setPageSum(count); // 总记录数
-		oip.setOrderid(orderid); // 查询条件
+		List<OrderFeePojo> list = iWarehouseService.getOrderfeeFreight(map,request);
+		OrderInfoPage oip = new OrderInfoPage();
+		oip.setOrderfeelist(list);
+		oip.setPageNum(pageNum);
+		oip.setPageSize(pageSize);
+		oip.setPageSum(count);
+		oip.setOrderid(orderid);
 		oip.setUserid(userid);
 		oip.setCkEndTime(ckEndTime);
 		oip.setCkStartTime(ckStartTime);
@@ -1562,10 +1534,12 @@ public class WarehouseCtrl {
 		}
 		map.put("admuserid", admuserid);
 		map.put("acount", acount);
-		List<String> list_orderid = iWarehouseService.getsourceValidation(map);// 昨天确认采购的订单
-		List<String> list_tbOrderid = iWarehouseService.getsourceValidationForBuy(map);// 采购 所有实际采购的订单
-		OrderInfoPage oip = new OrderInfoPage(); // 页
-		oip.setList_orderid(list_orderid); // 一页数据
+		// 昨天确认采购的订单
+		List<String> list_orderid = iWarehouseService.getsourceValidation(map);
+		// 采购 所有实际采购的订单
+		List<String> list_tbOrderid = iWarehouseService.getsourceValidationForBuy(map);
+		OrderInfoPage oip = new OrderInfoPage();
+		oip.setList_orderid(list_orderid);
 		oip.setList_tbOrderid(list_tbOrderid);
 		request.setAttribute("oip", oip);
 		return "source_validation";
@@ -1579,43 +1553,47 @@ public class WarehouseCtrl {
      */
     @RequestMapping(value = "/getDetailsForOrderid", method = RequestMethod.GET)
     public String getDetailsForOrderid(HttpServletRequest request, Model model) {
-        // 取查询条件参数
-        String orderid = (String) request.getParameter("orderid");
-        String userid = (String) request.getParameter("userid");
-        String goodid = (String) request.getParameter("goodid");
-        String ckStartTime = (String) request.getParameter("ckStartTime");
-        String ckEndTime = (String) request.getParameter("ckEndTime");
-        String state = (String) request.getParameter("state");
-        state="0".equals(state)?null:state;
-        String t = request.getParameter("pageNum");
-        int pageNum=!StringUtils.isStrNull(t)?Integer.parseInt(t):1;
-        t = request.getParameter("pageSize");
-        int pageSize=!StringUtils.isStrNull(t)?Integer.parseInt(t):50;
-        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-        Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
-        if (adm == null) {
-            return "1003";
-        }
-        String sql = "";
-        int startNum = pageNum * pageSize - pageSize; // 开始位置
-        Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
-        map.put("orderid", StringUtils.isStrNull(orderid)?"":orderid.trim());
-        map.put("userid", userid);
-        map.put("goodid", goodid);
-        map.put("ckStartTime", ckStartTime);
-        map.put("ckEndTime", ckEndTime);
-        map.put("state", state);
-        map.put("sql", sql);
+	    String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+	    Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+	    if (adm == null) {
+		    return "1003";
+	    }
+	    Map<String, Object> map = getStringMapForDetails(request);
         map.put("admName", adm.getId());
-        map.put("startNum", startNum);
-        map.put("endNum", pageSize);
-        List<StorageLocationBean> list = iWarehouseService.getOrderinfoPage(map); // 结果集
-        OrderInfoPage oip = new OrderInfoPage(); // 页
-        oip.setPagelist(list); // 一页数据
+        List<StorageLocationBean> list = iWarehouseService.getOrderinfoPage(map);
+        OrderInfoPage oip = new OrderInfoPage();
+        oip.setPagelist(list);
         request.setAttribute("oip", oip);
         request.setAttribute("oip_size",list.size());
         return "new_outboundAudit";
     }
+
+	private Map<String, Object> getStringMapForDetails(HttpServletRequest request) {
+		String orderid = (String) request.getParameter("orderid");
+		String userid = (String) request.getParameter("userid");
+		String goodid = (String) request.getParameter("goodid");
+		String ckStartTime = (String) request.getParameter("ckStartTime");
+		String ckEndTime = (String) request.getParameter("ckEndTime");
+		String state = (String) request.getParameter("state");
+		state="0".equals(state)?null:state;
+		String t = request.getParameter("pageNum");
+		int pageNum=!StringUtils.isStrNull(t)?Integer.parseInt(t):1;
+		t = request.getParameter("pageSize");
+		int pageSize=!StringUtils.isStrNull(t)?Integer.parseInt(t):50;
+		String sql = "";
+		int startNum = pageNum * pageSize - pageSize;
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderid", StringUtils.isStrNull(orderid)?"":orderid.trim());
+		map.put("userid", userid);
+		map.put("goodid", goodid);
+		map.put("ckStartTime", ckStartTime);
+		map.put("ckEndTime", ckEndTime);
+		map.put("state", state);
+		map.put("sql", sql);
+		map.put("startNum", startNum);
+		map.put("endNum", pageSize);
+		return map;
+	}
 
 	/**
 	 * 采购管理页面进入采样页面根据订单查询数据
@@ -1814,24 +1792,17 @@ public class WarehouseCtrl {
 				}
 				list_type.append(typeBean.getType());
 				String typeParam  = typeBean.getType().trim();
-				typeParam = !StringUtils.isStrNull(typeParam) ?
-						typeParam.replaceAll(Util.CHAR_B, " ").replaceAll(Util.CHAR_TWO, "")
-								.replace("<", Util.CHAT_FOUR).replace(">", Util.CHAR_FIVE) : "";
-
+				typeParam = !StringUtils.isStrNull(typeParam) ? typeParam.replaceAll(Util.CHAR_B, " ").replaceAll(Util.CHAR_TWO, "").replace("<", Util.CHAT_FOUR).replace(">", Util.CHAR_FIVE) : "";
 				typeBean.setType(typeParam.substring(0,1).toUpperCase()+typeParam.substring(1));
-
-				String labType = !StringUtils.isStrNull(typeParam) ?
-						typeParam.replaceAll(Util.CHAR_W, "").toLowerCase() : "";
+				String labType = !StringUtils.isStrNull(typeParam) ? typeParam.replaceAll(Util.CHAR_W, "").toLowerCase() : "";
 				typeBean.setLableType(labType);
 				String value = typeBean.getValue();
-				value = !StringUtils.isStrNull(value) ?
-						value.replaceAll(Util.CHAR_A, "").replaceAll(Util.CHAR_SEV, "") : "";
+				value = !StringUtils.isStrNull(value) ? value.replaceAll(Util.CHAR_A, "").replaceAll(Util.CHAR_SEV, "") : "";
 				if(!StringUtils.isStrNull(value)){
 					value = value.replace("<", Util.CHAT_FOUR).replace(">", Util.CHAR_FIVE);
 					typeBean.setValue(value.replaceAll(Util.CHAT_SIX, " "));
 				}
 			}
-
 			a.setList_type(list_type.toString());
 		}
 	}
@@ -1881,7 +1852,6 @@ public class WarehouseCtrl {
 				type_name=t.getLableType();
 			}
 			a.setType_msg(sb.toString());
-			//规格库存
 			a.setSku_inventory(getSkuCount(a.getSku_inventory()));
 		}
 	}
@@ -1955,7 +1925,11 @@ public class WarehouseCtrl {
 	 */
 	@RequestMapping(value = "/getOrderinfoPage.do", method = RequestMethod.GET)
 	public String getOrderinfoPage(HttpServletRequest request, Model model) {
-		// 取查询条件参数
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		if (adm == null) {
+			return "1003";
+		}
 		String orderid = (String) request.getParameter("orderid");
 		String userid = (String) request.getParameter("userid");
 		String goodid = (String) request.getParameter("goodid");
@@ -1967,11 +1941,6 @@ public class WarehouseCtrl {
 		int pageNum=!StringUtils.isStrNull(t)?Integer.parseInt(t):1;
 		t = request.getParameter("pageSize");
 		int pageSize=!StringUtils.isStrNull(t)?Integer.parseInt(t):50;
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
-		if (adm == null) {
-			return "1003";
-		}
 		String sql = "";
 		int startNum = pageNum * pageSize - pageSize;
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -1983,17 +1952,17 @@ public class WarehouseCtrl {
 		map.put("state", state);
 		map.put("sql", sql);
 		map.put("admName", adm.getId());
-		int count = iWarehouseService.getCountOrderinfo(map); // 总记录数
+		int count = iWarehouseService.getCountOrderinfo(map);
 		map.put("startNum", startNum);
 		map.put("endNum", pageSize);
-		List<StorageLocationBean> list = iWarehouseService.getOrderinfoPage(map); // 结果集
-		OrderInfoPage oip = new OrderInfoPage(); // 页
+		List<StorageLocationBean> list = iWarehouseService.getOrderinfoPage(map);
+		OrderInfoPage oip = new OrderInfoPage();
 		// 如果不是第一次 查询 就已经保存了 OrderInfoPage
-		oip.setPagelist(list); // 一页数据
-		oip.setPageNum(pageNum); // 当前页
-		oip.setPageSize(pageSize); // 也大小
-		oip.setPageSum(count); // 总记录数
-		oip.setOrderid(orderid); // 查询条件
+		oip.setPagelist(list);
+		oip.setPageNum(pageNum);
+		oip.setPageSize(pageSize);
+		oip.setPageSum(count);
+		oip.setOrderid(orderid);
 		oip.setUserid(userid);
 		oip.setCkEndTime(ckEndTime);
 		oip.setCkStartTime(ckStartTime);

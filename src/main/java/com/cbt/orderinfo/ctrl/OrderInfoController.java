@@ -208,7 +208,6 @@ public class OrderInfoController{
 	@RequestMapping(value = "/getResultInfo")
 	public void getResultInfo(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		request.setCharacterEncoding("utf-8");
-
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		List<SearchResultInfo> list=new ArrayList<SearchResultInfo>();
@@ -240,21 +239,15 @@ public class OrderInfoController{
 		String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String users = user.getAdmName();
-		String username=request.getParameter("userName");
 		String admName=request.getParameter("admName");
 		String orderNo=request.getParameter("orderNo");
 		PrintWriter out = response.getWriter();
 		int row=0;
-		//用户id
 		map.put("userid",userid);
-		//销售人id
 		map.put("adminid",adminid);
 		map.put("users",users);
-		//客户邮箱
 		map.put("email",email);
-		//销售人名称
 		map.put("admName",admName);
-		//订单号
 		map.put("orderNo",orderNo);
 		try{
 			row=iOrderinfoService.addUser(map);
@@ -547,21 +540,15 @@ public class OrderInfoController{
 		String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String users = user.getAdmName();
-		String username=request.getParameter("userName");
 		String admName=request.getParameter("admName");
 		String orderNo=request.getParameter("orderNo");
 		PrintWriter out = response.getWriter();
 		int row=0;
-		//用户id
 		map.put("userid",userid);
-		//销售人id
 		map.put("adminid",adminid);
 		map.put("users",users);
-		//客户邮箱
 		map.put("email",email);
-		//销售人名称
 		map.put("admName",admName);
-		//订单号
 		map.put("orderNo",orderNo);
 		try{
 			row=iOrderinfoService.addUser(map);
@@ -661,8 +648,7 @@ public class OrderInfoController{
 		}else{
 			startdate_req="0";
 		}
-		if(enddate_req!=null && !enddate_req.equals("") )
-		{
+		if(enddate_req!=null && !enddate_req.equals("") ) {
 			enddate_req=enddate_req + " 23:59:59";
 		}else{
 			enddate_req="0";
@@ -750,7 +736,6 @@ public class OrderInfoController{
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype(); int admuserid=user.getId();
 			if("0".equals(strm)){
-				//临时添加Sales1查看所有订单列表的统计
 				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			}
 			List<Map<String, Integer>> maps =  iOrderinfoService.getOrdersState(admuserid);
@@ -797,7 +782,6 @@ public class OrderInfoController{
 				}
 			}
 		}
-		
 		map.put("beanList", beanList);
 		map.put("shopidList", shopidList);
 		return map;
@@ -832,10 +816,8 @@ public class OrderInfoController{
 			}
 		}
 		String shop_id = request.getParameter("shopid");
-		
 		//需要下单的 商品信息
 		List<Map<String,Object>> listMap  = purchaseService.getComfirmedSourceGoods();
-		
 		List<String> shopidList = new ArrayList<String>(5);
 		List<PurchaseGoodsBean> beanList = new ArrayList<PurchaseGoodsBean>();
 		if(listMap!=null) {
@@ -863,7 +845,6 @@ public class OrderInfoController{
 			}
 			Map<String,Object> map = new HashMap<String,Object>();
 			map.put("shopid", shopid);
-			
 			List<PurchaseGoodsBean> thisShopGoods = new ArrayList<PurchaseGoodsBean>();
 			List<Integer> idsList = new ArrayList<Integer>();
 			for(PurchaseGoodsBean pgbBean:beanList) {
@@ -923,7 +904,7 @@ public class OrderInfoController{
         Map<String,Object> map = new HashMap<String,Object>();
         String userinfo = request.getParameter("userid");
         int userid = userinfo==null?0:Integer.parseInt(userinfo);
-        if("0".equals(saveFlag)||"1".equals(saveFlag)){//搜索日志记录和页面产品展示数量更新
+        if("0".equals(saveFlag)||"1".equals(saveFlag)){
             String keyWords = request.getParameter("keyWords")==null?"":request.getParameter("keyWords");
             if(StringUtil.isNotBlank(keyWords) && keyWords.length()>200){
                 keyWords = keyWords.substring(0, 198);
