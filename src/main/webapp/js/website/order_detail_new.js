@@ -941,23 +941,15 @@ function fnChangeProduct(orderNo) {
 }
 
 function sendCutomers(orderNo, whichOne, isDropship) {
-	$("#notifycustomer").attr("disabled", "disabled");
-	$("#msg").css("display", "none");
-	var params = {
-		"orderNo" : orderNo,
-		"action" : "sendCutomers",
-		"className" : "OrderwsServlet",
-		"whichOne" : whichOne,
-		"isDropship" : isDropship
-	};
+	// $("#notifycustomer").attr("disabled", "disabled");
+	// $("#msg").css("display", "none");
 	$.ajax({
 		url : '/cbtconsole/order/sendCutomers',
 		type : "post",
-		data : params,
-		dataType : "json",
+		data : {"orderNo" : orderNo, "whichOne" : whichOne, "isDropship" : isDropship},
 		success : function(data) {
 			console.log(data);
-			$("#notifycustomer").removeAttr("disabled");
+			// $("#notifycustomer").removeAttr("disabled");
 			if (data.result > 0) {
 				$("#msg").css("display", "inline");
 			} else {
