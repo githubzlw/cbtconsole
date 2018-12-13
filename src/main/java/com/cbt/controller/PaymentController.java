@@ -52,17 +52,6 @@ public class PaymentController {
 		}
 	}
 	
-	@RequestMapping(value = "/getById", method = RequestMethod.POST)
-	@ResponseBody
-	public JSONArray getById(Integer id) {
-		Payment payment =paymentService.getById(id);
-		if(payment!=null){
-			return JSONArray.fromObject(payment);
-		}else{
-			return JSONArray.fromObject("没查询到数据");
-		}
-	}
-	
 	
 	
 	//根据用户ID查询可退款的到账        可退款条件 1：已支付的单子    2：距今未超过3个月
