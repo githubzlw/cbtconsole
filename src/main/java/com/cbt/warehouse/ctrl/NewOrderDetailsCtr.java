@@ -1947,9 +1947,10 @@ public class NewOrderDetailsCtr {
 		//会员费
 		double memberFee = orderInfo.getMemberFee();
 
+		// 会员费不算优惠金额,去掉
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
-				+ actual_lwh + processingfee + memberFee;
+				+ actual_lwh + processingfee;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();
