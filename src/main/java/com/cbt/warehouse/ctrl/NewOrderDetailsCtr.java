@@ -1593,7 +1593,7 @@ public class NewOrderDetailsCtr {
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 
-						sendMailFactory.sendMail(String.valueOf(model.get("toEmail")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+						sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 						// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 						insertChangeRecords(orderNo, -1, adminId);
 						json.setOk(true);
@@ -1714,7 +1714,7 @@ public class NewOrderDetailsCtr {
 				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 				String modeStr = jsonObject.toString();
 
-				sendMailFactory.sendMail(String.valueOf(model.get("toEmail")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 				try {
 					insertChangeRecords(orderNo, -1, adminId);
