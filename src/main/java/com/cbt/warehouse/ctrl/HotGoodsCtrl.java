@@ -313,6 +313,7 @@ public class HotGoodsCtrl {
             hsGoods.setIsOn(flagStr);
             hsGoods.setAsinCode(asinCode);
             hsGoods.setProfitMargin(Double.valueOf(profitMarginStr));
+            hsGoods.setGoodsPid(goodsPid);
             // 更新本地
             hotGoodsService.updateHotSellingGoods(hsGoods);
 
@@ -779,11 +780,26 @@ public class HotGoodsCtrl {
     public JsonResult useHotGoods(HttpServletRequest request, HttpServletResponse response) {
 
         JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null) {
+            json.setOk(false);
+            json.setMessage("获取登录用户信息失败");
+            return json;
+        }
 
         String pids = request.getParameter("pids");
         if (pids == null || "".equals(pids)) {
             json.setOk(false);
             json.setMessage("获取商品PID失败");
+            return json;
+        }
+
+        String categoryId = request.getParameter("categoryId");
+        if(StringUtils.isBlank(categoryId)){
+            json.setOk(false);
+            json.setMessage("获取热卖类别ID失败");
             return json;
         }
 
@@ -800,7 +816,7 @@ public class HotGoodsCtrl {
                 pidsMap.put(pid, stateStr);
             }
             if (pidsMap.size() > 0) {
-                hotGoodsService.useHotGoodsByState(pidsMap);
+                hotGoodsService.useHotGoodsByState(pidsMap,Integer.valueOf(categoryId),user.getId());
                 SendMQ sendMQ = new SendMQ();
                 for (String key : pidsMap.keySet()) {
                     String value = pidsMap.get(key);
