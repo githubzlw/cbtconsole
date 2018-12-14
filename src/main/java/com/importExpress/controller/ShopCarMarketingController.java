@@ -525,15 +525,11 @@ public class ShopCarMarketingController {
             statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
-            /*List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
+            List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
             int count = shopCarMarketingService.queryForListCount(statistic);
 
             json.setRows(res);
-            json.setTotal(count);*/
-
-            json.setSuccess(true);
-            json.setRows(new ArrayList<>());
-            json.setTotal(0);
+            json.setTotal(count);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查询失败，原因 :" + e.getMessage());
