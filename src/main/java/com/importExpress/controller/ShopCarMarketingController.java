@@ -525,15 +525,15 @@ public class ShopCarMarketingController {
             statistic.setCountryId(countryId);
             statistic.setStartNum(startNum);
             statistic.setLimitNum(limitNum);
-            List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
+            /*List<ShopCarUserStatistic> res = shopCarMarketingService.queryForList(statistic);
             int count = shopCarMarketingService.queryForListCount(statistic);
 
             json.setRows(res);
-            json.setTotal(count);
+            json.setTotal(count);*/
 
-            /*json.setSuccess(true);
+            json.setSuccess(true);
             json.setRows(new ArrayList<>());
-            json.setTotal(0);*/
+            json.setTotal(0);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("查询失败，原因 :" + e.getMessage());
@@ -633,11 +633,13 @@ public class ShopCarMarketingController {
             // 预估总运费未0，则把客户支付的运费当做全部支付运费，计算最下利润率
             if(totalFreight < 0.1){
                 estimateProfit = (totalPrice - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
+                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(onlineFreight, 2));
             }else{
                 estimateProfit = (totalPrice + onlineFreight - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
+                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
             }
             carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-            carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
+            carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(onlineFreight, 2));
             carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
             carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
 
@@ -669,7 +671,9 @@ public class ShopCarMarketingController {
             if (json.getBoolean("ok")) {
                 System.out.println("getMinFreightByUserId success !!!");
                 freight = json.getJSONObject("data").getDouble("totalFreight");
-                carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+                if(freight > 0 ){
+                    carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+                }
             } else {
                 System.err.println("getMinFreightByUserId error :<:<:<");
             }
