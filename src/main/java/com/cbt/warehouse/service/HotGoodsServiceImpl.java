@@ -4,6 +4,7 @@ import com.cbt.bean.CustomGoodsBean;
 import com.cbt.warehouse.dao.HotGoodsMapper;
 import com.cbt.warehouse.pojo.HotSellingCategory;
 import com.cbt.warehouse.pojo.HotSellingGoods;
+import com.importExpress.mapper.HotManageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ import java.util.Map;
 public class HotGoodsServiceImpl implements HotGoodsService {
 	@Autowired
 	private HotGoodsMapper hotGoodsMapper;
+
+	@Autowired
+	private HotManageMapper hotManageMapper;
 
 	@Override
 	public List<HotSellingCategory> queryForList() {
@@ -42,6 +46,7 @@ public class HotGoodsServiceImpl implements HotGoodsService {
 
 	@Override
 	public int updateHotSellingGoods(HotSellingGoods hsGoods) {
+		hotManageMapper.insertHotSellingUpdateLog(hsGoods.getHotSellingId(),hsGoods.getGoodsPid(),hsGoods.getUpdateAdmid(),Integer.valueOf(hsGoods.getIsOn()));
 		return hotGoodsMapper.updateHotSellingGoods(hsGoods);
 	}
 
@@ -131,7 +136,10 @@ public class HotGoodsServiceImpl implements HotGoodsService {
 	}
 
 	@Override
-	public int useHotGoodsByState(Map<String, String> pidsMap) {
+	public int useHotGoodsByState(Map<String, String> pidsMap,int hotId,int adminId) {
+		for (String key : pidsMap.keySet()) {
+			hotManageMapper.insertHotSellingUpdateLog(hotId, key, adminId, Integer.valueOf(pidsMap.get(key)));
+		}
 		return hotGoodsMapper.useHotGoodsByState(pidsMap);
 	}
 
