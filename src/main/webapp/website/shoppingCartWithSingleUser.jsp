@@ -281,9 +281,9 @@
             <caption><b style="font-size: 24px;color: #e65510;">客户【${userId}】购物车信息</b></caption>
             <tr>
                 <td>总产品金额:${userInfo.totalPrice}<em>$</em></td>
-                <td>总运费:${userInfo.totalFreight}<em>$</em></td>
+                <td>预估国际运费:${userInfo.offFreight}<em>$</em></td>
                 <td>总采购价:${userInfo.totalWhosePrice}<em>$</em></td>
-                <td>预计利润率:${userInfo.estimateProfit}<em>%</em></td>
+                <td>预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+客户支付运费-预估国际运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/${userInfo.totalWhosePrice})】</td>
             </tr>
             <tr>
                 <td>客户国家:${userInfo.countryName}</td>

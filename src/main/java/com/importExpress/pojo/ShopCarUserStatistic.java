@@ -28,6 +28,7 @@ public class ShopCarUserStatistic {
     private double endMoney;
     private int saleId;//跟进人ID
     private String saleName;//销售
+    private double offFreight;// 线下预估运费
 
     public int getUserId() {
         return userId;
@@ -243,6 +244,14 @@ public class ShopCarUserStatistic {
 
     public void setSaleName(String saleName) {
         this.saleName = saleName;
+    }
+
+    public double getOffFreight() {
+        return offFreight;
+    }
+
+    public void setOffFreight(double offFreight) {
+        this.offFreight = offFreight;
     }
 
     @Override
