@@ -22,6 +22,8 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 
 import ceRong.tools.bean.SearchLog;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
@@ -588,6 +590,10 @@ public class OrderInfoController{
 			modelM.put("name",email);
 			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
 			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
+			SendMQ sendMQ=new SendMQ();
+			iOrderinfoService.updateOrderinfoUpdateState(orderNo);
+			sendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
+			sendMQ.closeConn();
 			row=1;
 		}
 		out.print(row);

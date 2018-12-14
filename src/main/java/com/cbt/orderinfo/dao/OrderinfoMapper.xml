@@ -976,6 +976,9 @@
     <select id="getUserEmailByOrderNo" resultType="java.lang.String">
         SELECT u.email FROM USER u INNER JOIN orderinfo oi ON u.id=oi.user_id WHERE oi.order_no=#{orderNo}
     </select>
+    <update id="updateOrderinfoUpdateState">
+        update orderinfo set server_update=1 where order_no=#{orderNo}
+    </update>
     <select id="getAllFreightByOrderid" resultType="java.lang.String">
         SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
     </select>
