@@ -473,7 +473,7 @@
             }
         }
 
-        function useHotGoods(state) {
+        function useHotGoods(state,categoryId) {
             var pids = "";
             $(".check_sty").each(function () {
                 if ($(this).is(':checked')) {
@@ -489,6 +489,7 @@
                 url: "/cbtconsole/hotGoods/useHotGoods.do",
                 data: {
                     pids: pids.substring(1),
+                    categoryId: categoryId,
                     state: state
                 },
                 success: function (data) {
@@ -639,9 +640,9 @@
         <tr>
             <td colspan="5">全选<input type="checkbox" class="check_sty_all"
                                      onclick="chooseAll(this)"/> &nbsp;&nbsp;&nbsp;<input
-                    type="button" class="but_edit" onclick="useHotGoods(1)"
+                    type="button" class="but_edit" onclick="useHotGoods(1,${categoryId})"
                     value="启用 "/> &nbsp;&nbsp;&nbsp;<input type="button"
-                                                           class="but_delete" onclick="useHotGoods(0)" value="关闭 "/>&nbsp;&nbsp;&nbsp;
+                                                           class="but_delete" onclick="useHotGoods(0,${categoryId})" value="关闭 "/>&nbsp;&nbsp;&nbsp;
                 <b style="color: red;">(提示：绿色背景表示当前商品已选中；点击图片可直接进入电商网站产品单页)</b> <br>
                 <br>
                 <div id="add_goods_btn">

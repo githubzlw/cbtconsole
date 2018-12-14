@@ -201,7 +201,7 @@ public interface HotGoodsService {
 	 * @return
 	 * @return int
 	 */
-	public int useHotGoodsByState(Map<String, String> pidsMap);
+	public int useHotGoodsByState(Map<String, String> pidsMap,int hotId,int adminId);
 	
 	/**
 	 * 

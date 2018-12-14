@@ -43,6 +43,7 @@ public class HotManageServiceImpl implements HotManageService {
 
     @Override
     public int updateHotCategory(HotCategory param) {
+        hotManageMapper.insertHotSellingUpdateLog(param.getId(), "", param.getUpdateAdminId(), param.getIsOn());
         return hotManageMapper.updateHotCategory(param);
     }
 
