@@ -629,7 +629,7 @@ public class ShopCarMarketingController {
             // 利润率计算
             estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
 
-            carUserStatistic.setTotalPrice(totalPrice);
+            carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
             carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
             carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
 
