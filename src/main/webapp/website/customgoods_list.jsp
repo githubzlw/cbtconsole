@@ -481,9 +481,9 @@ b {
 		<span><input type="button" id="sall"
 			onclick="fnpsave('${uid}')" value="批量保存"
 			style="height: 30px; width: 80px;" class="btn"></span> <span><input
-			type="button" id="pall" onclick="fnpall('${uid}')" value="批量保存并发布"
+			type="button" id="pall" onclick="fnpall('${uid}')" value="批量保存并发布" disabled="disabled"
 			style="height: 30px; width: 120px;" class="btn"></span> <span><input
-			type="button" id="pdown" onclick="fndall('${uid}')" value="批量下架"
+			type="button" id="pdown" onclick="fndall('${uid}')" value="批量下架" disabled="disabled"
 			style="height: 30px; width: 80px; margin-right: 40px;" class="btn"></span>
 		<span><input type="button" id="marker_bm"
 			onclick="markerByAdm('${uid}')" value="人为对标"
@@ -636,7 +636,7 @@ b {
 				<br> <a href="/cbtconsole/apa/customGoodsEditLog.html?pid=${list.pid}" target="_blank">编辑日志</a>
 				<br> <input type="button" id="pb_btn_${list.pid}"
 				onclick="fnpublish('${list.pid}','${uid}')" value="线上发布" class="btn"
-				id="publish_${list.pid}"> <br><input
+				id="publish_${list.pid}" disabled="disabled"> <br><input
 				type="button" onclick="fndown('${list.pid}','${uid}')" value="产品下架"
 				class="btn" id="down_${list.pid}"> <br><a
 				target="_blank"

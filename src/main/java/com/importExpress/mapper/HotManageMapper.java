@@ -43,4 +43,6 @@ public interface HotManageMapper {
 
     int deleteGoodsByCategoryId(@Param("id") int id);
 
+
+    int insertHotSellingUpdateLog(@Param("hotId") int hotId, @Param("pid") String pid, @Param("adminId") int adminId, @Param("isOn") int isOn);
 }

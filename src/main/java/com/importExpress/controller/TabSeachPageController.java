@@ -341,7 +341,7 @@ public class TabSeachPageController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		if (aliCategory == null) {
-			DataSourceSelector.set("dataSource127hop");
+//			DataSourceSelector.set("dataSource127hop");
 			aliCategory = tabSeachPageService.aliCategory();
 		}
 

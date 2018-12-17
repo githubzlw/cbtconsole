@@ -184,7 +184,7 @@ public class UserServer implements IUserServer {
 		userDao.upUserActivationCode(email, activationPassCode,2);
 		String path = "";
 		try {
-			 path = UUIDUtil.getAutoLoginPath("/processesServlet?action=passActivate&className=ForgotPassword&email="+user.getEmail()+"&validateCode="+activationPassCode, uuid);
+			 path = UUIDUtil.getAutoLoginPath("/forgotPassword/passActivate?email="+user.getEmail()+"&validateCode="+activationPassCode, uuid);
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}

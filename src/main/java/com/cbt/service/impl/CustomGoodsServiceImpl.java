@@ -101,11 +101,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }
         }
 
+        int res = customGoodsDao.publish(bean,1);
         // 屏蔽使用jdbc更新AWS数据
         //int res = customGoodsDao.publish(bean);
         // 使用MQ更新AWS服务器数据
         GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
-        int res = 1;
+        res = 1;
         if (res > 0) {
             int count = customGoodsDao.publishTo28(bean);
             if (count == 0) {
