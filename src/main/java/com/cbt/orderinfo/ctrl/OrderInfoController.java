@@ -873,6 +873,12 @@ public class OrderInfoController{
 		return purchaseService.getSizeChart();
 	}
 	
+	@RequestMapping(value = "/loadCategoryName")
+	public @ResponseBody List<Map<String,Object>> loadCategoryName(HttpServletRequest request){
+		String catid = request.getParameter("catid");
+		return purchaseService.loadCategoryName(catid);
+	}
+	
 	/**
      * 
      * @Title searchProductLog 

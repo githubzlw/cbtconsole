@@ -177,4 +177,6 @@ public interface IPurchaseService {
 
 	List<Map<String, Object>> getSizeChart();
 
+	List<Map<String, Object>> loadCategoryName(String catid);
+
 }

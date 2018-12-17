@@ -50,14 +50,60 @@
 </style>
 </head>
 <body>
+<div class="shopid_box">
+<h2 class="shopid">一级类别:</h2>
+<select class="catoption_lv1" value="">
+<option class="311">童装</option>
+<option class="312">内衣</option>
+<option class="127380009">运动服饰</option>
+<option class="10166">女装</option>
+<option class="10165">男装</option>
+</select>
+<select class="catoption_minlv">
+</select>
+<p class="shopid_p">
+<span class="submitButton" >一键替换成已上传的尺码表</span>
+</p>
+</div>
 </body>
 <script type="text/javascript">
 $(document).ready(function(){
-	getComfirmedSourceGoods();
+	$(".catoption_lv1").change(function(){
+		var opt = $(".catoption_lv1").val();
+		if(opt=='童装'){loadCategoryName('311');}
+		if(opt=='内衣'){loadCategoryName('312');}
+		if(opt=='运动服饰'){loadCategoryName('127380009');}
+		if(opt=='女装'){loadCategoryName('10166');}
+		if(opt=='男装'){loadCategoryName('10165');}
+	});
 });
 
-//加载 已经经过货源确认的商品
-function getComfirmedSourceGoods(){
+function loadCategoryName(catid){
+	if(catid=='311'){$(".catoption_lv1").val("童装");}
+	if(catid=='312'){$(".catoption_lv1").val("内衣");}
+	if(catid=='127380009'){$(".catoption_lv1").val("运动服饰");}
+	if(catid=='10166'){$(".catoption_lv1").val("女装");}
+	if(catid=='10165'){$(".catoption_lv1").val("男装");}
+	$.ajax({
+        type:"post", 
+        url:"/cbtconsole/order/loadCategoryName.do",
+        data:{"catid":catid},
+        dataType:"text",
+        async:true,
+        success : function(data){
+        	data = JSON.parse(data);
+            for(var i=0;i<data.length;i++){
+            	var catName = data[i].name;
+            	var catid = data[i].catid;
+            	var optionstr = "<option class='"+catid+"'>"+catName+"</option>";
+            	$(".catoption_minlv").append(optionstr);
+            }
+        }
+    });
+}
+
+//加载 尺码表
+function getSizeChart(catid){
 	$.ajax({
         type:"post", 
         url:"/cbtconsole/order/getSizeChart.do",
@@ -68,23 +114,20 @@ function getComfirmedSourceGoods(){
         	var dataJson = JSON.parse(data);
         	var shopHtml = "";
             if(dataJson.length>0){
-            	var shopHtml = '<div class="shopid_box"><h2 class="shopid">类别名称：'+dataJson[0].name+'</h2>';
-            	shopHtml = shopHtml +'<p class="shopid_p"><span class="submitButton" >一键替换成已上传的尺码表</span></p><ul class="ul_list">';
+            	var shopHtml = '<ul class="ul_list">';
             	for(var i=0;i<dataJson.length;i++){
             		var catimg = dataJson[i];
             		shopHtml = shopHtml + '<li class="li_list">';
                     shopHtml = shopHtml + '<div class="imgs"><img src="'+catimg.remotpath+'"></div>';
                     shopHtml = shopHtml + '<span calss="goods_name">产品id：<em>'+catimg.pid+'</em></span>';
                     shopHtml = shopHtml + '</li>';
-                    
                     shopHtml = shopHtml + '<li class="li_list"><input type="file"/>';
                     shopHtml = shopHtml + '<div class="imgs"><img src=""></div>';
-                    shopHtml = shopHtml + '<p class="shopid_p"><span class="singleButton sssd" >替换成此尺码表</span></p>';
                     shopHtml = shopHtml + '</li>';
             	}
-            	shopHtml = shopHtml + '</div>';
+            	shopHtml = shopHtml + '</ul>';
             }
-            $(document.body).html(shopHtml);
+            $(".shopid_box").append(shopHtml);
         }
     });
 }

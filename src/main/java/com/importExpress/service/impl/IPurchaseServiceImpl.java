@@ -1561,6 +1561,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	}
 
 	@Override
+	public List<Map<String,Object>> loadCategoryName(String catid) {
+		return pruchaseMapper.loadCategoryName(catid+"%");
+	}
+	
+	@Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);
 		AlibabaTradeFastCreateOrderParam param = new AlibabaTradeFastCreateOrderParam();
