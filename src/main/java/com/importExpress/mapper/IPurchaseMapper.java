@@ -373,6 +373,6 @@ public interface IPurchaseMapper {
 
 	int updateAutoOrderFlag(@Param("idsList") List<Integer> idsList);
 	
-	public List<Map<String,Object>> getSizeChart();
+	public List<Map<String,Object>> getSizeChart(@Param("catid")String  catid);
 	public List<Map<String,Object>> loadCategoryName(@Param("catid")String catid);
 }

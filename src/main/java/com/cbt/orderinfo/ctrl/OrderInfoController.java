@@ -871,7 +871,8 @@ public class OrderInfoController{
 	
 	@RequestMapping(value = "/getSizeChart")
 	public @ResponseBody List<Map<String,Object>> getSizeChart(HttpServletRequest request){
-		return purchaseService.getSizeChart();
+		String catid = request.getParameter("catid");
+		return purchaseService.getSizeChart(catid);
 	}
 	
 	@RequestMapping(value = "/loadCategoryName")

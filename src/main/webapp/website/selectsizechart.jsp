@@ -47,9 +47,14 @@
 .singleButton:hover{background:blue;color:#fff;}
 .singleButton:active{background:#999;color:red}
 .sssd{width:40%;}
+.transparent{width:100%;height:100%;background-color:rgba(0,0,0,.8);position:fixed;top:0;left:0;display:none;text-align:center;z-index:100;}
+.transparent img{max-width:100%;max-height:100%;width:auto;height:auto;}
 </style>
 </head>
 <body>
+<div class="transparent">
+    <img src="">
+</div>
 <div class="shopid_box">
 <h2 class="shopid">一级类别:</h2>
 <select class="catoption_lv1" value="">
@@ -76,9 +81,49 @@ $(document).ready(function(){
 		if(opt=='女装'){loadCategoryName('10166');}
 		if(opt=='男装'){loadCategoryName('10165');}
 	});
+	$(".catoption_minlv").change(function(){
+        var optHtml = $(".catoption_minlv").val();
+        var opObj = $(".catoption_minlv").find("option");
+        for(var i=0;i<opObj.length;i++){
+        	if($(opObj[i]).html()==optHtml){
+        		getSizeChart($(opObj[i]).attr("class"));
+        		break;
+        	}
+        }
+    });
+	loadCategoryName('311');
 });
 
+function imgUpLoad(){
+	$(".pictureFile").change(function() {
+        var $file = $(this);
+        var fileObj = $file[0];
+        var windowURL = window.URL || window.webkitURL;
+        var dataURL;
+        var $img = $($file.parent().find("img")[0]);
+        //当图片名称为空时，照片不显示。
+        if(this.value.trim()==""){
+            return;
+        }
+        if (fileObj && fileObj.files && fileObj.files[0]) {
+            dataURL = windowURL.createObjectURL(fileObj.files[0]);
+            //允许上传的图片格式  
+            var newPreview = this.value;
+            var regext = /\.jpg$|\.gif$|\.jpeg$|\.png$|\.bmp$/gi;
+            if (!regext.test(newPreview)) {
+                newPreview=="";
+                alert("选择的照片格式不正确，请重新选择！");
+                $(fileObj).after($(fileObj).clone($(fileObj)));
+                $(fileObj).remove();
+                return false;
+            }
+            $img.attr("src", dataURL);
+        }
+    });
+}
+
 function loadCategoryName(catid){
+	$(".catoption_minlv").html("");
 	if(catid=='311'){$(".catoption_lv1").val("童装");}
 	if(catid=='312'){$(".catoption_lv1").val("内衣");}
 	if(catid=='127380009'){$(".catoption_lv1").val("运动服饰");}
@@ -97,6 +142,9 @@ function loadCategoryName(catid){
             	var catid = data[i].catid;
             	var optionstr = "<option class='"+catid+"'>"+catName+"</option>";
             	$(".catoption_minlv").append(optionstr);
+            	if(i==0){
+            		getSizeChart(catid);
+            	}
             }
         }
     });
@@ -107,7 +155,7 @@ function getSizeChart(catid){
 	$.ajax({
         type:"post", 
         url:"/cbtconsole/order/getSizeChart.do",
-        data:{},
+        data:{'catid':catid},
         dataType:"text",
         async:true,
         success : function(data){
@@ -118,18 +166,31 @@ function getSizeChart(catid){
             	for(var i=0;i<dataJson.length;i++){
             		var catimg = dataJson[i];
             		shopHtml = shopHtml + '<li class="li_list">';
-                    shopHtml = shopHtml + '<div class="imgs"><img src="'+catimg.remotpath+'"></div>';
+                    shopHtml = shopHtml + '<div class="imgs"><img src="'+catimg.remotpath+'" onclick="bigPic(this)"></div>';
                     shopHtml = shopHtml + '<span calss="goods_name">产品id：<em>'+catimg.pid+'</em></span>';
                     shopHtml = shopHtml + '</li>';
-                    shopHtml = shopHtml + '<li class="li_list"><input type="file"/>';
+                    shopHtml = shopHtml + '<li class="li_list"><input class="pictureFile" type="file"/>';
                     shopHtml = shopHtml + '<div class="imgs"><img src=""></div>';
                     shopHtml = shopHtml + '</li>';
             	}
             	shopHtml = shopHtml + '</ul>';
             }
             $(".shopid_box").append(shopHtml);
+            
+            imgUpLoad();
         }
     });
 }
+// 获取大图
+function bigPic(obj){
+	$('.transparent').show();
+	var src = $(obj).attr('src');
+	$('.transparent img').attr('src',src);	
+}
+// 关闭大图
+$('.transparent').click(function(){
+	$('.transparent').hide();
+})
+
 </script>
 </html>

@@ -175,7 +175,7 @@ public interface IPurchaseService {
 
 	int updateAutoOrderFlag(List<Integer> idsList);
 
-	List<Map<String, Object>> getSizeChart();
+	List<Map<String, Object>> getSizeChart(String  catid);
 
 	List<Map<String, Object>> loadCategoryName(String catid);
 

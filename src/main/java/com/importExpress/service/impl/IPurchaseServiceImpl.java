@@ -1556,8 +1556,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	}
 	
 	@Override
-	public List<Map<String,Object>> getSizeChart() {
-		return pruchaseMapper.getSizeChart();
+	public List<Map<String,Object>> getSizeChart(String  catid) {
+		return pruchaseMapper.getSizeChart(catid);
 	}
 
 	@Override
