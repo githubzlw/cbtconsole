@@ -590,7 +590,7 @@ public class ShopCarMarketingController {
                 }
 
                 totalPrice += carInfo.getCartGoodsNum() * carInfo.getCartGoodsPrice();
-                //运费计算公式
+                // 运费计算公式
                 double freight = genFreightByPid(carUserStatistic.getShippingName(), carInfo.getCatid1(), carInfo.getCartWeight(), carUserStatistic.getCountryId());
                 totalFreight += freight;
                 double oldProfit = 0;
@@ -624,18 +624,12 @@ public class ShopCarMarketingController {
                 //计算利润率
                 totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
             }
-            // 调用线上接口，获取客户支付运费
-            double onlineFreight = getMinFreightByUserId(userId,carUserStatistic);
-            // 预估总运费未0，则把客户支付的运费当做全部支付运费，计算最下利润率
-            if(totalFreight < 0.1){
-                estimateProfit = (totalPrice - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
-                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(onlineFreight, 2));
-            }else{
-                estimateProfit = (totalPrice + onlineFreight - totalFreight - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
-                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(totalFreight, 2));
-            }
-            carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-            carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(onlineFreight, 2));
+            // 调用线上接口，获取客户支付运费,实际我司运费
+            getMinFreightByUserId(userId,carUserStatistic);
+            // 利润率计算
+            estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
+
+            carUserStatistic.setTotalPrice(totalPrice);
             carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
             carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
 
@@ -669,6 +663,8 @@ public class ShopCarMarketingController {
                 freight = json.getJSONObject("data").getDouble("totalFreight");
                 if(freight > 0 ){
                     carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
+                    carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
+                    carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
                 }
             } else {
                 System.err.println("getMinFreightByUserId error :<:<:<");
