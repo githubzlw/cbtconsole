@@ -189,7 +189,7 @@ public class SendEmailServlet extends HttpServlet {
 		sbBuffer.append("<div>The estimated transit time is " + transport_time + " days, and you can expect to receive the package on " + arrive_time + "</div>");
 		//获取uuid拼接邮件
 		String uuid = UUIDUtil.getEffectiveUUID(0, toEmail);
-		String path = UUIDUtil.getAutoLoginPath("/processesServlet?action=emailLink&className=OrderInfo&orderNo="+orderNo, uuid);
+		String path = UUIDUtil.getAutoLoginPath("/orderInfo/emailLink?orderNo="+orderNo, uuid);
 		sbBuffer.append("<br>Click <a href='"+AppConfig.ip_email+path+"'>here</a> to go to import-express.com to pay.</div>");
 //		sbBuffer.append("<br>Click <a href='"+AppConfig.ip_email+"/processesServlet?action=emailLink&className=OrderInfo&orderNo="+orderNo+"'>here</a> to go to import-express.com to pay.</div>");
 		sbBuffer.append("<br><div style='font-weight: bolder;'>Best regards</div><div style='font-weight: bolder;margin-bottom: 10px;'>Import-Express.com</div>"); 

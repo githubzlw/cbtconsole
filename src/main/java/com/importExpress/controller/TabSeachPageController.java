@@ -113,23 +113,33 @@ public class TabSeachPageController {
 			if (StringUtils.isNotBlank(pid)) {
 				bean.setParentId(Integer.parseInt(pid));
 			}
+            boolean updateFlag = true;
             String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
             if (null != imgInfo && imgInfo.length > 0) {
-                bean.setPageBannerName(imgInfo[0]);
-                bean.setPageBannerUrl(imgInfo[1]);
+                //判断最终文件大小
+                Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+                if (imgSize > 102401){//上传的文件最终大于100k
+                    result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+                    updateFlag = false;
+                } else {
+                    bean.setPageBannerName(imgInfo[0]);
+                    bean.setPageBannerUrl(imgInfo[1]);
+                }
             }
-			// 关键词对应的分类id
-			Integer catid = tabSeachPageService.getCategoryId(keyword);
-			if (catid != null) {
-				bean.setCatId(catid);
-			}
-			int res = tabSeachPageService.insert(bean);
+            if (updateFlag) {
+                // 关键词对应的分类id
+                Integer catid = tabSeachPageService.getCategoryId(keyword);
+                if (catid != null) {
+                    bean.setCatId(catid);
+                }
+                int res = tabSeachPageService.insert(bean);
 
-			if (res > 0) {
-				result = "{\"status\":true,\"message\":\"热搜词“" + keyword + "”添加成功！\",\"id\":\"" + bean.getId() + "\"}";
-			} else {
-				result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”添加失败！\"}";
-			}
+                if (res > 0) {
+                    result = "{\"status\":true,\"message\":\"热搜词“" + keyword + "”添加成功！\",\"id\":\"" + bean.getId() + "\"}";
+                } else {
+                    result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”添加失败！\"}";
+                }
+            }
 		}
 		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
@@ -285,21 +295,32 @@ public class TabSeachPageController {
 			if (StringUtils.isNotBlank(pid)) {
 				bean.setParentId(Integer.parseInt(pid));
 			}
+
+			boolean updateFlag = true;
             if ("on".equals(request.getParameter("del_pageBannerName"))){ //判断修改时候是否删除已上传的底部banner图片
                 bean.setPageBannerName("del");
             } else {
                 String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
                 if (null != imgInfo && imgInfo.length > 0) {
-                    bean.setPageBannerName(imgInfo[0]);
-                    bean.setPageBannerUrl(imgInfo[1]);
+                    //判断最终文件大小
+                    Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+                    if (imgSize > 102402){//上传的文件最终大于100k
+                        result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+                        updateFlag = false;
+                    } else {
+                        bean.setPageBannerName(imgInfo[0]);
+                        bean.setPageBannerUrl(imgInfo[1]);
+                    }
                 }
             }
-			int res = tabSeachPageService.update(bean);
-			if (res > 0) {
-				result = "{\"status\":true,\"message\":\"修改成功！\"}";
-			} else {
-				result = "{\"status\":false,\"message\":\"修改失败！\"}";
-			}
+            if (updateFlag) {
+                int res = tabSeachPageService.update(bean);
+                if (res > 0) {
+                    result = "{\"status\":true,\"message\":\"修改成功！\"}";
+                } else {
+                    result = "{\"status\":false,\"message\":\"修改失败！\"}";
+                }
+            }
 		}
 		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
@@ -320,7 +341,7 @@ public class TabSeachPageController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		if (aliCategory == null) {
-			DataSourceSelector.set("dataSource127hop");
+//			DataSourceSelector.set("dataSource127hop");
 			aliCategory = tabSeachPageService.aliCategory();
 		}
 
@@ -484,22 +505,29 @@ public class TabSeachPageController {
 			bean.setBannerName(detail_banner_name);
 			bean.setBannerDescribe(detail_banner_describe);
 
+            boolean updateFlag = true;
             String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
             if (null != imgInfo && imgInfo.length > 0) {
-                bean.setBannerImgName(imgInfo[0]);
-                bean.setBannerImgUrl(imgInfo[1]);
+                //判断最终文件大小
+                Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+                if (imgSize > 102400){//上传的文件最终大于100k
+                    result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+                    updateFlag = false;
+                } else {
+                    bean.setBannerImgName(imgInfo[0]);
+                    bean.setBannerImgUrl(imgInfo[1]);
+                }
             }
 
-			int res = tabSeachPageService.insertDetail(bean);
+            if (updateFlag) {
+                int res = tabSeachPageService.insertDetail(bean);
 
-			if (res > 0) {
-				result = "{\"status\":true,\"message\":\"添加成功！\"}";
-			} else {
-				result = "{\"status\":false,\"message\":\"添加失败！\"}";
-			}
-			// }else{
-			// result = "{\"status\":false,\"message\":\"搜索链接不能低于4个商品！\"}";
-			// }
+                if (res > 0) {
+                    result = "{\"status\":true,\"message\":\"添加成功！\"}";
+                } else {
+                    result = "{\"status\":false,\"message\":\"添加失败！\"}";
+                }
+            }
 		}
 		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
@@ -691,45 +719,51 @@ public class TabSeachPageController {
 				bean.setBannerName(detail_banner_name);
 				bean.setBannerDescribe(detail_banner_describe);
 
+                boolean updateFlag = true;
                 String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
                 if (null != imgInfo && imgInfo.length > 0) {
-                    bean.setBannerImgName(imgInfo[0]);
-                    bean.setBannerImgUrl(imgInfo[1]);
+                    //判断最终文件大小
+                    Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+                    if (imgSize > 102403){//上传的文件最终大于100k
+                        result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+                        updateFlag = false;
+                    } else {
+                        bean.setBannerImgName(imgInfo[0]);
+                        bean.setBannerImgUrl(imgInfo[1]);
+                    }
                 }
+                if (updateFlag) {
+                    bean.setId(Integer.parseInt(id));
+                    bean.setSid(Integer.parseInt(sid));
+                    bean.setName(name);
+                    bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
+                    bean.setKeyword(keyword);
+                    bean.setRelateKeyWordUrl(relateKeyWordUrl);
+                    bean.setSeachUrl(seach_url);
+                    bean.setAntiWords(anti_words);
+                    bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_update_sort) ? Integer
+                            .parseInt(detail_update_sort) : null);
 
-				bean.setId(Integer.parseInt(id));
-				bean.setSid(Integer.parseInt(sid));
-				bean.setName(name);
-				bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
-				bean.setKeyword(keyword);
-				bean.setRelateKeyWordUrl(relateKeyWordUrl);
-				bean.setSeachUrl(seach_url);
-				bean.setAntiWords(anti_words);
-				bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_update_sort) ? Integer
-						.parseInt(detail_update_sort) : null);
-
-				String sql = "update tab_seach_pages_details set name='" + SendMQ.repCha(bean.getName()) + "',catid='"
-						+ bean.getCatid() + "',relateKeyWordUrl='" + SendMQ.repCha(bean.getRelateKeyWordUrl()) + "',"
-						+ "seach_url='" + SendMQ.repCha(bean.getSeachUrl()) + "',keyword='"
-						+ SendMQ.repCha(bean.getKeyword()) + "',anti_words='" + SendMQ.repCha(bean.getAntiWords())
-						+ "',sort='" + bean.getSort();
-				if (!file.isEmpty()) {
-					sql += "',banner_img_name='" + bean.getBannerImgName() + "',banner_img_url='"
-							+ bean.getBannerImgUrl();
-				}
-				sql += "',banner_name='" + SendMQ.repCha(bean.getBannerName()) + "',banner_describe='"
-						+ SendMQ.repCha(bean.getBannerDescribe()) + "' where id='" + bean.getId() + "'";
-				sendMQ.sendMsg(new RunSqlModel(sql));
-				int res = 1;// tabSeachPageService.updateDetail(bean);
-				if (res > 0) {
-					result = "{\"status\":true,\"message\":\"修改成功！\",\"id\":\"" + id + "\"}";
-				} else {
-					result = "{\"status\":false,\"message\":\"修改失败！\"}";
-				}
-				// }else{
-				// result = "{\"status\":false,\"message\":\"搜索链接不能低于4个商品！\"}";
-				// }
-				sendMQ.closeConn();
+                    String sql = "update tab_seach_pages_details set name='" + SendMQ.repCha(bean.getName()) + "',catid='"
+                            + bean.getCatid() + "',relateKeyWordUrl='" + SendMQ.repCha(bean.getRelateKeyWordUrl()) + "',"
+                            + "seach_url='" + SendMQ.repCha(bean.getSeachUrl()) + "',keyword='"
+                            + SendMQ.repCha(bean.getKeyword()) + "',anti_words='" + SendMQ.repCha(bean.getAntiWords())
+                            + "',sort='" + bean.getSort();
+                    if (!file.isEmpty()) {
+                        sql += "',banner_img_name='" + bean.getBannerImgName() + "',banner_img_url='"
+                                + bean.getBannerImgUrl();
+                    }
+                    sql += "',banner_name='" + SendMQ.repCha(bean.getBannerName()) + "',banner_describe='"
+                            + SendMQ.repCha(bean.getBannerDescribe()) + "' where id='" + bean.getId() + "'";
+                    sendMQ.sendMsg(new RunSqlModel(sql));
+                    int res = 1;// tabSeachPageService.updateDetail(bean);
+                    if (res > 0) {
+                        result = "{\"status\":true,\"message\":\"修改成功！\",\"id\":\"" + id + "\"}";
+                    } else {
+                        result = "{\"status\":false,\"message\":\"修改失败！\"}";
+                    }
+                    sendMQ.closeConn();
+                }
 			} catch (Exception e) {
 				result = "{\"status\":false,\"message\":\"修改失败！\"}";
 			}

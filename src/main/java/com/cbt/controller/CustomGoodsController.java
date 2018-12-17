@@ -109,15 +109,7 @@ public class CustomGoodsController {
 		List<ConfirmUserInfo> AllAdm = dao.getAllUserHasOffUser();
 		List<ConfirmUserInfo> newAdms = new ArrayList<ConfirmUserInfo>();
 		for (ConfirmUserInfo userInfo : AllAdm) {
-			if (userInfo.getRole() == 0) {
-				if (userInfo.getConfirmusername().equalsIgnoreCase("Ling") || userInfo.getConfirmusername().equalsIgnoreCase("emmaxie") || userInfo.getConfirmusername().equalsIgnoreCase("admin1")) {
-					newAdms.add(userInfo);
-				} else if (userInfo.getConfirmusername().equalsIgnoreCase("testAdm")) {
-					newAdms.add(userInfo);
-				}
-			} else {
-				newAdms.add(userInfo);
-			}
+			newAdms.add(userInfo);
 		}
 		mv.addObject("sellAdm", newAdms);
 		return mv;

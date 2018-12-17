@@ -5,6 +5,7 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -62,6 +63,8 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.importExpress.controller.TabSeachPageController;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -69,6 +72,7 @@ import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -151,7 +155,8 @@ public class WarehouseCtrl {
 	private GeneralReportService generalReportService;
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	@Autowired
 	private MabangshipmentService mabangshipmentService;
 
@@ -203,8 +208,8 @@ public class WarehouseCtrl {
 		admuser.setId(1);
 		admuser.setAdmName("全部");
 		result.add(admuser);
-
-		if(adm.getId()==1 || adm.getId()==83  || adm.getId()==84){
+		
+		if(adm.getId()==1 || adm.getId()==83 || adm.getId()==84){
 			com.cbt.pojo.AdmuserPojo a=new com.cbt.pojo.AdmuserPojo();
 			a.setId(1);
 			a.setAdmName("Ling");
@@ -900,7 +905,7 @@ public class WarehouseCtrl {
 				return json;
 			}
 			map.put("result",sb.toString().substring(0,sb.toString().length()-1));
-			map.put("admName",adm!=null && !"emmaxie".equals(adm) && !"admin1".equals(adm)?adm.getAdmName():"ling");
+			map.put("admName",adm!=null && adm.getRoletype() != 0?adm.getAdmName():"ling");
 			//判断该商品是否有过质量评论如果则更新没有则插入
 			String result=iWarehouseService.getQualityEvaluation(map);
 			int row=0;
@@ -7203,6 +7208,26 @@ public class WarehouseCtrl {
 //		return strs;
 //
 //	}
+@RequestMapping(value = "/testSendEmail")
+	public String testSendEmail(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> model = new HashedMap();
+		StringBuilder msg=new StringBuilder();
+		String chatText= msg.toString();
+		model.put("chatText",chatText);
+		model.put("name","919923437@qq.com");
+		model.put("email","919923437@qq.com");
+	    model.put("orderid","123456788");
+	    model.put("recipients","Jones Drugs");
+		model.put("street","959 East Main St");
+		model.put("street1","");
+		model.put("city","Prattville");
+		model.put("state","Alabama");
+		model.put("country","UAS");
+		model.put("zipCode","36066");
+		model.put("phone","3343581630");
+		sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Order delivery notice", model, TemplateType.BATCK);
+		return "1";
+	}
 
 	@RequestMapping(value = "/batchCk", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
@@ -7297,11 +7322,29 @@ public class WarehouseCtrl {
 					}
 					bgMap.put("expressno", expressNo); // 添加包裹号
 					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
-					//发送邮件给客户告知已经发货
-//					IGuestBookService ibs = new GuestBookServiceImpl();
-//					OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
-//					int updateReplyContent=ibs.SendEmailForBatck(ob);
 				}
+			}
+			//发送邮件给客户提示发货
+			for (int i = 0; i < cont; i++) {
+				Map<String, Object> declares = sbxxList.get(i);
+				String orderid = (String) declares.get("orderid");
+				//发送邮件给客户告知已经发货
+				IGuestBookService ibs = new GuestBookServiceImpl();
+				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+				int updateReplyContent=ibs.SendEmailForBatck(ob);
+				Map<String,Object> modelM = new HashedMap();
+				modelM.put("name",ob.getEmail());
+				modelM.put("orderid",orderid);
+				modelM.put("recipients",ob.getRecipients());
+				modelM.put("street",ob.getStreet());
+				modelM.put("street1","");
+				modelM.put("city",ob.getAddress2());
+				modelM.put("state",ob.getStatename());
+				modelM.put("country",ob.getCountry());
+				modelM.put("zipCode",ob.getZipcode());
+				modelM.put("phone",ob.getPhonenumber());
+				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -7315,6 +7358,8 @@ public class WarehouseCtrl {
 		ret = updateBgState(bgList, ret);
 		return String.valueOf(ret);
 	}
+
+
 
 	private void saveUod(List<ProductBean> lpb, Map<String, String> bgMap, UserOrderDetails uod) {
 		uod.setShipmentno((String) bgMap.get("shipmentno"));

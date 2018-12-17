@@ -86,4 +86,19 @@ public class SingleGoodsServiceImpl implements SingleGoodsService {
 		return sgGdDao.setMainImgByShopId(shopId, imgUrl);
 	}
 
+	@Override
+	public List<String> queryIsExistsPidFromSingleOffers(List<SingleGoodsCheck> pidList) {
+		return sgGdDao.queryIsExistsPidFromSingleOffers(pidList);
+	}
+
+	@Override
+	public boolean deleteSingleOffersByPids(List<String> pidList) {
+		return sgGdDao.deleteSingleOffersByPids(pidList);
+	}
+
+	@Override
+	public int queryOnlineGoodsCountByShopId(String shopId) {
+		return sgGdDao.queryOnlineGoodsCountByShopId(shopId);
+	}
+
 }

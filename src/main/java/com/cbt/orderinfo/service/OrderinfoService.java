@@ -1176,6 +1176,8 @@ public class OrderinfoService implements IOrderinfoService {
 		}
 		if(countryid==37 && "epacket".equals(shippingMethod.toLowerCase())){
 			shippingMethod="China Post Packet(no tracking,unstable)";
+		}else if(countryid ==29 && "TNT Cargo Shipping (Duty Paid)".toLowerCase().equals(shippingMethod.toLowerCase())){
+			shippingMethod="TNT Cargo Shipping (DDP)";
 		}
 		double normalBaseWeight = 0d;
 		BigDecimal normalBasePrice = new BigDecimal(0);
@@ -1711,8 +1713,8 @@ public class OrderinfoService implements IOrderinfoService {
 		return dao.getOrders1(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
 	}
 	@Override
-	public int getOrdersCount(int userID, int state, Date startdate,
-	                          Date enddate, String email, String orderno, int admuserid,
+	public int getOrdersCount(int userID, int state, String startdate,
+	                          String enddate, String email, String orderno, int admuserid,
 	                          int buyid, int showUnpaid,String type,int status) {
 		return dao.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyid, showUnpaid,type,status);
 	}

@@ -10,6 +10,7 @@ import com.cbt.warehouse.util.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -358,8 +359,8 @@ public class OrderInfoImpl implements OrderInfoDao {
 
 	@Override
 	public Map<String, Object> queryPaymentInfoByOrderNo(String orderNo) {
-		String sql = "select a.pay_info,b.paytype from pay_result_info a,payment b where a.orderid = b.orderid  " +
-				"and b.paytype in(0,1,5) and a.orderid = ? limit 1";
+		String sql = "select a.pay_info,b.paytype,DATE_FORMAT(b.createtime,'%Y-%m-%d %H:%i:%s') as createtime from pay_result_info a,payment b " +
+				"where a.orderid = b.orderid and b.paytype in(0,1,5) and a.orderid = ? limit 1";
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -371,6 +372,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 			if (rs.next()) {
 				int payType = rs.getInt("paytype");
 				String paymentInfo = rs.getString("pay_info");
+				resultMap.put("payTime", rs.getString("createtime"));
 				if (payType == 0 || payType == 1) {
 					JSONObject jsonObject = JSONArray.fromObject("[" + paymentInfo + "]")
 							.getJSONObject(0)
@@ -398,4 +400,34 @@ public class OrderInfoImpl implements OrderInfoDao {
 		}
 		return resultMap;
 	}
+
+	@Override
+	public boolean checkIsOldPayPal(String orderNo) {
+		String sql = "select ipnInfo from ipn_info where orderNo = ? and paymentStatus = 1 limit 1";
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		boolean isOld = false;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, orderNo);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				String ipnInfo = rs.getString(1);
+				if (StringUtils.isNotBlank(ipnInfo)) {
+					if (ipnInfo.contains("=584JZVFU6PPVU")) {
+						isOld = true;
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+		} finally {
+			DBHelper.getInstance().closeConnection(conn);
+			DBHelper.getInstance().closeResultSet(rs);
+		}
+		return isOld;
+	}
+
 }

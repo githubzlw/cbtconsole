@@ -592,6 +592,7 @@ $(function(){
  	 var imgs = $("#urls_").html().trim();
 	 var imgArray = imgs.split(',');
 	 for(var i in imgArray){
+	     console.log("imgArray[i]==="+imgArray[i]);
 			if(imgArray[i]){
 				var html ="<ul id='img_sf_1'><li><a><img class='showImg' style='float:left;'  id='" + i + "' /></a></li></ul>";
 				$("#user_info").append(html);

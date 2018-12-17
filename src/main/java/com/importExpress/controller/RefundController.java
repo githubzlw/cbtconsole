@@ -19,10 +19,10 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.RefundDetailsBean;
 import com.importExpress.pojo.RefundNewBean;
+import com.importExpress.pojo.RefundResultInfo;
 import com.importExpress.service.RefundNewService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -325,6 +325,10 @@ public class RefundController {
                 json.setOk(false);
                 json.setMessage("获取订单号失败,请重试");
                 return json;
+            }else if(orderNo.contains("_")){
+                json.setOk(false);
+                json.setMessage("拆单或者补货订单号，不可退款");
+                return json;
             }
 
             String operatorIdStr = request.getParameter("operatorId");
@@ -367,7 +371,7 @@ public class RefundController {
             }
 
             boolean isCheck = false;
-            if (actionFlag == 1) {
+            if (actionFlag == 1 || operatorId == 1) {
                 //操作状态是1的说明是销售，不需要校检密码
                 isCheck = true;
             } else {
@@ -382,7 +386,7 @@ public class RefundController {
                 detailsBean.setRefundAmount(refundAmount);
                 detailsBean.setRemark(remark);
                 detailsBean.setUserId(userId);
-                if(actionFlag != 4){
+                if (actionFlag != 4) {
                     refundNewService.setAndRemark(detailsBean);
                     //使用MQ更新线上状态
                     updateOnlineRefundState(detailsBean);
@@ -391,7 +395,7 @@ public class RefundController {
                 //判断是否是主管同意状态，如果是，并且金额<=50则直接退款给客户，并且完结订单
                 if (user.getId() == 1 && "0".equals(user.getRoletype())) {
                     //判断是Ling账号
-                    if (actionFlag == 2 && refundAmount <= 50) {
+                    /*if (actionFlag == 2 && refundAmount <= 50) {
                         //主管同意状态,并且金额小于等于50美元,自动设置到财务确认状态
                         detailsBean.setRefundState(3);
                         detailsBean.setRemark("退款金额小于等于50美金,系统自动确认为财务确认状态");
@@ -400,9 +404,9 @@ public class RefundController {
                         updateOnlineRefundState(detailsBean);
                         //退款操作
                         json = refundByUserId(detailsBean, type, user.getAdmName());
-                    }
-                } else if (user.getId() == 8 && "0".equals(user.getRoletype())) {
-                    //判断是EMMA
+                    }*/
+                } else if ((user.getId() == 8 || user.getId() == 83) && "0".equals(user.getRoletype())) {
+                    //判断是EMMA或者Mandy
                     if (actionFlag == 2 || actionFlag == 3) {
                         if (actionFlag == 2) {
                             //主管同意状态
@@ -413,8 +417,17 @@ public class RefundController {
                             updateOnlineRefundState(detailsBean);
                         }
                         //退款操作
-                        json = refundByUserId(detailsBean, type, user.getAdmName());
-                    }else if(actionFlag == 4){
+                        if (user.getId() == 8) {
+                            if (refundAmount <= 500) {
+                                json = refundByUserId(detailsBean, type, user.getAdmName());
+                            } else {
+                                json.setOk(true);
+                                json.setMessage("金额大于500，请Emma继续操作");
+                            }
+                        } else if (user.getId() == 83) {
+                            json = refundByUserId(detailsBean, type, user.getAdmName());
+                        }
+                    } else if (actionFlag == 4) {
                         json = refundByUserId(detailsBean, type, user.getAdmName());
                     }
                 }
@@ -429,6 +442,7 @@ public class RefundController {
             json.setOk(false);
             json.setMessage("执行失败,原因：" + e.getMessage());
         }
+        json.setData(null);
         return json;
     }
 
@@ -868,6 +882,139 @@ public class RefundController {
         }
         sbf.append(" where id = " + detailsBean.getRefundId() + " and userid = " + detailsBean.getUserId());
         NotifyToCustomerUtil.sendSqlByMq(sbf.toString());
+    }
+
+    @RequestMapping("/refundByPayNo")
+    @ResponseBody
+    private JsonResult refundByPayNo(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+        if (user == null) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String adminIdStr = request.getParameter("adminId");
+        int adminId = 0;
+        if (StringUtils.isBlank(adminIdStr)) {
+            json.setOk(false);
+            json.setMessage("获取用户ID失败");
+            return json;
+        } else {
+            adminId = Integer.valueOf(adminIdStr);
+            if (adminId == 0 || adminId != user.getId()) {
+                json.setOk(false);
+                json.setMessage("选择用户和登录用户不一致");
+                return json;
+            }
+        }
+
+        String payNo = request.getParameter("payNo");
+        if (StringUtils.isBlank(payNo)) {
+            json.setOk(false);
+            json.setMessage("获取交易号失败");
+            return json;
+        }
+        String payType = request.getParameter("payType");
+        if (StringUtils.isBlank(payType)) {
+            json.setOk(false);
+            json.setMessage("获取支付类别失败");
+            return json;
+        }
+        String validPassWord = request.getParameter("validPassWord");
+        if (StringUtils.isBlank(validPassWord)) {
+            json.setOk(false);
+            json.setMessage("获取验证密码失败");
+            return json;
+        }
+        String remark = request.getParameter("remark");
+        if (StringUtils.isBlank(remark)) {
+            json.setOk(false);
+            json.setMessage("获取备注失败");
+            return json;
+        }
+        String refundAmount = request.getParameter("refundAmount");
+        if (StringUtils.isBlank(refundAmount)) {
+            json.setOk(false);
+            json.setMessage("获取退款金额失败");
+            return json;
+        }
+        try {
+            json = ppApiService.refundByPayNo(payNo, payType, refundAmount, remark, adminId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("payNo:" + payNo + ",payType:" + payType + ",refundByPayNo error :" + e.getMessage());
+            System.err.println("payNo:" + payNo + ",payType:" + payType + ",refundByPayNo error :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("退款失败,原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping("/queryForRefundResultList")
+    @ResponseBody
+    public EasyUiJsonResult queryForRefundResultList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+
+        RefundResultInfo queryPm = new RefundResultInfo();
+        int startNum = 0;
+        int limitNum = 50;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtil.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (!(StringUtil.isBlank(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        String orderNo = request.getParameter("orderNo");
+        if (StringUtil.isNotBlank(orderNo)) {
+            queryPm.setOrderno(orderNo);
+        }
+        String userId = request.getParameter("userId");
+        if (StringUtil.isNotBlank(userId)) {
+            queryPm.setUserid(userId);
+        }
+        String refundId = request.getParameter("refundId");
+        if (StringUtil.isNotBlank(refundId)) {
+            queryPm.setRefundid(refundId);
+        }
+        String saleId = request.getParameter("saleId");
+        if (StringUtil.isNotBlank(saleId)) {
+            queryPm.setSaleId(saleId);
+        }
+
+
+        try {
+            queryPm.setLimitNum(limitNum);
+            queryPm.setStartNum(startNum);
+            List<RefundResultInfo> res = refundNewService.queryForRefundResultList(queryPm);
+
+
+            int count = refundNewService.queryForRefundResultListCount(queryPm);
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
     }
 
 }

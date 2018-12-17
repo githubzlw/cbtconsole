@@ -77,11 +77,17 @@ public class SingleGoodsController {
         }
 
         int startNum = 0;
-        int limitNum = 20;
+        int limitNum = 40;
+        String rowStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowStr) || "0".equals(rowStr))) {
+            limitNum = Integer.valueOf(rowStr);
+        }
+
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
             startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
         }
+
         String pid = request.getParameter("pid");
         if (pid == null || "".equals(pid)) {
             pid = "";
@@ -132,6 +138,11 @@ public class SingleGoodsController {
             queryPm.setDrainageFlag(drainageFlag);
             queryPm.setGoodsType(goodsType);
             List<SameTypeGoodsBean> res = sgGsService.queryForList(queryPm);
+            for(SameTypeGoodsBean goodsBean : res){
+                if(StringUtils.isNotBlank(goodsBean.getShopId())){
+                    goodsBean.setShopGoodsNum(sgGsService.queryOnlineGoodsCountByShopId(goodsBean.getShopId()));
+                }
+            }
             int count = sgGsService.queryForListCount(queryPm);
             if (res.size() > 0) {
                 dealRalationAdmin(res);
@@ -374,11 +385,7 @@ public class SingleGoodsController {
         for (ConfirmUserInfo userInfo : admList) {
             String userName = userInfo.getConfirmusername();
             if (userInfo.getRole() == 0) {
-                if (userName.equalsIgnoreCase("Ling") || userName.equalsIgnoreCase("emmaxie") || userName.equalsIgnoreCase("admin1")) {
-                    allAdms.add(userInfo);
-                } else if (userName.equalsIgnoreCase("testAdm")) {
-                    allAdms.add(userInfo);
-                }
+                allAdms.add(userInfo);
             }else{
                 allAdms.add(userInfo);
             } /*else if (userInfo.getRole() == 2) {
@@ -682,10 +689,27 @@ public class SingleGoodsController {
             queryPm.setLimitNum(limitNum);
             queryPm.setStartNum(startNum);
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
-            for(SingleGoodsCheck goodsCheck : res){
-                if(goodsCheck.getIsPass() == 0){
-                    sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+
+            if(!(res == null || res.isEmpty())) {
+                List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
+                boolean isSuccess = false;
+                if (!(pids == null || pids.isEmpty())) {
+                    isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                    pids.clear();
+                } else {
+                    isSuccess = true;
                 }
+                if (isSuccess) {
+                    for (SingleGoodsCheck goodsCheck : res) {
+                        if (goodsCheck.getIsPass() == 0) {
+                            sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                        }
+                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("执行失败，请重试");
+                }
+                res.clear();
             }
             json.setOk(true);
         } catch (Exception e) {
@@ -732,10 +756,26 @@ public class SingleGoodsController {
             List<SingleGoodsCheck> res = sgGsService.queryCrossBorderGoodsForList(queryPm);
             if("0".equals(type)){
                 //全过
-                for(SingleGoodsCheck goodsCheck : res){
-                    if(goodsCheck.getIsPass() == 0){
-                        sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                if(!(res == null || res.isEmpty())) {
+                    boolean isSuccess = false;
+                    List<String> pids = sgGsService.queryIsExistsPidFromSingleOffers(res);
+                    if (!(pids == null || pids.isEmpty())) {
+                        isSuccess = sgGsService.deleteSingleOffersByPids(pids);
+                        pids.clear();
+                    } else {
+                        isSuccess = true;
                     }
+                    if (isSuccess) {
+                        for (SingleGoodsCheck goodsCheck : res) {
+                            if (goodsCheck.getIsPass() == 0) {
+                                sgGsService.insertIntoSingleGoodsByIsCheck(goodsCheck.getPid());
+                            }
+                        }
+                    } else {
+                        json.setOk(false);
+                        json.setMessage("执行失败，请重试");
+                    }
+                    res.clear();
                 }
             }else if("1".equals(type)){
                 //全否

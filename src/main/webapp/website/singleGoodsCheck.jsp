@@ -385,7 +385,7 @@
                 type: "POST",
                 url: "/cbtconsole/singleGoods/batchInsertIntoSingleGoods",
                 data: {
-                    "pid": "",
+                    "pid": queryParams.pid,
                     "catid": queryParams.catid,
                     "page": page,
                     "isPass": queryParams.isPass,

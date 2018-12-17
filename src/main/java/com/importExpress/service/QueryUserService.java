@@ -26,5 +26,8 @@ public interface QueryUserService {
 
 	AuthInfo queryAuthInfo(Integer authId);
 
+    String queryAvailable(String email);
+
+    long updateAvailable(String email, Double available);
 
 }

@@ -268,7 +268,7 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public List<ComplainFile> getImgsByCid(Integer complainId) {
-		String sql="SELECT cf.imgUrl from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
+		String sql="SELECT group_concat(cf.imgUrl) from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -305,7 +305,7 @@ public class ComplainDaoImpl implements IComplainDao{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType) {
 		int start= (page.getStartIndex()-1) *20;
 		ArrayList<ComplainVO> rfbList = new ArrayList<ComplainVO>();
 		StringBuilder sb = new StringBuilder("SELECT c.id,c.userid,c.userEmail,c.complainType,"
@@ -325,7 +325,7 @@ public class ComplainDaoImpl implements IComplainDao{
 		ResultSet rs1 = null;
 		PreparedStatement stmt1 = null;
 		//ling,Sales1可以看所有的投诉
-		if(admName!=null&&!"Ling".equalsIgnoreCase(admName) && !"Sales1".equalsIgnoreCase(admName) && !"Sales2".equalsIgnoreCase(admName) && !"emmaxie".equalsIgnoreCase(admName) && !"admin1".equalsIgnoreCase(admName)){
+		if(admName!=null&& roleType !=0){
 			sb.append(" and u.admName='"+admName+"'" ); 
 		}
 		if(t.getUserid()!=0){

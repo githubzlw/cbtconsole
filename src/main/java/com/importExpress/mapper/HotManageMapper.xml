@@ -159,4 +159,9 @@
         delete from hot_selling_goods where hot_selling_id = #{id}
     </delete>
 
+    <insert id="insertHotSellingUpdateLog">
+        insert into hot_selling_update_log(hot_selling_id,pid,admin_id,is_on)
+        values(#{hotId},#{pid},#{adminId},#{isOn})
+    </insert>
+
 </mapper>

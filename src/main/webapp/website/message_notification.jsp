@@ -207,7 +207,7 @@ function prepareToJump(){
 		
 		if(dataArr.length == 2){
 			if(dataArr[1] == 1){
-				if(admName.toLowerCase() == "ling" || admName.toLowerCase() == "emmaxie" || admName.toLowerCase() == "admin1"){
+				if(roletype == 0){
 					url = "/order/getOrderInfo.do?showUnpaid=0&orderno=" + hrefVal
 				} else if(roletype == 1){
 					url = "/order/getOrderInfo.do?showUnpaid=0&orderno=" + hrefVal
