@@ -497,7 +497,6 @@ function getUrlParam(url,name) {
 						}
 					},
 					error : function(res) {
-						//alert('查询错误');
 						$.messager
 								.alert(
 										"提醒",

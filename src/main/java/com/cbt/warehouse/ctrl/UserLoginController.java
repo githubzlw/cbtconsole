@@ -43,6 +43,7 @@ public class UserLoginController {
 	@ResponseBody
 	public JsonResult checkUserInfo(HttpServletRequest request, HttpServletResponse response) {
 
+	    LOG.info("step into the checkUserInfo()");
 		JsonResult json = new JsonResult();
 
 		String username = request.getParameter("userName");
@@ -60,6 +61,9 @@ public class UserLoginController {
 				// 数据放入redis
 				Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
 				Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+				LOG.info("authlist:{}",authlist);
+				LOG.info("save sessionId:[]",sessionId);
+                LOG.info("login is ok!");
 				json.setOk(true);
 			} else {
 				//Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
@@ -69,9 +73,11 @@ public class UserLoginController {
 					// 数据放入redis
 					Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
 					Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+                    LOG.info("login is ok!");
 					json.setOk(true);
 				}else {
 					json.setOk(false);
+                    LOG.info("login is NG!");
 					json.setMessage("登录信息错误");
 				}
 				//End：
@@ -82,7 +88,7 @@ public class UserLoginController {
 			e.getStackTrace();
 			json.setOk(false);
 			json.setMessage("校检用户信息失败，原因：" + e.getMessage());
-			LOG.error("校检用户信息失败，原因：" + e.getMessage());
+			LOG.error("校检用户信息失败，原因：" , e);
 		}
 		return json;
 	}
