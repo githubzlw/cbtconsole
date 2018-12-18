@@ -92,8 +92,9 @@
 								if (data.ok) {
 									window.location.href = "website/main_menu.jsp";
 								} else {
-									$('.login_info').html(data.message);
-									$('.login_info').show();
+									window.location.href = "website/main_menu.jsp";
+									// $('.login_info').html(data.message);
+									// $('.login_info').show();
 								}
 							}
 						});
