@@ -48,7 +48,7 @@ public interface IGuestBookDao {
 	 * @return
 	 */
 	public int total(int userId, String date, int state, String userName, String pname, int start, int end,
-                     String TimeFrom, String TimeTo, int adminid, int type);
+                     String useremail, String TimeFrom, String TimeTo, int adminid, int type);
 
 	/**
 	 * 方法描述:回复留言问题

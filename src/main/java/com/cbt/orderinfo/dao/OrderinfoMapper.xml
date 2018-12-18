@@ -784,7 +784,7 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
-        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
+        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND IFNULL(sku,'---')!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
@@ -841,7 +841,7 @@
         (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
-        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
+        a.address as addresss,o.user_id as userid,o.actual_allincost,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,a.street,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
@@ -973,6 +973,12 @@
         left join  admin_r_user aru on aru.userid= o.user_id
         left join  paymentconfirm  pf on pf.orderno=o.child_order_no where child_order_no =#{orderid}
     </select>
+    <select id="getUserEmailByOrderNo" resultType="java.lang.String">
+        SELECT u.email FROM USER u INNER JOIN orderinfo oi ON u.id=oi.user_id WHERE oi.order_no=#{orderNo}
+    </select>
+    <update id="updateOrderinfoUpdateState">
+        update orderinfo set server_update=1 where order_no=#{orderNo}
+    </update>
     <select id="getAllFreightByOrderid" resultType="java.lang.String">
         SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
     </select>

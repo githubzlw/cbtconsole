@@ -617,6 +617,13 @@ b {
 					<br>
 					<span>软下架原因:${list.unsellAbleReasonDesc}</span>
 				</c:if>
+				<c:if test="${not empty list.complain }">
+				<br>投诉:
+				<c:forEach var="complain" items="${list.complain }">
+				<a href="/cbtconsole/complain/getComplainByCid?cid=${complain }">${complain }</a>&nbsp;&nbsp;
+				</c:forEach>
+				
+				</c:if>
 
 			</td>
 

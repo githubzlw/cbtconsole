@@ -1,10 +1,7 @@
 package com.importExpress.service.impl;
 
 import com.importExpress.mapper.ShopCarMarketingMapper;
-import com.importExpress.pojo.ShopCarInfo;
-import com.importExpress.pojo.ShopCarMarketing;
-import com.importExpress.pojo.ShopCarMarketingExample;
-import com.importExpress.pojo.ShopCarUserStatistic;
+import com.importExpress.pojo.*;
 import com.importExpress.service.ShopCarMarketingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,7 +114,7 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
         shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
-        return shopCarMarketingMapper.updateUserFollowTime(userId);
+        return shopCarMarketingMapper.updateUserFollowTime(userId,adminId);
     }
 
     @Override
@@ -128,6 +125,21 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public int queryForListCount(ShopCarUserStatistic statistic) {
         return shopCarMarketingMapper.queryForListCount(statistic);
+    }
+
+    @Override
+    public List<ShopTrackingBean> queryTrackingList(ShopTrackingBean param) {
+        return shopCarMarketingMapper.queryTrackingList(param);
+    }
+
+    @Override
+    public int queryTrackingListCount(ShopTrackingBean param) {
+        return shopCarMarketingMapper.queryTrackingListCount(param);
+    }
+
+    @Override
+    public List<ZoneBean> queryAllCountry() {
+        return shopCarMarketingMapper.queryAllCountry();
     }
 
 }

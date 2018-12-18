@@ -4,6 +4,7 @@ import com.cbt.bean.CodeMaster;
 import com.cbt.bean.OrderDatailsNew;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.refund.bean.AdminUserBean;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.PreferentialPrice;
 import com.cbt.website.bean.*;
 import com.cbt.website.dao2.Page;
@@ -50,6 +51,8 @@ public interface PurchaseServer {
 	 * @return int
 	 */
 	public int determineStraighthair(Map<Object, Object> map);
+
+
 
 	/**
 	 * 保存商品沟通备注信息

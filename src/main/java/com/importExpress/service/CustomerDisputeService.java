@@ -86,5 +86,9 @@ public interface CustomerDisputeService {
 	 */
 	long updateMessage(String disputeId);
 	
-	
+	/**查询订单申诉
+	 * @param orderIdList
+	 * @return
+	 */
+	public Map<String, Object> list(List<String> orderIdList);
 }

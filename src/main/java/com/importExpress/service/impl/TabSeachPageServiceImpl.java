@@ -5,6 +5,7 @@ import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
 import com.importExpress.pojo.TabSeachPageBean;
 import com.importExpress.pojo.TabSeachPagesDetailBean;
 import com.importExpress.service.TabSeachPageService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -160,7 +161,10 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 
 	@Override
 	public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean) {
-		return tabSeachPageMapper.updateAuthorizedInfo(bean);
+	    if (bean.getId() != null){
+            return tabSeachPageMapper.updateAuthorizedInfo(bean);
+        }
+        return tabSeachPageMapper.insertAuthorizedInfo(bean);
 	}
 
 	@Override
@@ -173,6 +177,8 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 		return tabSeachPageMapper.queryStaticizeAll();
 	}
 
-	
-
+    @Override
+    public long updateAuthorizedInfoValid(String shopId, int valid) {
+        return tabSeachPageMapper.updateAuthorizedInfoValid(shopId, valid);
+    }
 }

@@ -389,7 +389,7 @@
         SELECT 
         LAST_INSERT_ID() 
     </selectKey>
-    insert into order_change(orderNo,goodId,ropType,oldValue,newValue,status) values(#{orderNo}, #{goodId}, #{ropType}, #{oldValue}, #{newValue}, #{status})
+    insert into order_change(orderNo,goodId,ropType,oldValue,newValue,status) values(#{orderNo}, #{goodId}, #{ropType}, #{oldValue}, #{newValue}, 1)
   </insert>
   
   <update id="updateClientUpdateByOrderNo" parameterType="String">

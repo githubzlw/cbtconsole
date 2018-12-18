@@ -18,6 +18,7 @@ import com.cbt.report.vo.StatisticalReportVo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.Util;
+import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.warehouse.pojo.Tb1688Account;
@@ -138,8 +139,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/addReport")
 	@ResponseBody
 	public JsonResult addReport(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
-                                @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
+	                            @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
+	                            @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
 		JsonResult json = new JsonResult();
 		// 获取登录用户
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -289,8 +290,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/addReport2")
 	@ResponseBody
 	public JsonResult addReport2(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                 @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
-                                 @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
+	                             @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
+	                             @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
 		JsonResult json = new JsonResult();
 		// 获取登录用户
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -311,8 +312,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/addReport2_bak")
 	@ResponseBody
 	public JsonResult addReport2_bak(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                     @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
-                                     @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
+	                                 @Param("reportMonth") String reportMonth, @Param("timeFrom") String timeFrom,
+	                                 @Param("timeTo") String timeTo, @Param("type") String type) throws ParseException {
 		JsonResult json = new JsonResult();
 		// 获取登录用户
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -444,8 +445,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/selectReport")
 	@ResponseBody
 	public JsonResult selectReport(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                   @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
-                                   @Param("type") String type) {
+	                               @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
+	                               @Param("type") String type) {
 		JsonResult json = new JsonResult();
 		Map<String,String> map=new HashMap<String,String>(3);
 		int page = request.getParameter("page") == null ? 1 : Integer.parseInt(request.getParameter("page"));
@@ -472,8 +473,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/selectReport1")
 	@ResponseBody
 	public JsonResult selectReport1(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                    @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
-                                    @Param("type") String type) {
+	                                @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
+	                                @Param("type") String type) {
 		JsonResult json = new JsonResult();
 		int page = request.getParameter("page") == null ? 1 : Integer.parseInt(request.getParameter("page"));
 		// 查询基本报表汇总信息
@@ -570,8 +571,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/selectReport2")
 	@ResponseBody
 	public JsonResult selectReport2(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                    @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
-                                    @Param("type") String type) {
+	                                @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
+	                                @Param("type") String type) {
 		JsonResult json = new JsonResult();
 		Map<String,String> map=new HashMap<String,String>(1);
 		try{
@@ -595,8 +596,8 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/selectReport2_bak")
 	@ResponseBody
 	public JsonResult selectReport2_bak(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                        @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
-                                        @Param("type") String type) {
+	                                    @Param("reportMonth") String reportMonth, @Param("orderName") String orderName,
+	                                    @Param("type") String type) {
 		JsonResult json = new JsonResult();
 		int page = request.getParameter("page") == null ? 1 : Integer.parseInt(request.getParameter("page"));
 		// 查询基本报表汇总信息
@@ -656,8 +657,8 @@ public class StatisticalReportController {
 
 	@RequestMapping(value = "/export")
 	public void exportExcel(HttpServletRequest request, @Param("reportYear") String reportYear,
-                            @Param("reportMonth") String reportMonth, @Param("orderName") String orderName, @Param("type") String type,
-                            HttpServletResponse response) throws Exception {
+	                        @Param("reportMonth") String reportMonth, @Param("orderName") String orderName, @Param("type") String type,
+	                        HttpServletResponse response) throws Exception {
 		int noFreeFreight = 3;
 		double expenditure = 0.00;
 		double allSalesPrice = 0.00;
@@ -742,8 +743,8 @@ public class StatisticalReportController {
 	 */
 	@RequestMapping(value = "/exportOrder")
 	public void exportOrderExcel(HttpServletRequest request, @Param("reportYear") String reportYear,
-                                 @Param("reportMonth") String reportMonth, @Param("orderName") String orderName, @Param("type") String type,
-                                 HttpServletResponse response) throws Exception {
+	                             @Param("reportMonth") String reportMonth, @Param("orderName") String orderName, @Param("type") String type,
+	                             HttpServletResponse response) throws Exception {
 		int noFreeFreight = 3;
 		orderName = "sales_volumes";
 		if (request.getParameter("noFreeFreight") != null && !request.getParameter("noFreeFreight").equals("")) {
@@ -800,15 +801,13 @@ public class StatisticalReportController {
 	 * 查询报表信息
 	 *
 	 * @param request
-	 * @param reportYear
-	 * @param reportMonth
 	 * @return
 	 * @throws ParseException
 	 */
 	@RequestMapping(value = "/showGoods")
 	@ResponseBody
 	public JsonResult showGoods(HttpServletRequest request, @Param("timeFrom") String timeFrom,
-                                @Param("timeTo") String timeTo, @Param("categroy") String categroy) throws ParseException {
+	                            @Param("timeTo") String timeTo, @Param("categroy") String categroy) throws ParseException {
 		JsonResult json = new JsonResult();
 		if (categroy.equals("无对应") || categroy == null || "".equals(categroy)) {
 			json.setOk(false);
@@ -845,7 +844,7 @@ public class StatisticalReportController {
 	@RequestMapping(value = "/showGoodsByOrder")
 	@ResponseBody
 	public JsonResult showGoodsByOrder(HttpServletRequest request, @Param("timeFrom") String timeFrom,
-                                       @Param("timeTo") String timeTo, @Param("categroy") String categroy) throws ParseException {
+	                                   @Param("timeTo") String timeTo, @Param("categroy") String categroy) throws ParseException {
 		JsonResult json = new JsonResult();
 		// 查询报表基本信息
 		StatisticalReportVo statisticalReportVo = new StatisticalReportVo();
@@ -1335,114 +1334,7 @@ public class StatisticalReportController {
 		}
 	}
 
-	/**
-	 * 导出库存Excel
-	 *
-	 * @throws ParseException
-	 *
-	 * @throws Exception
-	 */
 
-	@RequestMapping(value = "/exportGoodsInventory")
-	public void exportGoodsInventory(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setCharacterEncoding("utf-8");
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		String type = request.getParameter("type");
-		String type11 = request.getParameter("type11");
-		String goodinfo = request.getParameter("goodinfo");
-		String year = request.getParameter("year");
-		String flag = request.getParameter("flag");
-		String mouth = request.getParameter("mouth");
-		String scope = request.getParameter("scope");
-		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("goodscatid");
-		String have_barcode=request.getParameter("have_barcode");
-		String barcode = request.getParameter("barcode");
-		String startdate=request.getParameter("startdate");
-		String enddate=request.getParameter("enddate");
-		int count = Integer.valueOf(request.getParameter("count") != null && !"".equals(request.getParameter("count"))
-				? request.getParameter("count").toString() : "0");
-		int count11 = Integer
-				.valueOf(request.getParameter("count11") != null && !"".equals(request.getParameter("count11"))
-						? request.getParameter("count11").toString() : "0");
-		String goodsurl = request.getParameter("goodsurl");
-		String sku = request.getParameter("sku");
-		String buyTime = "";
-		if (year != null && year.equals("0")) {
-			buyTime = null;
-		} else if (year != null && mouth.equals("0")) {
-			buyTime = year;
-		} else if (year != null) {
-			buyTime = year + "-" + mouth;
-		}
-		goodscatid="0".equals(goodscatid)?null:goodscatid;
-		if("全部".equals(goodscatid)){
-			goodscatid="abc";
-		}else if("其他".equals(goodscatid)){
-			goodscatid="bcd";
-		}
-		if ("-1".equals(flag)) {
-			flag = null;
-		}
-		if (goodinfo == null || goodinfo.equals("")) {
-			goodinfo = null;
-		}
-		if (goodsurl == null || goodsurl.equals("")) {
-			goodsurl = null;
-		}
-		if (sku == null || sku.equals("")) {
-			sku = null;
-		}
-		if(StringUtils.isStrNull(startdate)){
-			startdate=null;
-		}else{
-			startdate=startdate+" 00:00:00";
-		}
-		if(StringUtils.isStrNull(enddate)){
-			enddate=null;
-		}else{
-			enddate=enddate+" 23:59:59";
-		}
-		if(!"全部".equals(have_barcode)){
-			barcode=have_barcode;
-		}else if ("全部".equals(have_barcode) && barcode != null && !"".equals(barcode) && barcode.indexOf("STK") <= -1) {
-			barcode = getBarcode(barcode);
-		} else if (barcode == null || "".equals(barcode)) {
-			barcode = null;
-		}
-		if (scope != null && scope.equals("0")) {
-			scope = null;
-		}
-		map.put("buyTime", buyTime);
-		map.put("goodinfo", goodinfo);
-		map.put("sku", sku);
-		map.put("goodsurl", goodsurl);
-		map.put("type", type);
-		map.put("type11", type11);
-		map.put("scope11", scope11);
-		map.put("count11", count11);
-		map.put("scope", scope);
-		map.put("count", count);
-		map.put("goodscatid", goodscatid);
-		map.put("barcode", barcode);
-		map.put("flag", flag);
-		map.put("enddate", enddate);
-		map.put("startdate", startdate);
-		map.put("page", -1);
-		map.put("export", "1");
-		List<Inventory> toryList = taoBaoOrderService.getIinOutInventory(map);
-		System.out.println("infoList================" + toryList.size());
-		HSSFWorkbook wb = generalReportService.exportGoodsInventory(toryList);
-		response.setContentType("application/vnd.ms-excel");
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String filename = "库存盘点数据导出" + sdf.format(new Date());
-		filename=StringUtils.getFileName(filename);
-		response.setHeader("Content-disposition", "attachment;filename=" + filename);
-		OutputStream ouputStream = response.getOutputStream();
-		wb.write(ouputStream);
-		ouputStream.flush();
-		ouputStream.close();
-	}
 
 	/**
 	 * 导出Excel
@@ -1648,266 +1540,6 @@ public class StatisticalReportController {
 		}
 		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(barcode_list));
 		return jsonArr;
-	}
-
-	/**
-	 * 查询库存统计报表
-	 *
-	 * @param request
-	 * @param reportYear
-	 * @param reportMonth
-	 * @return
-	 */
-	@RequestMapping(value = "/searchAliCategory")
-	@ResponseBody
-	protected JsonResult searchAliCategory(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		JsonResult json = new JsonResult();
-		TaoBaoInfoList list = new TaoBaoInfoList();
-		String type = request.getParameter("type");
-		String cid = request.getParameter("cid");
-		List<AliCategory> aliCategoryList = taoBaoOrderService.searchAliCategory(type, cid);
-		for (AliCategory a : aliCategoryList) {
-			if(a.getCategory().contains("'")){
-				a.setCategory(a.getCategory().replace("'", " "));
-			}
-		}
-		list.setAliCategoryList(aliCategoryList);
-		json.setData(list);
-		return json;
-	}
-
-	public double getMaxPrice(String[] prices) {
-		double maxPrice = 0.00;
-		for (int i = 0; i < prices.length; i++) {
-			double price = Double.valueOf(prices[i].toString());
-			if (maxPrice < price) {
-				maxPrice = price;
-			}
-		}
-		return maxPrice;
-	}
-
-	/**
-	 * 手动录入库存
-	 *
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 *             whj 2017-04-25
-	 */
-	@RequestMapping(value = "/inventoryEntry")
-	@ResponseBody
-	protected JsonResult inventoryEntry(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		JsonResult json = new JsonResult();
-		TaoBaoInfoList list = new TaoBaoInfoList();
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		int row = 0;
-		// String orderid=request.getParameter("orderid");
-		String goodsid = request.getParameter("goodsid");
-		String count = request.getParameter("count");
-		String remark = request.getParameter("remark");
-		String in_barcode = request.getParameter("in_barcode");
-		// map.put("orderid", orderid);
-		map.put("goodsid", goodsid);
-		map.put("count", count);
-		map.put("remark", remark);
-		map.put("in_barcode", in_barcode);
-		OrderDetailsBean od = taoBaoOrderService.findOrderDetails(map);
-		if (od != null && Integer.valueOf(count) >= 0) {
-			map.put("goods_name", od.getGoodsname());
-			map.put("sku", od.getCar_type());
-			map.put("goodscatid", od.getGoodscatid());
-			map.put("car_img", od.getCar_img());
-			if (od.getGoods_pid() == null || "".equals(od.getGoods_pid())) {
-				String pid = getItemid(od.getCar_url());
-				map.put("goods_pid", pid);
-				map.put("goods_url", od.getCar_url());
-			} else {
-				map.put("goods_pid", od.getGoods_pid());
-				map.put("goods_url", "https://www.import-express.com/spider/detail?&source=" + od.getCar_urlMD5()
-						+ "&item=" + od.getGoods_pid() + "");
-			}
-			map.put("car_urlMD5", od.getCar_urlMD5());
-			map.put("goods_p_price", od.getGoods_p_price());
-			double new_amount = Integer.valueOf(count)* Double.valueOf("".equals(od.getGoods_p_price()) ? "0" : od.getGoods_p_price());
-			map.put("inventory_amount", new_amount);
-			Inventory in = taoBaoOrderService.queryInId(od.getCar_type(), od.getGoods_pid(), in_barcode,od.getCar_urlMD5(), "");
-			if (in != null) {
-				map.put("flag", in.getFlag());
-				row = taoBaoOrderService.updateSources(String.valueOf(in.getFlag()), od.getCar_type(),
-						od.getGoods_pid(), od.getCar_urlMD5(), in_barcode, in_barcode, Integer.valueOf(count),
-						Integer.valueOf(count), remark, new_amount);
-			} else {
-				row = taoBaoOrderService.inventoryEntry(map);
-			}
-		}
-		list.setAllCount(row);
-		json.setData(list);
-		return json;
-	}
-
-	public String getItemid(String u) {
-		if (u.length() < 12) {// http://aaa&123
-			return "0";
-		}
-		String ret = "";
-		Pattern p = Pattern.compile("\\d{2,}");// 这个2是指连续数字的最少个数
-		String maxStr = "";
-		Matcher m = p.matcher(u);
-		int i = 0;
-		while (m.find()) {
-			String temp = m.group();
-			int c = u.indexOf(temp);
-			int len = c + m.group().length() + 5;
-			if (len > u.length()) {
-				len = c + m.group().length();
-			}
-			temp = u.substring(c - 4, len);
-			if (temp.indexOf("?id=") != -1 || temp.indexOf("&id=") != -1 || temp.indexOf(".html") != -1) {
-				if (m.group().length() > maxStr.length()) {
-					maxStr = m.group();
-				}
-			}
-			i++;
-		}
-		ret = maxStr;
-		return ret;
-	}
-
-	/**
-	 * 删除库存
-	 *
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 *             whj 2017-04-25
-	 */
-	@RequestMapping(value = "/deleteInventory")
-	@ResponseBody
-	protected JsonResult deleteInventory(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		JsonResult json = new JsonResult();
-		TaoBaoInfoList list = new TaoBaoInfoList();
-		int id=Integer.valueOf(request.getParameter("id"));
-		String goods_pid=request.getParameter("goods_pid");
-//		String sku=request.getParameter("sku");
-		String barcode=request.getParameter("barcode");
-//		String amount=request.getParameter("amount");
-		String dRemark=request.getParameter("dRemark");
-		int count = taoBaoOrderService.deleteInventory(id,dRemark);
-		if(count>0){
-			list.setAllCount(count);
-			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-			//如果库存为0则更改库存标识
-
-			UpdateIsStockFlagThread u=new UpdateIsStockFlagThread(String.valueOf(adm.getId()), goods_pid, id, barcode,adm.getAdmName());
-			u.start();
-		}else{
-			list.setAllCount(0);
-		}
-		json.setData(list);
-		return json;
-	}
-
-	/**
-	 * 库存盘点
-	 *
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws ParseException
-	 *             whj 2017-04-25
-	 */
-	@RequestMapping(value = "/updateSources")
-	@ResponseBody
-	protected JsonResult updateSources(HttpServletRequest request, HttpServletResponse response)
-			throws Exception{
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		JsonResult json = new JsonResult();
-		TaoBaoInfoList list = new TaoBaoInfoList();
-		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-//		String old_sku = request.getParameter("old_sku");
-//		String goods_pid = request.getParameter("goods_pid");
-//		String car_urlMD5 = request.getParameter("car_urlMD5");
-		String new_barcode = request.getParameter("new_barcode");//盘点后库位
-		String old_barcode = request.getParameter("old_barcode");//盘点前库位
-		String new_remaining = request.getParameter("new_remaining");//盘点后库存
-		String old_remaining = request.getParameter("old_remaining");//盘点前库存
-		String flag = request.getParameter("flag");
-		String remark = request.getParameter("remark");
-		String pd_id = request.getParameter("pd_id");
-		if (new_barcode == null || new_barcode.equals("")) {
-			new_barcode = old_barcode;
-		}
-		// 判断新的库位是否存在
-		int isExit = taoBaoOrderService.isExitBarcode(new_barcode);
-		Inventory i = taoBaoOrderService.queryInById(pd_id);
-		double goods_p_price=0.00;
-		if (isExit > 0 && new_remaining != null && !new_remaining.equals("") && i!=null) {
-			String price = i.getGoods_p_price();
-			double new_inventory_amount = 0.00;
-			if (price.indexOf(",") > -1) {
-				String prices[] = price.split(",");
-				goods_p_price=getMaxPrice(prices);
-				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
-			} else {
-				goods_p_price=Double.valueOf(price);
-				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
-			}
-			if (remark != null && !"".equals(remark)) {
-				//remark = (StringUtils.isStrNull(i.getRemark())?"":i.getRemark()) + remark;
-			} else {
-				remark ="";// i.getRemark();
-			}
-			isExit = taoBaoOrderService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
-					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
-			if (isExit > 0) {
-				if(Integer.valueOf(new_remaining)<=0){
-					//如果库存为0则更改库存标识
-					taoBaoOrderService.updateIsStockFlag(i.getGoods_pid());
-					DataSourceSelector.set("dataSource28_corss");
-					taoBaoOrderService.updateIsStockFlag1(i.getGoods_pid());
-					DataSourceSelector.restore();
-					SendMQ sendMQ = new SendMQ();
-					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
-					sendMQ.closeConn();
-				}
-				// 记录更改货源记录日志
-				taoBaoOrderService.updateSourcesLog(i.getId(), adm.getAdmName(),StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), new_barcode,
-						old_barcode, Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark);
-				taoBaoOrderService.insertChangeBarcode(i.getId(), old_barcode, new_barcode);
-				if(Integer.valueOf(new_remaining)<Integer.valueOf(old_remaining)){
-					//记录损耗的库存记录
-					map.put("new_remaining", new_remaining);
-					map.put("old_remaining", old_remaining);
-					map.put("new_barcode", new_barcode);
-					map.put("old_barcode", old_barcode);
-					map.put("in_id", i.getId());
-					double loss_amount=goods_p_price*(Integer.valueOf(new_remaining)-Integer.valueOf(old_remaining));
-					BigDecimal bg = new BigDecimal(loss_amount);
-					double f1 = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-					map.put("loss_amount",f1);//损耗金额
-					map.put("loss_price", goods_p_price);
-					map.put("admName", adm.getAdmName());
-					taoBaoOrderService.recordLossInventory(map);
-				}
-			}
-		}
-		list.setAllCount(isExit);
-		json.setData(list);
-		return json;
 	}
 
 	@RequestMapping(value = "/addTbOrderRemark")
@@ -3155,9 +2787,9 @@ public class StatisticalReportController {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-		@RequestMapping(value = "/profitSummaryData", method = RequestMethod.POST)
-		@ResponseBody
-		public Map<String,String> profitSummaryData(HttpServletRequest request, Model model) throws ParseException {
+	@RequestMapping(value = "/profitSummaryData", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,String> profitSummaryData(HttpServletRequest request, Model model) throws ParseException {
 		Map<String, String> map = new HashMap<String, String>();
 		TaoBaoInfoList list = new TaoBaoInfoList();
 		String year = request.getParameter("year");
@@ -3216,7 +2848,7 @@ public class StatisticalReportController {
 		String month = request.getParameter("month");
 		int page = Integer.valueOf(request.getParameter("page"));
 		String userId=request.getParameter("userId");
-        userId=StringUtil.isBlank(userId)?null:userId.trim();
+		userId=StringUtil.isBlank(userId)?null:userId.trim();
 		try{
 			if (page > 0) {
 				page = (page - 1) * 100;
@@ -3814,7 +3446,7 @@ public class StatisticalReportController {
 			state = Integer.parseInt(s);
 		}
 		String strAdminId = request.getParameter("adminId");
-		 adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
+		adminid = StrUtils.isNum(strAdminId) ? Integer.valueOf(strAdminId) : 0;
 		String su = request.getParameter("userId");
 		int userId = 0;
 		if (su != null && !"".equals(su)) {
@@ -3846,7 +3478,7 @@ public class StatisticalReportController {
 				gBean.setPname(ppName);
 			}
 		}
-		int total = ibs.total(userId, parse, state, userName, pname, start, 30, timeFrom, timeTo, adminid, qtype);
+		int total = ibs.total(userId, parse, state, userName, pname, start, 30, useremail, timeFrom, timeTo, adminid, qtype);
 		json.setRows(findAll);
 		json.setTotal(total);
 		return json;
@@ -4098,101 +3730,6 @@ public class StatisticalReportController {
 		return json;
 	}
 
-	/**
-	 * 查询库存统计报表
-	 *
-	 * @param request
-	 * @param reportYear
-	 * @param reportMonth
-	 * @return
-	 */
-	@RequestMapping(value = "/searchGoodsInventoryInfo")
-	@ResponseBody
-	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		EasyUiJsonResult json = new EasyUiJsonResult();
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		int page = Integer.valueOf(request.getParameter("page"));// 当前页
-		String type = request.getParameter("type");
-		String type11 = request.getParameter("type11");
-		String goodinfo = request.getParameter("goodinfo");
-		String year = request.getParameter("year");
-		String flag = request.getParameter("flag");
-		String mouth = request.getParameter("mouth");
-		String scope = request.getParameter("scope");
-		String scope11 = request.getParameter("scope11");
-		String goodscatid = request.getParameter("goodscatid");
-		String have_barcode=request.getParameter("have_barcode");
-		String barcode = request.getParameter("barcode");
-		String startdate=request.getParameter("startdate");
-		String goods_pid=request.getParameter("goods_pid");
-		String enddate=request.getParameter("enddate");
-		String valid=request.getParameter("valid");
-		goods_pid=StringUtil.isBlank(goods_pid)?null:goods_pid;
-		int count = Integer.valueOf(request.getParameter("count") != null && !"".equals(request.getParameter("count"))
-				? request.getParameter("count").toString() : "0");
-		int count11 = Integer
-				.valueOf(request.getParameter("count11") != null && !"".equals(request.getParameter("count11"))
-						? request.getParameter("count11").toString() : "0");
-		String goodsurl = request.getParameter("goodsurl");
-		String sku = request.getParameter("sku");
-		String buyTime = "";
-		if (year != null && year.equals("0")) {
-			buyTime = null;
-		} else if (year != null && mouth.equals("0")) {
-			buyTime = year;
-		} else if (year != null) {
-			buyTime = year + "-" + mouth;
-		}
-		goodscatid="0".equals(goodscatid)?null:goodscatid;
-		if("全部".equals(goodscatid)){
-			goodscatid="abc";
-		}else if("其他".equals(goodscatid)){
-			goodscatid="bcd";
-		}
-		flag="-1".equals(flag)?null:flag;
-		page=page>0?(page - 1) * 20:page;
-		goodinfo=StringUtils.isStrNull(goodinfo)?null:goodinfo;
-		goodsurl=StringUtils.isStrNull(goodsurl)?null:goodsurl;
-		sku=StringUtils.isStrNull(sku)?null:sku;
-		startdate=StringUtils.isStrNull(startdate)?null:(startdate+" 00:00:00");
-		enddate=StringUtils.isStrNull(enddate)?null:(enddate+" 23:59:59");
-		if(!"全部".equals(have_barcode)){
-			barcode=have_barcode;
-		}else if ("全部".equals(have_barcode) && barcode != null && !"".equals(barcode) && barcode.indexOf("STK") <= -1) {
-			barcode = getBarcode(barcode);
-		} else if (barcode == null || "".equals(barcode)) {
-			barcode = null;
-		}
-		if (scope != null && scope.equals("0")) {
-			scope = null;
-		}
-		map.put("buyTime", buyTime);
-		map.put("goodinfo", goodinfo);
-		map.put("sku", sku);
-		map.put("goodsurl", goodsurl);
-		map.put("type", type);
-		map.put("type11", type11);
-		map.put("scope11", scope11);
-		map.put("count11", count11);
-		map.put("scope", scope);
-		map.put("count", count);
-		map.put("goodscatid", goodscatid);
-		map.put("barcode", barcode);
-		map.put("page", page);
-		map.put("flag", flag);
-		map.put("enddate", enddate);
-		map.put("startdate", startdate);
-		map.put("export", "0");
-		map.put("goods_pid",goods_pid);
-		map.put("valid","-1".equals(valid)?null:valid);
-		List<Inventory> toryList = taoBaoOrderService.getIinOutInventory(map);
-		List<Inventory> toryListCount = taoBaoOrderService.getIinOutInventoryCount(map);
-		json.setRows(toryList);
-		json.setTotal(toryListCount.size());
-		return json;
-	}
-
 	@RequestMapping(value = "/getAllInventory", method = RequestMethod.GET)
 	@ResponseBody
 	protected com.alibaba.fastjson.JSONArray getAllInventory(HttpServletRequest request, HttpServletResponse response)
@@ -4314,20 +3851,6 @@ public class StatisticalReportController {
 		out.close();
 	}
 
-	@RequestMapping(value = "/problem_inventory")
-	@ResponseBody
-	protected void problem_inventory(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, ParseException {
-		Map<Object,Object> map = new HashMap<Object,Object>();
-		response.setCharacterEncoding("utf-8");
-		String id = request.getParameter("in_id");
-		map.put("in_id", id);
-		int row=taoBaoOrderService.problem_inventory(map);
-		PrintWriter out = response.getWriter();
-		out.print(row+"");
-		out.flush();
-		out.close();
-	}
 
 	/**
 	 * 强制入库
@@ -5012,7 +4535,7 @@ public class StatisticalReportController {
 	}
 
 	private void genResult(List<NoAvailableRate> rsList, Date beginDate, Date endDate, int calendarType,
-						   int queryType) {
+	                       int queryType) {
 
 		Calendar beginCld = Calendar.getInstance();
 		beginCld.setTime(beginDate);
@@ -5056,45 +4579,6 @@ public class StatisticalReportController {
 		}
 	}
 
-	class UpdateIsStockFlagThread extends Thread{
-		private String goods_pid;
-		private String adm_id;
-		private int id;
-		private String barcode;
-		private String admName;
-
-		public UpdateIsStockFlagThread(String adm_id,String goods_pid,int id,String barcode,String admName){
-			this.adm_id = adm_id;
-			this.goods_pid = goods_pid;
-			this.id = id;
-			this.barcode=barcode;
-			this.admName=admName;
-		}
-
-		@Override
-		public void run() {
-			try{
-				SendMQ sendMQ = new SendMQ();
-				taoBaoOrderService.updateIsStockFlag2(goods_pid);
-				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'"));
-				//如果库存为0则更改库存标识
-				taoBaoOrderService.updateIsStockFlag(goods_pid);
-				DataSourceSelector.set("dataSource28_corss");
-				taoBaoOrderService.updateIsStockFlag1(goods_pid);
-				DataSourceSelector.restore();
-				//记录删除该库存的人
-				String admuserJson = Redis.hget(adm_id, "admuser");
-				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-				taoBaoOrderService.updateSourcesLog(id, admName, "", goods_pid, "",barcode, 0, 0, "库存删除");
-				sendMQ.closeConn();
-			}catch (Exception e){
-				e.printStackTrace();
-			}finally {
-				DataSourceSelector.restore();
-			}
-		}
-
-	}
 
 
 }

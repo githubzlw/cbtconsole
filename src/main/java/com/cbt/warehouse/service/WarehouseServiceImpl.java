@@ -10,6 +10,7 @@ import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.Util;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.ClassDiscount;
@@ -22,6 +23,7 @@ import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
+import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
@@ -54,7 +56,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
     private FreightFeeSerive freightFeeSerive;
     @Autowired
     private CustomGoodsService customGoodsService;
-
+    @Autowired
+    private IPurchaseMapper pruchaseMapper;
     @Override
     public outIdBean findOutId(Integer uid) {
 
@@ -377,11 +380,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if(pics.contains("2018-05") || pics.contains("2018-04") || pics.contains("2018-03") || pics.contains("2018-02") || pics.contains("2018-01") || pics.contains("2018-05") ||
                 pics.contains("2017-03") || pics.contains("2018-04") || pics.contains("2018-05") || pics.contains("2018-06")
                 || pics.contains("2018-07") || pics.contains("2018-08") ||  pics.contains("2018-09") ||  pics.contains("2018-10") ||  pics.contains("2018-11") ||  pics.contains("2018-12")){
-            pics="https://img.import-express.com/importcsvimg/inspectionImg/"+pics+"";
+            pics= Util.PIC_URL+pics+"";
 //            pics="http://27.115.38.42:8084/"+pics+"";
         }else{
 //            pics="http://192.168.1.34:8085/"+pics+"";
-            pics="https://img.import-express.com/importcsvimg/inspectionImg/"+pics+"";
+            pics=Util.PIC_URL+pics+"";
 
         }
         return pics;
@@ -731,7 +734,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 SearchResultInfo p=ps.get(i);
                 String picture=p.getGoods_url();
                 if(!picture.contains("http")){
-                    picture="http://img.import-express.com/importcsvimg/inspectionImg/"+picture;
+                    picture=Util.PIC_URL+picture;
                 }
                 sb.append("<div class='div_box'><img src='"+picture+"' class='pic_01' onmouseout='closeBigImg();'" +
                         " onmouseover=BigImg(\""+picture+"\") style='width:220px;'></img>");
@@ -881,27 +884,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public OrderInfoCountPojo getOrderInfoCountByState(Map<String, Object> map) {
 
         return dao.getOrderInfoCountByState(map);
-    }
-
-    @Override
-    public OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map) {
-        return dao.getOrderInfoCountNoitemid(map);
-    }
-    @Override
-    public OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map) {
-
-        return dao.getNoMatchOrderByTbShipno(map);
-    }
-
-    @Override
-    public List<String> getNoShipInfoOrder(Map<String, String> map) {
-        return dao.getNoShipInfoOrder(map);
-    }
-
-    @Override
-    public List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map) {
-
-        return dao.getOrderInfoCountItemid(map);
     }
 
     @Override
@@ -1556,151 +1538,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return dao.getShopManagerListDetailsCount(map);
     }
     @Override
-    public List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map) {
-        List<PrePurchasePojo> list=dao.getPrePurchaseForTB(map);
-        for (PrePurchasePojo p : list) {
-            p.setStatus("<a target='_blank' href='/cbtconsole/website/purchase_order_details.jsp?orderid="+p.getOrderid()+"&id="+map.get("admuserid")+"'>处理</a>");
-        }
-        return list;
-    }
-    @Override
-    public List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map) {
-
-        return dao.getPrePurchaseForTBCount(map);
-    }
-    @Override
-    public List<PrePurchasePojo> getPrePurchase(Map<String, Object> map) {
-        IExpressTrackDao dao1 = new ExpressTrackDaoImpl();
-        IOrderwsServer server1 = new OrderwsServer();
-        List<PrePurchasePojo> list=dao.getPrePurchase(map);
-        for (PrePurchasePojo p : list) {
-            int checked=dao.getChecked(p.getOrderid(),map.get("admuserid").toString());//验货无误商品数量
-            List<String> problem=dao.getProblem(p.getOrderid(),map.get("admuserid").toString());//验货有误商品数量
-            int fp=dao.getFpCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给采购多少个商品
-            int rk=dao.getStorageCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配采购的商品中入库了多少商品
-            int cg=dao.getPurchaseCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给该采购采购了多少商品\
-//            int noShipInfo=dao.getNoShipInfo(p.getOrderid(),map.get("admuserid").toString());
-            //查询该订单有多少没有物流信息的商品数
-            int index_num=0;
-            List<PurchasesBean> list_p=dao.getFpOrderDetails(p.getOrderid(),map.get("admuserid").toString());
-            index_num = getIndexNum(dao1, server1, p, index_num, list_p);
-            if(cg<fp){
-                p.setAmount_s("<span style='background-color:aquamarine'>"+fp+"/"+cg+"</span>");
-            }else{
-                p.setAmount_s("<span style='background-color:yellow'>"+fp+"/"+cg+"</span>");
-            }
-            getAmounts(map, p, checked, problem, fp, rk, cg, index_num);
-            //判断采购订单状态
-            getGoodsStatus(p, checked, problem, fp, rk, cg);
-            p.setProduct_cost(p.getProduct_cost()+" USD");
-	        p.setOption("<a target='_blank' href='/cbtconsole/warehouse/getSampleGoods?orderid="+p.getOrderid()+"'>建议采样</a>");
-            int goods_info=dao.getGoodsInfo(p.getOrderid(),map.get("admuserid").toString());
-            //拼接显示页面的订单号信息
-            getOrderIdInfo(map, p, fp, goods_info);
-        }
-        return list;
-    }
-
-    private void getOrderIdInfo(Map<String, Object> map, PrePurchasePojo p, int fp, int goods_info) {
-        if(goods_info>0){
-            if(fp==0){
-                p.setOrderid("<a  style='color:green;' target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
-            }else{
-                p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
-            }
-        }else{
-            if(fp==0){
-                p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' style='color:green;' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
-            }else{
-                p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
-                        + "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
-            }
-        }
-    }
-
-    private int getIndexNum(IExpressTrackDao dao1, IOrderwsServer server1, PrePurchasePojo p, int index_num, List<PurchasesBean> list_p) {
-        for (PurchasesBean purchasesBean : list_p) {
-            System.out.println("goodsid="+purchasesBean.getGoodsid());
-            if("1043736".equals(purchasesBean.getGoodsid())){
-                System.out.println("===");
-            }
-            String admName = dao1.queryBuyCount(purchasesBean.getConfirm_userid());
-            TaoBaoOrderInfo t = server1.getShipStatusInfo(purchasesBean.getTb_1688_itemid(), purchasesBean.getLast_tb_1688_itemid(),
-                    purchasesBean.getConfirm_time().substring(0, 10), admName,"",purchasesBean.getOffline_purchase(),p.getOrderid(),purchasesBean.getGoodsid());
-            if (t != null && t.getShipstatus() != null && t.getShipstatus().length() > 0) {
-
-            }else{
-                index_num++;
-                System.out.println("goodsid="+purchasesBean.getGoodsid());
-            }
-        }
-        return index_num;
-    }
-
-    private void getAmounts(Map<String, Object> map, PrePurchasePojo p, int checked, List<String> problem, int fp, int rk, int cg, int index_num) {
-        String numUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201315&search_state=0";
-        String num=index_num>0?"<a href='"+numUrl+"' target='_blank' title='点击查看确认采购1天后还没有物流信息商品'>"+index_num+"</a>":"0";
-        if(problem.size()>0){
-            String toUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201314&search_state=0";
-            p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:aquamarine'>"+rk+"/"+checked+"/<a href='"+toUrl+"' target='_blank' title='点击查看验货疑问商品'>"+problem.size()+"</a>/"+num+"</span>");
-        }else if(cg>=fp && checked<fp){
-            p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:yellow'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
-        }else if(checked==fp){
-            p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:#FF00FF'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
-        }else{
-            p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
-        }
-    }
-
-    /**
-     * 判断采购订单状态
-     * @param p
-     * @param checked
-     * @param problem
-     * @param fp
-     * @param rk
-     * @param cg
-     */
-    private void getGoodsStatus(PrePurchasePojo p, int checked, List<String> problem, int fp, int rk, int cg) {
-        if ("6".equals(p.getStatus()) || "-1".equals(p.getStatus())) {
-            p.setStatus("<span style='color:green'>订单取消</span>");
-        }else if ("3".equals(p.getStatus())) {
-            p.setStatus("<span style='color:crimson'>出运中</span>");
-        }else if ("4".equals(p.getStatus())) {
-            p.setStatus("<span style='color:green'>完结</span>");
-        }else if(fp==0){
-            p.setStatus("<span style='color:green'>订单中商品已被取消</span>");
-        }else if (cg<=0) {
-            p.setStatus("<span style='color:blueviolet'>未采购</span>");
-        }else if(cg>0 && cg<fp){
-            p.setStatus("<span style='color:green'>采购中</span>");
-        }else if(cg==fp && rk<cg){
-            p.setStatus("<span style='color:blue'>采购完成,但未全部到库</span>");
-        }else if(checked==fp){
-            p.setStatus("<span style='color:green'>已到仓库,验货无误</span>");
-        }else if(problem.size()!=0){
-            p.setStatus("<span style='color:deepskyblue'>已全部到仓库,校验有问题</span>");
-        }else if(rk==fp && rk>checked){
-            p.setStatus("<span style='color:dodgerblue'>已全部到仓库,未校验</span>");
-        }else{
-            p.setStatus("<span style='color:red'>未知状态</span>");
-        }
-    }
-
-    @Override
-    public int getFpCount(String orderid, String admuserid) {
-
-        return dao.getFpCount(orderid,admuserid);
-    }
-    @Override
-    public List<String> getPrePurchaseCount(Map<String, Object> map) {
-
-        return dao.getPrePurchaseCount(map);
-    }
-    @Override
     public int updateShopState(Map<String, Object> map) {
 
         return dao.updateShopState(map);
@@ -1735,48 +1572,19 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
         return dao.getAllProposal(map);
     }
-
-    @Override
-    public int insertOrderReplenishment(Map<String, Object> map) {
-
-        map.put("goods_title", map.get("goods_title").toString().replaceAll("'", "&apos;"));
-
-        return dao.insertOrderReplenishment(map);
-    }
-    @Override
-    public int updateReplenishmentState(Map<String, Object> map) {
-
-        return dao.updateReplenishmentState(map);
-    }
     @Override
     public int insertShopId(Map<String, Object> map) {
 
         return dao.insertShopId(map);
     }
     @Override
-    public int addReplenishmentRecord(Map<String, Object> map) {
-
-        return dao.addReplenishmentRecord(map);
-    }
-    @Override
     public List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map) {
-
         return dao.getIsReplenishment(map);
-    }
-    @Override
-    public List<Replenishment_RecordPojo> getIsReplenishments(
-            Map<String, Object> map) {
-
-        return dao.getIsReplenishments(map);
     }
     @Override
     public List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map) {
 
         return dao.displayBuyLog(map);
-    }
-    @Override
-    public List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String,Object> map){
-        return dao.getIsOfflinepurchase(map);
     }
     @Override
     public Map<String, String> getCompanyInfo(String goods_pid) {
@@ -1816,28 +1624,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public String getOrderAddress(Map<String, Object> map) {
 
         return dao.getOrderAddress(map);
-    }
-
-    @Override
-    public String getCgCount(Map<String, Object> map) {
-
-        return dao.getCgCount(map);
-    }
-    //当月分配种类
-    @Override
-    public String getfpCount(Map<String, Object> map) {
-
-        return dao.getfpCount(map);
-    }
-
-    @Override
-    public String getNotShipped(Map<String, Object> map) {
-        return dao.getNotShipped(map);
-    }
-
-    @Override
-    public String getShippedNoStorage(Map<String, Object> map) {
-        return dao.getShippedNoStorage(map);
     }
 
     @Override
@@ -1887,90 +1673,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
         return row;
     }
-
-    //获得每月采购数量
-    @Override
-    public String getMCgCount(Map<String, Object> map) {
-
-        return dao.getMCgCount(map);
-    }
-    //当日分配采购种类
-    @Override
-    public String getDistributionCount(Map<String, Object> map) {
-
-        return dao.getDistributionCount(map);
-    }
-
-    @Override
-    public String getDeleteInventory() {
-        PurchaseSamplingStatisticsPojo p=dao.getDeleteInventory();
-        return getDate(p,3);
-    }
-
-    public String getDate(PurchaseSamplingStatisticsPojo p, int type){
-        StringBuilder str=new StringBuilder();
-        if(p != null){
-            if(StringUtil.isNotBlank(p.getAdmName())){
-                if(type == 1){
-                    str.append("<a target='_blank' href='/cbtconsole/website/saleInventory.jsp?times=2000&amount="+(StringUtil.isNotBlank(p.getPid())?p.getPid().replace("-",""):0)+"' title='查看使用库存商品的商品'>"+p.getAdmName()+"</a>").append("/");
-                }else if(type == 2){
-	                str.append("<a target='_blank' href='/cbtconsole/website/loss_inventory_log.jsp?times=2000' title='查看库存损耗的商品'>"+p.getAdmName()+"</a>").append("/");
-                }else if(type == 3){
-	                str.append("<a target='_blank' href='/cbtconsole/website/inventory_delete_log.jsp?times=2000' title='查看删除库存的商品'>"+p.getAdmName()+"</a>").append("/");
-                }else{
-                    str.append(p.getAdmName()).append("/");
-                }
-            }else{
-                str.append("0/");
-            }
-            if(StringUtil.isNotBlank(p.getPid())){
-                str.append(p.getPid().replace("-",""));
-            }else{
-                str.append("0");
-            }
-        }
-        return str.toString();
-    }
-
-
-
-    @Override
-    public String getLossInventory() {
-        PurchaseSamplingStatisticsPojo p=dao.getLossInventory();
-        return getDate(p,2);
-    }
-
-    @Override
-    public String getSaleInventory() {
-        PurchaseSamplingStatisticsPojo p=dao.getSaleInventory();
-        return getDate(p,1);
-    }
-
-    @Override
-    public String getNewInventory() {
-        PurchaseSamplingStatisticsPojo p=dao.getNewInventory();
-        StringBuilder str=new StringBuilder();
-        if(p != null){
-            if(StringUtil.isNotBlank(p.getAdmName())){
-                str.append(p.getAdmName()).append("/");
-            }else{
-                str.append("0/");
-            }
-            if(StringUtil.isNotBlank(p.getPid())){
-                str.append(p.getPid());
-            }else{
-                str.append("0");
-            }
-        }
-        return str.toString();
-    }
-
-    @Override
-    public String getSjCgCount(Map<String, Object> map) {
-
-        return dao.getSjCgCount(map);
-    }
-
     @Override
     public int checkedGoods(Map<String, String> map) {
         return dao.checkedGoods(map);
@@ -2684,6 +2386,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public int updateTbState(Map<String, String> map) {
+        return dao.updateTbState(map);
+    }
+
+    @Override
     public int insertRemark(Map<String, String> map) {
 
         return dao.insertRemark(map);
@@ -2960,7 +2667,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 if ("https:".equals(picturepath.toString().substring(0,6))) {
                     picturepaths.add(picturepath.toString());
                 } else {
-                    picturepaths.add("http://img.import-express.com/importcsvimg/inspectionImg/" + picturepath.toString());
+                    picturepaths.add(Util.PIC_URL + picturepath.toString());
                 }
             }
         }

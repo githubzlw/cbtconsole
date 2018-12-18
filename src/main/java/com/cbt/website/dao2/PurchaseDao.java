@@ -5,6 +5,7 @@ import com.cbt.bean.OrderDatailsNew;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.StraightHairPojo;
 import com.cbt.refund.bean.AdminUserBean;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.PreferentialPrice;
 import com.cbt.website.bean.*;
 
@@ -236,6 +237,7 @@ public interface PurchaseDao {
 	 * @return int
 	 */
 	public int determineStraighthair(Map<Object, Object> map);
+
 	/**
 	 * 采购使用使用库存
 	 * @param map
