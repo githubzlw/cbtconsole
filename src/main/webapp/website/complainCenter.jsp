@@ -397,7 +397,7 @@ function linkGoods(id,userid){
 				if(i!=0){
 					html+='<hr>'
 				}
-				html+='<div class="order_title" style="float:left;cursor: pointer;"><a href="#" onclick="orderclick(\''+orderid+'\')">'+orderid+'</a></div>';
+				html+='<div class="order_title" style="float:left;cursor: pointer;"><a href="###" onclick="orderclick(\''+orderid+'\')">'+orderid+'</a></div>';
 				var list = json[i].orderdetail;
 				
 				html+='<div class="div_tile goods_'+orderid+'"  style="float:left"><ul class="title_li"><input type="hidden" value="'+orderid+'" class="order_hidden"';
@@ -410,11 +410,11 @@ function linkGoods(id,userid){
 				html = "该用户没有可选择订单";
 			}else{
 				if(ismore){
-					html +='<a href="#" onclick="showmore()" id="showmorea">显示更多订单</a>';
+					html +='<a href="###" onclick="showmore()" id="showmorea">显示更多订单</a>';
 				} 
 			}
 			  $.dialog({
-					title : '  关联订单产品(点击订单号选择产品)',
+					title : '关联订单产品(点击订单号选择产品)',
 					content : html,
 					max : false,
 					min : false,
@@ -483,7 +483,7 @@ function openDispute(id){
 					url:'/cbtconsole/complain/dispute/update',
 					data:{id:id,disputeid:disputeid,merchantid:merchantid},
 					success:function(res){
-						window.location.href = href;
+						location.reload(); 
 					},
 					error:function(XMLResponse){
 						alert('error');
@@ -508,7 +508,7 @@ function selectGoods(id,userid,orderid,goodsid){
 			url:'/cbtconsole/complain/order/update',
 			data:{id:id,orderid:orderid,goodsid:goodsid},
 			success:function(res){
-				window.location.href = href;
+				location.reload(); 
 			},
 			error:function(XMLResponse){
 				alert('error');
