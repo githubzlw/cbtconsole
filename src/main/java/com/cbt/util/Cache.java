@@ -6,6 +6,7 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class Cache {
 		urlList.add(auth);
 	}
 
-	public static List<AuthInfo> getAllAuth() {
+	public static List<AuthInfo> getAllAuth() throws SQLException {
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		Connection conn=null;
@@ -108,7 +109,7 @@ public class Cache {
 				}
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			throw e;
 		}finally{
 			DBHelper.getInstance().closeConnection(conn);
 			DBHelper.getInstance().closePreparedStatement(stmt);

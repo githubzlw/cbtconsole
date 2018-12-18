@@ -100,10 +100,14 @@ public class HeadInterceptor implements Filter {
 					}
 
 				} else {// 如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面
+
 					if (admuser == null && "/website/".equals(servletPath)
 							|| admuser == null && ("/website/main_menu.jsp".equals(servletPath) || "/website/user_profit.jsp".equals(servletPath))) {
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website" + loginPage);
 					} else if (admuser != null && "/website/".equals(servletPath)) {
+						logger.error("如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
+						logger.info("requestUrl:[{}]",requestUrl);
+						logger.info("Cache.getAllAuth():[{}]",Cache.getAllAuth());
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website/main_menu.jsp");
 					} else {
 						chain.doFilter(request, response);
