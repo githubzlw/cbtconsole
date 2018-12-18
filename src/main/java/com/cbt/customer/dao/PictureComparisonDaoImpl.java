@@ -3759,7 +3759,76 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		}
 		return res;
 	}
-	
+
+
+	@Override
+	public int insertChangeGoodsLog(String pUrl, String goodsType, String name, String price, String goodsCarId,String admName) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql="";
+		String orderid="";
+		String old_odid="";
+		String old_goodsid="";
+		String old_url="";
+		String old_goodsPrice="";
+		String new_url=pUrl;
+		String new_goodsPrice="";
+		int row=0;
+		try{
+			//查询订单号和新的odid
+			sql="select orderno,goodid,chagoodprice from changegooddata where  chagoodurl = ? and goodscarid=?";
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, pUrl);
+			stmt.setString(2, goodsCarId);
+			rs=stmt.executeQuery();
+			if(rs.next()){
+				orderid=rs.getString("orderno");
+				new_goodsPrice=rs.getString("chagoodprice");
+			}
+			if(StringUtil.isNotBlank(orderid) && StringUtil.isNotBlank(goodsCarId)){
+				//查询替换前的信息
+				sql="select car_url,yourorder,goodsprice,goodsid,id from order_details where orderid=? and goodsid=?";
+				stmt=conn.prepareStatement(sql);
+				stmt.setString(1,orderid);
+				stmt.setString(2,goodsCarId);
+				rs=stmt.executeQuery();
+				if(rs.next()){
+					old_goodsid=rs.getString("goodsid");
+					old_odid=rs.getString("id");
+					old_url=rs.getString("car_url");
+					old_goodsPrice=rs.getString("goodsprice");
+				}
+			}
+//			if(StringUtil.isNotBlank(new_odid)){
+//				//查询替换后的order_details信息
+//				sql="select car_url,yourorder,goodsprice,goodsid from order_details where id=?";
+//				stmt=conn.prepareStatement(sql);
+//				stmt.setString(1,new_odid);
+//				rs=stmt.executeQuery();
+//				if(rs.next()){
+//					new_goodsid=rs.getString("goodsid");
+//					new_goodsPrice=rs.getString("goodsprice");
+//				}
+//			}
+			sql="insert into ChangeGoodsLog(orderid,old_odid,old_goodsid,old_url,old_goodsPrice,new_url,new_goodsPrice,admName,createtime) values" +
+					"(?,?,?,?,?,?,?,?,now())";
+			stmt=conn.prepareStatement(sql);
+			stmt.setString(1,orderid);
+			stmt.setString(2,old_odid);
+			stmt.setString(3,old_goodsid);
+			stmt.setString(4,old_url);
+			stmt.setString(5,old_goodsPrice);
+			stmt.setString(6,new_url);
+			stmt.setString(7,new_goodsPrice);
+			stmt.setString(8,admName);
+			row=stmt.executeUpdate();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return row;
+	}
+
 	@Override
 	public int updateChangeType(String pUrl,String goodsType,String name,String price,String goodsCarId) {
 		

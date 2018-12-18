@@ -1,10 +1,11 @@
 package com.cbt.method.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.method.dao.OrderDetailsMethodBean;
 import com.cbt.method.dao.PreOrderList;
-
-import java.util.List;
 
 public interface OrderDetailsService {
 	
@@ -49,5 +50,5 @@ public interface OrderDetailsService {
                             int goodid, double price, String resource, int buycount,
                             String reason, String currency, String pname, boolean allReplcae, String shop_url, String shop_name, String address);
 	
-
+	List<Map<String,Object>> getOrderDetailByUser(int userid);
 }

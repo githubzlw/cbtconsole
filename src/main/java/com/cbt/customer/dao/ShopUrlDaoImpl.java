@@ -113,7 +113,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 "where b.shop_id =a.shop_id and b.valid=1) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, " +
                 "au.admuser au_admuser, au.start_time au_start_time, au.end_time au_end_time, au.remark au_remark, au.valid au_valid," +
                 "ifnull(scs.shop_state,0) as shop_state,ifnull(scs.online_state,0) as online_state " +
-                "from shop_url_bak a LEFT JOIN shop_url_authorized_info au ON a.shop_id = au.shop_id " +
+                "from shop_url_bak a LEFT JOIN shop_url_authorized_info au ON a.shop_id = au.shop_id AND au.valid != 3 " +
                 "left join shop_clear_state scs on a.shop_id = scs.shop_id";
         sql += " where 1=1 ";
         if (shopId != null && !"".equals(shopId)) {
@@ -154,13 +154,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
 			case 1: //已授权但无授权文件
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = ''))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = ''))";
 				break;
 			case 2: //授权文件到期
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.end_time IS NOT NULL AND b.end_time < NOW()))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.end_time IS NOT NULL AND temb.end_time < NOW()))";
 				break;
 			case 3: //1+2
-				sql += " and a.shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = '' OR (b.end_time IS NOT NULL AND b.end_time < NOW())))";
+				sql += " and a.shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = '' OR (temb.end_time IS NOT NULL AND temb.end_time < NOW())))";
 				break;
 			default:
 				break;
@@ -395,13 +395,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
 			case 1: //已授权但无授权文件
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = ''))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = ''))";
 				break;
 			case 2: //授权文件到期
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.end_time IS NOT NULL AND b.end_time < NOW()))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.end_time IS NOT NULL AND temb.end_time < NOW()))";
 				break;
 			case 3: //1+2
-				sql += " and shop_id in(SELECT a.shop_id FROM shop_url_bak a LEFT JOIN shop_url_authorized_info b ON a.shop_id = b.shop_id WHERE a.authorized_flag = 1 AND (b.file_url is null OR b.file_url = '' OR (b.end_time IS NOT NULL AND b.end_time < NOW())))";
+				sql += " and shop_id in(SELECT tema.shop_id FROM shop_url_bak tema LEFT JOIN shop_url_authorized_info temb ON tema.shop_id = temb.shop_id WHERE tema.authorized_flag = 1 AND temb.valid != 3 AND (temb.file_url is null OR temb.file_url = '' OR (temb.end_time IS NOT NULL AND temb.end_time < NOW())))";
 				break;
 			default:
 				break;

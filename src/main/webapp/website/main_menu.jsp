@@ -14,6 +14,7 @@
 	String userJson = Redis.hget(sessionId, "admuser");
 	Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
 	int uid = user.getId();
+    String admName = user.getAdmName();
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -96,12 +97,12 @@ table caption {
 
 .but_color {
 	background: #44a823;
-	width: 80px;
+	width: 100px;
 	height: 30px;
 	border: 1px #aaa solid;
 	color: #fff;
 	float: right;
-	margin: 30px 300px 0px 0px;
+	margin: 30px 10px 0px 0px;
 	font-size: 18px;
 }
 td > a {
@@ -514,6 +515,11 @@ function getUrlParam(url,name) {
 	function loginOut() {
 		window.location.href = "/cbtconsole/userLogin/loginOut.do";
 	}
+	function resetPwd(admName) {
+        window.open("/cbtconsole/website/reset_pwd.html?admName=" + admName,
+            "windows",
+            "height=160px,width=400px,top=120px,left=200px,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
+	}
 </script>
 </head>
 <body>
@@ -575,7 +581,11 @@ function getUrlParam(url,name) {
 
 	</div>
 
-	<button class="but_color" onclick="loginOut()">退出</button>
+    <div class="usetablediv" style="border: none;">
+        <button class="but_color" onclick="loginOut()" style="margin-right: 100px">退出</button>
+        <button class="but_color" onclick="resetPwd('<%=admName%>')">密码修改</button>
+        <span style="float: right;margin: 36px 10px 0 0;">当前登录用户:&nbsp;<%=admName%></span>
+    </div>
 
 	<%-- <%  if(!(user.getId() ==1 || user.getAdmName().equalsIgnoreCase("Ling"))){%>
 	<!-- 载入消息提醒jsp页面 -->

@@ -10,10 +10,13 @@ import com.cbt.parse.bean.TypeBean;
 import com.cbt.parse.service.GoodsBean;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.TypeUtils;
+import com.cbt.pojo.Admuser;
 import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.dao.UserDao;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.util.AppConfig;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import com.cbt.util.UUIDUtil;
 import com.cbt.website.bean.GoodsSource;
 import com.cbt.website.dao.GoodsSourceDaoImp;
@@ -180,6 +183,9 @@ public class OrdersPurchaseServlet extends HttpServlet {
 		JSONObject json=JSONObject.fromObject(data);
 
         List<Map<String,String>> edit=(List<Map<String, String>>) json.getJSONArray("list");
+        if(edit!=null && edit.size()<=0){
+        	return;
+        }
         String orderNos = (String)edit.get(0).get("orderNo");
 //        PictureComparisonDaoImpl.delChangeGood(orderNoDel);
 //        String orderNos = "";
@@ -450,10 +456,13 @@ public class OrdersPurchaseServlet extends HttpServlet {
 	
 	//替代商品保存到云服务器
 	public void saveGoodsData(HttpServletRequest request, HttpServletResponse response) {
-		
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser user = (Admuser) SerializeUtil.JsonToObj(admJson, Admuser.class);
+		if(user == null){
+			return;
+		}
 		String data = request.getParameter("data");
 		JSONObject json=JSONObject.fromObject(data);
-
         List<Map<String,String>> edit=(List<Map<String, String>>) json.getJSONArray("list");
         IPictureComparisonService ips = new PictureComparisonServiceImpl();
 	        
@@ -471,13 +480,17 @@ public class OrdersPurchaseServlet extends HttpServlet {
     		String[] goodsType1 = goodsType.split(",");
     		for(int i=0;i<goodsType1.length;i++){
     			TypeBean typeBean = new TypeBean();
-    			typeBean.setType(goodsType1[i].split(":")[0]);
-    			typeBean.setValue(goodsType1[i].split(":")[1]);
-    			type.add(typeBean);
+    			if(goodsType1[i].split(":").length>1){
+				    typeBean.setType(goodsType1[i].split(":")[0]);
+				    typeBean.setValue(goodsType1[i].split(":")[1]);
+				    type.add(typeBean);
+			    }
     		}
     		int tbg = ips.updateChangeType(changeUrl,goodsType,enName,price,goodsCarId);
     		//插入goodsdata
     		ParseGoodsUrl.parseGoodsWbsite(changeUrl,enName,price,type,goodsCarId);
+    		//插入替换商品日志信息
+	        ips.insertChangeGoodsLog(changeUrl,goodsType,enName,price,goodsCarId,user.getAdmName());
     		try {
 			Thread.sleep(500);
 			} catch (InterruptedException e) {

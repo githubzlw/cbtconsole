@@ -147,8 +147,9 @@ public class ShopUrlAuthorizedInfoPO {
 		super();
 	}
 
-	public ShopUrlAuthorizedInfoPO(String shopId, Integer adminId, String admuser, Date startTime, Date endTime, String remark) {
+	public ShopUrlAuthorizedInfoPO(Long id, String shopId, Integer adminId, String admuser, Date startTime, Date endTime, String remark) {
 		super();
+		this.id = id;
 		this.shopId = shopId;
 		this.adminId = adminId;
 		this.admuser = admuser;

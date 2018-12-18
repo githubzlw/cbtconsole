@@ -295,9 +295,6 @@ em {
 					<tr>
 						<td rowspan="5"><span style="color:red">[质量]</span>:1:差   2:较差  3: 一般  4:无投诉  5: 优质</td>
 					</tr>
-					<%--<tr>--%>
-						<%--<td rowspan="5"><span style="color:red">[服务]</span>:1:发货不及时  2:发货及时但是乱发  3:处理问题回复不及时  4:售后处理配合度一般  5:售后处理配合度好</td>--%>
-					<%--</tr>--%>
 					<tr>
 					  <td>店铺</td><td>质量</td><td>是否有库存协议</td><td>支持退货天数</td>
 					</tr>
@@ -315,16 +312,6 @@ em {
                           <option value="5">5分</option>
                         </select>
 					  </td>
-					  <%--<td>--%>
-					    <%--<select id="service">--%>
-                          <%--<option value="0">---请选择---</option>--%>
-                          <%--<option value="1">1分</option>--%>
-                          <%--<option value="2">2分</option>--%>
-                          <%--<option value="3">3分</option>--%>
-                          <%--<option value="4">4分</option>--%>
-                          <%--<option value="5">5分</option>--%>
-                        <%--</select>--%>
-					  <%--</td>--%>
 					  <td>
 					    <input name="protocol" type="radio" value="2"/>有<input name="protocol" type="radio" value="1"/>无
 					  </td>
@@ -360,9 +347,6 @@ em {
 					<tr>
 						<td rowspan="5"><span style="color:red">[质量]</span>:1:差   2:较差  3: 一般  4:无投诉  5: 优质</td>
 					</tr>
-					<%--<tr>--%>
-						<%--<td rowspan="5"><span style="color:red">[服务]</span>:1:发货不及时  2:发货及时但是乱发  3:处理问题回复不及时  4:售后处理配合度一般  5:售后处理配合度好</td>--%>
-					<%--</tr>--%>
 					<tr>
 					  <td>产品</td><td>质量</td><td>备注</td>
 					</tr>
@@ -381,16 +365,6 @@ em {
                           <option value="5">5分</option>
                         </select>
 					  </td>
-					  <%--<td>--%>
-					    <%--<select id="g_service">--%>
-                          <%--<option value="0">---请选择---</option>--%>
-                          <%--<option value="1">1分</option>--%>
-                          <%--<option value="2">2分</option>--%>
-                          <%--<option value="3">3分</option>--%>
-                          <%--<option value="4">4分</option>--%>
-                          <%--<option value="5">5分</option>--%>
-                        <%--</select>--%>
-					  <%--</td>--%>
 					  <td>
 					   <textarea rows="10" cols="15" id="su_g_remark"></textarea>
 					  </td>
@@ -409,299 +383,6 @@ em {
 				</tbody>
 			</table>
 		</center>
-	</div>
-	<!-- 质检-->
-	<div id="div_clothing" style="display: none;">
-		<form id="div_clothing_from">
-			<table border="1">
-				<tr>
-					<td colspan="5">
-						策融电商仓库服装检查checklist V1.2
-					</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">客户ID/订单号：</td>
-					<td style="text-align:center" colspan="2"><span id="clothing_orderid"></span><input type="hidden" id="c_catid"></td>
-					<td style="text-align:center">商品ID：</td>
-					<td style="text-align:center"><span id="clothing_goodsid"></span></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">检验范围</td>
-					<td style="text-align:center">序号</td>
-					<td style="text-align:center">检验内容</td>
-					<td style="text-align:center" colspan="2">检验结果</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" rowspan="5">外观</td>
-					<td style="text-align:center">1</td>
-					<td style="text-align:center">外观完整</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_wg" value="1">完整<input type="radio" name="y_wg" value="0">破损</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">2</td>
-					<td style="text-align:center">表面细节</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_bmxj" value="1">完好<input type="radio" name="y_bmxj" value="0">图案错误<input type="radio" name="y_bmxj" value="2">不对称</td>
-				</tr>			<tr>
-				<td style="text-align:center">3</td>
-				<td style="text-align:center">外观细节</td>
-				<td style="text-align:center" colspan="2"><input type="radio" name="y_wgxj" value="1">干净<input type="radio" name="y_wgxj" value="0">有污渍</td>
-			</tr>			<tr>
-				<td style="text-align:center">4</td>
-				<td style="text-align:center">拉链</td>
-				<td style="text-align:center" colspan="2"><input type="radio" name="y_ll" value="1">顺畅<input type="radio" name="y_ll" value="0">卡顿</td>
-			</tr>
-				<tr>
-					<td style="text-align:center">5</td>
-					<td style="text-align:center">线头</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_xt" value="1">无线头<input type="radio" name="y_xt" value="0">少量线头<input type="radio" name="y_xt" value="2">过多线头</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">质感</td>
-					<td style="text-align:center">6</td>
-					<td style="text-align:center">材质与描述</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_zg" value="1">一致<input type="radio" name="y_zg" value="0">不确定<input type="radio" name="y_zg" value="2">有区别</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">*气味</td>
-					<td style="text-align:center">7</td>
-					<td style="text-align:center">衣服气味</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_qw" value="1">无异味<input type="radio" name="y_qw" value="0">有异味</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center">8</td>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center" colspan="2"><input type="radio" name="y_bz" value="1">完好<input type="radio" name="y_bz" value="0">需更换</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">尺码表</td>
-					<td style="text-align:center" colspan="2">要求尺寸</td>
-					<td style="text-align:center" colspan="2">实测尺寸</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" rowspan="6">上衣/裙子</td>
-					<td style="text-align:center">肩宽shoulder</td>
-					<td style="text-align:center"><input type="text" id="jks_value"></td>
-					<td style="text-align:center">肩宽</td>
-					<td style="text-align:center"><input type="text" id="jk_remark"></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">胸围bust</td>
-					<td style="text-align:center"><input type="text" id="xwb_value"></td>
-					<td style="text-align:center">胸围</td>
-					<td style="text-align:center"><input type="text" id="xw_remark"></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">腰围waist</td>
-					<td style="text-align:center"><input type="text" id="yww_value"></td>
-					<td style="text-align:center">腰围</td>
-					<td style="text-align:center"><input type="text" id="yw_remark"></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">臀围hip</td>
-					<td style="text-align:center"><input type="text" id="twh_value"></td>
-					<td style="text-align:center">臀围</td>
-					<td style="text-align:center"><input type="text" id="tw_remark"></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">袖长sleeve</td>
-					<td style="text-align:center"><input type="text" id="xcs_value"></td>
-					<td style="text-align:center">袖长</td>
-					<td style="text-align:center"><input type="text" id="xc_remark"></td>
-				</tr>
-				<tr>
-					<td style="text-align:center">衣长length</td>
-					<td style="text-align:center"><input type="text" id="yzl_value"></td>
-					<td style="text-align:center">衣长</td>
-					<td style="text-align:center"><input type="text" id="yc_remark"></td>
-				</tr>
-				<tr>
-					<td colspan="5"><input type="button" onclick="closeClothingData();" value="关闭"></td>
-				</tr>
-			</table>
-		</form>
-	</div>
-	<!-- 首饰检查checklist-->
-	<div style="display: none;" id="ss_div">
-		<form>
-			<table border="1">
-				<tr>
-					<td colspan="4">
-						策融电商仓库首饰检查checklist V1.2
-					</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" colspan="2"><span>订单号：</span></td>
-					<td style="text-align:center"><span id="ss_orderid"></span><input type="hidden" id="ss_catid"></td>
-					<td style="text-align:center"><span>商品ID：</span><span id="ss_goodsid"></span></td>
-				</tr>
-				<tr>
-					<td style="width:80px;text-align:center">检验范围</td>
-					<td style="width:50px;text-align:center">序号</td>
-					<td style="width:200px;text-align:center">检验内容</td>
-					<td style="width:200px;text-align:center">检验结果</td>
-				</tr>
-				<tr>
-					<td rowspan="7" style="text-align:center">
-						<span>外观</span>
-					</td>
-					<td style="text-align:center">1</td>
-					<td style="text-align:center">外观完整</td>
-					<td style="text-align:center"><input type="radio" name="s_wz" value="1">完整<input type="radio" name="s_wz" value="0">破损<input type="radio" name="s_wz" value="2">掉钻</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">2</td>
-					<td style="text-align:center">款式 </td>
-					<td style="text-align:center"><input type="radio" name="s_ks" value="1">正确<input type="radio" name="s_ks" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">3</td>
-					<td style="text-align:center">颜色</td>
-					<td style="text-align:center"><input type="radio" name="s_ys" value="1">正确<input type="radio" name="s_ys" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">4</td>
-					<td style="text-align:center">表面细节</td>
-					<td style="text-align:center"><input type="radio" name="s_bm" value="1">完好<input type="radio" name="s_bm" value="0">松动<input type="radio" name="s_bm" value="2">电镀层脱落</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">5</td>
-					<td style="text-align:center">外观细节</td>
-					<td style="text-align:center"><input type="radio" name="s_wgxj" value="1">干净<input type="radio" name="s_wgxj" value="0">有锈斑</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">6</td>
-					<td style="text-align:center">链扣</td>
-					<td style="text-align:center"><input type="radio" name="s_lk" value="1">正常<input type="radio" name="s_lk" value="0">松动</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">7</td>
-					<td style="text-align:center">掉色</td>
-					<td style="text-align:center"><input type="radio" name="s_ds" value="1">无掉色<input type="radio" name="s_ds" value="0">有掉色</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">质感</td>
-					<td style="text-align:center">8</td>
-					<td style="text-align:center">材质与描述</td>
-					<td style="text-align:center"><input type="radio" name="s_cz" value="1">一致<input type="radio" name="s_cz" value="0">有区别</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center">9</td>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center"><input type="radio" name="s_bz" value="1">有气泡膜<input type="radio" name="s_bz" value="0">需更换</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" colspan="4"><input type="button" onclick="closeJewelryData();" value="关闭"></td>
-				</tr>
-			</table>
-		</form>
-	</div>
-	<!--电子产品检查checklist -->
-	<div id="dz_div" style="display: none;">
-		<form>
-			<table border="1">
-				<tr>
-					<td colspan="4" style="text-align:center">
-						策融电商仓库电子产品检查checklist V1.2
-					</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" colspan="2"><span>订单号：</span></td>
-					<td style="text-align:center"><span id="dd_orderid"></span><input type="hidden" id="dd_catid"></td>
-					<td style="text-align:center"><span>商品ID：</span><span id="dd_goodsid"></span></td>
-				</tr>
-				<tr>
-					<td style="width:80px;text-align:center">检验范围</td>
-					<td style="width:50px;text-align:center">序号</td>
-					<td style="width:200px;text-align:center">检验内容</td>
-					<td style="width:200px;text-align:center">检验结果</td>
-				</tr>
-				<tr>
-					<td rowspan="7" style="text-align:center">外观</td>
-					<td style="text-align:center">1</td>
-					<td style="text-align:center">通电测试</td>
-					<td style="text-align:center"><input type="radio" name="d_wg" value="1">正常<input type="radio" name="d_wg" value="0">无反应</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">2</td>
-					<td style="text-align:center">款式</td>
-					<td style="text-align:center"><input type="radio" name="d_ks" value="1">正确<input type="radio" name="d_ks" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">3</td>
-					<td style="text-align:center">颜色</td>
-					<td style="text-align:center"><input type="radio" name="d_ys" value="1">正确<input type="radio" name="d_ys" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">4</td>
-					<td style="text-align:center">完整</td>
-					<td style="text-align:center"><input type="radio" name="d_wz" value="1">完好<input type="radio" name="d_wz" value="0">套件有缺失<input type="radio" name="d_wz" value="2">无说明书</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">5</td>
-					<td style="text-align:center">外观细节</td>
-					<td style="text-align:center"><input type="radio" name="d_wg1" value="1">干净<input type="radio" name="d_wg1" value="0">生锈<input type="radio" name="d_wg1" value="2">起泡<input type="radio" name="d_wg1" value="3">褪色</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">6</td>
-					<td style="text-align:center">外观细节2</td>
-					<td style="text-align:center"><input type="radio" name="d_wg2" value="1">正常<input type="radio" name="d_wg2" value="0">缺角<input type="radio" name="d_wg2" value="2">碎屏</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">7</td>
-					<td style="text-align:center">掉色</td>
-					<td style="text-align:center"><input type="radio" name="d_ds" value="1">无掉色<input type="radio" name="d_ds" value="0">有掉色</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" rowspan="5">规格</td>
-					<td style="text-align:center">8</td>
-					<td style="text-align:center">内存</td>
-					<td style="text-align:center"><input type="radio" name="d_nc" value="1">正确<input type="radio" name="d_nc" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">9</td>
-					<td style="text-align:center">电池容量</td>
-					<td style="text-align:center"><input type="radio" name="d_rl" value="1">正确<input type="radio" name="d_rl" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">10</td>
-					<td style="text-align:center">屏幕大小</td>
-					<td style="text-align:center"><input type="radio" name="d_pm" value="1">正确<input type="radio" name="d_pm" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">11</td>
-					<td style="text-align:center">分辨率</td>
-					<td style="text-align:center"><input type="radio" name="d_fbv" value="1">正确<input type="radio" name="d_fbv" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">12</td>
-					<td style="text-align:center">像素</td>
-					<td style="text-align:center"><input type="radio" name="d_xs" value="1">正确<input type="radio" name="d_xs" value="0">错误</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" rowspan="2">内部细节</td>
-					<td style="text-align:center">13</td>
-					<td style="text-align:center">插头</td>
-					<td style="text-align:center"><input type="radio" name="d_ct" value="1">正确<input type="radio" name="d_ct" value="0">错误</td>
-				</tr>
-
-				<tr>
-					<td style="text-align:center">14</td>
-					<td style="text-align:center">说明书</td>
-					<td style="text-align:center"><input type="radio" name="d_sms" value="1">有中文<input type="radio" name="d_sms" value="0">有英文<input type="radio" name="d_sms" value="2">无说明书</td>
-				</tr>
-				<tr>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center">15</td>
-					<td style="text-align:center">包装</td>
-					<td style="text-align:center"><input type="radio" name="d_bz" value="1">有气泡膜<input type="radio" name="d_bz" value="0">需更换</td>
-				</tr>
-				<tr>
-					<td style="text-align:center" colspan="4"><input type="button" onclick="closeClothingDivdd();" value="关闭"></td>
-				</tr>
-			</table>
-		</form>
 	</div>
 		<!-- 评论框 start yyl-->
 		<div class="mod_pay3" style="display: none;" id="commentDiv1">
@@ -755,13 +436,9 @@ em {
 									已到仓库，状态错误
 								</c:when>
 							</c:choose>
-							<%--${order.state==2 && Number(order.checked)==Number(order.countOd)?'已到仓库,验货无误':''}--%>
 							${order.state==0?'等待付款':'' }${order.state==3?'出运中':'' }
 							${order.state==4?'完结':'' }
 							${order.state==5?'确认价格中':'' }${order.state==7?'预订单':'' }
-
-						<%-- 	${order.state==-1?'订单已取消':'' }${order.state==1?'购买中':'' }${order.state==2?'已到仓库':'' }${order.state==0?'等待付款':'' }${order.state==3?'出运中':'' }${order.state==4?'完结':'' }${order.state==5?'确认价格中':'' }${order.state==7?'预订单':'' } --%>
-
 					</em></td>
 					<td width="50%" colspan="3">
 					<c:if test="${fn:length(orderNos) > 0}">
@@ -769,7 +446,6 @@ em {
 						<div class="ormrelanum">
 							<c:forEach items="${orderNos}" var="order_correlation">
 								<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?&orderNo=${order_correlation}&state=${order.state}&username=${order.userName}">${order_correlation}</a>&nbsp;
-
  							</c:forEach>
 						</div>
 					</c:if>
@@ -849,7 +525,7 @@ em {
 							+ 服务费 <span class="ormtittdred">（${service_fee}）</span>
 						</c:if>
 						<c:if test="${order.processingfee>0}">
-							+ 手续费 <span class="ormtittdred">（${order.processingfee}）</span>
+							+ 店铺金额低于15手续费 <span class="ormtittdred">（${order.processingfee}）</span>
 						</c:if>
 						<c:if test="${actual_lwh>0}">
 							+ 质检费 <span class="ormtittdred">（${actual_lwh}）</span>
@@ -860,8 +536,11 @@ em {
 						<c:if test="${order.memberFee>0}">
 							+ 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
 						</c:if>
+						<c:if test="${order.actual_allincost>0}">
+							+ 保险费 <span class="ormtittdred">（${order.actual_allincost}）</span>
+						</c:if>
 						<c:if test="${order.extra_freight>0}">
-							+额外运费金额<span class="ormtittdred">(${order.extra_freight})</span>
+							+运费<span class="ormtittdred">(${order.extra_freight})</span>
 						</c:if>
 						<c:if test="${order.actual_freight_c>0}">
 							+$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
@@ -891,9 +570,9 @@ em {
 							-首单优惠<span class="ormtittdred">（${firstdiscount}） </span>
 						</c:if>
 						=<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
-							value="${(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount) >0 ?
+							value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount) >0 ?
 									(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+order.extra_freight+actual_lwh+order.memberFee-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-
-									order.gradeDiscount + order.vatBalance - firstdiscount + order.actual_freight_c) : 0.00 }"
+									order.gradeDiscount + order.vatBalance - firstdiscount + order.actual_freight_c+order.actual_allincost) : 0.00 }"
 									pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span>
 						 <a href="/cbtconsole/orderDetails/orderPayDetails.do?orderNo=${order.orderNo}&userId=${order.userid}" target="_blank" style="text-decoration: none;">【到账详情 】</a>
@@ -940,16 +619,6 @@ em {
 				<tr>
 					<td colspan="4">
 						<input type="hidden" value="${isDropshipOrder}">
-						<%--<c:if test="${isDropshipOrder1==1}">--%>
-							<%--<input type="button" style="position: fixed; bottom: 552px; right: 50px; width: 150px; height: 30px;" id="notifycustomer" name="button" value="确认并告知客户"--%>
-							<%--${order.state==5||order.state==1?'':'disabled=disabled' }--%>
-							<%--onclick="sendCutomers('${fn:length(orderDetail) > 0 ? orderDetail[0].orderid:''}',1,1)">--%>
-						<%--</c:if> --%>
-						<%--<c:if test="${isDropshipOrder1!=1}">--%>
-							<%--<input type="button" style="position: fixed; bottom: 552px; right: 50px; width: 150px; height: 30px;" id="notifycustomer" name="button" value="确认并告知客户"--%>
-							<%--${order.state==5||order.state==1?'':'disabled=disabled' }--%>
-							<%--onclick="sendCutomers('${fn:length(orderDetail) > 0 ? orderDetail[0].orderid:''}',1,0)">--%>
-						<%--</c:if> --%>
 						<label style="display: none; color: red; position: fixed; bottom: 610px; right: 70px; width: 150px; height: 30px;" id="msg">(通知成功)</label>
 						&nbsp;&nbsp; &nbsp;&nbsp;
 						<c:if test="${order.state!=3 || order.state!=4 }">
@@ -981,27 +650,19 @@ em {
 						<input type="button" style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="open" onclick="afterReplenishment()" value="售后补货">
 					</td>
 					<td colspan="3" style="display: none;" id="td_buyuser">
-						<%--<span style="margin-left:300px;">分配此订单的采购人员：</span>--%>
-						<%--<select id="buyuser1" name="buyuser1" style="width: 110px;" onchange="changeOrderBuyer('${order.orderNo}',this.value);"></select> --%>
-						<%--<span id="buyuserinfo"></span> --%>
-						<%--<input type="submit" value="确认" id="buy_but" onclick="fnchangebuy()">--%>
-						<%--<span style="font-size: 15px; font-weight: bold; color: red;" id="buyresult"></span> --%>
 						<span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
 						<select id="saler" name="saler" style="width: 110px;"></select>
 						<input type="submit" value="确认" id="saler_but" onclick="addUser(${order.userid},'${order.userName}','${order.userEmail}')">
 						<span style="font-size: 15px; font-weight: bold; color: red;" id="salerresult"></span>
 					</td>
 				</tr>
-				<!-- 客户信息展示结束 -->
 			</table>
-			<!-- 采购情况-->
 			<span style="background-color: red">采购情况汇总</span>
 			<div style="background-color: aqua">
 				商品总数:<span style="color:red">${order.countOd}</span>;采购总数:<span style="color:red">${order.cg}</span>;
 				入库总数:<span style="color:red">${order.rk}</span>;验货无误总数:<span style="color:red">${order.checkeds}</span>;
 				验货疑问总数:<span style="color:red">${order.yhCount}</span>
 			</div>
-
 			<div id="remarkdiv">
 				<div class="ormamark"><table style="border-collapse:separate; border-spacing:5px;">
 					<tbody>
@@ -1018,17 +679,9 @@ em {
 						style="display: block; border-collapse: separate; border-spacing: 5px; border: 1px solid #00afff;width:1400px;">
 						<tr>
 							<td>快递跟踪号：</td>
-							<%-- <td><input value="${forwarder.express_no}" id="express_no"
-								name="express_no" type="text"></td> --%>
 							<td><a href="/cbtconsole/website/forwarderpageplck.jsp?expressNo=${forwarder.express_no}" target="_blank">${forwarder.express_no}</a></td>
 							<td>物流公司名称：</td>
-							<%-- <td><input value="${forwarder.logistics_name}"
-								id="logistics_name" name="logistics_name" type="text"
-								readonly="readonly"></td> --%>
 							<td><c:if test="${not empty forwarder.express_no}">${forwarder.logistics_name}</c:if></td>
-								<%--<td>给客户看的最新状态：</td>--%>
-							<%--<td><input value="${forwarder.new_state}" id="new_state"--%>
-								<%--name="new_state" type="text"></td>--%>
 						</tr>
 					</table>
 				</div>
@@ -1137,7 +790,6 @@ em {
 				</div>
 			</div>
 		</div>
-
 		<br>
 		<div>
 				<table border="1" style="margin-left:160px;">
@@ -1213,7 +865,6 @@ em {
 			<span class="d"></span><span id="sumFreight" style="color: green;"
 				class="c"></span>
 		</div>
-		<!-- 		<div style="color: red;font-size:25px;" >Warning:直接退钱操作的是线上的数据，所以时间稍微长,请不要重复点击!</div> -->
 		<div>
 			<br />
 			<c:if test="${invoice=='1'}">
@@ -1227,7 +878,6 @@ em {
 			<br />
 		</div>
 		<br>
-<%-- 		<input type="hidden" value="${isDropshipOrder}" name="cjcTem"> --%>
 		<c:if test="${isDropshipOrder == 0 || isDropshipOrder == 2 || isDropshipOrder == 3}">
 			<!-- 不是dropship订单 -->
 			<div style="width:1440px;">
@@ -1237,19 +887,13 @@ em {
 							<td>商品编号/购物车id</td>
 							<td colspan="2">详情</td>
 							<td style="width:400px;">订单信息</td>
-							<!-- 							<td>交期(新)</td> -->
-							<!-- 							<td width="100">备注</td> -->
 							<td style="width: 300px;">状态</td>
 							<td>沟通</td>
 							<td>货源/沟通</td>
-							<!-- 							<td>采购时间</td> -->
 							<td>采购员</td>
 							<td style="width:500px;">订单操作</td>
-							<%--<td style="width:200px">售后补货</td>--%>
-							<%--<td>消息备注</td>--%>
 						</tr>
 					</tbody>
-<%-- 					<input type="hidden" value="${orderDetail}" name="cjcTem1"> --%>
 					<c:forEach items="${orderDetail}" var="orderd" varStatus="sd">
 						<tr id="goodsid_${orderd.goodsid}"
 							style="${orderd.state == 2?'background-color: #FF8484':''}">
@@ -1276,13 +920,7 @@ em {
 							<td style='width: 150px;'><span style="color: red;">商品名称:</span><br>${orderd.state == 2? "<br>用户已取消":""}${orderd.goodsname}<br>
 								<span style="color: red;">客户下单规格:</span><br> <span
 								style="color: #00B1FF;display: inline-block;max-width: 250px;overflow: hidden;word-wrap: break-word;">
-<%-- 									<c:if test="${not empty orderd.goods_type}"> --%>
-<%-- 										<c:forEach items="${fn:split(orderd.goods_type,',')}" --%>
-<%-- 											var="types" varStatus="i"> --%>
-<%-- 										${fn:split(types,':')[1]}&nbsp; --%>
-<%-- 										</c:forEach> --%>
 											${orderd.goods_type}
-<%-- 									</c:if> --%>
 									</span><br> <span style="color: #8064A2; word-break: break-all;">${orderd.remark}</span>
 								<c:if test="${not empty orderd.img_type}">
 									<c:forEach items="${fn:split(orderd.img_type,'@')}"
@@ -1299,10 +937,6 @@ em {
 								<span style="color: red;">数量:</span><em
 								id="number_${orderd.goodsid}" style="font-weight: bold;">${orderd.yourorder}
 									${orderd.goodsUnit}</em><br>
-<%-- 									<c:if --%>
-<%-- 									test="${not empty orderd.seilUnit }"> --%>
-<%-- 									<span style="color: #FF4500; font-weight: bold;">${orderd.seilUnit}</span> --%>
-<%-- 								</c:if>  --%>
 								<em id="change_number_${sd.index}" style="color: red;"> <c:if
 										test="${not empty orderd.change_number }">
 										<br>${orderd.change_number}
@@ -1321,8 +955,6 @@ em {
 								style="color: red;"> <c:if
 										test="${not empty orderd.change_price }">
 										<br>${orderd.change_price}</c:if></em><br />
-<!-- 										<input type="button" -->
-<%-- 								onclick="showHistoryPrice('${orderd.goods_url}')" value="查看历史价格"></input> --%>
 								<br>
 									<c:if test="${orderd.bm_flag == 1 and orderd.isBenchmark == 1}">
 										    <span style="color: red">ali产品价格：</span>
@@ -1339,8 +971,6 @@ em {
 								<c:set value="${orderd.state}" var="ostate"></c:set> <em> <c:if
 										test="${ostate==0}">
 											${order.state==-1?'取消订单':'' }${order.state==0?'等待付款':'' }${order.state==1?'购买中':'' }${order.state==3?'出运中':'' }
-											<%-- ${order.state==4?'完结2':'' } --%>
-
 											<c:if test="${order.state==4}">
 															 <!-- yyl 评论start -->
 															<c:if test="${admuserinfo.roletype==0 }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
@@ -1355,9 +985,6 @@ em {
 														完结
 														<font color="red">销售评论状态： <font name="${orderd.goods_pid }ID">未评论</font></font>
 												</c:if>
-
-
-
 											${order.state==5?'确认价格中':'' }
 										<c:if test="${orderd.orsstate==1 && order.state==1}">
 											<br>
@@ -1444,9 +1071,6 @@ em {
 										<c:if test="${orderd.goodstatus==2}">
 											<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验该到没到</a>
 										</c:if>
-										<%--<c:if test="${orderd.goodstatus != 1}">--%>
-											<%--<input type="button" style="color:royalblue" value="查看质检结果" onclick="openCheckResult('${order.orderNo}','${orderd.goodsid}')">--%>
-										<%--</c:if>--%>
 									</c:if>
 									<c:if test="${ostate==1 && orderd.checked==1 && orderd.goodstatus==1}">
 									 <!-- yyl 评论start -->
@@ -1461,9 +1085,7 @@ em {
 											</button>
 										</br>已到仓库<!-- '${orderd.goods_img}','${orderd.goods_url }','${orderd.goodsname }','${orderd.goodsprice }',${orderd.goodsid }' -->
 										<font color="green">,验货无误</font>
-										<%--<input type="button" style="color:royalblue" value="查看质检结果" onclick="openCheckResult('${order.orderNo}','${orderd.goodsid}')">--%>
 											 </br>
-									 <%--  <c:set var="mygoodsid1" value="${orderd.goods_pid }${'ID'}"></c:set> --%>
 	 								<font color="red">
 	 								销售评论状态： <font name="${orderd.goods_pid }ID">未评论</font>
 									<!-- yyl 评论end -->
@@ -1561,10 +1183,6 @@ em {
 								<span id="spanurl${sd.index}" style="color:red;">
 									<p style="width:200px;">合计加入购物车重量(kg): ${orderd.od_total_weight}</p>
 								</span>
-								<%--<span id="spanurl${sd.index}">--%>
-									<%--<p style="width:200px;">产品总重量(kg): ${orderd.final_weight}</p>--%>
-								<%--</span>--%>
-
 								<span >
 									<p>采购数量: ${orderd.buycount}</p>
 								</span>
@@ -1624,14 +1242,6 @@ em {
 									   onfocus="if (value =='补货数量'){value =''}"
 									   onblur="if (value ==''){value='补货数量'}" />
 							</td>
-							<%--<td>--%>
-								<%--<input type="text"--%>
-								<%--id="count_${orderd.goodsid}" style="width:50px;" value="补货数量"--%>
-								<%--onfocus="if (value =='补货数量'){value =''}"--%>
-								<%--onblur="if (value ==''){value='补货数量'}" /><input type="checkbox" style="zoom:140%;" name="replenishment"--%>
-								<%--onchange="fnChange(${orderd.id},this);"--%>
-								<%--value="${orderd.goodsid}" />--%>
-							<%--</td>--%>
 						</tr>
 					</c:forEach>
 				</table>
@@ -1658,7 +1268,6 @@ em {
 										id="2">${orderd.dropshipid} </a> <strong>状态：</strong>
 									<c:if test="${orderd.dropShipState!=0}">
 												${orderd.dropShipState==-1?'后台取消订单':'' }${orderd.dropShipState==0?'等待付款':'' }${orderd.dropShipState==1?'购买中':'' }${orderd.dropShipState==3?'出运中':'' }
-												<%-- ${orderd.dropShipState==4?'完结3':'' } --%>
 
 												<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
@@ -1690,11 +1299,7 @@ em {
 										<td style="width: 5%;">Item</td>
 										<td colspan="2" style="width: 20%;">详情</td>
 										<td style="width: 10%;">订单信息</td>
-										<!-- 										<td style="width: 3%;">客户公司名称</td> -->
 										<td style="width: 3%;">状态</td>
-										<!-- 										<td style="width: 5%;">交期(新)</td> -->
-										<!-- 										<td style="width: 3%;">备注</td> -->
-										<!-- 										<td style="width: 5%;">状态</td> -->
 										<td style="width: 8%;">沟通</td>
 										<td style="width: 10%;">货源/沟通</td>
 										<td style="width: 5%;">采购时间</td>
@@ -1718,10 +1323,6 @@ em {
 										<spna style="color:red;">客户下单规格:</spna><br> <span
 										style="color: #00B1FF"> <c:if
 												test="${not empty orderd.goods_type}">
-<%-- 												<c:forEach items="${fn:split(orderd.goods_type,',')}" --%>
-<%-- 													var="types" varStatus="i"> --%>
-<%-- 																${fn:split(types,':')[1]}&nbsp; --%>
-<%-- 															</c:forEach> --%>
 											${orderd.goods_type }
 											</c:if></span><br> <span
 										style="color: #8064A2; word-break: break-all;">${orderd.remark}</span>
@@ -1769,9 +1370,6 @@ em {
 											var="ostate">
 										</c:set> <em> <c:if test="${ostate==0}">
 															${orderd.dropShipState==-1?'取消订单':'' }${orderd.dropShipState==0?'等待付款':'' }${orderd.dropShipState==1?'购买中':'' }${orderd.dropShipState==3?'出运中':'' }
-<%-- 															${orderd.dropShipState==4?'完结1':'' } --%>
-															<!-- 完结可以评价 -->
-												<%-- ${order.state==4?'完结':'' } --%>
 													<c:if test="${order.dropShipState==4}">
 															 <!-- yyl 评论start -->
 															<c:if test="${admuserinfo.roletype==0 }"> <button  onclick="showcomm('${orderd.id}','${orderd.car_type}','${admuserinfo.admName}','${order.orderNo}','${orderd.goods_pid }','${orderd.country }','${admuserinfo.id }')">添加/修改评论</button> </c:if>
@@ -1827,12 +1425,8 @@ em {
 											</br> 已到仓库,
 										<font color="green">验货无误</font>
 										</br>
-												<%-- <c:set var="mygoodsid1" value="${orderd.goods_pid }${'ID'}"></c:set> --%>
 											 <font color="red">
-											 销售评论状态：<font name="${orderd.goods_pid }ID">未评论</font><%-- <c:if test="${not empty maps[mygoodsid1]   }">已评论 <button style="cursor:pointer" title="${maps[mygoodsid1].commentsContent }">显示评论</button>  --%>
-											<%--  <input id="${orderd.goods_pid }" cmid="${maps[mygoodsid1].id }" type="hidden"  value="${maps[mygoodsid1].commentsContent }"></c:if> <c:if test="${ empty maps[mygoodsid1]  }">未评论</c:if></font> --%>
-
-											 <!--  yyl 评论 end-->
+											 销售评论状态：<font name="${orderd.goods_pid }ID">未评论</font>
 											</c:if>
 
 									</em> <input type="hidden" name="ostate" value="${ostate}">
@@ -1914,14 +1508,7 @@ em {
 											<c:forEach var="aub" items="${aublist }">
 												<option value="${aub.id }">${aub.admName}</option>
 											</c:forEach>
-											<!-- <option value="9">camry</option>
-											<option value="32">sherry</option>
-											<option value="36">cecile</option>
-											<option value="48">Zalman</option>
-											<option value="50">Alisa</option>
-											<option value="51">Debora</option> -->
 									</select><span id="info${orderd.id}"></span>
-
 									<!-- 消息备注列合并过来的-->
 									<div style="overflow-y:scroll;height:200px;width:200px;">
 										<div class="w-font">
@@ -1938,62 +1525,17 @@ em {
 										${orderd.state == 2?'checked="checked" disabled="true"':''}
 										value="${orderd.id}"><input type="hidden"
 										value="${orderd.state}"></td>
-									<%--<td>--%>
-										<%--<div style="overflow-y:scroll;height:200px;width:200px;">--%>
-											<%--<div class="w-font">--%>
-												<%--<font style="font-size: 15px;" id="rk_remark_${order.orderNo}${orderd.goodsid}">${orderd.goods_info}</font>--%>
-											<%--</div>--%>
-										<%--</div>--%>
-										<%--<div class="w-margin-top">--%>
-												<%--&lt;%&ndash; 								<c:if test="${orderd.goods_info != null && orderd.goods_info != ''}"> &ndash;%&gt;--%>
-											<%--<input type="button" value="回复" onclick="doReplay1('${order.orderNo}',${orderd.goodsid});" class="repalyBtn" />--%>
-												<%--&lt;%&ndash; 								</c:if> &ndash;%&gt;--%>
-										<%--</div>--%>
-									<%--</td>--%>
 								</tr>
 							</table>
 							<script>jslr('${orderd.dropshipid}')</script>
 						</div>
 					</div>
 				</c:forEach>
-<!-- 				<div>提醒:出货问题-问题货源并且包含替换产品</div> -->
 			</div>
 
 		</c:if>
 		<div id="prinum"></div>
 		<div class="peimask"></div>
-<!-- 		<div> -->
-<!-- 			<table id="table" width="100%" align="center" border="1px" -->
-<!-- 				style="font-size: 13px;" bordercolor="#8064A2" cellpadding="0" -->
-<!-- 				cellspacing="0"> -->
-<!-- 				<tr> -->
-
-<!-- 					<td width="8%">客户id</td> -->
-<!-- 					<td width="8%">客户名</td> -->
-<!-- 					<td width="5%">邮件标题</td> -->
-<!-- 					<td width="5%">邮件时间</td> -->
-
-<!-- 					<td width="3%">销售名</td> -->
-
-<!-- 					<td width="30%">正文内容</td> -->
-<!-- 					<td width="5%">orderNO</td> -->
-
-<!-- 				</tr> -->
-<%-- 				<c:forEach items="${emaillist }" var="email" varStatus="i"> --%>
-<!-- 					<tr> -->
-<%-- 						<td width="30%">${email.customerId }</td> --%>
-<%-- 						<td width="5%">${email.cname }</td> --%>
-<%-- 						<td width="3%">${email.title }</td> --%>
-<%-- 						<td width="3%">${email.createTime }</td> --%>
-<%-- 						<td width="3%">${email.saleName }</td> --%>
-<%-- 						<td width="3%">${email.content }</td> --%>
-<%-- 						<td width="3%">${email.orderid }</td> --%>
-<!-- 					</tr> -->
-<%-- 				</c:forEach> --%>
-<!-- 			</table> -->
-<!-- 			<br /> -->
-<%-- 			<div align="center">${pager }</div> --%>
-<!-- 		</div> -->
 	</div>
 </body>
 <script type="text/javascript">
@@ -2008,12 +1550,7 @@ em {
 	/* 异步加载该订单下的商品是否已经销售评论 yyl*/
 $(function(){
 	var orderNo=getUrl('orderNo');
-	var goodPids = '${lists}';//获得该订单险所有商品的pid
-	/* var controls=document.getElementsByName("550332258382ID");
-	console.info(controls)
-	 for(var i=0;i<controls.length;i++){
-		 controls[i].innerHTML="ss"
-	}  */
+	var goodPids = '${lists}';
 	$.ajax({
 		type : "post",
 		url : "/cbtconsole/goodsComment/searchIsComment",
@@ -2044,15 +1581,6 @@ function getUrl(para){
 }
 
 	var sum=0;
-// 	for(var i=0;i<$("#orderDetail").find('tbody:eq(1)').find('tr').length;i++){
-
-// 		sum+=parseFloat($("#orderDetail").find('tbody:eq(1)').find('tr:eq('+i+')').find('div').html());
-// 		if(sum == 0){
-// 			$("#sumFreight").html("该订单购物车运费：0USD");
-// 		}else{
-// 			$("#sumFreight").html("该订单购物车中总运费："+(sum).toFixed(2) +"USD ("+(sum*6.89).toFixed(2)+"RMB)");
-// 		}
-// 			}
 	admid = '<%=uid%>';
 	if (admid != 40) {
 		$(".shield").hide();}

@@ -24,6 +24,11 @@ public class ShopCarUserStatistic {
     private int isFollow= -1;//是否跟进
     private int limitNum;
     private int startNum;
+    private double beginMoney;
+    private double endMoney;
+    private int saleId;//跟进人ID
+    private String saleName;//销售
+    private double offFreight;// 线下预估运费
 
     public int getUserId() {
         return userId;
@@ -207,6 +212,46 @@ public class ShopCarUserStatistic {
 
     public void setLastAddCartTime(String lastAddCartTime) {
         this.lastAddCartTime = lastAddCartTime;
+    }
+
+    public double getBeginMoney() {
+        return beginMoney;
+    }
+
+    public void setBeginMoney(double beginMoney) {
+        this.beginMoney = beginMoney;
+    }
+
+    public double getEndMoney() {
+        return endMoney;
+    }
+
+    public void setEndMoney(double endMoney) {
+        this.endMoney = endMoney;
+    }
+
+    public int getSaleId() {
+        return saleId;
+    }
+
+    public void setSaleId(int saleId) {
+        this.saleId = saleId;
+    }
+
+    public String getSaleName() {
+        return saleName;
+    }
+
+    public void setSaleName(String saleName) {
+        this.saleName = saleName;
+    }
+
+    public double getOffFreight() {
+        return offFreight;
+    }
+
+    public void setOffFreight(double offFreight) {
+        this.offFreight = offFreight;
     }
 
     @Override

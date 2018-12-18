@@ -2,6 +2,7 @@ package com.cbt.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -318,9 +319,21 @@ public class CustomGoodsController {
 		if(StringUtils.isNotBlank(isSort)){
 			queryBean.setIsSort(Integer.valueOf(isSort));
 		}
+		
+		String isComplain = request.getParameter("isComplain");
+		if(StringUtils.isNotBlank(isComplain) && StringUtils.equals(isComplain, "1")){
+			queryBean.setIsComplain(Integer.valueOf(isComplain));
+		}
 
 
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
+		goodsList.stream().forEach(c -> {
+			String complainId = c.getComplainId();
+			complainId = StringUtils.endsWith(complainId, ",")?complainId.substring(0, complainId.length()-1) : complainId;
+			if(StringUtils.isNotBlank(complainId)) {
+				c.setComplain(Arrays.asList(complainId.split(",")));
+			}
+		});
 
 		int count = customGoodsService.queryGoodsInfosCount(queryBean);
 		int amount = (count % 40 == 0 ? count / 40 : count / 40 + 1);

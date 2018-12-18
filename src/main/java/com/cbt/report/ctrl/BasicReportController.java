@@ -362,15 +362,12 @@ public class BasicReportController {
 		cell.setCellValue("实际支付金额(USD)");
 		cell.setCellStyle(style);
 		cell = row.createCell(4);
-		cell.setCellValue("录入采购金额(USD)");
+		cell.setCellValue("实际采购金额(USD)");
 		cell.setCellStyle(style);
 		cell = row.createCell(5);
 		cell.setCellValue("实际运费金额(USD)");
 		cell.setCellStyle(style);
 		cell = row.createCell(6);
-		cell.setCellValue("根据实际重量计算的运费(USD)");
-		cell.setCellStyle(style);
-		cell = row.createCell(7);
 		cell.setCellValue("出运号");
 		cell.setCellStyle(style);
 		cell = row.createCell(7);
@@ -379,10 +376,10 @@ public class BasicReportController {
 		cell = row.createCell(8);
 		cell.setCellValue("订单创建时间");
 		cell.setCellStyle(style);
-		cell = row.createCell(10);
+		cell = row.createCell(9);
 		cell.setCellValue("订单状态");
 		cell.setCellStyle(style);
-		cell = row.createCell(11);
+		cell = row.createCell(10);
 		cell.setCellValue("订单支付时间");
 		cell.setCellStyle(style);
 
@@ -396,30 +393,29 @@ public class BasicReportController {
 			row.createCell(3).setCellValue(oi.getPayPrice());
 			row.createCell(4).setCellValue(oi.getBuyAmount());
 			row.createCell(5).setCellValue(oi.getFrightAmount());
-			row.createCell(6).setCellValue(oi.getEstimatefreight());
-			row.createCell(7).setCellValue(oi.getExpressNo());
-			row.createCell(8).setCellValue(oi.getProfit());
-			row.createCell(9).setCellValue(DateFormatUtil.getWithSeconds(oi.getCreateTime()));
+			row.createCell(6).setCellValue(oi.getExpressNo());
+			row.createCell(7).setCellValue(oi.getProfit());
+			row.createCell(8).setCellValue(DateFormatUtil.getWithSeconds(oi.getCreateTime()));
 			if ("0".equals(oi.getState())) {
-				row.createCell(10).setCellValue("未支付订单");
+				row.createCell(9).setCellValue("未支付订单");
 			} else if ("1".equals(oi.getState())) {
-				row.createCell(10).setCellValue("采购中");
+				row.createCell(9).setCellValue("采购中");
 			} else if ("2".equals(oi.getState())) {
-				row.createCell(10).setCellValue("入库");
+				row.createCell(9).setCellValue("入库");
 			} else if ("3".equals(oi.getState())) {
-				row.createCell(10).setCellValue("出运");
+				row.createCell(9).setCellValue("出运");
 			} else if ("4".equals(oi.getState())) {
-				row.createCell(10).setCellValue("完结");
+				row.createCell(9).setCellValue("完结");
 			} else if ("5".equals(oi.getState())) {
-				row.createCell(10).setCellValue("订单审核");
+				row.createCell(9).setCellValue("订单审核");
 			} else if ("6".equals(oi.getState())) {
-				row.createCell(10).setCellValue("客户取消");
+				row.createCell(9).setCellValue("客户取消");
 			} else if ("-1".equals(oi.getState())) {
-				row.createCell(10).setCellValue("系统取消");
+				row.createCell(9).setCellValue("系统取消");
 			} else {
-				row.createCell(10).setCellValue("");
+				row.createCell(9).setCellValue("");
 			}
-			row.createCell(11).setCellValue(DateFormatUtil.getWithSeconds(oi.getOrderPayTime()));
+			row.createCell(10).setCellValue(DateFormatUtil.getWithSeconds(oi.getOrderPayTime()));
 		}
 		return wb;
 	}

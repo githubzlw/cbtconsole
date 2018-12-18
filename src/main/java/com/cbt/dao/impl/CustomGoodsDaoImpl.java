@@ -1005,10 +1005,10 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean updateStateList(int state, String pids, int adminid) {
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection remoteConn = DBHelper.getInstance().getConnection2();
+        // Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
         PreparedStatement stmt = null;
-        PreparedStatement remoteStmt = null;
+        // PreparedStatement remoteStmt = null;
         PreparedStatement stmt28 = null;
 
         String upSql = "update custom_goods_edit a,custom_benchmark_ready b set b.valid=?,b.goodsstate=?,a.admin_id=?";
@@ -1018,7 +1018,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             upSql += ",a.off_time=now()";
         }
         upSql += " where a.pid = b.pid and b.pid =? ";
-        String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
+        // String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
         String up28Sql = "update custom_benchmark_ready_newest set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
 
         int rs = 0;
@@ -1027,11 +1027,11 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         try {
             String[] pidList = pids.split(",");
             conn.setAutoCommit(false);
-            remoteConn.setAutoCommit(false);
+            // remoteConn.setAutoCommit(false);
             conn28.setAutoCommit(false);
 
             stmt = conn.prepareStatement(upSql);
-            remoteStmt = remoteConn.prepareStatement(upRemoteSql);
+            // remoteStmt = remoteConn.prepareStatement(upRemoteSql);
             stmt28 = conn28.prepareStatement(up28Sql);
 
             for (String pid : pidList) {
@@ -1039,10 +1039,10 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     continue;
                 } else {
                     count++;
-                    remoteStmt.setInt(1, state == 4 ? 1 : 0);
-                    remoteStmt.setInt(2, state);
-                    remoteStmt.setString(3, pid);
-                    remoteStmt.addBatch();
+//                    remoteStmt.setInt(1, state == 4 ? 1 : 0);
+//                    remoteStmt.setInt(2, state);
+//                    remoteStmt.setString(3, pid);
+//                    remoteStmt.addBatch();
                     stmt.setInt(1, state == 4 ? 1 : 0);
                     stmt.setInt(2, state);
                     stmt.setInt(3, adminid);
@@ -1055,7 +1055,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     stmt28.addBatch();
                 }
             }
-            rs = remoteStmt.executeBatch().length;
+            /*rs = remoteStmt.executeBatch().length;
             if (rs == count) {
                 rs = 0;
                 rs = stmt.executeBatch().length;
@@ -1077,6 +1077,22 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 }
             } else {
                 remoteConn.rollback();
+            }*/
+
+
+            rs = stmt.executeBatch().length;
+            if (rs == count) {
+                rs = 0;
+                rs = stmt28.executeBatch().length;
+                if (rs == count) {
+                    conn.commit();
+                    conn28.commit();
+                } else {
+                    conn.rollback();
+                    conn28.rollback();
+                }
+            } else {
+                conn.rollback();
             }
 
         } catch (Exception e) {
@@ -1084,7 +1100,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             System.out.println("updateStateList error :" + e.getMessage());
             LOG.error("updateStateList error :" + e.getMessage());
             try {
-                remoteConn.rollback();
+                //remoteConn.rollback();
                 conn.rollback();
                 conn28.rollback();
             } catch (SQLException e1) {
@@ -1092,29 +1108,11 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (remoteStmt != null) {
-                try {
-                    remoteStmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt28 != null) {
-                try {
-                    stmt28.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            // DBHelper.getInstance().closePreparedStatement(remoteStmt);
+            DBHelper.getInstance().closePreparedStatement(stmt28);
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(remoteConn);
+            // DBHelper.getInstance().closeConnection(remoteConn);
             DBHelper.getInstance().closeConnection(conn28);
         }
         return rs == count;

@@ -11,9 +11,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="shortcut icon" href="/cbtprogram/img/mathematics1.ico" type="image/x-icon"/>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<!-- <script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script> -->
+<script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
 
 <style type="text/css">
+.goods_title_li{
+list-style:none;
+}
 .tabletitle{
 	font-family : 微软雅黑,宋体;
 	font-size : 2em;
@@ -32,6 +39,7 @@ a{
 body{
 	text-align: center;
 	width: 1800px;
+	height:1800px;
 }
 td{
 vertical-align:middle;
@@ -46,6 +54,12 @@ vertical-align:middle;
 }
 table { table-layout: fixed;word-wrap:break-word;}
 div { word-wrap:break-word;}
+.hide{display:none;}
+.div_tile{width:150px;display:none;}
+.order_img{
+width:80px;height:80px;}
+.dispute_id{height:30px;width:300px;}
+.merchant_id{height:30px;width:300px;}
 </style>
 
 <title>投诉管理</title>
@@ -53,7 +67,7 @@ div { word-wrap:break-word;}
 </head>
 
 <body>
-	<div class="main">
+	<div class="main" style="z-index: 99;position:absoulte;">
 			<div class="tabletitle" >投诉管理</div>
 		<div class="row"  style="margin-bottom: 20px;">
 			<div class="col-xs-2"><label>客户ID:</label><input type="text" id="userid" name="userid" value="${userid }">
@@ -63,6 +77,7 @@ div { word-wrap:break-word;}
 			<div class="col-xs-2"><label>申请日期:</label>
 				<input id="applyDate" class="Wdate" style="width: 174px;height: 26px" type="text" value="${appdate }" onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-12-12',maxDate:'2020-12-20'})"/>
 			</div>
+			<div class="col-xs-2"><input type="checkbox" id="checkbox_g" ${param.check=='1'?'checked="checked"':'' }>是否关联产品</div>
 			<div class="col-xs-2"><label>状态:</label>
 				<select id="_status" name="_status">
 					<option value="-1">请选择</option>
@@ -102,9 +117,11 @@ div { word-wrap:break-word;}
 				<td style="width:100px;">#</td>
 				<td style="width:100px;">客户ID</td>
 				<td style="width:200px;">客户邮箱</td>
-				<td style="width:300px;">投诉订单</td>
+				<td style="width:100px;">投诉关联产品</td>
+				<td style="width:100px;">申诉ID</td>
+				<td style="width:200px;">投诉订单</td>
 				<td style="width:200px;">投诉类型</td>
-				<td style="width:600px;" >投诉内容</td>
+				<td style="width:400px;" >投诉内容</td>
 				<td style="width:100px;">投诉状态</td>
 				<td style="width:100px;">投诉时间</td>
 				<td style="width:50px;">销售负责人</td>
@@ -126,8 +143,23 @@ div { word-wrap:break-word;}
 								<td align="center" >${complain.id}</td>
 								<td align="center" >${complain.userid }</td>
 								<td align="center"  style="width:300px;word-break:break-all">${complain.userEmail}</td>
-								<td align="center" style="width:300px;word-break: break-all;">
-									<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${complain.refOrderId}">${complain.refOrderId}</a>
+								<td align="center" style="width:100px;word-break: break-all;">
+								${complain.refGoodsId}
+								</td>
+								<td align="center" style="width:100px;word-break: break-all;">
+								<c:if test="${not empty complain.disputeId }">
+								<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ complain.disputeId}&merchant=${complain.merchantId}">${ complain.disputeId}</a>
+								</c:if>
+								<c:if test="${empty complain.disputeId }">
+								
+								<button type="button" class="btn btn-primary btn-sm" onclick="openDispute(${complain.id});">关联申诉</button>
+								
+								</c:if>
+								</td>
+								<td align="center" style="width:200px;word-break: break-all;">
+								<c:forEach items="${complain.orderIdList }" var="orderid">
+									<a target="_blank" href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${orderid}">${orderid}</a><br>
+								</c:forEach>
 								</td>
 								<td align="center" >${complain.complainType }</td>
 								<td align="center"  style="max-width: 600px;">${complain.complainText }</td>
@@ -166,7 +198,13 @@ div { word-wrap:break-word;}
 								<c:if test="${complain.counts==0}">
 						   			<button type="button" class="btn btn-primary btn-sm" onclick="watchDetail('${complain.id}');">投诉详情</button>
 								</c:if>
+								<c:if test="${empty complain.refGoodsId }">
+								<br>
+								<br>
+						   			<button type="button" class="btn btn-primary btn-sm" onclick="linkGoods('${complain.id}','${complain.userid }');">关联产品</button>
+								</c:if>
 								</td>
+								
 								<td align="center">
 								<c:if test="${complain.isRefund==0  && adminid==1}">
 									<c:if test="${complain.complainState!=2}">
@@ -251,8 +289,17 @@ div { word-wrap:break-word;}
 		</div>
 		
 	</div>
+	<div id="order_list_p" style="display:none;border:1px solid #000;width:300px;z-index: 9999;position:relative;">
+	<div onclick="closelog()">X</div>
+	<div id="order_list" >
+	</div>	
+	</div>
 	
 	<script type="text/javascript">
+	function closelog(){
+		$("#order_list").html("");
+		$("#order_list_p").hide();
+	}
 $(function(){
 	<%String sessionId = request.getSession().getId();
 	String userJson = Redis.hget(sessionId, "admuser");
@@ -287,7 +334,13 @@ function search(){
 	var type=$("#type").val();
 	//var currentPage = ${page.currentPage};
 	var currentPage=1;
-	window.location.href = '/cbtconsole/complain/searchComplainByParam?userid='+uid+'&creatTime='+applyDate+'&complainState='+statue+'&username='+useraccount+'&toPage='+i+'&currentPage='+currentPage+"&type="+type;
+	var check = 0;
+	if($("#checkbox_g").is(':checked')){
+		check = 1;
+	}
+	window.location.href = '/cbtconsole/complain/searchComplainByParam?userid='+uid+'&creatTime='+applyDate+'&complainState='
+			+statue+'&username='+useraccount+'&toPage='+i
+			+'&currentPage='+currentPage+"&type="+type+"&check="+check;
 }
 
 function FnsearchByState(){
@@ -322,6 +375,152 @@ $(document).ready(function(){
     $("#type").val(type);
     $("#_status").val(_status);
 })
+
+function linkGoods(id,userid){
+
+	 $.ajax({
+		type:'POST',
+		dataType:'text',
+		url:'/cbtconsole/complain/order/list',
+		data:{userid:userid},
+		success:function(res){
+			var html = "";
+			var json = eval('(' + res + ')').data
+			var ismore = json.length>10;
+			for(var i=0;i<json.length;i++){
+				var orderid = json[i].orderid;
+				if(i > 10){
+				html +='<div class="title_g" style="display:none;">'
+				}else{
+				html +='<div class="title_g" style="display:block;">'
+				}
+				if(i!=0){
+					html+='<hr>'
+				}
+				html+='<div class="order_title" style="float:left;cursor: pointer;"><a href="#" onclick="orderclick(\''+orderid+'\')">'+orderid+'</a></div>';
+				var list = json[i].orderdetail;
+				
+				html+='<div class="div_tile goods_'+orderid+'"  style="float:left"><ul class="title_li"><input type="hidden" value="'+orderid+'" class="order_hidden"';
+				for(var j=0;j<list.length;j++){
+					html +='<li class="goods_title_li">'+'<input type="checkbox" class="li_check" value="'+list[j].goods_pid+'"><img style="width:50px;height:50px;" src="'+list[j].car_img+'"'+'</li>';
+				}
+				html+='</ul></div><div style="clear:both"></div></div>';
+			}
+			if(html ==''){
+				html = "该用户没有可选择订单";
+			}else{
+				if(ismore){
+					html +='<a href="#" onclick="showmore()" id="showmorea">显示更多订单</a>';
+				} 
+			}
+			  $.dialog({
+					title : '  关联订单产品(点击订单号选择产品)',
+					content : html,
+					max : false,
+					min : false,
+					lock : true,
+					fixed : false,
+					height:10,
+					ok : function() {
+						var orderid = "";
+						var goodsid = "";
+						var check_orderid = '';
+						$(".li_check").each(function(){
+							if($(this).is(":checked")){
+								goodsid += $(this).val()+",";
+								check_orderid = $(this).parents(".title_li").find(".order_hidden").val();
+								if(check_orderid!='' && orderid.indexOf(check_orderid) == -1){
+									orderid += check_orderid+",";
+								}
+							}
+						})
+						
+						if(orderid!='' && goodsid != ''){
+							selectGoods(id,userid,orderid,goodsid);
+						}
+					},
+					cancel : function() {
+						$("#showmorea").show();
+					}
+				});  
+			
+		/* $("#order_list").html(html);
+			$("#order_list_p").show();*/
+		}, 
+		error:function(XMLResponse){
+			alert('error');
+		}
+	}); 
+	 
+	
+}
+function showmore(){
+	$(".title_g").show();
+	$("#showmorea").hide();
+}
+function openDispute(id){
+	var html='<span><input type="checkbox" id="checkbox_pp" checked="checked">新账号</span>'
+		+'<br><span>Dispute ID:<input type="text" class="dispute_id"></span>';
+	$.dialog({
+		title : '关联申诉',
+		content : html,
+		max : false,
+		min : false,
+		lock : true,
+		drag : false,
+		fixed : false,
+		ok : function() {
+			var disputeid = $(".dispute_id").val();
+			var merchantid = '584JZVFU6PPVU';
+			if($("#checkbox_pp").is(":checked")){
+				merchantid = 'UDSXBNQ5ARA76';
+			}
+			var href = window.location.href;
+			if(disputeid !='' && merchantid!=''){
+			  $.ajax({
+					type:'POST',
+					dataType:'text',
+					url:'/cbtconsole/complain/dispute/update',
+					data:{id:id,disputeid:disputeid,merchantid:merchantid},
+					success:function(res){
+						window.location.href = href;
+					},
+					error:function(XMLResponse){
+						alert('error');
+					}
+				}); 
+			}
+			
+		},
+		cancel : function() {
+		}
+	});
+	 
+	
+}
+
+
+function selectGoods(id,userid,orderid,goodsid){
+	var href = window.location.href;
+	  $.ajax({
+			type:'POST',
+			dataType:'text',
+			url:'/cbtconsole/complain/order/update',
+			data:{id:id,orderid:orderid,goodsid:goodsid},
+			success:function(res){
+				window.location.href = href;
+			},
+			error:function(XMLResponse){
+				alert('error');
+			}
+		}); 
+	
+}
+
+function orderclick(orderid){
+	$(".div_tile").hide();
+	$(".goods_"+orderid).show();
+}
 </script>
     <!-- HomTU start-->
     <div id="bigestdiv" onclick="FncloseOut();" class="bgd"></div>

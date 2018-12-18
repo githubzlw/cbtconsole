@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车营销成交统计</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 26px;
+            font-size: 20px;
+        }
+
+        #marketing_tracking_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 26px;
+            font-size: 20px;
+        }
+
+        #marketing_tracking_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-row {
+            height: 24px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            getAdminList();
+        });
+
+        function setDatagrid() {
+            $('#marketing_tracking_easyui-datagrid').datagrid({
+                title: '购物车营销成交统计',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#marketing_tracking_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/shopCarMarketingCtr/queryTrackingList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function doQuery() {
+            var adminId = $("#query_admin_id").val();
+            var userId = $("#query_user_id").val();
+            var orderNo = $("#query_order_no").val();
+            var beginTime = $("#query_pay_begin_time").val();
+            var endTime = $("#query_pay_end_time").val();
+            $("#marketing_tracking_easyui-datagrid").datagrid("load", {
+                "adminId": adminId,
+                "userId": userId,
+                "orderNo": orderNo,
+                "orderPayBeginTime": beginTime,
+                "orderPayEndTime": endTime
+            });
+        }
+
+        function formatUserId(val, row, index) {
+            return val;
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
+                row.userId + '" target="_blank">跟进</a>';
+            return content;
+        }
+
+        function exportTrackingExcel() {
+		var adminId = $("#query_admin_id").val();
+        var userId = $("#query_user_id").val();
+        var orderNo = $("#query_order_no").val();
+        var beginTime = $("#query_pay_begin_time").val();
+        var endTime = $("#query_pay_end_time").val();
+		window.location.href = "/cbtconsole/shopCarMarketingCtr/exportTrackingExcel?adminId="
+				+ adminId + "&userId=" + userId+ "&orderNo=" + orderNo
+                + "&beginTime=" + beginTime + "&endTime=" + endTime;
+	}
+
+    </script>
+</head>
+<body>
+
+<div id="marketing_tracking_toolbar" style="padding: 5px; height: auto">
+    <form id="marketing_tracking_query_form" action="#" onsubmit="return false;">
+
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;height: 20px;"/></span>
+        &nbsp;&nbsp;<span>订单号:<input id="query_order_no" type="text" value=""
+                                     style="width: 180px;height: 20px;"/></span>
+        &nbsp;&nbsp;<span>下单时间:<input id="query_pay_begin_time" type="text" class="Wdate"
+                                      onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"
+                                      value="" style="width: 120px;height: 20px;"/></span>
+        &nbsp;&nbsp;<span>至:<input id="query_pay_end_time" type="text" class="Wdate"
+                                   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"
+                                   value="" style="width: 120px;height: 20px;"/></span>
+        &nbsp;&nbsp;<span>销售: <select id="query_admin_id" style="font-size: 16px; height: 26px; width: 120px;">
+					<option value="-1" selected="selected">全部</option>
+			</select></span>&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="导出Excel" onclick="exportTrackingExcel()"/></span>
+    </form>
+</div>
+
+<table id="marketing_tracking_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
+        <th data-options="field:'orderNo',width:'150px'">订单号</th>
+        <th data-options="field:'orderPayTime',align:'center',width:'150px'">下单时间</th>
+        <th data-options="field:'orderPayAmount',align:'center',width:'100px'">下单金额(USD)</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">销售</th>
+        <th data-options="field:'followTime',align:'center',width:'150px'">跟进时间</th>
+        <!--<th data-options="field:'opFlag',align:'center',width:'150px',formatter:formatOperation">操作</th>-->
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
