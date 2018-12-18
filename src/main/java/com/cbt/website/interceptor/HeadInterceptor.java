@@ -1,9 +1,11 @@
 package com.cbt.website.interceptor;
 
 import com.cbt.util.*;
+import com.cbt.warehouse.ctrl.HotGoodsCtrl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import net.sf.json.JSONArray;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HeadInterceptor implements Filter {
+
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(HeadInterceptor.class);
 
 	private String loginPage;
 
@@ -52,8 +56,8 @@ public class HeadInterceptor implements Filter {
 			userauthJson = Redis.hget(sessionId, "userauth");
 			admuser = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		} catch (Exception e) {
-			e.getStackTrace();
-			System.out.println(e.getMessage());
+			logger.error("doFilter",e);
+			throw e;
 		}
 		try {
 
@@ -109,8 +113,7 @@ public class HeadInterceptor implements Filter {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.print(e.getMessage());
+			logger.error("doFilter",e);
 			String result = "{\"status\":false,\"message\":\"请重新登录进行操作\"}";
 			WebTool.writeJson(result, httpServletResponse);
 		}
