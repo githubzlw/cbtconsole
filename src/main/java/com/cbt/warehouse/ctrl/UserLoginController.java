@@ -61,6 +61,8 @@ public class UserLoginController {
 				// 数据放入redis
 				Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
 				Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+				LOG.info("authlist:{}",authlist);
+				LOG.info("save sessionId:[]",sessionId);
                 LOG.info("login is ok!");
 				json.setOk(true);
 			} else {
