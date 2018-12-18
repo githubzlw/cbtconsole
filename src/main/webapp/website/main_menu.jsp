@@ -486,7 +486,6 @@ function getUrlParam(url,name) {
 						} else {
 							//alert(data.message);
 							//window.location.href="/cbtconsole/website/main_login.jsp";
-							alert('提醒');
 							$.messager
 									.alert(
 											"提醒",
@@ -498,7 +497,6 @@ function getUrlParam(url,name) {
 						}
 					},
 					error : function(res) {
-						alert('查询错误');
 						$.messager
 								.alert(
 										"提醒",
