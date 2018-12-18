@@ -278,7 +278,7 @@
         SELECT COUNT(lock_remaining)  AS admName,SUM(lock_inventory_amount) AS pid FROM lock_inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)  AND is_use=1 AND flag=1 and is_delete=0
     </select>
     <select id="getLossInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-        SELECT SUM(old_remaining-new_remaining)  AS admName,case(SUM(loss_amount) as decimal(10,2)) AS pid FROM lossInventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
+        SELECT SUM(old_remaining-new_remaining)  AS admName,cast(SUM(loss_amount) as decimal(10,2)) AS pid FROM lossInventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
     </select>
     <select id="getDeleteInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
         SELECT SUM(IF(idd.flag=0,idd.remaining,idd.new_remaining)) AS admName,SUM(IF(idd.flag=0,idd.inventory_amount,idd.new_inventory_amount)) AS pid
