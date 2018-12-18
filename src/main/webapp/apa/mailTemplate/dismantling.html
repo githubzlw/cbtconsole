@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>ImportExpress Mail Dismantling</title>
+  <title th:text="${title}">ImportExpress Mail Dismantling</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -60,11 +60,15 @@
     .body .body-title{font-weight: bold;font-size: 16px;color: #464646;}
     .body .body-text .body-text-cell{text-align: left;font-size: 14px;line-height: 1.6;padding: 10px 0 10px;}
     /* dismantling */
-    .rece_shop{ border: 1px solid #d8d8d8; padding: 8px; font-size: 13px; margin-top: 10px; text-align: left;}
+    .rece_shop{ border: 1px solid #d8d8d8; padding: 8px; font-size: 13px; margin: 10px0; text-align: left; }
+    .rece_shop a{ color: #00B1FF; }
+    .rece_shop a:hover{ text-decoration: underline;}
+    .rece_shop p{ margin-bottom: 0;}
+    .estima_time{ margin-bottom: 0px; text-align: left;}
     .dismantling_box{ width: 100%; text-align: left; margin: 15px auto 0; }
-    .order_number{ background-color: #e7e7e7; color: #464646; padding-left: 5px; width: 260px; text-align: left;}
+    .order_number{ background-color: #e7e7e7; color: #464646; padding-left: 5px; text-align: left;}
     .order_first{ width: 100%; margin: 0 auto 20px; }
-    .order_items{ text-align: left; font-size: 14px; font-weight: normal;;  color: red; }
+    .order_items{ text-align: left; font-size: 14px; font-weight: normal;;  color: red; margin-bottom: 0px; }
     .order_first ul{ width: 100%; margin-bottom: 5px; border-bottom: 1px dashed #aaabaf; overflow: hidden;box-sizing:border-box;}
     .order_li{ float: left; width:190px;border:1px solid #e5e5e5;margin:5px; color: #333; padding: 5px;}
     .order_img{ width:100%; height: 100%; cursor: pointer; }
@@ -204,7 +208,9 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                    <td class="soapbox-title">Import Express Split Order Reminder</td>
+                     <td class="soapbox-title" th:text="${title}">Import Express Split Order Reminder</td>
+                    <!--  拆单取消退款 标题
+                     <td class="soapbox-title">Your Import Express order was partially cancelled</td>-->
                   </tr>
                 </table>
 
@@ -214,13 +220,37 @@
                     <td class="body-padded">
                       <div class="body-title">Hey <span th:text="${email}">first_name</span>,</div>
                       <div class="dismantling_box" >
+                        <div class="rece_shop" th:if="${message !=''}">
+                          <p> Item <span th:text="${message}">123456</span> has been cancelled due to supply shortage.</p>
+                          <p>The price value would be refunded to your balance, and you can check it in your
+                            <a href="https://www.import-express.com/individual/getCenter">individual center</a>. </p>
+                          <p>Should you have any questions, please feel free to contact us at:+86 13615838327</p>
+                          <p>Thanks very much.</p></div>
                         <div class="order_first" th:if="${state == 1}">
                           <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first.
                             No more extra fee needed, just you will receive more than one delivery. If you have any problem with it, please contact your
-                            account manager or our 24/7 whatsapp service number 0086 13564025061.</p>
+                            account manager or our 24/7 whatsapp service number +86 13615838327 .</p>
+                          <!--  拆单取消退款 文案内容
+                            <div class="rece_shop">
+                             <p> Item 123123 has been cancelled due to supply shortage.</p>
+                             <p>The price value would be refunded to your balance, and you can check it in your
+                              <a href="https://www.import-express.com/individual/getCenter">individual center</a>. </p>
+                            <p>Should you have any questions, please feel free to contact us at:+86 13615838327</p>
+                            <p>Thanks very much.</p></div>-->
+
+
                           <p class="order_number"><strong>Order Number: <span th:text=" ${orderno}">QA18474027512271
                               </span></strong></p>
-                          <h5 class="order_items order_items2" >Items to send you first:</h5>
+                          <p class="order_items order_items2" >Items to send you first:</p>
+                          <div class="order_usd">
+                            <strong th:if="${ orderbean !=null }">Product Value: <em
+                                    th:text="${currency}">USD</em>
+                              <em th:text="${orderbean.product_cost}">5.58</em> </strong>
+                            <p class="estima_time">Estimated Ship Out Time: <em th:text="${time_}">2018-10-18</em></p>
+                            <!--<p th:if="${expect_arrive_time_ != null && expect_arrive_time_ != ''}">-->
+                            <!--Estimated Arrival Time: <em th:text="${expect_arrive_time_}">2018-10-18</em>-->
+                            <!--</p>-->
+                          </div>
                           <ul class="clearfix">
                             <li class="order_li" th:each="detail,detailStat:${details}">
                               <img th:src="${detail[5]}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
@@ -240,25 +270,16 @@
                               <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
                             </li>
                           </ul>
-                          <div class="order_usd">
-                            <strong th:if="${ orderbean !=null }">Product Value: <em
-                                    th:text="${currency}">USD</em>
-                              <em th:text="${orderbean.product_cost}">5.58</em> </strong>
-                            <p>
-                              Estimated Ship Time: <em th:text="${time_}">2018-10-18</em>
-                            </p>
-                            <p th:if="${expect_arrive_time_ != null && expect_arrive_time_ != ''}">
-                              Estimated Arrival Time: <em th:text="${expect_arrive_time_}">2018-10-18</em>
-                            </p>
-                          </div>
-                          <div >Due to the supply reason, part of your order can not be supplied and you can find the below refund amount in <a href="http://www.import-express.com${autoUrl }" th:href="${autoUrl}">Your Account</a></div>
+
+                          <!--<div class="rece_shop" >Due to the supply reason, part of your order can not be supplied and you can find-->
+                            <!--the below refund amount in <a href="http://www.import-express.com${autoUrl }" th:href="${autoUrl}">Your Account</a></div>-->
                         </div>
                         <p class="order_number order_number2">
                           <strong> <i th:if="${state == 0}">Split </i>Order Number: <span
                                   th:text="${orderbean_.orderNo}">QA18474027512271_1</span></strong>
                         </p>
-                        <h5 class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</h5>
-                        <h5 class="order_items order_items2" th:if="${state == 0}">Products unavailable:</h5>
+                        <p class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</p>
+                        <p class="order_items order_items2" th:if="${state == 0}">Products unavailable:</p>
                         <div class="order_first">
                           <ul class="clearfix">
                             <li class="order_li" th:each="detail,detailStat:${details_}">
@@ -278,11 +299,11 @@
                               <p class="order_pr"><em th:text="${detail[2]}">1</em> pc </p>
                               <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
                             </li>
-
                           </ul>
                           <div class="order_usd order_usd_value">
                             <strong>Product Value: <em th:text="${currency}">USD</em><em th:text="${orderbean_.product_cost}"> 5.58</em></strong>
                           </div>
+
                           <div class="order_usd" th:if="${state == 0}">
                             <p>Offered Discount Deduction: <em th:text="${totalDisCount}">1</em></p>
                             <p>Extra Shipping Fee Paid: <em th:text="${totalExtraFree}">1</em></p>
