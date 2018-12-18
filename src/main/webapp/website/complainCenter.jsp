@@ -11,8 +11,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="shortcut icon" href="/cbtprogram/img/mathematics1.ico" type="image/x-icon"/>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
-<script type="text/javascript"
-	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
+<!-- <script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script> -->
 <script type="text/javascript"
 	src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -389,13 +389,11 @@ function linkGoods(id,userid){
 			var ismore = json.length>10;
 			for(var i=0;i<json.length;i++){
 				var orderid = json[i].orderid;
-				html+='<div class="title_g" style="display:block'
-				/* if(i > 10){
-				html+='none'
+				if(i > 10){
+				html +='<div class="title_g" style="display:none;">'
 				}else{
-				html+='block'
-				} */
-				html+=';">'
+				html +='<div class="title_g" style="display:block;">'
+				}
 				if(i!=0){
 					html+='<hr>'
 				}
@@ -411,19 +409,18 @@ function linkGoods(id,userid){
 			if(html ==''){
 				html = "该用户没有可选择订单";
 			}else{
-				/* if(ismore){
+				if(ismore){
 					html +='<a href="#" onclick="showmore()" id="showmorea">显示更多订单</a>';
-				} */
+				} 
 			}
 			  $.dialog({
 					title : '  关联订单产品(点击订单号选择产品)',
 					content : html,
 					max : false,
 					min : false,
-					lock : false,
-					drag : true,
+					lock : true,
 					fixed : false,
-					height : "400px",
+					height:10,
 					ok : function() {
 						var orderid = "";
 						var goodsid = "";
