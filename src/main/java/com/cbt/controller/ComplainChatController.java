@@ -157,6 +157,9 @@ public class ComplainChatController {
 			try {
 				// 保存文件名
 				newFileName = getNewFileName(mpf);
+				if(!newFileName.toLowerCase().contains("jpg") || !newFileName.toLowerCase().contains("png")){
+					newFileName=newFileName+".jpg";
+				}
 				// 去除中文
 				Pattern pat = Pattern.compile(REGEX_CHINESE);
 				Matcher mat = pat.matcher(newFileName);
