@@ -204,7 +204,7 @@
                             <td class="body-text-cell">
                               <p class="user_id_ple">Order #:<i th:text="${orderNo}">QA18474027512271</i></p>
                               <div class="cancel_p">
-                                <p>Your order 123123123 fails to be approved and it has been cancelled.</p>
+                                <p>Your order <span th:text="${orderNo}"></span> fails to be approved and it has been cancelled.</p>
                                 <p>The order amount has been returned to your balance. </p>
                                 <p>You can continue to shop with the balance or withdraw it to your PAYPAL account.</p>
                                 <p>And you can search this order in <a href="www.import-express.com/orderInfo/getOrders?state=-1">Order History</a> in individual center</p>

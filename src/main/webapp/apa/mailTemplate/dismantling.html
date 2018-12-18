@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>ImportExpress Mail Dismantling</title>
+  <title th:text="${title}">ImportExpress Mail Dismantling</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -208,7 +208,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                     <td class="soapbox-title">ImportExpress Mail Dismantling</td>
+                     <td class="soapbox-title" th:text="${title}">ImportExpress Mail Dismantling</td>
                     <!--  拆单取消退款 标题
                      <td class="soapbox-title">Your Import Express order was partially cancelled</td>-->
                   </tr>
@@ -220,17 +220,23 @@
                     <td class="body-padded">
                       <div class="body-title">Hey <span th:text="${email}">first_name</span>,</div>
                       <div class="dismantling_box" >
-                        <div class="order_first" th:if="${state == 1}">
-                           <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first.
-                            No more extra fee needed, just you will receive more than one delivery. If you have any problem with it, please contact your
-                            account manager or our 24/7 whatsapp service number +86 13615838327 .</p>
-                        <!--  拆单取消退款 文案内容
-                          <div class="rece_shop">
-                           <p> Item 123123 has been cancelled due to supply shortage.</p>
-                           <p>The price value would be refunded to your balance, and you can check it in your
+                        <div class="rece_shop" th:if="${message !=''}">
+                          <p> Item <span th:text="${message}">123456</span> has been cancelled due to supply shortage.</p>
+                          <p>The price value would be refunded to your balance, and you can check it in your
                             <a href="https://www.import-express.com/individual/getCenter">individual center</a>. </p>
                           <p>Should you have any questions, please feel free to contact us at:+86 13615838327</p>
-                          <p>Thanks very much.</p></div>-->
+                          <p>Thanks very much.</p></div>
+                        <div class="order_first" th:if="${state == 1}">
+                          <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first.
+                            No more extra fee needed, just you will receive more than one delivery. If you have any problem with it, please contact your
+                            account manager or our 24/7 whatsapp service number +86 13615838327 .</p>
+                          <!--  拆单取消退款 文案内容
+                            <div class="rece_shop">
+                             <p> Item 123123 has been cancelled due to supply shortage.</p>
+                             <p>The price value would be refunded to your balance, and you can check it in your
+                              <a href="https://www.import-express.com/individual/getCenter">individual center</a>. </p>
+                            <p>Should you have any questions, please feel free to contact us at:+86 13615838327</p>
+                            <p>Thanks very much.</p></div>-->
 
 
                           <p class="order_number"><strong>Order Number: <span th:text=" ${orderno}">QA18474027512271

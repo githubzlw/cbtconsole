@@ -577,109 +577,120 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         alert('获取订单号失败');
         return ;
 	}
-	var isCf = confirm("是否确定取消订单?");
-	if (isCf) {
-		// 按钮不可用
-		$("#closeOrder").attr("disabled", true);
-		$("#closeOrder").hide();
-		$(".mask").show().text("正在执行，请等待...");
-		// ==2 是补货订单能进行退款操作
-		if (isDropshipOrder == 2) {
+	//var isCf = confirm("是否确定取消订单?");
+    $.dialog({
+        title : '是否确定取消订单?',
+        content : "是否确定取消订单?",
+        max : false,
+        min : false,
+        lock : true,
+        drag : false,
+        fixed : true,
+        ok : function() {
+                // 按钮不可用
+                $("#closeOrder").attr("disabled", true);
+                $("#closeOrder").hide();
+                $(".mask").show().text("正在执行，请等待...");
+                // ==2 是补货订单能进行退款操作
+                if (isDropshipOrder == 2) {
 
-			var params = {
-				"orderNo" : orderno,
-				"userId" : userId,
-				"actualPay" : actualPay,
-				"currency" : currency,
-				"order_ac" : order_ac,
-				"email" : email,
-				"confirmEmail" : confirmEmail,
-				"totalPrice" : totalPrice,
-				"weight" : weight,
-				"isDropshipOrder" : isDropshipOrder
-			};
-			$.ajax({
-				url : '/cbtconsole/orderDetails/closeOrder.do',
-				type : "post",
-				data : params,
-				dataType : "json",
-				success : function(data) {
-					if (data.ok) {
-						showMessage('取消成功,请等待订单状态更新');
-						setTimeout(function() {
-							window.location.reload();
-						}, 1500);
-					} else {
-						$(".mask").hide();
-						alert(data.message);
-						$('#closeOrder').removeAttr("disabled");
-						$("#closeOrder").show();
-					}
-				},
-				error : function() {
-					showMessage('取消失败，请联系开发人员');
-					$('#closeOrder').removeAttr("disabled");
-					$("#closeOrder").show();
-				}
-			});
+                    var params = {
+                        "orderNo" : orderno,
+                        "userId" : userId,
+                        "actualPay" : actualPay,
+                        "currency" : currency,
+                        "order_ac" : order_ac,
+                        "email" : email,
+                        "confirmEmail" : confirmEmail,
+                        "totalPrice" : totalPrice,
+                        "weight" : weight,
+                        "isDropshipOrder" : isDropshipOrder
+                    };
+                    $.ajax({
+                        url : '/cbtconsole/orderDetails/closeOrder.do',
+                        type : "post",
+                        data : params,
+                        dataType : "json",
+                        success : function(data) {
+                            if (data.ok) {
+                                showMessage('取消成功,请等待订单状态更新');
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1500);
+                            } else {
+                                $(".mask").hide();
+                                showMessage(data.message);
+                                $('#closeOrder').removeAttr("disabled");
+                                $("#closeOrder").show();
+                            }
+                        },
+                        error : function() {
+                            showMessage('取消失败，请联系开发人员');
+                            $('#closeOrder').removeAttr("disabled");
+                            $("#closeOrder").show();
+                        }
+                    });
 
-		} else {
-			//Added <V1.0.1> Start： cjc 2018/10/23 16:21 TODO 判断是否是droship子订单，如果是子订单则要去 查询子订单的状态 0:默认不是  1：是
-			var  isDropshipOrder1 = 0;
-			var temParm = $('#isDropshipOrder1').val();
-            if(typeof (temParm) != 'undefined' && temParm != ''){
-                isDropshipOrder1 = $('#isDropshipOrder1').val();
-			}
-			//End：
+                } else {
+                    //Added <V1.0.1> Start： cjc 2018/10/23 16:21 TODO 判断是否是droship子订单，如果是子订单则要去 查询子订单的状态 0:默认不是  1：是
+                    var  isDropshipOrder1 = 0;
+                    var temParm = $('#isDropshipOrder1').val();
+                    if(typeof (temParm) != 'undefined' && temParm != ''){
+                        isDropshipOrder1 = $('#isDropshipOrder1').val();
+                    }
+                    //End：
 
-			// 如果订单总金额<= 0,不能进行退款操作
-			if (actualPay <= 0) {
-				$('#closeOrder').removeAttr("disabled");
-				$("#closeOrder").show();
-				showMessage('余额小于等于0，不能取消');
-			} else {
-				var params = {
-					"orderNo" : orderno,
-					"userId" : userId,
-					"actualPay" : actualPay,
-					"currency" : currency,
-					"order_ac" : order_ac,
-					"email" : email,
-					"confirmEmail" : confirmEmail,
-					"totalPrice" : totalPrice,
-					"weight" : weight,
-					"freight" : freight,
-					"isDropshipOrder" : isDropshipOrder,
-					'isDropshipOrder1':isDropshipOrder1
-				};
+                    // 如果订单总金额<= 0,不能进行退款操作
+                    if (actualPay <= 0) {
+                        $('#closeOrder').removeAttr("disabled");
+                        $("#closeOrder").show();
+                        showMessage('余额小于等于0，不能取消');
+                    } else {
+                        var params = {
+                            "orderNo" : orderno,
+                            "userId" : userId,
+                            "actualPay" : actualPay,
+                            "currency" : currency,
+                            "order_ac" : order_ac,
+                            "email" : email,
+                            "confirmEmail" : confirmEmail,
+                            "totalPrice" : totalPrice,
+                            "weight" : weight,
+                            "freight" : freight,
+                            "isDropshipOrder" : isDropshipOrder,
+                            'isDropshipOrder1':isDropshipOrder1
+                        };
 
-				$.ajax({
-					url : '/cbtconsole/orderDetails/closeOrder.do',
-					type : "post",
-					data : params,
-					dataType : "json",
-					success : function(data) {
-						if (data.ok) {
-							showMessage('取消成功,请等待订单状态更新');
-							setTimeout(function() {
-								window.location.reload();
-							}, 1500);
-						} else {
-							$(".mask").hide();
-							alert(data.message);
-							$('#closeOrder').removeAttr("disabled");
-							$("#closeOrder").show();
-						}
-					},
-					error : function() {
-						showMessage('取消失败，请联系开发人员');
-						$('#closeOrder').removeAttr("disabled");
-						$("#closeOrder").show();
-					}
-				});
-			}
-		}
-	}
+                        $.ajax({
+                            url : '/cbtconsole/orderDetails/closeOrder.do',
+                            type : "post",
+                            data : params,
+                            dataType : "json",
+                            success : function(data) {
+                                if (data.ok) {
+                                    showMessage('取消成功,请等待订单状态更新');
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 1500);
+                                } else {
+                                    $(".mask").hide();
+                                    showMessage(data.message,3000);
+                                    $('#closeOrder').removeAttr("disabled");
+                                    $("#closeOrder").show();
+                                }
+                            },
+                            error : function() {
+                                showMessage('取消失败，请联系开发人员');
+                                $('#closeOrder').removeAttr("disabled");
+                                $("#closeOrder").show();
+                            }
+                        });
+                    }
+                }
+        },
+        cancel : function() {
+        }
+    });
 }
 
 // 确认弹出框关闭方法
@@ -1468,11 +1479,14 @@ function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
         }
 	});
 }
-function showMessage(msg) {
+function showMessage(msg,time) {
     $('.mask').show().text(msg);
+    if(!time){
+        time=1500;
+	}
     setTimeout(function() {
         $('.mask').hide();
-    }, 1500);
+    }, time);
 }
 
 function searchCountry(cname, orderNo){
