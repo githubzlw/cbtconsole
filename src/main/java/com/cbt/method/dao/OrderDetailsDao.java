@@ -1086,6 +1086,9 @@ public class OrderDetailsDao implements IOrderDetailsDao {
 			Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iterator.next();
+				if(org.apache.commons.lang.StringUtils.isBlank(entry.getKey())) {
+					continue;
+				}
 				Map<String,Object> map2 = new HashMap<String,Object>();
 				map2.put( "orderid", entry.getKey());
 				map2.put( "orderdetail", entry.getValue());
