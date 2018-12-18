@@ -1,9 +1,11 @@
 package com.cbt.website.interceptor;
 
 import com.cbt.util.*;
+import com.cbt.warehouse.ctrl.HotGoodsCtrl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import net.sf.json.JSONArray;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HeadInterceptor implements Filter {
+
+	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(HeadInterceptor.class);
 
 	private String loginPage;
 
@@ -52,8 +56,8 @@ public class HeadInterceptor implements Filter {
 			userauthJson = Redis.hget(sessionId, "userauth");
 			admuser = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 		} catch (Exception e) {
-			e.getStackTrace();
-			System.out.println(e.getMessage());
+			logger.error("doFilter",e);
+			throw e;
 		}
 		try {
 
@@ -96,10 +100,17 @@ public class HeadInterceptor implements Filter {
 					}
 
 				} else {// 如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面
+
 					if (admuser == null && "/website/".equals(servletPath)
 							|| admuser == null && ("/website/main_menu.jsp".equals(servletPath) || "/website/user_profit.jsp".equals(servletPath))) {
+						logger.error("1如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
+						logger.info("requestUrl:[{}]",requestUrl);
+						logger.info("Cache.getAllAuth():[{}]",Cache.getAllAuth());
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website" + loginPage);
 					} else if (admuser != null && "/website/".equals(servletPath)) {
+						logger.error("2如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
+						logger.info("requestUrl:[{}]",requestUrl);
+						logger.info("Cache.getAllAuth():[{}]",Cache.getAllAuth());
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website/main_menu.jsp");
 					} else {
 						chain.doFilter(request, response);
@@ -109,8 +120,7 @@ public class HeadInterceptor implements Filter {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.print(e.getMessage());
+			logger.error("doFilter",e);
 			String result = "{\"status\":false,\"message\":\"请重新登录进行操作\"}";
 			WebTool.writeJson(result, httpServletResponse);
 		}
