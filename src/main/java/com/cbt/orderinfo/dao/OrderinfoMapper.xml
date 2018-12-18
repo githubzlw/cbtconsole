@@ -536,6 +536,9 @@
             <when test="type == 'systemfailure'">
                 where  o.order_no IN (SELECT distinct pri.orderid FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0) AND o.isDropshipOrder&lt;>3
             </when>
+            <when test="type == 'noChange'">
+                where  o.order_no IN (SELECT DISTINCT c.orderid FROM cancel_replacement_record c INNER JOIN orderinfo oi ON c.orderid=oi.order_no INNER JOIN order_details od ON c.orderid=od.orderid AND c.goodsid=od.goodsid LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.id=ops.od_id AND ops.purchase_state IN(3,4,5,6,8,13,12) WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) )
+            </when>
             <when test="type == 'purchasewarning'">
                 where  (date_add(orderpaytime, INTERVAL 2 day) &lt; now() and state in (5)) AND o.isDropshipOrder&lt;>3
             </when>
@@ -688,6 +691,21 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+        union ALL
+        SELECT 'noChange',COUNT(DISTINCT c.orderid) counts FROM cancel_replacement_record c
+        INNER JOIN orderinfo oi ON c.orderid=oi.order_no
+        INNER JOIN admin_r_user a ON oi.user_id=a.userid
+        INNER JOIN USER u ON oi.user_id=u.id
+        where   oi.state between 1 and 5 and c.flag=0
+        and oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
+        <if test="admuserid != 0">
+           and a.adminid=#{admuserid}
+        </if>
         union all
         SELECT 'deliver' AS state,COUNT(id) AS counts FROM ( SELECT order_fee.* FROM order_fee  LEFT JOIN orderinfo o ON  orderno=  order_no
         WHERE o.state IN (5,2,1) AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND

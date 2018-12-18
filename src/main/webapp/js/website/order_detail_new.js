@@ -940,6 +940,295 @@ function doReplay1(orderid,odid){
     rfddd.style.display = "block";
 }
 
+function showMessage(msg) {
+    $('.mask').show().text(msg);
+    setTimeout(function() {
+        $('.mask').hide();
+    }, 1500);
+}
+
+function queryRepeat(uid){
+    $.ajax({
+        url:"/cbtconsole/orderDetails/queryRepeatUserid.do",
+        type:"post",
+        dataType:"json",
+        data : {"userid":uid},
+        success:function(data){
+            if(data.ok){
+                var json = data.data;
+                $("#other_id").css("display","inline");
+                var content = "相似用户的id： ";
+                for(var i=0;i<json.length;i++){
+                    content +=json[i]+"&nbsp;";
+                }
+                $("#other_id").text("相似用户的id： ");
+                if(json == null || json == ""){
+                    $("#other_id").css("display","none");
+                }
+            }
+        }
+    });
+}
+
+function changeOrderBuyer(orderid,admuserid){
+    $.ajax({
+        url:"/cbtconsole/orderDetails/changeOrderBuyer.do",
+        type:"post",
+        dataType:"json",
+        data : {"orderid":orderid,"admuserid":admuserid},
+        success:function(data){
+            if(data.ok){
+                $("#buyuserinfo").text("执行成功");
+            }else{
+                $("#buyuserinfo").text("执行失败");
+            }
+            window.location.reload();
+        },
+        error : function(res){
+            $("#buyuserinfo").text("执行失败,请联系管理员");
+        }
+
+    });
+}
+
+//获取采购员
+function getBuyer(oids){
+    var adminName = '<%=user.getAdmName()%>';
+    $.ajax({
+        url:"/cbtconsole/orderDetails/qyeruBuyerByOrderNo.do",
+        type:"post",
+        dataType:"json",
+        data : {"str_oid" : oids},
+        success:function(data){
+            if(data.ok>0){
+                var json = data.data;
+                for(var i=0;i< json.length;i++){
+//  					 $("#odid"+json[i].odid).append(json[i].admName);
+                    for(var j=0;j<document.getElementById("buyer"+json[i].odid).options.length;j++){
+                        if (document.getElementById("buyer"+json[i].odid).options[j].text == json[i].admName){
+                            document.getElementById("buyer"+json[i].odid).options[j].selected=true;
+                            break;
+                        }
+                    }
+                    if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
+                        $("#buyer"+json[i].odid).attr("disabled",true);
+                    }
+                }
+            }
+        }
+    });
+}
+
+//计算利润
+function jslr(orderno){
+
+    var i = 0;
+    var j =0;
+    var hsSum = 0;
+    var heSum = 0;
+    $("div[id^='"+orderno+"']").each(function(){
+
+        var sBut = $(this).children("div:first").children().eq(1).val();
+        alert(sBut);
+        var divId = $(this).attr('id');
+
+        //获得原价   和货源价
+        var hs = $("#"+divId+"_s").val();
+        var _sQuantity = $("#"+divId+"_sQuantity").val();
+        var he = $("#"+divId+"_e").val();
+        var _eQuantity = $("#"+divId+"_eQuantity").val();
+        ///${pb.orderNo}${pbsi.index}_eQuantity
+        alert(sBut+"------"+hs+"----"+he);
+        //是否确认货源
+        //	if(sBut =="取消货源"){
+        //有一个为空的价格就不计算
+        if(hs!='' & he!=''){
+            hsSum += Number(hs)*Number(_sQuantity);
+
+            heSum += Number(he)*Number(_eQuantity);
+            i++;
+        }
+        //	}
+
+
+        j++;
+
+
+        alert($(this).attr('id')+"------"+sBut);
+    });
+
+    if(heSum == 0){
+        $("#"+orderno+"_span").html(j+"/"+i+"   利润：0%");
+        $("#"+orderno+"_span_s").html(0);
+        $("#"+orderno+"_span_e").html(0);
+    }else{
+        $("#"+orderno+"_span_s").html((hsSum).toFixed(2) +"USD ("+(hsSum*6.78).toFixed(2)+")");
+        $("#"+orderno+"_span_e").html(heSum.toFixed(2));
+        var t = Number(hsSum)*6.78 - Number(heSum);
+        t = t*100/(Number(hsSum)*6.78);
+        t = parseInt(t);//.toFixed(2);
+        $("#"+orderno+"_span").html(j+"/"+i+"   利润："+t+"%");
+
+        //alert(j+"/"+i+"   利润："+t+"%");
+    }
+}
+
+//显示产品历史的价格
+function showHistoryPrice(url){
+    $.ajax({
+        url: "/cbtconsole/orderDetails/showHistoryPrice.do",
+        type:"POST",
+        dataType:"json",
+        data : {"url":url},
+        success:function(data){
+            if(data.ok){
+                var json = data.data;
+                var pri = "";
+                pri += "<div class='pridivbg'><a class='pridclose' onclick='priclose()'>X</a>"
+                for(var i =0;i<json.length;i++){
+                    pri += "<p>"+json[i][1]+" &nbsp;&nbsp; "+json[i][0]+"</p>";
+                }
+                pri +="</div>";
+                var topHg = ($(window).height()-$("#prinum").height())/2 + $(document).scrollTop();
+                var lefhWt = ($(window).width()-$("#prinum").width())/2;
+                $("#prinum").show().append(pri).css({"top":topHg,"left":lefhWt});
+                $(".peimask").show().css("height",$(document).height());
+
+            }else{
+                data(info.message);
+            }
+        },
+        error: function(res) {
+            alert('请求失败,请重试');
+        }
+    });
+}
+
+function priclose(){
+    $(".pridivbg").remove();
+    $("#prinum").hide();
+    $(".peimask").hide();
+}
+
+function afterReplenishment(){
+    var str=document.getElementsByName("replenishment");
+    var orderid=$("#orderNo").val();
+    var objarray=str.length;
+    var parm="";
+    for (i=0;i<objarray;i++){
+        if(str[i].checked == true){
+            var count=$("#count_"+str[i].value).val();
+            if(count=="补货数量"){
+                alert("请输入补货数量");
+                return;
+            }
+            parm+=str[i].value+":"+count+":"+orderid+",";
+        }
+    }
+    $.ajax({
+        url: "/cbtconsole/orderDetails/afterReplenishment.do",
+        type:"POST",
+        dataType:"json",
+        data : {"parm":parm},
+        success:function(data){
+            alert(data.message);
+        },
+        error : function(res){
+            alert("执行失败，请联系管理员");
+        }
+    });
+}
+
+//保存或者修改评论yyl
+function saveCommentContent(){
+    var cmid = $("#cm_id").val();
+    var adminname = $("#cm_adminname").val();
+    var orderNo = $("#cm_orderNo").val();
+    var goods_pid = $("#cm_goodsPid").val();
+    var goodsSource = $("#cm_goodsSource").val();
+    var adminId = $("#cm_adminId").val();
+    var countryId = $("#cm_country").val();
+    var oid = $("#cm_oid").val();
+    var carType = $("#cm_carType").val();
+    var commentcontent = $("#comment_content_").val();
+    $.ajax({
+        type : 'POST',
+        async : false,
+        url : '/cbtconsole/goodsComment/savecomment.do',
+        data : {
+            'id':cmid,
+            'userName' : adminname,
+            'orderNo' : orderNo,
+            'goodsPid' : goods_pid,
+            'goodsSource' : goodsSource,
+            'adminId' : adminId,
+            'countryId' : countryId,
+            'oid' : oid,
+            'car_type' : carType,
+            "commentsContent":commentcontent,
+        },
+        dataType : 'json',
+        success : function(data){
+            if(data.success == true){
+                $('#commentDiv1').hide();
+                //将改页所有pid等于改pid的产品销售评论改变commentcontent
+                var button=document.getElementsByName(goods_pid+"ID");
+                for(var j=0;j<button.length;j++){
+                    button[j].innerHTML="已评论 &nbsp;&nbsp;<button cmid='"+data.cmid+"' name='but"+goods_pid+"' style='cursor:pointer' title=\""+commentcontent+"\">显示评论</button>"
+                }
+            }else{
+                alert("操作失败!")
+            }
+        }
+    });
+}
+//弹出评论框yyl
+function showcomm(id,car_type,adminname,orderNo,goods_pid,countryid,admindid){
+    var controls=document.getElementsByName("but"+goods_pid);
+    $("#cm_id").val($(controls[0]).attr("cmid"));
+    $("#cm_adminname").val(adminname);
+    $("#cm_orderNo").val(orderNo);
+    $("#cm_goodsPid").val(goods_pid);
+    $("#cm_country").val(countryid);
+    $("#cm_adminId").val(admindid);
+    $("#cm_oid").val(id);
+    $("#cm_carType").val(car_type);
+    $("#comment_content_").val($(controls[0]).attr("title"));
+    var rfddd1 = document.getElementById("commentDiv1");
+    rfddd1.style.display = "block";;
+
+}
+
+//手动调整采购人员
+function changeBuyer(odid,buyid){
+    $.ajax({
+        url:"/cbtconsole/orderDetails/changeBuyer.do",
+        type:"post",
+        dataType:"json",
+        data : {"odid":odid,"admuserid":buyid},
+        success:function(data){
+            if(data.ok){
+                $("#info"+odid).text("执行成功");
+            }else{
+                $("#info"+odid).text("执行失败");
+            }
+            window.location.reload();
+        },
+        error : function(res){
+            $("#info"+odid).text("执行失败,请联系管理员");
+        }
+    });
+}
+
+//备注回复
+function doReplay1(orderid,odid){
+    $("#remark_content_").val("");
+    $("#rk_orderNo").val(orderid);
+    $("#rk_odid").val(odid);
+    var rfddd = document.getElementById("repalyDiv1");
+    rfddd.style.display = "block";
+}
+
 // 确认弹出框关闭方法
 function fnPaymentConfirmClose(confirmtime, confirmname) {
 	location.reload();
