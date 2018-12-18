@@ -2,6 +2,7 @@ package com.cbt.website.thread;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.NewFtpUtil;
+import com.cbt.util.Util;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,16 +32,16 @@ public class AddInventoryThread extends Thread{
 		String sql="";
 		String goods_pid="";
 		try {
-			boolean flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", storePath, imgPath);
+			boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 			if(flag){
 				sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.id = ?;";
 				stmt = conn.prepareStatement(sql);
-				stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+				stmt.setString(1, Util.PIC_URL+storePath+"");
 				stmt.setString(2, orderid);
 				stmt.setString(3, odid);
 				stmt.executeUpdate();
 				stmt = conn1.prepareStatement(sql);
-				stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+				stmt.setString(1, Util.PIC_URL+storePath+"");
 				stmt.setString(2, orderid);
 				stmt.setString(3, odid);
 				stmt.executeUpdate();
@@ -48,21 +49,21 @@ public class AddInventoryThread extends Thread{
 				stmt=conn1.prepareStatement(sql);
 				stmt.setString(1, orderid);
 				stmt.setString(2, odid);
-				stmt.setString(3, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+				stmt.setString(3, Util.PIC_URL+storePath+"");
 				rs=stmt.executeQuery();
 				if(rs.next()){
 					sql="update inspection_picture set pic_path=?,updatetime=now() where orderid=? and odid=? and isdelete=0 and pic_path=?";
 					stmt=conn1.prepareStatement(sql);
-					stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, orderid);
 					stmt.setString(3, odid);
-					stmt.setString(4, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(4, Util.PIC_URL+storePath+"");
 					stmt.executeUpdate();
 					stmt=conn.prepareStatement(sql);
-					stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, orderid);
 					stmt.setString(3, odid);
-					stmt.setString(4, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(4, Util.PIC_URL+storePath+"");
 					stmt.executeUpdate();
 				}else{
 					sql="select goods_pid from order_details where orderid=? and id=?";
@@ -78,13 +79,13 @@ public class AddInventoryThread extends Thread{
 					stmt.setString(1, goods_pid);
 					stmt.setString(2, orderid);
 					stmt.setString(3, odid);
-					stmt.setString(4, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(4, Util.PIC_URL+storePath+"");
 					stmt.executeUpdate();
 					stmt=conn.prepareStatement(sql);
 					stmt.setString(1, goods_pid);
 					stmt.setString(2, orderid);
 					stmt.setString(3, odid);
-					stmt.setString(4, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(4, Util.PIC_URL+storePath+"");
 					stmt.executeUpdate();
 				}
 				if(index==1){

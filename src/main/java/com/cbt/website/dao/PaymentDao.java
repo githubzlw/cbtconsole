@@ -2366,7 +2366,7 @@ public class PaymentDao implements PaymentDaoImp {
 
         List<RefundBean> rfbList = new ArrayList<RefundBean>();
 
-        String _sql = "select  * from refund where userid= ? and status in(0,1,2,3,4)";
+        String _sql = "select  * from refund where userid= ? and status in(0,1,2)";
 
         Connection conn = DBHelper.getInstance().getConnection2();
         ResultSet rs = null;

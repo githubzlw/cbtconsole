@@ -17,6 +17,7 @@ import com.cbt.util.AppConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.PreferentialPrice;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
@@ -7059,6 +7060,8 @@ public class PurchaseDaoImpl implements PurchaseDao {
 		DBHelper.getInstance().closeConnection(conn);
 		return row;
 	}
+
+
 	/**
 	 * 更改order_details  straight_flag为2  确认直发
 	 */

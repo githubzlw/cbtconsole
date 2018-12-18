@@ -104,11 +104,12 @@
 					<div style="width:26%">
 						<label for="nickname" >采购人：<span style="color:red">*</span></label>
 						<select name="" id="buyer"  style="width: 90px;">
-							<option value="80">sales6</option>
+							<option value="51">buy5</option>
+							<option value="50">Alisa</option>
+							<option value="53">mindy</option>
 							<option value="58">buy2</option>
-							<option value="57">buy1</option>
-							<option value="56">salebuy1</option>
-							<option value="68">salebuy4</option>
+							<%--<option value="1">全部</option>--%>
+							<option value="9">camry</option>
 						</select>
 					</div>
 					<div style="width:26%">

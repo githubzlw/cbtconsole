@@ -1,21 +1,30 @@
 package com.cbt.controller;
 
+import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.bean.ShippingBean;
 import com.cbt.common.StringUtils;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.util.Util;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
+import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchasesBean;
 import com.cbt.website.dao2.Page;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.service.IPurchaseService;
 import net.sf.json.JSONArray;
@@ -24,7 +33,9 @@ import net.sf.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.ServletException;
@@ -39,6 +50,7 @@ import java.util.*;
 @RequestMapping(value = "/purchase")
 public class PurchaseController {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PurchaseController.class);
+	IOrderwsServer server1 = new OrderwsServer();
 	private PurchaseServer purchaseServer = new PurchaseServerImpl();
 	@Autowired
 	private IPurchaseService iPurchaseService;
@@ -63,6 +75,95 @@ public class PurchaseController {
 		out.print(row);
 		out.flush();
 		out.close();
+	}
+
+	@RequestMapping(value = "/getDetailsChangeInfo", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getDetailsChangeInfo(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("goodsid", goodsid);
+		map.put("orderid", orderid);
+		List<ChangeGoodsLogPojo> list = iPurchaseService.getDetailsChangeInfo(map);
+		return JSONArray.fromObject(list).toString();
+	}
+
+	// 采购补货
+	@RequestMapping(value = "/insertOrderReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String insertOrderReplenishment(HttpServletRequest request,
+	                                       Model model) {
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");// 获取登录用户
+		com.cbt.pojo.Admuser user = (com.cbt.pojo.Admuser) SerializeUtil
+				.JsonToObj(admJson, com.cbt.pojo.Admuser.class);
+		String userid = request.getParameter("userid");
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		String goods_url = request.getParameter("goods_url");
+		String goods_p_url = request.getParameter("goods_p_url");
+		String goods_price = request.getParameter("goods_price");
+		String buycount = request.getParameter("buycount");
+		String remark = request.getParameter("remark");
+		String rep_type = request.getParameter("rep_type");
+		String goods_title = request.getParameter("goods_title");
+		String shop_id=request.getParameter("shop_id");
+		String odid=request.getParameter("odid");
+		if (goods_p_url == null || "".equals(goods_p_url)) {
+			return "0";
+		}
+		String tb_1688_itemid = Util.getItemid(goods_p_url);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("userid", userid);
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		map.put("goods_url", goods_url);
+		map.put("goods_p_url", goods_p_url);
+		map.put("goods_price", goods_price);
+		map.put("buycount", buycount);
+		map.put("remark", remark);
+		map.put("tb_1688_itemid", tb_1688_itemid);
+		map.put("rep_type", rep_type);
+		map.put("goods_title", goods_title);
+		map.put("goods_type", "0");
+		map.put("shop_id", shop_id);
+		map.put("odid",odid);
+		int ret = iPurchaseService.insertOrderReplenishment(map);
+		if (ret > 0) {
+			iPurchaseService.updateReplenishmentState(map);
+			// 添加补货记录
+			map.put("admuserid", user.getId());
+			iPurchaseService.addReplenishmentRecord(map);
+		}
+		return "" + ret;
+	}
+
+	// 采购补货
+	@RequestMapping(value = "/getIsReplenishment.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getIsReplenishment(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		map.put("goods_type", "0");
+		List<Replenishment_RecordPojo> list = iPurchaseService.getIsReplenishments(map);
+		return JSONArray.fromObject(list).toString();
+	}
+
+	// 线下采购记录
+	@RequestMapping(value = "/getIsOfflinepurchase.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getIsOfflinepurchase(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		String goodsid = request.getParameter("goodsid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("orderid", orderid);
+		map.put("goodsid", goodsid);
+		List<OfflinePurchaseRecordsPojo> list = iPurchaseService.getIsOfflinepurchase(map);
+		return JSONArray.fromObject(list).toString();
 	}
 
 	/**
@@ -230,6 +331,362 @@ public class PurchaseController {
 		out.print(datas);
 		out.flush();
 		out.close();
+	}
+
+	/**
+	 *
+	 * @Title getPrePurchase
+	 * @Description 获取采购管理页面订单信息
+	 * @param request 客户端请求
+	 * @param model
+	 * @return easy ui结果集
+	 * @throws ParseException
+	 * @return EasyUiJsonResult
+	 */
+	@RequestMapping(value = "/getPrePurchase", method = RequestMethod.POST)
+	@ResponseBody
+	public EasyUiJsonResult getPrePurchase(HttpServletRequest request, Model model) throws ParseException {
+		DataSourceSelector.restore();
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, Object> map = new HashMap<String, Object>();
+		int page = Integer.parseInt(request.getParameter("page"));
+		String orderid=request.getParameter("orderid");
+		String userid=request.getParameter("userid");
+		String days=request.getParameter("days");
+		String goodsid=request.getParameter("goodsid");
+		String state=request.getParameter("state");
+		String admuserid=request.getParameter("admuserid");
+		String goods_name=request.getParameter("goods_name");
+		String goods_pid=request.getParameter("goods_pid");
+		String type=request.getParameter("type");
+		if (page > 0) {
+			page = (page - 1) * 40;
+		}
+		List<PrePurchasePojo> list=new ArrayList<PrePurchasePojo>();
+		List<String> counts=new ArrayList<String>();
+		map.put("admuserid",admuserid);
+		map.put("page", page);
+		if("000000000".equals(orderid)){
+			orderid="'000000000'";
+		}
+		map.put("orderid", orderid==null || "".equals(orderid) || "''".equals(orderid)?null:orderid);
+		map.put("userid", userid==null || "".equals(userid)?null:userid);
+		map.put("days", days==null || "".equals(days)?null:days);
+		map.put("goodsid", goodsid==null || "".equals(goodsid)?null:goodsid);
+		map.put("state", "-1".equals(state)?null:state);
+		map.put("goods_name", goods_name==null || "".equals(goods_name)?null:goods_name);
+		map.put("goods_pid",StringUtil.isNotBlank(goods_pid)?goods_pid:null);
+		if("6".equals(type) ){
+			if(!StringUtils.isStrNull(orderid)){
+				list=iPurchaseService.getPrePurchaseForTB(map);
+				counts=iPurchaseService.getPrePurchaseCount(map);
+			}else{
+				list=new ArrayList<PrePurchasePojo>();
+				counts=new ArrayList<String>();
+			}
+		}else{
+			list = iPurchaseService.getPrePurchase(map);
+			counts=iPurchaseService.getPrePurchaseCount(map);
+		}
+		json.setRows(list);
+		json.setTotal(counts.size());
+		return json;
+	}
+
+	/**
+	 *
+	 * @Title getMCgCount
+	 * @Description 获得每月采购数量
+	 * @param request
+	 * @param model
+	 * @return 返回采购人员每月采购数量
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getMCgCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getMCgCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("buyid", admuserid);
+		return iPurchaseService.getMCgCount(map) + "";
+	}
+
+	/**
+	 *
+	 * @Title getDistributionCount
+	 * @Description 获取当日采购分配种类
+	 * @param request
+	 * @param model
+	 * @return 返回当日采购分配种类
+	 * @return String 返回结果类型
+	 */
+	@RequestMapping(value = "/getDistributionCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getDistributionCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("buyid", admuserid);
+		return iPurchaseService.getDistributionCount(map) + "";
+	}
+	/**
+	 *
+	 * @Title getCgCount
+	 * @Description 获得采购数量
+	 * @param request
+	 * @param model
+	 * @return 返回某个采购的采购数量
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getCgCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getCgCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		map.put("buyid", admuserid);
+		return iPurchaseService.getCgCount(map) + "";
+	}
+	/**
+	 * 人工采购分配
+	 * @Title purchasing_allocation
+	 * @Description TODO
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 * @return void
+	 */
+	@RequestMapping(value = "/purchasing_allocation")
+	public void purchasing_allocation(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		int row=0;
+		try{
+			OrderAutoServlet o=new OrderAutoServlet();
+			o.PreOrderAutoDistribution();
+			row=1;
+		}catch(Exception e){
+			e.printStackTrace();
+			row=0;
+		}
+		out.print(row);
+		out.close();
+	}
+	/**
+	 *
+	 * @Title getSjCgCount
+	 * @Description 获得实际采购数量
+	 * @param request
+	 * @param model
+	 * @return 返回采购实际采购数量
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getSjCgCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getSjCgCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("buyid", admuserid);
+		return iPurchaseService.getSjCgCount(map) + "";
+	}
+
+	/**
+	 * 发货3天未入库
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getShippedNoStorage", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getShippedNoStorage(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		String username=null;
+		if(!"1".equals(admuserid)){
+			username = iWarehouseService.getBuyerNames(admuserid);
+		}
+		map.put("username", username);
+		return iPurchaseService.getShippedNoStorage(map) + "";
+	}
+
+	/**
+	 *
+	 * @Title getfpCount
+	 * @Description 获得分配数量
+	 * @param request
+	 * @param model
+	 * @return 返回某个采购的分配数量
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getfpCount.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getfpCount(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("buyid", admuserid);
+		return iPurchaseService.getfpCount(map) + "";
+	}
+
+	/**
+	 * 超过1天未发货
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getNotShipped", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getNotShipped(HttpServletRequest request, Model model) {
+		String admuserid=request.getParameter("admuserid");
+		Map<String, Object> map = new HashMap<String, Object>();
+		String username=null;
+		if(!"1".equals(admuserid)){
+			username = iWarehouseService.getBuyerNames(admuserid);
+		}
+		map.put("username", username);
+		return iPurchaseService.getNotShipped(map) + "";
+	}
+
+	/**
+	 *
+	 * @Title getOrderInfoCountByState
+	 * @Description 获取采购管理页面超过交期项目等结果
+	 * @param request 客户端请求
+	 * @param model
+	 * @return 超过交期项目的订单数量
+	 * @throws ParseException
+	 * @return String 返回值类型
+	 */
+	@RequestMapping(value = "/getOrderInfoCountByState.do", method = RequestMethod.POST)
+	@ResponseBody
+	public String getOrderInfoCountByState(HttpServletRequest request,Model model) throws ParseException {
+		String state = request.getParameter("state");
+		String admuserid=request.getParameter("admuserid");
+		String sql = "";
+		if(!"5".equals(state) && !"6".equals(state) && !"7".equals(state)){
+			if ("1".equals(state)) {
+				// 超过交期项目
+				sql = " and o.order_no in(SELECT distinct order_no FROM orderinfo where orderpaytime<=DATE_SUB(CURDATE(), INTERVAL 5 DAY) and state in(1,2,5))";
+			} else if ("2".equals(state)) {
+				// 建议替换
+				sql = " and o.order_no in(select distinct ops.orderid from order_product_source ops inner join order_details od on ops.od_id=od.id ";
+				if (!"1".equals(admuserid)) {
+					sql+="inner join goods_distribution g on od.id=g.odid ";
+				}
+				sql+="where od.state<2 and (od.od_state = 12 or ops.purchase_state=12)";
+				if (!"1".equals(admuserid)) {
+					sql += " and g.admuserid='"+admuserid+"'";
+				}
+				sql += ") ";
+			} else if ("3".equals(state)) {
+				// 同意替换
+				sql = " and o.order_no in(select distinct ops.orderid from order_product_source ops inner join order_details od on ops.od_id=od.id ";
+				if (!"1".equals(admuserid)) {
+					sql+="inner join goods_distribution g on od.id=g.odid ";
+				}
+				sql+="where od.state<2 AND (ops.purchase_state = 13 or od.od_state=13) and ops.purchase_state not in (3,4,6,8)";
+				if (!"1".equals(admuserid)) {
+					sql += " and g.admuserid='"+admuserid+"'";
+				}
+				sql += ")";
+			} else if ("4".equals(state)) {
+				// 验货有疑问
+				sql = " and o.order_no in(select distinct id.orderid from goods_distribution g inner join id_relationtable id on g.orderid=id.orderid and g.goodsid=id.goodid inner join order_details od on id.goodid=od.goodsid where id.is_delete=0 and id.is_replenishment=1 and id.goodstatus<>1 and od.state=1 and od.checked=0 ";
+				if (!"1".equals(admuserid)) {
+					sql += "and g.admuserid='"+admuserid+"'";
+				}
+				sql += ") and o.state not in(6,-1) ";
+			}
+			String sql1 = "select count(order_no) ordernonum, GROUP_CONCAT(\"'\",CONCAT(order_no,\"'\")) ordernoarray from (select DISTINCT o.order_no from orderinfo o inner join admin_r_user a on o.user_id=a.userid where a.admName <> 'testAdm' and o.state>0 and state<6 and 1=1 ";
+			// 0 代表管理员
+			if (!"1".equals(admuserid)) {
+				sql1 += "and o.order_no in(select DISTINCT orderid from goods_distribution where admuserid='"+ admuserid + "') ";
+			}
+			sql1 += sql + " )a";
+			Map<String, Object> map1 = new HashMap<String, Object>();
+			map1.put("sql", sql1);
+			OrderInfoCountPojo oicp = iWarehouseService.getOrderInfoCountByState(map1);
+			if (oicp.getOrdernoarray() == null || "".equals(oicp.getOrdernoarray())) {
+				oicp.setOrdernoarray("000000000");
+			}
+			return JSONObject.fromObject(oicp).toString();
+		}else if("5".equals(state)){
+			Map<String, Object> map1 = new HashMap<String, Object>();
+			map1.put("admin",admuserid);
+			String username = iWarehouseService.getBuyerNames(admuserid);
+			map1.put("username", username==null?"":username);
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DATE, -1);
+			String yesterday = new SimpleDateFormat("yyyy-MM-dd ").format(cal.getTime());
+			String time=yesterday + "16:00:00";
+			map1.put("times", time);
+			OrderInfoCountPojo oicp = iPurchaseService.getOrderInfoCountNoitemid(map1);
+			List<PurchasesBean> op_list=iPurchaseService.getOrderInfoCountItemid(map1);
+			if(op_list.size()>0){
+				String admName = iPurchaseService.queryBuyCount(Integer.valueOf(op_list.get(0).getConfirm_userid()));
+				for (PurchasesBean p : op_list) {
+					TaoBaoOrderInfo t = server1.getShipStatusInfo(p.getTb_1688_itemid(), p.getLast_tb_1688_itemid(),
+							p.getConfirm_time().substring(0, 10), admName,"",p.getOffline_purchase(),p.getOrderNo(),p.getGoodsid());
+					if(t!=null && !StringUtils.isStrNull(t.getOrderstatus()) && (t.getOrderstatus().indexOf("等待卖家发货")>-1 || t.getOrderstatus().indexOf("等待买家付款")>-1)){
+						if(!oicp.getOrdernoarray().contains(p.getOrderNo())){
+							oicp.setOrdernonum(String.valueOf(Integer.valueOf(oicp.getOrdernonum())+1));
+							String order_str="";
+							if(StringUtils.isStrNull(oicp.getOrdernoarray())){
+								order_str="'"+p.getOrderNo()+"'";
+							}else{
+								order_str=oicp.getOrdernoarray()+",'"+p.getOrderNo()+"'";
+							}
+							oicp.setOrdernoarray(order_str);
+						}
+					}else if(t!=null && !StringUtils.isStrNull(t.getShipno()) && (StringUtils.isStrNull(t.getShipstatus()) || t.getShipstatus().indexOf("了解发货状态")>-1 || StringUtils.isStrNull(t.getShipstatus()))){
+						if(!oicp.getOrdernoarray().contains(p.getOrderNo())){
+							oicp.setOrdernonum(String.valueOf(Integer.valueOf(oicp.getOrdernonum())+1));
+							String order_str="";
+							if(StringUtils.isStrNull(oicp.getOrdernoarray())){
+								order_str="'"+p.getOrderNo()+"'";
+							}else{
+								order_str=oicp.getOrdernoarray()+",'"+p.getOrderNo()+"'";
+							}
+							oicp.setOrdernoarray(order_str);
+						}
+					}
+				}
+			}
+			if (oicp.getOrdernoarray() == null || "".equals(oicp.getOrdernoarray())) {
+				oicp.setOrdernoarray("000000000");
+			}
+			return JSONObject.fromObject(oicp).toString();
+		}else if("6".equals(state)){
+			//查询采购入库有问题包裹
+			Map<String, Object> map1 = new HashMap<String, Object>();
+			map1.put("name", !"1".equals(admuserid)?admuserid:null);
+			OrderInfoCountPojo oicp = iPurchaseService.getNoMatchOrderByTbShipno(map1);
+			return JSONObject.fromObject(oicp).toString();
+		}else if("7".equals(state)){
+			//采购超24H无物流信息(订单)
+			OrderInfoCountPojo oicp=new OrderInfoCountPojo();
+			Map<String, String> map1 = new HashMap<String, String>();
+			map1.put("name", !"1".equals(admuserid)?admuserid:null);
+			List<String> orderids= iPurchaseService.getNoShipInfoOrder(map1);
+			int index_num=0;
+			StringBuilder o=new StringBuilder();
+			for(String orderid:orderids){
+				List<PurchasesBean> list_p=iPurchaseService.getFpOrderDetails(orderid,admuserid);
+				for (PurchasesBean purchasesBean : list_p) {
+					String admName = iPurchaseService.queryBuyCount(purchasesBean.getConfirm_userid());
+					TaoBaoOrderInfo t = server1.getShipStatusInfo(purchasesBean.getTb_1688_itemid(), purchasesBean.getLast_tb_1688_itemid(),
+							purchasesBean.getConfirm_time().substring(0, 10), admName,"",purchasesBean.getOffline_purchase(),orderid,purchasesBean.getGoodsid());
+					if (t != null && t.getShipstatus() != null && t.getShipstatus().length() > 0) {
+
+					}else if(!o.toString().contains(orderid)){
+						o.append("'").append(orderid).append("',");
+						index_num++;
+					}
+				}
+			}
+			oicp.setOrdernonum(String.valueOf(index_num));
+			oicp.setOrdernoarray(o.toString().length()>0?o.toString().substring(0,o.toString().length()-1):"");
+			return JSONObject.fromObject(oicp).toString();
+		}
+		return null;
 	}
 
 	/**

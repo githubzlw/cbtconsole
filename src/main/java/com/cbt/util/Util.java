@@ -18,6 +18,11 @@ public class Util {
 	public static final String CHINESE_CHAR = "([\\一-\\龥]+)",NUM_CHAR=",\\s*",
 			CHAR_ONE=",\\s*\\[",CHAR_TWO="[',\";#\\:]",CHAT_FOUR="&lt;",CHAR_FIVE="&gt;",CHAT_SIX="(\\s+)",
 			CHAR_SEV="(\\[.*\\])",CHAR_W="(\\W+)",CHAR_A="(\\(.*\\))",CHAR_B="(\\.\\s*)",CHAR_C="\\{";
+	public static final String PIC_IP="104.247.194.50";
+	public static final String PIC_PASS="importftp@123";
+	public static final String PIC_USER="importweb";
+	public static final String PIC_PATH="remotePath";
+	public static final String PIC_URL="https://img.import-express.com/importcsvimg/inspectionImg/";
     //单位g 运费
     public static final double PERGRAM = 0.054;
 	// 美元汇率

@@ -15,6 +15,10 @@ public interface IPictureComparisonService {
 	 * @return
 	 */
 	public List<GoodsFarBean> findByAliPicture(int maxC);
+	/*
+	插入商品替换日志
+	 */
+	public int insertChangeGoodsLog(String pUrl,String goodsType,String name,String price,String goodsCarId,String admuserid);
 	
 	/**
 	 * 方法描述:取得lire搜索条件

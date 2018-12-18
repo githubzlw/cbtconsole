@@ -60,11 +60,11 @@
     .body .body-title{font-weight: bold;font-size: 16px;color: #464646;}
     .body .body-text .body-text-cell{text-align: left;font-size: 14px;line-height: 1.6;padding: 10px 0 10px;}
     /* dismantling */
-    .rece_shop{ border: 1px solid #d8d8d8; padding: 8px; font-size: 13px; margin: 10px 0; text-align: left; }
+    .rece_shop{ border: 1px solid #d8d8d8; padding: 8px; font-size: 13px; margin: 10px0; text-align: left; }
     .rece_shop a{ color: #00B1FF; }
     .rece_shop a:hover{ text-decoration: underline;}
     .rece_shop p{ margin-bottom: 0;}
-    .estima_time{ margin-bottom: 0px;}
+    .estima_time{ margin-bottom: 0px; text-align: left;}
     .dismantling_box{ width: 100%; text-align: left; margin: 15px auto 0; }
     .order_number{ background-color: #e7e7e7; color: #464646; padding-left: 5px; text-align: left;}
     .order_first{ width: 100%; margin: 0 auto 20px; }
@@ -208,7 +208,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                     <td class="soapbox-title" th:text="${title}">ImportExpress Mail Dismantling</td>
+                     <td class="soapbox-title" th:text="${title}">Import Express Split Order Reminder</td>
                     <!--  拆单取消退款 标题
                      <td class="soapbox-title">Your Import Express order was partially cancelled</td>-->
                   </tr>
@@ -279,8 +279,7 @@
                                   th:text="${orderbean_.orderNo}">QA18474027512271_1</span></strong>
                         </p>
                         <p class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</p>
-                        <p class="order_items order_items2" th:if="${state == 0}">Items we can not supply:</p>
-
+                        <p class="order_items order_items2" th:if="${state == 0}">Products unavailable:</p>
                         <div class="order_first">
                           <ul class="clearfix">
                             <li class="order_li" th:each="detail,detailStat:${details_}">

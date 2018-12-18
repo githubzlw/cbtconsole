@@ -329,6 +329,7 @@
     <div style="margin-bottom: 20px;">
     	<form method="post" enctype="multipart/form-data">
 	    	<table>
+                <input type="hidden" id="authorized_id" name="authorized_id"/>
 	    		<tr>
 	    			<td>店铺 ID:</td>
 	    			<td><input type="text" readonly="readonly" id="authorized_shop_id" name="authorized_shop_id" 
@@ -368,6 +369,9 @@
            onclick="saveAuthorizedInfo()" style="width: 80px">保存</a> 
         <a href="javascript:void(0)" class="easyui-linkbutton"
            onclick="$('#authorized_dlg').dialog('close');" style="width: 80px">关闭</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="javascript:void(0)" class="easyui-linkbutton"
+           onclick="deleteAuthorizedInfo()" style="width: 80px">删除</a>
     </div>
 </div>
 
@@ -913,6 +917,7 @@
 		$('#startTime').datebox('setValue', "");
 		$('#endTime').datebox('setValue', "");
         $("#authorized_remark").val("");
+        $("#authorized_id").val("");
         $.ajax({
         	type: "GET",
         	url: "/cbtconsole/tabseachpage/queryAuthorizedInfo?shopId=" + shopId,
@@ -920,8 +925,9 @@
         	success: function(msg){
         		$("#authorized_shop_id").val(shopId);
         		if(msg.status){
-        			if (msg.bean != undefined) {
-        				if (msg.bean.fileUrl != undefined) {
+                    if (msg.bean != undefined) {
+                        $("#authorized_id").val(msg.bean.id);
+                        if (msg.bean.fileUrl != undefined) {
 		        			$('#authorized_filename').attr("href", msg.bean.fileUrl);
 		        			$('#authorized_filename').html("之前上传的授权文件:" + msg.bean.fileName + "(" + msg.bean.admuser + ")");
 						}
@@ -967,6 +973,29 @@
     	    }    
     	});  
     	$("#authorized_dlg form").submit();
+	}
+
+    function deleteAuthorizedInfo() {
+        var shopId = $("#authorized_shop_id").val();
+        if($.isEmptyObject(shopId)){
+            $.messager.alert('message','店铺id为空!');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/tabseachpage/deleteAuthorizedInfo.do?shopId=" + shopId,
+            dataType:"json",
+            success: function(res){
+                if(res.status) {
+                    $.messager.alert('message',res.message);
+                    $('#authorized_dlg').window('close');
+                    $('#authorized_dlg form').form('clear');
+                    doQuery(1);
+                }else{
+                    $.messager.alert('message',res.message);
+                }
+            }
+        });
 	}
 
     function saveReadyDeleteShop() {

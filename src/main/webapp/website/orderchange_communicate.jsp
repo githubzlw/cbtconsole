@@ -121,7 +121,7 @@
 		<table border="0">
 			<tr>
 				<td rowspan="2">问题:</td>
-				<td rowspan="2"><textarea rows="3" cols="20" name="newCommunicate" id="newCommunicate" style="width: 390px;height: 100px;"></textarea></td>
+				<td rowspan="2"><textarea rows="3" cols="20" name="newCommunicate" id="newCommunicate"></textarea></td>
 				<td colspan="2">
 					<label style="display: none;color:rend" id="send1">已发送，3秒后刷新</label><label style="display: none;color:rend" id="send2">已解决，3秒后刷新</label>
 				</td>
@@ -134,7 +134,7 @@
 	
 	<div id="addCon">
 	<table>
-        <tr><td>内容&nbsp;&nbsp;<span style="color: #CCC;">(注:保存发送之后后台都要5分钟左右的同步时间才可显示)</span></td></tr>
+		<tr><td>内容</td></tr>
 	<c:forEach items="${cont}" var="consss">
 		<tr>
 			<td>${consss}</td>

@@ -85,12 +85,6 @@
 		<result column="picturepath" property="picturepath"/>
 		<result column="position" property="position"/>
 	</resultMap>
-
-	<select id="getIsReplenishments" resultType="com.cbt.warehouse.pojo.Replenishment_RecordPojo">
-		select a.acount,a.price,a.createtime,b.admName as admuserid,a.goods_p_url,a.remark from replenishment_record a inner join admuser b on a.admuserid=b.id where a.orderid='${orderid}' and a.goodsid='${goodsid}'
-	   order by a.createtime
-	</select>
-
 	<resultMap id="PurchaseBeanResult" type="com.cbt.website.bean.PurchaseBean" >
 		<result column="userid" property="userid"/>
 		<result column="name" property="name"/>
@@ -185,7 +179,7 @@
     	insert into storage_location (barcode,region,`row`,`column`,position) values(#{0},#{1},#{2},#{3},#{4});
     </insert>
 	<insert id="insertId_relationtable">
-    	insert into id_relationtable (orderid,goodid,goodurl,userid,createtime,goodstatus,state,odid) values('${orderid}','${goodsid}','${goodsurl}','${admid}',now(),'1','1',#{odid});
+    	insert into id_relationtable (orderid,goodid,goodurl,userid,createtime,goodstatus,state,odid) values(#{orderid},#{goodsid},#{goodsurl},#{admid},now(),'1','1',#{odid});
     </insert>
 	<select id="findOutId" parameterType="java.lang.Integer" resultType="com.cbt.website.bean.outIdBean">
 		select distinct(oi.user_id) as id,user.email from orderinfo oi,payment pm,user where pm.orderid=oi.order_no and oi.state='2' and user.id=oi.user_id
@@ -199,7 +193,7 @@
 
 	<!-- 显示订单问题描述 -->
 	<select id="getOrderProblem" resultType="java.lang.String">
-		select problem from order_fee where orderno='${orderno}' and state='3' limit 1
+		select problem from order_fee where orderno=#{orderno} and state='3' limit 1
 	</select>
 
 	<!-- 取地址 -->
@@ -207,77 +201,6 @@
 		select z.country,oa.statename,oa.address2,oa.address,oa.zipcode,oa.street
 		from zone z,order_address oa where z.id=oa.country and orderNo=#{orderNo}
 	</select>
-	<select id="getfpCount" resultType="String">
-		select count(distinct g.goods_pid) from goods_distribution g inner join order_details od on g.odid=od.id inner join orderinfo o on od.orderid=o.order_no left join admin_r_user a on o.user_id=a.userid
-		where 1=1
-		<if test="buyid != 1 and buyid != 83 and buyid != 84">
-			and g.admuserid='${buyid}'
-		</if>
-		and LEFT(g.createtime,7)=LEFT(NOW(),7)
-		and od.state<![CDATA[<]]>2  and o.state>0 and o.state<![CDATA[<]]>6
-		and a.admName<![CDATA[<>]]>'testAdm'
-	</select>
-	<!-- 当前还剩采购数量 -->
-	<select id="getCgCount" resultType="String">
-		SELECT count(*) from	(
-		SELECT gd.goods_url ,ops.goods_url as goodsurl,max(gd.orderid) orderid FROM(
-		SELECT goods_distribution.goods_url,goods_distribution.odid,goods_distribution.orderid FROM goods_distribution, order_details WHERE 1=1
-		<if test="buyid != 1 and buyid != 83 and buyid != 84">
-			and goods_distribution.admuserid = '${buyid}'
-		</if>
-		AND goods_distribution.odid = order_details.id
-		AND order_details.state  &lt; 2
-		AND order_details.userid not in (SELECT userid from	 admin_r_user where	 admin_r_user.admName ='testAdm')
-		group by goods_distribution.goods_url,goods_distribution.odid,goods_distribution.orderid
-		) gd
-		LEFT JOIN order_product_source ops ON gd.orderid = ops.orderid AND gd.odid = ops.od_id
-		where gd.orderid not in 	 (SELECT order_no AS  gs_orderid from	 orderinfo where	 state in ('-1','6'))
-		group by gd.goods_url
-		HAVING goodsurl IS NULL) gb
-
-	</select>
-	<!-- 当日分配采购种类 -->
-	<select id="getDistributionCount" resultType="String">
-		SELECT COUNT(DISTINCT od.goods_pid) FROM goods_distribution  g INNER JOIN order_details od ON g.orderid=od.orderid AND g.goodsid=od.goodsid
-		INNER JOIN orderinfo o ON od.orderid=o.order_no
-		left JOIN admin_r_user a ON o.user_id=a.userid
-		WHERE  LEFT(g.createtime,10)=LEFT(NOW(),10)
-		<if test="buyid != 1 and buyid != 83 and buyid != 84">
-			AND g.admuserid='${buyid}'
-		</if>
-		and od.state<![CDATA[<]]>2  and a.admName<![CDATA[<>]]>'testAdm' and o.state>0 and o.state<![CDATA[<]]>6
-	</select>
-	<!-- 当月已经采购的数量 -->
-	<select id="getMCgCount" resultType="String">
-		select count(distinct od.goods_pid) from order_product_source ops
-		inner join order_details od on ops.orderid=od.orderid AND ops.goodsid=od.goodsid
-		inner join orderinfo o on od.orderid=o.order_no
-		left join admin_r_user a on o.user_id=a.userid
-		where LEFT(ops.confirm_time,7)=LEFT(NOW(),7)
-		<if test="buyid != 1">
-			and ops.confirm_userid='${buyid}'
-		</if>
-		and od.state<![CDATA[<]]>2  and a.admName<![CDATA[<>]]>'testAdm' and o.state>0 and o.state<![CDATA[<]]>6
-		and ops.purchase_state in (3,4,6,8)
-
-	</select>
-	<!-- 当前实际采购数量 -->
-	<select id="getSjCgCount" resultType="String">
-		select count(distinct od.goods_pid) from order_product_source ops inner join order_details od on ops.orderid=od.orderid AND ops.goodsid=od.goodsid  inner join orderinfo o on od.orderid=o.order_no
-		left join admin_r_user a on o.user_id=a.userid
-		where TO_DAYS(ops.confirm_time)=TO_DAYS(NOW())
-		<if test="buyid != 1">
-			and ops.confirm_userid='${buyid}'
-		</if>
-		and od.state<![CDATA[<]]>2
-		and a.admName<![CDATA[<>]]>'testAdm'
-		and o.state>0 and o.state<![CDATA[<]]>6
-		and ops.purchase_state=3
-
-	</select>
-
-
-	<!-- 	start -->
 	<select id="getAddressByOrderID2" resultType="java.lang.String">
 		select concat(oa.street,',',oa.address,',',oa.address2,',',oa.statename,',',oa.zipcode,',',z.country) address from zone z,order_address oa where z.id=oa.country and orderNo ='O2253294600230983'
 	</select>
@@ -326,16 +249,8 @@
 	<select id="getBuyerName" resultType="java.lang.String">
 		SELECT account FROM tb_1688_accounts WHERE adminid=#{admuserid} and del=1
 	</select>
-	<select id="getOrderInfoCountNoitemid" resultType="com.cbt.warehouse.pojo.OrderInfoCountPojo">
-		CALL query_noItemid(#{admin},#{username},#{times});
-	</select>
 	<select id="getBuyerNames" resultType="java.lang.String">
 		SELECT account FROM tb_1688_accounts WHERE adminid=#{admuserid} and del=1 order by del desc limit 1
-	</select>
-	<select id="getOrderInfoCountItemid" resultType="com.cbt.website.bean.PurchasesBean">
-		SELECT DISTINCT os.tb_1688_itemid,os.last_tb_1688_itemid,os.confirm_time,os.offline_purchase,os.orderid as orderNo,os.goodsid,os.confirm_userid  FROM orderinfo oi,order_product_source   os,admin_r_user ar WHERE  oi.order_no=os.orderid
-		AND os.confirm_userid=#{admin} AND oi.create_time>'2017-07-04' AND os.confirm_time &lt; #{times}
-		AND oi.state=1 AND oi.user_id=ar.userid AND ar.adminid &lt;&gt; '18' AND os.purchase_state=3 AND os.goodsid &lt;&gt; '1400'
 	</select>
 	<!-- 库位对照分页总记录个数 -->
 	<select id="getCountOrderinfo" resultType="java.lang.Integer">
@@ -896,7 +811,7 @@
 		select DISTINCT lf.createtime,ops.orderid,ops.goods_p_url,lf.logistics_id,lf.taobao_itemid,ops.goodsid,lf.tb_state from
 		(select * from order_product_source where DATE_SUB(CURDATE(), INTERVAL 2 MONTH)  &lt;= date(addtime) )  ops
 		left join logisticsinfo lf on ops.goods_p_url like CONCAT('%',lf.taobao_itemid,'%')
-		where ops.goodsid = '${goodsid}'
+		where ops.goodsid = #{goodsid}
 		and lf.logistics_id is not null and lf.logistics_id != ''
 		and lf.tb_state is not null
 		order by lf.createtime desc LIMIT 1
@@ -992,42 +907,14 @@
 		${sql}
 	</select>
 
-
-	<!-- 补货 -->
-	<insert id="insertOrderReplenishment">
-		<![CDATA[
-    	insert into order_replenishment (
-    		goods_type,
-    		goods_title,
-			userid,
-			orderid,
-			goodsid,
-			goods_url,
-			goods_p_url,
-			goods_price,
-			buycount,
-			remark,
-			tb_1688_itemid,
-			rep_type,
-			createtime,
-			shop_id,
-			od_id
-			) values('${goods_type}','${goods_title}','${userid}','${orderid}','${goodsid}','${goods_url}','${goods_p_url}','${goods_price}','${buycount}','${remark}','${tb_1688_itemid}','${rep_type}',NOW(),'${shop_id}',#{odid});
-   ]]>
-	</insert>
-
 	<!-- 商品 是否 存在 补货 -->
 	<select id="getIsReplenishment" resultType="com.cbt.warehouse.pojo.OrderReplenishmentPojo">
-		select * from order_replenishment where orderid='${orderid}' and goodsid='${goodsid}'
+		select * from order_replenishment where orderid=#{orderid} and goodsid=#{goodsid}
 		<if test="goods_type != null and goods_type != '' ">
 			and goods_type='${goods_type}'
 		</if>
 		order by createtime
 	</select>
-	<update id="updateReplenishmentState">
-		update order_product_source set is_replenishment=1 where od_id=#{odid} and orderid=#{orderid}
-	</update>
-
 	<!-- 根据订单查询地址 -->
 	<select id="getOrderAddress" resultType="String">
 		select z.country from order_address oa inner join zone z on z.id=oa.country and oa.orderNo='${orderid}' LIMIT 1
@@ -1212,10 +1099,6 @@
 		select sum(yourorder) yourorder from order_details where  orderid in(${orderids}) group by car_url
 		) a
 	</select>
-	<insert id="addReplenishmentRecord">
-		INSERT INTO replenishment_record (acount,price,goods_p_url,remark,createtime,admuserid,goodsid,orderid,odid) VALUES
-		(#{buycount},#{goods_price},#{goods_p_url},#{remark},NOW(),#{admuserid},#{goodsid},#{orderid},#{odid})
-	</insert>
 	<select id="getPackageInfo" resultType="com.cbt.warehouse.pojo.ShippingPackage">
 		select * from shipping_package where shipmentno='${shipmentno}'
 	</select>
@@ -1487,17 +1370,17 @@
 			1
 		</if>
 
-		where orderid='${orderid}' and goodsid='${goodsid}'
+		where orderid=#{orderid} and goodsid=#{goodsid}
 	</update>
 
 	<update id="updateRemainingPrice" parameterType="java.util.Map">
 		update orderinfo set remaining_price='${remaining_price}'
-		where order_no='${orderid}'
+		where order_no=#{orderid}
 	</update>
 
 	<update id="updateSendMail" parameterType="java.util.Map">
 		update shipping_package set issendmail=1
-		where orderid='${orderid}'
+		where orderid=#{orderid}
 	</update>
 
 
@@ -2413,9 +2296,6 @@
 	<select id="getGname" resultType="java.lang.String">
 		select gname from grade_discount where gid=#{gid}
 	</select>
-	<select id="getIsOfflinepurchase" resultType="com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo">
-		select a.shipno,a.createtime,b.admName as admuserid,a.goods_p_url,a.tb_orderid from offline_purchase_records a inner join admuser b on a.admuserid=b.id where a.orderid=#{orderid} and a.goodsid=#{goodsid}
-	</select>
 	<select id="getShopManagerList" resultType="com.cbt.website.bean.ShopManagerPojo">
 		SELECT DISTINCT s.*,GROUP_CONCAT(a.pic SEPARATOR '@') AS imgs FROM shop_manager s LEFT JOIN ali1688_company_offers_details a ON s.shop_id=a.shop_id WHERE 1=1
 		<if test="shop_name != null">
@@ -2457,266 +2337,8 @@
 			and a.goods_pid like '%${goods_pid}%'
 		</if>
 	</select>
-	<select id="getPrePurchase" resultType="com.cbt.website.bean.PrePurchasePojo">
-		SELECT DISTINCT o.order_no as orderid,o.user_id,o.orderpaytime as paytime,o.delivery_time as domesticTime,o.product_cost,o.state as status,obi.remark,
-		func_get_split_string(mode_transport,'@',3) AS country,func_get_split_string(mode_transport,'@',2) as delaytime,ad.admName as saleer,LEFT(g.createtime,10) as fptime
-		FROM orderinfo o left JOIN admin_r_user a ON o.user_id=a.userid
-		<if test="admuserid != 61 and state != 9">
-			and a.admName<![CDATA[<>]]>'testAdm'
-		</if>
-		LEFT JOIN admuser ad ON a.adminid=ad.id
-		INNER JOIN goods_distribution g ON g.orderid=o.order_no
-		left join order_buy_info obi on obi.orderid=o.order_no and obi.admuser=#{admuserid}
-		inner join order_details od on g.orderid=od.orderid AND g.odid=od.id
-		<if test="state == 2 or state == 4">
-			left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
-		</if>
-		<if test="state == 3">
-			left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.goodstatus<![CDATA[<>]]>1 and id.is_delete=0
-		</if>
-		<if test="state == 0 or state == 1 or state == 2">
-			left join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-		</if>
-		<if test="state == 10">
-			inner join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-		</if>
-		WHERE 1=1
-		<if test="state == 1 or state == 2">
-			AND od.state<![CDATA[<>]]>2 AND o.state=1
-		</if>
-		<if test="state == 0">
-			AND od.state<![CDATA[<>]]>2 AND o.state in (1,5)
-		</if>
-		<if test="state == 3 or state == 5">
-			AND o.state=2
-		</if>
-		<if test="state == 4">
-			AND o.state>0 and o.state<![CDATA[<]]>6
-		</if>
-		<if test="state == 6">
-			AND o.state=3
-		</if>
-		<if test="state == 7">
-			AND o.state=4
-		</if>
-		<if test="state == 8">
-			AND o.state in (-1,6)
-		</if>
-		<if test="state == 9">
-			AND o.isDropshipOrder=3
-		</if>
-		<if test="state != 9">
-			AND o.isDropshipOrder<![CDATA[<>]]>3
-		</if>
-		<if test="orderid != null">
-			and g.orderid in (${orderid})
-		</if>
-		<if test="userid != null">
-			and o.user_id=#{userid}
-		</if>
-		<if test="goodsid != null">
-			and (od.goodsid=#{goodsid} or od.id=#{goodsid})
-		</if>
-		<if test="days != null and days != '999'">
-			and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
-		</if>
-		<if test="goods_name != null">
-			and od.goodsname like '%${goods_name}%'
-		</if>
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			and g.admuserid=#{admuserid}
-		</if>
-		group by o.order_no
-		<if test="state == 0">
-			HAVING COUNT(ops.id)<![CDATA[<=]]>0
-		</if>
-		<if test="state == 1">
-			HAVING COUNT(distinct ops.id)>0 and COUNT(distinct ops.id)<![CDATA[<]]>COUNT(distinct g.id)
-		</if>
-		<if test="state == 2">
-			HAVING COUNT(distinct ops.id)=COUNT(distinct g.id) and count(distinct id.id)<![CDATA[<]]>COUNT(distinct ops.id)
-		</if>
-		<if test="state == 3">
-			HAVING IFNULL(COUNT(id.id),0)!=0
-		</if>
-		<if test="state == 4">
-			having sum(IFNULL(od.checked,0))=0 and COUNT(distinct g.id)=count(distinct id.id)
-		</if>
-		<if test="state == 5">
-			having sum(IFNULL(od.checked,0))=COUNT(distinct g.id)
-		</if>
-		<if test="state == 10">
-			having SUM(ops.buycount)>SUM(od.yourorder*(CASE WHEN GetNum(od.seilUnit) ='' THEN 1 ELSE GetNum(od.seilUnit) END))
-		</if>
-		ORDER BY o.orderpaytime DESC limit ${page},40;
-	</select>
-	<select id="getChecked" resultType="INTEGER">
-		SELECT IFNULL(COUNT(od.checked),0) FROM goods_distribution g
-		INNER JOIN order_details od ON g.orderid=od.orderid AND g.odid=od.id
-		INNER JOIN orderinfo o ON od.orderid=o.order_no
-		WHERE
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			g.admuserid='${admuserid}' AND
-		</if>
-		g.orderid =#{orderid} AND od.state<![CDATA[<]]>2
-		AND o.state>0 AND o.state<![CDATA[<]]>6 AND od.checked=1
-	</select>
 	<select id="getCountOd" resultType="INTEGER">
 		SELECT ifnull(COUNT(id),0) FROM order_details od WHERE od.orderid =#{orderid} AND od.state<![CDATA[<]]>2
-	</select>
-	<select id="getProblem" resultType="java.lang.String">
-		SELECT distinct goodid
-		FROM goods_distribution g INNER JOIN id_relationtable id ON g.orderid=id.orderid AND g.odid=id.odid
-		inner join order_details od on id.orderid=od.orderid and id.odid=od.id
-		inner join orderinfo oi on od.orderid=oi.order_no
-		WHERE
-		<if test="admuserid != 1 and admuserid != 83  and admuserid != 84">
-			g.admuserid='${admuserid}' and
-		</if>
-		g.orderid=#{orderid} and id.goodstatus&lt;>1 and id.is_replenishment=1 and id.is_delete=0 and od.state&lt;2 and oi.state between 1 and 5
-	</select>
-	<select id="getStorageCount" resultType="INTEGER">
-		select ifnull(count(distinct id.id),0) from goods_distribution g
-		inner join id_relationtable id on g.orderid=id.orderid and g.odid=id.odid and id.is_replenishment=1 and id.is_delete=0
-		inner join order_details od on id.orderid=od.orderid and id.odid=od.id
-		INNER JOIN orderinfo o ON od.orderid=o.order_no left JOIN admin_r_user a ON o.user_id=a.userid
-		<if test="admuserid != 61">
-			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm' )
-		</if>
-		where g.orderid=#{orderid}
-		<if test="admuserid != 1 and admuserid != 83  and admuserid != 84">
-			and g.admuserid='${admuserid}'
-		</if>
-		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
-	</select>
-	<select id="getFpCount" resultType="INTEGER">
-		SELECT COUNT(g.id) FROM  goods_distribution g INNER JOIN order_details od ON g.orderid=od.orderid AND g.odid=od.id
-		INNER JOIN orderinfo o ON od.orderid=o.order_no left JOIN admin_r_user a ON o.user_id=a.userid
-		<if test="admuserid != 61">
-			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm')
-		</if>
-		WHERE g.orderid =#{orderid}
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			and g.admuserid='${admuserid}'
-		</if>
-		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
-	</select>
-	<select id="getFpOrderDetails" resultType="com.cbt.website.bean.PurchasesBean">
-		SELECT ops.goodsid,ops.purchase_state,ifnull(ops.confirm_userid,0) as confirm_userid,ops.tb_1688_itemid,ops.last_tb_1688_itemid,ops.offline_purchase,ops.confirm_time
-		FROM  goods_distribution g INNER JOIN order_details od ON g.odid=od.id
-		INNER JOIN orderinfo o ON od.orderid=o.order_no left JOIN admin_r_user a ON o.user_id=a.userid
-		inner JOIN order_product_source ops ON ops.orderid=od.orderid AND ops.od_id=od.id
-		WHERE g.orderid =#{orderid}  and ops.purchase_state=3
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			and g.admuserid='${admuserid}'
-		</if>
-		AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
-		<if test="admuserid != 61">
-			AND a.admName<![CDATA[<>]]>'testAdm'
-		</if>
-	</select>
-	<select id="getPurchaseCount" resultType="INTEGER">
-		SELECT COUNT(ops.id) FROM order_product_source ops
-		INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.od_id=od.id
-		INNER JOIN orderinfo o ON od.orderid=o.order_no left JOIN admin_r_user a ON o.user_id=a.userid
-		<if test="admuserid != 61">
-			AND IF(o.isDropshipOrder=3,1=1,a.admName<![CDATA[<>]]>'testAdm')
-		</if>
-		WHERE
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			ops.confirm_userid='${admuserid}' AND
-		</if>
-		ops.orderid =#{orderid} AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
-		AND ops.purchase_state IN(3,4,6,8,12,13)
-	</select>
-	<select id="getPrePurchaseCount" resultType="java.lang.String">
-		SELECT distinct o.order_no
-		FROM orderinfo o left JOIN admin_r_user a ON o.user_id=a.userid
-		<if test="admuserid != 61  and state != 9">
-			and a.admName<![CDATA[<>]]>'testAdm'
-		</if>
-		INNER JOIN goods_distribution g ON g.orderid=o.order_no
-		inner join order_details od on g.orderid=od.orderid AND g.odid=od.id
-		<if test="state == 2 or state == 4">
-			left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
-		</if>
-		<if test="state == 3">
-			left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.goodstatus<![CDATA[<>]]>1 and id.is_delete=0
-		</if>
-		<if test="state == 0 or state == 1 or state == 2">
-			left join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-		</if>
-		<if test="state == 10">
-			inner join order_product_source ops on ops.orderid=od.orderid AND ops.od_id=od.id  AND ops.purchase_state IN(3,4,6,8)
-		</if>
-		WHERE 1=1
-		<if test="state == 1 or state == 2">
-			AND od.state<![CDATA[<>]]>2 AND o.state=1
-		</if>
-		<if test="state == 0">
-			AND od.state<![CDATA[<>]]>2 AND o.state in (1,5)
-		</if>
-		<if test="state == 3 or state == 5">
-			AND o.state=2
-		</if>
-		<if test="state == 4">
-			AND o.state>0 and o.state<![CDATA[<]]>6
-		</if>
-		<if test="state == 6">
-			AND o.state=3
-		</if>
-		<if test="state == 7">
-			AND o.state=4
-		</if>
-		<if test="state == 8">
-			AND o.state in (-1,6)
-		</if>
-		<if test="state == 9">
-			AND o.isDropshipOrder=3
-		</if>
-		<if test="state != 9">
-			AND o.isDropshipOrder<![CDATA[<>]]>3
-		</if>
-		<if test="orderid != null">
-			and g.orderid in (${orderid})
-		</if>
-		<if test="userid != null">
-			and o.user_id=#{userid}
-		</if>
-		<if test="days != null and days != '999'">
-			and g.createtime>DATE_ADD(NOW(),INTERVAL -${days} DAY)
-		</if>
-		<if test="goodsid != null">
-			and (g.goodsid=#{goodsid} or od.id=#{goodsid})
-		</if>
-		<if test="goods_name != null">
-			and od.goodsname like '%${goods_name}%'
-		</if>
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			and g.admuserid=#{admuserid}
-		</if>
-		group by o.order_no
-		<if test="state == 0">
-			HAVING COUNT(ops.id)<![CDATA[<=]]>0
-		</if>
-		<if test="state == 1">
-			HAVING COUNT(distinct ops.id)>0 and COUNT(distinct ops.id)<![CDATA[<]]>COUNT(distinct g.id)
-		</if>
-		<if test="state == 2">
-			HAVING COUNT(distinct ops.id)=COUNT(distinct g.id) and count(distinct id.id)<![CDATA[<]]>COUNT(distinct ops.id)
-		</if>
-		<if test="state == 3">
-			HAVING IFNULL(COUNT(id.id),0)!=0
-		</if>
-		<if test="state == 4">
-			having sum(IFNULL(od.checked,0))=0 and COUNT(distinct g.id)=count(distinct id.id)
-		</if>
-		<if test="state == 5">
-			having sum(IFNULL(od.checked,0))=COUNT(distinct g.id)
-		</if>
-		<if test="state == 10">
-			having SUM(ops.buycount)>SUM(od.yourorder*(CASE WHEN GetNum(od.seilUnit) ='' THEN 1 ELSE GetNum(od.seilUnit) END))
-		</if>
 	</select>
 	<select id="getAllBuyer" resultType="com.cbt.pojo.AdmuserPojo">
 		SELECT * FROM admuser  WHERE STATUS =1 AND roleType IN (3,5)
@@ -2724,13 +2346,6 @@
 			and id=${admuserid}
 		</if>
 		order by admName asc
-	</select>
-	<select id="getGoodsInfo" resultType="INTEGER">
-		SELECT COUNT(DISTINCT gc.id) FROM goods_distribution g INNER JOIN goods_communication_info gc ON g.orderid=gc.orderid AND g.odid=gc.odid and gc.is_read=0
-		WHERE g.orderid =#{orderid}
-		<if test="admuserid != 1 and admuserid != 83 and admuserid != 84">
-			AND g.admuserid='${admuserid}'
-		</if>
 	</select>
 	<select id="getInfos" resultType="java.lang.String">
 		SELECT DISTINCT order_no FROM message_notification WHERE IFNULL(is_read,'N') = 'N' AND sender_id = #{admid} AND send_type=9
@@ -2911,40 +2526,9 @@
 	<insert id="insertStorageProblemOrder">
 		insert into storage_problem_order (shipno,orderid,username,createtime,storage_name) values(#{expresstrackid},#{tbOrderId},#{remarkUserId},now(),#{name})
 	</insert>
-	<select id="getNoMatchOrderByTbShipno" resultType="com.cbt.warehouse.pojo.OrderInfoCountPojo">
-		SELECT COUNT(a.orderid) ordernonum, GROUP_CONCAT("'",CONCAT(a.orderid,"'")) ordernoarray FROM (
-		SELECT c.orderid,c.shipno,c.adminname,c.createtime FROM (
-		SELECT DISTINCT t.orderid,t.shipno,a.adminname,s.createtime FROM storage_problem_order s
-		INNER JOIN taobao_1688_order_history t ON s.shipno=t.shipno
-		INNER JOIN tb_1688_accounts a ON t.username=a.account
-		LEFT JOIN id_relationtable id ON t.orderid=id.tborderid
-		WHERE a.del=1 AND id.id IS NULL AND t.tbOr1688=1 AND LOCATE('退款',t.orderstatus)&lt;=0
-		AND LOCATE('关闭',t.orderstatus)&lt;=0 AND LOCATE('取消',t.orderstatus)&lt;=0
-		AND DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= DATE(s.createtime)
-		<if test="name != null">
-			AND a.adminid=#{name}
-		</if>
-		GROUP BY t.orderid
-		) c LEFT JOIN id_relationtable d ON c.shipno=d.shipno WHERE d.id IS NULL
-		)a
-	</select>
-	<select id="getPrePurchaseForTB" resultType="com.cbt.website.bean.PrePurchasePojo">
-		SELECT distinct t.username as user_id,t.orderid,t.shipno as country,
-		s.storage_name as saleer,s.createtime as fptime
-		FROM taobao_1688_order_history t
-		inner join storage_problem_order s on t.shipno=s.shipno
-		WHERE t.orderid IN (${orderid}) group by t.orderid
-		order by s.id desc
-		limit ${page},40;
-	</select>
-	<select id="getPrePurchaseForTBCount" resultType="com.cbt.website.bean.PrePurchasePojo">
-		SELECT distinct t.username as user_id,t.orderid,t.shipno as country,
-		s.storage_name as saleer,s.createtime as fptime
-		FROM taobao_1688_order_history t
-		inner join storage_problem_order s on t.shipno=s.shipno
-		WHERE t.orderid IN (${orderid}) group by t.orderid
-		order by s.id desc
-	</select>
+	<update id="updateTbState">
+		update taobao_1688_order_history set orderstatus='已退款' where orderid=#{orderid}
+	</update>
 	<update id="updateCrossBorder">
 		update custom_benchmark_ready_newest set samplingStatus=2 where pid=#{goods_pid}
 	</update>
@@ -3817,21 +3401,6 @@
 		email NOT LIKE 'zhouxueyun%')
 		AND a.admName=#{admName}
 	</select>
-	<select id="getNewInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT SUM(IF(flag=0,remaining,new_remaining)) AS admName,SUM(IF(flag=0,inventory_amount,new_inventory_amount)) AS pid
-		FROM inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
-	</select>
-	<select id="getSaleInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT COUNT(lock_remaining)  AS admName,SUM(lock_inventory_amount) AS pid FROM lock_inventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)  AND is_use=1 AND flag=1 and is_delete=0
-	</select>
-	<select id="getLossInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-		SELECT SUM(old_remaining-new_remaining)  AS admName,SUM(loss_amount) AS pid FROM lossInventory WHERE DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(createtime)
-	</select>
-	<select id="getDeleteInventory" resultType="com.cbt.website.bean.PurchaseSamplingStatisticsPojo">
-        SELECT SUM(IF(idd.flag=0,idd.remaining,idd.new_remaining)) AS admName,SUM(IF(idd.flag=0,idd.inventory_amount,idd.new_inventory_amount)) AS pid
-        FROM inventory_log_info ili INNER JOIN inventory_delete_details idd ON ili.in_id=idd.id
-        WHERE ili.remark='库存删除'  AND DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(idd.createtime)
-	</select>
 	<select id="getPriorityCategory" resultType="com.cbt.website.bean.ShopManagerPojo">
 		SELECT  p.id,p.keyword,p.category,p.status,p.minPrice,p.maxPrice,c.en_name as enName
 		FROM priority_category p
@@ -3884,46 +3453,9 @@
 	<select id="getShopSupplier" resultType="com.cbt.website.bean.ShopManagerPojo">
 		SELECT  shop_id as shopId,quality as orderid,IFNULL(remark,'') as totalprice,createtime as orderdate,username FROM supplier_product WHERE shop_id=#{shopId} AND goods_pid=#{shopId}
 	</select>
-	<select id="getNoShipInfoOrder" resultType="java.lang.String">
-		SELECT DISTINCT ops.orderid FROM order_product_source ops
-		INNER JOIN goods_distribution g ON ops.orderid=g.orderid AND g.odid=ops.od_id
-		INNER JOIN order_details od ON ops.orderid=od.orderid AND ops.od_id=od.id
-		INNER JOIN orderinfo oi ON od.orderid=oi.order_no
-		WHERE HOUR(TIMEDIFF(NOW(),ops.confirm_time))>24 AND ops.purchase_state=3
-		AND oi.state BETWEEN 1 AND 5 AND od.state&lt;2
-		AND DATE_SUB(CURDATE(), INTERVAL 30 DAY) &lt;= DATE(oi.orderpaytime)
-		<if test="name != null">
-			AND g.admuserid=#{name}
-		</if>
-		AND EXISTS (
-		SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%' AND id=oi.user_id
-		)
-	</select>
 	<update id="updateCatePrice">
         update priority_category set minPrice=${minPrice} where id=${id}
     </update>
-	<select id="getNotShipped" resultType="java.lang.String">
-		SELECT COUNT(DISTINCT orderid) FROM taobao_1688_order_history WHERE tbOr1688=1 AND LOCATE('退款',orderstatus)&lt;=0 AND LOCATE('关闭',orderstatus)&lt;=0 AND LOCATE('取消',orderstatus)&lt;=0
-		AND delivery_date='' AND orderdate>='2018-07-01 00:00:00'  AND DATE_SUB(orderdate,INTERVAL 1 DAY)
-		<if test="username != null">
-			and username=#{username}
-		</if>
-	</select>
-	<select id="getShippedNoStorage" resultType="java.lang.String">
-		SELECT COUNT(DISTINCT t.orderid) FROM taobao_1688_order_history t
-		LEFT JOIN id_relationtable id ON t.orderid=id.tborderid
-		WHERE t.tbOr1688=1 AND LOCATE('退款',t.orderstatus)&lt;=0 AND LOCATE('关闭',t.orderstatus)&lt;=0 AND LOCATE('取消',t.orderstatus)&lt;=0
-		AND t.delivery_date !='' AND t.orderdate>='2018-07-01 00:00:00'  AND t.delivery_date&lt;=DATE_SUB(CURDATE(),INTERVAL 3 DAY)
-		AND id.id IS NULL
-		<if test="username != null">
-			and t.username=#{username}
-		</if>
-	</select>
 	<select id="getBuyReturnManage" resultType="com.cbt.pojo.TaoBaoOrderInfo">
 		SELECT DISTINCT b.tId as bId,od.orderid as sOrderid,t.id,t.orderid t,t.orderid,t.username,t.orderdate,t.orderstatus,t.imgurl,t.itemurl,t.itemname,t.itemprice,t.itemqty,t.totalprice,t.sku
 		FROM order_details od

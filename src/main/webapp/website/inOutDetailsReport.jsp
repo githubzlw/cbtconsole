@@ -216,7 +216,7 @@ function searchExport(page){
                 	htm_ += '<td align="center"><img src='+reportDetail.car_img+'></img></td>';
                     htm_ += '<td align="center">'+reportDetail.yourorder+'</td>';
                 	htm_ += '<td align="center" style="width:200px">'+reportDetail.car_type +'</td>';
-                	htm_ += '<td align="center">'+reportDetail.types+'</td>';
+                	htm_ += '<td align="center">'+reportDetail.TYPE+'</td>';
                 	htm_ += '<td align="center">'+reportDetail.createtime+'</td>';
                 	htm_ += '<td align="center">'+reportDetail.counts+'</td>';
                     htm_ += '<td align="center">'+reportDetail.goods_pid+'</td>';

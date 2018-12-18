@@ -22,7 +22,12 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	public List<GoodsFarBean> getLireSearchCondition() {
 		return dao.getLireSearchCondition();
 	}
-	
+
+	@Override
+	public int insertChangeGoodsLog(String pUrl, String goodsType, String name, String price, String goodsCarId,String admuserid) {
+		return dao.insertChangeGoodsLog(pUrl,goodsType,name,price,goodsCarId,admuserid);
+	}
+
 	@Override
 	public List<GoodsFarBean> getImgFile() {
 		return dao.getImgFile();

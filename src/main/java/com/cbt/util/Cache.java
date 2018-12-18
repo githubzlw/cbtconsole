@@ -78,6 +78,14 @@ public class Cache {
 		return false;
 	}
 
+    /**
+     * 清除菜单中缓存
+     *
+     */
+    public static void clearCache() {
+        urlList.clear();
+    }
+
 	public static void saveCache(AuthInfo auth) {
 		urlList.add(auth);
 	}

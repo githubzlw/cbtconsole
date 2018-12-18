@@ -45,9 +45,13 @@ public interface TabSeachPageMapper {
 
 	public void move(@Param("id") int id);
 
-	public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean);
+	public long insertAuthorizedInfo(ShopUrlAuthorizedInfoPO bean);
+
+    long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean);
 
 	public ShopUrlAuthorizedInfoPO queryAuthorizedInfo(@Param("shopId") String shopId);
 
 	public List<TabSeachPageBean> queryStaticizeAll();
+
+    long updateAuthorizedInfoValid(@Param("shopId") String shopId, @Param("valid") int valid);
 }

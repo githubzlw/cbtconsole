@@ -199,7 +199,7 @@ public class GuestBookServlet extends HttpServlet {
 			}
 		}
 		
-		int total = ibs.total(userId, parse, state, userName, pname, start, PAGESIZE,timeFrom,timeTo,adminid,qtype);
+		int total = ibs.total(userId, parse, state, userName, pname, start, PAGESIZE,useremail,timeFrom,timeTo,adminid,qtype);
 //		SplitPage.buildPager(request, total, PAGESIZE, page);
 		/*for (GuestBookBean gb : findAll) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.ENGLISH);

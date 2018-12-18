@@ -10,6 +10,8 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.common.StringUtils;
+import com.cbt.customer.service.GuestBookServiceImpl;
+import com.cbt.customer.service.IGuestBookService;
 import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.parse.service.StrUtils;
@@ -19,7 +21,13 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.PurchasesBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
@@ -31,12 +39,15 @@ import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.ibm.icu.math.BigDecimal;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +73,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
 	@Autowired
+	private SendMailFactory sendMailFactory;
+	@Autowired
 	private IOrderinfoService iOrderinfoService;
+	@Autowired
+	private IWarehouseDao dao;
 	int total;
 	int goodsnum = 0;
 
@@ -70,6 +85,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public OrderBean getOrders(String orderNo) {
 		return pruchaseMapper.getOrders(orderNo);
 	}
+	@Override
+	public int getFpCount(String orderid, String admuserid) {
+
+		return pruchaseMapper.getFpCount(orderid,admuserid);
+	}
+
 
 	@Override
 	public Double getAllFreightByOrderid(String orderNo) {
@@ -361,6 +382,27 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public Map<String, Object> queryUserIdAndStateByOrderNo(String orderNo) {
 		return pruchaseMapper.queryUserIdAndStateByOrderNo(orderNo);
 	}
+	@Override
+	public int insertOrderReplenishment(Map<String, Object> map) {
+		map.put("goods_title", map.get("goods_title").toString().replaceAll("'", "&apos;"));
+		return pruchaseMapper.insertOrderReplenishment(map);
+	}
+	@Override
+	public int addReplenishmentRecord(Map<String, Object> map) {
+		return pruchaseMapper.addReplenishmentRecord(map);
+	}
+	@Override
+	public List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map) {
+		return pruchaseMapper.getIsReplenishments(map);
+	}
+	@Override
+	public List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String,Object> map){
+		return pruchaseMapper.getIsOfflinepurchase(map);
+	}
+	@Override
+	public int updateReplenishmentState(Map<String, Object> map) {
+		return pruchaseMapper.updateReplenishmentState(map);
+	}
 
 	@Override
 	public OrderProductSource ShowRmark(String orderNo, int goodsdataid, int goodid, String odid) {
@@ -385,6 +427,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		try{
 			SendMQ sendMQ=new SendMQ();
 			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
+			int isSendEmail=pruchaseMapper.getIsSendEmail(orderid);
 			//查询可以确认采购的商品信息
 			List<Map<String,String>> mapList=pruchaseMapper.getAlCgGoodsInfos(orderid,adminid);
 			for(Map<String,String> gmap:mapList){
@@ -429,10 +472,170 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			datas = bf.toString().length() > 0 ? bf.toString().substring(0,bf.toString().length() - 1) : "";
 			map.clear();
 			sendMQ.closeConn();
+			if(isSendEmail<=0){
+				//发送邮件给客户告知已经发货
+				IGuestBookService ibs = new GuestBookServiceImpl();
+				OrderBean ob=dao.getUserOrderInfoByOrderNo(orderid);
+				Map<String,Object> modelM = new HashedMap();
+				modelM.put("name",ob.getEmail());
+				modelM.put("orderid",orderid);
+				modelM.put("recipients",ob.getRecipients());
+				modelM.put("street",ob.getStreet());
+				modelM.put("street1","");
+				modelM.put("city",ob.getAddress2());
+				modelM.put("state",ob.getStatename());
+				modelM.put("country",ob.getCountry());
+				modelM.put("zipCode",ob.getZipcode());
+				modelM.put("phone",ob.getPhonenumber());
+				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
+				//插入发送邮件记录
+				pruchaseMapper.insertPurchaseEmail(orderid);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
 		return datas;
+	}
+
+	@Override
+	public List<String> getPrePurchaseCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getPrePurchaseCount(map);
+	}
+
+	@Override
+	public List<PrePurchasePojo> getPrePurchase(Map<String, Object> map) {
+		IExpressTrackDao dao1 = new ExpressTrackDaoImpl();
+		IOrderwsServer server1 = new OrderwsServer();
+		List<PrePurchasePojo> list=pruchaseMapper.getPrePurchase(map);
+		for (PrePurchasePojo p : list) {
+			int checked=pruchaseMapper.getChecked(p.getOrderid(),map.get("admuserid").toString());//验货无误商品数量
+			List<String> problem=pruchaseMapper.getProblem(p.getOrderid(),map.get("admuserid").toString());//验货有误商品数量
+			int fp=pruchaseMapper.getFpCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给采购多少个商品
+			int rk=pruchaseMapper.getStorageCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配采购的商品中入库了多少商品
+			int cg=pruchaseMapper.getPurchaseCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给该采购采购了多少商品\
+//            int noShipInfo=dao.getNoShipInfo(p.getOrderid(),map.get("admuserid").toString());
+			//查询该订单有多少没有物流信息的商品数
+			int index_num=0;
+			List<PurchasesBean> list_p=pruchaseMapper.getFpOrderDetails(p.getOrderid(),map.get("admuserid").toString());
+			index_num = getIndexNum(dao1, server1, p, index_num, list_p);
+			if(cg<fp){
+				p.setAmount_s("<span style='background-color:aquamarine'>"+fp+"/"+cg+"</span>");
+			}else{
+				p.setAmount_s("<span style='background-color:yellow'>"+fp+"/"+cg+"</span>");
+			}
+			getAmounts(map, p, checked, problem, fp, rk, cg, index_num);
+			//判断采购订单状态
+			getGoodsStatus(p, checked, problem, fp, rk, cg);
+			p.setProduct_cost(p.getProduct_cost()+" USD");
+			p.setOption("<a target='_blank' href='/cbtconsole/warehouse/getSampleGoods?orderid="+p.getOrderid()+"'>建议采样</a>");
+			int goods_info=pruchaseMapper.getGoodsInfo(p.getOrderid(),map.get("admuserid").toString());
+			//拼接显示页面的订单号信息
+			getOrderIdInfo(map, p, fp, goods_info);
+		}
+		return list;
+	}
+
+	private void getOrderIdInfo(Map<String, Object> map, PrePurchasePojo p, int fp, int goods_info) {
+		if(goods_info>0){
+			if(fp==0){
+				p.setOrderid("<a  style='color:green;' target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
+						+ "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+			}else{
+				p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
+						+ "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a><img src='/cbtconsole/img/tip1.png' style='margin-left:10px;'></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+			}
+		}else{
+			if(fp==0){
+				p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' style='color:green;' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
+						+ "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+			}else{
+				p.setOrderid("<a  target='_blank' title='"+(StringUtils.isStrNull(p.getRemark())?"无":p.getRemark())+"' href='/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0"
+						+ "&admid="+("1".equals(map.get("admuserid")) || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid"))+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid="+p.getUser_id()+"'>"+p.getOrderid()+"</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src='/cbtconsole/img/"+(StringUtils.isStrNull(p.getRemark())?"add_remark.png":"tip_red.png")+"' onclick='addOrderInfo(\""+ p.getOrderid() + "\",\""+ map.get("admuserid").toString() + "\")'  title='添加订单采购备注' style='margin-left:10px;'></img>");
+			}
+		}
+	}
+
+	/**
+	 * 判断采购订单状态
+	 * @param p
+	 * @param checked
+	 * @param problem
+	 * @param fp
+	 * @param rk
+	 * @param cg
+	 */
+	private void getGoodsStatus(PrePurchasePojo p, int checked, List<String> problem, int fp, int rk, int cg) {
+		if ("6".equals(p.getStatus()) || "-1".equals(p.getStatus())) {
+			p.setStatus("<span style='color:green'>订单取消</span>");
+		}else if ("3".equals(p.getStatus())) {
+			p.setStatus("<span style='color:crimson'>出运中</span>");
+		}else if ("4".equals(p.getStatus())) {
+			p.setStatus("<span style='color:green'>完结</span>");
+		}else if(fp==0){
+			p.setStatus("<span style='color:green'>订单中商品已被取消</span>");
+		}else if (cg<=0) {
+			p.setStatus("<span style='color:blueviolet'>未采购</span>");
+		}else if(cg>0 && cg<fp){
+			p.setStatus("<span style='color:green'>采购中</span>");
+		}else if(cg==fp && rk<cg){
+			p.setStatus("<span style='color:blue'>采购完成,但未全部到库</span>");
+		}else if(checked==fp){
+			p.setStatus("<span style='color:green'>已到仓库,验货无误</span>");
+		}else if(problem.size()!=0){
+			p.setStatus("<span style='color:deepskyblue'>已全部到仓库,校验有问题</span>");
+		}else if(rk==fp && rk>checked){
+			p.setStatus("<span style='color:dodgerblue'>已全部到仓库,未校验</span>");
+		}else{
+			p.setStatus("<span style='color:red'>未知状态</span>");
+		}
+	}
+
+	private void getAmounts(Map<String, Object> map, PrePurchasePojo p, int checked, List<String> problem, int fp, int rk, int cg, int index_num) {
+		String numUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201315&search_state=0";
+		String num=index_num>0?"<a href='"+numUrl+"' target='_blank' title='点击查看确认采购1天后还没有物流信息商品'>"+index_num+"</a>":"0";
+		if(problem.size()>0){
+			String toUrl="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid="+("1".equals(map.get("admuserid").toString())  || "83".equals(map.get("admuserid")) || "84".equals(map.get("admuserid"))?"999":map.get("admuserid").toString())+"&orderno="+p.getOrderid()+"&days=999&unpaid=0&pagesize=50&orderarrs=0&goodname=&goodid=5201314&search_state=0";
+			p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:aquamarine'>"+rk+"/"+checked+"/<a href='"+toUrl+"' target='_blank' title='点击查看验货疑问商品'>"+problem.size()+"</a>/"+num+"</span>");
+		}else if(cg>=fp && checked<fp){
+			p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:yellow'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
+		}else if(checked==fp){
+			p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;background-color:#FF00FF'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
+		}else{
+			p.setAmounts("<span style='font-size:19px;text-align:center;vertical-align:middle;'>"+rk+"/"+checked+"/"+problem.size()+"/"+num+"</span>");
+		}
+	}
+
+	private int getIndexNum(IExpressTrackDao dao1, IOrderwsServer server1, PrePurchasePojo p, int index_num, List<PurchasesBean> list_p) {
+		for (PurchasesBean purchasesBean : list_p) {
+			String admName = dao1.queryBuyCount(purchasesBean.getConfirm_userid());
+			TaoBaoOrderInfo t = server1.getShipStatusInfo(purchasesBean.getTb_1688_itemid(), purchasesBean.getLast_tb_1688_itemid(),
+					purchasesBean.getConfirm_time().substring(0, 10), admName,"",purchasesBean.getOffline_purchase(),p.getOrderid(),purchasesBean.getGoodsid());
+			if (t != null && t.getShipstatus() != null && t.getShipstatus().length() > 0) {
+			}else{
+				index_num++;
+			}
+		}
+		return index_num;
+	}
+
+	@Override
+	public List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map) {
+		List<PrePurchasePojo> list=pruchaseMapper.getPrePurchaseForTB(map);
+		for (PrePurchasePojo p : list) {
+			if(p.getRemark().contains("</br>")){
+				p.setStatus("<a target='_blank' style='color:red' href ='javascript:return false;' onclick='return false;'>已处理</a>");
+			}else{
+				p.setStatus("<a target='_blank' href='/cbtconsole/website/purchase_order_details.jsp?orderid="+p.getOrderid()+"&id="+map.get("admuserid")+"'>处理</a>");
+			}
+		}
+		return list;
+	}
+	@Override
+	public List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getPrePurchaseForTBCount(map);
 	}
 
 	@Override
@@ -602,6 +805,75 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Override
 	public String getUserName(int adminid) {
 		return pruchaseMapper.getUserName(adminid);
+	}
+
+	@Override
+	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String, String> map) {
+		return pruchaseMapper.getDetailsChangeInfo(map);
+	}
+
+	@Override
+	public String queryBuyCount(int admuserid) {
+		return pruchaseMapper.queryBuyCount(admuserid);
+	}
+
+	@Override
+	public List<String> getNoShipInfoOrder(Map<String, String> map) {
+		return pruchaseMapper.getNoShipInfoOrder(map);
+	}
+
+	@Override
+	public String getNotShipped(Map<String, Object> map) {
+		return pruchaseMapper.getNotShipped(map);
+	}
+	@Override
+	public String getShippedNoStorage(Map<String, Object> map) {
+		return pruchaseMapper.getShippedNoStorage(map);
+	}
+	//当日分配采购种类
+	@Override
+	public String getDistributionCount(Map<String, Object> map) {
+		return pruchaseMapper.getDistributionCount(map);
+	}
+	@Override
+	public String getCgCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getCgCount(map);
+	}
+	@Override
+	public String getSjCgCount(Map<String, Object> map) {
+		return pruchaseMapper.getSjCgCount(map);
+	}
+	@Override
+	public List<PurchasesBean> getFpOrderDetails(String orderid, String admuserid) {
+		return pruchaseMapper.getFpOrderDetails(orderid,admuserid);
+	}
+	//获得每月采购数量
+	@Override
+	public String getMCgCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getMCgCount(map);
+	}
+	//当月分配种类
+	@Override
+	public String getfpCount(Map<String, Object> map) {
+
+		return pruchaseMapper.getfpCount(map);
+	}
+	@Override
+	public OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map) {
+		return pruchaseMapper.getOrderInfoCountNoitemid(map);
+	}
+
+	@Override
+	public List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map) {
+
+		return pruchaseMapper.getOrderInfoCountItemid(map);
+	}
+	@Override
+	public OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map) {
+
+		return pruchaseMapper.getNoMatchOrderByTbShipno(map);
 	}
 
 	@Override

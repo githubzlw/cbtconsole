@@ -529,15 +529,14 @@ public interface TaoBaoOrderMapper {
 
     public List<InOutDetailsInfo> getIinOutDetailsCount(Map<String, String> map);
 
-    public List<Inventory> getIinOutInventory(Map<Object, Object> map);
+//    public List<Inventory> getIinOutInventory(Map<Object, Object> map);
 
     public List<Map<String,String>> getPidValidState(@Param("pids") String pids);
 
-    public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
+//    public List<Inventory> getIinOutInventoryCount(Map<Object, Object> map);
 
     public List<TaoBaoOrderInfo> queryBuyCount(@Param("torderid") String torderid, @Param("opsorderid") String opsorderid);
 
-    public List<AliCategory> searchAliCategory(@Param("type") String type, @Param("cid") String cid);
 	/**
 	 * 获取库存产品所有类别
 	 * @return
@@ -566,42 +565,13 @@ public interface TaoBaoOrderMapper {
 	 * 添加未入库采购订单备注
 	 */
 	public int updateReply(Map<Object, Object> map);
-	/**
-	 * 标记库存为问题库存
-	 * @Title problem_inventory
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return int
-	 */
-	public int problem_inventory(Map<Object, Object> map);
+
 	/**
 	 * 强制入库
 	 */
 	public int inStorage(Map<Object, Object> map);
 	public String getOperationRemark(Map<Object, Object> map);
     public List<String> getNewBarcode();
-	/**
-	 * 根据ID删除库存数据
-	 */
-	public int deleteInventory(@Param("id") int id,@Param("dRemark") String dRemark);
-    /**
-     *盘点库存库位变更
-     * @param id
-     * @param old_barcode
-     * @param new_barcode
-     * @return
-     */
-    public int insertChangeBarcode(@Param("id") int id, @Param("old_barcode") String old_barcode, @Param("new_barcode") String new_barcode);
-    /**
-     * 损耗库存记录
-     * @Title recordLossInventory
-     * @Description TODO
-     * @param map
-     * @return
-     * @return int
-     */
-    public int recordLossInventory(Map<Object, Object> map);
     /**
      * 获取采购订单备注信息
      * @param id
@@ -673,17 +643,20 @@ public interface TaoBaoOrderMapper {
 
     public int getSourceValidationCount(@Param("buyer") String buyer, @Param("account") String account, @Param("page") int page, @Param("startdate") String startdate, @Param("enddate") String enddate);
 
-    public int isExitBarcode(@Param("barcode") String barcode);
+
+
 	/**
-	 * 根据ID获取库存
+	 * 根据亚马逊录入的pid去查询是否存在库存
+	 * @param map
+	 * @return
 	 */
-	public Inventory queryInById(@Param("id") String id);
-    /**
-     * 查询订单商品详情信息
-     * @param map
-     * @return
-     */
-    public OrderDetailsBean findOrderDetails(Map<Object, Object> map);
+	public Inventory getInventoryByPid(Map<String,String> map);
+	/**
+	 * 录入的库存是新的亚马逊库存,做插入操作
+	 * @param map
+	 * @return
+	 */
+	public int insertInventoryYmx(Map<String,String> map);
 	/**
 	 * 分配给采购的商品实际没有采购
 	 * @param map
@@ -696,12 +669,6 @@ public interface TaoBaoOrderMapper {
 	 * @return
 	 */
 	public List<OrderProductSource> getNopurchaseDistributionCount(Map<String, String> map);
-    /**
-     * 手动录入库存
-     * @param map
-     * @return
-     */
-    public int inventoryEntry(Map<Object, Object> map);
 	/**
 	 * 查询一个商品采购了多次
 	 * @return
@@ -719,12 +686,6 @@ public interface TaoBaoOrderMapper {
 	 * @return
 	 */
 	public String getBuyOrderId(@Param("shipnos") String shipnos);
-    public int updateIsStockFlag(@Param("goods_pid") String goods_pid);
-
-    public int updateIsStockFlag1(@Param("goods_pid") String goods_pid);
-
-    public int updateIsStockFlag2(@Param("goods_pid") String goods_pid);
-
 	   /**
 	    * 更新库存
 	    * @param map
@@ -732,10 +693,4 @@ public interface TaoBaoOrderMapper {
 	    */
 	public int updateInventory(Map<Object, Object> map);
 
-
-    public Inventory queryInId(@Param("old_sku") String old_sku, @Param("goods_pid") String goods_pid, @Param("old_barcode") String old_barcode, @Param("car_urlMD5") String car_urlMD5, @Param("flag") String flag);
-
-    public int updateSources(@Param("flag") String flag, @Param("old_sku") String old_sku, @Param("goods_pid") String goods_pid, @Param("car_urlMD5") String car_urlMD5, @Param("new_barcode") String new_barcode, @Param("old_barcode") String old_barcode, @Param("new_remaining") int new_remaining, @Param("old_remaining") int old_remaining, @Param("remark") String remark, @Param("new_inventory_amount") double new_inventory_amount);
-
-    public int updateSourcesLog(@Param("in_id") int in_id, @Param("name") String name, @Param("old_sku") String old_sku, @Param("old_url") String old_url, @Param("new_barcode") String new_barcode, @Param("old_barcode") String old_barcode, @Param("new_remaining") int new_remaining, @Param("old_remaining") int old_remaining, @Param("remark") String remark);
  }
