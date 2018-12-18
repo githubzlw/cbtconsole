@@ -281,25 +281,24 @@ function fnSplitOrder(orderno, email, paytime) {
 						},
 						success : function(data) {
 							if (data.ok) {
-								if (confirm("拆单成功,是否发送邮件?")) {
-									window.location.reload();
-									var orderNew = data.data;
-									var url = "/cbtconsole/orderSplit/genOrderSplitEmail.do?orderno="
-											+ orderno
-											+ "&ordernoNew="
-											+ orderNew
-											+ "&odids="
-											+ odids
-											+ "&time_="
-											+ time_
-											+ "&state="
-											+ state
-											+ "&email=" + email;
-									var param = "height=900,width=1100,top=200,left=500,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
-									window.open(url, "windows", param);
-								} else {
-									window.location.reload();
-								}
+                                var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  /></div>";
+                                $.dialog({
+                                    title : '拆单成功是否要发送邮件！',
+                                    content : text,
+                                    max : false,
+                                    min : false,
+                                    lock : true,
+                                    drag : false,
+                                    fixed : true,
+                                    ok : function() {
+                                        var orderNew = data.data;
+                                        var email = $('#email').val();
+                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email);
+                                    },
+                                    cancel : function() {
+                                        window.location.reload();
+                                    }
+                                });
 
 							} else {
 								alert(data.message);
@@ -1661,4 +1660,68 @@ function resetClothingDiv(){
     $("#c_catid").val("");
     document.getElementById('clothing_orderid').innerHTML= "";
     document.getElementById('clothing_goodsid').innerHTML= "";
+}
+function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
+    var s = orderno;
+    $.ajax({
+        type : 'POST',
+        url : '/cbtconsole/orderSplit/genOrderSplitEmail.do',
+        data : {
+            "orderno" : orderno,
+            "odids" : odids,
+            "ordernoNew" : ordernoNew,
+            "time_" : time_,
+            "state" : state,
+            "email" : email
+        },
+        success : function(data) {
+            if(data != null){
+                $.dialog({
+                    title : '发送拆分邮件结果！',
+                    content : data,
+                    max : false,
+                    min : false,
+                    lock : true,
+                    drag : false,
+                    fixed : true,
+                    ok : function() {
+                        window.location.reload();
+                    },
+                    cancel : function() {
+                        window.location.reload();
+                    }
+                });
+            }
+        },
+        error:function(msg){
+            $.messager.show({
+                title:'消息',
+                msg:"发送邮件失败！！！",
+                showType:'slide',
+                style:{
+                    right:'',
+                    top:document.body.scrollTop+document.documentElement.scrollTop,
+                    bottom:''
+                }
+            });
+        }
+    });
+}
+function fnmessage() {
+    var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  /></div>";
+    $.dialog({
+        title : '拆单成功是否要发送邮件！',
+        content : text,
+        max : false,
+        min : false,
+        lock : true,
+        drag : false,
+        fixed : true,
+        ok : function() {
+            var message = $('#email').val();
+            alert(message);
+        },
+        cancel : function() {
+        }
+    });
 }
