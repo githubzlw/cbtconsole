@@ -39,6 +39,7 @@ a{
 body{
 	text-align: center;
 	width: 1800px;
+	height:1800px;
 }
 td{
 vertical-align:middle;
@@ -385,32 +386,44 @@ function linkGoods(id,userid){
 		success:function(res){
 			var html = "";
 			var json = eval('(' + res + ')').data
+			var ismore = json.length>10;
 			for(var i=0;i<json.length;i++){
 				var orderid = json[i].orderid;
-				html+='<div class="title_g">'
+				html+='<div class="title_g" style="display:block'
+				/* if(i > 10){
+				html+='none'
+				}else{
+				html+='block'
+				} */
+				html+=';">'
 				if(i!=0){
 					html+='<hr>'
 				}
-				html+='<div class="order_title" style="float:left" onclick="orderclick(\''+orderid+'\')">'+orderid+'</div>';
+				html+='<div class="order_title" style="float:left;cursor: pointer;"><a href="#" onclick="orderclick(\''+orderid+'\')">'+orderid+'</a></div>';
 				var list = json[i].orderdetail;
 				
 				html+='<div class="div_tile goods_'+orderid+'"  style="float:left"><ul class="title_li"><input type="hidden" value="'+orderid+'" class="order_hidden"';
 				for(var j=0;j<list.length;j++){
-					html +='<li class="goods_title_li">'+'<input type="checkbox" class="li_check" value="'+list[j].goods_pid+'"><img src="'+list[j].car_img+'"'+'</li>';
+					html +='<li class="goods_title_li">'+'<input type="checkbox" class="li_check" value="'+list[j].goods_pid+'"><img style="width:50px;height:50px;" src="'+list[j].car_img+'"'+'</li>';
 				}
 				html+='</ul></div><div style="clear:both"></div></div>';
 			}
 			if(html ==''){
 				html = "该用户没有可选择订单";
+			}else{
+				/* if(ismore){
+					html +='<a href="#" onclick="showmore()" id="showmorea">显示更多订单</a>';
+				} */
 			}
-			 $.dialog({
-					title : '关联订单产品',
+			  $.dialog({
+					title : '  关联订单产品(点击订单号选择产品)',
 					content : html,
 					max : false,
 					min : false,
-					lock : true,
-					drag : false,
+					lock : false,
+					drag : true,
 					fixed : false,
+					height : "400px",
 					ok : function() {
 						var orderid = "";
 						var goodsid = "";
@@ -430,12 +443,13 @@ function linkGoods(id,userid){
 						}
 					},
 					cancel : function() {
+						$("#showmorea").show();
 					}
-				});
+				});  
 			
-		/* 	$("#order_list").html(html);
-			$("#order_list_p").show(); */
-		},
+		/* $("#order_list").html(html);
+			$("#order_list_p").show();*/
+		}, 
 		error:function(XMLResponse){
 			alert('error');
 		}
@@ -443,7 +457,10 @@ function linkGoods(id,userid){
 	 
 	
 }
-
+function showmore(){
+	$(".title_g").show();
+	$("#showmorea").hide();
+}
 function openDispute(id){
 	var html='<span><input type="checkbox" id="checkbox_pp" checked="checked">新账号</span>'
 		+'<br><span>Dispute ID:<input type="text" class="dispute_id"></span>';

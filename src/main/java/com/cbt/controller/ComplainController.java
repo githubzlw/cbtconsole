@@ -105,7 +105,7 @@ public class ComplainController {
 				}
 			}
 		}
-		Map<String, Object> dispute = customerDisputeService.list(orderIdList);
+		/*Map<String, Object> dispute = customerDisputeService.list(orderIdList);
 		useridList = useridList.endsWith(",")?useridList.substring(0, useridList.length()-1):useridList;
 		Map<String, String> complainRefundByUserids = refundService.getComplainRefundByUserids(useridList);
 		for(ComplainVO c:list){
@@ -126,7 +126,7 @@ public class ComplainController {
 				
 			}
 			
-		}
+		}*/
 		
 		page.setList(list);
 		
