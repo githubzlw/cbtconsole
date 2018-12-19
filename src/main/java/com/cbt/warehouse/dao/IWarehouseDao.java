@@ -3,6 +3,7 @@ package com.cbt.warehouse.dao;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.*;
@@ -244,6 +245,12 @@ public interface IWarehouseDao {
 	public int updateStateCategory(Map<String, String> map);
 	//添加订单采购商品备注
 	public int insertOrderRemark(Map<String, Object> map);
+	/**
+	 * 出库时检验申报金额是否超出预定金额
+	 * @param orderid
+	 * @return
+	 */
+	public CustomsRegulationsPojo getCustomsRegulationsPojo(@Param("orderid") String orderid);
 	//功能订单采购备注
 	public int updateOrderRemark(Map<String, Object> map);
 	//查询某个订单备注是否存在
