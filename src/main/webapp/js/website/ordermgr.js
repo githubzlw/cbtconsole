@@ -193,6 +193,7 @@ function fnGetStatistic() {
             // if(json[i].state == "purchase")$("#errorbuy").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchase'>" + json[i].counts + "</a>");//采购问题
             if (json[i].state == "agree") $("#getchange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=agree'>" + json[i].counts + "</a>");//同意替换
             if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest'>" + json[i].counts + "</a>");//建议替换
+            if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
             if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy'>" + json[i].counts + "</a>");//出运
             if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
             // if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
@@ -223,6 +224,7 @@ function fnGetStatistic() {
 						// if(json[i].state == "purchase")$("#errorbuy").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchase'>" + json[i].counts + "</a>");//采购问题
 						if (json[i].state == "agree") $("#getchange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=agree&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//同意替换
 						if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//建议替换
+                        if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
 						if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//出运
 			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
 						// if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库

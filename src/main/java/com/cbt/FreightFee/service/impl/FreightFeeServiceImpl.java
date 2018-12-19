@@ -202,7 +202,7 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				}
 				// 当重量超过21KG后的计算公式需求不明确
 				if (fweight > 21) {
-					freightFee = Math.ceil(fweight) * 45;
+					freightFee = Math.ceil(fweight) * 38;
 				}
 			}
 			// 东欧国家 160+50

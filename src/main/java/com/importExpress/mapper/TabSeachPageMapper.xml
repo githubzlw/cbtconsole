@@ -173,4 +173,19 @@
         WHERE shop_id = #{shopId} AND valid != #{valid}
     </update>
 
+    <!--void updateShopBrand(ShopUrlAuthorizedInfoPO bean);-->
+    <update id="updateShopBrand" parameterType="com.importExpress.pojo.ShopUrlAuthorizedInfoPO">
+        UPDATE alidata.shop_url_bak
+        SET shop_brand = #{shopBrand}
+        WHERE shop_id = #{shopId}
+    </update>
+
+    <!--String queryShopBrand(@Param("shopId") String shopId);-->
+    <select id="queryShopBrand" resultType="java.lang.String">
+        SELECT shop_brand
+        FROM alidata.shop_url_bak
+        WHERE shop_id = #{shopId}
+        LIMIT 1
+    </select>
+
 </mapper>

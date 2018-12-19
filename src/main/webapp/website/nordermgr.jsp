@@ -557,7 +557,7 @@ $(document).ready(function(){
 									<td style="width: 138px;">出货预警项目</td>
 									<td style="width: 124px;">超期未出货</td>
 									<td style="width: 124px;">订单取消</td>
-									<td style="width: 124px;">建议替换/同意替换</td>
+									<td style="width: 124px;">建议替换/同意替换/取消替换</td>
 									<!-- <td style="width: 124px;">同意替换</td> -->
 									<%--<td style="width: 124px;">货源问题</td>--%>
 									<!-- <td style="width: 124px;">货物到齐</td> -->
@@ -572,7 +572,7 @@ $(document).ready(function(){
 									<td id="shipmentwarning">0</td>
 									<td id="notshipping">0</td>
 									<td id="cacleorder">0</td>
-									<td><span id="changes">0</span>/<span id="getchange">0</span></td>
+									<td><span id="changes">0</span>/<span id="getchange">0</span>/<span id="noChange">0</span></td>
 									<!-- <td id="getchange">0</td> -->
 									<%--<td id="errorbuy">0</td>--%>
 									<!-- <td id="allgoods">0</td> -->
