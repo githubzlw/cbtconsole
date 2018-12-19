@@ -1723,8 +1723,13 @@ public class NewOrderDetailsCtr {
 				model.put("orderNo",orderNo);
 				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 				String modeStr = jsonObject.toString();
-
-				sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				try {
+					sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
+					json.setMessage("Failed to send mail, please contact the developer by screen, thank you！"+ e.getMessage());
+				}
 				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 				try {
 					insertChangeRecords(orderNo, -1, adminId);

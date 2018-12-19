@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,8 @@ import com.stripe.net.APIResource;
 public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");//注意格式化的表达式
+	SimpleDateFormat sdfen = new SimpleDateFormat("HH:mm:ss MMM dd, yyyy", Locale.US);
+//	14:10:48 Nov 21, 2018 PST
 	@Autowired
 	private CustomerDisputeMapper customerDisputeMapper;
 	@Autowired
@@ -47,25 +50,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
 		BasicDBObject q = new BasicDBObject();
 		q.put("resource_type", "dispute");
-//		if(StringUtils.isNotBlank(disputeID)) {
-//			q.put("resource.dispute_id", disputeID);
-//		}
-//		if(StringUtils.isNotBlank(startTime)) {
-//			q.append("resource.create_time",new BasicDBObject("$gt",startTime));
-//		}
-//		if(StringUtils.isNotBlank(endTime)) {
-//			q.append("resource.create_time",new BasicDBObject("$lt",endTime));
-//		}
-//		if(StringUtils.isNotBlank(status)) {
-//			q.put("resource.status", status);
-//		}
-//		BasicDBObject s = new BasicDBObject("create_time",-1);
 		List<String> documents = 
 				instance.findAny("data",q,null);
 		List<CustomerDisputeVO> list = new ArrayList<CustomerDisputeVO>();
 		CustomerDisputeVO bean ;
 		long total = 0L;
 		List<String> filter = new ArrayList<String>();
+		List<String> webhookFilter = new ArrayList<String>();
 		try {
 	    	for(String content : documents) {
 	    		bean = new CustomerDisputeVO();
@@ -73,6 +64,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			JSONObject document = JSONObject.parseObject(content);
 	    			JSONObject  resource = (JSONObject)document.get("resource");
 	    			bean.setDisputeID(resource.getString("dispute_id"));
+	    			webhookFilter.add(resource.getString("dispute_id"));
 	    			Date parse = utc.parse(document.getString("create_time").replace("Z", " UTC"));
 	    			bean.setUpdateTime(sdf.format(parse));
 	    			bean.setTime(parse.getTime());
@@ -120,6 +112,41 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    		}
 				
 	    	}
+	    	
+	    	q = new BasicDBObject();
+			q.put("case_type", "dispute");
+			documents = 
+					instance.findAny("data",q,null);
+			for(String content : documents) {
+				JSONObject document = JSONObject.parseObject(content);
+				String case_id = document.getString("case_id");
+				if(!webhookFilter.contains(case_id)) {
+					bean = new CustomerDisputeVO();
+					bean.setDisputeID(case_id);
+					String case_creation_date = document.getString("case_creation_date").replace("PST", "").trim();
+					Date parse = sdfen.parse(case_creation_date);
+					bean.setUpdateTime(sdf.format(parse));
+	    			bean.setTime(parse.getTime());
+	    			String custom = document.getString("custom");
+	    			bean.setOrderNo("");
+	    			if(StringUtils.indexOf(custom, "@") > -1) {
+	    				
+	    				String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
+	    				
+	    				bean.setUserid(split.length > 3 ? split[0] : "");
+	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
+	    			}
+	    			bean.setApiType("Paypal");
+	    			String reason_code = document.getString("reason_code");
+//	    			reason_code = StringUtils.equals(reason_code, "non_receipt") ? "MERCHANDISE_OR_SERVICE_NOT_RECEIVED" : reason_code;
+	    			bean.setReason(reason_code);
+	    			String merchant_id = document.getString("receiver_id");
+	    			bean.setMerchantID(merchant_id);
+					list.add(bean);
+				}
+				
+			}
+	    	
 	    	
 	    	list = list.stream().sorted((b1,b2)->{
 	    		return Long.compare(b2.getTime(), b1.getTime());
@@ -192,7 +219,11 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			if(StringUtils.isNotBlank(status)) {
 	    				fl = fl && StringUtils.equals(b.getStatus(), status);
 	    			}
-	    			return fl && b.getTime() > sTime && b.getTime() < etime && StringUtils.isNotBlank(b.getOprateAdm());
+	    			fl = fl && b.getTime() > sTime && b.getTime() < etime;
+	    			
+	    			fl = fl && ((StringUtils.isNotBlank(b.getUserid()) && StringUtils.isNotBlank(b.getOprateAdm())) || StringUtils.isBlank(b.getUserid()));
+	    			
+	    			return fl;
 	    		}
 	    	}).collect(Collectors.toList());
 	    	
