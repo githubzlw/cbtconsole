@@ -2,6 +2,7 @@ package com.cbt.warehouse.ctrl;
 
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.util.WebCookie;
 import com.cbt.website.userAuth.Dao.AdmUserDao;
 import com.cbt.website.userAuth.Dao.UserAuthDao;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -32,70 +34,83 @@ public class UserLoginController {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(HotGoodsCtrl.class);
     @Autowired
     private QueryUserService userService;
-	/**
-	 * 判断用户信息
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "/checkUserInfo.do")
-	@ResponseBody
-	public JsonResult checkUserInfo(HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * 判断用户信息
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/checkUserInfo.do")
+    @ResponseBody
+    public JsonResult checkUserInfo(HttpServletRequest request, HttpServletResponse response) {
 
-	    LOG.info("step into the checkUserInfo()");
-		JsonResult json = new JsonResult();
+        LOG.info("step into the checkUserInfo()");
+        JsonResult json = new JsonResult();
 
-		String username = request.getParameter("userName");
-		String password = request.getParameter("passWord");
-		String sessionId = request.getSession().getId();
-		try {
-
-			AdmUserDao admuserDao = new AdmUserDaoImpl();
-			UserAuthDao userauthDao = new UserAuthDaoImpl();
-			Admuser admuser = null;
-			admuser = admuserDao.getAdmUser(username, password);
-			List<AuthInfo> authlist = new ArrayList<AuthInfo>();
-			if (admuser != null) {
-				authlist = userauthDao.getUserAuth(username);
-				// 数据放入redis
-				Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
-				Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
-				LOG.info("authlist:{}",authlist);
-				LOG.info("save sessionId:[]",sessionId);
+        String username = request.getParameter("userName");
+        String password = request.getParameter("passWord");
+        String sessionId = request.getSession().getId();
+        boolean isTrue = false;
+        try {
+            AdmUserDao admuserDao = new AdmUserDaoImpl();
+            UserAuthDao userauthDao = new UserAuthDaoImpl();
+            Admuser admuser = null;
+            admuser = admuserDao.getAdmUser(username, password);
+            List<AuthInfo> authlist = new ArrayList<AuthInfo>();
+            if (admuser != null) {
+                authlist = userauthDao.getUserAuth(username);
+                // 数据放入redis
+                Long userauth = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+                Long userauth1 = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+                LOG.info("authlist:{}", authlist);
+                LOG.info("save sessionId:[]", sessionId);
                 LOG.info("login is ok!");
-				json.setOk(true);
-			} else {
-				//Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
-				admuser = admuserDao.getAdmUserMd5(username, password);
-				if (admuser != null) {
-					authlist = userauthDao.getUserAuth(username);
-					// 数据放入redis
-					Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
-					Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+                json.setOk(true);
+                isTrue = true;
+            } else {
+                //Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
+                admuser = admuserDao.getAdmUserMd5(username, password);
+                if (admuser != null) {
+                    authlist = userauthDao.getUserAuth(username);
+                    // 数据放入redis
+                    Long userauth = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+                    Long userauth1 = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
                     LOG.info("login is ok!");
-					json.setOk(true);
-				}else {
-					json.setOk(false);
+                    json.setOk(true);
+                    isTrue = true;
+                } else {
+                    json.setOk(false);
                     LOG.info("login is NG!");
-					json.setMessage("登录信息错误");
-				}
-				//End：
+                    json.setMessage("登录信息错误");
+                }
+                //End：
 
-			}
+            }
+            if (isTrue) {
+                //清除页面保存的用户名密码
+                Cookie usName = new Cookie("usName", username);
+                usName.setMaxAge(3600 * 24 * 6);
+                usName.setPath("/");
+                response.addCookie(usName);
+                Cookie usPass = new Cookie("usPass", admuser.getPassword());
+                usPass.setMaxAge(3600 * 24 * 6);
+                usPass.setPath("/");
+                response.addCookie(usPass);
+            }
 
-		} catch (Exception e) {
-			e.getStackTrace();
-			json.setOk(false);
-			json.setMessage("校检用户信息失败，原因：" + e.getMessage());
-			LOG.error("校检用户信息失败，原因：" , e);
-		}
-		return json;
-	}
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+            LOG.error("校检用户信息失败，原因：", e);
+        }
+        return json;
+    }
 
 	/**
 	 * 退出登录
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @return
@@ -118,7 +133,7 @@ public class UserLoginController {
 
 	/**
 	 * 打开主菜单链接
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @return
@@ -207,5 +222,74 @@ public class UserLoginController {
         }
         return json;
     }
+    @RequestMapping(value = "/autoLoginByCookie")
+    @ResponseBody
+    public JsonResult autoLoginByCookie(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String username = WebCookie.cookieValue(request, "usName");
+        String password = WebCookie.cookieValue(request, "usPass");
+        String sessionId = request.getSession().getId();
+        boolean isTrue = false;
+        if (org.apache.commons.lang3.StringUtils.isBlank(username) || org.apache.commons.lang3.StringUtils.isBlank(password)) {
+            json.setOk(false);
+            json.setMessage("cookie用户信息为空,从新登陆！");
+            return json;
+        }
+        try {
+            AdmUserDao admuserDao = new AdmUserDaoImpl();
+            UserAuthDao userauthDao = new UserAuthDaoImpl();
+            Admuser admuser = null;
+            admuser = admuserDao.getAdmUser(username, password);
+            List<AuthInfo> authlist = new ArrayList<AuthInfo>();
+            if (admuser != null) {
+                authlist = userauthDao.getUserAuth(username);
+                // 数据放入redis
+                Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+                Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+                if (userauth == 0 || userauth1 == 0) {
+                    LOG.info("login is false!");
+                    json.setOk(false);
+                    isTrue = false;
+                } else {
+                    LOG.info("authlist:{}", authlist);
+                    LOG.info("save sessionId:[]", sessionId);
+                    LOG.info("login is ok!");
+                    json.setOk(true);
+                    isTrue = true;
+                }
 
+            } else {
+                //Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
+                admuser = admuserDao.getAdmUserMd5(username, password);
+                if (admuser != null) {
+                    authlist = userauthDao.getUserAuth(username);
+                    // 数据放入redis
+                    Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
+                    Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
+                    if (userauth == 0 || userauth1 == 0) {
+                        LOG.info("login is false!");
+                        json.setOk(false);
+                        isTrue = false;
+                    } else {
+                        LOG.info("login is ok!");
+                        json.setOk(true);
+                        isTrue = true;
+                    }
+                } else {
+                    json.setOk(false);
+                    LOG.info("login is NG!");
+                    json.setMessage("登录信息错误");
+                }
+                //End：
+
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("校检用户信息失败，原因：" + e.getMessage());
+            LOG.error("校检用户信息失败，原因：", e);
+        }
+        return json;
+    }
 }

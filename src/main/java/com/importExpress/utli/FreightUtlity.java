@@ -42,6 +42,7 @@ public class FreightUtlity {
                 System.out.println("getFreightByOrderno success !!!");
                 Map<String, Double> data = (Map<String, Double>) json.getJSONObject("data");
                 freight = (Double) data.get("freightCost");
+                freight = new BigDecimal(freight*6.6).setScale(2,BigDecimal.ROUND_UP).doubleValue();
             } else {
                 System.err.println("getFreightByOrderno error :<:<:<");
             }
