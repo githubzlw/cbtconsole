@@ -118,6 +118,7 @@ public class Redis {
 				}
 	        } catch (Exception e) {
 	            //释放redis对象
+				e.printStackTrace();
 	            pool.returnBrokenResource(jedis);
 	            logger.error("error",e);
 	        } finally {

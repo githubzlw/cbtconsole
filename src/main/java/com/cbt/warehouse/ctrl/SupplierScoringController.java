@@ -48,7 +48,7 @@ public class SupplierScoringController {
 	        String userJson = Redis.hget(sessionId, "admuser");
 	        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
 	        if (user == null) {
-	        	return "login";
+	        	return "main_login";
 			}
 	        String userid = String.valueOf(user.getId());//用户id
 			//筛选条件 最近7天已经验货的, 本人采购的，未评价的(true); 所有(false)
@@ -127,7 +127,7 @@ public class SupplierScoringController {
         String userJson = Redis.hget(sessionId, "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
         if (user == null) {
-        	return "login";
+        	return "main_login";
 		}
         String userid = String.valueOf(user.getId());//用户id
 		List<SupplierProductsBean> supplierproducts = new ArrayList<SupplierProductsBean>();

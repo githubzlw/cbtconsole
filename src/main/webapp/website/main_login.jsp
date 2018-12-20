@@ -68,6 +68,7 @@
 		</div>
 	</div>
 	<script>
+        fnAutoLoginByCookie();
 		function init() {
 			$("#username").focus();
 		}
@@ -101,6 +102,21 @@
 						});
 			}
 		}
+	function fnAutoLoginByCookie() {
+        $.ajax({
+                type : 'POST',
+                url : '/cbtconsole/userLogin/autoLoginByCookie.do',
+                success : function(data) {
+                    if (data.ok) {
+                        window.location = "/cbtconsole/website/main_menu.jsp";
+                    } else {
+                        /*window.location = "/cbtconsole/userLogin/loginOut.do";*/
+                        $('.login_info').html(data.message);
+                        $('.login_info').show();
+                    }
+                }
+            });
+    }
 	</script>
 </body>
 </html>

@@ -14,7 +14,7 @@ public class AppConfig {
 
 	
 //	public static String ips = "http://192.168.1.220:8084/cbtconsole";
-	public static String ips = "http://192.168.1.153:8087/cbtconsole";
+	public static String ips = "http://192.168.1.249:8081/cbtconsole";
 	//public static String ips = "http://192.168.1.29:8899/cbtconsole";
 	//public static String ips = "http://27.115.38.42:8086/cbtconsole";
 	

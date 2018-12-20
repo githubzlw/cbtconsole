@@ -37,6 +37,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
 import org.slf4j.LoggerFactory;
@@ -87,9 +88,14 @@ public class NewOrderDetailsCtr {
 			// 获取所有采购人员信息
 			List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
 			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+
 			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
 			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
+			//获取实际运费
+			Long start = System.currentTimeMillis();
+			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
+			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
 			// 获取汇率
 			double rate =Double.valueOf(orderInfo.getExchange_rate());
 			//获取订单出运信息
@@ -132,7 +138,11 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("shippingtype",shippingtype);
 			request.setAttribute("ac_weight",ac_weight);
 			request.setAttribute("awes_freight",awes_freight);
-			request.setAttribute("allFreight", freightFee);
+			if(freightCostByOrderno>0){
+				request.setAttribute("allFreight", freightCostByOrderno);
+			}else {
+				request.setAttribute("allFreight", freightFee);
+			}
 			request.setAttribute("estimatefreight",estimatefreight*rate);
 			request.setAttribute("allWeight",allWeight);
 			//产品预计采购金额-

@@ -48,7 +48,6 @@ public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
-
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
 
@@ -1140,6 +1139,4 @@ public class ShopCarMarketingController {
         }
         return mv;
     }
-
-
 }

@@ -184,7 +184,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			c.setOprateAdm(adminRUser.getAdmname());
 	    		}else {
 	    			c.setEmail("");
-	    			c.setOprateAdm("testAdm");
+	    			c.setOprateAdm("");
 	    		}
 	    		ComplainVO complainVO = disputeMap.get(c.getDisputeID());
 	    		c.setComplainId("");
