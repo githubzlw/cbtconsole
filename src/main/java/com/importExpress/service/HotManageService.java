@@ -3,6 +3,7 @@ package com.importExpress.service;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotDiscount;
 import com.cbt.warehouse.pojo.HotEvaluation;
+import com.importExpress.pojo.HotSellGoods;
 
 import java.util.List;
 
@@ -118,5 +119,21 @@ public interface HotManageService {
      * @return
      */
     int deleteCategory(int id);
+
+
+    /**
+	 * 根据分类查询热卖商品数据
+	 * @param hotType
+	 * @return
+	 */
+	List<HotSellGoods> queryGoodsByHotType(int hotType);
+
+
+	/**
+	 * 分页查询分类数据
+	 * @param hotCategory
+	 * @return
+	 */
+	List<HotCategory> queryCategoryList(HotCategory hotCategory);
 
 }

@@ -241,7 +241,7 @@ public class UserLoginController {
         boolean isTrue = false;
         if (org.apache.commons.lang3.StringUtils.isBlank(username) || org.apache.commons.lang3.StringUtils.isBlank(password)) {
             json.setOk(false);
-            json.setMessage("cookie用户信息为空,从新登陆！");
+            json.setMessage("cookie用户信息为空,重新登陆！");
             return json;
         }
         try {
@@ -255,11 +255,18 @@ public class UserLoginController {
                 // 数据放入redis
                 Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
                 Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
-                LOG.info("authlist:{}", authlist);
-                LOG.info("save sessionId:[]", sessionId);
-                LOG.info("login is ok!");
-                json.setOk(true);
-                isTrue = true;
+                if (userauth == 0 || userauth1 == 0) {
+                    LOG.info("login is false!");
+                    json.setOk(false);
+                    isTrue = false;
+                } else {
+                    LOG.info("authlist:{}", authlist);
+                    LOG.info("save sessionId:[]", sessionId);
+                    LOG.info("login is ok!");
+                    json.setOk(true);
+                    isTrue = true;
+                }
+
             } else {
                 //Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
                 admuser = admuserDao.getAdmUserMd5(username, password);
@@ -268,9 +275,15 @@ public class UserLoginController {
                     // 数据放入redis
                     Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
                     Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
-                    LOG.info("login is ok!");
-                    json.setOk(true);
-                    isTrue = true;
+                    if (userauth == 0 || userauth1 == 0) {
+                        LOG.info("login is false!");
+                        json.setOk(false);
+                        isTrue = false;
+                    } else {
+                        LOG.info("login is ok!");
+                        json.setOk(true);
+                        isTrue = true;
+                    }
                 } else {
                     json.setOk(false);
                     LOG.info("login is NG!");
