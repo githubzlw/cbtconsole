@@ -122,13 +122,22 @@ public class UserLoginController {
 			request.getSession().removeAttribute("admuser");
 			request.getSession().removeAttribute("userauth");
 			Redis.hdel(request.getSession().getId());
+            //清除页面保存的用户名密码
+            Cookie usName = new Cookie("usName", null);
+            usName.setMaxAge(0);
+            usName.setPath("/");
+            response.addCookie(usName);
+            Cookie usPass = new Cookie("usPass", null);
+            usPass.setMaxAge(0);
+            usPass.setPath("/");
+            response.addCookie(usPass);
 		} catch (Exception e) {
 			e.getStackTrace();
 			LOG.error("退出失败，原因：" + e.getMessage());
 		}
 
-//		return "main_login";
-		return "login";
+		return "main_login";
+//		return "login";
 	}
 
 	/**
