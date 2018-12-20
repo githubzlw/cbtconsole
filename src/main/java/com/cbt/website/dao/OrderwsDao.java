@@ -6345,8 +6345,8 @@ public class OrderwsDao implements IOrderwsDao {
             rs = stmt.executeQuery();
             if (rs.next() && flag) {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
-                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid) "
-                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid,actual_weight) "
+                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 stmt = conn.prepareStatement(sql);
                 stmt.setString(1, goodsid);
                 stmt.setString(2, newOrderid);
@@ -6375,6 +6375,7 @@ public class OrderwsDao implements IOrderwsDao {
                 stmt.setString(25, rs.getString("goodscatid"));
                 stmt.setString(26, rs.getString("car_urlMD5"));
                 stmt.setString(27, rs.getString("goods_pid"));
+                stmt.setString(28, rs.getString("actual_weight"));
                 row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";
