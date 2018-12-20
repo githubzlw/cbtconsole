@@ -122,13 +122,22 @@ public class UserLoginController {
 			request.getSession().removeAttribute("admuser");
 			request.getSession().removeAttribute("userauth");
 			Redis.hdel(request.getSession().getId());
+            //清除页面保存的用户名密码
+            Cookie usName = new Cookie("usName", null);
+            usName.setMaxAge(0);
+            usName.setPath("/");
+            response.addCookie(usName);
+            Cookie usPass = new Cookie("usPass", null);
+            usPass.setMaxAge(0);
+            usPass.setPath("/");
+            response.addCookie(usPass);
 		} catch (Exception e) {
 			e.getStackTrace();
 			LOG.error("退出失败，原因：" + e.getMessage());
 		}
 
-//		return "main_login";
 		return "main_login";
+//		return "login";
 	}
 
 	/**
@@ -232,7 +241,7 @@ public class UserLoginController {
         boolean isTrue = false;
         if (org.apache.commons.lang3.StringUtils.isBlank(username) || org.apache.commons.lang3.StringUtils.isBlank(password)) {
             json.setOk(false);
-            json.setMessage("cookie用户信息为空,从新登陆！");
+            json.setMessage("cookie用户信息为空,重新登陆！");
             return json;
         }
         try {
