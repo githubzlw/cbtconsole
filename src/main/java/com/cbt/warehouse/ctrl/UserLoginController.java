@@ -241,7 +241,7 @@ public class UserLoginController {
         boolean isTrue = false;
         if (org.apache.commons.lang3.StringUtils.isBlank(username) || org.apache.commons.lang3.StringUtils.isBlank(password)) {
             json.setOk(false);
-            json.setMessage("cookie用户信息为空,从新登陆！");
+            json.setMessage("cookie用户信息为空,重新登陆！");
             return json;
         }
         try {
