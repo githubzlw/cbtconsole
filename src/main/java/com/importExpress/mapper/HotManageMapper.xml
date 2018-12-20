@@ -206,7 +206,7 @@
         DATE_FORMAT(bb.begin_time,'%Y-%m-%d %H:%i:%S') as discount_begin_time,
         DATE_FORMAT(bb.end_time,'%Y-%m-%d %H:%i:%S') as discount_end_time,bb.sort as discount_sort
         from
-        (select a.show_name,a.selling_price,a.wholesale_price_1,a.wholesale_price_2,
+        (select b.enname as show_name,a.selling_price,a.wholesale_price_1,a.wholesale_price_2,
         a.wholesale_price_3,a.goods_img,a.hot_selling_id,a.goods_url,a.goods_pid,
         b.wprice goods_price,b.range_price rangePrice,b.sellunit
         goods_unit,b.isNewCloud,a.profit_margin,b.morder,a.asin_code,a.amazon_price,
