@@ -9,6 +9,9 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.page.Page;
 import com.cbt.util.SqlSplitUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.google.common.collect.ArrayTable;
+
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -16,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -187,8 +191,13 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public List<ComplainVO> getCommunicatingByCidBG(Integer complainId) {
-		String sql="SELECT cc.id,cc.complainid,cc.chatText,cc.chatAdmin,cc.chatTime,cc.flag,(select admName from admuser where id=( SELECT adminid from admin_r_user where userid=( SELECT userid from tb_complain where id=?) limit 1) limit 1) as admName,f.imgUrl"
-				+ " from tb_complain_chat cc LEFT JOIN tb_complain_file f ON cc.id=f.complainChatid AND f.flag=1 WHERE cc.complainid = ? ORDER BY chatTime ";
+		String sql="SELECT cc.id,cc.complainid,cc.chatText,cc.chatAdmin," + 
+				"cc.chatTime,cc.flag,ifnull(admin_r_user.admName,'') admName, ifnull(f.imgUrl,'') imgUrl " + 
+				"from tb_complain_chat cc " + 
+				"inner join tb_complain  on  tb_complain.id=cc.complainid " + 
+				"left join admin_r_user on tb_complain.userid=admin_r_user.userid " + 
+				"LEFT JOIN tb_complain_file f ON cc.id=f.complainChatid AND f.flag=1 " + 
+				"WHERE cc.complainid = ? ORDER BY chatTime";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -196,7 +205,6 @@ public class ComplainDaoImpl implements IComplainDao{
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, complainId);
-			stmt.setInt(2, complainId);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
 				ComplainVO rfb = new ComplainVO();
@@ -268,7 +276,7 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public List<ComplainFile> getImgsByCid(Integer complainId) {
-		String sql="SELECT cf.imgUrl from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
+		String sql="SELECT group_concat(cf.imgUrl) from tb_complain_file cf LEFT JOIN tb_complain c on c.id = cf.complainid WHERE c.id=? and cf.flag=0";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -305,11 +313,11 @@ public class ComplainDaoImpl implements IComplainDao{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username, Page page, String admName,int roleType,int check) {
 		int start= (page.getStartIndex()-1) *20;
 		ArrayList<ComplainVO> rfbList = new ArrayList<ComplainVO>();
 		StringBuilder sb = new StringBuilder("SELECT c.id,c.userid,c.userEmail,c.complainType,"
-				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,"
+				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,c.ref_goodsid,c.dispute_id,c.merchant_id,"
 				+ "c.complainState,c.dealAdmin,c.dealAdminid,u.admName,"
 				+" (SELECT COUNT(id) FROM tb_complain_chat WHERE complainid=c.id AND readorno=0 and flag=0) AS counts," +
 				" (SELECT COUNT(id)+1 FROM tb_complain_chat WHERE complainid=c.id  and flag=0) AS customSum , "
@@ -327,6 +335,10 @@ public class ComplainDaoImpl implements IComplainDao{
 		//ling,Sales1可以看所有的投诉
 		if(admName!=null&& roleType !=0){
 			sb.append(" and u.admName='"+admName+"'" ); 
+		}
+		if(check == 1) {
+			
+			sb.append(" and (c.ref_goodsid='' or c.ref_goodsid is null)");
 		}
 		if(t.getUserid()!=0){
 			sb.append(" and c.userid="+t.getUserid());
@@ -362,7 +374,14 @@ public class ComplainDaoImpl implements IComplainDao{
 				if(rs.getString("closeTime")!="" &&rs.getString("closeTime")!=null){
 					rfb.setCloseTime(rs.getString("closeTime").substring(0, 19));
 				}
-				rfb.setRefOrderId(rs.getString("ref_orderid"));
+				String ref_orderid = rs.getString("ref_orderid");
+				rfb.setRefOrderId(ref_orderid);
+				if(StringUtils.isNotBlank(ref_orderid)) {
+					rfb.setOrderIdList(Arrays.asList(ref_orderid.split(",")));
+				}
+				rfb.setDisputeId(rs.getString("dispute_id"));
+				rfb.setMerchantId(rs.getString("merchant_id"));
+				rfb.setRefGoodsId(rs.getString("ref_goodsid"));
 				rfb.setComplainState(rs.getInt("complainState"));
 				rfb.setDealAdmin(rs.getString("dealAdmin"));
 				rfb.setDealAdminid(rs.getInt("dealAdminid"));
@@ -399,9 +418,169 @@ public class ComplainDaoImpl implements IComplainDao{
 					e.printStackTrace();
 				}
 			}
+			if (rs1 != null) {
+				try {
+					rs1.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt1 != null) {
+				try {
+					stmt1.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return page;
 	}
+	@Override
+	public int updateGoodsid(int id, String orderid, String goodsid) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		int rs = 0;
+		String sql = "update  tb_complain set ref_goodsid=?,ref_orderid=? where id=?";
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, goodsid);
+			stmt.setString(2, orderid);
+			stmt.setInt(3, id);
+			rs = stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 
+		DBHelper.getInstance().closeConnection(conn);
+		return rs;
+	}
+	@Override
+	public int updateDisputeid(int id,String disputeid,String merchantid) {
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		int rs = 0;
+		String sql = "update  tb_complain set dispute_id=?,merchant_id=? where id=?";
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, disputeid);
+			stmt.setString(2, merchantid);
+			stmt.setInt(3, id);
+			rs = stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		DBHelper.getInstance().closeConnection(conn);
+		return rs;
+	}
+
+	@Override
+	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
+		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText,dispute_id,"
+				+ "merchant_id from tb_complain where dispute_id in (");
+
+		for(String disputeId : disputeIdList) {
+			sb.append("\"").append(disputeId).append("\",");
+		}
+		sb.append("\"0\"").append(")");
+		Connection conn = DBHelper.getInstance().getConnection();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+	
+		try {
+			stmt = conn.prepareStatement(sb.toString());
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				ComplainVO rfb = new ComplainVO();
+				rfb.setId(rs.getInt("id"));
+				rfb.setUserid((rs.getInt("userid")));
+				rfb.setComplainText(rs.getString("complainText"));
+				rfb.setDisputeId(rs.getString("dispute_id"));
+				rfb.setMerchantId(rs.getString("merchant_id"));
+				rfbList.add(rfb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return rfbList;
+	}
+
+	@Override
+	public List<ComplainVO> getComplainByUserId(String userId) {
+		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText "
+				+ "from tb_complain where userid=? order by id desc limit 30");
+
+		Connection conn = DBHelper.getInstance().getConnection();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+	
+		try {
+			stmt = conn.prepareStatement(sb.toString());
+			stmt.setString(1, userId);
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				ComplainVO rfb = new ComplainVO();
+				rfb.setId(rs.getInt("id"));
+				rfb.setUserid((rs.getInt("userid")));
+				rfb.setComplainText(rs.getString("complainText"));
+				rfbList.add(rfb);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return rfbList;
+	}
 }

@@ -324,11 +324,12 @@
 
 <div id="authorized_dlg" class="easyui-dialog" title="上传/修改授权文件"
      data-options="modal:true"
-     style="width: 450px; height: 360px;">
+     style="width: 450px; height: 400px;">
 
     <div style="margin-bottom: 20px;">
     	<form method="post" enctype="multipart/form-data">
 	    	<table>
+                <input type="hidden" id="authorized_id" name="authorized_id"/>
 	    		<tr>
 	    			<td>店铺 ID:</td>
 	    			<td><input type="text" readonly="readonly" id="authorized_shop_id" name="authorized_shop_id" 
@@ -359,6 +360,10 @@
 	    				<textarea name="authorized_remark" id="authorized_remark" style="width: 290px;height: 54px;"></textarea>
 	    			</td>
 	    		</tr>
+                <tr>
+                    <td>品牌属性:</td>
+                    <td><input type="text" id="authorized_shop_brand" name="authorized_shop_brand"></td>
+                </tr>
 	    	</table>
 	    </form>
     </div>
@@ -368,6 +373,9 @@
            onclick="saveAuthorizedInfo()" style="width: 80px">保存</a> 
         <a href="javascript:void(0)" class="easyui-linkbutton"
            onclick="$('#authorized_dlg').dialog('close');" style="width: 80px">关闭</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="javascript:void(0)" class="easyui-linkbutton"
+           onclick="deleteAuthorizedInfo()" style="width: 80px">删除</a>
     </div>
 </div>
 
@@ -447,6 +455,8 @@
             <option value="3">不适合运输</option>
             <option value="4">其他</option>
         </select>
+            &nbsp;&nbsp;品牌属性:<input class="easyui-textbox" name="shopBrand" id="shopBrand"
+                                    style="width:240px; margin-top: 10px;"/>
             &nbsp;&nbsp;<input
                 class="but_color" type="button" value="查询" onclick="doQuery(1)">
             &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
@@ -579,6 +589,7 @@
         var data = $("#data").val();
         //var questionType=$('#questionType').combobox('getValue');
         var shopId = $("#shopId").textbox("getValue");
+        var shopBrand = $("#shopBrand").textbox("getValue");
         var shopUserName = $('#shopUserName').val();
         var username = $("#username").val();
         var timeFrom = $("#timeFrom").val();
@@ -595,6 +606,7 @@
             "page": page,
             "createTime": data,
             "shopId": shopId,
+            "shopBrand": shopBrand,
             "shopUserName": shopUserName,
             "timeFrom": timeFrom,
             "timeTo": timeTo,
@@ -913,6 +925,7 @@
 		$('#startTime').datebox('setValue', "");
 		$('#endTime').datebox('setValue', "");
         $("#authorized_remark").val("");
+        $("#authorized_id").val("");
         $.ajax({
         	type: "GET",
         	url: "/cbtconsole/tabseachpage/queryAuthorizedInfo?shopId=" + shopId,
@@ -920,8 +933,9 @@
         	success: function(msg){
         		$("#authorized_shop_id").val(shopId);
         		if(msg.status){
-        			if (msg.bean != undefined) {
-        				if (msg.bean.fileUrl != undefined) {
+                    if (msg.bean != undefined) {
+                        $("#authorized_id").val(msg.bean.id);
+                        if (msg.bean.fileUrl != undefined) {
 		        			$('#authorized_filename').attr("href", msg.bean.fileUrl);
 		        			$('#authorized_filename').html("之前上传的授权文件:" + msg.bean.fileName + "(" + msg.bean.admuser + ")");
 						}
@@ -932,6 +946,7 @@
 	        				$('#endTime').datebox('setValue', formatterData(msg.bean.endTime));
 	        			}
 	        	        $("#authorized_remark").val(msg.bean.remark);
+	        	        $("#authorized_shop_brand").val(msg.bean.shopBrand);
 					}
         		}
        	        $('#authorized_dlg').dialog('open');
@@ -958,7 +973,6 @@
     					detailList(keyword_id);
     		    		getDetail(res.id);
     				}, 1500 ); */
-    	    		$('#authorized_dlg').window('close');
     		    	$('#authorized_dlg form').form('clear');
     				doQuery(1);
     	    	}else{
@@ -967,6 +981,30 @@
     	    }    
     	});  
     	$("#authorized_dlg form").submit();
+        $('#authorized_dlg').window('close');
+	}
+
+    function deleteAuthorizedInfo() {
+        var shopId = $("#authorized_shop_id").val();
+        if($.isEmptyObject(shopId)){
+            $.messager.alert('message','店铺id为空!');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/tabseachpage/deleteAuthorizedInfo.do?shopId=" + shopId,
+            dataType:"json",
+            success: function(res){
+                if(res.status) {
+                    $.messager.alert('message',res.message);
+                    $('#authorized_dlg').window('close');
+                    $('#authorized_dlg form').form('clear');
+                    doQuery(1);
+                }else{
+                    $.messager.alert('message',res.message);
+                }
+            }
+        });
 	}
 
     function saveReadyDeleteShop() {

@@ -83,14 +83,14 @@
 				$
 						.ajax({
 							type : 'POST',
-							url : '/cbtconsole/userLogin/checkUserInfo.do',
+							url : 'userLogin/checkUserInfo.do',
 							data : {
 								'userName' : userName,
 								'passWord' : passWord
 							},
 							success : function(data) {
 								if (data.ok) {
-									window.location = "/cbtconsole/website/main_menu.jsp";
+									window.location.href = "website/main_menu.jsp";
 								} else {
 									$('.login_info').html(data.message);
 									$('.login_info').show();

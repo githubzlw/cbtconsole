@@ -531,71 +531,45 @@
                 inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno =  order_no    where o.state in (5,2,1)
             </when>
             <when test="type == 'notshipping'">
-                <!-- left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no    -->
                 where o.state IN (5,1,2)  AND (DATE_ADD(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2) DAY)&lt; NOW() ) AND o.isDropshipOrder&lt;>3
             </when>
             <when test="type == 'systemfailure'">
                 where  o.order_no IN (SELECT distinct pri.orderid FROM pay_result_info pri LEFT JOIN orderinfo oi ON pri.orderid=oi.order_no WHERE oi.state=0) AND o.isDropshipOrder&lt;>3
             </when>
+            <when test="type == 'noChange'">
+                where  o.order_no IN (SELECT DISTINCT c.orderid FROM cancel_replacement_record c INNER JOIN orderinfo oi ON c.orderid=oi.order_no INNER JOIN order_details od ON c.orderid=od.orderid AND c.goodsid=od.goodsid LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.id=ops.od_id AND ops.purchase_state IN(3,4,5,6,8,13,12) WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) )
+            </when>
             <when test="type == 'purchasewarning'">
                 where  (date_add(orderpaytime, INTERVAL 2 day) &lt; now() and state in (5)) AND o.isDropshipOrder&lt;>3
             </when>
-
             <when test="type == 'storagewarning'">
                 where  (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and state = 1) AND o.isDropshipOrder&lt;>3
             </when>
             <when test="type == 'shipmentwarning'">
                 where  o.isDropshipOrder&lt;>3 and (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
             </when>
-
             <when test="type == 'cacle'">
-                <![CDATA[
-  		where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) <= 10  and  orderpaytime is not null
-  	]]>
+  		      where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) &lt;= 10  and  orderpaytime is not null
             </when>
             <when test="type == 'cy'">
-                <![CDATA[
-  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
-  	]]>
+  		    where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null
             </when>
             <when test="type == 'cyw'">
-                <![CDATA[
-  		where state=3 and   to_days(now()) - to_days(orderpaytime) <= 60 and orderpaytime is not null
-  		 AND order_no in(
-			SELECT
-				sp.orderid
-			FROM
-				(SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
-				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
-			WHERE
+  		       where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null AND order_no in(
+			   SELECT sp.orderid FROM (SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
+				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no WHERE
 				((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
-				((datediff(ti.updat_date,ti.track_update) IS null
-				OR datediff(ti.updat_date,ti.track_update) > 3
-				OR now() > ti.order_deliverDate))
-				OR ti.track_state IN (4,5,6)))
-			)
-  	]]>
+				((datediff(ti.updat_date,ti.track_update) IS null OR datediff(ti.updat_date,ti.track_update) > 3 OR now() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6))))
             </when>
             <when test="type == 'latelyOrdermessage'">
-                <![CDATA[
-  		where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
-  	]]>
+  		      where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
             </when>
             <when test="type == 'ordermessage'">
                 where orderremark != '' and state in(1,2,3,4,5)
             </when>
             <when test="type == 'ordermeg'">
-                LEFT JOIN
-                (
-                SELECT
-                order_no, count(payc.id) sl
-                FROM
-                orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
-                WHERE
-                oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3
-                group by order_no
-                ) cc on cc.order_no=o.order_no
-                where  cc.sl=0 and LENGTH(o.order_no)&lt;>18
+                LEFT JOIN (SELECT order_no, count(payc.id) sl FROM orderinfo oi	 left join  paymentconfirm payc on payc.orderno=oi.order_no
+                WHERE oi.state in (5,1,2) AND oi.isDropshipOrder&lt;>3  group by order_no) cc on cc.order_no=o.order_no where  cc.sl=0 and LENGTH(o.order_no)&lt;>18
             </when>
             <otherwise>  where 1=1  </otherwise>
         </choose>
@@ -615,7 +589,7 @@
                 and ( o.state=-1 or  o.state=6 )
             </when>
             <when test="state == 7 ">
-                and o.state=3 AND <![CDATA[ od.state<2 ]]>
+                and o.state=3 AND od.state&lt;2
             </when>
             <when test="state != -2">
                 and o.state=#{state}
@@ -624,22 +598,14 @@
         <if test="admuserid != 0">
             and aru.adminid=#{admuserid}
         </if>
-        <!--  <if test="buyid != 0">
-                 and order_buy.buyid=#{buyid}
-        </if> -->
         <if test="showUnpaid == 0">
             and o.state != 0
         </if>
-        <if test="startdate != null ">
-            <![CDATA[
+        <if test="startdate != null">
         	and  o.orderpaytime >=#{startdate}
-        ]]>
         </if>
-
         <if test="enddate !=null">
-            <![CDATA[
-        	and  o.orderpaytime <=#{enddate}
-       ]]>
+        	and  o.orderpaytime &lt;=#{enddate}
         </if>
         <if test="email != null and email != ''">
             and email = #{email}
@@ -725,6 +691,21 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
+        union ALL
+        SELECT 'noChange',COUNT(DISTINCT c.orderid) counts FROM cancel_replacement_record c
+        INNER JOIN orderinfo oi ON c.orderid=oi.order_no
+        INNER JOIN admin_r_user a ON oi.user_id=a.userid
+        INNER JOIN USER u ON oi.user_id=u.id
+        where   oi.state between 1 and 5 and c.flag=0
+        and oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+        email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+        email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
+        email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
+        email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+        email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
+        <if test="admuserid != 0">
+           and a.adminid=#{admuserid}
+        </if>
         union all
         SELECT 'deliver' AS state,COUNT(id) AS counts FROM ( SELECT order_fee.* FROM order_fee  LEFT JOIN orderinfo o ON  orderno=  order_no
         WHERE o.state IN (5,2,1) AND o.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
@@ -821,7 +802,7 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
-        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND sku!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
+        (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND IFNULL(sku,'---')!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
@@ -878,7 +859,7 @@
         (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
-        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
+        a.address as addresss,o.user_id as userid,o.actual_allincost,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,a.street,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
@@ -1010,6 +991,12 @@
         left join  admin_r_user aru on aru.userid= o.user_id
         left join  paymentconfirm  pf on pf.orderno=o.child_order_no where child_order_no =#{orderid}
     </select>
+    <select id="getUserEmailByOrderNo" resultType="java.lang.String">
+        SELECT u.email FROM USER u INNER JOIN orderinfo oi ON u.id=oi.user_id WHERE oi.order_no=#{orderNo}
+    </select>
+    <update id="updateOrderinfoUpdateState">
+        update orderinfo set server_update=1 where order_no=#{orderNo}
+    </update>
     <select id="getAllFreightByOrderid" resultType="java.lang.String">
         SELECT CAST(IFNULL(SUM(od_total_weight),0.00) AS DECIMAL(10,2)) FROM order_details WHERE orderid=#{orderNo} or dropshipid=#{orderNo}
     </select>
@@ -1378,8 +1365,8 @@
     </insert>
     <select id="getFlushOrderFreightOrder" resultType="com.cbt.bean.OrderBean">
         SELECT order_no AS orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
-        WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1) AND od.goodsid != '1400'
-        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QB29917379468058'
+        WHERE  oi.state IN (1,2,5) AND od.state IN (0,1) AND oi.isDropshipOrder IN (0,1,2) AND od.goodsid != '1400'
+        AND DATE_SUB(CURDATE(), INTERVAL 14 DAY) &lt;= DATE(oi.orderpaytime) and oi.order_no='QC07665001343198'
         GROUP BY oi.order_no  ORDER BY oi.orderid DESC;
     </select>
     <select id="getAllOrderInfo" resultType="com.cbt.bean.OrderBean">

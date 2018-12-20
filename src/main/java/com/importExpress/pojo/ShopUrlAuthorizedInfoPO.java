@@ -39,6 +39,16 @@ public class ShopUrlAuthorizedInfoPO {
 
 	private Date updatetime;
 
+	private String shopBrand;//店铺品牌属性
+
+    public String getShopBrand() {
+        return shopBrand;
+    }
+
+    public void setShopBrand(String shopBrand) {
+        this.shopBrand = shopBrand;
+    }
+
     public String getImgFileUrl() {
         return imgFileUrl;
     }
@@ -147,14 +157,16 @@ public class ShopUrlAuthorizedInfoPO {
 		super();
 	}
 
-	public ShopUrlAuthorizedInfoPO(String shopId, Integer adminId, String admuser, Date startTime, Date endTime, String remark) {
+	public ShopUrlAuthorizedInfoPO(Long id, String shopId, Integer adminId, String admuser, Date startTime, Date endTime, String remark, String shopBrand) {
 		super();
+		this.id = id;
 		this.shopId = shopId;
 		this.adminId = adminId;
 		this.admuser = admuser;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.remark = remark;
+		this.shopBrand = shopBrand;
 	}
 
 	@Override

@@ -2731,36 +2731,6 @@ public class Purchase extends HttpServlet {
 			DBHelper.getInstance().closeConnection(conn);
 		}
 	}
-	
-    /**
-     * 将商品的采购订单号录入到对应的商品中
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-	public void upadteTbOrderId(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		int row=0;
-		String orderid=request.getParameter("orderNo");
-		String goodsid=request.getParameter("goodsid");
-		String tborderid=request.getParameter("tborderid");
-		Connection conn = DBHelper.getInstance().getConnection();
-		String sql="update order_product_source set tborderid='"+tborderid+"' where orderid='"+orderid+"' and goodsid='"+goodsid+"'";
-		PreparedStatement stmt = null;
-		try {
-			stmt = conn.prepareStatement(sql);
-			row=stmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		PrintWriter out = response.getWriter();
-		out.print(row);
-		out.flush();
-		out.close();
-		DBHelper.getInstance().closePreparedStatement(stmt);
-        DBHelper.getInstance().closeConnection(conn);
-	}
 
 	public void getInventory(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

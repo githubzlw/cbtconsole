@@ -13,11 +13,12 @@
 <body>
 <table border="1px  #0094ff" style="border-collapse: collapse;width: 90%; height: 90%">
  		<form action="/cbtconsole/supplierscoring/querySupplierScoringList" method="get">
- 			<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>
-    		<input type="radio" name="flag" value="0">所有的</input>
+ 			<%--<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>--%>
+    		<input type="radio" name="flag" value="0" checked="checked">所有的</input>
     		<div style="float: right;">【合作过的供应商（<span>${cooperatedCount}</span>）】【优质供应商（<span>${highCount}</span>）】【普通供应商（<span>${ordinaryCount}</span>）】【黑名单供应商（<span>${blacklistCount}</span>）】
  			</div><br />
  			供应商ID:<input id="select_ship_id" type="text" name="shop_id">
+			供应商类别名称:<input id="categoryName" type="text" name="categoryName">
  			供应商级别:<select id="select_level"  name="level">
  							<option value=""  >---请选择---</option>
  							<option value="1">合作过的供应商</option>
@@ -45,7 +46,7 @@
 			<tr>
 			<td>供应商</td>
 			<td>供应商类别ID(类别名称)</td>
-			<td>店铺商品总数|在线产品数量|待评价商品数量</td>
+			<td>店铺商品总数|在线产品数量</td>
 			<td>是否精品店铺</td>
 			<td>是否授权</td>
 			<td>质量</td>
@@ -62,7 +63,7 @@
 			<td><a target='_blank' href='https://www.import-express.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a>
 			</td>
 			<td>${supplierScoringBean.category}</td>
-			<td>${supplierScoringBean.allcounts }|${supplierScoringBean.counts }|${supplierScoringBean.noSupplier}</td>
+			<td>${supplierScoringBean.allcounts }|${supplierScoringBean.counts }</td>
 			<td>${supplierScoringBean.type}</td>
 			<td>${supplierScoringBean.authorizedFlag}</td>
 			<td>
@@ -136,10 +137,11 @@
 		  }
 	}
 	function topageInfo(topage,currpage){
-			var countpage = "${pageInfo.countPage }"
-			var level =	$("#select_level").val()
-			var shop_id = $("#select_ship_id").val()
+			var countpage = "${pageInfo.countPage }";
+			var level =	$("#select_level").val();
+			var shop_id = $("#select_ship_id").val();
 			var quality=$("#quality").val();
+			var categoryName=$("#categoryName").val();
       		/* var services=$("#services").val(); */
       		var flag=$('input[type=radio][name=flag]:checked').val();
 			topage =parseInt(topage)
@@ -153,7 +155,7 @@
 			if(topage==-1){
 				topage = $("#jump1").val()
 			}
-		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage+"&shop_id="+shop_id+"&level="+level+"&quality="+quality+"&flag="+flag;
+		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage+"&shop_id="+shop_id+"&level="+level+"&quality="+quality+"&flag="+flag+"&categoryName="+categoryName;
 
 		}
 
@@ -213,12 +215,13 @@
 		var shop_id = '${shop_id}';
 		var level = '${level}';
 		var quality = '${quality}';
-        /* var services = '${services}'; */
         var authorizedFlag='${authorizedFlag}';
         var flag='${flag}';
+        var categoryName='${categoryName}';
         $("#quality").val(quality);
         /* $("#services").val(services); */
 		$("#select_ship_id").val(shop_id);
+		$("#categoryName").val(categoryName);
 		$("#authorizedFlag").val(authorizedFlag);
 		if("true" == flag){
 			$('input[type=radio][name=flag][value=1]').get(0).checked = "checked";

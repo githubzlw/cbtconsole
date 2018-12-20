@@ -1593,7 +1593,7 @@ public class NewOrderDetailsCtr {
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 
-						sendMailFactory.sendMail(String.valueOf(model.get("toEmail")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+						sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 						// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 						insertChangeRecords(orderNo, -1, adminId);
 						json.setOk(true);
@@ -1713,8 +1713,13 @@ public class NewOrderDetailsCtr {
 				model.put("orderNo",orderNo);
 				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 				String modeStr = jsonObject.toString();
-
-				sendMailFactory.sendMail(String.valueOf(model.get("toEmail")), null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				try {
+					sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
+					json.setMessage("Failed to send mail, please contact the developer by screen, thank you！"+ e.getMessage());
+				}
 				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 				try {
 					insertChangeRecords(orderNo, -1, adminId);
@@ -1816,7 +1821,7 @@ public class NewOrderDetailsCtr {
 			// 订单支付确认信息回显
 			PaymentConfirm paymentConfirm = server.queryForPaymentConfirm(orderNo);
 			// 是否为黑名单
-			int row = server.isTblack(payList.size() > 0 ? payList.get(0).getUsername() : "");
+			int row = server.isTblack(payList.size() > 0 && StringUtil.isNotBlank(payList.get(0).getUsername()) ? payList.get(0).getUsername() : "----");
 			if (row > 0) {
 				request.setAttribute("isTblack", "该用户为黑名单用户");
 			}
@@ -1947,9 +1952,10 @@ public class NewOrderDetailsCtr {
 		//会员费
 		double memberFee = orderInfo.getMemberFee();
 
+		// 会员费不算优惠金额,去掉
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
-				+ actual_lwh + processingfee + memberFee;
+				+ actual_lwh + processingfee;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

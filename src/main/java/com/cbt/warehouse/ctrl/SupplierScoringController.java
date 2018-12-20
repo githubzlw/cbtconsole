@@ -61,6 +61,8 @@ public class SupplierScoringController {
 			String services=request.getParameter("services");
 			String authorizedFlag=request.getParameter("authorizedFlag");
 			authorizedFlag=StringUtil.isBlank(authorizedFlag)?null:authorizedFlag;
+			String categoryName=request.getParameter("categoryName");
+			categoryName=StringUtil.isBlank(categoryName)?null:categoryName;
 			shop_id = StringUtils.isNotBlank(shop_id) ? new String(shop_id.getBytes("iso8859-1"), "utf-8"): null;
 			String level = request.getParameter("level");
 			request.setAttribute("flag",flag);
@@ -68,6 +70,7 @@ public class SupplierScoringController {
 			request.setAttribute("quality",StringUtil.isBlank(quality)?"":quality);
 			request.setAttribute("services",StringUtil.isBlank(services)?"":services);
 			request.setAttribute("authorizedFlag",StringUtil.isBlank(authorizedFlag)?"":authorizedFlag);
+			request.setAttribute("categoryName",categoryName == null?"":categoryName);
 			//此处暂时只做这个操作,后续需要将中文改成数字表示
 			request.setAttribute("select_shop_id", StringUtils.isBlank(shop_id)?"":shop_id);
 			if(StringUtils.isBlank(level)){
@@ -89,7 +92,7 @@ public class SupplierScoringController {
 			int start = Utility.getStringIsNull(request.getParameter("currpage")) ? Integer.parseInt(request.getParameter("currpage")) : 1;
 			int pagesize = 20;
 			Page<SupplierScoringBean> pageInfo = supplierScoringService.queryList(start, pagesize, shop_id, level,quality,services,
-					authorizedFlag,flag,userid);
+					authorizedFlag,flag,userid,categoryName);
 			List<SupplierScoringBean> scoringlist = pageInfo.getList();
 			if (scoringlist == null) {
 				LOG.warn("工厂列表查询为空");

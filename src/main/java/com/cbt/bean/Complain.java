@@ -9,12 +9,21 @@ public class Complain {
 	private String creatTime;
 	private String closeTime;
 	private String refOrderId;
+	private String refGoodsId;
 	private int complainState;
 	private String dealAdmin;
 	private int dealAdminid;
 
 	private String saleAdmin;// 关联的销售
 	private int isRefund;// 是否申请退款
+
+	public String getRefGoodsId() {
+		return refGoodsId;
+	}
+
+	public void setRefGoodsId(String refGoodsId) {
+		this.refGoodsId = refGoodsId;
+	}
 
 	public int getIsRefund() {
 		return isRefund;

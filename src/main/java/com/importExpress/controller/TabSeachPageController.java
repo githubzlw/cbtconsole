@@ -341,7 +341,7 @@ public class TabSeachPageController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		if (aliCategory == null) {
-			DataSourceSelector.set("dataSource127hop");
+//			DataSourceSelector.set("dataSource127hop");
 			aliCategory = tabSeachPageService.aliCategory();
 		}
 
@@ -802,13 +802,15 @@ public class TabSeachPageController {
 			result.put("message", "noLogin");
 			return result;				
 		}
+        String id = request.getParameter("authorized_id");
 		String shopId = request.getParameter("authorized_shop_id");
 		String startTime = request.getParameter("startTime");
 		String endTime = request.getParameter("endTime");
 		String remark = request.getParameter("authorized_remark");
-		ShopUrlAuthorizedInfoPO bean = new ShopUrlAuthorizedInfoPO(shopId, adminId, admName,
-				StringUtils.isNotBlank(startTime)?DATEFORMAT.parse(startTime):null, 
-				StringUtils.isNotBlank(endTime)?DATEFORMAT.parse(endTime):null, remark);
+		String shopBrand = request.getParameter("authorized_shop_brand");
+        ShopUrlAuthorizedInfoPO bean = new ShopUrlAuthorizedInfoPO(StringUtils.isBlank(id)?null:Long.parseLong(id), shopId, adminId, admName,
+				StringUtils.isNotBlank(startTime)?DATEFORMAT.parse(startTime):null,
+				StringUtils.isNotBlank(endTime)?DATEFORMAT.parse(endTime):null, remark, shopBrand);
 
         String[] imgInfo = SearchFileUtils.comFileUpload(file, "AuthorizedFile", null, null, null, 0);
         if (null != imgInfo && imgInfo.length > 0) {
@@ -831,6 +833,37 @@ public class TabSeachPageController {
 		}
 		return result;
 	}
+    /**
+     * ly  2018/12/05 16:49
+     * 上线店铺 功能中 授权图片删除功能
+     *
+     * @param request
+     */
+    @RequestMapping("/deleteAuthorizedInfo")
+    @ResponseBody
+    public Map<String, Object> deleteAuthorizedInfo(HttpServletRequest request, String shopId){
+        Map<String, Object> result = new HashMap<String, Object>();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        if (userJson == null) {
+            result.put("status", false);
+            result.put("message", "未登陆,请重新登录后操作!");
+            return result;
+        }
+
+        DataSourceSelector.set("dataSource28hop");
+        long count = tabSeachPageService.updateAuthorizedInfoValid(shopId, 3);
+        DataSourceSelector.restore();
+
+        if (count > 0) {
+            result.put("status", true);
+            result.put("message", "删除成功！");
+        } else {
+            result.put("status", false);
+            result.put("message", "删除失败！");
+        }
+        return result;
+    }
 
 	/**
 	 * 更具店铺查询 授权标识信息

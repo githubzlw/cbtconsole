@@ -1,8 +1,9 @@
 package com.cbt.method.dao;
 
-import com.cbt.bean.OrderDetailsBean;
-
 import java.util.List;
+import java.util.Map;
+
+import com.cbt.bean.OrderDetailsBean;
 
 public interface IOrderDetailsDao {
 	
@@ -47,4 +48,6 @@ public interface IOrderDetailsDao {
                             String goods_title, int googsnumber, String orderNo, int od_id,
                             int goodid, double price, String resource, int buycount,
                             String reason, String currency, String pname, boolean allReplcae, String shop_url, String shop_name, String address);
+	
+	List<Map<String,Object>> getOrderDetailByUser(int userid);
 }

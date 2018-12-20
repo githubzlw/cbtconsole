@@ -73,7 +73,7 @@
 
             setDatagrid();
             var opts = $("#easyui-datagrid").datagrid("options");
-            opts.url = "/cbtconsole/warehouse/getPrePurchase";
+            opts.url = "/cbtconsole/purchase/getPrePurchase";
             $('#dlg1').dialog('close');
         })
 
@@ -111,6 +111,7 @@
             var orderid = $("#orderid").val();
             var goodsid = $("#goodsid").val();
             var goods_name = $("#goods_name").val();
+            var goods_pid=$("#goods_pid").val();
             var admuserid=$('#admuserid').combobox('getValue');
             var state=$('#state').combobox('getValue');
             var days=$('#days').combobox('getValue');
@@ -129,6 +130,7 @@
                 "admuserid":admuserid,
                 "state":state,
                 "goods_name":goods_name,
+				"goods_pid":goods_pid,
                 "type":type
             });
             initData();
@@ -141,6 +143,7 @@
             $("#iduserid").textbox('setValue','');
             $('#days').combobox('setValue','1');
             $('#state').combobox('setValue','-1');
+            $("#goods_pid").textbox('setValue','');
             $('#admuserid').combobox('setValue','<%=adm.getId()%>');
         }
 
@@ -175,7 +178,7 @@
             //超过交期项目(订单)
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:1,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -190,7 +193,7 @@
             //建议替换(订单)
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:2,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -205,7 +208,7 @@
             //同意替换(订单)
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:3,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -220,7 +223,7 @@
             //验货有疑问(订单)
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:4,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -235,7 +238,7 @@
             //疑似没有购买记录(订单)
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:5,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -249,7 +252,7 @@
             });
             $.ajax({
             	type:"post",
-            	url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+            	url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
             	data:{state:6,admuserid:admuserid},
             	dataType:"text",
             	async:true,
@@ -267,7 +270,7 @@
             //采购超24H无物流信息
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getOrderInfoCountByState.do",
+                url:"/cbtconsole/purchase/getOrderInfoCountByState.do",
                 data:{state:7,admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -287,7 +290,7 @@
             //超过1天未发货
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getNotShipped",
+                url:"/cbtconsole/purchase/getNotShipped",
                 data:{admuserid:admuserid},
                 dataType:"text",
                 async:true,
@@ -301,13 +304,12 @@
             //发货3天未入库
             $.ajax({
                 type:"post",
-                url:"/cbtconsole/warehouse/getShippedNoStorage",
+                url:"/cbtconsole/purchase/getShippedNoStorage",
                 data:{admuserid:admuserid},
                 dataType:"text",
                 async:true,
                 success : function(data){
                     if(data != '0'){
-                        // var obj = eval("("+data+")");
                         $("#tb_info_7").html("<a target='_blank' href='/cbtconsole/website/noStorageDetails.jsp' title='查看发货三天未入库商品详情'>"+data+"</a>");
                     }
                 }
@@ -317,7 +319,7 @@
                 type:'post',
                 dataType:"text",
                 async:true,
-                url:'/cbtconsole/warehouse/getfpCount.do',
+                url:'/cbtconsole/purchase/getfpCount.do',
                 data:{admuserid:admuserid},
                 success:function(data){
                     if(data=='null'){
@@ -330,7 +332,7 @@
                 type:'post',
                 dataType:"text",
                 async:true,
-                url:'/cbtconsole/warehouse/getMCgCount.do',
+                url:'/cbtconsole/purchase/getMCgCount.do',
                 data:{admuserid:admuserid},
                 success:function(data){
                     if(data=='null'){
@@ -343,7 +345,7 @@
                 type:'post',
                 dataType:"text",
                 async:true,
-                url:'/cbtconsole/warehouse/getDistributionCount.do',
+                url:'/cbtconsole/purchase/getDistributionCount.do',
                 data:{admuserid:admuserid},
                 success:function(data){
                     if(data=='null'){
@@ -356,7 +358,7 @@
                 type:'post',
                 dataType:"text",
                 async:true,
-                url:'/cbtconsole/warehouse/getSjCgCount.do',
+                url:'/cbtconsole/purchase/getSjCgCount.do',
                 data:{admuserid:admuserid},
                 success:function(data){
                     if(data=='null'){
@@ -380,12 +382,9 @@
             $("#old_admuserid").val(admuserid);
         }
         function addOrderInfo(orderid,admuserid){
-            console.log(orderid);
-            console.log(admuserid);
             $("#ad_orderid").val(orderid);
             $("#ad_admuserid").val(admuserid);
             $('#dlg1').dialog('open');
-
         }
 
         function cance1(){
@@ -435,7 +434,7 @@
                 type:'post',
                 dataType:"text",
                 async:true,
-                url:'/cbtconsole/warehouse/purchasing_allocation',
+                url:'/cbtconsole/purchase/purchasing_allocation',
                 data:{},
                 success:function(data){
                     if(data>0){
@@ -497,6 +496,7 @@
 				<option value="8">订单取消</option>
 				<option value="9">采样订单</option>
 				<!-- 						<option value=fff"10">采购数    量大于订单数量</option> -->
+				<option value="11">历史替换</option>
 			</select>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<select class="easyui-combobox" name="days" id="days" style="width:8%;" data-options="label:'商品分配时间:',panelHeight:'auto'">
@@ -517,10 +517,11 @@
                     method:'get'">
 			</select>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="iduserid" id="iduserid" style="width:10%;margin-top: 10px;"  data-options="label:'客户编号(ID):'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:12%;margin-top: 10px;"  data-options="label:'商品编号/购物车id:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="orderid" id="orderid" style="width:12%;margin-top: 10px;"  data-options="label:'客户订单号:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			<input class="easyui-textbox" name="goods_name" id="goods_name" style="width:10%;margin-top: 10px;"  data-options="label:'产品名称:'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input class="easyui-textbox" name="iduserid" id="iduserid" style="width:10%;margin-top: 10px;"  data-options="label:'客户编号(ID):'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goodsid" id="goodsid" style="width:12%;margin-top: 10px;"  data-options="label:'商品编号/购物车id:'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="goods_pid" id="goods_pid" style="width:12%;margin-top: 10px;"  data-options="label:'商品pid:'">&nbsp;&nbsp;
+			<input class="easyui-textbox" name="orderid" id="orderid" style="width:12%;margin-top: 10px;"  data-options="label:'客户订单号:'"><br>
+			<input class="easyui-textbox" name="goods_name" id="goods_name" style="width:10%;margin-top: 10px;"  data-options="label:'产品名称:'">&nbsp;&nbsp;
 			<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)">
 			<input class="but_color" type="button" value="重置" onclick="doReset()">
 		</form>
@@ -529,7 +530,7 @@
 		<a href="javascript:purchasing_allocation();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">订单采购分配</a>
 	</c:if>
 	<a target="_blank" href="/cbtconsole/website/purchase_order_details.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">问题包裹反查</a>
-	<a target="_blank" href="/cbtconsole/website/comfirmOrderAndGenerate.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">一键生成1688未付款订单</a>
+	<%--<a target="_blank" href="/cbtconsole/website/comfirmOrderAndGenerate.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">一键生成1688未付款订单</a>--%>
 </div>
 <table class="easyui-datagrid" id="easyui-datagrid"
 	   style="width: 1800px; height: 900px">

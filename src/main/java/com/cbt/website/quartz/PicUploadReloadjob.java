@@ -2,6 +2,7 @@ package com.cbt.website.quartz;
 
 import com.cbt.jdbc.DBHelper;
 import com.cbt.util.NewFtpUtil;
+import com.cbt.util.Util;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,7 +27,7 @@ public class PicUploadReloadjob implements Job{
 				String imgPath=rs.getString("imgPath");
 				String orderid=rs.getString("orderid");
 				String goodsid=rs.getString("goodsid");
-				boolean flag=NewFtpUtil.uploadFileToRemote("104.247.194.50", 21, "importweb", "importftp@123", "/inspectionImg/", storePath, imgPath);
+				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
 				if(flag){
 					sql = "update pic_fail set flag=1 where storePath=? and imgPath=? and orderid=? and goodsid=?";
 					stmt = conn27.prepareStatement(sql);
@@ -37,12 +38,12 @@ public class PicUploadReloadjob implements Job{
 					stmt.executeUpdate();
 					sql = "UPDATE order_details t SET t.picturepath = ? WHERE t.orderid = ? AND t.goodsid = ?;";
 					stmt = conn27.prepareStatement(sql);
-					stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, orderid);
 					stmt.setString(3, goodsid);
 					stmt.executeUpdate();
 					stmt = conn70.prepareStatement(sql);
-					stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+					stmt.setString(1, Util.PIC_URL+storePath+"");
 					stmt.setString(2, orderid);
 					stmt.setString(3, goodsid);
 					stmt.executeUpdate();
@@ -54,12 +55,12 @@ public class PicUploadReloadjob implements Job{
 					if(rs.next()){
 						sql="update inspection_picture set pic_path=?,updatetime=now() where orderid=? and goods_id=? and isdelete=0";
 						stmt=conn27.prepareStatement(sql);
-						stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+						stmt.setString(1, Util.PIC_URL+storePath+"");
 						stmt.setString(2, orderid);
 						stmt.setString(3, goodsid);
 						stmt.executeUpdate();
 						stmt=conn70.prepareStatement(sql);
-						stmt.setString(1, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+						stmt.setString(1, Util.PIC_URL+storePath+"");
 						stmt.setString(2, orderid);
 						stmt.setString(3, goodsid);
 						stmt.executeUpdate();
@@ -76,13 +77,13 @@ public class PicUploadReloadjob implements Job{
 						sql="INSERT INTO inspection_picture (pid,orderid,goods_id,pic_path,createtime) values(?,?,?,?,now())";
 						stmt=conn27.prepareStatement(sql);
 						stmt.setString(1, goods_pid);
-						stmt.setString(2, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+						stmt.setString(2, Util.PIC_URL+storePath+"");
 						stmt.setString(3, orderid);
 						stmt.setString(4, goodsid);
 						stmt.executeUpdate();
 						stmt=conn70.prepareStatement(sql);
 						stmt.setString(1, goods_pid);
-						stmt.setString(2, "https://img.import-express.com/importcsvimg/inspectionImg/"+storePath+"");
+						stmt.setString(2, Util.PIC_URL+storePath+"");
 						stmt.setString(3, orderid);
 						stmt.setString(4, goodsid);
 						stmt.executeUpdate();

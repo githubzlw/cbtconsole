@@ -193,6 +193,7 @@ function fnGetStatistic() {
             // if(json[i].state == "purchase")$("#errorbuy").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchase'>" + json[i].counts + "</a>");//采购问题
             if (json[i].state == "agree") $("#getchange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=agree'>" + json[i].counts + "</a>");//同意替换
             if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest'>" + json[i].counts + "</a>");//建议替换
+            if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
             if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy'>" + json[i].counts + "</a>");//出运
             if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
             // if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
@@ -223,6 +224,7 @@ function fnGetStatistic() {
 						// if(json[i].state == "purchase")$("#errorbuy").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchase'>" + json[i].counts + "</a>");//采购问题
 						if (json[i].state == "agree") $("#getchange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=agree&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//同意替换
 						if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//建议替换
+                        if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
 						if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//出运
 			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
 						// if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
@@ -488,27 +490,31 @@ function fnGetMessage(uid){
 				window.open(url);
 			}
 		}else if(type=="propagemessage"){
-			// url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2&adminId=" + uid;
-			url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2";
+            url="/cbtconsole/website/guestbook.jsp?status=0&questionType=2";
+            if(",0,1,8,18,62,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminId=" + uid;
+            }
             window.open(url);
 		}else if(type=="customerInfoCollection"){
-			url="/cbtconsole/apa/customerInfo_collection.html?is_report=2";
-			window.open(url);
+            url="/cbtconsole/apa/customerInfo_collection.html?is_report=2";
+            if(",0,1,8,18,62,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminId=" + uid;
+            }
+            window.open(url);
 		}else if(type=="questionnum"){
-			url="/cbtconsole/question/questionlist?replayflag=1";
-			window.open(url);
+            url="/cbtconsole/question/questionlist?replayflag=1";
+            if(",0,1,8,18,62,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminid=" + uid;
+            }
+            window.open(url);
 		}else if(type=="businquiries"){
-			url="/cbtconsole/messages/getBusiess";
-			if(style=="noArrage"){
-				url+='?adminid='+uid+'&status=2';
-				window.open(url);
-			}else if(style=="noDelete"){
-				url+='?adminid='+uid+'&status=3';
-				window.open(url);
-			}else{
-				url+='?adminid='+uid+'&status=4';
-				window.open(url);
-			}
+            url="/cbtconsole/messages/getBusiess?state=0";
+            if(",0,1,8,18,62,83,84,".indexOf("," + uid + ",") == -1){
+                url += "&adminid=" + uid;
+            } else {
+                url += "&adminid=0";
+            }
+            window.open(url);
 		}else if(type=="shopcarmarket"){
 			url="/cbtconsole/website/shoppingCartManagement.jsp";
 			 if(style=="noDelete"){

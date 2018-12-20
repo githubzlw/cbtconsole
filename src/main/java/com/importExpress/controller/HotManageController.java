@@ -13,7 +13,9 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.Utility;
 import com.importExpress.service.HotManageService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -448,7 +450,7 @@ public class HotManageController {
                 if (hotCategory.getHotType() == 2) {
                     goods.setVirtualOldPrice(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) * (1 + goods.getDiscountPercentage() / 100D), 2));
                 }
-                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + goods.getShowName() + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
+                goods.setGoodsUrl("https://www.import-express.com/goodsinfo/" + Utility.StringFilter(goods.getShowName()) + (goods.getIsNewCloud() > 0 ? "-3" : "-1") + goods.getGoodsPid() + ".html");
             }
             mv.addObject("isOnTotal", isOnTotal);
             mv.addObject("allTotal", goodsList.size());
@@ -916,20 +918,8 @@ public class HotManageController {
 
 
     private void insertCategoryOnline(HotCategory param) {
-        String show_name = param.getShowName();
-        if (show_name.contains("'")) {
-            show_name = show_name.replace("'", "\\'");
-        }
-        if (show_name.contains("\"")) {
-            show_name = show_name.replace("\"", "\\\"");
-        }
-        String category_name = param.getCategoryName();
-        if (category_name.contains("'")) {
-            category_name = category_name.replace("'", "\\'");
-        }
-        if (category_name.contains("\"")) {
-            category_name = category_name.replace("\"", "\\\"");
-        }
+        String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
+        String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
         String sql = "insert into hot_category(category_name,show_name,show_img,is_on,sorting,hot_type,admin_id)" +
                 " values('" + category_name + "','" + show_name + "','" + param.getShowImg() + "'," + param.getIsOn()
                 + "," + param.getSorting() + "," + param.getHotType() + "," + param.getAdminId() + ")";
@@ -937,20 +927,8 @@ public class HotManageController {
     }
 
     private void updateCategoryOnline(HotCategory param) {
-        String show_name = param.getShowName();
-        if (show_name.contains("'")) {
-            show_name = show_name.replace("'", "\\'");
-        }
-        if (show_name.contains("\"")) {
-            show_name = show_name.replace("\"", "\\\"");
-        }
-        String category_name = param.getCategoryName();
-        if (category_name.contains("'")) {
-            category_name = category_name.replace("'", "\\'");
-        }
-        if (category_name.contains("\"")) {
-            category_name = category_name.replace("\"", "\\\"");
-        }
+        String show_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getShowName());
+        String category_name = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(param.getCategoryName());
         String sql = "update hot_category set" +
                 " category_name='" + category_name + "',show_name='" + show_name + "',show_img='" + param.getShowImg()
                 + "',is_on=" + param.getIsOn()
@@ -962,24 +940,7 @@ public class HotManageController {
 
     private void insertDiscountOnline(HotDiscount hotDiscount) {
 
-        try {
-
-            Calendar calendar = Calendar.getInstance();
-
-            if (StringUtils.isNotBlank(hotDiscount.getBeginTime())) {
-                calendar.setTime(DATE_FORMAT.parse(hotDiscount.getBeginTime()));
-                calendar.add(Calendar.HOUR_OF_DAY, -8);
-                hotDiscount.setBeginTime(DATE_FORMAT.format(calendar.getTime()));
-            }
-            if (StringUtils.isNotBlank(hotDiscount.getEndTime())) {
-                calendar.setTime(DATE_FORMAT.parse(hotDiscount.getEndTime()));
-                calendar.add(Calendar.HOUR_OF_DAY, -8);
-                hotDiscount.setEndTime(DATE_FORMAT.format(calendar.getTime()));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        AutoSub8Hour(hotDiscount);
         String sql = "insert into hot_goods_discount(hot_id,goods_pid,percentage,begin_time,end_time,admin_id,sort) values(";
         sql += hotDiscount.getHotId() + ",'" + hotDiscount.getGoodsPid() + "'," + hotDiscount.getPercentage()
                 + ",'" + hotDiscount.getBeginTime() + "','" + hotDiscount.getEndTime() + "'," + hotDiscount.getAdminId()
@@ -990,6 +951,15 @@ public class HotManageController {
 
     private void updateDiscountOnline(HotDiscount hotDiscount) {
 
+        AutoSub8Hour(hotDiscount);
+        String sql = "update hot_goods_discount set percentage= " + hotDiscount.getPercentage() + ",begin_time= '" + hotDiscount.getBeginTime() +
+                "',end_time= '" + hotDiscount.getEndTime() + "',admin_id= " + hotDiscount.getAdminId() + ",sort= " + hotDiscount.getSort() +
+                "        where hot_id = " + hotDiscount.getHotId() + " and goods_pid='" + hotDiscount.getGoodsPid() + "'";
+        System.err.println(sql);
+        NotifyToCustomerUtil.sendSqlByMq(sql);
+    }
+
+    private void AutoSub8Hour(HotDiscount hotDiscount){
         try{
 
             Calendar calendar = Calendar.getInstance();
@@ -1007,24 +977,13 @@ public class HotManageController {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        String sql = "update hot_goods_discount set percentage= " + hotDiscount.getPercentage() + ",begin_time= '" + hotDiscount.getBeginTime() +
-                "',end_time= '" + hotDiscount.getEndTime() + "',admin_id= " + hotDiscount.getAdminId() + ",sort= " + hotDiscount.getSort() +
-                "        where hot_id = " + hotDiscount.getHotId() + " and goods_pid='" + hotDiscount.getGoodsPid() + "'";
-        System.err.println(sql);
-        NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
 
     private void insertEvaluationOnline(HotEvaluation hotEvaluation) {
         String content = hotEvaluation.getContent();
         if (StringUtils.isNotBlank(content)) {
-            if (content.contains("'")) {
-                content = content.replace("'", "\\'");
-            }
-            if (content.contains("\"")) {
-                content = content.replace("\"", "\\\"");
-            }
+            content = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(content);
         } else {
             content = "";
         }
@@ -1041,12 +1000,7 @@ public class HotManageController {
     private void updateEvaluationOnline(HotEvaluation hotEvaluation) {
         String content = hotEvaluation.getContent();
         if (StringUtils.isNotBlank(content)) {
-            if (content.contains("'")) {
-                content = content.replace("'", "\\'");
-            }
-            if (content.contains("\"")) {
-                content = content.replace("\"", "\\\"");
-            }
+            content = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(content);
         } else {
             content = "";
         }

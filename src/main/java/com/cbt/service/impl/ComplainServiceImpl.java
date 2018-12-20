@@ -56,9 +56,37 @@ public class ComplainServiceImpl implements IComplainService{
 	}
 
 	@Override
-	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName,int roleType) {
+	public Page<ComplainVO> searchComplainByParam(Complain t, String username,Page page,String admName,int roleType,int check) {
 		// TODO Auto-generated method stub
-		return complainDao.searchComplainByParam(t, username,page,admName,roleType);
+		return complainDao.searchComplainByParam(t, username,page,admName,roleType,check);
+	}
+	
+	@Override
+	public int updateGoodsid(int id, String orderid, String goodsid) {
+		// TODO Auto-generated method stub
+		return complainDao.updateGoodsid(id, orderid, goodsid);
+	}
+	@Override
+	public int updateDisputeid(int id,String disputeid,String merchantid) {
+		// TODO Auto-generated method stub
+		return complainDao.updateDisputeid(id, disputeid,merchantid);
+	}
+
+
+	@Override
+	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
+		if(disputeIdList == null || disputeIdList.isEmpty()) {
+			return null;
+		}
+		// TODO Auto-generated method stub
+		return complainDao.getComplainByDisputeId(disputeIdList);
+	}
+
+
+	@Override
+	public List<ComplainVO> getComplainByUserId(String userId) {
+		// TODO Auto-generated method stub
+		return complainDao.getComplainByUserId(userId);
 	}
 	
 	

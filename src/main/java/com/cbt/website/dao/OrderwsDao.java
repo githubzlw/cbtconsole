@@ -580,7 +580,7 @@ public class OrderwsDao implements IOrderwsDao {
         }
         return t;
     }
-
+    @Override
     public void updateGoodsCarMessage(String orderNo) {
         String sql = "update order_change set is_read=1 where orderNo='" + orderNo + "'";
         Connection conn = DBHelper.getInstance().getConnection();
@@ -2330,7 +2330,7 @@ public class OrderwsDao implements IOrderwsDao {
                 upSql.append(","+changeType);
                 upSql.append(",'"+oldInfo+"'");
                 upSql.append(",'"+newInfo+"'");
-                upSql.append(",0");
+                upSql.append(",1");
                 upSql.append(",1)");
                 NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
                 //通知客户
@@ -6021,7 +6021,7 @@ public class OrderwsDao implements IOrderwsDao {
             stmt=conn.prepareStatement(sql);
             stmt.setString(1,orderNo);
             rs=stmt.executeQuery();
-            if(rs.next() && rs.getString("orderdesc").contains("余额足够抵扣订单金额")){
+            if(rs.next() && StringUtil.isNotBlank(rs.getString("orderdesc")) && rs.getString("orderdesc").contains("余额足够抵扣订单金额")){
                 status=1;
             }else{
                 sql="select id from ipn_info where paymentStatus = 1 and orderNo=?";

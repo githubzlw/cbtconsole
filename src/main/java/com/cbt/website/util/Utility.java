@@ -5,6 +5,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utility {
 	public static boolean getStringIsNull(String str){
@@ -70,6 +72,30 @@ public class Utility {
 		}else{
 			return null;
 		}
+	}
+
+	// 过滤特殊字符
+	public static String StringFilter(String str) {
+		// 只允许字母和数字 // String regEx ="[^a-zA-Z0-9]";
+		// 清除掉所有特殊字符
+		String tempStr = str;
+		String regEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+		try {
+			Pattern p = Pattern.compile(regEx);
+			Matcher m = p.matcher(str);
+			if(m.find()){
+				tempStr = m.replaceAll("").trim();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return tempStr;
+	}
+
+	public static void main(String[] args) {
+		String testStr = "[MKO Maikou] Lace Bleaching With Velvet Cotton Jacket Dog Clothes Pet Clothing And Pet Supplies";
+		System.err.println(StringFilter(testStr));
 	}
 
 }	

@@ -694,7 +694,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     }
 
     @Override
-    public int publish(CustomGoodsPublish bean) {
+    public int publish(CustomGoodsPublish bean,int isOnline) {
 
         String upsql = "update custom_benchmark_ready set valid=1,keyword=?,eninfo=?,enname=?,"
                 + "weight=?,img=?,endetail=?,revise_weight=?,final_weight=?, "
@@ -704,83 +704,79 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         } else if (bean.getIsEdited() == 2) {
             upsql += ",finalName=?,infoReviseFlag=?,priceReviseFlag=?";
         }
-        if(StringUtils.isNotBlank(bean.getFeeprice())){
+        if (StringUtils.isNotBlank(bean.getFeeprice())) {
             upsql += ",feeprice=?";
         }
         upsql += ",is_show_det_img_flag=?,entype=?,sellunit=?";
         upsql += ",ali_pid=?,ali_price=?,matchSource=?";
         upsql += " where pid=?";
-        Connection conn = DBHelper.getInstance().getConnection2();
+        Connection conn = null;
+        if (isOnline == 1) {
+            conn = DBHelper.getInstance().getConnection2();
+        } else {
+            conn = DBHelper.getInstance().getConnection();
+        }
+        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=? where pid = ?";
         ResultSet rs = null;
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
         int result = 0;
         try {
-            int i = 1;
-            stmt2 = conn.prepareStatement(upsql);
-            stmt2.setString(i++, bean.getKeyword());
-            stmt2.setString(i++, bean.getEninfo());
-            stmt2.setString(i++, bean.getEnname());
-            stmt2.setString(i++, bean.getWeight());
-            stmt2.setString(i++, bean.getImg());
-            stmt2.setString(i++, bean.getEndetail());
-
-            stmt2.setString(i++, bean.getReviseWeight());
-            stmt2.setString(i++, bean.getFinalWeight());
-            stmt2.setString(i++, bean.getPrice());
-            stmt2.setString(i++, bean.getWprice());
-            stmt2.setString(i++, bean.getRangePrice());
-            stmt2.setString(i++, bean.getSku());
-            if (bean.getIsEdited() == 1) {
+            if (isOnline == 1) {
+                int i = 1;
+                stmt2 = conn.prepareStatement(upsql);
+                stmt2.setString(i++, bean.getKeyword());
+                stmt2.setString(i++, bean.getEninfo());
                 stmt2.setString(i++, bean.getEnname());
-            } else if (bean.getIsEdited() == 2) {
-                stmt2.setString(i++, bean.getEnname());
-                stmt2.setInt(i++, 1);
-                stmt2.setInt(i++, 1);
-            }
+                stmt2.setString(i++, bean.getWeight());
+                stmt2.setString(i++, bean.getImg());
+                stmt2.setString(i++, bean.getEndetail());
 
-            if(StringUtils.isNotBlank(bean.getFeeprice())){
-                stmt2.setString(i++, bean.getFeeprice());
-            }
-            if (!(bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10)) {
-                stmt2.setInt(i++, 1);
+                stmt2.setString(i++, bean.getReviseWeight());
+                stmt2.setString(i++, bean.getFinalWeight());
+                stmt2.setString(i++, bean.getPrice());
+                stmt2.setString(i++, bean.getWprice());
+                stmt2.setString(i++, bean.getRangePrice());
+                stmt2.setString(i++, bean.getSku());
+                if (bean.getIsEdited() == 1) {
+                    stmt2.setString(i++, bean.getEnname());
+                } else if (bean.getIsEdited() == 2) {
+                    stmt2.setString(i++, bean.getEnname());
+                    stmt2.setInt(i++, 1);
+                    stmt2.setInt(i++, 1);
+                }
+
+                if (StringUtils.isNotBlank(bean.getFeeprice())) {
+                    stmt2.setString(i++, bean.getFeeprice());
+                }
+                if (!(bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10)) {
+                    stmt2.setInt(i++, 1);
+                } else {
+                    stmt2.setInt(i++, 0);
+                }
+                stmt2.setString(i++, bean.getEntype());
+                stmt2.setString(i++, bean.getSellUnit());
+                stmt2.setString(i++, bean.getAliGoodsPid());
+                stmt2.setString(i++, bean.getAliGoodsPrice());
+                stmt2.setInt(i++, bean.getMatchSource());
+                stmt2.setString(i++, bean.getPid());
+                result = stmt2.executeUpdate();
             } else {
-                stmt2.setInt(i++, 0);
+                stmt = conn.prepareStatement(upLocalSql);
+                stmt.setString(1, bean.getImg());
+                stmt.setString(2, bean.getEninfo());
+                stmt.setString(3, bean.getPid());
+                result = stmt.executeUpdate();
             }
-            stmt2.setString(i++, bean.getEntype());
-            stmt2.setString(i++, bean.getSellUnit());
-            stmt2.setString(i++, bean.getAliGoodsPid());
-            stmt2.setString(i++, bean.getAliGoodsPrice());
-            stmt2.setInt(i++, bean.getMatchSource());
-            stmt2.setString(i++, bean.getPid());
 
-            result = stmt2.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("publish error :" + e.getMessage());
             LOG.error("publish error :" + e.getMessage());
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt2 != null) {
-                try {
-                    stmt2.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closePreparedStatement(stmt2);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -1009,10 +1005,10 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean updateStateList(int state, String pids, int adminid) {
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection remoteConn = DBHelper.getInstance().getConnection2();
+        // Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
         PreparedStatement stmt = null;
-        PreparedStatement remoteStmt = null;
+        // PreparedStatement remoteStmt = null;
         PreparedStatement stmt28 = null;
 
         String upSql = "update custom_goods_edit a,custom_benchmark_ready b set b.valid=?,b.goodsstate=?,a.admin_id=?";
@@ -1022,7 +1018,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             upSql += ",a.off_time=now()";
         }
         upSql += " where a.pid = b.pid and b.pid =? ";
-        String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
+        // String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
         String up28Sql = "update custom_benchmark_ready_newest set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
 
         int rs = 0;
@@ -1031,11 +1027,11 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         try {
             String[] pidList = pids.split(",");
             conn.setAutoCommit(false);
-            remoteConn.setAutoCommit(false);
+            // remoteConn.setAutoCommit(false);
             conn28.setAutoCommit(false);
 
             stmt = conn.prepareStatement(upSql);
-            remoteStmt = remoteConn.prepareStatement(upRemoteSql);
+            // remoteStmt = remoteConn.prepareStatement(upRemoteSql);
             stmt28 = conn28.prepareStatement(up28Sql);
 
             for (String pid : pidList) {
@@ -1043,10 +1039,10 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     continue;
                 } else {
                     count++;
-                    remoteStmt.setInt(1, state == 4 ? 1 : 0);
-                    remoteStmt.setInt(2, state);
-                    remoteStmt.setString(3, pid);
-                    remoteStmt.addBatch();
+//                    remoteStmt.setInt(1, state == 4 ? 1 : 0);
+//                    remoteStmt.setInt(2, state);
+//                    remoteStmt.setString(3, pid);
+//                    remoteStmt.addBatch();
                     stmt.setInt(1, state == 4 ? 1 : 0);
                     stmt.setInt(2, state);
                     stmt.setInt(3, adminid);
@@ -1059,7 +1055,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     stmt28.addBatch();
                 }
             }
-            rs = remoteStmt.executeBatch().length;
+            /*rs = remoteStmt.executeBatch().length;
             if (rs == count) {
                 rs = 0;
                 rs = stmt.executeBatch().length;
@@ -1081,6 +1077,22 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 }
             } else {
                 remoteConn.rollback();
+            }*/
+
+
+            rs = stmt.executeBatch().length;
+            if (rs == count) {
+                rs = 0;
+                rs = stmt28.executeBatch().length;
+                if (rs == count) {
+                    conn.commit();
+                    conn28.commit();
+                } else {
+                    conn.rollback();
+                    conn28.rollback();
+                }
+            } else {
+                conn.rollback();
             }
 
         } catch (Exception e) {
@@ -1088,7 +1100,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             System.out.println("updateStateList error :" + e.getMessage());
             LOG.error("updateStateList error :" + e.getMessage());
             try {
-                remoteConn.rollback();
+                //remoteConn.rollback();
                 conn.rollback();
                 conn28.rollback();
             } catch (SQLException e1) {
@@ -1096,29 +1108,11 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (remoteStmt != null) {
-                try {
-                    remoteStmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt28 != null) {
-                try {
-                    stmt28.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            // DBHelper.getInstance().closePreparedStatement(remoteStmt);
+            DBHelper.getInstance().closePreparedStatement(stmt28);
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(remoteConn);
+            // DBHelper.getInstance().closeConnection(remoteConn);
             DBHelper.getInstance().closeConnection(conn28);
         }
         return rs == count;
