@@ -154,12 +154,14 @@ public class OKHttpUtils {
 				.setType(MultipartBody.FORM)
 				.addFormDataPart("uploadFile", file.getName(), fileBody)
 				.build();
-		Request request = new Request.Builder()
+		Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
 				.post(body)
 				.url(url)
 				.build();
 
 		Response response = client.newCall(request).execute();
+		System.err.println(response);
 		if(response.isSuccessful()){
 			String result = response.body().string();
 			System.err.println("upload result:" + result);
@@ -175,11 +177,12 @@ public class OKHttpUtils {
         if (file.exists() && file.isDirectory()) {
             File[] childList = file.listFiles();
             int total = childList.length;
+
             int count = 0;
             boolean isSuccess;
             for (File child : childList) {
                 try {
-                    isSuccess = okHttpUtils.postFileNoParam("http://127.0.0.1:8087/popProducts/hotFileUpload", child);
+                    isSuccess = okHttpUtils.postFileNoParam("https://www.import-express.com/hotFileUpload", child);
                     if(isSuccess){
                     	count++;
 					}
@@ -188,6 +191,7 @@ public class OKHttpUtils {
                     System.err.println("uploadFileToOnline,error:" + e.getMessage());
                 }
             }
+            System.err.println("total:" + total + ",count:" + count);
 			System.err.println("result:" + (total == count));
         } else {
             System.err.println("本次获取文件失败，无法更新到线上");
