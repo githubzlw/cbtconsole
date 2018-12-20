@@ -881,7 +881,7 @@ em {
 		<c:if test="${isDropshipOrder == 0 || isDropshipOrder == 2 || isDropshipOrder == 3}">
 			<!-- 不是dropship订单 -->
 			<div style="width:1440px;">
-				<%--<table id="orderDetail" class="ormtable2" align="center">
+				<table id="orderDetail" class="ormtable2" align="center">
 					<tbody>
 						<tr class="detfretit">
 							<td>商品编号/购物车id</td>
@@ -1051,8 +1051,8 @@ em {
 											<br>
 											<font color="red">【订单确认价格中】</font>
 										</c:if>
-									</c:if> &lt;%&ndash; 									<c:if test="${ostate==1 }"> &ndash;%&gt; <!-- 										产品买了并已经到我们仓库 -->
-									&lt;%&ndash; 									</c:if>  &ndash;%&gt; <input type="hidden"
+									</c:if> <%-- 									<c:if test="${ostate==1 }"> --%> <!-- 										产品买了并已经到我们仓库 -->
+									<%-- 									</c:if>  --%> <input type="hidden"
 									value="${ostate},${orderd.checked},${orderd.goodstatus}">
 									<c:if test="${ostate==1 && orderd.checked==0}">
 										已到仓库
@@ -1244,7 +1244,7 @@ em {
 							</td>
 						</tr>
 					</c:forEach>
-				</table>--%>
+				</table>
 			</div>
 		</c:if>
 
@@ -1585,7 +1585,6 @@ function getUrl(para){
 	if (admid != 40) {
 		$(".shield").hide();}
  </script>
-
 </html>
 <!-- 采购页面跳转使用 -->
 <%
