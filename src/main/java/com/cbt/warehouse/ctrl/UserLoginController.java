@@ -127,8 +127,8 @@ public class UserLoginController {
 			LOG.error("退出失败，原因：" + e.getMessage());
 		}
 
-//		return "main_login";
-		return "login";
+		return "main_login";
+//		return "login";
 	}
 
 	/**
