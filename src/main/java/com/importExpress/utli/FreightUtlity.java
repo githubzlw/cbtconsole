@@ -26,14 +26,16 @@ import java.util.Map;
  */
 public class FreightUtlity {
     private static final Logger logger = LoggerFactory.getLogger(FreightUtlity.class);
-    private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getFreightCostUrl");
+    private static final String getFreightCostUrl = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
 
     public static double getFreightByOrderno(String orderNo) {
         double freight = 0;
         OkHttpClient okHttpClient = new OkHttpClient();
 
         RequestBody formBody = new FormBody.Builder().add("orderNo", String.valueOf(orderNo)).build();
-        Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();
+        /*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
+        String url = getFreightCostUrl.replace("getMinFreightByUserId","getFreightByOrderNo");
+        Request request = new Request.Builder().url(url).post(formBody).build();
         try {
             Response response = okHttpClient.newCall(request).execute();
             String resultStr = response.body().string();
@@ -47,7 +49,6 @@ public class FreightUtlity {
                 System.err.println("getFreightByOrderno error :<:<:<");
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.err.println(e.getMessage());
             logger.error("getFreightByOrderno error,orderNo:[{}],e:[{}]" + orderNo + e.getMessage());
         }
