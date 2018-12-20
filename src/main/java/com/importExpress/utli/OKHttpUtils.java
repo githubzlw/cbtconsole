@@ -146,5 +146,51 @@ public class OKHttpUtils {
 	    }
 		
 	}
-	
+
+
+	public boolean postFileNoParam(String url,File file)  throws Exception {
+		RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+		MultipartBody body = new MultipartBody.Builder()
+				.setType(MultipartBody.FORM)
+				.addFormDataPart("uploadFile", file.getName(), fileBody)
+				.build();
+		Request request = new Request.Builder()
+				.post(body)
+				.url(url)
+				.build();
+
+		Response response = client.newCall(request).execute();
+		if(response.isSuccessful()){
+			String result = response.body().string();
+			System.err.println("upload result:" + result);
+			return "1".equals(result);
+		}else{
+			return false;
+		}
+	}
+
+	public static void main(String[] args) {
+		OKHttpUtils okHttpUtils = new OKHttpUtils();
+		File file = new File("E:/hotJson");
+        if (file.exists() && file.isDirectory()) {
+            File[] childList = file.listFiles();
+            int total = childList.length;
+            int count = 0;
+            boolean isSuccess;
+            for (File child : childList) {
+                try {
+                    isSuccess = okHttpUtils.postFileNoParam("http://127.0.0.1:8087/popProducts/hotFileUpload", child);
+                    if(isSuccess){
+                    	count++;
+					}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println("uploadFileToOnline,error:" + e.getMessage());
+                }
+            }
+			System.err.println("result:" + (total == count));
+        } else {
+            System.err.println("本次获取文件失败，无法更新到线上");
+        }
+	}
 }
