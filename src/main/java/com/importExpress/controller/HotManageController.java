@@ -976,12 +976,16 @@ public class HotManageController {
 				resultList.clear();
 			}
 			// 刷新到线上
-            uploadFileToOnline();
+            boolean isSuccess = uploadFileToOnline();
+			if(isSuccess){
+			    return 1;
+            }else{
+			    return 0;
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
 		}
-		return 1;
 	}
 
 
