@@ -5821,8 +5821,10 @@ public class WarehouseCtrl {
 		String remark = request.getParameter("remark");
 		String old_remark = request.getParameter("old_remark");
 		Map<String, String> map = new HashMap<String, String>();
-		if (old_remark == null || "".equals(old_remark)) {
+		if (StringUtil.isBlank(old_remark)) {
 			old_remark = "";
+		}else{
+			remark=remark+"<br>"+old_remark;
 		}
 		map.put("orderid", orderid);
 		map.put("sku", sku);
