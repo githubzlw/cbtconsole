@@ -27,13 +27,13 @@
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
             <p style="margin-bottom: 10px;">
             <h3 style="font-family: Times New Roman;margin-bottom:20px;">Dear customer,</h3>
-            <span>I'm ${adminName} of ImportExpress.</span>
-            <br>
+            <%--<span>I'm ${adminName} of ImportExpress.</span>
+            <br>--%>
             <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
             <br>
             <span>Is there anything I could help you with?</span>
             <br>
-            <span>Here's your shopping cart list</span>
+            <span>Here's your shopping cart list and some products are on sale!</span>
             </p>
 
             <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
@@ -158,13 +158,13 @@
             <div>
                 <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel
                     free to ask me by responding to this Email</p>
-                <p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>
-                <p style="margin-bottom: 5px;margin-top:0;"><b>${adminName}</b> | Marketing Manager</p>
-                <p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>
-                <p style="margin-bottom: 5px;margin-top:0;">Email: ${adminEmail}</p>
-                <p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input
-                        id="whats_app_span_temp" value="+86 136 3644 5063"/></p>
-                <p id="whats_app_pp" style="margin-bottom: 5px;margin-top:0;display: none;"></p>
+                <%--<p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>--%>
+                <%--<p style="margin-bottom: 5px;margin-top:0;"><b>${adminName}</b> | Marketing Manager</p>--%>
+                <%--<p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>--%>
+                <%--<p style="margin-bottom: 5px;margin-top:0;">Email: ${adminEmail}</p>--%>
+                <%--<p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input--%>
+                        <%--id="whats_app_span_temp" value="+86 136 3644 5063"/></p>--%>
+                <%--<p id="whats_app_pp" style="margin-bottom: 5px;margin-top:0;display: none;"></p>--%>
             </div>
             <div>
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
