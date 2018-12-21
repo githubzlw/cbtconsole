@@ -196,36 +196,37 @@
     function confirmAndSendEmail(userId, userEmail) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
-            var whatsApp = $("#whats_app_span_temp").val();
+            /*var whatsApp = $("#whats_app_span_temp").val();
             if (whatsApp) {
                 $("#whats_app_pp_temp").remove();
                 $("#whats_app_pp").text("WhatsApp: " + whatsApp).show();
 
-                $("#show_notice").show();
-                var emailContent = $("#email_content").html();
-                var model = $("#modeStr").html();
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'text',
-                    url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
-                    data: {
-                        "userEmail": userEmail,
-                        "userId": userId,
-                        "emailContent": emailContent,
-                        "model": model
-                    },
-                    success: function (data) {
-                        var json = eval("(" + data + ")");
-                        $("#show_notice").text(json.message);
-                    },
-                    error: function () {
-                        $("#show_notice").text("执行失败,请联系管理员");
-                    }
-                });
+
             } else {
                 $("#show_notice").text("请输入WhatsApp").show();
-            }
+            }*/
 
+            $("#show_notice").show();
+            var emailContent = $("#email_content").html();
+            var model = $("#modeStr").html();
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
+                data: {
+                    "userEmail": userEmail,
+                    "userId": userId,
+                    "emailContent": emailContent,
+                    "model": model
+                },
+                success: function (data) {
+                    var json = eval("(" + data + ")");
+                    $("#show_notice").text(json.message);
+                },
+                error: function () {
+                    $("#show_notice").text("执行失败,请联系管理员");
+                }
+            });
         } else {
             return false;
         }
