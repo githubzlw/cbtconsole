@@ -657,4 +657,6 @@ public interface OrderinfoMapper {
 	List<Orderinfo> getAllOrderShippingMehtodIsNull();
 	int updateOrderinfomodeTransport(@Param("modeTransport") String modeTransport, @Param("orderNo") String orderNo);
 	public String getDropshipOrderNoList(String orderNo);
+
+    void updateBusiess(Map<String, String> map);
 }

@@ -1021,6 +1021,10 @@
     <update id="updateAdminUser">
 		update admin_r_user set adminid=${adminid},admName=#{admName} where userid=${userid}
 	</update>
+    <!--void updateBusiess(Map<String, String> map);-->
+    <update id="updateBusiess">
+		UPDATE busiess SET userid=${userid} WHERE email=#{email};
+	</update>
     <select id="queryAdmin" resultType="INTEGER">
 		SELECT count(id) FROM admin_r_user WHERE userid=${userid}
 	</select>
