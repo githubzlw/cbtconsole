@@ -69,6 +69,10 @@
             float: right;width: 49%;height: 90%;
         }
 
+        .payLog_div {
+            float: right;width: 49%;height: 90%;
+        }
+
         #single_query_form {
             margin-left: 40px;
             text-align: left;
@@ -85,6 +89,8 @@
             opts.url = "/cbtconsole/behaviorStatistics/getStatisticsDatails";
             var opts1 = $("#statistics_easyui-datagrid1").datagrid("options");
             opts1.url = "/cbtconsole/behaviorStatistics/getStatisticsDatails";
+            var payLog = $("#statistics_easyui-datagrid3").datagrid("options");
+            payLog.url = "/cbtconsole/behaviorStatistics/getStatisticsDatails";
             var optsDay = $("#statistics_every_day").datagrid("options");
             optsDay.url = "/cbtconsole/behaviorStatistics/getStatisticsByEveryDay";
             doChooseData(7);
@@ -178,6 +184,7 @@
             $(".data_div").hide();
             $(".every_day_div").hide();
             $(".recent_view_div").hide();
+            $(".payLog_div").hide();
             var beginDate = $("#beginDate").val();
             if (beginDate == null) {
                 beginDate = "";
@@ -235,7 +242,7 @@
                                         + json[i].statisticsNum
                                         + "</a></td>";
                                 }
-                                if(json[i].typeFlag == 10){
+                                if(json[i].typeFlag == 10 || json[i].typeFlag == 11){
                                     content += "<td></td>";
                                 }else{
                                     content += "<td><a href='javascript:void(0);' onclick='showByEveryDay("
@@ -288,8 +295,21 @@
                     addTrBk(obj);
                     $(".recent_view_div").show();
                     $(".data_div").hide();
+                    $(".payLog_div").hide();
                     $(".every_day_div").hide();
                     $("#statistics_easyui-datagrid1").datagrid("load", {
+                        "beginDate": beginDate,
+                        "endDate": endDate,
+                        "total": total,
+                        "typeFlag": typeFlag
+                    });
+                }else if (typeFlag == 11) {
+                    addTrBk(obj);
+                    $(".payLog_div").show();
+                    $(".data_div").hide();
+                    $(".every_day_div").hide();
+                    $(".recent_view_div").hide();
+                    $("#statistics_easyui-datagrid3").datagrid("load", {
                         "beginDate": beginDate,
                         "endDate": endDate,
                         "total": total,
@@ -300,6 +320,7 @@
                     $(".data_div").show();
                     $(".every_day_div").hide();
                     $(".recent_view_div").hide();
+                    $(".payLog_div").hide();
                     $("#statistics_easyui-datagrid").datagrid("load", {
                         "beginDate": beginDate,
                         "endDate": endDate,
@@ -351,6 +372,7 @@
                     addTrBk(obj);
                     $(".recent_view_div").show();
                     $(".data_div").hide();
+                    $(".payLog_div").hide();
                     $(".every_day_div").hide();
                     $("#statistics_every_day").datagrid("load", {
                         "beginDate": beginDate,
@@ -493,6 +515,24 @@
         </tbody>
     </table>
 </div>
+
+<div class="payLog_div">
+    <h2>Pay按钮点击独特人数</h2>
+    <table id="statistics_easyui-datagrid3" style="width: 99%; height: 750px;" class="easyui-datagrid">
+        <thead>
+        <tr>
+            <th data-options="field:'createTime',align:'center',width:'180px'">日期</th>
+            <th data-options="field:'email',align:'center',width:'300px'">邮箱</th>
+            <th data-options="field:'pid',align:'center',width:'180px'">订单号</th>
+            <th data-options="field:'orderAmount',align:'center',width:'100px'">金额($)</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+
 
 
 

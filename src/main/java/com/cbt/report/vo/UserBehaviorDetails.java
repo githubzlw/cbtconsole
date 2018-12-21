@@ -13,6 +13,14 @@ public class UserBehaviorDetails {
     private String createTime;
     private String pid;
     private int carNum;
+    private String orderAmount;
+    public String getOrderAmount() {
+        return orderAmount;
+    }
+
+    public void setOrderAmount(String orderAmount) {
+        this.orderAmount = orderAmount;
+    }
 
     public String getPid() {
         return pid;
@@ -62,6 +70,7 @@ public class UserBehaviorDetails {
                 ", createTime='" + createTime + '\'' +
                 ", pid='" + pid + '\'' +
                 ", carNum=" + carNum +
+                ", orderAmount=" + orderAmount +
                 '}';
     }
 }

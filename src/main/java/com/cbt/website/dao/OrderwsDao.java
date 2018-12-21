@@ -7868,6 +7868,42 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
+    public List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate, String endDate, int startNum, int offSet) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        int num=0;
+        ResultSet rs = null;
+        Statement stmt = null;
+        List<UserBehaviorDetails> list=new ArrayList<UserBehaviorDetails>();
+        String sql="SELECT Operationtime,username,orderid,orderAmount FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        try{
+            if(StringUtil.isNotBlank(beginDate)){
+                sql+=" and Operationtime>='"+beginDate+"'";
+            }
+            if(StringUtil.isNotBlank(endDate)){
+                sql+=" and Operationtime<='"+endDate+"'";
+            }
+            sql+=" order by id desc ";
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                UserBehaviorDetails u=new UserBehaviorDetails();
+                u.setCreateTime(rs.getString("Operationtime"));
+                u.setEmail(rs.getString("username"));
+                u.setPid(rs.getString("orderid"));
+                u.setOrderAmount(rs.getString("orderAmount"));
+                list.add(u);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return list;
+    }
+
+    @Override
     public List<UserBehaviorDetails> queryUserRecentView(String beginDate, String endDate, int startNum, int offSet) {
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7971,6 +8007,35 @@ public class OrderwsDao implements IOrderwsDao {
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
+    }
+
+    @Override
+    public int queryUserPayLog(String beginDate, String endDate) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        int num=0;
+        ResultSet rs = null;
+        Statement stmt = null;
+        String sql="SELECT COUNT(1) as counts FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        try{
+            if(StringUtil.isNotBlank(beginDate)){
+                sql+=" and Operationtime>='"+beginDate+"'";
+            }
+            if(StringUtil.isNotBlank(endDate)){
+                sql+=" and Operationtime<='"+endDate+"'";
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if(rs.next()){
+               num=rs.getInt("counts");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return num;
     }
 
     @Override
