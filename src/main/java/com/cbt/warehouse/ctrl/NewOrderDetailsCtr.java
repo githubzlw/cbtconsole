@@ -380,7 +380,7 @@ public class NewOrderDetailsCtr {
 			}
 			double sale =orderInfo.getPay_price() * rate;
 			if(orderInfo.getMemberFee()>10){
-				sale-=orderInfo.getMemberFee();
+				sale-=orderInfo.getMemberFee()* rate;
 			}
 			double buy = 0.0;
 			double volume = 0.0;

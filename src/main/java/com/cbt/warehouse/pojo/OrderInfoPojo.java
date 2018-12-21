@@ -72,6 +72,34 @@ public class OrderInfoPojo {
 	//查出保存的信息
 
 	private String yfhNum; 	//快递单号
+	private double actual_lwh;//质检费
+
+	public double getMemberFee() {
+		return memberFee;
+	}
+
+	public void setMemberFee(double memberFee) {
+		this.memberFee = memberFee;
+	}
+
+	private double memberFee;//会员费
+	public String getExchange_rate() {
+		return exchange_rate;
+	}
+
+	public void setExchange_rate(String exchange_rate) {
+		this.exchange_rate = exchange_rate;
+	}
+
+	private String exchange_rate;
+	public double getActual_lwh() {
+		return actual_lwh;
+	}
+
+	public void setActual_lwh(double actual_lwh) {
+		this.actual_lwh = actual_lwh;
+	}
+
 	public String getLogistics_name() {
 		return logistics_name;
 	}

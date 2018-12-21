@@ -313,8 +313,8 @@ function batchCk(){
 			var sumPrice = $("#sumPrice"+orderid).val(); //总运费价格
 			var transportcompany = $("input[name$='"+shipmentno+"']:checked").val(); //运输公司
 			if(transportcompany == 4 && (fpxProductCode == null ||fpxProductCode =="" ||fpxProductCode=="运输方式")){
-				alert("邮政出货需要选择具体的运费方式");
-				return;
+                $.jBox.tip('邮政出货需要选择具体的运费方式！','error');
+                return;
 			}
 			t=1;
 			//申报信息
@@ -323,6 +323,10 @@ function batchCk(){
 			var sbphbz = $("input[name='sbphbz"+shipmentno+"']").val(); //配货备注式
 			var sbsl = $("input[name='sbsl"+shipmentno+"']").val(); //数量
 			var sbjg = $("input[name='sbjg"+shipmentno+"']").val(); //价格
+            if(sbsl == null || sbsl == "" || sbjg == null || sbjg ==""){
+                $.jBox.tip('请输入申报数量和单价！','error');
+                return;
+            }
 			var sbdw = $("input[name='sbdw"+shipmentno+"']").val(); //单位
 			var sbxxMap={};                    
 			sbxxMap['orderid']= orderid;
@@ -531,4 +535,59 @@ function insertWarningInfo(orderid){
             }
         }
     });
+}
+
+//检验申报金额是否超出预定金额
+function checkAmount(shipmentno,orderid){
+    var sbsl = $("input[name='sbsl"+shipmentno+"']").val(); //数量
+    var sbjg = $("input[name='sbjg"+shipmentno+"']").val(); //价格
+	if(sbsl == null || sbsl == "" || sbjg == null || sbjg ==""){
+		return;
+	}
+    $.ajax({
+        type:"post",
+        url:"checkAmount",
+        dataType:"text",
+        data:{sbsl:sbsl,sbjg:sbjg,orderid:orderid},
+        success : function(data){
+			if(data>0){
+                $.jBox.tip('申报金额大于预设金额不允许出库。', 'erro');
+				//申报金额超出预设金额不允许出库
+                $("#yjremark"+orderid).attr('disabled',false);
+                $("#inRemark"+orderid).attr('disabled',false);
+                $("#plckid").attr('disabled',true);
+                $("#disableWare").val("1");
+			}
+        }
+    });
+}
+//查看申报注意事项
+function openTipInfo(orderid){
+    $.ajax({
+        type:"post",
+        url:"openTipInfo",
+        dataType:"text",
+        data:{"orderid":orderid},
+        success : function(data){
+            var objlist = eval("("+data+")");
+            var html="";
+            for(var i=0; i<objlist.length; i++){
+                html +="<tr><td width='11%'>" + objlist[i].country + "</td><td width='11%'>" + objlist[i].regulation + "</td><td width='10%'>" + objlist[i].clear_require + "</td><td width='11%'>" + objlist[i].tax_code + "</td>" + "<td width='11%'>" + objlist[i].re_provider + "</td><td width='11%'>" + objlist[i].no_re_provider + "</td><td width='11%'>" + objlist[i].amount + "</td></tr>";
+                html+="<tr><td colspan='7'><button onclick='displayChangeLogInfo()'>关闭</button></td></tr>";
+            }
+            if(objlist.length<=0){
+                html += "<tr><td colspan='6' align='center'>暂无替换记录。</td></tr>";
+            }
+            html +="</table>";
+            var rfddd = document.getElementById("displayChangeLog");
+            rfddd.style.display = "block";
+            $("#displayChangeLogs").append(html);
+        }
+    });
+}
+
+function displayChangeLogInfo(){
+    var rfddd = document.getElementById("displayChangeLog");
+    rfddd.style.display = "none";
+    $("#displayChangeLogs tbody").html("");
 }
