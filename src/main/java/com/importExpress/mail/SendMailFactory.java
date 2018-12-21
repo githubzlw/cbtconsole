@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -67,8 +73,20 @@ public class SendMailFactory {
             }
             result=thymeleafEngine.process(templateType.toString(), context);
             logger.debug(result);
+            saveHtml(templateType.toString(), result);
         }
         return result;
+    }
+
+    private void saveHtml(String preFileName,String content){
+        final String strTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
+
+        try {
+            Path write = Files.write(Paths.get(preFileName.replace("/","_") + "_" + strTime + ".html"), content.getBytes());
+            logger.info("save to html,path:{}",write.getFileName());
+        } catch (IOException e) {
+            logger.error("saveHtml",e);
+        }
     }
 
 }
