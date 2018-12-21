@@ -785,7 +785,7 @@
 	</select>
 	<!-- 产品总金额 已支付运费 已支付产品费用 -->
 	<select id="getPaymentFy" resultType="com.cbt.warehouse.pojo.OrderInfoPojo">
-		select currency,sum(oi.discount_amount) sumDiscount_amount,sum(foreign_freight) sumForeign_freight,sum(oi.product_cost) sumProduct_cost,sum(order_ac) sumOrder_ac,sum(oi.pay_price_tow) sumPay_price_tow,sum(oi.pay_price+order_ac) sumPayment_amount from orderinfo oi
+		select oi.memberFee,case when exchange_rate>0 then exchange_rate else 6.3 end as exchange_rate,currency,sum(oi.discount_amount) sumDiscount_amount,cast(ifnull(actual_lwh,'0.00') as decimal(10,2)) as actual_lwh,sum(foreign_freight) sumForeign_freight,sum(oi.product_cost) sumProduct_cost,sum(order_ac) sumOrder_ac,sum(oi.pay_price_tow) sumPay_price_tow,sum(oi.pay_price+order_ac) sumPayment_amount from orderinfo oi
 		where oi.user_id='${user_id}' and  oi.order_no in(select orderno from order_fee where mergeOrders='${order_no}')
 	</select>
 	<!-- 修改快递单号  updateExperssNo -->
@@ -1105,19 +1105,18 @@
 
 	<select id="getPackageInfoList" resultType="com.cbt.warehouse.pojo.ShippingPackage">
 		select
-		(select  case when exchange_rate>0 then exchange_rate else 6.3 end  from  orderinfo where order_no = os.orderid) exchange_rate,
-		(select  orderpaytime  from  orderinfo where order_no = os.orderid) orderpaytime,
-		(select  remark  from  freight_waraing where state=0 and orderid = os.orderid) yjRemark,
-		( SELECT COUNT(DISTINCT IFNULL(ops.old_shopid,ops.id))*5 FROM order_details od INNER JOIN order_product_source ops ON od.goodsid=ops.goodsid AND od.orderid=ops.orderid WHERE od.orderid=o.order_no AND od.state&lt;2) AS pid_amount,
-		(select orderRemark from orderinfo where order_no = os.orderid) orderremark,
-		(select GROUP_CONCAT(createtime ,' : ',remarkuserid,' : ',orderremark)  from  order_remark where orderid=os.orderid) xsbz,
-		(select email from user where id=(select user_id from orderinfo where order_no=os.orderid)) email,
-		(select currency from orderinfo where order_no=os.orderid) currency,
-		(select user_id from orderinfo where order_no=os.orderid) userid,
-		(select remaining_price from orderinfo where order_no=os.orderid) remaining_price,
+		CASE WHEN o.exchange_rate>0 THEN o.exchange_rate ELSE 6.3 END AS exchange_rate,o.orderpaytime,
+		(SELECT  remark  FROM  freight_waraing WHERE state=0 AND orderid = os.orderid) yjRemark,o.orderRemark AS orderremark,o.actual_lwh,
+		(SELECT GROUP_CONCAT(createtime ,' : ',remarkuserid,' : ',orderremark)  FROM  order_remark WHERE orderid=os.orderid) xsbz,
+		(SELECT email FROM USER WHERE id=(SELECT user_id FROM orderinfo WHERE order_no=os.orderid)) email,o.currency,o.user_id AS userid,o.remaining_price,
 		(select count(*) from shipping_package where orderid=os.orderid) cont,
-		(select sum(oi.pay_price+order_ac) sumPayment_amount from orderinfo oi
+		(SELECT count(1) FROM order_address oa
+		INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.country OR oa.country=z.id
+		 INNER JOIN customs_regulations c ON z.chinapostbig=c.country OR z.fedexie=c.country
+		WHERE oa.orderNo=os.orderid) cacount,
+		(select sum(oi.pay_price-if(oi.memberFee>10,oi.memberFee,0)) sumPayment_amount from orderinfo oi
 		where oi.order_no in(select orderno from order_fee where mergeOrders=os.orderid)) sumprice,
+	( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=os.orderid AND ods.state in (0,1)) as pid_amount,
 		(select sum(oi.extra_freight) sumextra_freight from orderinfo oi where oi.order_no in(select orderno from order_fee where mergeOrders=os.orderid)) sumextra_freight,
 		(		select
 		CONCAT('sumDiscount_amount:',
@@ -1134,7 +1133,7 @@
 		sum(oi.pay_price+order_ac)
 		) from orderinfo oi
 		where oi.order_no in(select orderno from order_fee where mergeOrders=os.orderid)) allprice,
-		s.*,mode_transport,z.id as zid,truncate(os.sumcgprice,2) as sumcgprice,o.user_id,z.chinapostbig,o.remaining_price,
+		s.*,mode_transport,z.id as zid,z.fedexie,truncate(os.sumcgprice,2) as sumcgprice,o.user_id,z.chinapostbig,o.remaining_price,
 		func_get_split_string(o.mode_transport,'@',1) as transport ,
 		func_get_split_string(o.mode_transport,'@',2) as day
 		,func_get_split_string(o.mode_transport,'@',3) as gjcode,
@@ -1147,7 +1146,7 @@
 		from shipping_package s
 		inner join orderinfo o
 		on s.orderid=o.order_no  and  o.isDropshipOrder  <![CDATA[ <> ]]> 1
-		left join (select DISTINCT chinapostbig,country,id from zone group by country) z
+		left join (select DISTINCT chinapostbig,country,id,fedexie from zone group by country) z
 		on z.country =func_get_split_string(o.mode_transport,'@',3)
 		left join (
 		select orderid,sum(goods_p_price*buycount) as sumcgprice from order_product_source
@@ -3576,5 +3575,11 @@
 		) d
 -- 		 group by d.datas,IF(d.editName IS NULL,d.admName,d.editName)
 		) e  INNER JOIN admuser ad ON e.endName=ad.admName WHERE ad.id IN (62,56,68,80,69,57,51) GROUP BY e.datas,e.endName
+	</select>
+	<select id="getCustomsRegulationsPojo" resultType="com.cbt.pojo.CustomsRegulationsPojo">
+		SELECT c.country,c.regulation,c.clear_require,c.tax_code,c.re_provider,c.no_re_provider,c.amount FROM order_address oa
+		INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.country OR oa.country=z.id
+		 INNER JOIN customs_regulations c ON z.chinapostbig=c.country OR z.fedexie=c.country
+		WHERE oa.orderNo=#{orderid}
 	</select>
 </mapper>

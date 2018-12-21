@@ -100,32 +100,32 @@ public class HotManageServiceImpl implements HotManageService {
 	public List<HotSellGoods> queryGoodsByHotType(int hotType) {
         List<HotSellGoods> hotGoods = hotManageMapper.queryGoodsByHotType(hotType);
         if (hotGoods != null) {
-            for (int i = 0; i < hotGoods.size(); i++) {
+            for (HotSellGoods goods : hotGoods) {
                 String import_url = "https://www.import-express.com/goodsinfo/"
-                        + hotGoods.get(i).getShow_name().replace(" ", "-")
-                        + "-1" + hotGoods.get(i).getGoods_pid() + ".html";
+                        + goods.getShow_name().trim().replace(" ", "-")
+                        + "-1" + goods.getGoods_pid() + ".html";
 
 
-                hotGoods.get(i).setGoods_import_url(import_url);
+                goods.setGoods_import_url(import_url);
 
                 //获取产品区间价
-                String wprice = hotGoods.get(i).getGoods_price();
-                String rangePrice = hotGoods.get(i).getRangePrice();
-                String price_1688 = hotGoods.get(i).getPrice1688();
-                String feeprice = hotGoods.get(i).getFeeprice();
+                String wprice = goods.getGoods_price();
+                String rangePrice = goods.getRangePrice();
+                String price_1688 = goods.getPrice1688();
+                String feeprice = goods.getFeeprice();
                 if (rangePrice != null && !"".equals(rangePrice) && !"[]".equals(rangePrice)) {
-                    hotGoods.get(i).setPrice_show(rangePrice);
+                    goods.setPrice_show(rangePrice);
                     String[] rangePriceList = rangePrice.split("-");
                     if (rangePriceList.length == 2) {
-                        hotGoods.get(i).setMaxPrice(rangePriceList[1].trim());
-                        hotGoods.get(i).setMinPrice(rangePriceList[0].trim());
+                        goods.setMaxPrice(rangePriceList[1].trim());
+                        goods.setMinPrice(rangePriceList[0].trim());
                     } else {
-                        hotGoods.get(i).setMaxPrice(rangePriceList[0].trim());
-                        hotGoods.get(i).setMinPrice(rangePriceList[0].trim());
+                        goods.setMaxPrice(rangePriceList[0].trim());
+                        goods.setMinPrice(rangePriceList[0].trim());
                     }
                     rangePriceList = null;
                 } else {
-                    if (hotGoods.get(i).getIsSoldFlag() > 0) {
+                    if (goods.getIsSoldFlag() > 0) {
                         if (StringUtils.isNotBlank(feeprice) && !"[]".equals(feeprice)) {
                             String price_max = "0";
                             String price_min = "0";
@@ -135,18 +135,18 @@ public class HotManageServiceImpl implements HotManageService {
                                 String[] price2 = prices[0].replace(" ", "").split("\\$");
                                 price_min = price1[1].replace("]", "");
                                 price_max = price2[1].replace("[", "");
-                                hotGoods.get(i).setPrice_show(price_min.trim() + "-" + price_max.trim());
-                                hotGoods.get(i).setGoods_price(feeprice);
-                                hotGoods.get(i).setMaxPrice(price_max.trim());
-                                hotGoods.get(i).setMinPrice(price_min.trim());
+                                goods.setPrice_show(price_min.trim() + "-" + price_max.trim());
+                                goods.setGoods_price(feeprice);
+                                goods.setMaxPrice(price_max.trim());
+                                goods.setMinPrice(price_min.trim());
                             } else {
                                 String[] feePriceList = feeprice.split("\\$");
-                                hotGoods.get(i).setPrice_show(feePriceList[1].replace("]", "").trim());
-                                hotGoods.get(i).setMaxPrice(feePriceList[1].replace("]", "").trim());
-                                hotGoods.get(i).setMinPrice(feePriceList[1].replace("]", "").trim());
+                                goods.setPrice_show(feePriceList[1].replace("]", "").trim());
+                                goods.setMaxPrice(feePriceList[1].replace("]", "").trim());
+                                goods.setMinPrice(feePriceList[1].replace("]", "").trim());
                             }
                         } else {
-                            hotGoods.get(i).setPrice_show(price_1688.trim());
+                            goods.setPrice_show(price_1688.trim());
                         }
                     } else {
                         if (wprice != null && !"".equals(wprice) && !"[]".equals(wprice)) {
@@ -158,24 +158,24 @@ public class HotManageServiceImpl implements HotManageService {
                                 String[] price2 = prices[0].replace(" ", "").split("\\$");
                                 price_min = price1[1].replace("]", "");
                                 price_max = price2[1].replace("[", "");
-                                hotGoods.get(i).setPrice_show(price_min.trim() + "-" + price_max.trim());
-                                hotGoods.get(i).setMaxPrice(price_max.trim());
-                                hotGoods.get(i).setMinPrice(price_min.trim());
+                                goods.setPrice_show(price_min.trim() + "-" + price_max.trim());
+                                goods.setMaxPrice(price_max.trim());
+                                goods.setMinPrice(price_min.trim());
                             } else {
                                 String[] wpriceList = wprice.split("\\$");
-                                hotGoods.get(i).setPrice_show(wpriceList[1].replace("]", "").trim());
-                                hotGoods.get(i).setMaxPrice(wpriceList[1].replace("]", "").trim());
-                                hotGoods.get(i).setMinPrice(wpriceList[1].replace("]", "").trim());
+                                goods.setPrice_show(wpriceList[1].replace("]", "").trim());
+                                goods.setMaxPrice(wpriceList[1].replace("]", "").trim());
+                                goods.setMinPrice(wpriceList[1].replace("]", "").trim());
                             }
                         } else {
-                            hotGoods.get(i).setPrice_show(price_1688.trim());
-                            hotGoods.get(i).setMaxPrice(price_1688.trim());
-                            hotGoods.get(i).setMinPrice(price_1688.trim());
+                            goods.setPrice_show(price_1688.trim());
+                            goods.setMaxPrice(price_1688.trim());
+                            goods.setMinPrice(price_1688.trim());
                         }
                     }
                 }
-                hotGoods.get(i).setPrice1688(hotGoods.get(i).getMaxPrice());
-                hotGoods.get(i).setRangePrice(hotGoods.get(i).getMinPrice());
+                goods.setPrice1688(goods.getMaxPrice());
+                goods.setRangePrice(goods.getMinPrice());
             }
         }
         return hotGoods;
