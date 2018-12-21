@@ -83,7 +83,7 @@ public class SendMailFactory {
 
         try {
             Path write = Files.write(Paths.get(preFileName.replace("/","_") + "_" + strTime + ".html"), content.getBytes());
-            logger.info("save to html,path:{}",write.getFileName());
+            logger.info("save to html,path:{}",write.toAbsolutePath().getFileName());
         } catch (IOException e) {
             logger.error("saveHtml",e);
         }
