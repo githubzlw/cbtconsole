@@ -220,4 +220,19 @@ public class GoodsInfoUpdateOnlineUtil {
         return tempStr;
     }
 
+
+
+    public static boolean updateOnlineAndSolr(InputData inputData,int isSolr){
+
+        try{
+            String json = JsonUtils.objectToJsonNotNull(inputData);
+            System.err.println(json);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }
