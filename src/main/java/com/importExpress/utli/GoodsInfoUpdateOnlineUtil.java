@@ -1,11 +1,14 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.util.DateFormatUtil;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
+import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class GoodsInfoUpdateOnlineUtil {
@@ -38,6 +41,25 @@ public class GoodsInfoUpdateOnlineUtil {
             NotifyToCustomerUtil.sendSqlByMq(sql);
         }
     }
+
+
+    /**
+     * 根据mongodb更新AWS
+     *
+     * @param pid
+     * @param insertList
+     */
+    public static void updateCustomBenchmarkSkuNewByMongoDB(String pid, List<CustomBenchmarkSkuNew> insertList) {
+        List<String> mqSqlList = new ArrayList<>();
+        StringBuffer mqSql;
+        SkuValPO skuValPO;
+        for (CustomBenchmarkSkuNew skuNew : insertList) {
+
+        }
+
+
+    }
+
 
     /**
      * MQ更新商品信息到AWS服务器
@@ -80,14 +102,67 @@ public class GoodsInfoUpdateOnlineUtil {
         NotifyToCustomerUtil.sendSqlByMq("update custom_benchmark_ready set valid = 1" + mqSql.toString());
     }
 
+
     /**
-     * 批量下架AWS商品
+     * MongoDB更新商品信息到AWS服务器
+     *
+     * @param bean
+     */
+    public static void publishToOnlineByMongoDB(CustomGoodsPublish bean) {
+        InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+
+        inputData.setKeyword(bean.getKeyword());
+        inputData.setEninfo(checkAndReplaceQuotes(bean.getEninfo()));
+        inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
+        inputData.setWeight(bean.getWeight());
+        inputData.setImg(bean.getImg());
+        inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
+        inputData.setRevise_weight(bean.getReviseWeight());
+        inputData.setFinal_weight(bean.getFinalWeight());
+        inputData.setPrice(bean.getPrice());
+        inputData.setWprice(bean.getWprice());
+        inputData.setRange_price(bean.getRangePrice());
+        // inputData.setSku(bean.getSku());
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setBm_flag("1");
+        inputData.setGoodsstate("4");
+        if (bean.getIsEdited() == 1) {
+            inputData.setFinalName(checkAndReplaceQuotes(bean.getEnname()));
+        } else if (bean.getIsEdited() == 2) {
+            inputData.setFinalName(checkAndReplaceQuotes(bean.getEnname()));
+            inputData.setInfoReviseFlag("1");
+            inputData.setPriceReviseFlag("1");
+        }
+        if (StringUtils.isNotBlank(bean.getFeeprice())) {
+            inputData.setFeeprice(bean.getFeeprice());
+        }
+        if (bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10) {
+            inputData.setIs_show_det_img_flag("0");
+        } else {
+            inputData.setIs_show_det_img_flag("1");
+        }
+        inputData.setEntype(bean.getEntype());
+        inputData.setSellunit(bean.getSellUnit());
+        inputData.setAli_pid(bean.getAliGoodsPid());
+        inputData.setAli_price(bean.getAliGoodsPrice());
+        inputData.setMatchSource(String.valueOf(bean.getMatchSource()));
+        inputData.setPid(bean.getPid());
+        inputData.setValid("1");
+        inputData.setGoodsstate("4");
+        //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
+        String json = JsonUtils.objectToJsonNotNull(inputData);
+        System.err.println(json);
+    }
+
+
+     /**
+     * MQ批量下架AWS商品
      *
      * @param state
      * @param pids
      * @param adminid
      */
-    public static void batchUpdateGoodsState(int state, String pids, int adminid) {
+    public static void batchUpdateGoodsStateByMQ(int state, String pids, int adminid) {
         String[] pidList = pids.split(",");
         for (String pid : pidList) {
             if (StringUtils.isNotBlank(pid)) {
@@ -99,7 +174,31 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-    public void setGoodsValid(String pid, int type) {
+     /**
+     * MongoDB批量下架AWS商品
+     *
+     * @param state
+     * @param pids
+     * @param adminid
+     */
+    public static void batchUpdateGoodsStateMongoDB(int state, String pids, int adminid) {
+        InputData inputData;// u表示更新；c表示创建，d表示删除
+        String[] pidList = pids.split(",");
+        for (String pid : pidList) {
+            if (StringUtils.isNotBlank(pid)) {
+                inputData = new InputData('u');
+                inputData.setValid((state == 4 ? "1" : "0"));
+                inputData.setGoodsstate(String.valueOf(4));
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setPid(pid);
+                String json = JsonUtils.objectToJsonNotNull(inputData);
+                System.err.println(json);
+            }
+        }
+    }
+
+
+    public void setGoodsValidByMq(String pid, int type) {
         String sql = "update custom_benchmark_ready set valid=" + (type == 1 ? 1 : 0) + ",goodsstate=" + (type == 1 ? 4 : 2);
         if (type != 1) {
             sql += ",unsellableReason = 6";
@@ -108,6 +207,17 @@ public class GoodsInfoUpdateOnlineUtil {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
+
+    public void setGoodsValidByMongoDb(String pid, int type) {
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+                inputData.setValid((type == 1 ? "1" : "0"));
+                inputData.setGoodsstate(type == 1 ? "4" : "2");
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setUnsellableReason("6");
+                inputData.setPid(pid);
+                String json = JsonUtils.objectToJsonNotNull(inputData);
+                System.err.println(json);
+    }
 
     /**
      * 替换字符串中的逗号
