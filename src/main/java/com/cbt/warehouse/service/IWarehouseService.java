@@ -3,6 +3,7 @@ package com.cbt.warehouse.service;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.*;
@@ -224,6 +225,12 @@ public interface IWarehouseService {
 	public int insertOrderRemark(Map<String, Object> map);
 
 	/**
+	 * 出库时检验申报金额是否超出预定金额
+	 * @param orderid
+	 * @return
+	 */
+	public CustomsRegulationsPojo getCustomsRegulationsPojo(String orderid);
+	/**
 	 *出库审核验证商品号是否为该订单商品
 	 * @param map
 	 * @return
@@ -340,6 +347,7 @@ public interface IWarehouseService {
 	int updateAllDetailsState(Map<String, String> map);
 
 	void inertLocationTracking(Map<String, String> map);
+
 
 	//查询商品原链接
 	public List<Map<String,String>> getGoodsCar(Map<String, Object> map);

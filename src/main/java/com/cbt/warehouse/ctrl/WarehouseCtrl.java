@@ -1,6 +1,7 @@
 package com.cbt.warehouse.ctrl;
 
 import com.alibaba.fastjson.JSON;
+import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
@@ -31,6 +32,7 @@ import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.servlet.Currency;
@@ -174,6 +176,8 @@ public class WarehouseCtrl {
 	private OrderinfoService orderinfoService;
 	@Autowired
 	private IPurchaseService iPurchaseService;
+	@Autowired
+	private FreightFeeSerive freightFeeSerive;
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -2105,6 +2109,31 @@ public class WarehouseCtrl {
 	}
 
 	/**
+	 * 出库时检验申报金额是否超出预定金额
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/checkAmount", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String checkAmount(HttpServletRequest request, Model model) {
+		int res=0;
+		String count=request.getParameter("sbsl");
+		String price=request.getParameter("sbjg");
+		String orderid=request.getParameter("orderid");
+		double amount=0.00;
+		if(StringUtil.isNotBlank(count) && StringUtil.isNotBlank(price)){
+			amount=Double.parseDouble(count)*Double.parseDouble(price);
+		}
+		//获取订单国家或所属地区
+		CustomsRegulationsPojo c=iWarehouseService.getCustomsRegulationsPojo(orderid);
+		if(c !=null && amount>c.getAmount()){
+			res=1;
+		}
+		return res+"";
+	}
+
+	/**
 	 * 出运时运费预警信息录入
 	 * @param request
 	 * @param model
@@ -2341,14 +2370,18 @@ public class WarehouseCtrl {
 		map.put("user_id", user_id);
 		map.put("order_no", order_no);
 		OrderInfoPojo fpxProductCode = iWarehouseService.getPaymentFy(map);
-		double exchange_rate = 1;
+//		double exchange_rate = 1;
 		Map<String, Double> maphl = Currency.getMaphl(request);
-		exchange_rate = maphl.get("RMB");
-		exchange_rate = exchange_rate / maphl.get(fpxProductCode.getCurrency());
-		double t = exchange_rate* Double.parseDouble(fpxProductCode.getSumPayment_amount());
+//		exchange_rate = maphl.get("RMB");
+//		exchange_rate = exchange_rate / maphl.get(fpxProductCode.getCurrency());
+		double t = Double.parseDouble(fpxProductCode.getExchange_rate())* (Double.parseDouble(fpxProductCode.getSumPayment_amount())-fpxProductCode.getMemberFee());
+		double actual_lwh = Double.parseDouble(fpxProductCode.getExchange_rate())*fpxProductCode.getActual_lwh();
 		BigDecimal b = new BigDecimal(t);
 		double f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 		fpxProductCode.setSumPayment_amountRMB(f1 + "");
+		b = new BigDecimal(t);
+		f1 = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		fpxProductCode.setActual_lwh(f1);
 		return net.sf.json.JSONObject.fromObject(fpxProductCode).toString();
 	}
 
@@ -5977,6 +6010,22 @@ public class WarehouseCtrl {
 		return row + "";
 	}
 
+	/**
+	 * 查看申报注意事项
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/openTipInfo", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String openTipInfo(HttpServletRequest request, Model model) {
+		String orderid = request.getParameter("orderid");
+		List<CustomsRegulationsPojo> list=new ArrayList<CustomsRegulationsPojo>();
+		CustomsRegulationsPojo c=iWarehouseService.getCustomsRegulationsPojo(orderid);
+		list.add(c);
+		return JSONArray.fromObject(list).toString();
+	}
+
 	// 获得包裹列表
 	@RequestMapping(value = "/getPackageInfoList", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
 	public String getPackageInfoList(HttpServletRequest request,
@@ -5986,8 +6035,27 @@ public class WarehouseCtrl {
 		List<ShippingPackage> list = iWarehouseService.getPackageInfoList(map);
 		for (int i = 0; i < list.size(); i++) {
 			ShippingPackage s=list.get(i);
+			//获取预估运费 原飞航
+			String svolume=s.getSvolume();
+			double vol=0.00;
+			if(svolume.contains("*") && svolume.split("\\*").length>2){
+				String [] t=svolume.split("\\*");
+				vol = (Double.parseDouble(t[0])*0.01)*(Double.parseDouble(t[1])*0.01)*(Double.parseDouble(t[2])*0.01);
+			}
+			Map freightFeeMap = freightFeeSerive.getFreightFee(Double.parseDouble(s.getSweight()), vol, s.getZid(), "原飞航", s.getFedexie(), svolume);
+			double freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
+			freightFee=freightFee/s.getExchange_rate();
+			freightFee=Double.parseDouble(df.format(freightFee));
+			s.setYfhFreight(freightFee);
+			//获取预估运费 佳成
+			freightFeeMap = freightFeeSerive.getFreightFee(Double.parseDouble(s.getSweight()), vol, s.getZid(), "JCEX", s.getFedexie(), svolume);
+			freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
+			freightFee=freightFee/s.getExchange_rate();
+			freightFee=Double.parseDouble(df.format(freightFee));
+			s.setJcexFreight(freightFee);
 			list.get(i).setEstimatefreight(df.format(Double.valueOf(s.getEstimatefreight())*s.getExchange_rate()));
 			String orderid = list.get(i).getOrderid();
+			s.setSumcgprice(String.valueOf(Double.parseDouble(s.getSumcgprice())+s.getPid_amount()));
 			PurchaseServer purchaseServer = new PurchaseServerImpl();
 			// UserOrderDetails uod =
 			// purchaseServer.getUserDetails(orderid+",");

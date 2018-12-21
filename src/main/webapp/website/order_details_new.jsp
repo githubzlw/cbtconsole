@@ -267,7 +267,7 @@ em {
 <body onload="fninitbuy()">
 	<div class="mask"></div>
 	<div
-		style="width: 50px; height: 50px; position: fixed; right: 50px; top: 800px; background: url() no-repeat;">
+		style="width: 50px; height: 50px; position: fixed; right: 50px; top: 800px; background:no-repeat;">
 		<img src="/cbtconsole/img/website/top.png">
 	</div>
 	<a href="#top"> </a>

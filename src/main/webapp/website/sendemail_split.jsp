@@ -102,7 +102,7 @@
 				</c:if>
 			</div>
 			<c:if test="${parat.state == 0}">
-				<div >Due to the supply reason, part of your order can not be supplied and you can find the below refund amount in <a href="http://www.import-express.com${autoUrl }">Your Account</a></div>
+				<div >Due to the supply reason, part of your order can not be supplied and you can find the below refund amount in <a href="https://www.import-express.com/individual/getCenter">Your Account</a></div>
 			</c:if>
 		</c:if>
 		<div>
