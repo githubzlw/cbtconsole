@@ -143,7 +143,7 @@ $(function(){
 		           	htm_ += '<td align="center" width="150px;" style="word-wrap:break-word;">'+objlist[i].sku+'</td>';
 		           	htm_ += '<td align="center" width="200px;"> <ul id="img_sf_1"><li><a><img src="'+objlist[i].imgurl+'"></a></li></ul></td>';
 		           	htm_ += '<td align="center" width="50px;">'+objlist[i].username+'</td>';
-		           	htm_ += '<td align="center" width="180px;"><span id="'+objlist[i].shipno+'_remark_'+i+'">'+objlist[i].remark+'</span><textarea id="'+objlist[i].shipno+'_'+i+'"></textarea><input type="button" value="确认" onclick="insertRemark(\''+objlist[i].shipno+'\',\''+objlist[i].sku+'\',\''+i+'\');"/><input type="button" value="整单退货" onclick="updateTbState(\''+objlist[i].shipno+'\',\''+objlist[i].sku+'\',\''+i+'\');"/></td>';
+		           	htm_ += '<td align="center" width="180px;"><span id="'+objlist[i].shipno+'_remark_'+i+'">'+objlist[i].remark+'</span><textarea id="'+objlist[i].shipno+'_'+i+'"></textarea><input type="button" value="确认" onclick="insertRemark(\''+objlist[i].shipno+'\',\''+objlist[i].sku+'\',\''+i+'\');"/><input type="button" value="整单退货" onclick="updateTbState(\''+objlist[i].orderid+'\');"/></td>';
 		           	if(id!=null && id!="" && id!="null" && userid!="43"){
 		           		if(objlist[i].is_processing=="0"){
 		           			htm_ += '<td align="center" width="50px;"><input type="button" class="sendInfo" value="确认已处理完成" onclick="sendInfo();"></td>';
@@ -216,13 +216,13 @@ $(function(){
 		});
    }
 
-   function updateTbState(orderid,sku,i){
+   function updateTbState(orderid){
        var page=$("#nowPage").html();
        $.ajax({
            type:"post",
            url:"/cbtconsole/warehouse/updateTbState",
            dataType:"text",
-           data:{orderid : orderid,sku:sku,remark:reamrk,old_remark:old_remark},
+           data:{orderid : orderid},
            success : function(data){
                if(data>0){
                    alert("更新成功");
