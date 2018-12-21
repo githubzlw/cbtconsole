@@ -101,7 +101,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }
         }
 
-        int res = customGoodsDao.publish(bean,1);
+        int res = customGoodsDao.publish(bean,0);
         // 屏蔽使用jdbc更新AWS数据
         //int res = customGoodsDao.publish(bean);
 
@@ -252,6 +252,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
         // AWS更新
+        // MQ
+        // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
+        // MongoDB
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid,type);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
     }
 

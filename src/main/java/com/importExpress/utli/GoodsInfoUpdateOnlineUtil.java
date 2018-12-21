@@ -44,24 +44,6 @@ public class GoodsInfoUpdateOnlineUtil {
 
 
     /**
-     * 根据mongodb更新AWS
-     *
-     * @param pid
-     * @param insertList
-     */
-    public static void updateCustomBenchmarkSkuNewByMongoDB(String pid, List<CustomBenchmarkSkuNew> insertList) {
-        List<String> mqSqlList = new ArrayList<>();
-        StringBuffer mqSql;
-        SkuValPO skuValPO;
-        for (CustomBenchmarkSkuNew skuNew : insertList) {
-
-        }
-
-
-    }
-
-
-    /**
      * MQ更新商品信息到AWS服务器
      *
      * @param bean
@@ -198,7 +180,7 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-    public void setGoodsValidByMq(String pid, int type) {
+    public static void setGoodsValidByMq(String pid, int type) {
         String sql = "update custom_benchmark_ready set valid=" + (type == 1 ? 1 : 0) + ",goodsstate=" + (type == 1 ? 4 : 2);
         if (type != 1) {
             sql += ",unsellableReason = 6";
@@ -208,7 +190,7 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-    public void setGoodsValidByMongoDb(String pid, int type) {
+    public static void setGoodsValidByMongoDb(String pid, int type) {
         InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
                 inputData.setValid((type == 1 ? "1" : "0"));
                 inputData.setGoodsstate(type == 1 ? "4" : "2");
