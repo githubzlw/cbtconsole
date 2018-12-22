@@ -2,16 +2,30 @@ package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.util.DateFormatUtil;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class GoodsInfoUpdateOnlineUtil {
+    private static final Log logger = LogFactory.getLog(GoodsInfoUpdateOnlineUtil.class);
+    private static OKHttpUtils okHttpUtils = new OKHttpUtils();
+
+//    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
+//    private static final String MONGODB_UPDATE_GOODS_URL = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
+//    private static final String MONGODB_UPDATE_SOLR_URL = "http://192.168.1.153:8001/invokejob/b006";// 刷新刷新solr的
+
+    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
+    private static final String MONGODB_UPDATE_GOODS_URL = "https://www.import-express.com//invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL = "https://www.import-express.com//invokejob/b006";// 刷新刷新solr的
 
     /**
      * sku使用MQ更新AWS服务器数据
@@ -90,7 +104,7 @@ public class GoodsInfoUpdateOnlineUtil {
      *
      * @param bean
      */
-    public static void publishToOnlineByMongoDB(CustomGoodsPublish bean) {
+    public static boolean publishToOnlineByMongoDB(CustomGoodsPublish bean) {
         InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
 
         inputData.setKeyword(bean.getKeyword());
@@ -132,12 +146,11 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setValid("1");
         inputData.setGoodsstate("4");
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
-        String json = JsonUtils.objectToJsonNotNull(inputData);
-        System.err.println(json);
+        return updateOnlineAndSolr(inputData, 1);
     }
 
 
-     /**
+    /**
      * MQ批量下架AWS商品
      *
      * @param state
@@ -156,27 +169,32 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-     /**
+    /**
      * MongoDB批量下架AWS商品
      *
      * @param state
      * @param pids
      * @param adminid
      */
-    public static void batchUpdateGoodsStateMongoDB(int state, String pids, int adminid) {
+    public static boolean batchUpdateGoodsStateMongoDB(int state, String pids, int adminid) {
+        int total = 0;
+        int count = 0;
         InputData inputData;// u表示更新；c表示创建，d表示删除
         String[] pidList = pids.split(",");
         for (String pid : pidList) {
             if (StringUtils.isNotBlank(pid)) {
+                total ++;
                 inputData = new InputData('u');
                 inputData.setValid((state == 4 ? "1" : "0"));
                 inputData.setGoodsstate(String.valueOf(4));
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setPid(pid);
-                String json = JsonUtils.objectToJsonNotNull(inputData);
-                System.err.println(json);
+                if(updateOnlineAndSolr(inputData, 1)){
+                    count ++;
+                }
             }
         }
+        return total == count;
     }
 
 
@@ -190,15 +208,14 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-    public static void setGoodsValidByMongoDb(String pid, int type) {
+    public static boolean setGoodsValidByMongoDb(String pid, int type) {
         InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
-                inputData.setValid((type == 1 ? "1" : "0"));
-                inputData.setGoodsstate(type == 1 ? "4" : "2");
-                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
-                inputData.setUnsellableReason("6");
-                inputData.setPid(pid);
-                String json = JsonUtils.objectToJsonNotNull(inputData);
-                System.err.println(json);
+        inputData.setValid((type == 1 ? "1" : "0"));
+        inputData.setGoodsstate(type == 1 ? "4" : "2");
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setUnsellableReason("6");
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 1);
     }
 
     /**
@@ -221,18 +238,71 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
+    public static boolean updateOnlineAndSolr(InputData inputData, int isSolr) {
+        JsonResult json = new JsonResult();
+        File file = null;
+        try {
+            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
+            if (file != null) {
+                String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL, file);
+                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product:[" + result + "]");
+                if (StringUtils.isNotBlank(result)) {
+                    file.delete();
+                    if (isSolr > 0) {
+                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "006.json", result);
+                        if (file != null) {
+                            result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL, file);
+                            System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr:[" + result + "]");
+                            if (StringUtils.isNotBlank(result)) {
+                                json.setOk(false);
+                                json.setData(result);
+                            } else {
+                                json.setOk(false);
+                                json.setMessage("执行调用mongodb更新solr接口失败");
+                                System.err.println(inputData.getPid() + ",执行调用mongodb更新solr接口失败");
+                                logger.error(inputData.getPid() + ",执行调用mongodb更新solr接口失败");
+                            }
+                        } else {
+                            json.setOk(false);
+                            json.setMessage("solr生成json文件失败");
+                            System.err.println(inputData.getPid() + ",solr生成json文件失败");
+                            logger.error(inputData.getPid() + ",solr生成json文件失败");
+                        }
 
-    public static boolean updateOnlineAndSolr(InputData inputData,int isSolr){
-
-        try{
-            String json = JsonUtils.objectToJsonNotNull(inputData);
-            System.err.println(json);
-
-        }catch (Exception e){
+                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("执行调用mongodb更新产品接口失败");
+                    System.err.println(inputData.getPid() + ",执行调用mongodb更新产品接口失败");
+                    logger.error(inputData.getPid() + ",执行调用mongodb更新产品接口失败");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("产品生成json文件失败");
+                System.err.println(inputData.getPid() + ",产品生成json文件失败");
+                logger.error(inputData.getPid() + ",产品生成json文件失败");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        } finally {
+            if (file != null && file.exists()) {
+                file.delete();
+            }
         }
 
-        return false;
+        return json.isOk();
     }
 
+    private static File writeToLocal(String fileName, String json) throws Exception {
+        File file = new File(fileName);
+        FileHelper.writeFile(file, json);
+        file = new File(fileName);
+        if (file.exists()) {
+            return file;
+        } else {
+            return null;
+        }
+    }
 }

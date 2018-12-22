@@ -184,7 +184,6 @@ public class OKHttpUtils {
 				.build();
 
 		Response response = client.newCall(request).execute();
-		System.err.println(response);
 		if(response.isSuccessful()){
 			return response.body().string();
 		}else{
