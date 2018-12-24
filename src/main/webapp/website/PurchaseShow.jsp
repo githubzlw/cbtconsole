@@ -2928,7 +2928,7 @@
 									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" value="线下采购" onclick="AddinsertSources('${pb.newValue}','${pb.purchaseCount}','${pb.cGoodstype}','${pb.googs_img}','${pb.oldValue}','${pb.orderNo}','${pb.goodsid}','${pb.od_id}');" class="f" />
 								</c:if>
 								<c:if test="${pb.offline_purchase==1}">
-									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" style="background-color: red;" value="线下采购" onclick="AddinsertSources('${pb.newValue}','${pb.purchaseCount}','${pb.cGoodstype}','${pb.googs_img}','${pb.oldValue}','${pb.orderNo}','${pb.goodsid}');" class="f" />
+									<input type="button" id="insert_${pb.orderNo}${pb.od_id}" style="background-color: red;" value="线下采购" onclick="AddinsertSources('${pb.newValue}','${pb.purchaseCount}','${pb.cGoodstype}','${pb.googs_img}','${pb.oldValue}','${pb.orderNo}','${pb.goodsid}','${pb.od_id}');" class="f" />
 								</c:if>
 								<c:if test="${pb.authorized_flag==1 || pb.authorized_flag==2}">
 									<input type="button" style="background-color: green;"  value="授权该商品" onclick="productAuthorization('${pb.goods_pid}','${pb.od_id}',0);" class="f" />

@@ -334,7 +334,7 @@
 		$(".refresh_color").attr("disabled",true);
 		$.ajax({
 			type : "POST",
-			url : "/cbtconsole/hotManage/refreshHotJson",
+			url : "https://www.import-express.com/popProducts/refreshHotJson",
 			data : {},
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);

@@ -24,6 +24,8 @@ import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
@@ -2337,6 +2339,12 @@ public class OrderwsDao implements IOrderwsDao {
                 NotifyToCustomerUtil.updateOrderGoodsPrice(userId,orderNo);
                 result =1;
             }
+            sql="update orderinfo set server_update=1 where order_no='"+orderNo+"'";
+            stmt3 = conn.prepareStatement(sql);
+            stmt3.executeUpdate();
+            SendMQ sendMQ = new SendMQ();
+            sendMQ.sendMsg(new RunSqlModel(sql));
+            sendMQ.closeConn();
         } catch (Exception e) {
             e.printStackTrace();
             result =0;
@@ -2874,7 +2882,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int upOrderChangeResolve(String orderNo, int goodId, int changeType) {
-        String sql = "update order_change set del_state=1,dateline=dateline where  orderNo=? and goodId=? and ropType=?";
+        String sql = "update order_change set del_state=1 where  orderNo=? and goodId=? and ropType=?";
         String sql1 = "update orderinfo set server_update=0 where 1>(select count(id) from order_change where orderno=? and del_state=0) and order_no=?";
         Connection conn = DBHelper.getInstance().getConnection();
         Connection conn2 = DBHelper.getInstance().getConnection2();

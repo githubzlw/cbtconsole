@@ -711,11 +711,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         upsql += ",ali_pid=?,ali_price=?,matchSource=?";
         upsql += " where pid=?";
         Connection conn = null;
-        if (isOnline == 1) {
-            conn = DBHelper.getInstance().getConnection2();
-        } else {
-            conn = DBHelper.getInstance().getConnection();
-        }
+        conn = DBHelper.getInstance().getConnection();
         String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=? where pid = ?";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -2165,106 +2161,57 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     public int setGoodsValid(String pid, String adminName, int adminId, int type, int reason,String remark) {
 
         Connection conn = DBHelper.getInstance().getConnection();
-        Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
         String upSql = "update custom_goods_edit a,custom_benchmark_ready b " +
                 "set b.valid=?,b.goodsstate=?,b.unsellableReason = ?,a.admin_id=?,a.update_count=a.update_count + 1 ";
         if (type == 1) {
             upSql += ",a.publish_time=sysdate()";
-        }else{
+        } else {
             upSql += ",a.off_time=sysdate(),a.off_reason=?";
         }
         upSql += "  where a.pid = b.pid and b.pid = ? ";
         PreparedStatement stmt = null;
-        PreparedStatement remoteStmt = null;
         PreparedStatement stmt28 = null;
-        String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,unsellableReason = ?,cur_time=sysdate() where pid = ?";
         String up28Sql = "update custom_benchmark_ready_newest set valid=?,goodsstate=?,unsellableReason = ?,flag=? where pid = ?";
         int rs = 0;
         try {
-
-            remoteConn.setAutoCommit(false);
             conn.setAutoCommit(false);
-            //conn28.setAutoCommit(false);
-            remoteStmt = remoteConn.prepareStatement(upRemoteSql);
-            remoteStmt.setInt(1, type == 1 ? 1 : 0);
-            remoteStmt.setInt(2, type == 1 ? 4 : 2);
-            remoteStmt.setInt(3, reason);
-            remoteStmt.setString(4, pid);
-
-            rs = remoteStmt.executeUpdate();
-            if (rs > 0) {
-                rs = 0;
-                stmt = conn.prepareStatement(upSql);
-                int count27 = 1;
-                // type为-1 下架该商品 1 检查通过
-                stmt.setInt(count27++, type == 1 ? 1 : 0);
-                stmt.setInt(count27++, type == 1 ? 4 : 2);
-                stmt.setInt(count27++, reason);
-                stmt.setInt(count27++, adminId);
-                if (type < 1) {
-                    stmt.setString(count27++, remark);
-                }
-                stmt.setString(count27++, pid);
-
-                rs = stmt.executeUpdate();
-                if (rs > 0) {
-                    remoteConn.commit();
-                    conn.commit();
-                    //rs = 0;
-                    stmt28 = conn28.prepareStatement(up28Sql);
-                    stmt28.setInt(1, type == 1 ? 1 : 0);
-                    stmt28.setInt(2, type == 1 ? 4 : 2);
-                    stmt28.setInt(3, reason);
-                    stmt28.setInt(4, (reason > 0 || type == 1) ? 0 : 2);
-                    stmt28.setString(5, pid);
-                    //rs = stmt28.executeUpdate();
-                    stmt28.executeUpdate();
-                    /*if (rs > 0) {
-                        remoteConn.commit();
-                        conn.commit();
-                        conn28.commit();
-                    } else {
-                        remoteConn.rollback();
-                        conn.rollback();
-                        conn28.rollback();
-                    }*/
-                } else {
-                    remoteConn.rollback();
-                    conn.rollback();
-                }
-            } else {
-                remoteConn.rollback();
+            rs = 0;
+            stmt = conn.prepareStatement(upSql);
+            int count27 = 1;
+            // type为-1 下架该商品 1 检查通过
+            stmt.setInt(count27++, type == 1 ? 1 : 0);
+            stmt.setInt(count27++, type == 1 ? 4 : 2);
+            stmt.setInt(count27++, reason);
+            stmt.setInt(count27++, adminId);
+            if (type < 1) {
+                stmt.setString(count27++, remark);
             }
+            stmt.setString(count27++, pid);
 
+            rs = stmt.executeUpdate();
+            if (rs > 0) {
+                conn.commit();
+                //rs = 0;
+                stmt28 = conn28.prepareStatement(up28Sql);
+                stmt28.setInt(1, type == 1 ? 1 : 0);
+                stmt28.setInt(2, type == 1 ? 4 : 2);
+                stmt28.setInt(3, reason);
+                stmt28.setInt(4, (reason > 0 || type == 1) ? 0 : 2);
+                stmt28.setString(5, pid);
+                //rs = stmt28.executeUpdate();
+                stmt28.executeUpdate();
+            } else {
+                conn.rollback();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("pid:" + pid + " setGoodsValid error :" + e.getMessage());
             LOG.error("pid:" + pid + " setGoodsValid error :" + e.getMessage());
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (remoteStmt != null) {
-                try {
-                    remoteStmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt28 != null) {
-                try {
-                    stmt28.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closePreparedStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
-            DBHelper.getInstance().closeConnection(remoteConn);
             DBHelper.getInstance().closeConnection(conn28);
         }
         return rs;

@@ -33,11 +33,21 @@ public class TabCouponNew {
 
 	// 创建用户 id
 	private Integer userid;
-	
+
 	// 创建用户名
 	private String username;
 
-	public String getUsername() {
+	private String userids;//折扣卷关联的用户id
+
+    public String getUserids() {
+        return userids;
+    }
+
+    public void setUserids(String userids) {
+        this.userids = userids;
+    }
+
+    public String getUsername() {
 		return username;
 	}
 
