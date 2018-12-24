@@ -856,7 +856,7 @@
          (select DISTINCT pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no LIMIT 1) as payUserName,
         (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
         (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
-        (SELECT COUNT(od.id) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
+        (SELECT COUNT(od.orderid) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
         a.address as addresss,o.user_id as userid,o.actual_allincost,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,

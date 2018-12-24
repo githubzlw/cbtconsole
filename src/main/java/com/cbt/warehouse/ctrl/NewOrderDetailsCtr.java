@@ -40,6 +40,8 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -81,8 +84,11 @@ public class NewOrderDetailsCtr {
 	public String queryByOrderNo(HttpServletRequest request, HttpServletResponse response) {
 		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 		DecimalFormat df = new DecimalFormat("######0.00");
-		try {
+		//try {
 			String orderNo = request.getParameter("orderNo");
+			if(StringUtils.isNotBlank(orderNo)){
+				orderNo = orderNo.replaceAll("'","");
+			}
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
@@ -234,7 +240,14 @@ public class NewOrderDetailsCtr {
 				if (arrive != 0 && arrive != -1) {
 					Calendar c = Calendar.getInstance();
 					if (Utility.getStringIsNull(orderInfo.getTransport_time())) {
-						c.setTime(sf.parse(orderInfo.getTransport_time()));
+						Date parse = null;
+						try {
+							parse = sf.parse(orderInfo.getTransport_time());
+						} catch (ParseException e) {
+							e.printStackTrace();
+							LOG.error("订单详情：",orderNo+e.getMessage());
+						}
+						c.setTime(parse);
 					}
 					c.add(Calendar.DAY_OF_MONTH, arrive);
 					arrive_time = sf.format(c.getTime());
@@ -263,7 +276,12 @@ public class NewOrderDetailsCtr {
 				if (Utility.getStringIsNull(pay_time)) {
 					// 支付时间+最长国内交期+国际运输时间<当前时间
 					Calendar c = Calendar.getInstance();
-					c.setTime(sf.parse(pay_time));
+					try {
+						c.setTime(sf.parse(pay_time));
+					} catch (ParseException e) {
+						e.printStackTrace();
+						LOG.error("订单详情：",orderNo+e.getMessage());
+					}
 					if (state == 5) {
 						c.add(Calendar.DAY_OF_MONTH, 2);
 						if ((new Date().getTime()) > c.getTime().getTime()) {
@@ -449,10 +467,10 @@ public class NewOrderDetailsCtr {
 				lists.add(orderDetailsBean.getGoods_pid());
 			}
 			request.setAttribute("lists", lists);
-		} catch (Exception e) {
-			e.printStackTrace();
-			LOG.error("查询详情失败，原因：" + e.getMessage());
-		}
+		//} catch (Exception e) {
+			/*e.printStackTrace();
+			LOG.error("查询详情失败，原因：" + e.getMessage());*/
+		//}
 		return "order_details_new";
 	}
 
