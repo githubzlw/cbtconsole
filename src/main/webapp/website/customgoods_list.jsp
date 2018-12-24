@@ -481,9 +481,9 @@ b {
 		<span><input type="button" id="sall"
 			onclick="fnpsave('${uid}')" value="批量保存"
 			style="height: 30px; width: 80px;" class="btn"></span> <span><input
-			type="button" id="pall" onclick="fnpall('${uid}')" value="批量保存并发布" disabled="disabled"
+			type="button" id="pall" onclick="fnpall('${uid}')" value="批量保存并发布"
 			style="height: 30px; width: 120px;" class="btn"></span> <span><input
-			type="button" id="pdown" onclick="fndall('${uid}')" value="批量下架" disabled="disabled"
+			type="button" id="pdown" onclick="fndall('${uid}')" value="批量下架"
 			style="height: 30px; width: 80px; margin-right: 40px;" class="btn"></span>
 		<span><input type="button" id="marker_bm"
 			onclick="markerByAdm('${uid}')" value="人为对标"
@@ -519,7 +519,7 @@ b {
 					<!-- 索引 -->
 					<td><input type="checkbox" id="checkpid_${list.pid}"
 						class="checkpid is_disabled" style="height: 16px; width: 16px;"
-						value="${list.pid}" disabled="disabled" title="非当前商品的编辑人">
+						value="${list.pid}" title="非当前商品的编辑人">
 			</c:if>
 			<c:if test="${list.canEdit ==0 || list.canEdit == uid}">
 				<tr bgcolor="#FFF7FB"
@@ -636,7 +636,7 @@ b {
 				<br> <a href="/cbtconsole/apa/customGoodsEditLog.html?pid=${list.pid}" target="_blank">编辑日志</a>
 				<br> <input type="button" id="pb_btn_${list.pid}"
 				onclick="fnpublish('${list.pid}','${uid}')" value="线上发布" class="btn"
-				id="publish_${list.pid}" disabled="disabled"> <br><input
+				id="publish_${list.pid}"> <br><input
 				type="button" onclick="fndown('${list.pid}','${uid}')" value="产品下架"
 				class="btn" id="down_${list.pid}"> <br><a
 				target="_blank"

@@ -1317,14 +1317,16 @@
 					<input id="query_pid" value="${goods.pid}" placeholder="请输入PID"/>
 					<i class="s_btn" onclick="doQuery()">查询</i>
 				</span>
-            <%--<span class="s_btn" onclick="doSaveDetalis('${goods.pid}',1,${isSoldFlag})">保存并发布</span>
-            <span class="s_btn" onclick="setGoodsValid('${goods.pid}',-1)">下架该商品</span>
-            <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>--%>
-
             <span class="s_btn" onclick="doSaveDetalis('${goods.pid}',0,${isSoldFlag})">保存</span>
-            <span class="s_btn" >保存并发布</span>
+
+            <span class="s_btn" onclick="doSaveDetalis('${goods.pid}',1,${isSoldFlag})">保存并发布</span>
+            <span class="s_btn" onclick="setGoodsValid('${goods.pid}',-1)">下架该商品</span>
+            <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
+
+            <%--<span class="s_btn" >保存并发布</span>
             <span class="s_btn" >下架该商品</span>
-            <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>
+            <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
+
             <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0)">设置描述很精彩</span>
             <span class="s_last">*点击后数据直接更新线上</span>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
