@@ -662,9 +662,9 @@ public class ShopCarMarketingController {
                 freight = json.getJSONObject("data").getDouble("totalFreight");
                 if(freight > 0 ){
                     carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
-                    carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
                     carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
                 }
+                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
             } else {
                 System.err.println("getMinFreightByUserId error :<:<:<");
             }
