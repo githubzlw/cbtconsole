@@ -531,8 +531,8 @@
         WHERE
         problem_report.email = admin_r_user.useremail
         AND (
-        reply_content IS NULL
-        OR reply_content = ''
+        problem_report.reply_content IS NULL
+        OR problem_report.reply_content = ''
         )
         <if test="adminid != 0" >
             and admin_r_user.adminid = #{adminid,jdbcType=INTEGER}

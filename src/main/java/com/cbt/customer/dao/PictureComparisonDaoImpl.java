@@ -3825,6 +3825,15 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			row=stmt.executeUpdate();
 		}catch (Exception e){
 			e.printStackTrace();
+		}finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;
 	}

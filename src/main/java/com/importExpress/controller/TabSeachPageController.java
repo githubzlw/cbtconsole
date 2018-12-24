@@ -243,16 +243,21 @@ public class TabSeachPageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		DataSourceSelector.set("dataSource127hop");
 		String id = request.getParameter("id");
-		TabSeachPageBean bean = tabSeachPageService.get(Integer.parseInt(id));
-		DataSourceSelector.restore();
-		bean.setImportPath(SearchFileUtils.importexpressPath);
+		TabSeachPageBean bean = new TabSeachPageBean();
+		//step v1. @author: cjc @date：2018/12/24 14:01:13  TODO 判断是否为空 不然报错
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(id)){
+			bean = tabSeachPageService.get(Integer.parseInt(id));
+			DataSourceSelector.restore();
+			bean.setImportPath(SearchFileUtils.importexpressPath);
 
-		if (StringUtil.isNotBlank(bean.getFilename())) {
-			bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
+			if (StringUtil.isNotBlank(bean.getFilename())) {
+				bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
+			}
+			if (StringUtil.isNotBlank(bean.getPageBannerName())){
+				bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
+			}
 		}
-        if (StringUtil.isNotBlank(bean.getPageBannerName())){
-		    bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
-        }
+
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
 		out.print(jsonob);

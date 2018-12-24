@@ -792,7 +792,6 @@ public class ParseGoodsUrl {
 	
 	
 	/**货源获取商品数据
-	 * @param url
 	 * @return
 	 */
 	public static GoodsBean parseGoodsWbsite(String urls, String name, String price, ArrayList<TypeBean> type, String goodsCarId){

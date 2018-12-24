@@ -41,16 +41,14 @@ public class FreightUtlity {
             String resultStr = response.body().string();
             JSONObject json = JSONObject.fromObject(resultStr);
             if (json.getBoolean("ok")) {
-                System.out.println("getFreightByOrderno success !!!");
                 Map<String, Double> data = (Map<String, Double>) json.getJSONObject("data");
                 freight = (Double) data.get("freightCost");
                 freight = new BigDecimal(freight*6.6).setScale(2,BigDecimal.ROUND_UP).doubleValue();
             } else {
-                System.err.println("getFreightByOrderno error :<:<:<");
+                logger.warn("getFreightByOrderno error :<:<:<");
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            logger.error("getFreightByOrderno error,orderNo:[{}],e:[{}]" + orderNo + e.getMessage());
+            logger.warn("getFreightByOrderno error,orderNo:[{}],e:[{}]" + orderNo + e.getMessage());
         }
         return freight;
     }
