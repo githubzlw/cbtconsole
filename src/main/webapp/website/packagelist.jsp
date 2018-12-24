@@ -201,8 +201,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 			var a=Number(document.getElementById("cgje"+order_no+"").innerHTML)+Number(document.getElementById("ygyf"+index+"").innerHTML);
 			var b=$("#payPrice"+order_no+"").val();
 			b=b.replace(",","");
-			if(Number(a)-Number(b)<=10){
-                $("#spjg1"+h_orderid).html("采购额加运费超出销售金额");
+			if(Number(a)-Number(b)>10){
+                $("#spjg1"+h_orderid).html("采购额加运费超出销售金额(10美金差额)");
                 $("#yjremark"+order_no).attr('disabled',false);
                 $("#inRemark"+order_no).attr('disabled',false);
                 $("#plckid").attr('disabled',true);
