@@ -21,4 +21,9 @@ public interface TabCouponMapper {
 
 	Long checkCouponCode(@Param("couponCode") String couponCode);
 
+    TabCouponNew queryTabCouponOne(@Param("couponCode") String couponCode);
+
+    void insertCouponUsers(@Param("bean") TabCouponNew bean, @Param("list") List<String> list);
+
+    String queryTabCouponUser(@Param("couponCode") String couponCode);
 }
