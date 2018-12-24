@@ -274,11 +274,17 @@ function fn(va) {
 		}
 		uname = user.username;
 		uemail = user.email;
+        var checkType='${param.type}';
 		if(adminName=="Ling"){
-			$("#table tr:eq(" + row + ") td:eq(15)").after("<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
-					+"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
-					+ json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=230,width=420,"
-					+"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a></td>");
+		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
+                +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
+                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=230,width=420,"
+                +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
+		    if(checkType == "checkOrder"){
+                html_+="|<a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+			}
+            html_+="</td>";
+			$("#table tr:eq(" + row + ") td:eq(15)").after(html_);
 		}else{
 			$("#table tr:eq(" + row + ") td:eq(15)").after("<td></td>");
 		}
@@ -399,9 +405,35 @@ $(document).ready(function(){
 .tabletoptoal td {text-align: center;}
 #table tr td{height:38px;word-break: break-all;}
 .otherpage a{background-color: #46f11e;font-size: 16px;font-weight: 500;color: black;}
+.mod_pay3 {
+	width: 720px;
+	position: fixed;
+	top: 250px;
+	left: 15%;
+	z-index: 1011;
+	background: gray;
+	padding: 5px;
+	padding-bottom: 20px;
+	z-index: 1011;
+	border: 15px solid #33CCFF;
+}
 </style> 
 </head>
 <body>
+<div class="mod_pay3" style="display: none;" id="checkDiv">
+	<div>
+		<a href="javascript:void(0)" class="show_x"
+		   onclick="closeCheckEmailForUser();">╳</a>
+	</div>
+	<input id="checkOrderid" type="hidden" value=""> <input
+		id="checkEmail" type="hidden" value="">
+	回复内容:
+	<textarea name="checkRemark" rows="8" cols="50"
+			  id="checkRemark"></textarea>
+	<input type="button" id="repalyBtnId" onclick="sendCheckEmailForUser()"
+		   value="发送邮件">
+	<input type="button" onclick="closeCheckEmailForUser();" value="关闭">
+</div>
 		<div align="center">
 
 			<div style="text-align: center;" class="otherpage">
@@ -564,6 +596,7 @@ $(document).ready(function(){
 									<td style="width: 124px;">出货审核问题</td>
 									<td style="width: 124px;">出运中/<br />物流问题</td>
 									<%--<td style="width: 124px;">出运运费预警</td>--%>
+									<td style="width: 124px;">质检服务订单</td>
 								</tr>
 								<tr>
 									<td id="order_pending">0</td>
@@ -579,6 +612,7 @@ $(document).ready(function(){
 									<td id="errorgoods">0</td>
 									<td><span id="onshipping">0</span>/<span id="onshippingw">0</span></td>
 									<%--<td id="freightWaraing">0</td>--%>
+									<td><span id="checkOrder">0</span></td>
 								</tr>
 							</table>
 

@@ -268,6 +268,20 @@ public interface IOrderinfoService {
 	public int updateOrderinfoUpdateState(String orderNo);
 
 	/**
+	 * 查看该订单是否发送过质检信息邮件
+	 * @param orderNo
+	 * @return
+	 */
+	public int checkRecord(String orderNo);
+
+	/**
+	 * 记录该订单已发送质检信息邮件
+	 * @param orderNo
+	 * @return
+	 */
+	public int insertEmailRecord(String orderNo);
+
+	/**
 	 * 根据订单号查询订单详情
 	 * @param orderNo
 	 * @return

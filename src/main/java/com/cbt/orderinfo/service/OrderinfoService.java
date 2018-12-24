@@ -1675,6 +1675,16 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
+	public int checkRecord(String orderNo) {
+		return dao.checkRecord(orderNo);
+	}
+
+	@Override
+	public int insertEmailRecord(String orderNo) {
+		return dao.insertEmailRecord(orderNo);
+	}
+
+	@Override
 	public List<Map<String, String>> getorderPending() {
 		List<Map<String, String>> list=new ArrayList<Map<String, String>>();
 		String orderIds=dao.getOrderIds();
