@@ -606,7 +606,9 @@ public class ComplainDaoImpl implements IComplainDao{
 				ComplainVO rfb = new ComplainVO();
 				rfb.setId(rs.getInt("id"));
 				rfb.setUserid((rs.getInt("userid")));
-				rfb.setComplainText(rs.getString("complainText"));
+				String complainText = rs.getString("complainText");
+				complainText = complainText.length() > 50 ? complainText.substring(0, 50)+"..." : complainText;
+				rfb.setComplainText(complainText);
 				rfbList.add(rfb);
 			}
 		} catch (Exception e) {
