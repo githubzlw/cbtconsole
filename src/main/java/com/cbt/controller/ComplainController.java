@@ -97,7 +97,8 @@ public class ComplainController {
 			int userid2 = c.getUserid();
 			useridList = useridList+userid2+",";
 			List<String> corderIdList = c.getOrderIdList();
-			if(StringUtils.isBlank(c.getDisputeId()) && corderIdList != null && !corderIdList.isEmpty()) {
+			List<Map<String,String>> disputeList = c.getDisputeList();
+			if((disputeList == null || disputeList.isEmpty()) && corderIdList != null && !corderIdList.isEmpty()) {
 				for(String o : corderIdList) {
 					if(StringUtil.isNotBlank(o) ) {
 						orderIdList.add(o.split("_")[0]);
@@ -105,7 +106,7 @@ public class ComplainController {
 				}
 			}
 		}
-		/*Map<String, Object> dispute = customerDisputeService.list(orderIdList);
+		Map<String, Object> dispute = customerDisputeService.list(orderIdList);
 		useridList = useridList.endsWith(",")?useridList.substring(0, useridList.length()-1):useridList;
 		Map<String, String> complainRefundByUserids = refundService.getComplainRefundByUserids(useridList);
 		for(ComplainVO c:list){
@@ -113,20 +114,23 @@ public class ComplainController {
 			isRefund = isRefund==null||isRefund.isEmpty()?"0":isRefund;
 			c.setIsRefund(Integer.valueOf(isRefund));
 			List<String> corderIdList = c.getOrderIdList();
-			if(StringUtils.isBlank(c.getDisputeId()) && corderIdList != null && !corderIdList.isEmpty()) {
+			List<Map<String,String>> disputeList = c.getDisputeList();
+			if((disputeList == null || disputeList.isEmpty()) && corderIdList != null && !corderIdList.isEmpty()) {
 				for(String o : corderIdList) {
 					o = o.split("_")[0];
 					CustomerDisputeBean cDisputeBean = (CustomerDisputeBean)dispute.get(o);
 					if(cDisputeBean != null && StringUtils.equals(String.valueOf(c.getUserid()), cDisputeBean.getUserid())) {
-						c.setDisputeId(cDisputeBean.getDisputeID());
-						c.setMerchantId(cDisputeBean.getMerchantID());
-						break;
+						disputeList = disputeList == null ? new ArrayList<>() : disputeList ;
+						Map<String,String> disMap = new HashMap<>();
+						disMap.put("disputeId", cDisputeBean.getDisputeID());
+						disMap.put("merchantId", cDisputeBean.getMerchantID());
+						disputeList.add(disMap);
 					}
 				}
-				
+				c.setDisputeList(disputeList);
 			}
 			
-		}*/
+		}
 		
 		page.setList(list);
 		

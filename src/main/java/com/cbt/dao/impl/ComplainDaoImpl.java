@@ -1,5 +1,18 @@
 package com.cbt.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
+
 import com.cbt.bean.Complain;
 import com.cbt.bean.ComplainChat;
 import com.cbt.bean.ComplainFile;
@@ -9,18 +22,6 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.page.Page;
 import com.cbt.util.SqlSplitUtil;
 import com.cbt.warehouse.util.StringUtil;
-import com.google.common.collect.ArrayTable;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class ComplainDaoImpl implements IComplainDao{
@@ -52,10 +53,11 @@ public class ComplainDaoImpl implements IComplainDao{
 
 	@Override
 	public ComplainVO getComplainByCid(Integer cid) {
-		String sql="SELECT c.id cid,c.userid,c.userEmail,c.complainType,c.complainText,c.createTime,c.closeTime,c.ref_orderid,c.complainState,c.dealAdmin,c.dealAdminid"
+		String sql="SELECT c.id cid,c.userid,c.userEmail,c.complainType,c.complainText,c.createTime,"
+				+ "c.closeTime,c.ref_orderid,c.complainState,c.dealAdmin,c.dealAdminid,c.ref_dispute_merchant_id"
 				+ " from tb_complain c   "
 				+ "where c.id=?";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		ComplainVO rfb = new ComplainVO();
@@ -81,6 +83,23 @@ public class ComplainDaoImpl implements IComplainDao{
 				rfb.setComplainState(rs.getInt("complainState"));
 				rfb.setDealAdmin(rs.getString("dealAdmin"));
 				rfb.setDealAdminid(rs.getInt("dealAdminid"));
+				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
+				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
+					List<Map<String,String>> disList = new ArrayList<>();
+					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
+						if(StringUtils.isNotBlank(s)) {
+							String[] split = s.split("_");
+							if(split.length == 2 && StringUtils.isNotBlank(split[0]) && StringUtils.isNotBlank(split[1])) {
+								Map<String,String> map = new HashMap<>();
+								map.put("disputeId", split[0]);
+								map.put("merchantId", split[1]);
+								disList.add(map);
+							}
+						}
+						
+					});
+					rfb.setDisputeList(disList);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -317,7 +336,7 @@ public class ComplainDaoImpl implements IComplainDao{
 		int start= (page.getStartIndex()-1) *20;
 		ArrayList<ComplainVO> rfbList = new ArrayList<ComplainVO>();
 		StringBuilder sb = new StringBuilder("SELECT c.id,c.userid,c.userEmail,c.complainType,"
-				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,c.ref_goodsid,c.dispute_id,c.merchant_id,"
+				+ "c.complainText,c.createTime,c.closeTime,c.ref_orderid,c.ref_goodsid,c.ref_dispute_merchant_id,"
 				+ "c.complainState,c.dealAdmin,c.dealAdminid,u.admName,"
 				+" (SELECT COUNT(id) FROM tb_complain_chat WHERE complainid=c.id AND readorno=0 and flag=0) AS counts," +
 				" (SELECT COUNT(id)+1 FROM tb_complain_chat WHERE complainid=c.id  and flag=0) AS customSum , "
@@ -379,8 +398,23 @@ public class ComplainDaoImpl implements IComplainDao{
 				if(StringUtils.isNotBlank(ref_orderid)) {
 					rfb.setOrderIdList(Arrays.asList(ref_orderid.split(",")));
 				}
-				rfb.setDisputeId(rs.getString("dispute_id"));
-				rfb.setMerchantId(rs.getString("merchant_id"));
+				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
+				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
+					List<Map<String,String>> disList = new ArrayList<>();
+					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
+						if(StringUtils.isNotBlank(s)) {
+							String[] split = s.split("_");
+							if(split.length == 2 && StringUtils.isNotBlank(split[0]) && StringUtils.isNotBlank(split[1])) {
+								Map<String,String> map = new HashMap<>();
+								map.put("disputeId", split[0]);
+								map.put("merchantId", split[1]);
+								disList.add(map);
+							}
+						}
+						
+					});
+					rfb.setDisputeList(disList);
+				}
 				rfb.setRefGoodsId(rs.getString("ref_goodsid"));
 				rfb.setComplainState(rs.getInt("complainState"));
 				rfb.setDealAdmin(rs.getString("dealAdmin"));
@@ -469,12 +503,11 @@ public class ComplainDaoImpl implements IComplainDao{
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		int rs = 0;
-		String sql = "update  tb_complain set dispute_id=?,merchant_id=? where id=?";
+		String sql = "update  tb_complain set ref_dispute_merchant_id= CONCAT_WS(',',ref_dispute_merchant_id,?) where id=?";
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, disputeid);
-			stmt.setString(2, merchantid);
-			stmt.setInt(3, id);
+			stmt.setInt(2, id);
 			rs = stmt.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -496,13 +529,14 @@ public class ComplainDaoImpl implements IComplainDao{
 	@Override
 	public List<ComplainVO> getComplainByDisputeId(List<String> disputeIdList) {
 		List<ComplainVO> rfbList = new ArrayList<ComplainVO>();
-		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText,dispute_id,"
-				+ "merchant_id from tb_complain where dispute_id in (");
-
+		StringBuilder sb = new StringBuilder("SELECT id,userid,complainText,ref_dispute_merchant_id "
+				+ " from tb_complain where  ");
+		
 		for(String disputeId : disputeIdList) {
-			sb.append("\"").append(disputeId).append("\",");
+			sb.append("locate(ref_dispute_merchant_id,\"").append(disputeId).append("\")>0").append(" or ");
 		}
-		sb.append("\"0\"").append(")");
+		
+		sb.append("1=1");
 		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
@@ -515,8 +549,21 @@ public class ComplainDaoImpl implements IComplainDao{
 				rfb.setId(rs.getInt("id"));
 				rfb.setUserid((rs.getInt("userid")));
 				rfb.setComplainText(rs.getString("complainText"));
-				rfb.setDisputeId(rs.getString("dispute_id"));
-				rfb.setMerchantId(rs.getString("merchant_id"));
+				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
+				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
+					List<Map<String,String>> disList = new ArrayList<>();
+					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
+						if(StringUtils.isNotBlank(s)) {
+							String[] split = s.split("_");
+							Map<String,String> map = new HashMap<>();
+							map.put("disputeId", split[0]);
+							map.put("merchantId", split[1]);
+							disList.add(map);
+						}
+						
+					});
+					rfb.setDisputeList(disList);
+				}
 				rfbList.add(rfb);
 			}
 		} catch (Exception e) {

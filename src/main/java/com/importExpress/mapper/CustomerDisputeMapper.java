@@ -57,6 +57,4 @@ public interface CustomerDisputeMapper {
 	 * @return
 	 */
 	Integer updateRefund(@Param("disputeid")String disputeid,@Param("refundedAmount")String refundedAmount);
-	
-	
 }
