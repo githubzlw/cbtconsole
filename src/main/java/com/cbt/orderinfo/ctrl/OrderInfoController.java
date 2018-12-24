@@ -25,6 +25,9 @@ import ceRong.tools.bean.SearchLog;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
+import net.sf.json.JSONObject;
+import sun.misc.BASE64Decoder;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +64,7 @@ public class OrderInfoController{
 	private SendMailFactory sendMailFactory;
 	@Autowired
 	private ISpiderServer spiderService;
-
+	private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		Map<String,String> map=new HashMap<String,String>();
@@ -904,6 +913,56 @@ public class OrderInfoController{
 	public @ResponseBody List<Map<String,Object>> loadCategoryName(HttpServletRequest request){
 		String catid = request.getParameter("catid");
 		return purchaseService.loadCategoryName(catid);
+	}
+	
+	@RequestMapping(value = "/uploadImg")
+	public @ResponseBody Map<String,Object> uploadImg(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> map = new HashMap<String,Object>();
+		response.setContentType("text/html;charset=utf-8");
+		String imgObj = request.getParameter("imgFile");
+		String imgName = request.getParameter("imgName");
+		String rowid = request.getParameter("rowid");
+		try {
+			imgName = URLDecoder.decode(imgName,"utf-8");//前面进行了两次编码，这里�?要用解码器解码一�?
+			
+			String path = imgSavePath+File.separator+imgName;//Windows文件保存路径
+			
+			//如果文件夹不存在则创�?
+			File file = new File(imgSavePath);
+			if(!file.exists() && !file.isDirectory()){
+				file.mkdirs();//生成�?有目�?
+			}
+			
+			//�? 提交的imgObj 保存到指定目�?
+			FileOutputStream os = new FileOutputStream(path);
+			imgObj = imgObj.replaceAll("#wb#", "+");
+			BASE64Decoder decoder = new BASE64Decoder();
+			byte[] b = decoder.decodeBuffer(imgObj);
+			for(int i=0;i< b.length;++i){
+			   if(b[i]< 0){//调整异常数据
+			      b[i]+=256;
+			   }
+			}
+			InputStream is = new ByteArrayInputStream(b);
+			int len = 0;
+			while((len=is.read(b))!=-1){
+			   os.write(b,0,len);
+			}
+			os.close();
+			is.close();
+			ArrayList<String> imgList = new ArrayList<String>();
+			imgList.add("123");
+			imgList.add("456");
+			map.put("state",1);
+			map.put("imgs",imgList);
+			JSONObject re=JSONObject.fromObject(map);
+			PrintWriter pw = response.getWriter();
+			pw.print(re.toString());
+			pw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 	
 	/**

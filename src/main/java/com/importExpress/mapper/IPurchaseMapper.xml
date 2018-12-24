@@ -792,9 +792,12 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         </foreach>
     </update>
 
-    
+    <update id="updateSizeChart">
+update ocr_img_sizechart set replace_img = #{imgname},replace_localpath = #{localpath} where id=#{rowid}
+</update>
+
     <select id="getSizeChart" resultType="java.util.Map">
-select cat.name,ocr.remotpath,ocr.pid  from ocr_img_sizechart  ocr
+select cat.name,ocr.remotpath,ocr.pid,ocr.id  from ocr_img_sizechart  ocr
 left join 1688_category  cat on ocr.catid = cat.category_id
 left join custom_benchmark_ready cu on cu.pid=ocr.pid
 where ocr.sizechart=2 and ocr.catid=#{catid} and cu.valid=1

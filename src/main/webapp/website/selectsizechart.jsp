@@ -67,7 +67,7 @@
 <select class="catoption_minlv">
 </select>
 <p class="shopid_p">
-<span class="submitButton" >一键替换成已上传的尺码表</span>
+<span class="submitButton" >替换已上传的尺码表</span>
 </p>
 </div>
 </body>
@@ -92,7 +92,77 @@ $(document).ready(function(){
         }
     });
 	loadCategoryName('311');
+	
+	//阻止浏览器默认行，从而能实现自定义拖拽图片功能
+    $(document).on({ 
+        dragleave:function(e){    //拖离 
+            e.preventDefault(); 
+        }, 
+        drop:function(e){  //拖后放 
+            e.preventDefault(); 
+        }, 
+        dragenter:function(e){    //拖进 
+            e.preventDefault(); 
+        }, 
+        dragover:function(e){    //拖来拖去 
+            e.preventDefault(); 
+        } 
+    });
 });
+
+function uploadImg(rowid,imgFile){
+    //获取图片文件
+    //var file = imgFile.files[0];//文件对象
+    var file = imgFile;
+    var name = file.name;//图片名
+    //检测浏览器对FileReader的支持
+    if(window.FileReader) {
+        var reader = new FileReader();
+        reader.onload = function(){//异步方法,文件读取成功完成时触发
+            var dataImg = reader.result;//文件一旦开始读取，无论成功或失败，实例的 result 属性都会被填充。如果读取失败，则 result 的值为 null ，否则即是读取的结果
+            syncUpload(rowid,name,dataImg);
+        }
+        reader.readAsDataURL(file);//将文件读取为 DataURL
+    }else{
+        console.log("浏览器不支持H5的FileReader!");
+    }
+}
+
+function syncUpload(rowid,name,dataImg){
+    var imgFile = dataImg.replace(/\+/g,"#wb#");//将所有“+”号替换为“#wb#”
+    imgFile = imgFile.substring(imgFile.indexOf(",")+1);//截取只保留图片的base64部分,去掉了data:image/jpeg;base64,这段内容
+    imgFile = encodeURIComponent(imgFile);//把字符串作为 URI 组件进行编码。后台容器会自动解码一次
+    name = encodeURIComponent(encodeURIComponent(name));//这里对中文参数进行了两次URI编码，后台容器自动解码了一次，获取到参数后还需要解码一次才能得到正确的参数内容
+    var mydata = "method=syncUpload&imgFile="+imgFile+"&imgName="+name+"&rowid="+rowid;
+    $.ajax({
+         url: "/cbtconsole/order/uploadImg",
+         data:mydata,
+         type: "post",
+         dataType: "json",
+         success: function(data){
+             console.log(data);
+         }
+     });
+}
+
+function previewImg(thisObj,imgfie){
+	var windowURL = window.URL || window.webkitURL;
+	var $img = $($(thisObj).parent().find("img")[0]);
+	var dataURL = windowURL.createObjectURL(imgfie);
+    //允许上传的图片格式  
+//     var newPreview = imgfie.type;
+//     var regext = /\.jpg$|\.gif$|\.jpeg$|\.png$|\.bmp$/gi;
+//     if (!regext.test(newPreview)) {
+//         newPreview=="";
+//         alert("选择的照片格式不正确，请重新选择！");
+//         $(thisObj).after($(thisObj).clone($(fileObj)));
+//         $(thisObj).remove();
+//         return false;
+//     }
+    var rowid = $(thisObj).parent().find(".rowid").val();
+    $img.attr("src", dataURL);
+    uploadImg(rowid,imgfie);
+}
 
 function imgUpLoad(){
 	$(".pictureFile").change(function() {
@@ -106,20 +176,34 @@ function imgUpLoad(){
             return;
         }
         if (fileObj && fileObj.files && fileObj.files[0]) {
-            dataURL = windowURL.createObjectURL(fileObj.files[0]);
-            //允许上传的图片格式  
-            var newPreview = this.value;
-            var regext = /\.jpg$|\.gif$|\.jpeg$|\.png$|\.bmp$/gi;
-            if (!regext.test(newPreview)) {
-                newPreview=="";
-                alert("选择的照片格式不正确，请重新选择！");
-                $(fileObj).after($(fileObj).clone($(fileObj)));
-                $(fileObj).remove();
-                return false;
-            }
-            $img.attr("src", dataURL);
+        	previewImg(this,fileObj.files[0]);
         }
     });
+}
+
+function imgUpload1(){
+	//定义能够拖拽的区域
+    var box = $(".ul_list").find(".li_list_replace");
+	for(var i=0;i<box.length;i++){
+		var boxxc = box[i];
+		//var thisobj = $(boxxc).find(".pictureFile")[0];
+		boxxc.addEventListener("drop",function(e){
+	        e.preventDefault(); //取消默认浏览器拖拽效果
+	        var fileList = e.dataTransfer.files; //获取文件对象
+	        //检测是否是拖拽文件到页面的操作 
+	        if(fileList.length == 0){ 
+	            return false; 
+	        } 
+	        //检测文件是不是图片 
+	        if(fileList[0].type.indexOf('image') === -1){ 
+	            alert("您拖的不是图片！"); 
+	            return false; 
+	        }
+	        //$(this).find(".pictureFile")[0].value=fileList[0];
+	        previewImg($(this).find(".pictureFile")[0],fileList[0]);
+	    });
+	}
+    
 }
 
 function loadCategoryName(catid){
@@ -169,15 +253,15 @@ function getSizeChart(catid){
                     shopHtml = shopHtml + '<div class="imgs"><img src="'+catimg.remotpath+'" onclick="bigPic(this)"></div>';
                     shopHtml = shopHtml + '<span calss="goods_name">产品id：<em>'+catimg.pid+'</em></span>';
                     shopHtml = shopHtml + '</li>';
-                    shopHtml = shopHtml + '<li class="li_list"><input class="pictureFile" type="file"/>';
+                    shopHtml = shopHtml + '<li class="li_list li_list_replace"><input class="rowid" value="'+catimg.id+'"/><input class="pictureFile" type="file"/>';
                     shopHtml = shopHtml + '<div class="imgs"><img src=""></div>';
                     shopHtml = shopHtml + '</li>';
             	}
             	shopHtml = shopHtml + '</ul>';
             }
             $(".shopid_box").append(shopHtml);
-            
             imgUpLoad();
+            imgUpload1();
         }
     });
 }
