@@ -600,6 +600,37 @@ public class OrderInfoController{
 		out.close();
 	}
 
+	/**
+	 * 发送质检完成邮件给客户
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/sendCheckEmailForUser")
+	public void sendCheckEmailForUser(HttpServletRequest request, HttpServletResponse response)throws Exception {
+		PrintWriter out = response.getWriter();
+		String orderNo = request.getParameter("orderNo");
+		String email =request.getParameter("email");
+		String remark=request.getParameter("remark");
+		int row=iOrderinfoService.checkRecord(orderNo);
+		int index=0;
+		if(row ==1){
+			index=2;
+		}else if(StringUtil.isNotBlank(email)){
+			Map<String,Object> modelM = new HashedMap();
+			modelM.put("orderNo",orderNo);
+			modelM.put("name",email);
+			modelM.put("remark",remark);
+			modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderNo+"");
+			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
+			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order Inspection notice", modelM, TemplateType.CHECK);
+			iOrderinfoService.insertEmailRecord(orderNo);
+			index=1;
+		}
+		out.print(index);
+		out.close();
+	}
+
 
 	
 	@RequestMapping(value = "/getOrderInfo.do", method = RequestMethod.GET)
