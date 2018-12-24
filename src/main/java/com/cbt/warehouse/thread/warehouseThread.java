@@ -37,7 +37,6 @@ public class warehouseThread extends Thread {
 		try {
 			SendMQ sendMQ = new SendMQ();
 			// 同步更新线上数据
-			DataSourceSelector.set("dataSource127hop");
 			// 删除原来orderid对应的数据
 			if (iWarehouseService.selectShippingPackage(m2) > 0) {
 				sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
@@ -55,8 +54,6 @@ public class warehouseThread extends Thread {
 			sendMQ.closeConn();
 		} catch (Exception e) {
 			LOG.error("打印便签纸，更新线上数据异常 【订单号:" + m2.get("orderid") + "】", e);
-		}finally {
-			DataSourceSelector.restore();
 		}
 
 	}
