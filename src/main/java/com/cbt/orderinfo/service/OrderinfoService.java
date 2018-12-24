@@ -1174,11 +1174,6 @@ public class OrderinfoService implements IOrderinfoService {
 		}else {
 			sumGoodsCarWeight =  DoubleUtil.mul(weight,1000d);
 		}
-		if(countryid==37 && "epacket".equals(shippingMethod.toLowerCase())){
-			shippingMethod="China Post Packet(no tracking,unstable)";
-		}else if(countryid ==29 && "TNT Cargo Shipping (Duty Paid)".toLowerCase().equals(shippingMethod.toLowerCase())){
-			shippingMethod="TNT Cargo Shipping (DDP)";
-		}
 		double normalBaseWeight = 0d;
 		BigDecimal normalBasePrice = new BigDecimal(0);
 		BigDecimal normalRatioPrice = new BigDecimal(0);
@@ -1284,10 +1279,10 @@ public class OrderinfoService implements IOrderinfoService {
 				String dropShipList = dao.getDropshipOrderNoList(orderNo);
 				ob.setDropShipList(dropShipList);
 			}
-			List<String> yhCount=iWarehouseDao.getProblem(orderNo,"1");//验货疑问总数
-			int checkeds=iWarehouseDao.getChecked(orderNo,"1");//验货无误总数
-			int cg=iWarehouseDao.getPurchaseCount(orderNo,"1");//采购总数
-			int rk=iWarehouseDao.getStorageCount(orderNo,"1");//入库总数
+			List<String> yhCount=pruchaseMapper.getProblem(orderNo,"1");//验货疑问总数
+			int checkeds=pruchaseMapper.getChecked(orderNo,"1");//验货无误总数
+			int cg=pruchaseMapper.getPurchaseCount(orderNo,"1");//采购总数
+			int rk=pruchaseMapper.getStorageCount(orderNo,"1");//入库总数
 			//判断该用户是否为黑名单
 			int backList=iWarehouseDao.getBackList(ob.getUserEmail());
 			int payBackList=0;
@@ -1332,7 +1327,6 @@ public class OrderinfoService implements IOrderinfoService {
 			address.setStatename(ob.getStatename());
 			address.setAddress2(ob.getAddress2());
 			address.setRecipients(ob.getRecipients());
-			address.setStreet(StringUtil.isBlank(ob.getStreet())?"":ob.getStreet());
 			ob.setAddress(address);
 			ob.setOrderNumber(ob.getOrdernum() == 1);
 			ob.setPay_price(Double.parseDouble(Utility.formatPrice(String.valueOf(ob.getPay_price())).replaceAll(",", "")));
@@ -1666,6 +1660,16 @@ public class OrderinfoService implements IOrderinfoService {
 			buy_url = "";
 		}
 		return buy_url;
+	}
+
+	@Override
+	public String getUserEmailByOrderNo(String orderNo) {
+		return dao.getUserEmailByOrderNo(orderNo);
+	}
+
+	@Override
+	public int updateOrderinfoUpdateState(String orderNo) {
+		return dao.updateOrderinfoUpdateState(orderNo);
 	}
 
 	@Override

@@ -1,12 +1,13 @@
 package com.cbt.method.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.method.dao.IOrderDetailsDao;
 import com.cbt.method.dao.OrderDetailsDao;
 import com.cbt.method.dao.OrderDetailsMethodBean;
 import com.cbt.method.dao.PreOrderList;
-
-import java.util.List;
 
 
 public class OrderDetailsServiceImpl implements OrderDetailsService {
@@ -92,4 +93,8 @@ public class OrderDetailsServiceImpl implements OrderDetailsService {
 		 idd.AddRecource(type, admid, userid, goodsdataid, goods_url, googs_img, goodsprice, goods_title, googsnumber, orderNo, od_id, goodid, price, resource, buycount, reason, currency, pname,allReplcae,shop_url,shop_name,address);
 	}
 
+	@Override
+	public List<Map<String,Object>> getOrderDetailByUser(int userid) {
+		return idd.getOrderDetailByUser(userid);
+	}
 }

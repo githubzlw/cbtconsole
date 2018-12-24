@@ -3,6 +3,7 @@ package com.cbt.warehouse.dao;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.*;
@@ -229,44 +230,6 @@ public interface IWarehouseDao {
 	public String getBatckInfo(@Param("pid") String pid);
 	//getAllStorageLocationByPage
 	public List<StorageLocationBean> getAllStorageLocationByPage(int startNum, int endNum);
-	//获得采购数量
-	public String getCgCount(Map<String, Object> map);
-	//当日分配采购种类
-	public String getDistributionCount(Map<String, Object> map);
-	/**
-	 * 最近30天 产生的 库存损耗
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getLossInventory();
-	/**
-	 * 最近30天 产生的 库存删除
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getDeleteInventory();
-	/**
-	 * 最近30天销售掉的库存
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getSaleInventory();
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @return
-	 */
-	public PurchaseSamplingStatisticsPojo getNewInventory();
-	//当月分配采购种类
-	public String getfpCount(Map<String, Object> map);
-	/**
-	 * 超过1天未发货
-	 * @param map
-	 * @return
-	 */
-	public String getNotShipped(Map<String, Object> map);
-	/**
-	 *发货3天未入库
-	 * @param map
-	 * @return
-	 */
-	public String getShippedNoStorage(Map<String, Object> map);
 	/**
 	 * 新增搜索词对应的优先类别
 	 * @param map
@@ -280,12 +243,14 @@ public interface IWarehouseDao {
 	 */
 	public int editKeyword(Map<String, String> map);
 	public int updateStateCategory(Map<String, String> map);
-	//获得每月采购数量cjc 1-11
-	public String getMCgCount(Map<String, Object> map);
-	//获得实际采购数量
-	public String getSjCgCount(Map<String, Object> map);
 	//添加订单采购商品备注
 	public int insertOrderRemark(Map<String, Object> map);
+	/**
+	 * 出库时检验申报金额是否超出预定金额
+	 * @param orderid
+	 * @return
+	 */
+	public CustomsRegulationsPojo getCustomsRegulationsPojo(@Param("orderid") String orderid);
 	//功能订单采购备注
 	public int updateOrderRemark(Map<String, Object> map);
 	//查询某个订单备注是否存在
@@ -706,20 +671,7 @@ public interface IWarehouseDao {
 	//根据不同的状态获得订单的数量
 	OrderInfoCountPojo getOrderInfoCountByState(Map<String, Object> map);
 
-	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
-	/**
-	 * 获取入库没有匹配到商品的订单
-	 * @Title getNoMatchOrderByTbShipno
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return OrderInfoCountPojo
-	 */
-	OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map);
 	List<UserInfo> getUserInfoForPrice(Map<String, Object> map);
-	List<String> getNoShipInfoOrder(Map<String, String> map);
-    //点了采购确认
-    List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map);
 	/**
 	 * 1688采购订单建议退货管理
 	 * @param goodsid
@@ -1136,54 +1088,6 @@ public interface IWarehouseDao {
 	 */
 	int getShopManagerListDetailsCount(Map<String, Object> map);
 	/**
-	 * 根据入库未匹配到商品的订单查询订单信息
-	 * @Title getPrePurchaseForTB
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map);
-	/**
-	 * 根据入库未匹配到商品的订单查询订单信息数量
-	 * @Title getPrePurchaseForTBCount
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map);
-
-	/**
-	 * 采购前置页面数据获取
-	 * @param map
-	 * @return
-	 */
-	List<PrePurchasePojo> getPrePurchase(Map<String, Object> map);
-	/**
-	 * 采购前置页面数据条数
-	 * @param map
-	 * @return
-	 */
-	List<String> getPrePurchaseCount(Map<String, Object> map);
-	/**
-	 * 获取某个采购的订单分配商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getFpCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-
-	List<PurchasesBean> getFpOrderDetails(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取某个采购的订单入库商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getStorageCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-
-	/**
 	 * 判断用户邮箱是否为黑名单
 	 * @param email
 	 * @return
@@ -1197,37 +1101,11 @@ public interface IWarehouseDao {
 	 */
 	int getPayBackList(@Param("payName") String payName);
 	/**
-	 * 获取某个采购的订单采购商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getPurchaseCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取该订单采购与销售的沟通
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getGoodsInfo(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取已经验货无误商品
-	 * @param orderid
-	 * @return
-	 */
-	int getChecked(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
 	 * 获取订单商品数量
 	 * @param orderid
 	 * @return
 	 */
 	int getCountOd(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
-	/**
-	 * 获取验货有问题数量
-	 * @param orderid
-	 * @return
-	 */
-	List<String> getProblem(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
 	/**
 	 * 更改店铺状态
 	 * @param map
@@ -1249,24 +1127,12 @@ public interface IWarehouseDao {
 	List<AllProblemPojo> getAllProblem(Map<String, Object> map);
 	int getTotalNumber(Map<String, Object> map);
 	List<String> getAllProposal(Map<String, Object> map);
-
-
-	//补货
-	int insertOrderReplenishment(Map<String, Object> map);
-	//补货订单按钮状态改变
-	int updateReplenishmentState(Map<String, Object> map);
 	//将采购补货时录入的店铺ID添加到28库中
 	int insertShopId(Map<String, Object> map);
 	//是否存在补货
 	List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map);
-	//添加补货记录
-	int addReplenishmentRecord(Map<String, Object> map);
-	//查询补货记录
-	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
 	//获取采样记录
 	public List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map);
-	//查询线下采购记录
-	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
 	//根据1688产品获取工厂和级别
 	Map<String, String> getCompanyInfo(@Param("goods_pid") String goods_pid);
 	//申报信息
@@ -1409,7 +1275,12 @@ public interface IWarehouseDao {
     public int updateOrderState(Map<String, String> map);
 
     public int updateAllDetailsState(Map<String, String> map);
-
+	/**
+	 * 1688订单退货状态更改
+	 * @param map
+	 * @return
+	 */
+	int updateTbState(Map<String, String> map);
     public int insertRemark(Map<String, String> map);
 
     public List<String> allLibraryCount();

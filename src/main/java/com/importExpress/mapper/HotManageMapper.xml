@@ -30,6 +30,42 @@
         <result column="sort" property="sort"/>
     </resultMap>
 
+
+    <resultMap id="HotSellGoodsMap" type="com.importExpress.pojo.HotSellGoods" >
+	    <result column="show_name" property="show_name" />
+	    <result column="selling_price" property="selling_price" />
+	    <result column="wholesale_price_1" property="wholesale_price_1" />
+	    <result column="wholesale_price_2" property="wholesale_price_2" />
+	    <result column="wholesale_price_3" property="wholesale_price_3" />
+	    <result column="goods_img" property="goods_img" />
+	    <result column="hot_selling_id" property="hot_selling_id" />
+	    <result column="goods_url" property="goods_url" />
+	    <result column="goods_pid" property="goods_pid" />
+	    <result column="goods_price" property="goods_price" />
+	    <result column="rangePrice" property="rangePrice" />
+	    <result column="isNewCloud" property="isNewCloud" />
+	    <result column="morder" property="moq" />
+	    <result column="asin_code" property="asin_code" />
+	    <result column="amazon_price" property="amazon_price" /><!-- price1688 -->
+	    <result column="price" property="price1688" />
+
+		<result column="discount_id" property="discountId" />
+		<result column="discount_percentage" property="discountPercentage" />
+		<result column="discount_begin_time" property="discountBeginTime" />
+		<result column="discount_end_time" property="discountEndTime" />
+		<result column="discount_sort" property="discountSort" />
+
+		<result column="evaluation_id" property="evaluationId" />
+		<result column="evaluation_sku_id" property="evaluationSkuId" />
+		<result column="evaluation_user_id" property="evaluationUserId" />
+		<result column="evaluation_content" property="evaluationContent" />
+		<result column="evaluation_level" property="evaluationLevel" />
+		<result column="evaluation_service_level" property="evaluationServiceLevel" />
+		<result column="evaluation_time" property="evaluationTime" />
+		<result column="is_sold_flag" property="isSoldFlag" />
+		<result column="feeprice" property="feeprice" />
+	  </resultMap>
+
     <sql id="hotCategoryColumn">
 		id,category_name,show_name,show_img,is_on,sorting,hot_type,
 		admin_id,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,update_admin_id,
@@ -163,5 +199,52 @@
         insert into hot_selling_update_log(hot_selling_id,pid,admin_id,is_on)
         values(#{hotId},#{pid},#{adminId},#{isOn})
     </insert>
+
+
+    <select id="queryGoodsByHotType" resultMap="HotSellGoodsMap">
+        select aa.*,bb.id as discount_id,bb.percentage as discount_percentage,
+        DATE_FORMAT(bb.begin_time,'%Y-%m-%d %H:%i:%S') as discount_begin_time,
+        DATE_FORMAT(bb.end_time,'%Y-%m-%d %H:%i:%S') as discount_end_time,bb.sort as discount_sort
+        from
+        (select b.enname as show_name,a.selling_price,a.wholesale_price_1,a.wholesale_price_2,
+        a.wholesale_price_3,a.goods_img,a.hot_selling_id,a.goods_url,a.goods_pid,
+        b.wprice goods_price,b.range_price rangePrice,b.sellunit
+        goods_unit,b.isNewCloud,a.profit_margin,b.morder,a.asin_code,a.amazon_price,
+        b.price,b.is_sold_flag,b.feeprice
+        from hot_selling_goods a,custom_benchmark_ready b
+        where a.hot_selling_id in(select id from hot_category where hot_type = #{hotType} and is_on = 1) and a.is_on = 1
+        and a.goods_pid = b.pid and b.valid =1) as aa
+        left join hot_goods_discount bb on aa.goods_pid =bb.goods_pid and aa.hot_selling_id =bb.hot_id
+        where 1=1
+        <if test=" hotType == 2">
+            and (now() >= bb.begin_time AND bb.end_time > now())
+        </if>
+        <if test=" hotType == 2">
+            order by bb.sort desc
+        </if>
+        <if test=" hotType != 2">
+            order by profit_margin desc
+        </if>
+    </select>
+
+
+    <select id="queryCategoryList" resultMap="hotCategoryResultMap"
+			parameterType="com.cbt.warehouse.pojo.HotCategory">
+		select a.id,a.category_name,a.show_name,a.show_img,a.is_on,a.sorting,a.hot_type,
+		a.admin_id,b.admName,DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.update_admin_id,
+		DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time
+		from hot_category a left join admuser b on a.admin_id =b.id
+		where 1=1
+		<if test=" isOn > -1">
+			and a.is_on = #{isOn}
+		</if>
+		<if test=" hotType > 0">
+			and a.hot_type = #{hotType}
+		</if>
+		order by a.is_on desc,a.sorting desc
+		<if test=" limitNum > 0">
+			limit #{startNum},#{limitNum}
+		</if>
+	</select>
 
 </mapper>

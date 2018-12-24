@@ -246,13 +246,13 @@ function gotoBuiess(flag){
 			<option value="3">问卷调查</option>--%>
     	</select>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<label for="state">状态:</label>
-		<select id="state" style="height: 24px;">
-			<option value="-1" ${state == -1?'selected="selected"':'' }>全部</option>
-			<option value="0" ${state == 0?'selected="selected"':'' }>待办</option>
-			<option value="1" ${state == 1?'selected="selected"':'' }>完成</option>
-			<option value="2" ${state == 2?'selected="selected"':'' }>未布置</option>
-		</select>
+        <label for="state">状态:</label>
+        <select id="state" style="height: 24px;">
+            <option value="-1" ${state == -1?'selected="selected"':'' }>全部</option>
+            <option value="0" ${state == 0?'selected="selected"':'' }>待办</option>
+            <option value="1" ${state == 1?'selected="selected"':'' }>完成</option>
+            <option value="2" ${state == 2?'selected="selected"':'' }>未布置</option>
+        </select>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<label for="admName">负责人:</label>
         <select class="easyui-combobox"  name="admName" id="admName">

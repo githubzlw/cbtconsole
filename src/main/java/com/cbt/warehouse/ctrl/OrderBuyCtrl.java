@@ -15,24 +15,5 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class OrderBuyCtrl {
 	@Autowired
 	private IOrderBuyService buyService;
-	
-	
-	@RequestMapping(value = "/getById", method = RequestMethod.GET)
-	@ResponseBody 
-	public String getById(Integer id){
-		OrderBuyBean bean = buyService.getById(id);
-		
-		return JSONObject.fromObject(bean).toString();
-	}
-	
-//	
-//	@RequestMapping(value = "/getById.do", method = RequestMethod.GET)
-//	public String getById(HttpServletRequest request, Model model) {
-//		Address address = addressService.getById(Integer.valueOf(request.getParameter("id")));
-//		
-//		if(address != null) {
-//			System.out.println("查询成功");
-//		}
-//		return "indexuser";
-//	}
+
 }

@@ -3,6 +3,7 @@ package com.importExpress.mapper;
 import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.pojo.HotDiscount;
 import com.cbt.warehouse.pojo.HotEvaluation;
+import com.importExpress.pojo.HotSellGoods;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -45,4 +46,8 @@ public interface HotManageMapper {
 
 
     int insertHotSellingUpdateLog(@Param("hotId") int hotId, @Param("pid") String pid, @Param("adminId") int adminId, @Param("isOn") int isOn);
+
+    List<HotSellGoods> queryGoodsByHotType(@Param("hotType") int hotType);
+
+	List<HotCategory> queryCategoryList(HotCategory hotCategory);
 }

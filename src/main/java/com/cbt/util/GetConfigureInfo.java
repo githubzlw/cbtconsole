@@ -85,6 +85,22 @@ public class GetConfigureInfo {
 		return rsVal;
 	}
 
+
+
+	public static String getValueByCbt(String key){
+		String rsVal = "";
+		try{
+			if(cbtProperties == null){
+				initCbt();
+			}
+			rsVal = cbtProperties.getProperty(key);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
+		return rsVal;
+	}
+
 	/**
 	 * 获取cbt.properties是否开启线下同步线上配置
 	 * 

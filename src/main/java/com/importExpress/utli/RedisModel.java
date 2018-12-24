@@ -4,7 +4,7 @@ public class RedisModel {
     /**
      * 1对应客户key值删除，2客户信息全部删除
      */
-    private String type = "1";
+    private String type = "1";// 1 清空指定redis键值，2全部清空redis 3清空 showBean activeBean键值
     private String[] userid;
 
     public RedisModel(String[] userid) {

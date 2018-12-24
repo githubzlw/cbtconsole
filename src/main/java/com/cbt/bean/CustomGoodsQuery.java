@@ -55,7 +55,16 @@ public class CustomGoodsQuery {
 	private double price1688End;
 	private int isSort;
 
+	private int isComplain = -1;//是否被投诉 0-为投诉  1-投诉
+	
 
+	public int getIsComplain() {
+		return isComplain;
+	}
+
+	public void setIsComplain(int isComplain) {
+		this.isComplain = isComplain;
+	}
 
 	public String getCatid() {
 		return catid;

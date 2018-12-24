@@ -2,7 +2,6 @@ package com.cbt.customer.service;
 
 import com.cbt.bean.GuestBookBean;
 import com.cbt.bean.OrderBean;
-import com.cbt.common.StringUtils;
 import com.cbt.customer.dao.GuestBookDaoImpl;
 import com.cbt.customer.dao.IGuestBookDao;
 import com.cbt.parse.service.TypeUtils;
@@ -217,8 +216,8 @@ public class GuestBookServiceImpl implements IGuestBookService{
 
 	@Override
 	public int total(int userId, String date, int state,
-			String userName, String pname, int start, int end,String TimeFrom,String TimeTo,int adminid,int type) {
-		return dao.total(userId, date, state, userName, pname, start, end,TimeFrom,TimeTo,adminid,type);
+			String userName, String pname, int start, int end,String useremail,String TimeFrom,String TimeTo,int adminid,int type) {
+		return dao.total(userId, date, state, userName, pname, start, end,useremail,TimeFrom,TimeTo,adminid,type);
 	}
 	
 

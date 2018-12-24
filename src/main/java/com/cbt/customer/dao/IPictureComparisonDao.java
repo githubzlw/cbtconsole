@@ -18,7 +18,10 @@ public interface IPictureComparisonDao {
 	public List<GoodsFarBean> findByAliPicture(int maxC);
 	
 	public List<GoodsFarBean> getLireSearchCondition();
-	
+		/*
+		插入商品替换日志
+	 */
+	public int insertChangeGoodsLog(String pUrl,String goodsType,String name,String price,String goodsCarId,String admuserid);
 	public List<GoodsFarBean> getImgFile();
 	
 	public List<GoodsFarBean> findByTbPicture(int maxC);

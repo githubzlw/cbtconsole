@@ -37,6 +37,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
 import org.slf4j.LoggerFactory;
@@ -87,9 +88,14 @@ public class NewOrderDetailsCtr {
 			// 获取所有采购人员信息
 			List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
 			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+
 			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
 			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
+			//获取实际运费
+			Long start = System.currentTimeMillis();
+			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
+			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
 			// 获取汇率
 			double rate =Double.valueOf(orderInfo.getExchange_rate());
 			//获取订单出运信息
@@ -132,7 +138,11 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("shippingtype",shippingtype);
 			request.setAttribute("ac_weight",ac_weight);
 			request.setAttribute("awes_freight",awes_freight);
-			request.setAttribute("allFreight", freightFee);
+			if(freightCostByOrderno>0){
+				request.setAttribute("allFreight", freightCostByOrderno);
+			}else {
+				request.setAttribute("allFreight", freightFee);
+			}
 			request.setAttribute("estimatefreight",estimatefreight*rate);
 			request.setAttribute("allWeight",allWeight);
 			//产品预计采购金额-
@@ -370,7 +380,7 @@ public class NewOrderDetailsCtr {
 			}
 			double sale =orderInfo.getPay_price() * rate;
 			if(orderInfo.getMemberFee()>10){
-				sale-=orderInfo.getMemberFee();
+				sale-=orderInfo.getMemberFee()* rate;
 			}
 			double buy = 0.0;
 			double volume = 0.0;
@@ -1713,8 +1723,13 @@ public class NewOrderDetailsCtr {
 				model.put("orderNo",orderNo);
 				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 				String modeStr = jsonObject.toString();
-
-				sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				try {
+					sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+				} catch (Exception e) {
+					e.printStackTrace();
+					LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
+					json.setMessage("Failed to send mail, please contact the developer by screen, thank you！"+ e.getMessage());
+				}
 				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 				try {
 					insertChangeRecords(orderNo, -1, adminId);
@@ -1816,7 +1831,7 @@ public class NewOrderDetailsCtr {
 			// 订单支付确认信息回显
 			PaymentConfirm paymentConfirm = server.queryForPaymentConfirm(orderNo);
 			// 是否为黑名单
-			int row = server.isTblack(payList.size()  > 0 && StringUtil.isNotBlank(payList.get(0).getUsername())? payList.get(0).getUsername() : "----");
+			int row = server.isTblack(payList.size() > 0 && StringUtil.isNotBlank(payList.get(0).getUsername()) ? payList.get(0).getUsername() : "----");
 			if (row > 0) {
 				request.setAttribute("isTblack", "该用户为黑名单用户");
 			}

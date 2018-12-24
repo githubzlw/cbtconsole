@@ -254,6 +254,20 @@ public interface IOrderinfoService {
 	public List<Map<String, String>> getorderPending();
 
 	/**
+	 * 根据客户订单获取邮箱地址
+	 * @param orderNo
+	 * @return
+	 */
+	public String getUserEmailByOrderNo(String orderNo);
+
+	/**
+	 * 订单详情改价等操作提醒客户个人中心
+	 * @param orderNo
+	 * @return
+	 */
+	public int updateOrderinfoUpdateState(String orderNo);
+
+	/**
 	 * 根据订单号查询订单详情
 	 * @param orderNo
 	 * @return

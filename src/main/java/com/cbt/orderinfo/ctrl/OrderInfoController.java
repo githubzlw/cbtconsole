@@ -17,10 +17,15 @@ import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.quartz.ParseOrderFreightJob;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.google.gson.Gson;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
 
 import ceRong.tools.bean.SearchLog;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,10 +49,10 @@ public class OrderInfoController{
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderInfoController.class);
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
-	
 	@Autowired
 	private IPurchaseService purchaseService;
-
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	@Autowired
 	private ISpiderServer spiderService;
 
@@ -205,7 +210,6 @@ public class OrderInfoController{
 	@RequestMapping(value = "/getResultInfo")
 	public void getResultInfo(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		request.setCharacterEncoding("utf-8");
-
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		List<SearchResultInfo> list=new ArrayList<SearchResultInfo>();
@@ -237,21 +241,15 @@ public class OrderInfoController{
 		String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String users = user.getAdmName();
-		String username=request.getParameter("userName");
 		String admName=request.getParameter("admName");
 		String orderNo=request.getParameter("orderNo");
 		PrintWriter out = response.getWriter();
 		int row=0;
-		//用户id
 		map.put("userid",userid);
-		//销售人id
 		map.put("adminid",adminid);
 		map.put("users",users);
-		//客户邮箱
 		map.put("email",email);
-		//销售人名称
 		map.put("admName",admName);
-		//订单号
 		map.put("orderNo",orderNo);
 		try{
 			row=iOrderinfoService.addUser(map);
@@ -544,26 +542,59 @@ public class OrderInfoController{
 		String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 		String users = user.getAdmName();
-		String username=request.getParameter("userName");
 		String admName=request.getParameter("admName");
 		String orderNo=request.getParameter("orderNo");
 		PrintWriter out = response.getWriter();
 		int row=0;
-		//用户id
 		map.put("userid",userid);
-		//销售人id
 		map.put("adminid",adminid);
 		map.put("users",users);
-		//客户邮箱
 		map.put("email",email);
-		//销售人名称
 		map.put("admName",admName);
-		//订单号
 		map.put("orderNo",orderNo);
 		try{
 			row=iOrderinfoService.addUser(map);
 		}catch (Exception e){
 			e.printStackTrace();
+		}
+		out.print(row);
+		out.close();
+	}
+
+	/**
+	 * 订单详情-价格更新、交期偏长、定量偏低、需沟通邮件发送
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/sendCutomers")
+	public void sendCutomers(HttpServletRequest request, HttpServletResponse response)throws Exception {
+		PrintWriter out = response.getWriter();
+		String orderNo = null;
+		String orderNo1 = request.getParameter("orderNo");
+		int whichOne = Integer.parseInt(request.getParameter("whichOne"));
+		// 获取到是否是isDropship订单
+		int isDropship = Integer.parseInt(request.getParameter("isDropship"));
+		// 0不是，1是
+		if (isDropship == 1) {
+			orderNo = orderNo1.substring(0, orderNo1.indexOf("_"));
+		} else {
+			orderNo = orderNo1;
+		}
+		int row=0;
+		//根据订单号获取客户邮箱地址
+		String email=iOrderinfoService.getUserEmailByOrderNo(orderNo);
+		if(StringUtil.isNotBlank(email)){
+			Map<String,Object> modelM = new HashedMap();
+			modelM.put("orderNo",orderNo);
+			modelM.put("name",email);
+			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
+			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
+			SendMQ sendMQ=new SendMQ();
+			iOrderinfoService.updateOrderinfoUpdateState(orderNo);
+			sendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));
+			sendMQ.closeConn();
+			row=1;
 		}
 		out.print(row);
 		out.close();
@@ -623,8 +654,7 @@ public class OrderInfoController{
 		}else{
 			startdate_req="0";
 		}
-		if(enddate_req!=null && !enddate_req.equals("") )
-		{
+		if(enddate_req!=null && !enddate_req.equals("") ) {
 			enddate_req=enddate_req + " 23:59:59";
 		}else{
 			enddate_req="0";
@@ -712,7 +742,6 @@ public class OrderInfoController{
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype(); int admuserid=user.getId();
 			if("0".equals(strm)){
-				//临时添加Sales1查看所有订单列表的统计
 				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			}
 			List<Map<String, Integer>> maps =  iOrderinfoService.getOrdersState(admuserid);
@@ -759,7 +788,6 @@ public class OrderInfoController{
 				}
 			}
 		}
-		
 		map.put("beanList", beanList);
 		map.put("shopidList", shopidList);
 		return map;
@@ -794,10 +822,8 @@ public class OrderInfoController{
 			}
 		}
 		String shop_id = request.getParameter("shopid");
-		
 		//需要下单的 商品信息
 		List<Map<String,Object>> listMap  = purchaseService.getComfirmedSourceGoods();
-		
 		List<String> shopidList = new ArrayList<String>(5);
 		List<PurchaseGoodsBean> beanList = new ArrayList<PurchaseGoodsBean>();
 		if(listMap!=null) {
@@ -825,7 +851,6 @@ public class OrderInfoController{
 			}
 			Map<String,Object> map = new HashMap<String,Object>();
 			map.put("shopid", shopid);
-			
 			List<PurchaseGoodsBean> thisShopGoods = new ArrayList<PurchaseGoodsBean>();
 			List<Integer> idsList = new ArrayList<Integer>();
 			for(PurchaseGoodsBean pgbBean:beanList) {
@@ -897,7 +922,7 @@ public class OrderInfoController{
         Map<String,Object> map = new HashMap<String,Object>();
         String userinfo = request.getParameter("userid");
         int userid = userinfo==null?0:Integer.parseInt(userinfo);
-        if("0".equals(saveFlag)||"1".equals(saveFlag)){//搜索日志记录和页面产品展示数量更新
+        if("0".equals(saveFlag)||"1".equals(saveFlag)){
             String keyWords = request.getParameter("keyWords")==null?"":request.getParameter("keyWords");
             if(StringUtil.isNotBlank(keyWords) && keyWords.length()>200){
                 keyWords = keyWords.substring(0, 198);

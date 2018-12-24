@@ -3,8 +3,8 @@
  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="importExpress" version="2.5">
   <display-name>cbtconsole</display-name>
   <welcome-file-list>
-<!--     <welcome-file>website/main_login.jsp</welcome-file> -->
-    <welcome-file>website/login.jsp</welcome-file>
+     <welcome-file>website/main_login.jsp</welcome-file>
+    <!--<welcome-file>website/login.jsp</welcome-file>-->
   </welcome-file-list>
   <!-- 不要注释提交代码的时候，会影响采购分配 王宏杰-->
   <!--<listener>

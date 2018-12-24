@@ -761,7 +761,6 @@ function search() {
     var remarkUserId="";
     var buyUrl="";
     $.post("/cbtconsole/order/getGoodsData",{expresstrackid : expresstrackid},
-     // $.post("/cbtconsole/WebsiteServlet?action=getGoodsData&className=ExpressTrackServlet",{expresstrackid : expresstrackid},
            function(res){
             var jsonObj =JSON.parse(res);
             if (res == "[]") {

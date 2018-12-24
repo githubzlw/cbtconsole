@@ -3,8 +3,16 @@ package com.importExpress.service;
 import com.alibaba.trade.param.AlibabaTradeFastCreateOrderResult;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderProductSource;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
+import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
+import com.cbt.website.bean.PurchasesBean;
 import com.cbt.website.dao2.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +40,64 @@ public interface IPurchaseService {
 	 */
 	public Page findPageByCondition(String pagenum, String orderid, String admid, String userid, String orderno, String goodid, String date,
                                     String days, String state, int unpaid, int pagesize, String orderid_no_array, String goodsid, String goodname, String orderarrs, String search_state);
+	//当月分配采购种类
+	public String getfpCount(Map<String, Object> map);
+	List<PurchasesBean> getFpOrderDetails(String orderid,String admuserid);
+
+	/**
+	 * 超过1天未发货
+	 * @param map
+	 * @return
+	 */
+	public String getNotShipped(Map<String, Object> map);
+	/**
+	 * 获取某个采购的订单分配商品数量
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int getFpCount(String orderid, String admuserid);
+	/**
+	 *发货3天未入库
+	 * @param map
+	 * @return
+	 */
+	public String getShippedNoStorage(Map<String, Object> map);
+	//获取当日采购分配种类
+	public String getDistributionCount(Map<String, Object> map);
+	//获得采购数量
+	public String getCgCount(Map<String, Object> map);
+	//获得实际采购数量
+	public String getSjCgCount(Map<String, Object> map);
+	//获得每月采购数量
+	public String getMCgCount(Map<String, Object> map);
+	//获取疑似货源贴错
+	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
+	//点了采购确认
+	List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map);
+	List<String> getNoShipInfoOrder(Map<String, String> map);
+	/**
+	 * 获取入库没有匹配商品的订单
+	 * @Title getNoMatchOrderByTbShipno
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return OrderInfoCountPojo
+	 */
+	OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map);
+
+	/**
+	 * 通过id查询采购账号名称
+	 * @return
+	 */
+	public String queryBuyCount(int admuserid);
+
+	/**
+	 * 采购详情查询山沟替换日志
+	 * @param map
+	 * @return
+	 */
+	public List<ChangeGoodsLogPojo> getDetailsChangeInfo(Map<String,String> map);
 
 	/**
 	 * 获取订单备注
@@ -49,7 +115,16 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	public String allQxQrNew(String orderid, int adminid);
-
+	//补货
+	int insertOrderReplenishment(Map<String, Object> map);
+	//添加补货记录
+	int addReplenishmentRecord(Map<String, Object> map);
+	//查询补货记录
+	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
+	//查询线下采购记录
+	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
+	//补货按钮状态改变
+	int updateReplenishmentState(Map<String, Object> map);
 	/**
 	 *采购是否使用库存
 	 * @param map
@@ -71,6 +146,36 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	public int insertSources(Map<String, String> map);
+	/**
+	 * 根据入库未匹配到的订单号查询订单信息
+	 * @Title getPrePurchaseForTB
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return List<PrePurchasePojo>
+	 */
+	List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map);
+	/**
+	 * 采购前置页面数据条数
+	 * @param map
+	 * @return
+	 */
+	List<String> getPrePurchaseCount(Map<String, Object> map);
+	/**
+	 * 采购前置页面数据曾现
+	 * @param map
+	 * @return
+	 */
+	List<PrePurchasePojo> getPrePurchase(Map<String, Object> map);
+	/**
+	 * 根据入库未匹配到的订单号查询订单信息数量
+	 * @Title getPrePurchaseForTB
+	 * @Description TODO
+	 * @param map
+	 * @return
+	 * @return List<PrePurchasePojo>
+	 */
+	List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map);
 
 	/**
 	 *一键确认采购

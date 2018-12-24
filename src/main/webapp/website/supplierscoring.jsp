@@ -13,8 +13,8 @@
 <body>
 <table border="1px  #0094ff" style="border-collapse: collapse;width: 90%; height: 90%">
  		<form action="/cbtconsole/supplierscoring/querySupplierScoringList" method="get">
- 			<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>
-    		<input type="radio" name="flag" value="0">所有的</input>
+ 			<%--<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>--%>
+    		<input type="radio" name="flag" value="0" checked="checked">所有的</input>
     		<div style="float: right;">【合作过的供应商（<span>${cooperatedCount}</span>）】【优质供应商（<span>${highCount}</span>）】【普通供应商（<span>${ordinaryCount}</span>）】【黑名单供应商（<span>${blacklistCount}</span>）】
  			</div><br />
  			供应商ID:<input id="select_ship_id" type="text" name="shop_id">

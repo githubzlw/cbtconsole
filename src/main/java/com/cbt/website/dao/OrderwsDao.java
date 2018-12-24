@@ -582,7 +582,7 @@ public class OrderwsDao implements IOrderwsDao {
         }
         return t;
     }
-
+    @Override
     public void updateGoodsCarMessage(String orderNo) {
         String sql = "update order_change set is_read=1 where orderNo='" + orderNo + "'";
         Connection conn = DBHelper.getInstance().getConnection();
@@ -2332,13 +2332,19 @@ public class OrderwsDao implements IOrderwsDao {
                 upSql.append(","+changeType);
                 upSql.append(",'"+oldInfo+"'");
                 upSql.append(",'"+newInfo+"'");
-                upSql.append(",0");
+                upSql.append(",1");
                 upSql.append(",1)");
                 NotifyToCustomerUtil.sendSqlByMq(upSql.toString());
                 //通知客户
                 NotifyToCustomerUtil.updateOrderGoodsPrice(userId,orderNo);
                 result =1;
             }
+            sql="update orderinfo set server_update=1 where order_no='"+orderNo+"'";
+            stmt3 = conn.prepareStatement(sql);
+            stmt3.executeUpdate();
+            SendMQ sendMQ = new SendMQ();
+            sendMQ.sendMsg(new RunSqlModel(sql));
+            sendMQ.closeConn();
         } catch (Exception e) {
             e.printStackTrace();
             result =0;
@@ -2545,14 +2551,9 @@ public class OrderwsDao implements IOrderwsDao {
 //        }
 //        return result;
     	//更新线上数据改为mq方式
-    	try{
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel("update orderinfo set state="+ orderStatus +" where order_no='" + orderNo + "'"));
-            sendMQ.closeConn();
-        }catch (Exception e){
-    	    e.printStackTrace();
-        }
-    	return 1;
+    	String sql = "update orderinfo set state="+ orderStatus +" where order_no='" + orderNo + "'";
+    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+    	return sendMQ.runSqlOnline(orderNo, sql);
     }
 
     @Override
@@ -2579,14 +2580,9 @@ public class OrderwsDao implements IOrderwsDao {
 //        }
 //        return result;
         //更新线上数据改为mq方式
-        try{
-            String sql = "update orderinfo set state =2 where order_no='" + orderNo + "' and ( select count(id) from order_details where orderid=order_no and state=0)=0";
-            SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel(sql));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    	return 1;
+    	String sql = "update orderinfo set state =2 where order_no='" + orderNo + "' and ( select count(id) from order_details where orderid=order_no and state=0)=0";
+    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+    	return sendMQ.runSqlOnline(orderNo, sql);
     }
 
     @Override
@@ -2605,10 +2601,8 @@ public class OrderwsDao implements IOrderwsDao {
 //            stmt1.setString(1, orderNo);
 //            result = stmt1.executeUpdate();
             //更新线上数据改为mq方式
-        	SendMQ sendMQ = new SendMQ();
-            sendMQ.sendMsg(new RunSqlModel("update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0"));
-//        	return sendMQ.runSqlOnline(orderNo, "update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0");
-            sendMQ.closeConn();
+        	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
+        	return sendMQ.runSqlOnline(orderNo, "update order_change set status=1 where orderNo='" + orderNo + "' and ropType!=6 and del_state=0");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -2888,7 +2882,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int upOrderChangeResolve(String orderNo, int goodId, int changeType) {
-        String sql = "update order_change set del_state=1,dateline=dateline where  orderNo=? and goodId=? and ropType=?";
+        String sql = "update order_change set del_state=1 where  orderNo=? and goodId=? and ropType=?";
         String sql1 = "update orderinfo set server_update=0 where 1>(select count(id) from order_change where orderno=? and del_state=0) and order_no=?";
         Connection conn = DBHelper.getInstance().getConnection();
         Connection conn2 = DBHelper.getInstance().getConnection2();
@@ -6359,8 +6353,8 @@ public class OrderwsDao implements IOrderwsDao {
             rs = stmt.executeQuery();
             if (rs.next() && flag) {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
-                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid) "
-                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid,actual_weight) "
+                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 stmt = conn.prepareStatement(sql);
                 stmt.setString(1, goodsid);
                 stmt.setString(2, newOrderid);
@@ -6389,6 +6383,7 @@ public class OrderwsDao implements IOrderwsDao {
                 stmt.setString(25, rs.getString("goodscatid"));
                 stmt.setString(26, rs.getString("car_urlMD5"));
                 stmt.setString(27, rs.getString("goods_pid"));
+                stmt.setString(28, rs.getString("actual_weight"));
                 row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";

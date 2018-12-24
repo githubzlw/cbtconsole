@@ -6,6 +6,7 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +79,19 @@ public class Cache {
 		return false;
 	}
 
+    /**
+     * 清除菜单中缓存
+     *
+     */
+    public static void clearCache() {
+        urlList.clear();
+    }
+
 	public static void saveCache(AuthInfo auth) {
 		urlList.add(auth);
 	}
 
-	public static List<AuthInfo> getAllAuth() {
+	public static List<AuthInfo> getAllAuth() throws SQLException {
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		Connection conn=null;
@@ -100,7 +109,7 @@ public class Cache {
 				}
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			throw e;
 		}finally{
 			DBHelper.getInstance().closeConnection(conn);
 			DBHelper.getInstance().closePreparedStatement(stmt);

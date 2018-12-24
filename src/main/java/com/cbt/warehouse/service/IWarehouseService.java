@@ -3,6 +3,7 @@ package com.cbt.warehouse.service;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.*;
@@ -206,24 +207,6 @@ public interface IWarehouseService {
 
 	int updateGoodsDistribution(Map<String, String> map);
 
-	//获得采购数量
-	public String getCgCount(Map<String, Object> map);
-	//当月分配采购种类
-	public String getfpCount(Map<String, Object> map);
-
-	/**
-	 * 超过1天未发货
-	 * @param map
-	 * @return
-	 */
-	public String getNotShipped(Map<String, Object> map);
-
-	/**
-	 *发货3天未入库
-	 * @param map
-	 * @return
-	 */
-	public String getShippedNoStorage(Map<String, Object> map);
 	public int updateStateCategory(Map<String, String> map);
 
 	/**
@@ -238,39 +221,15 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	public int addKeyword(Map<String, String> map);
-	//获得每月采购数量
-	public String getMCgCount(Map<String, Object> map);
-	//获取当日采购分配种类
-	public String getDistributionCount(Map<String, Object> map);
-
-	/**
-	 * 库存管理页面统计最近30天新产生的库存
-	 * @return
-	 */
-	public String getNewInventory();
-
-	/**
-	 * 最近30天销售掉的库存
-	 * @return
-	 */
-	public String getSaleInventory();
-
-	/**
-	 * 最近30天 产生的 库存损耗
-	 * @return
-	 */
-	public String getLossInventory();
-
-	/**
-	 * 最近30天 产生的 库存删除
-	 * @return
-	 */
-	public String getDeleteInventory();
-	//获得实际采购数量
-	public String getSjCgCount(Map<String, Object> map);
 	//添加订单采购商品备注
 	public int insertOrderRemark(Map<String, Object> map);
 
+	/**
+	 * 出库时检验申报金额是否超出预定金额
+	 * @param orderid
+	 * @return
+	 */
+	public CustomsRegulationsPojo getCustomsRegulationsPojo(String orderid);
 	/**
 	 *出库审核验证商品号是否为该订单商品
 	 * @param map
@@ -375,6 +334,12 @@ public interface IWarehouseService {
 
 	int insertRemark(Map<String, String> map);
 
+	/**
+	 * 1688订单退货状态更改
+	 * @param map
+	 * @return
+	 */
+	int updateTbState(Map<String, String> map);
 	int queryOrderState(Map<String, String> map);
 
 	int updateOrderState(Map<String, String> map);
@@ -382,6 +347,7 @@ public interface IWarehouseService {
 	int updateAllDetailsState(Map<String, String> map);
 
 	void inertLocationTracking(Map<String, String> map);
+
 
 	//查询商品原链接
 	public List<Map<String,String>> getGoodsCar(Map<String, Object> map);
@@ -700,22 +666,6 @@ public interface IWarehouseService {
 
 	//根据不同的状态获得订单的数量
 	OrderInfoCountPojo getOrderInfoCountByState(Map<String, Object> map);
-
-	//获取疑似货源贴错
-	OrderInfoCountPojo getOrderInfoCountNoitemid(Map<String, Object> map);
-	/**
-	 * 获取入库没有匹配商品的订单
-	 * @Title getNoMatchOrderByTbShipno
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return OrderInfoCountPojo
-	 */
-	OrderInfoCountPojo getNoMatchOrderByTbShipno(Map<String, Object> map);
-	List<String> getNoShipInfoOrder(Map<String, String> map);
-	//点了采购确认
-	List<PurchasesBean> getOrderInfoCountItemid(Map<String, Object> map);
-
 	//查询用户信息
 	List<UserInfo> getUserInfoForPrice(Map<String, Object> map);
 
@@ -994,44 +944,6 @@ public interface IWarehouseService {
 	int getShopManagerListDetailsCount(Map<String, Object> map);
 
 	/**
-	 * 采购前置页面数据曾现
-	 * @param map
-	 * @return
-	 */
-	List<PrePurchasePojo> getPrePurchase(Map<String, Object> map);
-	/**
-	 * 根据入库未匹配到的订单号查询订单信息
-	 * @Title getPrePurchaseForTB
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTB(Map<String, Object> map);
-	/**
-	 * 根据入库未匹配到的订单号查询订单信息数量
-	 * @Title getPrePurchaseForTB
-	 * @Description TODO
-	 * @param map
-	 * @return
-	 * @return List<PrePurchasePojo>
-	 */
-	List<PrePurchasePojo> getPrePurchaseForTBCount(Map<String, Object> map);
-	/**
-	 * 获取某个采购的订单分配商品数量
-	 * @param orderid
-	 * @param admuserid
-	 * @return
-	 */
-	int getFpCount(String orderid, String admuserid);
-	/**
-	 * 采购前置页面数据条数
-	 * @param map
-	 * @return
-	 */
-	List<String> getPrePurchaseCount(Map<String, Object> map);
-
-	/**
 	 * 更改店铺状态
 	 * @param map
 	 * @return
@@ -1049,25 +961,12 @@ public interface IWarehouseService {
 	List<AllProblemPojo> getAllProblem(Map<String, Object> map);
 	int getTotalNumber(Map<String, Object> map);
 	List<String> getAllProposal(Map<String, Object> map);
-
-	//补货
-	int insertOrderReplenishment(Map<String, Object> map);
 	//采购补货时将录入的店铺ID添加到28库中
 	int insertShopId(Map<String, Object> map);
-
-	//补货按钮状态改变
-	int updateReplenishmentState(Map<String, Object> map);
-
-	//添加补货记录
-	int addReplenishmentRecord(Map<String, Object> map);
 	//是否存在补货
 	List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map);
-	//查询补货记录
-	List<Replenishment_RecordPojo> getIsReplenishments(Map<String, Object> map);
 	//获取采样Log
 	List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map);
-	//查询线下采购记录
-	List<OfflinePurchaseRecordsPojo> getIsOfflinepurchase(Map<String, Object> map);
 	//根据产品ID获取工厂和工厂级别
 	Map<String,String> getCompanyInfo(String goods_pid);
 	//申报信息

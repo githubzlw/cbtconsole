@@ -623,6 +623,18 @@ public interface OrderinfoMapper {
 	 */
 	public String getOrderIds();
 	/**
+	 * 根据客户订单获取邮箱地址
+	 * @param orderNo
+	 * @return
+	 */
+	public String getUserEmailByOrderNo(@Param("orderNo") String orderNo);
+	/**
+	 * 订单详情改价等操作提醒客户个人中心
+	 * @param orderNo
+	 * @return
+	 */
+	public int updateOrderinfoUpdateState(@Param("orderNo") String orderNo);
+	/**
 	 * 统计订单每个状态的数量
 	 *
 	 * @return

@@ -2,11 +2,13 @@ package com.importExpress.service.impl;
 
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.website.userAuth.bean.AuthInfo;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
 import com.importExpress.pojo.GoodsInfoSpiderPO;
 import com.importExpress.pojo.ItemStaticFile;
 import com.importExpress.pojo.StandardGoodsFormDataPO;
 import com.importExpress.service.QueryUserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -280,5 +282,53 @@ public class QueryUserServiceImpl implements QueryUserService {
         long count = queryUserMapper.updateAvailable(email, available);
         DataSourceSelector.restore();
         return count;
+    }
+
+    @Override
+    public JsonResult resetPwd(String admName, String oldPwd, String newPwd) {
+        JsonResult json = new JsonResult();
+        //旧密码校验
+        long count = queryUserMapper.queryAdmUserByAdmNameAndPwd(admName, oldPwd);
+        if (count == 0) {
+            json.setOk(false);
+            json.setMessage("旧密码输入错误!");
+            return json;
+        }
+        //新密码更新
+        queryUserMapper.updatePasswordByAdmName(admName, newPwd);
+        json.setOk(true);
+        json.setMessage("密码修改成功,下次登录请使用新密码!");
+        return json;
+    }
+
+    public long updateAuthInfo(AuthInfo authInfo, String url, String urlFlag, String colorFlag) {
+        String urlParam = "";
+        //入口显示方式
+        if ("2".equals(urlFlag)){
+            urlParam += "urlFlag=a";
+        }
+        //入口颜色
+        if (StringUtils.isNotBlank(colorFlag)){
+            if (StringUtils.isBlank(urlParam)){
+                urlParam += "colorFlag=" + colorFlag.replace("#", "");
+            } else {
+                urlParam += "&colorFlag=" + colorFlag.replace("#", "");
+            }
+        }
+        //拼接
+        if (StringUtils.isNotBlank(urlParam)){
+            if (url.indexOf("?") > 0){
+                url += "&" + urlParam;
+            } else {
+                url += "?" + urlParam;
+            }
+        }
+        authInfo.setUrl(url);
+        if (0 == authInfo.getAuthId()){
+            Integer maxOrderNo = queryUserMapper.queryOrderNoByModuleType(authInfo.getModuleType());
+            authInfo.setOrderNo((maxOrderNo == null?0:maxOrderNo) + 1);
+            return queryUserMapper.insertAuthInfo(authInfo);
+        }
+        return queryUserMapper.updateAuthInfo(authInfo);
     }
 }

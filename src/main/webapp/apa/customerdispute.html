@@ -10,6 +10,10 @@
             src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+            <script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
+<script type="text/javascript"
+	src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css"
@@ -92,6 +96,8 @@
         .td_sty {
             width: 130px;
         }
+        .complain_id{width:100px;}
+        .complain_txt{width:300px;margin-left: 50px;}
     </style>
     <script>
         $(document).ready(function () {
@@ -159,15 +165,25 @@
         }
         
         function formatPP(val, row, index) {
-        	if(row.merchant=='584JZVFU6PPVU'){
+        	if(row.merchantID=='584JZVFU6PPVU'){
         		return '老账号';
         	}
     		return '新账号';
     	}
-        function formatAction(val, row, index) {
-    		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-    					+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
+        function formatComplain(val, row, index) {
+        	var actionHtml = '';
+        	if(row.complainId ==''){
+        		actionHtml ='<input type="button" value="关联投诉" onclick="linkComplain(\''+row.userid+'\',\''+row.disputeID+'\',\''+row.merchantID+'\')">';
+        	}else{
+        		actionHtml = '<a target="_blank" href="/cbtconsole/complain/getComplainByCid?cid='+row.complainId+'">'+row.complainId+'</a>';
+        	}
+    		return actionHtml;
     	}
+        function formatAction(val, row, index) {
+        	return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
+    	}
+        
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
         		return 'undefind';
@@ -195,6 +211,70 @@
                     bottom: ''
                 }
             });
+        }
+        function linkComplain(userid,disputeID,merchantID){
+        	
+        	$.ajax({
+    			type:'POST',
+    			dataType:'text',
+    			url:'/cbtconsole/complain/dispute/list',
+    			data:{userid:userid},
+    			success:function(res){
+    				var result = eval('(' + res + ')')
+    				var html = '该用户没有投诉,无法关联';
+    				if(result.status){
+    					html = '<div><div><span></span><span  class="complain_id">id</span><span  class="complain_txt">投诉内容</span></div>';
+    					var json = result.data;
+    					for(var i=0;i<json.length;i++){
+    						var complain = json[i];
+    						html +='<div><span><input type="radio" class="c_radio" value="'+complain.id+'"></span><span class="complain_id">'+complain.id+'</span><span class="complain_txt">'+complain.complainText+'</span></div>';
+    					}
+    					html +='</div>';
+    				}
+    				
+    				$.dialog({
+						title : '关联投诉',
+						content : html,
+						max : false,
+						min : false,
+						lock : true,
+						drag : false,
+						fixed : false,
+						ok : function() {
+							var id = "";
+							$(".c_radio").each(function(){
+								if($(this).is(":checked")){
+									id = $(this).val();
+								}
+							})
+							var href = window.location.href;
+							if(disputeID !='' && merchantID!='' && id !=''){
+							  $.ajax({
+									type:'POST',
+									dataType:'text',
+									url:'/cbtconsole/complain/dispute/update',
+									data:{id:id,disputeid:disputeID,merchantid:merchantID},
+									success:function(res){
+										window.location.href = href;
+									},
+									error:function(XMLResponse){
+										alert('error');
+									}
+								}); 
+							}
+							
+						},
+						cancel : function() {
+						}
+					});
+    				
+    				
+    			},
+    			error:function(XMLResponse){
+    				alert('error');
+    			}
+    		}); 
+        	
         }
         </script>
 
@@ -232,7 +312,8 @@
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
-        <th data-options="field:'type',width:'30px'">来源</th>
+        <th data-options="field:'apiType',width:'30px'">来源</th>
+        <th data-options="field:'complainId',width:'80px',formatter:formatComplain">投诉号</th>
         <th data-options="field:'disputeID',width:'80px'">事件号</th>
         <th data-options="field:'reason',align:'left',width:'210px'">原因</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>

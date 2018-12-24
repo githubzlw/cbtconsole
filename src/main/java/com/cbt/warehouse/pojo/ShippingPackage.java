@@ -52,6 +52,50 @@ public class ShippingPackage {
 	private String yjRemark;//预警提交的备注信息
 	private double exchange_rate;//
 	private double pid_amount;
+	private double actual_lwh;//质检费
+	private String fedexie;//区域
+	private double yfhFreight;
+	private double jcexFreight;
+	private int cacount;
+	public int getCacount() {
+		return cacount;
+	}
+
+	public void setCacount(int cacount) {
+		this.cacount = cacount;
+	}
+
+	public double getYfhFreight() {
+		return yfhFreight;
+	}
+
+	public void setYfhFreight(double yfhFreight) {
+		this.yfhFreight = yfhFreight;
+	}
+
+	public double getJcexFreight() {
+		return jcexFreight;
+	}
+
+	public void setJcexFreight(double jcexFreight) {
+		this.jcexFreight = jcexFreight;
+	}
+
+	public String getFedexie() {
+		return fedexie;
+	}
+
+	public void setFedexie(String fedexie) {
+		this.fedexie = fedexie;
+	}
+
+	public double getActual_lwh() {
+		return actual_lwh;
+	}
+
+	public void setActual_lwh(double actual_lwh) {
+		this.actual_lwh = actual_lwh;
+	}
 	public double getPid_amount() {
 		return pid_amount;
 	}

@@ -39,8 +39,19 @@ Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
 <%@ page import="com.cbt.processes.servlet.Currency" %>
 <%@ page import="java.util.Map" %>
  <style type="text/css">                
-body{font-family: arial,"Hiragino Sans GB","Microsoft Yahei",sans-serif;}       
-
+body{font-family: arial,"Hiragino Sans GB","Microsoft Yahei",sans-serif;}
+.mod_pay4 {
+	width: 720px;
+	position: fixed;
+	top: 100px;
+	left: 45%;
+	z-index: 1011;
+	background: gray;
+	padding: 5px;
+	padding-bottom: 20px;
+	z-index: 1011;
+	border: 15px solid #33CCFF;
+}
 span{text-indent : 0em;word-spacing : 1px;letter-spacing : 1px;overflow : visible;color : #980013;font-size : 10pt;}                                                                  
                                                        
  </style>
@@ -190,7 +201,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 			var a=Number(document.getElementById("cgje"+order_no+"").innerHTML)+Number(document.getElementById("ygyf"+index+"").innerHTML);
 			var b=$("#payPrice"+order_no+"").val();
 			b=b.replace(",","");
-			if(Number(a)>Number(b)){
+			if(Number(a)-Number(b)<=10){
                 $("#spjg1"+h_orderid).html("采购额加运费超出销售金额");
                 $("#yjremark"+order_no).attr('disabled',false);
                 $("#inRemark"+order_no).attr('disabled',false);
@@ -382,7 +393,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 				<td>估算运费(USD)</td>                           
 				<td>估算运输方式</td>  
 				<!-- <td>是否支付额外运费</td>   --><!--暂时隐藏  -->
-				<td>运输公司</td>                                               
+				<td style="width:200px">运输公司</td>
 				<td>运输方式</td>               
 				<td>申报信息</td> 
 				<td>申报种类</td>    
@@ -440,7 +451,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						=======================<br/>
 						<input type="hidden" id="eur_${obj.shipmentno}" value="${obj.exchange_rate}">
 						采购金额&#12288;:<span id="cgje${obj.orderid }">${obj.sumcgprice}</span>(RMB)<br/>
-						客户已付款:<span id="khfk${obj.orderid }">
+						质检费&#12288;:<span id="jzf${obj.orderid }">${obj.actual_lwh}</span>(USD)<br/>
+						客户已付款:<span id="khfk${obj.orderid }"></span>
 						<fmt:formatNumber type="number" value="${obj.sumprice*obj.exchange_rate}"/>
 						</span>(RMB)<br/>   <!-- 客户已付款 -->
 						<input type="hidden" id="payPrice${obj.orderid }" value="${obj.sumprice*obj.exchange_rate}">
@@ -502,8 +514,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 					<c:choose>
 						<c:when test="${fn:toLowerCase(obj.transportcompany) =='epacket' || fn:toLowerCase(obj.transportcompany) =='emsinten'}">
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')" checked="checked"  type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -512,8 +524,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						</c:when>
 						<c:when test="${fn:toLowerCase(obj.transportcompany) =='原飞航'}">
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" checked="checked" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" checked="checked" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -522,8 +534,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 					</c:when>
 						<c:when test="${fn:toLowerCase(obj.transportcompany) =='jcex'}">
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" checked="checked" type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" checked="checked" type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -531,8 +543,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						</c:when>
 						<c:when test="${fn:toLowerCase(obj.transportcompany) =='zto'}">
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')" checked="checked"  type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -540,8 +552,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						</c:when>
 						<c:when test="${fn:toLowerCase(obj.transportcompany) =='飞特' }">
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -549,8 +561,8 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						</c:when>
 						<c:otherwise>
 							<input  value="1" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>4PX<br/>
-							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航<br/>
-							<input  value="3" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>佳成<br/>
+							<input  value="2" onclick="getYsfs('${obj.shipmentno }')" type="radio" name="ysfs${obj.shipmentno }"/>原飞航(${obj.yfhFreight})<br/>
+							<input  value="3" onclick="getYsfs('${obj.shipmentno }')"  type="radio" name="ysfs${obj.shipmentno }"/>佳成(${obj.jcexFreight})<br/>
 							<input  value="4" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>邮政 <br/>
 							<input  value="5" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>中通 <br/>
 							<input  value="6" onclick="getYsfs('${obj.shipmentno }')"   type="radio" name="ysfs${obj.shipmentno }"/>迅邮<br/>
@@ -582,11 +594,14 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 							<br/>     
 							 -->                                                                                                 
 							</c:if>
+							<c:if test="${obj.cacount>0}">
+								<button onclick="openTipInfo('${obj.orderid}');">查看申报注意事项</button><br/>
+							</c:if>
 							中文品名：<input id="sbzwpm${obj.orderid }" style="width: 123px" type="text" name='sbzwpm${obj.shipmentno }'/><br/>
 							英文品名：<input id="sbywpm${obj.orderid }" style="width: 123px" type="text" name='sbywpm${obj.shipmentno }'/><br/>
 							配货备注：<input id="sbphbz${obj.orderid }" style="width: 30px" type="text" name='sbphbz${obj.shipmentno }'/>
-							数&#12288;&#12288;量：<input id="sbsl${obj.orderid }" class="sbsl${obj.shipmentno }" style="width: 30px" value="1" type="text" name='sbsl${obj.shipmentno }'/><br/>                     
-		 					价&#12288;&#12288;格：<input id="sbjg${obj.orderid }" class="sbjg${obj.shipmentno }" style="width: 30px" type="text" name='sbjg${obj.shipmentno }' 
+							数&#12288;&#12288;量：<input id="sbsl${obj.orderid }" class="sbsl${obj.shipmentno }" style="width: 30px" value="1" type="text" name='sbsl${obj.shipmentno }' onblur="checkAmount('${obj.shipmentno }','${obj.orderid }');"/><br/>
+		 					价&#12288;&#12288;格：<input id="sbjg${obj.orderid }" class="sbjg${obj.shipmentno }" style="width: 30px" type="text" name='sbjg${obj.shipmentno }' onblur="checkAmount('${obj.shipmentno }','${obj.orderid }');"
 		 					value="<fmt:formatNumber  value='${obj.sumcgprice*0.4/obj.cont*obj.exchange_rate }' pattern='0.00'/>"/>
 	    			 		单&#12288;&#12288;位：<input id="sbdw${obj.orderid }" style="width: 30px" value="usd"  type="text" name='sbdw${obj.shipmentno }'/>                   
 						          
@@ -753,7 +768,30 @@ function isKq(){
 	hideOrShowTr(kg);
 }
 
-</script>   -->                                                                                                                          
+</script>   -->
+<div class="mod_pay4" style="display: none;" id="displayChangeLog">
+	<div>
+		<a href="javascript:void(0)" class="show_x" onclick="displayChangeLogInfo()">╳</a>
+	</div>
+	<center>
+		<h3 class="show_h3">出货注意事项</h3>
+		<table id="displayChangeLogs" class="imagetable" border="1">
+			<thead>
+			<tr>
+				<td width='11%'>国家/地区</td>
+				<td width='11%'>法规</td>
+				<td width='11%'>清关要求</td>
+				<td width='11%'>税则</td>
+				<td width='11%'>建议物流商</td>
+				<td width='11%'>不建议物流商</td>
+				<td width='11%'>申报金额</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</center>
+</div>
 </body>
 </html>
 
