@@ -47,7 +47,7 @@ public class CouponUserRedisBean {
 
     public CouponUserRedisBean(String id, String to, String userid) {
         this.id = id;
-        this.to = to;
+        this.to = to.substring(0, to.length() - 3);
         this.userid = userid;
     }
 }
