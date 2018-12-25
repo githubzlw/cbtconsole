@@ -224,7 +224,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "details_number,pay_price_three,foreign_freight, "
 				+ "(case when  orderinfo.state=-1 then (select payment.payment_amount from payment where orderid=order_no and paystatus=1 limit 1) else orderinfo.pay_price end  ) pay_price,"
 				+ "pay_price_tow,currency,actual_ffreight, discount_amount,order_ac,pay_price,purchase_number,server_update,client_update,"
-				+ "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback,extra_freight,vatbalance "
+				+ "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback,extra_freight,vatbalance,actual_lwh,processingfee "
 				+ "from orderinfo where orderinfo.order_no= ?";
 		for (int i = 1; i < orderno.length; i++) {
 			sql += " or order_no=?";
@@ -274,6 +274,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				ob.setCashback(rs.getDouble("cashback"));
 				ob.setExtra_freight(rs.getDouble("extra_freight"));
 				ob.setVatBalance(rs.getDouble("vatbalance"));
+				ob.setActual_lwh(rs.getString("actual_lwh"));
+				ob.setProcessingfee(rs.getDouble("processingfee"));
 				obs.add(ob);
 			}
 		} catch (Exception e) {

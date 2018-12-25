@@ -828,8 +828,8 @@ public class NewOrderSplitCtr {
                     double qualityFee = Double.parseDouble(obBean_.getActual_lwh() == null ? "0.00" : obBean_.getActual_lwh());
                     double processFee = obBean_.getProcessingfee();
 
-                    double totalDisCount = coupon_discount + extra_discount + grade_discount + share_discount + discount_amount + cash_back
-                            + extra_freight + vatBalance + qualityFee + processFee;
+                    double totalDisCount = coupon_discount + extra_discount + grade_discount
+                            + share_discount + discount_amount + cash_back;
                     if (totalDisCount > 0.01) {
                         request.setAttribute("totalDisCount", orderBeans.get(0).getCurrency() + " -"
                                 + (BigDecimalUtil.truncateDouble(totalDisCount, 2)));
@@ -850,6 +850,9 @@ public class NewOrderSplitCtr {
                         request.setAttribute("totalExtraFree", "--");
                         model.put("totalExtraFree", "--");
                     }
+                    System.err.println(orderBeans.get(0).getPay_price() + "(payPrice)="
+                            +  orderBeans.get(0).getProduct_cost() + "(productCost)+ "
+                            + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
                     model.put("title", "Your Import Express order was partially cancelled");
