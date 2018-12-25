@@ -603,10 +603,13 @@ public class ComplainDaoImpl implements IComplainDao{
 			stmt.setString(1, userId);
 			rs = stmt.executeQuery();
 			while (rs.next()) {
+				String complainText = rs.getString("complainText");
+				if(StringUtils.isBlank(complainText)) {
+					continue;
+				}
 				ComplainVO rfb = new ComplainVO();
 				rfb.setId(rs.getInt("id"));
 				rfb.setUserid((rs.getInt("userid")));
-				String complainText = rs.getString("complainText");
 				complainText = complainText.length() > 50 ? complainText.substring(0, 50)+"..." : complainText;
 				rfb.setComplainText(complainText);
 				rfbList.add(rfb);
