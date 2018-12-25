@@ -341,7 +341,7 @@ function fn(){
 					<td class="tableleft">第三方申诉:</td>
 					<td colspan="3">
 					<c:forEach items="${complain.disputeList }" var="dispute">
-					<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ dispute.disputeId}&merchant=${dispute.merchantId}">${ dispute.disputeId}</a>
+					<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ dispute}">${ dispute}</a>
 					<br>
 					</c:forEach>
 					
