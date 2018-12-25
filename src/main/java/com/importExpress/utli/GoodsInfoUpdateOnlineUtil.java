@@ -24,8 +24,8 @@ public class GoodsInfoUpdateOnlineUtil {
 //    private static final String MONGODB_UPDATE_SOLR_URL = "http://192.168.1.153:8001/invokejob/b006";// 刷新刷新solr的
 
     private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
-    private static final String MONGODB_UPDATE_GOODS_URL = "https://www.import-express.com/invokejob/b004";// 刷新产品表数据
-    private static final String MONGODB_UPDATE_SOLR_URL = "https://www.import-express.com/invokejob/b006";// 刷新刷新solr的
+    private static final String MONGODB_UPDATE_GOODS_URL = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL = "http://35.166.131.70:18001/invokejob/b006";// 刷新刷新solr的
 
     /**
      * sku使用MQ更新AWS服务器数据
@@ -216,6 +216,16 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setUnsellableReason("6");
         inputData.setPid(pid);
         return updateOnlineAndSolr(inputData, 1);
+    }
+
+    public static boolean setNoBenchmarkingMongoDb(String pid){
+        // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setAli_weight("0");
+        inputData.setBm_flag("2");
+        inputData.setIsBenchmark("3");
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 0);
     }
 
     /**

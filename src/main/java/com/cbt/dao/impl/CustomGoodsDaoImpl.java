@@ -10,6 +10,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.SkuValPO;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.UpdateTblModel;
 import net.sf.json.JSONObject;
@@ -3583,14 +3584,14 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         Connection conn28 = DBHelper.getInstance().getConnection8();
         Connection conn31 = DBHelper.getInstance().getConnection6();
         Connection conn27 = DBHelper.getInstance().getConnection();
-        Connection connAws = DBHelper.getInstance().getConnection2();
+        // Connection connAws = DBHelper.getInstance().getConnection2();
         PreparedStatement stmt28 = null;
         PreparedStatement stmt31 = null;
         PreparedStatement stmt27 = null;
         PreparedStatement stmtAws = null;
         String updateSql28 = "update custom_benchmark_ready_newest set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
         String updateSql27 = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
-        String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
+        // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
         String updateSql31 = "replace into single_goods_offers_child(good_url,goods_pid,set_weight,change_mark," +
                 "crawl_flag,service_ip) values(?,?,?,1,0,'')";
         int rs = 0;
@@ -3601,16 +3602,18 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt27 = conn27.prepareStatement(updateSql27);
             stmt27.setString(1, pid);
 
-            stmtAws = connAws.prepareStatement(updateSqlAws);
-            stmtAws.setString(1, pid);
+            // stmtAws = connAws.prepareStatement(updateSqlAws);
+            // stmtAws.setString(1, pid);
 
             stmt31 = conn31.prepareStatement(updateSql31);
             stmt31.setString(1, "https://detail.1688.com/offer/" + pid + ".html");
             stmt31.setString(2, pid);
             stmt31.setDouble(3, finalWeight);
 
-            rs = stmtAws.executeUpdate();
-            if (rs > 0) {
+            // rs = stmtAws.executeUpdate();
+            boolean isSuccess = GoodsInfoUpdateOnlineUtil.setNoBenchmarkingMongoDb(pid);
+            if (isSuccess) {
+                rs = 1;
                 stmt28.executeUpdate();
                 stmt27.executeUpdate();
                 stmt31.executeUpdate();
@@ -3627,7 +3630,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             DBHelper.getInstance().closeConnection(conn28);
             DBHelper.getInstance().closeConnection(conn31);
             DBHelper.getInstance().closeConnection(conn27);
-            DBHelper.getInstance().closeConnection(connAws);
+            // DBHelper.getInstance().closeConnection(connAws);
         }
         return rs > 0;
     }
