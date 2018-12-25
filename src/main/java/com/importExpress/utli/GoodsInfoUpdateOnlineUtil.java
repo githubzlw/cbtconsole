@@ -218,6 +218,16 @@ public class GoodsInfoUpdateOnlineUtil {
         return updateOnlineAndSolr(inputData, 1);
     }
 
+    public static boolean setNoBenchmarkingMongoDb(String pid){
+        // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setAli_weight("0");
+        inputData.setBm_flag("2");
+        inputData.setIsBenchmark("3");
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 0);
+    }
+
     /**
      * 替换字符串中的逗号
      *
