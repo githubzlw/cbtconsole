@@ -175,12 +175,16 @@ public class CustomerDisputeController {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
 			}	
 			LOG.info(showDisputeDetails);
+//			System.out.println(showDisputeDetails);
 			if(StringUtils.isNotEmpty(showDisputeDetails)) {
 				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
 			}
 			if(infoByDisputeID != null) {
 				mv.addObject("result", infoByDisputeID);
 				JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
+				
+				JSONObject seller = (JSONObject)((JSONObject)disputedTransactions.get(0)).get("seller");
+				merchant = seller.getString("merchant_id");
 				
 				String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
 				mv.addObject("orderNo", "");

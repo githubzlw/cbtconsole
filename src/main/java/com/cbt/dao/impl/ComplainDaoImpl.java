@@ -85,16 +85,10 @@ public class ComplainDaoImpl implements IComplainDao{
 				rfb.setDealAdminid(rs.getInt("dealAdminid"));
 				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
 				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
-					List<Map<String,String>> disList = new ArrayList<>();
+					List<String> disList = new ArrayList<String>();
 					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
 						if(StringUtils.isNotBlank(s)) {
-							String[] split = s.split("_");
-							if(split.length == 2 && StringUtils.isNotBlank(split[0]) && StringUtils.isNotBlank(split[1])) {
-								Map<String,String> map = new HashMap<>();
-								map.put("disputeId", split[0]);
-								map.put("merchantId", split[1]);
-								disList.add(map);
-							}
+							disList.add(s.trim());
 						}
 						
 					});
@@ -400,16 +394,10 @@ public class ComplainDaoImpl implements IComplainDao{
 				}
 				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
 				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
-					List<Map<String,String>> disList = new ArrayList<>();
+					List<String> disList = new ArrayList<String>();
 					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
 						if(StringUtils.isNotBlank(s)) {
-							String[] split = s.split("_");
-							if(split.length == 2 && StringUtils.isNotBlank(split[0]) && StringUtils.isNotBlank(split[1])) {
-								Map<String,String> map = new HashMap<>();
-								map.put("disputeId", split[0]);
-								map.put("merchantId", split[1]);
-								disList.add(map);
-							}
+							disList.add(s.trim());
 						}
 						
 					});
@@ -551,14 +539,10 @@ public class ComplainDaoImpl implements IComplainDao{
 				rfb.setComplainText(rs.getString("complainText"));
 				String ref_dispute_merchant_id = rs.getString("ref_dispute_merchant_id");
 				if(StringUtils.isNotBlank(ref_dispute_merchant_id)) {
-					List<Map<String,String>> disList = new ArrayList<>();
+					List<String> disList = new ArrayList<String>();
 					Arrays.asList(ref_dispute_merchant_id.split(",")).stream().forEach(s -> {
 						if(StringUtils.isNotBlank(s)) {
-							String[] split = s.split("_");
-							Map<String,String> map = new HashMap<>();
-							map.put("disputeId", split[0]);
-							map.put("merchantId", split[1]);
-							disList.add(map);
+							disList.add(s.trim());
 						}
 						
 					});
