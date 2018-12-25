@@ -165,7 +165,7 @@
         }
         
         function formatPP(val, row, index) {
-        	if(row.merchant=='584JZVFU6PPVU'){
+        	if(row.merchantID=='584JZVFU6PPVU'){
         		return '老账号';
         	}
     		return '新账号';
@@ -227,7 +227,9 @@
     					var json = result.data;
     					for(var i=0;i<json.length;i++){
     						var complain = json[i];
-    						html +='<div><span><input type="radio" class="c_radio" value="'+complain.id+'"></span><span class="complain_id">'+complain.id+'</span><span class="complain_txt">'+complain.complainText+'</span></div>';
+    						html +='<div><span><input type="radio" class="c_radio c_'+complain.id+'" value="'+
+    						complain.id+'" onclick="selectComplain('+complain.id+')"></span><span class="complain_id">'+complain.id
+    						+'</span><span class="complain_txt">'+complain.complainText+'</span></div>';
     					}
     					html +='</div>';
     				}
@@ -247,15 +249,15 @@
 									id = $(this).val();
 								}
 							})
-							var href = window.location.href;
+							var dispute_merchant = disputeID + '_' + merchantID;
 							if(disputeID !='' && merchantID!='' && id !=''){
 							  $.ajax({
 									type:'POST',
 									dataType:'text',
 									url:'/cbtconsole/complain/dispute/update',
-									data:{id:id,disputeid:disputeID,merchantid:merchantID},
+									data:{id:id,disputeid:dispute_merchant,merchantid:merchantID},
 									success:function(res){
-										window.location.href = href;
+										location.reload(); 
 									},
 									error:function(XMLResponse){
 										alert('error');
@@ -275,6 +277,11 @@
     			}
     		}); 
         	
+        }
+        function selectComplain(id){
+        	$(".c_"+id).removeClass("c_radio");
+        	$(".c_radio").attr("checked", false);
+        	$(".c_"+id).addClass("c_radio");
         }
         </script>
 

@@ -48,7 +48,6 @@ public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
-
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
 
@@ -663,9 +662,9 @@ public class ShopCarMarketingController {
                 freight = json.getJSONObject("data").getDouble("totalFreight");
                 if(freight > 0 ){
                     carUserStatistic.setShippingName(json.getJSONObject("data").getString("transportation"));
-                    carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
                     carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
                 }
+                carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
             } else {
                 System.err.println("getMinFreightByUserId error :<:<:<");
             }
@@ -1140,6 +1139,4 @@ public class ShopCarMarketingController {
         }
         return mv;
     }
-
-
 }

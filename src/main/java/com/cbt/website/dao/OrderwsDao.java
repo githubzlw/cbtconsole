@@ -24,6 +24,8 @@ import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
@@ -2337,6 +2339,12 @@ public class OrderwsDao implements IOrderwsDao {
                 NotifyToCustomerUtil.updateOrderGoodsPrice(userId,orderNo);
                 result =1;
             }
+            sql="update orderinfo set server_update=1 where order_no='"+orderNo+"'";
+            stmt3 = conn.prepareStatement(sql);
+            stmt3.executeUpdate();
+            SendMQ sendMQ = new SendMQ();
+            sendMQ.sendMsg(new RunSqlModel(sql));
+            sendMQ.closeConn();
         } catch (Exception e) {
             e.printStackTrace();
             result =0;
@@ -2874,7 +2882,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int upOrderChangeResolve(String orderNo, int goodId, int changeType) {
-        String sql = "update order_change set del_state=1,dateline=dateline where  orderNo=? and goodId=? and ropType=?";
+        String sql = "update order_change set del_state=1 where  orderNo=? and goodId=? and ropType=?";
         String sql1 = "update orderinfo set server_update=0 where 1>(select count(id) from order_change where orderno=? and del_state=0) and order_no=?";
         Connection conn = DBHelper.getInstance().getConnection();
         Connection conn2 = DBHelper.getInstance().getConnection2();
@@ -6345,8 +6353,8 @@ public class OrderwsDao implements IOrderwsDao {
             rs = stmt.executeQuery();
             if (rs.next() && flag) {
                 sql = " insert into order_details(goodsid,orderid,dropshipid,delivery_time,checkprice_fee,checkproduct_fee,state,fileupload,yourorder,userid,goodsname,goodsprice,goodsfreight,"
-                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid) "
-                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        + "goodsdata_id,remark,goods_class,extra_freight,car_url,car_img,car_type,freight_free,od_bulk_volume,od_total_weight,discount_ratio,goodscatid,car_urlMD5,goods_pid,actual_weight) "
+                        + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 stmt = conn.prepareStatement(sql);
                 stmt.setString(1, goodsid);
                 stmt.setString(2, newOrderid);
@@ -6375,6 +6383,7 @@ public class OrderwsDao implements IOrderwsDao {
                 stmt.setString(25, rs.getString("goodscatid"));
                 stmt.setString(26, rs.getString("car_urlMD5"));
                 stmt.setString(27, rs.getString("goods_pid"));
+                stmt.setString(28, rs.getString("actual_weight"));
                 row = stmt.executeUpdate();
                 sql = "select id,goodsdata_id,goodscatid,car_url from order_details where orderid='" + newOrderid
                         + "' and goodsid='" + goodsid + "'";
@@ -7867,6 +7876,42 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
+    public List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate, String endDate, int startNum, int offSet) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        int num=0;
+        ResultSet rs = null;
+        Statement stmt = null;
+        List<UserBehaviorDetails> list=new ArrayList<UserBehaviorDetails>();
+        String sql="SELECT Operationtime,username,orderid,orderAmount FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        try{
+            if(StringUtil.isNotBlank(beginDate)){
+                sql+=" and Operationtime>='"+beginDate+"'";
+            }
+            if(StringUtil.isNotBlank(endDate)){
+                sql+=" and Operationtime<='"+endDate+"'";
+            }
+            sql+=" order by id desc ";
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                UserBehaviorDetails u=new UserBehaviorDetails();
+                u.setCreateTime(rs.getString("Operationtime"));
+                u.setEmail(rs.getString("username"));
+                u.setPid(rs.getString("orderid"));
+                u.setOrderAmount(rs.getString("orderAmount"));
+                list.add(u);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return list;
+    }
+
+    @Override
     public List<UserBehaviorDetails> queryUserRecentView(String beginDate, String endDate, int startNum, int offSet) {
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7970,6 +8015,35 @@ public class OrderwsDao implements IOrderwsDao {
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
+    }
+
+    @Override
+    public int queryUserPayLog(String beginDate, String endDate) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        int num=0;
+        ResultSet rs = null;
+        Statement stmt = null;
+        String sql="SELECT COUNT(1) as counts FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        try{
+            if(StringUtil.isNotBlank(beginDate)){
+                sql+=" and Operationtime>='"+beginDate+"'";
+            }
+            if(StringUtil.isNotBlank(endDate)){
+                sql+=" and Operationtime<='"+endDate+"'";
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if(rs.next()){
+               num=rs.getInt("counts");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return num;
     }
 
     @Override

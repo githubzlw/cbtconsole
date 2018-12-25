@@ -4,19 +4,21 @@ import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
-import com.cbt.warehouse.pojo.HotCategory;
-import com.cbt.warehouse.pojo.HotDiscount;
-import com.cbt.warehouse.pojo.HotEvaluation;
-import com.cbt.warehouse.pojo.HotSellingGoods;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.HotGoodsService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.Utility;
+import com.importExpress.pojo.HotCategoryShow;
+import com.importExpress.pojo.HotSellGoods;
+import com.importExpress.pojo.HotSellGoodsShow;
 import com.importExpress.service.HotManageService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.OKHttpUtils;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -37,6 +44,16 @@ import java.util.List;
 public class HotManageController {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(HotManageController.class);
     private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final String HOT_FILE_LOCAL_PATH = "/data/cbtconsole/hotJson";
+    private static final String HOT_UPLOAD_TO_PATH = "https://www.import-express.com/popProducts/hotFileUpload";
+
+    // private static final String HOT_FILE_LOCAL_PATH = "E:/hotJson";
+    // private static final String HOT_UPLOAD_TO_PATH = "http://127.0.0.1:8087/popProducts/hotFileUpload";
+
+
+
+    private OKHttpUtils okHttpUtils = new OKHttpUtils();
 
     @Autowired
     private HotManageService hotManageService;
@@ -915,6 +932,177 @@ public class HotManageController {
         }
         return json;
     }
+
+
+    /**
+	 * 刷新热卖商品json文件
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/refreshHotJson")
+	@ResponseBody
+	public int refreshHotJson(HttpServletRequest request,HttpServletResponse response){
+
+		try {
+		    HotCategory param = new HotCategory();
+		    param.setIsOn(1);
+			for (int hotType = 1; hotType < 8; hotType++) {
+				List<HotCategoryShow> resultList = new ArrayList<HotCategoryShow>();
+				param.setHotType(hotType);
+				List<HotCategory> categoryList = hotManageService.queryCategoryList(param);
+				List<HotSellGoods> hotGoodsList = hotManageService.queryGoodsByHotType(hotType);
+				genHotGoodsData(categoryList,hotGoodsList,resultList);
+				//匹配文件信息
+				String fileName = "";
+				if (hotType == 1) {
+					fileName = "queryAllHotGoodsOld.json";
+				} else if (hotType == 2) {
+					fileName = "index-new-C2.json";
+				} else if (hotType == 3) {
+					fileName = "index-new-C3.json";
+				} else if (hotType == 4) {
+					fileName = "queryGoodsByHotTypePanda.json";
+				} else if (hotType == 5) {
+					fileName = "queryGoodsByHotTypeAlisa.json";
+				} else if (hotType == 6) {
+					fileName = "queryAllHotGoodsMobile.json";
+				} else if (hotType == 7) {
+					fileName = "index-new-C4.json";
+				}
+				writeHotGoodsJson(resultList, fileName);
+				categoryList.clear();
+				hotGoodsList.clear();
+				resultList.clear();
+			}
+			// 刷新到线上
+            boolean isSuccess = uploadFileToOnline();
+			if(isSuccess){
+			    return 1;
+            }else{
+			    return 0;
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
+
+	/**
+	 * 热卖json信息写入
+	 * @param resultList
+	 * @param fileName
+	 */
+	private void writeHotGoodsJson(List<HotCategoryShow> resultList,String fileName) {
+		FileWriter fw = null;
+		PrintWriter out = null;
+		try {
+			File patentFile = new File(HOT_FILE_LOCAL_PATH);
+			if(!(patentFile.exists() && patentFile.isDirectory())){
+				patentFile.mkdirs();
+			}
+			fw = new FileWriter(HOT_FILE_LOCAL_PATH + "/" + fileName, false);
+			out = new PrintWriter(fw);
+			//JSONObject dataJson = JSONObject.fromObject(resultList);
+			out.write(JSONArray.fromObject(resultList).toString());
+			out.println();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error(fileName + " writeHotGoodsJson,error:" + e.getMessage());
+		} finally {
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (out != null) {
+				out.close();
+			}
+		}
+	}
+
+	private boolean uploadFileToOnline() {
+        boolean isSuccess = false;
+        File file = new File(HOT_FILE_LOCAL_PATH);
+        if (file.exists() && file.isDirectory()) {
+            File[] childList = file.listFiles();
+            int total = childList.length;
+            int count = 0;
+            boolean childSuccess;
+            for (File child : childList) {
+                try {
+                    childSuccess = okHttpUtils.postFileNoParam(HOT_UPLOAD_TO_PATH, child);
+                    if(childSuccess){
+                        count++;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println("uploadFileToOnline,error:" + e.getMessage());
+                    LOG.error("uploadFileToOnline,error:" + e.getMessage());
+                }
+            }
+            isSuccess = (total == count);
+        } else {
+            System.err.println("本次获取文件失败，无法更新到线上");
+            LOG.error("uploadFileToOnline,无法更新到线上");
+        }
+        return isSuccess;
+    }
+
+
+	private void genHotGoodsData(List<HotCategory> categoryList,List<HotSellGoods> hotGoodsList,List<HotCategoryShow> resultList) {
+		for (HotCategory hotCategory : categoryList) {
+			HotCategoryShow categoryShow = new HotCategoryShow();
+			categoryShow.setHotType(hotCategory.getHotType());
+			categoryShow.setId(hotCategory.getId());
+			categoryShow.setShowImg(hotCategory.getShowImg());
+			categoryShow.setShowName(hotCategory.getShowName());
+			categoryShow.setSorting(hotCategory.getSorting());
+			resultList.add(categoryShow);
+		}
+		//使用商品匹配类别
+		for (HotSellGoods hotGd : hotGoodsList) {
+
+			HotSellGoodsShow sellGoodsShow = new HotSellGoodsShow();
+			sellGoodsShow.setAmazon_price(hotGd.getAmazon_price());
+			sellGoodsShow.setAsin_code(hotGd.getAsin_code());
+			sellGoodsShow.setDiscountBeginTime(hotGd.getDiscountBeginTime());
+			sellGoodsShow.setDiscountEndTime(hotGd.getDiscountEndTime());
+			sellGoodsShow.setDiscountId(hotGd.getDiscountId());
+			sellGoodsShow.setPrice1688(hotGd.getPrice1688());
+			sellGoodsShow.setDiscountPercentage(hotGd.getDiscountPercentage());
+			if (hotGd.getDiscountPercentage() > 0) {
+				double discountPrice = Double.valueOf(hotGd.getMaxPrice()) * ( 1 + hotGd.getDiscountPercentage() / 100D) ;
+				sellGoodsShow.setDiscountPrice(BigDecimalUtil.truncateDouble(discountPrice, 2));
+				sellGoodsShow.setPrice1688(hotGd.getMaxPrice());
+			}
+			sellGoodsShow.setDiscountSort(hotGd.getDiscountSort());
+			sellGoodsShow.setGoods_import_url(hotGd.getGoods_import_url());
+			sellGoodsShow.setGoods_img(hotGd.getGoods_img());
+			sellGoodsShow.setGoods_pid(hotGd.getGoods_pid());
+			sellGoodsShow.setGoods_price(hotGd.getGoods_price());
+			sellGoodsShow.setGoods_unit(hotGd.getGoods_unit());
+			sellGoodsShow.setHot_id(Integer.valueOf(hotGd.getHot_selling_id()));
+			sellGoodsShow.setMoq(hotGd.getMoq());
+			sellGoodsShow.setPrice_show(hotGd.getPrice_show());
+			sellGoodsShow.setProfit_margin(hotGd.getProfit_margin());
+			sellGoodsShow.setRangePrice(hotGd.getRangePrice());
+			sellGoodsShow.setShow_name(hotGd.getShow_name());
+
+			for (HotCategoryShow hotCategoryShow : resultList) {
+				if (hotCategoryShow.getId() == sellGoodsShow.getHot_id()) {
+					if (hotCategoryShow.getGoodsList() == null || hotCategoryShow.getGoodsList().size() == 0) {
+						hotCategoryShow.setGoodsList(new ArrayList<HotSellGoodsShow>());
+					}
+					hotCategoryShow.getGoodsList().add(sellGoodsShow);
+				}
+			}
+		}
+	}
 
 
     private void insertCategoryOnline(HotCategory param) {

@@ -6,6 +6,7 @@ import com.cbt.bean.OrderBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.BuyerCommentPojo;
+import com.cbt.pojo.CustomsRegulationsPojo;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.servlet.Currency;
@@ -1700,6 +1701,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public CustomsRegulationsPojo getCustomsRegulationsPojo(String orderid) {
+        return dao.getCustomsRegulationsPojo(orderid);
+    }
+
+    @Override
     public int insertWarningInfo(Map<String, String> map) {
         return dao.insertWarningInfo(map);
     }
@@ -1842,10 +1848,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
             bean.setIsDropshipFlag(1);
         }
         list.addAll(dropshipList);
-        for(int i=0;i<list.size();i++){
-            ShippingPackage s=list.get(i);
-            s.setEstimatefreight(String.valueOf(Double.valueOf(s.getEstimatefreight())+s.getPid_amount()));
-        }
+//        for(int i=0;i<list.size();i++){
+//            ShippingPackage s=list.get(i);
+//            s.setEstimatefreight(String.valueOf(Double.valueOf(s.getEstimatefreight())+s.getPid_amount()));
+//        }
         return list;
     }
 

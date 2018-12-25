@@ -20,7 +20,7 @@ public class OKHttpUtils {
 	/**
 	 * Get请求
 	 * @param url 请求链接
-	 * @param header 请求头
+	 * @param mHeaders 请求头
 	 * @return
 	 * @throws IOException
 	 */
@@ -36,7 +36,7 @@ public class OKHttpUtils {
 	
 	/**Post请求
 	 * @param url 请求链接
-	 * @param header 请求头
+	 * @param mHeaders 请求头
 	 * @param mediaType 
 	 * @param param 请求参数
 	 * @return
@@ -61,9 +61,9 @@ public class OKHttpUtils {
 	}
 	/**Post请求
 	 * @param url 请求链接
-	 * @param header 请求头
-	 * @param mediaType 
+	 * @param mHeaders 请求头
 	 * @param param 请求参数
+	 * @param file 请求文件
 	 * @return
 	 * @throws IOException
 	 */
@@ -120,7 +120,7 @@ public class OKHttpUtils {
 	}
 	/**Patch请求
 	 * @param url 请求链接
-	 * @param header 请求头
+	 * @param mHeaders 请求头
 	 * @param mediaType 
 	 * @param param 请求参数
 	 * @return
@@ -146,5 +146,54 @@ public class OKHttpUtils {
 	    }
 		
 	}
-	
+
+
+	public boolean postFileNoParam(String url,File file)  throws Exception {
+		RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+		MultipartBody body = new MultipartBody.Builder()
+				.setType(MultipartBody.FORM)
+				.addFormDataPart("uploadFile", file.getName(), fileBody)
+				.build();
+		Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+				.post(body)
+				.url(url)
+				.build();
+
+		Response response = client.newCall(request).execute();
+		System.err.println(response);
+		if(response.isSuccessful()){
+			String result = response.body().string();
+			System.err.println("upload result:" + result);
+			return "1".equals(result);
+		}else{
+			return false;
+		}
+	}
+
+	public String postFileNoParam(String uploadFileName,String url,File file)  throws Exception {
+		RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+		MultipartBody body = new MultipartBody.Builder()
+				.setType(MultipartBody.FORM)
+				.addFormDataPart(uploadFileName, file.getName(), fileBody)
+				.build();
+		Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+				.post(body)
+				.url(url)
+				.build();
+
+		Response response = client.newCall(request).execute();
+		if(response.isSuccessful()){
+			return response.body().string();
+		}else{
+			return null;
+		}
+	}
+
+	public static void main(String[] args) throws Exception{
+		OKHttpUtils okHttpUtils = new OKHttpUtils();
+		File file = new File("E:/hotJson/1000190129.json");
+        okHttpUtils.postFileNoParam("file","http://192.168.1.153:8001/invokejob/b004", file);
+	}
 }

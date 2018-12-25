@@ -204,6 +204,7 @@ function fnGetStatistic() {
             // if(json[i].state == "freightWaraing" )$("#freightWaraing").html("<a href='/cbtconsole/warehouse/getPackageInfoList'>" + json[i].counts + "</a>");//出运是运费过高预警
             if (json[i].state == "notshipping") $("#notshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=notshipping'>" + json[i].counts + "</a>");//未出货项目
             if (json[i].state == "order_pending") $("#order_pending").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=order_pending'>" + json[i].counts + "</a>");//未出货项目
+            if (json[i].state == "checkOrder") $("#checkOrder").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=checkOrder'>" + json[i].counts + "</a>");//质检服务订单
             //超过交期项目
         }
         $("#cacleorder").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cacle'>" + cacleorder + "</a>");
@@ -235,7 +236,8 @@ function fnGetStatistic() {
 						// if(json[i].state == "freightWaraing" )$("#freightWaraing").html("<a href='/cbtconsole/warehouse/getPackageInfoList'>" + json[i].counts + "</a>");//出运是运费过高预警
 						if (json[i].state == "notshipping") $("#notshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=notshipping&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//未出货项目
 						if (json[i].state == "order_pending") $("#order_pending").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=order_pending&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//未出货项目
-						//超过交期项目
+                        //质检服务订单
+                        if (json[i].state == "checkOrder") $("#checkOrder").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=checkOrder&admuserid="+admuserid+"'>" + json[i].counts + "</a>");
 					}
 					$("#cacleorder").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cacle&admuserid="+admuserid+"'>" + cacleorder + "</a>");
 
@@ -576,3 +578,43 @@ function reFreshoDate() {
 // $('#reFreshoDate').click(function () {
 //     reFreshoDate();
 // });
+
+	function openCheckEmailForUser(orderid,email){
+        $("#checkOrderid").val(orderid);
+       $("#checkEmail").val(email);
+        var rfddd = document.getElementById("checkDiv");
+        rfddd.style.display = "block";
+        $("#checkRemark").val("");
+	}
+
+	function closeCheckEmailForUser(){
+        $("#checkRemark").val("");
+        $("#checkOrderid").val("");
+        $("#checkEmail").val("");
+        var rfddd = document.getElementById("checkDiv");
+        rfddd.style.display = "none";
+	}
+
+	function sendCheckEmailForUser(){
+		var orderid=$("#checkOrderid").val();
+		var email="919923437@qq.com";//$("#checkEmail").val();
+		var remark=$("#checkRemark").val();
+        $.ajax({
+            type: "POST",//方法类型
+            dataType:'json',
+            url:'/cbtconsole/order/sendCheckEmailForUser',
+            data:{"orderNo":orderid,"email":email,"remark":remark},
+            dataType:"json",
+            success:function(data) {
+                if(data == 1){
+                    alert("发送成功");
+                    closeCheckEmailForUser();
+                }else if(data == 2){
+                    alert("已发送过质检邮件，不能重复发送");
+                    closeCheckEmailForUser();
+				}else{
+                    alert("发送失败");
+                }
+            }
+        });
+	}

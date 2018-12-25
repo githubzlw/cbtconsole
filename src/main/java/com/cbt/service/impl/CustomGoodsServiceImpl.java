@@ -101,11 +101,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }
         }
 
-        int res = customGoodsDao.publish(bean,1);
+        int res = customGoodsDao.publish(bean,0);
         // 屏蔽使用jdbc更新AWS数据
         //int res = customGoodsDao.publish(bean);
+
         // 使用MQ更新AWS服务器数据
-        GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
+        // GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
+
+        // 使用MongoDB更新AWS服务器数据
+        GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean);
+
         res = 1;
         if (res > 0) {
             int count = customGoodsDao.publishTo28(bean);
@@ -170,7 +175,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public boolean updateStateList(int state, String pids, int adminid) {
         // AWS更新
-        GoodsInfoUpdateOnlineUtil.batchUpdateGoodsState(state, pids, adminid);
+        // GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateByMQ(state, pids, adminid);
+        GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateMongoDB(state, pids, adminid);
         // 本地更新
         return customGoodsDao.updateStateList(state, pids, adminid);
     }
@@ -246,6 +252,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
         // AWS更新
+        // MQ
+        // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
+        // MongoDB
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid,type);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
     }
 

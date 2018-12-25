@@ -68,6 +68,6 @@
       update shipping_package set optimal_cost=#{cost},optimal_company=#{company} where id=#{id}
     </update>
     <select id="getOrderRate" resultType="java.lang.String">
-        SELECT CASE WHEN oi.exchange_rate>0 THEN oi.exchange_rate ELSE 6.3 END AS rate FROM orderinfo oi INNER JOIN shipping_package sp ON oi.order_no=sp.orderid WHERE sp.id=1111119932
+        SELECT CASE WHEN oi.exchange_rate>0 THEN oi.exchange_rate ELSE 6.3 END AS rate FROM orderinfo oi INNER JOIN shipping_package sp ON oi.order_no=sp.orderid WHERE sp.id=#{sp_id}
     </select>
 </mapper>
