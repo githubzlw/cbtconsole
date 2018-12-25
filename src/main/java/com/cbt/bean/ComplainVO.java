@@ -2,7 +2,6 @@ package com.cbt.bean;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 public class ComplainVO extends Complain {
@@ -34,13 +33,13 @@ public class ComplainVO extends Complain {
 	
 	private List<String> orderIdList;
 	
-	private List<Map<String,String>> disputeList;//申诉集合
+	private List<String> disputeList;//申诉集合
 	
-	public List<Map<String, String>> getDisputeList() {
+	public List<String> getDisputeList() {
 		return disputeList;
 	}
 
-	public void setDisputeList(List<Map<String, String>> disputeList) {
+	public void setDisputeList(List<String> disputeList) {
 		this.disputeList = disputeList;
 	}
 

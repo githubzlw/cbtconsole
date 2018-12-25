@@ -58,7 +58,7 @@ div { word-wrap:break-word;}
 .div_tile{width:150px;display:none;}
 .order_img{
 width:80px;height:80px;}
-.dispute_id{height:30px;width:300px;}
+.dispute_id{height:30px;width:670px;}
 .merchant_id{height:30px;width:300px;}
 </style>
 
@@ -150,7 +150,7 @@ width:80px;height:80px;}
 								
 								<c:if test="${not empty complain.disputeList }">
 								<c:forEach items="${complain.disputeList }" var="dispute">
-								<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ dispute.disputeId}&merchant=${dispute.merchantId}">${ dispute.disputeId}</a>
+								<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${dispute}">${dispute}</a>
 								<br>
 								</c:forEach>
 								</c:if>
@@ -466,7 +466,9 @@ function showmore(){
 	$("#showmorea").hide();
 }
 function openDispute(id){
-	var html='<span>请输入申诉事件号_账号id(如：PP-D-13916157_UDSXBNQ5ARA76)，<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
+	var html='<span>请输入申诉事件号(如：PP-D-13916157),'
+	+'<br>可以参考申诉管理界面输入对应的事件号 '
+	+'<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
 		
 	$.dialog({
 		title : '关联申诉',

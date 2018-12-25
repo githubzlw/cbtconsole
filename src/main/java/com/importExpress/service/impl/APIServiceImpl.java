@@ -104,7 +104,17 @@ public class APIServiceImpl implements APIService {
 			
 		String url = DISPUTE_URL + disputeID;
 		//请求
-		String response = okHttpUtils.get(url, header);
+		String response = "";
+		try {
+			response = okHttpUtils.get(url, header);
+			
+		} catch (Exception e) {
+			if(e.getMessage().indexOf("RESOURCE_NOT_FOUND_ERROR") > -1) {
+				response = showDisputeDetails(disputeID, "584JZVFU6PPVU");
+			}else {
+				throw e;
+			}
+		}
 		return 	response;
 	}
 

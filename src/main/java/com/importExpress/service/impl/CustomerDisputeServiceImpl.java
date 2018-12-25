@@ -64,10 +64,10 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    	List<ComplainVO> complainByDisputeId = complainDao.getComplainByDisputeId(disputeIdList);
 	    	Map<String,ComplainVO> disputeMap = new HashMap<String,ComplainVO>();
 	    	complainByDisputeId.stream().forEach(c -> {
-	    		List<Map<String,String>> disputeList = c.getDisputeList();
+	    		List<String> disputeList = c.getDisputeList();
 	    		if(disputeList != null) {
 	    			disputeList.stream().forEach(d -> {
-	    				disputeMap.put(d.get("disputeId"), c);	
+	    				disputeMap.put(d, c);	
 	    			});
 	    		}
 	    	});
