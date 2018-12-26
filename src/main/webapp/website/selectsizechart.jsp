@@ -444,7 +444,7 @@
 						var catimg = dataJson[i];
 						shopHtml = shopHtml + '<li class="li_list">';
 						shopHtml = shopHtml + '<div class="imgs"><img src="'+ catimg.remotpath + '" onclick="bigPic(this)"></div>';
-						shopHtml = shopHtml + '<span calss="goods_name">产品id：<em>' + catimg.pid + '</em></span>';
+						shopHtml = shopHtml + '<a calss="goods_name" target="_Blank" href="https://www.import-express.com/goodsinfo/top-1'+catimg.pid+'.html">产品id：<em>' + catimg.pid + '</em></a>';
 						shopHtml = shopHtml + '</li>';
 						shopHtml = shopHtml + '<li class="li_list li_list_replace"><input class="uploadtips" value="" readonly="readonly"/><input class="rowid" type="hidden" value="'+catimg.id+'"/><input class="thispid" type="hidden" value="'+catimg.pid+'"/><input class="pictureFile" type="file"/>';
 						shopHtml = shopHtml + '<div class="imgs"><img src=""></div>';
