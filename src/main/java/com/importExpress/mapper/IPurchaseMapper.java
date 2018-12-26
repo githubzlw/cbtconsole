@@ -510,4 +510,9 @@ public interface IPurchaseMapper {
 	List<Map<String,Object>> getComfirmedSourceGoods();
 
 	int updateAutoOrderFlag(@Param("idsList") List<Integer> idsList);
+	
+	public List<Map<String,Object>> getSizeChart(@Param("catid")String  catid);
+	public List<Map<String,Object>> loadCategoryName(@Param("catid")String catid);
+	public int updateSizeChart(@Param("imgname")String imgname,@Param("localpath")String localpath,@Param("rowid")int rowid);
+	public int updateSizeChartById(@Param("rowidArray")List<Integer> rowidArray,@Param("userid")int userid);
 }
