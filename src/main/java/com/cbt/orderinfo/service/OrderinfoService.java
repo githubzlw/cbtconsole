@@ -464,6 +464,7 @@ public class OrderinfoService implements IOrderinfoService {
 					//查询上一次该商品发货的订单信息
 					check=iWarehouseDao.getBatckInfo(goods_pid);
 				}
+				check=StringUtil.isBlank(check)?"-":check;
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
