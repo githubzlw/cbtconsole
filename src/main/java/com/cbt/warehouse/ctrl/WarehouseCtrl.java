@@ -1218,6 +1218,10 @@ public class WarehouseCtrl {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
 		Map<String, Object> map = getStringObjectMap(request);
+		if(!(org.apache.commons.lang3.StringUtils.isNotBlank((String)map.get("userid"))&& org.apache.commons.lang3.StringUtils.isNumeric((String)map.get("userid")))){
+			json.setMessage("用户id 格式不正确");
+			return json;
+		}
 		userInfos = iWarehouseService.getUserInfoForPrice(map);
 		List<UserInfo> userInfoCount = iWarehouseService.getUserInfoForPriceCount(map);
 		json.setRows(userInfos);
