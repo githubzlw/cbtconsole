@@ -110,8 +110,8 @@ public class CouponRedisBean {
 		this.leftCount = leftCount;
 		this.describe = describe;
 		this.value = value;
-		this.from = from;
-		this.to = to;
+		this.from = from.substring(0, from.length() - 3);
+		this.to = to.substring(0, to.length() - 3);
 		this.type = type;
 		this.valid = valid;
 	}

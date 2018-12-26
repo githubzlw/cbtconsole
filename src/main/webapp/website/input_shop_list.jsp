@@ -324,7 +324,7 @@
 
 <div id="authorized_dlg" class="easyui-dialog" title="上传/修改授权文件"
      data-options="modal:true"
-     style="width: 450px; height: 360px;">
+     style="width: 450px; height: 400px;">
 
     <div style="margin-bottom: 20px;">
     	<form method="post" enctype="multipart/form-data">
@@ -360,6 +360,10 @@
 	    				<textarea name="authorized_remark" id="authorized_remark" style="width: 290px;height: 54px;"></textarea>
 	    			</td>
 	    		</tr>
+                <tr>
+                    <td>品牌属性:</td>
+                    <td><input type="text" id="authorized_shop_brand" name="authorized_shop_brand"></td>
+                </tr>
 	    	</table>
 	    </form>
     </div>
@@ -451,6 +455,8 @@
             <option value="3">不适合运输</option>
             <option value="4">其他</option>
         </select>
+            &nbsp;&nbsp;品牌属性:<input class="easyui-textbox" name="shopBrand" id="shopBrand"
+                                    style="width:240px; margin-top: 10px;"/>
             &nbsp;&nbsp;<input
                 class="but_color" type="button" value="查询" onclick="doQuery(1)">
             &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
@@ -583,6 +589,7 @@
         var data = $("#data").val();
         //var questionType=$('#questionType').combobox('getValue');
         var shopId = $("#shopId").textbox("getValue");
+        var shopBrand = $("#shopBrand").textbox("getValue");
         var shopUserName = $('#shopUserName').val();
         var username = $("#username").val();
         var timeFrom = $("#timeFrom").val();
@@ -599,6 +606,7 @@
             "page": page,
             "createTime": data,
             "shopId": shopId,
+            "shopBrand": shopBrand,
             "shopUserName": shopUserName,
             "timeFrom": timeFrom,
             "timeTo": timeTo,
@@ -938,6 +946,7 @@
 	        				$('#endTime').datebox('setValue', formatterData(msg.bean.endTime));
 	        			}
 	        	        $("#authorized_remark").val(msg.bean.remark);
+	        	        $("#authorized_shop_brand").val(msg.bean.shopBrand);
 					}
         		}
        	        $('#authorized_dlg').dialog('open');
@@ -964,7 +973,6 @@
     					detailList(keyword_id);
     		    		getDetail(res.id);
     				}, 1500 ); */
-    	    		$('#authorized_dlg').window('close');
     		    	$('#authorized_dlg form').form('clear');
     				doQuery(1);
     	    	}else{
@@ -973,6 +981,7 @@
     	    }    
     	});  
     	$("#authorized_dlg form").submit();
+        $('#authorized_dlg').window('close');
 	}
 
     function deleteAuthorizedInfo() {

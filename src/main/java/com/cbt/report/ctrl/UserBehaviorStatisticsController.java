@@ -148,6 +148,14 @@ public class UserBehaviorStatisticsController {
             RecentView.setStatisticsNum(recentViewNum);
             list.add(RecentView);
 
+            // 8Pay按钮点击独特人数
+            UserBehaviorBean payLogInfo = new UserBehaviorBean();
+            payLogInfo.setTypeDesc("Pay按钮点击独特人数");
+            payLogInfo.setTypeFlag(11);
+            int payLogNum = dao.queryUserPayLog(beginDate, endDate);
+	        payLogInfo.setStatisticsNum(payLogNum);
+            list.add(payLogInfo);
+
             json.setOk(true);
             json.setData(list);
 
@@ -229,6 +237,9 @@ public class UserBehaviorStatisticsController {
             } else if ("10".equals(typeStr)) {
                 //产品单页浏览次数统计（同一用户一天访问多次同一个产品只算一次）
                 list = dao.queryUserRecentView(beginDate, endDate, (page - 1) * 20, row);
+            }else if ("11".equals(typeStr)) {
+                //Pay按钮点击独特人数
+                list = dao.queryUserPayLogDetails(beginDate, endDate, (page - 1) * 20, row);
             }
 
             json.setSuccess(true);
@@ -378,9 +389,10 @@ public class UserBehaviorStatisticsController {
         String endDate = request.getParameter("endDate");
 
         String typeStr = request.getParameter("typeFlag");
-
         if (StringUtils.isNotBlank(beginDate) && StringUtils.isNotBlank(endDate) && StringUtils.isNotBlank(typeStr)) {
             OutputStream ouputStream = null;
+	        beginDate += " 00:00:00";
+	        endDate += " 23:59:59";
             try {
 
                 String typeDesc = "";
@@ -437,6 +449,11 @@ public class UserBehaviorStatisticsController {
                     typeDesc = "产品单页浏览次数最多的50个商品";
                     typeEnDesc = "GoodsView";
                     list = dao.queryUserRecentView(beginDate, endDate, 0, 0);
+                }else if ("11".equals(typeStr)) {
+	                //Pay按钮点击独特人数
+	                typeDesc = "Pay按钮点击独特人数";
+	                typeEnDesc = "Pay_log";
+	                list = dao.queryUserPayLogDetails(beginDate, endDate, 0, 0);
                 }
 
                 if (StringUtils.isNotBlank(endDate)) {
@@ -453,6 +470,8 @@ public class UserBehaviorStatisticsController {
                 HSSFWorkbook wb = null;
                 if ("10".equals(typeStr)) {
                     wb = genUserRecentView(list, typeDesc);
+                }else  if ("11".equals(typeStr)) {
+	                wb = genUserPayLog(list, typeDesc);
                 } else {
                     wb = genUserInfoExcel(list, typeDesc);
                 }
@@ -476,6 +495,42 @@ public class UserBehaviorStatisticsController {
                 }
             }
         }
+    }
+
+    private HSSFWorkbook genUserPayLog(List<UserBehaviorDetails> list, String title) {
+	    // 第一步，创建一个webbook，对应一个Excel文件
+	    HSSFWorkbook wb = new HSSFWorkbook();
+	    // 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+	    HSSFSheet sheet = wb.createSheet(title);
+	    // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+	    HSSFRow row = sheet.createRow((int) 0);
+	    // 第四步，创建单元格，并设置值表头 设置表头居中
+	    HSSFCellStyle style = wb.createCellStyle();
+	    style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+
+	    HSSFCell cell = row.createCell(0);
+	    cell.setCellValue("日期");
+	    cell.setCellStyle(style);
+	    cell = row.createCell(1);
+	    cell.setCellValue("邮箱");
+	    cell.setCellStyle(style);
+	    cell = row.createCell(2);
+	    cell.setCellValue("订单号");
+	    cell.setCellStyle(style);
+	    cell = row.createCell(3);
+	    cell.setCellValue("金额($)");
+	    cell.setCellStyle(style);
+
+	    for (int i = 0; i < list.size(); i++) {
+		    row = sheet.createRow((int) i + 1);
+		    UserBehaviorDetails usBh = (UserBehaviorDetails) list.get(i);
+		    // 第四步，创建单元格，并设置值
+		    row.createCell(0).setCellValue(usBh.getCreateTime());
+		    row.createCell(1).setCellValue(usBh.getEmail());
+		    row.createCell(2).setCellValue(usBh.getPid());
+		    row.createCell(3).setCellValue(usBh.getOrderAmount());
+	    }
+	    return wb;
     }
 
     private HSSFWorkbook genUserRecentView(List<UserBehaviorDetails> list, String title) {

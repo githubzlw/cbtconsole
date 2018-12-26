@@ -9,11 +9,11 @@ public interface IShopUrlDao {
 
     ShopUrl findById(int id);
 
-    List<ShopUrl> findAll(String shopId, String shopUserName, String date, int start, int end,
+    List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end,
                           String timeFrom, String timeTo, int isOn, int state, int isAuto, int readyDel, int shopType,
                           int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids);
 
-    int total(String shopId, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
+    int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
               int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids);
 
     int delById(int id);
