@@ -268,7 +268,7 @@
 		});
 	});
 
-	function uploadImg(uploadtipObj,rowid, imgFile) {
+	function uploadImg(thispid,uploadtipObj,rowid, imgFile) {
 		//获取图片文件
 		//var file = imgFile.files[0];//文件对象
 		var file = imgFile;
@@ -278,7 +278,7 @@
 			var reader = new FileReader();
 			reader.onload = function() {//异步方法,文件读取成功完成时触发
 				var dataImg = reader.result;//文件一旦开始读取，无论成功或失败，实例的 result 属性都会被填充。如果读取失败，则 result 的值为 null ，否则即是读取的结果
-				syncUpload(uploadtipObj,rowid, name, dataImg);
+				syncUpload(thispid,uploadtipObj,rowid, name, dataImg);
 			}
 			reader.readAsDataURL(file);//将文件读取为 DataURL
 		} else {
@@ -286,13 +286,13 @@
 		}
 	}
 
-	function syncUpload(uploadtipObj,rowid, name, dataImg) {
+	function syncUpload(thispid,uploadtipObj,rowid, name, dataImg) {
 		var imgFile = dataImg.replace(/\+/g, "#wb#");//将所有“+”号替换为“#wb#”
 		imgFile = imgFile.substring(imgFile.indexOf(",") + 1);//截取只保留图片的base64部分,去掉了data:image/jpeg;base64,这段内容
 		imgFile = encodeURIComponent(imgFile);//把字符串作为 URI 组件进行编码。后台容器会自动解码一次
 		name = encodeURIComponent(encodeURIComponent(name));//这里对中文参数进行了两次URI编码，后台容器自动解码了一次，获取到参数后还需要解码一次才能得到正确的参数内容
 		var mydata = "method=syncUpload&imgFile=" + imgFile + "&imgName="
-				+ name + "&rowid=" + rowid;
+				+ name + "&rowid=" + rowid+"&pid="+thispid;
 		$.ajax({
 			url : "/cbtconsole/order/uploadImg",
 			data : mydata,
@@ -315,6 +315,7 @@
 		var $img = $($(thisObj).parent().find("img")[0]);
 		var dataURL = windowURL.createObjectURL(imgfie);
 		var uploadtipObj = $(thisObj).parent().find(".uploadtips");
+		var thispid = $(thisObj).parent().find(".thispid").val();
 		//允许上传的图片格式  
 		var newPreview = imgfie.type;
 		var regext = /\jpg$|\gif$|\jpeg$|\png$|\bmp$/gi;
@@ -325,7 +326,7 @@
 		}
 		var rowid = $(thisObj).parent().find(".rowid").val();
 		$img.attr("src", dataURL);
-		uploadImg(uploadtipObj,rowid, imgfie);
+		uploadImg(thispid,uploadtipObj,rowid, imgfie);
 	}
 
 	function imgUpLoad() {
@@ -445,7 +446,7 @@
 						shopHtml = shopHtml + '<div class="imgs"><img src="'+ catimg.remotpath + '" onclick="bigPic(this)"></div>';
 						shopHtml = shopHtml + '<span calss="goods_name">产品id：<em>' + catimg.pid + '</em></span>';
 						shopHtml = shopHtml + '</li>';
-						shopHtml = shopHtml + '<li class="li_list li_list_replace"><input class="uploadtips" value=""/><input class="rowid" value="'+catimg.id+'"/><input class="pictureFile" type="file"/>';
+						shopHtml = shopHtml + '<li class="li_list li_list_replace"><input class="uploadtips" value="" readonly="readonly"/><input class="rowid" type="hidden" value="'+catimg.id+'"/><input class="thispid" type="hidden" value="'+catimg.pid+'"/><input class="pictureFile" type="file"/>';
 						shopHtml = shopHtml + '<div class="imgs"><img src=""></div>';
 						shopHtml = shopHtml + '</li>';
 						rowidList.push(catimg.id);

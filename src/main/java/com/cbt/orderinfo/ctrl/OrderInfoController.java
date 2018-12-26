@@ -65,7 +65,8 @@ public class OrderInfoController{
 	private SendMailFactory sendMailFactory;
 	@Autowired
 	private ISpiderServer spiderService;
-	private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
+	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+	//private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		Map<String,String> map=new HashMap<String,String>();
@@ -816,7 +817,7 @@ public class OrderInfoController{
 			if(result_list!=null) {
 				for(int i=0;i<result_list.size();i++) {
 					String str = result_list.get(i);
-					if(str.indexOf("access_token")>-1) {
+					if(str.indexOf("access_token")>-1){
 						String[] strArr = str.replace("{", "").replace("}", "").split(",");
 						for(String sss:strArr) {
 							if(sss.indexOf("access_token")>-1) {
@@ -945,12 +946,22 @@ public class OrderInfoController{
 		String imgObj = request.getParameter("imgFile");
 		String imgName = request.getParameter("imgName");
 		String rowid = request.getParameter("rowid");
+		String pid = request.getParameter("pid");
+		if(StringUtils.isBlank("pid")) {
+			pid = "1111111";
+		}
 		int row = 0;
 		try {
 			imgName = URLDecoder.decode(imgName,"utf-8");//前面进行了两次编码，这里�?要用解码器解码一�?
 			
-			String path = imgSavePath+File.separator+imgName;//Windows文件保存路径
-			
+			//String path = imgSavePath+File.separator+imgName;//Windows文件保存路径
+			// 获取配置文件信息
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            String localDiskPath = ftpConfig.getLocalDiskPath();
+            String imgSavePath = localDiskPath + pid ;
+            String path = imgSavePath + File.separator +imgName;
 			//如果文件夹不存在则创�?
 			File file = new File(imgSavePath);
 			if(!file.exists() && !file.isDirectory()){
