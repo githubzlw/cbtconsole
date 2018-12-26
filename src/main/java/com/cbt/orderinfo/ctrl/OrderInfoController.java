@@ -29,6 +29,7 @@ import net.sf.json.JSONObject;
 import sun.misc.BASE64Decoder;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -906,6 +907,28 @@ public class OrderInfoController{
 	@RequestMapping(value = "/getSizeChart")
 	public @ResponseBody List<Map<String,Object>> getSizeChart(HttpServletRequest request){
 		String catid = request.getParameter("catid");
+		String rowidListstr = request.getParameter("rowidListstr");
+		List<Integer> rowidList = new ArrayList<Integer>();
+		if(StringUtils.isNotBlank(rowidListstr)) {
+			String[] rowidArrays = rowidListstr.split(",");
+			for(String idstr:rowidArrays) {
+				if(StringUtils.isBlank(idstr)) {
+					continue;
+				}else {
+					idstr = idstr.replaceAll("\\s*","");
+				}
+				rowidList.add(Integer.parseInt(idstr));
+			}
+		}
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		if(StringUtils.isNotBlank(admuserJson)) {
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+			//标记为已处理
+			if(rowidList.size()>0&&adm!=null) {
+				purchaseService.updateSizeChartById(rowidList,adm.getId());
+			}
+			
+		}
 		return purchaseService.getSizeChart(catid);
 	}
 	
@@ -922,6 +945,7 @@ public class OrderInfoController{
 		String imgObj = request.getParameter("imgFile");
 		String imgName = request.getParameter("imgName");
 		String rowid = request.getParameter("rowid");
+		int row = 0;
 		try {
 			imgName = URLDecoder.decode(imgName,"utf-8");//前面进行了两次编码，这里�?要用解码器解码一�?
 			
@@ -950,17 +974,18 @@ public class OrderInfoController{
 			}
 			os.close();
 			is.close();
-			ArrayList<String> imgList = new ArrayList<String>();
-			imgList.add("123");
-			imgList.add("456");
-			map.put("state",1);
-			map.put("imgs",imgList);
-			JSONObject re=JSONObject.fromObject(map);
-			PrintWriter pw = response.getWriter();
-			pw.print(re.toString());
-			pw.close();
+			
+			Integer row_id = Integer.parseInt(rowid);
+			//更新上传图片路径和信息
+			row = purchaseService.updateSizeChart(imgName,path,row_id);
 		} catch (Exception e) {
 			e.printStackTrace();
+			map.put("state", 0);
+		}
+		if(row>0) {
+			map.put("state", 1);
+		}else {
+			map.put("state", 0);
 		}
 		return map;
 	}
