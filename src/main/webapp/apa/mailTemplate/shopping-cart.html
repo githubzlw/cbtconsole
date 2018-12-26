@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title th:text="${title}">ImportExpress Mail Dismantling</title>
+  <title th:text="${title}">ImportExpress Notice of Lowering Price</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -64,30 +64,35 @@
     .rece_shop a{ color: #00B1FF; }
     .rece_shop a:hover{ text-decoration: underline;}
     .rece_shop p{ margin-bottom: 0;}
-    .estima_time{ margin-bottom: 0px; text-align: left;}
+    .estima_time{ margin-bottom: 0px; text-align: left;color: #333;}
+    .estima_time_color{ font-weight: bold; font-size: 18px;}
+    .estima_time_color span{ color: red;}
+    .order_off i{ text-decoration: line-through; margin-left: 5px; color: #999;}
     .dismantling_box{ width: 100%; text-align: left; margin: 15px auto 0; }
-    .order_number{ background-color: #e7e7e7; color: #464646; padding-left: 5px; text-align: left;}
+    .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
     .order_first{ width: 100%; margin: 0 auto 20px; }
-    .order_items{ text-align: left; font-size: 14px; font-weight: normal;;  color: red; margin-bottom: 0px; }
+    .order_first2{ margin: 0 auto 0;}
     .order_first ul{ width: 100%; margin-bottom: 5px; border-bottom: 1px dashed #aaabaf; overflow: hidden;box-sizing:border-box;}
-    .order_li{ float: left; width:190px;border:1px solid #e5e5e5;margin:5px; color: #333; padding: 5px;
-        list-style:none; height: 300px; overflow:hidden;}
+    .order_li{ float: left; width:46%;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
+        list-style:none; height: 338px; overflow:hidden;text-align: left;box-sizing:border-box;}
     .order_img{ width:100%; cursor: pointer; }
     .a6S{opacity: 0.01; left: 163px; top: 380.406px; position: absolute; font-weight: normal;}
-    .order_title{width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; margin: 0 auto;}
+    .order_title{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; margin: 0 auto; text-align:left;}
     .order_size{ text-align: left; width: 98%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       word-break: break-all; }
     .order_size span{border:1px solid #e1e1e1;}
     .order_pr{ margin: 0; text-align: left; }
     .order_usd{ text-align: left; color: #333; }
     .order_usd strong{ font-size: 14px; }
-    .order_usd_value{ margin-bottom: 10px;}
-    .order_number2{ color: red; }
-    .order_items2{ color:#333; }
-    .order_remark{ width: 100%; border-top: 2px solid #ffc167; }
+    .order_usd_due{ margin: 10px 0; border-top: 2px solid #ffc167; padding-top: 5px;}
+    .order_usd_due p{ margin-bottom: 0px;}
+    .order_remark{ width: 100%; margin-top: 5px; }
     .order_rem_p{ text-align: left; margin: 10px 0 0; color:#333;  }
     .refund_amount{font-weight: bold;border-top: 1px  dashed #AAABAF;margin-top: 5px; text-align: left;}
     .refund_amount h3{ font-size: 16px; font-weight: bold; margin: 8px 0;}
+    .order_pr strong{ color: red;}
+    .order_pr span{ text-decoration: line-through; color: #999;}
+
 
     .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
     .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
@@ -110,6 +115,15 @@
     .content table{width: 100%; margin:0 auto; }
     .clear{display: block;clear: both;}
     table.full-width-gmail-android{width: 100% !important;}
+
+    @media (min-width: 377px) and (max-width: 415px) {
+      .order_li{ height: 300px;}
+
+    }
+    @media (min-width: 320px) and (max-width: 376px) {
+      .order_li{ height: 275px;}
+
+    }
 
   </style>
 
@@ -210,9 +224,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                     <td class="soapbox-title" th:text="${title}">Import Express Split Order Reminder</td>
-                    <!--  拆单取消退款 标题
-                     <td class="soapbox-title">Your Import Express order was partially cancelled</td>-->
+                    <td class="soapbox-title">Notice of Lowering Price</td>
                   </tr>
                 </table>
 
@@ -220,106 +232,97 @@
                   <tr>
                     <td class="body-padding"></td>
                     <td class="body-padded">
-                      <div class="body-title">Hey <span th:text="${email}">first_name</span>,</div>
+                      <div class="body-title">Dear customer,</div>
                       <div class="dismantling_box" >
-                        <div class="rece_shop" th:if="${message !=''}">
-                          <p> Item <span th:text="${message}">123456</span> has been cancelled due to supply shortage.</p>
-                          <p>The order amount would be refunded to your balance, and you can check it in your
-                            <a href="https://www.import-express.com/individual/getCenter">individual center</a>. </p>
-                          <p>Should you have any question, please feel free to contact us at:+86 13615838327</p>
-                          <p>Thanks very much.</p></div>
-                        <div class="order_first" th:if="${state == 1}">
-                          <p class="rece_shop">Due to supply reasons, we might need more time to process your complete order and we will send you a portion of your order first.
-                            No more extra fee needed, only that you will receive more than one delivery. If you have any
-                            problem with it, please contact your
-                            account manager or our 24/7 whatsapp service number +86 13615838327 .</p>
 
-                          <p class="order_number"><strong>Order Number: <span th:text=" ${orderno}">QA18474027512271
-                              </span></strong></p>
-                          <p class="order_items order_items2" >Items to send you first:</p>
-                          <div class="order_usd">
-                            <strong th:if="${ orderbean !=null }">Product Value: <em
-                                    th:text="${currency}">USD</em>
-                              <em th:text="${orderbean.product_cost}">5.58</em> </strong>
-                            <p class="estima_time">Estimated Ship Out Time: <em th:text="${time_}">2018-10-18</em></p>
-                            <!--<p th:if="${expect_arrive_time_ != null && expect_arrive_time_ != ''}">-->
-                            <!--Estimated Arrival Time: <em th:text="${expect_arrive_time_}">2018-10-18</em>-->
-                            <!--</p>-->
-                          </div>
-                          <ul class="clearfix">
-                            <li class="order_li" th:each="detail,detailStat:${details}">
-                              <img th:src="${detail[5]}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                              <!-- <div class="a6S" dir="ltr" style="">
-                                 <div id=":1jr" class="T-I J-J5-Ji aQv T-I-ax7 L3 a5q" role="button" tabindex="0" aria-label="下载附件“”" data-tooltip-class="a1V" data-tooltip="下载">
-                                   <div class="aSK J-J5-Ji aYr"></div>
-                                 </div>
-                               </div>
-                               <img>-->
-                               <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses" th:text="${detail[4]}" th:title="${detail[4]}" >Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                               <div class="order_size" th:if="${detail[6]}!=null"  th:each="carType : ${#strings.arraySplit(detail[6],',')}">
-                                 <font th:if="${carType} != null">
-                                   <span th:text="${#strings.arraySplit(carType,'@')[0]}">Size:S</span>
-                                 </font>
-                               </div>
-                               <p class="order_pr"><em th:text="${detail[2]}">1</em> pc </p>
-                               <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
-                             </li>
-                           </ul>
-
-                           <!--<div class="rece_shop" >Due to the supply reason, part of your order can not be supplied and you can find-->
-                            <!--the below refund amount in <a href="http://www.import-express.com${autoUrl }" th:href="${autoUrl}">Your Account</a></div>-->
-                        </div>
-                        <p class="order_number order_number2">
-                          <strong> <i th:if="${state == 0}">Split </i>Order Number: <span
-                                  th:text="${orderbean_.orderNo}">QA18474027512271_1</span></strong>
-                        </p>
-                        <p class="order_items order_items2" th:if="${state == 1}">Items to send you after the first batch:</p>
-                        <p class="order_items order_items2" th:if="${state == 0}">Products unavailable:</p>
                         <div class="order_first">
+                          <div class="rece_shop">
+                            <p>I noticed that you were about to pick up some products on our website but haven’t completed your order</p>
+                            <p>Is there anything I could help you with?</p>
+                            <p>Here's your shopping cart list and some products are on sale!</p>
+                          </div>
+                          <p class="order_number">Price reduced items</p>
+                          <p class="estima_time">Item Name & Details:</p>
+
                           <ul class="clearfix">
-                            <li class="order_li" th:each="detail,detailStat:${details_}">
-                              <img th:src="${detail[5]}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                              <!-- <div class="a6S" dir="ltr" style="">
-                                 <div id=":1jr" class="T-I J-J5-Ji aQv T-I-ax7 L3 a5q" role="button" tabindex="0" aria-label="下载附件“”" data-tooltip-class="a1V" data-tooltip="下载">
-                                   <div class="aSK J-J5-Ji aYr"></div>
-                                 </div>
-                               </div>
-                               <img>-->
-                              <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses" th:text="${detail[4]}" th:title="${detail[4]}" >Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                              <div class="order_size" th:if="${detail[6]}!=null"  th:each="carType : ${#strings.arraySplit(detail[6],',')}">
-                                <font th:if="${carType} != null">
-                                  <span th:text="${#strings.arraySplit(carType,'@')[0]}">Size:S</span>
-                                </font>
+                            <li class="order_li">
+                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                               <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+                              <div class="order_size">
+                                <span>Color:Black</span>
                               </div>
-                              <p class="order_pr"><em th:text="${detail[2]}">1</em> pc </p>
-                              <p class="order_pr"><em th:text="${currency}">USD</em> <em th:text="${detail[3]}">5.58</em></p>
+                              <div class="order_size">
+                                   <span>Size:S</span>
+                               </div>
+                               <p class="order_pr"><em>1</em> pc </p>
+                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong> <span><em>USD</em> <em>6.58</em></span></p>
+                             </li>
+                            <li class="order_li">
+                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+                              <div class="order_size">
+                                <span>Color:Black</span>
+                              </div>
+                              <div class="order_size">
+                                <span>Size:S</span>
+                              </div>
+                              <p class="order_pr"><em>1</em> pc </p>
+                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong> <span><em>USD</em> <em>6.58</em></span></p>
+                            </li>
+                           </ul>
+                          <div class="order_usd">
+                            <strong>Products Cart Total: <em>USD</em>
+                              <em>36.0</em> </strong>
+                          </div>
+                          <div class="order_usd">
+                            <strong>Final Due:<em>USD</em>
+                              <em>28.8</em> </strong>
+                          </div>
+                        </div>
+                        <p class="order_number">Other Items in your shopping Cart</p>
+                        <p class="estima_time">Item Name & Details</p>
+                        <div class="order_first order_first2">
+                          <ul class="clearfix">
+                            <li class="order_li">
+                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+                              <div class="order_size">
+                                <span>Color:Black</span>
+                              </div>
+                              <div class="order_size">
+                                <span>Size:S</span>
+                              </div>
+                              <p class="order_pr"><em>1</em> pc </p>
+                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong></p>
+                            </li>
+                            <li class="order_li">
+                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+                              <div class="order_size">
+                                <span>Color:Black</span>
+                              </div>
+                              <div class="order_size">
+                                <span>Size:S</span>
+                              </div>
+                              <p class="order_pr"><em>1</em> pc </p>
+                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong></p>
                             </li>
                           </ul>
-                          <div class="order_usd order_usd_value">
-                            <strong>Product Value: <em th:text="${currency}">USD</em><em th:text="${orderbean_.product_cost}"> 5.58</em></strong>
+                          <div class="order_usd">
+                            <strong>Products Cart Total: <em>USD</em><em> 5.58</em></strong>
                           </div>
+                          <div class="order_usd order_usd_due">
+                            <p class="order_off"><strong>Shop Cart Final Due:
+                              <em>USD</em><em> 15.00</em></strong><i><strong>Shop Cart Total:<em>USD</em><em> 18.80</em></strong></i></p>
+                            <p class="estima_time estima_time_color">You have saved :USD 7.2 <span>(20.0% Off)</span> </p>
 
-                          <div class="order_usd" th:if="${state == 0}">
-                            <p>Offered Discount Deduction: <em th:text="${totalDisCount}">1</em></p>
-                            <p>Extra Shipping Fee Paid: <em th:text="${totalExtraFree}">1</em></p>
-                            <p style="clear: both;"></p>
-                            <div class="refund_amount">
-                              <h3>Refund Amount: <em th:text="${currency}">USD</em><em
-                                      th:text="${orderbean_.pay_price}">1</em></h3></div></div>
-                        </div>
-                        <div class="order_remark">
-                          <p class="order_rem_p"><strong>Remark:</strong><i th:text="${remark}">test_2018-10-18 13:37:19</i></p>
-                        </div>
-                      </div>
+                          </div>
+                          <p class="order_rem_p">If you have any further concerns or questions please feel free to ask me by responding to this Email</p>
                       <table class="body-signature-block">
                         <tr>
-                          <td class="body-signature-cell">
+                          <td class="body-signature-cell order_cart_bottom">
                             <p class="thanks_so">Thanks so much,</p>
                             <p>ImportExpress</p>
-                            <div class="please_note">
-                              <h3>PLEASE NOTE:</h3>
-                              <p>This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any question or concern, please access our <a href="https://www.import-express.com/" >Here</a>.</p>
-                            </div>
                           </td>
                         </tr>
                       </table>
