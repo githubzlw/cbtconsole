@@ -103,12 +103,12 @@ public class HeadInterceptor implements Filter {
 
 					if (admuser == null && "/website/".equals(servletPath)
 							|| admuser == null && ("/website/main_menu.jsp".equals(servletPath) || "/website/user_profit.jsp".equals(servletPath))) {
-						logger.error("1如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
+						logger.warn("1如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
 						logger.info("requestUrl:[{}]",requestUrl);
 						logger.info("Cache.getAllAuth():[{}]",Cache.getAllAuth());
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website" + loginPage);
 					} else if (admuser != null && "/website/".equals(servletPath)) {
-						logger.error("2如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
+						logger.warn("2如果没登录且访问后台页面或者session过期在menu页面刷新都转到登录页面");
 						logger.info("requestUrl:[{}]",requestUrl);
 						logger.info("Cache.getAllAuth():[{}]",Cache.getAllAuth());
 						httpServletResponse.sendRedirect(AppConfig.ip + "/website/main_menu.jsp");

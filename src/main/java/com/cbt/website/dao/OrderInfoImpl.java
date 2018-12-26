@@ -85,6 +85,22 @@ public class OrderInfoImpl implements OrderInfoDao {
 			}
 		}catch (Exception e){
 			e.printStackTrace();
+		}finally {
+			if(stmt!=null){
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if(rs!=null){
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;
 	}
