@@ -280,4 +280,10 @@ public interface IPurchaseService {
 
 	int updateAutoOrderFlag(List<Integer> idsList);
 
+	List<Map<String, Object>> getSizeChart(String  catid);
+
+	List<Map<String, Object>> loadCategoryName(String catid);
+	public int updateSizeChart(String imgname,String localpath,int rowid);
+	public int updateSizeChartById(List<Integer> rowidArray,int userid);
+
 }

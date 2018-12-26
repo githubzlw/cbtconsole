@@ -25,7 +25,11 @@ import ceRong.tools.bean.SearchLog;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
+import net.sf.json.JSONObject;
+import sun.misc.BASE64Decoder;
+
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,8 +40,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +65,8 @@ public class OrderInfoController{
 	private SendMailFactory sendMailFactory;
 	@Autowired
 	private ISpiderServer spiderService;
-
+	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+	//private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		Map<String,String> map=new HashMap<String,String>();
@@ -806,7 +817,7 @@ public class OrderInfoController{
 			if(result_list!=null) {
 				for(int i=0;i<result_list.size();i++) {
 					String str = result_list.get(i);
-					if(str.indexOf("access_token")>-1) {
+					if(str.indexOf("access_token")>-1){
 						String[] strArr = str.replace("{", "").replace("}", "").split(",");
 						for(String sss:strArr) {
 							if(sss.indexOf("access_token")>-1) {
@@ -892,6 +903,102 @@ public class OrderInfoController{
 			list_map.add(map);
 		}
 		return list_map;
+	}
+	
+	@RequestMapping(value = "/getSizeChart")
+	public @ResponseBody List<Map<String,Object>> getSizeChart(HttpServletRequest request){
+		String catid = request.getParameter("catid");
+		String rowidListstr = request.getParameter("rowidListstr");
+		List<Integer> rowidList = new ArrayList<Integer>();
+		if(StringUtils.isNotBlank(rowidListstr)) {
+			String[] rowidArrays = rowidListstr.split(",");
+			for(String idstr:rowidArrays) {
+				if(StringUtils.isBlank(idstr)) {
+					continue;
+				}else {
+					idstr = idstr.replaceAll("\\s*","");
+				}
+				rowidList.add(Integer.parseInt(idstr));
+			}
+		}
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		if(StringUtils.isNotBlank(admuserJson)) {
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+			//标记为已处理
+			if(rowidList.size()>0&&adm!=null) {
+				purchaseService.updateSizeChartById(rowidList,adm.getId());
+			}
+			
+		}
+		return purchaseService.getSizeChart(catid);
+	}
+	
+	@RequestMapping(value = "/loadCategoryName")
+	public @ResponseBody List<Map<String,Object>> loadCategoryName(HttpServletRequest request){
+		String catid = request.getParameter("catid");
+		return purchaseService.loadCategoryName(catid);
+	}
+	
+	@RequestMapping(value = "/uploadImg")
+	public @ResponseBody Map<String,Object> uploadImg(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> map = new HashMap<String,Object>();
+		response.setContentType("text/html;charset=utf-8");
+		String imgObj = request.getParameter("imgFile");
+		String imgName = request.getParameter("imgName");
+		String rowid = request.getParameter("rowid");
+		String pid = request.getParameter("pid");
+		if(StringUtils.isBlank("pid")) {
+			pid = "1111111";
+		}
+		int row = 0;
+		try {
+			imgName = URLDecoder.decode(imgName,"utf-8");//前面进行了两次编码，这里�?要用解码器解码一�?
+			
+			//String path = imgSavePath+File.separator+imgName;//Windows文件保存路径
+			// 获取配置文件信息
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            String localDiskPath = ftpConfig.getLocalDiskPath();
+            String imgSavePath = localDiskPath + pid ;
+            String path = imgSavePath + File.separator +imgName;
+			//如果文件夹不存在则创�?
+			File file = new File(imgSavePath);
+			if(!file.exists() && !file.isDirectory()){
+				file.mkdirs();//生成�?有目�?
+			}
+			
+			//�? 提交的imgObj 保存到指定目�?
+			FileOutputStream os = new FileOutputStream(path);
+			imgObj = imgObj.replaceAll("#wb#", "+");
+			BASE64Decoder decoder = new BASE64Decoder();
+			byte[] b = decoder.decodeBuffer(imgObj);
+			for(int i=0;i< b.length;++i){
+			   if(b[i]< 0){//调整异常数据
+			      b[i]+=256;
+			   }
+			}
+			InputStream is = new ByteArrayInputStream(b);
+			int len = 0;
+			while((len=is.read(b))!=-1){
+			   os.write(b,0,len);
+			}
+			os.close();
+			is.close();
+			
+			Integer row_id = Integer.parseInt(rowid);
+			//更新上传图片路径和信息
+			row = purchaseService.updateSizeChart(imgName,path,row_id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("state", 0);
+		}
+		if(row>0) {
+			map.put("state", 1);
+		}else {
+			map.put("state", 0);
+		}
+		return map;
 	}
 	
 	/**
