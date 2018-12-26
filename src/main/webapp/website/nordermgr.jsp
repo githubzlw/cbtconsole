@@ -286,7 +286,11 @@ function fn(va) {
             html_+="</td>";
 			$("#table tr:eq(" + row + ") td:eq(15)").after(html_);
 		}else{
-			$("#table tr:eq(" + row + ") td:eq(15)").after("<td></td>");
+		    var html_="";
+            if(checkType == "checkOrder"){
+                html_+="<a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+            }
+			$("#table tr:eq(" + row + ") td:eq(15)").after("<td>"+html_+"</td>");
 		}
 		if(json[i].orderremarks==undefined || json[i].orderremarks=="null" || json[i].orderremarks==""){
 			$("#table tr:eq(" + row + ") td:eq(16)").after("<td>无</td>");
