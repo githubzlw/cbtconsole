@@ -597,7 +597,7 @@ function reFreshoDate() {
 
 	function sendCheckEmailForUser(){
 		var orderid=$("#checkOrderid").val();
-		var email="919923437@qq.com";//$("#checkEmail").val();
+		var email=$("#checkEmail").val();
 		var remark=$("#checkRemark").val();
         $.ajax({
             type: "POST",//方法类型
