@@ -324,6 +324,15 @@ public class GoodsDao implements IGoodsDao{
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
 		}
 		return list;
 	}

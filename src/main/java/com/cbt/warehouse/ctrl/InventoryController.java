@@ -204,9 +204,6 @@ public class InventoryController {
 				if(Integer.valueOf(new_remaining)<=0){
 					//如果库存为0则更改库存标识
 					inventoryService.updateIsStockFlag(i.getGoods_pid());
-					DataSourceSelector.set("dataSource28_corss");
-					inventoryService.updateIsStockFlag1(i.getGoods_pid());
-					DataSourceSelector.restore();
 					SendMQ sendMQ = new SendMQ();
 					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
 					sendMQ.closeConn();
@@ -619,9 +616,6 @@ public class InventoryController {
 				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'"));
 				//如果库存为0则更改库存标识
 				inventoryService.updateIsStockFlag(goods_pid);
-				DataSourceSelector.set("dataSource28_corss");
-				inventoryService.updateIsStockFlag1(goods_pid);
-				DataSourceSelector.restore();
 				//记录删除该库存的人
 				String admuserJson = Redis.hget(adm_id, "admuser");
 				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -629,8 +623,6 @@ public class InventoryController {
 				sendMQ.closeConn();
 			}catch (Exception e){
 				e.printStackTrace();
-			}finally {
-				DataSourceSelector.restore();
 			}
 		}
 

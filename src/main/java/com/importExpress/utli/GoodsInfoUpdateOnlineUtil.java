@@ -1,14 +1,31 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.util.DateFormatUtil;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
+import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class GoodsInfoUpdateOnlineUtil {
+    private static final Log logger = LogFactory.getLog(GoodsInfoUpdateOnlineUtil.class);
+    private static OKHttpUtils okHttpUtils = new OKHttpUtils();
+
+    private static final String MONGODB_UPDATE_GOODS_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b006";// 刷新刷新solr的
+
+    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
+    // private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
+    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";// 刷新刷新solr的
 
     /**
      * sku使用MQ更新AWS服务器数据
@@ -38,6 +55,7 @@ public class GoodsInfoUpdateOnlineUtil {
             NotifyToCustomerUtil.sendSqlByMq(sql);
         }
     }
+
 
     /**
      * MQ更新商品信息到AWS服务器
@@ -80,14 +98,66 @@ public class GoodsInfoUpdateOnlineUtil {
         NotifyToCustomerUtil.sendSqlByMq("update custom_benchmark_ready set valid = 1" + mqSql.toString());
     }
 
+
     /**
-     * 批量下架AWS商品
+     * MongoDB更新商品信息到AWS服务器
+     *
+     * @param bean
+     */
+    public static boolean publishToOnlineByMongoDB(CustomGoodsPublish bean) {
+        InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+
+        inputData.setKeyword(bean.getKeyword());
+        inputData.setEninfo(checkAndReplaceQuotes(bean.getEninfo()));
+        inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
+        inputData.setWeight(bean.getWeight());
+        inputData.setImg(bean.getImg());
+        inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
+        inputData.setRevise_weight(bean.getReviseWeight());
+        inputData.setFinal_weight(bean.getFinalWeight());
+        inputData.setPrice(bean.getPrice());
+        inputData.setWprice(bean.getWprice());
+        inputData.setRange_price(bean.getRangePrice());
+        // inputData.setSku(bean.getSku());
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setBm_flag("1");
+        inputData.setGoodsstate("4");
+        if (bean.getIsEdited() == 1) {
+            inputData.setFinalName(checkAndReplaceQuotes(bean.getEnname()));
+        } else if (bean.getIsEdited() == 2) {
+            inputData.setFinalName(checkAndReplaceQuotes(bean.getEnname()));
+            inputData.setInfoReviseFlag("1");
+            inputData.setPriceReviseFlag("1");
+        }
+        if (StringUtils.isNotBlank(bean.getFeeprice())) {
+            inputData.setFeeprice(bean.getFeeprice());
+        }
+        if (bean.getEninfo() == null || "".equals(bean.getEninfo()) || bean.getEninfo().length() < 10) {
+            inputData.setIs_show_det_img_flag("0");
+        } else {
+            inputData.setIs_show_det_img_flag("1");
+        }
+        inputData.setEntype(bean.getEntype());
+        inputData.setSellunit(bean.getSellUnit());
+        inputData.setAli_pid(bean.getAliGoodsPid());
+        inputData.setAli_price(bean.getAliGoodsPrice());
+        inputData.setMatchSource(String.valueOf(bean.getMatchSource()));
+        inputData.setPid(bean.getPid());
+        inputData.setValid("1");
+        inputData.setGoodsstate("4");
+        //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
+        return updateOnlineAndSolr(inputData, 1);
+    }
+
+
+    /**
+     * MQ批量下架AWS商品
      *
      * @param state
      * @param pids
      * @param adminid
      */
-    public static void batchUpdateGoodsState(int state, String pids, int adminid) {
+    public static void batchUpdateGoodsStateByMQ(int state, String pids, int adminid) {
         String[] pidList = pids.split(",");
         for (String pid : pidList) {
             if (StringUtils.isNotBlank(pid)) {
@@ -99,7 +169,36 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
-    public void setGoodsValid(String pid, int type) {
+    /**
+     * MongoDB批量下架AWS商品
+     *
+     * @param state
+     * @param pids
+     * @param adminid
+     */
+    public static boolean batchUpdateGoodsStateMongoDB(int state, String pids, int adminid) {
+        int total = 0;
+        int count = 0;
+        InputData inputData;// u表示更新；c表示创建，d表示删除
+        String[] pidList = pids.split(",");
+        for (String pid : pidList) {
+            if (StringUtils.isNotBlank(pid)) {
+                total++;
+                inputData = new InputData('u');
+                inputData.setValid((state == 4 ? "1" : "0"));
+                inputData.setGoodsstate(String.valueOf(4));
+                inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+                inputData.setPid(pid);
+                if (updateOnlineAndSolr(inputData, 1)) {
+                    count++;
+                }
+            }
+        }
+        return total == count;
+    }
+
+
+    public static void setGoodsValidByMq(String pid, int type) {
         String sql = "update custom_benchmark_ready set valid=" + (type == 1 ? 1 : 0) + ",goodsstate=" + (type == 1 ? 4 : 2);
         if (type != 1) {
             sql += ",unsellableReason = 6";
@@ -108,6 +207,26 @@ public class GoodsInfoUpdateOnlineUtil {
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
+
+    public static boolean setGoodsValidByMongoDb(String pid, int type) {
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setValid((type == 1 ? "1" : "0"));
+        inputData.setGoodsstate(type == 1 ? "4" : "2");
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setUnsellableReason("6");
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 1);
+    }
+
+    public static boolean setNoBenchmarkingMongoDb(String pid) {
+        // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setAli_weight("0");
+        inputData.setBm_flag("2");
+        inputData.setIsBenchmark("3");
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 0);
+    }
 
     /**
      * 替换字符串中的逗号
@@ -128,4 +247,134 @@ public class GoodsInfoUpdateOnlineUtil {
         return tempStr;
     }
 
+
+    public static boolean updateOnlineAndSolr(InputData inputData, int isSolr) {
+        JsonResult json = new JsonResult();
+        File file = null;
+        try {
+            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
+            if (file != null) {
+                String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_ONLINE, file);
+                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product:[" + result + "]");
+                if (StringUtils.isNotBlank(result)) {
+                    file.delete();
+                    if (isSolr > 0) {
+                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "006.json", result);
+                        if (file != null) {
+                            result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_ONLINE, file);
+                            System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr online:[" + result + "]");
+                            if (StringUtils.isNotBlank(result)) {
+                                json.setOk(false);
+                                json.setData(result);
+                            } else {
+                                json.setOk(false);
+                                json.setMessage("online执行调用mongodb更新solr接口失败");
+                                System.err.println(inputData.getPid() + ",online执行调用mongodb更新solr接口失败");
+                                logger.error(inputData.getPid() + ",online执行调用mongodb更新solr接口失败");
+                            }
+                        } else {
+                            json.setOk(false);
+                            json.setMessage("solr生成json文件失败");
+                            System.err.println(inputData.getPid() + ",online solr生成json文件失败");
+                            logger.error(inputData.getPid() + ",online solr生成json文件失败");
+                        }
+
+                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("online执行调用mongodb更新产品接口失败");
+                    System.err.println(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
+                    logger.error(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("online产品生成json文件失败");
+                System.err.println(inputData.getPid() + ",online产品生成json文件失败");
+                logger.error(inputData.getPid() + ",online产品生成json文件失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        } finally {
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+        }
+
+        if (json.isOk()) {
+            updateLocalAndSolr(inputData, isSolr);
+        }
+        return json.isOk();
+    }
+
+
+    public static boolean updateLocalAndSolr(InputData inputData, int isSolr) {
+        JsonResult json = new JsonResult();
+        File file = null;
+        try {
+            file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
+            if (file != null) {
+                String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
+                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product:[" + result + "]");
+                if (StringUtils.isNotBlank(result)) {
+                    file.delete();
+                    if (isSolr > 0) {
+                        file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "006.json", result);
+                        if (file != null) {
+                            result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_LOCAL, file);
+                            System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr local:[" + result + "]");
+                            if (StringUtils.isNotBlank(result)) {
+                                json.setOk(false);
+                                json.setData(result);
+                            } else {
+                                json.setOk(false);
+                                json.setMessage("local执行调用mongodb更新solr接口失败");
+                                System.err.println(inputData.getPid() + ",local执行调用mongodb更新solr接口失败");
+                                logger.error(inputData.getPid() + ",local执行调用mongodb更新solr接口失败");
+                            }
+                        } else {
+                            json.setOk(false);
+                            json.setMessage("local solr生成json文件失败");
+                            System.err.println(inputData.getPid() + ",local solr生成json文件失败");
+                            logger.error(inputData.getPid() + ",local solr生成json文件失败");
+                        }
+
+                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("local执行调用mongodb更新产品接口失败");
+                    System.err.println(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
+                    logger.error(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("local产品生成json文件失败");
+                System.err.println(inputData.getPid() + ",local产品生成json文件失败");
+                logger.error(inputData.getPid() + ",local产品生成json文件失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage(e.getMessage());
+        } finally {
+            if (file != null && file.exists()) {
+                file.delete();
+            }
+        }
+
+        return json.isOk();
+    }
+
+
+    private static File writeToLocal(String fileName, String json) throws Exception {
+        File file = new File(fileName);
+        FileHelper.writeFile(file, json);
+        file = new File(fileName);
+        if (file.exists()) {
+            return file;
+        } else {
+            return null;
+        }
+    }
 }
