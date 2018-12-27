@@ -255,36 +255,37 @@ public class GoodsInfoUpdateOnlineUtil {
             file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_ONLINE, file);
-                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product:[" + result + "]");
-                if (StringUtils.isNotBlank(result)) {
+                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product online:[" + result + "]");
+                if (StringUtils.isBlank(result) || result.contains("false") || result.contains("FAILED")) {
+                    json.setOk(false);
+                    json.setMessage("online执行调用mongodb更新产品接口失败");
+                    System.err.println(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
+                    logger.error(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
+                } else {
                     file.delete();
+                    json.setOk(true);
+                    json.setData(result);
                     if (isSolr > 0) {
                         file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "006.json", result);
                         if (file != null) {
                             result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_ONLINE, file);
                             System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr online:[" + result + "]");
-                            if (StringUtils.isNotBlank(result)) {
-                                json.setOk(false);
-                                json.setData(result);
-                            } else {
+                            if (StringUtils.isBlank(result) || result.contains("false") || result.contains("FAILED")) {
                                 json.setOk(false);
                                 json.setMessage("online执行调用mongodb更新solr接口失败");
                                 System.err.println(inputData.getPid() + ",online执行调用mongodb更新solr接口失败");
                                 logger.error(inputData.getPid() + ",online执行调用mongodb更新solr接口失败");
+                            } else {
+                                json.setOk(true);
+                                json.setData(result);
                             }
                         } else {
                             json.setOk(false);
-                            json.setMessage("solr生成json文件失败");
+                            json.setMessage("online solr生成json文件失败");
                             System.err.println(inputData.getPid() + ",online solr生成json文件失败");
                             logger.error(inputData.getPid() + ",online solr生成json文件失败");
                         }
-
                     }
-                } else {
-                    json.setOk(false);
-                    json.setMessage("online执行调用mongodb更新产品接口失败");
-                    System.err.println(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
-                    logger.error(inputData.getPid() + ",online执行调用mongodb更新产品接口失败");
                 }
             } else {
                 json.setOk(false);
@@ -316,22 +317,29 @@ public class GoodsInfoUpdateOnlineUtil {
             file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
-                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product:[" + result + "]");
-                if (StringUtils.isNotBlank(result)) {
+                System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",product local:[" + result + "]");
+                if (StringUtils.isBlank(result) || result.contains("false") || result.contains("FAILED")) {
+                    json.setOk(false);
+                    json.setMessage("local执行调用mongodb更新产品接口失败");
+                    System.err.println(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
+                    logger.error(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
+                } else {
                     file.delete();
+                    json.setOk(true);
+                    json.setData(result);
                     if (isSolr > 0) {
                         file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "006.json", result);
                         if (file != null) {
                             result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_SOLR_URL_LOCAL, file);
                             System.err.println("pid:" + inputData.getPid() + ",valid:" + inputData.getValid() + ",solr local:[" + result + "]");
-                            if (StringUtils.isNotBlank(result)) {
-                                json.setOk(false);
-                                json.setData(result);
-                            } else {
+                            if (StringUtils.isBlank(result) || result.contains("false") || result.contains("FAILED")) {
                                 json.setOk(false);
                                 json.setMessage("local执行调用mongodb更新solr接口失败");
                                 System.err.println(inputData.getPid() + ",local执行调用mongodb更新solr接口失败");
                                 logger.error(inputData.getPid() + ",local执行调用mongodb更新solr接口失败");
+                            } else {
+                                json.setOk(true);
+                                json.setData(result);
                             }
                         } else {
                             json.setOk(false);
@@ -339,13 +347,7 @@ public class GoodsInfoUpdateOnlineUtil {
                             System.err.println(inputData.getPid() + ",local solr生成json文件失败");
                             logger.error(inputData.getPid() + ",local solr生成json文件失败");
                         }
-
                     }
-                } else {
-                    json.setOk(false);
-                    json.setMessage("local执行调用mongodb更新产品接口失败");
-                    System.err.println(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
-                    logger.error(inputData.getPid() + ",local执行调用mongodb更新产品接口失败");
                 }
             } else {
                 json.setOk(false);
@@ -362,14 +364,17 @@ public class GoodsInfoUpdateOnlineUtil {
                 file.delete();
             }
         }
-
         return json.isOk();
     }
 
 
     private static File writeToLocal(String fileName, String json) throws Exception {
+        String tempJson = json;
+        if (tempJson.contains("\\\\\\")) {
+            tempJson = tempJson.replace("\\\\\\", "\\");
+        }
         File file = new File(fileName);
-        FileHelper.writeFile(file, json);
+        FileHelper.writeFile(file, tempJson);
         file = new File(fileName);
         if (file.exists()) {
             return file;

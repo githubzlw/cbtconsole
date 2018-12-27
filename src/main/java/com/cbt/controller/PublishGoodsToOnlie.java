@@ -87,11 +87,17 @@ public class PublishGoodsToOnlie extends Thread {
                             if (StringUtils.isBlank(wdImg)) {
                                 continue;
                             } else if (wdImg.contains(localShowPath)) {
-                                imgList.add(wdImg);
-                                // 上面小图60x60的，下面大图400x400的
-                                imgList.add(wdImg.replace("60x60", "400x400"));
-                                // 替换本地路径为远程路径
-                                tempImgs.add(wdImg.replace(localShowPath, remoteShowPath));
+                                // 判断图片是否存在，不存在删除
+                                if (checkIsExistsLocalImg(wdImg.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
+                                    imgList.add(wdImg);
+                                    // 上面小图60x60的，下面大图400x400的
+                                    imgList.add(wdImg.replace("60x60", "400x400"));
+                                    // 替换本地路径为远程路径
+                                    tempImgs.add(wdImg.replace(localShowPath, remoteShowPath));
+                                } else {
+                                    // 本地文件不存的，删除数据
+                                    windowImgs.set(i, "");
+                                }
                             }else if(wdImg.contains("192.168.1")){
                                 // 清空原来服务器上传的图片数据，原因：图片路劲对应服务器本地路劲已经失效，无法再同步到服务器
                                 windowImgs.set(i, "");
@@ -114,9 +120,14 @@ public class PublishGoodsToOnlie extends Thread {
                             if (StringUtils.isBlank(imgUrl)) {
                                 continue;
                             } else if (imgUrl.contains(localShowPath)) {
-                                imgList.add(imgUrl);
-                                // 替换本地路径为远程路径
-                                imel.attr("src", imgUrl.replace(localShowPath, remoteShowPath));
+                                if (checkIsExistsLocalImg(imgUrl.replace(localShowPath, ftpConfig.getLocalDiskPath()))) {
+                                    imgList.add(imgUrl);
+                                    // 替换本地路径为远程路径
+                                    imel.attr("src", imgUrl.replace(localShowPath, remoteShowPath));
+                                } else {
+                                    // 本地文件不存在的，移除
+                                    imel.remove();
+                                }
                             }else if(imgUrl.contains("192.168.1")){
                                 // 判断本地路径非当前配置的上传图片地址，移除数据
                                 imel.remove();
@@ -236,6 +247,11 @@ public class PublishGoodsToOnlie extends Thread {
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");
+    }
+
+    private boolean checkIsExistsLocalImg(String fileName){
+        File file = new File(fileName);
+        return file.exists() && file.isFile();
     }
 
     // 处理1688商品的规格图片数据
