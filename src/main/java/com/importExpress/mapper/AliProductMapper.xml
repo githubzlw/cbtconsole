@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.mapper.AliProductMapper">
+    <resultMap id="aliProductResultMap" type="com.importExpress.pojo.AliProductBean">
+        <id column="id" property="id"/>
+        <result column="ali_pid" property="aliPid"/>
+        <result column="ali_name" property="aliName"/>
+        <result column="ali_img" property="aliImg"/>
+        <result column="ali_price" property="aliPrice"/>
+        <result column="ali_url" property="aliUrl"/>
+        <result column="li_unit" property="aliUnit"/>
+        <result column="keyword" property="keyword"/>
+        <result column="ali_catid" property="aliCatid"/>
+        <result column="ali_weight" property="aliWeight"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="importProductResultMap" type="com.importExpress.pojo.ImportProductBean">
+        <id column="id" property="id"/>
+        <result column="ali_pid" property="aliPid"/>
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <result column="img" property="img"/>
+        <result column="price" property="price"/>
+        <result column="url" property="url"/>
+        <result column="unit" property="unit"/>
+        <result column="catid" property="catid"/>
+        <result column="weight" property="weight"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+
+    <select id="queryForList" resultMap="aliProductResultMap" parameterType="com.importExpress.pojo.AliProductBean">
+        select id,ali_pid,ali_url,ali_price,ali_img,keyword, DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        from aa_aliexpress_product
+        where 1=1
+        <if test="aliPid != null">
+            and ali_pid = #{aliPid}
+        </if>
+        <if test="keyword != null">
+            and keyword = #{keyword}
+        </if>
+        <if test="aliCatid != null">
+            and ali_catid = #{aliCatid}
+        </if>
+
+        <if test="adminId != null">
+            and admin_id = #{adminId}
+        </if>
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryForListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.AliProductBean">
+        select count(1)
+        from aa_aliexpress_product
+        where 1=1
+        <if test="aliPid != null">
+            and ali_pid = #{aliPid}
+        </if>
+        <if test="keyword != null">
+            and keyword = #{keyword}
+        </if>
+        <if test="aliCatid != null">
+            and ali_catid = #{aliCatid}
+        </if>
+        <if test="adminId != null">
+            and admin_id = #{adminId}
+        </if>
+    </select>
+
+
+    <select id="query1688ByLire" resultMap="importProductResultMap">
+        select id,ali_pid,pid,url,price,img,unit,catid,weight,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        from aa_ali_product_lire
+        where ali_pid = #{aliPid}
+    </select>
+
+
+    <select id="query1688ByPython" resultMap="importProductResultMap">
+        select id,ali_pid,pid,url,price,img,unit,catid,weight,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        from aa_ali_product_lire
+        where ali_pid = #{aliPid}
+    </select>
+
+</mapper>
