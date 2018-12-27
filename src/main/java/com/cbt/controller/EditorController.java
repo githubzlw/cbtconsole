@@ -1268,15 +1268,29 @@ public class EditorController {
                             String originalName = mf.getOriginalFilename();
                             // 文件的后缀取出来
                             String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
-                            String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)) + fileSuffix);
+                            String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                             // 本地服务器磁盘全路径
-                            String localFilePath = "importimg/" + pid + "/" + saveFilename;
+                            String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
                             ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                             // 检查图片分辨率
                             boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
                             if (is) {
-                                msg = ftpConfig.getLocalShowPath() + localFilePath;
+                                is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
+                                if (is) {
+                                    String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                    is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                            localDiskPath + newLocalPath);
+                                    if (is) {
+                                        msg = ftpConfig.getLocalShowPath() + newLocalPath;
+                                    } else {
+                                        json.setOk(false);
+                                        json.setMessage("压缩图片到700*700失败，终止执行");
+                                        break;
+                                    }
+                                } else {
+                                    msg = ftpConfig.getLocalShowPath() + localFilePath;
+                                }
                             } else {
                                 // 判断分辨率不通过删除图片
                                 File file = new File(localFilePath);
