@@ -31,6 +31,7 @@ import com.cbt.website.server.PurchaseServerImpl;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.thread.PurchaseThred;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -7033,11 +7034,12 @@ public class PurchaseDaoImpl implements PurchaseDao {
 					stmt.executeUpdate();
 					DBHelper.getInstance().closeConnection(conn28);
 					//线上表
-					Connection conn2 = DBHelper.getInstance().getConnection2();
-					sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-					stmt = conn2.prepareStatement(sql);
-					stmt.executeUpdate();
-					DBHelper.getInstance().closeConnection(conn2);
+//					Connection conn2 = DBHelper.getInstance().getConnection2();
+//					sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
+//					stmt = conn2.prepareStatement(sql);
+//					stmt.executeUpdate();
+//					DBHelper.getInstance().closeConnection(conn2);
+					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 				}
 				sql="update order_details set inventory_remark='此次不使用库存' where id="+map.get("od_id")+"";
 				stmt=conn.prepareStatement(sql);

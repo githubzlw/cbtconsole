@@ -161,6 +161,7 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 
 	@Override
 	public long updateAuthorizedInfo(ShopUrlAuthorizedInfoPO bean) {
+	    tabSeachPageMapper.updateShopBrand(bean);
 	    if (bean.getId() != null){
             return tabSeachPageMapper.updateAuthorizedInfo(bean);
         }
@@ -169,7 +170,14 @@ public class TabSeachPageServiceImpl implements TabSeachPageService {
 
 	@Override
 	public ShopUrlAuthorizedInfoPO queryAuthorizedInfo(String shopId) {
-		return tabSeachPageMapper.queryAuthorizedInfo(shopId);
+	    String shopBrand = tabSeachPageMapper.queryShopBrand(shopId);
+        ShopUrlAuthorizedInfoPO bean = tabSeachPageMapper.queryAuthorizedInfo(shopId);
+        if (bean == null){
+            bean = new ShopUrlAuthorizedInfoPO();
+            bean.setShopId(shopId);
+        }
+        bean.setShopBrand(shopBrand);
+        return bean;
 	}
 
 	@Override

@@ -26,8 +26,8 @@ public class SendMQ {
     private final static String QUEUE_NAME = "updateTbl";
 
     /** 优惠卷json数据*/
-//    private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上
-    private final static String COUPON_NAME = "coupon2"; //发送优惠卷信息到镜像服
+    private final static String COUPON_NAME = "coupon"; //发送优惠卷到线上 （mq 连接27更新线上，连接98更新153）
+//    private final static String COUPON_NAME = "coupon2"; //发送优惠卷信息到镜像服 未使用
 
     /**  优惠卷json数据*/
     private final static String RECOMMEND_NAME = "recommend";

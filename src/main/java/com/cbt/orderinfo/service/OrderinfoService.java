@@ -464,6 +464,7 @@ public class OrderinfoService implements IOrderinfoService {
 					//查询上一次该商品发货的订单信息
 					check=iWarehouseDao.getBatckInfo(goods_pid);
 				}
+				check=StringUtil.isBlank(check)?"-":check;
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
@@ -654,8 +655,10 @@ public class OrderinfoService implements IOrderinfoService {
 			SendMQ sendMQ = new SendMQ();
 			row=dao.queryAdmin(map);
 			if(row>0){
-				//更新销售人
-				row=dao.updateAdminUser(map);
+                //更新商业询盘中分配的数据
+			    dao.updateBusiess(map);
+                //更新销售人
+                row=dao.updateAdminUser(map);
 				if(row>0){
 					sendMQ.sendMsg(new RunSqlModel("update admin_r_user set adminid="+map.get("adminid")+",admName='"+map.get("admName")+"' where userid="+map.get("userid")+""));
 				}
@@ -1670,6 +1673,16 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public int updateOrderinfoUpdateState(String orderNo) {
 		return dao.updateOrderinfoUpdateState(orderNo);
+	}
+
+	@Override
+	public int checkRecord(String orderNo) {
+		return dao.checkRecord(orderNo);
+	}
+
+	@Override
+	public int insertEmailRecord(String orderNo) {
+		return dao.insertEmailRecord(orderNo);
 	}
 
 	@Override

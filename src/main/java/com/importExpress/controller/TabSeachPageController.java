@@ -812,9 +812,10 @@ public class TabSeachPageController {
 		String startTime = request.getParameter("startTime");
 		String endTime = request.getParameter("endTime");
 		String remark = request.getParameter("authorized_remark");
+		String shopBrand = request.getParameter("authorized_shop_brand");
         ShopUrlAuthorizedInfoPO bean = new ShopUrlAuthorizedInfoPO(StringUtils.isBlank(id)?null:Long.parseLong(id), shopId, adminId, admName,
 				StringUtils.isNotBlank(startTime)?DATEFORMAT.parse(startTime):null,
-				StringUtils.isNotBlank(endTime)?DATEFORMAT.parse(endTime):null, remark);
+				StringUtils.isNotBlank(endTime)?DATEFORMAT.parse(endTime):null, remark, shopBrand);
 
         String[] imgInfo = SearchFileUtils.comFileUpload(file, "AuthorizedFile", null, null, null, 0);
         if (null != imgInfo && imgInfo.length > 0) {
