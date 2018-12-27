@@ -18,7 +18,7 @@
 	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode); -->
 	<select id="queryTabCouponListCount" resultType="long">
 		SELECT COUNT(1)
-		FROM tab_coupon_available
+		FROM tab_coupon_new
 		<where>
 			<if test="typeCode != null">
 				 type_code = #{typeCode}
@@ -49,6 +49,30 @@
     <!-- Long checkCouponCode(@Param("couponCode") String couponCode); -->
     <select id="checkCouponCode" resultType="Long">
     	SELECT COUNT(1) FROM tab_coupon_new WHERE id = #{couponCode}
+    </select>
+
+    <!--TabCouponNew queryTabCouponOne(@Param("couponCode") String couponCode);-->
+    <select id="queryTabCouponOne" resultType="com.importExpress.pojo.TabCouponNew">
+        SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid,
+        a.mqlog, a.createtime, b.admName username
+		FROM tab_coupon_new a
+		LEFT JOIN admuser b ON a.userid = b.id
+		WHERE a.id = #{couponCode}
+    </select>
+
+    <!--void insertCouponUsers(@Param("bean") TabCouponNew bean, @Param("list") List<String> list);-->
+    <insert id="insertCouponUsers">
+        <foreach collection="list" separator=";" item="item">
+            INSERT INTO tab_coupon_user (userid, couponCode, createtime, coupon_state, type)
+            VALUES (#{item}, #{bean.id}, NOW(), '1', #{bean.type})
+        </foreach>
+    </insert>
+
+    <!--String queryTabCouponUser(@Param("couponCode") String couponCode);-->
+    <select id="queryTabCouponUser" resultType="String">
+        SELECT GROUP_CONCAT(userid) FROM tab_coupon_user
+        WHERE couponCode = #{couponCode}
+        GROUP BY couponCode
     </select>
     
 </mapper>

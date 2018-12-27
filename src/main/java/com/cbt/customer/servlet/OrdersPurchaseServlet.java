@@ -10,6 +10,8 @@ import com.cbt.parse.bean.TypeBean;
 import com.cbt.parse.service.GoodsBean;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.TypeUtils;
+import com.cbt.pay.service.IOrderServer;
+import com.cbt.pay.service.OrderServer;
 import com.cbt.pojo.Admuser;
 import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.dao.UserDao;
@@ -56,7 +58,7 @@ public class OrdersPurchaseServlet extends HttpServlet {
 	
 	//新采购信息查询
 	public void findOrdersPurchaseInfo(HttpServletRequest request, HttpServletResponse response) {
-		
+		IOrderServer os = new OrderServer();
 		//订单号
 		String orderNo = request.getParameter("orderNo");
 		//销量
@@ -78,7 +80,7 @@ public class OrdersPurchaseServlet extends HttpServlet {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+		os.initCheckData(orderNo);
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();

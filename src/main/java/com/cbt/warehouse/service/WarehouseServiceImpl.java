@@ -1839,19 +1839,24 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<ShippingPackage> getPackageInfoList(Map<String, String> map) {
-        List<ShippingPackage> list = dao.getPackageInfoList(map);
-        for(ShippingPackage bean:list){
-            bean.setIsDropshipFlag(0);
-        }
-        List<ShippingPackage> dropshipList = dao.getDropshipPackageInfoList(map);
-        for(ShippingPackage bean:dropshipList){
-            bean.setIsDropshipFlag(1);
-        }
-        list.addAll(dropshipList);
+        List<ShippingPackage> list =new ArrayList<ShippingPackage>();
+        try{
+            list = dao.getPackageInfoList(map);
+            for(ShippingPackage bean:list){
+                bean.setIsDropshipFlag(0);
+            }
+            List<ShippingPackage> dropshipList = dao.getDropshipPackageInfoList(map);
+            for(ShippingPackage bean:dropshipList){
+                bean.setIsDropshipFlag(1);
+            }
+            list.addAll(dropshipList);
 //        for(int i=0;i<list.size();i++){
 //            ShippingPackage s=list.get(i);
 //            s.setEstimatefreight(String.valueOf(Double.valueOf(s.getEstimatefreight())+s.getPid_amount()));
 //        }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return list;
     }
 

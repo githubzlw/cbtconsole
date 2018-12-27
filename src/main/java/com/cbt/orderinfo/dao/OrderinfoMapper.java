@@ -635,6 +635,19 @@ public interface OrderinfoMapper {
 	 */
 	public int updateOrderinfoUpdateState(@Param("orderNo") String orderNo);
 	/**
+	 * 查看该订单是否发送过质检信息邮件
+	 * @param orderNo
+	 * @return
+	 */
+	public int checkRecord(@Param("orderNo") String orderNo);
+
+	/**
+	 * 记录该订单已发送质检信息邮件
+	 * @param orderNo
+	 * @return
+	 */
+	public int insertEmailRecord(@Param("orderNo") String orderNo);
+	/**
 	 * 统计订单每个状态的数量
 	 *
 	 * @return
@@ -657,4 +670,6 @@ public interface OrderinfoMapper {
 	List<Orderinfo> getAllOrderShippingMehtodIsNull();
 	int updateOrderinfomodeTransport(@Param("modeTransport") String modeTransport, @Param("orderNo") String orderNo);
 	public String getDropshipOrderNoList(String orderNo);
+
+    void updateBusiess(Map<String, String> map);
 }

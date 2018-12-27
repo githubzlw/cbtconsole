@@ -336,6 +336,18 @@ function fn(){
 					<td class="tableleft">退款补偿：</td>
 					<td colspan="3"><em style="font-size: 18px;color: #2196F3;font-weight: bold;">${money}</em>&nbsp;&nbsp;USD</td>
 				</tr>
+				<c:if test="${not empty complain.disputeList }">
+				<tr>
+					<td class="tableleft">第三方申诉:</td>
+					<td colspan="3">
+					<c:forEach items="${complain.disputeList }" var="dispute">
+					<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ dispute}">${ dispute}</a>
+					<br>
+					</c:forEach>
+					
+					</td>
+				</tr>
+				</c:if>
 <!-- 				<tr> -->
 <!-- 					<td class="tableleft">图片：</td> -->
 <!-- 					<td colspan="3" id="imgs"> -->

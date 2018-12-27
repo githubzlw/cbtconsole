@@ -54,4 +54,8 @@ public interface TabSeachPageMapper {
 	public List<TabSeachPageBean> queryStaticizeAll();
 
     long updateAuthorizedInfoValid(@Param("shopId") String shopId, @Param("valid") int valid);
+
+    void updateShopBrand(ShopUrlAuthorizedInfoPO bean);
+
+    String queryShopBrand(@Param("shopId") String shopId);
 }

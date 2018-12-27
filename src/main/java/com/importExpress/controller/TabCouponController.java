@@ -10,6 +10,7 @@ import com.importExpress.pojo.TabCouponRules;
 import com.importExpress.pojo.TabCouponType;
 import com.importExpress.service.TabCouponService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,14 +21,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/coupon")
 public class TabCouponController {
+
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TabCouponController.class);
 	
 	@Autowired
 	private TabCouponService tabCouponService;
@@ -204,6 +204,58 @@ public class TabCouponController {
 			
 		}
         return false;
+    }
+
+    /**
+     * 根据折扣卷码查询折扣卷信息
+     * 		http://127.0.0.1:8086/cbtconsole/coupon/queryTabCouponOne.do?couponCode=
+     * @return
+     **/
+    @RequestMapping(value = "/queryTabCouponOne.do")
+    @ResponseBody
+    public TabCouponNew queryTabCouponOne(String couponCode) {
+        try {
+            return tabCouponService.queryTabCouponOne(couponCode);
+        } catch (Exception e) {
+            LOG.error("queryTabCouponOne 查询折扣卷异常", e);
+        }
+        return null;
+    }
+
+    /**
+     * 折扣卷码关联用户id
+     * 		http://127.0.0.1:8086/cbtconsole/coupon/addCouponUser.do?couponCode=&userids=
+     * @param couponCode 折扣卷id
+     * @param userids 关联的用户id
+     * @return
+     **/
+    @RequestMapping(value = "/addCouponUser.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, String> addCouponUser(String couponCode, String userids) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            if (userids == null){
+                userids = "";
+            }
+            List<String> idList = Arrays.asList(userids.replace("，", ",").split(","));
+            List<String> useridList = new ArrayList<String>();
+            for (String userid : idList) {
+                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim())){
+                    useridList.add(userid.trim());
+                }
+            }
+            if (useridList == null || useridList.size() == 0){
+                result.put("state", "false");
+                result.put("message", "未录入用户id");
+                return result;
+            }
+            result = tabCouponService.addCouponUser(couponCode, useridList);
+        } catch (Exception e) {
+            result.put("state", "false");
+            result.put("message", "录入异常");
+            LOG.error("addCouponUser 折扣卷码关联用户id", e);
+        }
+        return result;
     }
 	
 }

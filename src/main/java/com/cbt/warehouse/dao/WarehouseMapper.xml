@@ -1147,7 +1147,7 @@
 		inner join orderinfo o
 		on s.orderid=o.order_no  and  o.isDropshipOrder  <![CDATA[ <> ]]> 1
 		left join (select DISTINCT chinapostbig,country,id,fedexie from zone group by country) z
-		on z.country =func_get_split_string(o.mode_transport,'@',3)
+		on REPLACE(z.country,' ','') =REPLACE(func_get_split_string(o.mode_transport,'@',3),' ','')
 		left join (
 		select orderid,sum(goods_p_price*buycount) as sumcgprice from order_product_source
 		where orderid in(select orderno from order_fee where mergeOrders=orderid)
@@ -1564,7 +1564,7 @@
 		INNER JOIN dropshiporder o
 		on s.orderid=o.child_order_no
 		left join (select DISTINCT chinapostbig,country,id from zone group by country) z
-		on z.country = func_get_split_string(o.mode_transport,'@',3)
+		on REPLACE(z.country,' ','') = REPLACE(func_get_split_string(o.mode_transport,'@',3),' ','')
 		left join (
 		select orderid,sum(goods_p_price*buycount) as sumcgprice from order_product_source
 		where orderid in(select orderno from order_fee where mergeOrders=orderid)
@@ -1579,7 +1579,7 @@
 		inner join dropshiporder of on sp.orderid=of.child_order_no
 		left join shipment s on s.orderNo=sp.expressno
 		left join (select DISTINCT chinapostbig,country,id from zone group by country) z
-		on z.country = replace(func_get_split_string(of.mode_transport,'@',3),' ','')
+		on REPLACE(z.country,' ','') = replace(func_get_split_string(of.mode_transport,'@',3),' ','')
 		where 1=1
 		<if test="orderid != null and orderid != ''">
 			and sp.REMARKS like CONCAT('%','${orderid}','%' )
@@ -1599,7 +1599,7 @@
 		select sp.*,of.user_id,z.id as zoneId from (select * from shipping_package where sflag=3) sp
 		inner join dropshiporder of on sp.orderid=of.child_order_no
 		left join (select DISTINCT chinapostbig,country,id from zone group by country) z
-		on z.country = replace(func_get_split_string(of.mode_transport,'@',3),' ','')
+		on REPLACE(z.country,' ','') = replace(func_get_split_string(of.mode_transport,'@',3),' ','')
 		where 1=1
 		<if test="orderid != null and orderid != ''">
 			and sp.REMARKS like CONCAT('%','${orderid}','%' )
