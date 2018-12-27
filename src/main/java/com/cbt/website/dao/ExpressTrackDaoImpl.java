@@ -12,6 +12,7 @@ import com.cbt.website.bean.OrderWarehouseInfo;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.SearchTaobaoInfo;
 import com.cbt.website.util.Utility;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
@@ -846,9 +847,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                 + map.get("goodsid")
                 + "' AND od.orderid='"
                 + map.get("orderid") + "' and li.is_use=1";
-        SendMQ sendMQ = null;
+//        SendMQ sendMQ = null;
         try {
-            sendMQ = new SendMQ();
+//            sendMQ = new SendMQ();
             stmt = conn.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next()) {
@@ -929,8 +930,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
                     }else{
                         //如果库存锁定后可用库存为0则更新线上产品表。预上线表。后台产品表库存标识为无库存
                         //本地
@@ -944,8 +946,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
                     }
                 }
             }
@@ -1090,8 +1093,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                     stmt.executeUpdate();
                     DBHelper.getInstance().closeConnection(conn28);
                     //线上表
-                    sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-                    sendMQ.sendMsg(new RunSqlModel(sql));
+//                    sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
+//                    sendMQ.sendMsg(new RunSqlModel(sql));
+                    GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
                 } else {
                     // 根据锁定库存数量时间来重新分配可使用库存量
                     sql = "SELECT li.od_id,od.yourorder,od.seilUnit,li.in_id FROM lock_inventory li INNER JOIN order_details od ON li.od_id=od.id WHERE li.in_id="
@@ -1179,8 +1183,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
                     }else{
                         //释放锁定库存后更新线上产品表。预上线表。后台产品表库存标识为无库存
                         //本地
@@ -1194,8 +1199,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+rs1.getString("goods_pid")+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+rs1.getString("goods_pid")+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
                     }
                 }
             }
@@ -1251,7 +1257,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                 + "' AND od.orderid='"
                 + map.get("orderid") + "' and li.is_use=1";
         try {
-            SendMQ sendMQ=new SendMQ();
+//            SendMQ sendMQ=new SendMQ();
             stmt = conn.prepareStatement(sql);
             rs = stmt.executeQuery();
             if (rs.next()) {
@@ -1398,8 +1404,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
                     }else{
                         //如果库存锁定后可用库存为0则更新线上产品表。预上线表。后台产品表库存标识为无库存
                         //本地
@@ -1413,12 +1420,13 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                         stmt.executeUpdate();
                         DBHelper.getInstance().closeConnection(conn28);
                         //线上表
-                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
-                        sendMQ.sendMsg(new RunSqlModel(sql));
+//                        sql="update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'";
+//                        sendMQ.sendMsg(new RunSqlModel(sql));
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
                     }
                 }
             }
-            sendMQ.closeConn();
+//            sendMQ.closeConn();
         } catch (Exception e) {
             if (rs != null) {
                 try {
@@ -2815,15 +2823,16 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
                     sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
                     stmt = conn.prepareStatement(sql);
                     stmt.executeUpdate();
-                    //预上线表
-                    sql="update custom_benchmark_ready_newest set is_stock_flag=1 where pid='"+goods_pid+"'";
-                    stmt = conn28.prepareStatement(sql);
-                    stmt.executeUpdate();
-                    //线上表
-                    sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
-                    SendMQ sendMQ = new SendMQ();
-                    sendMQ.sendMsg(new RunSqlModel(sql));
-                    sendMQ.closeConn();
+//                    //预上线表
+//                    sql="update custom_benchmark_ready_newest set is_stock_flag=1 where pid='"+goods_pid+"'";
+//                    stmt = conn28.prepareStatement(sql);
+//                    stmt.executeUpdate();
+//                    //线上表
+//                    sql="update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'";
+//                    SendMQ sendMQ = new SendMQ();
+//                    sendMQ.sendMsg(new RunSqlModel(sql));
+//                    sendMQ.closeConn();
+                    GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
                 }
                 //记录库存存入记录，用来统计当月库存金额
                 sql="insert into inventory_details (createtime,od_id,inventory_acount,inventory_price,invetory_amount,inventory_barcode,goods_pid,sku,car_urlMD5) values(now(),?,?,?,?,?,?,?,?)";

@@ -11,6 +11,7 @@ import com.importExpress.mapper.GoodsCarconfigMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.OrderSplitService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -171,6 +172,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                         double sampleFee = (Double) goodMap.get("sampleFee") == null ? 0.00 : (Double) goodMap.get("sampleFee");
                         //库存标识
                         int isStockFlag = (Integer) goodMap.get("is_stock_flag") == null ? 0 : (Integer) goodMap.get("is_stock_flag");
+                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(pid,String.valueOf(isStockFlag));
                         int shopCount = (Integer) goodMap.get("shopCount") == null ? 0 : (Integer) goodMap.get("shopCount");
 
                         if(perWeight != null && !"".equals(perWeight) && perWeight.toLowerCase().contains("kg")){

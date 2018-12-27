@@ -43,6 +43,7 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -749,7 +750,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public int useInventory(Map<String, String> map) {
 		int row = 0;
 		try{
-			SendMQ sendMQ=new SendMQ();
+//			SendMQ sendMQ=new SendMQ();
 			if("1".equals(map.get("isUse"))){
 				//使用库存
 				pruchaseMapper.updateLockInventory(map);
@@ -761,11 +762,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					//更新本地产品表为无库存标识
 					map.put("goods_pid",goods_pid);
 					pruchaseMapper.updateCustomSstockFlag(map);
-					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'"));
+//					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=1 where pid='"+goods_pid+"'"));
+					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"1");
 				}
 				pruchaseMapper.updateDetailsRemark(map);
 			}
-			sendMQ.closeConn();
+//			sendMQ.closeConn();
 		}catch (Exception e){
 			e.printStackTrace();
 		}
