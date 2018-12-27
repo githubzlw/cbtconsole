@@ -813,7 +813,7 @@ where ocr.sizechart=2 and ocr.catid=#{catid} and cu.valid=1 and ocr.flag=0 limit
 <select id="loadCategoryName" resultType="java.util.Map">
 select  cats.name,os.catid  from ocr_img_sizechart os 
 left join 1688_category cats on cats.category_id = os.catid
-where os.path_catid like #{catid} and os.sizechart=2  group by os.catid
+where os.path_catid like #{catid} and os.sizechart=2 and os.flag=0   group by os.catid
 </select>
 
     <select id="getDetailsChangeInfo" resultType="com.cbt.warehouse.pojo.ChangeGoodsLogPojo">
