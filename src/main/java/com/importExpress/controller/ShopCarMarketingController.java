@@ -652,7 +652,9 @@ public class ShopCarMarketingController {
         OkHttpClient okHttpClient = new OkHttpClient();
 
         RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
-        Request request = new Request.Builder().url(GET_MIN_FREIGHT_URL).post(formBody).build();
+        Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                .url(GET_MIN_FREIGHT_URL).post(formBody).build();
         try {
             Response response = okHttpClient.newCall(request).execute();
             String resultStr = response.body().string();
