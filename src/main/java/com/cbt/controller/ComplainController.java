@@ -22,6 +22,7 @@ import com.cbt.bean.ComplainFile;
 import com.cbt.bean.ComplainVO;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
+import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.page.Page;
 import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.service.AdditionalBalanceService;
@@ -97,7 +98,8 @@ public class ComplainController {
 			int userid2 = c.getUserid();
 			useridList = useridList+userid2+",";
 			List<String> corderIdList = c.getOrderIdList();
-			if(StringUtils.isBlank(c.getDisputeId()) && corderIdList != null && !corderIdList.isEmpty()) {
+			List<String> disputeList = c.getDisputeList();
+			if((disputeList == null || disputeList.isEmpty()) && corderIdList != null && !corderIdList.isEmpty()) {
 				for(String o : corderIdList) {
 					if(StringUtil.isNotBlank(o) ) {
 						orderIdList.add(o.split("_")[0]);
@@ -105,7 +107,7 @@ public class ComplainController {
 				}
 			}
 		}
-		/*Map<String, Object> dispute = customerDisputeService.list(orderIdList);
+		Map<String, Object> dispute = customerDisputeService.list(orderIdList);
 		useridList = useridList.endsWith(",")?useridList.substring(0, useridList.length()-1):useridList;
 		Map<String, String> complainRefundByUserids = refundService.getComplainRefundByUserids(useridList);
 		for(ComplainVO c:list){
@@ -113,20 +115,20 @@ public class ComplainController {
 			isRefund = isRefund==null||isRefund.isEmpty()?"0":isRefund;
 			c.setIsRefund(Integer.valueOf(isRefund));
 			List<String> corderIdList = c.getOrderIdList();
-			if(StringUtils.isBlank(c.getDisputeId()) && corderIdList != null && !corderIdList.isEmpty()) {
+			List<String> disputeList = c.getDisputeList();
+			if((disputeList == null || disputeList.isEmpty()) && corderIdList != null && !corderIdList.isEmpty()) {
 				for(String o : corderIdList) {
 					o = o.split("_")[0];
 					CustomerDisputeBean cDisputeBean = (CustomerDisputeBean)dispute.get(o);
 					if(cDisputeBean != null && StringUtils.equals(String.valueOf(c.getUserid()), cDisputeBean.getUserid())) {
-						c.setDisputeId(cDisputeBean.getDisputeID());
-						c.setMerchantId(cDisputeBean.getMerchantID());
-						break;
+						disputeList = disputeList == null ? new ArrayList<>() : disputeList ;
+						disputeList.add(cDisputeBean.getDisputeID());
 					}
 				}
-				
+				c.setDisputeList(disputeList);
 			}
 			
-		}*/
+		}
 		
 		page.setList(list);
 		
@@ -259,8 +261,11 @@ public class ComplainController {
 		String id = request.getParameter("id");
 		String disputeid = request.getParameter("disputeid");
 		String merchantid = request.getParameter("merchantid");
-		complainService.updateDisputeid(Integer.valueOf(id), disputeid,merchantid);
-		map.put("status", true);
+		map.put("status", false);
+		if(StringUtils.isNotBlank(disputeid)) {
+			complainService.updateDisputeid(Integer.valueOf(id), disputeid,merchantid);
+			map.put("status", true);
+		}
 		return map;
 	}
 	@RequestMapping(value = "/dispute/list", method = RequestMethod.POST)

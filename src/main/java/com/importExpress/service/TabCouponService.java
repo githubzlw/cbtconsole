@@ -20,4 +20,7 @@ public interface TabCouponService {
 
 	Boolean checkCouponCode(String couponCode);
 
+    TabCouponNew queryTabCouponOne(String couponCode);
+
+    Map<String, String> addCouponUser(String couponCode, List<String> useridList);
 }

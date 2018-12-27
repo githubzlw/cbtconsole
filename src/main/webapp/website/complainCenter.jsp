@@ -58,7 +58,7 @@ div { word-wrap:break-word;}
 .div_tile{width:150px;display:none;}
 .order_img{
 width:80px;height:80px;}
-.dispute_id{height:30px;width:300px;}
+.dispute_id{height:30px;width:670px;}
 .merchant_id{height:30px;width:300px;}
 </style>
 
@@ -147,14 +147,21 @@ width:80px;height:80px;}
 								${complain.refGoodsId}
 								</td>
 								<td align="center" style="width:100px;word-break: break-all;">
-								<c:if test="${not empty complain.disputeId }">
-								<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${ complain.disputeId}&merchant=${complain.merchantId}">${ complain.disputeId}</a>
+								
+								<c:if test="${not empty complain.disputeList }">
+								<c:forEach items="${complain.disputeList }" var="dispute">
+								<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid=${dispute}">${dispute}</a>
+								<br>
+								</c:forEach>
 								</c:if>
-								<c:if test="${empty complain.disputeId }">
+								
+								<c:if test="${empty complain.disputeList }">
 								
 								<button type="button" class="btn btn-primary btn-sm" onclick="openDispute(${complain.id});">关联申诉</button>
 								
 								</c:if>
+								
+								
 								</td>
 								<td align="center" style="width:200px;word-break: break-all;">
 								<c:forEach items="${complain.orderIdList }" var="orderid">
@@ -459,8 +466,10 @@ function showmore(){
 	$("#showmorea").hide();
 }
 function openDispute(id){
-	var html='<span><input type="checkbox" id="checkbox_pp" checked="checked">新账号</span>'
-		+'<br><span>Dispute ID:<input type="text" class="dispute_id"></span>';
+	var html='<span>请输入申诉事件号(如：PP-D-13916157),'
+	+'<br>可以参考申诉管理界面输入对应的事件号 '
+	+'<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
+		
 	$.dialog({
 		title : '关联申诉',
 		content : html,
@@ -471,17 +480,12 @@ function openDispute(id){
 		fixed : false,
 		ok : function() {
 			var disputeid = $(".dispute_id").val();
-			var merchantid = '584JZVFU6PPVU';
-			if($("#checkbox_pp").is(":checked")){
-				merchantid = 'UDSXBNQ5ARA76';
-			}
-			var href = window.location.href;
-			if(disputeid !='' && merchantid!=''){
+			if(disputeid !=''){
 			  $.ajax({
 					type:'POST',
 					dataType:'text',
 					url:'/cbtconsole/complain/dispute/update',
-					data:{id:id,disputeid:disputeid,merchantid:merchantid},
+					data:{id:id,disputeid:disputeid},
 					success:function(res){
 						location.reload(); 
 					},

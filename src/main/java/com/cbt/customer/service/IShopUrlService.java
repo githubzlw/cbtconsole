@@ -10,13 +10,13 @@ public interface IShopUrlService {
 
     public ShopUrl findById(int id);
 
-    public List<ShopUrl> findAll(String shopId, String shopUserName, String date, int start, int end, String timeFrom,
+    public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel, int shopType, int authorizedFlag,
                                  int authorizedFileFlag, int ennameBrandFlag, String shopids);
 
     public String getShopList(String admName, String days);
 
-    public int total(String shopId, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
+    public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
                      int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids);
 
     public int delById(int id);

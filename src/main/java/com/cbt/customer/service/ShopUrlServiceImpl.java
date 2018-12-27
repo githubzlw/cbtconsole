@@ -21,10 +21,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
     @Override
-    public List<ShopUrl> findAll(String shopId, String shopUserName, String date, int start,
+    public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start,
                                  int end, String timeFrom, String timeTo, int isOn, int state, int isAuto, int readyDel,
                                  int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
-        return dao.findAll(shopId, shopUserName, date, start, end, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
+        return dao.findAll(shopId, shopBrand, shopUserName, date, start, end, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
                 authorizedFileFlag,ennameBrandFlag,shopids);
     }
 
@@ -34,9 +34,9 @@ public class ShopUrlServiceImpl implements IShopUrlService {
     }
 
     @Override
-    public int total(String shopId, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
+    public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
                      int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
-        return dao.total(shopId, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids);
+        return dao.total(shopId, shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids);
     }
 
     @Override

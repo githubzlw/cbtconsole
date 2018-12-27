@@ -104,7 +104,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     }
 
     @Override
-    public List<ShopUrl> findAll(String shopId, String shopUserName, String date, int start, int end, String timeFrom,
+    public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel,int shopTypeFlag,
                                  int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
@@ -118,6 +118,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         sql += " where 1=1 ";
         if (shopId != null && !"".equals(shopId)) {
             sql += " and a.shop_id='" + shopId + "'";
+        }
+        if (shopBrand != null && !"".equals(shopBrand)) {
+            sql += " and shop_brand like '%" + shopBrand + "%'";
         }
         if(StringUtil.isNotBlank(shopids)){
             sql += " and a.shop_id in ("+shopids+")";
@@ -351,7 +354,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     }
 
     @Override
-    public int total(String shopId, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
+    public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
                      int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -360,6 +363,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         String sql = "select count(id) from shop_url_bak where 1=1 ";
         if (shopId != null && !"".equals(shopId)) {
             sql += " and shop_id='" + shopId + "'";
+        }
+        if (shopBrand != null && !"".equals(shopBrand)) {
+            sql += " and shop_brand like '%" + shopBrand + "%'";
         }
         if(StringUtil.isNotBlank(shopids)){
             sql += " and shop_id in ("+shopids+")";

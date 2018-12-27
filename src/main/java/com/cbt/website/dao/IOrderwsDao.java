@@ -1134,6 +1134,16 @@ public interface IOrderwsDao {
 	 * @return
 	 */
 	List<UserBehaviorDetails> queryUserRecentView(String beginDate,String endDate,int startNum,int offSet);
+
+	/**
+	 *Pay按钮点击独特人数
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 */
+	List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate,String endDate,int startNum,int offSet);
 	/**
 	 *
 	 * @Title queryExistsBehaviorData
@@ -1144,4 +1154,12 @@ public interface IOrderwsDao {
 	 * @return List<UserBehaviorBean>
 	 */
 	List<UserBehaviorBean> queryExistsBehaviorData(String beginDate,String endDate);
+
+	/**
+	 * Pay按钮点击独特人数
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	int queryUserPayLog(String beginDate,String endDate);
 }
