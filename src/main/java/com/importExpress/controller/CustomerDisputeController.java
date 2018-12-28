@@ -162,6 +162,7 @@ public class CustomerDisputeController {
         mv.addObject("role", adm.getId() == 1||adm.getId() == 8 ? 1 : 2);
     	String disputeID = request.getParameter("disputeid");
     	String merchant = request.getParameter("merchant");
+    	String isread = request.getParameter("isread");
     	JSONObject infoByDisputeID = null;
     	int resonFlag = 0;
     	int statusFlag = 0;
@@ -227,8 +228,10 @@ public class CustomerDisputeController {
 				mv.addObject("merchant", merchant);
 				
 			}
-			long updateMessage = customerDisputeService.updateMessage(disputeID);
-			LOG.info("updateMessage:"+updateMessage);
+			if(!StringUtils.equals(isread, "true")) {
+				long updateMessage = customerDisputeService.updateMessage(disputeID);
+				LOG.info("updateMessage:"+updateMessage);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
