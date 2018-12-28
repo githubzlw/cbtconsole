@@ -24,8 +24,6 @@ import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.map.HashedMap;
-
-import org.apache.poi.openxml4j.opc.internal.ZipContentTypeManager;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1741,9 +1739,9 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Map<String, Integer>> result = dao.getOrdersState(admuserid);
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
-		ca.add(Calendar.DATE, - 60);
+		ca.add(Calendar.DATE, - 90);
 		String startDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
-		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0);
+		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0, null);
 		Map<String, Integer> cywMap = new HashMap<String, Integer>();
 		cywMap.put("state", 1);
 		cywMap.put("counts", waring0);

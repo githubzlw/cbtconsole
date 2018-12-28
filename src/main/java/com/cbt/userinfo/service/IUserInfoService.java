@@ -52,4 +52,8 @@ public interface IUserInfoService {
 	 * @return
 	 */
 	public int InPhone(String newPhone, int userid);
+
+    List<String> queryUserRemark(int userid);
+
+    void insertUserRemark(int userid, String remark);
 }
