@@ -283,6 +283,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
 	    				
 	    			}
+	    			bean.setRead(document.getBooleanValue("isRead"));
 	    			list.add(bean);
 	    		}else if(StringUtils.indexOf(content, "issuing.dispute") > -1){
 	    			Dispute dispute = APIResource.GSON.fromJson(content, Dispute.class);
