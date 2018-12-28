@@ -16,6 +16,7 @@ import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -204,9 +205,10 @@ public class InventoryController {
 				if(Integer.valueOf(new_remaining)<=0){
 					//如果库存为0则更改库存标识
 					inventoryService.updateIsStockFlag(i.getGoods_pid());
-					SendMQ sendMQ = new SendMQ();
-					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
-					sendMQ.closeConn();
+//					SendMQ sendMQ = new SendMQ();
+//					sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+i.getGoods_pid()+"'"));
+//					sendMQ.closeConn();
+					GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(i.getGoods_pid(),"0");
 				}
 				// 记录更改货源记录日志
 				inventoryService.updateSourcesLog(i.getId(), adm.getAdmName(),StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), new_barcode,
@@ -611,16 +613,17 @@ public class InventoryController {
 		@Override
 		public void run() {
 			try{
-				SendMQ sendMQ = new SendMQ();
+//				SendMQ sendMQ = new SendMQ();
 				inventoryService.updateIsStockFlag2(goods_pid);
-				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'"));
+//				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set is_stock_flag=0 where pid='"+goods_pid+"'"));
+				GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(goods_pid,"0");
 				//如果库存为0则更改库存标识
 				inventoryService.updateIsStockFlag(goods_pid);
 				//记录删除该库存的人
 				String admuserJson = Redis.hget(adm_id, "admuser");
 				Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 				inventoryService.updateSourcesLog(id, admName, "", goods_pid, "",barcode, 0, 0, "库存删除");
-				sendMQ.closeConn();
+//				sendMQ.closeConn();
 			}catch (Exception e){
 				e.printStackTrace();
 			}

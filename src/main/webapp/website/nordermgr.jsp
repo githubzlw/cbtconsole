@@ -274,6 +274,7 @@ function fn(va) {
 		}
 		uname = user.username;
 		uemail = user.email;
+        var emailFlag = json[i].emailFlag;
         var checkType='${param.type}';
 		if(adminName=="Ling"){
 		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
@@ -281,14 +282,22 @@ function fn(va) {
                 + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=230,width=420,"
                 +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
 		    if(checkType == "checkOrder"){
-                html_+="|<a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+		        if(emailFlag>0){
+                    html_+="<br><a target='_blank' style='color:red'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+				}else{
+                    html_+="<br><a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+				}
 			}
             html_+="</td>";
 			$("#table tr:eq(" + row + ") td:eq(15)").after(html_);
 		}else{
 		    var html_="";
             if(checkType == "checkOrder"){
-                html_+="<a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+                if(emailFlag>0){
+                    html_+="<br><a target='_blank' style='color:red'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+                }else{
+                    html_+="<br><a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
+                }
             }
 			$("#table tr:eq(" + row + ") td:eq(15)").after("<td>"+html_+"</td>");
 		}
@@ -708,7 +717,7 @@ $(document).ready(function(){
 						<%--<td style="width: 90px;">入库情况汇总</td>--%>
 						<td style="width: 60px;">销售</td>
 <!-- 						<td style="width: 65px;">采购</td> -->
-						<td style="width: 40px;">操作</td>
+						<td style="width: 50px;">操作</td>
 						<td style="width: 100px;">备注</td>
 					</Tr>
 				</table>

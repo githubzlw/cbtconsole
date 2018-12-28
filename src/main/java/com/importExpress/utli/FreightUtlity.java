@@ -35,7 +35,9 @@ public class FreightUtlity {
         RequestBody formBody = new FormBody.Builder().add("orderNo", String.valueOf(orderNo)).build();
         /*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
         String url = getFreightCostUrl.replace("getMinFreightByUserId","getFreightByOrderNo");
-        Request request = new Request.Builder().url(url).post(formBody).build();
+        Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                .url(url).post(formBody).build();
         try {
             Response response = okHttpClient.newCall(request).execute();
             String resultStr = response.body().string();
