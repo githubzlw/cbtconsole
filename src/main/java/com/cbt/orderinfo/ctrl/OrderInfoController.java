@@ -26,6 +26,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.tuckey.web.filters.urlrewrite.utils.URLEncoder;
 import sun.misc.BASE64Decoder;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -52,6 +53,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/order")
@@ -647,61 +650,43 @@ public class OrderInfoController{
 	@RequestMapping(value = "/getOrderInfo.do", method = RequestMethod.GET)
 	public String getOrderInfo(HttpServletRequest request, HttpServletResponse response, Model model) throws ParseException, IOException {
 		Map<String,String> paramMap=new HashMap<String,String>();
-		String ropType = request.getParameter("ropType");
-		String userID_req = request.getParameter("userid");
-		String state_req = request.getParameter("state");
-		String startdate_req = request.getParameter("startdate");
-		String enddate_req = request.getParameter("enddate");
-		int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
-		String orderno = request.getParameter("orderno");
-		String email = request.getParameter("email");
-		String paymentid=request.getParameter("paymentid");
-		paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
-		int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
-		int currentPage = Utility.getStringIsNull(request.getParameter("currentPage"))?Integer.parseInt(request.getParameter("currentPage")):1;
-		String buyid = request.getParameter("buyuser");
-		String admuserid_str = request.getParameter("admuserid");
-		admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
-		request.setAttribute("admuserid_str",admuserid_str);
-		String type = request.getParameter("type");
-		request.setAttribute("type",StringUtil.isNotBlank(type)?type:"");
-		String status = request.getParameter("status");
-		int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
-		int buyuser=StringUtil.isNotBlank(buyid)?Integer.parseInt(buyid):0;
-		page=page>0?(page - 1) * 40:0;
-		userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
-		int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
-		int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
-		String admJson = Redis.hget(request.getSession().getId(), "admuser");
-		if(admJson == null){
-			return "main_login";
-		}
-		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
-		String strm=user.getRoletype(); int admuserid=user.getId();
-		if("0".equals(strm)){
-			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
-		}
-		Date startdate =null;
-		Date enddate = null;
-		if(startdate_req!=null&&startdate_req.isEmpty()){
-			startdate = null;
-		}
-		if(enddate_req!=null&&enddate_req.isEmpty()){
-			enddate = null;
-		}
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		if(startdate_req!=null && !startdate_req.equals("")){
-			startdate_req=startdate_req + " 00:00:00";
-		}else{
-			startdate_req="0";
-		}
-		if(enddate_req!=null && !enddate_req.equals("") ) {
-			enddate_req=enddate_req + " 23:59:59";
-		}else{
-			enddate_req="0";
-		}
 		try {
+			String admJson = Redis.hget(request.getSession().getId(), "admuser");
+			if(admJson == null){
+				return "main_login";
+			}
+			String ropType = request.getParameter("ropType");
+			String userID_req = request.getParameter("userid");
+			String state_req = request.getParameter("state");
+			String startdate_req = request.getParameter("startdate");
+			String enddate_req = request.getParameter("enddate");
+			int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
+			String orderno = request.getParameter("orderno");
+			String email = request.getParameter("email");
+			String paymentid=request.getParameter("paymentid");
+			paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
+			int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
+			int currentPage = Utility.getStringIsNull(request.getParameter("currentPage"))?Integer.parseInt(request.getParameter("currentPage")):1;
+			String buyid = request.getParameter("buyuser");
+			String admuserid_str = request.getParameter("admuserid");
+			admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
+			request.setAttribute("admuserid_str",admuserid_str);
+			String type = request.getParameter("type");
+			request.setAttribute("type",StringUtil.isNotBlank(type)?type:"");
+			String status = request.getParameter("status");
+			int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
+			int buyuser=StringUtil.isNotBlank(buyid)?Integer.parseInt(buyid):0;
+			page=page>0?(page - 1) * 40:0;
+			userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
+			int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
+			int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
+			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+			String strm=user.getRoletype(); int admuserid=user.getId();
+			admuserid ="0".equals(strm) && Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
+			enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
 			if(StringUtil.isNotBlank(type) && "order_pending".equals(type)){
 				list=iOrderinfoService.getorderPending();
 			}else{
@@ -723,13 +708,13 @@ public class OrderInfoController{
 		}
 		request.setAttribute("orderws", net.sf.json.JSONArray.fromObject(list));
 		UserDao dao=new UserDaoImpl();
-		List<ConfirmUserInfo> listAdm = getConfirmUserInfos(request, dao);
+//		List<ConfirmUserInfo> listAdm = getConfirmUserInfos(request, dao);
 		page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
 		//获取纯销售和采销一体账户信息
 		List<ConfirmUserInfo> sellAdm =iOrderinfoService.getAllSalesAndBuyer();
 		List<ConfirmUserInfo> purchaseAdm =  new ArrayList<ConfirmUserInfo>();
 		purchaseAdm = dao.getAllByRoleType(2);
-		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
+//		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
 		request.setAttribute("sellAdm", JSONArray.toJSONString(sellAdm));
 		request.setAttribute("purchaseAdm", JSONArray.toJSONString(purchaseAdm));
 		request.setAttribute("count", count);

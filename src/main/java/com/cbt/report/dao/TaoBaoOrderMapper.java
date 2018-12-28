@@ -311,6 +311,18 @@ public interface TaoBaoOrderMapper {
 	 *
 	 */
 	public List<DataQueryBean> getOrderQuery(Map<Object, Object> map);
+	/**
+	 *采购订单/销售订单匹配查询
+	 * @param map
+	 * @return
+	 */
+	public List<StraightHairPojo> getSaleBuyInfo(Map<String, String> map);
+	/**
+	 *采购订单/销售订单匹配查询
+	 * @param map
+	 * @return
+	 */
+	public List<StraightHairPojo> getSaleBuyInfoCount(Map<String, String> map);
 	   /**
 	    * 查询建议或确定广东直发的列表
 	    */

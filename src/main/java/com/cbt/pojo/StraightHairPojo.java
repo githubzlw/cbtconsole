@@ -31,6 +31,25 @@ public class StraightHairPojo implements Serializable{
 	private String operating;
 	private String remark;
 	private String states;
+	private String odid;
+
+	public String getTborderid() {
+		return tborderid;
+	}
+
+	public void setTborderid(String tborderid) {
+		this.tborderid = tborderid;
+	}
+
+	private String tborderid;
+	public String getOdid() {
+		return odid;
+	}
+
+	public void setOdid(String odid) {
+		this.odid = odid;
+	}
+
 	public String getStates() {
 		return states;
 	}
