@@ -23,14 +23,14 @@ public class GoodsInfoUpdateOnlineUtil {
     private static final String MONGODB_UPDATE_SOLR_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b006";// 刷新solr的
 
     // online
-//    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
-//    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
-//    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";// 刷新solr的
+    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
+    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";// 刷新solr的
 
     // test
-    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
-    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
-    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b006";// 刷新solr的
+//    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
+//    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
+//    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b006";// 刷新solr的
 
     /**
      * sku使用MQ更新AWS服务器数据
