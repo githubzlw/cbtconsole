@@ -22,10 +22,15 @@ public class GoodsInfoUpdateOnlineUtil {
     private static final String MONGODB_UPDATE_GOODS_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
     private static final String MONGODB_UPDATE_SOLR_URL_LOCAL = "http://192.168.1.153:8001/invokejob/b006";// 刷新solr的
 
-    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
-    // private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
-    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
-    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";// 刷新solr的
+    // online
+//    private static final String LOCAL_JSON_PATH = "/data/cbtconsole/product/";
+//    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b004";// 刷新产品表数据
+//    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";// 刷新solr的
+
+    // test
+    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
+    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
+    private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b006";// 刷新solr的
 
     /**
      * sku使用MQ更新AWS服务器数据
@@ -262,13 +267,12 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
     /**
-     *
+     *更新线上
      * @param inputData
      * @param isSolr   0不更新solr  1更新solr
      * @return
      */
     public static boolean updateOnlineAndSolr(InputData inputData, int isSolr) {
-        updateLocalAndSolr(inputData, isSolr);
         JsonResult json = new JsonResult();
         File file = null;
         try {
@@ -329,6 +333,12 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
+    /**
+     * 本地更新
+     * @param inputData
+     * @param isSolr  0不更新solr  1更新solr
+     * @return
+     */
     public static boolean updateLocalAndSolr(InputData inputData, int isSolr) {
         JsonResult json = new JsonResult();
         File file = null;
@@ -391,6 +401,9 @@ public class GoodsInfoUpdateOnlineUtil {
         String tempJson = json;
         if (tempJson.contains("\\\\\\")) {
             tempJson = tempJson.replace("\\\\\\", "\\");
+        }
+        if(tempJson.contains("\\\\'")){
+            tempJson = tempJson.replace("\\\\'", "\\'");
         }
         File file = new File(fileName);
         FileHelper.writeFile(file, tempJson);
