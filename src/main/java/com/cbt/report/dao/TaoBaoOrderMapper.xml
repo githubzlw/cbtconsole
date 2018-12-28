@@ -676,10 +676,10 @@
       SELECT GROUP_CONCAT(statistics_year,'-',statistics_month) AS times,0.00 as beginBlance,0.00 as endBlance,0.00 as transfer,0.00 as payFreight,0.00 as ebayAmount,0.00 as materialsAmount,0.00 as zfbFright,0.00 as grabAmount,0.00 AS normalAmount,0.00 as cancelAmount,0.00 as noMatchingOrder,0.00 as noStorage,0.00 as lastMonth,0.00 AS forecastAmount,0.00 as actualAmount,0.00 as inventory_amount,0.00 as sale_inventory,cast(order_sales*6.3 as decimal(10,2)) as order_sales,cast(balance_compensation*6.3 as decimal(10,2)) as balance_compensation,0.00 as orderFreight
       FROM monthly_financial_statistics  where 1=1
       <if test="year !=null">
-          and statistics_year=left(#{startTime},4)
+          and statistics_year=#{year}
       </if>
-      <if test="endTime!=null">
-         and statistics_year=left(#{endTime},4) and statistics_month=subString(#{endTime},6,2)
+      <if test="month!=null">
+         and statistics_month=#{month}
       </if>
       GROUP BY statistics_year,statistics_month
       union

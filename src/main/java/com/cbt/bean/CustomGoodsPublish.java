@@ -571,6 +571,18 @@ public class CustomGoodsPublish extends CustomGoodsBean {
             unsellAbleReasonDesc = "除服装珠宝分类外的非精品数据更新到软下架";
         } else if (unsellAbleReason == 16) {
             unsellAbleReasonDesc = "“搜索展现点击比+添加购物车数据”指标不符合要求";
+        } else if (unsellAbleReason == 17) {
+            unsellAbleReasonDesc = "低价商品下架";
+        } else if (unsellAbleReason == 18) {
+            unsellAbleReasonDesc = "类别隐藏数据下架";
+        } else if (unsellAbleReason == 19) {
+            unsellAbleReasonDesc = "店铺小于5件商品软下架";
+        } else if (unsellAbleReason == 20) {
+            unsellAbleReasonDesc = "一手数据下架";
+        } else if (unsellAbleReason == 21) {
+            unsellAbleReasonDesc = "大于400美元商品下架";
+        } else if (unsellAbleReason == 22) {
+            unsellAbleReasonDesc = "老数据没有展示详情图片";
         }
     }
 
