@@ -331,6 +331,19 @@ public interface TaobaoOrderService {
     * @return List<StraightHairPojo>
     */
    public List<StraightHairPojo> StraightHairList(Map<Object, Object> map);
+
+   /**
+    *采购订单/销售订单匹配查询
+    * @param map
+    * @return
+    */
+   public List<StraightHairPojo> getSaleBuyInfo(Map<String, String> map);
+   /**
+    *采购订单/销售订单匹配查询
+    * @param map
+    * @return
+    */
+   public List<StraightHairPojo> getSaleBuyInfoCount(Map<String, String> map);
    /**
     * 查询损耗库存数据
     * @Title searchLossInventory
