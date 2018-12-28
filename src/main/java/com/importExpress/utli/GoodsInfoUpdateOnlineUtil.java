@@ -403,7 +403,7 @@ public class GoodsInfoUpdateOnlineUtil {
             tempJson = tempJson.replace("\\\\\\", "\\");
         }
         if(tempJson.contains("\\\\'")){
-            tempJson = tempJson.replace("\\\\'", "\\'");
+            tempJson = tempJson.replace("\\\\'", "'");
         }
         File file = new File(fileName);
         FileHelper.writeFile(file, tempJson);
