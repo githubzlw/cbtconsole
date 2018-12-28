@@ -17,6 +17,14 @@
 </head>
 <body>
 
+<div>
+    <form action="/produceCtr/queryForList">
+        <input type="text" name="aliPid" value="${aliPid}"/>
+        <input type="text" name="keyword" value="${keyword}"/>
+        <input type="text" name="adminId" value="${adminId}"/>
+        <input type="button" value="查询">
+    </form>
+</div>
 
 <table id="shop_category_id" border="1" cellpadding="1"
        cellspacing="0" align="center">
@@ -53,5 +61,15 @@
     </tbody>
 </table>
 
+<div>
+    <form id="submit_form" action="/produceCtr/queryForList">
+        <input type="hidden" id="page_ali_pid" name="aliPid" value="${aliPid}"/>
+        <input type="hidden" id="page_keyword" name="keyword" value="${keyword}"/>
+        <input type="hidden" id="page_adminId" name="adminId" value="${adminId}"/>
+        <input type="hidden" id="page_num" name="page" value="${page}"/>
+        <input type="button" value="翻页">
+        <input style="display: none;" type="submit" value="提交隐藏">
+    </form>
+</div>
 </body>
 </html>
