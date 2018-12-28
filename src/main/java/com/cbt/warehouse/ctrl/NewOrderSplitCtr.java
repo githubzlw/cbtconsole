@@ -810,7 +810,7 @@ public class NewOrderSplitCtr {
                     model.put("expect_arrive_time", expect_arrive_time);
                     model.put("orderbean", obBean);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "ImportExpress Mail Dismantling");
+                    model.put("title", "Import Express Split Order Reminder");
                     model.put("message", "");
                 } else {
                     //针对取消的订单计算折扣金额
