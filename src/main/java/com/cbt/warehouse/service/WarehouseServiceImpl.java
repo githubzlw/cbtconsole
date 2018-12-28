@@ -949,7 +949,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getUserid()
                     + ",'"
                     + userInfo.getAvailable()
-                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>");
+                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
+                    + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>");
             for (int j = 0; j < list.size(); j++) {
                 ConfirmUserInfo c = list.get(j);
                 if (c.getConfirmusername().equals(userInfo.getAdminname())) {

@@ -6,6 +6,14 @@ public class CustomerDisputeVO extends CustomerDisputeBean {
 	private String value;//申诉订单金额
 	private String reason;//申诉理由
 	private String complainId;//投诉id
+	private boolean read;//是否已读
+	
+	public boolean isRead() {
+		return read;
+	}
+	public void setRead(boolean read) {
+		this.read = read;
+	}
 	public String getComplainId() {
 		return complainId;
 	}
