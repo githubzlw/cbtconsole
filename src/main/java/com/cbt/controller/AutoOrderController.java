@@ -185,7 +185,7 @@ public class AutoOrderController {
 			orderBean.setActual_ffreight("0");
 			orderBean.setDiscount_amount(0);
 			orderBean.setOrder_ac(0);
-			orderBean.setActual_lwh("1");
+			orderBean.setActual_lwh("0");
 			orderBean.setActual_weight("1");
 			orderBean.setActual_weight_estimate(1);
 			orderBean.setExtra_freight(0);
