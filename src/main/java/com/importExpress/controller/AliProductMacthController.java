@@ -31,6 +31,7 @@ public class AliProductMacthController {
         if (StringUtils.isNotBlank(aliPid)) {
             productBean.setAliPid(aliPid);
         }
+
         String keyword = request.getParameter("keyword");
         if (StringUtils.isNotBlank(keyword)) {
             productBean.setKeyword(keyword);
@@ -51,12 +52,16 @@ public class AliProductMacthController {
         productBean.setStartNum((page - 1) * limitNum);
 
         try {
+            mv.addObject("aliPid",aliPid == null ? "":aliPid);
+            mv.addObject("keyword",keyword == null ? "":keyword);
+            mv.addObject("page",page);
+
             List<AliProductBean> aliBeans = aliProductService.queryForList(productBean);
             for (AliProductBean aliProduct : aliBeans) {
                 aliProduct.setProductListLire(aliProductService.query1688ByLire(productBean.getAliPid()));
                 aliProduct.setProductListPython(aliProductService.query1688ByPython(productBean.getAliPid()));
             }
-
+            mv.addObject("infos",aliBeans);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());

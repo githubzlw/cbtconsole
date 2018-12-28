@@ -15,14 +15,20 @@
     <link rel="stylesheet" type="text/css"
           href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
 </head>
+<style>
+    .img_sty {
+        max-height: 180px;
+        max-width: 180px;
+    }
+</style>
 <body>
 
 <div>
     <form action="/produceCtr/queryForList">
-        <input type="text" name="aliPid" value="${aliPid}"/>
-        <input type="text" name="keyword" value="${keyword}"/>
-        <input type="text" name="adminId" value="${adminId}"/>
-        <input type="button" value="查询">
+        AliPid:<input type="text" name="aliPid" value="${aliPid}"/>
+        keyword:<input type="text" name="keyword" value="${keyword}"/>
+        adminId:<input type="text" name="adminId" value="${adminId}"/>
+        &nbsp;&nbsp;&nbsp;<input type="button" value="查询">
     </form>
 </div>
 
@@ -31,30 +37,48 @@
     <thead>
     <tr align="center" bgcolor="#DAF3F5" style="height: 50px;">
         <th style="width: 200px;">速卖通商品信息</th>
-        <th style="width: 800px;">lire对标1688商品信息</th>
-        <th style="width: 800px;">爆款对标商品信息</th>
+        <th style="width: 800px;" colspan="4">lire对标1688商品信息</th>
+        <th style="width: 800px;" colspan="4">爆款对标商品信息</th>
     </tr>
     </thead>
     <tbody>
-    <c:forEach items="${infos}" var="shopInfo" varStatus="status">
+    <c:forEach items="${infos}" var="aliGd" varStatus="status">
         <tr bgcolor="#FFF7FB" style="height: 42px;">
             <td>
                 <div>
-
+                    <img class="img_sty" src="${aliGd.aliImg}"/>
+                    <a target="_blank" href="${aliGd.aliUrl}">${aliGd.aliUrl}</a>
+                    <span>关键词:${aliGd.keyword}</span>
+                    <span>价格:${aliGd.aliPrice}</span>
+                    <span>AliPid:${aliGd.aliPid}</span>
                 </div>
             </td>
-            <td>
+            <c:if test="${fn:length(aliGd.productListLire)}">
+                <c:forEach items="${aliGd.productListLire}" var="lireGd">
+                    <td>
 
-                <div>
+                        <div>
+                            <img class="img_sty" src="${lireGd.img}"/>
+                            <a target="_blank" href="${lireGd.url}">${lireGd.url}</a>
+                            <span>价格:${lireGd.price}</span>
+                            <span>Pid:${aliGd.pid}</span>
+                        </div>
+                    </td>
+                </c:forEach>
+            </c:if>
+            <c:if test="${fn:length(aliGd.productListPython)}">
+                <c:forEach items="${aliGd.productListPython}" var="pyGd">
+                    <td>
+                        <div>
+                            <img class="img_sty" src="${pyGd.img}"/>
+                            <a target="_blank" href="${pyGd.url}">${pyGd.url}</a>
+                            <span>价格:${pyGd.price}</span>
+                            <span>Pid:${aliGd.pid}</span>
+                        </div>
+                    </td>
+                </c:forEach>
+            </c:if>
 
-                </div>
-            </td>
-            <td>
-
-                <div>
-
-                </div>
-            </td>
         </tr>
     </c:forEach>
 
