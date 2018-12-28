@@ -2,6 +2,10 @@ package com.importExpress.utli;
 
 import com.cbt.util.SysParamUtil;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.*;
 import com.mongodb.client.result.UpdateResult;
 
@@ -28,13 +32,25 @@ public enum MongoDBHelp {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(MongoDBHelp.class);
 
-    private static final String MONGODB_URL = SysParamUtil.getParam("mongodb.url");
+    private static final String MONGODB_HOST = SysParamUtil.getParam("mongodb.host");
+    private static final String MONGODB_PORT = SysParamUtil.getParam("mongodb.port");
     private static final String MONGODB_DB = SysParamUtil.getParam("mongodb.db");
+    private static final String MONGODB_USERNAME = SysParamUtil.getParam("mongodb.username");
+    private static final String MONGODB_POSSWORD = SysParamUtil.getParam("mongodb.password");
     private MongoClient mongoClient = null;
     private MongoDatabase mongoDatabase = null;
 
     private void getConnection(){
-        this.mongoClient = MongoClients.create(MONGODB_URL);
+    	List<ServerAddress> seeds = new ArrayList<>();
+    	ServerAddress addr = new ServerAddress(MONGODB_HOST, Integer.valueOf(MONGODB_PORT));
+    	seeds.add(addr);
+    	MongoClientOptions options = MongoClientOptions.builder()
+    			.maxWaitTime(30*1000)
+    			.socketTimeout(60*1000)
+    			.maxConnectionLifeTime(60*1000)
+    			.connectTimeout(60*1000).build();
+    	MongoCredential credential = MongoCredential.createCredential(MONGODB_USERNAME, MONGODB_DB, MONGODB_POSSWORD.toCharArray());
+        this.mongoClient = new MongoClient(seeds,credential,options);
         this.mongoDatabase = mongoClient.getDatabase(MONGODB_DB);
     }
 

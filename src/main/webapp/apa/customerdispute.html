@@ -181,7 +181,7 @@
     	}
         function formatAction(val, row, index) {
         	return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
-				+ row.disputeID+'&merchant='+ row.merchantID+ '">查看</a>';
+				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
     	}
         
         function formatOrder(val, row, index) {
