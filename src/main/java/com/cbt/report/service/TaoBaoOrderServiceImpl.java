@@ -372,13 +372,12 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		DecimalFormat df = new DecimalFormat("#0.###");
 		List<BuyReconciliationPojo> list=taoBaoOrderMapper.buyReconciliationReport(map);
 		for (BuyReconciliationPojo buyReconciliationPojo : list) {
-			double ac = Double.valueOf(buyReconciliationPojo.getBeginBlance())//51832.66
-					+ Double.valueOf(buyReconciliationPojo.getTransfer())//205001.00
-					- Double.valueOf(buyReconciliationPojo.getEndBlance())//106764.13
-					- Double.valueOf(buyReconciliationPojo.getEbayAmount())//37000.00
-					- Double.valueOf(buyReconciliationPojo.getMaterialsAmount())//4876.44
-					- Double.valueOf(buyReconciliationPojo.getZfbFright());//30000.00
-//  51832.66+205001.00-106764.13-37000.00-4876.44-30000.00
+			double ac = Double.valueOf(buyReconciliationPojo.getBeginBlance())
+					+ Double.valueOf(buyReconciliationPojo.getTransfer())
+					- Double.valueOf(buyReconciliationPojo.getEndBlance())
+					- Double.valueOf(buyReconciliationPojo.getEbayAmount())
+					- Double.valueOf(buyReconciliationPojo.getMaterialsAmount())
+					- Double.valueOf(buyReconciliationPojo.getZfbFright());
 			double zfbPayAmount = Double.valueOf(buyReconciliationPojo.getNormalAmount())
 					+ Double.valueOf(buyReconciliationPojo.getCancelAmount())
 					+ Double.valueOf(buyReconciliationPojo.getNoMatchingOrder())
@@ -946,6 +945,21 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.getOrderQuery(map);
 	}
+
+	@Override
+	public List<StraightHairPojo> getSaleBuyInfo(Map<String, String> map) {
+		List<StraightHairPojo> list=taoBaoOrderMapper.getSaleBuyInfo(map);
+		for(StraightHairPojo s:list){
+			s.setOrderid("<a target='_blank' title='查看订单详情' href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+s.getOrderid()+"'>"+s.getOrderid()+"</a>");
+		}
+		return list;
+	}
+
+	@Override
+	public List<StraightHairPojo> getSaleBuyInfoCount(Map<String, String> map) {
+		return taoBaoOrderMapper.getSaleBuyInfoCount(map);
+	}
+
 	/**
 	 * 查询建议或确定广东直发的列表
 	 */

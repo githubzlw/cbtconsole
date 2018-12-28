@@ -1902,5 +1902,24 @@
     <select id="getPidValidState"  resultType="hashmap">
         SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
     </select>
+    <select id="getSaleBuyInfo" resultType="com.cbt.pojo.StraightHairPojo">
+        SELECT  tborderid,orderid,goodid as goodsid,odid FROM id_relationtable WHERE  1=1
+        <if test="orderid != null">
+            and tborderid=#{orderid}
+        </if>
+        <if test="odid != null">
+            and (odid=#{odid} or goodid=#{odid})
+        </if>
+        limit ${page0,20}
+    </select>
+    <select id="getSaleBuyInfoCount" resultType="com.cbt.pojo.StraightHairPojo">
+        SELECT  tborderid,orderid,goodid as goodsid,odid FROM id_relationtable WHERE  1=1
+        <if test="orderid != null">
+            and tborderid=#{orderid}
+        </if>
+        <if test="odid != null">
+            and (odid=#{odid} or goodid=#{odid})
+        </if>
+    </select>
 </mapper>
 
