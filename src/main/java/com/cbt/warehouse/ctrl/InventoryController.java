@@ -67,6 +67,15 @@ public class InventoryController {
 	protected EasyUiJsonResult searchGoodsInventoryInfo(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<Object, Object> map = getObjectByInventory(request);
+		List<Inventory> toryList = inventoryService.getIinOutInventory(map);
+		List<Inventory> toryListCount = inventoryService.getIinOutInventoryCount(map);
+		json.setRows(toryList);
+		json.setTotal(toryListCount.size());
+		return json;
+	}
+
+	private Map<Object, Object> getObjectByInventory(HttpServletRequest request) {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		int page = Integer.valueOf(request.getParameter("page"));
 		String type = request.getParameter("type");
@@ -139,11 +148,7 @@ public class InventoryController {
 		map.put("export", "0");
 		map.put("goods_pid",goods_pid);
 		map.put("valid","-1".equals(valid)?null:valid);
-		List<Inventory> toryList = inventoryService.getIinOutInventory(map);
-		List<Inventory> toryListCount = inventoryService.getIinOutInventoryCount(map);
-		json.setRows(toryList);
-		json.setTotal(toryListCount.size());
-		return json;
+		return map;
 	}
 
 	/**
@@ -166,13 +171,10 @@ public class InventoryController {
 		TaoBaoInfoList list = new TaoBaoInfoList();
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
-//		String old_sku = request.getParameter("old_sku");
-//		String goods_pid = request.getParameter("goods_pid");
-//		String car_urlMD5 = request.getParameter("car_urlMD5");
-		String new_barcode = request.getParameter("new_barcode");//盘点后库位
-		String old_barcode = request.getParameter("old_barcode");//盘点前库位
-		String new_remaining = request.getParameter("new_remaining");//盘点后库存
-		String old_remaining = request.getParameter("old_remaining");//盘点前库存
+		String new_barcode = request.getParameter("new_barcode");
+		String old_barcode = request.getParameter("old_barcode");
+		String new_remaining = request.getParameter("new_remaining");
+		String old_remaining = request.getParameter("old_remaining");
 		String flag = request.getParameter("flag");
 		String remark = request.getParameter("remark");
 		String pd_id = request.getParameter("pd_id");
@@ -194,11 +196,7 @@ public class InventoryController {
 				goods_p_price=Double.valueOf(price);
 				new_inventory_amount = goods_p_price * Integer.valueOf(new_remaining);
 			}
-			if (remark != null && !"".equals(remark)) {
-				//remark = (StringUtils.isStrNull(i.getRemark())?"":i.getRemark()) + remark;
-			} else {
-				remark ="";// i.getRemark();
-			}
+			remark=StringUtil.isBlank(remark)?"":remark;
 			isExit = inventoryService.updateSources(flag, StringUtil.isBlank(i.getSku())?"":i.getSku(), i.getGoods_pid(), i.getCar_urlMD5(), new_barcode, old_barcode,
 					Integer.valueOf(new_remaining), Integer.valueOf(old_remaining), remark, new_inventory_amount);
 			if (isExit > 0) {
