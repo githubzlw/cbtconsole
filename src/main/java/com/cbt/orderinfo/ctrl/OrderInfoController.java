@@ -681,8 +681,12 @@ public class OrderInfoController{
 			int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
 			int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
-			String strm=user.getRoletype(); int admuserid=user.getId();
-			admuserid ="0".equals(strm) && Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+			String strm=user.getRoletype();
+			int admuserid=user.getId();
+			if("0".equals(strm)){
+				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+			}
+//			admuserid ="0".equals(strm) && Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
 			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
