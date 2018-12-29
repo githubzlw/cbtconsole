@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
-@RequestMapping("/produceCtr")
+@RequestMapping("/productCtr")
 public class AliProductMacthController {
     private static final Log logger = LogFactory.getLog(AliProductMacthController.class);
 
@@ -29,12 +29,12 @@ public class AliProductMacthController {
         AliProductBean productBean = new AliProductBean();
         String aliPid = request.getParameter("aliPid");
         if (StringUtils.isNotBlank(aliPid)) {
-            productBean.setAliPid(aliPid);
+            productBean.setAliPid(aliPid.trim());
         }
 
         String keyword = request.getParameter("keyword");
         if (StringUtils.isNotBlank(keyword)) {
-            productBean.setKeyword(keyword);
+            productBean.setKeyword(keyword.trim());
         }
 
         String adminIdStr = request.getParameter("adminId");
@@ -52,16 +52,24 @@ public class AliProductMacthController {
         productBean.setStartNum((page - 1) * limitNum);
 
         try {
-            mv.addObject("aliPid",aliPid == null ? "":aliPid);
-            mv.addObject("keyword",keyword == null ? "":keyword);
-            mv.addObject("page",page);
+            mv.addObject("aliPid", productBean.getAliPid() == null ? "" : productBean.getAliPid());
+            mv.addObject("keyword", productBean.getKeyword() == null ? "" : productBean.getKeyword());
+            mv.addObject("page", page);
+            mv.addObject("adminId", productBean.getAdminId());
 
             List<AliProductBean> aliBeans = aliProductService.queryForList(productBean);
             for (AliProductBean aliProduct : aliBeans) {
-                aliProduct.setProductListLire(aliProductService.query1688ByLire(productBean.getAliPid()));
-                aliProduct.setProductListPython(aliProductService.query1688ByPython(productBean.getAliPid()));
+                aliProduct.setProductListLire(aliProductService.query1688ByLire(aliProduct.getAliPid()));
+                aliProduct.setProductListPython(aliProductService.query1688ByPython(aliProduct.getAliPid()));
             }
-            mv.addObject("infos",aliBeans);
+            int total = aliProductService.queryForListCount(productBean);
+            mv.addObject("infos", aliBeans);
+            mv.addObject("total", total);
+            if (total % limitNum == 0) {
+                mv.addObject("totalPage", total / limitNum);
+            } else {
+                mv.addObject("totalPage", total / limitNum + 1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());

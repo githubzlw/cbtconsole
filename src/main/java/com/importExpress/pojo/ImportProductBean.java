@@ -1,17 +1,25 @@
 package com.importExpress.pojo;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ImportProductBean {
-    private  Integer id;
+    private Integer id;
     private String pid;//产品id
     private String name;//产品名称
-	private String img;//产品图片
-	private String price;//产品价格
-	private String url;//产品链接
-	private String unit;//单位
+    private String img;//产品图片
+    private String price;//产品价格
+    private String url;//产品链接
+    private String unit;//单位
     private String catid;
     private String weight;
     private String createTime;
     private String aliPid;
+    private String remotePath;
+    private String rangePrice;
+	private String wprice;
+	private String feeprice;
+	private String showPrice;
+	private int isSoldFlag;
 
     public Integer getId() {
         return id;
@@ -27,6 +35,9 @@ public class ImportProductBean {
 
     public void setPid(String pid) {
         this.pid = pid;
+        if (StringUtils.isNotBlank(pid)) {
+            this.url = "https://detail.1688.com/offer/" + pid + ".html";
+        }
     }
 
     public String getName() {
@@ -99,6 +110,54 @@ public class ImportProductBean {
 
     public void setAliPid(String aliPid) {
         this.aliPid = aliPid;
+    }
+
+    public String getRemotePath() {
+        return remotePath;
+    }
+
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
+    }
+
+    public String getRangePrice() {
+        return rangePrice;
+    }
+
+    public void setRangePrice(String rangePrice) {
+        this.rangePrice = rangePrice;
+    }
+
+    public String getWprice() {
+        return wprice;
+    }
+
+    public void setWprice(String wprice) {
+        this.wprice = wprice;
+    }
+
+    public String getFeeprice() {
+        return feeprice;
+    }
+
+    public void setFeeprice(String feeprice) {
+        this.feeprice = feeprice;
+    }
+
+    public String getShowPrice() {
+        return showPrice;
+    }
+
+    public void setShowPrice(String showPrice) {
+        this.showPrice = showPrice;
+    }
+
+    public int getIsSoldFlag() {
+        return isSoldFlag;
+    }
+
+    public void setIsSoldFlag(int isSoldFlag) {
+        this.isSoldFlag = isSoldFlag;
     }
 
     @Override

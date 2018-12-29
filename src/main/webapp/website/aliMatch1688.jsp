@@ -20,80 +20,179 @@
         max-height: 180px;
         max-width: 180px;
     }
-</style>
-<body>
 
-<div>
-    <form action="/produceCtr/queryForList">
-        AliPid:<input type="text" name="aliPid" value="${aliPid}"/>
-        keyword:<input type="text" name="keyword" value="${keyword}"/>
-        adminId:<input type="text" name="adminId" value="${adminId}"/>
-        &nbsp;&nbsp;&nbsp;<input type="button" value="查询">
+    .s_btn {
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        background: #169bd4;
+        border-radius: 10px;
+        text-align: center;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .inp_sty {
+        height: 26px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var adminId = "${adminId}";
+        getAdminList(adminId);
+    });
+
+    function getAdminList(adminId) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/singleGoods/getAdminList",
+            data: {},
+            success: function (data) {
+                if (data.ok) {
+                    $("#query_admin_id").empty();
+                    var content = '<option value="0" selected="selected">全部</option>';
+                    var json = data.data;
+                    for (var i = 0; i < json.length; i++) {
+                        if (json[i].id == adminId) {
+                            content += '<option selected="select" value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        } else {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                    }
+                    $("#query_admin_id").append(content);
+                } else {
+                    console.log("获取用户列表失败，原因 :" + data.message);
+                }
+            },
+            error: function (res) {
+                console.log("网络获取失败");
+            }
+        });
+    }
+</script>
+<body style="overflow-y: hidden;">
+
+
+<div style="margin-bottom: -3px;text-align: center;width: 100%;height: 10%;">
+    <h3 style="text-align: center;">速卖通对标1688</h3>
+    <form action="/cbtconsole/productCtr/queryForList" method="post">
+        <span>AliPid:<input type="text" name="aliPid" class="inp_sty" value="${aliPid}"/></span>
+        <span>关键词:<input type="text" name="keyword" class="inp_sty" value="${keyword}"/></span>
+        <span>
+            对标人:<select id="query_admin_id" name="adminId" style="height: 28px;"></select>
+            </span>
+        <input type="hidden" value="1" name="page"/>
+        &nbsp;&nbsp;&nbsp;<span><input type="submit" class="s_btn" value="查询"></span>
     </form>
 </div>
 
-<table id="shop_category_id" border="1" cellpadding="1"
-       cellspacing="0" align="center">
-    <thead>
-    <tr align="center" bgcolor="#DAF3F5" style="height: 50px;">
-        <th style="width: 200px;">速卖通商品信息</th>
-        <th style="width: 800px;" colspan="4">lire对标1688商品信息</th>
-        <th style="width: 800px;" colspan="4">爆款对标商品信息</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach items="${infos}" var="aliGd" varStatus="status">
-        <tr bgcolor="#FFF7FB" style="height: 42px;">
-            <td>
-                <div>
-                    <img class="img_sty" src="${aliGd.aliImg}"/>
-                    <a target="_blank" href="${aliGd.aliUrl}">${aliGd.aliUrl}</a>
-                    <span>关键词:${aliGd.keyword}</span>
-                    <span>价格:${aliGd.aliPrice}</span>
-                    <span>AliPid:${aliGd.aliPid}</span>
-                </div>
-            </td>
-            <c:if test="${fn:length(aliGd.productListLire)}">
-                <c:forEach items="${aliGd.productListLire}" var="lireGd">
-                    <td>
-
-                        <div>
-                            <img class="img_sty" src="${lireGd.img}"/>
-                            <a target="_blank" href="${lireGd.url}">${lireGd.url}</a>
-                            <span>价格:${lireGd.price}</span>
-                            <span>Pid:${aliGd.pid}</span>
-                        </div>
-                    </td>
-                </c:forEach>
-            </c:if>
-            <c:if test="${fn:length(aliGd.productListPython)}">
-                <c:forEach items="${aliGd.productListPython}" var="pyGd">
-                    <td>
-                        <div>
-                            <img class="img_sty" src="${pyGd.img}"/>
-                            <a target="_blank" href="${pyGd.url}">${pyGd.url}</a>
-                            <span>价格:${pyGd.price}</span>
-                            <span>Pid:${aliGd.pid}</span>
-                        </div>
-                    </td>
-                </c:forEach>
-            </c:if>
-
+<div style="width: 100%;height: 90%;overflow-y: auto">
+    <table id="shop_category_id" border="1" cellpadding="1"
+           cellspacing="0" align="center">
+        <thead>
+        <tr align="center" style="height: 50px;background-color: #1fe237;">
+            <th style="width: 11%;">速卖通商品信息</th>
+            <th style="width: 44%;" colspan="4">lire对标1688商品信息</th>
+            <th style="width: 44%;" colspan="4">爆款对标商品信息</th>
         </tr>
-    </c:forEach>
+        </thead>
+        <tbody>
+        <c:forEach items="${infos}" var="aliGd" varStatus="status">
+            <tr style="height: 42px;">
+                <td style="width: 11%;">
+                    <div>
+                        <span>关键词:${aliGd.keyword}</span>
+                        <br><span>AliPid:${aliGd.aliPid}</span>
+                        <br><a target="_blank" href="${aliGd.aliUrl}"><img class="img_sty" src="${aliGd.aliImg}"/></a>
+                        <br><span>价格:${aliGd.aliPrice}</span>
+                        <br><span>产品名称:${aliGd.aliName}</span>
+                        <br><span>操作</span>
+                    </div>
+                </td>
+                <c:if test="${fn:length(aliGd.productListLire) > 0}">
+                    <c:forEach items="${aliGd.productListLire}" var="lireGd">
+                        <td style="width: 11%;">
 
-    </tbody>
-</table>
+                            <div>
+                                <span>Pid:${lireGd.pid}</span>
+                                <br><span>价格:${lireGd.showPrice}</span>
+                                <br><a target="_blank" href="${lireGd.url}"><img class="img_sty"
+                                                                             src="${lireGd.remotePath}${lireGd.img}"/></a>
+                                <br><span>产品名:${lireGd.name}</span>
+                            </div>
+                        </td>
+                    </c:forEach>
+                </c:if>
+                <c:if test="${fn:length(aliGd.productListPython) > 0}">
+                    <c:forEach items="${aliGd.productListPython}" var="pyGd">
+                        <td style="width: 11%;">
+                            <div>
+                                <span>Pid:${pyGd.pid}</span>
+                                <br><span>价格:${pyGd.showPrice}</span>
+                                <br><a target="_blank" href="${pyGd.url}"><img class="img_sty"
+                                                                           src="${pyGd.remotePath}${pyGd.img}"/></a>
+                                <br><span>产品名:${pyGd.name}</span>
+                            </div>
+                        </td>
+                    </c:forEach>
+                </c:if>
 
-<div>
-    <form id="submit_form" action="/produceCtr/queryForList">
+            </tr>
+        </c:forEach>
+
+        </tbody>
+    </table>
+
+
+    <form id="submit_form" action="/cbtconsole/productCtr/queryForList" method="post">
         <input type="hidden" id="page_ali_pid" name="aliPid" value="${aliPid}"/>
         <input type="hidden" id="page_keyword" name="keyword" value="${keyword}"/>
         <input type="hidden" id="page_adminId" name="adminId" value="${adminId}"/>
-        <input type="hidden" id="page_num" name="page" value="${page}"/>
-        <input type="button" value="翻页">
-        <input style="display: none;" type="submit" value="提交隐藏">
+        <input type="hidden" id="query_current_page" name="page" value="${page}"/>
     </form>
+    <div style="text-align: center;">
+        <span>当前页：<span id="query_page">${page}</span>/<span id="query_total_page">${totalPage}</span></span>
+        <span>&nbsp;&nbsp;总数：<span id="query_total">${total}</span></span>
+        <span>&nbsp;&nbsp;<input type="button" class="s_btn" value="上一页"
+                                 onclick="beforeQuery(${page},${page-1},${totalPage})"/></span>
+        <span>&nbsp;&nbsp;<input type="button" class="s_btn" value="下一页"
+                                 onclick="beforeQuery(${page},${page+1},${totalPage})"/></span>
+        <span>&nbsp;&nbsp;&nbsp;&nbsp;跳转页：<input id="jump_page" type="number" value="1"/>
+        <input type="button" value="翻页" class="s_btn" onclick="jumpPage(${page},${totalPage})"/></span>
+    </div>
 </div>
 </body>
+<script>
+    function beforeQuery(currentPage, nextPage, totalPage) {
+        if (nextPage > 0 && nextPage <= totalPage) {
+            $("#query_current_page").val(nextPage);
+            doQuery();
+        } else {
+            alert("无法翻页！");
+            return false;
+        }
+    }
+
+    function jumpPage(currentPage, totalPage) {
+
+        var nextPage = $("#jump_page").val();
+        if (nextPage == null || nextPage == "" || nextPage < 1) {
+            alert("请输入跳转页");
+            return false;
+        } else {
+            if (nextPage > 0 && nextPage <= totalPage) {
+                $("#query_current_page").val(nextPage);
+                doQuery();
+            } else {
+                alert("无法翻页！");
+                return false;
+            }
+        }
+    }
+
+    function doQuery() {
+        $("#submit_form").submit();
+    }
+</script>
 </html>

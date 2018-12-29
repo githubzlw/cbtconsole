@@ -27,12 +27,17 @@
         <result column="unit" property="unit"/>
         <result column="catid" property="catid"/>
         <result column="weight" property="weight"/>
+        <result column="remotpath" property="remotePath"/>
         <result column="create_time" property="createTime"/>
+        <result column="is_sold_flag" property="isSoldFlag" />
+		<result column="feeprice" property="feeprice" />
+        <result column="wprice" property="wprice" />
+        <result column="range_price" property="rangePrice" />
     </resultMap>
 
 
     <select id="queryForList" resultMap="aliProductResultMap" parameterType="com.importExpress.pojo.AliProductBean">
-        select id,ali_pid,ali_url,ali_price,ali_img,keyword, DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        select id,ali_pid,ali_name,ali_url,ali_price,ali_img,keyword, DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
         from aa_aliexpress_product
         where 1=1
         <if test="aliPid != null">
@@ -75,17 +80,21 @@
 
     <select id="query1688ByLire" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice
         from aa_ali_product_lire a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
+        limit 4
     </select>
 
 
     <select id="query1688ByPython" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice
         from aa_ali_product_lire a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
+        limit 4
     </select>
 
 </mapper>

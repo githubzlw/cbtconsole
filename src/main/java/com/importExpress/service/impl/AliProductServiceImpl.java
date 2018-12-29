@@ -4,6 +4,7 @@ import com.importExpress.mapper.AliProductMapper;
 import com.importExpress.pojo.AliProductBean;
 import com.importExpress.pojo.ImportProductBean;
 import com.importExpress.service.AliProductService;
+import com.importExpress.utli.GoodsPricePraseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,18 @@ public class AliProductServiceImpl implements AliProductService {
     }
 
     public List<ImportProductBean> query1688ByLire(String aliPid) {
-        return aliProductMapper.query1688ByLire(aliPid);
+        List<ImportProductBean> list = aliProductMapper.query1688ByLire(aliPid);
+        for (ImportProductBean gd : list) {
+            GoodsPricePraseUtil.prasePrice(gd);
+        }
+        return list;
     }
 
     public List<ImportProductBean> query1688ByPython(String aliPid) {
-        return aliProductMapper.query1688ByPython(aliPid);
+        List<ImportProductBean> list = aliProductMapper.query1688ByPython(aliPid);
+        for (ImportProductBean gd : list) {
+            GoodsPricePraseUtil.prasePrice(gd);
+        }
+        return list;
     }
 }
