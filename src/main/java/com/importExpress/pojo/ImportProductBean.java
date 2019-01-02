@@ -19,7 +19,10 @@ public class ImportProductBean {
 	private String wprice;
 	private String feeprice;
 	private String showPrice;
-	private int isSoldFlag;
+	private Integer isSoldFlag;
+	private Integer moq;
+	private Integer sold;
+	private Integer dealState;
 
     public Integer getId() {
         return id;
@@ -152,13 +155,38 @@ public class ImportProductBean {
         this.showPrice = showPrice;
     }
 
-    public int getIsSoldFlag() {
+    public Integer getIsSoldFlag() {
         return isSoldFlag;
     }
 
-    public void setIsSoldFlag(int isSoldFlag) {
+    public void setIsSoldFlag(Integer isSoldFlag) {
         this.isSoldFlag = isSoldFlag;
     }
+
+    public Integer getMoq() {
+        return moq;
+    }
+
+    public void setMoq(Integer moq) {
+        this.moq = moq;
+    }
+
+    public Integer getSold() {
+        return sold;
+    }
+
+    public void setSold(Integer sold) {
+        this.sold = sold;
+    }
+
+    public Integer getDealState() {
+        return dealState;
+    }
+
+    public void setDealState(Integer dealState) {
+        this.dealState = dealState;
+    }
+
 
     @Override
     public String toString() {
@@ -174,6 +202,15 @@ public class ImportProductBean {
                 ", weight='" + weight + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", aliPid='" + aliPid + '\'' +
+                ", remotePath='" + remotePath + '\'' +
+                ", rangePrice='" + rangePrice + '\'' +
+                ", wprice='" + wprice + '\'' +
+                ", feeprice='" + feeprice + '\'' +
+                ", showPrice='" + showPrice + '\'' +
+                ", isSoldFlag=" + isSoldFlag +
+                ", moq=" + moq +
+                ", sold=" + sold +
+                ", dealState=" + dealState +
                 '}';
     }
 }

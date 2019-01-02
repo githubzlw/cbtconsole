@@ -39,4 +39,14 @@ public class AliProductServiceImpl implements AliProductService {
         }
         return list;
     }
+
+    @Override
+    public int setAliFlag(String aliPid, int dealState,int adminId) {
+        return aliProductMapper.setAliFlag(aliPid, dealState,adminId);
+    }
+
+    @Override
+    public int set1688PidFlag(String aliPid, String pid, int dealState,int adminId) {
+        return aliProductMapper.set1688PidFlag(aliPid, pid, dealState,adminId);
+    }
 }

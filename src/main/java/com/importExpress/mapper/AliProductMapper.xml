@@ -14,6 +14,9 @@
         <result column="ali_weight" property="aliWeight"/>
         <result column="admin_id" property="adminId"/>
         <result column="create_time" property="createTime"/>
+        <result column="deal_state" property="dealState"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <resultMap id="importProductResultMap" type="com.importExpress.pojo.ImportProductBean">
@@ -29,29 +32,34 @@
         <result column="weight" property="weight"/>
         <result column="remotpath" property="remotePath"/>
         <result column="create_time" property="createTime"/>
-        <result column="is_sold_flag" property="isSoldFlag" />
-		<result column="feeprice" property="feeprice" />
-        <result column="wprice" property="wprice" />
-        <result column="range_price" property="rangePrice" />
+        <result column="is_sold_flag" property="isSoldFlag"/>
+        <result column="feeprice" property="feeprice"/>
+        <result column="wprice" property="wprice"/>
+        <result column="range_price" property="rangePrice"/>
+        <result column="deal_state" property="dealState"/>
     </resultMap>
 
 
     <select id="queryForList" resultMap="aliProductResultMap" parameterType="com.importExpress.pojo.AliProductBean">
-        select id,ali_pid,ali_name,ali_url,ali_price,ali_img,keyword, DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
-        from aa_aliexpress_product
+        select a.id,a.ali_pid,a.ali_name,a.ali_url,a.ali_price,a.ali_img,a.keyword,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.deal_state,a.admin_id,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,b.admName as admin_name
+        from aa_aliexpress_product a left join admuser b on a.admin_id = b.id
         where 1=1
         <if test="aliPid != null">
-            and ali_pid = #{aliPid}
+            and a.ali_pid = #{aliPid}
         </if>
         <if test="keyword != null">
-            and keyword = #{keyword}
+            and a.keyword = #{keyword}
         </if>
         <if test="aliCatid != null">
-            and ali_catid = #{aliCatid}
+            and a.ali_catid = #{aliCatid}
         </if>
-
-        <if test="adminId != null">
-            and admin_id = #{adminId}
+        <if test="adminId != null and adminId > 0">
+            and a.admin_id = #{adminId}
+        </if>
+        <if test="dealState != null">
+            and a.deal_state = #{dealState}
         </if>
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -72,8 +80,11 @@
         <if test="aliCatid != null">
             and ali_catid = #{aliCatid}
         </if>
-        <if test="adminId != null">
+        <if test="adminId != null and adminId > 0">
             and admin_id = #{adminId}
+        </if>
+        <if test="dealState != null">
+            and deal_state = #{dealState}
         </if>
     </select>
 
@@ -81,7 +92,7 @@
     <select id="query1688ByLire" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
-        b.wprice,b.range_price,b.is_sold_flag,b.feeprice
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state
         from aa_ali_product_lire a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
         limit 4
@@ -91,10 +102,22 @@
     <select id="query1688ByPython" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
-        b.wprice,b.range_price,b.is_sold_flag,b.feeprice
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state
         from aa_ali_product_lire a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
         limit 4
     </select>
+
+    <update id="setAliFlag">
+        update aa_aliexpress_product
+        set deal_state = #{dealState},admin_id = #{adminId}
+        where ali_pid = #{aliPid}
+    </update>
+
+    <update id="set1688PidFlag">
+        update aa_ali_product_lire
+        set deal_state = #{dealState},admin_id = #{adminId}
+        where ali_pid = #{aliPid} and pid = #{pid}
+    </update>
 
 </mapper>

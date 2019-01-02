@@ -19,6 +19,9 @@ public class AliProductBean {
     private int limitNum;
     private List<ImportProductBean> productListLire;
     private List<ImportProductBean> productListPython;
+    private Integer dealState;
+    private String adminName;
+    private String updateTime;
 
     public Integer getId() {
         return id;
@@ -148,6 +151,30 @@ public class AliProductBean {
         this.productListPython = productListPython;
     }
 
+    public Integer getDealState() {
+        return dealState;
+    }
+
+    public void setDealState(Integer dealState) {
+        this.dealState = dealState;
+    }
+
+    public String getAdminName() {
+        return adminName;
+    }
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public String toString() {
         return "AliProductBean{" +
@@ -163,6 +190,13 @@ public class AliProductBean {
                 ", aliWeight='" + aliWeight + '\'' +
                 ", adminId=" + adminId +
                 ", createTime='" + createTime + '\'' +
+                ", startNum=" + startNum +
+                ", limitNum=" + limitNum +
+                ", productListLire=" + productListLire +
+                ", productListPython=" + productListPython +
+                ", dealState=" + dealState +
+                ", adminName='" + adminName + '\'' +
+                ", updateTime='" + updateTime + '\'' +
                 '}';
     }
 }

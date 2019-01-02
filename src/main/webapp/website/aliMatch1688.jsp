@@ -23,7 +23,6 @@
 
     .s_btn {
         display: inline-block;
-        width: 100px;
         height: 30px;
         background: #169bd4;
         border-radius: 10px;
@@ -36,11 +35,34 @@
     .inp_sty {
         height: 26px;
     }
+
+    .s_give {
+        display: inline-block;
+        height: 30px;
+        background: red;
+        border-radius: 10px;
+        text-align: center;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .b_sty {
+        color: red;
+    }
+
+    .b_check {
+        color: #1909ea;
+    }
 </style>
 <script>
     $(document).ready(function () {
         var adminId = "${adminId}";
         getAdminList(adminId);
+        var dealState = "${dealState}";
+        if(!(dealState == null || dealState =="")){
+            $("#query_deal_state").val(dealState);
+        }
     });
 
     function getAdminList(adminId) {
@@ -62,11 +84,72 @@
                     }
                     $("#query_admin_id").append(content);
                 } else {
-                    console.log("获取用户列表失败，原因 :" + data.message);
+                    alert("获取用户列表失败，原因 :" + data.message);
                 }
             },
             error: function (res) {
-                console.log("网络获取失败");
+                alert("网络获取失败");
+            }
+        });
+    }
+
+    function openUrl(aliUrl) {
+        //var aliUrl = 'https://www.aliexpress.com/item/10pc-New-Indian-God-Oil-Wipes-Retardante-Sex-Ejaculation-Delay-Wipes-Sexual-Wet-Tissue-Wipes-for/32901387578.html';
+        var url = 'http://192.168.1.27:10013/cbt/searchPidByAliPid.jsp?aliUrl=' + aliUrl;
+        window.open(url);
+    }
+
+    function setAliFlag(aliPid, obj) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/productCtr/setAliFlag",
+            data: {
+                aliPid: aliPid,
+                dealState: 1
+            },
+            success: function (data) {
+                if (data.ok) {
+                    $(obj).hide();
+                    $(".ali1_" + aliPid).hide();
+                    $(".ali2_" + aliPid).hide();
+                    $(obj).parent().find('input').hide();
+                    $(obj).parent().append('<b class="b_sty">放弃</b>');
+                } else {
+                    alert("执行失败,原因:" + data.message);
+                }
+            },
+            error: function (res) {
+                alert("网络获取失败");
+            }
+        });
+    }
+
+    function set1688PidFlag(aliPid, pid, dealState, obj) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/productCtr/set1688PidFlag",
+            data: {
+                aliPid: aliPid,
+                pid: pid,
+                dealState: dealState
+            },
+            success: function (data) {
+                if (data.ok) {
+                    $(obj).parent().find('input').hide();
+                    if (dealState == 1) {
+                        $(obj).parent().append('<b class="b_sty">近似</b>');
+                    } else if (dealState == 2) {
+                        $(".ali2_" + aliPid).hide();
+                        $(".main_" + aliPid).find('input').hide();
+                        $(".main_" + aliPid).append('<b class="b_sty">已对标</b>');
+                        $(obj).parent().append('<b class="b_sty">对标</b>');
+                    }
+                } else {
+                    alert("执行失败,原因:" + data.message);
+                }
+            },
+            error: function (res) {
+                alert("网络获取失败");
             }
         });
     }
@@ -82,6 +165,12 @@
         <span>
             对标人:<select id="query_admin_id" name="adminId" style="height: 28px;"></select>
             </span>
+        <span>处理状态:<select id="query_deal_state" name="dealState" style="height: 28px;">
+            <option value="-1">全部</option>
+            <option value="0">未处理</option>
+            <option value="1">放弃</option>
+            <option value="2">已对标</option>
+        </select></span>
         <input type="hidden" value="1" name="page"/>
         &nbsp;&nbsp;&nbsp;<span><input type="submit" class="s_btn" value="查询"></span>
     </form>
@@ -91,15 +180,15 @@
     <table id="shop_category_id" border="1" cellpadding="1"
            cellspacing="0" align="center">
         <thead>
-        <tr align="center" style="height: 50px;background-color: #1fe237;">
-            <th style="width: 11%;">速卖通商品信息</th>
-            <th style="width: 44%;" colspan="4">lire对标1688商品信息</th>
-            <th style="width: 44%;" colspan="4">爆款对标商品信息</th>
+        <tr align="center" style="height: 50px;">
+            <th style="width: 11%;background-color: #5aec6c;">速卖通商品信息</th>
+            <th style="width: 44%;background-color: #c0c38e;" colspan="4">lire对标1688商品信息</th>
+            <th style="width: 44%;background-color: #91dee2;" colspan="4">爆款对标商品信息</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${infos}" var="aliGd" varStatus="status">
-            <tr style="height: 42px;">
+            <tr style="height: 42px;background-color: #5aec6c">
                 <td style="width: 11%;">
                     <div>
                         <span>关键词:${aliGd.keyword}</span>
@@ -107,31 +196,71 @@
                         <br><a target="_blank" href="${aliGd.aliUrl}"><img class="img_sty" src="${aliGd.aliImg}"/></a>
                         <br><span>价格:${aliGd.aliPrice}</span>
                         <br><span>产品名称:${aliGd.aliName}</span>
-                        <br><span>操作</span>
+                        <c:if test="${aliGd.dealState == 0}">
+                            <br><span class="main_${aliGd.aliPid}"><input type="button" class="s_btn" value="开发产品"
+                                                                          onclick="openUrl('${aliGd.aliUrl}')"/>
+                        &nbsp;&nbsp;&nbsp;<input type="button" class="s_give" value="放弃"
+                                                 onclick="setAliFlag('${aliGd.aliPid}',this)"/>
+                        </span>
+                        </c:if>
+                        <c:if test="${aliGd.dealState == 1}">
+                            <br><span><b class="b_sty">放弃,操作人:${aliGd.adminName}</b></span>
+                            <br><span><b class="b_sty">操作时间:${aliGd.updateTime}</b></span>
+                        </c:if>
+
+                        <c:if test="${aliGd.dealState == 2}">
+                            <br><span><b class="b_check">已对标,操作人:${aliGd.adminName}</b></span>
+                            <br><span><b class="b_check">操作时间:${aliGd.updateTime}</b></span>
+                        </c:if>
+
                     </div>
                 </td>
                 <c:if test="${fn:length(aliGd.productListLire) > 0}">
                     <c:forEach items="${aliGd.productListLire}" var="lireGd">
-                        <td style="width: 11%;">
-
+                        <td style="width: 11%;background-color: #c0c38e;">
                             <div>
                                 <span>Pid:${lireGd.pid}</span>
                                 <br><span>价格:${lireGd.showPrice}</span>
-                                <br><a target="_blank" href="${lireGd.url}"><img class="img_sty"
-                                                                             src="${lireGd.remotePath}${lireGd.img}"/></a>
+                                <br><a target="_blank" href="${lireGd.url}">
+                                <img class="img_sty" src="${lireGd.remotePath}${lireGd.img}"/></a>
                                 <br><span>产品名:${lireGd.name}</span>
+                                <c:if test="${lireGd.dealState > 0}">
+                                    <c:if test="${lireGd.dealState == 1}">
+                                        <br><span><b class="b_sty">相似</b>
+                                <c:if test="${aliGd.dealState == 0}">
+                                    &nbsp;&nbsp;<input type="button" class="s_btn ali2_${aliGd.aliPid}" value="对标"
+                                    onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this)"/>
+                                </c:if>
+
+                                </span>
+                                    </c:if>
+                                    <c:if test="${lireGd.dealState == 2}">
+                                        <br><span><b class="b_sty">对标</b>
+                                </span>
+                                    </c:if>
+                                </c:if>
+                                <c:if test="${lireGd.dealState == 0}">
+                                    <br><span><input type="button" value="相似" class="s_btn ali1_${aliGd.aliPid}"
+                                                     onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',1,this)"/>
+                                    <c:if test="${aliGd.dealState == 0}">
+                                        &nbsp;&nbsp;<input type="button" value="对标" class="s_btn ali2_${aliGd.aliPid}"
+                                        onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this)"/>
+                                    </c:if>
+                                </span>
+                                </c:if>
+
                             </div>
                         </td>
                     </c:forEach>
                 </c:if>
                 <c:if test="${fn:length(aliGd.productListPython) > 0}">
                     <c:forEach items="${aliGd.productListPython}" var="pyGd">
-                        <td style="width: 11%;">
+                        <td style="width: 11%;background-color: #91dee2;">
                             <div>
                                 <span>Pid:${pyGd.pid}</span>
                                 <br><span>价格:${pyGd.showPrice}</span>
                                 <br><a target="_blank" href="${pyGd.url}"><img class="img_sty"
-                                                                           src="${pyGd.remotePath}${pyGd.img}"/></a>
+                                                                               src="${pyGd.remotePath}${pyGd.img}"/></a>
                                 <br><span>产品名:${pyGd.name}</span>
                             </div>
                         </td>

@@ -40,4 +40,24 @@ public interface AliProductService {
      * @return
      */
     List<ImportProductBean> query1688ByPython(String aliPid);
+
+    /**
+     * 设置阿里商品处理状态
+     *
+     * @param aliPid
+     * @param dealState
+     * @return
+     */
+    int setAliFlag(String aliPid, int dealState,int adminId);
+
+
+    /**
+     * 设置1688商品的处理状态
+     *
+     * @param aliPid
+     * @param pid
+     * @param dealState
+     * @return
+     */
+    int set1688PidFlag(String aliPid, String pid, int dealState,int adminId);
 }
