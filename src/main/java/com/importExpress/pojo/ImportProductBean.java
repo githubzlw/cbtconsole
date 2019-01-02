@@ -23,6 +23,9 @@ public class ImportProductBean {
 	private Integer moq;
 	private Integer sold;
 	private Integer dealState;
+	private Integer bmFlag;
+	private Integer isBenchmark;
+	private String oldAliPid;
 
     public Integer getId() {
         return id;
@@ -187,6 +190,29 @@ public class ImportProductBean {
         this.dealState = dealState;
     }
 
+    public Integer getBmFlag() {
+        return bmFlag;
+    }
+
+    public void setBmFlag(Integer bmFlag) {
+        this.bmFlag = bmFlag;
+    }
+
+    public Integer getIsBenchmark() {
+        return isBenchmark;
+    }
+
+    public void setIsBenchmark(Integer isBenchmark) {
+        this.isBenchmark = isBenchmark;
+    }
+
+    public String getOldAliPid() {
+        return oldAliPid;
+    }
+
+    public void setOldAliPid(String oldAliPid) {
+        this.oldAliPid = oldAliPid;
+    }
 
     @Override
     public String toString() {

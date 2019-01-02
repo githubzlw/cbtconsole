@@ -37,6 +37,12 @@
         <result column="wprice" property="wprice"/>
         <result column="range_price" property="rangePrice"/>
         <result column="deal_state" property="dealState"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
+        <result column="morder" property="moq"/>
+        <result column="sold" property="sold"/>
+        <result column="bm_flag" property="bmFlag"/>
+        <result column="isBenchmark" property="isBenchmark"/>
+        <result column="old_ali_pid" property="oldAliPid"/>
     </resultMap>
 
 
@@ -92,7 +98,8 @@
     <select id="query1688ByLire" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
-        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
+        b.bm_flag ,b.isBenchmark
         from aa_ali_product_lire a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
         limit 4
@@ -102,8 +109,9 @@
     <select id="query1688ByPython" resultMap="importProductResultMap">
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
-        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state
-        from aa_ali_product_lire a,custom_benchmark_ready b
+        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
+        b.bm_flag ,b.isBenchmark
+        from aa_ali_product_python a,custom_benchmark_ready b
         where a.pid = b.pid and a.ali_pid = #{aliPid}
         limit 4
     </select>

@@ -224,6 +224,18 @@
                                 <br><a target="_blank" href="${lireGd.url}">
                                 <img class="img_sty" src="${lireGd.remotePath}${lireGd.img}"/></a>
                                 <br><span>产品名:${lireGd.name}</span>
+                                <br><span>MOQ:${lireGd.moq}&nbsp;&nbsp;销量:${lireGd.sold}&nbsp;&nbsp;
+                                <c:if test="${lireGd.isSoldFlag > 0}">
+                                    <b style="color: green">免邮</b>
+                                </c:if>
+                                <c:if test="${lireGd.isSoldFlag == 0}">
+                                    <b style="color: green">非免邮</b>
+                                </c:if>
+                                </span>
+                                <c:if test="${lireGd.bmFlag == 1 && lireGd.isBenchmark == 1}">
+                                    <br><span style="background-color: #8cda96;">原对标AliPid:${lireGd.oldAliPid}</span>
+                                </c:if>
+
                                 <c:if test="${lireGd.dealState > 0}">
                                     <c:if test="${lireGd.dealState == 1}">
                                         <br><span><b class="b_sty">相似</b>
@@ -262,6 +274,17 @@
                                 <br><a target="_blank" href="${pyGd.url}"><img class="img_sty"
                                                                                src="${pyGd.remotePath}${pyGd.img}"/></a>
                                 <br><span>产品名:${pyGd.name}</span>
+                                <br><span>MOQ:${pyGd.moq}&nbsp;&nbsp;销量:${pyGd.sold}&nbsp;&nbsp;
+                                <c:if test="${pyGd.isSoldFlag > 0}">
+                                    <b style="color: green">免邮</b>
+                                </c:if>
+                                <c:if test="${pyGd.isSoldFlag == 0}">
+                                    <b style="color: green">非免邮</b>
+                                </c:if>
+                                </span>
+                                <c:if test="${pyGd.bmFlag == 1 && pyGd.isBenchmark == 1}">
+                                    <br><span style="background-color: #8cda96;">原对标AliPid:${pyGd.oldAliPid}</span>
+                                </c:if>
                             </div>
                         </td>
                     </c:forEach>
