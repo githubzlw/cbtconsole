@@ -116,7 +116,8 @@ function updatecanceltatus(isok, orderid,odid, goodid, index, repState) {
  * @param repState
  */
 function updategoodstatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
-                          strcartype, usid, goodspprice,odid, goodurl, status, index, repState) {
+                          strcartype, usid, goodspprice,position,odid, goodurl, status, index, repState) {
+    position=position.replace("CR-","");
     var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
         .val();
     var barcode = document.getElementById("code_" + odid + "").innerHTML;
@@ -247,7 +248,7 @@ function updategoodstatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     if (status != 1) {
         put_print(orderid, usid, odid, strcartype, count, loginName,
             tbOrderId, _count, record_, seiUnit, goods_name, barcode,
-            goodurl,odid);
+            goodurl,odid,position);
     }
 }
 //验货是可以重新打印标签
@@ -293,7 +294,7 @@ function relabel(orderid,odid,taobao_itemid,strcar_type,userid,goods_p_price,goo
  * @param goodurl
  */
 function put_print(orderid, usid, odid, strcartype, count, loginName,
-                   tbOrderId, count1, record_, unit, goods_name, barcode, goodurl,odid) {
+                   tbOrderId, count1, record_, unit, goods_name, barcode, goodurl,odid,position) {
     var d = new Date();
     var str = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
     document.getElementById("div_body").style.display = "none";
@@ -310,6 +311,7 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
     document.getElementById('td6').innerHTML = count;
     document.getElementById('td7').innerHTML = str;
     document.getElementById('td9').innerHTML = tbOrderId;
+    document.getElementById('td10').innerHTML = position;
     // jQuery('#qrcode').qrcode({
     //     width : 50,
     //     height : 50,
@@ -342,6 +344,7 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
             document.getElementById('td6').innerHTML = "";
             document.getElementById('td7').innerHTML = "";
             document.getElementById('td9').innerHTML = "";
+            document.getElementById('td10').innerHTML = "";
             // document.getElementById('barcode_img').src="";
             // setTimeout(
             //     function() {
@@ -401,7 +404,8 @@ function addInventory(barcode,inventory_count,orderid,odid,count,record_,unit,go
  * @param repState
  */
 function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
-                           strcartype, usid, goodspprice,odid,isDropshipOrder, goodurl, status, index, repState) {
+                           strcartype, usid, goodspprice,position,odid,isDropshipOrder, goodurl, status, index, repState) {
+    position=position.replace("CR-","");
     var seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
     var unit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
     if (unit == null || unit == "null" || unit == "") {
@@ -476,7 +480,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
         addInventory(barcode,inventory_count,orderid,odid,count,record_,unit,goods_name,tbOrderId,strcartype,goodurl);
     }
     put_print(orderid, usid, odid, strcartype, count, loginName, tbOrderId,
-        _count, record_, unit, goods_name, barcode, goodurl,odid);
+        _count, record_, unit, goods_name, barcode, goodurl,odid,position);
 }
 
 //仓库位置
@@ -694,7 +698,7 @@ document.onmouseup = function() {
     dragging = false;
 }
 
-function put_print1(strcartype,count,tbOrderId,goods_name,barcode,odid,goodurl){
+function put_print1(strcartype,count,tbOrderId,goods_name,barcode,odid,goodurl,id_barcode){
     var d = new Date();
     var str = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
     document.getElementById("div_body").style.display="none";
@@ -1117,6 +1121,8 @@ function search() {
                                 + '\',\''
                                 + json[i].goods_p_price
                                 + '\',\''
+                                + json[i].position
+                                + '\',\''
                                 + json[i].odid
                                 + '\',\''
                                 + json[i].goods_url.replace("'","").replace(/[\r\n]/g, "")
@@ -1146,6 +1152,8 @@ function search() {
                                 + '\',\''
                                 + json[i].goods_p_price
                                 + '\',\''
+                                + json[i].position
+                                + '\',\''
                                 + json[i].odid
                                 + '\',\''
                                 + json[i].isDropshipOrder
@@ -1169,6 +1177,8 @@ function search() {
                                 + '\',\''
                                 + json[i].goods_p_price
                                 + '\',\''
+                                + json[i].position
+                                + '\',\''
                                 + json[i].odid
                                 + '\',\''
                                 + json[i].goods_url.replace("'","").replace(/[\r\n]/g, "")
@@ -1188,6 +1198,8 @@ function search() {
                                 + json[i].userid
                                 + '\',\''
                                 + json[i].goods_p_price
+                                + '\',\''
+                                + json[i].position
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
@@ -1209,6 +1221,8 @@ function search() {
                                 + '\',\''
                                 + json[i].goods_p_price
                                 + '\',\''
+                                + json[i].position
+                                + '\',\''
                                 + json[i].odid
                                 + '\',\''
                                 + json[i].goods_url.replace("'","")
@@ -1228,6 +1242,8 @@ function search() {
                                 + json[i].userid
                                 + '\',\''
                                 + json[i].goods_p_price
+                                + '\',\''
+                                + json[i].position
                                 + '\',\''
                                 + json[i].odid
                                 + '\',\''
@@ -1462,6 +1478,8 @@ function search() {
                                     + '\',\''
                                     + json[i].goods_p_price
                                     + '\',\''
+                                    + json[i].position
+                                    + '\',\''
                                     + json[i].odid
                                     + '\',\''
                                     + json[i].goods_url
@@ -1490,6 +1508,8 @@ function search() {
                                     + json[i].userid
                                     + '\',\''
                                     + json[i].goods_p_price
+                                    + '\',\''
+                                    + json[i].position
                                     + '\',\''
                                     + json[i].odid
                                     + '\',\''
