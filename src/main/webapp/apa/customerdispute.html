@@ -165,10 +165,13 @@
         }
         
         function formatPP(val, row, index) {
-        	if(row.merchantID=='584JZVFU6PPVU'){
-        		return '老账号('+row.merchantID+')';
+        	if(row.apiType=='Paypal'){
+	        	if(row.merchantID=='584JZVFU6PPVU'){
+	        		return '老账号('+row.merchantID+')';
+	        	}
+	    		return '新账号('+row.merchantID+')';
         	}
-    		return '新账号('+row.merchantID+')';
+        	return '';
     	}
         function formatComplain(val, row, index) {
         	var actionHtml = '';
@@ -180,8 +183,12 @@
     		return actionHtml;
     	}
         function formatAction(val, row, index) {
-        	return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+        	if(row.apiType=='Paypal'){
+        		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
 				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
+        	}
+        	return '';
+        	
     	}
         
         function formatOrder(val, row, index) {
