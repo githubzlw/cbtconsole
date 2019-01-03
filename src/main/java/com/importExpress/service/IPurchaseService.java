@@ -285,6 +285,7 @@ public interface IPurchaseService {
 	List<Map<String, Object>> loadCategoryName(String catid);
 	public int updateSizeChart(String imgname,String localpath,int rowid);
 	public List<Map<String,Object>> getSizeChartPidInfo();
+	public int updateSizeChartUpload(List<Integer> rowidArray);
 	public int updateSizeChartById(List<Integer> rowidArray,int userid);
 
 }

@@ -1838,6 +1838,10 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		return pruchaseMapper.updateSizeChart(imgname,localpath, rowid);
 	}
 	@Override
+	public int updateSizeChartUpload(List<Integer> rowidArray) {
+		return pruchaseMapper.updateSizeChartUpload(rowidArray);
+	}
+	@Override
 	public List<Map<String,Object>> getSizeChartPidInfo() {
 		return pruchaseMapper.getSizeChartPidInfo();
 	}

@@ -59,9 +59,16 @@ public class UploadByOkHttp {
 		if (originFile.getName().endsWith(".png")) {
 			imageType = "image/png";
 		}
+		String uploadFileName = originFile.getName();
+		String[] destPathArr = destPath.split("@@@@");
+		if(destPathArr.length==2) {
+			destPath = destPathArr[0];
+			uploadFileName = destPathArr[1];
+		}
 		try {
 			RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-					.addFormDataPart("image", originFile.getName(),
+//					.addFormDataPart("image", originFile.getName(),
+							.addFormDataPart("image", uploadFileName,
 							RequestBody.create(MediaType.parse(imageType), originFile))
 					.addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
 			Request request = new Request.Builder().url(ACCESS_URL).post(formBody).build();

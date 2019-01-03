@@ -21,9 +21,12 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.InputData;
 import com.importExpress.service.IPurchaseService;
 
 import ceRong.tools.bean.SearchLog;
+
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
@@ -1042,7 +1045,9 @@ public class OrderInfoController{
 	 * @return Map<String,Object>
 	 */
 	@RequestMapping(value = "/updateOnlineDetailImgs")
-	public @ResponseBody Map<String,Object> updateOnlineDetailImgs(HttpServletRequest request,HttpServletResponse response){
+	public @ResponseBody List<String> updateOnlineDetailImgs(HttpServletRequest request,HttpServletResponse response){
+		List<String> result_list = new ArrayList<String>();
+		List<Integer> up_ids = new ArrayList<Integer>();
 		//获取需要替换尺码表的产品信息
 		List<Map<String,Object>> listMap = purchaseService.getSizeChartPidInfo();
 		if(listMap!=null) {
@@ -1052,10 +1057,10 @@ public class OrderInfoController{
 				String pid = String.valueOf(map.get("pid"));//40454495059
 				String en_info = String.valueOf(map.get("en_info"));
 				String imgPath = String.valueOf(map.get("remotpath"));//https://img.import-express.com/importcsvimg/coreimg1/40454495059/desc/3019180200_1237798930.jpg
-				String remotePath = imgPath.split("/desc/")[0];//https://img.import-express.com/importcsvimg/coreimg1/40454495059
 				String imgName = imgPath.split("/desc/")[1];//3019180200_1237798930.jpg
 				String replace_img = String.valueOf(map.get("replace_img"));//20181227161224.png
 				String replace_localpath = String.valueOf(map.get("replace_localpath"));// /data/cbtconsole/cbtimg/editimg/520962734304/20181227161224.png
+				//replace_localpath = "E:\\site\\images\\39310691178\\4.4.png";
 				if(stringNotBlank(en_info)&&stringNotBlank(pid)&&stringNotBlank(imgPath)&&stringNotBlank(replace_img)&&stringNotBlank(replace_localpath)) {
 					//解析en_info字段，去掉被替换图片，加入要替换图片
 					Document nwDoc = Jsoup.parseBodyFragment(en_info);
@@ -1066,7 +1071,9 @@ public class OrderInfoController{
 							//是被替换图片
 							if(StringUtils.isNotBlank(imgUrl)&&imgUrl.indexOf(imgName)>-1) {
 								/**********修正 en_info字段 start***/
-								imgUrl = imgUrl.replace(imgName, replace_img);
+								//上传到图片服务器的文件名称
+								String uploadFileName = Calendar.getInstance().getTimeInMillis()+".jpg";
+								imgUrl = imgUrl.replace(imgName, uploadFileName);
 								imel.attr("src", imgUrl);
 								/**********修正 en_info字段 end***/
 								
@@ -1082,28 +1089,32 @@ public class OrderInfoController{
 		                        } else if (imgPath.contains(SERVICE_SHOW_URL_4)) {
 		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
 		                        }
-		                        remoteSavePath = remoteSavePath.replace(imgName, replace_img);
-		                        uploadMap.put(replace_localpath, remoteSavePath);
+		                        remoteSavePath = remoteSavePath.replace(imgName, "");
+		                        uploadMap.put(replace_localpath, remoteSavePath+"@@@@"+uploadFileName);
 	                            /**********把图片上传到图片服务器 end*****/
 	                            break;
 							}
 						}
 						/**********远程发送MQ，更新mongodb eninfo字段 start*****/
-                        
-                        
+						InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+						inputData.setPid(pid);
+						inputData.setEninfo(nwDoc.html());
+						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0);
+						result_list.add(id+"@"+pid);
+						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/
 					}
 				}else {
 					logger.error("updateOnlineDetailImgs data error,row id :"+id);
 				}
-				UploadByOkHttp.doUpload(uploadMap);
+			}
+			boolean dsds = UploadByOkHttp.doUpload(uploadMap);
+			//更新已上传状态
+			if(up_ids.size()>0&&dsds) {
+				purchaseService.updateSizeChartUpload(up_ids);
 			}
 		}
-		
-		
-		
-		
-		
+		return result_list;
 	}
 	
 	/**
