@@ -52,4 +52,10 @@ public interface PaymentMapper {
      * @return
      */
     int countStripePayment(@Param("startTime")String startTime,@Param("endTime")String endTime);
+    
+    /**通过strip交易号获取订单信息
+     * @param paypalids
+     * @return
+     */
+    List<Map<String,Object>> listStripeByTransactionId(@Param("list")List<String> paypalids);
 }

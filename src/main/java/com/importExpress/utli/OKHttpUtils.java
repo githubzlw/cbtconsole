@@ -15,7 +15,13 @@ import okhttp3.Response;
 
 
 public class OKHttpUtils {
-	private OkHttpClient client = new OkHttpClient();
+	private static OkHttpClient client;
+	private static int total = 0;
+
+	static {
+		client = new OkHttpClient();
+		client.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
+	}
 	
 	/**
 	 * Get请求
@@ -25,6 +31,8 @@ public class OKHttpUtils {
 	 * @throws IOException
 	 */
 	public String get(String url,Headers mHeaders) throws Exception {
+		checkAndInitOkHttp();
+
 		Request request = new Request.Builder().url(url).headers(mHeaders).build();
 	    Response response = client.newCall(request).execute();
 	    if(response.isSuccessful()) {
@@ -43,7 +51,8 @@ public class OKHttpUtils {
 	 * @throws IOException
 	 */
 	public String post(String url,Headers mHeaders,String mediaType,String param) throws Exception{
-		
+		checkAndInitOkHttp();
+
 		//设置请求头header
 //		System.out.println("----heads:"+mHeaders);
 		//设置请求参数
@@ -68,7 +77,7 @@ public class OKHttpUtils {
 	 * @throws IOException
 	 */
 	public String postFile(String url,Headers mHeaders,String param,File file) throws Exception{
-		
+
 		//设置请求头header
 //		System.out.println("----heads:"+mHeaders);
 		
@@ -127,7 +136,8 @@ public class OKHttpUtils {
 	 * @throws IOException
 	 */
 	public String patch(String url,Headers mHeaders,String mediaType,String param) throws Exception{
-		
+		checkAndInitOkHttp();
+
 		//设置请求参数
 		RequestBody formBody = RequestBody.create(MediaType.parse(mediaType), param);
 		
@@ -149,6 +159,8 @@ public class OKHttpUtils {
 
 
 	public boolean postFileNoParam(String url,File file)  throws Exception {
+		checkAndInitOkHttp();
+
 		RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 		MultipartBody body = new MultipartBody.Builder()
 				.setType(MultipartBody.FORM)
@@ -172,6 +184,9 @@ public class OKHttpUtils {
 	}
 
 	public String postFileNoParam(String uploadFileName,String url,File file)  throws Exception {
+		
+		checkAndInitOkHttp();
+
 		RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 		MultipartBody body = new MultipartBody.Builder()
 				.setType(MultipartBody.FORM)
@@ -188,6 +203,16 @@ public class OKHttpUtils {
 			return response.body().string();
 		}else{
 			return null;
+		}
+	}
+	
+	
+	private void checkAndInitOkHttp(){
+		total++;
+		if (total % 100 == 0) {
+			total = 0;
+			client = new OkHttpClient();
+			client.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
 		}
 	}
 
