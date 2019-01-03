@@ -145,10 +145,15 @@ function doReset(){
 		<thead>	
 			<tr>
 				<th data-options="field:'tborderid',width:25,align:'center'">采购订单号</th>
+				<th data-options="field:'odid',width:40,align:'center'">购物车id/商品号</th>
+				<th data-options="field:'car_type',width:60,align:'center'">尺寸颜色</th>
+				<th data-options="field:'goods_p_price',width:40,align:'center'">单价（元）</th>
+				<th data-options="field:'buycount',width:40,align:'center'">数量</th>
+				<%--<th data-options="field:'yh',width:40,align:'center'">优惠（元）</th>--%>
+				<th data-options="field:'amount',width:40,align:'center'">采购金额</th>
 				<th data-options="field:'username',width:25,align:'center'">采购账号</th>
-				<th data-options="field:'orderid',width:40,align:'center'">销售订单号</th>
-				<th data-options="field:'goodsid',width:40,align:'center'">商品号</th>
-				<th data-options="field:'odid',width:40,align:'center'">购物车id</th>
+				<%--<th data-options="field:'orderid',width:40,align:'center'">销售订单号</th>--%>
+				<%--<th data-options="field:'goodsid',width:40,align:'center'">商品号</th>--%>
 			</tr>
 		</thead>
 	</table>
