@@ -1903,23 +1903,39 @@
         SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
     </select>
     <select id="getSaleBuyInfo" resultType="com.cbt.pojo.StraightHairPojo">
-        SELECT  tborderid,orderid,goodid as goodsid,odid FROM id_relationtable WHERE  1=1
+        SELECT  distinct id.tborderid,id.orderid,id.goodid as goodsid,id.odid,t.username FROM id_relationtable id inner join taobao_1688_order_history t on id.tborderid=t.orderid WHERE  1=1
         <if test="orderid != null">
-            and tborderid=#{orderid}
+            and id.tborderid=#{orderid}
         </if>
         <if test="odid != null">
-            and (odid=#{odid} or goodid=#{odid})
+            and (id.odid=#{odid} or id.goodid=#{odid})
+        </if>
+        <if test="tborderid != null">
+            and id.orderid=#{tborderid}
         </if>
         limit ${page0,20}
     </select>
     <select id="getSaleBuyInfoCount" resultType="com.cbt.pojo.StraightHairPojo">
-        SELECT  tborderid,orderid,goodid as goodsid,odid FROM id_relationtable WHERE  1=1
+        SELECT  distinct id.tborderid,id.orderid,id.goodid as goodsid,id.odid,t.username FROM id_relationtable id inner join taobao_1688_order_history t on id.tborderid=t.orderid WHERE  1=1
         <if test="orderid != null">
-            and tborderid=#{orderid}
+            and id.tborderid=#{orderid}
         </if>
         <if test="odid != null">
-            and (odid=#{odid} or goodid=#{odid})
+            and (id.odid=#{odid} or id.goodid=#{odid})
         </if>
+        <if test="tborderid != null">
+            and id.orderid=#{tborderid}
+        </if>
+    </select>
+    <select id="getTbOrderDetails" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username
+        FROM taobao_1688_order_history
+        WHERE  orderid=#{orderid} limit ${page},20
+    </select>
+    <select id="getTbOrderDetailsCount" resultType="com.cbt.pojo.TaoBaoOrderInfo">
+        SELECT id,operation_remark,shipno,itemid,tbOr1688,orderid,orderstatus,itemname,itemurl,imgurl,itemprice,itemqty,preferential,totalprice,sku,orderdate,paydata,delivery_date,username
+        FROM taobao_1688_order_history
+        WHERE  orderid=#{orderid}
     </select>
 </mapper>
 
