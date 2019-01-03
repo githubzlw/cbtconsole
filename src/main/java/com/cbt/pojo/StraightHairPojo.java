@@ -32,6 +32,15 @@ public class StraightHairPojo implements Serializable{
 	private String remark;
 	private String states;
 	private String odid;
+	private String username;
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 
 	public String getTborderid() {
 		return tborderid;
