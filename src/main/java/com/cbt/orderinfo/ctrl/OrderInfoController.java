@@ -1,34 +1,31 @@
 package com.cbt.orderinfo.ctrl;
 
+import ceRong.tools.bean.SearchLog;
 import com.alibaba.trade.param.AlibabaTradeFastCreateOrderResult;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.pojo.RechangeRecord;
 import com.cbt.processes.service.ISpiderServer;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.cbt.website.quartz.ParseOrderFreightJob;
+import com.cbt.website.dao.*;
+import com.cbt.website.dao2.IWebsiteOrderDetailDao;
+import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.service.IPurchaseService;
-
-import ceRong.tools.bean.SearchLog;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.tuckey.web.filters.urlrewrite.utils.URLEncoder;
-import sun.misc.BASE64Decoder;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -38,23 +35,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/order")
@@ -70,6 +61,10 @@ public class OrderInfoController{
 	private ISpiderServer spiderService;
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	//private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
+
+	private PaymentDaoImp paymentDao = new PaymentDao();
+	private IWebsiteOrderDetailDao websiteOrderDetailDao = new WebsiteOrderDetailDaoImpl();
+
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		Map<String,String> map=new HashMap<String,String>();
@@ -1103,4 +1098,70 @@ public class OrderInfoController{
         String goodsPid = request.getParameter("goodsPid");
         spiderService.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
     }
+
+
+    @RequestMapping("/recoverCancelOrder")
+    @ResponseBody
+    public JsonResult recoverCancelOrder(HttpServletRequest request) {
+		JsonResult json = new JsonResult();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		if (admuserJson == null) {
+			json.setOk(false);
+			json.setMessage("请登录后操作!");
+			return json;
+		}
+		com.cbt.pojo.Admuser admuser = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+
+		String orderNo = request.getParameter("orderNo");
+		if (StringUtils.isBlank(orderNo)) {
+			json.setMessage("获取订单号失败");
+			json.setOk(false);
+			return json;
+		}
+		String stateStr = request.getParameter("state");
+		if (StringUtils.isBlank(stateStr)) {
+			json.setMessage("获取订单状态失败");
+			json.setOk(false);
+			return json;
+		}
+		try {
+			RechangeRecord record = paymentDao.querySystemCancelOrder(orderNo);
+			if (record == null || record.getPrice() <= 0) {
+				json.setMessage("获取系统取消记录失败，请确认有系统取消记录");
+				json.setOk(false);
+			} else {
+				int res = websiteOrderDetailDao.websiteUpdateOrderState(orderNo, Integer.valueOf(stateStr));
+				// 插入订单状态修改日志表
+				websiteOrderDetailDao.updateOrderStateLog(orderNo, Integer.valueOf(stateStr), "订单状态恢复", admuser.getId());
+				if (res > 0) {
+					ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
+					BigDecimal bd = new BigDecimal(String.valueOf(record.getPrice()));
+					json = balanceDao.changeBalance(record.getUserId(), bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(), 1,
+							1, orderNo, "", admuser.getId());
+					if (json.isOk()) {
+						// 删除订单取消记录
+						boolean isSuccess = websiteOrderDetailDao.deleteRechangeRecord(record.getUserId(), orderNo);
+						if (isSuccess) {
+							json.setOk(true);
+						} else {
+							json.setMessage("删除订单取消记录失败");
+							json.setOk(false);
+							// 执行失败，还原订单状态
+							websiteOrderDetailDao.websiteUpdateOrderState(orderNo, -1);
+						}
+					} else {
+						// 执行失败，还原订单状态
+						websiteOrderDetailDao.websiteUpdateOrderState(orderNo, -1);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
+			json.setMessage("error:" + e.getMessage());
+			json.setOk(false);
+		}
+		return json;
+	}
 }
