@@ -70,6 +70,7 @@
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
+        order by id desc
     </select>
 
 
