@@ -1052,7 +1052,9 @@ public class OrderInfoController{
 		List<Map<String,Object>> listMap = purchaseService.getSizeChartPidInfo();
 		if(listMap!=null) {
 			Map<String, String> uploadMap = new HashMap<String, String>();
+			int count=0;
 			for(Map<String,Object> map:listMap) {
+				count++;
 				String id = String.valueOf(map.get("id"));
 				String pid = String.valueOf(map.get("pid"));//40454495059
 				String en_info = String.valueOf(map.get("en_info"));
@@ -1103,15 +1105,23 @@ public class OrderInfoController{
 						result_list.add(id+"@"+pid);
 						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/
+						
+						//每100张上传一次
+                        if(count==100) {
+                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap);
+                			//更新已上传状态
+                			if(up_ids.size()>0&&dsds) {
+                				purchaseService.updateSizeChartUpload(up_ids);
+                			}
+                			
+                			uploadMap = new HashMap<String, String>();
+                			up_ids = new ArrayList<Integer>();
+                			count=0;
+                        }
 					}
 				}else {
 					logger.error("updateOnlineDetailImgs data error,row id :"+id);
 				}
-			}
-			boolean dsds = UploadByOkHttp.doUpload(uploadMap);
-			//更新已上传状态
-			if(up_ids.size()>0&&dsds) {
-				purchaseService.updateSizeChartUpload(up_ids);
 			}
 		}
 		return result_list;
