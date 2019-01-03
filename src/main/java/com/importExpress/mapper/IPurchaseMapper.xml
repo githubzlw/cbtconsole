@@ -791,7 +791,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
             #{item}
         </foreach>
     </update>
-
+   <select id="getSizeChartPidInfo" resultType="hashMap">
+        select  id,pid,en_info,remotpath,replace_img,replace_localpath from ocr_img_sizechart 
+        where flag=1 and sizechart=2 and replace_img is  not  null limit 1
+    </select>
     <update id="updateSizeChart">
          update ocr_img_sizechart set replace_img = #{imgname},replace_localpath = #{localpath},replace_time=now() where id=#{rowid}
     </update>

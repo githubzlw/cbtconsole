@@ -16,6 +16,8 @@ import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.quartz.ParseOrderFreightJob;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
@@ -24,6 +26,7 @@ import com.importExpress.service.IPurchaseService;
 import ceRong.tools.bean.SearchLog;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+
 import net.minidev.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.tuckey.web.filters.urlrewrite.utils.URLEncoder;
@@ -31,6 +34,10 @@ import sun.misc.BASE64Decoder;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,7 +62,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 @Controller
 @RequestMapping("/order")
 public class OrderInfoController{
@@ -69,6 +75,11 @@ public class OrderInfoController{
 	@Autowired
 	private ISpiderServer spiderService;
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
+    private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
+    private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_4 = "https://img1.import-express.com";
 	//private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
@@ -1022,6 +1033,80 @@ public class OrderInfoController{
 	}
 	
 	/**
+	 * 
+	 * @Title updateOnlineDetailImgs 
+	 * @Description 将运营人员替换的尺码表上传到线上，显示到详情图中
+	 * @param request
+	 * @param response
+	 * @return
+	 * @return Map<String,Object>
+	 */
+	@RequestMapping(value = "/updateOnlineDetailImgs")
+	public @ResponseBody Map<String,Object> updateOnlineDetailImgs(HttpServletRequest request,HttpServletResponse response){
+		//获取需要替换尺码表的产品信息
+		List<Map<String,Object>> listMap = purchaseService.getSizeChartPidInfo();
+		if(listMap!=null) {
+			Map<String, String> uploadMap = new HashMap<String, String>();
+			for(Map<String,Object> map:listMap) {
+				String id = String.valueOf(map.get("id"));
+				String pid = String.valueOf(map.get("pid"));//40454495059
+				String en_info = String.valueOf(map.get("en_info"));
+				String imgPath = String.valueOf(map.get("remotpath"));//https://img.import-express.com/importcsvimg/coreimg1/40454495059/desc/3019180200_1237798930.jpg
+				String remotePath = imgPath.split("/desc/")[0];//https://img.import-express.com/importcsvimg/coreimg1/40454495059
+				String imgName = imgPath.split("/desc/")[1];//3019180200_1237798930.jpg
+				String replace_img = String.valueOf(map.get("replace_img"));//20181227161224.png
+				String replace_localpath = String.valueOf(map.get("replace_localpath"));// /data/cbtconsole/cbtimg/editimg/520962734304/20181227161224.png
+				if(stringNotBlank(en_info)&&stringNotBlank(pid)&&stringNotBlank(imgPath)&&stringNotBlank(replace_img)&&stringNotBlank(replace_localpath)) {
+					//解析en_info字段，去掉被替换图片，加入要替换图片
+					Document nwDoc = Jsoup.parseBodyFragment(en_info);
+					Elements imgEls = nwDoc.getElementsByTag("img");
+					if(imgEls!=null&&imgEls.size()>0) {
+						for(Element imel : imgEls) {
+							String imgUrl = imel.attr("src");
+							//是被替换图片
+							if(StringUtils.isNotBlank(imgUrl)&&imgUrl.indexOf(imgName)>-1) {
+								/**********修正 en_info字段 start***/
+								imgUrl = imgUrl.replace(imgName, replace_img);
+								imel.attr("src", imgUrl);
+								/**********修正 en_info字段 end***/
+								
+								/**********把图片上传到图片服务器 start*****/
+								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
+								String remoteSavePath = "";
+		                        if (imgPath.contains(SERVICE_SHOW_URL_1)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_2)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_3)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_4)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
+		                        }
+		                        remoteSavePath = remoteSavePath.replace(imgName, replace_img);
+		                        uploadMap.put(replace_localpath, remoteSavePath);
+	                            /**********把图片上传到图片服务器 end*****/
+	                            break;
+							}
+						}
+						/**********远程发送MQ，更新mongodb eninfo字段 start*****/
+                        
+                        
+                        /**********远程发送MQ，更新mongodb eninfo字段 end*****/
+					}
+				}else {
+					logger.error("updateOnlineDetailImgs data error,row id :"+id);
+				}
+				UploadByOkHttp.doUpload(uploadMap);
+			}
+		}
+		
+		
+		
+		
+		
+	}
+	
+	/**
      * 
      * @Title searchProductLog 
      * @Description 搜索页面记录用户的搜索结果和点击商品
@@ -1102,5 +1187,12 @@ public class OrderInfoController{
         String searchUserMD5 = request.getParameter("searchUserMD5");
         String goodsPid = request.getParameter("goodsPid");
         spiderService.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
+    }
+    
+    public boolean stringNotBlank(String str) {
+    	if("null".equals(str)||StringUtils.isBlank(str)) {
+    		return false;
+    	}
+    	return true;
     }
 }

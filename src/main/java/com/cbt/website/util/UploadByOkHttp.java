@@ -1,0 +1,104 @@
+package com.cbt.website.util;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.*;
+
+public class UploadByOkHttp {
+	private static final String ACCESS_URL = "http://104.247.194.50:3009/uploadImage";
+	private static final String TOKEN = "cerong2018jack";
+
+	public static boolean doUpload(Map<String, String> uploadMap) {
+		boolean isSuccess = false;
+		File originFile;
+
+		for (String mapKey : uploadMap.keySet()) {
+
+			originFile = new File(mapKey);
+			if (originFile.exists()) {
+				// 重试5次
+				int count = 0;
+				boolean isUpload = false;
+				while (!isUpload && count < 5) {
+					count++;
+					isUpload = uploadFile(originFile, uploadMap.get(mapKey));
+					if (!isUpload) {
+						// 休眠5秒
+						try {
+							Thread.sleep(5 * 1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				if (isUpload) {
+					isSuccess = true;
+				} else {
+					isSuccess = false;
+					break;
+				}
+
+			} else {
+				System.err.println("file:" + originFile.getAbsolutePath() + " is not exists :<:<:<:<");
+				isSuccess = false;
+				break;
+			}
+		}
+		if (!isSuccess) {
+			System.err.println("doUploadByMap error :<:<:<:<");
+		}
+		return isSuccess;
+	}
+
+	public static boolean uploadFile(File originFile, String destPath) {
+		boolean isUpload = false;
+		String imageType = "image/jpeg";
+		if (originFile.getName().endsWith(".png")) {
+			imageType = "image/png";
+		}
+		try {
+			RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+					.addFormDataPart("image", originFile.getName(),
+							RequestBody.create(MediaType.parse(imageType), originFile))
+					.addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
+			Request request = new Request.Builder().url(ACCESS_URL).post(formBody).build();
+			// client = new OkHttpClient();
+			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
+					.readTimeout(60, TimeUnit.SECONDS).writeTimeout(120, TimeUnit.SECONDS).build();
+			Response response = client.newCall(request).execute();
+			String rs = response.body().string();
+			System.out.println(rs);
+			if (rs.contains("OK")) {
+				isUpload = true;
+			} else {
+				isUpload = false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isUpload = false;
+		}
+		return isUpload;
+
+	}
+
+	public static void main(String[] args) {
+		Map<String, String> uploadMap = new HashMap<String, String>();
+
+		for (int i = 0; i < 20; i++) {
+			String sourcePrePath = "E:/";
+			String sourceFileName = "3155222823_1506463280.jpg";
+			if (i < 10) {
+				String preFilePath = "/usr/local/goodsimg/importcsvimg/test/36996699/";
+				uploadMap.put(sourcePrePath + sourceFileName, preFilePath);
+			} else {
+				String preFilePath = "/usr/local/goodsimg/importcsvimg/test/36996699/desc/";
+				uploadMap.put(sourcePrePath + sourceFileName, preFilePath);
+			}
+		}
+		doUpload(uploadMap);
+	}
+
+}
