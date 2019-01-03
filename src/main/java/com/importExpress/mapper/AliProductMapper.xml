@@ -67,10 +67,10 @@
         <if test="dealState != null">
             and a.deal_state = #{dealState}
         </if>
+        order by id desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
-        order by id desc
     </select>
 
 
