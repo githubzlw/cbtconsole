@@ -192,6 +192,7 @@
                 <td style="width: 11%;">
                     <div>
                         <span>关键词:${aliGd.keyword}</span>
+                        <br><span>对标人:${aliGd.adminName}</span>
                         <br><span>AliPid:${aliGd.aliPid}</span>
                         <br><a target="_blank" href="${aliGd.aliUrl}"><img class="img_sty" src="${aliGd.aliImg}"/></a>
                         <br><span>价格:${aliGd.aliPrice}</span>
