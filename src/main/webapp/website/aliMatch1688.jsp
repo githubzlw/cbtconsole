@@ -137,7 +137,7 @@
                 if (data.ok) {
                     $(obj).parent().find('input').hide();
                     if (dealState == 1) {
-                        $(obj).parent().append('<b class="b_sty">近似</b>');
+                        $(obj).parent().append('<b class="b_sty">相似</b>');
                     } else if (dealState == 2) {
                         $(".ali2_" + aliPid).hide();
                         $(".main_" + aliPid).find('input').hide();
@@ -252,9 +252,9 @@
                                     </c:if>
                                 </c:if>
                                 <c:if test="${lireGd.dealState == 0}">
-                                    <br><span><input type="button" value="相似" class="s_btn ali1_${aliGd.aliPid}"
-                                                     onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',1,this)"/>
                                     <c:if test="${aliGd.dealState == 0}">
+                                        <br><span><input type="button" value="相似" class="s_btn ali1_${aliGd.aliPid}"
+                                                     onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',1,this)"/>
                                         &nbsp;&nbsp;<input type="button" value="对标" class="s_btn ali2_${aliGd.aliPid}"
                                         onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this)"/>
                                     </c:if>
