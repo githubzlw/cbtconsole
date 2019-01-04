@@ -48,15 +48,18 @@ public class KeywordCatidRecordController {
 		if (!(stateNumStr == null || "".equals(stateNumStr) || "0".equals(stateNumStr))) {
 			currentPage = Integer.valueOf(stateNumStr);
 		}
-		
-		String keyword = request.getParameter("keyword");
-		DataSourceSelector.set("dataSource127hop");
-		Map<String,Object> map = keywordCatidRecordService.getList(keyword, currentPage, pageSize);
-		DataSourceSelector.restore();
-		json.setSuccess(true);
-		json.setRows(map.get("list"));
-		json.setTotal((Integer)map.get("count"));
-		
+		try{
+			String keyword = request.getParameter("keyword");
+			DataSourceSelector.set("dataSource127hop");
+			Map<String,Object> map = keywordCatidRecordService.getList(keyword, currentPage, pageSize);
+			json.setSuccess(true);
+			json.setRows(map.get("list"));
+			json.setTotal((Integer)map.get("count"));
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return json;
 	}
 	
@@ -77,30 +80,35 @@ public class KeywordCatidRecordController {
 				}
 			}
 		}
-		String issyn = request.getParameter("issyn");
-		DataSourceSelector.set("dataSource127hop");
 		String result = null;
-		if(keywordCatidRecordService.getCountByKeyword(keyword)==0) {
-			KeywordCatidRecordBean bean = new KeywordCatidRecordBean();
-			bean.setKeyword(keyword);
-			bean.setCatid1(catid1);
-			bean.setCatid2(catid2);
-			bean.setCatid3(catid3);
-			if(StringUtil.isNotBlank(keyword1sb.toString())) {
-				keyword1sb.deleteCharAt(keyword1sb.length()-1);
-				bean.setKeyword1(keyword1sb.toString());
+		try{
+			String issyn = request.getParameter("issyn");
+			DataSourceSelector.set("dataSource127hop");
+			if(keywordCatidRecordService.getCountByKeyword(keyword)==0) {
+				KeywordCatidRecordBean bean = new KeywordCatidRecordBean();
+				bean.setKeyword(keyword);
+				bean.setCatid1(catid1);
+				bean.setCatid2(catid2);
+				bean.setCatid3(catid3);
+				if(StringUtil.isNotBlank(keyword1sb.toString())) {
+					keyword1sb.deleteCharAt(keyword1sb.length()-1);
+					bean.setKeyword1(keyword1sb.toString());
+				}
+				bean.setIssyn(Integer.parseInt(issyn));
+				int res = keywordCatidRecordService.addKeyword(bean);
+				if(res>0) {
+					result = "{\"status\":true,\"message\":\"添加成功！\"}";
+				} else {
+					result = "{\"status\":false,\"message\":\"添加失败！\"}";
+				}
+			}else{
+				result = "{\"status\":false,\"message\":\"添加的关键词已存在！\"}";
 			}
-			bean.setIssyn(Integer.parseInt(issyn));
-			int res = keywordCatidRecordService.addKeyword(bean);
-			if(res>0) {
-				result = "{\"status\":true,\"message\":\"添加成功！\"}";
-			} else {
-				result = "{\"status\":false,\"message\":\"添加失败！\"}";
-			}
-		}else{
-			result = "{\"status\":false,\"message\":\"添加的关键词已存在！\"}";
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -111,15 +119,19 @@ public class KeywordCatidRecordController {
 	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		DataSourceSelector.set("dataSource127hop");
-		String id = request.getParameter("id");
-		KeywordCatidRecordBean bean = keywordCatidRecordService.getDetail(Integer.parseInt(id));
-		DataSourceSelector.restore();
-		
-		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(bean);
-		out.print(jsonob);
-		out.close();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			String id = request.getParameter("id");
+			KeywordCatidRecordBean bean = keywordCatidRecordService.getDetail(Integer.parseInt(id));
+			PrintWriter out = response.getWriter();
+			JSONObject jsonob = JSONObject.fromObject(bean);
+			out.print(jsonob);
+			out.close();
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 	}
 	
 	@RequestMapping("/update")
@@ -141,35 +153,39 @@ public class KeywordCatidRecordController {
 		}
 		String issyn = request.getParameter("update_issyn");
 		String id = request.getParameter("update_id");
-		
-		DataSourceSelector.set("dataSource127hop");
-		String result = null;
-		if(keywordCatidRecordService.getCountByKeyword1(keyword,Integer.parseInt(id))==0) {
-			KeywordCatidRecordBean bean = new KeywordCatidRecordBean();
-			bean.setKeyword(keyword);
-			bean.setCatid1(catid1);
-			bean.setCatid2(catid2);
-			bean.setCatid3(catid3);
-			if(StringUtil.isNotBlank(keyword1sb.toString())) {
-				keyword1sb.deleteCharAt(keyword1sb.length()-1);
-				bean.setKeyword1(keyword1sb.toString());
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			String result = null;
+			if(keywordCatidRecordService.getCountByKeyword1(keyword,Integer.parseInt(id))==0) {
+				KeywordCatidRecordBean bean = new KeywordCatidRecordBean();
+				bean.setKeyword(keyword);
+				bean.setCatid1(catid1);
+				bean.setCatid2(catid2);
+				bean.setCatid3(catid3);
+				if(StringUtil.isNotBlank(keyword1sb.toString())) {
+					keyword1sb.deleteCharAt(keyword1sb.length()-1);
+					bean.setKeyword1(keyword1sb.toString());
+				}
+				bean.setIssyn(Integer.parseInt(issyn));
+				bean.setId(Integer.parseInt(id));
+				int res = keywordCatidRecordService.updateKeyword(bean);
+				if(res>0) {
+					result = "{\"status\":true,\"message\":\"修改成功！\"}";
+				} else {
+					result = "{\"status\":false,\"message\":\"修改失败！\"}";
+				}
+			}else{
+				result = "{\"status\":false,\"message\":\"关键词已存在！\"}";
 			}
-			bean.setIssyn(Integer.parseInt(issyn));
-			bean.setId(Integer.parseInt(id));
-			int res = keywordCatidRecordService.updateKeyword(bean);
-			if(res>0) {
-				result = "{\"status\":true,\"message\":\"修改成功！\"}";
-			} else {
-				result = "{\"status\":false,\"message\":\"修改失败！\"}";
-			}
-		}else{
-			result = "{\"status\":false,\"message\":\"关键词已存在！\"}";
+			PrintWriter out = response.getWriter();
+			JSONObject jsonob = JSONObject.fromObject(result);
+			out.print(jsonob);
+			out.close();
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
-		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
-		out.close();
 	}
 	
 	@RequestMapping("/delete")
@@ -177,19 +193,24 @@ public class KeywordCatidRecordController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String id = request.getParameter("id");
-		DataSourceSelector.set("dataSource127hop");
-		int res = keywordCatidRecordService.delKeyword(Integer.parseInt(id));
-		DataSourceSelector.restore();
-		String result = null;
-		if(res>0) {
-			result = "{\"status\":true,\"message\":\"删除成功！\"}";
-		} else {
-			result = "{\"status\":false,\"message\":\"删除失败！\"}";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			int res = keywordCatidRecordService.delKeyword(Integer.parseInt(id));
+			String result = null;
+			if(res>0) {
+				result = "{\"status\":true,\"message\":\"删除成功！\"}";
+			} else {
+				result = "{\"status\":false,\"message\":\"删除失败！\"}";
+			}
+			PrintWriter out = response.getWriter();
+			JSONObject jsonob = JSONObject.fromObject(result);
+			out.print(jsonob);
+			out.close();
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		PrintWriter out = response.getWriter();
-		JSONObject jsonob = JSONObject.fromObject(result);
-		out.print(jsonob);
-		out.close();
 	}
 	
 	@RequestMapping("/updateSyn")
@@ -198,23 +219,28 @@ public class KeywordCatidRecordController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String id = request.getParameter("id");
 		String issyn = request.getParameter("issyn");
-		DataSourceSelector.set("dataSource127hop");
 		String result = null;
-		int res = keywordCatidRecordService.updateSyn(Integer.parseInt(id), Integer.parseInt(issyn));
-		if(res>0){
-			if("1".equals(issyn)) {
-				result = "{\"status\":true,\"message\":\"启用成功\"}";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			int res = keywordCatidRecordService.updateSyn(Integer.parseInt(id), Integer.parseInt(issyn));
+			if(res>0){
+				if("1".equals(issyn)) {
+					result = "{\"status\":true,\"message\":\"启用成功\"}";
+				}else{
+					result = "{\"status\":true,\"message\":\"停用成功\"}";
+				}
 			}else{
-				result = "{\"status\":true,\"message\":\"停用成功\"}";
+				if("1".equals(issyn)) {
+					result = "{\"status\":false,\"message\":\"启用失败\"}";
+				}else{
+					result = "{\"status\":false,\"message\":\"停用失败\"}";
+				}
 			}
-		}else{
-			if("1".equals(issyn)) {
-				result = "{\"status\":false,\"message\":\"启用失败\"}";
-			}else{
-				result = "{\"status\":false,\"message\":\"停用失败\"}";
-			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -223,19 +249,23 @@ public class KeywordCatidRecordController {
 	
 	@RequestMapping("/synonyms.txt")
     public void exportText(HttpServletResponse response){
-		DataSourceSelector.set("dataSource127hop");
-		List<Map<String,Object>> list = keywordCatidRecordService.getKeyword1s();
-		DataSourceSelector.restore();
 		StringBuffer sb = new StringBuffer("");
-		if(list!=null&&list.size()>0){
-			for(Map<String,Object> map : list) {
-				String keyword1 = (String) map.get("keyword1");
-				if(StringUtil.isNotBlank(keyword1)) {
-					sb.append(keyword1.replace(";", ",")).append("\r\n");
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			List<Map<String,Object>> list = keywordCatidRecordService.getKeyword1s();
+			if(list!=null&&list.size()>0){
+				for(Map<String,Object> map : list) {
+					String keyword1 = (String) map.get("keyword1");
+					if(StringUtil.isNotBlank(keyword1)) {
+						sb.append(keyword1.replace(";", ",")).append("\r\n");
+					}
 				}
 			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		
         ExportTextUtil.writeToTxt(response,sb.toString(),"synonyms");
     } 
 	

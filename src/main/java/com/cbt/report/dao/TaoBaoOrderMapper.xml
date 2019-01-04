@@ -1903,7 +1903,12 @@
         SELECT pid,valid FROM custom_benchmark_ready WHERE pid IN (${pids})
     </select>
     <select id="getSaleBuyInfo" resultType="com.cbt.pojo.StraightHairPojo">
-        SELECT  distinct id.tborderid,id.orderid,id.goodid as goodsid,id.odid,t.username FROM id_relationtable id inner join taobao_1688_order_history t on id.tborderid=t.orderid WHERE  1=1
+        SELECT  DISTINCT id.tborderid,id.orderid,CONCAT(id.odid,'/',id.goodid) AS odid,t.username,od.car_type,ops.goods_p_price,ops.buycount,ops.goods_p_price*ops.buycount AS amount
+        FROM id_relationtable id
+        INNER JOIN taobao_1688_order_history t ON id.tborderid=t.orderid
+        INNER JOIN order_details od ON id.odid=od.id
+        INNER JOIN order_product_source ops ON od.id=ops.od_id
+        WHERE  1=1
         <if test="orderid != null">
             and id.tborderid=#{orderid}
         </if>
@@ -1916,7 +1921,12 @@
         limit ${page0,20}
     </select>
     <select id="getSaleBuyInfoCount" resultType="com.cbt.pojo.StraightHairPojo">
-        SELECT  distinct id.tborderid,id.orderid,id.goodid as goodsid,id.odid,t.username FROM id_relationtable id inner join taobao_1688_order_history t on id.tborderid=t.orderid WHERE  1=1
+        SELECT  DISTINCT id.tborderid,id.orderid,CONCAT(id.odid,'/',id.goodid) AS odid,t.username,od.car_type,ops.goods_p_price,ops.buycount,ops.goods_p_price*ops.buycount AS amount
+        FROM id_relationtable id
+        INNER JOIN taobao_1688_order_history t ON id.tborderid=t.orderid
+        INNER JOIN order_details od ON id.odid=od.id
+        INNER JOIN order_product_source ops ON od.id=ops.od_id
+        WHERE  1=1
         <if test="orderid != null">
             and id.tborderid=#{orderid}
         </if>
