@@ -91,14 +91,17 @@ public class EventGoodsCtrl extends UtilAll {
 	@ResponseBody
 	public String getTbGoodsSample(HttpServletRequest request, Model model) {
 		String title = request.getParameter("title");
-
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		List<EventGoodsPojo> tbGoodslist=new ArrayList<EventGoodsPojo>();
 		map.put("title", title);
-		DataSourceSelector.set("dataSource127hop");
-		List<EventGoodsPojo> tbGoodslist = eventGoodsService
-				.getTbGoodsSample(map);
-		DataSourceSelector.restore();
-
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			tbGoodslist = eventGoodsService.getTbGoodsSample(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return net.sf.json.JSONArray.fromObject(tbGoodslist).toString();
 	}
 
@@ -129,13 +132,16 @@ public class EventGoodsCtrl extends UtilAll {
 	@ResponseBody
 	public String getAliCategory(HttpServletRequest request, Model model) {
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
-		map.put("sql",
-				"select * from ali_category where LENGTH(0+path)=LENGTH(path) order by path*1 ");
-
-		DataSourceSelector.set("dataSource127hop");
-		List<AliCategoryPojo> list = eventGoodsService.getAliCategory(map);
-		DataSourceSelector.restore();
-
+		map.put("sql","select * from ali_category where LENGTH(0+path)=LENGTH(path) order by path*1 ");
+		List<AliCategoryPojo> list=new ArrayList<AliCategoryPojo>();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			list = eventGoodsService.getAliCategory(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return net.sf.json.JSONArray.fromObject(list).toString();
 	}
 
@@ -217,12 +223,16 @@ public class EventGoodsCtrl extends UtilAll {
 		}
 
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
+		List<EventGoodsDetailsPojo> tbGoodslist=new ArrayList<EventGoodsDetailsPojo>();
 		map.put("goodssampleid", goodssampleid);
-		DataSourceSelector.set("dataSource127hop");
-		List<EventGoodsDetailsPojo> tbGoodslist = eventGoodsService
-				.getTbGoodsSampleDetails(map);
-		DataSourceSelector.restore();
-
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			tbGoodslist = eventGoodsService.getTbGoodsSampleDetails(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return net.sf.json.JSONArray.fromObject(tbGoodslist).toString();
 	}
 
@@ -260,18 +270,19 @@ public class EventGoodsCtrl extends UtilAll {
 		if (isStringNull(id)) {
 			return "1001";
 		}
-
-		// (category,title,viewimg,discount,discountprice,minnum,defaultnum,remark,createuser
-
-		DataSourceSelector.set("dataSource127hop");
-		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
-		map.put("id", id);
-		int ret = eventGoodsService.deleteTbGoodsSample(map);
-		map.put("goodssampleid", id);
-
-		ret += eventGoodsService.delteGoodsSampleDetails(map);
-		DataSourceSelector.restore();
-
+		int ret=0;
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", id);
+			ret = eventGoodsService.deleteTbGoodsSample(map);
+			map.put("goodssampleid", id);
+			ret += eventGoodsService.delteGoodsSampleDetails(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		if (ret > 0) {
 			return "1000";
 		} else {
@@ -401,10 +412,15 @@ public class EventGoodsCtrl extends UtilAll {
 			return "1003";
 		}
 		map.put("createuser", adm.getId());
-
-		DataSourceSelector.set("dataSource127hop");
-		int ret = eventGoodsService.updateTbGoodsSampleByid(map);
-		DataSourceSelector.restore();
+		int ret=0;
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			ret = eventGoodsService.updateTbGoodsSampleByid(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		if (ret > 0) {
 			return "1000";
 		} else {
@@ -426,11 +442,15 @@ public class EventGoodsCtrl extends UtilAll {
 
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
 		map.put("id", id);
-
-		DataSourceSelector.set("dataSource127hop");
-		EventGoodsDetailsPojo tbGoodslist = eventGoodsService
-				.getTbGoodsSampleDetailsById(map);
-		DataSourceSelector.restore();
+		EventGoodsDetailsPojo tbGoodslist=new EventGoodsDetailsPojo();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			tbGoodslist = eventGoodsService.getTbGoodsSampleDetailsById(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 
 		return net.sf.json.JSONObject.fromObject(tbGoodslist).toString();
 	}
