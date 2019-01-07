@@ -120,7 +120,9 @@ public class HeadInterceptor implements Filter {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error("doFilter",e);
+			System.err.println("doFilter:"+ e.getMessage());
 			String result = "{\"status\":false,\"message\":\"请重新登录进行操作\"}";
 			WebTool.writeJson(result, httpServletResponse);
 		}

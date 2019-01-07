@@ -9,7 +9,7 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
-<title>采购订单/销售订单匹配查询</title>
+<title>采采购订单详情</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link rel="stylesheet" href="script/style.css" type="text/css">
 <link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
@@ -73,17 +73,25 @@ table.imagetable td {
 }
 
 </style>
+	<%
+		String orderid=request.getParameter("orderid");
+	%>
 <script type="text/javascript">
 $(function(){
-	setDatagrid();
-	var opts = $("#easyui-datagrid").datagrid("options");
-	opts.url = "/cbtconsole/StatisticalReport/getSaleBuyInfo";
-
+    setDatagrid();
+    var opts = $("#easyui-datagrid").datagrid("options");
+    opts.url = "/cbtconsole/StatisticalReport/getTbOrderDetails";
+    var orderid='<%=orderid%>';
+    if(orderid != null && orderid != '' && orderid != 'null'){
+        console.log("orderid="+orderid);
+        $("#orderid").val(orderid);
+        doQuery(1);
+    }
 })
 
 function setDatagrid() {
 		$('#easyui-datagrid').datagrid({
-			title : '采购订单/销售订单匹配查询',
+			title : '采购订单详情',
 			//iconCls : 'icon-ok',
 			width : "100%",
 			fit : true,//自动补全 
@@ -108,21 +116,12 @@ function setDatagrid() {
 	
 function doQuery(page) {
 	var orderid=$('#orderid').val();
-	var odid=$('#odid').val();
-	var tborderid=$("#tborderid").val();
 	$("#easyui-datagrid").datagrid("load", {
 		"page":page,
-		"orderid":orderid,
-		"odid":odid,
-		"tborderid":tborderid
+		"orderid":orderid
 	});
 }
 
-function doReset(){
-    $("#orderid").textbox('setValue','');
-    $("#tborderid").textbox('setValue','');
-    $("#odid").textbox('setValue','');
-}
 
 
 
@@ -133,9 +132,7 @@ function doReset(){
 		<div>
 			<form id="query_form" action="#" onsubmit="return false;" style="margin-left:100px;">
 				<input class="easyui-textbox" name="orderid" id="orderid"  style="width:20%;"  data-options="label:'采购订单号:'">
-				<input class="easyui-textbox" name="tborderid" id="tborderid"  style="width:20%;"  data-options="label:'销售订单号:'">
-				<input class="easyui-textbox" name="odid" id="odid"  style="width:20%;"  data-options="label:'购物车id:'">
-				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)"> 
+				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
 		</div>
@@ -144,16 +141,20 @@ function doReset(){
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1500px;height:900px">
 		<thead>	
 			<tr>
-				<th data-options="field:'tborderid',width:25,align:'center'">采购订单号</th>
-				<th data-options="field:'odid',width:40,align:'center'">购物车id/商品号</th>
-				<th data-options="field:'car_type',width:60,align:'center'">尺寸颜色</th>
-				<th data-options="field:'goods_p_price',width:40,align:'center'">单价（元）</th>
-				<th data-options="field:'buycount',width:40,align:'center'">数量</th>
-				<%--<th data-options="field:'yh',width:40,align:'center'">优惠（元）</th>--%>
-				<th data-options="field:'amount',width:40,align:'center'">采购金额</th>
-				<th data-options="field:'username',width:25,align:'center'">采购账号</th>
-				<%--<th data-options="field:'orderid',width:40,align:'center'">销售订单号</th>--%>
-				<%--<th data-options="field:'goodsid',width:40,align:'center'">商品号</th>--%>
+				<th data-options="field:'tbOr1688',width:25,align:'center'">下单来源</th>
+				<th data-options="field:'orderid',width:40,align:'center'">订单号</th>
+				<th data-options="field:'orderstatus',width:40,align:'center'">订单状态</th>
+				<th data-options="field:'itemname',width:55,align:'center'">商品名称</th>
+				<th data-options="field:'imgurl',width:35,align:'center'">商品图片</th>
+				<th data-options="field:'itemprice',width:40,align:'center'">商品单价</th>
+				<th data-options="field:'itemqty',width:45,align:'center'">商品数量</th>
+				<th data-options="field:'preferential',width:45,align:'center'">国内运费</th>
+				<th data-options="field:'totalprice',width:30,align:'center'">订单总价</th>
+				<th data-options="field:'sku',width:55,align:'center'">商品规格</th>
+				<th data-options="field:'orderdate',width:55,align:'center'">订单时间</th>
+				<th data-options="field:'paydata',width:30,align:'center'">支付时间</th>
+				<th data-options="field:'delivery_date',width:45,align:'center'">发货时间</th>
+				<th data-options="field:'username',width:45,align:'center'">采购人</th>
 			</tr>
 		</thead>
 	</table>
