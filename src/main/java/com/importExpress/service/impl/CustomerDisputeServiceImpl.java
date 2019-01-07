@@ -276,7 +276,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setValue(disputeAmount.getString("value") + disputeAmount.getString("currency_code"));
 	    			bean.setReason(resource.getString("reason"));
 	    			bean.setStatus(resource.getString("status"));
-	    			bean.setApiType("Paypal");
+	    			
 	    			JSONArray disputedTransactions = (JSONArray)resource.get("disputed_transactions");
 	    			JSONObject disputedTransaction = (JSONObject)disputedTransactions.get(0);
 	    			JSONObject seller = (JSONObject)disputedTransaction.get("seller");
@@ -290,7 +290,9 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    				
 	    				bean.setUserid(split.length > 3 ? split[0] : "");
 	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
-	    				
+	    				bean.setApiType("Paypal-电商");
+	    			}else {
+	    				bean.setApiType("Paypal-贸易");
 	    			}
 	    			bean.setRead(document.getBooleanValue("isRead"));
 	    			list.add(bean);
@@ -317,7 +319,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	                }
 	                bean.setReason(objectd.getString("reason").toUpperCase());
 	    			bean.setStatus(objectd.getString("status").toUpperCase());
-	    			bean.setApiType("Stripe");
+	    			bean.setApiType("Stripe-电商");
 	    			list.add(bean);
 	    		}
 				
@@ -339,13 +341,14 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			String custom = document.getString("custom");
 	    			bean.setOrderNo("");
 	    			if(StringUtils.indexOf(custom, "@") > -1) {
-	    				
+	    				bean.setApiType("Paypal-电商");
 	    				String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
 	    				
 	    				bean.setUserid(split.length > 3 ? split[0] : "");
 	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
+	    			}else {
+	    				bean.setApiType("Paypal-贸易");
 	    			}
-	    			bean.setApiType("Paypal");
 	    			String reason_code = document.getString("reason_code");
 //	    			reason_code = StringUtils.equals(reason_code, "non_receipt") ? "MERCHANDISE_OR_SERVICE_NOT_RECEIVED" : reason_code;
 	    			bean.setReason(reason_code);
@@ -362,7 +365,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 					transcationMap.put((String)s.get("paypalid"), s);
 				});
 				list.stream().forEach(l -> {
-					if(StringUtils.equals(l.getApiType(), "Stripe")) {
+					if(StringUtils.indexOf(l.getApiType(), "Stripe") > -1) {
 						Map<String, Object> map = transcationMap.get(l.getTransactionID());
 						if(map != null) {
 							l.setUserid(String.valueOf(map.get("userid")));

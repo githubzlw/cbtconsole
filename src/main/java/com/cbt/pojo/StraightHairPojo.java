@@ -32,6 +32,51 @@ public class StraightHairPojo implements Serializable{
 	private String remark;
 	private String states;
 	private String odid;
+	private String username;
+	private String car_type;
+	private String goods_p_price;
+	private String buycount;
+	private String amount;
+	public String getCar_type() {
+		return car_type;
+	}
+
+	public void setCar_type(String car_type) {
+		this.car_type = car_type;
+	}
+
+	public String getGoods_p_price() {
+		return goods_p_price;
+	}
+
+	public void setGoods_p_price(String goods_p_price) {
+		this.goods_p_price = goods_p_price;
+	}
+
+	public String getBuycount() {
+		return buycount;
+	}
+
+	public void setBuycount(String buycount) {
+		this.buycount = buycount;
+	}
+
+	public String getAmount() {
+		return amount;
+	}
+
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 
 	public String getTborderid() {
 		return tborderid;
