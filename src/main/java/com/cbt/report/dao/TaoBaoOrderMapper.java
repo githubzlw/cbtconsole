@@ -287,6 +287,18 @@ public interface TaoBaoOrderMapper {
 	 */
 	public List<TaoBaoOrderInfo> getNoStorage(Map<Object, Object> map);
 	/**
+	 * 采购订单详情查询
+	 * @param map
+	 * @return
+	 */
+	public List<TaoBaoOrderInfo> getTbOrderDetails(Map<String,String> map);
+	/**
+	 * 采购订单详情查询
+	 * @param map
+	 * @return
+	 */
+	public List<TaoBaoOrderInfo> getTbOrderDetailsCount(Map<String,String> map);
+	/**
 	 *发货三天未入库订单详情
 	 * @param map
 	 * @return

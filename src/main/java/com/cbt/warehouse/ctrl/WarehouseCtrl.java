@@ -194,8 +194,12 @@ public class WarehouseCtrl {
 	@ResponseBody
 	protected com.alibaba.fastjson.JSONArray getAllBuyer(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
+		com.alibaba.fastjson.JSONArray jsonArr=new com.alibaba.fastjson.JSONArray();
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null){
+			return jsonArr;
+		}
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
@@ -213,7 +217,7 @@ public class WarehouseCtrl {
 			result.add(a);
 		}
 		result.addAll(list);
-		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
+		jsonArr = JSON.parseArray(JSON.toJSONString(result));
 		return jsonArr;
 	}
 

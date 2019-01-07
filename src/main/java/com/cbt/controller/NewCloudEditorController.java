@@ -1058,7 +1058,7 @@ public class NewCloudEditorController {
 							if (is) {
 								is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 700);
 								if(is){
-									ImageCompression.reduceImgByWidth(700, 0.9f, localDiskPath + localFilePath, localDiskPath + localFilePath);
+									ImageCompression.reduceImgByWidth(700, localDiskPath + localFilePath, localDiskPath + localFilePath);
 								}
 								msg = ftpConfig.getLocalShowPath() + localFilePath;
 							} else {
