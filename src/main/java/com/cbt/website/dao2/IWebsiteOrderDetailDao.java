@@ -23,12 +23,13 @@ public interface IWebsiteOrderDetailDao {
 	/**
 	 * 更新订单状态更新日志
 	 * @param orderid
-	 * @param state
+	 * @param newState
+	 * @param oldState
 	 * @param remark
 	 * @param adminId
 	 * @return
 	 */
-	int updateOrderStateLog(String orderid, int state,String remark,int adminId);
+	int updateOrderStateLog(String orderid, int newState,int oldState,String remark,int adminId);
 
 	/**
 	 * 删除余额变更记录信息

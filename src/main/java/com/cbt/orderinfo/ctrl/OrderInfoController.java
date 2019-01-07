@@ -27,7 +27,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -1124,6 +1124,12 @@ public class OrderInfoController{
 			json.setOk(false);
 			return json;
 		}
+
+		String oldStateStr = request.getParameter("oldState");
+		if(StringUtils.isBlank(oldStateStr)){
+            oldStateStr = "0";
+        }
+
 		try {
 			RechangeRecord record = paymentDao.querySystemCancelOrder(orderNo);
 			if (record == null || record.getPrice() <= 0) {
@@ -1132,12 +1138,12 @@ public class OrderInfoController{
 			} else {
 				int res = websiteOrderDetailDao.websiteUpdateOrderState(orderNo, Integer.valueOf(stateStr));
 				// 插入订单状态修改日志表
-				websiteOrderDetailDao.updateOrderStateLog(orderNo, Integer.valueOf(stateStr), "订单状态恢复", admuser.getId());
+				websiteOrderDetailDao.updateOrderStateLog(orderNo, Integer.valueOf(stateStr), Integer.valueOf(oldStateStr),"订单状态恢复", admuser.getId());
 				if (res > 0) {
 					ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
 					BigDecimal bd = new BigDecimal(String.valueOf(record.getPrice()));
-					json = balanceDao.changeBalance(record.getUserId(), bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(), 1,
-							1, orderNo, "", admuser.getId());
+					json = balanceDao.changeBalance(record.getUserId(), bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(), -1,
+							1, orderNo, "订单状态恢复", admuser.getId());
 					if (json.isOk()) {
 						// 删除订单取消记录
 						boolean isSuccess = websiteOrderDetailDao.deleteRechangeRecord(record.getUserId(), orderNo);

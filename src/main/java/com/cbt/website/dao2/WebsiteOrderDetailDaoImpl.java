@@ -119,19 +119,20 @@ public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 	}
 
 	@Override
-	public int updateOrderStateLog(String orderid, int state, String remark,int adminId) {
+	public int updateOrderStateLog(String orderid, int newState,int oldState, String remark,int adminId) {
 		// TODO Auto-generated method stub
-		String sql = "insert into orderinfo_state_log(order_no,state,remark,admin_id)" +
-				"values(?,?,?,?)";
+		String sql = "insert into orderinfo_state_log(order_no,new_state,old_state,remark,admin_id)" +
+				"values(?,?,?,?,?)";
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		int res = 0;
 		try {
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, orderid);
-			stmt.setInt(2, state);
-			stmt.setString(3, remark);
-			stmt.setInt(4, adminId);
+			stmt.setInt(2, newState);
+			stmt.setInt(3, oldState);
+			stmt.setString(4, remark);
+			stmt.setInt(5,adminId);
 			res = stmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,16 +1,17 @@
 package com.cbt.website.servlet2;
 
+import com.cbt.bean.OrderBean;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
 import com.cbt.messages.ctrl.InsertMessageNotification;
 import com.cbt.pojo.RechangeRecord;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
-import com.cbt.website.dao.PaymentDao;
-import com.cbt.website.dao.PaymentDaoImp;
+import com.cbt.website.dao.*;
 import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 
 /**
  * Servlet implementation class UpdateOrderStateServlet
@@ -71,6 +73,10 @@ public class UpdateOrderStateServlet extends HttpServlet {
         String orderid = request.getParameter("orderid");
         int state = Integer.parseInt(request.getParameter("updatestate"));
         String remark = request.getParameter("remark");
+        String oldStateStr = request.getParameter("oldState");
+        if(StringUtils.isBlank(oldStateStr)){
+            oldStateStr = "0";
+        }
         int res = 0;
 
         try {
@@ -85,20 +91,28 @@ public class UpdateOrderStateServlet extends HttpServlet {
                     // 判断是否取消状态，如果是，则查询是否存在取消记录，存在则不能再取消
                     if (state == -1 || state == 6) {
                         RechangeRecord record = paymentDao.querySystemCancelOrder(orderid);
-                        if (record == null || record.getPrice() <= 0) {
-                            res = 0;
-                        } else {
+                        if (record == null || record.getUserId() == 0 || record.getPrice() <= 0) {
                             res = dao.websiteUpdateOrderState(orderid, state);
                             // 插入订单状态修改日志表
-                            dao.updateOrderStateLog(orderid, state, remark, admuser.getId());
+                            dao.updateOrderStateLog(orderid, state,Integer.valueOf(oldStateStr), remark, admuser.getId());
                             // 插入消息提醒表中
                             InsertMessageNotification msgNtDao = new InsertMessageNotification();
                             msgNtDao.insertOrderStatusChanges(orderid, admuser, state);
+
+                            OrderInfoDao orderInfoDao = new OrderInfoImpl();
+                            OrderBean orderBean = orderInfoDao.getOrderInfo(orderid, null);
+                            //把取消的金额退给客户
+                            UserDao userDao = new UserDaoImpl();
+                            userDao.updateUserAvailable(orderBean.getUserid(),
+                                    new BigDecimal(String.valueOf(orderBean.getPay_price())).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+                                    " system closeOrder:" + orderid,orderid, String.valueOf(admuser.getId()), 0, 0, 1);
+                        } else {
+                            res = 0;
                         }
                     } else {
                         res = dao.websiteUpdateOrderState(orderid, state);
                         // 插入订单状态修改日志表
-                        dao.updateOrderStateLog(orderid, state, remark, admuser.getId());
+                        dao.updateOrderStateLog(orderid, state, Integer.valueOf(oldStateStr),remark, admuser.getId());
                         // 插入消息提醒表中
                         InsertMessageNotification msgNtDao = new InsertMessageNotification();
                         msgNtDao.insertOrderStatusChanges(orderid, admuser, state);

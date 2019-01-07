@@ -25,21 +25,26 @@ $(function(){
 	document.getElementById("originstate").value=state;
  	document.getElementById("orderid").value=orderid;
 });
-function update(){
-	var updatestate=$("#updatestate").val();
-	if(updatestat == -1 || updatestat == 6){
-	    var remark =prompt("取消原因?","请输入备注");
-	    if(remark){
-	        updateOrderState(orderid,updatestate,remark);
-		}
+function update(oldState){
+    if(oldState == -1 || oldState == 6){
+        alert("订单已经取消，请使用“恢复取消订单”按钮来恢复订单");
 	}else{
-	    updateOrderState(orderid,updatestate,"");
+        var updatestate=$("#updatestate").val();
+		if(updatestate == -1 || updatestate == 6){
+			var remark =prompt("确认取消?订单支付金额将退给客户","请输入原因");
+			if(remark){
+				updateOrderState(orderid,updatestate,oldState,remark);
+			}
+		}else{
+			updateOrderState(orderid,updatestate,oldState,"");
+		}
 	}
+
 }
 
-function updateOrderState(orderid,updatestate,remark) {
+function updateOrderState(orderid,updatestate,oldState,remark) {
 	$.post("/cbtconsole/UpdateOrderStateServlet",
-			{orderid:orderid,updatestate:updatestate,remark:remark},
+			{orderid:orderid,updatestate:updatestate,oldState:oldState,remark:remark},
 			function(res){
 				if(res>0){
 					alert('修改成功！(点击之后需要等3分钟才有效果)');
@@ -51,29 +56,38 @@ function updateOrderState(orderid,updatestate,remark) {
 }
 
 
-function recoverCancelOrder(orderid) {
-    var updatestate = $("#updatestate").val();
-    if (updatestat == -1 || updatestat == 6 || updatestat == 0) {
-        alert("恢复订单状态错误");
-    } else {
-        $.ajax({
-            type: "POST",
-            url: "/cbtconsole/order/recoverCancelOrder",
-            data: {
-                "orderNo": orderid,
-                "state": updatestate
-            },
-            success: function (data) {
-                if (data.ok) {
-                    alert("执行成功");
-                } else {
-                    alert("执行错误:' + data.message");
-                }
-            },
-            error: function (res) {
-                alert("获取网络路径失败");
+function recoverCancelOrder(oldState) {
+    var rs = confirm("确认恢复订单状态为选则状态？");
+    if (rs) {
+        if (oldState == -1 || oldState == 6) {
+            var updatestate = $("#updatestate").val();
+            if (updatestate == -1 || updatestate == 6 || updatestate == 0) {
+                alert("恢复订单状态错误");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/order/recoverCancelOrder",
+                    data: {
+                        "orderNo": orderid,
+                        "state": updatestate,
+                        oldState: oldState
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            alert("执行成功");
+                            window.close();
+                        } else {
+                            alert("执行错误:" + data.message);
+                        }
+                    },
+                    error: function (res) {
+                        alert("获取网络路径失败");
+                    }
+                });
             }
-        });
+        } else {
+            alert("请选择正确状态");
+        }
     }
 }
 
@@ -170,7 +184,8 @@ function queryOrderinfo(){
             <% if(!("-1".equals(request.getParameter("state")) || "6".equals(request.getParameter("state")))){%>
                 <option value="6">6</option>
             <%}%>
-		</select><input type="button" value="修改" onclick="update()"><br>
+		</select><input type="button" value="修改" onclick="update(${param.state})">
+&nbsp;&nbsp;<input type="button" value="恢复取消订单" onclick="recoverCancelOrder(${param.state})"><br>
 订单应付款金额：<input id="price" type="text" style="width:88px;height:15px" value="${price}">
 			<input type="button" id="queryOrderinfo" onclick="query()" value="查询">
 			<input type="hidden" id="productcost" value="${product_cost}">
@@ -182,7 +197,6 @@ function queryOrderinfo(){
 			<input type="hidden" id="share_discount" value="${share_discount}">
 			<input type="hidden" id="price1" value="${price}">
 			<input type="button" value="修改" onclick="updatePrice()">
-			&nbsp;&nbsp;<input type="button" value="恢复取消订单" onclick="recoverCancelOrder()">
 			<br>
 <!-- 			<script type="text/javascript"> -->
 <!-- // 				queryOrderinfo(); -->
