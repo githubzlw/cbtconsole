@@ -19,17 +19,23 @@ import com.cbt.website.dao2.IWebsiteOrderDetailDao;
 import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.InputData;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -1022,10 +1028,10 @@ public class OrderInfoController{
 		}
 		return map;
 	}
-	
+
 	/**
-	 * 
-	 * @Title updateOnlineDetailImgs 
+	 *
+	 * @Title updateOnlineDetailImgs
 	 * @Description 将运营人员替换的尺码表上传到线上，显示到详情图中
 	 * @param request
 	 * @param response
@@ -1051,7 +1057,7 @@ public class OrderInfoController{
 				String replace_img = String.valueOf(map.get("replace_img"));//20181227161224.png
 				String replace_localpath = String.valueOf(map.get("replace_localpath"));// /data/cbtconsole/cbtimg/editimg/520962734304/20181227161224.png
 				//replace_localpath = "E:\\site\\images\\39310691178\\4.4.png";
-				if(stringNotBlank(en_info)&&stringNotBlank(pid)&&stringNotBlank(imgPath)&&stringNotBlank(replace_img)&&stringNotBlank(replace_localpath)) {
+				if(StringUtils.isNotBlank(en_info)&&StringUtils.isNotBlank(pid)&&StringUtils.isNotBlank(imgPath)&&StringUtils.isNotBlank(replace_img)&&StringUtils.isNotBlank(replace_localpath)) {
 					//解析en_info字段，去掉被替换图片，加入要替换图片
 					Document nwDoc = Jsoup.parseBodyFragment(en_info);
 					Elements imgEls = nwDoc.getElementsByTag("img");
@@ -1066,7 +1072,7 @@ public class OrderInfoController{
 								imgUrl = imgUrl.replace(imgName, uploadFileName);
 								imel.attr("src", imgUrl);
 								/**********修正 en_info字段 end***/
-								
+
 								/**********把图片上传到图片服务器 start*****/
 								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
 								String remoteSavePath = "";
@@ -1093,7 +1099,7 @@ public class OrderInfoController{
 						result_list.add(id+"@"+pid);
 						up_ids.add(Integer.parseInt(id));
                         /**********远程发送MQ，更新mongodb eninfo字段 end*****/
-						
+
 						//每100张上传一次
                         if(count==100) {
                         	boolean dsds = UploadByOkHttp.doUpload(uploadMap);
@@ -1101,7 +1107,7 @@ public class OrderInfoController{
                 			if(up_ids.size()>0&&dsds) {
                 				purchaseService.updateSizeChartUpload(up_ids);
                 			}
-                			
+
                 			uploadMap = new HashMap<String, String>();
                 			up_ids = new ArrayList<Integer>();
                 			count=0;
@@ -1114,6 +1120,7 @@ public class OrderInfoController{
 		}
 		return result_list;
 	}
+
 	
 	/**
      * 
