@@ -255,18 +255,11 @@ public class UserLoginController {
                 // 数据放入redis
                 Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
                 Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
-                if (userauth == 0 || userauth1 == 0) {
-                    LOG.info("login is false!");
-                    json.setOk(false);
-                    isTrue = false;
-                } else {
-                    LOG.info("authlist:{}", authlist);
-                    LOG.info("save sessionId:[]", sessionId);
-                    LOG.info("login is ok!");
-                    json.setOk(true);
-                    isTrue = true;
-                }
-
+                LOG.info("authlist:{}", authlist);
+                LOG.info("save sessionId:[]", sessionId);
+                LOG.info("login is ok!");
+                json.setOk(true);
+                isTrue = true;
             } else {
                 //Added <V1.0.1> Start： cjc 2018/10/9 11:37 TODO 如果用户密码不正确则直接验证是否是MD5 密码直接登陆
                 admuser = admuserDao.getAdmUserMd5(username, password);
@@ -275,15 +268,9 @@ public class UserLoginController {
                     // 数据放入redis
                     Long userauth1 = Redis.hset(sessionId, "admuser", SerializeUtil.ObjToJson(admuser));
                     Long userauth = Redis.hset(sessionId, "userauth", JSONArray.fromObject(authlist).toString());
-                    if (userauth == 0 || userauth1 == 0) {
-                        LOG.info("login is false!");
-                        json.setOk(false);
-                        isTrue = false;
-                    } else {
-                        LOG.info("login is ok!");
-                        json.setOk(true);
-                        isTrue = true;
-                    }
+                    LOG.info("login is ok!");
+                    json.setOk(true);
+                    isTrue = true;
                 } else {
                     json.setOk(false);
                     LOG.info("login is NG!");

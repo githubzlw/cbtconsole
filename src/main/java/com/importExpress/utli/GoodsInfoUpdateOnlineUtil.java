@@ -6,6 +6,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -406,7 +407,8 @@ public class GoodsInfoUpdateOnlineUtil {
             tempJson = tempJson.replace("\\\\'", "'");
         }
         File file = new File(fileName);
-        FileHelper.writeFile(file, tempJson);
+        // FileHelper.writeFile(file, tempJson);
+        FileUtils.write(file, tempJson,"utf-8");
         file = new File(fileName);
         if (file.exists()) {
             return file;

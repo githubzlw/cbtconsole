@@ -20,4 +20,12 @@
         tab_track_details.action_date DESC
     </select>
 
+    <!--String queryMaxTimeTrackInfo(@Param("trackNo") String trackNo);-->
+    <select id="queryMaxTimeTrackInfo" resultType="String">
+        SELECT CONCAT(action_info,',',action_date)
+        FROM cross_border_shop.tab_track_details
+        WHERE track_no = #{trackNo}
+        ORDER BY action_date DESC LIMIT 1
+    </select>
+
 </mapper>
