@@ -10,7 +10,6 @@ import com.cbt.pojo.RechangeRecord;
 import com.cbt.refund.bean.RefundBean;
 import com.cbt.website.bean.*;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
@@ -2629,6 +2628,42 @@ public class PaymentDao implements PaymentDaoImp {
             DBHelper.getInstance().closeConnection(conn);
         }
         return rfb;
+    }
+
+    @Override
+    public RechangeRecord querySystemCancelOrder(String orderNo) {
+
+        RechangeRecord record = new RechangeRecord();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        String sql = "select * from recharge_record  where remark_id = ? and type = 1 and remark like '%system closeOrder%' limit 1";
+        Connection conn = DBHelper.getInstance().getConnection();
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, orderNo);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                record.setUserId(rs.getInt("userid"));
+                record.setPrice(rs.getDouble("price"));
+                //info.setType(rs.getInt("type"));
+                record.setRemark(rs.getString("remark"));
+                record.setCurrency(rs.getString("currency"));
+                record.setRemarkId(rs.getString("remark_id"));
+                record.setDataTime(rs.getString("datatime"));
+                record.setAdminUser(rs.getString("adminuser"));
+                record.setUseSign(rs.getInt("usesign"));
+                record.setBalanceAfter(rs.getDouble("balanceAfter"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return record;
     }
 
 }
