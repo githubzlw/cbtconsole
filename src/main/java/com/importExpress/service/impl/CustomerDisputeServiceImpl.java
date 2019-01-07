@@ -124,7 +124,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			}
 	    			fl = fl && b.getTime() > sTime && b.getTime() < etime;
 	    			
-//	    			fl = fl && ((StringUtils.isNotBlank(b.getUserid()) && StringUtils.isNotBlank(b.getOprateAdm())) || StringUtils.isBlank(b.getUserid()));
+	    			fl = fl && ((StringUtils.isNotBlank(b.getUserid()) && StringUtils.isNotBlank(b.getOprateAdm())) || StringUtils.isBlank(b.getUserid()));
 	    			
 	    			return fl;
 	    		}
