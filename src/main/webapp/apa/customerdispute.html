@@ -165,7 +165,7 @@
         }
         
         function formatPP(val, row, index) {
-        	if(row.apiType=='Paypal'){
+        	if(row.apiType.indexOf('Paypal')>-1){
 	        	if(row.merchantID=='584JZVFU6PPVU'){
 	        		return '老账号('+row.merchantID+')';
 	        	}
@@ -326,8 +326,7 @@
     <thead>
     <tr>
         <!-- <th data-options="field:'id',width:'80px'">ID</th> -->
-        <th data-options="field:'apiType',width:'30px'">来源</th>
-        <th data-options="field:'complainId',width:'80px',formatter:formatComplain">投诉号</th>
+        <th data-options="field:'apiType',width:'80px'">来源</th>
         <th data-options="field:'disputeID',width:'80px'">事件号</th>
         <th data-options="field:'reason',align:'left',width:'210px'">原因</th>
         <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
@@ -339,6 +338,7 @@
         <th data-options="field:'merchantID',align:'center',width:'100px',formatter:formatPP">pp账号</th>
         <th data-options="field:'oprateAdm',align:'center',width:'100px'">销售</th>
         <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
+        <th data-options="field:'complainId',width:'80px',formatter:formatComplain">投诉号</th>
     </tr>
     </thead>
     <tbody>
