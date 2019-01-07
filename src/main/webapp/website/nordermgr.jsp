@@ -235,7 +235,7 @@ function fn(va) {
 		//运单状态   undefined-未出货 -备货中；2-已发货；3-已签收；4-退回；5-异常；6-内部异常;7-手动标记为正常',
         var trackStateHtm = '';
         var trackState = json[i].track_state;
-        if(trackState != undefined && trackState != '0'){
+        if(trackState != undefined && trackState != '-1'){
             switch (trackState){
                 case '7':
                     trackStateHtm = '手动标记为正常';
