@@ -365,7 +365,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 					transcationMap.put((String)s.get("paypalid"), s);
 				});
 				list.stream().forEach(l -> {
-					if(StringUtils.equals(l.getApiType(), "Stripe")) {
+					if(StringUtils.indexOf(l.getApiType(), "Stripe") > -1) {
 						Map<String, Object> map = transcationMap.get(l.getTransactionID());
 						if(map != null) {
 							l.setUserid(String.valueOf(map.get("userid")));
