@@ -118,4 +118,73 @@ public class WebsiteOrderDetailDaoImpl implements IWebsiteOrderDetailDao {
 		return res;
 	}
 
+	@Override
+	public int updateOrderStateLog(String orderid, int newState,int oldState, String remark,int adminId) {
+		// TODO Auto-generated method stub
+		String sql = "insert into orderinfo_state_log(order_no,new_state,old_state,remark,admin_id)" +
+				"values(?,?,?,?,?)";
+		Connection conn = DBHelper.getInstance().getConnection();
+		PreparedStatement stmt = null;
+		int res = 0;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, orderid);
+			stmt.setInt(2, newState);
+			stmt.setInt(3, oldState);
+			stmt.setString(4, remark);
+			stmt.setInt(5,adminId);
+			res = stmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closePreparedStatement(stmt);
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return res;
+	}
+
+	@Override
+	public boolean deleteRechangeRecord(int userId, String orderid) {
+		// TODO Auto-generated method stub
+		String sql = "delete from recharge_record  where userid = ? and remark_id = ? and type = 1 and remark like '%system closeOrder%'";
+		Connection connAws = DBHelper.getInstance().getConnection2();
+		Connection conn27 = DBHelper.getInstance().getConnection();
+		PreparedStatement stmtAws = null;
+		PreparedStatement stmt27 = null;
+		int rs = 0;
+		try {
+			connAws.setAutoCommit(false);
+			conn27.setAutoCommit(false);
+
+			stmtAws = connAws.prepareStatement(sql);
+			stmtAws.setInt(1, userId);
+			stmtAws.setString(2, orderid);
+
+			stmt27 = conn27.prepareStatement(sql);
+			stmt27.setInt(1, userId);
+			stmt27.setString(2, orderid);
+			rs = stmtAws.executeUpdate();
+			if (rs > 0) {
+				rs = stmt27.executeUpdate();
+				if (rs > 0) {
+					connAws.commit();
+					conn27.commit();
+				} else {
+					connAws.rollback();
+					conn27.rollback();
+				}
+			} else {
+				connAws.rollback();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closePreparedStatement(stmtAws);
+			DBHelper.getInstance().closePreparedStatement(stmt27);
+			DBHelper.getInstance().closeConnection(connAws);
+			DBHelper.getInstance().closeConnection(conn27);
+		}
+		return rs > 0;
+	}
+
 }
