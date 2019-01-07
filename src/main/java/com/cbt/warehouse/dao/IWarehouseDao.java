@@ -2,11 +2,9 @@ package com.cbt.warehouse.dao;
 
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.website.bean.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -891,6 +889,31 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	int saveClothingData(Map<String, String> map);
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProduct(Map<String,String> map);
+
+	/**
+	 * 根据pid查询
+	 * @param pids
+	 * @return
+	 */
+	public List<CustomGoodsBean> getCustomPids(@Param("pids") String pids);
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProductCount(Map<String,String> map);
+	/**
+	 * 添加修改红人产品发货单号
+	 * @param map
+	 * @return
+	 */
+	public int insertShipno(Map<String,String> map);
 	/**
 	 * 人工赋能统计数据查询
 	 * @Title getPurchaseSamplingStatistics

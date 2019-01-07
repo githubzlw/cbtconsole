@@ -30,16 +30,14 @@ import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.orderinfo.service.OrderinfoService;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
-import com.cbt.pojo.Admuser;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.pojo.*;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.*;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.service.MabangshipmentService;
 import com.cbt.warehouse.service.SkuinfoService;
@@ -657,6 +655,49 @@ public class WarehouseCtrl {
 		}
 		out.print(1);
 		out.close();
+	}
+
+	@RequestMapping(value = "/getRedManProduct", method = RequestMethod.POST)
+	@ResponseBody
+	public EasyUiJsonResult getRedManProduct(HttpServletRequest request, Model model) throws ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		int page = Integer.parseInt(request.getParameter("page"));
+		if (page > 0) {
+			page = (page - 1) * 50;
+		}
+		String email=request.getParameter("email");
+		String shipno=request.getParameter("shipno");
+		String shipnoState=request.getParameter("shipnoState");
+		email=StringUtil.isBlank(email)?null:email;
+		map.put("email",email);
+		map.put("page",String.valueOf(page));
+		map.put("shipno",StringUtil.isNotBlank(shipno)?shipno:null);
+		map.put("shipnoState",StringUtil.isNotBlank(shipnoState)?shipnoState:"0");
+		List<RedManProductBean> list=iWarehouseService.getRedProduct(map);
+		List<RedManProductBean> listCount=iWarehouseService.getRedProductCount(map);
+		json.setTotal(listCount.size());
+		json.setRows(list);
+		return json;
+	  }
+
+	/**
+	 * 添加修改红人产品发货单号
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/insertShipno", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String insertShipno(HttpServletRequest request, Model model) {
+		Map<String, String> map = new HashMap<String, String>();
+		String a_id=request.getParameter("a_id");
+		String type=request.getParameter("type");
+		String newShipno=request.getParameter("newShipno");
+		map.put("a_id",a_id);
+		map.put("type",type);
+		map.put("newShipno",newShipno);
+		return iWarehouseService.insertShipno(map) + "";
 	}
 
 	/**
