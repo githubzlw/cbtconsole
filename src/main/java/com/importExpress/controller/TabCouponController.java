@@ -44,10 +44,13 @@ public class TabCouponController {
      */
     @RequestMapping(value = "/list.do")
     @ResponseBody
-    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode) {
+    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid) {
     	if (StringUtils.isBlank(typeCode) || "0".equals(typeCode)) {
     		typeCode = null;
 		}
+		if(valid == -1){
+    	    valid = null;
+        }
         //返回数据
         EasyUiJsonResult json = new EasyUiJsonResult();
         //分页参数接收并处理
@@ -62,7 +65,7 @@ public class TabCouponController {
             page = Integer.valueOf(pageStr);//无该参数时查询默认值1
         }
         // 查询
-        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode);
+        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid);
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
             json.setSuccess(true);
@@ -220,6 +223,29 @@ public class TabCouponController {
             LOG.error("queryTabCouponOne 查询折扣卷异常", e);
         }
         return null;
+    }
+    /**
+     * 删除折扣卷（附带删除关联的相关用户中的折扣卷数据）
+     * 		http://127.0.0.1:8086/cbtconsole/coupon/delCoupon.do?couponCode=
+     * @return
+     **/
+    @RequestMapping(value = "/delCoupon.do")
+    @ResponseBody
+    public Map<String, String> delCoupon(String couponCode) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            if (StringUtils.isBlank(couponCode)){
+                result.put("state", "false");
+                result.put("message", "折扣卷码问题");
+                return result;
+            }
+            result = tabCouponService.delCoupon(couponCode);
+        } catch (Exception e) {
+            LOG.error("queryTabCouponOne 删除扣卷异常, couponCode " + couponCode, e);
+            result.put("state", "false");
+            result.put("message", "删除折扣卷异常");
+        }
+        return result;
     }
 
     /**

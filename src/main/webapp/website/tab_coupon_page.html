@@ -405,7 +405,17 @@ input, textarea, select, button {
 		});
 		//删除卷
 		function delCoupon(couponCode) {
-			alert("功能待完善");
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/coupon/delCoupon.do?couponCode=" + couponCode,
+                dataType:"json",
+                success: function(row){
+                    if(row.state){
+                        $("#date-range-search").click();
+                    }
+                    alert(row.message);
+                }
+            });
 		}
 		//关联用户
 		function showAddCouponUser(couponCode) {
@@ -494,7 +504,8 @@ input, textarea, select, button {
 			$("#date-range-search")
 					.click(
 							function() {
-								var typeCode = $("#typeCode").val()
+								var typeCode = $("#typeCode").val();
+								var valid = $("#valid").val();
 								// 页数
 								var pageSize = $("#main-datagrid").datagrid(
 										"options").pageSize;
@@ -504,7 +515,8 @@ input, textarea, select, button {
 								$('#main-datagrid').datagrid("load", {
 									rows : pageSize,
 									page : pageNumber,
-									typeCode : typeCode
+									typeCode : typeCode,
+                                    valid : valid
 								});
 
 							});
@@ -549,7 +561,7 @@ input, textarea, select, button {
 						return "有效";
 						break;
 					case 0:
-						return "无效";
+						return "已删除";
 						break;
 				}
 			}
@@ -571,11 +583,14 @@ input, textarea, select, button {
 		//操作列
 		function formatterEdit(value, row, index) {
 			if (row.id != null) {
-				return '<a href=\"#\" onclick=\"delCoupon(\'' + row.id
-						+ '\')\"></a>'
-						//+ '\')\">删除</a>&nbsp;&nbsp;'
-                        + '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
-                        + '\')\">关联用户</a>';
+				var temHtml = '';
+				if(row.valid == 1){
+				    temHtml = '<a href=\"#\" onclick=\"delCoupon(\'' + row.id
+                        + '\')\">删除</a>&nbsp;&nbsp;';
+                }
+                temHtml += '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
+                    + '\')\">关联用户</a>';
+                return temHtml;
 			}
 			return;
 		}
@@ -594,6 +609,9 @@ input, textarea, select, button {
 					<td align="center" style="width: 124px;"><span
 						style="float: left; line-height: 30px;">&nbsp;卷类别&nbsp;&nbsp;</span>
 					</td>
+					<td align="center" style="width: 124px;"><span
+						style="float: left; line-height: 30px;">&nbsp;是否有效&nbsp;&nbsp;</span>
+					</td>
 					<td style="width: 100px;">
 						<!--重置按钮-->
 					</td>
@@ -609,7 +627,16 @@ input, textarea, select, button {
 					<td align="center"><select class="form-control" id="typeCode"
 						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
 							<option value="0">0-全部</option>
-					</select></td>
+					</select>
+                    </td>
+					<!--是否有效-->
+					<td align="center"><select class="form-control" id="valid"
+						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="-1">0-全部</option>
+							<option value="1">1-有效</option>
+							<option value="0">2-删除</option>
+					</select>
+                    </td>
 					<!--查询按钮-->
 					<td align="center">
 						<button type="button" id="date-range-search"
@@ -684,5 +711,9 @@ input, textarea, select, button {
 	});
 	$("#typeCodeMo").val(1);
 	$("#typeCodeMo").change();
+	//页面加载完成后进行查询
+    jQuery(function($){
+        $("#date-range-search").click();
+    });
 </script>
 </html>

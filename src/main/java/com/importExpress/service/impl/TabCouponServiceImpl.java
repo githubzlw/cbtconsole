@@ -23,9 +23,9 @@ public class TabCouponServiceImpl implements TabCouponService {
 	private TabCouponMapper tabCouponMapper;
 	
 	@Override
-	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode) {
-		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode);
-		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode);
+	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid) {
+		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid);
+		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid);
 		
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
@@ -49,7 +49,7 @@ public class TabCouponServiceImpl implements TabCouponService {
 		tabCouponNew.setMqlog(json);
 		//保存记录到本地
 		tabCouponMapper.addCoupon(tabCouponNew);
-		//发送mq
+		//发送mq {"count":"100","describe":"-3$","from":"1545580800","id":"001-20181228-100","leftCount":"100","to":"1545926400","type":"1","valid":"1","value":"10-3"}
 		SendMQ sendMQ = new SendMQ();
 		sendMQ.sendCouponMsg(json);
 		sendMQ.closeConn();
@@ -81,7 +81,7 @@ public class TabCouponServiceImpl implements TabCouponService {
         }
         //保存记录到本地
         tabCouponMapper.insertCouponUsers(tabCouponNew, useridList);
-        //发送mq 到线上
+        //发送mq 到线上 {"id":"001-20181228-100","to":"1546185600","type":"2","userid":"1000"}
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
@@ -101,4 +101,22 @@ public class TabCouponServiceImpl implements TabCouponService {
         result.put("message", "关联用户id成功");
         return result;
     }
+
+    @Override
+    public Map<String, String> delCoupon(String couponCode) {
+        Map<String, String> result = new HashMap<String, String>();
+	    //本地数据删除（打标记）
+        tabCouponMapper.updateCouponValid(couponCode, 0);
+        //发送mq删除线上  {"key":"coupon:001-20180929-1000","type":"3"}
+        Map<String, String> jsonMap = new HashMap<String, String>();
+        jsonMap.put("key", "coupon:" + couponCode);
+        jsonMap.put("type", "3");
+        String json = JSONObject.fromObject(jsonMap).toString();
+        //TODO
+        result.put("state", "true");
+        result.put("message", "删除折扣卷成功");
+        return result;
+    }
+
+
 }
