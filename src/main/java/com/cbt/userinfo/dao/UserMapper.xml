@@ -80,4 +80,15 @@
     </if>
     order by status desc,admName
   </select>
+    <!--List<String> queryUserRemark(@Param("userid") int userid);-->
+    <select id="queryUserRemark" resultType="String">
+        SELECT CONCAT(remark, '@@@@', createtime) remark
+        FROM user_remark WHERE userid = #{userid} AND del = 0 AND LENGTH(remark) > 0
+        ORDER BY createtime ASC
+    </select>
+    <!--void insertUserRemark(@Param("userid") int userid, @Param("remark") String remark);-->
+    <insert id="insertUserRemark">
+        INSERT INTO user_remark (userid, remark, createtime)
+        VALUES (#{userid}, #{remark}, NOW())
+    </insert>
 </mapper>

@@ -3582,4 +3582,44 @@
 		 INNER JOIN customs_regulations c ON z.chinapostbig=c.country OR z.fedexie=c.country
 		WHERE oa.orderNo=#{orderid}
 	</select>
+	<select id="getRedProduct" resultType="com.cbt.pojo.RedManProductBean">
+		SELECT GROUP_CONCAT(b.pids) AS pids,a.id,a.recipients,a.address,a.phonenumber,a.country,a.zipcode,a.statename,a.city,a.addressEmail,a.countryname,a.remark,b.createtime,a.shipno
+		FROM ren_product_address a INNER JOIN  red_man_product b ON a.id=b.address_id WHERE a.flag=0 AND b.flag=0
+		<if test="email != null">
+			and a.addressEmail=#{email}
+		</if>
+		<if test="shipno != null">
+			and a.shipno=#{shipno}
+		</if>
+		<if test="shipnoState == 1">
+			and a.shipno is not null
+		</if>
+		<if test="shipnoState == 2">
+			and a.shipno is null
+		</if>
+		GROUP BY a.id ORDER BY a.id DESC
+	</select>
+	<select id="getRedProductCount" resultType="com.cbt.pojo.RedManProductBean">
+		SELECT GROUP_CONCAT(b.pids) AS pids,a.recipients,a.address,a.phonenumber,a.country,a.zipcode,a.statename,a.city,a.addressEmail,a.countryname,a.remark,b.createtime
+		FROM ren_product_address a INNER JOIN  red_man_product b ON a.id=b.address_id WHERE a.flag=0 AND b.flag=0
+		<if test="email != null">
+			and a.addressEmail=#{email}
+		</if>
+		<if test="shipno != null">
+			and a.shipno=#{shipno}
+		</if>
+		<if test="shipnoState == 1">
+			and a.shipno is not null
+		</if>
+		<if test="shipnoState == 2">
+			and a.shipno is null
+		</if>
+		GROUP BY a.id ORDER BY a.id DESC
+	</select>
+	<select id="getCustomPids" resultType="com.cbt.bean.CustomGoodsBean">
+		SELECT pid,enname,custom_main_image as customMainImage,remotpath FROM custom_benchmark_ready WHERE pid IN (${pids})
+	</select>
+	<update id="insertShipno">
+		update ren_product_address set shipno=#{newShipno} where id=#{a_id}
+	</update>
 </mapper>

@@ -558,5 +558,12 @@ public interface CustomGoodsDao {
 
     int insertIntoSkuToOnline(List<CustomBenchmarkSkuNew> insertList);
 
+	/**
+	 * 更新28促销flag
+	 * @param pid
+	 * @return
+	 */
+	int updatePromotionFlag(String pid);
+
 
 }

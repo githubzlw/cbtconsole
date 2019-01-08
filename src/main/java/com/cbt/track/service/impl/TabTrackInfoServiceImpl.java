@@ -5,6 +5,7 @@ import com.cbt.bean.TabTrackInfo;
 import com.cbt.track.dao.TabTrackDetailsMapping;
 import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.track.service.TabTrackInfoService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,10 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
     }
 
     @Override
-    public Map<String, Object> getWarningRecordList(Integer page, Integer rows, String startDate, String endDate, int warning) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getWarningRecordList((page-1)*rows, rows, startDate, endDate, warning);
-        Integer totalCount = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, warning);
-
+    public Map<String, Object> getWarningRecordList(Integer page, Integer rows, String startDate, String endDate, int warning, Integer userid) {
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getWarningRecordList((page-1)*rows, rows, startDate, endDate, warning, userid);
+        Integer totalCount = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, warning, userid);
+        queryTrackInfo(list);//查询最新一条物流
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
         map.put("totalCount", totalCount);
@@ -44,10 +45,10 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
     }
 
     @Override
-    public Map<String, Object> getRecordListByTrackState(Integer page, Integer rows, String startDate, String endDate, int trackState) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByTrackState((page-1)*rows, rows, startDate, endDate, trackState);
-        Integer totalCount = tabTrackInfoMapping.getRecordCountByTrackState(startDate, endDate, trackState);
-
+    public Map<String, Object> getRecordListByTrackState(Integer page, Integer rows, String startDate, String endDate, int trackState, Integer userid) {
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByTrackState((page-1)*rows, rows, startDate, endDate, trackState, userid);
+        Integer totalCount = tabTrackInfoMapping.getRecordCountByTrackState(startDate, endDate, trackState, userid);
+        queryTrackInfo(list);//查询最新一条物流
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
         map.put("totalCount", totalCount);
@@ -55,12 +56,25 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 
     }
 
+    //查询最新一条物流
+    public void queryTrackInfo(List<TabTrackInfo> list) {
+        if (list != null && list.size() > 0){
+            for (TabTrackInfo bean : list) {
+                String trackNo = bean.getTrackNo();
+                String info = tabTrackDetailsMapping.queryMaxTimeTrackInfo(trackNo);
+                if (StringUtils.isNotBlank(info)){
+                    bean.setInfo(info);
+                }
+            }
+        }
+    }
+
 
     @Override
-    public Map<String, Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByOrderOrTrackNo("%" + orderOrTrackNo + "%", "%" + orderOrTrackNo + "%");
+    public Map<String, Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid) {
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByOrderOrTrackNo("%" + orderOrTrackNo + "%", "%" + orderOrTrackNo + "%", userid);
         //通过转单运单查询
-    	List<TabTrackInfo> list2 = tabTrackInfoMapping.getForwardListByTrackNo("%" + orderOrTrackNo + "%");
+    	List<TabTrackInfo> list2 = tabTrackInfoMapping.getForwardListByTrackNo("%" + orderOrTrackNo + "%", userid);
     	if(null != list2 && list2.size() > 0){
     		list.addAll(list2);
     	}
@@ -81,6 +95,7 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         	if (null != delList && delList.size() > 0) {
 				list.removeAll(delList);
 			}
+			queryTrackInfo(list);//查询最新一条物流
             map.put("recordList", list);
             map.put("totalCount", list.size());
         }
@@ -106,13 +121,13 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 	@Override
 	public Map<String, Integer> queryWaringNum(String startDate, String endDate) {
 		Map<String, Integer> result = new HashMap<String, Integer>();
-        Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 0);
-        Integer waring1 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 1);
-        Integer waring2 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 2);
+        Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 0, null);
+        Integer waring1 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 1, null);
+        Integer waring2 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 2, null);
 //        Integer waring3 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 3);
-        Integer waring4 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 4);
-        Integer waring5 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 5);
-        Integer waring6 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 6);
+        Integer waring4 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 4, null);
+        Integer waring5 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 5, null);
+        Integer waring6 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 6, null);
         result.put("waring0", waring0);
         result.put("waring1", waring1);
         result.put("waring2", waring2);

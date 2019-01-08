@@ -92,6 +92,7 @@
 		var paymentid=$("#paymentid").val();
 		var useremail = $("#useremail").val();
 		var state = $("#state").val();
+		var trackState = $("#trackState").val();
 		var showUnpaid = $('#isShowUnpaid').prop('checked')==true?1:0;
 		if(state == 0){
 			showUnpaid = 1;
@@ -134,7 +135,7 @@
 		} else if (va == 4) {
 			page = $("#jump").val();
 		}
-		window.location.href="/cbtconsole/order/getOrderInfo.do?page="+page+"&userid="+userid+"&orderno="+orderno+"&email="+useremail+"&state="+state+"&buyuser="+buyuser+"&admuserid="+admuserid+"&startdate="+startdate+"&enddate="+enddate+"&showUnpaid="+isshowUnpaid+"&type="+type+"&paymentid="+paymentid
+		window.location.href="/cbtconsole/order/getOrderInfo.do?page="+page+"&userid="+userid+"&orderno="+orderno+"&email="+useremail+"&state="+state+"&trackState="+trackState+"&buyuser="+buyuser+"&admuserid="+admuserid+"&startdate="+startdate+"&enddate="+enddate+"&showUnpaid="+isshowUnpaid+"&type="+type+"&paymentid="+paymentid
 	}
 	
 	
