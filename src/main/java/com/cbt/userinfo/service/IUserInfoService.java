@@ -11,6 +11,8 @@ public interface IUserInfoService {
 	Map<String, Object> getUserCount(int userid);
 	
 	List<String> getPaypal(int userID);
+
+	int checkUserName(String username);
 	
 	UserEx getUserEx(int userID);
 

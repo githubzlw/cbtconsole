@@ -24,7 +24,7 @@ public class BlackListDaoImpl implements BlackListDao {
 			stmt = conn.prepareStatement(sql);
 			if(ipSet != null && ipSet.size()>0){
 				for(String ip : ipSet){
-					stmt.setString(1, blackList.getEmail());
+					stmt.setString(1, blackList.getBlackVlue());
 					stmt.setString(2, blackList.getCreatetime());
 					stmt.setString(3, blackList.getOperatorid());
 					stmt.setString(4, ip);
@@ -53,10 +53,10 @@ public class BlackListDaoImpl implements BlackListDao {
 		// TODO Auto-generated method stub
 		StringBuffer sql=new StringBuffer();
 		sql.append("select count(*) as count from tblacklist where 1=1 ");
-		String email=blackList.getEmail();
+		String email=blackList.getBlackVlue();
 		String createtime=blackList.getCreatetime();
 		String operatorid=blackList.getOperatorid();
-		String userip=blackList.getUserip();
+//		String userip=blackList.getUserip();
 		String username=blackList.getUsername();
 		if(email !=null && !"".equals(email)){
 			sql.append(" and email='"+email+"'");
@@ -70,9 +70,9 @@ public class BlackListDaoImpl implements BlackListDao {
 			sql.append(" and operatorid='"+operatorid+"'");
 		}
 		
-		if(userip !=null && !"".equals(userip)){
-			sql.append(" and userip='"+userip+"'");
-		}
+//		if(userip !=null && !"".equals(userip)){
+//			sql.append(" and userip='"+userip+"'");
+//		}
 		
 		if(username !=null && !"".equals(username)){
 			sql.append(" and username='"+username+"'");
@@ -116,10 +116,10 @@ public class BlackListDaoImpl implements BlackListDao {
 	public int getBlackListPageCount(BlackList blackList) {
 		// TODO Auto-generated method stub
 		Integer id=blackList.getId();
-		String email=blackList.getEmail();
+		String email=blackList.getBlackVlue();
 		String createtime=blackList.getCreatetime();
 		String operatorid=blackList.getOperatorid();
-		String userip=blackList.getUserip();
+//		String userip=blackList.getUserip();
 		String username=blackList.getUsername();
 		StringBuffer sql=new StringBuffer();
 		sql.append("select count(*) as count from tblacklist where 1=1 ");
@@ -139,9 +139,9 @@ public class BlackListDaoImpl implements BlackListDao {
 			sql.append(" and operatorid='"+operatorid+"'");
 		}
 		
-		if(userip !=null && !"".equals(userip)){
-			sql.append(" and userip='"+userip+"'");
-		}
+//		if(userip !=null && !"".equals(userip)){
+//			sql.append(" and userip='"+userip+"'");
+//		}
 		
 		if(username !=null && !"".equals(username)){
 			sql.append(" and username='"+username+"'");
@@ -182,10 +182,10 @@ public class BlackListDaoImpl implements BlackListDao {
 	public List<BlackList> getBlackListPage(BlackList blackList, int pagenum, int pagesize) {
 		// TODO Auto-generated method stub
 		Integer id=blackList.getId();
-		String email=blackList.getEmail();
+		String email=blackList.getBlackVlue();
 		String createtime=blackList.getCreatetime();
 		String operatorid=blackList.getOperatorid();
-		String userip=blackList.getUserip();
+//		String userip=blackList.getUserip();
 		String username=blackList.getUsername();
 		StringBuffer sql=new StringBuffer();
 		sql.append("select * from tblacklist where 1=1 ");
@@ -205,10 +205,10 @@ public class BlackListDaoImpl implements BlackListDao {
 			sql.append(" and operatorid='"+operatorid+"'");
 		}
 		
-		if(userip !=null && !"".equals(userip)){
-			sql.append(" and userip='"+userip+"'");
-		}
-		
+//		if(userip !=null && !"".equals(userip)){
+//			sql.append(" and userip='"+userip+"'");
+//		}
+//
 		if(username !=null && !"".equals(username)){
 			sql.append(" and username='"+username+"'");
 		}
@@ -223,10 +223,10 @@ public class BlackListDaoImpl implements BlackListDao {
 			while(rs.next()){
 				blackList=new BlackList();
 				blackList.setId(rs.getInt("id"));
-				blackList.setEmail(rs.getString("email"));
+//				blackList.setEmail(rs.getString("email"));
 				blackList.setCreatetime(rs.getString("createtime"));
 				blackList.setOperatorid(rs.getString("operatorid"));
-				blackList.setUserip(rs.getString("userip"));
+//				blackList.setUserip(rs.getString("userip"));
 				blackList.setUsername(rs.getString("username"));
 				list.add(blackList);
 			}
@@ -283,30 +283,30 @@ public class BlackListDaoImpl implements BlackListDao {
 		StringBuffer sql=new StringBuffer();
 		sql.append("select * from tblacklist where 1=1 ");
 		Integer id=blackList.getId();
-		String email=blackList.getEmail();
+//		String email=blackList.getEmail();
 		String createtime=blackList.getCreatetime();
 		String operatorid=blackList.getOperatorid();
-		String userip=blackList.getUserip();
+//		String userip=blackList.getUserip();
 		String username=blackList.getUsername();
 		if(id != null){
 			sql.append(" and id="+id);
 		}
-		
-		if(email !=null && !"".equals(email)){
-			sql.append(" and email='"+email+"'");
-		}
+//
+//		if(email !=null && !"".equals(email)){
+//			sql.append(" and email='"+email+"'");
+//		}
 		
 		if(createtime !=null && !"".equals(createtime)){
 			sql.append(" and createtime='"+createtime+"'");
 		}
 		
-		if(operatorid !=null && !"".equals(email)){
-			sql.append(" and operatorid='"+operatorid+"'");
-		}
-		
-		if(userip !=null && !"".equals(userip)){
-			sql.append(" and userip='"+userip+"'");
-		}
+//		if(operatorid !=null && !"".equals(email)){
+//			sql.append(" and operatorid='"+operatorid+"'");
+//		}
+//
+//		if(userip !=null && !"".equals(userip)){
+//			sql.append(" and userip='"+userip+"'");
+//		}
 		
 		if(username !=null && !"".equals(username)){
 			sql.append(" and username='"+username+"'");
@@ -319,10 +319,10 @@ public class BlackListDaoImpl implements BlackListDao {
 			rs = stmt.executeQuery();
 			while(rs.next()){
 				blackList.setId(rs.getInt("id"));
-				blackList.setEmail(rs.getString("email"));
+//				blackList.setEmail(rs.getString("email"));
 				blackList.setCreatetime(rs.getString("createtime"));
 				blackList.setOperatorid(rs.getString("operatorid"));
-				blackList.setUserip(rs.getString("userip"));
+//				blackList.setUserip(rs.getString("userip"));
 				blackList.setUsername(rs.getString("username"));
 			}
 		} catch (Exception e) {
@@ -355,8 +355,8 @@ public class BlackListDaoImpl implements BlackListDao {
 		int res = 0;
 		try {
 			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, blackList.getEmail());
-			stmt.setString(2, blackList.getUserip());
+//			stmt.setString(1, blackList.getEmail());
+//			stmt.setString(2, blackList.getUserip());
 			stmt.setInt(3, blackList.getId());
 			res = stmt.executeUpdate();
 		}catch (Exception e) {

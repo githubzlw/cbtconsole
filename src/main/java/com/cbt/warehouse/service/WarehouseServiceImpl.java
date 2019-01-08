@@ -3,6 +3,7 @@ package com.cbt.warehouse.service;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.ZoneBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.*;
@@ -784,7 +785,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
             s.setGcUnit(sb.toString());
             //|<button onclick=\"showEvaluation("+s.getOrderid()+")\">前台展示</button>fdgdf
-            s.setPosition("<button onclick=\"uploadPics("+s.getOrderid()+")\">上传新图片</button>|<button onclick=\"openEvaluation("+s.getOrderid()+")\">产品评论</button>");
+            s.setPosition("<button onclick=\"uploadPics("+s.getOrderid()+")\">上传新图片</button>|<button onclick=\"openEvaluation("+s.getOrderid()+")\">产品评论</button>|<a target='_blank' href='/cbtconsole/website/upload_video.jsp?goods_pid="+s.getOrderid()+"'>添加视频</a>");
             String valid=s.getValid();
             if("0".equals(valid)){
                 valid="下架";
@@ -1213,7 +1214,14 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 flag="<span style='color:red'>停用</span>";
                 op.append("<button style='color:green' onclick=\"updateFlag("+b.getId()+",0)\">使用</button>");
             }
-            op.append("|<button onclick=\"updateEmail("+b.getId()+",'"+b.getEmail()+"')\">修改</button>");
+            if("0".equals(b.getType())){
+                b.setType("邮箱黑名单");
+            }else if("1".equals(b.getType())){
+                b.setType("ip黑名单");
+            }else if("2".equals(b.getType())){
+                b.setType("城市黑名单");
+            }
+            op.append("|<button onclick=\"updateEmail("+b.getId()+",'"+b.getBlackVlue()+"')\">修改</button>");
             b.setOption(op.toString());
             b.setFlag(flag);
         }
@@ -1265,6 +1273,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public List<com.cbt.pojo.AdmuserPojo> getAllBuyer(int id) {
 
         return dao.getAllBuyer(id);
+    }
+
+    @Override
+    public List<ZoneBean> getAllZone() {
+        return dao.getAllZone();
     }
 
     @Override
@@ -2276,13 +2289,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
-    public int updatebackEmail(String id, String email) {
-        return dao.updatebackEmail(id,email);
+    public int updatebackEmail(String id, String newBlackVlue,String type) {
+        return dao.updatebackEmail(id,newBlackVlue,type);
     }
 
     @Override
-    public int addBackUser(String email, String ip,String userName) {
-        return dao.addBackUser(email,ip,userName);
+    public int addBackUser(String blackVlue, String type,String userName) {
+        return dao.addBackUser(blackVlue,type,userName);
     }
 
     @Override
