@@ -2066,7 +2066,14 @@ public class EditorController {
         }
         editBean.setUniqueness_flag(uniqueness_flag);
 
-        if (weight_flag > 0 || ugly_flag > 0 || benchmarking_flag > 0 || describe_good_flag > 0 || never_off_flag > 0 || uniqueness_flag > 0) {
+        String promotion_flag_str = request.getParameter("promotion_flag");
+        int promotion_flag = 0;
+        if (StringUtils.isNotBlank(promotion_flag_str)) {
+            promotion_flag = Integer.valueOf(promotion_flag_str);
+        }
+        editBean.setPromotion_flag(promotion_flag);
+
+        if (weight_flag > 0 || ugly_flag > 0 || benchmarking_flag > 0 || describe_good_flag > 0 || never_off_flag > 0 || uniqueness_flag > 0 || promotion_flag > 0) {
             System.err.println("pid:" + pid + ",获取标识信息成功");
         } else {
             json.setOk(false);
@@ -2077,6 +2084,9 @@ public class EditorController {
             //boolean is = customGoodsService.setGoodsFlagByPid(editBean);
             customGoodsService.updatePidIsEdited(editBean);
             customGoodsService.insertIntoGoodsEditBean(editBean);
+            if(promotion_flag > 0){
+                customGoodsService.updatePromotionFlag(pid);
+            }
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
@@ -2393,7 +2403,7 @@ public class EditorController {
 
         try {
             boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
-            if (is) {
+            /*if (is) {
                 // 重新刷新价格数据
                 String ip = request.getRemoteAddr();
                 int is27 = 29;
@@ -2416,7 +2426,11 @@ public class EditorController {
             } else {
                 json.setOk(false);
                 json.setMessage("执行错误，请重试");
-            }
+            }*/
+            // 修改重量非直接显示价格数据更新
+            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight);
+            json.setOk(true);
+            json.setMessage("执行成功");
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);

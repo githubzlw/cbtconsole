@@ -898,7 +898,7 @@
             });
         }
 
-        function setGoodsFlagByPid(pid,weight_flag,ugly_flag,benchmarking_flag,describe_good_flag,never_off_flag,uniqueness_flag) {
+        function setGoodsFlagByPid(pid,weight_flag,ugly_flag,benchmarking_flag,describe_good_flag,never_off_flag,uniqueness_flag,promotion_flag) {
             $.messager.confirm('提示', '是否确认设置此标识？', function (rs) {
                 if (rs) {
                     $.ajax({
@@ -912,7 +912,8 @@
                             "benchmarking_flag":benchmarking_flag,
                             "describe_good_flag":describe_good_flag,
                             "never_off_flag":never_off_flag,
-                            "uniqueness_flag":uniqueness_flag
+                            "uniqueness_flag":uniqueness_flag,
+                            "promotion_flag":promotion_flag
                         },
                         success: function (data) {
                             var json = eval('(' + data + ')');
@@ -1327,10 +1328,14 @@
             <span class="s_btn" >下架该商品</span>
             <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
 
-            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0)">设置描述很精彩</span>
+            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
             <span class="s_last">*点击后数据直接更新线上</span>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
-            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0)">标识永不下架</span>
+            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0,0)">标识永不下架</span>
+            <c:if test="${goods.promotionFlag == 0}">
+                <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,0,1)">标识促销商品</span>
+            </c:if>
+
 
         </div>
         <div class="all_s">
@@ -1568,6 +1573,12 @@
 
 
                             <div class="goods_p">
+                                <p class="goods_color">bizPrice:</p>
+                                <p class="ul_size">
+                                    <span class="goods_cur">${goods.fpriceStr}</span>
+                                </p>
+                            </div>
+                            <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>
@@ -1636,7 +1647,10 @@
                 <br>
                 <b style="font-size: 16px;">编辑人：${goods.admin}</b>
                 <br>
-            </c:if> <c:if test="${goods.isAbnormal >0}">
+            </c:if> <c:if test="${goods.promotionFlag >0}">
+                <br>
+                <b style="font-size: 16px;color: red;">促销商品</b>
+            </c:if><c:if test="${goods.isAbnormal >0}">
                 <br>
                 <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
             </c:if> <c:if test="${goods.isBenchmark >0}">
@@ -1718,17 +1732,17 @@
 			</span> <br> <br>
                 <span class="s_btn" onclick="addKeyWordWeight('${goods.shopId}','${goods.catid1}','${goods.pid}')">添加关键词重量</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="addBenchmarking('${goods.pid}')">亚马逊对标数据</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0)">难看中文多</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0)">重量不合理</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1)">不具备独特性可舍弃</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0,0)">难看中文多</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0,0)">重量不合理</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1,0)">不具备独特性可舍弃</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="openEditLog('${goods.pid}')">查看编辑日志</span>
                 <c:if test="${goods.isBenchmark == 1 && goods.bmFlag == 1}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0)">对标准确</span>
+                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
                 </c:if>
                 <c:if test="${goods.isBenchmark == 2}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0)">对标准确</span>
+                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
                 </c:if>
                 &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
 

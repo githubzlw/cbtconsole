@@ -3991,6 +3991,30 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         } finally {
             DBHelper.getInstance().closePreparedStatement(stmt28);
             DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closePreparedStatement(stmtAws);
+            DBHelper.getInstance().closeConnection(connAws);
+        }
+        return count;
+    }
+
+    @Override
+    public int updatePromotionFlag(String pid) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "update custom_benchmark_ready_newest set promotion_flag = 1 where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updatePromotionFlag error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updatePromotionFlag error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
         }
         return count;
     }
