@@ -183,7 +183,7 @@
     		return actionHtml;
     	}
         function formatAction(val, row, index) {
-        	if(row.apiType=='Paypal'){
+        	if(row.apiType.indexOf('Paypal')>-1){
         		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
 				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
         	}
