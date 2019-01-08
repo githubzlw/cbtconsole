@@ -57,12 +57,12 @@ function updateOrderState(orderid,updatestate,oldState,remark) {
 
 
 function recoverCancelOrder(oldState) {
-    var rs = confirm("确认恢复订单状态为选则状态？");
+    var rs = confirm("确认恢复订单状态为选中的状态？");
     if (rs) {
         if (oldState == -1 || oldState == 6) {
             var updatestate = $("#updatestate").val();
             if (updatestate == -1 || updatestate == 6 || updatestate == 0) {
-                alert("恢复订单状态错误");
+                alert("请选择恢复的订单状态");
             } else {
                 $.ajax({
                     type: "POST",
@@ -86,7 +86,7 @@ function recoverCancelOrder(oldState) {
                 });
             }
         } else {
-            alert("请选择正确状态");
+            alert("原订单非取消状态");
         }
     }
 }
