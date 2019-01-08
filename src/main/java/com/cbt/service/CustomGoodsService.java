@@ -553,4 +553,11 @@ public interface CustomGoodsService {
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
     boolean refreshPriceRelatedData(CustomGoodsPublish bean);
+
+    /**
+	 * 更新28促销flag
+	 * @param pid
+	 * @return
+	 */
+	int updatePromotionFlag(String pid);
 }

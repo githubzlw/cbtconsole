@@ -514,4 +514,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return count > 0;
     }
 
+    @Override
+    public int updatePromotionFlag(String pid) {
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        customGoodsDao.insertIntoSingleOffersChild(orGoods.getPid(), Double.valueOf(orGoods.getFinalWeight()));
+        return customGoodsDao.updatePromotionFlag(pid);
+    }
+
 }
