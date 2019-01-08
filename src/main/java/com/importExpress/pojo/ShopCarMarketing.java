@@ -1,6 +1,7 @@
 package com.importExpress.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 public class ShopCarMarketing {
     private Integer id;
@@ -146,6 +147,8 @@ public class ShopCarMarketing {
     private Integer samplemoq;
 
     private double totalPrice;
+
+    private List<String> typeList;
 
     public double getTotalPrice() {
         return totalPrice;
@@ -721,5 +724,14 @@ public class ShopCarMarketing {
 
     public void setSamplemoq(Integer samplemoq) {
         this.samplemoq = samplemoq;
+    }
+
+
+    public List<String> getTypeList() {
+        return typeList;
+    }
+
+    public void setTypeList(List<String> typeList) {
+        this.typeList = typeList;
     }
 }

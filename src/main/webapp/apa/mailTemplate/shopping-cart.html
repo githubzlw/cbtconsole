@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title th:text="${title}">ImportExpress Notice of Lowering Price</title>
+  <title th:text="${title}">ImportExpress ShopCart Show</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -74,7 +74,7 @@
     .order_first{ width: 100%; margin: 0 auto 15px; }
     .order_first2{ margin: 0 auto 0;}
     .order_first ul{ width: 100%; margin-bottom: 5px; border-bottom: 1px dashed #aaabaf; overflow: hidden;box-sizing:border-box;}
-    .order_li{ float: left; width:46%;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
+    .order_li{ float: left; width:225px;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
         list-style:none; height: 338px; overflow:hidden;text-align: left;box-sizing:border-box;}
     .order_img{ width:100%; cursor: pointer; }
     .a6S{opacity: 0.01; left: 163px; top: 380.406px; position: absolute; font-weight: normal;}
@@ -126,7 +126,6 @@
       .order_li{ height: 275px;}
 
     }
-
   </style>
 
   <style type="text/css" media="only screen">
@@ -247,44 +246,35 @@
                           <p class="estima_time">Item Name & Details:</p>
 
                           <ul class="clearfix">
-                            <li class="order_li">
-                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                               <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                              <div class="order_size">
-                                <span>Color:Black</span>
+
+                            <li class="order_li" th:each="carInfo:${updateList}">
+
+                              <img th:src="${carInfo.googsImg}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                               <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+
+                              <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
+                                <div class="order_size">
+                                  <span th:title="${typeStr}" th:text="${typeStr}">Size:S</span>
+                                </div>
                               </div>
-                              <div class="order_size">
-                                   <span>Size:S</span>
-                               </div>
-                               <p class="order_pr"><em>1</em> pc </p>
-                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong> <span><em>USD</em> <em>6.58</em></span></p>
+
+                               <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
+                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong> <span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span></p>
                              </li>
-                            <li class="order_li">
-                              <img src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                              <p class="order_title" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
-                              <div class="order_size">
-                                <span>Color:Black</span>
-                              </div>
-                              <div class="order_size">
-                                <span>Size:S</span>
-                              </div>
-                              <p class="order_pr"><em>1</em> pc </p>
-                              <p class="order_pr"><strong><em>USD</em> <em>5.58</em></strong> <span><em>USD</em> <em>6.58</em></span></p>
-                            </li>
                            </ul>
                           <div class="order_usd">
                             <strong>Products Cart Total: <em>USD</em>
-                              <em>36.0</em> </strong>
+                              <em th:text="${productCost}">36.0</em> </strong>
                           </div>
                           <div class="order_usd">
                             <strong>Final Due:<em>USD</em>
-                              <em>28.8</em> </strong>
+                              <em th:text="${actualCost}">28.8</em> </strong>
                           </div>
 
                           <div class="order_usd order_usd_due">
                             <p class="order_off"><strong>Shop Cart Final Due:
-                              <em>USD</em><em> 15.00</em></strong><i><strong>Shop Cart Total:<em>USD</em><em> 18.80</em></strong></i></p>
-                            <p class="estima_time estima_time_color">You have saved :USD 7.2 <a href="###">Buy now</a></p>
+                              <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong>Shop Cart Total:<em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${offCost}">7.2</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">If you have any further concerns or questions please feel free to ask me by responding to this Email.</p>
                           <p class="order_rem_p"><strong>Import Express CHINA</strong><br/>
@@ -299,7 +289,7 @@
                             <p class="thanks_so"> Marketing Department</p>
                             <p class="thanks_so"> Email: <strong>lenawu@import-express.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong>+86 18717701974</strong></p>
-                            <p class="thanks_so"><a href="https://www.import-express.com">www.import-express.com</a></p>
+                            <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
                           </td>
                         </tr>
                       </table>
