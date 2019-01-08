@@ -88,9 +88,30 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if (weightAndSyn.getSyn() == 1){
             return 4;
         }
-        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
+        //调整到异步处理
+        Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn.getWeight());
+        new Thread(task).start();
+//        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         dao.updateGoodsWeightFlag(pid);
         return 1;
+    }
+
+    class SetGoodsWeightByWeigherTask implements Runnable{
+        public String pid;
+        public String newWeight;
+        public SetGoodsWeightByWeigherTask(String pid, String newWeight) {
+            this.pid=pid;
+            this.newWeight=newWeight;
+        }
+
+        @Override
+        public void run() {
+            try {
+                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight); //jxw同步重量到产品库接口
+            } catch (Exception e) {
+                LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);
+            }
+        }
     }
 
     @Override
