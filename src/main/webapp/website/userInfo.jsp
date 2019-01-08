@@ -66,7 +66,18 @@
         </tr>
         <tr>
             <td colspan="2"><span class="ormtittd">kiki:${userex.kiki }</td>
-            <td colspan="2"><span class="ormtittd">skype:${userex.skype }</td>
+            <td><span class="ormtittd">skype:${userex.skype }</td>
+            <td>
+                <c:if test="${backList>0}">
+                    <span style="color:Red">用户黑名单&nbsp;&nbsp;</span>
+                </c:if>
+                <c:if test="${payBackList>0}">
+                    <span style="color:Red">支付账号黑名单&nbsp;&nbsp;</span>
+                </c:if>
+                <c:if test="${backAddressCount>0}">
+                    <span style="color:Red">订单城市黑名单</span>
+                </c:if>
+            </td>
         </tr>
     </table>
 

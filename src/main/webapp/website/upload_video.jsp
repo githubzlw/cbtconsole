@@ -26,14 +26,26 @@
             src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>产品单页橱窗视频编辑</title>
+    <%
+      String pid=request.getParameter("goods_pid");
+    %>
     <script type="text/javascript">
+        <%--var pid='<%=pid%>';--%>
+        <%--if(pid !=null && pid != ""){--%>
+            <%--$("#goods_pid").val('1264073673');--%>
+            queryVideo();
+        <%--}--%>
         video_id="";
         //查询产品视频信息
         function queryVideo(){
             var goods_pid=$("#goods_pid").val();
-            if(goods_pid == null || goods_pid == ""){
-                alert("请输入产品pid");
+            var pid='${param.goods_pid}';
+            if((goods_pid == null || goods_pid == "") && (pid == null || pid == "")){
+                // alert("请输入产品pid");
                 return;
+            }
+            if(pid != null && pid != ""){
+                goods_pid=pid;
             }
             $.ajax({
                 type: "GET",

@@ -2213,7 +2213,8 @@ public class PaymentDao implements PaymentDaoImp {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        String sql = "select * from orderinfo  where user_id = ? and state !=0 order by create_time desc";
+        String sql = "select o.*,(SELECT COUNT(1) FROM tblacklist a INNER JOIN order_address b ON a.blackVlue=b.address2 WHERE b.orderNo=o.order_no AND a.flag=0) as backAddressCount " +
+                "from orderinfo o  where o.user_id = ? and o.state !=0 order by o.create_time desc";
         Connection conn = DBHelper.getInstance().getConnection();
         try {
             stmt = conn.prepareStatement(sql);
@@ -2236,6 +2237,7 @@ public class PaymentDao implements PaymentDaoImp {
                 info.setProduct_cost(rs.getString("product_cost"));
                 info.setState(rs.getInt("state"));
                 info.setCreatetime(rs.getString("create_time"));
+                info.setBackAddressCount(rs.getInt("backAddressCount"));
                 list.add(info);
             }
 
