@@ -1573,6 +1573,12 @@
 
 
                             <div class="goods_p">
+                                <p class="goods_color">bizPrice:</p>
+                                <p class="ul_size">
+                                    <span class="goods_cur">${goods.fpriceStr}</span>
+                                </p>
+                            </div>
+                            <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>

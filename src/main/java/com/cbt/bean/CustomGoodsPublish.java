@@ -89,6 +89,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private List<String> complain;
 
     private int promotionFlag;//促销flag: 0不促销，1促销
+    private String fpriceStr;//bizprice 字段
 
 
     public List<String> getComplain() {
@@ -650,5 +651,13 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setPromotionFlag(int promotionFlag) {
         this.promotionFlag = promotionFlag;
+    }
+
+    public String getFpriceStr() {
+        return fpriceStr;
+    }
+
+    public void setFpriceStr(String fpriceStr) {
+        this.fpriceStr = fpriceStr;
     }
 }
