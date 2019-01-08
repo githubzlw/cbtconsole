@@ -163,7 +163,7 @@
 	
 	<!-- public List<TabSeachPageBean> queryStaticizeAll(); -->
 	<select id="queryStaticizeAll" resultMap="BaseResultMap">
-		select id,keyword from tab_seach_pages where isshow = 1 AND pid != 0
+		select id,keyword from tab_seach_pages where pid not in(0,-1)
 	</select>
 
     <!--long updateAuthorizedInfoValid(@Param("shopId") String shopId, @Param("valid") int valid);-->

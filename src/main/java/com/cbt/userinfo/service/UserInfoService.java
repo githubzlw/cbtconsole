@@ -90,4 +90,14 @@ public static void main(String[] args) {
 	sb.append("Please login to your <a href='http://www.import-express.com/cbt/uppass.jsp?email=1351535753@qq.com'>Import-express Account</a> to reset your passward.<br> ");
 	SendEmail.send(null,null,"1351535753@qq.com", SendEmail.SetContent("1351535753@qq.com", sb).toString(),"Your ImportExpress login email address has been reset!","","", 1);
 }
+
+    @Override
+    public List<String> queryUserRemark(int userid) {
+        return mapper.queryUserRemark(userid);
+    }
+
+    @Override
+    public void insertUserRemark(int userid, String remark) {
+        mapper.insertUserRemark(userid, remark);
+    }
 }
