@@ -88,6 +88,8 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String complainId;//投诉id
     private List<String> complain;
 
+    private int promotionFlag;//促销flag: 0不促销，1促销
+
 
     public List<String> getComplain() {
 		return complain;
@@ -640,5 +642,13 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setWeightIsEdit(int weightIsEdit) {
         this.weightIsEdit = weightIsEdit;
+    }
+
+    public int getPromotionFlag() {
+        return promotionFlag;
+    }
+
+    public void setPromotionFlag(int promotionFlag) {
+        this.promotionFlag = promotionFlag;
     }
 }

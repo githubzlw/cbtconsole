@@ -102,6 +102,7 @@
         <result column="ugly_flag" property="uglyFlag"/>
         <result column="repaired_flag" property="repairedFlag"/>
         <result column="weight_is_edit" property="weightIsEdit"/>
+        <result column="promotion_flag" property="promotionFlag"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -209,6 +210,9 @@
         <if test="repaired_flag > 0">
             ,a.repaired_flag = #{repaired_flag}
         </if>
+        <if test="promotion_flag > 0">
+            ,b.promotion_flag = #{promotion_flag}
+        </if>
         where a.pid = b.pid and a.pid = #{pid}
     </update>
 
@@ -270,9 +274,9 @@
 
     <insert id="insertIntoGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean">
         insert into custom_goods_edited_log(pid,old_title,new_title,admin_id,weight_flag,ugly_flag,
-          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag,repaired_flag)
+          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag,repaired_flag,promotion_flag)
         values(#{pid},#{old_title},#{new_title},#{admin_id},#{weight_flag},#{ugly_flag},
-          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag})
+          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag},#{promotion_flag})
     </insert>
 
     <select id="queryGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean" resultMap="goodsEditResultMap">
@@ -691,7 +695,7 @@
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,
-        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,
+        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,

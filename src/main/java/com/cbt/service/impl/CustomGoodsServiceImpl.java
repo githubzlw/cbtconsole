@@ -514,4 +514,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return count > 0;
     }
 
+    @Override
+    public int updatePromotionFlag(String pid) {
+        return customGoodsDao.updatePromotionFlag(pid);
+    }
+
 }
