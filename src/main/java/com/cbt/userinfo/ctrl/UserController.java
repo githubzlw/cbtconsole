@@ -32,6 +32,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,6 +53,9 @@ import java.util.Map;
 @Controller
 @RequestMapping("/userinfo")
 public class UserController {
+
+
+
     @Autowired
     private RefundSSService refundSSService;
     @Autowired
@@ -70,7 +74,7 @@ public class UserController {
 
     private RefundDaoPlus refundDao = new RefundDaoImpl();
 
-
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(RefundDaoImpl.class);
 
     @RequestMapping(value = "/checkUserBalance.do", method = RequestMethod.GET)
     @ResponseBody
@@ -358,6 +362,28 @@ public class UserController {
         int res = userInfoService.upEmail(email, userid, oldemail, admuserid);
         DataSourceSelector.restore();
         return res + "";
+    }
+
+    @RequestMapping(value = "/queryUserRemark")
+    @ResponseBody
+    public List<String> queryUserRemark(int userid) {
+        return userInfoService.queryUserRemark(userid);
+    }
+
+    @RequestMapping(value = "/addUserRemark")
+    @ResponseBody
+    public Map<String, String> addUserRemark(int userid, String remark) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            userInfoService.insertUserRemark(userid, remark);
+            result.put("state", "true");
+            result.put("message", "添加成功");
+        } catch (Exception e){
+            result.put("state", "false");
+            result.put("message", "添加异常");
+            LOG.error("addUserRemark error, userid " + userid + "remark" + remark, e);
+        }
+        return result;
     }
 
     @RequestMapping(value = "/upPhone")

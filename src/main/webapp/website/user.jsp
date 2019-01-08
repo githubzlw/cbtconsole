@@ -53,6 +53,12 @@ tr .td_class{width:230px;}
 	width:120px;
 }
 .w_input input{width:200px;}
+#user_remark .remark_td {
+    width: 200px;
+}
+#user_remark tr {
+    line-height: 24px;
+}
 </style>
 <script type="text/javascript">
 	var str = '';
@@ -205,6 +211,48 @@ tr .td_class{width:230px;}
 						});
 			});
 	}
+    function showRemark(uid) {
+        $('#user_remark .remark_list').html('');
+        $("#user_remark input[name='userid']").val(uid);
+        $('#new_user_remark').val('');
+        //查询历史备注信息
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/userinfo/queryUserRemark",
+            data: {userid:uid},
+            dataType:"json",
+            success: function(msg){
+                var oldRemark = '';
+                if(msg != undefined && msg.length > 0){
+                    var temHtml = msg.join('</td></tr><tr><td>').replace(/@@@@/g, '</td><td class="remark_td">');
+                    $('#user_remark .remark_list').html('<tr><td>' + temHtml + '</td></tr>');
+                }
+                $('#user_remark').window('open');
+            }
+        });
+    }
+
+    function addUserRemark() {
+        var userid = $("#user_remark input[name='userid']").val();
+        var remark = $('#new_user_remark').val();
+        if(remark == undefined || remark == ''){
+            $.messager.alert('提示', '请输入新添加的备注');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/userinfo/addUserRemark",
+            data: {
+                remark:remark,
+                userid:userid
+            },
+            dataType:"json",
+            success: function(res){
+                $.messager.alert('提示', res.message);
+                $('#user_remark').window('close');
+            }
+        });
+    }
 
 
 	function fnsetDropshipUser() {
@@ -384,6 +432,26 @@ tr .td_class{width:230px;}
 			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="fnUp()" style="width:80px">确认修改</a>
 		</div>
 	</div>
+    <div id="user_remark" class="easyui-window" title="增加用户备注"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:800px;height:auto;display: none;font-size: 16px;">
+            <div style="margin-left:20px;">
+                <input type="hidden" name="userid">
+                <div style="margin-top:20px;">历史备注:</div>
+                <div style="margin-left:20px;">
+                    <table class="remark_list" >
+                    </table>
+                </div>
+                <div style="margin-top:20px;">新添加备注:</div>
+                <div style="margin-left:20px;">
+                    <textarea rows="60" cols="60" id="new_user_remark" style="height: 80px;width: 400px;"></textarea><br />
+                </div>
+            </div>
+            <div style="margin:20px 0 20px 40px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton"
+                   onclick="addUserRemark()" style="width:80px">添加备注</a>
+            </div>
+    </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<table style="margin:auto;">
@@ -445,7 +513,7 @@ tr .td_class{width:230px;}
 		<thead>
 			<tr>
 				<th data-options="field:'userid',width:80,align:'center',formatter:formatterUserid">用户ID</th>
-				<th data-options="field:'businessName',width:80,align:'center'">business name</th>
+				<th data-options="field:'businessName',width:50,align:'center'">business name</th>
 				<th data-options="field:'email',width:80,align:'center'">注册邮箱</th>
 				<th data-options="field:'creattime',width:80,align:'center'">创建时间</th>
 				<th data-options="field:'loginStyle',width:50,align:'center'">登录方式</th>
@@ -458,7 +526,7 @@ tr .td_class{width:230px;}
 				<th data-options="field:'grade',width:50">用户等级</th>
 				<th data-options="field:'admuser',width:65,align:'center'">负责人</th>
 				<th data-options="field:'currency',width:30,align:'center'">货币单位</th>
-				<th data-options="field:'operation',width:195,align:'center'">操作</th>
+				<th data-options="field:'operation',width:230,align:'center'">操作</th>
 			</tr>
 		</thead>
 	</table>

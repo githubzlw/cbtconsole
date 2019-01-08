@@ -5,15 +5,13 @@ import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.pojo.*;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Util;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.Utility;
@@ -949,7 +947,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getUserid()
                     + ",'"
                     + userInfo.getAvailable()
-                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>");
+                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
+                    + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>");
             for (int j = 0; j < list.size(); j++) {
                 ConfirmUserInfo c = list.get(j);
                 if (c.getConfirmusername().equals(userInfo.getAdminname())) {
@@ -1289,6 +1288,52 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int saveClothingData(Map<String, String> map) {
 
         return dao.saveClothingData(map);
+    }
+
+    @Override
+    public List<RedManProductBean> getRedProduct(Map<String, String> map) {
+        List<RedManProductBean> list=dao.getRedProduct(map);
+        for(RedManProductBean p:list){
+            String pids=p.getPids();
+            StringBuilder pid=new StringBuilder();
+            String [] ps=pids.split(",");
+            for(int i=0;i<ps.length;i++){
+                if(i==ps.length-1){
+                    pid.append("'").append(ps[i]).append("'");
+                }else{
+                    pid.append("'").append(ps[i]).append("',");
+                }
+            }
+            if(StringUtil.isNotBlank(pid.toString())){
+                List<CustomGoodsBean> cList=dao.getCustomPids(pid.toString());
+                pid.setLength(0);
+                for(CustomGoodsBean c:cList){
+                    pid.append("<a target='_blank'title='"+c.getEnname().replace("'","")+"' href='https://www.import-express.com/goodsinfo/cbtconsole-1"+c.getPid()+".html'><img src='"+(c.getRemotpath()+c.getCustomMainImage())+"'></img></a>");
+                }
+            }
+            p.setRedProduct(pid.toString());
+            pid.setLength(0);
+            pid.append("recipients:").append(p.getRecipients()).append("<br>").append("address:").append(p.getAddress()).append("<br>").append("phonenumber:").append(p.getPhonenumber())
+            .append("<br>").append("zipcode:").append(p.getZipcode()).append("<br>").append("statename:").append(p.getStatename())
+            .append("<br>").append("city:").append(p.getCity()).append("<br>").append("countryname:").append(p.getCountryname());
+            p.setAddress(pid.toString());
+            if(StringUtil.isBlank(p.getShipno())){
+                p.setShipno("<button onclick='saveShipno("+p.getId()+",0)'>录入发货单号</button>");
+            }else{
+                p.setShipno(""+p.getShipno()+"<br><button onclick='saveShipno("+p.getId()+",1)'>修改发货单号</button>");
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<RedManProductBean> getRedProductCount(Map<String, String> map) {
+        return dao.getRedProductCount(map);
+    }
+
+    @Override
+    public int insertShipno(Map<String, String> map) {
+        return dao.insertShipno(map);
     }
 
     /**

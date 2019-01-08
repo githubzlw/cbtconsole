@@ -3,6 +3,7 @@ package com.cbt.track.ctrl;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.TabTrackInfo;
 import com.cbt.track.service.TabTrackInfoService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,6 +80,12 @@ public class TabTrackInfoController {
         } else {
             funChange = Integer.parseInt(funChangeStr);
         }
+        //搜索条件 负责人 userid
+        String useridStr = request.getParameter("userid");
+        Integer userid = null;
+        if (StringUtils.isNotBlank(useridStr) && !"0".equals(useridStr)) {
+            userid = Integer.valueOf(useridStr);
+        }
         //查询结果
         Map<String, Object> map = null;
         // 2-单个订单号或运单号的查询
@@ -91,7 +98,7 @@ public class TabTrackInfoController {
                 json.setSuccess(false);
                 return json;
             }
-            map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo);
+            map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo, userid);
             // 查询结果处理 并返回
             if (map != null && map.size() > 0) {
                 json.setSuccess(true);
@@ -137,7 +144,7 @@ public class TabTrackInfoController {
             } else {
                 trackState = Integer.parseInt(trackStateStr);
             }
-            map = tabTrackInfoService.getRecordListByTrackState(page, rows, startDate, endDate, trackState);
+            map = tabTrackInfoService.getRecordListByTrackState(page, rows, startDate, endDate, trackState, userid);
         } else if (funChange ==1 ) {
             // 查询运单预警
             // 获取参数
@@ -151,7 +158,7 @@ public class TabTrackInfoController {
             } else {
                 warning = Integer.parseInt(warningStr);
             }
-            map = tabTrackInfoService.getWarningRecordList(page, rows, startDate, endDate, warning);
+            map = tabTrackInfoService.getWarningRecordList(page, rows, startDate, endDate, warning, userid);
         }
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
@@ -228,7 +235,7 @@ public class TabTrackInfoController {
      * 查询预警数量
      * /tabtrackinfo/querywaringnum.do?startDate=&endDate=
      *
-     * @param trackNo 运单号
+     *  trackNo 运单号
      * @return
      */
     @RequestMapping(value = "/querywaringnum.do", method = RequestMethod.GET)

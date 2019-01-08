@@ -54,4 +54,8 @@ public interface UserMapper {
 	public int InPhone(@Param("newPhone") String newPhone, @Param("userid") int userid);
 
 	public void saveupemail_log(@Param("oldemail") String oldemail, @Param("newemail") String newemail, @Param("adminid") int adminid);
+
+    List<String> queryUserRemark(@Param("userid") int userid);
+
+    void insertUserRemark(@Param("userid") int userid, @Param("remark") String remark);
 }
