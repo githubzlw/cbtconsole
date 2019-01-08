@@ -372,13 +372,12 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 		DecimalFormat df = new DecimalFormat("#0.###");
 		List<BuyReconciliationPojo> list=taoBaoOrderMapper.buyReconciliationReport(map);
 		for (BuyReconciliationPojo buyReconciliationPojo : list) {
-			double ac = Double.valueOf(buyReconciliationPojo.getBeginBlance())//51832.66
-					+ Double.valueOf(buyReconciliationPojo.getTransfer())//205001.00
-					- Double.valueOf(buyReconciliationPojo.getEndBlance())//106764.13
-					- Double.valueOf(buyReconciliationPojo.getEbayAmount())//37000.00
-					- Double.valueOf(buyReconciliationPojo.getMaterialsAmount())//4876.44
-					- Double.valueOf(buyReconciliationPojo.getZfbFright());//30000.00
-//  51832.66+205001.00-106764.13-37000.00-4876.44-30000.00
+			double ac = Double.valueOf(buyReconciliationPojo.getBeginBlance())
+					+ Double.valueOf(buyReconciliationPojo.getTransfer())
+					- Double.valueOf(buyReconciliationPojo.getEndBlance())
+					- Double.valueOf(buyReconciliationPojo.getEbayAmount())
+					- Double.valueOf(buyReconciliationPojo.getMaterialsAmount())
+					- Double.valueOf(buyReconciliationPojo.getZfbFright());
 			double zfbPayAmount = Double.valueOf(buyReconciliationPojo.getNormalAmount())
 					+ Double.valueOf(buyReconciliationPojo.getCancelAmount())
 					+ Double.valueOf(buyReconciliationPojo.getNoMatchingOrder())
@@ -891,6 +890,30 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 	}
 
 	@Override
+	public List<TaoBaoOrderInfo> getTbOrderDetails(Map<String, String> map) {
+		List<TaoBaoOrderInfo> list=taoBaoOrderMapper.getTbOrderDetails(map);
+		for (TaoBaoOrderInfo c : list) {
+			if ("0".equals(c.getTbOr1688())) {
+				c.setTbOr1688("淘宝");
+			} else if ("1".equals(c.getTbOr1688())) {
+				c.setTbOr1688("1688");
+			} else if ("3".equals(c.getTbOr1688())) {
+				c.setTbOr1688("天猫");
+			} else {
+				c.setTbOr1688("未知");
+			}
+			c.setItemname("<a target='_blank' href='"+c.getItemurl()+"'>"+c.getItemname().substring(0,c.getItemname().length()/3)+"</a>");
+			c.setImgurl("<img src='"+c.getImgurl()+"' height='100' width='100'>");
+		}
+		return list;
+	}
+
+	@Override
+	public List<TaoBaoOrderInfo> getTbOrderDetailsCount(Map<String, String> map) {
+		return taoBaoOrderMapper.getTbOrderDetailsCount(map);
+	}
+
+	@Override
 	public List<TaoBaoOrderInfo> getNoStorageDetails(Map<String, String> map) {
 		List<TaoBaoOrderInfo> list=taoBaoOrderMapper.getNoStorageDetails(map);
 		for (TaoBaoOrderInfo c : list) {
@@ -946,6 +969,22 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 
 		return taoBaoOrderMapper.getOrderQuery(map);
 	}
+
+	@Override
+	public List<StraightHairPojo> getSaleBuyInfo(Map<String, String> map) {
+		List<StraightHairPojo> list=taoBaoOrderMapper.getSaleBuyInfo(map);
+		for(StraightHairPojo s:list){
+			s.setOrderid("<a target='_blank' title='查看订单详情' href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+s.getOrderid()+"'>"+s.getOrderid()+"</a>");
+			s.setTborderid("<a target='_blank' title='查看采购订单详情' href='/cbtconsole/website/tbOrderDetails.jsp?orderid="+s.getTborderid()+"'>"+s.getTborderid()+"</a>");
+		}
+		return list;
+	}
+
+	@Override
+	public List<StraightHairPojo> getSaleBuyInfoCount(Map<String, String> map) {
+		return taoBaoOrderMapper.getSaleBuyInfoCount(map);
+	}
+
 	/**
 	 * 查询建议或确定广东直发的列表
 	 */

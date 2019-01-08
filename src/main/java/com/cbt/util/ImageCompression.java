@@ -74,16 +74,7 @@ public class ImageCompression {
 						return is;
 					}
 				}
-				// 开始读取文件并进行压缩
-				Image src = javax.imageio.ImageIO.read(srcfile);
-				BufferedImage tag = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
-				tag.getGraphics().drawImage(src.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
-				//out = new FileOutputStream(targetImgUrl);
-//				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//				encoder.encode(tag);
-
-				String fileSuffix = targetImgUrl.substring(targetImgUrl.lastIndexOf(".") + 1);
-				ImageIO.write(tag,fileSuffix,new File(targetImgUrl));
+				readAndReduceImg(srcfile,width,height,targetImgUrl);
 				is = true;
 			}
 		} catch (IOException ex) {
@@ -126,16 +117,7 @@ public class ImageCompression {
 				}
 				double rate = width / results[0];
 				int height = (int) (results[1] * rate);
-				// 开始读取文件并进行压缩
-				Image src = javax.imageio.ImageIO.read(srcfile);
-				BufferedImage tag = new BufferedImage((int) width, height, BufferedImage.TYPE_INT_RGB);
-				tag.getGraphics().drawImage(src.getScaledInstance((int) width, height, Image.SCALE_SMOOTH), 0, 0, null);
-				//out = new FileOutputStream(targetImgUrl);
-//				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//				encoder.encode(tag);
-
-				String fileSuffix = targetImgUrl.substring(targetImgUrl.lastIndexOf(".") + 1);
-				ImageIO.write(tag,fileSuffix,new File(targetImgUrl));
+				readAndReduceImg(srcfile,(int)width,height,targetImgUrl);
 				is = true;
 			}
 		} catch (IOException ex) {
@@ -153,63 +135,33 @@ public class ImageCompression {
 		}
 		return is;
 	}
-	
-	/**
-	 * 根据宽度压缩图片，高度等比例压缩，质量压缩
-	 * @param width 压缩宽度，必填
-	 * @param quality 压缩质量，必填
-	 * @param imgUrl 源图片地址
-	 * @param targetImgUrl 目标图片地址
-	 */
-	public static boolean reduceImgByWidth(double width, float quality, String imgUrl, String targetImgUrl) {
-		boolean is = false;
-		FileOutputStream out = null;
-		try {
-			File srcfile = new File(imgUrl);
-			// 检查文件是否存在
-			if (srcfile.exists()) {
-				int[] results = getImgWidth(srcfile);
-				// 只提供压缩，判断宽度小于width或者高度小于10分辨率的图片终止执行
-				if (width <= 0 || results[0] < width || results[1] < 10) {
-					return is;
-				}
-				double rate = width / results[0];
-				int height = (int) (results[1] * rate);
-				// 开始读取文件并进行压缩
+
+
+	private static void readAndReduceImg(File srcfile,int width,int height,String targetImgUrl) throws IOException{
+		// 开始读取文件并进行压缩
 				//宽度压缩
 				Image src = javax.imageio.ImageIO.read(srcfile);
-				BufferedImage tag = new BufferedImage((int) width, height, BufferedImage.TYPE_INT_RGB);
-				tag.getGraphics().drawImage(src.getScaledInstance((int) width, height, Image.SCALE_SMOOTH), 0, 0, null);
+				BufferedImage tag;
+				if(targetImgUrl.contains(".png") || targetImgUrl.contains(".PNG")){
+					tag = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_555_RGB);
+				}else{
+					tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				}
+
+				// tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+
+				tag.getGraphics().drawImage(src.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, null);
 				//out = new FileOutputStream(targetImgUrl);
 //				JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-//
 //				//质量压缩
 //				JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(tag);
 //		        param.setQuality(quality, true);
 //		        encoder.setJPEGEncodeParam(param);
-//
 //				encoder.encode(tag);
 				String fileSuffix = targetImgUrl.substring(targetImgUrl.lastIndexOf(".") + 1);
 				ImageIO.write(tag,fileSuffix,new File(targetImgUrl));
-
-				is = true;
-			}
-		} catch (IOException ex) {
-			ex.getStackTrace();
-			System.out.println("imgUrl:" + imgUrl + ",targetImgUrl" + targetImgUrl);
-			System.out.print(ex.getMessage());
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return is;
 	}
-
 
 	/**
 	 * 获取图片宽度
@@ -243,26 +195,30 @@ public class ImageCompression {
 	}
 
 	public static void main(String[] args) {
-		String imgUrl = "E:/imgCompression/112.jpg";
-		System.out.println(imgUrl + ",判断宽高超过300:" + checkImgResolution(imgUrl, 300, 300));
-		System.out.println(imgUrl + ",判断宽高超过300:" + checkImgResolution(imgUrl, 300, 300));
-		System.out.println(imgUrl + ",判断宽高超过400:" + checkImgResolution(imgUrl, 400, 400));
-		String targetImgUrl = "E:/imgCompression/112-2.jpg";
-		System.out.println(imgUrl + ",压缩比例0.9:" + reduceImg(imgUrl, targetImgUrl, 0, 0, 0.9));
-		String targetImgUrl1 = "E:/imgCompression/112-400.jpg";
-		System.out.println(imgUrl + ",标准宽度400压缩:" + reduceImgByWidth(400.00, imgUrl, targetImgUrl1));
+//		String imgUrl = "E:/imgCompression/112.jpg";
+//		System.out.println(imgUrl + ",判断宽高超过300:" + checkImgResolution(imgUrl, 300, 300));
+//		System.out.println(imgUrl + ",判断宽高超过300:" + checkImgResolution(imgUrl, 300, 300));
+//		System.out.println(imgUrl + ",判断宽高超过400:" + checkImgResolution(imgUrl, 400, 400));
+//		String targetImgUrl = "E:/imgCompression/112-2.jpg";
+//		System.out.println(imgUrl + ",压缩比例0.9:" + reduceImg(imgUrl, targetImgUrl, 0, 0, 0.9));
+//		String targetImgUrl1 = "E:/imgCompression/112-400.jpg";
+//		System.out.println(imgUrl + ",标准宽度400压缩:" + reduceImgByWidth(400.00, imgUrl, targetImgUrl1));
+//
+//		System.out.println("===========================================");
+//
+//		String imgUrl2 = "E:/imgCompression/223.jpg";
+//		System.out.println(imgUrl2 + ",判断宽高超过300:" + checkImgResolution(imgUrl2, 300, 300));
+//		System.out.println(imgUrl2 + ",判断宽高超过400:" + checkImgResolution(imgUrl2, 400, 400));
+//		String targetImgUrl2 = "E:/imgCompression/223-2.jpg";
+//		System.out.println(imgUrl2 + ",压缩比例0.9:" + reduceImg(imgUrl2, targetImgUrl2, 0, 0, 0.9));
+//		String targetImgUrl3 = "E:/imgCompression/223_400x400.jpg";
+//		System.out.println(imgUrl2 + ",标准宽度400压缩:" + reduceImgByWidth(400.00, imgUrl2, targetImgUrl3));
+//		String targetImgUrl4 = "E:/imgCompression/223_100x100.jpg";
+//		System.out.println(imgUrl2 + ",标准宽度100压缩:" + reduceImgByWidth(100.00, imgUrl2, targetImgUrl4));
 
-		System.out.println("===========================================");
-
-		String imgUrl2 = "E:/imgCompression/223.jpg";
-		System.out.println(imgUrl2 + ",判断宽高超过300:" + checkImgResolution(imgUrl2, 300, 300));
-		System.out.println(imgUrl2 + ",判断宽高超过400:" + checkImgResolution(imgUrl2, 400, 400));
-		String targetImgUrl2 = "E:/imgCompression/223-2.jpg";
-		System.out.println(imgUrl2 + ",压缩比例0.9:" + reduceImg(imgUrl2, targetImgUrl2, 0, 0, 0.9));
-		String targetImgUrl3 = "E:/imgCompression/223_400x400.jpg";
-		System.out.println(imgUrl2 + ",标准宽度400压缩:" + reduceImgByWidth(400.00, imgUrl2, targetImgUrl3));
-		String targetImgUrl4 = "E:/imgCompression/223_100x100.jpg";
-		System.out.println(imgUrl2 + ",标准宽度100压缩:" + reduceImgByWidth(100.00, imgUrl2, targetImgUrl4));
+		String imgUrl2 = "E:/imgCompression/00003333r.png";
+		String targetImgUrl4 = "E:/imgCompression/0000667778.png";
+		System.out.println(imgUrl2 + ",标准宽度700压缩:" + reduceImgByWidth(700.00, imgUrl2, targetImgUrl4));
 	}
 
 }

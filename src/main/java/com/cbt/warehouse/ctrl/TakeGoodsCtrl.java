@@ -169,10 +169,16 @@ public class TakeGoodsCtrl extends UtilAll {
 
 		Map<String, Object> map = new HashMap<String, Object>(); // sql 参数
 		map.put("title", title);
-		DataSourceSelector.set("dataSource127hop");
-		List<TbGoodsSamplePojo> tbGoodslist = goodsService
-				.getTbGoodsSample(map);
-		DataSourceSelector.restore();
+		List<TbGoodsSamplePojo> tbGoodslist=new ArrayList<TbGoodsSamplePojo>();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			tbGoodslist = goodsService
+					.getTbGoodsSample(map);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 
 		return net.sf.json.JSONArray.fromObject(tbGoodslist).toString();
 	}

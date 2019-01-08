@@ -1,6 +1,7 @@
 package com.cbt.service.impl;
 
 import com.cbt.bean.*;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.controller.EditorController;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
@@ -233,6 +234,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
         //return customGoodsDao.queryGoodsDetails(pid, type);
+        DataSourceSelector.restore();
         return customGoodsMapper.queryGoodsDetailsByPid(pid);
     }
 

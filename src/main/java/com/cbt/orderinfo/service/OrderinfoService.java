@@ -971,7 +971,6 @@ public class OrderinfoService implements IOrderinfoService {
 				tp=StringUtil.getPayType(paytype);
 			}
 			map.put("paytypes",tp);
-			// if((odCode == null || ipnaddress == null || ipnaddress !=odCode) && json[i].paytypes.indexOf("paypal")>-1){
 			String allFreight =String.valueOf(map.get("allFreight"));
 			OrderBean orderInfo=new OrderBean();
 			orderInfo.setMode_transport(String.valueOf(map.get("mode_transport")));
@@ -995,16 +994,13 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 			}
 			map.put("addressFlag",addressFlag);
-			long starttime=System.currentTimeMillis();
 			double freightFee = orderInfo.getFreightFee();
-			//getFreightFee(allFreight, orderInfo);
 			map.put("allFreight",String.valueOf(freightFee));
 			String exchange_rate=String.valueOf(map.get("exchange_rate"));
 			if(StringUtil.isBlank(exchange_rate) || Double.parseDouble(exchange_rate)<=0){
 				exchange_rate="6.3";
 			}
-			double estimatefreight=Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate);
-			map.put("estimatefreight",String.valueOf(estimatefreight));
+			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
 		logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
 		return list;

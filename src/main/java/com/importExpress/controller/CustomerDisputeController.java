@@ -172,7 +172,7 @@ public class CustomerDisputeController {
 			int confim = customerDisputeService.count(disputeID,"0");
 			mv.addObject("confim", confim);
 			String showDisputeDetails = "";//
-			if(StringUtils.isBlank(showDisputeDetails)) {
+			if(StringUtils.startsWith(disputeID, "PP")) {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
 			}	
 			LOG.info(showDisputeDetails);

@@ -2,6 +2,7 @@ package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.cbt.bean.*;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.*;
 import com.cbt.parse.service.ImgDownload;
@@ -62,6 +63,7 @@ public class EditorController {
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
     public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DataSourceSelector.restore();
         // ModelAndView mv = new ModelAndView("customgoods_detalis");
         ModelAndView mv = new ModelAndView("customgoods_detalis_new");
 
@@ -500,7 +502,6 @@ public class EditorController {
     @RequestMapping(value = "/saveEditDetalis")
     @ResponseBody
     public JsonResult saveEditDetalis(HttpServletRequest request, HttpServletResponse response) {
-
         JsonResult json = new JsonResult();
         String sessionId = request.getSession().getId();
         String userJson = Redis.hget(sessionId, "admuser");

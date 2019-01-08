@@ -307,7 +307,7 @@ function fn(va) {
 		if(adminName=="Ling"){
 		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
                 +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
-                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=230,width=420,"
+                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=280,width=530,"
                 +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
 		    if(checkType == "checkOrder"){
 		        if(emailFlag>0){
