@@ -1162,4 +1162,6 @@ public interface IOrderwsDao {
 	 * @return
 	 */
 	int queryUserPayLog(String beginDate,String endDate);
+
+    int queryBehaviorRecord(String beginDate, String endDate);
 }

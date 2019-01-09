@@ -10,6 +10,12 @@
 <title>发送邮件</title>
 </head>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+<link type="text/css" rel="stylesheet"
+	  href="/cbtconsole/css/web-ordetail.css" />
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <script type="text/javascript">
 function fnSendEmail(){
  	 var reason3 = $("#reason3").val();
@@ -66,21 +72,48 @@ function fnSendEmail(){
 	var copyEmail = $("#copyEmail").val();
 	var orderNo = $("#orderNo").val();
 	var userId = $("#userId").val();
-	
-	$.post("/cbtconsole/WebsiteServlet",
-  			{action:'chaPsendEmail',className:'SendEmailServlet',emailInfo : emailInfo,email:emailaddress,copyEmail:copyEmail,orderNo:orderNo,userId:userId,title:titleinfo},
-  			function(res){
-				if(res>0){
-					alert("发送成功");
-					window.close();
-				}else{
-					alert("发送失败");
-				 	$("#send_bt").removeAttr("disabled");
-					$("#Reason").html(reasonHTML);
-					$("#freight").html(freight);
-					$("#sendemailInfo3").html('<textarea id="textinfo" rows="25" cols="140"></textarea>');
-				}
-  	});
+	$.ajax({
+        type : 'POST',
+		url:"../customerRelationshipManagement/sendChaPsendEmail",
+		data:{
+            emailInfo : emailInfo,
+			email:emailaddress,
+			copyEmail:copyEmail,
+			orderNo:orderNo,
+			userId:userId,
+			title:titleinfo,
+			reason3:reason3
+		},
+        success:function(data){
+		    if(data.ok){
+                $.messager.show({
+                    title:'消息',
+                    msg:data.message,
+                    showType:'slide',
+                    style:{
+                        right:'',
+                        top:document.body.scrollTop+document.documentElement.scrollTop,
+                        bottom:''
+                    }
+                });
+			}else {
+                $.messager.show({
+                    title:'消息',
+                    msg:data.message,
+                    showType:'slide',
+                    style:{
+                        right:'',
+                        top:document.body.scrollTop+document.documentElement.scrollTop,
+                        bottom:''
+                    }
+                });
+                $("#send_bt").removeAttr("disabled");
+                $("#Reason").html(reasonHTML);
+                $("#freight").html(freight);
+                $("#sendemailInfo3").html('<textarea id="textinfo" rows="25" cols="140"></textarea>');
+			}
+		}
+	});
 }
  function fn(val){
 	if(val == 2){
