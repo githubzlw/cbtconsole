@@ -76,9 +76,15 @@ public class TabSeachPageController {
 	@RequestMapping("getAllCat")
 	public @ResponseBody
     List<TabSeachPageBean> getAllCat() {
-		DataSourceSelector.set("dataSource127hop");
-		List<TabSeachPageBean> list = tabSeachPageService.list(0);
-		DataSourceSelector.restore();
+		List<TabSeachPageBean> list=new ArrayList<TabSeachPageBean>();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			list = tabSeachPageService.list(0);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return list;
 	}
 
@@ -96,52 +102,57 @@ public class TabSeachPageController {
 		String result = null;
 		String keyword = request.getParameter("keyword");
 		DataSourceSelector.set("dataSource127hop");
-		if (tabSeachPageService.getWordsCount(keyword) > 0) {
-			result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
-		} else {
-			TabSeachPageBean bean = new TabSeachPageBean();
-            String keyword1 = request.getParameter("keyword1");
-            String pid = request.getParameter("parentId");
-            String pageTitle = request.getParameter("pageTitle");
-            String pageKeywords = request.getParameter("pageKeywords");
-            String pageDescription = request.getParameter("pageDescription");
-			bean.setKeyword(keyword);
-			bean.setKeyword1(keyword1);
-			bean.setPageTitle(pageTitle);
-			bean.setPageKeywords(pageKeywords);
-			bean.setPageDescription(pageDescription);
-			if (StringUtils.isNotBlank(pid)) {
-				bean.setParentId(Integer.parseInt(pid));
-			}
-            boolean updateFlag = true;
-            String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
-            if (null != imgInfo && imgInfo.length > 0) {
-                //判断最终文件大小
-                Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
-                if (imgSize > 102401){//上传的文件最终大于100k
-                    result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
-                    updateFlag = false;
-                } else {
-                    bean.setPageBannerName(imgInfo[0]);
-                    bean.setPageBannerUrl(imgInfo[1]);
-                }
-            }
-            if (updateFlag) {
-                // 关键词对应的分类id
-                Integer catid = tabSeachPageService.getCategoryId(keyword);
-                if (catid != null) {
-                    bean.setCatId(catid);
-                }
-                int res = tabSeachPageService.insert(bean);
+		try{
+			if (tabSeachPageService.getWordsCount(keyword) > 0) {
+				result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
+			} else {
+				TabSeachPageBean bean = new TabSeachPageBean();
+				String keyword1 = request.getParameter("keyword1");
+				String pid = request.getParameter("parentId");
+				String pageTitle = request.getParameter("pageTitle");
+				String pageKeywords = request.getParameter("pageKeywords");
+				String pageDescription = request.getParameter("pageDescription");
+				bean.setKeyword(keyword);
+				bean.setKeyword1(keyword1);
+				bean.setPageTitle(pageTitle);
+				bean.setPageKeywords(pageKeywords);
+				bean.setPageDescription(pageDescription);
+				if (StringUtils.isNotBlank(pid)) {
+					bean.setParentId(Integer.parseInt(pid));
+				}
+				boolean updateFlag = true;
+				String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
+				if (null != imgInfo && imgInfo.length > 0) {
+					//判断最终文件大小
+					Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+					if (imgSize > 102401){//上传的文件最终大于100k
+						result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+						updateFlag = false;
+					} else {
+						bean.setPageBannerName(imgInfo[0]);
+						bean.setPageBannerUrl(imgInfo[1]);
+					}
+				}
+				if (updateFlag) {
+					// 关键词对应的分类id
+					Integer catid = tabSeachPageService.getCategoryId(keyword);
+					if (catid != null) {
+						bean.setCatId(catid);
+					}
+					int res = tabSeachPageService.insert(bean);
 
-                if (res > 0) {
-                    result = "{\"status\":true,\"message\":\"热搜词“" + keyword + "”添加成功！\",\"id\":\"" + bean.getId() + "\"}";
-                } else {
-                    result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”添加失败！\"}";
-                }
-            }
+					if (res > 0) {
+						result = "{\"status\":true,\"message\":\"热搜词“" + keyword + "”添加成功！\",\"id\":\"" + bean.getId() + "\"}";
+					} else {
+						result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”添加失败！\"}";
+					}
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -162,15 +173,16 @@ public class TabSeachPageController {
 		if (org.apache.commons.lang.StringUtils.isBlank(pid)) {
 			pid = "0";
 		}
-		DataSourceSelector.set("dataSource127hop");
-		// 在此只id及name属性,
-		// String[] s = new String[] { "getId",
-		// "getKeyword","getParentId","getIsshow" };
-		List<TabSeachPageBean> li = this.tabSeachPageService.list(Integer.parseInt(pid));
-		// 生成json格式的数据
-		String jsontree = JsonTreeUtils.jsonTree(li);
-		// this.tree(tm, li, s, true);
-		DataSourceSelector.restore();
+		String jsontree="";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			List<TabSeachPageBean> li = this.tabSeachPageService.list(Integer.parseInt(pid));
+			jsontree = JsonTreeUtils.jsonTree(li);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		return jsontree;
 	}
 
@@ -241,23 +253,26 @@ public class TabSeachPageController {
 	public void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		DataSourceSelector.set("dataSource127hop");
-		String id = request.getParameter("id");
 		TabSeachPageBean bean = new TabSeachPageBean();
-		//step v1. @author: cjc @date：2018/12/24 14:01:13  TODO 判断是否为空 不然报错
-		if(org.apache.commons.lang3.StringUtils.isNotBlank(id)){
-			bean = tabSeachPageService.get(Integer.parseInt(id));
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			String id = request.getParameter("id");
+			if(org.apache.commons.lang3.StringUtils.isNotBlank(id)){
+				bean = tabSeachPageService.get(Integer.parseInt(id));
+				bean.setImportPath(SearchFileUtils.importexpressPath);
+
+				if (StringUtil.isNotBlank(bean.getFilename())) {
+					bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
+				}
+				if (StringUtil.isNotBlank(bean.getPageBannerName())){
+					bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
 			DataSourceSelector.restore();
-			bean.setImportPath(SearchFileUtils.importexpressPath);
-
-			if (StringUtil.isNotBlank(bean.getFilename())) {
-				bean.setFilename(SearchFileUtils.importexpressPath + bean.getFilename());
-			}
-			if (StringUtil.isNotBlank(bean.getPageBannerName())){
-				bean.setPageBannerName(SearchFileUtils.IMAGEHOSTURL + bean.getPageBannerName());
-			}
 		}
-
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
 		out.print(jsonob);
@@ -279,55 +294,58 @@ public class TabSeachPageController {
 		String result = null;
 		String id = request.getParameter("update_id");
 		String keyword = request.getParameter("update_keyword");
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			if (tabSeachPageService.getWordsCount1(keyword, Integer.parseInt(id)) > 0) {
+				result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
+			} else {
+				TabSeachPageBean bean = new TabSeachPageBean();
+				String keyword1 = request.getParameter("update_keyword1");
+				String pid = request.getParameter("parentId");
+				String pageTitle = request.getParameter("update_pageTitle");
+				String pageKeywords = request.getParameter("update_pageKeywords");
+				String pageDescription = request.getParameter("update_pageDescription");
+				bean.setId(Integer.parseInt(id));
+				bean.setKeyword(keyword);
+				bean.setKeyword1(keyword1);
+				bean.setPageTitle(pageTitle);
+				bean.setPageKeywords(pageKeywords);
+				bean.setPageDescription(pageDescription);
+				if (StringUtils.isNotBlank(pid)) {
+					bean.setParentId(Integer.parseInt(pid));
+				}
 
-		DataSourceSelector.set("dataSource127hop");
-		if (tabSeachPageService.getWordsCount1(keyword, Integer.parseInt(id)) > 0) {
-			result = "{\"status\":false,\"message\":\"热搜词“" + keyword + "”已存在！\"}";
-		} else {
-
-			TabSeachPageBean bean = new TabSeachPageBean();
-            String keyword1 = request.getParameter("update_keyword1");
-            String pid = request.getParameter("parentId");
-            String pageTitle = request.getParameter("update_pageTitle");
-            String pageKeywords = request.getParameter("update_pageKeywords");
-            String pageDescription = request.getParameter("update_pageDescription");
-			bean.setId(Integer.parseInt(id));
-			bean.setKeyword(keyword);
-			bean.setKeyword1(keyword1);
-            bean.setPageTitle(pageTitle);
-            bean.setPageKeywords(pageKeywords);
-            bean.setPageDescription(pageDescription);
-			if (StringUtils.isNotBlank(pid)) {
-				bean.setParentId(Integer.parseInt(pid));
+				boolean updateFlag = true;
+				if ("on".equals(request.getParameter("del_pageBannerName"))){ //判断修改时候是否删除已上传的底部banner图片
+					bean.setPageBannerName("del");
+				} else {
+					String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
+					if (null != imgInfo && imgInfo.length > 0) {
+						//判断最终文件大小
+						Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+						if (imgSize > 102402){//上传的文件最终大于100k
+							result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+							updateFlag = false;
+						} else {
+							bean.setPageBannerName(imgInfo[0]);
+							bean.setPageBannerUrl(imgInfo[1]);
+						}
+					}
+				}
+				if (updateFlag) {
+					int res = tabSeachPageService.update(bean);
+					if (res > 0) {
+						result = "{\"status\":true,\"message\":\"修改成功！\"}";
+					} else {
+						result = "{\"status\":false,\"message\":\"修改失败！\"}";
+					}
+				}
 			}
-
-			boolean updateFlag = true;
-            if ("on".equals(request.getParameter("del_pageBannerName"))){ //判断修改时候是否删除已上传的底部banner图片
-                bean.setPageBannerName("del");
-            } else {
-                String[] imgInfo = SearchFileUtils.comFileUpload(file, String.valueOf(bean.getParentId()), null, null, null, 0);
-                if (null != imgInfo && imgInfo.length > 0) {
-                    //判断最终文件大小
-                    Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
-                    if (imgSize > 102402){//上传的文件最终大于100k
-                        result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
-                        updateFlag = false;
-                    } else {
-                        bean.setPageBannerName(imgInfo[0]);
-                        bean.setPageBannerUrl(imgInfo[1]);
-                    }
-                }
-            }
-            if (updateFlag) {
-                int res = tabSeachPageService.update(bean);
-                if (res > 0) {
-                    result = "{\"status\":true,\"message\":\"修改成功！\"}";
-                } else {
-                    result = "{\"status\":false,\"message\":\"修改失败！\"}";
-                }
-            }
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -480,61 +498,65 @@ public class TabSeachPageController {
 		String seach_url = request.getParameter("detail_seach_url");
 		String anti_words = request.getParameter("detail_anti_words");
 		String detail_sort = request.getParameter("detail_sort");
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			if (tabSeachPageService.getNameCount(name, Integer.parseInt(sid)) > 0) {
+				result = "{\"status\":false,\"message\":\"主商品名已存在！\"}";
+			} else {
+				// List<Map<String,Object>> goodslist = null;
+				// try{
+				// goodslist = getGoodslist(seach_url,anti_words);
+				// }catch(Exception e){
+				//
+				// }
 
-		DataSourceSelector.set("dataSource127hop");
-		if (tabSeachPageService.getNameCount(name, Integer.parseInt(sid)) > 0) {
-			result = "{\"status\":false,\"message\":\"主商品名已存在！\"}";
-		} else {
-			// List<Map<String,Object>> goodslist = null;
-			// try{
-			// goodslist = getGoodslist(seach_url,anti_words);
-			// }catch(Exception e){
-			//
-			// }
+				// if(goodslist != null && goodslist.size() >= 4) {
+				bean.setSid(Integer.parseInt(sid));
+				bean.setName(name);
+				bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
+				bean.setKeyword(keyword);
+				bean.setRelateKeyWordUrl(relateKeyWordUrl);
+				// 对搜索链接进行反关键词处理
+				bean.setSeachUrl(seach_url);
+				bean.setAntiWords(anti_words);
+				bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_sort) ? Integer.parseInt(detail_sort)
+						: null);
 
-			// if(goodslist != null && goodslist.size() >= 4) {
-			bean.setSid(Integer.parseInt(sid));
-			bean.setName(name);
-			bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
-			bean.setKeyword(keyword);
-			bean.setRelateKeyWordUrl(relateKeyWordUrl);
-			// 对搜索链接进行反关键词处理
-			bean.setSeachUrl(seach_url);
-			bean.setAntiWords(anti_words);
-			bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_sort) ? Integer.parseInt(detail_sort)
-					: null);
+				// 活动相关
+				String detail_banner_name = request.getParameter("detail_banner_name");
+				String detail_banner_describe = request.getParameter("detail_banner_describe");
+				bean.setBannerName(detail_banner_name);
+				bean.setBannerDescribe(detail_banner_describe);
 
-			// 活动相关
-			String detail_banner_name = request.getParameter("detail_banner_name");
-			String detail_banner_describe = request.getParameter("detail_banner_describe");
-			bean.setBannerName(detail_banner_name);
-			bean.setBannerDescribe(detail_banner_describe);
+				boolean updateFlag = true;
+				String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
+				if (null != imgInfo && imgInfo.length > 0) {
+					//判断最终文件大小
+					Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+					if (imgSize > 102400){//上传的文件最终大于100k
+						result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+						updateFlag = false;
+					} else {
+						bean.setBannerImgName(imgInfo[0]);
+						bean.setBannerImgUrl(imgInfo[1]);
+					}
+				}
 
-            boolean updateFlag = true;
-            String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
-            if (null != imgInfo && imgInfo.length > 0) {
-                //判断最终文件大小
-                Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
-                if (imgSize > 102400){//上传的文件最终大于100k
-                    result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
-                    updateFlag = false;
-                } else {
-                    bean.setBannerImgName(imgInfo[0]);
-                    bean.setBannerImgUrl(imgInfo[1]);
-                }
-            }
+				if (updateFlag) {
+					int res = tabSeachPageService.insertDetail(bean);
 
-            if (updateFlag) {
-                int res = tabSeachPageService.insertDetail(bean);
-
-                if (res > 0) {
-                    result = "{\"status\":true,\"message\":\"添加成功！\"}";
-                } else {
-                    result = "{\"status\":false,\"message\":\"添加失败！\"}";
-                }
-            }
+					if (res > 0) {
+						result = "{\"status\":true,\"message\":\"添加成功！\"}";
+					} else {
+						result = "{\"status\":false,\"message\":\"添加失败！\"}";
+					}
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -553,15 +575,21 @@ public class TabSeachPageController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String sid = request.getParameter("sid");
-		DataSourceSelector.set("dataSource127hop");
-		List<TabSeachPagesDetailBean> list = tabSeachPageService.detailList(Integer.parseInt(sid));
-		DataSourceSelector.restore();
-		if (null != list && list.size() > 0) {
-			for (TabSeachPagesDetailBean bean : list) {
-				if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-					bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+		List<TabSeachPagesDetailBean> list=new ArrayList<TabSeachPagesDetailBean>();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			list = tabSeachPageService.detailList(Integer.parseInt(sid));
+			if (null != list && list.size() > 0) {
+				for (TabSeachPagesDetailBean bean : list) {
+					if (StringUtils.isNotBlank(bean.getBannerImgName())) {
+						bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+					}
 				}
 			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
 		JSONArray jsonarr = JSONArray.fromObject(list);
 		PrintWriter out = response.getWriter();
@@ -643,23 +671,19 @@ public class TabSeachPageController {
 	public void getDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		DataSourceSelector.set("dataSource127hop");
-		String id = request.getParameter("id");
-		TabSeachPagesDetailBean bean = tabSeachPageService.getDetail(Integer.parseInt(id));
-		DataSourceSelector.restore();
-		if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-			bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+		TabSeachPagesDetailBean bean=new TabSeachPagesDetailBean();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			String id = request.getParameter("id");
+			bean = tabSeachPageService.getDetail(Integer.parseInt(id));
+			if (StringUtils.isNotBlank(bean.getBannerImgName())) {
+				bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		// List<Map<String,Object>> goodslist = null;
-		// try{
-		// goodslist = getGoodslist(bean.getSeachUrl(),bean.getAntiWords());
-		// }catch(Exception e){
-		//
-		// }
-		// if(goodslist!=null&&goodslist.size()>0) {
-		// bean.setGoodslist(goodslist);
-		// }
-
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
 		out.print(jsonob);
@@ -670,12 +694,18 @@ public class TabSeachPageController {
 	public void preUpdateDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		DataSourceSelector.set("dataSource127hop");
-		String id = request.getParameter("id");
-		TabSeachPagesDetailBean bean = tabSeachPageService.getDetail(Integer.parseInt(id));
-		DataSourceSelector.restore();
-		if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-			bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+		TabSeachPagesDetailBean bean=new TabSeachPagesDetailBean();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			String id = request.getParameter("id");
+			bean = tabSeachPageService.getDetail(Integer.parseInt(id));
+			if (StringUtils.isNotBlank(bean.getBannerImgName())) {
+				bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(bean);
@@ -707,73 +737,78 @@ public class TabSeachPageController {
 		String seach_url = request.getParameter("detail_update_seach_url");
 		String anti_words = request.getParameter("detail_update_anti_words");
 		String detail_update_sort = request.getParameter("detail_update_sort");
-		DataSourceSelector.set("dataSource127hop");
-		if (tabSeachPageService.getNameCount1(name, Integer.parseInt(sid), Integer.parseInt(id)) > 0) {
-			result = "{\"status\":false,\"message\":\"主商品名已存在！\"}";
-		} else {
-			List<Map<String, Object>> goodslist = null;
-			try {
-				SendMQ sendMQ = new SendMQ();
-				// goodslist = getGoodslist(seach_url,anti_words);
-				// if(goodslist != null && goodslist.size() >= 4) {
-				TabSeachPagesDetailBean bean = new TabSeachPagesDetailBean();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			if (tabSeachPageService.getNameCount1(name, Integer.parseInt(sid), Integer.parseInt(id)) > 0) {
+				result = "{\"status\":false,\"message\":\"主商品名已存在！\"}";
+			} else {
+				List<Map<String, Object>> goodslist = null;
+				try {
+					SendMQ sendMQ = new SendMQ();
+					// goodslist = getGoodslist(seach_url,anti_words);
+					// if(goodslist != null && goodslist.size() >= 4) {
+					TabSeachPagesDetailBean bean = new TabSeachPagesDetailBean();
 
-				// 活动相关
-				String detail_banner_name = request.getParameter("detail_banner_name");
-				String detail_banner_describe = request.getParameter("detail_banner_describe");
-				bean.setBannerName(detail_banner_name);
-				bean.setBannerDescribe(detail_banner_describe);
+					// 活动相关
+					String detail_banner_name = request.getParameter("detail_banner_name");
+					String detail_banner_describe = request.getParameter("detail_banner_describe");
+					bean.setBannerName(detail_banner_name);
+					bean.setBannerDescribe(detail_banner_describe);
 
-                boolean updateFlag = true;
-                String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
-                if (null != imgInfo && imgInfo.length > 0) {
-                    //判断最终文件大小
-                    Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
-                    if (imgSize > 102403){//上传的文件最终大于100k
-                        result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
-                        updateFlag = false;
-                    } else {
-                        bean.setBannerImgName(imgInfo[0]);
-                        bean.setBannerImgUrl(imgInfo[1]);
-                    }
-                }
-                if (updateFlag) {
-                    bean.setId(Integer.parseInt(id));
-                    bean.setSid(Integer.parseInt(sid));
-                    bean.setName(name);
-                    bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
-                    bean.setKeyword(keyword);
-                    bean.setRelateKeyWordUrl(relateKeyWordUrl);
-                    bean.setSeachUrl(seach_url);
-                    bean.setAntiWords(anti_words);
-                    bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_update_sort) ? Integer
-                            .parseInt(detail_update_sort) : null);
+					boolean updateFlag = true;
+					String[] imgInfo = SearchFileUtils.comFileUpload(file, sid, null, null, null, 0);
+					if (null != imgInfo && imgInfo.length > 0) {
+						//判断最终文件大小
+						Long imgSize = SearchFileUtils.getImgSize(imgInfo[0]);
+						if (imgSize > 102403){//上传的文件最终大于100k
+							result = "{\"status\":false,\"message\":\"请不要上传超过100K的图，可使用QQ截图保存后再上传\"}";
+							updateFlag = false;
+						} else {
+							bean.setBannerImgName(imgInfo[0]);
+							bean.setBannerImgUrl(imgInfo[1]);
+						}
+					}
+					if (updateFlag) {
+						bean.setId(Integer.parseInt(id));
+						bean.setSid(Integer.parseInt(sid));
+						bean.setName(name);
+						bean.setCatid(org.apache.commons.lang.StringUtils.isBlank(catid) ? 0 : Integer.parseInt(catid));
+						bean.setKeyword(keyword);
+						bean.setRelateKeyWordUrl(relateKeyWordUrl);
+						bean.setSeachUrl(seach_url);
+						bean.setAntiWords(anti_words);
+						bean.setSort(org.apache.commons.lang.StringUtils.isNotBlank(detail_update_sort) ? Integer
+								.parseInt(detail_update_sort) : null);
 
-                    String sql = "update tab_seach_pages_details set name='" + SendMQ.repCha(bean.getName()) + "',catid='"
-                            + bean.getCatid() + "',relateKeyWordUrl='" + SendMQ.repCha(bean.getRelateKeyWordUrl()) + "',"
-                            + "seach_url='" + SendMQ.repCha(bean.getSeachUrl()) + "',keyword='"
-                            + SendMQ.repCha(bean.getKeyword()) + "',anti_words='" + SendMQ.repCha(bean.getAntiWords())
-                            + "',sort='" + bean.getSort();
-                    if (!file.isEmpty()) {
-                        sql += "',banner_img_name='" + bean.getBannerImgName() + "',banner_img_url='"
-                                + bean.getBannerImgUrl();
-                    }
-                    sql += "',banner_name='" + SendMQ.repCha(bean.getBannerName()) + "',banner_describe='"
-                            + SendMQ.repCha(bean.getBannerDescribe()) + "' where id='" + bean.getId() + "'";
-                    sendMQ.sendMsg(new RunSqlModel(sql));
-                    int res = 1;// tabSeachPageService.updateDetail(bean);
-                    if (res > 0) {
-                        result = "{\"status\":true,\"message\":\"修改成功！\",\"id\":\"" + id + "\"}";
-                    } else {
-                        result = "{\"status\":false,\"message\":\"修改失败！\"}";
-                    }
-                    sendMQ.closeConn();
-                }
-			} catch (Exception e) {
-				result = "{\"status\":false,\"message\":\"修改失败！\"}";
+						String sql = "update tab_seach_pages_details set name='" + SendMQ.repCha(bean.getName()) + "',catid='"
+								+ bean.getCatid() + "',relateKeyWordUrl='" + SendMQ.repCha(bean.getRelateKeyWordUrl()) + "',"
+								+ "seach_url='" + SendMQ.repCha(bean.getSeachUrl()) + "',keyword='"
+								+ SendMQ.repCha(bean.getKeyword()) + "',anti_words='" + SendMQ.repCha(bean.getAntiWords())
+								+ "',sort='" + bean.getSort();
+						if (!file.isEmpty()) {
+							sql += "',banner_img_name='" + bean.getBannerImgName() + "',banner_img_url='"
+									+ bean.getBannerImgUrl();
+						}
+						sql += "',banner_name='" + SendMQ.repCha(bean.getBannerName()) + "',banner_describe='"
+								+ SendMQ.repCha(bean.getBannerDescribe()) + "' where id='" + bean.getId() + "'";
+						sendMQ.sendMsg(new RunSqlModel(sql));
+						int res = 1;// tabSeachPageService.updateDetail(bean);
+						if (res > 0) {
+							result = "{\"status\":true,\"message\":\"修改成功！\",\"id\":\"" + id + "\"}";
+						} else {
+							result = "{\"status\":false,\"message\":\"修改失败！\"}";
+						}
+						sendMQ.closeConn();
+					}
+				} catch (Exception e) {
+					result = "{\"status\":false,\"message\":\"修改失败！\"}";
+				}
 			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -823,11 +858,15 @@ public class TabSeachPageController {
             bean.setImgFileUrl(imgInfo[1]);
             bean.setFileName(imgInfo[2]);
         }
-
-		DataSourceSelector.set("dataSource28hop");
-		long count = tabSeachPageService.updateAuthorizedInfo(bean);
-		DataSourceSelector.restore();
-		
+		long count=0L;
+		try{
+			DataSourceSelector.set("dataSource28hop");
+			count = tabSeachPageService.updateAuthorizedInfo(bean);
+		}catch (Exception e){
+        	e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
 		if (count > 0) {
 			result.put("status", true);
 			result.put("message", "修改成功！");
@@ -855,11 +894,15 @@ public class TabSeachPageController {
             result.put("message", "未登陆,请重新登录后操作!");
             return result;
         }
-
-        DataSourceSelector.set("dataSource28hop");
-        long count = tabSeachPageService.updateAuthorizedInfoValid(shopId, 3);
-        DataSourceSelector.restore();
-
+	    long count=0L;
+		try{
+			DataSourceSelector.set("dataSource28hop");
+			count = tabSeachPageService.updateAuthorizedInfoValid(shopId, 3);
+		}catch (Exception e){
+        	e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
+		}
         if (count > 0) {
             result.put("status", true);
             result.put("message", "删除成功！");
@@ -884,10 +927,16 @@ public class TabSeachPageController {
 				result.put("message", "参数问题");
 				return result;	
 			}
-			DataSourceSelector.set("dataSource28hop");
-			ShopUrlAuthorizedInfoPO bean = tabSeachPageService.queryAuthorizedInfo(shopId);
-			DataSourceSelector.restore();
-			
+			ShopUrlAuthorizedInfoPO bean=new ShopUrlAuthorizedInfoPO();
+			try{
+				DataSourceSelector.set("dataSource28hop");
+				bean = tabSeachPageService.queryAuthorizedInfo(shopId);
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally {
+				DataSourceSelector.restore();
+			}
+
 			if (null == bean) {
 				result.put("status", false);
 				result.put("message", "未找到");
@@ -919,19 +968,24 @@ public class TabSeachPageController {
 		response.setContentType("text/json;charset=utf-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String sid = request.getParameter("sid");
-		DataSourceSelector.set("dataSource127hop");
-		List<TabSeachPagesDetailBean> list = tabSeachPageService.detailList(Integer.parseInt(sid));
-		DataSourceSelector.restore();
-		String result = null;
-		if (list != null && list.size() > 0) {
-			for (TabSeachPagesDetailBean bean : list) {
-				if (StringUtils.isNotBlank(bean.getBannerImgName())) {
-					bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+		String result = "";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			List<TabSeachPagesDetailBean> list = tabSeachPageService.detailList(Integer.parseInt(sid));
+			if (list != null && list.size() > 0) {
+				for (TabSeachPagesDetailBean bean : list) {
+					if (StringUtils.isNotBlank(bean.getBannerImgName())) {
+						bean.setBannerImgName(SearchFileUtils.IMAGEHOSTURL + bean.getBannerImgName());
+					}
 				}
+				result = "{\"status\":true}";
+			} else {
+				result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
 			}
-			result = "{\"status\":true}";
-		} else {
-			result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
@@ -952,20 +1006,25 @@ public class TabSeachPageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String sid = request.getParameter("sid");
 		String keyword = request.getParameter("keyword");
-		DataSourceSelector.set("dataSource127hop");
-		List<TabSeachPagesDetailBean> list = tabSeachPageService.detailList(Integer.parseInt(sid));
-		DataSourceSelector.restore();
-		String result = null;
-		if (list != null && list.size() > 0) {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("sid", sid));
-			params.add(new BasicNameValuePair("keyword", keyword));
-			result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
+		String result ="";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			List<TabSeachPagesDetailBean> list = tabSeachPageService.detailList(Integer.parseInt(sid));
+			if (list != null && list.size() > 0) {
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("sid", sid));
+				params.add(new BasicNameValuePair("keyword", keyword));
+				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
 
-			// List <NameValuePair> params1 = new ArrayList<NameValuePair>();
-			// getContentClientPost(importexpressPath+"/app/rlevel",params1);
-		} else {
-			result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
+				// List <NameValuePair> params1 = new ArrayList<NameValuePair>();
+				// getContentClientPost(importexpressPath+"/app/rlevel",params1);
+			} else {
+				result = "{\"status\":false,\"message\":\"主关键词没有对应的类别！请添加下面的类别\"}";
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
 
 		if (StringUtil.isBlank(result)) {
@@ -989,24 +1048,29 @@ public class TabSeachPageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String result = null;
 		// 查询需要生成的静态页
-		DataSourceSelector.set("dataSource127hop");
-		List<TabSeachPageBean> list = tabSeachPageService.queryStaticizeAll();
-		DataSourceSelector.restore();
-		if (list == null || list.size() == 0) {
-			result = "{\"status\":false,\"message\":\"未找到启动的关键词!\"}";
-		}
-		for (TabSeachPageBean bean : list) {
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("sid", bean.getId() + ""));
-			params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
-			result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
-		}
-		result = "{\"status\":true,\"message\":\"静态页全部生成完毕, 总数量:" + list.size() + "\"}";
+		List<TabSeachPageBean> list=new ArrayList<TabSeachPageBean>();
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			list = tabSeachPageService.queryStaticizeAll();
+			if (list == null || list.size() == 0) {
+				result = "{\"status\":false,\"message\":\"未找到启动的关键词!\"}";
+			}
+			for (TabSeachPageBean bean : list) {
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("sid", bean.getId() + ""));
+				params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
+				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
+			}
+			result = "{\"status\":true,\"message\":\"静态页全部生成完毕, 总数量:" + list.size() + "\"}";
 
-		if (StringUtil.isBlank(result)) {
-			result = "{\"status\":false,\"message\":\"静态化页面生成失败\"}";
+			if (StringUtil.isBlank(result)) {
+				result = "{\"status\":false,\"message\":\"静态化页面生成失败\"}";
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);
@@ -1028,11 +1092,8 @@ public class TabSeachPageController {
         String result;
 
         try {
-
             DataSourceSelector.set("dataSource127hop");
             boolean boo = tabSeachPageService.updateTitleAndKey(Integer.parseInt(sid));
-            DataSourceSelector.restore();
-
             if (boo) {
                 result = "{\"status\":true,\"message\":\"生成成功\"}";
             } else {
@@ -1041,8 +1102,9 @@ public class TabSeachPageController {
         } catch (Exception e){
             LOG.error(e.toString());
             result = "{\"status\":false,\"message\":\"内部异常\"}";
+        }finally {
+	        DataSourceSelector.restore();
         }
-
         PrintWriter out = response.getWriter();
         JSONObject jsonob = JSONObject.fromObject(result);
         out.print(jsonob);
@@ -1062,34 +1124,33 @@ public class TabSeachPageController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		String id = request.getParameter("id");
 		String isshow = request.getParameter("isshow");
-		DataSourceSelector.set("dataSource127hop");
-		TabSeachPageBean bean = tabSeachPageService.get(Integer.parseInt(id));
-		String result = null;
-		if (StringUtil.isNotBlank(bean.getFilename())) {
-			int res = tabSeachPageService.updateIsshow(Integer.parseInt(isshow), Integer.parseInt(id));
-			if (res > 0) {
-				// List <NameValuePair> params1 = new
-				// ArrayList<NameValuePair>();
-				// getContentClientPost(importexpressPath+"/app/rlevel",params1);
-				if ("1".equals(isshow)) {
-					result = "{\"status\":true,\"message\":\"启用成功\"}";
+		String result ="";
+		try{
+			DataSourceSelector.set("dataSource127hop");
+			TabSeachPageBean bean = tabSeachPageService.get(Integer.parseInt(id));
+			if (StringUtil.isNotBlank(bean.getFilename())) {
+				int res = tabSeachPageService.updateIsshow(Integer.parseInt(isshow), Integer.parseInt(id));
+				if (res > 0) {
+					if ("1".equals(isshow)) {
+						result = "{\"status\":true,\"message\":\"启用成功\"}";
+					} else {
+						result = "{\"status\":true,\"message\":\"停用成功\"}";
+					}
 				} else {
-					result = "{\"status\":true,\"message\":\"停用成功\"}";
+					if ("1".equals(isshow)) {
+						result = "{\"status\":false,\"message\":\"启用失败\"}";
+					} else {
+						result = "{\"status\":false,\"message\":\"停用失败\"}";
+					}
 				}
 			} else {
-				if ("1".equals(isshow)) {
-					// List <NameValuePair> params1 = new
-					// ArrayList<NameValuePair>();
-					// getContentClientPost(importexpressPath+"/app/rlevel",params1);
-					result = "{\"status\":false,\"message\":\"启用失败\"}";
-				} else {
-					result = "{\"status\":false,\"message\":\"停用失败\"}";
-				}
+				result = "{\"status\":false,\"message\":\"请先生成关键词专页静态页\"}";
 			}
-		} else {
-			result = "{\"status\":false,\"message\":\"请先生成关键词专页静态页\"}";
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+			DataSourceSelector.restore();
 		}
-		DataSourceSelector.restore();
 		PrintWriter out = response.getWriter();
 		JSONObject jsonob = JSONObject.fromObject(result);
 		out.print(jsonob);

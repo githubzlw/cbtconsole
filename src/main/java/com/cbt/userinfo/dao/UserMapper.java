@@ -13,6 +13,7 @@ public interface UserMapper {
 	public List<String> getPaypal(@Param("userID") int userID);
 
 	public UserEx getUserEx(@Param("userID") int userID);
+	int checkUserName(@Param("username") String username);
 	public List<String> getAllAdmuser(@Param("admName") String admName);
 
 	/**

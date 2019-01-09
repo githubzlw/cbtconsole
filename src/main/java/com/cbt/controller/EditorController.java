@@ -2,6 +2,7 @@ package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.cbt.bean.*;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.*;
 import com.cbt.parse.service.ImgDownload;
@@ -14,6 +15,8 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.GoodsPriceUpdateUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +65,7 @@ public class EditorController {
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
     public ModelAndView detalisEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DataSourceSelector.restore();
         // ModelAndView mv = new ModelAndView("customgoods_detalis");
         ModelAndView mv = new ModelAndView("customgoods_detalis_new");
 
@@ -119,7 +123,9 @@ public class EditorController {
         }
 
         mv.addObject("shopId", queryId);
-
+        //查询商品评论信息
+        List<CustomGoodsPublish> reviewList=customGoodsService.getAllReviewByPid(pid);
+        request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
         // 取出主图筛选数量
         GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
         pictureQt.setImgDeletedSize(pictureQt.getTypeOriginalSize() + pictureQt.getImgOriginalSize()
@@ -500,7 +506,6 @@ public class EditorController {
     @RequestMapping(value = "/saveEditDetalis")
     @ResponseBody
     public JsonResult saveEditDetalis(HttpServletRequest request, HttpServletResponse response) {
-
         JsonResult json = new JsonResult();
         String sessionId = request.getSession().getId();
         String userJson = Redis.hget(sessionId, "admuser");
@@ -1729,6 +1734,92 @@ public class EditorController {
                 json.setMessage("上传错误:" + e.getMessage());
                 LOG.error("上传错误：" + e.getMessage());
             }
+        }
+        return json;
+    }
+
+    /**
+     * 编辑产品评论内容
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/updateReviewRemark", method = {RequestMethod.POST})
+    @ResponseBody
+    public JsonResult updateReviewRemark(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        json.setOk(true);
+        try{
+            String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+            com.cbt.pojo.Admuser adm =(com.cbt.pojo.Admuser)SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+            if(adm==null){
+                json.setOk(false);
+            }
+            Map<String,String> paramMap=new HashMap<String,String>();
+            String update_aliId=request.getParameter("update_aliId");
+            String edit_remark=request.getParameter("edit_remark");
+            String editcountry=request.getParameter("editcountry");
+            String edit_score=request.getParameter("edit_score");
+            String update_flag=request.getParameter("update_flag");
+            paramMap.put("update_aliId",update_aliId);
+            paramMap.put("edit_remark",edit_remark);
+            paramMap.put("editcountry",editcountry);
+            paramMap.put("edit_score",edit_score);
+            paramMap.put("update_flag",update_flag);
+            paramMap.put("review_name",adm.getAdmName());
+            int index=customGoodsService.updateReviewRemark(paramMap);
+            if(index>0){
+                //插入数据到线上
+                SendMQ sendMQ=new SendMQ();
+                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where id='"+update_aliId+"'";
+                sendMQ.sendMsg(new RunSqlModel(sql));
+                sendMQ.closeConn();
+            }
+            json.setOk(index>0?true:false);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    /**
+     * 添加产品评论内容
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/addReviewRemark", method = {RequestMethod.POST})
+    @ResponseBody
+    public JsonResult addReviewRemark(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        json.setOk(true);
+        try{
+            String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+            com.cbt.pojo.Admuser adm =(com.cbt.pojo.Admuser)SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+            if(adm==null){
+                json.setOk(false);
+            }
+            Map<String,String> paramMap=new HashMap<String,String>();
+            String goods_pid=request.getParameter("goods_pid");
+            String review_remark=request.getParameter("review_remark");
+            String review_score=request.getParameter("review_score");
+            String country=request.getParameter("country");
+            paramMap.put("goods_pid",goods_pid);
+            paramMap.put("review_remark",review_remark);
+            paramMap.put("review_score",review_score);
+            paramMap.put("country",country);
+            paramMap.put("review_name",adm.getAdmName());
+            int index=customGoodsService.addReviewRemark(paramMap);
+            if(index>0){
+                //插入数据到线上
+                SendMQ sendMQ=new SendMQ();
+                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"',now(),'"+review_remark+"','"+review_score+"')";
+                sendMQ.sendMsg(new RunSqlModel(sql));
+                sendMQ.closeConn();
+            }
+            json.setOk(index>0?true:false);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return json;
     }

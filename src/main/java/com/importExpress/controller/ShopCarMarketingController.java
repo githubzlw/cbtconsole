@@ -21,7 +21,6 @@ import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONObject;
 import okhttp3.*;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 
 import org.apache.commons.logging.Log;
@@ -37,10 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/shopCarMarketingCtr")
@@ -197,24 +193,59 @@ public class ShopCarMarketingController {
             return json;
         }
 
-        String emailContent = request.getParameter("emailContent");
+        String adminNameFirst = request.getParameter("adminNameFirst");
+        if (StringUtils.isBlank(adminNameFirst)) {
+            json.setOk(false);
+            json.setMessage("获取销售名称失败");
+            return json;
+        }
+
+        String adminName = request.getParameter("adminName");
+        if (StringUtils.isBlank(adminName)) {
+            json.setOk(false);
+            json.setMessage("获取销售名称失败");
+            return json;
+        }
+
+        String adminEmail = request.getParameter("adminEmail");
+        if (StringUtils.isBlank(adminEmail)) {
+            json.setOk(false);
+            json.setMessage("获取销售邮箱失败");
+            return json;
+        }
+
+        String whatsApp = request.getParameter("whatsApp");
+        if (StringUtils.isBlank(whatsApp)) {
+            json.setOk(false);
+            json.setMessage("获取whatsApp失败");
+            return json;
+        }
+        /*String emailContent = request.getParameter("emailContent");
         if (StringUtils.isBlank(emailContent)) {
             json.setOk(false);
             json.setMessage("获取邮件内容失败");
             return json;
-        }
+        }*/
 
 
+        String userName;
         String userEmail = request.getParameter("userEmail");
         if (StringUtils.isBlank(userEmail)) {
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
             userEmail = listu.get("email").toString();
             listu.clear();
+            if(listu.containsValue("name") && StringUtils.isNotBlank(listu.get("name").toString())){
+                userName = listu.get("name").toString();
+            }else{
+                userName = userEmail;
+            }
         }
         try {
 
             int userId = Integer.valueOf(userIdStr);
+            String emailTitle = "You have made some wonderful selections";
+
             //1.重新生成goods_carconfig数据，并进行保存
             List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
             List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
@@ -232,10 +263,6 @@ public class ShopCarMarketingController {
                 activeList.add(genActiveBeanByShopCar(shopCar));
             }
 
-            String emailTitle = "Your shopping cart misses you!";
-            if (emailContent.contains("noticed that you have over")) {
-                emailTitle = "";
-            }
             //判断是否有改价的情况，有改价更新并清空购物车
             if (isUpdatePrice > 0) {
                 boolean isSuccess = updateGoodsCarConfig(showList, activeList, Integer.valueOf(userIdStr));
@@ -255,6 +282,7 @@ public class ShopCarMarketingController {
                     return json;
                 }
             }
+            Map<String,String> paramMap = new HashMap<>();
             //3.发送邮件给客户
             //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
             boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
@@ -263,12 +291,18 @@ public class ShopCarMarketingController {
                 Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
                 sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
             } else {
-                sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
+
+                paramMap.put("userEmail",userEmail);
+                paramMap.put("emailTitle",emailTitle);
+                paramMap.put("adminNameFirst",adminNameFirst);
+                paramMap.put("adminName",adminName);
+                paramMap.put("adminEmail",adminEmail);
+                paramMap.put("whatsApp",whatsApp);
+                genHtmlEamil(userId,paramMap);
+                //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
-            //End：
-            //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             //4.更新跟进信息
-            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), emailContent);
+            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
             json.setOk(true);
             json.setMessage("发送邮件成功！");
         } catch (Exception e) {
@@ -282,6 +316,90 @@ public class ShopCarMarketingController {
         return json;
     }
 
+
+    private void genHtmlEamil(int userId,Map<String,String> paramMap){
+        try{
+            //查询当前客户存在的购物车数据
+            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
+            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
+            marketingCriteria.andUseridEqualTo(userId);
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+            //格式化处理规格数据
+            double productCost = 0;
+            double actualCost = 0;
+            double totalProductCost = 0;
+            double totalActualCost = 0;
+            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
+            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
+            int sourceCount = 0;
+            for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                String tempType = "";
+                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
+                    String[] splitFirst = shopCar.getGoodsType().split(",");
+                    for (String spCh : splitFirst) {
+                        String[] spScList = spCh.split("@");
+                        tempType += spScList[0] + ";";
+                        spScList = null;
+                    }
+                    splitFirst = null;
+                }
+                if (tempType.length() > 0) {
+                    shopCar.setGoodsType(tempType);
+                }
+                shopCar.setGoogsImg(shopCar.getGoogsImg().replace(".60x60",".400x400"));
+                List<String> typeList= new ArrayList<>();
+                if(StringUtils.isNotBlank(shopCar.getGoodsType())){
+                    String[] tempList = shopCar.getGoodsType().split(";");
+                    for(String str : tempList){
+                        if(StringUtils.isNotBlank(str)){
+                            typeList.add(str);
+                        }
+                    }
+                }
+                shopCar.setTypeList(typeList);
+                if (shopCar.getPrice1() > 0) {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    actualCost += totalPrice;
+                    totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                    totalActualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    resultList.add(shopCar);
+                } else {
+                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                    totalProductCost += totalPrice;
+                    totalActualCost += totalPrice;
+                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    if(sourceCount < 5){
+                        sourceList.add(shopCar);
+                        sourceCount ++;
+                    }
+                }
+            }
+            shopCarMarketingList.clear();
+
+            Map<String,Object> modelM = new HashMap<String,Object>();
+            double offCost = productCost - actualCost;
+
+                modelM.put("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
+                modelM.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+                modelM.put("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
+                modelM.put("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
+                modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+                modelM.put("updateList", resultList);
+                modelM.put("sourceList", sourceList);
+
+                modelM.put("userEmail", paramMap.get("userEmail"));
+                modelM.put("adminNameFirst", paramMap.get("adminNameFirst"));
+                modelM.put("adminName", paramMap.get("adminName"));
+                modelM.put("adminEmail", paramMap.get("adminEmail"));
+                modelM.put("whatsApp", paramMap.get("whatsApp"));
+			    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     private boolean updateGoodsCarConfig(List<GoodsCarShowBean> showList, List<GoodsCarActiveBeanUpdate> activeList, int userId) {
 

@@ -7,6 +7,7 @@ import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.ZoneBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -192,8 +193,12 @@ public class WarehouseCtrl {
 	@ResponseBody
 	protected com.alibaba.fastjson.JSONArray getAllBuyer(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, ParseException {
+		com.alibaba.fastjson.JSONArray jsonArr=new com.alibaba.fastjson.JSONArray();
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm =(Admuser)SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if(adm == null){
+			return jsonArr;
+		}
 		List<com.cbt.pojo.AdmuserPojo> list=iWarehouseService.getAllBuyer(adm.getId());
 		List<com.cbt.pojo.AdmuserPojo> result = new ArrayList<com.cbt.pojo.AdmuserPojo>();
 		com.cbt.pojo.AdmuserPojo admuser=new com.cbt.pojo.AdmuserPojo();
@@ -210,6 +215,20 @@ public class WarehouseCtrl {
 			a.setAdmName("testadm");
 			result.add(a);
 		}
+		result.addAll(list);
+		jsonArr = JSON.parseArray(JSON.toJSONString(result));
+		return jsonArr;
+	}
+
+	@RequestMapping(value = "/getAllZone", method = RequestMethod.GET)
+	@ResponseBody
+	protected com.alibaba.fastjson.JSONArray getAllZone(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		List<ZoneBean> list=iWarehouseService.getAllZone();
+		List<ZoneBean> result = new ArrayList<ZoneBean>();
+		ZoneBean z=new ZoneBean();
+		z.setCountry("全部");
+		result.add(z);
 		result.addAll(list);
 		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
 		return jsonArr;
@@ -898,16 +917,18 @@ public class WarehouseCtrl {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, String> map = new HashMap<String, String>();
 		List<BlackList> list = new ArrayList<BlackList>();
-		String email = request.getParameter("qEmail");
+		String blackVlue = request.getParameter("blackVlue");
 		int page = Integer.parseInt(request.getParameter("page"));
 		String flag=request.getParameter("flag");
+		String paramType=request.getParameter("paramType");
 		flag=StringUtil.isBlank(flag)?null:flag;
 		if (page > 0) {
-			page = (page - 1) * 40;
+			page = (page - 1) * 20;
 		}
 		map.put("page", String.valueOf(page));
-		map.put("email", email);
+		map.put("blackVlue", StringUtil.isNotBlank(blackVlue)?blackVlue:null);
 		map.put("flag",flag);
+		map.put("paramType",StringUtil.isNotBlank(paramType)?paramType:"-1");
 		try{
 			list = iWarehouseService.getUserBackList(map);
 			List<BlackList> counts = iWarehouseService.getUserBackListCount(map);
@@ -2903,6 +2924,7 @@ public class WarehouseCtrl {
 		return map;
 	}
 
+
 	/**
 	 * 产品单页视频图片编辑上传
 	 * @param request
@@ -2926,8 +2948,15 @@ public class WarehouseCtrl {
 				System.out.println("请上传文件,注意文件的name属性为file");
 			}
 			MultipartFile file = fileList.get(0);
-			String filename=file.getOriginalFilename();
-			filePath="E:/video/temp/"+filename;
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
+			String time = df.format(new Date());// new Date()为获取当前系统时间
+			String filename=goods_pid+"_"+time;
+			if (ftpConfig == null) {
+				ftpConfig = GetConfigureInfo.getFtpConfig();
+			}
+			// 检查配置文件信息是否正常读取
+			String imgUploadPath = ftpConfig.getLocalDiskPath();
+			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 			FileOutputStream fs=new FileOutputStream(filePath);
 			byte[] buffer =new byte[1024*1024];
 			int bytesum = 0;
@@ -2942,43 +2971,12 @@ public class WarehouseCtrl {
 			stream.close();
 			File video=new File(filePath);
 			if (video.exists()) {
-				System.out.println("文件上传成功");
-				PostMethod filePost = new PostMethod( "http://140.82.48.255:3000/upload");
-				File f = new File(filePath);
-//				Part[] parts = { new FilePart("video", f)};
-				Part[] parts = {new FilePart("video", f),new StringPart("token","cerong2018jack")};
-				filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost .getParams()));
-				HttpClient clients = new HttpClient();
-				int status = clients.executeMethod(filePost);
-				BufferedReader rd = new BufferedReader(new InputStreamReader(  filePost.getResponseBodyAsStream(), "UTF-8"));
-				StringBuffer stringBuffer = new StringBuffer();
-				String line;
-				while ((line = rd.readLine()) != null) {
-					stringBuffer .append(line);
-				}
-				rd.close();
-				System.out.println("接受到的流是：" + stringBuffer + "—-" + status);
-				video.delete();
-				if(stringBuffer.toString().contains("success")){
-					//成功
-					String [] msg=stringBuffer.toString().replace("}","").replace("{","")
-							.replace("\"","").replace("\\","").split("/");
-					System.out.println(msg);
-					String result=msg[msg.length-1];
-					if(StringUtil.isNotBlank(result)){
-						System.out.println("result:"+result);
-						map.put("goods_pid",goods_pid);
-						map.put("v_id",result);
-						iWarehouseService.updateCustomVideoUrl(map);
-						sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set video_url='"+result+"' where pid='"+goods_pid+"'"));
-						map.put("msg","1");
-					}else{
-						map.put("msg","0");
-					}
-				}
-				System.out.println("文件删除成功");
+				map.put("msg","1");
+				map.put("goods_pid",goods_pid);
+				map.put("v_id",filePath);
+				iWarehouseService.updateCustomVideoUrl(map);
 			}else{
-				System.out.println("文件上传失败");
+				map.put("msg","0");
 			}
 			sendMQ.closeConn();
 		} catch (Exception e) {
@@ -3064,6 +3062,8 @@ public class WarehouseCtrl {
 		com.alibaba.fastjson.JSONArray jsonArr = JSON.parseArray(JSON.toJSONString(result));
 		return jsonArr;
 	}
+
+
 
 
 
@@ -6002,15 +6002,15 @@ public class WarehouseCtrl {
 	@ResponseBody
 	public String addBackUser(HttpServletRequest request, HttpServletResponse response) {
 		int row=0;
-		String userEmail=request.getParameter("userEmail");
-		String userIp=request.getParameter("userIp");
+		String blackVlue=request.getParameter("blackVlue");
+		String type=request.getParameter("type");
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 		try{
 			if(adm == null){
 				return "0";
 			}
-			row=iWarehouseService.addBackUser(userEmail,userIp,adm.getAdmName());
+			row=iWarehouseService.addBackUser(blackVlue,type,adm.getAdmName());
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -6022,9 +6022,10 @@ public class WarehouseCtrl {
 	public String updatebackEmail(HttpServletRequest request, HttpServletResponse response) {
 		int row=0;
 		String id=request.getParameter("id");
-		String email=request.getParameter("email");
+		String newBlackVlue=request.getParameter("newBlackVlue");
+		String type=request.getParameter("type");
 		try{
-			row=iWarehouseService.updatebackEmail(id,email);
+			row=iWarehouseService.updatebackEmail(id,newBlackVlue,type);
 		}catch (Exception e){
 			e.printStackTrace();
 		}

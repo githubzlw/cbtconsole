@@ -106,6 +106,34 @@ public class OrderBean implements Cloneable {
     private String payUserName;
     private String backFlag;
     private double processingfee;
+    //黑名单相关
+    private int backList;
+    private int backAddressCount;
+    private int payBackList;
+    public int getBackList() {
+        return backList;
+    }
+
+    public void setBackList(int backList) {
+        this.backList = backList;
+    }
+
+    public int getBackAddressCount() {
+        return backAddressCount;
+    }
+
+    public void setBackAddressCount(int backAddressCount) {
+        this.backAddressCount = backAddressCount;
+    }
+
+    public int getPayBackList() {
+        return payBackList;
+    }
+
+    public void setPayBackList(int payBackList) {
+        this.payBackList = payBackList;
+    }
+
     public String getStreet() {
         return street;
     }
