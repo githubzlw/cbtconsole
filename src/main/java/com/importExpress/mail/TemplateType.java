@@ -22,8 +22,7 @@ public enum TemplateType {
     SHOPPING_CART_PROBLEM("SHOPPING-CART-PROBLEM"),
     WELCOME("WELCOME"),
     SHOPPING_CART("SHOPPING-CART");
-
-
+    REPLACEGOODS("REPLACE-GOODS");
 
     private String name;
 

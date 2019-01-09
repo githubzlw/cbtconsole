@@ -94,14 +94,26 @@ function fn(va) {
 			showImg += "<span class='spiconbl'>电汇</span>";
 		}
         if(addressFlag == 1){
-            showImg += "<span class='spiconbl' style='color:red'>付款失败</span>";
+            showImg += "<span class='spiconbl' style='color:red'>付款异常(国家不一致)</span>";
+        }
+        if(addressFlag == 2){
+            showImg += "<span class='spiconbl' style='color:red'>无付款信息</span>";
+        }
+        if(addressFlag == 3){
+            showImg += "<span class='spiconbl' style='color:red'>B2B库存</span>";
         }
         if(json[i].ordertype == 3){
             showImg += "<span class='spiconbl' style='color:red'>dropship 国内库存订单</span>";
         }
-        if(json[i].backList>0 || json[i].payBackList>0){
-            showImg += "<span class='spiconbl' style='color:red'>黑名单</span>";
+        if(json[i].backList>0){
+            showImg += "<span class='spiconbl' style='color:red'>用户黑名单</span>";
 		}
+        if(json[i].payBackList>0){
+            showImg += "<span class='spiconbl' style='color:red'>支付账号黑名单</span>";
+        }
+        if(json[i].backAddressCount>0){
+            showImg += "<span class='spiconbl' style='color:red'>订单城市黑名单</span>";
+        }
 		if(isDropship == 1){
 			showImg += "<img style='width: 20px;' title='dropship' src='/cbtconsole/img/ds1.png'>";
 		}
