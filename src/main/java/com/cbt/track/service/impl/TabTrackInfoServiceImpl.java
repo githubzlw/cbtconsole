@@ -85,7 +85,7 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         	Set<String> onlySet = new HashSet<String>();
         	List<TabTrackInfo> delList = new ArrayList<TabTrackInfo>();
         	for (TabTrackInfo bean : list) {
-        		String tem = bean.getOrderNo() + bean.getTrackCompany();
+        		String tem = bean.getOrderNo() + bean.getTrackNo() + bean.getTrackCompany();
 				if (!onlySet.contains(tem)) {
 					onlySet.add(tem);
 				} else {
