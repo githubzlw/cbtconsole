@@ -8,6 +8,7 @@ import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.AdminRUserExample;
 import com.importExpress.pojo.UserBean;
@@ -152,5 +153,35 @@ public class CustomerRelationshipManagementController {
         request.setAttribute("orderNo",orderNo);
         return "reorder";
     }
+    @RequestMapping(value = "/getOutofstockdemandList")
+    public EasyUiJsonResult getOutofstockdemandtable(HttpServletRequest request) throws Exception {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        int startNum = 0;
+        int limitNum = 50;
+        String pageStr = request.getParameter("page");
+        String limitNumStr = request.getParameter("rows");
 
+        if (!(limitNumStr == null || "".equals(limitNumStr) || "0".equals(limitNumStr))) {
+            limitNum = Integer.valueOf(limitNumStr) ;
+        }
+
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        String disputeid = request.getParameter("disputeid");
+
+        String sttime = request.getParameter("sttime");
+        if (sttime == null || "".equals(sttime)) {
+            sttime = "";
+        } else {
+            sttime += " 00:00:00";
+        }
+        String edtime = request.getParameter("edtime");
+        if (edtime == null || "".equals(edtime)) {
+            edtime = "";
+        } else {
+            edtime += " 23:59:59";
+        }
+        return json;
+    }
 }

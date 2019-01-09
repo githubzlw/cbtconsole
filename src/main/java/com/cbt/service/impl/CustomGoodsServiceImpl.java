@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CustomGoodsServiceImpl implements CustomGoodsService {
@@ -34,6 +35,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public List<CategoryBean> getCaterory() {
 
         return customGoodsDao.getCaterory();
+    }
+
+    @Override
+    public int addReviewRemark(Map<String, String> map) {
+        return customGoodsMapper.addReviewRemark(map);
+    }
+
+    @Override
+    public int updateReviewRemark(Map<String, String> map) {
+        return customGoodsMapper.updateReviewRemark(map);
     }
 
     @Override
@@ -249,6 +260,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public GoodsPictureQuantity queryPictureQuantityByPid(String pid) {
         return customGoodsDao.queryPictureQuantityByPid(pid);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> getAllReviewByPid(String pid) {
+        return customGoodsMapper.getAllReviewByPid(pid);
     }
 
     @Override

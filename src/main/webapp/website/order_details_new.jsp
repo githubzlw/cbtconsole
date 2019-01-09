@@ -439,7 +439,18 @@ em {
 							${order.state==0?'等待付款':'' }${order.state==3?'出运中':'' }
 							${order.state==4?'完结':'' }
 							${order.state==5?'确认价格中':'' }${order.state==7?'预订单':'' }
-					</em></td>
+					</em>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<c:if test="${order.backList>0}">
+						<span style="color:Red">用户黑名单&nbsp;&nbsp;</span>
+					</c:if>
+					<c:if test="${order.payBackList>0}">
+						<span style="color:Red">支付账号黑名单&nbsp;&nbsp;</span>
+					</c:if>
+					<c:if test="${order.backAddressCount>0}">
+						<span style="color:Red">订单城市黑名单</span>
+					</c:if>
+					</td>
 					<td width="50%" colspan="3">
 					<c:if test="${fn:length(orderNos) > 0}">
 						<span class="ornmatd1">关联订单:</span>

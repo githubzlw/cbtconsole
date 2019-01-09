@@ -956,7 +956,7 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Map<String, String>> list=dao.getOrderManagementQuery(userID,state,StringUtils.isStrNull(startdate)?"":startdate,StringUtils.isStrNull(enddate)?"":enddate,StringUtils.isStrNull(email)?"":email, StringUtils.isStrNull(orderno)?"":orderno,startpage,page,admuserid,buyid,showUnpaid,StringUtils.isStrNull(type)?"":type,status,paymentid);
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
-			String tp="支付错误";
+			String tp="支付类型错误";
 			if(StringUtil.isNotBlank(paytype) && paytype.indexOf(",")>-1){
 				StringBuilder types=new StringBuilder();
 				String [] t=paytype.split(",");
@@ -982,12 +982,20 @@ public class OrderinfoService implements IOrderinfoService {
 				ipnaddress = udao.getIpnaddress(orderInfo.getOrderNo()).get("ipnaddress");
 			}
 			String zCountry=map.get("zCountry");
+			String ordertype=String.valueOf(map.get("ordertype"));
 			if((StringUtil.isBlank(odCode) || StringUtil.isBlank(ipnaddress) || !ipnaddress.equals(odCode)) && tp.indexOf("paypal")>-1){
 				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
-				if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
-					addressFlag="0";
+				if("3".equals(ordertype)){
+					//B2B订单
+					addressFlag="3";
+				}else if(StringUtil.isBlank(addressCountry)){
+					//没有支付信息，
+					addressFlag="2";
+				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
+					//两边都有编码但不一致
+					addressFlag="1";
 				}else{
 					logger.warn("二次校验，全称国家不一致： zCountry={},addressCountry={}", zCountry,addressCountry);
 					addressFlag="1";
