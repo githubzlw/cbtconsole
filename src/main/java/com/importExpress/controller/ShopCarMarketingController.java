@@ -193,28 +193,58 @@ public class ShopCarMarketingController {
             return json;
         }
 
-        String emailContent = request.getParameter("emailContent");
+        String adminNameFirst = request.getParameter("adminNameFirst");
+        if (StringUtils.isBlank(adminNameFirst)) {
+            json.setOk(false);
+            json.setMessage("获取销售名称失败");
+            return json;
+        }
+
+        String adminName = request.getParameter("adminName");
+        if (StringUtils.isBlank(adminName)) {
+            json.setOk(false);
+            json.setMessage("获取销售名称失败");
+            return json;
+        }
+
+        String adminEmail = request.getParameter("adminEmail");
+        if (StringUtils.isBlank(adminEmail)) {
+            json.setOk(false);
+            json.setMessage("获取销售邮箱失败");
+            return json;
+        }
+
+        String whatsApp = request.getParameter("whatsApp");
+        if (StringUtils.isBlank(whatsApp)) {
+            json.setOk(false);
+            json.setMessage("获取whatsApp失败");
+            return json;
+        }
+        /*String emailContent = request.getParameter("emailContent");
         if (StringUtils.isBlank(emailContent)) {
             json.setOk(false);
             json.setMessage("获取邮件内容失败");
             return json;
-        }
+        }*/
 
 
+        String userName;
         String userEmail = request.getParameter("userEmail");
         if (StringUtils.isBlank(userEmail)) {
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
             userEmail = listu.get("email").toString();
             listu.clear();
+            if(listu.containsValue("name") && StringUtils.isNotBlank(listu.get("name").toString())){
+                userName = listu.get("name").toString();
+            }else{
+                userName = userEmail;
+            }
         }
         try {
 
             int userId = Integer.valueOf(userIdStr);
-            String emailTitle = "Your shopping cart misses you!";
-            if (emailContent.contains("noticed that you have over")) {
-                emailTitle = "";
-            }
+            String emailTitle = "You have made some wonderful selections";
 
             /*int userId = Integer.valueOf(userIdStr);
             //1.重新生成goods_carconfig数据，并进行保存
@@ -265,7 +295,14 @@ public class ShopCarMarketingController {
                 Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
                 sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
             } else {
-                genHtmlEamil(userId,userEmail,user.getEmail());
+                Map<String,String> paramMap = new HashMap<>();
+                paramMap.put("userEmail",userEmail);
+                paramMap.put("emailTitle",emailTitle);
+                paramMap.put("adminNameFirst",adminNameFirst);
+                paramMap.put("adminName",adminName);
+                paramMap.put("adminEmail",adminEmail);
+                paramMap.put("whatsApp",whatsApp);
+                genHtmlEamil(userId,paramMap);
                 //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
             //4.更新跟进信息
@@ -284,7 +321,7 @@ public class ShopCarMarketingController {
     }
 
 
-    private void genHtmlEamil(int userId,String userEmail,String adminEmail){
+    private void genHtmlEamil(int userId,Map<String,String> paramMap){
         try{
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
@@ -356,7 +393,13 @@ public class ShopCarMarketingController {
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
-			    sendMailFactory.sendMail(userEmail, adminEmail, "You have made some wonderful selections", modelM, TemplateType.SHOPPING_CART);
+
+                modelM.put("userEmail", paramMap.get("userEmail"));
+                modelM.put("adminNameFirst", paramMap.get("adminNameFirst"));
+                modelM.put("adminName", paramMap.get("adminName"));
+                modelM.put("adminEmail", paramMap.get("adminEmail"));
+                modelM.put("whatsApp", paramMap.get("whatsApp"));
+			    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART);
         }catch (Exception e){
             e.printStackTrace();
         }

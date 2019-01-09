@@ -225,7 +225,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                    <td class="soapbox-title">Hey <em>[Name]</em>, your cart is expiring soon</td>
+                    <td class="soapbox-title">Hey <em th:text="${userEmail}">[]</em>, your cart is expiring soon</td>
                   </tr>
                 </table>
 
@@ -237,7 +237,7 @@
                       <div class="dismantling_box" >
                         <div class="order_first">
                           <div class="rece_shop">
-                            <p>I'm <strong>Lena Wu</strong>, Marketing Manager of Import Express.</p>
+                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
                             <p>I noticed that you were about to pick up some products on our website but haven’t completed your order.</p>
                             <p>Is there anything I could help you with? </p>
                             <p>Here's your shopping cart list.</p>
@@ -285,10 +285,10 @@
                         <tr>
                           <td class="body-signature-cell order_cart_bottom">
                             <p class="thanks_so">Yours Sincerely,</p>
-                            <p class="thanks_so"> Lena | Marketing Manager</p>
+                              <p class="thanks_so"> <span th:text="${adminName}">Lena</span> | Lenaeting Manager</p>
                             <p class="thanks_so"> Marketing Department</p>
-                            <p class="thanks_so"> Email: <strong>lenawu@import-express.com</strong></p>
-                            <p class="thanks_so">WhatsApp: <strong>+86 18717701974</strong></p>
+                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
+                            <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
                             <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
                           </td>
                         </tr>

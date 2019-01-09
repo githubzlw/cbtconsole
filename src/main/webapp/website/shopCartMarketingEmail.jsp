@@ -27,13 +27,13 @@
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
             <p style="margin-bottom: 10px;">
             <h3 style="font-family: Times New Roman;margin-bottom:20px;">Dear customer,</h3>
-            <%--<span>I'm ${adminName} of ImportExpress.</span>
-            <br>--%>
+            <span>I'm <input id="admin_name_first" value="${adminName}">, Marketing Manager of Import Express.</span>
+            <br>
             <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
             <br>
             <span>Is there anything I could help you with?</span>
             <br>
-            <span>Here's your shopping cart list and some products are on sale!</span>
+            <span>Here's your shopping cart list.</span>
             </p>
 
             <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
@@ -158,15 +158,21 @@
             <div>
                 <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel
                     free to ask me by responding to this Email</p>
-                <%--<p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>--%>
-                <%--<p style="margin-bottom: 5px;margin-top:0;"><b>${adminName}</b> | Marketing Manager</p>--%>
-                <%--<p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>--%>
-                <%--<p style="margin-bottom: 5px;margin-top:0;">Email: ${adminEmail}</p>--%>
-                <%--<p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input--%>
-                        <%--id="whats_app_span_temp" value="+86 136 3644 5063"/></p>--%>
-                <%--<p id="whats_app_pp" style="margin-bottom: 5px;margin-top:0;display: none;"></p>--%>
+
+                <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
+                <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><a href="https://www.import-express.com/" target="_blank"
+                                                               style="color:#01a4ef;font-size:28px;"><b>www.import-express.com</b></a>
+                </p>
+
+                <p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><input id="admin_name" value="${adminName}"/> | Marketing Manager</p>
+                <p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>
+                <p style="margin-bottom: 5px;margin-top:0;">Email:<input id="admin_email" value="${adminEmail}"/></p>
+                <p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input
+                        id="whats_app" value="+86 136 3644 5063"/></p>
             </div>
-            <div>
+            <%--<div>
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
                 <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
                 <p style="margin-bottom: 5px;margin-top:0;"><a href="https://www.import-express.com/" target="_blank"
@@ -187,7 +193,7 @@
                 <a href="http://clothing-wholesaler.com/"
                    style="background:url(https://img1.import-express.com/importcsvimg/webpic/newindex/img/express.png) -57px -5px no-repeat;display: inline-block;width:42px;height:42px;"></a>
                 </p>
-            </div>
+            </div>--%>
         </div>
     </div>
 </c:if>
@@ -196,37 +202,55 @@
     function confirmAndSendEmail(userId, userEmail) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
-            /*var whatsApp = $("#whats_app_span_temp").val();
-            if (whatsApp) {
-                $("#whats_app_pp_temp").remove();
-                $("#whats_app_pp").text("WhatsApp: " + whatsApp).show();
-
-
-            } else {
+            var ischeck = 0;
+            var adminNameFirst = $("#admin_name_first").val();
+            if (adminNameFirst == null || adminNameFirst == "") {
+                $("#show_notice").text("请输入销售名称").show();
+                ischeck = 1;
+            }
+            var adminName = $("#admin_name").val();
+            if (adminName == null || adminName == "") {
+                $("#show_notice").text("请输入销售名称").show();
+                ischeck = 1;
+            }
+            var adminEmail = $("#admin_email").val();
+            if (adminEmail == null || adminEmail == "") {
+                $("#show_notice").text("请输入销售邮箱").show();
+                ischeck = 1;
+            }
+            var whatsApp = $("#whats_app").val();
+            if (whatsApp == null || whatsApp == "") {
                 $("#show_notice").text("请输入WhatsApp").show();
-            }*/
-
-            $("#show_notice").show();
-            var emailContent = $("#email_content").html();
-            var model = $("#modeStr").html();
-            $.ajax({
-                type: 'POST',
-                dataType: 'text',
-                url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
-                data: {
-                    "userEmail": userEmail,
-                    "userId": userId,
-                    "emailContent": emailContent,
-                    "model": model
-                },
-                success: function (data) {
-                    var json = eval("(" + data + ")");
-                    $("#show_notice").text(json.message);
-                },
-                error: function () {
-                    $("#show_notice").text("执行失败,请联系管理员");
-                }
-            });
+                ischeck = 1;
+            }
+            if (ischeck == 1) {
+                return false;
+            } else {
+                //var emailContent = $("#email_content").html();
+                //var model = $("#modeStr").html();
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'text',
+                    url: '/cbtconsole/shopCarMarketingCtr/confirmAndSendEmail',
+                    data: {
+                        "userEmail": userEmail,
+                        "userId": userId,
+                        "adminNameFirst": adminNameFirst,
+                        "adminName": adminName,
+                        "adminEmail": adminEmail,
+                        "whatsApp": whatsApp
+                        //"emailContent": emailContent,
+                        //"model": model,
+                    },
+                    success: function (data) {
+                        var json = eval("(" + data + ")");
+                        $("#show_notice").text(json.message).show();
+                    },
+                    error: function () {
+                        $("#show_notice").text("执行失败,请联系管理员").show();
+                    }
+                });
+            }
         } else {
             return false;
         }
