@@ -246,7 +246,6 @@ public class ShopCarMarketingController {
             int userId = Integer.valueOf(userIdStr);
             String emailTitle = "You have made some wonderful selections";
 
-            /*int userId = Integer.valueOf(userIdStr);
             //1.重新生成goods_carconfig数据，并进行保存
             List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
             List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
@@ -264,10 +263,6 @@ public class ShopCarMarketingController {
                 activeList.add(genActiveBeanByShopCar(shopCar));
             }
 
-            String emailTitle = "Your shopping cart misses you!";
-            if (emailContent.contains("noticed that you have over")) {
-                emailTitle = "";
-            }
             //判断是否有改价的情况，有改价更新并清空购物车
             if (isUpdatePrice > 0) {
                 boolean isSuccess = updateGoodsCarConfig(showList, activeList, Integer.valueOf(userIdStr));
@@ -286,7 +281,8 @@ public class ShopCarMarketingController {
                     json.setMessage("更新失败,请重试");
                     return json;
                 }
-            }*/
+            }
+            Map<String,String> paramMap = new HashMap<>();
             //3.发送邮件给客户
             //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
             boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
@@ -295,7 +291,7 @@ public class ShopCarMarketingController {
                 Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
                 sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
             } else {
-                Map<String,String> paramMap = new HashMap<>();
+
                 paramMap.put("userEmail",userEmail);
                 paramMap.put("emailTitle",emailTitle);
                 paramMap.put("adminNameFirst",adminNameFirst);
@@ -306,7 +302,7 @@ public class ShopCarMarketingController {
                 //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
             //4.更新跟进信息
-            // shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), emailContent);
+            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
             json.setOk(true);
             json.setMessage("发送邮件成功！");
         } catch (Exception e) {
