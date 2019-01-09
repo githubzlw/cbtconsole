@@ -9,6 +9,7 @@ import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.OnlineGoodsCheck;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CustomGoodsService {
 
@@ -20,6 +21,20 @@ public interface CustomGoodsService {
      * @author abc
      */
     public List<CategoryBean> getCaterory();
+
+    /**
+     * 添加商品评论
+     * @param map
+     * @return
+     */
+    public int addReviewRemark(Map<String,String> map);
+
+    /**
+     * 编辑商品评论
+     * @param map
+     * @return
+     */
+    public int updateReviewRemark(Map<String,String> map);
 
     /**
      * 查询参数下类别和商品总数统计
@@ -264,6 +279,13 @@ public interface CustomGoodsService {
      * @return
      */
     public GoodsPictureQuantity queryPictureQuantityByPid(String pid);
+
+    /**
+     * 查询商品评论内容
+     * @param pid
+     * @return
+     */
+    public List<CustomGoodsPublish> getAllReviewByPid(String pid);
 
     /**
      * 设置pid商品是否有效(上架或者下架)
@@ -553,4 +575,11 @@ public interface CustomGoodsService {
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
     boolean refreshPriceRelatedData(CustomGoodsPublish bean);
+
+    /**
+	 * 更新28促销flag
+	 * @param pid
+	 * @return
+	 */
+	int updatePromotionFlag(String pid);
 }

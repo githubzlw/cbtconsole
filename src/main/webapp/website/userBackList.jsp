@@ -98,18 +98,21 @@ tr .td_class{width:230px;}
 
 
 	function doQuery(page) {
-	    var qEmail=$("#qEmail").val();
+	    var blackVlue=$("#pBlackVlue").val();
 	    var flag=$("#flag").val();
+        var paramType=$("#paramType").val();
 		$("#easyui-datagrid").datagrid("load", {
 			"page" : page,
-			"qEmail":qEmail,
-			"flag":flag
+			"blackVlue":blackVlue,
+			"flag":flag,
+			"paramType":paramType
 		});
 	}
 
 	function doReset() {
-	    $("#qEmail").val("");
+	    $("#pBlackVlue").val("");
 	    $("#flag").val("");
+        $("#paramType").val("-1");
 	}
 
 	function updateFlag(id,type){
@@ -137,25 +140,42 @@ tr .td_class{width:230px;}
 	function cance(){
         $('#dlg').dialog('close');
         $("#oldEmail").textbox('setValue',"");
-        $("#newEmail").textbox('setValue',"");
+        $("#newBlackVlue").textbox('setValue',"");
+        $("#newType").combobox('setValue',"-1");
+        $("#type").combobox('setValue',"-1");
         $("#id").val("");
         $('#dlg1').dialog('close')
-        $("#userEmail").textbox('setValue',"");
-        $("#userIp").textbox('setValue',"");
+        $("#blackVlue").textbox('setValue',"");
+        $('#valid').combobox('setValue','-1');
 	}
 
 	function updatebackEmail(){
-	    var email=$.trim(document.getElementById("newEmail").value);
+	    var newBlackVlue=$.trim(document.getElementById("newBlackVlue").value);
         var oldEmail=$.trim(document.getElementById("oldEmail").value);
 	    var id=$("#id").val();
-	    if(email ==null || email == "" || email==oldEmail){
-            topCenter("新邮箱不能为空且不能一致");
-            return;
+        var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+        var type=$('#newType').combobox('getValue');
+        if(type == -1){
+            topCenter("请选择黑名单类型");
+            return false;
+        }else if(type == 0){
+            if(newBlackVlue == null || newBlackVlue == ""){
+                topCenter("Please enter your email！");
+                return false;
+            }
+            if(!reg.test(newBlackVlue)){
+                topCenter("Please enter your vaild email！");
+                return false;
+            }
+        }
+        if(newBlackVlue == null || newBlackVlue == "" || newBlackVlue ==oldEmail ){
+            topCenter("请输入黑名单值，且不能喝当前黑名单信息一致");
+            return false;
 		}
         $.ajax({
             url: "/cbtconsole/warehouse/updatebackEmail",
             type:"POST",
-            data : {"id":id,"email":email},
+            data : {"id":id,"newBlackVlue":newBlackVlue,"type":type},
             dataType:"json",
             success:function(data){
                 if(data>0){
@@ -175,12 +195,26 @@ tr .td_class{width:230px;}
 	}
 
 	function addBackUser(){
-        var userEmail=$.trim(document.getElementById("userEmail").value);
-        var userIp=$.trim(document.getElementById("userIp").value);
+        var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+        var blackVlue=$.trim(document.getElementById("blackVlue").value);
+        var type=$('#type').combobox('getValue');
+        if(type == -1){
+            topCenter("请选择黑名单类型");
+            return false;
+		}else if(type == 0){
+            if(blackVlue == null || blackVlue == ""){
+                topCenter("Please enter your email！");
+                return false;
+            }
+            if(!reg.test(blackVlue)){
+                topCenter("Please enter your vaild email！");
+                return false;
+            }
+		}
         $.ajax({
             url: "/cbtconsole/warehouse/addBackUser",
             type:"POST",
-            data : {"userEmail":userEmail,"userIp":userIp},
+            data : {"blackVlue":blackVlue,"type":type},
             dataType:"json",
             success:function(data){
                 if(data>0){
@@ -195,14 +229,22 @@ tr .td_class{width:230px;}
 </script>
 </head>
 <body onload="$('#dlg').dialog('close');$('#dlg1').dialog('close');">
-<div id="dlg" class="easyui-dialog"  title="修改黑名单邮箱" data-options="modal:true" style="width:500px;height:200px;padding:10px;autoOpen:false;closed:true;display: none;">
+<div id="dlg" class="easyui-dialog"  title="修改黑名单" data-options="modal:true" style="width:500px;height:300px;padding:10px;autoOpen:false;closed:true;display: none;">
 	<form id="ff" method="post" style="height:100%;">
 		<div style="margin-bottom:20px;margin-left:35px;">
-			<input class="easyui-textbox" name="oldEmail" id="oldEmail" readonly="readonly"   style="width:90%;"  data-options="label:'当前邮箱:'">
+			<input class="easyui-textbox" name="oldEmail" id="oldEmail" readonly="readonly"   style="width:90%;"  data-options="label:'当前内容:'">
 			<input type="hidden" id="id" name="id"/>
 		</div>
 		<div style="margin-bottom:20px;margin-left:35px;">
-			<input class="easyui-textbox" name="newEmail" id="newEmail"  style="width:90%;"  data-options="label:'修改后邮箱:'">
+			<input class="easyui-textbox" name="newBlackVlue" id="newBlackVlue"  style="width:90%;"  data-options="label:'修改后内容:'">
+		</div>
+		<div style="margin-bottom:20px;margin-left:35px;">
+			<select class="easyui-combobox" name="newType" id="newType" style="width:230px" data-options="label:'类型:',Height:'auto'">
+				<option value="-1" selected="selected">请选择</option>
+				<option value="0">邮箱黑名单</option>
+				<option value="1">ip黑名单</option>
+				<option value="2">城市黑名单</option>
+			</select>
 		</div>
 		<div style="text-align:center;padding:5px 0">
 			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="updatebackEmail()" style="width:80px">提交</a>
@@ -210,13 +252,18 @@ tr .td_class{width:230px;}
 		</div>
 	</form>
 </div>
-<div id="dlg1" class="easyui-dialog"  title="新增黑名单邮箱" data-options="modal:true" style="width:400px;height:200px;padding:10px;autoOpen:false;closed:true;display: none;">
+<div id="dlg1" class="easyui-dialog"  title="新增黑名单" data-options="modal:true" style="width:400px;height:200px;padding:10px;autoOpen:false;closed:true;display: none;">
 	<form id="ff1" method="post" style="height:100%;">
 		<div style="margin-bottom:20px;margin-left:35px;">
-			<input class="easyui-textbox" name="userEmail" id="userEmail"  style="width:70%;"  data-options="label:'邮箱:'">
+			<input class="easyui-textbox" name="blackVlue" id="blackVlue"  style="width:70%;"  data-options="label:'黑名单内容:'">
 		</div>
 		<div style="margin-bottom:20px;margin-left:35px;">
-			<input class="easyui-textbox" name="userIp" id="userIp"  style="width:70%;"  data-options="label:'用户ip:'">
+			<select class="easyui-combobox" name="type" id="type" style="width:230px" data-options="label:'类型:',Height:'auto'">
+				<option value="-1" selected="selected">请选择</option>
+				<option value="0">邮箱黑名单</option>
+				<option value="1">ip黑名单</option>
+				<option value="2">城市黑名单</option>
+			</select>
 		</div>
 		<div style="text-align:center;padding:5px 0">
 			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="addBackUser()" style="width:80px">提交</a>
@@ -228,8 +275,8 @@ tr .td_class{width:230px;}
 		<div>
 			<table style="margin:auto;">
 				<tr>
-					<td class="td_class"><div class="w_input">邮箱：<input id="qEmail" type="text"
-						value="${param.email}" onblur="this.value=this.value.trim();"
+					<td class="td_class"><div class="w_input">黑名单内容：<input id="pBlackVlue" type="text"
+						value="" onblur="this.value=this.value.trim();"
 						onkeypress="this.value=this.value.trim();if (event.keyCode == 13) doQuery(1)" /></div></td>
 					<td>
 						状态：<select id="flag">
@@ -237,6 +284,14 @@ tr .td_class{width:230px;}
 							<option value="0">使用中</option>
 						    <option value="1">停用</option>
 						</select>
+					</td>
+					<td>
+						类型：<select id="paramType">
+						<option value="-1">全部</option>
+						<option value="0">邮箱黑名单</option>
+						<option value="1">ip黑名单</option>
+						<option value="2">城市黑名单</option>
+					</select>
 					</td>
 					<td>
 						<input class="but_color" type="button"  value="查询" onclick="doQuery(1)">
@@ -251,11 +306,11 @@ tr .td_class{width:230px;}
 	<table class="easyui-datagrid" id="easyui-datagrid">
 		<thead>
 			<tr>
-				<th data-options="field:'email',width:40,align:'center'">黑名单邮箱</th>
+				<th data-options="field:'blackVlue',width:40,align:'center'"></th>
 				<th data-options="field:'createtime',width:40,align:'center'">创建时间</th>
 				<th data-options="field:'updateTime',width:40,align:'center'">最后更新时间</th>
-				<th data-options="field:'userip',width:20,align:'center'">Ip地址</th>
 				<th data-options="field:'flag',width:10,align:'center'">状态</th>
+				<th data-options="field:'type',width:10,align:'center'">类型</th>
 				<th data-options="field:'username',width:30,align:'center'">操作人</th>
 				<th data-options="field:'option',width:40,align:'center'">操作</th>
 			</tr>

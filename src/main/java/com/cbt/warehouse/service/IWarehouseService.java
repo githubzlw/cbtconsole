@@ -2,11 +2,10 @@ package com.cbt.warehouse.service;
 
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.bean.ZoneBean;
+import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
 import com.cbt.website.bean.*;
 import org.apache.ibatis.annotations.Param;
@@ -328,8 +327,8 @@ public interface IWarehouseService {
 	int resetLocation(Map<String, String> map);
 
 	int updateFlag(String id,String type);
-	int updatebackEmail(String id,String email);
-	int addBackUser(String email,String ip,String userName);
+	int updatebackEmail(String id,String newBlackVlue,String type);
+	int addBackUser(String blackVlue,String type,String userName);
 	int updateState(Map<String, String> map);
 
 	int insertRemark(Map<String, String> map);
@@ -801,6 +800,12 @@ public interface IWarehouseService {
 	 * @return
 	 */
 	List<com.cbt.pojo.AdmuserPojo> getAllBuyer(int id);
+
+	/**
+	 * 获取所有国家名称
+	 * @return
+	 */
+	public List<ZoneBean> getAllZone();
 	/**
 	 * 添加采样商品备注
 	 * @Title addSampleRemark
@@ -875,6 +880,26 @@ public interface IWarehouseService {
 	 * @return List<PurchaseSamplingStatisticsPojo>
 	 */
 	List<PurchaseSamplingStatisticsPojo> getPurchaseSamplingStatistics(Map<String, Object> map);
+
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProduct(Map<String,String> map);
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProductCount(Map<String,String> map);
+
+	/**
+	 * 添加修改红人产品发货单号
+	 * @param map
+	 * @return
+	 */
+	public int insertShipno(Map<String,String> map);
 
 	public List<Inventory> getAllUser();
 

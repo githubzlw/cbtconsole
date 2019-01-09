@@ -46,6 +46,8 @@
             closeSimilarGoodsDialog();
             closeKeyWordDialog();
             closeBenchmarking();
+            $('#review_dlg').dialog('close');
+            $('#update_review_dlg').dialog('close');
         });
 
         function relieveDisabled(obj) {
@@ -817,9 +819,130 @@
             $('#similar_dlg').dialog('open');
         }
 
+        function openReviewDiv() {
+            $('#review_dlg').dialog('open');
+        }
+
         function closeSimilarGoodsDialog() {
             $('#similar_dlg').dialog('close');
             $("#similar_pids").val("");
+        }
+
+        function closeRemark(){
+            $('#review_dlg').dialog('close');
+            $("#review_remark").val("");
+        }
+
+        function openEditReview(aliId,country,review_remark,review_score,review_flag){
+            $('#edit_score').combobox('setValue',review_score);
+            $('#editcountry').combobox('setValue',country);
+            $("#edit_remark").val(review_remark);
+            $("#update_aliId").val(aliId);
+            if(review_flag == "不显示"){
+                review_flag="1";
+            }else if(review_flag == "显示"){
+                review_flag="0";
+            }
+            $('#update_flag').combobox('setValue',review_flag);
+            $('#update_review_dlg').dialog('open');
+        }
+
+        function closeUpdateRemark(){
+            $('#edit_score').combobox('setValue',"1");
+            $('#editcountry').combobox('setValue',"country");
+            $("#edit_remark").val("");
+            $("#update_aliId").val("");
+            $('#update_flag').combobox('setValue',"0");
+            $('#update_review_dlg').dialog('close');
+        }
+
+        function updateReviewRemark(){
+            var update_aliId=$("#update_aliId").val();
+            var edit_remark=$("#edit_remark").val();
+            var editcountry=$('#editcountry').combobox('getValue');
+            var edit_score=$("#edit_score").val();
+            var update_flag=$('#update_flag').combobox('getValue');
+            if(edit_remark ==null ||edit_remark ==""){
+                showMessage("请输入商品评论");
+                return false;
+            }
+            if(editcountry ==null ||editcountry =="" || editcountry=="country"){
+                showMessage("请选择国家");
+                return false;
+            }
+            if(edit_score ==null ||edit_score ==""){
+                showMessage("请选择评分");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/updateReviewRemark',
+                data: {
+                    "update_aliId": update_aliId,
+                    "edit_remark": edit_remark,
+                    "editcountry":editcountry,
+                    "edit_score":edit_score,
+                    "update_flag":update_flag
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if(json.ok){
+                        showMessage("修改评论成功；2秒后刷新页面");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }else{
+                        showMessage("修改评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        }
+
+        function addReviewRemark(goods_pid){
+            var review_remark=$("#review_remark").val();
+            var country=$('#country').combobox('getValue');
+            var review_score=$("#review_score").val();
+            if(review_remark ==null ||review_remark ==""){
+                showMessage("请输入商品评论");
+                return false;
+            }
+            if(country ==null ||country =="" || country=="country"){
+                showMessage("请选择国家");
+                return false;
+            }
+            if(review_score ==null ||review_score ==""){
+                showMessage("请选择评分");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/addReviewRemark',
+                data: {
+                    "goods_pid": goods_pid,
+                    "review_remark": review_remark,
+                    "country":country,
+                    "review_score":review_score
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if(json.ok){
+                        showMessage("添加评论成功；2秒后刷新页面");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }else{
+                        showMessage("添加评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
         }
 
         function addSimilarGoods() {
@@ -898,7 +1021,7 @@
             });
         }
 
-        function setGoodsFlagByPid(pid,weight_flag,ugly_flag,benchmarking_flag,describe_good_flag,never_off_flag,uniqueness_flag) {
+        function setGoodsFlagByPid(pid,weight_flag,ugly_flag,benchmarking_flag,describe_good_flag,never_off_flag,uniqueness_flag,promotion_flag) {
             $.messager.confirm('提示', '是否确认设置此标识？', function (rs) {
                 if (rs) {
                     $.ajax({
@@ -912,7 +1035,8 @@
                             "benchmarking_flag":benchmarking_flag,
                             "describe_good_flag":describe_good_flag,
                             "never_off_flag":never_off_flag,
-                            "uniqueness_flag":uniqueness_flag
+                            "uniqueness_flag":uniqueness_flag,
+                            "promotion_flag":promotion_flag
                         },
                         success: function (data) {
                             var json = eval('(' + data + ')');
@@ -1170,10 +1294,11 @@
                 }
             });
         }
+
     </script>
 </head>
 
-<body onload="querySimilarGoodsByMainPid()">
+<body onload="querySimilarGoodsByMainPid();$('#review_dlg').dialog('close');$('#update_review_dlg').dialog('close');">
 
 <c:if test="${uid ==0}">
     {"status":false,"message":"请重新登录进行操作"}
@@ -1310,6 +1435,74 @@
         </div>
     </div>
 
+    <div id="review_dlg" class="easyui-dialog" title="添加评论"
+         data-options="modal:true"
+         style="width: 460px; height: 320px; padding: 10px;">
+        <br>
+         评论:<textarea id="review_remark" style="width: 300px; height: 88px;"></textarea><br>
+        <br>
+        <select class="easyui-combobox" name="review_score" id="review_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+       <br><br>
+        <select class="easyui-combobox" name="country" id="country" style="width:300px;" data-options="label:'国家:',Height:'2000px',valueField: 'country',
+                    textField: 'country', value:'country',selected:true,
+                    url: '/cbtconsole/warehouse/getAllZone',
+                    method:'get'">
+         </select>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="addReviewRemark('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeRemark()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+    <div id="update_review_dlg" class="easyui-dialog" title="编辑评论"
+         data-options="modal:true"
+         style="width: 460px; height: 360px; padding: 10px;">
+        <br>
+        <input id="update_aliId" type="hidden" name="update_aliId">
+        评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
+        <br>
+        <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <br><br>
+        <select class="easyui-combobox" name="update_flag" id="update_flag" style="width:300px;" data-options="label:'是否显示:',panelHeight:'auto'">
+            <option value="0">显示</option>
+            <option value="1">不显示</option>
+        </select>
+        <br><br>
+        <select class="easyui-combobox" name="editcountry" id="editcountry" style="width:300px;" data-options="label:'国家:',Height:'2000px',valueField: 'country',
+                    textField: 'country', value:'country',selected:true,
+                    url: '/cbtconsole/warehouse/getAllZone',
+                    method:'get'">
+        </select>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="updateReviewRemark()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeUpdateRemark()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
 
     <div class="allMain">
         <div class="s_top">
@@ -1327,10 +1520,14 @@
             <span class="s_btn" >下架该商品</span>
             <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
 
-            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0)">设置描述很精彩</span>
+            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
             <span class="s_last">*点击后数据直接更新线上</span>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
-            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0)">标识永不下架</span>
+            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0,0)">标识永不下架</span>
+            <c:if test="${goods.promotionFlag == 0}">
+                <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,0,1)">标识促销商品</span>
+            </c:if>
+
 
         </div>
         <div class="all_s">
@@ -1568,6 +1765,12 @@
 
 
                             <div class="goods_p">
+                                <p class="goods_color">bizPrice:</p>
+                                <p class="ul_size">
+                                    <span class="goods_cur">${goods.fpriceStr}</span>
+                                </p>
+                            </div>
+                            <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>
@@ -1636,7 +1839,10 @@
                 <br>
                 <b style="font-size: 16px;">编辑人：${goods.admin}</b>
                 <br>
-            </c:if> <c:if test="${goods.isAbnormal >0}">
+            </c:if> <c:if test="${goods.promotionFlag >0}">
+                <br>
+                <b style="font-size: 16px;color: red;">促销商品</b>
+            </c:if><c:if test="${goods.isAbnormal >0}">
                 <br>
                 <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
             </c:if> <c:if test="${goods.isBenchmark >0}">
@@ -1718,17 +1924,17 @@
 			</span> <br> <br>
                 <span class="s_btn" onclick="addKeyWordWeight('${goods.shopId}','${goods.catid1}','${goods.pid}')">添加关键词重量</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="addBenchmarking('${goods.pid}')">亚马逊对标数据</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0)">难看中文多</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0)">重量不合理</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1)">不具备独特性可舍弃</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0,0)">难看中文多</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0,0)">重量不合理</span>
+                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1,0)">不具备独特性可舍弃</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="openEditLog('${goods.pid}')">查看编辑日志</span>
                 <c:if test="${goods.isBenchmark == 1 && goods.bmFlag == 1}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0)">对标准确</span>
+                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
                 </c:if>
                 <c:if test="${goods.isBenchmark == 2}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0)">对标准确</span>
+                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
                 </c:if>
                 &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
 
@@ -1738,7 +1944,8 @@
                                                                 href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a> <br> <a target="_blank"
                                                                                                         href="${goods.aliGoodsUrl}">速卖通原链接</a><br><br>
                 <a target="_blank"
-                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a>
+                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a><br>
+                <button onclick="openReviewDiv()">添加产品评价</button>
             </div>
 
 
@@ -1748,6 +1955,14 @@
             <div>
                 <span style="font-size: 22px; color: red; margin-top: 15px;">相似商品：</span>
                 <span class="s_btn_2" onclick="openSimilarGoodsDialog()">添加相似商品</span>
+            </div>
+            <div>
+                <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
+                <c:forEach items="${reviewList}" var="review">
+                    <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
+                    <button onclick="openEditReview(${review.aliId},'${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}');">编辑</button><br>
+                </c:forEach>
+
             </div>
 
             <div class="goods_img_2">

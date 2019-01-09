@@ -47,7 +47,21 @@ public class TabTrackInfo implements Serializable{
     private Date senttime;// 新增 发货时间
     
     private String trackNote;
-    
+
+    private Date trackNoteTime; //备注日期
+
+    private String info;//最后一条物流信息
+
+    private String admName;//负责人
+
+    public String getAdmName() {
+        return admName;
+    }
+
+    public void setAdmName(String admName) {
+        this.admName = admName;
+    }
+
     @Override
 	public String toString() {
 		return "TabTrackInfo [id=" + id + ", orderNo=" + orderNo + ", orderList=" + orderList + ", packageNo="
@@ -58,8 +72,16 @@ public class TabTrackInfo implements Serializable{
 				+ ", grabState=" + grabState + ", sourceType=" + sourceType + ", tabTrackDetailsList="
 				+ tabTrackDetailsList + ", senttime=" + senttime + "]";
 	}
-    
-	public Date getSenttime() {
+
+    public Date getTrackNoteTime() {
+        return trackNoteTime;
+    }
+
+    public void setTrackNoteTime(Date trackNoteTime) {
+        this.trackNoteTime = trackNoteTime;
+    }
+
+    public Date getSenttime() {
 		return senttime;
 	}
 
@@ -219,7 +241,15 @@ public class TabTrackInfo implements Serializable{
 		this.trackNote = trackNote;
 	}
 
-	public TabTrackInfo() {
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public TabTrackInfo() {
 		super();
 	}
 //TabTrackInfo(trackNo, trackState, trackNote)

@@ -21,15 +21,13 @@ import com.cbt.bean.ComplainVO;
 import com.cbt.dao.IComplainDao;
 import com.importExpress.mapper.AdminRUserMapper;
 import com.importExpress.mapper.CustomerDisputeMapper;
+import com.importExpress.mapper.PaymentMapper;
 import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomerDisputeService;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
-import com.stripe.model.BalanceTransaction;
-import com.stripe.model.Dispute;
-import com.stripe.net.APIResource;
 @Service
 public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -38,6 +36,8 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 //	14:10:48 Nov 21, 2018 PST
 	@Autowired
 	private CustomerDisputeMapper customerDisputeMapper;
+	@Autowired
+	private PaymentMapper paymentMapper;
 	@Autowired
 	private AdminRUserMapper adminRUserMapper;
 	@Autowired
@@ -124,7 +124,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			}
 	    			fl = fl && b.getTime() > sTime && b.getTime() < etime;
 	    			
-//	    			fl = fl && ((StringUtils.isNotBlank(b.getUserid()) && StringUtils.isNotBlank(b.getOprateAdm())) || StringUtils.isBlank(b.getUserid()));
+	    			fl = fl && ((StringUtils.isNotBlank(b.getUserid()) && StringUtils.isNotBlank(b.getOprateAdm())) || StringUtils.isBlank(b.getUserid()));
 	    			
 	    			return fl;
 	    		}
@@ -200,8 +200,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	public long updateMessage(String disputeId) {
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
 		BasicDBObject filter = new BasicDBObject();
-		filter.put("resource_type", "dispute");
-		filter.put("resource.dispute_id", disputeId);
+		if(StringUtils.startsWith(disputeId, "PP")) {
+			filter.put("resource_type", "dispute");
+			filter.put("resource.dispute_id", disputeId);
+		}else {
+			filter.put("data.object.object", "dispute");
+			filter.put("data.object.id", disputeId);
+		}
 		BasicDBObject update = new BasicDBObject("$set",new BasicDBObject("isRead",true));
 		long result = instance.update("data", filter, update ); 
 		
@@ -246,9 +251,13 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	private List<CustomerDisputeVO> getDisputesFromMongo(){
 		List<CustomerDisputeVO> list = new ArrayList<CustomerDisputeVO>();
 		List<String> webhookFilter = new ArrayList<String>();
+		List<String> stripFilter = new ArrayList<String>();
 		MongoDBHelp instance = MongoDBHelp.INSTANCE;
+		List<BasicDBObject> qList = new ArrayList<>();
+		qList.add(new BasicDBObject("resource_type", "dispute"));
+		qList.add(new BasicDBObject("data.object.object", "dispute"));
 		BasicDBObject q = new BasicDBObject();
-		q.put("resource_type", "dispute");
+		q.put("$or", qList);
 		List<String> documents = instance.findAny("data",q,null);
 		CustomerDisputeVO bean ;
 		try {
@@ -267,7 +276,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			bean.setValue(disputeAmount.getString("value") + disputeAmount.getString("currency_code"));
 	    			bean.setReason(resource.getString("reason"));
 	    			bean.setStatus(resource.getString("status"));
-	    			bean.setApiType("Paypal");
+	    			
 	    			JSONArray disputedTransactions = (JSONArray)resource.get("disputed_transactions");
 	    			JSONObject disputedTransaction = (JSONObject)disputedTransactions.get(0);
 	    			JSONObject seller = (JSONObject)disputedTransaction.get("seller");
@@ -281,28 +290,36 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    				
 	    				bean.setUserid(split.length > 3 ? split[0] : "");
 	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
-	    				
+	    				bean.setApiType("Paypal-电商");
+	    			}else {
+	    				bean.setApiType("Paypal-贸易");
 	    			}
 	    			bean.setRead(document.getBooleanValue("isRead"));
 	    			list.add(bean);
-	    		}else if(StringUtils.indexOf(content, "issuing.dispute") > -1){
-	    			Dispute dispute = APIResource.GSON.fromJson(content, Dispute.class);
-	                List<BalanceTransaction> balanceTransactions = dispute.getBalanceTransactions();
-	                BalanceTransaction balanceTransaction = balanceTransactions.get(0);
-	                bean.setDisputeID(balanceTransaction.getId());
-	                String net = String.valueOf(balanceTransaction.getNet());
-	                net = net.substring(0,net.length() - 2) + "." + net.substring(net.length() - 2);
+	    		}else if(StringUtils.indexOf(content, "dp_") > -1){
+	    			JSONObject document = JSONObject.parseObject(content);
+	    			
+	    			JSONObject data = (JSONObject)document.get("data");
+	    			JSONObject objectd = (JSONObject)data.get("object");
+	    			
+	    			JSONArray balanceTransactions = objectd.getJSONArray("balance_transactions");
+	    			
+	                JSONObject balanceTransaction = (JSONObject)balanceTransactions.get(0);
+	                bean.setDisputeID(objectd.getString("id"));
+	                String net = String.valueOf(balanceTransaction.getString("net"));
+	                net = net.substring(1,net.length() - 2) + "." + net.substring(net.length() - 2);
 	                
-	                bean.setValue(net + " " + dispute.getCurrency());
-	                bean.setTime(dispute.getCreated() * 1000L);
+	                bean.setValue(net + " " + balanceTransaction.getString("currency").toUpperCase());
+	                bean.setTime(document.getLongValue("created") * 1000L);
 	                bean.setUpdateTime(sdf.format(bean.getTime()));
-	                bean.setUserid("");
-	                bean.setEmail("");
-	                bean.setOrderNo("");
-	                bean.setUpdateTime(sdf.format(dispute.getCreated() * 1000L));
-	                bean.setReason(dispute.getReason());
-	    			bean.setStatus(dispute.getStatus());
-	    			bean.setApiType("stripe");
+	                String charge = objectd.getString("charge");
+	                bean.setTransactionID(charge);
+	                if(!stripFilter.contains(charge)) {
+	                	stripFilter.add(charge);
+	                }
+	                bean.setReason(objectd.getString("reason").toUpperCase());
+	    			bean.setStatus(objectd.getString("status").toUpperCase());
+	    			bean.setApiType("Stripe-电商");
 	    			list.add(bean);
 	    		}
 				
@@ -324,13 +341,14 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			String custom = document.getString("custom");
 	    			bean.setOrderNo("");
 	    			if(StringUtils.indexOf(custom, "@") > -1) {
-	    				
+	    				bean.setApiType("Paypal-电商");
 	    				String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
 	    				
 	    				bean.setUserid(split.length > 3 ? split[0] : "");
 	    				bean.setOrderNo(split.length == 10 ? split[6] : split.length > 3 ?split[2] : "");
+	    			}else {
+	    				bean.setApiType("Paypal-贸易");
 	    			}
-	    			bean.setApiType("Paypal");
 	    			String reason_code = document.getString("reason_code");
 //	    			reason_code = StringUtils.equals(reason_code, "non_receipt") ? "MERCHANDISE_OR_SERVICE_NOT_RECEIVED" : reason_code;
 	    			bean.setReason(reason_code);
@@ -339,6 +357,25 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 					list.add(bean);
 				}
 			}
+			
+			if(stripFilter != null && !stripFilter.isEmpty()) {
+				Map<String,Map<String,Object>> transcationMap = new HashMap<String,Map<String,Object>>();
+				List<Map<String,Object>> listStripeByTransactionId = paymentMapper.listStripeByTransactionId(stripFilter);
+				listStripeByTransactionId.stream().forEach(s -> {
+					transcationMap.put((String)s.get("paypalid"), s);
+				});
+				list.stream().forEach(l -> {
+					if(StringUtils.indexOf(l.getApiType(), "Stripe") > -1) {
+						Map<String, Object> map = transcationMap.get(l.getTransactionID());
+						if(map != null) {
+							l.setUserid(String.valueOf(map.get("userid")));
+							l.setOrderNo(String.valueOf(map.get("orderid")));
+							l.setEmail(String.valueOf(map.get("username")));
+						}
+					}
+				});
+			}
+			
 			list = list.stream().sorted((b1,b2)->{
 	    		return Long.compare(b2.getTime(), b1.getTime());
 	    	}).collect(Collectors.toList());

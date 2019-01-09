@@ -8,6 +8,7 @@ import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
 import com.cbt.change.util.OnlineOrderInfoDao;
+import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.IRechargeRecordSSMDao;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.email.service.EmailReceiveServiceImpl;
@@ -82,6 +83,7 @@ public class NewOrderDetailsCtr {
 	 */
 	@RequestMapping(value = "/queryByOrderNo.do")
 	public String queryByOrderNo(HttpServletRequest request, HttpServletResponse response) {
+		DataSourceSelector.restore();
 		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 		DecimalFormat df = new DecimalFormat("######0.00");
 		//try {

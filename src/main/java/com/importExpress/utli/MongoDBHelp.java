@@ -37,6 +37,10 @@ public enum MongoDBHelp {
     private static final String MONGODB_DB = SysParamUtil.getParam("mongodb.db");
     private static final String MONGODB_USERNAME = SysParamUtil.getParam("mongodb.username");
     private static final String MONGODB_POSSWORD = SysParamUtil.getParam("mongodb.password");
+    private static final String MONGODB_MAX_WAIT_TIME = SysParamUtil.getParam("mongodb.maxWaitTime");
+    private static final String MONGODB_SOCKET_TIMEOUT = SysParamUtil.getParam("mongodb.socketTimeout");
+    private static final String MONGODB_MAX_CONNECTION_LIFE_TIME = SysParamUtil.getParam("mongodb.maxConnectionLifeTime");
+    private static final String MONGODB_CONNECTION_TIMEOUT = SysParamUtil.getParam("mongodb.connectTimeout");
     private MongoClient mongoClient = null;
     private MongoDatabase mongoDatabase = null;
 
@@ -45,10 +49,10 @@ public enum MongoDBHelp {
     	ServerAddress addr = new ServerAddress(MONGODB_HOST, Integer.valueOf(MONGODB_PORT));
     	seeds.add(addr);
     	MongoClientOptions options = MongoClientOptions.builder()
-    			.maxWaitTime(30*1000)
-    			.socketTimeout(60*1000)
-    			.maxConnectionLifeTime(60*1000)
-    			.connectTimeout(60*1000).build();
+    			.maxWaitTime(Integer.valueOf(MONGODB_MAX_WAIT_TIME))
+    			.socketTimeout(Integer.valueOf(MONGODB_SOCKET_TIMEOUT))
+    			.maxConnectionLifeTime(Integer.valueOf(MONGODB_MAX_CONNECTION_LIFE_TIME))
+    			.connectTimeout(Integer.valueOf(MONGODB_CONNECTION_TIMEOUT)).build();
     	MongoCredential credential = MongoCredential.createCredential(MONGODB_USERNAME, MONGODB_DB, MONGODB_POSSWORD.toCharArray());
         this.mongoClient = new MongoClient(seeds,credential,options);
         this.mongoDatabase = mongoClient.getDatabase(MONGODB_DB);

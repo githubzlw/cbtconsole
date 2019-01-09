@@ -299,19 +299,19 @@ function doReset(){
 					<input class="easyui-numberbox" name="transfer" id="transfer" style="width:85%;"  data-options="label:'银行转账:',precision:2">
 				</div>
 				<div style="margin-bottom:20px">
-					<input class="easyui-numberbox" name="payFreight" id="payFreight" style="width:85%;"  data-options="label:'实际运费:',precision:2">
-				</div>
-				<div style="margin-bottom:20px">
-					<input class="easyui-numberbox" name="ebayAmount" id="ebayAmount" style="width:85%;"  data-options="label:'ebay费用:',precision:2">
-				</div>
-				<div style="margin-bottom:20px">
-					<input class="easyui-numberbox" name="materialsAmount" id="materialsAmount" style="width:85%;"  data-options="label:'电商物料:',precision:2">
+					<input class="easyui-numberbox" name="ebayAmount" id="ebayAmount" style="width:85%;"  data-options="label:'ebay备用金/运费:',precision:2">
 				</div>
 				<div style="margin-bottom:20px">
 					<input class="easyui-numberbox" name="zfbFright1" id="zfbFright1" style="width:85%;"  data-options="label:'支付宝运费:',precision:2">
 				</div>
 				 <div style="margin-bottom:20px">
 					 <input class="easyui-numberbox" name="cancelAmount" id="cancelAmount" style="width:85%;"  data-options="label:'订单退款:',precision:2">
+				 </div>
+				 <div style="margin-bottom:20px">
+					 <input class="easyui-numberbox" name="materialsAmount" id="materialsAmount" style="width:85%;"  data-options="label:'电商物料:',precision:2">
+				 </div>
+				 <div style="margin-bottom:20px">
+					 <input class="easyui-numberbox" name="payFreight" id="payFreight" style="width:85%;"  data-options="label:'实际运费:',precision:2">
 				 </div>
 			<div style="text-align:center;padding:5px 0">
 				<a href="javascript:void(0)" class="easyui-linkbutton" onclick="addZfbData()" style="width:160px">录入支付宝余额</a>
@@ -352,6 +352,7 @@ function doReset(){
 		<a href="javascript:openLog();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">录入支付宝余额及转账</a>
 		<a href="/cbtconsole/website/orderSalesAmount.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">订单页面的销售额</a>
 		<a href="/cbtconsole/website/orderDetailsSales.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">每天的进账退款数据</a>
+		<a href="/cbtconsole/website/sales_buy.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">采购订单/销售订单匹配查询</a>
 		<%--<a href="/cbtconsole/website/data_query.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">GA数据统计</a>--%>
 		<%--<a href="/cbtconsole/website/user_profit.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">用户月利润统计</a>--%>
 		<br>

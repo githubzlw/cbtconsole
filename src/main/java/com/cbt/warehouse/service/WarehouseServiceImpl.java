@@ -3,17 +3,16 @@ package com.cbt.warehouse.service;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.ZoneBean;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.pojo.*;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Util;
 import com.cbt.warehouse.dao.IWarehouseDao;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.Utility;
@@ -88,9 +87,30 @@ public class WarehouseServiceImpl implements IWarehouseService {
         if (weightAndSyn.getSyn() == 1){
             return 4;
         }
-        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
+        //调整到异步处理
+        Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn.getWeight());
+        new Thread(task).start();
+//        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         dao.updateGoodsWeightFlag(pid);
         return 1;
+    }
+
+    class SetGoodsWeightByWeigherTask implements Runnable{
+        public String pid;
+        public String newWeight;
+        public SetGoodsWeightByWeigherTask(String pid, String newWeight) {
+            this.pid=pid;
+            this.newWeight=newWeight;
+        }
+
+        @Override
+        public void run() {
+            try {
+                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight); //jxw同步重量到产品库接口
+            } catch (Exception e) {
+                LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);
+            }
+        }
     }
 
     @Override
@@ -765,7 +785,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
             s.setGcUnit(sb.toString());
             //|<button onclick=\"showEvaluation("+s.getOrderid()+")\">前台展示</button>fdgdf
-            s.setPosition("<button onclick=\"uploadPics("+s.getOrderid()+")\">上传新图片</button>|<button onclick=\"openEvaluation("+s.getOrderid()+")\">产品评论</button>");
+            s.setPosition("<button onclick=\"uploadPics("+s.getOrderid()+")\">上传新图片</button>|<button onclick=\"openEvaluation("+s.getOrderid()+")\">产品评论</button>|<a target='_blank' href='/cbtconsole/website/upload_video.jsp?goods_pid="+s.getOrderid()+"'>添加视频</a>");
             String valid=s.getValid();
             if("0".equals(valid)){
                 valid="下架";
@@ -949,7 +969,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getUserid()
                     + ",'"
                     + userInfo.getAvailable()
-                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>");
+                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
+                    + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>");
             for (int j = 0; j < list.size(); j++) {
                 ConfirmUserInfo c = list.get(j);
                 if (c.getConfirmusername().equals(userInfo.getAdminname())) {
@@ -1193,7 +1214,14 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 flag="<span style='color:red'>停用</span>";
                 op.append("<button style='color:green' onclick=\"updateFlag("+b.getId()+",0)\">使用</button>");
             }
-            op.append("|<button onclick=\"updateEmail("+b.getId()+",'"+b.getEmail()+"')\">修改</button>");
+            if("0".equals(b.getType())){
+                b.setType("邮箱黑名单");
+            }else if("1".equals(b.getType())){
+                b.setType("ip黑名单");
+            }else if("2".equals(b.getType())){
+                b.setType("城市黑名单");
+            }
+            op.append("|<button onclick=\"updateEmail("+b.getId()+",'"+b.getBlackVlue()+"')\">修改</button>");
             b.setOption(op.toString());
             b.setFlag(flag);
         }
@@ -1248,6 +1276,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
+    public List<ZoneBean> getAllZone() {
+        return dao.getAllZone();
+    }
+
+    @Override
     public int addSampleRemark(Map<String, Object> map) {
 
         return dao.addSampleRemark(map);
@@ -1289,6 +1322,52 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int saveClothingData(Map<String, String> map) {
 
         return dao.saveClothingData(map);
+    }
+
+    @Override
+    public List<RedManProductBean> getRedProduct(Map<String, String> map) {
+        List<RedManProductBean> list=dao.getRedProduct(map);
+        for(RedManProductBean p:list){
+            String pids=p.getPids();
+            StringBuilder pid=new StringBuilder();
+            String [] ps=pids.split(",");
+            for(int i=0;i<ps.length;i++){
+                if(i==ps.length-1){
+                    pid.append("'").append(ps[i]).append("'");
+                }else{
+                    pid.append("'").append(ps[i]).append("',");
+                }
+            }
+            if(StringUtil.isNotBlank(pid.toString())){
+                List<CustomGoodsBean> cList=dao.getCustomPids(pid.toString());
+                pid.setLength(0);
+                for(CustomGoodsBean c:cList){
+                    pid.append("<a target='_blank'title='"+c.getEnname().replace("'","")+"' href='https://www.import-express.com/goodsinfo/cbtconsole-1"+c.getPid()+".html'><img src='"+(c.getRemotpath()+c.getCustomMainImage())+"'></img></a>");
+                }
+            }
+            p.setRedProduct(pid.toString());
+            pid.setLength(0);
+            pid.append("recipients:").append(p.getRecipients()).append("<br>").append("address:").append(p.getAddress()).append("<br>").append("phonenumber:").append(p.getPhonenumber())
+            .append("<br>").append("zipcode:").append(p.getZipcode()).append("<br>").append("statename:").append(p.getStatename())
+            .append("<br>").append("city:").append(p.getCity()).append("<br>").append("countryname:").append(p.getCountryname());
+            p.setAddress(pid.toString());
+            if(StringUtil.isBlank(p.getShipno())){
+                p.setShipno("<button onclick='saveShipno("+p.getId()+",0)'>录入发货单号</button>");
+            }else{
+                p.setShipno(""+p.getShipno()+"<br><button onclick='saveShipno("+p.getId()+",1)'>修改发货单号</button>");
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<RedManProductBean> getRedProductCount(Map<String, String> map) {
+        return dao.getRedProductCount(map);
+    }
+
+    @Override
+    public int insertShipno(Map<String, String> map) {
+        return dao.insertShipno(map);
     }
 
     /**
@@ -2210,13 +2289,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
-    public int updatebackEmail(String id, String email) {
-        return dao.updatebackEmail(id,email);
+    public int updatebackEmail(String id, String newBlackVlue,String type) {
+        return dao.updatebackEmail(id,newBlackVlue,type);
     }
 
     @Override
-    public int addBackUser(String email, String ip,String userName) {
-        return dao.addBackUser(email,ip,userName);
+    public int addBackUser(String blackVlue, String type,String userName) {
+        return dao.addBackUser(blackVlue,type,userName);
     }
 
     @Override

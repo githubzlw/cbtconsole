@@ -2,11 +2,10 @@ package com.cbt.warehouse.dao;
 
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
-import com.cbt.pojo.BuyerCommentPojo;
-import com.cbt.pojo.CustomsRegulationsPojo;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.bean.ZoneBean;
+import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.website.bean.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -832,6 +831,11 @@ public interface IWarehouseDao {
 	 */
 	List<com.cbt.pojo.AdmuserPojo> getAllBuyer(@Param("admuserid") int admuserid);
 	/**
+	 * 获取所有国家名称
+	 * @return
+	 */
+	public List<ZoneBean> getAllZone();
+	/**
 	 * 添加采样商品反馈
 	 * @Title addSampleRemark
 	 * @Description TODO
@@ -891,6 +895,31 @@ public interface IWarehouseDao {
 	 * @return
 	 */
 	int saveClothingData(Map<String, String> map);
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProduct(Map<String,String> map);
+
+	/**
+	 * 根据pid查询
+	 * @param pids
+	 * @return
+	 */
+	public List<CustomGoodsBean> getCustomPids(@Param("pids") String pids);
+	/**
+	 * 红人产品查询
+	 * @param map
+	 * @return
+	 */
+	public List<RedManProductBean> getRedProductCount(Map<String,String> map);
+	/**
+	 * 添加修改红人产品发货单号
+	 * @param map
+	 * @return
+	 */
+	public int insertShipno(Map<String,String> map);
 	/**
 	 * 人工赋能统计数据查询
 	 * @Title getPurchaseSamplingStatistics
@@ -1209,9 +1238,9 @@ public interface IWarehouseDao {
     public int resetLocation(Map<String, String> map);
 	public int updateFlag(@Param("id") String id,@Param("type") String type);
     public int searchCount(Map<Object, Object> map);
-	public int updatebackEmail(@Param("id") String id,@Param("email") String email);
+	public int updatebackEmail(@Param("id") String id,@Param("newBlackVlue") String newBlackVlue,@Param("type") String type);
     public void inertLocationTracking(Map<String, String> map);
-	public int addBackUser(@Param("email") String email,@Param("ip") String ip,@Param("userName") String userName);
+	public int addBackUser(@Param("blackVlue") String blackVlue,@Param("type") String type,@Param("userName") String userName);
     public List<LocationTracking> getLocationTracking(Map<Object, Object> map);
 
     public int searchCount1();

@@ -186,6 +186,15 @@
         and createtime &lt; #{endTime}
         </if>
     </select>
+ 	<select id="listStripeByTransactionId" resultType="Map">
 
+        select userid,orderid,username,paypalid 
+        from payment where paystatus=1 and paytype=5 and paypalid in 
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+        #{item}
+        
+        </foreach>
+       
+    </select>
 
 </mapper>

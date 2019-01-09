@@ -94,14 +94,26 @@ function fn(va) {
 			showImg += "<span class='spiconbl'>电汇</span>";
 		}
         if(addressFlag == 1){
-            showImg += "<span class='spiconbl' style='color:red'>付款失败</span>";
+            showImg += "<span class='spiconbl' style='color:red'>付款异常(国家不一致)</span>";
+        }
+        if(addressFlag == 2){
+            showImg += "<span class='spiconbl' style='color:red'>无付款信息</span>";
+        }
+        if(addressFlag == 3){
+            showImg += "<span class='spiconbl' style='color:red'>B2B库存</span>";
         }
         if(json[i].ordertype == 3){
             showImg += "<span class='spiconbl' style='color:red'>dropship 国内库存订单</span>";
         }
-        if(json[i].backList>0 || json[i].payBackList>0){
-            showImg += "<span class='spiconbl' style='color:red'>黑名单</span>";
+        if(json[i].backList>0){
+            showImg += "<span class='spiconbl' style='color:red'>用户黑名单</span>";
 		}
+        if(json[i].payBackList>0){
+            showImg += "<span class='spiconbl' style='color:red'>支付账号黑名单</span>";
+        }
+        if(json[i].backAddressCount>0){
+            showImg += "<span class='spiconbl' style='color:red'>订单城市黑名单</span>";
+        }
 		if(isDropship == 1){
 			showImg += "<img style='width: 20px;' title='dropship' src='/cbtconsole/img/ds1.png'>";
 		}
@@ -232,21 +244,49 @@ function fn(va) {
 			color1 = "yellow;";
 		}
 		$("#table tr:eq(" + row + ") td:eq(10)").after("<td style='background-color:"+color+";'>"+ state_text + "</td>");
-		//订货国家
-		$("#table tr:eq(" + row + ") td:eq(11)").after("<td   id='custCountry"+json[i].order_no+"'  >" + (json[i].countrys == null || json[i].countrys == ''?"-":json[i].countrys)+ "</td>");
+		//运单状态   undefined-未出货 -备货中；2-已发货；3-已签收；4-退回；5-异常；6-内部异常;7-手动标记为正常',
+        var trackStateHtm = '';
+        var trackState = json[i].track_state;
+        if(trackState != undefined && trackState != '-1'){
+            switch (trackState){
+                case '7':
+                    trackStateHtm = '手动标记为正常';
+                    break;
+                case '6':
+                    trackStateHtm = '内部异常';
+                    break;
+                case '5':
+                    trackStateHtm = '异常';
+                    break;
+                case '4':
+                    trackStateHtm = '退回';
+                    break;
+                case '3':
+                    trackStateHtm = '已签收';
+                    break;
+                default:
+                    trackStateHtm = '已发货';
+                    break;
+            }
+        } /*else {
+            trackStateHtm = '备货中';
+        }*/
+        $("#table tr:eq(" + row + ") td:eq(11)").after("<td>"+ trackStateHtm + "</td>");
+        //订货国家
+		$("#table tr:eq(" + row + ") td:eq(12)").after("<td   id='custCountry"+json[i].order_no+"'  >" + (json[i].countrys == null || json[i].countrys == ''?"-":json[i].countrys)+ "</td>");
 		//预估国际运费/实际称重预估运费
-        $("#table tr:eq(" +row + ") td:eq(12)").after("<td>" + Number(json[i].allFreights).toFixed(2)+ "/"+Number(json[i].estimatefreight).toFixed(2)+"</td>");
+        $("#table tr:eq(" +row + ") td:eq(13)").after("<td>" + Number(json[i].allFreights).toFixed(2)+ "/"+Number(json[i].estimatefreight).toFixed(2)+"</td>");
 		//显示订单总数量,采购数量,入库数量
         //入库数量
 		var  NOWarehouses  = json[i].number_of_warehouses;
         var  problems  = json[i].problems;
 		//采购数量
-		$("#table tr:eq(" + row + ") td:eq(13)").after("<td style='font-size:19px;text-align:center;vertical-align:middle;'>" + NOWarehouses + "/"+ problems + "/" + json[i].purchase_number + "/"+ json[i].details_number+ "</td>");
+		$("#table tr:eq(" + row + ") td:eq(14)").after("<td style='font-size:19px;text-align:center;vertical-align:middle;'>" + NOWarehouses + "/"+ problems + "/" + json[i].purchase_number + "/"+ json[i].details_number+ "</td>");
 		if (Number(json[i].purchase_number) >= Number(json[i].details_number) && Number(json[i].details_number) != 0) {
-			$("#table tr:eq(" + row + ") td:eq(14)").css("background-color", "yellow");
+			$("#table tr:eq(" + row + ") td:eq(15)").css("background-color", "yellow");
 		}
 		if (Number(NOWarehouses) >= Number(json[i].details_number) && Number(json[i].details_number) != 0) {
-			$("#table tr:eq(" + row + ") td:eq(14)").css("background-color", "#FF00FF");
+			$("#table tr:eq(" + row + ") td:eq(15)").css("background-color", "#FF00FF");
 		}
 		var client_update = json[i].client_update;
 		var server_update = json[i].server_update;
@@ -256,9 +296,9 @@ function fn(va) {
             $("#table tr:eq(" + row + ")").css("color", "#0084FF");
 		}
         //入库情况汇总
-        // $("#table tr:eq(" + row + ") td:eq(14)").after("<td></td>");
+        // $("#table tr:eq(" + row + ") td:eq(15)").after("<td></td>");
 		var user = json[i];
-		$("#table tr:eq(" + row + ") td:eq(14)")
+		$("#table tr:eq(" + row + ") td:eq(15)")
 		.after("<td id='tduser"+json[i].user_id+"'><select id=\"select"+json[i].id+"\" class=\"select"+json[i].user_id+"\" onchange=\"gradeChange("
 								+ json[i].id+","+ json[i].user_id+",'"+ json[i].email+"',"+i+ ",'"+json[i].username+"','"+json[i].order_no+"')\"  name='user"
 								+ json[i].id+ "'>"+ str_personCharge
@@ -279,7 +319,7 @@ function fn(va) {
 		if(adminName=="Ling"){
 		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
                 +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
-                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=230,width=420,"
+                + json[i].order_no+ "&state="+ state + "\",\"windows\",\"height=280,width=530,"
                 +"top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no\")'>修改</a>";
 		    if(checkType == "checkOrder"){
 		        if(emailFlag>0){
@@ -289,7 +329,7 @@ function fn(va) {
 				}
 			}
             html_+="</td>";
-			$("#table tr:eq(" + row + ") td:eq(15)").after(html_);
+			$("#table tr:eq(" + row + ") td:eq(16)").after(html_);
 		}else{
 		    var html_="";
             if(checkType == "checkOrder"){
@@ -299,12 +339,12 @@ function fn(va) {
                     html_+="<br><a target='_blank'  href='javascript:openCheckEmailForUser(\""+json[i].order_no+"\",\""+json[i].email+"\");'>提醒客户</a>";
                 }
             }
-			$("#table tr:eq(" + row + ") td:eq(15)").after("<td>"+html_+"</td>");
+			$("#table tr:eq(" + row + ") td:eq(16)").after("<td>"+html_+"</td>");
 		}
 		if(json[i].orderremarks==undefined || json[i].orderremarks=="null" || json[i].orderremarks==""){
-			$("#table tr:eq(" + row + ") td:eq(16)").after("<td>无</td>");
+			$("#table tr:eq(" + row + ") td:eq(17)").after("<td>无</td>");
 		}else{
-			$("#table tr:eq(" + row + ") td:eq(16)").after("<td><div style='width: 95%;margin:5px;height: 38px;overflow-y:scroll;overflow-x:hidden;'>"+json[i].orderremarks+"</div></td>");
+			$("#table tr:eq(" + row + ") td:eq(17)").after("<td><div style='width: 95%;margin:5px;height: 38px;overflow-y:scroll;overflow-x:hidden;'>"+json[i].orderremarks+"</div></td>");
 		}
 	}
 	$("#counto").html(count);
@@ -666,6 +706,17 @@ $(document).ready(function(){
 								<option value="8" ${param.state==8?'selected="selected"':''}>采样订单</option>
 						</select>
 						</td>
+						<%--<td style="width: 80px;">运单状态<select id="trackState"
+							name="trackState" style="width: 87px;">
+								<option value="0" ${param.trackState==0?'selected="selected"':''}>全部订单</option>
+								<option value="2" ${param.trackState==2?'selected="selected"':''}>出运中</option>
+								<option value="3" ${param.trackState==3?'selected="selected"':''}>已签收</option>
+								<option value="4" ${param.trackState==4?'selected="selected"':''}>退回</option>
+								<option value="5" ${param.trackState==5?'selected="selected"':''}>异常</option>
+								<option value="6" ${param.trackState==6?'selected="selected"':''}>内部异常</option>
+								<option value="7" ${param.trackState==7?'selected="selected"':''}>手动标记为正常</option>
+						</select>--%>
+						</td>
 						<td style="width: 115px;">销售负责人： <select id="adminusersc"
 							name="adminuser" style="width: 87px;">
 						</select>
@@ -710,7 +761,8 @@ $(document).ready(function(){
 						<td style="width: 67px;">国内准备段</td>
 						<td style="width: 67px;">国际运输段</td>
 						<td style="width: 85px;">产品金额</td>
-						<td style="width: 63px;">当前状态</td>
+						<td style="width: 63px;">订单状态</td>
+						<td style="width: 60px;">运单状态</td>
 						<td style="width: 60px;">订货国家</td>
 						<td style="width: 110px;">预估国际运费/实重预估运费</td>
 						<td style="width: 110px;">入库/验货疑问/采购/总数</td>

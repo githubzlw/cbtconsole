@@ -2995,6 +2995,9 @@
 							<div style="width: 100%; word-wrap: break-word;">
 								物流信息： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipstatus}</span></font> <br>
 							</div>
+							<div style="width: 100%; word-wrap: break-word;">
+								产品编辑页面打分：<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${pb.goods_pid}">产品编辑</a> <br>
+							</div>
 							<script>
                                 FnHideDetails('${pb.newValue}','${pb.orderNo}', '${pb.od_id}', '${pb.od_id}')
 							</script>

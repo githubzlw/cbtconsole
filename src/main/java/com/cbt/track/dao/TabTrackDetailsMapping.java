@@ -8,5 +8,6 @@ import java.util.List;
 public interface TabTrackDetailsMapping {
 
     List<TabTrackDetails> queryByTrackNo(@Param("trackNo") String trackNo);
-    
+
+    String queryMaxTimeTrackInfo(@Param("trackNo") String trackNo);
 }

@@ -87,6 +87,95 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     
     private String complainId;//投诉id
     private List<String> complain;
+    //评论
+    private String review_name;
+    private String review_score;
+    private String createtime;
+    private String review_remark;
+    private String country;
+    private String reviews;
+    private int reviewCount;
+    private String updatetime;
+    private String review_flag;
+    public String getReview_flag() {
+        return review_flag;
+    }
+
+    public void setReview_flag(String review_flag) {
+        this.review_flag = review_flag;
+    }
+
+    @Override
+    public String getUpdatetime() {
+        return updatetime;
+    }
+
+    @Override
+    public void setUpdatetime(String updatetime) {
+        this.updatetime = updatetime;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public String getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(String reviews) {
+        this.reviews = reviews;
+    }
+
+
+    public String getReview_name() {
+        return review_name;
+    }
+
+    public void setReview_name(String review_name) {
+        this.review_name = review_name;
+    }
+
+    public String getReview_score() {
+        return review_score;
+    }
+
+    public void setReview_score(String review_score) {
+        this.review_score = review_score;
+    }
+
+    @Override
+    public String getCreatetime() {
+        return createtime;
+    }
+
+    @Override
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
+    }
+
+    public String getReview_remark() {
+        return review_remark;
+    }
+
+    public void setReview_remark(String review_remark) {
+        this.review_remark = review_remark;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    private int promotionFlag;//促销flag: 0不促销，1促销
+    private String fpriceStr;//bizprice 字段
 
 
     public List<String> getComplain() {
@@ -640,5 +729,21 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     public void setWeightIsEdit(int weightIsEdit) {
         this.weightIsEdit = weightIsEdit;
+    }
+
+    public int getPromotionFlag() {
+        return promotionFlag;
+    }
+
+    public void setPromotionFlag(int promotionFlag) {
+        this.promotionFlag = promotionFlag;
+    }
+
+    public String getFpriceStr() {
+        return fpriceStr;
+    }
+
+    public void setFpriceStr(String fpriceStr) {
+        this.fpriceStr = fpriceStr;
     }
 }

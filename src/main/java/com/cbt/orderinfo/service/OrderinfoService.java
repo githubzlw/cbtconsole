@@ -24,8 +24,6 @@ import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.map.HashedMap;
-
-import org.apache.poi.openxml4j.opc.internal.ZipContentTypeManager;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -958,7 +956,7 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Map<String, String>> list=dao.getOrderManagementQuery(userID,state,StringUtils.isStrNull(startdate)?"":startdate,StringUtils.isStrNull(enddate)?"":enddate,StringUtils.isStrNull(email)?"":email, StringUtils.isStrNull(orderno)?"":orderno,startpage,page,admuserid,buyid,showUnpaid,StringUtils.isStrNull(type)?"":type,status,paymentid);
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
-			String tp="支付错误";
+			String tp="支付类型错误";
 			if(StringUtil.isNotBlank(paytype) && paytype.indexOf(",")>-1){
 				StringBuilder types=new StringBuilder();
 				String [] t=paytype.split(",");
@@ -973,7 +971,6 @@ public class OrderinfoService implements IOrderinfoService {
 				tp=StringUtil.getPayType(paytype);
 			}
 			map.put("paytypes",tp);
-			// if((odCode == null || ipnaddress == null || ipnaddress !=odCode) && json[i].paytypes.indexOf("paypal")>-1){
 			String allFreight =String.valueOf(map.get("allFreight"));
 			OrderBean orderInfo=new OrderBean();
 			orderInfo.setMode_transport(String.valueOf(map.get("mode_transport")));
@@ -985,28 +982,33 @@ public class OrderinfoService implements IOrderinfoService {
 				ipnaddress = udao.getIpnaddress(orderInfo.getOrderNo()).get("ipnaddress");
 			}
 			String zCountry=map.get("zCountry");
+			String ordertype=String.valueOf(map.get("ordertype"));
 			if((StringUtil.isBlank(odCode) || StringUtil.isBlank(ipnaddress) || !ipnaddress.equals(odCode)) && tp.indexOf("paypal")>-1){
 				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
-				if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
-					addressFlag="0";
+				if("3".equals(ordertype)){
+					//B2B订单
+					addressFlag="3";
+				}else if(StringUtil.isBlank(addressCountry)){
+					//没有支付信息，
+					addressFlag="2";
+				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
+					//两边都有编码但不一致
+					addressFlag="1";
 				}else{
 					logger.warn("二次校验，全称国家不一致： zCountry={},addressCountry={}", zCountry,addressCountry);
 					addressFlag="1";
 				}
 			}
 			map.put("addressFlag",addressFlag);
-			long starttime=System.currentTimeMillis();
 			double freightFee = orderInfo.getFreightFee();
-			//getFreightFee(allFreight, orderInfo);
 			map.put("allFreight",String.valueOf(freightFee));
 			String exchange_rate=String.valueOf(map.get("exchange_rate"));
 			if(StringUtil.isBlank(exchange_rate) || Double.parseDouble(exchange_rate)<=0){
 				exchange_rate="6.3";
 			}
-			double estimatefreight=Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate);
-			map.put("estimatefreight",String.valueOf(estimatefreight));
+			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
 		logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
 		return list;
@@ -1741,9 +1743,9 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Map<String, Integer>> result = dao.getOrdersState(admuserid);
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
-		ca.add(Calendar.DATE, - 60);
+		ca.add(Calendar.DATE, - 90);
 		String startDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
-		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0);
+		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0, null);
 		Map<String, Integer> cywMap = new HashMap<String, Integer>();
 		cywMap.put("state", 1);
 		cywMap.put("counts", waring0);

@@ -283,5 +283,12 @@ public interface PaymentDaoImp {
     RefundBean queryRefundBeanById(int rfId, int userId);
 
 
+    /**
+     * 查询后台取消的订单退余额信息
+     * @param orderNo
+     * @return
+     */
+    RechangeRecord querySystemCancelOrder(String orderNo);
+
 
 }

@@ -2,7 +2,9 @@ package com.cbt.website.quartz;
 
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.jdbc.DBHelper;
+import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.utli.NewSendMQ;
+import net.sf.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -11,7 +13,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 刷新新购物车页面展示买过该商品的客户还买过哪些商品数据
@@ -25,7 +29,7 @@ public class FlushboughtAndBoughtJob implements Job{
 			//客户买过的产品并且是在线商品
 //			List<OrderDetailsBean> pidLiusts=getAllPidss();
 //			int psiaze=pidLiusts.size();
-////			//查询所有的买过的商品
+//			//查询所有的买过的商品
 //			List<String> adList=new ArrayList<String>();
 //			for(int i=1;i<=psiaze;i++){
 //				Map<String,Object> map=new HashMap<String,Object>();
@@ -74,32 +78,49 @@ public class FlushboughtAndBoughtJob implements Job{
 //			}
 			//刷新线上guess you like数据
 			//查询类别数据销售、
-//			List<String> allUser =getAllUser();
-//			for(String userId:allUser){
-//				//用户最近下过的订单
-//				List<String> allCatid=getCatidByUser(userId);
-//				List<String> pids=new ArrayList<String>();
-//				for(String catid:allCatid){
-//					//根据类别查询卖过的产品数据
-//					List<String> pid=getPidByCatid(catid);
-//					if(pids.size()<10){
-//						pids.addAll(pid);
-//					}
-//				}
+			List<String> allUser =getAllUser();
+			for(String userId:allUser){
+				//用户最近下过的订单
+				List<String> allCatid=getCatidByUser(userId);
+				List<String> pids=new ArrayList<String>();
+				StringBuilder sbPid=new StringBuilder();
+				for(int i=0;i<allCatid.size();i++){
+					String catid=allCatid.get(i);
+					//根据类别查询卖过的产品数据
+					List<String> pid=getPidByCatid(catid);
+					if(pid.size()>0 && pids.size()<=10 && !pids.contains(pid.get(0))){
+						pids.add(pid.get(0));
+					}else if(pids.size()>=10){
+						break;
+					}
+				}
+				outterLoop:for(int j=1;j<100;j++){
+					if(pids.size()<=10){
+						for(int i=0;i<allCatid.size();i++){
+							String catid=allCatid.get(i);
+							//根据类别查询卖过的产品数据
+							List<String> pid=getPidByCatid(catid);
+							if(pid.size()>=(j+1) && pids.size()<=10 && !pids.contains(pid.get(j))){
+								pids.add(pid.get(j));
+							}else if(pids.size()>=10){
+								break outterLoop;
+							}
+						}
+					}
+				}
 //				pids=removeDuplicate(pids);
-//				if(pids.size()>10){
-//					pids= pids.subList(0, 10);
-//				}
-//				if(pids.size()>0){
-//					System.out.println("用户【"+userId+"】推荐商品pid：【"+pids.toString()+"】");
-//					Map<String,Object> map=new HashMap<String,Object>();
-//					map.put("type","1");
-//					map.put(userId,pids);
-//					JSONObject json = JSONObject.fromObject(map);
-//					sendMQ.sendRecommend(json.toString());
-//				}
-//			}
-//			List<OrderDetailsBean> catIdLiusts=getAllCatIdDta();
+				if(pids.size()>10){
+					pids= pids.subList(0, 10);
+				}
+				if(pids.size()>0){
+					System.out.println("用户【"+userId+"】推荐商品pid：【"+pids.toString()+"】");
+					Map<String,Object> map=new HashMap<String,Object>();
+					map.put("type","1");
+					map.put(userId,pids);
+					JSONObject json = JSONObject.fromObject(map);
+					sendMQ.sendRecommend(json.toString());
+				}
+			}
 			sendMQ.closeConn();
 		}catch (Exception e){
 			e.printStackTrace();
@@ -123,7 +144,7 @@ public class FlushboughtAndBoughtJob implements Job{
 	 */
 	public List<String> getAllUser(){
 		List<String> list=new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
@@ -149,7 +170,7 @@ public class FlushboughtAndBoughtJob implements Job{
 	 */
 	public List<String> getCatidByUser(String userId){
 		List<String> list=new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
@@ -176,7 +197,7 @@ public class FlushboughtAndBoughtJob implements Job{
 	 */
 	public List<String> getPidByCatid(String catid){
 		List<String> list=new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
@@ -198,7 +219,7 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<OrderDetailsBean> getAllCatIdDta(){
 		List<OrderDetailsBean> list=new ArrayList<OrderDetailsBean>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
@@ -230,7 +251,7 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<OrderDetailsBean> getAllGoodsInfos(){
 		List<OrderDetailsBean> list=new ArrayList<OrderDetailsBean>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
@@ -256,12 +277,12 @@ public class FlushboughtAndBoughtJob implements Job{
 	public String getAllGoodsInfo(int page){
 		String msg="";
 		StringBuilder goods=new StringBuilder();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try{
 			goods.append("{\"type\":\"2\",\"items\":[");
-			String sql="SELECT pid,catid1,wprice,range_price,custom_main_image,feeprice,enname,remotpath,wholesale_price,is_sold_flag FROM custom_benchmark_ready WHERE valid=1 limit "+page+",100";
+			String sql="SELECT pid,catid1,wprice,range_price,price,custom_main_image,feeprice,enname,remotpath,wholesale_price,is_sold_flag FROM custom_benchmark_ready WHERE valid=1 limit "+page+",100";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			while(rs.next()){
@@ -273,6 +294,7 @@ public class FlushboughtAndBoughtJob implements Job{
 				goods.append("\"range_price\":\""+rs.getString("range_price")+"\",");
 				goods.append("\"feeprice\":\""+rs.getString("feeprice")+"\",");
 				goods.append("\"enname\":\""+rs.getString("enname")+"\",");
+				goods.append("\"custom_price\":\""+rs.getString("price")+"\",");
 				goods.append("\"remotpath\":\""+rs.getString("remotpath")+"\",");
 				goods.append("\"wholesale_price\":\""+rs.getString("wholesale_price")+"\",");
 				goods.append("\"is_sold_flag\":\""+rs.getString("is_sold_flag")+"\"");
@@ -291,7 +313,7 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<String> getBuyPidList(String pid){
 		List<String> list = new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -299,7 +321,7 @@ public class FlushboughtAndBoughtJob implements Job{
 					" FROM order_details od1 INNER JOIN order_details od ON od1.userid=od.userid " +
 					" WHERE od.goods_pid='"+pid+"' AND od1.goods_pid != '"+pid+"' " +
 					" GROUP BY od1.goods_pid ORDER BY COUNT(od1.id) DESC ) a " +
-					" ON c.pid=a.goods_pid WHERE c.valid=1 LIMIT 12";
+					" ON c.pid=a.goods_pid WHERE c.valid=1 and c.price>=10 LIMIT 12";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			while(rs.next()){
@@ -317,14 +339,14 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<String> boughtAndCatId(String pid,String catid){
 		List<String> list = new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			String sql=" SELECT c.pid" +
 					"  FROM custom_benchmark_ready c INNER JOIN (SELECT od1.goods_pid  FROM order_details od1 " +
 					" INNER JOIN order_details od ON od1.userid=od.userid WHERE od.goodscatid='"+catid+"' AND od1.goods_pid != '"+pid+"' " +
-					" GROUP BY od1.goods_pid ORDER BY COUNT(od1.id) DESC ) a ON c.pid=a.goods_pid WHERE c.valid=1 LIMIT 12";
+					" GROUP BY od1.goods_pid ORDER BY COUNT(od1.id) DESC ) a ON c.pid=a.goods_pid WHERE c.valid=1 and c.price>=10 LIMIT 12";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			while(rs.next()){
@@ -342,7 +364,7 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<String> saleMoreGoods(String pid){
 		List<String> list = new ArrayList<String>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -353,7 +375,7 @@ public class FlushboughtAndBoughtJob implements Job{
 					"email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND " +
 					"email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND " +
 					"email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND " +
-					"email NOT LIKE 'zhouxueyun%') AND c.valid=1 AND od.goods_pid IS NOT NULL AND od.goods_pid != '' AND od.goods_pid!='"+pid+"' " +
+					"email NOT LIKE 'zhouxueyun%') AND c.valid=1 and c.price>=10 AND od.goods_pid IS NOT NULL AND od.goods_pid != '' AND od.goods_pid!='"+pid+"' " +
 					"AND  oi.orderpaytime BETWEEN DATE_SUB(NOW(),INTERVAL 6 MONTH) AND NOW() GROUP BY od.goods_pid ORDER BY COUNT(od.id) DESC LIMIT 12";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
@@ -372,12 +394,12 @@ public class FlushboughtAndBoughtJob implements Job{
 
 	public List<OrderDetailsBean> getAllPidss() {
 		List<OrderDetailsBean> list=new ArrayList<OrderDetailsBean>();
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			String sql="SELECT distinct od.goods_pid,od.goodscatid FROM order_details od INNER JOIN orderinfo oi ON od.orderid=oi.order_no  INNER JOIN custom_benchmark_ready c ON od.goods_pid=c.pid" +
-					" WHERE c.valid=1 AND od.state<2 AND oi.state BETWEEN 1 AND 5 AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND " +
+					" WHERE c.valid=1 and c.price>=10 AND od.state<2 AND oi.state BETWEEN 1 AND 5 AND oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND " +
 					" email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND email NOT LIKE '%qqsss.com' AND  email " +
 					" NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND " +
 					" email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND " +

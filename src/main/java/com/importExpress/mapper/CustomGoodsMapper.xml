@@ -41,6 +41,7 @@
         <result column="off_reason" property="offReason"/>
         <result column="click_num" property="clickNum"/>
         <result column="complain_id" property="complainId"/>
+        <result column="reviewCount" property="reviewCount"/>
     </resultMap>
 
 
@@ -102,6 +103,13 @@
         <result column="ugly_flag" property="uglyFlag"/>
         <result column="repaired_flag" property="repairedFlag"/>
         <result column="weight_is_edit" property="weightIsEdit"/>
+        <result column="promotion_flag" property="promotionFlag"/>
+        <result column="fprice_str" property="fpriceStr"/>
+        <result column="review_name" property="review_name"/>
+        <result column="review_score" property="review_score"/>
+        <result column="createtime" property="createtime"/>
+        <result column="review_remark" property="review_remark"/>
+        <result column="country" property="country"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -209,6 +217,9 @@
         <if test="repaired_flag > 0">
             ,a.repaired_flag = #{repaired_flag}
         </if>
+        <if test="promotion_flag > 0">
+            ,b.promotion_flag = #{promotion_flag}
+        </if>
         where a.pid = b.pid and a.pid = #{pid}
     </update>
 
@@ -270,9 +281,9 @@
 
     <insert id="insertIntoGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean">
         insert into custom_goods_edited_log(pid,old_title,new_title,admin_id,weight_flag,ugly_flag,
-          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag,repaired_flag)
+          benchmarking_flag,describe_good_flag,never_off_flag,publish_flag,repaired_flag,promotion_flag)
         values(#{pid},#{old_title},#{new_title},#{admin_id},#{weight_flag},#{ugly_flag},
-          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag})
+          #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag},#{promotion_flag})
     </insert>
 
     <select id="queryGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean" resultMap="goodsEditResultMap">
@@ -344,7 +355,8 @@
         ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
-        ifnull(cbc.complain_id,'') as complain_id
+        ifnull(cbc.complain_id,'') as complain_id,
+        (select count(1) from goods_review where goods_pid=cbu.pid) as reviewCount
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
@@ -691,7 +703,7 @@
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,
-        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,
+        ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as admin_name,
@@ -705,11 +717,18 @@
         left join needfindsizechart cbn on cbn.pid=cbu.pid
         where cbu.pid = #{pid}
     </select>
-
+    <select id="getAllReviewByPid" resultType="com.cbt.bean.CustomGoodsPublish">
+    <!--       SELECT GROUP_CONCAT('评论人',':',review_name,';','评论时间',':',createtime,';','国家',':',country,';','评论内容',':',review_remark,';','评分',':',review_score,';',CASE WHEN TYPE=1 THEN '客户评论' ELSE '运营评论' END,';',CASE WHEN review_flag=1 THEN '不显示' ELSE '显示' END) AS reviews
+            FROM goods_review WHERE goods_pid=#{pid} GROUP BY id -->
+        select id as aliId,review_name,createtime,country,review_remark,review_score,updatetime,CASE WHEN type=1 THEN '客户评论' ELSE '运营评论' END as type,CASE WHEN review_flag=1 THEN '不显示' ELSE '显示' END as review_flag
+        from  goods_review WHERE goods_pid=#{pid}
+    </select>
     <select id="queryMaxIdFromCustomGoods" resultType="java.lang.Integer">
         select max(id) from custom_benchmark_ready where 1=1
     </select>
-
+    <update id="updateReviewRemark">
+        update goods_review set review_remark=#{edit_remark},country=#{editcountry},review_score=#{edit_score},review_flag=#{update_flag},updatetime=now() where id=#{update_aliId}
+    </update>
     <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
         select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight
         from custom_benchmark_ready
@@ -881,5 +900,8 @@
         </if>
         group by a.catid1) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
+    <insert id="addReviewRemark">
+        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},now(),#{review_remark},#{review_score})
+    </insert>
 
 </mapper>

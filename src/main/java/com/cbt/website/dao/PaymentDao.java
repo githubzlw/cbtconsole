@@ -10,7 +10,6 @@ import com.cbt.pojo.RechangeRecord;
 import com.cbt.refund.bean.RefundBean;
 import com.cbt.website.bean.*;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
@@ -2213,7 +2212,8 @@ public class PaymentDao implements PaymentDaoImp {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        String sql = "select * from orderinfo  where user_id = ? and state !=0 order by create_time desc";
+        String sql = "select o.*,(SELECT COUNT(1) FROM tblacklist a INNER JOIN order_address b ON a.blackVlue=b.address2 WHERE b.orderNo=o.order_no AND a.flag=0) as backAddressCount " +
+                "from orderinfo o  where o.user_id = ? and o.state !=0 order by o.create_time desc";
         Connection conn = DBHelper.getInstance().getConnection();
         try {
             stmt = conn.prepareStatement(sql);
@@ -2236,6 +2236,7 @@ public class PaymentDao implements PaymentDaoImp {
                 info.setProduct_cost(rs.getString("product_cost"));
                 info.setState(rs.getInt("state"));
                 info.setCreatetime(rs.getString("create_time"));
+                info.setBackAddressCount(rs.getInt("backAddressCount"));
                 list.add(info);
             }
 
@@ -2629,6 +2630,42 @@ public class PaymentDao implements PaymentDaoImp {
             DBHelper.getInstance().closeConnection(conn);
         }
         return rfb;
+    }
+
+    @Override
+    public RechangeRecord querySystemCancelOrder(String orderNo) {
+
+        RechangeRecord record = new RechangeRecord();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        String sql = "select * from recharge_record  where remark_id = ? and type = 1 and remark like '%system closeOrder%' limit 1";
+        Connection conn = DBHelper.getInstance().getConnection();
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, orderNo);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                record.setUserId(rs.getInt("userid"));
+                record.setPrice(rs.getDouble("price"));
+                //info.setType(rs.getInt("type"));
+                record.setRemark(rs.getString("remark"));
+                record.setCurrency(rs.getString("currency"));
+                record.setRemarkId(rs.getString("remark_id"));
+                record.setDataTime(rs.getString("datatime"));
+                record.setAdminUser(rs.getString("adminuser"));
+                record.setUseSign(rs.getInt("usesign"));
+                record.setBalanceAfter(rs.getDouble("balanceAfter"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return record;
     }
 
 }

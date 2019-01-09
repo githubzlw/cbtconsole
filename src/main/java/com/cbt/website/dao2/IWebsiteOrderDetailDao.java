@@ -19,5 +19,25 @@ public interface IWebsiteOrderDetailDao {
 	 *orderid:订单id
 	 */
 	public int websiteUpdateOrderPrice(String orderid, double price);
+
+	/**
+	 * 更新订单状态更新日志
+	 * @param orderid
+	 * @param newState
+	 * @param oldState
+	 * @param remark
+	 * @param adminId
+	 * @return
+	 */
+	int updateOrderStateLog(String orderid, int newState,int oldState,String remark,int adminId);
+
+	/**
+	 * 删除余额变更记录信息
+	 *
+	 * @param userId
+	 * @param orderid
+	 * @return
+	 */
+	boolean deleteRechangeRecord(int userId, String orderid);
 	
 }

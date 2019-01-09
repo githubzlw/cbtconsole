@@ -1967,6 +1967,48 @@ public class StatisticalReportController {
 		}
 		return code.toString();
 	}
+
+	/**
+	 * 采购订单/销售订单匹配查询
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/getSaleBuyInfo")
+	@ResponseBody
+	protected EasyUiJsonResult getSaleBuyInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		String orderid=request.getParameter("orderid");
+		String tborderid=request.getParameter("tborderid");
+		String odid=request.getParameter("odid");
+		orderid=StringUtil.isBlank(orderid)?null:orderid;
+		odid=StringUtil.isBlank(odid)?null:odid;
+		tborderid=StringUtil.isNotBlank(tborderid)?tborderid:null;
+		int page = Integer.valueOf(request.getParameter("page"));
+		if (page > 0) {
+			page = (page - 1) * 20;
+		}
+		if(StringUtil.isBlank(orderid) && StringUtil.isBlank(odid) && StringUtil.isBlank(tborderid)){
+			json.setTotal(0);
+			json.setRows(new ArrayList<StraightHairPojo>());
+			return json;
+		}
+		map.put("orderid",orderid);
+		map.put("odid",odid);
+		map.put("page",String.valueOf(page));
+		map.put("tborderid",tborderid);
+		List<StraightHairPojo> list=taoBaoOrderService.getSaleBuyInfo(map);
+		List<StraightHairPojo> listCount=taoBaoOrderService.getSaleBuyInfoCount(map);
+		json.setTotal(listCount.size());
+		json.setRows(list);
+		return json;
+	}
+
 	/**
 	 * 查询建议或确定广东直发的列表
 	 * @Title StraightHairList
@@ -2313,6 +2355,37 @@ public class StatisticalReportController {
 		count = taoBaoOrderService.getNoStorageDetailsCount(map);
 		json.setTotal(count);
 		json.setRows(list);
+		return json;
+	}
+
+	/**
+	 * 采购订单详情查询
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	@RequestMapping(value = "/getTbOrderDetails")
+	@ResponseBody
+	protected EasyUiJsonResult getTbOrderDetails(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		List<TaoBaoOrderInfo> list=new ArrayList<TaoBaoOrderInfo>();
+		List<TaoBaoOrderInfo> listCount=new ArrayList<TaoBaoOrderInfo>();
+		Map<String, String> map = new HashMap<String, String>();
+		int page = Integer.valueOf(request.getParameter("page"));
+		if (page > 0) {
+			page = (page - 1) * 20;
+		}
+		String orderid = request.getParameter("orderid");
+		map.put("orderid",orderid);
+		map.put("page",String.valueOf(page));
+		list = taoBaoOrderService.getTbOrderDetails(map);
+		listCount=taoBaoOrderService.getTbOrderDetailsCount(map);
+		json.setRows(list);
+		json.setTotal(listCount.size());
 		return json;
 	}
 

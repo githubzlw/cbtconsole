@@ -1,35 +1,41 @@
 package com.cbt.orderinfo.ctrl;
 
+import ceRong.tools.bean.SearchLog;
 import com.alibaba.trade.param.AlibabaTradeFastCreateOrderResult;
 import com.cbt.Specification.util.DateFormatUtil;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.pojo.RechangeRecord;
 import com.cbt.processes.service.ISpiderServer;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.SearchResultInfo;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.cbt.website.quartz.ParseOrderFreightJob;
+import com.cbt.website.dao.*;
+import com.cbt.website.dao2.IWebsiteOrderDetailDao;
+import com.cbt.website.dao2.WebsiteOrderDetailDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.google.gson.Gson;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.InputData;
 import com.importExpress.service.IPurchaseService;
-
-import ceRong.tools.bean.SearchLog;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import net.minidev.json.JSONArray;
-import net.sf.json.JSONObject;
-import sun.misc.BASE64Decoder;
 
+import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,16 +43,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -66,7 +68,16 @@ public class OrderInfoController{
 	@Autowired
 	private ISpiderServer spiderService;
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
+    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
+    private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
+    private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_4 = "https://img1.import-express.com";
 	//private static String imgSavePath = "E:\\site\\images";//上传的图片保存的路径E:\site\images
+
+	private PaymentDaoImp paymentDao = new PaymentDao();
+	private IWebsiteOrderDetailDao websiteOrderDetailDao = new WebsiteOrderDetailDaoImpl();
+
 	@RequestMapping(value = "/changeBuyer")
 	public void changeBuyer(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		Map<String,String> map=new HashMap<String,String>();
@@ -647,61 +658,47 @@ public class OrderInfoController{
 	@RequestMapping(value = "/getOrderInfo.do", method = RequestMethod.GET)
 	public String getOrderInfo(HttpServletRequest request, HttpServletResponse response, Model model) throws ParseException, IOException {
 		Map<String,String> paramMap=new HashMap<String,String>();
-		String ropType = request.getParameter("ropType");
-		String userID_req = request.getParameter("userid");
-		String state_req = request.getParameter("state");
-		String startdate_req = request.getParameter("startdate");
-		String enddate_req = request.getParameter("enddate");
-		int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
-		String orderno = request.getParameter("orderno");
-		String email = request.getParameter("email");
-		String paymentid=request.getParameter("paymentid");
-		paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
-		int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
-		int currentPage = Utility.getStringIsNull(request.getParameter("currentPage"))?Integer.parseInt(request.getParameter("currentPage")):1;
-		String buyid = request.getParameter("buyuser");
-		String admuserid_str = request.getParameter("admuserid");
-		admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
-		request.setAttribute("admuserid_str",admuserid_str);
-		String type = request.getParameter("type");
-		request.setAttribute("type",StringUtil.isNotBlank(type)?type:"");
-		String status = request.getParameter("status");
-		int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
-		int buyuser=StringUtil.isNotBlank(buyid)?Integer.parseInt(buyid):0;
-		page=page>0?(page - 1) * 40:0;
-		userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
-		int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
-		int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
-		String admJson = Redis.hget(request.getSession().getId(), "admuser");
-		if(admJson == null){
-			return "main_login";
-		}
-		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
-		String strm=user.getRoletype(); int admuserid=user.getId();
-		if("0".equals(strm)){
-			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
-		}
-		Date startdate =null;
-		Date enddate = null;
-		if(startdate_req!=null&&startdate_req.isEmpty()){
-			startdate = null;
-		}
-		if(enddate_req!=null&&enddate_req.isEmpty()){
-			enddate = null;
-		}
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		if(startdate_req!=null && !startdate_req.equals("")){
-			startdate_req=startdate_req + " 00:00:00";
-		}else{
-			startdate_req="0";
-		}
-		if(enddate_req!=null && !enddate_req.equals("") ) {
-			enddate_req=enddate_req + " 23:59:59";
-		}else{
-			enddate_req="0";
-		}
 		try {
+			String admJson = Redis.hget(request.getSession().getId(), "admuser");
+			if(admJson == null){
+				return "main_login";
+			}
+			String ropType = request.getParameter("ropType");
+			String userID_req = request.getParameter("userid");
+			String state_req = request.getParameter("state");
+			String startdate_req = request.getParameter("startdate");
+			String enddate_req = request.getParameter("enddate");
+			int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
+			String orderno = request.getParameter("orderno");
+			String email = request.getParameter("email");
+			String paymentid=request.getParameter("paymentid");
+			paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
+			int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
+			int currentPage = Utility.getStringIsNull(request.getParameter("currentPage"))?Integer.parseInt(request.getParameter("currentPage")):1;
+			String buyid = request.getParameter("buyuser");
+			String admuserid_str = request.getParameter("admuserid");
+			admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
+			request.setAttribute("admuserid_str",admuserid_str);
+			String type = request.getParameter("type");
+			request.setAttribute("type",StringUtil.isNotBlank(type)?type:"");
+			String status = request.getParameter("status");
+			int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
+			int buyuser=StringUtil.isNotBlank(buyid)?Integer.parseInt(buyid):0;
+			page=page>0?(page - 1) * 40:0;
+			userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
+			int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
+			int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
+			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+			String strm=user.getRoletype();
+			int admuserid=user.getId();
+			if("0".equals(strm)){
+				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+			}
+//			admuserid ="0".equals(strm) && Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
+			enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
 			if(StringUtil.isNotBlank(type) && "order_pending".equals(type)){
 				list=iOrderinfoService.getorderPending();
 			}else{
@@ -723,13 +720,13 @@ public class OrderInfoController{
 		}
 		request.setAttribute("orderws", net.sf.json.JSONArray.fromObject(list));
 		UserDao dao=new UserDaoImpl();
-		List<ConfirmUserInfo> listAdm = getConfirmUserInfos(request, dao);
+//		List<ConfirmUserInfo> listAdm = getConfirmUserInfos(request, dao);
 		page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
 		//获取纯销售和采销一体账户信息
 		List<ConfirmUserInfo> sellAdm =iOrderinfoService.getAllSalesAndBuyer();
 		List<ConfirmUserInfo> purchaseAdm =  new ArrayList<ConfirmUserInfo>();
 		purchaseAdm = dao.getAllByRoleType(2);
-		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
+//		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
 		request.setAttribute("sellAdm", JSONArray.toJSONString(sellAdm));
 		request.setAttribute("purchaseAdm", JSONArray.toJSONString(purchaseAdm));
 		request.setAttribute("count", count);
@@ -1031,6 +1028,99 @@ public class OrderInfoController{
 		}
 		return map;
 	}
+
+	/**
+	 *
+	 * @Title updateOnlineDetailImgs
+	 * @Description 将运营人员替换的尺码表上传到线上，显示到详情图中
+	 * @param request
+	 * @param response
+	 * @return
+	 * @return Map<String,Object>
+	 */
+	@RequestMapping(value = "/updateOnlineDetailImgs")
+	public @ResponseBody List<String> updateOnlineDetailImgs(HttpServletRequest request,HttpServletResponse response){
+		List<String> result_list = new ArrayList<String>();
+		List<Integer> up_ids = new ArrayList<Integer>();
+		//获取需要替换尺码表的产品信息
+		List<Map<String,Object>> listMap = purchaseService.getSizeChartPidInfo();
+		if(listMap!=null) {
+			Map<String, String> uploadMap = new HashMap<String, String>();
+			int count=0;
+			for(Map<String,Object> map:listMap) {
+				count++;
+				String id = String.valueOf(map.get("id"));
+				String pid = String.valueOf(map.get("pid"));//40454495059
+				String en_info = String.valueOf(map.get("en_info"));
+				String imgPath = String.valueOf(map.get("remotpath"));//https://img.import-express.com/importcsvimg/coreimg1/40454495059/desc/3019180200_1237798930.jpg
+				String imgName = imgPath.split("/desc/")[1];//3019180200_1237798930.jpg
+				String replace_img = String.valueOf(map.get("replace_img"));//20181227161224.png
+				String replace_localpath = String.valueOf(map.get("replace_localpath"));// /data/cbtconsole/cbtimg/editimg/520962734304/20181227161224.png
+				//replace_localpath = "E:\\site\\images\\39310691178\\4.4.png";
+				if(StringUtils.isNotBlank(en_info)&&StringUtils.isNotBlank(pid)&&StringUtils.isNotBlank(imgPath)&&StringUtils.isNotBlank(replace_img)&&StringUtils.isNotBlank(replace_localpath)) {
+					//解析en_info字段，去掉被替换图片，加入要替换图片
+					Document nwDoc = Jsoup.parseBodyFragment(en_info);
+					Elements imgEls = nwDoc.getElementsByTag("img");
+					if(imgEls!=null&&imgEls.size()>0) {
+						for(Element imel : imgEls) {
+							String imgUrl = imel.attr("src");
+							//是被替换图片
+							if(StringUtils.isNotBlank(imgUrl)&&imgUrl.indexOf(imgName)>-1) {
+								/**********修正 en_info字段 start***/
+								//上传到图片服务器的文件名称
+								String uploadFileName = Calendar.getInstance().getTimeInMillis()+".jpg";
+								imgUrl = imgUrl.replace(imgName, uploadFileName);
+								imel.attr("src", imgUrl);
+								/**********修正 en_info字段 end***/
+
+								/**********把图片上传到图片服务器 start*****/
+								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
+								String remoteSavePath = "";
+		                        if (imgPath.contains(SERVICE_SHOW_URL_1)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_2)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_3)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
+		                        } else if (imgPath.contains(SERVICE_SHOW_URL_4)) {
+		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
+		                        }
+		                        remoteSavePath = remoteSavePath.replace(imgName, "");
+		                        uploadMap.put(replace_localpath, remoteSavePath+"@@@@"+uploadFileName);
+	                            /**********把图片上传到图片服务器 end*****/
+	                            break;
+							}
+						}
+						/**********远程发送MQ，更新mongodb eninfo字段 start*****/
+						InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+						inputData.setPid(pid);
+						inputData.setEninfo(nwDoc.html());
+						GoodsInfoUpdateOnlineUtil.updateOnlineAndSolr(inputData, 0);
+						result_list.add(id+"@"+pid);
+						up_ids.add(Integer.parseInt(id));
+                        /**********远程发送MQ，更新mongodb eninfo字段 end*****/
+
+						//每100张上传一次
+                        if(count==100) {
+                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap);
+                			//更新已上传状态
+                			if(up_ids.size()>0&&dsds) {
+                				purchaseService.updateSizeChartUpload(up_ids);
+                			}
+
+                			uploadMap = new HashMap<String, String>();
+                			up_ids = new ArrayList<Integer>();
+                			count=0;
+                        }
+					}
+				}else {
+					logger.error("updateOnlineDetailImgs data error,row id :"+id);
+				}
+			}
+		}
+		return result_list;
+	}
+
 	
 	/**
      * 
@@ -1114,4 +1204,76 @@ public class OrderInfoController{
         String goodsPid = request.getParameter("goodsPid");
         spiderService.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
     }
+
+
+    @RequestMapping("/recoverCancelOrder")
+    @ResponseBody
+    public JsonResult recoverCancelOrder(HttpServletRequest request) {
+		JsonResult json = new JsonResult();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		if (admuserJson == null) {
+			json.setOk(false);
+			json.setMessage("请登录后操作!");
+			return json;
+		}
+		com.cbt.pojo.Admuser admuser = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+
+		String orderNo = request.getParameter("orderNo");
+		if (StringUtils.isBlank(orderNo)) {
+			json.setMessage("获取订单号失败");
+			json.setOk(false);
+			return json;
+		}
+		String stateStr = request.getParameter("state");
+		if (StringUtils.isBlank(stateStr)) {
+			json.setMessage("获取订单状态失败");
+			json.setOk(false);
+			return json;
+		}
+
+		String oldStateStr = request.getParameter("oldState");
+		if(StringUtils.isBlank(oldStateStr)){
+            oldStateStr = "0";
+        }
+
+		try {
+			RechangeRecord record = paymentDao.querySystemCancelOrder(orderNo);
+			if (record == null || record.getPrice() <= 0) {
+				json.setMessage("获取系统取消记录失败，请确认有系统取消记录");
+				json.setOk(false);
+			} else {
+				int res = websiteOrderDetailDao.websiteUpdateOrderState(orderNo, Integer.valueOf(stateStr));
+				// 插入订单状态修改日志表
+				websiteOrderDetailDao.updateOrderStateLog(orderNo, Integer.valueOf(stateStr), Integer.valueOf(oldStateStr),"订单状态恢复", admuser.getId());
+				if (res > 0) {
+					ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
+					BigDecimal bd = new BigDecimal(String.valueOf(record.getPrice()));
+					json = balanceDao.changeBalance(record.getUserId(), bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(), -1,
+							1, orderNo, "订单状态恢复", admuser.getId());
+					if (json.isOk()) {
+						// 删除订单取消记录
+						boolean isSuccess = websiteOrderDetailDao.deleteRechangeRecord(record.getUserId(), orderNo);
+						if (isSuccess) {
+							json.setOk(true);
+						} else {
+							json.setMessage("删除订单取消记录失败");
+							json.setOk(false);
+							// 执行失败，还原订单状态
+							websiteOrderDetailDao.websiteUpdateOrderState(orderNo, -1);
+						}
+					} else {
+						// 执行失败，还原订单状态
+						websiteOrderDetailDao.websiteUpdateOrderState(orderNo, -1);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
+			json.setMessage("error:" + e.getMessage());
+			json.setOk(false);
+		}
+		return json;
+	}
 }

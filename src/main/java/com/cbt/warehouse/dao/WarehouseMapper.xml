@@ -3128,31 +3128,37 @@
 		</if>
 	</update>
 	<select id="getUserBackList" resultType="com.cbt.bean.BlackList">
-		select id,email,createtime,updateTime,userip,flag,username from tblacklist where 1=1
-		<if test="email != null">
-            and email like CONCAT('%','${email}','%' )
+		select id,blackVlue,createtime,updateTime,type,flag,username from tblacklist where 1=1
+		<if test="blackVlue != null">
+			and blackVlue like CONCAT('%','${blackVlue}','%' )
 		</if>
 		<if test="flag != null">
 			and flag=#{flag}
 		</if>
-		order by flag asc
+		<if test="paramType !=-1">
+			and type=#{paramType}
+		</if>
+		order by flag asc limit ${page},20
 	</select>
 	<insert id="addBackUser">
-		insert into tblacklist(email,createtime,userip,username) values(#{email},now(),#{ip},#{userName})
+		insert into tblacklist(blackVlue,createtime,type,username) values(#{blackVlue},now(),#{type},#{userName})
 	</insert>
 	<update id="updatebackEmail">
-		update tblacklist set email=#{email},updateTime=now() where id=${id}
+		update tblacklist set blackVlue=#{newBlackVlue},updateTime=now(),type=#{type} where id=${id}
 	</update>
 	<update id="updateFlag">
 		update tblacklist set flag=${type},updateTime=now() where id=#{id}
 	</update>
 	<select id="getUserBackListCount" resultType="com.cbt.bean.BlackList">
 		select * from tblacklist where 1=1
-		<if test="email != null">
-			and email like CONCAT('%','${email}','%' )
+		<if test="blackVlue != null">
+			and blackVlue like CONCAT('%','${blackVlue}','%' )
 		</if>
 		<if test="flag != null">
 			and flag=#{flag}
+		</if>
+		<if test="paramType !=-1">
+			and type=#{paramType}
 		</if>
 	</select>
 	<update id="updateIsRefund">
@@ -3581,5 +3587,48 @@
 		INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.country OR oa.country=z.id
 		 INNER JOIN customs_regulations c ON z.chinapostbig=c.country OR z.fedexie=c.country
 		WHERE oa.orderNo=#{orderid}
+	</select>
+	<select id="getRedProduct" resultType="com.cbt.pojo.RedManProductBean">
+		SELECT GROUP_CONCAT(b.pids) AS pids,a.id,a.recipients,a.address,a.phonenumber,a.country,a.zipcode,a.statename,a.city,a.addressEmail,a.countryname,a.remark,b.createtime,a.shipno
+		FROM ren_product_address a INNER JOIN  red_man_product b ON a.id=b.address_id WHERE a.flag=0 AND b.flag=0
+		<if test="email != null">
+			and a.addressEmail=#{email}
+		</if>
+		<if test="shipno != null">
+			and a.shipno=#{shipno}
+		</if>
+		<if test="shipnoState == 1">
+			and a.shipno is not null
+		</if>
+		<if test="shipnoState == 2">
+			and a.shipno is null
+		</if>
+		GROUP BY a.id ORDER BY a.id DESC
+	</select>
+	<select id="getRedProductCount" resultType="com.cbt.pojo.RedManProductBean">
+		SELECT GROUP_CONCAT(b.pids) AS pids,a.recipients,a.address,a.phonenumber,a.country,a.zipcode,a.statename,a.city,a.addressEmail,a.countryname,a.remark,b.createtime
+		FROM ren_product_address a INNER JOIN  red_man_product b ON a.id=b.address_id WHERE a.flag=0 AND b.flag=0
+		<if test="email != null">
+			and a.addressEmail=#{email}
+		</if>
+		<if test="shipno != null">
+			and a.shipno=#{shipno}
+		</if>
+		<if test="shipnoState == 1">
+			and a.shipno is not null
+		</if>
+		<if test="shipnoState == 2">
+			and a.shipno is null
+		</if>
+		GROUP BY a.id ORDER BY a.id DESC
+	</select>
+	<select id="getCustomPids" resultType="com.cbt.bean.CustomGoodsBean">
+		SELECT pid,enname,custom_main_image as customMainImage,remotpath FROM custom_benchmark_ready WHERE pid IN (${pids})
+	</select>
+	<update id="insertShipno">
+		update ren_product_address set shipno=#{newShipno} where id=#{a_id}
+	</update>
+	<select id="getAllZone" resultType="com.cbt.bean.ZoneBean">
+		SELECT REPLACE(country,' ','') AS country FROM zone
 	</select>
 </mapper>

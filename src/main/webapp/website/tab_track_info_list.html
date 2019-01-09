@@ -104,7 +104,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">保存在本地的物流信息</h4>
+                        <h4 class="modal-title">保存在本地的物流信息</h4>
                     </div>
                     <div class="modal-body" style="float: left;font-size: 13px;width: 100%;">
                     	<h3>运单信息</h3>
@@ -150,20 +150,27 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">操作订单运单状态</h4>
+                        <h4 class="modal-title">运单状态修改</h4>
                     </div>
                     <div class="modal-body">
                         <div>
                             <span>&nbsp;&nbsp;运单号:&nbsp;&nbsp;</span><span id="modal_trackNo2"></span><br />
-                            <span style="float: left;line-height: 30px;">&nbsp;&nbsp;标记:&nbsp;&nbsp;</span>
+                            <span style="float: left;line-height: 30px;">&nbsp;&nbsp;状态:&nbsp;&nbsp;</span>
                             <input type="radio" name="trackState" value="2" checked="checked" style="float: left;height: 20px;" />
-                            <span style="float: left;line-height: 30px;">&nbsp;无标记&nbsp;&nbsp;</span>
+                            <span style="float: left;line-height: 30px;">&nbsp;1.出运中(或者原本是异常)&nbsp;&nbsp;</span>
                             <input type="radio" name="trackState" value="7" style="float: left;height: 20px;" />
-                            <span style="float: left;line-height: 30px;">&nbsp;标记为非异常(不会出现在预警中)</span><br />
+                            <span style="float: left;line-height: 30px;">&nbsp;2.手动标记正常</span><br />
                             <div style="clear:both"></div>
-                            <span>&nbsp;&nbsp;备注:</span><br />
+                            <span>&nbsp;&nbsp;标记备注:</span>
+                            <span>&nbsp;&nbsp;(最后标记时间:</span>
+                            <span id="track_note_time"></span><span>)</span><br />
                             <textarea rows="60" cols="60" id="track_note" style="height: 150px;width: 566px;"></textarea><br />
                             <input type="button" value="提交" id="myModal2_sub"><span id="myModal2_sub_message" style="color:red;"></span>
+                            <span>
+                                <br/>状态说明:
+                                <br/>1.修改到“出运中”后运单正常抓取,如果运单有异常,会出现在“运单预警”中;
+                                <br/>2.修改到“手动标记正常”后,运单不会出现在“运单预警”中。如果运单抓取中判断为签收状态,则状态会更新到“已签收”;“手动标记正常”标记7天有效,7天后如果运单异常则会继续出现在“运单预警”中。
+                            </span>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -279,7 +286,7 @@
                     var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
                     document.getElementById("nowdate2").value = mydate;
                     today = new Date();
-                    today.setDate(today.getDate() - 60); //日期减60天
+                    today.setDate(today.getDate() - 90); //日期减90天
                     nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
                     date = new Date(nowdate);
                     mon = date.getMonth() + 1;
@@ -307,6 +314,7 @@
                     $("#orderOrTrackNo").css("color","#C4C4C4");
                     $("#trackState").val(0);
                     $("#warning").val(0);
+                    $("#adminSelect").val(0);
                 });
                 /*下架商品范围内时间的条件查询*/
                 $("#date-range-search").click(function() {
@@ -342,6 +350,7 @@
                         $("#errMsg").text("");
                     }
                     //查询
+                    var userid = $("#adminSelect").val();
                     if(funChange == 0) {
                         //查询运单状态
                         var trackState = $("#trackState").val();
@@ -352,6 +361,7 @@
                             trackState: trackState,
                             startDate: startDate,
                             endDate: endDate,
+                            userid: userid,
                             funChange: funChange
                         });
                     } else if(funChange == 1) {
@@ -364,6 +374,7 @@
                             warning: warning,
                             startDate: startDate,
                             endDate: endDate,
+                            userid: userid,
                             funChange: funChange
                         });
                     }
@@ -435,7 +446,7 @@
                             return '已发货';
                     }
                 }
-                return '已发货';
+                return '';
             }
             /*运单预警 formatterWarning*/
            function formatterWarning(value, row, index) {
@@ -574,12 +585,11 @@
             function alert_modal2(trackNo) {
             	// 初始值
             	$('#modal_trackNo2').text(trackNo);
-            	$('#myModal2_sub_message').text("");
-            	//初始化该订单之前修改记录
+                $('#myModal2_sub_message').text("");
+                //初始化该订单之前修改记录
             	$.ajax({
            		   type: "GET",
            		   url: "/cbtconsole/tabtrackinfo/querystatebytrackno.do?trackNo=" + trackNo,
-           		   data: "",
            		   dataType:"json",
            		   success: function(msg){
            			   if(7 == msg.trackState){
@@ -588,9 +598,10 @@
              			  $('input[type=radio][name=trackState]').get(0).checked = "checked";
            			   }
 					   $('#track_note').val(msg.trackNote);
+					   $('#track_note_time').text(formatterData2(msg.trackNoteTime, null, null));
+                       $('#myModal2').modal('show');
            		   }
            		});
-            	$('#myModal2').modal('show');
             }
             /*格式化本地物流数据查看 formatterSourceType*/
             function formatterSourceType(value, row, index) {
@@ -634,6 +645,9 @@
                         	<input type="radio" name="funChange" value="1" checked="checked" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单预警&nbsp;&nbsp;</span>
                         </td>
+                        <td align="center" style="width: 224px;">
+                        	<span style="float: left;line-height: 30px;">&nbsp;负责人(与左侧条件组合查询)&nbsp;&nbsp;</span>
+                        </td>
                         <td style="width: 100px;"><!--重置按钮--></td>
                         <td style="width: 56px;"><!--查询按钮--></td>
                     </tr>
@@ -644,7 +658,7 @@
                                 <input type='text' class="form-control" id='nowdate1' style="width: 100px; height: 30px;" />
                                 <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
 			                <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span></a>
                         </td>
                         <!--结束时间-->
                         <td align="center">
@@ -652,7 +666,7 @@
                                 <input type='text' class="form-control" id='nowdate2' style="width: 100px; height: 30px;" />
                                 <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
 				                <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
+                                </span></a>
                         </td>
                         <!--通过运单号或订单号查询(时间选择失效)-->
                         <td align="center">
@@ -682,6 +696,11 @@
                                 <option value="6">6-内部异常 (运单异常等)</option>
                             </select>
                         </td>
+                        <!--负责人-->
+                        <td align="center">
+                            <select class="form-control" id="adminSelect" style="height: 30px;width: 220px;font-size: 14px;padding-top: 4px;padding-left: 4px;">
+                            </select>
+                        </td>
                         <!--查询按钮-->
                         <td align="center">
                             <button type="button" id="date-range-search" class="btn btn-default" style="height: 30px;width: 98px;text-align: center;" >查询</button>
@@ -704,11 +723,13 @@
                     <th data-options="field:'id',width:'120px',align:'center'">用户id</th>
                     <th data-options="field:'orderNo',width:'150px',align:'center',formatter:formatterOrderNo">主单号</th>
                     <!--<th data-options="field:'orderList',width:'150px',align:'center'">合并订单列表</th>-->
+                    <th data-options="field:'admName',width:'150px',align:'center'">负责人</th>
                     <th data-options="field:'trackNo',width:'150px',align:'center'">运单号</th>
                     <th data-options="field:'trackCompany',width:'120px',align:'center'">物流公司</th>
                     <th data-options="field:'forwardNo',width:'150px',align:'center'">转单号</th>
                     <th data-options="field:'forwardCompany',width:'150px',align:'center'">转单物流公司</th>
                     <th data-options="field:'trackState',width:'100px',align:'center',formatter:formatterTrackState">运单状态</th>
+                    <th data-options="field:'info',width:'150px',align:'center'">最新物流</th>
                     <th data-options="field:'b',width:'200px',align:'center',formatter:formatterWarning">运单预警</th>
                     <!--<th data-options="field:'packageNo',width:'150px',align:'center'">包裹号</th>-->
                     <!--<th data-options="field:'trackAddress',width:'150px',align:'center'">寄件地址</th>-->
@@ -721,7 +742,7 @@
                     <th data-options="field:'trackUpdate',width:'160px',align:'center',formatter:formatterData">最后一次运单变更时间</th>
                     <!--<th data-options="field:'updatDate',width:'160px',align:'center',formatter:formatterData">最后一次抓取时间</th>-->
                     <th data-options="field:'deliveredTime',width:'160px',align:'center',formatter:formatterData">运单完成时间</th>
-                    <th data-options="field:'d',width:'160px',align:'center',formatter:formatterOperation"">操作</th>
+                    <th data-options="field:'d',width:'160px',align:'center',formatter:formatterOperation">操作</th>
                     <th data-options="field:'sourceType',width:'150px',align:'center',formatter:formatterSourceType">物流信息</th>
                 </tr>
             </thead>
@@ -733,12 +754,31 @@
     
     <script type="text/javascript">
 	    $(function(){
+            //负责人拉取
+            $.ajax({
+                type : 'POST',
+                async : false,
+                url : '/cbtconsole/admuser/queryAllAdmuser',
+                success : function(data){
+                    if(data.ok){
+                        var results = data.data;
+                        var options = '<option value="0" selected="selected">全部</option>';
+                        for (var i = 0; i < results.length; i++) {
+                            options += '<option value="'+results[i].id+'">'+results[i].admname+'</option>';
+                        }
+                        $("#adminSelect").empty();
+                        $("#adminSelect").append(options);
+                    } else{
+                        alert("获取下拉框数据失败，请重新刷新页面");
+                    }
+                }
+            });
 	    	$.ajax({
     		   type: "GET",
     		   url: "/cbtconsole/tabtrackinfo/querywaringnum.do?startDate=" + $("#nowdate1").val() + "&endDate=" + $("#nowdate2").val(),
     		   dataType:"json",
     		   success: function(msg){
-    		     var waringtext = "最近<strong>60</strong>天预警信息 (0-总预警条数:<span>" + msg.waring0
+    		     var waringtext = "最近<strong>90</strong>天预警信息 (0-总预警条数:<span>" + msg.waring0
     		    		 + "</span>条; 1-物流问题:<span>" + msg.waring1
     		    		 + "</span>条; 2-交期超时:<span>" + msg.waring2
     		    		 + "</span>条; 4-退回:<span>" + msg.waring4

@@ -807,7 +807,7 @@
 			<td  style="text-align:center;vertical-align:middle;" colspan="4">Scanning date:<span id="td7"></span></td>
 		</tr>
 	</table>
-	<span id="td9" style="float:right;"></span>
+	<span id="td10"></span><span id="td9" style="float:right;"></span>
 </div>
 <div id="div_print2" style="margin:0;padding:0;position: fixed;left:0;bottom:0;display: none;width: 283px;height:142px;" align="center">
 	<table border="1" style="width: 283px;">
