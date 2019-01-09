@@ -310,8 +310,8 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
     $("#td5").html(strcartype);
     document.getElementById('td6').innerHTML = count;
     document.getElementById('td7').innerHTML = str;
-    document.getElementById('td9').innerHTML = tbOrderId;
     document.getElementById('td10').innerHTML = position;
+    document.getElementById('td9').innerHTML = tbOrderId;
     // jQuery('#qrcode').qrcode({
     //     width : 50,
     //     height : 50,
