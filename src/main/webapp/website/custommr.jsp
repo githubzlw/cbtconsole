@@ -113,7 +113,7 @@ b {
 			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"0",
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
-			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0"
+			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0","unsellableReason":"-1"
 	};
 	var isQuery =0;
 
@@ -262,6 +262,11 @@ b {
             queryParams.isSort = isSort;
             $("#query_is_sort").val(isSort);
         }
+        var unsellableReason = sessionStorage.getItem("unsellableReason");
+        if(!(unsellableReason == null || unsellableReason == "")){
+            queryParams.unsellableReason = unsellableReason;
+            $("#unsellableReason").val(unsellableReason);
+        }
         var isComplain = sessionStorage.getItem("isComplain");
         if(!(isComplain == null || isComplain == "" || isComplain != '1')){
             queryParams.isComplain = isComplain;
@@ -344,6 +349,7 @@ b {
 		var price1688End = $("#query_1688_price_end").val();
 		var isSort = $("#query_is_sort").val();
 		var isComplain = $("#is_complain").is(":checked")?"1":"0";
+		var unsellableReason=$("#unsellableReason").val();
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -375,6 +381,7 @@ b {
         queryParams.price1688Begin = price1688Begin;
         queryParams.price1688End = price1688End;
         queryParams.isSort = isSort;
+        queryParams.unsellableReason=unsellableReason;
         queryParams.isComplain = isComplain;
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
@@ -419,6 +426,7 @@ b {
             sessionStorage.setItem("price1688Begin", queryParams.price1688Begin);
             sessionStorage.setItem("price1688End", queryParams.price1688End);
             sessionStorage.setItem("isSort", queryParams.isSort);
+            sessionStorage.setItem("unsellableReason", queryParams.unsellableReason);
             sessionStorage.setItem("isComplain", queryParams.isComplain);
 
 			$('#goods_list').empty();
@@ -432,7 +440,7 @@ b {
 			+ "&onlineTime=" + queryParams.onlineTime + "&offlineTime=" + queryParams.offlineTime
 			+ "&editBeginTime=" + queryParams.editBeginTime + "&editEndTime=" + queryParams.editEndTime + "&weight1688Begin="
 			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
-			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain;
+			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain+"&unsellableReason="+queryParams.unsellableReason;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -682,8 +690,37 @@ b {
 					</select><br>&nbsp;&nbsp;<input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
 						value="查询" style="height: 30px; width: 60px;" class="btn" />
 						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
-						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" /></td>
-
+						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
+					</td>
+				</tr>
+				<tr>
+						<td>
+						下架原因:<select id="unsellableReason"
+						style="font-size: 18px; height: 28px;">
+						<option value="-1" selected="selected">请选择</option>
+						<option value="1">1688货源下架</option>
+						<option value="2">不满足库存条件</option>
+						<option value="3">销量无变化(低库存)</option>
+							<option value="4">页面404</option>
+							<option value="5">重复验证合格</option>
+							<option value="6">P问题或运营直接下架</option>
+							<option value="7">店铺整体禁掉</option>
+							<option value="8">采样不合格</option>
+							<option value="9">有质量问题</option>
+							<option value="10">商品侵权</option>
+							<option value="11">店铺侵权</option>
+							<option value="12">难看</option>
+							<option value="13">中文</option>
+							<option value="14">1688商品货源变更</option>
+							<option value="15">非精品数据更新到软下架</option>
+							<option value="16">中文搜索展现点击比+添加购物车数据 指标不符合要求</option>
+							<option value="17">低价商品下架</option>
+							<option value="18">类别隐藏数据下架</option>
+							<option value="19">店铺小于5件商品软下架</option>
+							<option value="20">一手数据下架</option>
+							<option value="21">大于400美元商品下架</option>
+						</select>
+						</td>
 				</tr>
 			</table>
 

@@ -354,6 +354,9 @@
         <if test="catid !=null">
             and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
+        <if test="unsellableReason !=null">
+            and cbu.unsellableReason=${unsellableReason}
+        </if>
         <if test="sttime !=null">
             and cge.publish_time &gt;= #{sttime}
         </if>
@@ -481,6 +484,9 @@
         </if>
         <if test="sttime !=null">
             and cge.publish_time &gt;= #{sttime}
+        </if>
+        <if test="unsellableReason !=null">
+            and cbu.unsellableReason=${unsellableReason}
         </if>
         <if test="edtime !=null">
             and cge.publish_time &lt;= #{edtime}
