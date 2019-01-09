@@ -479,18 +479,18 @@ tr .td_class{width:230px;}
 		</select>
 		<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)"> 
 		<input class="but_color" type="button" value="重置" onclick="doReset()">
-		<br><a href="/cbtconsole/website/upload_video.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">产品单页视频展示操作</a>
+		<%--<br><a href="/cbtconsole/website/upload_video.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">产品单页视频展示操作</a>--%>
 	</div>
 	<table class="easyui-datagrid" id="easyui-datagrid"
 		style="width: 1800px; height: 900px">
 		<thead>
 			<tr>
 				<th data-options="field:'orderid',width:10,align:'center'">商品pid</th>
-				<th data-options="field:'valid',width:10,align:'center'">商品状态</th>
+				<th data-options="field:'valid',width:5,align:'center'">商品状态</th>
 				<th data-options="field:'currency',width:20,align:'center'">主图图片</th>
 				<th data-options="field:'gcUnit',width:80,align:'center'">验货图片</th>
                 <th data-options="field:'evaluation',width:10,align:'center'">产品评论</th>
-				<th data-options="field:'position',width:15,align:'center'">上传图片</th>
+				<th data-options="field:'position',width:25,align:'center'">上传图片</th>
 			</tr>
 		</thead>
 	</table>

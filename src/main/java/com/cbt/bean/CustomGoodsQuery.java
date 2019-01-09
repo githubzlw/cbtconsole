@@ -54,9 +54,17 @@ public class CustomGoodsQuery {
 	private double price1688Begin;
 	private double price1688End;
 	private int isSort;
-
+	private String unsellableReason;
 	private int isComplain = -1;//是否被投诉 0-为投诉  1-投诉
-	
+	public String getUnsellableReason() {
+		return unsellableReason;
+	}
+
+	public void setUnsellableReason(String unsellableReason) {
+		this.unsellableReason = unsellableReason;
+	}
+
+
 
 	public int getIsComplain() {
 		return isComplain;
