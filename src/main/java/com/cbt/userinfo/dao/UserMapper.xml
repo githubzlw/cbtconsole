@@ -41,7 +41,7 @@
    <select id="getUserCount" resultType="java.util.Map">
    		select id,(select count(g.id) from goods_car g where state=0 and userid=user.id) carcount, 
    		(select count(o.orderid) from orderinfo o where user_id=user.id and o.state in(1,2,3,4,5)) ordercount,email,available_m,
-   		applicable_credit,currency from user where user.id=#{userID}
+   		name,applicable_credit,currency from user where user.id=#{userID}
    </select>
    <select id="getPaypal" resultType="java.lang.String">
    		select username from payment where userid=#{userID} and username is not null   group by username
