@@ -385,7 +385,9 @@ public class ShopCarMarketingController {
                 modelM.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
                 modelM.put("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
                 modelM.put("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
-                modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                if(productCost > 0){
+                    modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                }
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
