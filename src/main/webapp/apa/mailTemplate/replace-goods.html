@@ -188,7 +188,7 @@
                 <td>
                   <table class="soapbox">
                     <tr>
-                      <td class="soapbox-title">Your ImportExpress order has substitutes need your confirm before purchase!</td>
+                      <td class="soapbox-title" th:text="${title}">Your ImportExpress order has substitutes need your confirm before purchase!</td>
                     </tr>
                   </table>
                   
@@ -199,8 +199,8 @@
                         <div class="body-title">Dea <span th:text="${email}">first_name</span>,</div>
                         <p class="user_id_ple">Order #:<i th:text="${orderNo}">QA18474027512271</i></p>
                         <p class="track_p"> Unfortunately, we are not able to buy the following items for you. We are suggesting alternatives for your review.</p>
-                        <p class="track_p"><a target="_blank" href="">Click here for details. </a> </p>
-                        <p class="track_p"> 123123123123123123123</p>
+                        <p class="track_p"><a target="_blank" href="" th:href="${clickHereForDetails}">Click here for details. </a> </p>
+                        <p class="track_p" th:text="${reason3}"> 123123123123123123123</p>
                         <table class="body-signature-block">
                           <tr>
                             <td class="body-signature-cell">
@@ -209,7 +209,7 @@
                               <div class="please_note">
                                 <h3>PLEASE NOTE:</h3>
                                 <p>This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any question or concern, access
-                                  your account <a href="https://www.import-express.com/user/loginNew" th:href="${accountLink}">here</a>.</p>
+                                  your account <a href="https://www.import-express.com/user/loginNew">here</a>.</p>
                               </div>
                             </td>
                           </tr>

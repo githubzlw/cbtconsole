@@ -5,10 +5,11 @@ import ceRong.tools.bean.DorpDwonBean;
 import com.cbt.bean.*;
 import com.cbt.customer.dao.IPictureComparisonDao;
 import com.cbt.customer.dao.PictureComparisonDaoImpl;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-
+@Service
 public class PictureComparisonServiceImpl implements IPictureComparisonService {
 
 	IPictureComparisonDao dao = new PictureComparisonDaoImpl();
