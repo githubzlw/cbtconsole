@@ -234,32 +234,39 @@ function fn(va) {
 		$("#table tr:eq(" + row + ") td:eq(10)").after("<td style='background-color:"+color+";'>"+ state_text + "</td>");
 		//运单状态   undefined-未出货 -备货中；2-已发货；3-已签收；4-退回；5-异常；6-内部异常;7-手动标记为正常',
         var trackStateHtm = '';
+        var trackStateColor = "";
         var trackState = json[i].track_state;
         if(trackState != undefined && trackState != '-1'){
             switch (trackState){
                 case '7':
                     trackStateHtm = '手动标记为正常';
+                    trackStateColor = '#428484;color:white';
                     break;
                 case '6':
                     trackStateHtm = '内部异常';
+                    trackStateColor = '#FF00FF;color:white';
                     break;
                 case '5':
                     trackStateHtm = '异常';
+                    trackStateColor = '#FF00FF;color:white';
                     break;
                 case '4':
                     trackStateHtm = '退回';
+                    trackStateColor = '#FF00FF;color:white';
                     break;
                 case '3':
                     trackStateHtm = '已签收';
+                    trackStateColor = '#008442;color:white';
                     break;
                 default:
                     trackStateHtm = '已发货';
+                    trackStateColor = '#428484;color:white';
                     break;
             }
         } /*else {
             trackStateHtm = '备货中';
         }*/
-        $("#table tr:eq(" + row + ") td:eq(11)").after("<td>"+ trackStateHtm + "</td>");
+        $("#table tr:eq(" + row + ") td:eq(11)").after("<td style='background-color:"+trackStateColor+";'>"+ trackStateHtm + "</td>");
         //订货国家
 		$("#table tr:eq(" + row + ") td:eq(12)").after("<td   id='custCountry"+json[i].order_no+"'  >" + (json[i].countrys == null || json[i].countrys == ''?"-":json[i].countrys)+ "</td>");
 		//预估国际运费/实际称重预估运费
