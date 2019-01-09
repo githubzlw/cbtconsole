@@ -39,7 +39,7 @@ public class BlackListServlet extends HttpServlet {
 		Map<String,Object> map=new HashMap<String,Object>();
 		if("blacklist".equals(action)){
 			String email=request.getParameter("email");
-			blackList.setEmail(email);
+//			blackList.setEmail(email);
 			int total=blackListDao.getBlackListPageCount(blackList);
 			List<BlackList> list=blackListDao.getBlackListPage(blackList,Integer.parseInt(page), 20);
 			request.setAttribute("list", list);
@@ -83,7 +83,7 @@ public class BlackListServlet extends HttpServlet {
 			String email = us.getUserEmailByUserName(username);
 			blackList.setEmail(email);*/
 			String ip=Utility.getIpAddress(request);
-			blackList.setUserip(ip);
+//			blackList.setUserip(ip);
 			boolean flag = blackListDao.getBlackListCount(blackList);
 			if (flag) {
 				map.put("code", "1");
@@ -123,7 +123,7 @@ public class BlackListServlet extends HttpServlet {
 			String userId=userDao.getUserIdByEmail(email);
 			IOrderwsDao iorderwsDao=new OrderwsDao();
 			Set<String> ipSet=iorderwsDao.getOrderIpByUserId(userId);	
-			blackList.setEmail(email);
+//			blackList.setEmail(email);
 			blackList.setUsername(username);
 			if(userip != null && !"".equals(userip)){
 				ipSet.add(userip);
@@ -145,8 +145,8 @@ public class BlackListServlet extends HttpServlet {
 			String userip=request.getParameter("userip");
 			String id=request.getParameter("id");
 			blackList.setId(Integer.parseInt(id));
-			blackList.setEmail(email);
-			blackList.setUserip(userip);
+//			blackList.setEmail(email);
+//			blackList.setUserip(userip);
 			int result=blackListDao.modifyBlackList(blackList);
 			if(result == 1){
 				map.put("code", "1");

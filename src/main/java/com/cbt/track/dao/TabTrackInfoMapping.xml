@@ -302,13 +302,16 @@
 		 `track_state` = #{trackState},
 		 `track_note` = #{trackNote},
 		 `track_note_time` = NOW()
+		<if test="trackState != 7">
+            , up_state_time = '1970-01-01 00:00:00'
+        </if>
 		WHERE
 			(`track_no` = #{trackNo});
     </update>
     
     <!-- TabTrackInfo queryStateByTrackNo(@Param("trackNo") String trackNo); -->
 	<select id="queryStateByTrackNo" resultType="com.cbt.bean.TabTrackInfo">
-        SELECT track_no trackNo, track_state trackState, track_note trackNote, track_note_time trackNoteTime
+        SELECT track_no trackNo, track_state trackState, track_note trackNote, track_note_time trackNoteTime,up_state_time upStateTime
         FROM cross_border_shop.tab_track_info 
         WHERE track_no = #{trackNo} 
         LIMIT 1
