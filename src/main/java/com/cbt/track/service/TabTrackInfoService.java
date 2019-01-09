@@ -10,13 +10,13 @@ public interface TabTrackInfoService {
 
     TabTrackInfo queryByTrackNo(String trackNo);
 
-    Map<String,Object> getWarningRecordList(Integer page, Integer rows, String startDate, String endDate, int warning);
+    Map<String,Object> getWarningRecordList(Integer page, Integer rows, String startDate, String endDate, int warning, Integer userid);
 
-    Map<String,Object> getRecordListByTrackState(Integer page, Integer rows, String startDate, String endDate, int trackState);
+    Map<String,Object> getRecordListByTrackState(Integer page, Integer rows, String startDate, String endDate, int trackState, Integer userid);
 
 //    List<TabTrackInfo> queryOrderNo();
 
-    Map<String,Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo);
+    Map<String,Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid);
 
 	boolean updatestate(TabTrackInfo tabTrackInfo);
 

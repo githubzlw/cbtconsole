@@ -171,7 +171,11 @@ public class CustomGoodsController {
 			queryBean.setSttime(sttime);
 		}
 
-
+		String unsellableReason=request.getParameter("unsellableReason");
+		if(StringUtils.isBlank(unsellableReason) || "-1".equals(unsellableReason)){
+			unsellableReason=null;
+		}
+		queryBean.setUnsellableReason(unsellableReason);
 		String edtime = request.getParameter("edtime");
 		if (StringUtils.isNotBlank(edtime)) {
 			queryBean.setEdtime(edtime);

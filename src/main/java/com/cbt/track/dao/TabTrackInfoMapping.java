@@ -9,20 +9,26 @@ public interface TabTrackInfoMapping {
 
     TabTrackInfo queryByTrackNo(@Param("trackNo") String trackNo);
 
-    List<TabTrackInfo> getWarningRecordList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("startDate") String startDate, @Param("endDate") String endDate, @Param("warning") int warning);
+    List<TabTrackInfo> getWarningRecordList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                            @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                            @Param("warning") int warning, @Param("userid") Integer userid);
 
-    Integer getWarningRecordCount(@Param("startDate") String startDate, @Param("endDate") String endDate, @Param("warning") int warning);
+    Integer getWarningRecordCount(@Param("startDate") String startDate, @Param("endDate") String endDate,
+                                  @Param("warning") int warning, @Param("userid") Integer userid);
 
-    List<TabTrackInfo> getRecordListByTrackState(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("startDate") String startDate, @Param("endDate") String endDate, @Param("trackState") int trackState);
+    List<TabTrackInfo> getRecordListByTrackState(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                                 @Param("startDate") String startDate, @Param("endDate") String endDate,
+                                                 @Param("trackState") int trackState, @Param("userid") Integer userid);
 
-    Integer getRecordCountByTrackState(@Param("startDate") String startDate, @Param("endDate") String endDate, @Param("trackState") int trackState);
+    Integer getRecordCountByTrackState(@Param("startDate") String startDate, @Param("endDate") String endDate,
+                                       @Param("trackState") int trackState, @Param("userid") Integer userid);
 
-    List<TabTrackInfo> getRecordListByOrderOrTrackNo(@Param("orderNo") String orderNo, @Param("trackNo") String trackNo);
+    List<TabTrackInfo> getRecordListByOrderOrTrackNo(@Param("orderNo") String orderNo, @Param("trackNo") String trackNo, @Param("userid") Integer userid);
 
 	void updatestate(TabTrackInfo tabTrackInfo);
 
 	TabTrackInfo queryStateByTrackNo(@Param("trackNo") String trackNo);
 
-	List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo);
+	List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo, @Param("userid") Integer userid);
 
 }

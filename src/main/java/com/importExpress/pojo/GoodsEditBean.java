@@ -27,6 +27,7 @@ public class GoodsEditBean {
     private int weight_is_edit;
     private int limitNum;
     private int startNum;
+    private int promotion_flag;
 
 
     public int getId() {
@@ -228,6 +229,14 @@ public class GoodsEditBean {
 
     public void setRepaired_flag(int repaired_flag) {
         this.repaired_flag = repaired_flag;
+    }
+
+    public int getPromotion_flag() {
+        return promotion_flag;
+    }
+
+    public void setPromotion_flag(int promotion_flag) {
+        this.promotion_flag = promotion_flag;
     }
 
     @Override
