@@ -43,6 +43,9 @@
         <result column="bm_flag" property="bmFlag"/>
         <result column="isBenchmark" property="isBenchmark"/>
         <result column="old_ali_pid" property="oldAliPid"/>
+        <result column="valid" property="valid"/>
+        <result column="sold_flag" property="soldFlag"/>
+        <result column="is_edit" property="isEdit"/>
     </resultMap>
 
 
@@ -100,9 +103,13 @@
         select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
         b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
-        b.bm_flag ,b.isBenchmark
-        from aa_ali_product_lire a,custom_benchmark_ready b
-        where a.pid = b.pid and a.ali_pid = #{aliPid}
+        b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit
+        from aa_ali_product_lire a
+        INNER JOIN custom_benchmark_ready b
+        on a.pid = b.pid 
+				LEFT JOIN custom_goods_edit c
+				on b.pid = c.pid and c.is_edited=1
+        where a.ali_pid = #{aliPid}
         limit 4
     </select>
 
@@ -128,5 +135,5 @@
         set deal_state = #{dealState},admin_id = #{adminId}
         where ali_pid = #{aliPid} and pid = #{pid}
     </update>
-
+    
 </mapper>
