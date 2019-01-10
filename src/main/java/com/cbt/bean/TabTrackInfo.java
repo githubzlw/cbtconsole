@@ -54,6 +54,16 @@ public class TabTrackInfo implements Serializable{
 
     private String admName;//负责人
 
+    private Date upStateTime;//手动标记正常时间
+
+    public Date getUpStateTime() {
+        return upStateTime;
+    }
+
+    public void setUpStateTime(Date upStateTime) {
+        this.upStateTime = upStateTime;
+    }
+
     public String getAdmName() {
         return admName;
     }

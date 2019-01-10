@@ -895,7 +895,10 @@
         actual_lwh,memberFee,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name username,
         u.email as userEmail,'' as buyer,exporttime,   '' storagetime,o.actual_weight_estimate as freightFee,  o.delivery_time as deliveryTime,  0  buyid,
         o.orderRemark,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount as gradeDiscount,u.businessName
-        ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume
+        ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume,
+        (SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.blackVlue=u.email) as backList,
+        (SELECT COUNT(1) FROM tblacklist a INNER JOIN order_address b ON a.blackVlue=b.address2 WHERE b.orderNo=o.order_no AND a.flag=0) as backAddressCount,
+        (SELECT COUNT(t.id) FROM payment f INNER JOIN tblacklist t ON f.username=t.blackVlue  WHERE f.orderid=o.order_no AND f.username&lt;>'' AND f.paystatus=1 AND t.flag=0) as payBackList
         from orderinfo o left join order_address a on o.order_no=a.orderNo
         left join zone z ON a.country=z.country left join user u  on  u.id =o.user_id
         left join order_fee of  on  of.orderno =o.order_no
