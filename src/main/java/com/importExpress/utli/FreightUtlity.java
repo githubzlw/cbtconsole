@@ -3,7 +3,6 @@ package com.importExpress.utli;
 import com.cbt.util.GetConfigureInfo;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
-import com.sun.xml.internal.bind.v2.TODO;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
