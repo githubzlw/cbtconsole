@@ -100,7 +100,7 @@
 
 
     <select id="query1688ByLire" resultMap="importProductResultMap">
-        select a.id,a.ali_pid,a.pid,b.price,a.match_local_path as img,b.sellunit as unit,b.catid1 as catid,b.weight,
+        select a.id,a.ali_pid,a.pid,b.price,a.match_local_path as img, b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.match_remote_path as remotpath,b.enname as name,
         b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
         b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit
