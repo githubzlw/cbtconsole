@@ -26,8 +26,35 @@ public class ImportProductBean {
 	private Integer bmFlag;
 	private Integer isBenchmark;
 	private String oldAliPid;
+	private Integer valid;//状态
+	private Integer soldFlag;//是否卖过
+	private Integer isEdit;//是否编辑过
 
-    public Integer getId() {
+    public Integer getSoldFlag() {
+		return soldFlag;
+	}
+
+	public void setSoldFlag(Integer soldFlag) {
+		this.soldFlag = soldFlag;
+	}
+
+	public Integer getIsEdit() {
+		return isEdit;
+	}
+
+	public void setIsEdit(Integer isEdit) {
+		this.isEdit = isEdit;
+	}
+
+	public Integer getValid() {
+		return valid;
+	}
+
+	public void setValid(Integer valid) {
+		this.valid = valid;
+	}
+
+	public Integer getId() {
         return id;
     }
 

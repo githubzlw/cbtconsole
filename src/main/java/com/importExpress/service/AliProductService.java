@@ -60,4 +60,5 @@ public interface AliProductService {
      * @return
      */
     int set1688PidFlag(String aliPid, String pid, int dealState,int adminId);
+    
 }

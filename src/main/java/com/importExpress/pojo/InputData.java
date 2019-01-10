@@ -90,8 +90,17 @@ public class InputData {
     private String score;
     private String is_edited;
     private Character crud;
+    private String rwKeyword;
+    
+    public String getRwKeyword() {
+		return rwKeyword;
+	}
 
-    public String getId() {
+	public void setRwKeyword(String rwKeyword) {
+		this.rwKeyword = rwKeyword;
+	}
+
+	public String getId() {
         return id;
     }
 

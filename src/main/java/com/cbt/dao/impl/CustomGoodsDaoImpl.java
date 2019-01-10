@@ -13,9 +13,10 @@ import com.importExpress.pojo.SkuValPO;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.UpdateTblModel;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -3635,6 +3636,75 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return rs > 0;
     }
 
+    
+    @Override
+    public boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        Connection conn27 = DBHelper.getInstance().getConnection();
+        PreparedStatement stmt28 = null;
+        PreparedStatement stmt31 = null;
+        PreparedStatement stmt27 = null;
+        String updateSql28 = "update custom_benchmark_ready_newest set ali_pid=?,ali_price=?,bm_flag=?,isBenchmark=?,finalName=?,rw_keyword=? where pid = ?";
+        String updateSql27 = "update custom_benchmark_ready set ali_pid=?,ali_price=?,bm_flag=?,isBenchmark=?,finalName=?,rw_keyword=? where pid = ?";
+        String updateSql31 = "replace into single_goods_offers_child(good_url,goods_pid,change_mark," +
+                "crawl_flag,service_ip) values(?,?,1,0,'')";
+        int rs = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql28);
+            stmt28.setString(1, aliPid);
+            stmt28.setString(2, aliPrice);
+            stmt28.setInt(3, bmFlag);
+            stmt28.setInt(4, isBenchmark);
+            stmt28.setString(5, edName);
+            stmt28.setString(6, rwKeyword);
+            stmt28.setString(7, pid);
+
+            stmt27 = conn27.prepareStatement(updateSql27);
+            stmt27.setString(1, aliPid);
+            stmt27.setString(2, aliPrice);
+            stmt27.setInt(3, bmFlag);
+            stmt27.setInt(4, isBenchmark);
+            stmt27.setString(5, edName);
+            stmt27.setString(6, rwKeyword);
+            stmt27.setString(7, pid);
+            
+            if(flag==1){
+	            stmt31 = conn31.prepareStatement(updateSql31);
+	            stmt31.setString(1, "https://detail.1688.com/offer/" + pid + ".html");
+	            stmt31.setString(2, pid);
+            }
+
+            // 线上MongoDB
+            boolean isSuccess = GoodsInfoUpdateOnlineUtil.setCustomerReadyMongoDb(pid,aliPid,aliPrice,bmFlag,isBenchmark,edName,rwKeyword);
+            if (isSuccess) {
+                rs = 1;
+                stmt28.executeUpdate();
+                stmt27.executeUpdate();
+                if(flag==1){
+                	stmt31.executeUpdate();
+                }
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",upCustomerReady error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",upCustomerReady error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            if(flag==1){
+            	DBHelper.getInstance().closePreparedStatement(stmt31);
+            	DBHelper.getInstance().closeConnection(conn31);
+            }
+            DBHelper.getInstance().closePreparedStatement(stmt27);
+            DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closeConnection(conn27);
+        }
+        return rs > 0;
+    }
+    
+    
+    
     @Override
     public boolean setNeverOff(String pid) {
         Connection conn28 = DBHelper.getInstance().getConnection8();
