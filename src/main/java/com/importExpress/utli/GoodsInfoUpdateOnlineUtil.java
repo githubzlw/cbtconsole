@@ -6,6 +6,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -248,6 +249,22 @@ public class GoodsInfoUpdateOnlineUtil {
         return updateOnlineAndSolr(inputData, 0);
     }
 
+    public static boolean setCustomerReadyMongoDb(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword) {
+        // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setAli_pid(aliPid);
+        inputData.setAli_price(aliPrice);
+        inputData.setBm_flag(String.valueOf(bmFlag));
+        inputData.setIsBenchmark(String.valueOf(isBenchmark));
+        inputData.setFinalName(edName);
+        inputData.setRwKeyword(rwKeyword);
+        inputData.setPid(pid);
+        return updateOnlineAndSolr(inputData, 0);
+    }
+    
+    
+    
+    
     /**
      * 替换字符串中的逗号
      *

@@ -2,6 +2,7 @@ package com.importExpress.mapper;
 
 import com.importExpress.pojo.AliProductBean;
 import com.importExpress.pojo.ImportProductBean;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -59,4 +60,5 @@ public interface AliProductMapper {
      * @return
      */
     int set1688PidFlag(@Param("aliPid") String aliPid, @Param("pid") String pid, @Param("dealState") int dealState, @Param("adminId") int adminId);
+    
 }
