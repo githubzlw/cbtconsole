@@ -557,7 +557,16 @@ b {
 				</c:if>
 			</td>
 			<!-- 发布状态时间  -->
-			<td id="state_${index.index}" style="font-size: 14px;"><c:if
+			<td id="state_${index.index}" style="font-size: 14px;">
+				<c:if test="${list.reviewCount > 0}">
+					<br>
+					<span>有评论</span>
+				</c:if>
+				<c:if test="${list.reviewCount <= 0}">
+					<br>
+					<span>暂无评论</span>
+				</c:if>
+				<c:if
 					test="${list.isEdited > 0}">
 					<br>
 					<span>商品编辑:已编辑</span>

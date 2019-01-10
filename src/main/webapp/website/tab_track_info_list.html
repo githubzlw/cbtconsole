@@ -146,7 +146,7 @@
         </div>
 		<!-- 模态框（Modal） 操作物流使用 -->
         <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog" style="width: 600px;">
+            <div class="modal-dialog" style="width: 680px;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -159,7 +159,9 @@
                             <input type="radio" name="trackState" value="2" checked="checked" style="float: left;height: 20px;" />
                             <span style="float: left;line-height: 30px;">&nbsp;1.出运中(或者原本是异常)&nbsp;&nbsp;</span>
                             <input type="radio" name="trackState" value="7" style="float: left;height: 20px;" />
-                            <span style="float: left;line-height: 30px;">&nbsp;2.手动标记正常</span><br />
+                            <span style="float: left;line-height: 30px;">&nbsp;2.手动标记正常&nbsp;&nbsp;</span>
+                            <input type="radio" name="trackState" value="3" style="float: left;height: 20px;" />
+                            <span style="float: left;line-height: 30px;">&nbsp;3.手动标记已签收(或者已经是已签收)</span><br />
                             <div style="clear:both"></div>
                             <span>&nbsp;&nbsp;标记备注:</span>
                             <span>&nbsp;&nbsp;(最后标记时间:</span>
@@ -169,7 +171,8 @@
                             <span>
                                 <br/>状态说明:
                                 <br/>1.修改到“出运中”后运单正常抓取,如果运单有异常,会出现在“运单预警”中;
-                                <br/>2.修改到“手动标记正常”后,运单不会出现在“运单预警”中。如果运单抓取中判断为签收状态,则状态会更新到“已签收”;“手动标记正常”标记7天有效,7天后如果运单异常则会继续出现在“运单预警”中。
+                                <br/>2.修改到“手动标记正常”后,运单不会出现在“运单预警”中。如果运单抓取中判断为签收状态,则状态会更新到“已签收”;“手动标记正常”标记7天有效,7天后如果运单异常则会继续出现在“运单预警”中;
+                                <br/>3.修改到“手动标记已签收”后,后续运单不会再抓取,线上此运单是签收状态(签收状态数据同步到线上需要10分钟左右)。
                             </span>
                         </div>
                     </div>
@@ -594,9 +597,11 @@
            		   success: function(msg){
            			   if(7 == msg.trackState){
            				  $('input[type=radio][name=trackState]').get(1).checked = "checked";
+           			   } else if(3 == msg.trackState){
+             			  $('input[type=radio][name=trackState]').get(2).checked = "checked";
            			   } else {
-             			  $('input[type=radio][name=trackState]').get(0).checked = "checked";
-           			   }
+                           $('input[type=radio][name=trackState]').get(0).checked = "checked";
+                       }
 					   $('#track_note').val(msg.trackNote);
 					   $('#track_note_time').text(formatterData2(msg.trackNoteTime, null, null));
                        $('#myModal2').modal('show');

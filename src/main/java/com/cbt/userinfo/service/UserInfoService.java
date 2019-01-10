@@ -24,7 +24,12 @@ public class UserInfoService implements IUserInfoService {
 	public List<String> getPaypal(int userID) {
 		return mapper.getPaypal(userID);
 	}
-	
+
+	@Override
+	public int checkUserName(String username) {
+		return mapper.checkUserName(username);
+	}
+
 	/**
 	 * 获取扩展用户信息
 	 */

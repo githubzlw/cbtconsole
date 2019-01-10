@@ -155,7 +155,13 @@ public class UserBehaviorStatisticsController {
             int payLogNum = dao.queryUserPayLog(beginDate, endDate);
 	        payLogInfo.setStatisticsNum(payLogNum);
             list.add(payLogInfo);
-
+            //9 点击添加购物车按钮数量
+            UserBehaviorBean addToOrder = new UserBehaviorBean();
+            addToOrder.setTypeDesc("Add to order 按钮点击次数");
+            addToOrder.setTypeFlag(12);
+            payLogNum = dao.queryBehaviorRecord(beginDate, endDate);
+            addToOrder.setStatisticsNum(payLogNum);
+            list.add(addToOrder);
             json.setOk(true);
             json.setData(list);
 
@@ -365,6 +371,15 @@ public class UserBehaviorStatisticsController {
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
                     int statisticsNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    makeOrderAllUser.setStatisticsNum(statisticsNum);
+                    makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
+                    list.add(makeOrderAllUser);
+                }
+            }else if ("12".equals(typeStr)) {
+                // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
+                for (int i = 1; i <= dateList.size() / 2; i++) {
+                    UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
+                    int statisticsNum = dao.queryBehaviorRecord(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);

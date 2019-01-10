@@ -46,7 +46,9 @@
    <select id="getPaypal" resultType="java.lang.String">
    		select username from payment where userid=#{userID} and username is not null   group by username
    </select>
-   
+   <select id="checkUserName" resultType="INTEGER">
+       SELECT count(1) FROM tblacklist v WHERE v.flag=0 AND v.blackVlue=#{username}
+   </select>
     <select id="getUserEx" parameterType="com.cbt.pojo.UserEx" resultMap="UserExResultMap">
    		select 
    		<include refid="userex_clumn_list"/>
