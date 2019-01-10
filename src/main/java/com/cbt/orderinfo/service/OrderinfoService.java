@@ -813,7 +813,7 @@ public class OrderinfoService implements IOrderinfoService {
 			String price1688 = Utility.getStringIsNull(odb.getCbrPrice()) ? odb.getCbrPrice() : "0";
 			String es_price=price1688;
 			if(odb.getState() ==1 || odb.getState() == 0){
-				es_price=StringUtil.getEsPrice(es_price);
+				es_price=StringUtil.getEsPriceNew(es_price,odb.getYourorder());
 			}else{
 				es_price="0.00";
 			}
@@ -1572,7 +1572,7 @@ public class OrderinfoService implements IOrderinfoService {
 			odb.setCar_type(StringUtil.isBlank(odb.getCar_type())? "" :odb.getCar_type());
 			String es_price=price1688;
 			if(odb.getState() ==1 || odb.getState() == 0){
-				es_price=StringUtil.getEsPrice(es_price);
+				es_price=StringUtil.getEsPriceNew(es_price,odb.getYourorder());
 			}else{
 				es_price="0.00";
 			}

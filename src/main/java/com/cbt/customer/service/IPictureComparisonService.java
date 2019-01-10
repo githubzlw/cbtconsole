@@ -2,10 +2,10 @@ package com.cbt.customer.service;
 
 import ceRong.tools.bean.DorpDwonBean;
 import com.cbt.bean.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-
 public interface IPictureComparisonService {
 	
 	/**

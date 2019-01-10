@@ -1,5 +1,9 @@
 package com.cbt.warehouse.util;
 
+import com.cbt.util.DoubleUtil;
+import com.importExpress.utli.FreightUtlity;
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,17 +12,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
- 
+
     // Delim style
     public static final String DELIM_DEFAULT = ".";
- 
+
     private StringUtil() {
         // Cannot be instantiated
     }
- 
+
     /**
      * 将指定对象转换成字符串
-     * 
+     *
      * @param obj
      *            指定对象
      * @return 转换后的字符串
@@ -30,10 +34,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 判断指定字符串是否等于null或空字符串
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 如果等于null或空字符串则返回true，否则返回false
@@ -41,10 +45,10 @@ public class StringUtil {
     public static boolean isBlank(String str) {
         return str == null || "".equals(str.trim()) || "null".equals(str.trim());
     }
- 
+
     /**
      * 判断指定字符串是否不等于null和空字符串
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 如果不等于null和空字符串则返回true，否则返回false
@@ -52,10 +56,10 @@ public class StringUtil {
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
     }
- 
+
     /**
      * 根据默认分隔符获取字符串前缀
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回前缀字符串
@@ -63,10 +67,10 @@ public class StringUtil {
     public static String getPrefix(String str) {
         return getPrefix(str, DELIM_DEFAULT);
     }
- 
+
     /**
      * 根据指定分隔符获取字符串前缀
-     * 
+     *
      * @param str
      *            指定字符串
      * @param delim
@@ -83,10 +87,10 @@ public class StringUtil {
         }
         return prefix;
     }
- 
+
     /**
      * 根据默认分隔符获取字符串后缀
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回字符串后缀
@@ -94,10 +98,10 @@ public class StringUtil {
     public static String getSuffix(String str) {
         return getSuffix(str, DELIM_DEFAULT);
     }
- 
+
     /**
      * 根据指定分隔符获取字符串后缀
-     * 
+     *
      * @param str
      *            指定字符串
      * @param delim
@@ -114,10 +118,10 @@ public class StringUtil {
         }
         return suffix;
     }
- 
+
     /**
      * 根据指定字符串和重复次数生成新字符串
-     * 
+     *
      * @param str
      *            指定字符串
      * @param repeatCount
@@ -131,10 +135,10 @@ public class StringUtil {
         }
         return buf.toString();
     }
- 
+
     /**
      * 隐藏字符串指定位置的字符
-     * 
+     *
      * @param str
      *            指定字符串
      * @param index
@@ -146,10 +150,10 @@ public class StringUtil {
     public static String hideChars(String str, int index, int length) {
         return hideChars(str, index, length, true);
     }
- 
+
     /**
      * 隐藏字符串指定位置的字符
-     * 
+     *
      * @param str
      *            指定字符串
      * @param start
@@ -176,14 +180,14 @@ public class StringUtil {
             }
             String temp = newString("*", confusion ? 4 : endIndex - startIndex);
             buf.append(str).replace(startIndex, endIndex, temp);
- 
+
         }
         return buf.toString();
     }
- 
+
     /**
      * 将指定字符串转换成大写
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回转换后的大写字符串
@@ -196,10 +200,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 将指定字符串转换成大写
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回转换后的大写字符串
@@ -212,10 +216,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 将指定字符串转换成驼峰命名方式
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回驼峰命名方式
@@ -238,10 +242,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 将指定字符串转换成匈牙利命名方式
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 转换后的匈牙利命名方式
@@ -262,10 +266,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 将指定字符串首字母转换成大写字母
-     * 
+     *
      * @param str
      *            指定字符串
      * @return 返回首字母大写的字符串
@@ -278,10 +282,10 @@ public class StringUtil {
         }
         return buffer.toString();
     }
- 
+
     /**
      * 将指定数组转换成字符串
-     * 
+     *
      * @param objs
      *            指定数组
      * @return 返回转换后的字符串
@@ -430,6 +434,51 @@ public class StringUtil {
         }
         if(es_price.indexOf("-")>-1){
             es_price=es_price.split("-")[0];
+        }
+        return es_price;
+    }
+    public static String getEsPriceNew(String es_price,int num){
+        //End：
+        String wholePrice = es_price;
+        boolean isTrue = false;
+        double sumWholePrice = 0d;
+        if(StringUtils.isNotBlank(wholePrice)){
+            wholePrice = wholePrice.replaceAll("[\\[\\]≥≤\\s*]", "");
+            String[] split = new String[]{};
+            int length = 1;
+            if(wholePrice.indexOf(",")>-1){
+                split = wholePrice.trim().split(",");
+                length = split.length;
+            }else {
+                split = new String[]{wholePrice};
+            }
+            String priceListStr = FreightUtlity.getPriceListStrTwo(length,split);
+            double currentPriceRange = FreightUtlity.getNextIntervalPrice(String.valueOf(length), num, String.valueOf(num), priceListStr, false);
+            sumWholePrice =currentPriceRange;
+            es_price = String.valueOf(sumWholePrice);
+        }else {
+            isTrue = true;
+        }
+        //如果其中一个商品没有获取到成本价，则沿用老的获取利润方法
+        if(isTrue){
+            if(es_price.indexOf(",")>-1) {
+                String prices=es_price.split(",")[0].replace("[","").replace(" ","").trim();
+                if(prices.indexOf("$") > -1){
+                    es_price =prices .split("\\$")[1];
+                }else if(prices.indexOf("￥") > -1){
+                    es_price =prices .split("￥")[1];
+                }
+            }else if(es_price.indexOf("[")>-1){
+                es_price=es_price.replace("[","").replace("]","").replace(" ","");
+                if(es_price.indexOf("$") > -1){
+                    es_price =es_price .split("\\$")[1];
+                }else if(es_price.indexOf("￥") > -1){
+                    es_price =es_price .split("￥")[1];
+                }
+            }
+            if(es_price.indexOf("-")>-1){
+                es_price=es_price.split("-")[0];
+            }
         }
         return es_price;
     }
