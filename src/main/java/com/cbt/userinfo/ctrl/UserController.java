@@ -200,13 +200,20 @@ public class UserController {
         //@author  zhulg 获取扩展用户信息
         UserEx userex = userInfoService.getUserEx(userId);
         request.setAttribute("userex", userex);
+        int backList=userInfoService.checkUserName(String.valueOf(listu.get("email")));
+        request.setAttribute("backList",backList);
         //获取用户地址
         List<Address> addresslist = iOrderServer.getUserAddr(userId);
         request.setAttribute("addresslist", addresslist);
         //获取paypal账号
         List<String> paypayList = userInfoService.getPaypal(userId);
+        //判断paypal账号是否有黑名单
+        int payBackList=0;
+        for(String username:paypayList){
+            payBackList+=userInfoService.checkUserName(username);
+        }
         request.setAttribute("paypays", paypayList);
-
+        request.setAttribute("payBackList", payBackList);
 
         // I总的实际到账金额 payment 中 paypal+wiretransfer
         Map<String, Double> paysUserid = paymentDao.getPaysUserid(userId);
@@ -304,11 +311,13 @@ public class UserController {
         //获取客户的全部订单数据
         List<OrderBean> orderList = paymentDao.queryOrderInfoByUserId(userId);
         //计算实际应付PayPal金额
+        int backAddressCount=0;
         for(OrderBean odIf : orderList){
             odIf.setActualPay(0);
+            backAddressCount+=odIf.getBackAddressCount();
         }
         request.setAttribute("orderList", orderList);
-
+        request.setAttribute("backAddressCount",backAddressCount);
         List<RechangeRecord> rcRds = paymentDao.queryRechangeRecordByUserId(userId);
         //统计余额总收入，补偿总收入和余额总支出
         double balanceTotalRevenue = 0;//余额总收入

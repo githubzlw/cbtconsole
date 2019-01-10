@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class SendEmailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+
     public SendEmailServlet() {
         super();
         // TODO Auto-generated constructor stub
@@ -44,7 +44,7 @@ public class SendEmailServlet extends HttpServlet {
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/plain");
 	}
-    
+
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
@@ -56,8 +56,8 @@ public class SendEmailServlet extends HttpServlet {
 		String needs=request.getParameter("needs");
 		Map<String,Object> resultMap=new HashMap<String,Object>();
 		Map<String,List<Map<String, String>>> addressMap=new HashMap<String,List<Map<String, String>>>();
-    	Map<String, String> paramsMap=new HashMap<String, String>(); 
-    	Map<String, String> paramsMap2=new HashMap<String, String>(); 
+    	Map<String, String> paramsMap=new HashMap<String, String>();
+    	Map<String, String> paramsMap2=new HashMap<String, String>();
     	paramsMap.put("address", "contact@sourcing-cn.com");
     	paramsMap.put("content", "company:"+company+"\r\n email:"+email+"\r\n ordervalue:"+ordervalue+"\r\n needs:"+needs);
     	List<Map<String, String>> list=new ArrayList<Map<String,String>>();
@@ -69,7 +69,7 @@ public class SendEmailServlet extends HttpServlet {
     	int result=MessageSender.startSendMail(addressMap);
     	if(result==1){
     		Map<String,List<Map<String, String>>> addressMap2=new HashMap<String,List<Map<String, String>>>();
-	    	Map<String, String> paramsMap3=new HashMap<String, String>(); 
+	    	Map<String, String> paramsMap3=new HashMap<String, String>();
 	    	paramsMap3.put("address", email);
 	    	List<Map<String, String>> list2=new ArrayList<Map<String,String>>();
 	    	list2.add(paramsMap3);
@@ -91,7 +91,7 @@ public class SendEmailServlet extends HttpServlet {
 		out.flush();
 		out.close();
 	}
-	
+
 	//后台发送邮件按钮
 	public void sendEmail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String emailInfo=request.getParameter("emailInfo");
@@ -122,7 +122,7 @@ public class SendEmailServlet extends HttpServlet {
 		out.flush();
 		out.close();
 	}
-	
+
 	//后台发送邮件按钮-提醒支付运费
 	public void sendEmail_fright(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String orderNo=request.getParameter("orderNo");
@@ -158,7 +158,7 @@ public class SendEmailServlet extends HttpServlet {
 //		sbBuffer.append("This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any questions or concerns, Access your account "+
 //				"<a style='color: #0070C0' href='"+AppConfig.ip_email+path1+"'>here</a>.");
 //		sbBuffer.append("</div></div></div>");
-		
+
 		sbBuffer.append("<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear "+toEmail+"</div>");
 		double actual_ffreight_ = Utility.getIsDouble(actual_ffreight)? Double.parseDouble(actual_ffreight):0;
 		double actual_weight_ = Utility.getIsDouble(actual_weight)? Double.parseDouble(actual_weight):0;
@@ -174,7 +174,7 @@ public class SendEmailServlet extends HttpServlet {
 		if(actual_weight_ > weight_){
 			sbBuffer.append("The original estimated shipping weight is " + weight + ", but the actual weight is " + actual_weight + ".  So, the shipping cost has changed from " + currency + ys_ffreight + " to " + currency + actual_ffreight + ".");
 		}
-		
+
 		actual_ffreight_ = new BigDecimal(actual_ffreight_-price_).setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
 		if(price_ > 0){
 			sbBuffer.append("We have also granted you an additional discount of "+currency+price_+".  This reduces shipping cost from " + currency + ys_ffreight + " to " + currency + actual_ffreight_ + ".");
@@ -192,14 +192,14 @@ public class SendEmailServlet extends HttpServlet {
 		String path = UUIDUtil.getAutoLoginPath("/orderInfo/emailLink?orderNo="+orderNo, uuid);
 		sbBuffer.append("<br>Click <a href='"+AppConfig.ip_email+path+"'>here</a> to go to import-express.com to pay.</div>");
 //		sbBuffer.append("<br>Click <a href='"+AppConfig.ip_email+"/processesServlet?action=emailLink&className=OrderInfo&orderNo="+orderNo+"'>here</a> to go to import-express.com to pay.</div>");
-		sbBuffer.append("<br><div style='font-weight: bolder;'>Best regards</div><div style='font-weight: bolder;margin-bottom: 10px;'>Import-Express.com</div>"); 
+		sbBuffer.append("<br><div style='font-weight: bolder;'>Best regards</div><div style='font-weight: bolder;margin-bottom: 10px;'>Import-Express.com</div>");
 		sbBuffer.append("<div style='border: 2px solid;background-color: #A5A5A5;padding-left: 10px;'><div style='margin-bottom: 10px;font-weight: bolder;'>PLEASE NOTE:</div>");
 		sbBuffer.append("<div style='margin-bottom: 10px;font-size: 13px;'>");
 		path = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
 		sbBuffer.append("This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any questions or concerns, Access your account "+
 				"<a style='color: #0070C0' href='"+AppConfig.ip_email+path+"'>here</a>.");
 		sbBuffer.append("</div></div></div>");
-		
+
 		String sendemail = null;
 	    String pwd = null;
 		 if(Utility.getStringIsNull(copyEmail)){
@@ -216,7 +216,7 @@ public class SendEmailServlet extends HttpServlet {
 		out.flush();
 		out.close();
 	}
-	
+
 	public void chaPsendEmail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String emailInfo=request.getParameter("emailInfo");
 		String email=request.getParameter("email");
@@ -224,7 +224,7 @@ public class SendEmailServlet extends HttpServlet {
 		String orderNo=request.getParameter("orderNo");
 		String userId=request.getParameter("userId");
 		String title = request.getParameter("title");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		ips.updateCgdEmailFlag(orderNo);
 		//线上插入changegooddata数据

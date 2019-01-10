@@ -238,7 +238,7 @@ public class QueryUserController {
 		try {
 			return queryUserService.queryAuthInfo(authId);
 		} catch (Exception e) {
-			System.out.println(e);
+			LOG.error("queryAuthInfo[{}]",e.getMessage());
 		}
 		return null;
 	}
