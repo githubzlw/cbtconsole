@@ -510,7 +510,19 @@ public interface CustomGoodsDao {
 	 */
 	boolean setNoBenchmarking(String pid, double finalWeight);
 
-
+    /**
+     * 更新对标关联数据 
+     * 精准对标更新产品表ali_pid,ali_price,bm_flag=1,isBenchmark=1,
+     *
+     * @param pid
+     * @param aliPid
+     * @param aliPrice
+     * @param bmFlag
+     * @param isBenchmark
+     * @return
+     */
+    boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag);
+    
 	/**
 	 * 设置永不下架标识
 	 * @param pid

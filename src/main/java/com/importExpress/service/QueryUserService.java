@@ -35,4 +35,5 @@ public interface QueryUserService {
 
     long updateAuthInfo(AuthInfo authInfo, String url, String urlFlag, String colorFlag);
 
+    void updateNeedOffShelfData();
 }

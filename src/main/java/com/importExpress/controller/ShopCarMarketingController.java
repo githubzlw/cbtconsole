@@ -385,7 +385,9 @@ public class ShopCarMarketingController {
                 modelM.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
                 modelM.put("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
                 modelM.put("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
-                modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                if(productCost > 0){
+                    modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
+                }
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
@@ -1235,21 +1237,18 @@ public class ShopCarMarketingController {
                 }
             }
             shopCarMarketingList.clear();
-            if (resultList.size() > 0) {
-                double offCost = productCost - actualCost;
-                mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
-                mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
-                mv.addObject("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
-                mv.addObject("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
+            double offCost = productCost - actualCost;
+            mv.addObject("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
+            mv.addObject("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
+            mv.addObject("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
+            mv.addObject("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
+            if(productCost > 0){
                 mv.addObject("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
-                mv.addObject("success", 1);
-                mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
-                mv.addObject("updateList", resultList);
-                mv.addObject("sourceList", sourceList);
-            } else {
-                mv.addObject("message", "未设置商品价格，请先设置后打开此页面");
-                mv.addObject("success", 0);
             }
+            mv.addObject("success", 1);
+            mv.addObject("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+            mv.addObject("updateList", resultList);
+            mv.addObject("sourceList", sourceList);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("genShoppingCarMarketingEmail error:" + e.getMessage());

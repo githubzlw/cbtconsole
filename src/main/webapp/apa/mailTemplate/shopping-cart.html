@@ -73,7 +73,7 @@
     .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
     .order_first{ width: 100%; margin: 0 auto 15px; }
     .order_first2{ margin: 0 auto 0;}
-    .order_first ul{ width: 100%; margin-bottom: 5px; border-bottom: 1px dashed #aaabaf; overflow: hidden;box-sizing:border-box;}
+    .order_first ul{ width: 100%; margin: 0 auto; overflow: hidden;box-sizing:border-box;}
     .order_li{ float: left; width:225px;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
         list-style:none; height: 338px; overflow:hidden;text-align: left;box-sizing:border-box;}
     .order_img{ width:100%; cursor: pointer; }
@@ -225,7 +225,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                    <td class="soapbox-title">Hey <em th:text="${userEmail}">[]</em>, your cart is expiring soon</td>
+                    <td class="soapbox-title">You have made some wonderful selections</td>
                   </tr>
                 </table>
 
@@ -262,18 +262,9 @@
                               <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong> <span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span></p>
                              </li>
                            </ul>
-                          <div class="order_usd">
-                            <strong>Products Cart Total: <em>USD</em>
-                              <em th:text="${productCost}">36.0</em> </strong>
-                          </div>
-                          <div class="order_usd">
-                            <strong>Final Due:<em>USD</em>
-                              <em th:text="${actualCost}">28.8</em> </strong>
-                          </div>
-
                           <div class="order_usd order_usd_due">
-                            <p class="order_off"><strong>Shop Cart Final Due:
-                              <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong>Shop Cart Total:<em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>
+                            <p class="order_off"><strong>Products Cart Final Total:
+                              <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong>Products Cart Total:<em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>
                             <p class="estima_time estima_time_color">You have saved :USD <span th:text="${offCost}">7.2</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">If you have any further concerns or questions please feel free to ask me by responding to this Email.</p>
@@ -285,7 +276,7 @@
                         <tr>
                           <td class="body-signature-cell order_cart_bottom">
                             <p class="thanks_so">Yours Sincerely,</p>
-                              <p class="thanks_so"> <span th:text="${adminName}">Lena</span> | Lenaeting Manager</p>
+                              <p class="thanks_so"> <strong th:text="${adminName}">Lena</strong> | Lenaeting Manager</p>
                             <p class="thanks_so"> Marketing Department</p>
                             <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
