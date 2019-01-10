@@ -106,7 +106,7 @@
         b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit
         from aa_ali_product_lire a
         INNER JOIN custom_benchmark_ready b
-        on a.pid = b.pid 
+        on a.pid = b.pid  
 				LEFT JOIN custom_goods_edit c
 				on b.pid = c.pid and c.is_edited=1
         where a.ali_pid = #{aliPid}
