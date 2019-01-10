@@ -163,7 +163,7 @@
                 "status": type,
             });
         }
-        
+
         function formatPP(val, row, index) {
         	if(row.apiType.indexOf('Paypal')>-1){
 	        	if(row.merchantID=='584JZVFU6PPVU'){
@@ -188,9 +188,9 @@
 				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
         	}
         	return '';
-        	
+
     	}
-        
+
         function formatOrder(val, row, index) {
         	if(row.orderNo == undefined ){
         		return 'undefind';
@@ -220,7 +220,7 @@
             });
         }
         function linkComplain(userid,disputeID,merchantID){
-        	
+
         	$.ajax({
     			type:'POST',
     			dataType:'text',
@@ -240,7 +240,7 @@
     					}
     					html +='</div>';
     				}
-    				
+
     				$.dialog({
 						title : '关联投诉',
 						content : html,
@@ -264,26 +264,26 @@
 									url:'/cbtconsole/complain/dispute/update',
 									data:{id:id,disputeid:dispute_merchant,merchantid:merchantID},
 									success:function(res){
-										location.reload(); 
+										location.reload();
 									},
 									error:function(XMLResponse){
 										alert('error');
 									}
-								}); 
+								});
 							}
-							
+
 						},
 						cancel : function() {
 						}
 					});
-    				
-    				
+
+
     			},
     			error:function(XMLResponse){
     				alert('error');
     			}
-    		}); 
-        	
+    		});
+
         }
         function selectComplain(id){
         	$(".c_"+id).removeClass("c_radio");
@@ -305,7 +305,7 @@
 				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
                                                  style="width: 110px; height: 24px;" type="text" value=""
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;&nbsp;&nbsp; 
+			</span>&nbsp;&nbsp;&nbsp;&nbsp;
         <span> 状态: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
             <option value="-1">全部</option>
             <option value="0">open</option>
@@ -315,9 +315,9 @@
         </select></span>
         &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
                                               class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      
+
       <span>等待退款(<a target="_blank" href="/cbtconsole/apa/disputerefund.html" id="confirm_count">0</a>)</span>
-      
+
     </form>
 </div>
 

@@ -11,13 +11,18 @@ import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.AdminRUserExample;
+import com.importExpress.pojo.Outofstockdemandtable;
 import com.importExpress.pojo.UserBean;
 import com.importExpress.service.AdminRUserServiece;
 import com.importExpress.service.OrderSplitService;
+import com.importExpress.service.OutofstockdemandService;
 import com.importExpress.service.ReorderService;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
+import org.opencv.ml.EM;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +52,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/customerRelationshipManagement")
 public class CustomerRelationshipManagementController {
+    private static final Logger logger = LoggerFactory.getLogger(CustomerRelationshipManagementController.class);
     @Autowired
     private AdminRUserServiece adminRUserServiece;
     @Autowired
@@ -55,6 +61,8 @@ public class CustomerRelationshipManagementController {
     private  IOrderinfoService iOrderinfoService;
     @Autowired
     private OrderSplitService orderSplitService;
+    @Autowired
+    private OutofstockdemandService out;
     /**
      * @Title: queryTheNumCustomersUnderSaler
      * @Author: cjc
@@ -154,10 +162,11 @@ public class CustomerRelationshipManagementController {
         return "reorder";
     }
     @RequestMapping(value = "/getOutofstockdemandList")
-    public EasyUiJsonResult getOutofstockdemandtable(HttpServletRequest request) throws Exception {
+    public EasyUiJsonResult getOutofstockdemandtable(HttpServletRequest request,HttpServletResponse response) throws Exception {
         EasyUiJsonResult json = new EasyUiJsonResult();
         int startNum = 0;
         int limitNum = 50;
+        long total = 0l;
         String pageStr = request.getParameter("page");
         String limitNumStr = request.getParameter("rows");
 
@@ -181,6 +190,25 @@ public class CustomerRelationshipManagementController {
             edtime = "";
         } else {
             edtime += " 23:59:59";
+        }
+        String email = request.getParameter("email");
+        String flagStr = request.getParameter("flag");
+        int flag = -1;
+        if(StringUtils.isNotBlank(flagStr)){
+            flag = Integer.parseInt(flagStr);
+        }
+        String itemid = request.getParameter("itemid");
+        try {
+            List<Outofstockdemandtable> outofstockdemandList = out.getOutofstockdemandList(startNum, limitNum, sttime, edtime, email, flag, itemid);
+            total = outofstockdemandList.stream().count();
+            json.setTotal((int)total);
+            json.setRows(outofstockdemandList);
+            json.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setSuccess(false);
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            logger.error("获取数据失败，原因：" + e.getMessage());
         }
         return json;
     }

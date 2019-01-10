@@ -191,7 +191,27 @@
 </head>
 <body>
 
+<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
+    <form id="groupbuy_query_form" action="#" onsubmit="return false;">
+			<span> email: <input type="text" id="email"
+                                 style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+				creatime: <input id="query_sttime" class="Wdate"
+                                 style="width: 110px; height: 24px" type="text" value=""
+                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
+                                                 style="width: 110px; height: 24px;" type="text" value=""
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+			</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span> Flag: <select id="query_type" style="font-size: 16px; height: 28px; width: 200px;">
+            <option value="-1">全部</option>
+            <option value="0">未发送邮件</option>
+            <option value="1">已经发送邮件</option>
+        </select></span>
+        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
+                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+    </form>
+</div>
 
 <table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
        class="easyui-datagrid">
