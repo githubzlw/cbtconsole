@@ -331,4 +331,31 @@ public class QueryUserServiceImpl implements QueryUserService {
         }
         return queryUserMapper.updateAuthInfo(authInfo);
     }
+
+    @Override
+    public void updateNeedOffShelfData() {
+        //时间范围内用户
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        //一周到两周
+        calendar.add(Calendar.DATE, -360);
+        String startDate = sdf.format(calendar.getTime()).toString() + " 00:00";
+
+        //查询已卖过的27 type=1
+        List<String> pidList = queryUserMapper.queryBoughtGoods(startDate);
+        //查询加过购物车的27 type=2
+        List<String> pidList2 = queryUserMapper.queryCarProducts(startDate);
+        //保存到28
+        DataSourceSelector.set("dataSource28hop");
+        //清空原表中数据
+        queryUserMapper.deleteNeedoffshelfSoldAll();
+        if (pidList != null && pidList.size() > 0) {
+            queryUserMapper.insertNeedoffshelfSoldPid(pidList, 1);
+        }
+        if (pidList2 != null && pidList2.size() > 0) {
+            queryUserMapper.insertNeedoffshelfSoldPid(pidList2, 2);
+        }
+        DataSourceSelector.restore();
+    }
 }

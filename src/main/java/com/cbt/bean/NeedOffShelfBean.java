@@ -17,7 +17,15 @@ public class NeedOffShelfBean {
     private String endTime;
     private int startNum;
     private int limitNum;
+    private int soldFlag;
 
+    public int getSoldFlag() {
+        return soldFlag;
+    }
+
+    public void setSoldFlag(int soldFlag) {
+        this.soldFlag = soldFlag;
+    }
 
     public int getId() {
         return id;
