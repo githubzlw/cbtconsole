@@ -368,6 +368,11 @@
                 showMessage("获取橱窗图为空");
                 return;
             }
+            var bizPrice = $("#biz_price").val();
+            if(bizPrice == null || bizPrice == "" || bizPrice == 0){
+                showMessage("获取bizPrice为空");
+                return;
+            }
             var wprice = "";
             var feePrice = "";
             var singSkus = "";
@@ -469,6 +474,7 @@
                         "wprice": wprice.substring(1),
                         "feePrice":feePrice.substring(1),
                         "rangePrice": range_price,
+                        "bizPrice": bizPrice,
                         "goodsPrice": goodsPriceVal,
                         "sellUtil": sellUtil,
                         "typeRepalceIds": typeRepalceIds.substring(1),
@@ -1767,7 +1773,7 @@
                             <div class="goods_p">
                                 <p class="goods_color">bizPrice:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur">${goods.fpriceStr}</span>
+                                    <span class="goods_cur"><input class="pr_txt" id="biz_price" value="${goods.fpriceStr}"/></span>
                                 </p>
                             </div>
                             <div class="goods_p">
