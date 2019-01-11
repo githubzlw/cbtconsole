@@ -802,6 +802,12 @@
         <if test="sellUnit != null">
             ,b.sellunit=#{sellUnit}
         </if>
+        <if test="fpriceStr != null">
+            ,b.fprice_str=#{fpriceStr}
+        </if>
+        <if test="priceIsEdit > 0">
+            ,a.price_is_edit=#{priceIsEdit}
+        </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
 

@@ -67,6 +67,7 @@ public class PublishGoodsToOnlie extends Thread {
 
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            goods.setIsUpdateImg(isUpdateImg);
             // 判断是否处于发布中的状态
             if (goods.getGoodsState() != 1) {
 

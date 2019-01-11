@@ -181,7 +181,7 @@ public class EditorController {
             request.setAttribute("typeNames", typeNames);
         }
 
-        //判断是否是非免邮商品(isSoldFlag > 0)，如果是则显示非免邮价格显示
+        //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
         if (goods.getSoldFlag() > 0) {
             if (StringUtils.isNotBlank(goods.getFeeprice())) {
                 request.setAttribute("feePrice", goods.getFeeprice());
@@ -620,6 +620,15 @@ public class EditorController {
                 return json;
             }
 
+            String bizPrice = request.getParameter("bizPrice");
+            if (StringUtils.isNotBlank(bizPrice) || "0".equals(bizPrice)) {
+                cgp.setFpriceStr(bizPrice);
+            } else {
+                json.setOk(false);
+                json.setMessage("获取bizPrice失败");
+                return json;
+            }
+
             String rangePrice = request.getParameter("rangePrice");
 
             if (rangePrice == null || "".equals(rangePrice)) {
@@ -695,6 +704,13 @@ public class EditorController {
                         return json;
                     }
                 }
+            }
+
+            // 判断是否改价 wprice range_price feeprice price  fprice_str
+            if(checkPriceIsUpdate(cgp,orGoods)){
+                System.err.println("pid:" + pidStr + ",not update price");
+            }else{
+                cgp.setPriceIsEdit(1);
             }
 
             //获取需要删除的规格ids数据，进行匹配删除
@@ -836,6 +852,53 @@ public class EditorController {
             LOG.error("保存错误，原因：" + e.getMessage());
         }
         return json;
+    }
+
+    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp,CustomGoodsPublish orGoods){
+        int count = 0;
+        // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
+        // wprice
+        if(StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())){
+            if(cgp.getWprice().equals(orGoods.getWprice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())){
+            count ++;
+        }
+        // range_price
+        if(StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())){
+            if(cgp.getRangePrice().equals(orGoods.getRangePrice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())){
+            count ++;
+        }
+        // feeprice
+        if(StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())){
+            if(cgp.getFeeprice().equals(orGoods.getFeeprice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())){
+            count ++;
+        }
+        // price
+        if(StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())){
+            if(cgp.getPrice().equals(orGoods.getPrice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())){
+            count ++;
+        }
+        // fprice_str
+        if(StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())){
+            if(cgp.getFpriceStr().equals(orGoods.getFpriceStr())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())){
+            count ++;
+        }
+
+        return count == 5;
     }
 
     // 处理sku数据，跟参数传递过来的价格数据进行赋值
