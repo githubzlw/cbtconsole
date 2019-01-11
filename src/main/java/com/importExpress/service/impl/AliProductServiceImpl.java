@@ -5,6 +5,7 @@ import com.importExpress.pojo.AliProductBean;
 import com.importExpress.pojo.ImportProductBean;
 import com.importExpress.service.AliProductService;
 import com.importExpress.utli.GoodsPricePraseUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,4 +50,5 @@ public class AliProductServiceImpl implements AliProductService {
     public int set1688PidFlag(String aliPid, String pid, int dealState,int adminId) {
         return aliProductMapper.set1688PidFlag(aliPid, pid, dealState,adminId);
     }
+    
 }
