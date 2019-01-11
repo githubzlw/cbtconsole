@@ -1,5 +1,6 @@
 package com.importExpress.controller;
 
+import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -11,13 +12,12 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.Utility;
+import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.HotCategoryShow;
 import com.importExpress.pojo.HotSellGoods;
 import com.importExpress.pojo.HotSellGoodsShow;
 import com.importExpress.service.HotManageService;
-import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.OKHttpUtils;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,9 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/hotManage")
@@ -60,6 +58,9 @@ public class HotManageController {
 
     @Autowired
     private HotGoodsService hotGoodsService;
+
+    @Autowired
+    private CustomGoodsService customGoodsService;
 
     /**
      * 分页查询类别信息
@@ -987,6 +988,55 @@ public class HotManageController {
 			return 0;
 		}
 	}
+
+
+
+	@RequestMapping(value = "/useGoodsPromotionFlag")
+    @ResponseBody
+    public JsonResult useGoodsPromotionFlag(HttpServletRequest request, HttpServletResponse response) {
+
+        GoodsEditBean editBean = new GoodsEditBean();
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null) {
+            json.setOk(false);
+            json.setMessage("获取登录用户信息失败");
+            return json;
+        } else {
+            editBean.setAdmin_id(user.getId());
+        }
+
+        String pids = request.getParameter("pids");
+        if (StringUtils.isBlank(pids)) {
+            json.setOk(false);
+            json.setMessage("获取商品PID失败");
+            return json;
+        }
+
+        try {
+            editBean.setPromotion_flag(1);
+            String[] pidList = pids.split(",");
+            for (String pid : pidList) {
+                if (StringUtils.isNotBlank(pid)) {
+                    editBean.setPid(pid);
+                    customGoodsService.updatePidIsEdited(editBean);
+                    customGoodsService.insertIntoGoodsEditBean(editBean);
+                    customGoodsService.updatePromotionFlag(pid);
+                }
+            }
+            json.setOk(true);
+            json.setMessage("执行成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("更新热卖商品热销标识失败，原因：" + e.getMessage());
+            LOG.error("更新热卖商品热销标识失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
 
 	/**
