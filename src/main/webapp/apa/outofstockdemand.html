@@ -121,7 +121,7 @@
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 nowrap: false,//超出换行
                 rownumbers: true,
-                pageSize: 20,//默认选择的分页是每页50行数据
+                pageSize: 50,//默认选择的分页是每页50行数据
                 pageList: [20, 30, 50],//可以选择的分页集合
                 pagination: true,//分页
                 style: {
@@ -140,9 +140,9 @@
          * 页面首次查询
          */
         function doQuery() {
-            var disputeid = $("#pid_id").val();
-            if (disputeid == null || disputeid == "") {
-                disputeid = "";
+            var email = $("#email").val();
+            if (email == null || email == "") {
+                email = "";
             }
             var sttime = $("#query_sttime").val();
             if (sttime == null || sttime == "") {
@@ -157,10 +157,10 @@
                 type = -1;
             }
             $("#groupbuy_easyui-datagrid").datagrid("load", {
-                "disputeid": disputeid,
+                "email": email,
                 "sttime": sttime,
                 "edtime": edtime,
-                "status": type,
+                "flag": type,
             });
         }
 
@@ -217,14 +217,13 @@
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'id',width:'80px'">ID</th>
+       <!-- <th data-options="field:'id',width:'80px'">ID</th>-->
         <th data-options="field:'email',width:'80px'">Email</th>
-        <th data-options="field:'itemid',width:'80px'">订单号</th>
-        <th data-options="field:'goodstype',align:'left',width:'210px'">原因</th>
-        <th data-options="field:'updateTime',align:'center',width:'80px'">最后更新时间</th>
-        <th data-options="field:'creatime',align:'center',width:'150px'">创建时间</th>
-        <th data-options="field:'action',align:'center',width:'50px',formatter:formatAction">操作</th>
-
+        <th data-options="field:'itemid',width:'80px'">产品id</th>
+        <th data-options="field:'goodstype',align:'left',width:'80px'">产品类别id</th>
+        <th data-options="field:'etime',align:'center',width:'80px'">最后更新时间</th>
+        <th data-options="field:'ctime',align:'center',width:'150px'">创建时间</th>
+        <th data-options="field:'flag',align:'center',width:'50px'">是否发送邮件</th>
     </tr>
     </thead>
     <tbody>

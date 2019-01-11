@@ -15,10 +15,7 @@ import com.cbt.util.Utility;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.TemplateType;
 import com.cbt.website.util.EasyUiJsonResult;
-import com.importExpress.pojo.AdminRUser;
-import com.importExpress.pojo.AdminRUserExample;
-import com.importExpress.pojo.Outofstockdemandtable;
-import com.importExpress.pojo.UserBean;
+import com.importExpress.pojo.*;
 import com.importExpress.service.AdminRUserServiece;
 import com.importExpress.service.OrderSplitService;
 import com.importExpress.service.OutofstockdemandService;
@@ -45,8 +42,12 @@ import javax.jws.Oneway;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Result;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 /**
  * *****************************************************************************************
@@ -191,6 +192,7 @@ public class CustomerRelationshipManagementController {
         return result;
     }
     @RequestMapping(value = "/getOutofstockdemandList")
+    @ResponseBody
     public EasyUiJsonResult getOutofstockdemandtable(HttpServletRequest request,HttpServletResponse response) throws Exception {
         EasyUiJsonResult json = new EasyUiJsonResult();
         int startNum = 0;
@@ -210,13 +212,13 @@ public class CustomerRelationshipManagementController {
 
         String sttime = request.getParameter("sttime");
         if (sttime == null || "".equals(sttime)) {
-            sttime = "";
+            sttime = "2018-12-12 00:00:00";
         } else {
             sttime += " 00:00:00";
         }
         String edtime = request.getParameter("edtime");
         if (edtime == null || "".equals(edtime)) {
-            edtime = "";
+            edtime = "2050-12-12 23:59:59";
         } else {
             edtime += " 23:59:59";
         }
@@ -228,9 +230,19 @@ public class CustomerRelationshipManagementController {
         }
         String itemid = request.getParameter("itemid");
         try {
+           /* OutofstockdemandtableExample example = new OutofstockdemandtableExample();
+            int count = out.countByExample(example);*/
             List<Outofstockdemandtable> outofstockdemandList = out.getOutofstockdemandList(startNum, limitNum, sttime, edtime, email, flag, itemid);
             total = outofstockdemandList.stream().count();
-            json.setTotal((int)total);
+            outofstockdemandList = outofstockdemandList.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+            outofstockdemandList.stream().forEach(e -> {
+                e.setCtime(sdf.format(e.getCreatime()));
+                e.setEtime(sdf.format(e.getUpdatetime()));
+                e.setItemid("<a href ='https://www.import-express.com/goodsinfo/cbtconsole-1"+e.getItemid()+".html' target='_blank'>"+e.getItemid()+"</a>");
+                    }
+            );
+            json.setTotal((int) total);
             json.setRows(outofstockdemandList);
             json.setSuccess(true);
         } catch (Exception e) {

@@ -113,7 +113,6 @@ public class OutofstockdemandServiceImpl implements OutofstockdemandService {
             criteria.andEmailEqualTo(email);
         }
         List<Outofstockdemandtable> list = out.selectByExample(example);
-        list = list.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
         return list;
     }
 }
