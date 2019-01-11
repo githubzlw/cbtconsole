@@ -14,8 +14,10 @@ import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -332,6 +334,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsDao.setNoBenchmarking(pid, finalWeight);
     }
 
+    @Override
+    public boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag) {
+        return customGoodsDao.upCustomerReady(pid, aliPid,aliPrice,bmFlag,isBenchmark,edName,rwKeyword,flag);
+    }
+    
+    
     @Override
     public boolean setNeverOff(String pid) {
         return customGoodsDao.setNeverOff(pid);

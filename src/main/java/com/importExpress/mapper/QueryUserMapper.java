@@ -67,5 +67,12 @@ public interface QueryUserMapper {
     long updateAuthInfo(AuthInfo authInfo);
 
     Integer queryOrderNoByModuleType(@Param("moduleType") int moduleType);
-    
+
+    List<String> queryBoughtGoods(@Param("startDate") String startDate);
+
+    List<String> queryCarProducts(@Param("startDate") String startDate);
+
+    void insertNeedoffshelfSoldPid(@Param("list") List<String> list, @Param("type") Integer type);
+
+    void deleteNeedoffshelfSoldAll();
 }
