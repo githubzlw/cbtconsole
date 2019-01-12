@@ -264,27 +264,33 @@ public class UserController {
         double compensateAmount = additionalBalanceService.getMoneyAmount(userId);// 总的额外奖励或者补偿
         financial.setCompensateAmount(BigDecimalUtil.truncateDouble(compensateAmount, 2));
 
-        //算法1：账号应有余额 = 总的实际到账金额 - 总的实际完成订单金额 + 额外奖励或补偿-实际发放的  退款或提现
-
-        double dueBalance = actualPayAmount - actualOrderAmount + compensateAmount - totalApplyRefund;
-        financial.setDueBalance(BigDecimalUtil.truncateDouble(dueBalance, 2));
-
         //算法2：账号应有余额 = 被取消的订单金额 - 余额支付的金额 + 额外奖励或补偿-实际发放的  退款或提现 + 充值
-        dueBalance = cancelOrderAmount - balancePay + compensateAmount - totalApplyRefund + payForBalance;
-
+        double dueBalance = cancelOrderAmount - balancePay + compensateAmount - totalApplyRefund + payForBalance;
         financial.setDueBalance2(BigDecimalUtil.truncateDouble(dueBalance, 2));
 
+
+        //算法1：账号应有余额 = 总的实际到账金额 - 总的实际完成订单金额 + 额外奖励或补偿-实际发放的  退款或提现
+        dueBalance = actualPayAmount - actualOrderAmount + compensateAmount - totalApplyRefund;
+        financial.setDueBalance(BigDecimalUtil.truncateDouble(dueBalance, 2));
+
+
         double currentBalance = 0;////当前余额
+        double balanceCorrection = 0;
+
         if (listu != null) {
             // 用户emailemail
-            currentBalance = (Double) listu.get("available_m");
+            currentBalance = Double.valueOf(listu.get("available_m").toString()) ;
+            balanceCorrection = Double.valueOf(listu.get("balance_correction").toString());
+
         }
         financial.setCurrentBalance(BigDecimalUtil.truncateDouble(currentBalance, 2));
         financial.setAvailableBalance(BigDecimalUtil.truncateDouble(currentBalance, 2));
-        if (Math.abs(dueBalance - currentBalance) >= 0.01) {
+        financial.setBalanceCorrection(BigDecimalUtil.truncateDouble(balanceCorrection, 2));
+
+        if (Math.abs(currentBalance - dueBalance - balanceCorrection) >= 0.01) {
             financial.setWarnFlag(1);
             String warnMsg = "客户实际余额(" + BigDecimalUtil.truncateDouble(currentBalance, 2)
-                    + ")不等于" + "应有余额(" + BigDecimalUtil.truncateDouble(dueBalance, 2) + ")";
+                    + ")不等于" + "应有余额+强平余额(" + BigDecimalUtil.truncateDouble(dueBalance + balanceCorrection, 2) + ")";
             financial.setWarnMsg(warnMsg);
         }
         double blockedBalance = totalDealRefund;

@@ -191,6 +191,11 @@
                         </td>
                     </tr>
                     <tr>
+                        <td colspan="1" class="td_right">强制平账余额:</td>
+                        <td colspan="1" class="td_left"><span> ${financial.balanceCorrection}</span>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="1" class="td_right">客户在我司账户实际余额:</td>
                         <td colspan="1" class="td_left"><span> ${financial.currentBalance}</span>
                         </td>
