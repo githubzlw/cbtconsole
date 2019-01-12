@@ -100,6 +100,15 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private int priceIsEdit;
     private int isUpdateImg;
+    private String sizeInfoEn;
+
+    public String getSizeInfoEn() {
+        return sizeInfoEn;
+    }
+
+    public void setSizeInfoEn(String sizeInfoEn) {
+        this.sizeInfoEn = sizeInfoEn;
+    }
 
     public int getIsUpdateImg() {
         return isUpdateImg;

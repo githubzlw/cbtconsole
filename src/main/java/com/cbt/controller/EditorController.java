@@ -327,8 +327,10 @@ public class EditorController {
 
         String text = textBf.toString();
 
+        // 已经放入产品表的size_info_en字段
         //获取文字尺码数据
-        String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
+        // String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
+        String wordSizeInfo = goods.getSizeInfoEn();
         if (StringUtils.isNotBlank(wordSizeInfo)) {
             if (wordSizeInfo.indexOf("[") == 0) {
                 wordSizeInfo = wordSizeInfo.substring(1);
@@ -336,7 +338,7 @@ public class EditorController {
             if (wordSizeInfo.lastIndexOf("]") == wordSizeInfo.length() - 1) {
                 wordSizeInfo = wordSizeInfo.substring(0, wordSizeInfo.length() - 1);
             }
-            goods.setWordSizeInfo(wordSizeInfo);
+            goods.setSizeInfoEn(wordSizeInfo);
         }
 
         // 当前抓取aliexpress的商品数据
@@ -785,6 +787,13 @@ public class EditorController {
             newTypeList.clear();
             typeList.clear();
 
+
+            // 获取文字尺码表
+
+            String wordSizeInfo = request.getParameter("wordSizeInfo");
+            if(StringUtils.isNotBlank(wordSizeInfo)){
+                cgp.setSizeInfoEn(wordSizeInfo);
+            }
 
             GoodsEditBean editBean = new GoodsEditBean();
 
