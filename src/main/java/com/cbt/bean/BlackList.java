@@ -3,20 +3,37 @@ package com.cbt.bean;
 
 public class BlackList {
 	private Integer id;
+
+
 	/*黑名单email	*/
-	private String email;
+	private String blackVlue;
 	/*创建时间	*/
 	private String createtime;
 	/*操作人id */
 	private String operatorid;
 	/*黑名单ip 	*/
-	private String userip;
+	private String type;
 	/*黑名单人用户名	*/
 	private String username;
 
 	private String updateTime;
 	private String flag;
 	private String option;
+	public String getBlackVlue() {
+		return blackVlue;
+	}
+
+	public void setBlackVlue(String blackVlue) {
+		this.blackVlue = blackVlue;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 	public String getUpdateTime() {
 		return updateTime;
 	}
@@ -49,14 +66,7 @@ public class BlackList {
 		this.id = id;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-	
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
+
 	public String getCreatetime() {
 		return createtime;
 	}
@@ -73,14 +83,7 @@ public class BlackList {
 		this.operatorid = operatorid;
 	}
 	
-	public String getUserip() {
-		return userip;
-	}
-	
-	public void setUserip(String userip) {
-		this.userip = userip;
-	}
-	
+
 	public String getUsername() {
 		return username;
 	}

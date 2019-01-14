@@ -9,6 +9,7 @@ import com.importExpress.pojo.OnlineGoodsCheck;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CustomGoodsMapper {
 
@@ -127,6 +128,18 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<CategoryBean> queryCategoryByParam(CustomGoodsQuery goodsQuery);
+    /**
+     * 添加商品评论
+     * @param map
+     * @return
+     */
+    public int addReviewRemark(Map<String,String> map);
+    /**
+     * 编辑商品评论
+     * @param map
+     * @return
+     */
+    public int updateReviewRemark(Map<String,String> map);
 
 
     /**
@@ -212,6 +225,12 @@ public interface CustomGoodsMapper {
      * @return
      */
     int updateGoodsDetailsByInfo(CustomGoodsPublish goodsPublish);
+    /**
+     * 查询商品评论内容
+     * @param pid
+     * @return
+     */
+    public List<CustomGoodsPublish> getAllReviewByPid(@Param("pid") String pid);
 
 
     /**

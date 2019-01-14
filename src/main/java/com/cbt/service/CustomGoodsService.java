@@ -9,6 +9,7 @@ import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.OnlineGoodsCheck;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CustomGoodsService {
 
@@ -20,6 +21,20 @@ public interface CustomGoodsService {
      * @author abc
      */
     public List<CategoryBean> getCaterory();
+
+    /**
+     * 添加商品评论
+     * @param map
+     * @return
+     */
+    public int addReviewRemark(Map<String,String> map);
+
+    /**
+     * 编辑商品评论
+     * @param map
+     * @return
+     */
+    public int updateReviewRemark(Map<String,String> map);
 
     /**
      * 查询参数下类别和商品总数统计
@@ -266,6 +281,13 @@ public interface CustomGoodsService {
     public GoodsPictureQuantity queryPictureQuantityByPid(String pid);
 
     /**
+     * 查询商品评论内容
+     * @param pid
+     * @return
+     */
+    public List<CustomGoodsPublish> getAllReviewByPid(String pid);
+
+    /**
      * 设置pid商品是否有效(上架或者下架)
      *
      * @param pid
@@ -364,8 +386,20 @@ public interface CustomGoodsService {
      * @return
      */
     boolean setNoBenchmarking(String pid, double finalWeight);
-
-
+    
+    /**
+     * 更新对标关联数据 
+     * 精准对标更新产品表ali_pid,ali_price,bm_flag=1,isBenchmark=1,
+     *
+     * @param pid
+     * @param aliPid
+     * @param aliPrice
+     * @param bmFlag
+     * @param isBenchmark
+     * @return
+     */
+    boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag);
+    
     /**
      * 设置永不下架标识
      *

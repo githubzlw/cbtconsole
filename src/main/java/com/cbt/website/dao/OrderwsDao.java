@@ -8086,5 +8086,32 @@ public class OrderwsDao implements IOrderwsDao {
         }
         return list;
     }
-
+    @Override
+    public int queryBehaviorRecord(String beginDate, String endDate) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        int num=0;
+        ResultSet rs = null;
+        Statement stmt = null;
+        String sql="SELECT count(id) as counts FROM behavior_record WHERE action = 'Add to Order' ";
+        try{
+            if(StringUtil.isNotBlank(beginDate)){
+                sql+=" and view_date_time>='"+beginDate+"'";
+            }
+            if(StringUtil.isNotBlank(endDate)){
+                sql+=" and view_date_time<='"+endDate+"'";
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if(rs.next()){
+                num=rs.getInt("counts");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return num;
+    }
 }

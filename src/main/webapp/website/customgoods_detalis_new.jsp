@@ -46,6 +46,8 @@
             closeSimilarGoodsDialog();
             closeKeyWordDialog();
             closeBenchmarking();
+            $('#review_dlg').dialog('close');
+            $('#update_review_dlg').dialog('close');
         });
 
         function relieveDisabled(obj) {
@@ -817,9 +819,130 @@
             $('#similar_dlg').dialog('open');
         }
 
+        function openReviewDiv() {
+            $('#review_dlg').dialog('open');
+        }
+
         function closeSimilarGoodsDialog() {
             $('#similar_dlg').dialog('close');
             $("#similar_pids").val("");
+        }
+
+        function closeRemark(){
+            $('#review_dlg').dialog('close');
+            $("#review_remark").val("");
+        }
+
+        function openEditReview(aliId,country,review_remark,review_score,review_flag){
+            $('#edit_score').combobox('setValue',review_score);
+            $('#editcountry').combobox('setValue',country);
+            $("#edit_remark").val(review_remark);
+            $("#update_aliId").val(aliId);
+            if(review_flag == "不显示"){
+                review_flag="1";
+            }else if(review_flag == "显示"){
+                review_flag="0";
+            }
+            $('#update_flag').combobox('setValue',review_flag);
+            $('#update_review_dlg').dialog('open');
+        }
+
+        function closeUpdateRemark(){
+            $('#edit_score').combobox('setValue',"1");
+            $('#editcountry').combobox('setValue',"country");
+            $("#edit_remark").val("");
+            $("#update_aliId").val("");
+            $('#update_flag').combobox('setValue',"0");
+            $('#update_review_dlg').dialog('close');
+        }
+
+        function updateReviewRemark(){
+            var update_aliId=$("#update_aliId").val();
+            var edit_remark=$("#edit_remark").val();
+            var editcountry=$('#editcountry').combobox('getValue');
+            var edit_score=$("#edit_score").val();
+            var update_flag=$('#update_flag').combobox('getValue');
+            if(edit_remark ==null ||edit_remark ==""){
+                showMessage("请输入商品评论");
+                return false;
+            }
+            if(editcountry ==null ||editcountry =="" || editcountry=="country"){
+                showMessage("请选择国家");
+                return false;
+            }
+            if(edit_score ==null ||edit_score ==""){
+                showMessage("请选择评分");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/updateReviewRemark',
+                data: {
+                    "update_aliId": update_aliId,
+                    "edit_remark": edit_remark,
+                    "editcountry":editcountry,
+                    "edit_score":edit_score,
+                    "update_flag":update_flag
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if(json.ok){
+                        showMessage("修改评论成功；2秒后刷新页面");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }else{
+                        showMessage("修改评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        }
+
+        function addReviewRemark(goods_pid){
+            var review_remark=$("#review_remark").val();
+            var country=$('#country').combobox('getValue');
+            var review_score=$("#review_score").val();
+            if(review_remark ==null ||review_remark ==""){
+                showMessage("请输入商品评论");
+                return false;
+            }
+            if(country ==null ||country =="" || country=="country"){
+                showMessage("请选择国家");
+                return false;
+            }
+            if(review_score ==null ||review_score ==""){
+                showMessage("请选择评分");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/addReviewRemark',
+                data: {
+                    "goods_pid": goods_pid,
+                    "review_remark": review_remark,
+                    "country":country,
+                    "review_score":review_score
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if(json.ok){
+                        showMessage("添加评论成功；2秒后刷新页面");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }else{
+                        showMessage("添加评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
         }
 
         function addSimilarGoods() {
@@ -1171,10 +1294,11 @@
                 }
             });
         }
+
     </script>
 </head>
 
-<body onload="querySimilarGoodsByMainPid()">
+<body onload="querySimilarGoodsByMainPid();$('#review_dlg').dialog('close');$('#update_review_dlg').dialog('close');">
 
 <c:if test="${uid ==0}">
     {"status":false,"message":"请重新登录进行操作"}
@@ -1307,6 +1431,74 @@
                onclick="addSimilarGoods('${goods.pid}')" style="width: 80px">保存</a>
             <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                class="easyui-linkbutton" onclick="closeSimilarGoodsDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+    <div id="review_dlg" class="easyui-dialog" title="添加评论"
+         data-options="modal:true"
+         style="width: 460px; height: 320px; padding: 10px;">
+        <br>
+         评论:<textarea id="review_remark" style="width: 300px; height: 88px;"></textarea><br>
+        <br>
+        <select class="easyui-combobox" name="review_score" id="review_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+       <br><br>
+        <select class="easyui-combobox" name="country" id="country" style="width:300px;" data-options="label:'国家:',Height:'2000px',valueField: 'country',
+                    textField: 'country', value:'country',selected:true,
+                    url: '/cbtconsole/warehouse/getAllZone',
+                    method:'get'">
+         </select>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="addReviewRemark('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeRemark()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+    <div id="update_review_dlg" class="easyui-dialog" title="编辑评论"
+         data-options="modal:true"
+         style="width: 460px; height: 360px; padding: 10px;">
+        <br>
+        <input id="update_aliId" type="hidden" name="update_aliId">
+        评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
+        <br>
+        <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <br><br>
+        <select class="easyui-combobox" name="update_flag" id="update_flag" style="width:300px;" data-options="label:'是否显示:',panelHeight:'auto'">
+            <option value="0">显示</option>
+            <option value="1">不显示</option>
+        </select>
+        <br><br>
+        <select class="easyui-combobox" name="editcountry" id="editcountry" style="width:300px;" data-options="label:'国家:',Height:'2000px',valueField: 'country',
+                    textField: 'country', value:'country',selected:true,
+                    url: '/cbtconsole/warehouse/getAllZone',
+                    method:'get'">
+        </select>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="updateReviewRemark()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeUpdateRemark()"
                style="width: 80px">关闭</a>
         </div>
     </div>
@@ -1752,7 +1944,8 @@
                                                                 href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a> <br> <a target="_blank"
                                                                                                         href="${goods.aliGoodsUrl}">速卖通原链接</a><br><br>
                 <a target="_blank"
-                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a>
+                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a><br>
+                <button onclick="openReviewDiv()">添加产品评价</button>
             </div>
 
 
@@ -1762,6 +1955,14 @@
             <div>
                 <span style="font-size: 22px; color: red; margin-top: 15px;">相似商品：</span>
                 <span class="s_btn_2" onclick="openSimilarGoodsDialog()">添加相似商品</span>
+            </div>
+            <div>
+                <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
+                <c:forEach items="${reviewList}" var="review">
+                    <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
+                    <button onclick="openEditReview(${review.aliId},'${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}');">编辑</button><br>
+                </c:forEach>
+
             </div>
 
             <div class="goods_img_2">
