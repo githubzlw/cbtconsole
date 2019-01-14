@@ -180,6 +180,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         customGoodsService.updateGoodsState(pid, 4);
                     }
 
+                    // isUpdateImg = 1;
                     if (isUpdateImg > 0) {
                         // 下载需要的图片到本地
                         // 新的主图名称
@@ -188,7 +189,9 @@ public class PublishGoodsToOnlineThread extends Thread {
                         String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
                         String localDownImg = localDownImgPre + downImgName.replace(".220x220", ".400x400");
                         boolean isSuccess = ImgDownload.execute(goods.getShowMainImage(), localDownImg);
+                        System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
                         if (isSuccess) {
+                            System.err.println("localDownImg:" + localDownImg + ",success!!");
                             //压缩图片 220x200 285x285 285x380
                             boolean isCompress;
                             String img285x285 = localDownImg.replace(".400x400.", ".285x285.");
@@ -200,6 +203,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                             isCompress = isCompress1 && isCompress2 && isCompress3;
                             // 压缩成功后，上传图片
                             if (isCompress) {
+                                System.err.println("Compress:[" + img285x285 + "," + img285x380 + "," + img220x220 + "] success");
                                 String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
                                 //上传
                                 File upFile = new File(localDownImgPre);
@@ -229,7 +233,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 isSuccess = false;
                             }
                         } else {
-                            LOG.error("this pid:" + pid + ",下载图片识别,无法设置主图");
+                            LOG.error("this pid:" + pid + ",下载图片失败,无法设置主图");
                         }
                         if (!isSuccess) {
                             customGoodsService.updateGoodsState(pid, 3);
