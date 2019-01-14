@@ -1895,9 +1895,10 @@ public class OrderwsDao implements IOrderwsDao {
 
         String sql = "SELECT order_no,if(memberFee>=10,pay_price-memberFee,pay_price) as pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
+                +"(SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
                 + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
-                " FROM orderinfo where LEFT(order_no,17) = LEFT(?,17) ";
+                " FROM orderinfo o where LEFT(order_no,17) = LEFT(?,17) ";
         List<OrderBean> list = new ArrayList<OrderBean>();
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -1915,6 +1916,7 @@ public class OrderwsDao implements IOrderwsDao {
                 String foreign_freight_ = rs.getString("foreign_freight");
                 ob.setForeign_freight(Utility.getStringIsNull(foreign_freight_) ? foreign_freight_ : "0");
                 ob.setProduct_cost(rs.getString("product_cost"));
+                ob.setCouponAmount(StringUtil.isBlank(rs.getString("couponAmount"))?"0":rs.getString("couponAmount"));
                 ob.setActual_allincost(rs.getDouble("actual_allincost"));
                 String pay_price_tow = rs.getString("pay_price_tow");
                 ob.setRemaining_price(rs.getDouble("remaining_price"));

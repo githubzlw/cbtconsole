@@ -1284,6 +1284,11 @@ public class OrderinfoService implements IOrderinfoService {
 				String dropShipList = dao.getDropshipOrderNoList(orderNo);
 				ob.setDropShipList(dropShipList);
 			}
+			String couponAmount=ob.getCouponAmount();
+			if(StringUtil.isBlank(couponAmount)){
+				couponAmount="0";
+			}
+			ob.setCouponAmount(couponAmount);
 			List<String> yhCount=pruchaseMapper.getProblem(orderNo,"1");//验货疑问总数
 			int checkeds=pruchaseMapper.getChecked(orderNo,"1");//验货无误总数
 			int cg=pruchaseMapper.getPurchaseCount(orderNo,"1");//采购总数
