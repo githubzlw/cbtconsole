@@ -302,10 +302,13 @@ function batchCk(){
 				estimatefreight = 0;
 			}
 			var sweight = $("#sweight"+shipmentno).html();   //重量
-			if(sweight.length==0){
-			   	return  true;
+			if(sweight==null || sweight == "" || sweight.length==0){
+			   	return;
 			}
 			var svolume = $("#svolume"+shipmentno).html();   //体积
+			if(svolume == null || svolume =="" || svolume.length==0){
+				return;
+			}
 			var isDropshipFlag = $("#isDropshipFlag"+shipmentno).val();  //dropship标识
 			var orderid = $("#h_orderid2"+shipmentno).val(); //订单号
 			var fpxCountryCode = $("#fpxCountryCode"+shipmentno).val(); //国家

@@ -127,7 +127,7 @@ public class NewOrderDetailsCtr {
 							shippingtype=shippingtype+";"+(StringUtil.isBlank(s.getShippingtype())?"":s.getShippingtype());
 						}
 						awesFreight=awesFreight+Double.parseDouble(s.getEstimatefreight())*rate;
-						ac_weight+=Double.parseDouble(s.getAc_weight());
+						ac_weight+=Double.parseDouble(StringUtil.isBlank(s.getAc_weight())?"0.00":s.getAc_weight());
 					}
 				}
 				actual_freight=df.format(actualFreight);
