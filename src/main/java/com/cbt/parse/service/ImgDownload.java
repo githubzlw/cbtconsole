@@ -114,6 +114,7 @@ public class ImgDownload {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setConnectTimeout(20000);
+		conn.setRequestProperty("user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
 		InputStream inStream = conn.getInputStream();// 通过输入流获取图片数据
 		byte[] btImg = readInputStream(inStream);// 得到图片的二进制数据
 		return btImg;

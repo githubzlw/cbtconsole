@@ -797,11 +797,12 @@ public class EditorController {
             // 设置主图数据 mainImg
             String mainImg = request.getParameter("mainImg");
             if(StringUtils.isNotBlank(mainImg)){
+                mainImg = mainImg.replace(orGoods.getRemotpath(),"");
                 // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
                 if(mainImg.contains(".60x60")){
-                    cgp.setCustomMainImage(mainImg.replace(".60x60",""));
+                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
                 }else if(mainImg.contains(".400x400")){
-                    cgp.setCustomMainImage(mainImg.replace(".400x400",""));
+                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
                 }
                 cgp.setShowMainImage(mainImg);
                 cgp.setIsUpdateImg(2);
@@ -843,6 +844,7 @@ public class EditorController {
                     if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
                         if(cgp.getIsUpdateImg() == 0){
                             cgp.setIsUpdateImg(1);
+                            // 设置图片信息
                         }
                     }else{
                         cgp.setIsUpdateImg(0);

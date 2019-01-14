@@ -4,10 +4,13 @@ import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.parse.service.DownloadMain;
+import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
+import com.cbt.website.util.UploadByOkHttp;
+import com.importExpress.utli.ImageCompressionByNoteJs;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -102,6 +105,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         goods.setImg(tempImgs.toString().replace(remotepath, ""));
                         // 获取第一张图片数据的大图
                         firstImg = tempImgs.get(0).replace(".60x60", ".400x400");
+                        goods.setShowMainImage(firstImg);
                     }
 
                     // 详情数据的获取和解析img数据
@@ -168,30 +172,54 @@ public class PublishGoodsToOnlineThread extends Thread {
                     }
 
                     if (isUpdateImg > 0) {
-                        //橱窗图默认第一张图片
-                        if (isUpdateImg == 1) {
-                            // 进行搜索图设置，取橱窗图的第一张大图数据
-                            String resultStr = "";
-                            int count = 0;
-                            String localPathByRemote = GoodsInfoUtils.changeRemotePathToLocal(remotepath);
-                            String oldMainImg = localPathByRemote + goods.getShowMainImage();
-                            // 防止出现是上传的第一张图片数据
-                            String tempFirstImg = "";
-                            if (firstImg.contains("http://") || firstImg.contains("https://")) {
-                                tempFirstImg = GoodsInfoUtils.changeRemotePathToLocal(firstImg);
-                            } else {
-                                tempFirstImg = localPathByRemote + firstImg;
+                        // 下载需要的图片到本地
+                        // 新的主图名称
+                        String downImgName =   goods.getShowMainImage().substring(goods.getShowMainImage().lastIndexOf("/"));
+                        // 图片下载本地路径名称
+                        String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
+                        String localDownImg =  localDownImgPre + downImgName.replace(".220x220",".400x400");
+                        boolean isSuccess = ImgDownload.execute(goods.getShowMainImage(), localDownImg);
+                        if(isSuccess){
+                            //压缩图片 220x200 285x285 285x380
+                            boolean isCompress;
+                            String img285x285 = localDownImg.replace(".400x400.",".285x285.");
+                            String img285x380 = localDownImg.replace(".400x400.",".285x380.");
+                            String img220x220 = localDownImg.replace(".400x400.",".220x220.");
+                            boolean isCompress1 = ImageCompressionByNoteJs.compressByOkHttp(img285x285,2);
+                            boolean isCompress2 = ImageCompressionByNoteJs.compressByOkHttp(img285x380,3);
+                            boolean isCompress3 = ImageCompressionByNoteJs.compressByOkHttp(img220x220,4);
+                            isCompress = isCompress1 && isCompress2 && isCompress3;
+                            // 压缩成功后，上传图片
+                            if(isCompress){
+                                String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
+                                //上传
+                                File upFile = new File(localDownImgPre);
+                                if(upFile.exists() && upFile.isDirectory()){
+                                    boolean isUpload;
+                                    isUpload = UploadByOkHttp.uploadFileBatch(upFile,destPath);
+                                    if(isUpload){
+                                        System.err.println("this pid:" + pid + ",上传产品主图成功");
+                                    }else{
+                                        // 重试一次
+                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile,destPath);
+                                        if(isUpload){
+                                            System.err.println("this pid:" + pid + ",上传产品主图成功");
+                                        }else{
+                                            System.err.println("this pid:" + pid + ",上传产品主图失败");
+                                            isSuccess = false;
+                                        }
+                                    }
+                                }
+                            }else{
+                                System.err.println("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
+                                LOG.error("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
+                                 isSuccess = false;
                             }
-                            String url = IMG_SERVICE_CHOOSE_MAIN_IMG_URL + "oldMainImg=" + oldMainImg + "&firstImg=" + tempFirstImg;
-                            while (!("1".equals(resultStr) || count > 3)) {
-                                count++;
-                                resultStr = DownloadMain.getContentClient(url, null);
-                            }
-                            if (!"1".equals(resultStr)) {
-                                LOG.error("this pid:" + pid + ",选择设置主图失败");
-                            }
-                        } else {
-                            // 设置的封面图
+                        }else{
+                            LOG.error("this pid:" + pid + ",下载图片识别,无法设置主图");
+                        }
+                        if(!isSuccess){
+                            customGoodsService.updateGoodsState(pid, 3);
                         }
                     }
                 } else {
@@ -201,8 +229,9 @@ public class PublishGoodsToOnlineThread extends Thread {
                 LOG.warn("UploadImgToOnline pid:" + pid + " is uploading!");
             }
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace();
             LOG.error("UploadImgToOnline error:" + e.getMessage());
+            System.err.println("UploadImgToOnline error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");
