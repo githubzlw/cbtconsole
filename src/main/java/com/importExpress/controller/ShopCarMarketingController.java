@@ -689,6 +689,9 @@ public class ShopCarMarketingController {
             double totalWhosePrice = 0;
             double estimateProfit = 0;
             for (ShopCarInfo carInfo : shopCarInfoList) {
+                if(StringUtils.isBlank(carInfo.getWholesalePrice())){
+                    continue;
+                }
                 //设置显示图片
                 carInfo.setShowImg(carInfo.getRemotePath() + carInfo.getMainImg());
                 carInfo.setCartGoodsImg(carInfo.getCartGoodsImg().replace("60x60.", "400x400."));
