@@ -46,6 +46,7 @@
             closeSimilarGoodsDialog();
             closeKeyWordDialog();
             closeBenchmarking();
+            closeSizeInfoEnDialog();
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
         });
@@ -356,6 +357,8 @@
                 showMessage("获取商品描述详情为空");
                 return;
             }
+            var wordSizeInfo = $("#word_info_div").html();
+
             var remotepath = $("#goods_remotepath").val();
             if (remotepath == "") {
                 showMessage("获取图片远程路径为空");
@@ -478,7 +481,8 @@
                         "goodsPrice": goodsPriceVal,
                         "sellUtil": sellUtil,
                         "typeRepalceIds": typeRepalceIds.substring(1),
-                        "typeDeleteIds": typeDeleteIds.substring(1)
+                        "typeDeleteIds": typeDeleteIds.substring(1),
+                        "wordSizeInfo":wordSizeInfo
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -1171,6 +1175,23 @@
             $("#form_benchmarking")[0].reset();
         }
 
+        function updateWordSizeInfo() {
+            $('#size_info_en_dlg').dialog('open');
+        }
+
+        function addSizeInfoEn() {
+            var size_info_en_text = $("#size_info_en_text").val();
+            $("#word_info_div").empty();
+            $("#word_info_div").append(size_info_en_text);
+            closeSizeInfoEnDialog();
+        }
+
+
+        function closeSizeInfoEnDialog() {
+            $('#size_info_en_dlg').dialog('close');
+        }
+
+
         function saveBenchmarking() {
             var noKeyWeight = false;
             var pid = $("#add_goods_pid").val();
@@ -1505,6 +1526,24 @@
                onclick="updateReviewRemark()" style="width: 80px">保存</a>
             <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                class="easyui-linkbutton" onclick="closeUpdateRemark()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+
+    <div id="size_info_en_dlg" class="easyui-dialog" title="编辑文字尺码表"
+         data-options="modal:true"
+         style="width: 520px; height: 440px; padding: 10px;">
+        <br>
+        <textarea id="size_info_en_text" style="width: 460px; height: 300px;">${goods.sizeInfoEn}</textarea>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="addSizeInfoEn()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeSizeInfoEnDialog()"
                style="width: 80px">关闭</a>
         </div>
     </div>
@@ -1990,17 +2029,15 @@
             </div>
         </c:if>
 
-        <c:if test="${not empty goods.wordSizeInfo}">
+        <c:if test="${not empty goods.sizeInfoEn}">
 
-            <div class="s_bot" id="word_info_div">
-                <div style="float:left;width:75%;">
-                        ${goods.wordSizeInfo}
+            <div class="s_bot" >
+                <div style="float:left;width:75%;" id="word_info_div">
+                        ${goods.sizeInfoEn}
                 </div>
-
-                <div
-                        style="width: 20%; margin: 0 auto;float: right;">
-                <span id="word_size_info" class="s_btn"
-                      onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>
+                <div style="width: 20%; margin: 0 auto;float: right;">
+                <%--<span id="word_size_info" class="s_btn" onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>--%>
+                <span id="size_info_en" class="s_btn" onclick="updateWordSizeInfo()">修改文字尺码表</span>
 
                 </div>
 
@@ -2016,12 +2053,9 @@
             <div class="bot_l">
                 <div class="b_left">
                     <h1 style="text-align: center">importE详情编辑框</h1>
-                    <input type="hidden" id="goods_savePath" value="${savePath}"
-                           name="savePath"> <input type="hidden" id="goods_localpath"
-                                                   value="${localpath}" name="localpath"> <input type="hidden"
-                                                                                                 id="goods_remotepath"
-                                                                                                 value="${goods.remotpath}"
-                                                                                                 name="remotepath">
+                    <input type="hidden" id="goods_savePath" value="${savePath}" name="savePath">
+                    <input type="hidden" id="goods_localpath" value="${localpath}" name="localpath">
+                    <input type="hidden" id="goods_remotepath" value="${goods.remotpath}" name="remotepath">
                     <textarea id="goods_content" rows="100" style="width: 100%;">${text}</textarea>
                 </div>
             </div>
