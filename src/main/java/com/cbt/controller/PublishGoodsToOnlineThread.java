@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PublishGoodsToOnlineThread extends Thread {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PublishGoodsToOnlineThread.class);
@@ -136,6 +138,8 @@ public class PublishGoodsToOnlineThread extends Thread {
                     // 判断需要上传的图片，执行上传逻辑
                     if (imgList.size() > 0) {
                         boolean isSuccess = true;
+                        // 使用批量上传文件代码
+                        Map<String, String> uploadMap = new HashMap<>();
                         // 循环单独上传图片
                         for (String imgUrl : imgList) {
                             // 得到图片服务器FTP后部分保存全路径
@@ -143,16 +147,16 @@ public class PublishGoodsToOnlineThread extends Thread {
                             System.err.println("imgUrl:" + imgUrl + ",remoteSavePath:" + remoteSavePath);
                             // 本地图片全路径
                             String localImgPath = ftpConfig.getLocalDiskPath() + remoteSavePath;
-
                             File imgFile = new File(localImgPath);
                             if (imgFile.exists()) {
-                                boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid, remoteSavePath, localImgPath, ftpConfig);
+                                uploadMap.put(localImgPath,remoteSavePath);
+                                /*boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid, remoteSavePath, localImgPath, ftpConfig);
                                 if (isSc) {
                                     continue;
                                 } else {
                                     isSuccess = false;
                                     break;
-                                }
+                                }*/
                             } else {
                                 System.err.println("this pid:" + pid + ",file:" + localImgPath + " is not exists");
                                 LOG.error("this pid:" + pid + ",file:" + localImgPath + " is not exists");
@@ -160,6 +164,11 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 break;
                             }
                         }
+                        //批量上传
+                        if(isSuccess){
+                            isSuccess = UploadByOkHttp.doUpload(uploadMap);
+                        }
+
                         if (isSuccess) {
                             customGoodsService.publish(goods);
                             customGoodsService.updateGoodsState(pid, 4);
