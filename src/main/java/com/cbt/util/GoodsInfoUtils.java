@@ -5,12 +5,21 @@ import com.cbt.bean.ImportExSku;
 import com.cbt.bean.ImportExSkuShow;
 import com.cbt.bean.TypeBean;
 import com.cbt.parse.service.StrUtils;
+import com.cbt.website.util.JsonResult;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 public class GoodsInfoUtils {
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(GoodsInfoUtils.class);
+
+    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
+    private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
+    private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
+    private static final String SERVICE_SHOW_URL_4 = "https://img1.import-express.com";
 
     private static String chineseChar = "([\\一-\\龥]+)";
 
@@ -84,20 +93,16 @@ public class GoodsInfoUtils {
     }
 
     // 处理1688商品的规格图片数据
-    public static List<String> deal1688GoodsImg(CustomGoodsPublish cgbean, String remotPath) {
+    public static List<String> deal1688GoodsImg(String img, String remotPath) {
 
         List<String> imgList = new ArrayList<String>();
-        // 图片
-        String img = cgbean.getImg();
+
         if (StringUtils.isNotBlank(img)) {
             img = img.replace("[", "").replace("]", "").trim();
             String[] imgs = img.split(",\\s*");
 
             for (int i = 0; i < imgs.length; i++) {
                 if (!imgs[i].isEmpty()) {
-                    // imgList.add(remotPath + imgs[i].replace(".60x60.jpg",
-                    // ""));
-                    // 统一路径，下面代码屏蔽
                     if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
                         imgList.add(imgs[i]);
                     } else {
@@ -105,7 +110,6 @@ public class GoodsInfoUtils {
                     }
                 }
             }
-            cgbean.setShowImages(imgList);
         }
         return imgList;
     }
@@ -195,5 +199,47 @@ public class GoodsInfoUtils {
         }
         skuList = null;
         return cbSkuLst;
+    }
+
+
+    public static String changeRemotePathToLocal(String remotepath) {
+
+        String localPathByRemote = remotepath;
+        if (remotepath.contains(SERVICE_SHOW_URL_1)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_URL_2)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_URL_3)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
+        } else if (remotepath.contains(SERVICE_SHOW_URL_4)) {
+            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
+        }
+        return localPathByRemote;
+    }
+
+
+    public static boolean uploadFileToRemoteSSM(String pid, String remoteSavePath, String localImgPath, FtpConfig ftpConfig) {
+        boolean isSc = false;
+        JsonResult json = new JsonResult();
+        json.setOk(false);
+        // 重试5次
+        int count = 0;
+        while (!(json.isOk() || count > 5)) {
+            count++;
+            json = NewFtpUtil.uploadFileToRemoteSSM(remoteSavePath, localImgPath, ftpConfig);
+            if (json.isOk()) {
+                isSc = true;
+                break;
+            } else {
+                isSc = false;
+            }
+        }
+        if (!isSc) {
+            System.err.println("this pid:" + pid + "," + localImgPath + " upload error,"
+                    + json.getMessage());
+            LOG.error("this pid:" + pid + "," + localImgPath + " upload error,"
+                    + json.getMessage());
+        }
+        return isSc;
     }
 }

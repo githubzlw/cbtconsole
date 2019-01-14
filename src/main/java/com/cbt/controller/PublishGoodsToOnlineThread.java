@@ -7,33 +7,25 @@ import com.cbt.parse.service.DownloadMain;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.NewFtpUtil;
-import com.cbt.website.util.JsonResult;
+import com.cbt.util.GoodsInfoUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PublishGoodsToOnlie extends Thread {
-    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PublishGoodsToOnlie.class);
+public class PublishGoodsToOnlineThread extends Thread {
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(PublishGoodsToOnlineThread.class);
     /**
      * 图片服务器选择主图路径
      */
     private static final String IMG_SERVICE_CHOOSE_MAIN_IMG_URL = "http://104.247.194.50:8080/cloudimginterface/selectSearchImg/editedGoodsMainImg?";
     // private static final String IMG_SERVICE_CHOOSE_MAIN_IMG_URL = "http://127.0.0.1:8765/cloudimginterface/selectSearchImg/editedGoodsMainImg?";
-
-    private static final String SERVICE_LOCAL_PATH = "/usr/local/goodsimg";
-    private static final String SERVICE_SHOW_URL_1 = "http://img.import-express.com";
-    private static final String SERVICE_SHOW_URL_2 = "http://img1.import-express.com";
-    private static final String SERVICE_SHOW_URL_3 = "https://img.import-express.com";
-    private static final String SERVICE_SHOW_URL_4 = "https://img1.import-express.com";
 
     private String pid;
     private CustomGoodsService customGoodsService;
@@ -41,7 +33,7 @@ public class PublishGoodsToOnlie extends Thread {
     private int isUpdateImg;
     private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
-    public PublishGoodsToOnlie(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg) {
+    public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg) {
         super();
         this.pid = pid;
         this.customGoodsService = customGoodsService;
@@ -79,7 +71,7 @@ public class PublishGoodsToOnlie extends Thread {
                     String remotepath = goods.getRemotpath();
 
                     // 获取橱窗图的img List集合
-                    List<String> windowImgs = deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
+                    List<String> windowImgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
                     // 抽取含有本地上传的图片数据
                     if (windowImgs.size() > 0) {
                         List<String> tempImgs = new ArrayList<>();
@@ -150,30 +142,11 @@ public class PublishGoodsToOnlie extends Thread {
 
                             File imgFile = new File(localImgPath);
                             if (imgFile.exists()) {
-
-                                boolean isSc = false;
-                                JsonResult json = new JsonResult();
-                                json.setOk(false);
-                                // 重试5次
-                                int count = 0;
-                                while (!(json.isOk() || count > 5)) {
-                                    count++;
-                                    json = NewFtpUtil.uploadFileToRemoteSSM(remoteSavePath, localImgPath, ftpConfig);
-                                    if (json.isOk()) {
-                                        isSc = true;
-                                        break;
-                                    } else {
-                                        isSc = false;
-                                    }
-                                }
+                                boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid,remoteSavePath, localImgPath, ftpConfig);
                                 if (isSc) {
                                     continue;
                                 } else {
                                     isSuccess = false;
-                                    System.err.println("this pid:" + pid + "," + localImgPath + " upload error,"
-                                            + json.getMessage());
-                                    LOG.error("this pid:" + pid + "," + localImgPath + " upload error,"
-                                            + json.getMessage());
                                     break;
                                 }
                             } else {
@@ -185,66 +158,51 @@ public class PublishGoodsToOnlie extends Thread {
                         }
                         if (isSuccess) {
                             customGoodsService.publish(goods);
-                            customGoodsDao.publish(goods,0);
                             customGoodsService.updateGoodsState(pid, 4);
                         } else {
                             customGoodsService.updateGoodsState(pid, 3);
                         }
                     } else {
                         customGoodsService.publish(goods);
-                        customGoodsDao.publish(goods,0);
                         customGoodsService.updateGoodsState(pid, 4);
                     }
 
                     if (isUpdateImg > 0) {
-                        // 进行搜索图设置，取橱窗图的第一张大图数据
-                        String resultStr = "";
-                        int count = 0;
-                        String localPathByRemote = "";
-                        if (remotepath.contains(SERVICE_SHOW_URL_1)) {
-                            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
-                        } else if (remotepath.contains(SERVICE_SHOW_URL_2)) {
-                            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
-                        } else if (remotepath.contains(SERVICE_SHOW_URL_3)) {
-                            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
-                        } else if (remotepath.contains(SERVICE_SHOW_URL_4)) {
-                            localPathByRemote = remotepath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
-                        }
-                        String oldMainImg = localPathByRemote + goods.getShowMainImage();
-                        // 防止出现是上传的第一张图片数据
-                        String tempFirstImg = "";
-                        if (firstImg.contains("http://") || firstImg.contains("https://")) {
-                            if (firstImg.contains(SERVICE_SHOW_URL_1)) {
-                                tempFirstImg = firstImg.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
-                            } else if (firstImg.contains(SERVICE_SHOW_URL_2)) {
-                                tempFirstImg = firstImg.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
-                            } else if (firstImg.contains(SERVICE_SHOW_URL_3)) {
-                                tempFirstImg = firstImg.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
-                            } else if (firstImg.contains(SERVICE_SHOW_URL_4)) {
-                                tempFirstImg = firstImg.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
+                        //橱窗图默认第一张图片
+                        if (isUpdateImg == 1) {
+                            // 进行搜索图设置，取橱窗图的第一张大图数据
+                            String resultStr = "";
+                            int count = 0;
+                            String localPathByRemote = GoodsInfoUtils.changeRemotePathToLocal(remotepath);
+                            String oldMainImg = localPathByRemote + goods.getShowMainImage();
+                            // 防止出现是上传的第一张图片数据
+                            String tempFirstImg = "";
+                            if (firstImg.contains("http://") || firstImg.contains("https://")) {
+                                tempFirstImg = GoodsInfoUtils.changeRemotePathToLocal(firstImg);
+                            } else {
+                                tempFirstImg = localPathByRemote + firstImg;
+                            }
+                            String url = IMG_SERVICE_CHOOSE_MAIN_IMG_URL + "oldMainImg=" + oldMainImg + "&firstImg=" + tempFirstImg;
+                            while (!("1".equals(resultStr) || count > 3)) {
+                                count++;
+                                resultStr = DownloadMain.getContentClient(url, null);
+                            }
+                            if (!"1".equals(resultStr)) {
+                                LOG.error("this pid:" + pid + ",选择设置主图失败");
                             }
                         } else {
-                            tempFirstImg = localPathByRemote + firstImg;
-                        }
-
-                        String url = IMG_SERVICE_CHOOSE_MAIN_IMG_URL + "oldMainImg=" + oldMainImg + "&firstImg=" + tempFirstImg;
-                        while (!("1".equals(resultStr) || count > 3)) {
-                            count++;
-                            resultStr = DownloadMain.getContentClient(url, null);
-                        }
-                        if (!"1".equals(resultStr)) {
-                            LOG.error("this pid:" + pid + ",选择设置主图失败");
+                            // 设置的封面图
                         }
                     }
                 } else {
                     LOG.error("this pid:" + pid + " update goodsstate error!");
                 }
             } else {
-                LOG.warn("UploadImgToOnlie pid:" + pid + " is uploading!");
+                LOG.warn("UploadImgToOnline pid:" + pid + " is uploading!");
             }
         } catch (Exception e) {
             e.getStackTrace();
-            LOG.error("UploadImgToOnlie error:" + e.getMessage());
+            LOG.error("UploadImgToOnline error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");
@@ -255,26 +213,6 @@ public class PublishGoodsToOnlie extends Thread {
         return file.exists() && file.isFile();
     }
 
-    // 处理1688商品的规格图片数据
-    private List<String> deal1688GoodsImg(String img, String remotPath) {
 
-        List<String> imgList = new ArrayList<String>();
-
-        if (StringUtils.isNotBlank(img)) {
-            img = img.replace("[", "").replace("]", "").trim();
-            String[] imgs = img.split(",\\s*");
-
-            for (int i = 0; i < imgs.length; i++) {
-                if (!imgs[i].isEmpty()) {
-                    if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
-                        imgList.add(imgs[i]);
-                    } else {
-                        imgList.add(remotPath + imgs[i]);
-                    }
-                }
-            }
-        }
-        return imgList;
-    }
 
 }

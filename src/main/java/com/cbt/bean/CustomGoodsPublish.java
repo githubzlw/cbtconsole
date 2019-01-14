@@ -99,7 +99,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String review_flag;
 
     private int priceIsEdit;
-    private int isUpdateImg;
+    private int isUpdateImg;// 1自动设置第一张图片为橱窗图，2设置选中的封面图
     private String sizeInfoEn;
 
     public String getSizeInfoEn() {
