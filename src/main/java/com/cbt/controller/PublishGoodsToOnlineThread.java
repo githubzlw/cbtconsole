@@ -146,7 +146,7 @@ public class PublishGoodsToOnlineThread extends Thread {
 
                             File imgFile = new File(localImgPath);
                             if (imgFile.exists()) {
-                                boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid,remoteSavePath, localImgPath, ftpConfig);
+                                boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid, remoteSavePath, localImgPath, ftpConfig);
                                 if (isSc) {
                                     continue;
                                 } else {
@@ -174,51 +174,55 @@ public class PublishGoodsToOnlineThread extends Thread {
                     if (isUpdateImg > 0) {
                         // 下载需要的图片到本地
                         // 新的主图名称
-                        String downImgName =   goods.getShowMainImage().substring(goods.getShowMainImage().lastIndexOf("/"));
+                        String downImgName = goods.getShowMainImage().substring(goods.getShowMainImage().lastIndexOf("/"));
                         // 图片下载本地路径名称
                         String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
-                        String localDownImg =  localDownImgPre + downImgName.replace(".220x220",".400x400");
+                        String localDownImg = localDownImgPre + downImgName.replace(".220x220", ".400x400");
                         boolean isSuccess = ImgDownload.execute(goods.getShowMainImage(), localDownImg);
-                        if(isSuccess){
+                        if (isSuccess) {
                             //压缩图片 220x200 285x285 285x380
                             boolean isCompress;
-                            String img285x285 = localDownImg.replace(".400x400.",".285x285.");
-                            String img285x380 = localDownImg.replace(".400x400.",".285x380.");
-                            String img220x220 = localDownImg.replace(".400x400.",".220x220.");
-                            boolean isCompress1 = ImageCompressionByNoteJs.compressByOkHttp(img285x285,2);
-                            boolean isCompress2 = ImageCompressionByNoteJs.compressByOkHttp(img285x380,3);
-                            boolean isCompress3 = ImageCompressionByNoteJs.compressByOkHttp(img220x220,4);
+                            String img285x285 = localDownImg.replace(".400x400.", ".285x285.");
+                            String img285x380 = localDownImg.replace(".400x400.", ".285x380.");
+                            String img220x220 = localDownImg.replace(".400x400.", ".220x220.");
+                            boolean isCompress1 = ImageCompressionByNoteJs.compressByOkHttp(img285x285, 2);
+                            boolean isCompress2 = ImageCompressionByNoteJs.compressByOkHttp(img285x380, 3);
+                            boolean isCompress3 = ImageCompressionByNoteJs.compressByOkHttp(img220x220, 4);
                             isCompress = isCompress1 && isCompress2 && isCompress3;
                             // 压缩成功后，上传图片
-                            if(isCompress){
+                            if (isCompress) {
                                 String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
                                 //上传
                                 File upFile = new File(localDownImgPre);
-                                if(upFile.exists() && upFile.isDirectory()){
+                                if (upFile.exists() && upFile.isDirectory()) {
                                     boolean isUpload;
-                                    isUpload = UploadByOkHttp.uploadFileBatch(upFile,destPath);
-                                    if(isUpload){
+                                    isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath);
+                                    if (isUpload) {
                                         System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                    }else{
+                                    } else {
                                         // 重试一次
-                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile,destPath);
-                                        if(isUpload){
+                                        isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath);
+                                        if (isUpload) {
                                             System.err.println("this pid:" + pid + ",上传产品主图成功");
-                                        }else{
+                                        } else {
                                             System.err.println("this pid:" + pid + ",上传产品主图失败");
                                             isSuccess = false;
                                         }
                                     }
+                                } else {
+                                    System.err.println("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
+                                    LOG.error("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
+                                    isSuccess = false;
                                 }
-                            }else{
+                            } else {
                                 System.err.println("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
                                 LOG.error("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
-                                 isSuccess = false;
+                                isSuccess = false;
                             }
-                        }else{
+                        } else {
                             LOG.error("this pid:" + pid + ",下载图片识别,无法设置主图");
                         }
-                        if(!isSuccess){
+                        if (!isSuccess) {
                             customGoodsService.updateGoodsState(pid, 3);
                         }
                     }
