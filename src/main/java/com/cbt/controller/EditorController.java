@@ -792,7 +792,7 @@ public class EditorController {
 
             String wordSizeInfo = request.getParameter("wordSizeInfo");
             if(StringUtils.isNotBlank(wordSizeInfo)){
-                cgp.setSizeInfoEn(wordSizeInfo);
+                cgp.setSizeInfoEn(wordSizeInfo.replace("\\n","<br>"));
             }
 
             GoodsEditBean editBean = new GoodsEditBean();
