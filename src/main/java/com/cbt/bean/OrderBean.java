@@ -110,6 +110,16 @@ public class OrderBean implements Cloneable {
     private int backList;
     private int backAddressCount;
     private int payBackList;
+    //优惠券优惠
+    private String couponAmount;
+    public String getCouponAmount() {
+        return couponAmount;
+    }
+
+    public void setCouponAmount(String couponAmount) {
+        this.couponAmount = couponAmount;
+    }
+
     public int getBackList() {
         return backList;
     }
