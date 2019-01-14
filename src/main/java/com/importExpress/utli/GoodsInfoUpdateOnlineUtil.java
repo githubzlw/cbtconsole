@@ -152,8 +152,10 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setPid(bean.getPid());
         inputData.setValid("1");
         inputData.setGoodsstate("4");
+        inputData.setFprice_str(bean.getFpriceStr());
+        inputData.setSize_info_en(bean.getSizeInfoEn());
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
-        return updateOnlineAndSolr(inputData, 1);
+        return updateLocalAndSolr(inputData, 1);
     }
 
     /**
@@ -167,7 +169,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
         inputData.setPid(pid);
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
-        return updateOnlineAndSolr(inputData, 1);
+        return updateLocalAndSolr(inputData, 1);
     }
 
 
@@ -210,7 +212,7 @@ public class GoodsInfoUpdateOnlineUtil {
                 inputData.setGoodsstate(String.valueOf(4));
                 inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
                 inputData.setPid(pid);
-                if (updateOnlineAndSolr(inputData, 1)) {
+                if (updateLocalAndSolr(inputData, 1)) {
                     count++;
                 }
             }
@@ -236,7 +238,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
         inputData.setUnsellableReason("6");
         inputData.setPid(pid);
-        return updateOnlineAndSolr(inputData, 1);
+        return updateLocalAndSolr(inputData, 1);
     }
 
     public static boolean setNoBenchmarkingMongoDb(String pid) {
@@ -246,7 +248,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setBm_flag("2");
         inputData.setIsBenchmark("3");
         inputData.setPid(pid);
-        return updateOnlineAndSolr(inputData, 0);
+        return updateLocalAndSolr(inputData, 0);
     }
 
     public static boolean setCustomerReadyMongoDb(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword) {
@@ -259,7 +261,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setFinalName(edName);
         inputData.setRwKeyword(rwKeyword);
         inputData.setPid(pid);
-        return updateOnlineAndSolr(inputData, 0);
+        return updateLocalAndSolr(inputData, 0);
     }
     
     
@@ -346,9 +348,6 @@ public class GoodsInfoUpdateOnlineUtil {
                 file.delete();
             }
         }
-        if (json.isOk()) {
-            updateLocalAndSolr(inputData, isSolr);
-        }
         return json.isOk();
     }
 
@@ -414,6 +413,9 @@ public class GoodsInfoUpdateOnlineUtil {
             if (file != null && file.exists()) {
                 file.delete();
             }
+        }
+        if (json.isOk()) {
+            return updateOnlineAndSolr(inputData, isSolr);
         }
         return json.isOk();
     }

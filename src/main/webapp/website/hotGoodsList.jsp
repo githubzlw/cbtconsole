@@ -19,7 +19,7 @@
     <style>
         .but_edit {
             background: #009688;
-            width: 60px;
+            width: 90px;
             height: 29px;
             border: 1px #aaa solid;
             color: #fff;
@@ -508,6 +508,39 @@
             });
         }
 
+        function useGoodsPromotionFlag() {
+            var pids = "";
+            $(".check_sty").each(function () {
+                if ($(this).is(':checked')) {
+                    pids += "," + $(this).val();
+                }
+            });
+            if (pids == "") {
+                $.messager.alert("提醒", "请选择需要执行的数据", "info");
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/hotManage/useGoodsPromotionFlag",
+                data: {
+                    pids: pids.substring(1)
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        $.messager.alert("提醒", '保存成功，即将刷新页面', "info");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        $.messager.alert("提醒", '执行错误:' + data.message, "error");
+                    }
+                },
+                error: function (res) {
+                    $.messager.alert("提醒", '保存错误，请联系管理员', "error");
+                }
+            });
+        }
+
         function querySearchGoods(id) {
             var localUrl = window.location.href;
             var url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
@@ -641,8 +674,12 @@
             <td colspan="5">全选<input type="checkbox" class="check_sty_all"
                                      onclick="chooseAll(this)"/> &nbsp;&nbsp;&nbsp;<input
                     type="button" class="but_edit" onclick="useHotGoods(1,${categoryId})"
-                    value="启用 "/> &nbsp;&nbsp;&nbsp;<input type="button"
-                                                           class="but_delete" onclick="useHotGoods(0,${categoryId})" value="关闭 "/>&nbsp;&nbsp;&nbsp;
+                    value="启用 "/>
+                &nbsp;&nbsp;&nbsp;<input type="button"
+                                                           class="but_edit" onclick="useGoodsPromotionFlag()" value="标记促销商品 "/>
+                &nbsp;&nbsp;&nbsp;<input type="button"
+                                                           class="but_delete" onclick="useHotGoods(0,${categoryId})" value="关闭 "/>
+                &nbsp;&nbsp;&nbsp;
                 <b style="color: red;">(提示：绿色背景表示当前商品已选中；点击图片可直接进入电商网站产品单页)</b> <br>
                 <br>
                 <div id="add_goods_btn">
@@ -674,7 +711,11 @@
                 <span>ASIN码:${goods.asinCode}</span><br>
                 <span>利润率:${goods.profitMargin}</span><em>%</em><br>
                 <b style="color:${goods.isOn > 0 ? 'green':'red'};">状态:${goods.isOn > 0 ? '开启':'关闭'}</b>&nbsp;&nbsp;
-                <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a><br><br><br>
+                <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a><br>
+                <c:if test="${goods.promotionFlag > 0}">
+                    <b style="color:red;">促销商品</b><br>
+                </c:if>
+                <br><br>
                 <c:if test="${hotType == 2}">
                     <c:if test="${goods.discountId>0}">
                         <div style="background-color: #9ecdef">

@@ -58,6 +58,7 @@ public class HotSellingGoods implements Serializable {
 	private int isSoldFlag;
 	private String maxPrice;
 	private double virtualOldPrice;
+	private int promotionFlag;//促销flag: 0不促销，1促销
 
 	public int getId() {
 		return id;
@@ -405,6 +406,14 @@ public class HotSellingGoods implements Serializable {
 
 	public void setVirtualOldPrice(double virtualOldPrice) {
 		this.virtualOldPrice = virtualOldPrice;
+	}
+
+	public int getPromotionFlag() {
+		return promotionFlag;
+	}
+
+	public void setPromotionFlag(int promotionFlag) {
+		this.promotionFlag = promotionFlag;
 	}
 
 	@Override

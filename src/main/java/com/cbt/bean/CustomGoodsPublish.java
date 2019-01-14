@@ -97,6 +97,35 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int reviewCount;
     private String updatetime;
     private String review_flag;
+
+    private int priceIsEdit;
+    private int isUpdateImg;
+    private String sizeInfoEn;
+
+    public String getSizeInfoEn() {
+        return sizeInfoEn;
+    }
+
+    public void setSizeInfoEn(String sizeInfoEn) {
+        this.sizeInfoEn = sizeInfoEn;
+    }
+
+    public int getIsUpdateImg() {
+        return isUpdateImg;
+    }
+
+    public void setIsUpdateImg(int isUpdateImg) {
+        this.isUpdateImg = isUpdateImg;
+    }
+
+    public int getPriceIsEdit() {
+        return priceIsEdit;
+    }
+
+    public void setPriceIsEdit(int priceIsEdit) {
+        this.priceIsEdit = priceIsEdit;
+    }
+
     public String getReview_flag() {
         return review_flag;
     }

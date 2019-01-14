@@ -110,6 +110,7 @@
         <result column="createtime" property="createtime"/>
         <result column="review_remark" property="review_remark"/>
         <result column="country" property="country"/>
+        <result column="size_info_en" property="sizeInfoEn"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -708,7 +709,7 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
@@ -801,6 +802,15 @@
         </if>
         <if test="sellUnit != null">
             ,b.sellunit=#{sellUnit}
+        </if>
+        <if test="fpriceStr != null">
+            ,b.fprice_str=#{fpriceStr}
+        </if>
+        <if test="priceIsEdit > 0">
+            ,a.price_is_edit=#{priceIsEdit}
+        </if>
+        <if test="sizeInfoEn != null">
+            ,b.size_info_en=#{sizeInfoEn}
         </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
