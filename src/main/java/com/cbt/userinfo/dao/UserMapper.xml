@@ -84,7 +84,7 @@
   </select>
     <!--List<String> queryUserRemark(@Param("userid") int userid);-->
     <select id="queryUserRemark" resultType="String">
-        SELECT CONCAT(remark, '@@@@', createtime) remark
+        SELECT CONCAT(id,'@@@@', remark, '@@@@', createtime) remark
         FROM user_remark WHERE userid = #{userid} AND del = 0 AND LENGTH(remark) > 0
         ORDER BY createtime ASC
     </select>
@@ -93,4 +93,12 @@
         INSERT INTO user_remark (userid, remark, createtime)
         VALUES (#{userid}, #{remark}, NOW())
     </insert>
+
+    <!--void updateUserRemark(@Param("id") String id);-->
+    <update id="updateUserRemark">
+        UPDATE user_remark
+        SET del = 1
+        WHERE id = #{id}
+    </update>
+
 </mapper>
