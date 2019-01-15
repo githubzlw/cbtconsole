@@ -3,7 +3,6 @@ package com.cbt.controller;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
-import com.cbt.parse.service.DownloadMain;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.FtpConfig;
@@ -149,7 +148,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                             String localImgPath = ftpConfig.getLocalDiskPath() + remoteSavePath;
                             File imgFile = new File(localImgPath);
                             if (imgFile.exists()) {
-                                uploadMap.put(localImgPath,remoteSavePath);
+                                uploadMap.put(localImgPath,FtpConfig.REMOTE_LOCAL_PATH + remoteSavePath);
                                 /*boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid, remoteSavePath, localImgPath, ftpConfig);
                                 if (isSc) {
                                     continue;
