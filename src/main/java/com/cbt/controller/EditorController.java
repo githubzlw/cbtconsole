@@ -1365,7 +1365,7 @@ public class EditorController {
                             String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                             String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                             // 本地服务器磁盘全路径
-                            String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                            String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
                             ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                             // 检查图片分辨率
@@ -1373,7 +1373,7 @@ public class EditorController {
                             if (is) {
                                 is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                 if (is) {
-                                    String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                    String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
                                     is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
                                             localDiskPath + newLocalPath);
                                     if (is) {
@@ -1571,7 +1571,7 @@ public class EditorController {
                                     // 生成唯一文件名称
                                     String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                                     // 本地服务器磁盘全路径
-                                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                                    String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                                     // 下载网络图片到本地
                                     boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
                                     if (is) {
@@ -1581,7 +1581,7 @@ public class EditorController {
                                             // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
                                             checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                             if (checked) {
-                                                String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                                String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
                                                 checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
                                                         localDiskPath + newLocalPath);
                                                 if (checked) {
