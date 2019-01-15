@@ -113,7 +113,8 @@ b {
 			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"0",
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
-			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0","unsellableReason":"-1"
+			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
+			"unsellableReason":"-1","fromFlag":"-1"
 	};
 	var isQuery =0;
 
@@ -272,6 +273,12 @@ b {
             queryParams.isComplain = isComplain;
             $("#is_complain").attr("checked",'true');//全选 
         }
+        // fromFlag
+		var fromFlag = sessionStorage.getItem("fromFlag");
+        if(!(fromFlag == null || fromFlag == "" || fromFlag == '-1')){
+            queryParams.fromFlag = fromFlag;
+            $("#query_from_flag").val(fromFlag);
+        }
 
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -350,6 +357,7 @@ b {
 		var isSort = $("#query_is_sort").val();
 		var isComplain = $("#is_complain").is(":checked")?"1":"0";
 		var unsellableReason=$("#unsellableReason").val();
+		var fromFlag = $("#query_from_flag").val();
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -383,6 +391,7 @@ b {
         queryParams.isSort = isSort;
         queryParams.unsellableReason=unsellableReason;
         queryParams.isComplain = isComplain;
+        queryParams.fromFlag = fromFlag;
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -428,6 +437,7 @@ b {
             sessionStorage.setItem("isSort", queryParams.isSort);
             sessionStorage.setItem("unsellableReason", queryParams.unsellableReason);
             sessionStorage.setItem("isComplain", queryParams.isComplain);
+            sessionStorage.setItem("fromFlag", queryParams.fromFlag);
 
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
@@ -440,7 +450,8 @@ b {
 			+ "&onlineTime=" + queryParams.onlineTime + "&offlineTime=" + queryParams.offlineTime
 			+ "&editBeginTime=" + queryParams.editBeginTime + "&editEndTime=" + queryParams.editEndTime + "&weight1688Begin="
 			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
-			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain+"&unsellableReason="+queryParams.unsellableReason;
+			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
+			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -680,23 +691,17 @@ b {
 					<td>1688价格:<input id="query_1688_price_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_1688_price_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
-					<td>排序:<select id="query_is_sort"
-						style="font-size: 18px; height: 28px;">
-							<option value="0" selected="selected">请选择</option>
-							<option value="1">搜索次数倒排序</option>
-							<option value="2">点击次数倒排序</option>
-							<%--<option value="3">已点击商品倒排序</option>--%>
-							<option value="4">按照类别排序</option>
-					</select><br>&nbsp;&nbsp;<input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+					<td colspan="2"><input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
 						value="查询" style="height: 30px; width: 60px;" class="btn" />
 						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
 						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
 					</td>
+
 				</tr>
 				<tr>
-						<td>
-						下架原因:<select id="unsellableReason"
-						style="font-size: 18px; height: 28px;">
+						<td colspan="3">
+						产品下架原因:<select id="unsellableReason"
+						style="font-size: 18px; height: 28px;width: 480px;">
 						<option value="-1" selected="selected">请选择</option>
 						<option value="1">1688货源下架</option>
 						<option value="2">不满足库存条件</option>
@@ -721,6 +726,24 @@ b {
 							<option value="21">大于400美元商品下架</option>
 						</select>
 						</td>
+					<td>产品来源:<select id="query_from_flag"
+						style="font-size: 18px; height: 28px;width: 180px;">
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">原始产品</option>
+							<option value="1">店铺上线</option>
+							<option value="2">单个商品录入上线</option>
+							<option value="3">速卖通对标上线</option>
+							<option value="4">跨境上线</option>
+							<option value="5">爆款开发上线</option>
+					</select></td>
+					<td>查询排序:<select id="query_is_sort"
+						style="font-size: 18px; height: 28px;width: 140px;">
+							<option value="0" selected="selected">请选择</option>
+							<option value="1">搜索次数倒排序</option>
+							<option value="2">点击次数倒排序</option>
+							<%--<option value="3">已点击商品倒排序</option>--%>
+							<option value="4">按照类别排序</option>
+					</select></td>
 				</tr>
 			</table>
 
