@@ -154,7 +154,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setGoodsstate("4");
         inputData.setFprice_str(bean.getFpriceStr());
         inputData.setSize_info_en(bean.getSizeInfoEn());
-        inputData.setCustom_main_image(bean.getShowMainImage());
+        inputData.setCustom_main_image(bean.getShowMainImage().replace(bean.getRemotpath(),""));
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
         return updateLocalAndSolr(inputData, 1);
     }
