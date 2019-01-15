@@ -98,10 +98,18 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String updatetime;
     private String review_flag;
 
+
+    private String goods_pid;
     private int priceIsEdit;
     private int isUpdateImg;
     private String sizeInfoEn;
+    public String getGoods_pid() {
+        return goods_pid;
+    }
 
+    public void setGoods_pid(String goods_pid) {
+        this.goods_pid = goods_pid;
+    }
     public String getSizeInfoEn() {
         return sizeInfoEn;
     }

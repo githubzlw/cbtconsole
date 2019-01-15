@@ -1828,12 +1828,15 @@ public class EditorController {
                 json.setOk(false);
             }
             Map<String,String> paramMap=new HashMap<String,String>();
-            String update_aliId=request.getParameter("update_aliId");
+            String oldCreateTime=request.getParameter("oldCreateTime");
+            String goods_pid=request.getParameter("goods_pid");
+
             String edit_remark=request.getParameter("edit_remark");
             String editcountry=request.getParameter("editcountry");
             String edit_score=request.getParameter("edit_score");
             String update_flag=request.getParameter("update_flag");
-            paramMap.put("update_aliId",update_aliId);
+            paramMap.put("oldCreateTime",oldCreateTime);
+            paramMap.put("goods_pid",goods_pid);
             paramMap.put("edit_remark",edit_remark);
             paramMap.put("editcountry",editcountry);
             paramMap.put("edit_score",edit_score);
@@ -1843,7 +1846,7 @@ public class EditorController {
             if(index>0){
                 //插入数据到线上
                 SendMQ sendMQ=new SendMQ();
-                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where id='"+update_aliId+"'";
+                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where goods_pid='"+goods_pid+"' and createtime='"+oldCreateTime+"'";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
@@ -1863,6 +1866,7 @@ public class EditorController {
     @RequestMapping(value = "/addReviewRemark", method = {RequestMethod.POST})
     @ResponseBody
     public JsonResult addReviewRemark(HttpServletRequest request, HttpServletResponse response) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JsonResult json = new JsonResult();
         json.setOk(true);
         try{
@@ -1881,11 +1885,13 @@ public class EditorController {
             paramMap.put("review_score",review_score);
             paramMap.put("country",country);
             paramMap.put("review_name",adm.getAdmName());
+            String createTime=df.format(new Date());
+            paramMap.put("createTime",createTime);
             int index=customGoodsService.addReviewRemark(paramMap);
             if(index>0){
                 //插入数据到线上
                 SendMQ sendMQ=new SendMQ();
-                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"',now(),'"+review_remark+"','"+review_score+"')";
+                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"','"+createTime+"','"+review_remark+"','"+review_score+"')";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }

@@ -843,11 +843,13 @@
             $("#review_remark").val("");
         }
 
-        function openEditReview(aliId,country,review_remark,review_score,review_flag){
+        function openEditReview(country,review_remark,review_score,review_flag,createtime,pid){
+            $("#oldCreateTime").val(createtime);
+            $("#goods_pid").val(pid);
+
             $('#edit_score').combobox('setValue',review_score);
             $('#editcountry').combobox('setValue',country);
             $("#edit_remark").val(review_remark);
-            $("#update_aliId").val(aliId);
             if(review_flag == "不显示"){
                 review_flag="1";
             }else if(review_flag == "显示"){
@@ -858,16 +860,20 @@
         }
 
         function closeUpdateRemark(){
+            $("#oldCreateTime").val("");
+            $("#goods_pid").val("");
+
             $('#edit_score').combobox('setValue',"1");
             $('#editcountry').combobox('setValue',"country");
             $("#edit_remark").val("");
-            $("#update_aliId").val("");
             $('#update_flag').combobox('setValue',"0");
             $('#update_review_dlg').dialog('close');
         }
 
         function updateReviewRemark(){
-            var update_aliId=$("#update_aliId").val();
+           var oldCreateTime=$("#oldCreateTime").val();
+            var goods_pid=$("#goods_pid").val();
+
             var edit_remark=$("#edit_remark").val();
             var editcountry=$('#editcountry').combobox('getValue');
             var edit_score=$("#edit_score").val();
@@ -889,11 +895,12 @@
                 dataType: 'text',
                 url: '/cbtconsole/editc/updateReviewRemark',
                 data: {
-                    "update_aliId": update_aliId,
                     "edit_remark": edit_remark,
                     "editcountry":editcountry,
                     "edit_score":edit_score,
-                    "update_flag":update_flag
+                    "update_flag":update_flag,
+                    "oldCreateTime":oldCreateTime,
+                    "goods_pid":goods_pid
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
@@ -1497,7 +1504,8 @@
          data-options="modal:true"
          style="width: 460px; height: 360px; padding: 10px;">
         <br>
-        <input id="update_aliId" type="hidden" name="update_aliId">
+        <input id="oldCreateTime" type="hidden">
+        <input id="goods_pid" type="hidden">
         评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
         <br>
         <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
@@ -2005,7 +2013,7 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview(${review.aliId},'${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}');">编辑</button><br>
+                    <button onclick="openEditReview('${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">编辑</button><br>
                 </c:forEach>
 
             </div>
