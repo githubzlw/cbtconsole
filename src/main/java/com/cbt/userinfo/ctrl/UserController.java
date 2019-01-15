@@ -384,6 +384,21 @@ public class UserController {
     public List<String> queryUserRemark(int userid) {
         return userInfoService.queryUserRemark(userid);
     }
+    @RequestMapping(value = "/updateUserRemark")
+    @ResponseBody
+    public Map<String, String> updateUserRemark(String id) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            userInfoService.updateUserRemark(id);
+            result.put("state", "true");
+            result.put("message", "删除成功");
+        } catch (Exception e){
+            result.put("state", "false");
+            result.put("message", "删除异常");
+            LOG.error("updateUserRemark error, id " + id, e);
+        }
+        return result;
+    }
 
     @RequestMapping(value = "/addUserRemark")
     @ResponseBody
