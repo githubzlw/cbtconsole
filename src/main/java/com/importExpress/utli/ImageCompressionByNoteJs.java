@@ -44,8 +44,8 @@ public class ImageCompressionByNoteJs {
 			response = client.newCall(request).execute();
 
 			String resultStr = response.body().string();
+			System.err.println("compressByOkHttp[" + url + "],result:" + resultStr);
 			if(StringUtils.isBlank(resultStr) || "null".equals(resultStr)){
-				System.err.println("compressByOkHttp[" + url + "],result:" + resultStr);
 				isSuccess = false;
 			}else{
 				jsAr = JSONArray.fromObject(resultStr);

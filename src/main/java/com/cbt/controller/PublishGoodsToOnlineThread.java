@@ -194,16 +194,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                             System.err.println("localDownImg:" + localDownImg + ",success!!");
                             //压缩图片 220x200 285x285 285x380
                             boolean isCompress;
-                            String img285x285 = localDownImg.replace(".400x400.", ".285x285.");
-                            String img285x380 = localDownImg.replace(".400x400.", ".285x380.");
-                            String img220x220 = localDownImg.replace(".400x400.", ".220x220.");
-                            boolean isCompress1 = ImageCompressionByNoteJs.compressByOkHttp(img285x285, 2);
-                            boolean isCompress2 = ImageCompressionByNoteJs.compressByOkHttp(img285x380, 3);
-                            boolean isCompress3 = ImageCompressionByNoteJs.compressByOkHttp(img220x220, 4);
+                            boolean isCompress1 = ImageCompressionByNoteJs.compressByOkHttp(localDownImg, 2);
+                            boolean isCompress2 = ImageCompressionByNoteJs.compressByOkHttp(localDownImg, 3);
+                            boolean isCompress3 = ImageCompressionByNoteJs.compressByOkHttp(localDownImg, 4);
                             isCompress = isCompress1 && isCompress2 && isCompress3;
                             // 压缩成功后，上传图片
                             if (isCompress) {
-                                System.err.println("Compress:[" + img285x285 + "," + img285x380 + "," + img220x220 + "] success");
+                                System.err.println("Compress:[" + localDownImg  + "] 285x285,285x380,img220x220 success");
                                 String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
                                 //上传
                                 File upFile = new File(localDownImgPre);
