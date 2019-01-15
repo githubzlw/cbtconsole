@@ -72,7 +72,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 			if(rs.next()){
 				return 1;
 			}
-			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo='"+orderNo+"'";
+			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE LEFT(oa.orderNo,16)='"+orderNo+"'";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			if(rs.next()){

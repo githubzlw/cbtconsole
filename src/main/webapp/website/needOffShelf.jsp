@@ -146,6 +146,7 @@
             if (neverFlag == null || neverFlag == "") {
                 neverFlag = 0;
             }
+            var soldFlag = $("#query_sold_flag").val();
             $("#neef_off_easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "catid":catid,
@@ -154,7 +155,8 @@
                 "reason": reason,
                 "isOffShelf": isOffShelf,
                 "updateFlag": updateFlag,
-                "neverFlag": neverFlag
+                "neverFlag": neverFlag,
+                "soldFlag":soldFlag
             });
         }
 
@@ -210,31 +212,49 @@
         function formatReason(val, row, index) {
             //商品下架原因
             if (val == 1) {
-                return '1688货源下架';
+                return '1-1688货源下架';
             } else if (val == 2) {
-                return '不满足库存条件';
+                return '2-不满足库存条件';
             } else if (val == 3) {
-                return '销量无变化(低库存)';
+                return '3-销量无变化(低库存)';
             } else if (val == 4) {
-                return '页面404';
+                return '4-页面404';
             } else if (val == 5) {
-                return '重复验证合格';
+                return '5-重复验证合格';
             } else if (val == 6) {
-                return 'IP问题或运营直接下架';
+                return '6-IP问题或运营直接下架';
             } else if (val == 7) {
-                return '店铺整体禁掉';
+                return '7-店铺整体禁掉';
             } else if (val == 8) {
-                return '采样不合格';
+                return '8-采样不合格';
             } else if (val == 9) {
-                return '有质量问题';
+                return '9-有质量问题';
             } else if (val == 10) {
-                return '商品侵权';
+                return '10-商品侵权';
             } else if (val == 11) {
-                return '店铺侵权';
+                return '11-店铺侵权';
             } else if (val == 12) {
-                return '难看';
+                return '12-难看';
             } else if (val == 13) {
-                return '中文';
+                return '13-中文';
+            } else if (val == 14) {
+                return '14-1688商品货源变更';
+            } else if (val == 15) {
+                return '15-除服装珠宝分类外的非精品数据更新到软下架';
+            } else if (val == 16) {
+                return '16-搜索展现点击比+添加购物车数据 指标不符合要求';
+            } else if (val == 17) {
+                return '17-低价商品下架';
+            } else if (val == 18) {
+                return '18-类别隐藏数据下架';
+            } else if (val == 19) {
+                return '19-店铺小于5件商品软下架';
+            } else if (val == 20) {
+                return '20-一手数据下架';
+            } else if (val == 21) {
+                return '21-大于400美元商品下架';
+            } else if (val == 22) {
+                return '22-原因老数据没有展示详情图片';
             } else {
                 return '';
             }
@@ -275,19 +295,28 @@
         </span>
         <span> 下架原因: <select id="query_reason" style="font-size: 14px; height: 24px; width: 160px;">
                                 <option value="0" selected="selected">全部</option>
-                                <option value="1">1688货源下架</option>
-                                <option value="2">不满足库存条件</option>
-                                <option value="3">销量无变化(低库存)</option>
-                                <option value="4">页面404</option>
-                                <option value="5">重复验证合格</option>
-                                <option value="6">IP问题或运营直接下架</option>
-                                <option value="7">店铺整体禁掉</option>
-                                <option value="8">采样不合格</option>
-                                <option value="9">有质量问题</option>
-                                <option value="10">商品侵权</option>
-                                <option value="11">店铺侵权</option>
-                                <option value="12">难看</option>
-                                <option value="13">中文</option>
+                                <option value="1">1-1688货源下架</option>
+                                <option value="2">2-不满足库存条件</option>
+                                <option value="3">3-销量无变化(低库存)</option>
+                                <option value="4">4-页面404</option>
+                                <option value="5">5-重复验证合格</option>
+                                <option value="6">6-IP问题或运营直接下架</option>
+                                <option value="7">7-店铺整体禁掉</option>
+                                <option value="8">8-采样不合格</option>
+                                <option value="9">9-有质量问题</option>
+                                <option value="10">10-商品侵权</option>
+                                <option value="11">11-店铺侵权</option>
+                                <option value="12">12-难看</option>
+                                <option value="13">13-中文</option>
+                                <option value="14">14-1688商品货源变更</option>
+                                <option value="15">15-除服装珠宝分类外的非精品数据更新到软下架</option>
+                                <option value="16">16-搜索展现点击比+添加购物车数据 指标不符合要求</option>
+                                <option value="17">17-低价商品下架</option>
+                                <option value="18">18-类别隐藏数据下架</option>
+                                <option value="19">19-店铺小于5件商品软下架</option>
+                                <option value="20">20-一手数据下架</option>
+                                <option value="21">21-大于400美元商品下架</option>
+                                <option value="22">22-原因老数据没有展示详情图片</option>
                         </select>
         </span>
         <span> 更新标识: <select id="query_updateFlag" style="font-size: 14px; height: 24px; width: 100px;">
@@ -301,6 +330,12 @@
         <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
                                 <option value="0" selected="selected">全部</option>
                                 <option value="1">永不下架</option>
+                        </select>
+            <span> 有销量等筛选(<a href="#" id="refreshData">刷新临时数据</a>): <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
+                                <option value="0" selected="selected">不进行筛选</option>
+                                <option value="1">有销量</option>
+                                <option value="2">购物车中商品</option>
+                                <option value="3">有跨境图片包</option>
                         </select>
         </span>
         <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
@@ -326,7 +361,19 @@
     <tbody>
     </tbody>
 </table>
-
+<script type="text/javascript">
+    $("#refreshData").click(function () {
+        alert("临时查询数据刷新中 预计30s!");
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/queryuser/refreshNeedOffShelfData.do",
+            dataType:"json",
+            success: function(msg){
+                alert(msg.message);
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

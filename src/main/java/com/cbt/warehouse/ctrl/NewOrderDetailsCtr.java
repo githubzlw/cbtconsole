@@ -127,7 +127,7 @@ public class NewOrderDetailsCtr {
 							shippingtype=shippingtype+";"+(StringUtil.isBlank(s.getShippingtype())?"":s.getShippingtype());
 						}
 						awesFreight=awesFreight+Double.parseDouble(s.getEstimatefreight())*rate;
-						ac_weight+=Double.parseDouble(s.getAc_weight());
+						ac_weight+=Double.parseDouble(StringUtil.isBlank(s.getAc_weight())?"0.00":s.getAc_weight());
 					}
 				}
 				actual_freight=df.format(actualFreight);
@@ -1982,10 +1982,12 @@ public class NewOrderDetailsCtr {
 		//会员费
 		double memberFee = orderInfo.getMemberFee();
 
+		double couponAmount = Double.parseDouble(orderInfo.getCouponAmount());
+
 		// 会员费不算优惠金额,去掉
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
-				+ actual_lwh + processingfee;
+				+ actual_lwh + processingfee-couponAmount;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

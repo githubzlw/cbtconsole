@@ -46,6 +46,7 @@
             closeSimilarGoodsDialog();
             closeKeyWordDialog();
             closeBenchmarking();
+            closeSizeInfoEnDialog();
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
         });
@@ -356,6 +357,8 @@
                 showMessage("获取商品描述详情为空");
                 return;
             }
+            var wordSizeInfo = $("#word_info_div").html();
+
             var remotepath = $("#goods_remotepath").val();
             if (remotepath == "") {
                 showMessage("获取图片远程路径为空");
@@ -366,6 +369,11 @@
             var imgInfo = getImgInfo();
             if (imgInfo == "") {
                 showMessage("获取橱窗图为空");
+                return;
+            }
+            var bizPrice = $("#biz_price").val();
+            if(bizPrice == null || bizPrice == "" || bizPrice == 0){
+                showMessage("获取bizPrice为空");
                 return;
             }
             var wprice = "";
@@ -469,10 +477,12 @@
                         "wprice": wprice.substring(1),
                         "feePrice":feePrice.substring(1),
                         "rangePrice": range_price,
+                        "bizPrice": bizPrice,
                         "goodsPrice": goodsPriceVal,
                         "sellUtil": sellUtil,
                         "typeRepalceIds": typeRepalceIds.substring(1),
-                        "typeDeleteIds": typeDeleteIds.substring(1)
+                        "typeDeleteIds": typeDeleteIds.substring(1),
+                        "wordSizeInfo":wordSizeInfo
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -833,11 +843,13 @@
             $("#review_remark").val("");
         }
 
-        function openEditReview(aliId,country,review_remark,review_score,review_flag){
+        function openEditReview(country,review_remark,review_score,review_flag,createtime,pid){
+            $("#oldCreateTime").val(createtime);
+            $("#goods_pid").val(pid);
+
             $('#edit_score').combobox('setValue',review_score);
             $('#editcountry').combobox('setValue',country);
             $("#edit_remark").val(review_remark);
-            $("#update_aliId").val(aliId);
             if(review_flag == "不显示"){
                 review_flag="1";
             }else if(review_flag == "显示"){
@@ -848,16 +860,20 @@
         }
 
         function closeUpdateRemark(){
+            $("#oldCreateTime").val("");
+            $("#goods_pid").val("");
+
             $('#edit_score').combobox('setValue',"1");
             $('#editcountry').combobox('setValue',"country");
             $("#edit_remark").val("");
-            $("#update_aliId").val("");
             $('#update_flag').combobox('setValue',"0");
             $('#update_review_dlg').dialog('close');
         }
 
         function updateReviewRemark(){
-            var update_aliId=$("#update_aliId").val();
+           var oldCreateTime=$("#oldCreateTime").val();
+            var goods_pid=$("#goods_pid").val();
+
             var edit_remark=$("#edit_remark").val();
             var editcountry=$('#editcountry').combobox('getValue');
             var edit_score=$("#edit_score").val();
@@ -879,11 +895,12 @@
                 dataType: 'text',
                 url: '/cbtconsole/editc/updateReviewRemark',
                 data: {
-                    "update_aliId": update_aliId,
                     "edit_remark": edit_remark,
                     "editcountry":editcountry,
                     "edit_score":edit_score,
-                    "update_flag":update_flag
+                    "update_flag":update_flag,
+                    "oldCreateTime":oldCreateTime,
+                    "goods_pid":goods_pid
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
@@ -1164,6 +1181,23 @@
             $("#add_goods_pid").val("");
             $("#form_benchmarking")[0].reset();
         }
+
+        function updateWordSizeInfo() {
+            $('#size_info_en_dlg').dialog('open');
+        }
+
+        function addSizeInfoEn() {
+            var size_info_en_text = $("#size_info_en_text").val();
+            $("#word_info_div").empty();
+            $("#word_info_div").append(size_info_en_text);
+            closeSizeInfoEnDialog();
+        }
+
+
+        function closeSizeInfoEnDialog() {
+            $('#size_info_en_dlg').dialog('close');
+        }
+
 
         function saveBenchmarking() {
             var noKeyWeight = false;
@@ -1470,7 +1504,8 @@
          data-options="modal:true"
          style="width: 460px; height: 360px; padding: 10px;">
         <br>
-        <input id="update_aliId" type="hidden" name="update_aliId">
+        <input id="oldCreateTime" type="hidden">
+        <input id="goods_pid" type="hidden">
         评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
         <br>
         <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
@@ -1499,6 +1534,24 @@
                onclick="updateReviewRemark()" style="width: 80px">保存</a>
             <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
                class="easyui-linkbutton" onclick="closeUpdateRemark()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+
+    <div id="size_info_en_dlg" class="easyui-dialog" title="编辑文字尺码表"
+         data-options="modal:true"
+         style="width: 520px; height: 440px; padding: 10px;">
+        <br>
+        <textarea id="size_info_en_text" style="width: 460px; height: 300px;">${goods.sizeInfoEn}</textarea>
+        <br><br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="addSizeInfoEn()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeSizeInfoEnDialog()"
                style="width: 80px">关闭</a>
         </div>
     </div>
@@ -1767,7 +1820,7 @@
                             <div class="goods_p">
                                 <p class="goods_color">bizPrice:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur">${goods.fpriceStr}</span>
+                                    <span class="goods_cur"><input class="pr_txt" id="biz_price" value="${goods.fpriceStr}"/></span>
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -1960,7 +2013,7 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview(${review.aliId},'${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}');">编辑</button><br>
+                    <button onclick="openEditReview('${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">编辑</button><br>
                 </c:forEach>
 
             </div>
@@ -1984,17 +2037,15 @@
             </div>
         </c:if>
 
-        <c:if test="${not empty goods.wordSizeInfo}">
+        <c:if test="${not empty goods.sizeInfoEn}">
 
-            <div class="s_bot" id="word_info_div">
-                <div style="float:left;width:75%;">
-                        ${goods.wordSizeInfo}
+            <div class="s_bot" >
+                <div style="float:left;width:75%;" id="word_info_div">
+                        ${goods.sizeInfoEn}
                 </div>
-
-                <div
-                        style="width: 20%; margin: 0 auto;float: right;">
-                <span id="word_size_info" class="s_btn"
-                      onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>
+                <div style="width: 20%; margin: 0 auto;float: right;">
+                <%--<span id="word_size_info" class="s_btn" onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>--%>
+                <span id="size_info_en" class="s_btn" onclick="updateWordSizeInfo()">修改文字尺码表</span>
 
                 </div>
 
@@ -2010,12 +2061,9 @@
             <div class="bot_l">
                 <div class="b_left">
                     <h1 style="text-align: center">importE详情编辑框</h1>
-                    <input type="hidden" id="goods_savePath" value="${savePath}"
-                           name="savePath"> <input type="hidden" id="goods_localpath"
-                                                   value="${localpath}" name="localpath"> <input type="hidden"
-                                                                                                 id="goods_remotepath"
-                                                                                                 value="${goods.remotpath}"
-                                                                                                 name="remotepath">
+                    <input type="hidden" id="goods_savePath" value="${savePath}" name="savePath">
+                    <input type="hidden" id="goods_localpath" value="${localpath}" name="localpath">
+                    <input type="hidden" id="goods_remotepath" value="${goods.remotpath}" name="remotepath">
                     <textarea id="goods_content" rows="100" style="width: 100%;">${text}</textarea>
                 </div>
             </div>

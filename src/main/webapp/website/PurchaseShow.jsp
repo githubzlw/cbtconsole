@@ -2900,6 +2900,7 @@
 									<c:if test="${cgid != 52}">
 										<a style="color:red" href="/cbtconsole/customerServlet?action=findOrdersPurchaseInfo&className=OrdersPurchaseServlet&orderNo=${pb.orderNo}&purchaseId=${admid==999?1:cgid}" target="_blank" style="text-decoration: none">[选择其他1688货源]</a>
 									</c:if>
+									<%--<a style="color:red" href="/cbtconsole/website/goods_change.jsp?odid=${pb.od_id}" target="_blank" style="text-decoration: none">商品替换</a>--%>
 								</div>
 								<span> <input type="hidden" value="${pb.goods_title }" /></span>
 								<span id="chk22_${pb.orderNo}${pb.od_id}">
@@ -2938,7 +2939,9 @@
 								</c:if>
 								<span id="issure${pb.orderNo}${pb.od_id}">
 									<input type="hidden" value="${pb.goods_title }" /><label id="rmk_${pb.orderNo}${pb.od_id}" style="color: red;">${pb.issure}</label></span>
-								<span>${pb.originalGoodsUrl}</span> <input type="hidden" id="dhy${pb.orderNo}${pb.od_id}" value="${pb.goods_title}" />								</div>
+								<span>${pb.originalGoodsUrl}</span> <input type="hidden" id="dhy${pb.orderNo}${pb.od_id}" value="${pb.goods_title}" />
+								<br>${pb.noChnageRemark}
+							</div>
 								<%--<div style="width: 100%; word-wrap: break-word;">--%>
 								<%--预估单品利润金额RMB（预估单品利润率%):${pb.profit}--%>
 								<%--【预估单品利润金额RMB（预估单品利润率%）=客户实际支付单品金额-实际预估采购单品金额-预估国际单品运费--%>

@@ -1717,6 +1717,13 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			tbSku=String.valueOf(map.get("tbSku"));
 		}
 		purchaseBean.setTbSku(tbSku);
+		String noChangeRemark=String.valueOf(map.get("noChnageRemark"));
+		if(StringUtil.isBlank(noChangeRemark)){
+			noChangeRemark="";
+		}else{
+			noChangeRemark="<span style='color:red'>客户不同意替换备注:"+noChangeRemark+"</span>";
+		}
+		purchaseBean.setNoChnageRemark(noChangeRemark);
 		purchaseBean.setOd_state(Integer.valueOf(String.valueOf(map.get("od_state")==null?"0":map.get("od_state"))));
 		purchaseBean.setLastValue(map.get("lastValue"));
 		String pidInventory="0";

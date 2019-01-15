@@ -3054,6 +3054,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
         }
+        if(offShelf.getSoldFlag() != 0){
+            if (offShelf.getSoldFlag() == 3){
+                sql += " and cbr.from_flag = 4 ";
+            } else {
+                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type = " + offShelf.getSoldFlag() + ") ";
+            }
+        }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
         }
@@ -3148,6 +3155,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
+        }
+        if(offShelf.getSoldFlag() != 0){
+            if (offShelf.getSoldFlag() == 3){
+                sql += " and cbr.from_flag = 4 ";
+            } else {
+                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type = " + offShelf.getSoldFlag() + ") ";
+            }
         }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
