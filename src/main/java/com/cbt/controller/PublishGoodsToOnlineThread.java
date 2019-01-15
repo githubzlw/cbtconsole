@@ -188,7 +188,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         // 图片下载本地路径名称
                         String localDownImgPre = ftpConfig.getLocalDiskPath() + pid + "/edit";
                         String localDownImg = localDownImgPre + downImgName.replace(".220x220", ".400x400");
-                        boolean isSuccess = ImgDownload.execute(goods.getShowMainImage(), localDownImg);
+                        boolean isSuccess = ImgDownload.downFromImgService(goods.getShowMainImage(), localDownImg);
                         System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
                         if (isSuccess) {
                             System.err.println("localDownImg:" + localDownImg + ",success!!");
