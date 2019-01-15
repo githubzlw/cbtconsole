@@ -1884,7 +1884,6 @@
         </div>
         <div class="s_r">
             <div class="table_su">
-			<b>
                 <c:if
 					test="${goods.fromFlag > 0}">
 					<br>
