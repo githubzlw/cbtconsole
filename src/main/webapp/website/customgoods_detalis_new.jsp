@@ -213,6 +213,17 @@
             })
         }
 
+        function setMainImg() {
+            $('.ul_pic li').each(function (i) {
+                if ($('.ul_pic li').eq(i).hasClass('red_border')) {
+                    var imgUrl = $(this).find("img")[0].src;
+                    $("#first_li").after($(this));
+                    $("#first_li").val(imgUrl);
+                }
+                roastingImg();
+            });
+        }
+
         function aliImgToExpress() {
             var img_src = "";
             var index = null;
@@ -364,6 +375,15 @@
                 showMessage("获取图片远程路径为空");
                 return;
             }
+
+            var mainImg = $("#first_li").val();
+            if (mainImg == "" || mainImg == null) {
+                showMessage("设置封面图失败,请重新设置");
+                return;
+            }else if(mainImg == "99"){
+                mainImg = "";
+            }
+
             //不校检商品属性
             var endetail = getGoodsAttributeInfo();
             var imgInfo = getImgInfo();
@@ -482,7 +502,8 @@
                         "sellUtil": sellUtil,
                         "typeRepalceIds": typeRepalceIds.substring(1),
                         "typeDeleteIds": typeDeleteIds.substring(1),
-                        "wordSizeInfo":wordSizeInfo
+                        "wordSizeInfo":wordSizeInfo,
+                        "mainImg":mainImg
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -1182,7 +1203,10 @@
             $("#form_benchmarking")[0].reset();
         }
 
-        function updateWordSizeInfo() {
+        function updateWordSizeInfo(type) {
+            if(type == 0){
+                $("#size_info_en_text").val("");
+            }
             $('#size_info_en_dlg').dialog('open');
         }
 
@@ -1609,6 +1633,7 @@
                                     <span class="prev_arrow"></span>
                                 </p>
                                 <ul class="ul_pic">
+                                    <input type="hidden" id="first_li" style="display: none" value="99"/>
                                     <c:forEach items="${showimgs}" var="imgBean"
                                                varStatus="imgIndex">
                                         <li class="li_pic"><img src="${imgBean}"></li>
@@ -1619,9 +1644,9 @@
                                 </p>
                             </div>
                             <div class="clear_box">
-                                <span class="clear_clo" onclick="showDialog()">添加</span> <span
-                                    id="delete_pic" class="clear_clo">删除</span> <span
-                                    class="clear_txt">*删除所选中的橱窗图</span>
+                                <span title="添加橱窗图" class="clear_clo" onclick="showDialog()">添加</span> <span
+                                    title="删除所选中的橱窗图" id="delete_pic" class="clear_clo">删除</span> <span
+                                    class="clear_clo" title="选中设置为主图" onclick="setMainImg()">设置封面图</span>
                             </div>
                         </div>
                         <div class="goods_detail">
@@ -2037,21 +2062,24 @@
             </div>
         </c:if>
 
-        <c:if test="${not empty goods.sizeInfoEn}">
 
-            <div class="s_bot" >
-                <div style="float:left;width:75%;" id="word_info_div">
-                        ${goods.sizeInfoEn}
-                </div>
-                <div style="width: 20%; margin: 0 auto;float: right;">
-                <%--<span id="word_size_info" class="s_btn" onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>--%>
-                <span id="size_info_en" class="s_btn" onclick="updateWordSizeInfo()">修改文字尺码表</span>
-
-                </div>
-
+        <div class="s_bot">
+            <div style="float:left;width:75%;" id="word_info_div">
+                    ${goods.sizeInfoEn}
+            </div>
+            <div style="width: 20%; margin: 0 auto;float: right;">
+                    <%--<span id="word_size_info" class="s_btn" onclick="deleteWordSizeInfo(${goods.pid})">删除文字尺码表</span>--%>
+                <c:if test="${not empty goods.sizeInfoEn}">
+                    <span id="size_info_en" class="s_btn" onclick="updateWordSizeInfo(1)">修改文字尺码表</span>
+                </c:if>
+                <c:if test="${empty goods.sizeInfoEn}">
+                    <span id="size_info_en" class="s_btn" onclick="updateWordSizeInfo(0)">新增文字尺码表</span>
+                </c:if>
             </div>
 
-        </c:if>
+        </div>
+
+
 
 
         <div class="s_bot">

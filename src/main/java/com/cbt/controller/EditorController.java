@@ -141,7 +141,7 @@ public class EditorController {
 
         // 将goods的img属性值取出来,即橱窗图
         request.setAttribute("showimgs", JSONArray.fromObject("[]"));
-        List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods, goods.getRemotpath());
+        List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
         if (imgs.size() > 0) {
             request.setAttribute("showimgs", JSONArray.fromObject(imgs));
             String firstImg = imgs.get(0);
@@ -789,10 +789,23 @@ public class EditorController {
 
 
             // 获取文字尺码表
-
             String wordSizeInfo = request.getParameter("wordSizeInfo");
             if(StringUtils.isNotBlank(wordSizeInfo)){
                 cgp.setSizeInfoEn(wordSizeInfo.replace("\\n","<br>"));
+            }
+
+            // 设置主图数据 mainImg
+            String mainImg = request.getParameter("mainImg");
+            if(StringUtils.isNotBlank(mainImg)){
+                mainImg = mainImg.replace(orGoods.getRemotpath(),"");
+                // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
+                if(mainImg.contains(".60x60")){
+                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
+                }else if(mainImg.contains(".400x400")){
+                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
+                }
+                cgp.setShowMainImage(mainImg);
+                cgp.setIsUpdateImg(2);
             }
 
             GoodsEditBean editBean = new GoodsEditBean();
@@ -827,9 +840,14 @@ public class EditorController {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
-                    int isUpdateImg = 0;
+
                     if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
-                        isUpdateImg = 1;
+                        if(cgp.getIsUpdateImg() == 0){
+                            cgp.setIsUpdateImg(1);
+                            // 设置图片信息
+                        }
+                    }else{
+                        cgp.setIsUpdateImg(0);
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -838,12 +856,12 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
+                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
                             pbThread.start();
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     } else {
-                        PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
+                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
                         pbThread.start();
                         json.setMessage("更新成功,异步上传图片中，请等待");
                     }
