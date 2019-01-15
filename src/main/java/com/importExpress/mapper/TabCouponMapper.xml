@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.importExpress.mapper.TabCouponMapper">
 	
-    <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode); -->
+    <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode, @Param("valid") Integer valid); -->
 	<select id="queryTabCouponList" resultType="com.importExpress.pojo.TabCouponNew">
 		SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid, a.mqlog, a.createtime, b.admName username
 		FROM tab_coupon_new a
@@ -11,18 +11,24 @@
 			<if test="typeCode != null">
 				 a.type = #{typeCode}
 			</if>
+            <if test="valid != null">
+                AND a.valid = #{valid}
+            </if>
 		</where>
 		LIMIT #{startBars},#{rows}
     </select>
 
-	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode); -->
+	<!-- Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid); -->
 	<select id="queryTabCouponListCount" resultType="long">
 		SELECT COUNT(1)
-		FROM tab_coupon_new
+		FROM tab_coupon_new a
 		<where>
 			<if test="typeCode != null">
-				 type_code = #{typeCode}
+				 a.type_code = #{typeCode}
 			</if>
+            <if test="valid != null">
+                AND a.valid = #{valid}
+            </if>
 		</where>
     </select>
     
@@ -74,5 +80,12 @@
         WHERE couponCode = #{couponCode}
         GROUP BY couponCode
     </select>
+
+    <!--void updateCouponValid(@Param("couponCode") String couponCode, @Param("valid") int valid);-->
+    <update id="updateCouponValid">
+        UPDATE tab_coupon_new
+        SET valid = #{valid}
+        WHERE id = #{couponCode}
+    </update>
     
 </mapper>

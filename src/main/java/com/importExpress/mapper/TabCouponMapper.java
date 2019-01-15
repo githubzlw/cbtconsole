@@ -9,9 +9,10 @@ import java.util.List;
 
 public interface TabCouponMapper {
 
-	List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode);
+	List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                          @Param("typeCode") String typeCode, @Param("valid") Integer valid);
 
-	Long queryTabCouponListCount(@Param("typeCode") String typeCode);
+	Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid);
 
 	List<TabCouponType> queryTabCouponTypeCodeList();
 
@@ -26,4 +27,6 @@ public interface TabCouponMapper {
     void insertCouponUsers(@Param("bean") TabCouponNew bean, @Param("list") List<String> list);
 
     String queryTabCouponUser(@Param("couponCode") String couponCode);
+
+    void updateCouponValid(@Param("couponCode") String couponCode, @Param("valid") int valid);
 }
