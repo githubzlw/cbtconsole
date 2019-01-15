@@ -180,7 +180,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         customGoodsService.updateGoodsState(pid, 4);
                     }
 
-                    // isUpdateImg = 1;
+                    isUpdateImg = 1;
                     if (isUpdateImg > 0) {
                         // 下载需要的图片到本地
                         // 新的主图名称
@@ -201,7 +201,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                             // 压缩成功后，上传图片
                             if (isCompress) {
                                 System.err.println("Compress:[" + localDownImg  + "] 285x285,285x380,img220x220 success");
-                                String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
+                                String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0,goods.getShowMainImage().lastIndexOf("/")));
                                 //上传
                                 File upFile = new File(localDownImgPre);
                                 if (upFile.exists() && upFile.isDirectory()) {
