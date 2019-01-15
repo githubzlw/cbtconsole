@@ -143,12 +143,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                         for (String imgUrl : imgList) {
                             // 得到图片服务器FTP后部分保存全路径
                             String remoteSavePath = imgUrl.replace(localShowPath, "");
-                            System.err.println("imgUrl:" + imgUrl + ",remoteSavePath:" + remoteSavePath);
+                            String remoteSavePreFile =  FtpConfig.REMOTE_LOCAL_PATH + remoteSavePath.substring(0,remoteSavePath.lastIndexOf("/"));
+                            System.err.println("imgUrl:" + imgUrl + ",remoteSavePreFile:" + remoteSavePreFile);
                             // 本地图片全路径
                             String localImgPath = ftpConfig.getLocalDiskPath() + remoteSavePath;
                             File imgFile = new File(localImgPath);
                             if (imgFile.exists()) {
-                                uploadMap.put(localImgPath,FtpConfig.REMOTE_LOCAL_PATH + remoteSavePath);
+                                uploadMap.put(localImgPath,remoteSavePreFile);
                                 /*boolean isSc = GoodsInfoUtils.uploadFileToRemoteSSM(pid, remoteSavePath, localImgPath, ftpConfig);
                                 if (isSc) {
                                     continue;
