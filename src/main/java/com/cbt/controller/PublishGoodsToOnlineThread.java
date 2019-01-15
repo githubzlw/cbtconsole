@@ -201,7 +201,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                             // 压缩成功后，上传图片
                             if (isCompress) {
                                 System.err.println("Compress:[" + localDownImg  + "] 285x285,285x380,img220x220 success");
-                                String destPath = GoodsInfoUtils.changeRemotePathToLocal(remotepath + pid);
+                                String destPath = GoodsInfoUtils.changeRemotePathToLocal(goods.getShowMainImage().substring(0,goods.getShowMainImage().lastIndexOf("/")));
                                 //上传
                                 File upFile = new File(localDownImgPre);
                                 if (upFile.exists() && upFile.isDirectory()) {
