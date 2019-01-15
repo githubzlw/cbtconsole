@@ -37,7 +37,7 @@ public class PaymentDao implements PaymentDaoImp {
                 + "if(paytype!=2,(select sum(p.payment_amount) from payment p where "
                 + "p1.orderid= p.orderid and p.paystatus=1 "
                 + "and paytype=2 group by p.orderid  ),payment_amount) as bpay,  "
-                + " if(orderid!='',(select count(distinct left(p7.orderid,16))  "
+                + " if(orderid!='',(select count(distinct func_get_split_string(p7.orderid,'_',1)))  "
                 + " from payment p7  where p7.userid=p1.userid),0) as ordersum "
                 + "from payment  p1  where p1.paystatus=1 ";
 
@@ -295,7 +295,7 @@ public class PaymentDao implements PaymentDaoImp {
     @Override
     public int queryTotalNum(PayCheckBean bean) {
 
-        String sql = "select count(*) from (select orderid,if(orderid!='',(select count(distinct left(p7.orderid,16))  "
+        String sql = "select count(*) from (select orderid,if(orderid!='',(select count(distinct func_get_split_string(p7.orderid,'_',1))  "
                 + " from payment p7  where p7.userid=p1.userid),0) as ordersum from payment p1 where p1.paystatus=1 ";
 
         Connection conn = DBHelper.getInstance().getConnection();
@@ -1756,21 +1756,21 @@ public class PaymentDao implements PaymentDaoImp {
     public List<OrderPaymentBean> getOrderPayList(int userid, int page) {
         String sql = " select sql_calc_found_rows a.user_id,a.create_time,a.order_no,a.pay_price,"
                 + "b.payment_amount,c.payment_all from "
-                + "(select o.create_time,left(order_no,16) as order_no,o.user_id,sum(if(o.state=-1 or o.state=6,0.0,o.pay_price)/e.exchange_rate) as pay_price "
+                + "(select o.create_time,func_get_split_string(order_no,'_',1) as order_no,o.user_id,sum(if(o.state=-1 or o.state=6,0.0,o.pay_price)/e.exchange_rate) as pay_price "
                 + "from orderinfo o ,exchange_rate e where  o.currency=e.country and  "
-                + "(o.state=-1 or (o.state>0 and o.state<7)) and o.user_id=?  group by left(order_no,16)) as a ,"
-                + " (select  left(o.orderid,16) as orderid,sum(o.payment_amount/e.exchange_rate) as payment_amount "
+                + "(o.state=-1 or (o.state>0 and o.state<7)) and o.user_id=?  group by func_get_split_string(order_no,'_',1)) as a ,"
+                + " (select  func_get_split_string(o.orderid,'_',1) as orderid,sum(o.payment_amount/e.exchange_rate) as payment_amount "
                 + "from  payment o,exchange_rate e where  o.payment_cc=e.country and  o.paystatus=1 and "
-                + "(o.paytype='0' or o.paytype='1' or o.paytype='2') and o.userid=?  group by left(o.orderid,16)) as b ,"
-                + "(select  left(o.orderid,16) as orderid,sum(o.payment_amount/e.exchange_rate) as payment_all "
+                + "(o.paytype='0' or o.paytype='1' or o.paytype='2') and o.userid=?  group by func_get_split_string(o.orderid,'_',1)) as b ,"
+                + "(select  func_get_split_string(o.orderid,'_',1) as orderid,sum(o.payment_amount/e.exchange_rate) as payment_all "
                 + "from  payment o,exchange_rate e where  o.payment_cc=e.country and  o.paystatus=1 and "
-                + "(o.paytype='0' or o.paytype='1') and o.userid=?  group by left(o.orderid,16)) as c  "
+                + "(o.paytype='0' or o.paytype='1') and o.userid=?  group by func_get_split_string(o.orderid,'_',1)) as c  "
                 + "where a.order_no=b.orderid and c.orderid=b.orderid  order by a.create_time desc limit ?,20 ";//order by a.create_time desc
 
 
-        String sql2 = "select sum(price) as price,left(remark_id,16) as remark_id,balanceAfter from recharge_record where  userid=? and "
-                + " left(remark_id,16) in (?) and (type=1 or remark like '%cancel%' or remark like '%取消%')  "
-                + " group by left(remark_id,16)";//order by datatime
+        String sql2 = "select sum(price) as price,func_get_split_string(remark_id,'_',1) as remark_id,balanceAfter from recharge_record where  userid=? and "
+                + " func_get_split_string(remark_id,'_',1) in (?) and (type=1 or remark like '%cancel%' or remark like '%取消%')  "
+                + " group by func_get_split_string(reamrk_id,'_',1)";//order by datatime
 
 
         //status 状态 0-申请退款 1-销售同意退款 2-退款完结 3-管理员同意退款  -1-销售驳回退款 -2 -客户取消退款 -3-管理员拒绝退款
