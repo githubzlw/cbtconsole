@@ -261,6 +261,7 @@ input, textarea, select, button {
 								<option value="1">Wire Transfer</option>
 								<option value="2">余额支付</option>
 								<option value="5">Stripe支付</option>
+								<option value="8">非电商网站支付</option>
 						</select></td>
 						<td><input style="width: 180px;" id="query_pay_id" type="text"
 								   value="" /></td>
