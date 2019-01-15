@@ -688,6 +688,7 @@ public class ShopCarMarketingController {
             double totalPrice = 0;
             double totalWhosePrice = 0;
             double estimateProfit = 0;
+            
             for (ShopCarInfo carInfo : shopCarInfoList) {
                 if(StringUtils.isBlank(carInfo.getWholesalePrice())){
                     continue;
