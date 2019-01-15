@@ -180,7 +180,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                         customGoodsService.updateGoodsState(pid, 4);
                     }
 
-                    isUpdateImg = 1;
+                    // isUpdateImg = 1;
                     if (isUpdateImg > 0) {
                         // 下载需要的图片到本地
                         // 新的主图名称
