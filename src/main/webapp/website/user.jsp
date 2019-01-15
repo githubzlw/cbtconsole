@@ -53,8 +53,21 @@ tr .td_class{width:230px;}
 	width:120px;
 }
 .w_input input{width:200px;}
-#user_remark .remark_td {
+#user_remark .remark_td1 {
+    width: 450px;
+}
+#user_remark .remark_td2 {
     width: 200px;
+}
+#user_remark table,#user_remark table tr th, #user_remark table tr td {
+    border:1px solid #CCC;
+}
+#user_remark table {
+    width: 200px;
+    min-height: 25px;
+    line-height: 25px;
+    text-align: center;
+    border-collapse: collapse;
 }
 #user_remark tr {
     line-height: 24px;
@@ -211,6 +224,23 @@ tr .td_class{width:230px;}
 						});
 			});
 	}
+	//删除用户备注
+	function deleteUserRemark(id) {
+        $.messager.confirm('提示','你确定要删除该条备注吗?',function(r){
+            if(r){
+                $.ajax({
+                    type: "POST",
+                    url: "/cbtconsole/userinfo/updateUserRemark.do?id=" + id,
+                    dataType:"json",
+                    success: function(msg){
+                        $.messager.alert('提示', msg.message);
+                        $('#user_remark').window('close');
+                    }
+                });
+            }
+        });
+    }
+    //显示用户备注
     function showRemark(uid) {
         $('#user_remark .remark_list').html('');
         $("#user_remark input[name='userid']").val(uid);
@@ -222,16 +252,23 @@ tr .td_class{width:230px;}
             data: {userid:uid},
             dataType:"json",
             success: function(msg){
-                var oldRemark = '';
                 if(msg != undefined && msg.length > 0){
-                    var temHtml = msg.join('</td></tr><tr><td>').replace(/@@@@/g, '</td><td class="remark_td">');
-                    $('#user_remark .remark_list').html('<tr><td>' + temHtml + '</td></tr>');
+                    var temHtml = '';
+                    $(msg).each(function (index, item) {
+                        var remarkArr = item.split('@@@@');
+                        if(remarkArr != undefined && remarkArr.length == 3){
+                            temHtml += '<tr><td class="remark_td1">' + remarkArr[1]
+                                + '</td><td class="remark_td2">' + remarkArr[2]
+                                + '</td><td>' + '<a href="#" onclick="deleteUserRemark(\'' + remarkArr[0] + '\')">删除</a>' + '</td></tr>';
+                        }
+                    });
+                    $('#user_remark .remark_list').html(temHtml);
                 }
                 $('#user_remark').window('open');
             }
         });
     }
-
+    //添加用户备注
     function addUserRemark() {
         var userid = $("#user_remark input[name='userid']").val();
         var remark = $('#new_user_remark').val();
@@ -432,14 +469,14 @@ tr .td_class{width:230px;}
 			<a href="javascript:void(0)" class="easyui-linkbutton" onclick="fnUp()" style="width:80px">确认修改</a>
 		</div>
 	</div>
-    <div id="user_remark" class="easyui-window" title="增加用户备注"
+    <div id="user_remark" class="easyui-window" title="添加/历史用户备注"
          data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
          style="width:800px;height:auto;display: none;font-size: 16px;">
             <div style="margin-left:20px;">
                 <input type="hidden" name="userid">
                 <div style="margin-top:20px;">历史备注:</div>
                 <div style="margin-left:20px;">
-                    <table class="remark_list" >
+                    <table class="remark_list" style="width: 720px;word-break:break-all; word-wrap:break-all;">
                     </table>
                 </div>
                 <div style="margin-top:20px;">新添加备注:</div>

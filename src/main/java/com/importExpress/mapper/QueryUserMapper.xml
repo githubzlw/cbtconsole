@@ -305,5 +305,37 @@
         SET authName=#{authName}, url=#{url}, reMark=#{reMark}, module_type=#{moduleType}
         WHERE authId=#{authId}
     </update>
+
+    <!--List<String> queryBoughtGoods(@Param("startDate") String startDate);-->
+    <select id="queryBoughtGoods" resultType="String">
+        SELECT DISTINCT od.goods_pid pid FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
+        INNER JOIN custom_benchmark_ready c ON od.goods_pid=c.pid AND c.valid=0
+        WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1)
+        AND oi.user_id IN (SELECT id FROM USER WHERE is_test=0)
+        AND oi.orderpaytime >= #{startDate}
+    </select>
+
+    <!--List<String> queryCarProducts(@Param("startDate") String startDate);-->
+    <select id="queryCarProducts" resultType="String">
+        select DISTINCT a.itemId pid from goods_car a
+        LEFT JOIN custom_benchmark_ready c ON a.itemId = c.pid
+        LEFT JOIN USER u ON a.userid = u.id
+        where c.valid=0 AND u.is_test=0
+        and a.datatime >= #{startDate}
+    </select>
+
+    <!--void insertNeedoffshelfSoldPid(@Param("list") List<String> list, @Param("type") Integer type);-->
+    <insert id="insertNeedoffshelfSoldPid">
+        INSERT INTO alidata.needoffshelf_sold_pid (pid, type, create_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item}, #{type}, NOW())
+        </foreach>
+    </insert>
+
+    <!--void deleteNeedoffshelfSoldAll();-->
+    <delete id="deleteNeedoffshelfSoldAll">
+        TRUNCATE TABLE alidata.needoffshelf_sold_pid
+    </delete>
 	
 </mapper>

@@ -234,7 +234,7 @@
         select userid,orderid,paymentid,payment_other,payment_amount,payment_cc,orderdesc,
         username,paystatus,date_format(createtime,'%Y-%m-%d %H:%i:%s') as createtime,paySID,payflag,paytype
         from payment
-        where 1=1 and paystatus = 1 and paytype = 0 and userid = #{userId} and length(orderid) = 16
+        where 1=1 and paystatus = 1 and paytype = 0 and userid = #{userId} and LOCATE('_',orderid)&lt;=0
         <if test=" type == 1">
             and createtime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
         </if>

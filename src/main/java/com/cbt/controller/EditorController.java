@@ -141,7 +141,7 @@ public class EditorController {
 
         // 将goods的img属性值取出来,即橱窗图
         request.setAttribute("showimgs", JSONArray.fromObject("[]"));
-        List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods, goods.getRemotpath());
+        List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(), goods.getRemotpath());
         if (imgs.size() > 0) {
             request.setAttribute("showimgs", JSONArray.fromObject(imgs));
             String firstImg = imgs.get(0);
@@ -181,7 +181,7 @@ public class EditorController {
             request.setAttribute("typeNames", typeNames);
         }
 
-        //判断是否是非免邮商品(isSoldFlag > 0)，如果是则显示非免邮价格显示
+        //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
         if (goods.getSoldFlag() > 0) {
             if (StringUtils.isNotBlank(goods.getFeeprice())) {
                 request.setAttribute("feePrice", goods.getFeeprice());
@@ -327,8 +327,10 @@ public class EditorController {
 
         String text = textBf.toString();
 
+        // 已经放入产品表的size_info_en字段
         //获取文字尺码数据
-        String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
+        // String wordSizeInfo = customGoodsService.getWordSizeInfoByPid(pid);
+        String wordSizeInfo = goods.getSizeInfoEn();
         if (StringUtils.isNotBlank(wordSizeInfo)) {
             if (wordSizeInfo.indexOf("[") == 0) {
                 wordSizeInfo = wordSizeInfo.substring(1);
@@ -336,7 +338,7 @@ public class EditorController {
             if (wordSizeInfo.lastIndexOf("]") == wordSizeInfo.length() - 1) {
                 wordSizeInfo = wordSizeInfo.substring(0, wordSizeInfo.length() - 1);
             }
-            goods.setWordSizeInfo(wordSizeInfo);
+            goods.setSizeInfoEn(wordSizeInfo);
         }
 
         // 当前抓取aliexpress的商品数据
@@ -620,6 +622,15 @@ public class EditorController {
                 return json;
             }
 
+            String bizPrice = request.getParameter("bizPrice");
+            if (StringUtils.isNotBlank(bizPrice) || "0".equals(bizPrice)) {
+                cgp.setFpriceStr(bizPrice);
+            } else {
+                json.setOk(false);
+                json.setMessage("获取bizPrice失败");
+                return json;
+            }
+
             String rangePrice = request.getParameter("rangePrice");
 
             if (rangePrice == null || "".equals(rangePrice)) {
@@ -697,6 +708,13 @@ public class EditorController {
                 }
             }
 
+            // 判断是否改价 wprice range_price feeprice price  fprice_str
+            if(checkPriceIsUpdate(cgp,orGoods)){
+                System.err.println("pid:" + pidStr + ",not update price");
+            }else{
+                cgp.setPriceIsEdit(1);
+            }
+
             //获取需要删除的规格ids数据，进行匹配删除
             String typeDeleteIds = request.getParameter("typeDeleteIds");
 
@@ -770,6 +788,26 @@ public class EditorController {
             typeList.clear();
 
 
+            // 获取文字尺码表
+            String wordSizeInfo = request.getParameter("wordSizeInfo");
+            if(StringUtils.isNotBlank(wordSizeInfo)){
+                cgp.setSizeInfoEn(wordSizeInfo.replace("\\n","<br>"));
+            }
+
+            // 设置主图数据 mainImg
+            String mainImg = request.getParameter("mainImg");
+            if(StringUtils.isNotBlank(mainImg)){
+                mainImg = mainImg.replace(orGoods.getRemotpath(),"");
+                // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
+                if(mainImg.contains(".60x60")){
+                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
+                }else if(mainImg.contains(".400x400")){
+                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
+                }
+                cgp.setShowMainImage(mainImg);
+                cgp.setIsUpdateImg(2);
+            }
+
             GoodsEditBean editBean = new GoodsEditBean();
 
             String type = request.getParameter("type");
@@ -802,9 +840,14 @@ public class EditorController {
                     String updateTimeStr = orGoods.getUpdateTimeAll();
                     //判断不是正式环境的，不进行搜图图片更新
                     String ip = request.getRemoteAddr();
-                    int isUpdateImg = 0;
+
                     if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
-                        isUpdateImg = 1;
+                        if(cgp.getIsUpdateImg() == 0){
+                            cgp.setIsUpdateImg(1);
+                            // 设置图片信息
+                        }
+                    }else{
+                        cgp.setIsUpdateImg(0);
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -813,12 +856,12 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
+                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
                             pbThread.start();
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     } else {
-                        PublishGoodsToOnlie pbThread = new PublishGoodsToOnlie(pidStr, customGoodsService, ftpConfig, isUpdateImg);
+                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
                         pbThread.start();
                         json.setMessage("更新成功,异步上传图片中，请等待");
                     }
@@ -836,6 +879,53 @@ public class EditorController {
             LOG.error("保存错误，原因：" + e.getMessage());
         }
         return json;
+    }
+
+    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp,CustomGoodsPublish orGoods){
+        int count = 0;
+        // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
+        // wprice
+        if(StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())){
+            if(cgp.getWprice().equals(orGoods.getWprice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())){
+            count ++;
+        }
+        // range_price
+        if(StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())){
+            if(cgp.getRangePrice().equals(orGoods.getRangePrice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())){
+            count ++;
+        }
+        // feeprice
+        if(StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())){
+            if(cgp.getFeeprice().equals(orGoods.getFeeprice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())){
+            count ++;
+        }
+        // price
+        if(StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())){
+            if(cgp.getPrice().equals(orGoods.getPrice())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())){
+            count ++;
+        }
+        // fprice_str
+        if(StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())){
+            if(cgp.getFpriceStr().equals(orGoods.getFpriceStr())){
+                count ++;
+            }
+        }else if(StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())){
+            count ++;
+        }
+
+        return count == 5;
     }
 
     // 处理sku数据，跟参数传递过来的价格数据进行赋值
@@ -1275,7 +1365,7 @@ public class EditorController {
                             String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                             String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                             // 本地服务器磁盘全路径
-                            String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                            String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                             // 文件流输出到本地服务器指定路径
                             ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
                             // 检查图片分辨率
@@ -1283,7 +1373,7 @@ public class EditorController {
                             if (is) {
                                 is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                 if (is) {
-                                    String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                    String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
                                     is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
                                             localDiskPath + newLocalPath);
                                     if (is) {
@@ -1481,7 +1571,7 @@ public class EditorController {
                                     // 生成唯一文件名称
                                     String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                                     // 本地服务器磁盘全路径
-                                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                                    String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
                                     // 下载网络图片到本地
                                     boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
                                     if (is) {
@@ -1491,7 +1581,7 @@ public class EditorController {
                                             // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
                                             checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                                             if (checked) {
-                                                String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                                String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
                                                 checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
                                                         localDiskPath + newLocalPath);
                                                 if (checked) {
@@ -1756,12 +1846,15 @@ public class EditorController {
                 json.setOk(false);
             }
             Map<String,String> paramMap=new HashMap<String,String>();
-            String update_aliId=request.getParameter("update_aliId");
+            String oldCreateTime=request.getParameter("oldCreateTime");
+            String goods_pid=request.getParameter("goods_pid");
+
             String edit_remark=request.getParameter("edit_remark");
             String editcountry=request.getParameter("editcountry");
             String edit_score=request.getParameter("edit_score");
             String update_flag=request.getParameter("update_flag");
-            paramMap.put("update_aliId",update_aliId);
+            paramMap.put("oldCreateTime",oldCreateTime);
+            paramMap.put("goods_pid",goods_pid);
             paramMap.put("edit_remark",edit_remark);
             paramMap.put("editcountry",editcountry);
             paramMap.put("edit_score",edit_score);
@@ -1771,7 +1864,7 @@ public class EditorController {
             if(index>0){
                 //插入数据到线上
                 SendMQ sendMQ=new SendMQ();
-                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where id='"+update_aliId+"'";
+                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where goods_pid='"+goods_pid+"' and createtime='"+oldCreateTime+"'";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
@@ -1791,6 +1884,7 @@ public class EditorController {
     @RequestMapping(value = "/addReviewRemark", method = {RequestMethod.POST})
     @ResponseBody
     public JsonResult addReviewRemark(HttpServletRequest request, HttpServletResponse response) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JsonResult json = new JsonResult();
         json.setOk(true);
         try{
@@ -1809,11 +1903,13 @@ public class EditorController {
             paramMap.put("review_score",review_score);
             paramMap.put("country",country);
             paramMap.put("review_name",adm.getAdmName());
+            String createTime=df.format(new Date());
+            paramMap.put("createTime",createTime);
             int index=customGoodsService.addReviewRemark(paramMap);
             if(index>0){
                 //插入数据到线上
                 SendMQ sendMQ=new SendMQ();
-                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"',now(),'"+review_remark+"','"+review_score+"')";
+                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"','"+createTime+"','"+review_remark+"','"+review_score+"')";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }

@@ -58,4 +58,6 @@ public interface IUserInfoService {
     List<String> queryUserRemark(int userid);
 
     void insertUserRemark(int userid, String remark);
+
+    void updateUserRemark(String id);
 }

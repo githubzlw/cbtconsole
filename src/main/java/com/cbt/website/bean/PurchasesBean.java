@@ -87,6 +87,14 @@ public class PurchasesBean {
 	private int authorized_flag;
 	private String tbSku;
 	private String quality;
+	private String noChnageRemark;
+	public String getNoChnageRemark() {
+		return noChnageRemark;
+	}
+
+	public void setNoChnageRemark(String noChnageRemark) {
+		this.noChnageRemark = noChnageRemark;
+	}
 
 	public String getInventoryRemark() {
 		return inventoryRemark;

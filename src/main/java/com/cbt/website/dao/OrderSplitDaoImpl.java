@@ -453,7 +453,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "details_number,actual_lwh,processingfee,pay_price_three,remaining_price,foreign_freight,pay_price,pay_price_tow,currency,actual_ffreight,discount_amount,"
 				+ "order_ac,pay_price,purchase_number,server_update,client_update,cashback,extra_freight,share_discount,extra_discount,coupon_discount,grade_discount,exchange_rate,"
 				+ "(select max(order_no) from orderinfo where order_no like '" + orderno
-				+ "%' and length(order_no) < 21) maxSplitOrder,"
+				+ "%' and isDropshipOrder < 2) maxSplitOrder,"
 				+ "(select min(createtime) from payment where orderid=order_no and paystatus=1 ) paytime "
 				+ "from orderinfo where order_no=? ";
 		Connection conn = DBHelper.getInstance().getConnection2();

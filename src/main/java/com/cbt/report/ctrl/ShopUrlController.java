@@ -1877,7 +1877,8 @@ public class ShopUrlController {
 
             // 将goods的img属性值取出来,即橱窗图
             request.setAttribute("showimgs", JSONArray.fromObject("[]"));
-            List<String> imgs = deal1688GoodsImg(goods, goods.getLocalpath());
+            List<String> imgs = GoodsInfoUtils.deal1688GoodsImg(goods.getImg(),goods.getLocalpath());
+            goods.setShowImages(imgs);
             if (imgs.size() > 0) {
                 String firstImg = imgs.get(0);
                 goods.setShowMainImage(firstImg.replace(".60x60.", ".400x400."));
@@ -2063,33 +2064,6 @@ public class ShopUrlController {
 
         return typeList;
 
-    }
-
-    // 处理1688商品的规格图片数据
-    private List<String> deal1688GoodsImg(CustomGoodsPublish cgbean, String localPath) {
-
-        List<String> imgList = new ArrayList<String>();
-        // 图片
-        String img = cgbean.getImg();
-        if (StringUtils.isNotBlank(img)) {
-            img = img.replace("[", "").replace("]", "").trim();
-            String[] imgs = img.split(",\\s*");
-
-            for (int i = 0; i < imgs.length; i++) {
-                if (!imgs[i].isEmpty()) {
-                    // imgList.add(remotPath + imgs[i].replace(".60x60.jpg",
-                    // ""));
-                    // 统一路径，下面代码屏蔽
-                    if (imgs[i].indexOf("http://") > -1 || imgs[i].indexOf("https://") > -1) {
-                        imgList.add(imgs[i]);
-                    } else {
-                        imgList.add(localPath + imgs[i]);
-                    }
-                }
-            }
-            cgbean.setShowImages(imgList);
-        }
-        return imgList;
     }
 
     private HashMap<String, String> deal1688Sku(CustomGoodsPublish cgbean) {
