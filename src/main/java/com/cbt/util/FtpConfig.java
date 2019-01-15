@@ -1,6 +1,7 @@
 package com.cbt.util;
 
 public class FtpConfig {
+	public static final String REMOTE_LOCAL_PATH = "/usr/local/goodsimg/importcsvimg/";
 
 	private String ftpURL;
 	private String ftpPort;

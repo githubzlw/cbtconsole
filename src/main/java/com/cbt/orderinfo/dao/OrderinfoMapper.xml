@@ -233,7 +233,7 @@
         o.order_no,o.mode_transport, orderpaytime   paytime,o.orderid as id,o.delivery_time ,o.currency,o.user_id,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email, ''as buyer,
         func_get_split_string(mode_transport,'@',3) as countrys, '' address,'' address2,'' statename,'' phoneNumber,'' street,'' zipcode,
         (select count(id) from order_change oc where oc.orderno=o.order_no and roptype = 5 and oldvalue= 1) oc_c,(CASE WHEN pay_price_three='-999' THEN 3 WHEN IFNULL(pay_price_three,0)>0  THEN 2 ELSE 0 END ) paytype    ,1 paystatus,
-        (select count(*) from (select left(d.order_no,16) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, left(d.order_no,16) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
+        (select count(*) from (select func_get_split_string(d.order_no,'_',1) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, func_get_split_string(d.order_no,'_',1) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
         true then  (ifnull(pay_price,0)-ifnull(pay_price_three,0)) else 0 end )   service_fee
         ,o.packag_style as changenum ,o.actual_weight_estimate as freightFee,date_format(ifnull(orderpaytime,o.create_time),'%Y-%c-%d %h:%i:%s') as createtime ,o.orderRemark,pay_price_three,isDropshipOrder
         from orderinfo    o  inner join user  on o.user_id=user.id
@@ -401,7 +401,7 @@
         (select count(of.id) from order_fee of  where ( state=3 or  state=0)  and of.orderno = o.order_no) deliver,
         o.order_no,o.mode_transport, orderpaytime  paytime,o.orderid as id,o.delivery_time ,o.currency,o.user_id,ifnull(aru.admName,'') adminname,cancel_obj,o.actual_ffreight,purchase_number,details_number,o.product_cost,o.state,user.name username,user.email email, <!-- ifnull(order_buy.buyuser,'') -->'' as buyer, func_get_split_string(mode_transport,'@',3) as countrys,'' address,'' address2,'' statename,'' phoneNumber,'' street,'' zipcode,
         (select count(id) from order_change oc where oc.orderno=o.order_no and roptype = 5 and oldvalue= 1) oc_c,(CASE ifnull(pay_price_three,0)>0 when true  then 2 else 0 end ) paytype    ,1 paystatus,
-        (select count(*) from (select left(d.order_no,16) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, left(d.order_no,16) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
+        (select count(*) from (select func_get_split_string(d.order_no,'_',1) ordercnt ,d.user_id   from orderinfo d where d.state between 1 and 5  group by d.user_id, func_get_split_string(d.order_no,'_',1) ) as  act  where act.user_id=o.user_id) as order_count,(CASE  (ifnull(pay_price,0)-ifnull(pay_price_three,0))>0 when
         true then  (ifnull(pay_price,0)-ifnull(pay_price_three,0)) else 0 end )   service_fee
         ,o.packag_style as changenum ,date_format(ifnull(orderpaytime,o.create_time),'%Y-%c-%d %h:%i:%s')  as createtime ,o.orderRemark
         from orderinfo    o  inner join user  on o.user_id=user.id
@@ -882,6 +882,7 @@
          (select DISTINCT pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no LIMIT 1) as payUserName,
         (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
         (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
+        (SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,
         (SELECT COUNT(od.orderid) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
@@ -1431,7 +1432,7 @@
     <select id="getFlushOrderFreightOrderCancel" resultType="com.cbt.bean.OrderBean">
         SELECT oi.order_no as orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
         WHERE oi.actual_weight_estimate&lt;=0
-        AND (oi.state IN (1,2) OR od.state IN (-1,2) OR LEFT(oi.order_no,16)=LEFT(FIND_IN_SET(oi.order_no,'_'),16))
+        AND (oi.state IN (1,2) OR od.state IN (-1,2) OR func_get_split_string(oi.order_no,'_',1)=func_get_split_string(FIND_IN_SET(oi.order_no,'_'),'_',1))
         AND oi.isDropshipOrder IN(0,1) AND  DATE_SUB(CURDATE(), INTERVAL 20 DAY) &lt;= date(oi.orderpaytime)
         GROUP BY oi.order_no  ORDER BY
     </select>

@@ -115,32 +115,33 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             }
         }
 
-        int res = customGoodsDao.publish(bean,0);
+        //int res = customGoodsDao.publish(bean,0);
         // 屏蔽使用jdbc更新AWS数据
         //int res = customGoodsDao.publish(bean);
 
         // 使用MQ更新AWS服务器数据
         // GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
 
+        int res = 0 ;
         // 使用MongoDB更新AWS服务器数据
-        GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean);
-
-        res = 1;
-        if (res > 0) {
-            int count = customGoodsDao.publishTo28(bean);
-            if (count == 0) {
+        if(GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean)){
+            // 更新27
+            customGoodsDao.publish(bean,0);
+            // 更新28并重试一次
+            res = customGoodsDao.publishTo28(bean);
+            if (res == 0) {
                 customGoodsDao.publishTo28(bean);
             }
-        }
 
-        //更新SkuGoodsOffers和SingleOffersChild信息
-        int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
-        //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers
-        if (count > 0) {
-            customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
-        } else {
-            //否则插入或者更新SingleOffersChild信息
-            customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+            //更新SkuGoodsOffers和SingleOffersChild信息
+            int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
+            //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers
+            if (count > 0) {
+                customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+            } else {
+                //否则插入或者更新SingleOffersChild信息
+                customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+            }
         }
         return res;
     }

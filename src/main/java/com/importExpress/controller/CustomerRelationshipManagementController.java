@@ -14,11 +14,11 @@ import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.util.Utility;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.TemplateType;
-import com.importExpress.pojo.AdminRUser;
-import com.importExpress.pojo.AdminRUserExample;
-import com.importExpress.pojo.UserBean;
+import com.cbt.website.util.EasyUiJsonResult;
+import com.importExpress.pojo.*;
 import com.importExpress.service.AdminRUserServiece;
 import com.importExpress.service.OrderSplitService;
+import com.importExpress.service.OutofstockdemandService;
 import com.importExpress.service.ReorderService;
 import com.importExpress.service.SendChaPsendEmailService;
 import com.importExpress.utli.FreightUtlity;
@@ -27,6 +27,9 @@ import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.opencv.ml.EM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +42,12 @@ import javax.jws.Oneway;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Result;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 /**
  * *****************************************************************************************
@@ -73,6 +80,8 @@ public class CustomerRelationshipManagementController {
     private ReorderService reorderService;
     @Autowired
     private SendChaPsendEmailService sendChaPsendEmailService;
+    @Autowired
+    private OutofstockdemandService out;
     /**
      * @Title: queryTheNumCustomersUnderSaler
      * @Author: cjc
@@ -181,5 +190,67 @@ public class CustomerRelationshipManagementController {
         String reason3 = request.getParameter("reason3");
         JsonResult result = sendChaPsendEmailService.sendChaPsendEmail( emailInfo,  email,  copyEmail,  orderNo,  userId,  title ,  reason3);
         return result;
+    }
+    @RequestMapping(value = "/getOutofstockdemandList")
+    @ResponseBody
+    public EasyUiJsonResult getOutofstockdemandtable(HttpServletRequest request,HttpServletResponse response) throws Exception {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        int startNum = 0;
+        int limitNum = 50;
+        long total = 0l;
+        String pageStr = request.getParameter("page");
+        String limitNumStr = request.getParameter("rows");
+
+        if (!(limitNumStr == null || "".equals(limitNumStr) || "0".equals(limitNumStr))) {
+            limitNum = Integer.valueOf(limitNumStr) ;
+        }
+
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        String disputeid = request.getParameter("disputeid");
+
+        String sttime = request.getParameter("sttime");
+        if (sttime == null || "".equals(sttime)) {
+            sttime = "2018-12-12 00:00:00";
+        } else {
+            sttime += " 00:00:00";
+        }
+        String edtime = request.getParameter("edtime");
+        if (edtime == null || "".equals(edtime)) {
+            edtime = "2050-12-12 23:59:59";
+        } else {
+            edtime += " 23:59:59";
+        }
+        String email = request.getParameter("email");
+        String flagStr = request.getParameter("flag");
+        int flag = -1;
+        if(StringUtils.isNotBlank(flagStr)){
+            flag = Integer.parseInt(flagStr);
+        }
+        String itemid = request.getParameter("itemid");
+        try {
+           /* OutofstockdemandtableExample example = new OutofstockdemandtableExample();
+            int count = out.countByExample(example);*/
+            List<Outofstockdemandtable> outofstockdemandList = out.getOutofstockdemandList(startNum, limitNum, sttime, edtime, email, flag, itemid);
+            total = outofstockdemandList.stream().count();
+            outofstockdemandList = outofstockdemandList.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+            outofstockdemandList.stream().forEach(e -> {
+                e.setCtime(sdf.format(e.getCreatime()));
+                e.setEtime(sdf.format(e.getUpdatetime()));
+                e.setItemid("<a href ='https://www.import-express.com/goodsinfo/cbtconsole-1"+e.getItemid()+".html' target='_blank'>"+e.getItemid()+"</a>");
+                    }
+            );
+            json.setTotal((int) total);
+            json.setRows(outofstockdemandList);
+            json.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setSuccess(false);
+            json.setMessage("获取数据失败，原因：" + e.getMessage());
+            logger.error("获取数据失败，原因：" + e.getMessage());
+        }
+        return json;
     }
 }

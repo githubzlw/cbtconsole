@@ -97,6 +97,43 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int reviewCount;
     private String updatetime;
     private String review_flag;
+
+
+    private String goods_pid;
+    private int priceIsEdit;
+    private int isUpdateImg;// 1自动设置第一张图片为橱窗图，2设置选中的封面图
+    private String sizeInfoEn;
+    public String getGoods_pid() {
+        return goods_pid;
+    }
+
+    public void setGoods_pid(String goods_pid) {
+        this.goods_pid = goods_pid;
+    }
+    public String getSizeInfoEn() {
+        return sizeInfoEn;
+    }
+
+    public void setSizeInfoEn(String sizeInfoEn) {
+        this.sizeInfoEn = sizeInfoEn;
+    }
+
+    public int getIsUpdateImg() {
+        return isUpdateImg;
+    }
+
+    public void setIsUpdateImg(int isUpdateImg) {
+        this.isUpdateImg = isUpdateImg;
+    }
+
+    public int getPriceIsEdit() {
+        return priceIsEdit;
+    }
+
+    public void setPriceIsEdit(int priceIsEdit) {
+        this.priceIsEdit = priceIsEdit;
+    }
+
     public String getReview_flag() {
         return review_flag;
     }

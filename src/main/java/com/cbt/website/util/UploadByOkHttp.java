@@ -68,7 +68,7 @@ public class UploadByOkHttp {
 		try {
 			RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
 //					.addFormDataPart("image", originFile.getName(),
-							.addFormDataPart("image", uploadFileName,
+							.addFormDataPart("userPhoto", uploadFileName,
 							RequestBody.create(MediaType.parse(imageType), originFile))
 					.addFormDataPart("token", TOKEN).addFormDataPart("destPath", destPath).build();
 			Request request = new Request.Builder().url(ACCESS_URL).post(formBody).build();
@@ -91,8 +91,62 @@ public class UploadByOkHttp {
 
 	}
 
+	public static boolean uploadFileBatch(File originFile, String destPath) {
+		boolean isUpload = false;
+
+		try {
+			if (originFile.exists() && originFile.isDirectory()) {
+
+				File[] childFiles = originFile.listFiles();
+
+				String imageType;
+				MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder();
+				multipartBodyBuilder.setType(MultipartBody.FORM);
+
+				int count = 0;
+				for (File chFile : childFiles) {
+					if (chFile.isFile()) {
+						imageType = "image/jpeg";
+						if (originFile.getName().endsWith(".png")) {
+							imageType = "image/png";
+						}
+						count ++;
+						//System.out.println("upload file:[" + chFile.getAbsolutePath().replace("\\", "/") +  "]");
+						multipartBodyBuilder.addFormDataPart("userPhoto", chFile.getName(),
+								RequestBody.create(MediaType.parse(imageType), chFile));
+					}
+				}
+				System.out.println("total size:" + count + " to destPath:" + destPath);
+				RequestBody formBody = multipartBodyBuilder.addFormDataPart("token", TOKEN)
+						.addFormDataPart("destPath", destPath).build();
+
+				Request request = new Request.Builder().url(ACCESS_URL).post(formBody).build();
+				// client = new OkHttpClient();
+				OkHttpClient client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
+						.readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS).build();
+				Response response = client.newCall(request).execute();
+				String rs = response.body().string();
+				System.out.println(rs);
+				if (rs.contains("OK")) {
+					isUpload = true;
+				} else {
+					isUpload = false;
+				}
+			} else {
+				System.err.println("file" + originFile.getAbsolutePath() + " is not exist or is not directory");
+				isUpload = false;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			isUpload = false;
+		}
+		return isUpload;
+	}
+
+
 	public static void main(String[] args) {
-		Map<String, String> uploadMap = new HashMap<String, String>();
+		/*Map<String, String> uploadMap = new HashMap<String, String>();
 
 		for (int i = 0; i < 20; i++) {
 			String sourcePrePath = "E:/";
@@ -105,7 +159,13 @@ public class UploadByOkHttp {
 				uploadMap.put(sourcePrePath + sourceFileName, preFilePath);
 			}
 		}
-		doUpload(uploadMap);
+		doUpload(uploadMap);*/
+
+		// 批量上传测试
+		File testFile = new File("G:/singleimg/singleimg135/571374457941");
+		String filePath = "/usr/local/goodsimg/importcsvimg/test/789456";
+
+		uploadFileBatch(testFile, filePath);
 	}
 
 }

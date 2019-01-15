@@ -367,6 +367,25 @@ public class QueryUserController {
         return result;
     }
 
-
+    /**
+     * ly  2019/01/10 11:20
+     * 商品下架审核 中 刷新 有销量 加过购物车 等商品的临时数据
+     * http://127.0.0.1:8086/cbtconsole/queryuser/refreshNeedOffShelfData.do
+     */
+    @RequestMapping(value = "/refreshNeedOffShelfData", method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String, Object> refreshNeedOffShelfData() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            queryUserService.updateNeedOffShelfData();
+            result.put("status", false);
+            result.put("message", "临时数据刷新成功!");
+        } catch (Exception e){
+            result.put("status", false);
+            result.put("message", "刷新内部异常!");
+            LOG.error("QueryUserController.refreshNeedOffShelfData error", e);
+        }
+        return result;
+    }
 
 }

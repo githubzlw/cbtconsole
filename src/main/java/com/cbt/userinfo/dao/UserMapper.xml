@@ -40,8 +40,9 @@
   
    <select id="getUserCount" resultType="java.util.Map">
    		select id,(select count(g.id) from goods_car g where state=0 and userid=user.id) carcount, 
-   		(select count(o.orderid) from orderinfo o where user_id=user.id and o.state in(1,2,3,4,5)) ordercount,email,available_m,
-   		name,applicable_credit,currency from user where user.id=#{userID}
+   		(select count(o.orderid) from orderinfo o where user_id=user.id and o.state in(1,2,3,4,5)) as ordercount,
+   		email,available_m,name,applicable_credit,currency,balance_correction from user
+   		where user.id=#{userID}
    </select>
    <select id="getPaypal" resultType="java.lang.String">
    		select username from payment where userid=#{userID} and username is not null   group by username
@@ -84,7 +85,7 @@
   </select>
     <!--List<String> queryUserRemark(@Param("userid") int userid);-->
     <select id="queryUserRemark" resultType="String">
-        SELECT CONCAT(remark, '@@@@', createtime) remark
+        SELECT CONCAT(id,'@@@@', remark, '@@@@', createtime) remark
         FROM user_remark WHERE userid = #{userid} AND del = 0 AND LENGTH(remark) > 0
         ORDER BY createtime ASC
     </select>
@@ -93,4 +94,12 @@
         INSERT INTO user_remark (userid, remark, createtime)
         VALUES (#{userid}, #{remark}, NOW())
     </insert>
+
+    <!--void updateUserRemark(@Param("id") String id);-->
+    <update id="updateUserRemark">
+        UPDATE user_remark
+        SET del = 1
+        WHERE id = #{id}
+    </update>
+
 </mapper>

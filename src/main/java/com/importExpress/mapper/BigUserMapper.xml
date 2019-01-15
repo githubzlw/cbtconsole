@@ -52,11 +52,11 @@
         (select admin_r_user.userid,admuser.id as admin_id,admuser.admName as admin_name from admin_r_user,admuser
         where admin_r_user.adminid = admuser.id) au
         on od.user_id = au.userid
-        where if(od.memberFee>=10,od.pay_price-od.memberFee,od.pay_price) > 400 and od.state in(1,2,3,4,5) and LENGTH(od.order_no)=16
+        where if(od.memberFee>=10,od.pay_price-od.memberFee,od.pay_price) > 400 and od.state in(1,2,3,4,5) and LOCATE('_',od.order_no)&lt;=0
         GROUP BY user_id ) a,
         (select user_id,order_no,orderpaytime from orderinfo where orderid in(
         select max(orderid) as orderid from orderinfo
-        where state in(1,2,3,4,5) and LENGTH(order_no) = 16
+        where state in(1,2,3,4,5) and LOCATE('_',order_no)&lt;=0
         and user_id in(SELECT id FROM USER WHERE email NOT LIKE '%[图片]qq.com%' AND email NOT LIKE '%ww.com%' AND
         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
         email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
