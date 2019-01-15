@@ -493,7 +493,7 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
     </select>
     <select id="getPrePurchase" resultType="com.cbt.website.bean.PrePurchasePojo">
         SELECT DISTINCT o.order_no as orderid,o.user_id,o.orderpaytime as paytime,o.delivery_time as domesticTime,o.product_cost,o.state as status,obi.remark,
-        func_get_split_string(mode_transport,'@',3) AS country,func_get_split_string(mode_transport,'@',2) as delaytime,ad.admName as saleer,LEFT(g.createtime,10) as fptime
+        z.country,func_get_split_string(mode_transport,'@',2) as delaytime,ad.admName as saleer,LEFT(g.createtime,10) as fptime
         FROM orderinfo o left JOIN admin_r_user a ON o.user_id=a.userid
         <if test="admuserid != 61 and state != 9">
             and a.admName<![CDATA[<>]]>'testAdm'
@@ -501,6 +501,8 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         LEFT JOIN admuser ad ON a.adminid=ad.id
         INNER JOIN goods_distribution g ON g.orderid=o.order_no
         left join order_buy_info obi on obi.orderid=o.order_no and obi.admuser=#{admuserid}
+        left join order_address oa on g.orderid=oa.orderNo
+        left join zone z on replace(oa.country,' ','')=replace(z.country,' ','') or oa.country=z.id
         inner join order_details od on g.orderid=od.orderid AND g.odid=od.id
         <if test="state == 2 or state == 4">
             left join id_relationtable id on od.orderid=id.orderid and od.id=id.odid and id.is_replenishment=1 and id.is_delete=0
