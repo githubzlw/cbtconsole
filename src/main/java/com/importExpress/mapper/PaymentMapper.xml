@@ -84,6 +84,24 @@
         limit #{page},#{rows}
     </select>
 
+    <select id="queryPaymentStatistics_notWebsitData" resultMap="paymentStatisticResultMap"
+            parameterType="com.cbt.website.bean.PayCheckBean">
+        select userid,orderid,payment_amount,createtime,
+        paytype,payment_cc,paymentid,orderdesc orderStateDesc,0 isShow from payment
+        where paystatus=1 and paySID='00321' 
+        <if test=" dataStart != null and dataStart != '' ">
+            and createtime &gt;= #{dataStart}
+        </if>
+        <if test=" dataEnd != null and dataEnd != '' ">
+            and createtime &lt;= #{dataEnd}
+        </if>
+        <if test=" payId != null and payId != '' ">
+            and paymentid = #{payId}
+        </if>
+        order by createtime desc
+        limit #{page},#{rows}
+    </select>
+
     <select id="queryPaymentStatisticsCount" resultType="java.lang.Integer"
             parameterType="com.cbt.website.bean.PayCheckBean">
 

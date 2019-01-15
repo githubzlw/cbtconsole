@@ -17,7 +17,7 @@ public interface PaymentMapper {
      * @return
      */
     List<PaymentStatistics> queryPaymentStatistics(PayCheckBean bean);
-
+    List<PaymentStatistics> queryPaymentStatistics_notWebsitData(PayCheckBean bean);
     /**
      * 根据参数查询支付统计数据数量
      *
@@ -25,7 +25,6 @@ public interface PaymentMapper {
      * @return
      */
     int queryPaymentStatisticsCount(PayCheckBean bean);
-
 
     /**
      * 根据订单号查询支付详情数据

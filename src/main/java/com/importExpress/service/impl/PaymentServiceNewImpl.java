@@ -17,7 +17,12 @@ public class PaymentServiceNewImpl implements PaymentServiceNew {
 
     @Override
     public List<PaymentStatistics> queryPaymentStatistics(PayCheckBean bean) {
-        return paymentMapper.queryPaymentStatistics(bean);
+    	if(!"8".equals(bean.getPaytype())) {
+    		return paymentMapper.queryPaymentStatistics(bean);
+    	}else {
+    		return paymentMapper.queryPaymentStatistics_notWebsitData(bean);
+    	}
+        
     }
 
     @Override
