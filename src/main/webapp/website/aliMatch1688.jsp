@@ -250,7 +250,7 @@
                     <c:forEach items="${aliGd.productListLire}" var="lireGd">
                         <td style="width: 11%;background-color: #c0c38e;">
                             <div>
-                                <span>Pid:${lireGd.pid}</span>
+                                <span>Pid:<a href="/cbtconsole/editc/detalisEdit?pid=${lireGd.pid}" target="_blank"></a>${lireGd.pid}</span>
                                 <br><a target="_blank" href="${lireGd.url}">
                                 <img class="img_sty" src="${lireGd.remotePath}${lireGd.img}"/></a>
                                 <br><span style="color: red">价格USD:${lireGd.showPrice}</span>
