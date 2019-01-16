@@ -125,6 +125,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         int res = 0 ;
         // 使用MongoDB更新AWS服务器数据
         if(GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean)){
+            // 更新27
+            customGoodsDao.publish(bean,0);
             // 更新28并重试一次
             res = customGoodsDao.publishTo28(bean);
             if (res == 0) {

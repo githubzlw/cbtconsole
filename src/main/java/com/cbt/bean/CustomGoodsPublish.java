@@ -101,7 +101,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String goods_pid;
     private int priceIsEdit;
-    private int isUpdateImg;
+    private int isUpdateImg;// 1自动设置第一张图片为橱窗图，2设置选中的封面图
     private String sizeInfoEn;
 
     private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线

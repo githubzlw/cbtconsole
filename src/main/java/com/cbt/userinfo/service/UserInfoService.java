@@ -105,4 +105,10 @@ public static void main(String[] args) {
     public void insertUserRemark(int userid, String remark) {
         mapper.insertUserRemark(userid, remark);
     }
+
+    @Override
+    public void updateUserRemark(String id) {
+        mapper.updateUserRemark(id);
+    }
+
 }
