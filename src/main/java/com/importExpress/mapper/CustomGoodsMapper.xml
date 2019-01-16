@@ -42,6 +42,7 @@
         <result column="click_num" property="clickNum"/>
         <result column="complain_id" property="complainId"/>
         <result column="reviewCount" property="reviewCount"/>
+        <result column="from_flag" property="fromFlag"/>
     </resultMap>
 
 
@@ -111,6 +112,7 @@
         <result column="review_remark" property="review_remark"/>
         <result column="country" property="country"/>
         <result column="size_info_en" property="sizeInfoEn"/>
+        <result column="from_flag" property="fromFlag"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -348,7 +350,7 @@
     <select id="queryForListByParam" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
         select
         cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
-        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
@@ -470,6 +472,10 @@
         <if test="isComplain == 1">
             and cbc.complain_count > 0
         </if>
+        <if test="fromFlag > -1">
+            and cbu.from_flag = #{fromFlag}
+        </if>
+
 
         <if test="isSort == 1">
             order by cge.search_num desc
@@ -594,6 +600,12 @@
         <if test="isSort == 3">
             and cge.click_num > 0
         </if>
+        <if test="isComplain == 1">
+            and cbc.complain_count > 0
+        </if>
+        <if test="fromFlag > -1">
+            and cbu.from_flag = #{fromFlag}
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -699,6 +711,12 @@
         <if test="price1688End > 0">
             and cge.price_1688 &lt;= #{price1688End}
         </if>
+        <if test="isComplain == 1">
+            and cbc.complain_count > 0
+        </if>
+        <if test="fromFlag > -1">
+            and cbu.from_flag = #{fromFlag}
+        </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
@@ -709,7 +727,7 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,

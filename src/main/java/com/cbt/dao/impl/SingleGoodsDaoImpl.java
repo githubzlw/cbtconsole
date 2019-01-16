@@ -1116,10 +1116,10 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         String selectSql = "insert into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku," +
                 "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime, " +
-                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name) " +
+                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name,from_flag) " +
                 "select goods_name, price,shop_id,bargain_number, standard, sku," +
                 "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime," +
-                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name " +
+                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name,from_flag " +
                 "from kj_single_goods_offers where goods_pid ='" + pid + "'";
         String updateSql = "update kj_single_goods_offers set is_update = 1,is_pass = 2 where goods_pid = '" + pid + "'";
         String updateOffer = "update kj_catid_bak a, single_goods_offers b set b.catid=a.catid " +
