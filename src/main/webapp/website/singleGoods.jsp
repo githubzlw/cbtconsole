@@ -111,6 +111,8 @@
             closeDialog();
             setDatagrid();
             getAdminList();
+            var opts = $("#single_easyui-datagrid").datagrid("options");
+		    opts.url = "/cbtconsole/singleGoods/queryForList";
         });
 
         function setDatagrid() {
@@ -121,7 +123,7 @@
                 striped: true,//设置为true将交替显示行背景。
                 collapsible: true,//显示可折叠按钮
                 toolbar: "#single_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-                url: '/cbtconsole/singleGoods/queryForList',//url调用Action方法
+                url: '',//url调用Action方法
                 loadMsg: '数据装载中......',
                 singleSelect: true,//为true时只能选择单行
                 fitColumns: true,//允许表格自动缩放，以适应父容器

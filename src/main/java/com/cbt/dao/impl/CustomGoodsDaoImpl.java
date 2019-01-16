@@ -2311,7 +2311,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
         String upsql = "update custom_benchmark_ready_newest set valid=1,keyword=?,eninfo=?,enname=?,"
                 + "weight=?,img=?,endetail=?,revise_weight=?,final_weight=?, "
-                + "price=?,wprice=?,range_price=?,sku=?,cur_time=now(),bm_flag=1,goodsstate=4";
+                + "price=?,wprice=?,range_price=?,sku=?,cur_time=now(),bm_flag=1,goodsstate=4,fprice_str=?";
         if (bean.getIsEdited() == 1) {
             upsql += ",finalName=?";
         } else if (bean.getIsEdited() == 2) {
@@ -2349,6 +2349,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt2.setString(i++, bean.getWprice());
             stmt2.setString(i++, bean.getRangePrice());
             stmt2.setString(i++, bean.getSku());
+            stmt2.setString(i++, bean.getFpriceStr());
             if (bean.getIsEdited() == 1) {
                 stmt2.setString(i++, bean.getEnname());
             } else if (bean.getIsEdited() == 2) {
