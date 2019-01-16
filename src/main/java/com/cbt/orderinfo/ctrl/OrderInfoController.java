@@ -1075,16 +1075,7 @@ public class OrderInfoController{
 
 								/**********把图片上传到图片服务器 start*****/
 								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
-								String remoteSavePath = "";
-		                        if (imgPath.contains(SERVICE_SHOW_URL_1)) {
-		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_1, SERVICE_LOCAL_PATH);
-		                        } else if (imgPath.contains(SERVICE_SHOW_URL_2)) {
-		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_2, SERVICE_LOCAL_PATH);
-		                        } else if (imgPath.contains(SERVICE_SHOW_URL_3)) {
-		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_3, SERVICE_LOCAL_PATH);
-		                        } else if (imgPath.contains(SERVICE_SHOW_URL_4)) {
-		                        	remoteSavePath = imgPath.replace(SERVICE_SHOW_URL_4, SERVICE_LOCAL_PATH);
-		                        }
+								String remoteSavePath = GoodsInfoUtils.changeRemotePathToLocal(imgPath);
 		                        remoteSavePath = remoteSavePath.replace(imgName, "");
 		                        uploadMap.put(replace_localpath, remoteSavePath+"@@@@"+uploadFileName);
 	                            /**********把图片上传到图片服务器 end*****/

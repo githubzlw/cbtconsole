@@ -63,7 +63,7 @@
         group by orderid ) pm INNER JOIN
         (select userid,count(userid) as order_num from (select userid,count(orderid)
         from payment where paystatus=1
-        and LENGTH(orderid) = 16
+        and LOCATE('_',orderid)&lt;=0
         <if test=" userid >0 ">
             and userid= #{userid}
         </if>
@@ -81,6 +81,24 @@
         </if>
         left JOIN orderinfo on pm.orderid = orderinfo.order_no
         order by pm.createtime desc,userid,orderid
+        limit #{page},#{rows}
+    </select>
+
+    <select id="queryPaymentStatistics_notWebsitData" resultMap="paymentStatisticResultMap"
+            parameterType="com.cbt.website.bean.PayCheckBean">
+        select userid,orderid,payment_amount,createtime,
+        paytype,payment_cc,paymentid,orderdesc orderStateDesc,0 isShow from payment
+        where paystatus=1 and paySID='00321' 
+        <if test=" dataStart != null and dataStart != '' ">
+            and createtime &gt;= #{dataStart}
+        </if>
+        <if test=" dataEnd != null and dataEnd != '' ">
+            and createtime &lt;= #{dataEnd}
+        </if>
+        <if test=" payId != null and payId != '' ">
+            and paymentid = #{payId}
+        </if>
+        order by createtime desc
         limit #{page},#{rows}
     </select>
 
@@ -121,7 +139,7 @@
         group by orderid order by createtime desc) odd INNER JOIN
         (select userid,count(userid) as order_num from (select userid,count(orderid)
         from payment where paystatus=1
-        and LENGTH(orderid) = 16
+        and LOCATE('_',orderid)&lt;=0
         <if test=" userid >0 ">
             and userid= #{userid}
         </if>

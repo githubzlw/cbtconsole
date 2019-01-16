@@ -538,7 +538,7 @@
 	<tr>
 		<th data-options="field:'user_id',width:30,align:'center'">用户ID</th>
 		<th data-options="field:'orderid',width:50,align:'center'">订单号</th>
-		<th data-options="field:'country',width:30,align:'center'">订单国家</th>
+		<th data-options="field:'country',width:30,align:'center'">订货国家</th>
 		<th data-options="field:'saleer',width:25,align:'center'">销售</th>
 		<th data-options="field:'fptime',width:40,align:'center'">分配时间</th>
 		<th data-options="field:'paytime',width:50,align:'center'">支付时间</th>

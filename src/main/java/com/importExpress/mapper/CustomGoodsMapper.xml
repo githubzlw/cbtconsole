@@ -810,6 +810,9 @@
         <if test="sizeInfoEn != null">
             ,b.size_info_en=#{sizeInfoEn}
         </if>
+        <if test="customMainImage != null">
+            ,b.custom_main_image=#{customMainImage}
+        </if>
         where a.pid = b.pid and b.pid = #{pid}
     </update>
 

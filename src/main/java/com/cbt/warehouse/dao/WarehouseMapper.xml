@@ -339,7 +339,7 @@
 			inner join  id_relationtable ir on oi.order_no = ir.orderid
 			and ir.barcode like 'SHCR%'
 		</if>
-		inner join paymentconfirm pm on  left(pm.orderno, 16) = left(oi.order_no, 16)
+		inner join paymentconfirm pm on  func_get_split_string(pm.orderno,'_',1)=func_get_split_string(oi.order_no,'_',1)
 		left join order_fee of on oi.order_no=of.orderno
 		left join (select orderid,count(orderid) len ,GROUP_CONCAT(shipmentno) shipmentno from shipping_package group by orderid) sp on oi.order_no=sp.orderid
 		INNER JOIN user u on u.id = oi.user_id
@@ -416,7 +416,7 @@
 		<if test="orderPos==2">
 			and  ir.barcode like 'SHCR%'
 		</if>
-		inner join paymentconfirm pm on  left(pm.orderno, 16) = left(oi.order_no, 16)
+		inner join paymentconfirm pm on  func_get_split_string(pm.orderno,'_',1)=func_get_split_string(oi.order_no,'_',1)
 		left join order_fee of on oi.order_no=of.orderno
 		left join (select orderid,count(orderid) len ,GROUP_CONCAT(shipmentno) shipmentno from shipping_package group by orderid) sp on oi.order_no=sp.orderid
 		INNER JOIN user u on u.id = oi.user_id
@@ -1446,7 +1446,7 @@
 			and  ir.barcode like 'SHCR%'
 		</if>
 		inner join  dropshiporder  dso on dso.parent_order_no = oi.order_no and oi.order_no in (select order_no  from orderinfo   where   isDropshipOrder =1 )  and dso.state ='2'
-		inner join paymentconfirm pm on  left(pm.orderno, 16) = left(oi.order_no, 16)
+		inner join paymentconfirm pm on  func_get_split_string(pm.orderno,'_',1)=func_get_split_string(oi.order_no,'_',1)
 		<!-- inner join payment pm on  left(pm.orderid, 16) = left(oi.order_no, 16)  and pm.paystatus=1 -->
 		left join order_fee of on dso.child_order_no=of.orderno
 		left join (select orderid,count(orderid) len ,GROUP_CONCAT(shipmentno) shipmentno from shipping_package group by orderid) sp on dso.child_order_no=sp.orderid
@@ -1503,7 +1503,7 @@
 			and  ir.barcode like 'SHCR%'
 		</if>
 		INNER JOIN dropshiporder  dso on dso.parent_order_no = oi.order_no and oi.order_no in (select order_no  from orderinfo   where   isDropshipOrder =1 )  and dso.state ='2'
-		inner join paymentconfirm pm on  left(pm.orderno, 16) = left(oi.order_no, 16)
+		inner join paymentconfirm pm on  func_get_split_string(pm.orderno,'_',1)=func_get_split_string(oi.order_no,'_',1)
 		left join order_fee of on dso.child_order_no=of.orderno
 		left join (select orderid,count(orderid) len ,GROUP_CONCAT(shipmentno) shipmentno from shipping_package group by orderid) sp on dso.child_order_no=sp.orderid
 		INNER JOIN user u on u.id = oi.user_id
@@ -3220,7 +3220,7 @@
 	</select>
 	<select id="getUndeliveredOrder" resultType="INTEGER">
 		SELECT COUNT(od.id) FROM order_details od INNER JOIN orderinfo oi ON od.orderid=oi.order_no
-		WHERE oi.state IN (1,2,3,4,5) AND LEFT(oi.order_no,16)=LEFT(#{orderid},16)
+		WHERE oi.state IN (1,2,3,4,5) AND  func_get_split_string(oi.order_no,'_',1)=func_get_split_string(#{orderid},'_',1)
 		AND od.state IN (0,1)
 	</select>
 	<update id="updateQuestPicPath">
