@@ -29,4 +29,10 @@ public interface TabCouponMapper {
     String queryTabCouponUser(@Param("couponCode") String couponCode);
 
     void updateCouponValid(@Param("couponCode") String couponCode, @Param("valid") int valid);
+
+    String queryCouponCodeByCreatetime(@Param("createtime") String createtime);
+
+    void updateCouponUsers(@Param("couponCode") String couponCode, @Param("userid") String userid);
+
+    Long queryCouponUsersCount(@Param("couponCode") String couponCode);
 }

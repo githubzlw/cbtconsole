@@ -25,4 +25,8 @@ public interface TabCouponService {
     Map<String, String> addCouponUser(String couponCode, List<String> useridList);
 
     Map<String, String> delCoupon(String couponCode);
+
+    String querycouponcode();
+
+    Map<String,String> delCouponUser(String couponCode, String userid);
 }

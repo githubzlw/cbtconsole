@@ -4,7 +4,7 @@
 	
     <!-- List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("typeCode") String typeCode, @Param("valid") Integer valid); -->
 	<select id="queryTabCouponList" resultType="com.importExpress.pojo.TabCouponNew">
-		SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid, a.mqlog, a.createtime, b.admName username
+		SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid, a.mqlog, a.createtime, b.admName username, a.share_flag shareFlag
 		FROM tab_coupon_new a
 		LEFT JOIN admuser b ON a.userid = b.id
 		<where>
@@ -15,6 +15,7 @@
                 AND a.valid = #{valid}
             </if>
 		</where>
+        ORDER BY createtime DESC
 		LIMIT #{startBars},#{rows}
     </select>
 
@@ -47,9 +48,9 @@
     
     <!-- void addCoupon(@Param("tabCouponNew") TabCouponNew tabCouponNew); -->
     <insert id="addCoupon">
-    	INSERT INTO tab_coupon_new (`id`, `count`, `leftCount`, `describe`, `value`, `from`, `to`, `type`, `valid`, `userid`, `mqlog`, `createtime`) 
+    	INSERT INTO tab_coupon_new (`id`, `count`, `leftCount`, `describe`, `value`, `from`, `to`, `type`, `valid`, `userid`, `mqlog`, `createtime`, `share_flag`)
     	VALUES (#{tabCouponNew.id}, #{tabCouponNew.count}, #{tabCouponNew.leftCount}, #{tabCouponNew.describe}, #{tabCouponNew.value}, 
-    		#{tabCouponNew.from}, #{tabCouponNew.to}, #{tabCouponNew.type}, #{tabCouponNew.valid}, #{tabCouponNew.userid}, #{tabCouponNew.mqlog}, NOW())
+    		#{tabCouponNew.from}, #{tabCouponNew.to}, #{tabCouponNew.type}, #{tabCouponNew.valid}, #{tabCouponNew.userid}, #{tabCouponNew.mqlog}, NOW(), #{tabCouponNew.shareFlag})
     </insert>
     
     <!-- Long checkCouponCode(@Param("couponCode") String couponCode); -->
@@ -60,7 +61,7 @@
     <!--TabCouponNew queryTabCouponOne(@Param("couponCode") String couponCode);-->
     <select id="queryTabCouponOne" resultType="com.importExpress.pojo.TabCouponNew">
         SELECT a.id, a.count, a.leftCount, a.describe, a.value, a.from, a.to, a.type, a.valid, a.userid,
-        a.mqlog, a.createtime, b.admName username
+        a.mqlog, a.createtime, b.admName username, a.share_flag shareFlag
 		FROM tab_coupon_new a
 		LEFT JOIN admuser b ON a.userid = b.id
 		WHERE a.id = #{couponCode}
@@ -74,11 +75,24 @@
         </foreach>
     </insert>
 
+    <!--void updateCouponUsers(@Param("couponCode") String couponCode, @Param("userid") String userid);-->
+    <update id="updateCouponUsers">
+        UPDATE tab_coupon_user
+        SET valid = 0
+        WHERE couponCode = #{couponCode} AND userid = #{userid}
+    </update>
+
     <!--String queryTabCouponUser(@Param("couponCode") String couponCode);-->
     <select id="queryTabCouponUser" resultType="String">
         SELECT GROUP_CONCAT(userid) FROM tab_coupon_user
-        WHERE couponCode = #{couponCode}
+        WHERE couponCode = #{couponCode} AND valid = 1
         GROUP BY couponCode
+    </select>
+
+    <!--Long queryCouponUsersCount(@Param("couponCode") String couponCode);-->
+    <select id="queryCouponUsersCount" resultType="Long">
+        SELECT count(1) FROM tab_coupon_user
+        WHERE couponCode = #{couponCode} AND valid = 1
     </select>
 
     <!--void updateCouponValid(@Param("couponCode") String couponCode, @Param("valid") int valid);-->
@@ -87,5 +101,13 @@
         SET valid = #{valid}
         WHERE id = #{couponCode}
     </update>
+
+    <!--String queryCouponCodeByCreatetime(@Param("createtime") String createtime);-->
+    <select id="queryCouponCodeByCreatetime" resultType="String">
+        SELECT id FROM tab_coupon_new
+        WHERE createtime >= #{createtime}
+        ORDER BY createtime DESC
+        LIMIT 1
+    </select>
     
 </mapper>

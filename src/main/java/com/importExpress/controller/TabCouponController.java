@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.cbt.bean.EasyUiJsonResult;
+import com.cbt.util.Md5Util;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -9,6 +10,7 @@ import com.importExpress.pojo.TabCouponNew;
 import com.importExpress.pojo.TabCouponRules;
 import com.importExpress.pojo.TabCouponType;
 import com.importExpress.service.TabCouponService;
+import com.importExpress.utli.SearchFileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +133,7 @@ public class TabCouponController {
     public Map<String, String> addCoupon(HttpServletRequest request,
                                          String couponCode, //卷码
                                          Integer type, //卷类别
+                                         Integer shareFlag, //是否用于社交分享
                                          @RequestParam(value = "valueLeft", defaultValue = "0", required = false) Integer valueLeft, //慢减卷最低消费金额
                                          @RequestParam(value = "valueRight", defaultValue = "0", required = false) Integer valueRight, //满减卷优惠金额
                                          String describe, //卷描述
@@ -170,17 +173,25 @@ public class TabCouponController {
         	resultMap.put("code", "2");
         	return resultMap;
 		}
-        
+        String value = valueLeft + "-" + valueRight;
+    	String shareid = "";
+    	if (shareFlag == 1){
+            shareid = Md5Util.encoder(String.valueOf(System.currentTimeMillis())).substring(0, 6).toLowerCase();
+    	    value += "-1-" + shareid;
+        }
         //表单数据 (String id, String count, String leftCount, String describe, String value, String from, String to, String type, String valid)
         CouponRedisBean couponRedis = new CouponRedisBean(couponCode, count.toString(), count.toString(),
-        		describe, valueLeft + "-" + valueRight, new Long(fromDate.getTime()).toString(), new Long(toDate.getTime()).toString(), 
+        		describe, value, new Long(fromDate.getTime()).toString(), new Long(toDate.getTime()).toString(),
         		type.toString(), "1");
         //String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to, int type, int valid, Integer userid
         TabCouponNew tabCouponNew = new TabCouponNew(couponCode, count, count, describe,
-        		valueLeft + "-" + valueRight, fromDate, toDate, type, 1, userId);
+        		value, fromDate, toDate, type, 1, userId, shareFlag);
         try {
         	tabCouponService.addCoupon(couponRedis, tabCouponNew);
         	resultMap.put("message", "保存成功!");
+        	if (shareFlag == 1) {
+                resultMap.put("shareUrl", SearchFileUtils.importexpressPath + "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid);
+            }
         	resultMap.put("state", "success");
 		} catch (Exception e) {
 			System.out.println(e);
@@ -210,6 +221,23 @@ public class TabCouponController {
     }
 
     /**
+     * 自动生成一张卷码
+     * 		http://127.0.0.1:8086/cbtconsole/coupon/querycouponcode.do
+     *
+     * @return 是否可用
+     **/
+    @RequestMapping(value = "/querycouponcode.do")
+    @ResponseBody
+    public String querycouponcode(String couponCode) {
+    	try {
+    		return tabCouponService.querycouponcode();
+		} catch (Exception e) {
+            LOG.error("querycouponcode error", e);
+        }
+        return "";
+    }
+
+    /**
      * 根据折扣卷码查询折扣卷信息
      * 		http://127.0.0.1:8086/cbtconsole/coupon/queryTabCouponOne.do?couponCode=
      * @return
@@ -218,14 +246,15 @@ public class TabCouponController {
     @ResponseBody
     public TabCouponNew queryTabCouponOne(String couponCode) {
         try {
-            return tabCouponService.queryTabCouponOne(couponCode);
+            TabCouponNew tabCouponNew = tabCouponService.queryTabCouponOne(couponCode);
+            return tabCouponNew;
         } catch (Exception e) {
             LOG.error("queryTabCouponOne 查询折扣卷异常", e);
         }
         return null;
     }
     /**
-     * 删除折扣卷（附带删除关联的相关用户中的折扣卷数据）
+     * 删除折扣卷（附带删除关联的相关用户中的折扣卷数据 调用齐庆接口）
      * 		http://127.0.0.1:8086/cbtconsole/coupon/delCoupon.do?couponCode=
      * @return
      **/
@@ -283,5 +312,27 @@ public class TabCouponController {
         }
         return result;
     }
-	
+    /**
+     * 折扣卷码关联用户id -> 删除之前关联的用户id
+     * 		http://127.0.0.1:8086/cbtconsole/coupon/delCouponUser.do?couponCode=&userid=
+     *
+     * @param couponCode 折扣卷id
+     * @param userid 关联的用户id
+     * @return
+     *
+     **/
+    @RequestMapping(value = "/delCouponUser.do", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, String> delCouponUser(String couponCode, String userid) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            result = tabCouponService.delCouponUser(couponCode, userid);
+        } catch (Exception e) {
+            result.put("state", "false");
+            result.put("message", "录入异常");
+            LOG.error("delCouponUser 折扣卷码关联用户id", e);
+        }
+        return result;
+    }
+
 }
