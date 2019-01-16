@@ -2325,6 +2325,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         if(bean.getWeightIsEdit() > 0){
             upsql += ",source_pro_flag = 7 ";
         }
+        if(StringUtils.isNotBlank(bean.getSizeInfoEn())){
+            upsql += ",size_info_en = ? ";
+        }
         upsql += " where pid=?";
         Connection conn = DBHelper.getInstance().getConnection8();
         ResultSet rs = null;
@@ -2366,6 +2369,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             stmt2.setString(i++, bean.getAliGoodsPid());
             stmt2.setString(i++, bean.getAliGoodsPrice());
             stmt2.setInt(i++, bean.getMatchSource());
+            if(StringUtils.isNotBlank(bean.getSizeInfoEn())){
+                stmt2.setString(i++, bean.getSizeInfoEn());
+            }
             stmt2.setString(i++, bean.getPid());
             result = stmt2.executeUpdate();
         } catch (Exception e) {

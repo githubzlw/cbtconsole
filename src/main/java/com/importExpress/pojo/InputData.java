@@ -91,7 +91,16 @@ public class InputData {
     private String is_edited;
     private Character crud;
     private String rwKeyword;
-    
+    private String size_info_en;
+
+    public String getSize_info_en() {
+        return size_info_en;
+    }
+
+    public void setSize_info_en(String size_info_en) {
+        this.size_info_en = size_info_en;
+    }
+
     public String getRwKeyword() {
 		return rwKeyword;
 	}

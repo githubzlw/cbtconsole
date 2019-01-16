@@ -30,6 +30,7 @@ public class CustomerFinancialBean {
     private double blockedBalance;//冻结余额
     private int warnFlag;//警告标识
     private String warnMsg;//警告说明
+    private Double balanceCorrection;// 强行平账余额
 
     public int getUserId() {
         return userId;
@@ -223,6 +224,13 @@ public class CustomerFinancialBean {
         this.warnMsg = warnMsg;
     }
 
+    public Double getBalanceCorrection() {
+        return balanceCorrection;
+    }
+
+    public void setBalanceCorrection(Double balanceCorrection) {
+        this.balanceCorrection = balanceCorrection;
+    }
 
     @Override
     public String toString() {

@@ -687,20 +687,13 @@ b {
 							<option value="2">点击次数倒排序</option>
 							<%--<option value="3">已点击商品倒排序</option>--%>
 							<option value="4">按照类别排序</option>
-					</select><br>&nbsp;&nbsp;<input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
-						value="查询" style="height: 30px; width: 60px;" class="btn" />
-						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
-						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
-					</td>
-				</tr>
-				<tr>
-						<td>
+					</select>
 						下架原因:<select id="unsellableReason"
-						style="font-size: 18px; height: 28px;">
-						<option value="-1" selected="selected">请选择</option>
-						<option value="1">1688货源下架</option>
-						<option value="2">不满足库存条件</option>
-						<option value="3">销量无变化(低库存)</option>
+									 style="font-size: 18px; height: 28px;">
+							<option value="-1" selected="selected">请选择</option>
+							<option value="1">1688货源下架</option>
+							<option value="2">不满足库存条件</option>
+							<option value="3">销量无变化(低库存)</option>
 							<option value="4">页面404</option>
 							<option value="5">重复验证合格</option>
 							<option value="6">P问题或运营直接下架</option>
@@ -720,8 +713,15 @@ b {
 							<option value="20">一手数据下架</option>
 							<option value="21">大于400美元商品下架</option>
 						</select>
-						</td>
+						<br>&nbsp;&nbsp;<input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+						value="查询" style="height: 30px; width: 60px;" class="btn" />
+						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
+						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
+					</td>
 				</tr>
+				<%--<tr>--%>
+						<%----%>
+				<%--</tr>--%>
 			</table>
 
 

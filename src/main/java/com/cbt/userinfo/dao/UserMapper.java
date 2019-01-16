@@ -59,4 +59,6 @@ public interface UserMapper {
     List<String> queryUserRemark(@Param("userid") int userid);
 
     void insertUserRemark(@Param("userid") int userid, @Param("remark") String remark);
+
+    void updateUserRemark(@Param("id") String id);
 }

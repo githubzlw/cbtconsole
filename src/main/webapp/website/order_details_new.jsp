@@ -571,6 +571,9 @@ em {
 						<c:if test="${order.share_discount>0}">
 							-分享折扣<span class="ormtittdred">（ ${order.share_discount}）</span>
 						</c:if>
+						<c:if test="${order.couponAmount>0}">
+							-coupon优惠<span class="ormtittdred">（ ${order.couponAmount}）</span>
+						</c:if>
 						<c:if test="${order.coupon_discount>0}">
 							-返单优惠<span class="ormtittdred">（${order.coupon_discount}） </span>
 						</c:if>
@@ -581,8 +584,8 @@ em {
 							-首单优惠<span class="ormtittdred">（${firstdiscount}） </span>
 						</c:if>
 						=<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
-							value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount) >0 ?
-									(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+order.extra_freight+actual_lwh+order.memberFee-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-0-
+							value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount-order.couponAmount) >0 ?
+									(order.product_cost+actual_ffreight_+foreign_freight+order.processingfee+order.extra_freight+actual_lwh+order.memberFee-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.couponAmount-0-
 									order.gradeDiscount + order.vatBalance - firstdiscount + order.actual_freight_c+order.actual_allincost) : 0.00 }"
 									pattern="#0.00" type="number" maxFractionDigits="2" />）
 						</span>

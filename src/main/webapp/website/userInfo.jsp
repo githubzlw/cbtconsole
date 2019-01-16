@@ -9,7 +9,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>客户详情页</title>
     <link type="text/css" rel="stylesheet" href="/cbtconsole/css/web-ordetail.css"/>
-    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
     <style type="text/css">
 
         .tr_sty {
@@ -31,9 +36,118 @@
         /*#table1 {
             margin-left: 36%;
         }*/
+        #user_remark .remark_td1 {
+            width: 450px;
+        }
+        #user_remark .remark_td2 {
+            width: 200px;
+        }
+        #user_remark table,#user_remark table tr th, #user_remark table tr td {
+            border:1px solid #CCC;
+        }
+        #user_remark table {
+            width: 200px;
+            min-height: 25px;
+            line-height: 25px;
+            text-align: center;
+            border-collapse: collapse;
+        }
+        #user_remark tr {
+            line-height: 24px;
+        }
     </style>
 </head>
 <body>
+
+<div id="user_remark" class="easyui-window" title="添加/历史用户备注"
+     data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+     style="width:800px;height:auto;display: none;font-size: 16px;">
+    <div style="margin-left:20px;">
+        <input type="hidden" name="userid">
+        <div style="margin-top:20px;">历史备注:</div>
+        <div style="margin-left:20px;">
+            <table class="remark_list" style="width: 720px;word-break:break-all; word-wrap:break-all;">
+            </table>
+        </div>
+        <div style="margin-top:20px;">新添加备注:</div>
+        <div style="margin-left:20px;">
+            <textarea rows="60" cols="60" id="new_user_remark" style="height: 80px;width: 400px;"></textarea><br />
+        </div>
+    </div>
+    <div style="margin:20px 0 20px 40px;">
+        <a href="javascript:void(0)" class="easyui-linkbutton"
+           onclick="addUserRemark()" style="width:80px">添加备注</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    //删除用户备注
+    function deleteUserRemark(id) {
+        $.messager.confirm('提示','你确定要删除该条备注吗?',function(r){
+            if(r){
+                $.ajax({
+                    type: "GET",
+                    url: "/cbtconsole/userinfo/updateUserRemark.do?id=" + id,
+                    dataType:"json",
+                    success: function(msg){
+                        $.messager.alert('提示', msg.message);
+                        $('#user_remark').window('close');
+                    }
+                });
+            }
+        });
+    }
+    //显示用户备注
+    function showRemark(uid) {
+        $('#user_remark .remark_list').html('');
+        $("#user_remark input[name='userid']").val(uid);
+        $('#new_user_remark').val('');
+        //查询历史备注信息
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/userinfo/queryUserRemark.do",
+            data: {userid:uid},
+            dataType:"json",
+            success: function(msg){
+                if(msg != undefined && msg.length > 0){
+                    var temHtml = '';
+                    $(msg).each(function (index, item) {
+                        var remarkArr = item.split('@@@@');
+                        if(remarkArr != undefined && remarkArr.length == 3){
+                            temHtml += '<tr><td class="remark_td1">' + remarkArr[1]
+                                + '</td><td class="remark_td2">' + remarkArr[2]
+                                + '</td><td>' + '<a href="#" onclick="deleteUserRemark(\'' + remarkArr[0] + '\')">删除</a>' + '</td></tr>';
+                        }
+                    });
+                    $('#user_remark .remark_list').html(temHtml);
+                }
+                $('#user_remark').window('open');
+            }
+        });
+    }
+    //添加用户备注
+    function addUserRemark() {
+        var userid = $("#user_remark input[name='userid']").val();
+        var remark = $('#new_user_remark').val();
+        if(remark == undefined || remark == ''){
+            $.messager.alert('提示', '请输入新添加的备注');
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/userinfo/addUserRemark.do",
+            data: {
+                remark:remark,
+                userid:userid
+            },
+            dataType:"json",
+            success: function(res){
+                $.messager.alert('提示', res.message);
+                $('#user_remark').window('close');
+            }
+        });
+    }
+</script>
 <input type="hidden" id="userid" value="${userId}">
 <div class="useindiv">
     <table class="ormatable usrintable">
@@ -65,7 +179,7 @@
             <td><span class="ormtittd">Twitter:${userex.tweater }</td>
         </tr>
         <tr>
-            <td colspan="2"><span class="ormtittd">kiki:${userex.kiki }</td>
+            <td><span class="ormtittd">kiki:${userex.kiki }</td>
             <td><span class="ormtittd">skype:${userex.skype }</td>
             <td>
                 <c:if test="${backList>0}">
@@ -78,6 +192,7 @@
                     <span style="color:Red">订单城市黑名单</span>
                 </c:if>
             </td>
+            <td><button href="#" onclick="showRemark('${user.id}')">备注</button></td>
         </tr>
     </table>
 
@@ -188,6 +303,11 @@
                     <tr>
                         <td colspan="1" class="td_right">账号应有余额(算法二)：</td>
                         <td colspan="1" class="td_left"><span> ${financial.dueBalance2}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" class="td_right">强制平账余额:</td>
+                        <td colspan="1" class="td_left"><span> ${financial.balanceCorrection}</span>
                         </td>
                     </tr>
                     <tr>

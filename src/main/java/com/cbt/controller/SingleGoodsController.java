@@ -5,7 +5,6 @@ import com.cbt.customer.service.IShopUrlService;
 import com.cbt.pojo.Admuser;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.service.SingleGoodsService;
-import com.cbt.util.IpCheckUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
@@ -16,7 +15,6 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.utli.EasyUiTreeUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -473,6 +471,16 @@ public class SingleGoodsController {
             neverFlag = 0;
         }
         offShelfParam.setNeverOffFlag(neverFlag);
+
+        String soldFlagStr = request.getParameter("soldFlag");
+        int soldFlag;
+        if (StringUtil.isNotBlank(soldFlagStr)) {
+            soldFlag = Integer.valueOf(soldFlagStr);
+        } else {
+            soldFlag = 0;
+        }
+        offShelfParam.setSoldFlag(soldFlag);
+
         try {
             List<NeedOffShelfBean> res = shopUrlService.queryNeedOffShelfByParam(offShelfParam);
             List<String> pids = new ArrayList<>(res.size());

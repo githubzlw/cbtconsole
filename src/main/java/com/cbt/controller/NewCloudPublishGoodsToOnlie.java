@@ -157,11 +157,11 @@ public class NewCloudPublishGoodsToOnlie extends Thread {
 					LOG.error("this pid:" + pid + " update goodsstate 1 error!");
 				}
 			} else {
-				LOG.warn("UploadImgToOnlie pid:" + pid + " is uploading!");
+				LOG.warn("UploadImgToOnline pid:" + pid + " is uploading!");
 			}
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("UploadImgToOnlie error:" + e.getMessage());
+			LOG.error("UploadImgToOnline error:" + e.getMessage());
 			newCloudGoodsService.updateGoodsState(pid, 3);
 		}
 		LOG.info("Pid : " + pid + " Execute End");

@@ -150,6 +150,8 @@
                         $(".main_" + aliPid).find('input').hide();
                         $(".main_" + aliPid).append('<b class="b_sty">已对标</b>');
                         $(obj).parent().append('<b class="b_sty">对标</b>');
+                    } else if(dealState == 3){
+                    	  $(obj).parent().append('<b class="b_sty">删除同款</b>');
                     }
                 } else {
                     alert("执行失败,原因:" + data.message);
@@ -161,7 +163,7 @@
          }); 
     }
     
-    function up1688PidFlag(pid, obj) {
+    /* function up1688PidFlag(pid, obj) {
  	   
       $.ajax({
          type: "POST",
@@ -179,8 +181,8 @@
          error: function (res) {
              alert("网络获取失败");
          }
-      }); 
- }
+      });  
+ }*/
     		
     		
 </script>
@@ -305,6 +307,9 @@
                                     <c:if test="${lireGd.dealState == 2}">
                                         <br><span><b class="b_sty">对标</b></span>
                                     </c:if>
+                                    <c:if test="${lireGd.dealState == 3}">
+                                        <br><span><b class="b_sty">删除同款</b></span>
+                                    </c:if>
                                 </c:if>
                                 
                                 <c:if test="${lireGd.dealState == 0}">
@@ -313,12 +318,12 @@
                                                      onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',1,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
                                         &nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" value="对标" class="s_btn ali2_${aliGd.aliPid}"
                                         onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
+                                        &nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" value="删除同款" class="s_btn ali3_${aliGd.aliPid}"
+                                        onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',3,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
                                     </c:if>
                                 </span>
                                 </c:if>
-                                
- 																&nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" value="删除同款" class="s_btn ali2_${aliGd.aliPid}"
-                                        onclick="up1688PidFlag('${lireGd.pid}',this)"/>
+ 																
                             </div>
                         </td>
                     </c:forEach>

@@ -63,7 +63,7 @@
         group by orderid ) pm INNER JOIN
         (select userid,count(userid) as order_num from (select userid,count(orderid)
         from payment where paystatus=1
-        and LENGTH(orderid) = 16
+        and LOCATE('_',orderid)&lt;=0
         <if test=" userid >0 ">
             and userid= #{userid}
         </if>
@@ -139,7 +139,7 @@
         group by orderid order by createtime desc) odd INNER JOIN
         (select userid,count(userid) as order_num from (select userid,count(orderid)
         from payment where paystatus=1
-        and LENGTH(orderid) = 16
+        and LOCATE('_',orderid)&lt;=0
         <if test=" userid >0 ">
             and userid= #{userid}
         </if>
