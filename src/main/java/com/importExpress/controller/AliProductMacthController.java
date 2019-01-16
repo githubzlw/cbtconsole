@@ -222,6 +222,14 @@ public class AliProductMacthController {
             if ("2".equals(dealStateStr)) {
                 aliProductService.setAliFlag(aliPid, 2, user.getId());
             }
+           // 如果是删除同款，更新状态信息
+            if("3".equals(dealStateStr)){
+            	aliProductService.setAliFlag(aliPid, 3, user.getId());
+            	//删除同款
+                customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
+            }
+            
+            
             
             //在线商品 对标
             if("2".equals(dealStateStr) && validInt != 0){
@@ -266,45 +274,45 @@ public class AliProductMacthController {
      * @param response
      * @return
      */
-    @RequestMapping("/up1688PidFlag")
-    @ResponseBody
-    public JsonResult up1688PidFlag(HttpServletRequest request, HttpServletResponse response) {
-        JsonResult json = new JsonResult();
-
-        String sessionId = request.getSession().getId();
-        String userJson = Redis.hget(sessionId, "admuser");
-        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
-        if (user == null || user.getId() == 0) {
-            json.setOk(false);
-            json.setMessage("请登录后操作");
-            return json;
-        }
-
-        String pid = request.getParameter("pid");
-        if (StringUtils.isBlank(pid)) {
-            json.setOk(false);
-            json.setMessage("获取1688Pid失败");
-            return json;
-        }
-
-
-        try {
-        	int count = customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
-            if (count > 0) {
-            	json.setOk(true);
-            }else{
-            	json.setOk(false);
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("up1688PidFlag error:" + e.getMessage());
-            json.setOk(false);
-            json.setMessage("更新失败:" + e.getMessage());
-            logger.error("up1688PidFlag error:" + e.getMessage());
-        }
-        return json;
-    }
+//    @RequestMapping("/up1688PidFlag")
+//    @ResponseBody
+//    public JsonResult up1688PidFlag(HttpServletRequest request, HttpServletResponse response) {
+//        JsonResult json = new JsonResult();
+//
+//        String sessionId = request.getSession().getId();
+//        String userJson = Redis.hget(sessionId, "admuser");
+//        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+//        if (user == null || user.getId() == 0) {
+//            json.setOk(false);
+//            json.setMessage("请登录后操作");
+//            return json;
+//        }
+//
+//        String pid = request.getParameter("pid");
+//        if (StringUtils.isBlank(pid)) {
+//            json.setOk(false);
+//            json.setMessage("获取1688Pid失败");
+//            return json;
+//        }
+//
+//
+//        try {
+//        	int count = customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
+//            if (count > 0) {
+//            	json.setOk(true);
+//            }else{
+//            	json.setOk(false);
+//            }
+//            
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.err.println("up1688PidFlag error:" + e.getMessage());
+//            json.setOk(false);
+//            json.setMessage("更新失败:" + e.getMessage());
+//            logger.error("up1688PidFlag error:" + e.getMessage());
+//        }
+//        return json;
+//    }
     
     
     
