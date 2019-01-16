@@ -626,9 +626,7 @@ public class EditorController {
             if (StringUtils.isNotBlank(bizPrice) || "0".equals(bizPrice)) {
                 cgp.setFpriceStr(bizPrice);
             } else {
-                json.setOk(false);
-                json.setMessage("获取bizPrice失败");
-                return json;
+                cgp.setFpriceStr("");
             }
 
             String rangePrice = request.getParameter("rangePrice");
