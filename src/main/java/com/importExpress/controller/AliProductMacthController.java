@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
-@RequestMapping("/productCtr")
+@RequestMapping("/aliProductCtr")
 public class AliProductMacthController {
     private static final Log logger = LogFactory.getLog(AliProductMacthController.class);
 
