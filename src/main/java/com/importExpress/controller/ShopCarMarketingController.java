@@ -749,13 +749,19 @@ public class ShopCarMarketingController {
             }
             // 调用线上接口，获取客户支付运费,实际我司运费
             getMinFreightByUserId(userId,carUserStatistic);
+
             // 利润率计算
-            estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
-
-            carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-            carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
-            carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
-
+            if(totalWhosePrice == 0){
+                estimateProfit = 0;
+                carUserStatistic.setTotalPrice(0);
+                carUserStatistic.setEstimateProfit(0);
+                carUserStatistic.setTotalWhosePrice(0);
+            }else {
+                estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
+                carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
+                carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
+            }
 
             mv.addObject("success", 1);
             mv.addObject("userInfo", carUserStatistic);
