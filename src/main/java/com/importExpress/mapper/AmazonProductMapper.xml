@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.AmazonProductMapper">
+    <resultMap id="amazonProductResultMap" type="com.importExpress.pojo.AmazonProductBean">
+        <id column="id" property="id"/>
+        <result column="goods_pid" property="amazonPid"/>
+        <result column="goods_name" property="amazonName"/>
+        <result column="goods_img" property="amazonImg"/>
+        <result column="goods_price" property="amazonPrice"/>
+        <result column="goods_url" property="amazonUrl"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="match_pid" property="matchPid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="deal_state" property="dealState"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+
+    <select id="queryForList" resultMap="amazonProductResultMap"
+            parameterType="com.importExpress.pojo.AmazonProductBean">
+        select a.id,a.goods_pid,a.goods_name,a.goods_url,a.goods_price,a.goods_img,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.deal_state,a.admin_id,a.match_pid,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,b.admName as admin_name
+        from am_goods_info a left join admuser b on a.admin_id = b.id
+        where 1=1
+        <if test="amazonPid != null">
+            and a.goods_pid = #{amazonPid}
+        </if>
+        <if test="adminId != null and adminId > 0">
+            and a.admin_id = #{adminId}
+        </if>
+        <if test="dealState != null">
+            and a.deal_state = #{dealState}
+        </if>
+        order by id desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryForListCount" resultType="java.lang.Integer"
+            parameterType="com.importExpress.pojo.AmazonProductBean">
+        select count(1)
+        from am_goods_info
+        where 1=1
+        <if test="amazonPid != null">
+            and goods_pid = #{amazonPid}
+        </if>
+        <if test="adminId != null and adminId > 0">
+            and admin_id = #{adminId}
+        </if>
+        <if test="dealState != null">
+            and deal_state = #{dealState}
+        </if>
+    </select>
+
+
+    <update id="setAmazonDealFlag">
+        update am_goods_info
+        set deal_state = #{dealState},admin_id = #{adminId},match_pid = #{matchPid}
+        where goods_pid = #{amazonPid}
+    </update>
+
+    <select id="checkAmazonProductIsExists" resultType="java.lang.Integer">
+        select count(1) from am_goods_info
+        where goods_pid = #{amazonPid} and deal_state = 1
+    </select>
+
+</mapper>
