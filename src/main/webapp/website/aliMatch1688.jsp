@@ -102,7 +102,7 @@
     function setAliFlag(aliPid, obj) {
         $.ajax({
             type: "POST",
-            url: "/cbtconsole/productCtr/setAliFlag",
+            url: "/cbtconsole/aliProductCtr/setAliFlag",
             data: {
                 aliPid: aliPid,
                 dealState: 1
@@ -129,7 +129,7 @@
     	   
          $.ajax({
             type: "POST",
-            url: "/cbtconsole/productCtr/set1688PidFlag",
+            url: "/cbtconsole/aliProductCtr/set1688PidFlag",
             data: {
                 aliPid: aliPid,
                 pid: pid,
@@ -167,7 +167,7 @@
  	   
       $.ajax({
          type: "POST",
-         url: "/cbtconsole/productCtr/up1688PidFlag",
+         url: "/cbtconsole/aliProductCtr/up1688PidFlag",
          data: {
              pid: pid
          },
@@ -191,7 +191,7 @@
 
 <div style="margin-bottom: -3px;text-align: center;width: 100%;height: 10%;">
     <h3 style="text-align: center;">速卖通对标1688</h3>
-    <form action="/cbtconsole/productCtr/queryForList" method="post">
+    <form action="/cbtconsole/aliProductCtr/queryForList" method="post">
         <span>AliPid:<input type="text" name="aliPid" class="inp_sty" value="${aliPid}"/></span>
         <span>关键词:<input type="text" name="keyword" class="inp_sty" value="${keyword}"/></span>
         <span>
@@ -252,7 +252,7 @@
                     <c:forEach items="${aliGd.productListLire}" var="lireGd">
                         <td style="width: 11%;background-color: #c0c38e;">
                             <div>
-                                <span>Pid:${lireGd.pid}</span>
+                                <span>Pid:<<a href="/cbtconsole/editc/detalisEdit?pid=${lireGd.pid}">${lireGd.pid}</a></span>
                                 <br><a target="_blank" href="${lireGd.url}">
                                 <img class="img_sty" src="${lireGd.remotePath}${lireGd.img}"/></a>
                                 <br><span style="color: red">价格USD:${lireGd.showPrice}</span>
@@ -361,11 +361,12 @@
     </table>
 
 
-    <form id="submit_form" action="/cbtconsole/productCtr/queryForList" method="post">
+    <form id="submit_form" action="/cbtconsole/aliProductCtr/queryForList" method="post">
         <input type="hidden" id="page_ali_pid" name="aliPid" value="${aliPid}"/>
         <input type="hidden" id="page_keyword" name="keyword" value="${keyword}"/>
         <input type="hidden" id="page_adminId" name="adminId" value="${adminId}"/>
         <input type="hidden" id="query_current_page" name="page" value="${page}"/>
+        <input type="hidden" id="page_dealState" name="dealState" value="${dealState}"/>
     </form>
     <div style="text-align: center;">
         <span>当前页：<span id="query_page">${page}</span>/<span id="query_total_page">${totalPage}</span></span>
