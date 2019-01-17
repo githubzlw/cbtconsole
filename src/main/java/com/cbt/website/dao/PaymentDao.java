@@ -1945,7 +1945,7 @@ public class PaymentDao implements PaymentDaoImp {
 
         //插入付款信息
         String sqlpay = "insert into " + temporary_table + "(type,createtime,remark,currency,money_in)"
-                + "(select paytype,createtime,orderid,payment_cc,payment_amount  "
+                + "(select paytype,createtime,orderid,CASE WHEN payment_cc='US' THEN 'USD' ELSE payment_cc END AS payment_cc,payment_amount  "
                 + "from payment where (paytype='0' or paytype='1') "
                 + "and paystatus=1 and userid=?)";
 
@@ -1957,17 +1957,17 @@ public class PaymentDao implements PaymentDaoImp {
 
         //插入订单消费信息
         String sqlorder = "insert into " + temporary_table + "(type,createtime,remark,currency,money_out)"
-                + "(select '3',orderpaytime,order_no,currency,pay_price "
+                + "(select '3',orderpaytime,order_no,CASE WHEN currency='US' THEN 'USD' ELSE currency END AS currency,pay_price "
                 + "from  orderinfo where (state>0 and state<6) and user_id=?)";
 
         //已完结退款
         String sqlref1 = "insert into " + temporary_table + "(type,createtime,remark,currency,money_out)"
-                + "(select '4',endtime,remark,currency,account "
+                + "(select '4',endtime,remark,CASE WHEN currency='US' THEN 'USD' ELSE currency END AS currency,account "
                 + "from  refund where status=2 and valid=1 and account>0.009 and userid=?)";
 
         //提现处理中
         String sqlref2 = "insert into " + temporary_table + "(type,createtime,remark,currency,money_out)"
-                + "(select '7',apptime,IFNULL(remark,'提现正在处理中...'),currency,account "
+                + "(select '7',apptime,IFNULL(remark,'提现正在处理中...'),CASE WHEN currency='US' THEN 'USD' ELSE currency END AS currency,account "
                 + "from  refund where status>-1 and status<2 and valid=1 and account>0.009 and type=0 and userid=?)";
 
         //payple申诉中
@@ -1978,10 +1978,10 @@ public class PaymentDao implements PaymentDaoImp {
 
         //余额变更信息
         String recharge_record_in = "insert into " + temporary_table + "(type,createtime,remark,currency,money_out)"
-                + "(select '8' as type,datatime,remark_id,currency,price from recharge_record where userid = ? " +
+                + "(select '8' as type,datatime,remark_id,CASE WHEN currency='US' THEN 'USD' ELSE currency END AS currency,price from recharge_record where userid = ? " +
                 "and usesign  =1 and LENGTH(remark_id) > 6)";
         String recharge_record_out = "insert into " + temporary_table + "(type,createtime,remark,currency,money_in)"
-                + "(select '9' as type,datatime,remark_id,currency,price from recharge_record where userid = ? " +
+                + "(select '9' as type,datatime,remark_id,CASE WHEN currency='US' THEN 'USD' ELSE currency END AS currency,price from recharge_record where userid = ? " +
                 "and usesign in(0,2) and LENGTH(remark_id) > 6)";
 
 

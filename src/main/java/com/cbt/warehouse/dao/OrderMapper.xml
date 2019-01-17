@@ -1049,7 +1049,7 @@
   </update>
   
   <select id="existOrderNo"  parameterType="String" resultType="Integer">
-  SELECT orderid from orderinfo   WHERE  func_get_split_string(order_no,'_',1) = #{orderNo} limit 1
+  SELECT orderid from orderinfo   WHERE  LOCATE(#{orderNo},order_no) OR LOCATE(order_no,#{orderNo}) limit 1
   </select>
     
   <select id="getOrderByUidPage" resultMap="OrderResultMap">
