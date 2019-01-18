@@ -2135,7 +2135,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			sql= sql+"pro_score,pro_score1,pro_score2,pro_score3,pro_score4,pro_score5,pro_score6, ";
 			sql= sql+"deep_factory,deep_factory1,deep_factory2,deep_factory3,deep_factory4,deep_factory5,deep_factory6, ";
 			sql= sql+"valid,valid1,valid2,valid3,valid4,valid5,valid6, ";
-			sql= sql+"pro_sold,pro_sold1,pro_sold2,pro_sold3,pro_sold4,pro_sold5,pro_sold6 from  lire_img_custom where flag=0 limit ?, ?";
+			sql= sql+"pro_sold,pro_sold1,pro_sold2,pro_sold3,pro_sold4,pro_sold5,pro_sold6 from  lire_img_custom where flag=2 limit ?, ?";
 			
 			String path ="";
 			if(flag>0){
@@ -2271,11 +2271,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		
 		String sql ="update lire_img_custom a,lire_goods b set a.valid=0 where a.sor_pid=b.pid";
 		String sql1 ="update lire_img_custom a,lire_goods b set a.valid1=0 where a.res_pid1=b.pid";
-		String sql2 ="update lire_img_custom a,lire_goods b set a.valid2=0 where a.res_pid1=b.pid";
-		String sql3 ="update lire_img_custom a,lire_goods b set a.valid3=0 where a.res_pid1=b.pid";
-		String sql4 ="update lire_img_custom a,lire_goods b set a.valid4=0 where a.res_pid1=b.pid";
-		String sql5 ="update lire_img_custom a,lire_goods b set a.valid5=0 where a.res_pid1=b.pid";
-		String sql6 ="update lire_img_custom a,lire_goods b set a.valid6=0 where a.res_pid1=b.pid";
+		String sql2 ="update lire_img_custom a,lire_goods b set a.valid2=0 where a.res_pid2=b.pid";
+		String sql3 ="update lire_img_custom a,lire_goods b set a.valid3=0 where a.res_pid3=b.pid";
+		String sql4 ="update lire_img_custom a,lire_goods b set a.valid4=0 where a.res_pid4=b.pid";
+		String sql5 ="update lire_img_custom a,lire_goods b set a.valid5=0 where a.res_pid5=b.pid";
+		String sql6 ="update lire_img_custom a,lire_goods b set a.valid6=0 where a.res_pid6=b.pid";
 			
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null,stmt1 = null,stmt2 = null,stmt3 = null,stmt4 = null,stmt5 = null,stmt6 = null;
