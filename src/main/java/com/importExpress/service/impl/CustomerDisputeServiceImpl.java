@@ -320,6 +320,7 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	                bean.setReason(objectd.getString("reason").toUpperCase());
 	    			bean.setStatus(objectd.getString("status").toUpperCase());
 	    			bean.setApiType("Stripe-电商");
+	    			bean.setRead(document.getBooleanValue("isRead"));
 	    			list.add(bean);
 	    		}
 				

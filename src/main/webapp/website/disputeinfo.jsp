@@ -12,6 +12,13 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/fine-uploader/jquery.fine-uploader.js"></script>
 <style type="text/css">
+table,table tr th, table tr td { border:12px solid #ebf6e0;font-weight: bold;text-align: left;}
+table { line-height: 25px; text-align: center; border-collapse: collapse;}
+.title_c{font-size: 25px;font-weight: bold;color: #2dadc2;text-align: left;margin-left: 11px;}   
+.td_title{width:300px;color:black;}
+.td_value{width:660px;color: black;}
+.td_value2{width:630px;height: 30px;}
+.td_back{background:#d2ddc7ad;}
 	.avatar.isMe {
     color: #333;
     border-color: #333;
@@ -164,16 +171,237 @@
 -->
 </head>
 
-<body>
+<body style="width: 100%" >
 <c:if test="${success ==0}">
-
 <div style="font-size: 18px;color: red;font-weight: bold;">
 ${message}
 </div>
+</c:if>
+
+<c:if test="${success == 1 && apiType!=0}">
+<div style="width: 90%;margin-left: 2%" align="center" >
+<div class="title_c">Detail</div>
+<table>
+<tr>
+<td class="td_title td_back">ID:</td>
+<td class="td_value">${dispute.id}</td>
+<td class="td_title td_back">Amount:</td>
+<td class="td_value"><em class="c_amount">${dispute.amount}</em> ${dispute.currency}</td>
+</tr>
+<tr>
+<td class="td_title td_back">Charge:</td>
+<td class="td_value">${dispute.charge }</td>
+<td class="td_title td_back">Reason:</td>
+<td class="td_value">${dispute.reason }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Balance Transaction:</td>
+<td class="td_value">${dispute.balanceTransaction }</td>
+<td class="td_title td_back">Status:</td>
+<td class="td_value">${dispute.status }</td>
+</tr>
+
+</table>
+<div class="title_c">Balance Transactions</div>
+<table>
+<tr>
+<td class="td_back">ID</td>
+<td class="td_back">Amount</td>
+<td class="td_back">Fee</td>
+<td class="td_back">Net</td>
+<td class="td_back">Time</td>
+<td class="td_back">Description</td>
+
+</tr>
+<c:forEach items="${dispute.balanceTransactions }" var="transaction">
+<tr>
+<td style="width:300px;">${transaction.id }</td>
+<td style="width:300px;"><em class="c_amount">${transaction.amount }</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_amount">${transaction.fee}</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_amount">${transaction.net}</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_time">${transaction.created }</em></td>
+<td style="width:500px;">${transaction.description }</td>
+
+</tr>
+</c:forEach>
+</table>
+<div class="title_c">Evidence</div>
+<table>
+<tr>
+<td class="td_title td_back">Product Description:</td>
+<td class="td_value">${dispute.evidenceSubObject.productDescription }</td>
+<td class="td_title td_back">Customer Name:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerName }</td>
+
+
+</tr>
+<tr>
+<td class="td_title td_back">Receipt:</td>
+<td class="td_value">${dispute.evidenceSubObject.receipt }</td>
+<td class="td_title td_back">Customer Email:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerEmailAddress }</td>
+
+</tr>
+
+<tr>
+<td class="td_title td_back">Shipping Date:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingDate }</td>
+<td class="td_title td_back">Billing Address:</td>
+<td class="td_value">${dispute.evidenceSubObject.billingAddress }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Tracking Number:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingTrackingNumber }</td>
+<td class="td_title td_back">Shipping Address:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingAddress }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Carrier:</td>
+<td class="td_value"><%-- ${dispute.evidenceSubObject.shippingCarrier } --%></td>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingDocumentation }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Policy:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationPolicy }</td>
+<td class="td_title td_back">Cancellation Policy Disclosure:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationPolicyDisclosure }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Rebuttal:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationRebuttal }</td>
+<td class="td_title td_back">Customer Communication:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerCommunication }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Id:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeId }</td>
+<td class="td_title td_back">Duplicate Charge Explanation:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeExplanation }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Documentation:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeDocumentation }</td>
+<td class="td_title td_back">Refund Policy:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundPolicy }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Refund Policy Disclosure:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundPolicyDisclosure }</td>
+<td class="td_title td_back">Refund Refusal Explanation:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundRefusalExplanation }</td>
+</tr>
+
+
+
+</table>
+
+
+<c:if test="${status==0 }">
+<form action="/cbtconsole/customer/dispute/stripe/update" method="post">
+<div class="title_c">Please provide evidence</div>
+<input name="disputeId" value="${dispute.id}" type="hidden">
+<input name="resonFlag" value="${resonFlag }" type="hidden">
+<input name="isRead" value="${isread }" type="hidden">
+<table>
+<tr>
+<td class="td_title td_back">Product Description</td>
+<td class="td_value"><input name="product_description" value="" class="td_value2"></td>
+<c:if test="${ resonFlag==4}">
+<td class="td_title td_back">Access Activity Log</td>
+<td class="td_value"><input name="access_activity_log" value="" class="td_value2"></td>
+</c:if>
+<c:if test="${ resonFlag!=4}">
+<td class="td_title"></td>
+<td class="td_value"></td>
+</c:if>
+
+</tr>
+<c:if test="${resonFlag> 0 && resonFlag<5}">
+<tr>
+<td class="td_title td_back">Shipping Date:</td>
+<td class="td_value"><input name="shipping_date" value="" class="td_value2"></td>
+<td class="td_title td_back">Shipping Number:</td>
+<td class="td_value"><input name="shipping_number" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Carrier:</td>
+<td class="td_value"><input name="shipping_carrier" value="" class="td_value2"></td>
+<td class="td_title td_back">Shipping Address:</td>
+<td class="td_value"><input name="shipping_address" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
+<td class="td_title"></td>
+<td class="td_value"></td>
+</tr>
+</c:if>
+
+<c:if test="${resonFlag==5}">
+<tr>
+<td class="td_title td_back">Cancellation Policy:</td>
+<td class="td_value"><input name="cancellation_policy" value="" class="td_value2"></td>
+<td class="td_title td_back">Cancellation Policy Disclosure:</td>
+<td class="td_value"><input name="cancellation_policy_disclosure" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Rebuttal:</td>
+<td class="td_value"><input name="cancellation_rebuttal" value="" class="td_value2"></td>
+<td class="td_title td_back">Customer Communication:</td>
+<td class="td_value"><input name="customer_communication" value="" class="td_value2"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==6}">
+<tr>
+<td class="td_title td_back">Duplicate Charge_id:</td>
+<td class="td_value"><input name="duplicate_charge_id" value="" class="td_value2"></td>
+<td class="td_title td_back">Duplicate Charge Explanation:</td>
+<td class="td_value"><input name="duplicate_charge_explanation" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Documentation:</td>
+<td class="td_value"><input name="duplicate_charge_documentation" value="" class="td_value2"></td>
+<c:if test="${resonFlag==0}">
+<td class="td_title td_back">Service Documentation:</td>
+<td class="td_value"><input name="service_documentation" value="" class="td_value2"></td>
+</c:if>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==7}">
+<tr>
+<td class="td_title td_back">Refund Policy:</td>
+<td class="td_value"><input name="refund_policy" value="" class="td_value2"></td>
+<td class="td_title td_back">Refund Policy Disclosure:</td>
+<td class="td_value"><input name="refund_policy_disclosure" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Refund Refusal Explanation:</td>
+<td class="td_value"><input name="refund_refusal_explanation" value="" class="td_value2"></td>
+<td class="td_title"></td>
+<td class="td_value"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==7}"></c:if>
+
+
+</table>
+
+<input type="submit" value="Submit">
+</form>
 
 </c:if>
 
-<c:if test="${success == 1}">
+
+
+</div>
+<br><br>
+<br><br>
+</c:if>
+
+<c:if test="${success == 1 && apiType==0}">
 <div style="width:980px; position: absolute;margin-left: 200px;">
 <div>
 <h1>消息</h1>
@@ -278,7 +506,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <section id="compose">
 <!-- || statusFlag ==1 -->
-<c:if test="${statusFlag==0 }">
+<c:if test="${statusFlag!=10 }">
 <div class="row">
 
 <div class="col-md-1 col-sm-2 col-xs-2 col-lg-1" style="float: left;">
@@ -289,7 +517,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="col-md-7 seller-response-options ">
 <span>How would you like to respond?</span>
-<c:if test="${statusFlag != 1}">
+<c:if test="${statusFlag != 10}">
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
@@ -984,6 +1212,26 @@ var sendResult = '${sendResult}'
 if(sendResult !=''){
 	alert(sendResult);
 }
+$(function(){
+	$(".c_amount").each(function(){
+		var amount = $(this).html();
+		if(amount){
+			var len = amount.length;
+			amount = amount.substring(0,len-2)+"."+amount.substring(len-2);
+			$(this).html(amount);
+		}
+		
+	})
+	$(".c_time").each(function(){
+		var timestamp = parseInt($(this).html());
+		 var unixTimestamp = new Date(timestamp * 1000) ;
+		 var commonTime = unixTimestamp.toLocaleString();
+		 $(this).html(commonTime);
+		 
+	})
+})
+
+
 $("input:radio").click(function(){
 		if($(this).is(':checked')){
 			$(this).parents(".issuediv").find("#messageBodyForGeneric").val('');

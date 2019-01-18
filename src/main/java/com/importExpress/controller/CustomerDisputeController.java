@@ -31,6 +31,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.FileMeta;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.stripe.StripeService;
 import com.cbt.util.FileUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -42,6 +44,8 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.service.APIService;
 import com.importExpress.service.CustomerDisputeService;
+import com.stripe.model.BalanceTransaction;
+import com.stripe.model.Dispute;
 
 @Controller
 @RequestMapping("/customer/dispute")
@@ -51,6 +55,8 @@ public class CustomerDisputeController {
 	 private CustomerDisputeService customerDisputeService;
 	 @Autowired
 	 private APIService apiService;
+	 @Autowired
+	 private StripeService stripeService;
 	
 	
 	 /**
@@ -167,6 +173,7 @@ public class CustomerDisputeController {
     	int resonFlag = 0;
     	int statusFlag = 0;
     	int disputeLifeCycleFlag = 0;
+    	int apiType = 0;
     	mv.addObject("success", 1);
 		try {
 			int confim = customerDisputeService.count(disputeID,"0");
@@ -174,60 +181,84 @@ public class CustomerDisputeController {
 			String showDisputeDetails = "";//
 			if(StringUtils.startsWith(disputeID, "PP")) {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
+				LOG.info(showDisputeDetails);
+				System.out.println(showDisputeDetails);
+				if(StringUtils.isNotEmpty(showDisputeDetails)) {
+					infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
+				}
+				if(infoByDisputeID != null) {
+					mv.addObject("result", infoByDisputeID);
+					JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
+					
+					JSONObject seller = (JSONObject)((JSONObject)disputedTransactions.get(0)).get("seller");
+					merchant = seller.getString("merchant_id");
+					
+					String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
+					mv.addObject("orderNo", "");
+					if(StringUtils.indexOf(custom, "@") > -1) {
+						String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
+						String userid = split.length > 3 ? split[0] : "";
+						String orderNo = split.length > 5 ? split[6] : split.length > 3 ?split[2] : "";
+						mv.addObject("userid", userid);
+						mv.addObject("orderNo", orderNo);
+					}
+					//原因
+					String reason = infoByDisputeID.getString("reason");
+					resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
+					//状态
+					String status = infoByDisputeID.getString("status");
+					statusFlag = StringUtils.equals("WAITING_FOR_SELLER_RESPONSE", status) ? 1 : statusFlag;
+					statusFlag = StringUtils.equals("WAITING_FOR_BUYER_RESPONSE", status) ? 2 : statusFlag;
+					statusFlag = StringUtils.equals("UNDER_REVIEW", status) ? 3 : statusFlag;
+					statusFlag = StringUtils.equals("RESOLVED", status) ? 4 : statusFlag;
+					
+					String disputeLifeCycleStage = infoByDisputeID.getString("dispute_life_cycle_stage");
+					disputeLifeCycleFlag = StringUtils.equals("INQUIRY", disputeLifeCycleStage) ? 1 : disputeLifeCycleFlag;
+					disputeLifeCycleFlag = StringUtils.equals("CHARGEBACK", disputeLifeCycleStage) ? 2 : disputeLifeCycleFlag;
+					//
+					JSONObject disputeOutcome = (JSONObject)infoByDisputeID.get("dispute_outcome");
+					if(disputeOutcome != null) {
+						JSONObject amountRefunded = (JSONObject)disputeOutcome.get("amount_refunded");
+						mv.addObject("dispute_outcome_amount", amountRefunded != null ? amountRefunded.getString("value") : null);
+					}
+					JSONObject offer = (JSONObject)infoByDisputeID.get("offer");
+					if(offer != null) {
+						JSONObject sellerOfferedAmount = (JSONObject)offer.get("seller_offered_amount");
+						JSONObject buyerRequestedAmount = (JSONObject)offer.get("buyer_requested_amount");
+						mv.addObject("buyer_requested_amount", buyerRequestedAmount != null ? buyerRequestedAmount.getString("value") : null);
+						mv.addObject("seller_offered_amount", sellerOfferedAmount != null ? sellerOfferedAmount.getString("value") : null);
+					}
+					mv.addObject("resonFlag", resonFlag);
+					mv.addObject("statusFlag", statusFlag);
+					mv.addObject("disputeLifeCycleFlag", disputeLifeCycleFlag);
+					mv.addObject("merchant", merchant);
+				}
+			}else {
+				apiType = 1;
+				Dispute dispute = stripeService.dispute(disputeID);
+				if(dispute != null) {
+					Long amount = dispute.getAmount();
+					String strAmount = String.valueOf(amount);
+					strAmount = strAmount.substring(0,strAmount.length()-2)+"."+strAmount.substring(strAmount.length()-2);
+					mv.addObject("disputeAmount", strAmount);
+				}
+				mv.addObject("status","needs_response".equals(dispute.getStatus().toLowerCase()) ? 0:1);
+				mv.addObject("dispute", dispute);
+				
+				resonFlag = "fraudulent".equals(dispute.getReason().toLowerCase())? 1: resonFlag;
+				resonFlag = "product not received".equals(dispute.getReason().toLowerCase())? 2: resonFlag;
+				resonFlag = "product unacceptable".equals(dispute.getReason().toLowerCase())? 3: resonFlag;
+				resonFlag = "unrecognized".equals(dispute.getReason().toLowerCase())? 4: resonFlag;
+				
+				resonFlag = "subscription canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
+				resonFlag = "duplicate".equals(dispute.getReason().toLowerCase())? 6: resonFlag;
+				resonFlag = "credit not processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
+				
+				
+				
 			}	
-			LOG.info(showDisputeDetails);
-//			System.out.println(showDisputeDetails);
-			if(StringUtils.isNotEmpty(showDisputeDetails)) {
-				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
-			}
-			if(infoByDisputeID != null) {
-				mv.addObject("result", infoByDisputeID);
-				JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
-				
-				JSONObject seller = (JSONObject)((JSONObject)disputedTransactions.get(0)).get("seller");
-				merchant = seller.getString("merchant_id");
-				
-				String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
-				mv.addObject("orderNo", "");
-				if(StringUtils.indexOf(custom, "@") > -1) {
-					String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
-					String userid = split.length > 3 ? split[0] : "";
-					String orderNo = split.length > 5 ? split[6] : split.length > 3 ?split[2] : "";
-					mv.addObject("userid", userid);
-					mv.addObject("orderNo", orderNo);
-				}
-				//原因
-				String reason = infoByDisputeID.getString("reason");
-				resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
-				//状态
-				String status = infoByDisputeID.getString("status");
-				statusFlag = StringUtils.equals("WAITING_FOR_SELLER_RESPONSE", status) ? 1 : statusFlag;
-				statusFlag = StringUtils.equals("WAITING_FOR_BUYER_RESPONSE", status) ? 2 : statusFlag;
-				statusFlag = StringUtils.equals("UNDER_REVIEW", status) ? 3 : statusFlag;
-				statusFlag = StringUtils.equals("RESOLVED", status) ? 4 : statusFlag;
-				
-				String disputeLifeCycleStage = infoByDisputeID.getString("dispute_life_cycle_stage");
-				disputeLifeCycleFlag = StringUtils.equals("INQUIRY", disputeLifeCycleStage) ? 1 : disputeLifeCycleFlag;
-				disputeLifeCycleFlag = StringUtils.equals("CHARGEBACK", disputeLifeCycleStage) ? 2 : disputeLifeCycleFlag;
-				//
-				JSONObject disputeOutcome = (JSONObject)infoByDisputeID.get("dispute_outcome");
-				if(disputeOutcome != null) {
-					JSONObject amountRefunded = (JSONObject)disputeOutcome.get("amount_refunded");
-					mv.addObject("dispute_outcome_amount", amountRefunded != null ? amountRefunded.getString("value") : null);
-				}
-				JSONObject offer = (JSONObject)infoByDisputeID.get("offer");
-				if(offer != null) {
-					JSONObject sellerOfferedAmount = (JSONObject)offer.get("seller_offered_amount");
-					JSONObject buyerRequestedAmount = (JSONObject)offer.get("buyer_requested_amount");
-					mv.addObject("buyer_requested_amount", buyerRequestedAmount != null ? buyerRequestedAmount.getString("value") : null);
-					mv.addObject("seller_offered_amount", sellerOfferedAmount != null ? sellerOfferedAmount.getString("value") : null);
-				}
-				mv.addObject("resonFlag", resonFlag);
-				mv.addObject("statusFlag", statusFlag);
-				mv.addObject("disputeLifeCycleFlag", disputeLifeCycleFlag);
-				mv.addObject("merchant", merchant);
-				
-			}
+			mv.addObject("resonFlag", resonFlag);
+			mv.addObject("apiType", apiType);
 			if(!StringUtils.equals(isread, "true")) {
 				long updateMessage = customerDisputeService.updateMessage(disputeID);
 				LOG.info("updateMessage:"+updateMessage);
@@ -833,4 +864,48 @@ public class CustomerDisputeController {
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }
+    @RequestMapping("/stripe/update")
+    public String stripeUpdate(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
+    	String disputeid = request.getParameter("disputeId");
+    	String isRead = request.getParameter("isRead");
+    	String resonFlag = request.getParameter("resonFlag");
+    	
+    	Map<String, Object> evidence = new HashMap<>();
+    	int reson = StrUtils.isNum(resonFlag) ? Integer.valueOf(resonFlag) : 0;
+    	evidence.put("product_description", request.getParameter("product_description"));
+    	if(reson < 5 && reson >0) {
+    		evidence.put("shipping_date", request.getParameter("shipping_date"));
+    		evidence.put("shipping_number", request.getParameter("shipping_number"));
+    		evidence.put("shipping_carrier", request.getParameter("shipping_carrier"));
+    		evidence.put("shipping_address", request.getParameter("shipping_address"));
+    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    		if(reson == 4) {
+    			evidence.put("access_activity_log", request.getParameter("access_activity_log"));
+    		}
+    	}else if(reson == 5) {
+    		evidence.put("cancellation_policy", request.getParameter("cancellation_policy"));
+    		evidence.put("cancellation_policy_disclosure", request.getParameter("cancellation_policy_disclosure"));
+    		evidence.put("cancellation_rebuttal", request.getParameter("cancellation_rebuttal"));
+    		evidence.put("customer_communication", request.getParameter("customer_communication"));
+    	}else if(reson == 6) {
+    		evidence.put("duplicate_charge_id", request.getParameter("duplicate_charge_id"));
+    		evidence.put("duplicate_charge_explanation", request.getParameter("duplicate_charge_explanation"));
+    		evidence.put("duplicate_charge_documentation", request.getParameter("duplicate_charge_documentation"));
+    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    	}else if(reson == 7) {
+    		evidence.put("refund_policy", request.getParameter("refund_policy"));
+    		evidence.put("refund_policy_disclosure", request.getParameter("refund_policy_disclosure"));
+    		evidence.put("refund_refusal_explanation", request.getParameter("refund_refusal_explanation"));
+    	}
+    	try {
+    		stripeService.update(disputeid, evidence );
+    		attr.addAttribute("sendResult", "Successed");
+		} catch (Exception e) {
+			attr.addAttribute("sendResult", e.getMessage());
+		}
+    	
+    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread="+isRead;
+    }
+    
+    
 }
