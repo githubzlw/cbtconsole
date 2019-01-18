@@ -29,6 +29,7 @@ public class ImportProductBean {
 	private Integer valid;//状态
 	private Integer soldFlag;//是否卖过
 	private Integer isEdit;//是否编辑过
+    private String bargainNumber;
 
     public Integer getSoldFlag() {
 		return soldFlag;
@@ -239,6 +240,17 @@ public class ImportProductBean {
 
     public void setOldAliPid(String oldAliPid) {
         this.oldAliPid = oldAliPid;
+    }
+
+    public String getBargainNumber() {
+        return bargainNumber;
+    }
+
+    public void setBargainNumber(String bargainNumber) {
+        this.bargainNumber = bargainNumber;
+        if(StringUtils.isNotBlank(bargainNumber)){
+            this.sold = Integer.valueOf(bargainNumber);
+        }
     }
 
     @Override
