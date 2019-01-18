@@ -66,13 +66,14 @@ public class OrderInfoImpl implements OrderInfoDao {
 		int row=12;
 		String shorthand="";
 		try{
-			String  sql="select paytype from payment where orderid='"+orderNo+"' and paystatus=1 and paytype<>0";
+			String orderNos=orderNo.indexOf("_")>-1?orderNo.split("_")[0]:orderNo;
+			String  sql="select paytype from payment where orderid='"+orderNos+"' and paystatus=1 and paytype<>0";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			if(rs.next()){
 				return 1;
 			}
-			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE LEFT(oa.orderNo,16)='"+orderNo+"'";
+			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo='"+orderNos+"'";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			if(rs.next()){
