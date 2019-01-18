@@ -68,10 +68,7 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
@@ -2902,22 +2899,17 @@ public class WarehouseCtrl {
 	public Map<String, String> deleteVideoPath(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		try{
-			SendMQ sendMQ = new SendMQ();
 			String goods_pid=request.getParameter("goods_pid");
 			if(StringUtil.isBlank(goods_pid)){
 				map.put("msg","0");
 				return map;
 			}else{
 				map.put("goods_pid",goods_pid);
-				map.put("v_id","");
+				map.put("path","");
 				int row= iWarehouseService.updateCustomVideoUrl(map);
-				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set video_url='' where pid='"+goods_pid+"'"));
-				row+=1;
-				if(row==2){
-					map.put("msg","1");
-				}
+				GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,"");
+				map.put("msg","1");
 			}
-			sendMQ.closeConn();
 		}catch (Exception e){
 			map.put("msg","0");
 		}
@@ -2971,10 +2963,15 @@ public class WarehouseCtrl {
 			stream.close();
 			File video=new File(filePath);
 			if (video.exists()) {
-				map.put("msg","1");
-				map.put("goods_pid",goods_pid);
-				map.put("v_id",filePath);
-				iWarehouseService.updateCustomVideoUrl(map);
+				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/insp_video/", filename+"_"+file.getOriginalFilename(), filePath);
+				if(flag){
+					map.put("msg","1");
+					map.put("goods_pid",goods_pid);
+					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+					map.put("path",path);
+					GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,path);
+					iWarehouseService.updateCustomVideoUrl(map);
+				}
 			}else{
 				map.put("msg","0");
 			}
