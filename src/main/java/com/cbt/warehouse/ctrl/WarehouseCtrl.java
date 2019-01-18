@@ -5423,15 +5423,29 @@ public class WarehouseCtrl {
 	}
 
 	// 获得包裹信息
-	@RequestMapping(value = "/getPackageInfo", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/getPackageInfo_bak", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
-	public String getPackageInfo(HttpServletRequest request,
+	public String getPackageInfo_bak(HttpServletRequest request,
 								 HttpServletResponse response) {
 		String shipmentno = request.getParameter("shipmentno");
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("shipmentno", shipmentno);
-		ShippingPackage shippingPackage = iWarehouseService.getPackageInfo(map);
+		ShippingPackage shippingPackage =null;// iWarehouseService.getPackageInfo(map);
 		return JSONObject.fromObject(shippingPackage).toString();
+	}
+
+	@RequestMapping(value = "/getPackageInfo")
+	@ResponseBody
+	protected EasyUiJsonResult getPackageInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		String shipmentno = request.getParameter("shipmentno");
+		map.put("shipmentno",shipmentno);
+		List<ShippingPackage>  shippingPackage = iWarehouseService.getPackageInfo(map);
+		json.setTotal(1);
+		json.setRows(shippingPackage);
+		return json;
 	}
 
 	// 获得库位信息
