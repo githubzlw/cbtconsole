@@ -998,7 +998,8 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("selled", selled);
 		
 		try {
-			request.getRequestDispatcher("/website/lire_img_info.jsp").forward(request, response);
+//			request.getRequestDispatcher("/website/lire_img_info.jsp").forward(request, response);
+			request.getRequestDispatcher("/website/lire_same_img_info.jsp").forward(request, response);
 		} catch (ServletException e) {
 			e.printStackTrace();	
 		} catch (IOException e) {
@@ -2071,13 +2072,15 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			for(int i=0; i<pidSorsAry.length;i++){
 				tbg = ips.updateLireFlag(pidSorsAry[i]);
 			}
-			for(int i=0; i<pIdAry.length;i++){
-				TbGoodBean tbgood = new TbGoodBean();
-				tbgood.setGoodId(pIdAry[i]);
-				tbgood.setDelFlag(10);
-				//1688产品插入
-				ips.saveLireGood(tbgood);
-			}
+			// zlw 2019/01/15 del start
+//			for(int i=0; i<pIdAry.length;i++){
+//				TbGoodBean tbgood = new TbGoodBean();
+//				tbgood.setGoodId(pIdAry[i]);
+//				tbgood.setDelFlag(10);
+//				//1688产品插入
+//				ips.saveLireGood(tbgood);
+//			}
+			//zlw 2019/01/15 del end
 			out.print(tbg);
 			out.flush();
 			out.close();
