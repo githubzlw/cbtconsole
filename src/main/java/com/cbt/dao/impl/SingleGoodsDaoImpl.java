@@ -5,8 +5,8 @@ import com.cbt.dao.SingleGoodsDao;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.Goods1688OfferBean;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -1116,10 +1116,10 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         String selectSql = "insert into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku," +
                 "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime, " +
-                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name) " +
+                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name,from_flag) " +
                 "select goods_name, price,shop_id,bargain_number, standard, sku," +
                 "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime," +
-                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name " +
+                "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name,from_flag " +
                 "from kj_single_goods_offers where goods_pid ='" + pid + "'";
         String updateSql = "update kj_single_goods_offers set is_update = 1,is_pass = 2 where goods_pid = '" + pid + "'";
         String updateOffer = "update kj_catid_bak a, single_goods_offers b set b.catid=a.catid " +
@@ -1376,6 +1376,65 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             DBHelper.getInstance().closeConnection(conn27);
         }
         return count;
+    }
+
+    @Override
+    public int insertIntoSingleGoods(Goods1688OfferBean goodsOffer) {
+
+        Connection conn31 = DBHelper.getInstance().getConnection6();
+        String sql = "insert into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku,"
+                + "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime,"
+                + "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,"
+                + "crawl_flag,shop_name,from_flag,is_benchmarking,goods_type,ali_pid,ali_price) "
+                +" values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,1,?,?)";
+        PreparedStatement stmt31 = null;
+        int rs = 0;
+        try {
+            stmt31 = conn31.prepareStatement(sql);
+
+            int i = 1;
+            stmt31.setString(i++, goodsOffer.getGoods_name() == null ? "" : goodsOffer.getGoods_name());
+            stmt31.setString(i++, goodsOffer.getPrice() == null ? "" : goodsOffer.getPrice());
+            stmt31.setString(i++, goodsOffer.getShop_id() == null ? "" : goodsOffer.getShop_id());
+            stmt31.setString(i++, goodsOffer.getBargain_number() == null ? "" : goodsOffer.getBargain_number());
+            stmt31.setString(i++, goodsOffer.getStandard() == null ? "" : goodsOffer.getStandard());
+            stmt31.setString(i++, goodsOffer.getSku() == null ? "" : goodsOffer.getSku());
+            stmt31.setString(i++, goodsOffer.getColor() == null ? "" : goodsOffer.getColor());
+            stmt31.setString(i++, goodsOffer.getPic() == null ? "" : goodsOffer.getPic());
+            stmt31.setString(i++, goodsOffer.getPics() == null ? "" : goodsOffer.getPics());
+            stmt31.setString(i++, goodsOffer.getPics1() == null ? "" : goodsOffer.getPics1());
+            stmt31.setString(i++, goodsOffer.getiDetailData() == null ? "" : goodsOffer.getiDetailData());
+            stmt31.setString(i++, goodsOffer.getiDetailConfig() == null ? "" : goodsOffer.getiDetailConfig());
+            stmt31.setString(i++, goodsOffer.getDetail() == null ? "" : goodsOffer.getDetail());
+            stmt31.setString(i++, goodsOffer.getDetail_url() == null ? "" : goodsOffer.getDetail_url());
+            stmt31.setString(i++, goodsOffer.getWeight() == null ? "" : goodsOffer.getWeight());
+            stmt31.setString(i++, goodsOffer.getWeight_url() == null ? "" : goodsOffer.getWeight_url());
+            stmt31.setString(i++, goodsOffer.getAddtime() == null ? "" : goodsOffer.getAddtime());
+            stmt31.setString(i++, goodsOffer.getServiceid() == null ? "" : goodsOffer.getServiceid());
+            stmt31.setString(i++, goodsOffer.getTag_name() == null ? "" : goodsOffer.getTag_name());
+            stmt31.setString(i++, goodsOffer.getCatid() == null ? "" : goodsOffer.getCatid());
+            stmt31.setString(i++, goodsOffer.getKeywords() == null ? "" : goodsOffer.getKeywords());
+            stmt31.setString(i++, goodsOffer.getAverage_deliver_time() == null ? "" : goodsOffer.getAverage_deliver_time());
+            stmt31.setString(i++, goodsOffer.getDl_flag() == null ? "" : goodsOffer.getDl_flag());
+            stmt31.setString(i++, goodsOffer.getSet_weight() == null ? "" : goodsOffer.getSet_weight());
+            stmt31.setString(i++, goodsOffer.getGoods_pid() == null ? "" : goodsOffer.getGoods_pid());
+            stmt31.setString(i++, goodsOffer.getGood_url() == null ? "" : goodsOffer.getGood_url());
+            stmt31.setInt(i++, goodsOffer.getCrawl_flag());
+            stmt31.setString(i++, goodsOffer.getShop_name() == null ? "" : goodsOffer.getShop_name());
+            stmt31.setInt(i++, goodsOffer.getFrom_flag());
+            stmt31.setString(i++, goodsOffer.getAliPid() == null ? "" : goodsOffer.getAliPid());
+            stmt31.setString(i++, goodsOffer.getAliPrice() == null ? "" : goodsOffer.getAliPrice());
+
+            rs = stmt31.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("pid" + goodsOffer.getGoods_pid() + ",insertIntoSingleGoods error :" + e.getMessage());
+            LOG.error("pid" + goodsOffer.getGoods_pid() + ",insertIntoSingleGoods error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt31);
+            DBHelper.getInstance().closeConnection(conn31);
+        }
+        return rs;
     }
 
 }

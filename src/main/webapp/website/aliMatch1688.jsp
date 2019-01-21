@@ -23,7 +23,8 @@
 
     .s_btn {
         display: inline-block;
-        height: 30px;
+        height:40px;
+        width:80px;
         background: #169bd4;
         border-radius: 10px;
         text-align: center;
@@ -38,7 +39,8 @@
 
     .s_give {
         display: inline-block;
-        height: 30px;
+        height:40px;
+        width:80px;
         background: red;
         border-radius: 10px;
         text-align: center;
@@ -102,7 +104,7 @@
     function setAliFlag(aliPid, obj) {
         $.ajax({
             type: "POST",
-            url: "/cbtconsole/productCtr/setAliFlag",
+            url: "/cbtconsole/aliProductCtr/setAliFlag",
             data: {
                 aliPid: aliPid,
                 dealState: 1
@@ -112,6 +114,7 @@
                     $(obj).hide();
                     $(".ali1_" + aliPid).hide();
                     $(".ali2_" + aliPid).hide();
+                    $(".p1688_" + aliPid).hide();
                     $(obj).parent().find('input').hide();
                     $(obj).parent().append('<b class="b_sty">放弃</b>');
                 } else {
@@ -129,7 +132,7 @@
     	   
          $.ajax({
             type: "POST",
-            url: "/cbtconsole/productCtr/set1688PidFlag",
+            url: "/cbtconsole/aliProductCtr/set1688PidFlag",
             data: {
                 aliPid: aliPid,
                 pid: pid,
@@ -148,6 +151,7 @@
                     } else if (dealState == 2) {
                         $(".ali2_" + aliPid).hide();
                         $(".main_" + aliPid).find('input').hide();
+                        $(".p1688_" + aliPid).hide();
                         $(".main_" + aliPid).append('<b class="b_sty">已对标</b>');
                         $(obj).parent().append('<b class="b_sty">对标</b>');
                     } else if(dealState == 3){
@@ -163,11 +167,36 @@
          }); 
     }
     
+    function develop1688Pid(aliPid, pid,aliPrice,obj) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/aliProductCtr/develop1688Pid",
+            data: {
+                aliPid: aliPid,
+                pid: pid,
+                aliPrice: aliPrice
+            },
+            success: function (data) {
+                if (data.ok) {
+                    $(obj).hide();
+                    $(".p1688_" + aliPid).hide();
+                    $(".ali2_" + aliPid).hide();
+                    $(obj).parent().append('<b class="b_sty">爆款对标</b>');
+                } else {
+                    alert("执行失败,原因:" + data.message);
+                }
+            },
+            error: function (res) {
+                alert("网络获取失败");
+            }
+         });
+    }
+    
     /* function up1688PidFlag(pid, obj) {
  	   
       $.ajax({
          type: "POST",
-         url: "/cbtconsole/productCtr/up1688PidFlag",
+         url: "/cbtconsole/aliProductCtr/up1688PidFlag",
          data: {
              pid: pid
          },
@@ -191,7 +220,7 @@
 
 <div style="margin-bottom: -3px;text-align: center;width: 100%;height: 10%;">
     <h3 style="text-align: center;">速卖通对标1688</h3>
-    <form action="/cbtconsole/productCtr/queryForList" method="post">
+    <form action="/cbtconsole/aliProductCtr/queryForList" method="post">
         <span>AliPid:<input type="text" name="aliPid" class="inp_sty" value="${aliPid}"/></span>
         <span>关键词:<input type="text" name="keyword" class="inp_sty" value="${keyword}"/></span>
         <span>
@@ -230,9 +259,11 @@
                         <br><span>关键词:${aliGd.keyword}</span>
                         <br><span>对标人:${aliGd.adminName}</span>
                         <c:if test="${aliGd.dealState == 0}">
-                            <br><span class="main_${aliGd.aliPid}"><input type="button" style="height:50px;width:80px;" class="s_btn" value="开发产品"
-                                                                          onclick="openUrl('${aliGd.aliUrl}')"/>
-                        &nbsp;&nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" class="s_give" value="放弃"
+                            <br>
+                            <span class="main_${aliGd.aliPid}">
+                                <input type="button" class="s_btn" value="爆款对标" onclick="openUrl('${aliGd.aliUrl}')"/>
+                        &nbsp;&nbsp;&nbsp;
+                                <input type="button" class="s_give" value="放弃"
                                                  onclick="setAliFlag('${aliGd.aliPid}',this)"/>
                         </span>
                         </c:if>
@@ -245,14 +276,17 @@
                             <br><span><b class="b_check">已对标,操作人:${aliGd.adminName}</b></span>
                             <br><span><b class="b_check">操作时间:${aliGd.updateTime}</b></span>
                         </c:if>
-
+                        <c:if test="${aliGd.dealState == 3}">
+                            <br><span><b class="b_check">爆款对标,操作人:${aliGd.adminName}</b></span>
+                            <br><span><b class="b_check">操作时间:${aliGd.updateTime}</b></span>
+                        </c:if>
                     </div>
                 </td>
                 <c:if test="${fn:length(aliGd.productListLire) > 0}">
                     <c:forEach items="${aliGd.productListLire}" var="lireGd">
                         <td style="width: 11%;background-color: #c0c38e;">
                             <div>
-                                <span>Pid:${lireGd.pid}</span>
+                                <span>Pid:<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${lireGd.pid}">${lireGd.pid}</a></span>
                                 <br><a target="_blank" href="${lireGd.url}">
                                 <img class="img_sty" src="${lireGd.remotePath}${lireGd.img}"/></a>
                                 <br><span style="color: red">价格USD:${lireGd.showPrice}</span>
@@ -266,7 +300,7 @@
                                 </c:if>
                                 </span>
                                 <c:if test="${lireGd.bmFlag == 1 && lireGd.isBenchmark == 1}">
-                                    <br><span style="background-color: #8cda96;">原对标AliPid:${lireGd.oldAliPid}</span>
+                                    <br><span style="background-color: #e4d6d6;color: red;font-weight: 500;">原对标AliPid:${lireGd.oldAliPid}</span>
                                 </c:if>
                                 <br><span>状态:</span>
                                 <c:if test="${lireGd.valid > 0}">
@@ -299,7 +333,7 @@
                                         <span>
                                           <b class="b_sty">相似</b>
 					                                <c:if test="${aliGd.dealState == 0}">
-					                                    &nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" class="s_btn ali2_${aliGd.aliPid}" value="对标"
+					                                    &nbsp;&nbsp;<input type="button" class="s_btn ali2_${aliGd.aliPid}" value="对标"
 					                                    onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
 					                                </c:if>
                                 				</span>
@@ -314,40 +348,49 @@
                                 
                                 <c:if test="${lireGd.dealState == 0}">
                                     <c:if test="${aliGd.dealState == 0}">
-                                        <br><span><input type="button" value="相似" style="height:50px;width:80px;" class="s_btn ali1_${aliGd.aliPid}"
+                                        <br><span><input type="button" value="相似" class="s_btn ali1_${aliGd.aliPid}"
                                                      onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',1,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
-                                        &nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" value="对标" class="s_btn ali2_${aliGd.aliPid}"
+                                        &nbsp;&nbsp;<input type="button" value="对标" class="s_btn ali2_${aliGd.aliPid}"
                                         onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',2,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
-                                        &nbsp;&nbsp;<input type="button" style="height:50px;width:80px;" value="删除同款" class="s_btn ali3_${aliGd.aliPid}"
-                                        onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',3,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/>
                                     </c:if>
                                 </span>
                                 </c:if>
- 																
+
+                                <c:if test="${lireGd.dealState < 2}">
+                                    <br><span><input type="button" value="删除同款" class="s_btn ali3_${aliGd.aliPid}"
+                                    onclick="set1688PidFlag('${aliGd.aliPid}','${lireGd.pid}',3,this,'${lireGd.valid}','${aliGd.aliPrice}','${aliGd.keyword}')"/></span>
+                                </c:if>
+
                             </div>
                         </td>
                     </c:forEach>
+                </c:if>
+                <c:if test="${fn:length(aliGd.productListLire) == 0}">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </c:if>
                 <c:if test="${fn:length(aliGd.productListPython) > 0}">
                     <c:forEach items="${aliGd.productListPython}" var="pyGd">
                         <td style="width: 11%;background-color: #91dee2;">
                             <div>
                                 <span>Pid:${pyGd.pid}</span>
-                                
-                                <br><a target="_blank" href="${pyGd.url}"><img class="img_sty"
-                                                                               src="${pyGd.remotePath}${pyGd.img}"/></a>
+
+                                <br><a target="_blank" href="${pyGd.url}">
+                                <img class="img_sty" src="${pyGd.img}"/></a>
                                 <br><span style="color: red">价格USD:${pyGd.showPrice}</span>
                                 <br><span>产品名:${pyGd.name}</span>
-                                <br><span>MOQ:${pyGd.moq}&nbsp;&nbsp;销量:${pyGd.sold}&nbsp;&nbsp;
-                                <c:if test="${pyGd.isSoldFlag > 0}">
-                                    <b style="color: green">免邮</b>
+                                <c:if test="${pyGd.sold > 0}">
+                                    <br><span>销量:${pyGd.sold}</span>
                                 </c:if>
-                                <c:if test="${pyGd.isSoldFlag == 0}">
-                                    <b style="color: green">非免邮</b>
+                                <br>
+                                <c:if test="${pyGd.dealState > 0}">
+                                    <span><b class="b_sty">爆款对标</b></span>
                                 </c:if>
-                                </span>
-                                <c:if test="${pyGd.bmFlag == 1 && pyGd.isBenchmark == 1}">
-                                    <br><span style="background-color: #8cda96;">原对标AliPid:${pyGd.oldAliPid}</span>
+                                <c:if test="${aliGd.dealState == 0}">
+                                    <span><input type="button" class="s_btn p1688_${aliGd.aliPid}" value="爆款对标"
+                                                 onclick="develop1688Pid('${aliGd.aliPid}','${pyGd.pid}','${aliGd.aliPrice}',this)"/></span>
                                 </c:if>
                             </div>
                         </td>
@@ -361,11 +404,12 @@
     </table>
 
 
-    <form id="submit_form" action="/cbtconsole/productCtr/queryForList" method="post">
+    <form id="submit_form" action="/cbtconsole/aliProductCtr/queryForList" method="post">
         <input type="hidden" id="page_ali_pid" name="aliPid" value="${aliPid}"/>
         <input type="hidden" id="page_keyword" name="keyword" value="${keyword}"/>
         <input type="hidden" id="page_adminId" name="adminId" value="${adminId}"/>
         <input type="hidden" id="query_current_page" name="page" value="${page}"/>
+        <input type="hidden" id="page_dealState" name="dealState" value="${dealState}"/>
     </form>
     <div style="text-align: center;">
         <span>当前页：<span id="query_page">${page}</span>/<span id="query_total_page">${totalPage}</span></span>
