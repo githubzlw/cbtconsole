@@ -34,6 +34,15 @@ public class ProblemFeedBackBean implements Serializable{
 	
 	private String reply_content;
 	private String reply_time;
+	private String whatsApp;
+	public String getWhatsApp() {
+		return whatsApp;
+	}
+
+	public void setWhatsApp(String whatsApp) {
+		this.whatsApp = whatsApp;
+	}
+
 	public String getReply_content() {
 		return reply_content;
 	}

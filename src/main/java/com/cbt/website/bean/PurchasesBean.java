@@ -88,6 +88,15 @@ public class PurchasesBean {
 	private String tbSku;
 	private String quality;
 	private String noChnageRemark;
+	private String shopInventory;
+	public String getShopInventory() {
+		return shopInventory;
+	}
+
+	public void setShopInventory(String shopInventory) {
+		this.shopInventory = shopInventory;
+	}
+
 	public String getNoChnageRemark() {
 		return noChnageRemark;
 	}

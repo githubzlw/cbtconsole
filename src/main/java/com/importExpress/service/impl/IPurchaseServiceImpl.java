@@ -1227,9 +1227,14 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			page.setTotalpage("5201314".equals(goodid) || "5201315".equals(goodid)?1:totalpage);
 //			Map<Object,Object> map =new HashMap<Object,Object>();
 			List<StraightHairPojo> list_stra= pruchaseMapper.straightHairList();
-			SendMQ sendMQ = new SendMQ();
-			updateDetailsState(list_stra, sendMQ);
-			sendMQ.closeConn();
+			try{
+				SendMQ sendMQ = new SendMQ();
+				updateDetailsState(list_stra, sendMQ);
+				sendMQ.closeConn();
+			}catch (Exception e){
+				System.out.println("MQ错误。。。。。。。。。。。");
+			}finally {
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -1723,6 +1728,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}else{
 			noChangeRemark="<span style='color:red'>客户不同意替换备注:"+noChangeRemark+"</span>";
 		}
+		purchaseBean.setShopInventory(String.valueOf(map.get("shopInventory")));
 		purchaseBean.setNoChnageRemark(noChangeRemark);
 		purchaseBean.setOd_state(Integer.valueOf(String.valueOf(map.get("od_state")==null?"0":map.get("od_state"))));
 		purchaseBean.setLastValue(map.get("lastValue"));
