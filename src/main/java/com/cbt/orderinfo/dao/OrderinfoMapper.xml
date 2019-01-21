@@ -1432,7 +1432,7 @@
     <select id="getFlushOrderFreightOrderCancel" resultType="com.cbt.bean.OrderBean">
         SELECT oi.order_no as orderNo,SUM(od.od_total_weight) AS volumeweight,mode_transport FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
         WHERE oi.actual_weight_estimate&lt;=0
-        AND (oi.state IN (1,2) OR od.state IN (-1,2) OR func_get_split_string(oi.order_no,'_',1)=func_get_split_string(FIND_IN_SET(oi.order_no,'_'),'_',1))
+        AND (oi.state IN (1,2) OR od.state IN (-1,2) OR (LOCATE(FIND_IN_SET(oi.order_no,'_'),oi.order_no) OR LOCATE(oi.order_no,FIND_IN_SET(oi.order_no,'_')))
         AND oi.isDropshipOrder IN(0,1) AND  DATE_SUB(CURDATE(), INTERVAL 20 DAY) &lt;= date(oi.orderpaytime)
         GROUP BY oi.order_no  ORDER BY
     </select>

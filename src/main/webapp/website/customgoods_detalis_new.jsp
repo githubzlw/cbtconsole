@@ -393,8 +393,7 @@
             }
             var bizPrice = $("#biz_price").val();
             if(bizPrice == null || bizPrice == "" || bizPrice == 0){
-                showMessage("获取bizPrice为空");
-                return;
+                bizPrice = "";
             }
             var wprice = "";
             var feePrice = "";

@@ -3,6 +3,7 @@ package com.cbt.dao;
 import com.cbt.bean.*;
 import com.cbt.pojo.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.Goods1688OfferBean;
 
 import java.util.List;
 
@@ -215,5 +216,12 @@ public interface SingleGoodsDao {
 	boolean deleteSingleOffersByPids(List<String> pidList);
 
 	int queryOnlineGoodsCountByShopId(String shopId);
+
+	/**
+	 * 插入单个商品上线
+	 * @param goodsOffer
+	 * @return
+	 */
+	int insertIntoSingleGoods(Goods1688OfferBean goodsOffer);
 
 }

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
-@RequestMapping("/productCtr")
+@RequestMapping("/aliProductCtr")
 public class AliProductMacthController {
     private static final Log logger = LogFactory.getLog(AliProductMacthController.class);
 
@@ -222,7 +222,13 @@ public class AliProductMacthController {
             if ("2".equals(dealStateStr)) {
                 aliProductService.setAliFlag(aliPid, 2, user.getId());
             }
-            
+           // 如果是删除同款，更新状态信息
+            if("3".equals(dealStateStr)){
+            	// aliProductService.setAliFlag(aliPid, 3, user.getId());
+            	//删除同款
+                customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
+            }
+
             //在线商品 对标
             if("2".equals(dealStateStr) && validInt != 0){
             	// 精准对标更新产品表ali_pid,ali_price,bm_flag=1,isBenchmark=1 27,28,31,线上
@@ -251,24 +257,18 @@ public class AliProductMacthController {
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("set1688PidFlag error:" + e.getMessage());
+            System.err.println("aliPid:" + aliPid + ",set1688PidFlag error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("更新失败:" + e.getMessage());
-            logger.error("set1688PidFlag error:" + e.getMessage());
+            logger.error("aliPid:" + aliPid + ",set1688PidFlag error:" + e.getMessage());
         }
         return json;
     }
 
-    /**
-     * 删除同款
-     *
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping("/up1688PidFlag")
+
+    @RequestMapping("/develop1688Pid")
     @ResponseBody
-    public JsonResult up1688PidFlag(HttpServletRequest request, HttpServletResponse response) {
+    public JsonResult develop1688Pid(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
 
         String sessionId = request.getSession().getId();
@@ -280,6 +280,13 @@ public class AliProductMacthController {
             return json;
         }
 
+        String aliPid = request.getParameter("aliPid");
+        if (StringUtils.isBlank(aliPid)) {
+            json.setOk(false);
+            json.setMessage("获取AliPid失败");
+            return json;
+        }
+
         String pid = request.getParameter("pid");
         if (StringUtils.isBlank(pid)) {
             json.setOk(false);
@@ -287,24 +294,83 @@ public class AliProductMacthController {
             return json;
         }
 
+        String aliPrice;
+        String aliPriceStr = request.getParameter("aliPrice");
+        if (StringUtils.isBlank(aliPriceStr)) {
+            json.setOk(false);
+            json.setMessage("获取速卖通价格失败");
+            return json;
+        }else{
+            if(aliPriceStr.contains("-")){
+                aliPrice = aliPriceStr.split("-")[1];
+            }else{
+                aliPrice = aliPriceStr;
+            }
+        }
 
         try {
-        	int count = customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
-            if (count > 0) {
-            	json.setOk(true);
-            }else{
-            	json.setOk(false);
-            }
-            
+            aliProductService.develop1688Pid(aliPid,aliPrice, pid,user.getId());
+            json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("up1688PidFlag error:" + e.getMessage());
+            System.err.println("develop1688Pid error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("更新失败:" + e.getMessage());
-            logger.error("up1688PidFlag error:" + e.getMessage());
+            logger.error("develop1688Pid error:" + e.getMessage());
         }
         return json;
     }
+
+
+
+
+
+    /**
+     * 删除同款
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+//    @RequestMapping("/up1688PidFlag")
+//    @ResponseBody
+//    public JsonResult up1688PidFlag(HttpServletRequest request, HttpServletResponse response) {
+//        JsonResult json = new JsonResult();
+//
+//        String sessionId = request.getSession().getId();
+//        String userJson = Redis.hget(sessionId, "admuser");
+//        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+//        if (user == null || user.getId() == 0) {
+//            json.setOk(false);
+//            json.setMessage("请登录后操作");
+//            return json;
+//        }
+//
+//        String pid = request.getParameter("pid");
+//        if (StringUtils.isBlank(pid)) {
+//            json.setOk(false);
+//            json.setMessage("获取1688Pid失败");
+//            return json;
+//        }
+//
+//
+//        try {
+//        	int count = customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), -1, "同款下架");
+//            if (count > 0) {
+//            	json.setOk(true);
+//            }else{
+//            	json.setOk(false);
+//            }
+//            
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.err.println("up1688PidFlag error:" + e.getMessage());
+//            json.setOk(false);
+//            json.setMessage("更新失败:" + e.getMessage());
+//            logger.error("up1688PidFlag error:" + e.getMessage());
+//        }
+//        return json;
+//    }
     
     
     
