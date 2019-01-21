@@ -46,8 +46,41 @@
         <result column="valid" property="valid"/>
         <result column="sold_flag" property="soldFlag"/>
         <result column="is_edit" property="isEdit"/>
+        <result column="bargain_number" property="bargainNumber"/>
     </resultMap>
 
+    <resultMap id="goods1688OfferResultMap" type="com.importExpress.pojo.Goods1688OfferBean">
+        <id column="id" property="id"/>
+        <id column="goods_name" property="goods_name"/>
+        <id column="price" property="price"/>
+        <id column="shop_id" property="shop_id"/>
+        <id column="bargain_number" property="bargain_number"/>
+        <id column="standard" property="standard"/>
+        <id column="sku" property="sku"/>
+        <id column="color" property="color"/>
+        <id column="pic" property="pic"/>
+        <id column="pics" property="pics"/>
+        <id column="pics1" property="pics1"/>
+        <id column="iDetailData" property="iDetailData"/>
+        <id column="iDetailConfig" property="iDetailConfig"/>
+        <id column="detail" property="detail"/>
+        <id column="detail_url" property="detail_url"/>
+        <id column="weight" property="weight"/>
+        <id column="weight_url" property="weight_url"/>
+        <id column="addtime" property="addtime"/>
+        <id column="serviceid" property="serviceid"/>
+        <id column="tag_name" property="tag_name"/>
+        <id column="catid" property="catid"/>
+        <id column="keywords" property="keywords"/>
+        <id column="average_deliver_time" property="average_deliver_time"/>
+        <id column="dl_flag" property="dl_flag"/>
+        <id column="set_weight" property="set_weight"/>
+        <id column="goods_pid" property="goods_pid"/>
+        <id column="good_url" property="good_url"/>
+        <id column="crawl_flag" property="crawl_flag"/>
+        <id column="shop_name" property="shop_name"/>
+        <id column="from_flag" property="from_flag"/>
+     </resultMap>
 
     <select id="queryForList" resultMap="aliProductResultMap" parameterType="com.importExpress.pojo.AliProductBean">
         select a.id,a.ali_pid,a.ali_name,a.ali_url,a.ali_price,a.ali_img,a.keyword,
@@ -115,12 +148,11 @@
 
 
     <select id="query1688ByPython" resultMap="importProductResultMap">
-        select a.id,a.ali_pid,a.pid,b.price,b.custom_main_image as img,b.sellunit as unit,b.catid1 as catid,b.weight,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.remotpath,b.enname as name,
-        b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
-        b.bm_flag ,b.isBenchmark
-        from aa_ali_product_python a,custom_benchmark_ready b
-        where a.pid = b.pid and a.ali_pid = #{aliPid}
+        select a.id,a.ali_pid,b.goods_pid as pid,b.price,b.pic as img,b.set_weight as weight,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.goods_name as name,
+        a.deal_state,b.good_url as url,b.bargain_number
+        from aa_ali_product_python a,aa_goods_offers_python b
+        where a.pid = b.goods_pid and a.ali_pid = #{aliPid}
         limit 4
     </select>
 
@@ -135,5 +167,21 @@
         set deal_state = #{dealState},admin_id = #{adminId}
         where ali_pid = #{aliPid} and pid = #{pid}
     </update>
+
+
+    <update id="setDevelop1688PidFlag">
+        update aa_aliexpress_product a,aa_ali_product_python b
+        set a.deal_state = 3,b.deal_state =1,b.admin_id = #{adminId}
+        where a.ali_pid = b.ali_pid and a.ali_pid = #{aliPid} and b.pid = #{pid}
+    </update>
+
+    <select id="queryGoodsOffersByPid" resultMap="goods1688OfferResultMap">
+        select goods_name, price,shop_id,bargain_number, standard, sku,
+        color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url,
+        weight, weight_url,addtime,serviceid, tag_name,catid, keywords, average_deliver_time,
+        dl_flag,set_weight,goods_pid,good_url,crawl_flag,shop_name,from_flag
+        from aa_goods_offers_python
+        where goods_pid = #{pid}
+    </select>
     
 </mapper>
