@@ -253,7 +253,7 @@ public interface IWarehouseService {
 	String getOrderProblem(Map<String, Object> map);
 
 	//包裹信息
-	ShippingPackage getPackageInfo(Map<String, String> map);
+	List<ShippingPackage> getPackageInfo(Map<String, String> map);
 
 	//查询所有待出库订单
 	List<StorageLocationBean> getAllOutboundorder(Map<Object, Object> map);

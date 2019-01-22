@@ -287,7 +287,7 @@ public interface IWarehouseDao {
 	String getShipmentno();
 
 	//包裹信息
-	ShippingPackage getPackageInfo(Map<String, String> map);
+	List<ShippingPackage> getPackageInfo(Map<String, String> map);
 
 	//出库页面订单的所有包裹
 	List<ShippingPackage> getShippingPackageById(Map<String, String> map);

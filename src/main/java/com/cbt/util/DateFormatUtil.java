@@ -54,7 +54,17 @@ public class DateFormatUtil {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		return df.format(date);
 	}
-	
+
+	/**
+	 * 获取 yyyy/MM/dd 格式的时间字符串
+	 * @param date
+	 * @return
+	 */
+	public static String getWithDaySkim(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+		return df.format(date);
+	}
+
 	/**
 	 * 转换 yyyy-MM-dd 字符串到date类型
 	 * @param dateStr
