@@ -437,12 +437,12 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			sql1 = sql1 +" inner join goods_distribution gd on od.orderid=gd.orderid and od.id=gd.odid   ";
 		}
 		sql1 = sql1 +"left join goodsdatacheck gdc on od.car_url = gdc.url   ";
-		sql1 = sql1 +"left join order_product_source ops on od.goodsid = ops.goodsid   ";
+		sql1 = sql1 +"left join order_product_source ops on od.id = ops.od_id   ";
 		sql1 = sql1 +"where od.orderid= ? and od.state!=2 and gdc.url is not null ";
 		if(categoryId1!=null && !"".equals(categoryId1)&& !"18".equals(categoryId1) && !"1".equals(categoryId1)){
 			sql1 = sql1+" and gd.admuserid= ? ";
 		}
-		sql1 = sql1+" order by od.car_url,od.goodsid ";
+		sql1 = sql1+" order by od.car_url,od.id ";
 		
 		String sql2= "select distinct goods_url,goods_purl,goods_img_url,order_details.car_img,goods_price,goods_name,goodsid as goodscarid ";
 		sql2= sql2+" from order_details,goods_source where goods_url =car_url  and  order_details.orderid= ? and order_details.state<2 ";
