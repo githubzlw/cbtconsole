@@ -329,6 +329,11 @@ public class CustomGoodsController {
 			queryBean.setIsComplain(Integer.valueOf(isComplain));
 		}
 
+		String fromFlag = request.getParameter("fromFlag");
+		if(StringUtils.isNotBlank(fromFlag)){
+			queryBean.setFromFlag(Integer.valueOf(fromFlag));
+		}
+
 
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
 		goodsList.stream().forEach(c -> {
@@ -512,6 +517,16 @@ public class CustomGoodsController {
 		String isSort = request.getParameter("isSort");
 		if(StringUtils.isNotBlank(isSort)){
 			queryBean.setIsSort(Integer.valueOf(isSort));
+		}
+
+		String isComplain = request.getParameter("isComplain");
+		if(StringUtils.isNotBlank(isComplain) && StringUtils.equals(isComplain, "1")){
+			queryBean.setIsComplain(Integer.valueOf(isComplain));
+		}
+
+		String fromFlag = request.getParameter("fromFlag");
+		if(StringUtils.isNotBlank(fromFlag)){
+			queryBean.setFromFlag(Integer.valueOf(fromFlag));
 		}
 
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);

@@ -60,5 +60,15 @@ public interface AliProductService {
      * @return
      */
     int set1688PidFlag(String aliPid, String pid, int dealState,int adminId);
+
+    /**
+     * 开发产品和数据标识
+     * @param aliPid
+     * @param aliPrice
+     * @param pid
+     * @param adminId
+     * @return
+     */
+    int develop1688Pid(String aliPid,String aliPrice, String pid,int adminId);
     
 }

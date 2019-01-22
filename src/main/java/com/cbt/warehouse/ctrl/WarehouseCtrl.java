@@ -68,10 +68,7 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SearchFileUtils;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
@@ -1279,11 +1276,17 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult getUserInfo(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		if (adm == null) {
+			return json;
+		}
 		Map<String, Object> map = getStringObjectMap(request);
 		if(!(org.apache.commons.lang3.StringUtils.isNotBlank((String)map.get("userid"))&& org.apache.commons.lang3.StringUtils.isNumeric((String)map.get("userid")))){
 			json.setMessage("用户id 格式不正确");
 			return json;
 		}
+		map.put("roleType",String.valueOf(adm.getRoletype()));
 		userInfos = iWarehouseService.getUserInfoForPrice(map);
 		List<UserInfo> userInfoCount = iWarehouseService.getUserInfoForPriceCount(map);
 		json.setRows(userInfos);
@@ -2902,22 +2905,17 @@ public class WarehouseCtrl {
 	public Map<String, String> deleteVideoPath(HttpServletRequest request) {
 		Map<String, String> map = new HashMap<String, String>();
 		try{
-			SendMQ sendMQ = new SendMQ();
 			String goods_pid=request.getParameter("goods_pid");
 			if(StringUtil.isBlank(goods_pid)){
 				map.put("msg","0");
 				return map;
 			}else{
 				map.put("goods_pid",goods_pid);
-				map.put("v_id","");
+				map.put("path","");
 				int row= iWarehouseService.updateCustomVideoUrl(map);
-				sendMQ.sendMsg(new RunSqlModel("update custom_benchmark_ready set video_url='' where pid='"+goods_pid+"'"));
-				row+=1;
-				if(row==2){
-					map.put("msg","1");
-				}
+				GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,"");
+				map.put("msg","1");
 			}
-			sendMQ.closeConn();
 		}catch (Exception e){
 			map.put("msg","0");
 		}
@@ -2971,10 +2969,15 @@ public class WarehouseCtrl {
 			stream.close();
 			File video=new File(filePath);
 			if (video.exists()) {
-				map.put("msg","1");
-				map.put("goods_pid",goods_pid);
-				map.put("v_id",filePath);
-				iWarehouseService.updateCustomVideoUrl(map);
+				boolean flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/insp_video/", filename+"_"+file.getOriginalFilename(), filePath);
+				if(flag){
+					map.put("msg","1");
+					map.put("goods_pid",goods_pid);
+					String path="https://img.import-express.com/importcsvimg/insp_video/"+(filename+"_"+file.getOriginalFilename())+"";
+					map.put("path",path);
+					GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(goods_pid,path);
+					iWarehouseService.updateCustomVideoUrl(map);
+				}
 			}else{
 				map.put("msg","0");
 			}
@@ -5423,15 +5426,29 @@ public class WarehouseCtrl {
 	}
 
 	// 获得包裹信息
-	@RequestMapping(value = "/getPackageInfo", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/getPackageInfo_bak", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
-	public String getPackageInfo(HttpServletRequest request,
+	public String getPackageInfo_bak(HttpServletRequest request,
 								 HttpServletResponse response) {
 		String shipmentno = request.getParameter("shipmentno");
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("shipmentno", shipmentno);
-		ShippingPackage shippingPackage = iWarehouseService.getPackageInfo(map);
+		ShippingPackage shippingPackage =null;// iWarehouseService.getPackageInfo(map);
 		return JSONObject.fromObject(shippingPackage).toString();
+	}
+
+	@RequestMapping(value = "/getPackageInfo")
+	@ResponseBody
+	protected EasyUiJsonResult getPackageInfo(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException, ParseException {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		Map<String, String> map = new HashMap<String, String>();
+		String shipmentno = request.getParameter("shipmentno");
+		map.put("shipmentno",shipmentno);
+		List<ShippingPackage>  shippingPackage = iWarehouseService.getPackageInfo(map);
+		json.setTotal(1);
+		json.setRows(shippingPackage);
+		return json;
 	}
 
 	// 获得库位信息

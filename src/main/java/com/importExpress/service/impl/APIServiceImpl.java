@@ -1,18 +1,31 @@
 package com.importExpress.service.impl;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.importExpress.service.APIService;
 import com.importExpress.utli.OKHttpUtils;
 import com.paypal.base.codec.binary.Base64;
 
 import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 @Service
 public class APIServiceImpl implements APIService {
 	//CLIENT_ID
@@ -166,7 +179,7 @@ public class APIServiceImpl implements APIService {
 		String url = DISPUTE_URL + disputeID+"/require-evidence";
 		//请求
 		String mediaType = "application/json; charset=utf-8";
-		String param = "{\"action\":\"BUYER_EVIDENCE\"}";
+		String param = "{\"action\":\"SELLER_EVIDENCE\"}";
 		String response = okHttpUtils.post(url, header, mediaType , param );
 		System.out.println(response);
 		return 	response;	
@@ -223,18 +236,122 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String provideEvidence(String disputeID, String merchantID,String param,File fileName) throws Exception {
+	public String provideEvidence(String disputeID, String merchantID,Map<String,Object> param,Map<String,File> fileMap) throws Exception {
 		String accessToken = getAccessToken(merchantID);
 		//设置请求头
 		Headers header = new Headers.Builder()
-				.set("Content-Type", "multipart/related; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+				.set("Content-Type", "multipart/related;  boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
 				.set("Authorization", "Bearer "+accessToken)
 				.build();
 		
 		String url = DISPUTE_URL + disputeID + "/provide-evidence";
 		//请求
-		String response = okHttpUtils.postFile(url, header,param,fileName );
+		String response = okHttpUtils.postFile(url, header,param,fileMap );
 		return 	response;
 	}
-
+//public static void main(String[] args) {
+//	APIServiceImpl d = new APIServiceImpl();
+//	try {
+//		d.updateDisputeStatus("PP-D-7183", "");
+//	} catch (Exception e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+//}
+public static void main(String[] args) {
+	APIServiceImpl d = new APIServiceImpl();
+	try {
+		d.updateDisputeStatus("PP-D-7183", "");
+		JSONObject in = new JSONObject();
+        in.put("evidence_type", "PROOF_OF_FULFILLMENT");
+//        
+//        
+        JSONArray tracking_info = new JSONArray();
+        JSONObject info = new JSONObject();
+        info.put("carrier_name", "FEDEX");
+        info.put("tracking_number", "122533485");
+        tracking_info.add(info);
+//        
+        JSONObject evidence_info = new JSONObject();
+        evidence_info.put("tracking_info", tracking_info);
+//        
+        in.put("evidence_info", evidence_info);
+        in.put("notes", "Test");
+        Map<String,Object> param = new HashMap<>();
+        param.put("input", in);
+        
+        Map<String,File> fileMap = new HashMap<>();
+      fileMap.put("file1", new File("C:\\Users\\Administrator\\Desktop\\sample.png"));
+//        d.provideEvidence("PP-D-7183", "", param, fileMap);
+//		
+//        
+//        
+//        JSONObject returnAddress =  new JSONObject();
+//    	returnAddress.put("address_line_1", "14,Kimberly st");
+//    	returnAddress.put("address_line_2", "Open Road North");
+//    	returnAddress.put("country_code", "US");
+//    	returnAddress.put("admin_area_1", "Gotham City");
+//    	returnAddress.put("admin_area_2", "Gotham");
+//    	returnAddress.put("postal_code", "124566");
+//        
+//        
+//    	param.put("return_shipping_address", returnAddress);
+//        
+//        
+//    	Map<String,File> fileMap = new HashMap<>();
+//        fileMap.put("file1", new File("C:\\Users\\Administrator\\Desktop\\sample.png"));
+//        
+//		String accessToken = d.getAccessToken("");
+//		//设置请求头
+//		Headers header = new Headers.Builder()
+//				.set("Content-Type", "multipart/related;  boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+//				.set("Authorization", "Bearer "+accessToken)
+//				.build();
+//		
+//		String url = DISPUTE_URL + "PP-D-7183" + "/provide-evidence";
+//
+//		//设置请求参数
+//        MediaType MutilPart_Form_File = MediaType.parse("multipart/form-data; charset=utf-8");
+//        RequestBody fileBody = null;
+//        MediaType MutilPart_Form_Data = MediaType.parse("application/json");
+//        RequestBody bodyParams = null;//RequestBody.create(MutilPart_Form_Data,param);
+//                  
+//        
+//        MultipartBody.Builder requestBody = new MultipartBody.Builder()
+//                .setType(MultipartBody.FORM) ;
+//        Iterator<Entry<String, File>> iteratorFile = fileMap.entrySet().iterator();
+//        
+//        while (iteratorFile.hasNext()){
+//        	Entry<String, File> fileNext = iteratorFile.next();
+//        	fileBody = RequestBody.create(MutilPart_Form_File, fileNext.getValue());
+//        	requestBody.addFormDataPart(fileNext.getKey(), "@"+fileNext.getValue().getName(), fileBody);
+//		}
+//        
+//        Iterator<Entry<String, Object>> iteratorParam = param.entrySet().iterator();
+//        while (iteratorParam.hasNext()) {
+//        	Entry<String, Object> paramNext = iteratorParam.next();
+//        	bodyParams = RequestBody.create(MutilPart_Form_Data,JSON.toJSONString(paramNext.getValue()));
+//        	System.out.println(paramNext.getKey()+"===="+JSON.toJSONString(paramNext.getValue()));
+//        	requestBody.addFormDataPart(paramNext.getKey(), "", bodyParams);
+//		}
+//        
+//    
+//    //发送post请求o
+//        Request request = new Request.Builder().url(url)
+//        		.headers(header).post(requestBody.build()).build();
+//		Response response = new OkHttpClient().newBuilder()
+//				.connectTimeout(50, TimeUnit.SECONDS)
+//				.readTimeout(10, TimeUnit.SECONDS)
+//				.build().newCall(request).execute();
+//		if(response.isSuccessful()) {
+//			System.out.println(response.body().string());
+//		}else {
+//			System.out.println("-----------"+response.body().string());
+//		}
+		
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
 }

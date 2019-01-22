@@ -938,7 +938,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         for (int i = 0; i < userInfos.size(); i++) {
             UserInfo userInfo = userInfos.get(i);
             StringBuffer admuser = new StringBuffer();
-            admuser.append("<select id='admuser_" + userInfo.getUserid()
+            admuser.append("<select "+("0".equals(map.get("roleType"))?"":"disabled='disabled'")+" id='admuser_" + userInfo.getUserid()
                     + "'><option value='0'>未分配</option>");
             if (!StringUtils.isStrNull(userInfo.getPass())) {
                 userInfo.setLoginStyle("网站登录");
@@ -982,7 +982,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             + c.getConfirmusername() + "</option>");
                 }
             }
-            admuser.append("</select><input id=\"confirm\" type=\"button\" value=\"确认\" onclick=\"addUser("
+            admuser.append("</select><input id=\"confirm\" type=\"button\" "+("0".equals(map.get("roleType"))?"":"disabled='disabled'")+" value=\"确认\"   onclick=\"addUser("
                     + userInfo.getUserid()
                     + ",'"
                     + userInfo.getEmail()
@@ -1907,8 +1907,23 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
-    public ShippingPackage getPackageInfo(Map<String, String> map) {
-        return dao.getPackageInfo(map);
+    public List<ShippingPackage> getPackageInfo(Map<String, String> map) {
+        List<ShippingPackage> list=dao.getPackageInfo(map);
+        list.stream().forEach(s->{
+            s.setShipmentno("<input type='text' id='packageNo' value='"+map.get("shipmentno")+"' style='width: 50px' disabled='disabled'/><input type='hidden' id='"+map.get("shipmentno")+"' value='"+map.get("shipmentno")+"' />");
+            s.setSweight("<input type='text' id='weight' value='"+s.getSweight()+"' />");
+            String a="";
+            String b="";
+            String c="";
+            if(StringUtil.isNotBlank(s.getSvolume())){
+                String [] svolume =s.getSvolume().split("\\*");
+                a=svolume[0];
+                b=svolume[1];
+                c=svolume[2];
+            }
+            s.setVolumeweight("<input type='text' id='volumeLength' value='"+a+"'  style='width: 50px'/>*<input type='text' id='width'  value='"+b+"' style='width: 50px'/>*<input type='text' id='height'  value='"+c+"' style='width: 50px'/>");
+        });
+        return list;
     }
 
     @Override

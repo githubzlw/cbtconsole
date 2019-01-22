@@ -147,6 +147,7 @@
                 neverFlag = 0;
             }
             var soldFlag = $("#query_sold_flag").val();
+            var soldFlag2 = $("#query_sold_flag2").val();
             $("#neef_off_easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "catid":catid,
@@ -156,7 +157,8 @@
                 "isOffShelf": isOffShelf,
                 "updateFlag": updateFlag,
                 "neverFlag": neverFlag,
-                "soldFlag":soldFlag
+                "soldFlag":soldFlag,
+                "soldFlag2":soldFlag2
             });
         }
 
@@ -333,9 +335,13 @@
                         </select>
             <span> 有销量等筛选(<a href="#" id="refreshData">刷新临时数据</a>): <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
+                                <option value="3">全部(有销量+购物车中商品)</option>
                                 <option value="1">有销量</option>
                                 <option value="2">购物车中商品</option>
-                                <option value="3">有跨境图片包</option>
+                        </select>
+            <span> 有跨境图片包: <select id="query_sold_flag2" style="font-size: 14px; height: 24px; width: 120px;">
+                                <option value="0" selected="selected">不进行筛选</option>
+                                <option value="1">有跨境图片包</option>
                         </select>
         </span>
         <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>

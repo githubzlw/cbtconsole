@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -31,6 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.bean.FileMeta;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.stripe.StripeService;
 import com.cbt.util.FileUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -42,6 +45,8 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.service.APIService;
 import com.importExpress.service.CustomerDisputeService;
+import com.stripe.model.BalanceTransaction;
+import com.stripe.model.Dispute;
 
 @Controller
 @RequestMapping("/customer/dispute")
@@ -51,6 +56,8 @@ public class CustomerDisputeController {
 	 private CustomerDisputeService customerDisputeService;
 	 @Autowired
 	 private APIService apiService;
+	 @Autowired
+	 private StripeService stripeService;
 	
 	
 	 /**
@@ -167,6 +174,7 @@ public class CustomerDisputeController {
     	int resonFlag = 0;
     	int statusFlag = 0;
     	int disputeLifeCycleFlag = 0;
+    	int apiType = 0;
     	mv.addObject("success", 1);
 		try {
 			int confim = customerDisputeService.count(disputeID,"0");
@@ -174,60 +182,84 @@ public class CustomerDisputeController {
 			String showDisputeDetails = "";//
 			if(StringUtils.startsWith(disputeID, "PP")) {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
+				LOG.info(showDisputeDetails);
+//				System.out.println(showDisputeDetails);
+				if(StringUtils.isNotEmpty(showDisputeDetails)) {
+					infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
+				}
+				if(infoByDisputeID != null) {
+					mv.addObject("result", infoByDisputeID);
+					JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
+					
+					JSONObject seller = (JSONObject)((JSONObject)disputedTransactions.get(0)).get("seller");
+					merchant = seller.getString("merchant_id");
+					
+					String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
+					mv.addObject("orderNo", "");
+					if(StringUtils.indexOf(custom, "@") > -1) {
+						String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
+						String userid = split.length > 3 ? split[0] : "";
+						String orderNo = split.length > 5 ? split[6] : split.length > 3 ?split[2] : "";
+						mv.addObject("userid", userid);
+						mv.addObject("orderNo", orderNo);
+					}
+					//原因
+					String reason = infoByDisputeID.getString("reason");
+					resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
+					//状态
+					String status = infoByDisputeID.getString("status");
+					statusFlag = StringUtils.equals("WAITING_FOR_SELLER_RESPONSE", status) ? 1 : statusFlag;
+					statusFlag = StringUtils.equals("WAITING_FOR_BUYER_RESPONSE", status) ? 2 : statusFlag;
+					statusFlag = StringUtils.equals("UNDER_REVIEW", status) ? 3 : statusFlag;
+					statusFlag = StringUtils.equals("RESOLVED", status) ? 4 : statusFlag;
+					
+					String disputeLifeCycleStage = infoByDisputeID.getString("dispute_life_cycle_stage");
+					disputeLifeCycleFlag = StringUtils.equals("INQUIRY", disputeLifeCycleStage) ? 1 : disputeLifeCycleFlag;
+					disputeLifeCycleFlag = StringUtils.equals("CHARGEBACK", disputeLifeCycleStage) ? 2 : disputeLifeCycleFlag;
+					//
+					JSONObject disputeOutcome = (JSONObject)infoByDisputeID.get("dispute_outcome");
+					if(disputeOutcome != null) {
+						JSONObject amountRefunded = (JSONObject)disputeOutcome.get("amount_refunded");
+						mv.addObject("dispute_outcome_amount", amountRefunded != null ? amountRefunded.getString("value") : null);
+					}
+					JSONObject offer = (JSONObject)infoByDisputeID.get("offer");
+					if(offer != null) {
+						JSONObject sellerOfferedAmount = (JSONObject)offer.get("seller_offered_amount");
+						JSONObject buyerRequestedAmount = (JSONObject)offer.get("buyer_requested_amount");
+						mv.addObject("buyer_requested_amount", buyerRequestedAmount != null ? buyerRequestedAmount.getString("value") : null);
+						mv.addObject("seller_offered_amount", sellerOfferedAmount != null ? sellerOfferedAmount.getString("value") : null);
+					}
+					mv.addObject("resonFlag", resonFlag);
+					mv.addObject("statusFlag", statusFlag);
+					mv.addObject("disputeLifeCycleFlag", disputeLifeCycleFlag);
+					mv.addObject("merchant", merchant);
+				}
+			}else {
+				apiType = 1;
+				Dispute dispute = stripeService.dispute(disputeID);
+				if(dispute != null) {
+					Long amount = dispute.getAmount();
+					String strAmount = String.valueOf(amount);
+					strAmount = strAmount.substring(0,strAmount.length()-2)+"."+strAmount.substring(strAmount.length()-2);
+					mv.addObject("disputeAmount", strAmount);
+				}
+				mv.addObject("status","needs_response".equals(dispute.getStatus().toLowerCase()) ? 0:1);
+				mv.addObject("dispute", dispute);
+				
+				resonFlag = "fraudulent".equals(dispute.getReason().toLowerCase())? 1: resonFlag;
+				resonFlag = "product not received".equals(dispute.getReason().toLowerCase())? 2: resonFlag;
+				resonFlag = "product unacceptable".equals(dispute.getReason().toLowerCase())? 3: resonFlag;
+				resonFlag = "unrecognized".equals(dispute.getReason().toLowerCase())? 4: resonFlag;
+				
+				resonFlag = "subscription canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
+				resonFlag = "duplicate".equals(dispute.getReason().toLowerCase())? 6: resonFlag;
+				resonFlag = "credit not processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
+				
+				
+				
 			}	
-			LOG.info(showDisputeDetails);
-//			System.out.println(showDisputeDetails);
-			if(StringUtils.isNotEmpty(showDisputeDetails)) {
-				infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
-			}
-			if(infoByDisputeID != null) {
-				mv.addObject("result", infoByDisputeID);
-				JSONArray disputedTransactions = (JSONArray)infoByDisputeID.get("disputed_transactions");
-				
-				JSONObject seller = (JSONObject)((JSONObject)disputedTransactions.get(0)).get("seller");
-				merchant = seller.getString("merchant_id");
-				
-				String custom = ((JSONObject)disputedTransactions.get(0)).getString("custom");
-				mv.addObject("orderNo", "");
-				if(StringUtils.indexOf(custom, "@") > -1) {
-					String[] split = custom.indexOf("{@}") > -1 ? custom.split("\\{@\\}") : custom.split("@");
-					String userid = split.length > 3 ? split[0] : "";
-					String orderNo = split.length > 5 ? split[6] : split.length > 3 ?split[2] : "";
-					mv.addObject("userid", userid);
-					mv.addObject("orderNo", orderNo);
-				}
-				//原因
-				String reason = infoByDisputeID.getString("reason");
-				resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
-				//状态
-				String status = infoByDisputeID.getString("status");
-				statusFlag = StringUtils.equals("WAITING_FOR_SELLER_RESPONSE", status) ? 1 : statusFlag;
-				statusFlag = StringUtils.equals("WAITING_FOR_BUYER_RESPONSE", status) ? 2 : statusFlag;
-				statusFlag = StringUtils.equals("UNDER_REVIEW", status) ? 3 : statusFlag;
-				statusFlag = StringUtils.equals("RESOLVED", status) ? 4 : statusFlag;
-				
-				String disputeLifeCycleStage = infoByDisputeID.getString("dispute_life_cycle_stage");
-				disputeLifeCycleFlag = StringUtils.equals("INQUIRY", disputeLifeCycleStage) ? 1 : disputeLifeCycleFlag;
-				disputeLifeCycleFlag = StringUtils.equals("CHARGEBACK", disputeLifeCycleStage) ? 2 : disputeLifeCycleFlag;
-				//
-				JSONObject disputeOutcome = (JSONObject)infoByDisputeID.get("dispute_outcome");
-				if(disputeOutcome != null) {
-					JSONObject amountRefunded = (JSONObject)disputeOutcome.get("amount_refunded");
-					mv.addObject("dispute_outcome_amount", amountRefunded != null ? amountRefunded.getString("value") : null);
-				}
-				JSONObject offer = (JSONObject)infoByDisputeID.get("offer");
-				if(offer != null) {
-					JSONObject sellerOfferedAmount = (JSONObject)offer.get("seller_offered_amount");
-					JSONObject buyerRequestedAmount = (JSONObject)offer.get("buyer_requested_amount");
-					mv.addObject("buyer_requested_amount", buyerRequestedAmount != null ? buyerRequestedAmount.getString("value") : null);
-					mv.addObject("seller_offered_amount", sellerOfferedAmount != null ? sellerOfferedAmount.getString("value") : null);
-				}
-				mv.addObject("resonFlag", resonFlag);
-				mv.addObject("statusFlag", statusFlag);
-				mv.addObject("disputeLifeCycleFlag", disputeLifeCycleFlag);
-				mv.addObject("merchant", merchant);
-				
-			}
+			mv.addObject("resonFlag", resonFlag);
+			mv.addObject("apiType", apiType);
 			if(!StringUtils.equals(isread, "true")) {
 				long updateMessage = customerDisputeService.updateMessage(disputeID);
 				LOG.info("updateMessage:"+updateMessage);
@@ -458,61 +490,97 @@ public class CustomerDisputeController {
      * @return
      */
     @RequestMapping("/evidence")
-    @ResponseBody
-    public String provideEvidence(HttpServletRequest request, HttpServletResponse response) {
+    public String provideEvidence(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
     	String merchant = request.getParameter("merchant");
     	String content = request.getParameter("messageBodyForGeneric");
     	String fileLocation = request.getParameter("fileLocation");
-    	
+    	String evidence_type = request.getParameter("evidence_type");
+    	String carrier_name = request.getParameter("carrier_name");
+    	String tracking_number = request.getParameter("tracking_number");
+    	String refund_ids = request.getParameter("refund_ids");
+    	Map<String,File> fileMap = new HashMap<>();
     	LOG.info("fileLocation:"+fileLocation);
-    	File file = new File(fileLocation);
-    	
-    	//数据
-    	JSONObject data = new JSONObject();
-    	data.put("note", content);
-    	data.put("evidence_type", "PROOF_OF_FULFILLMENT");
-    	
-    	
-    	JSONObject returnAddress =  new JSONObject();
-    	returnAddress.put("address_line_1", "14,Kimberly st");
-    	returnAddress.put("address_line_2", "Open Road North");
-    	returnAddress.put("country_code", "US");
-    	returnAddress.put("admin_area_1", "Gotham City");
-    	returnAddress.put("admin_area_2", "Gotham");
-    	returnAddress.put("postal_code", "124566");
-    	
-    	JSONObject evidence_info =  new JSONObject();
-    	
-    	JSONObject tracking =  new JSONObject();
-    	tracking.put("carrier_name", "FEDEX");
-    	tracking.put("tracking_number", "122533485");
-    	
-    	List<JSONObject> tracking_info = new ArrayList<JSONObject>();
-    	tracking_info.add( tracking);
-    	
-    	evidence_info.put("tracking_info", tracking_info);
-    	
-    	
-    	data.put("evidence_info", evidence_info);
-    	
-    	data.put("return_shipping_address", returnAddress);
-    	
-    	
+    	if(StringUtils.isNotBlank(fileLocation)) {
+    		File file = new File(fileLocation);
+    		fileMap.put("file1", file);
+    	}
+    	JSONObject in = new JSONObject();
+        in.put("evidence_type", evidence_type);
+        
+        JSONObject evidence_info = new JSONObject();
+        if(StringUtils.isNotBlank(tracking_number) && StringUtils.isNotBlank(carrier_name)) {
+        	
+        	JSONArray tracking_info = new JSONArray();
+        	JSONObject info = new JSONObject();
+        	info.put("carrier_name", carrier_name);
+        	info.put("tracking_number", tracking_number);
+        	tracking_info.add(info);
+        	evidence_info.put("tracking_info", tracking_info);
+        }
+        
+        if(StringUtils.isNotBlank(refund_ids)) {
+        	JSONArray refund_id = new JSONArray();
+        	String[] refund_idss = refund_ids.split(",");
+        	for(String id : refund_idss) {
+        		refund_id.add(id);
+        	}
+        	evidence_info.put("refund_ids", refund_id);
+        }
+        
+        in.put("evidence_info", evidence_info);
+        in.put("notes", content);
+		
+        Map<String,Object> param = new HashMap<>();
+        param.put("input", in);
+        
+        
+        String address_line_1 = request.getParameter("address_line_1");
+        String address_line_2 = request.getParameter("address_line_2");
+        String address_line_3 = request.getParameter("address_line_3");
+        String country_code = request.getParameter("country_code");
+        String admin_area_1 = request.getParameter("admin_area_1");
+        String admin_area_2 = request.getParameter("admin_area_2");
+        String admin_area_3 = request.getParameter("admin_area_3");
+        String admin_area_4 = request.getParameter("admin_area_4");
+        String postal_code = request.getParameter("postal_code");
+        if(StringUtils.isNotBlank(postal_code) && StringUtils.isNotBlank(country_code)) {
+        	JSONObject returnAddress =  new JSONObject();
+        	returnAddress.put("address_line_1", address_line_1);
+        	returnAddress.put("address_line_2", address_line_2);
+        	if(StringUtils.isNotBlank(address_line_3)) {
+        		returnAddress.put("address_line_3", address_line_3);
+        	}
+        	if(StringUtils.isNotBlank(admin_area_3)) {
+        		returnAddress.put("admin_area_3", admin_area_3);
+        	}
+        	if(StringUtils.isNotBlank(admin_area_4)) {
+        		returnAddress.put("admin_area_4", admin_area_4);
+        	}
+        	returnAddress.put("country_code", country_code);
+        	returnAddress.put("admin_area_1", admin_area_1);
+        	returnAddress.put("admin_area_2", admin_area_2);
+        	returnAddress.put("postal_code", postal_code);
+        	param.put("return_shipping_address", returnAddress);
+        }
+//        System.out.println(param.toString());
     	String result = null;
 		try {
-			result = apiService.provideEvidence(disputeID, merchant, JSONObject.toJSONString(data),file);
+			if(StringUtils.isNotBlank(content)) {
+				result = apiService.provideEvidence(disputeID, merchant, param,fileMap);
+			}else {
+				attr.addFlashAttribute("sendResult", "Error:Please send a friendly message to the buyer");
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			result = e.getMessage();
-//			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
+			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
 		}
     	LOG.info(result);
     	
-    	return result;
+    	return "redirect:/customer/dispute/info?disputeid="+disputeID+"&merchant="+merchant+"&isread=true";
     }
-    /**Acknowledge returned item
+    /**Acknowledge returned ite
      * @param request
      * @param response
      * @return
@@ -833,4 +901,48 @@ public class CustomerDisputeController {
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }
+    @RequestMapping(value="/stripe/update",method= {RequestMethod.POST,RequestMethod.GET})
+    public String stripeUpdate(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
+    	String disputeid = request.getParameter("disputeId");
+    	String isRead = request.getParameter("isRead");
+    	String resonFlag = request.getParameter("resonFlag");
+    	
+    	Map<String, Object> evidence = new HashMap<>();
+    	int reson = StrUtils.isNum(resonFlag) ? Integer.valueOf(resonFlag) : 0;
+    	evidence.put("product_description", request.getParameter("product_description"));
+    	if(reson < 5 && reson >0) {
+    		evidence.put("shipping_date", request.getParameter("shipping_date"));
+    		evidence.put("shipping_number", request.getParameter("shipping_number"));
+    		evidence.put("shipping_carrier", request.getParameter("shipping_carrier"));
+    		evidence.put("shipping_address", request.getParameter("shipping_address"));
+    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    		if(reson == 4) {
+    			evidence.put("access_activity_log", request.getParameter("access_activity_log"));
+    		}
+    	}else if(reson == 5) {
+    		evidence.put("cancellation_policy", request.getParameter("cancellation_policy"));
+    		evidence.put("cancellation_policy_disclosure", request.getParameter("cancellation_policy_disclosure"));
+    		evidence.put("cancellation_rebuttal", request.getParameter("cancellation_rebuttal"));
+    		evidence.put("customer_communication", request.getParameter("customer_communication"));
+    	}else if(reson == 6) {
+    		evidence.put("duplicate_charge_id", request.getParameter("duplicate_charge_id"));
+    		evidence.put("duplicate_charge_explanation", request.getParameter("duplicate_charge_explanation"));
+    		evidence.put("duplicate_charge_documentation", request.getParameter("duplicate_charge_documentation"));
+    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    	}else if(reson == 7) {
+    		evidence.put("refund_policy", request.getParameter("refund_policy"));
+    		evidence.put("refund_policy_disclosure", request.getParameter("refund_policy_disclosure"));
+    		evidence.put("refund_refusal_explanation", request.getParameter("refund_refusal_explanation"));
+    	}
+    	try {
+    		stripeService.update(disputeid, evidence );
+    		attr.addAttribute("sendResult", "Successed");
+		} catch (Exception e) {
+			attr.addAttribute("sendResult", e.getMessage());
+		}
+    	
+    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread="+isRead;
+    }
+    
+    
 }

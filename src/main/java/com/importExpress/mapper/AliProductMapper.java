@@ -1,6 +1,7 @@
 package com.importExpress.mapper;
 
 import com.importExpress.pojo.AliProductBean;
+import com.importExpress.pojo.Goods1688OfferBean;
 import com.importExpress.pojo.ImportProductBean;
 
 import org.apache.ibatis.annotations.Param;
@@ -60,5 +61,22 @@ public interface AliProductMapper {
      * @return
      */
     int set1688PidFlag(@Param("aliPid") String aliPid, @Param("pid") String pid, @Param("dealState") int dealState, @Param("adminId") int adminId);
+
+
+    /**
+     * 开发产品的数据标识
+     *
+     * @param aliPid
+     * @param pid
+     * @return
+     */
+    int setDevelop1688PidFlag(@Param("aliPid") String aliPid, @Param("pid") String pid, @Param("adminId") int adminId);
+
+    /**
+     * 爆款开发的商品信息
+     * @param pid
+     * @return
+     */
+    Goods1688OfferBean queryGoodsOffersByPid(@Param("pid") String pid);
     
 }

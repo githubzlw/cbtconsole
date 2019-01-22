@@ -173,6 +173,20 @@ public class GoodsInfoUpdateOnlineUtil {
         return updateLocalAndSolr(inputData, 1);
     }
 
+    /**
+     * 更新库存标识到mongodb和solr
+     *
+     * @param pid
+     */
+    public static boolean videoUrlToOnlineByMongoDB(String pid,String path) {
+        InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+        inputData.setVideo_url(path);
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setPid(pid);
+        //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
+        return updateLocalAndSolr(inputData, 1);
+    }
+
 
     /**
      * MQ批量下架AWS商品

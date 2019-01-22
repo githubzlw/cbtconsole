@@ -2,7 +2,12 @@ package com.importExpress.utli;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+
+import com.alibaba.fastjson.JSON;
 
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -76,56 +81,45 @@ public class OKHttpUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public String postFile(String url,Headers mHeaders,String param,File file) throws Exception{
-
-		//设置请求头header
-//		System.out.println("----heads:"+mHeaders);
-		
+	public String postFile(String url,Headers mHeaders,Map<String,Object> param,Map<String,File> fileMap) throws Exception{
 		//设置请求参数
-        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        
-        RequestBody paramBody = RequestBody.create(MediaType.parse("application/json"), param);
-        
-        MultipartBody.Builder requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM) 
-                .addFormDataPart("evidence", file.getName(), fileBody)
-                .addFormDataPart("evidence_type", "PROOF_OF_FULFILLMENT")
-                .addFormDataPart("carrier_name", "FEDEX")
-                .addFormDataPart("tracking_number", "122533485")
-                .addFormDataPart("notes", "testnotes")
-                .addFormDataPart("address_line_1", "14,Kimberly st")
-                .addFormDataPart("address_line_2", "Open Road North")
-                .addFormDataPart("country_code", "US")
-                .addFormDataPart("admin_area_1", "Gotham City")
-                .addFormDataPart("admin_area_2", "Gotham")
-                .addFormDataPart("postal_code", "124566");
-//       if (param != null) {
-//	        // map 里面是请求中所需要的 key 和 value
-//    	   Iterator<Entry<String, String>> iterator = param.entrySet().iterator();
-//    	   while (iterator.hasNext()) {
-//    		   Entry<String, String> next = iterator.next();
-//    		   requestBody.addFormDataPart(next.getKey(), next.getValue());
-//		}
-//    	   System.out.println(requestBody.toString());
-//    }
-       System.out.println(param.toString());
-    
-    //发送post请求
-        Request request = new Request.Builder().url(url)
-        		.headers(mHeaders).post(requestBody.build()).build();
-		
-		Response response = client.newBuilder()
+      MediaType MutilPart_Form_File = MediaType.parse("multipart/form-data; charset=utf-8");
+      RequestBody fileBody = null;
+      MediaType MutilPart_Form_Data = MediaType.parse("application/json");
+      RequestBody bodyParams = null;//RequestBody.create(MutilPart_Form_Data,param);
+                
+      
+      MultipartBody.Builder requestBody = new MultipartBody.Builder()
+              .setType(MultipartBody.FORM) ;
+      Iterator<Entry<String, File>> iteratorFile = fileMap.entrySet().iterator();
+      
+      while (iteratorFile.hasNext()){
+	      	Entry<String, File> fileNext = iteratorFile.next();
+	      	fileBody = RequestBody.create(MutilPart_Form_File, fileNext.getValue());
+	      	requestBody.addFormDataPart(fileNext.getKey(), "@"+fileNext.getValue().getName(), fileBody);
+		}
+      
+      Iterator<Entry<String, Object>> iteratorParam = param.entrySet().iterator();
+      while (iteratorParam.hasNext()) {
+	      	Entry<String, Object> paramNext = iteratorParam.next();
+	      	bodyParams = RequestBody.create(MutilPart_Form_Data,JSON.toJSONString(paramNext.getValue()));
+//	      	System.out.println(paramNext.getKey()+"===="+JSON.toJSONString(paramNext.getValue()));
+	      	requestBody.addFormDataPart(paramNext.getKey(), "", bodyParams);
+		}
+      
+  
+  //发送post请求o
+      Request request = new Request.Builder().url(url)
+      		.headers(mHeaders).post(requestBody.build()).build();
+	  Response response = new OkHttpClient().newBuilder()
 				.connectTimeout(50, TimeUnit.SECONDS)
 				.readTimeout(10, TimeUnit.SECONDS)
 				.build().newCall(request).execute();
-		if(response.isSuccessful()) {
-			return response.body().string();
-		}else {
-			throw new Exception("result:"+response.body().string()+"Exception:"+response);
-		}
-		
-		
-		
+	 if(response.isSuccessful()) {
+		return response.body().string();
+	 }else {
+		throw new Exception("result:"+response.body().string()+"Exception:"+response);
+	 }
 	}
 	/**Patch请求
 	 * @param url 请求链接

@@ -1908,7 +1908,12 @@
         </div>
         <div class="s_r">
             <div class="table_su">
-			<span> <c:if
+                <c:if
+					test="${goods.fromFlag > 0}">
+					<br>
+					<b style="font-size: 16px;">产品来源:${goods.fromFlagDesc}</b>
+				</c:if>
+                <c:if
                     test="${goods.isEdited == 1 || goods.isEdited == 2}">
                 <b style="font-size: 16px;"> 编辑状态：已编辑</b>
                 <br>
