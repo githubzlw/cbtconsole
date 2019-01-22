@@ -109,5 +109,14 @@
         ORDER BY createtime DESC
         LIMIT 1
     </select>
+
+    <!--List<UserBean> queryLocalUser(@Param("list") List<String> list);-->
+    <select id="queryLocalUser" resultType="com.cbt.bean.UserBean">
+        SELECT id, name, email
+        FROM user WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
     
 </mapper>

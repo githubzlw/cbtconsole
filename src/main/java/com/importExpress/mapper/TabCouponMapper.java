@@ -1,5 +1,6 @@
 package com.importExpress.mapper;
 
+import com.cbt.bean.UserBean;
 import com.importExpress.pojo.TabCouponNew;
 import com.importExpress.pojo.TabCouponRules;
 import com.importExpress.pojo.TabCouponType;
@@ -35,4 +36,6 @@ public interface TabCouponMapper {
     void updateCouponUsers(@Param("couponCode") String couponCode, @Param("userid") String userid);
 
     Long queryCouponUsersCount(@Param("couponCode") String couponCode);
+
+    List<UserBean> queryLocalUser(@Param("list") List<String> list);
 }
