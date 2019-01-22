@@ -362,6 +362,7 @@ public class StrUtils {
 	}
 	
 	public static void main(String[] args) {
+		
 		System.out.println(removeSpecialCodeForWprice("[1-2 $ 4.00,3-10 $ 3.80,≥11 $ 3.00]"));
 	}
 }
