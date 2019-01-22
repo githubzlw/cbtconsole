@@ -1,13 +1,13 @@
 package com.cbt.util;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 public class StrUtils {
 	
@@ -325,5 +325,43 @@ public class StrUtils {
         return m.matches();  
     }
     
-
+    /**去除中文字符与符号
+	 * @return
+	 */
+	public static String removeChineseCode(String str) {
+		String result = str;
+		if(StringUtils.isNotBlank(str)) {
+			return str.replaceAll("[\u4e00-\u9fa5]+", " ").replaceAll("[\u2e80－\ua4cf]+", " ")
+					.replaceAll("[\uf900-\ufaff]+", " ").replaceAll("[\ufe30-\ufe4f]+"," ")
+					.replaceAll("[。，《》？、（）……￥！·——‘’“”｛｝【】：；{}\\+\\=\\?\\:;\\^#@\\!~`><\\\t\\\n,\\[\\]]", " ");
+		}
+		return result;
+	}
+	
+	/**去除英文符号
+	 * @param str
+	 * @return
+	 */
+	public static String removeSpecialCode(String str) {
+		String result = str;
+		if(StringUtils.isNotBlank(str)) {
+			return str.replaceAll("[\\[\\]\\!\\@#\\$%\\^&\\*\\(\\)_\\+\\-\\=\\|\\?/>,<\\:;'\"{}~`。，《》？、（）……￥！·——‘’“”｛｝【】：；\\\t\\\n]+", " ");
+		}
+		return result;//\\.
+	}
+	/**针对批发价格特殊处理字符
+	 * @param str
+	 * @return
+	 */
+	public static String removeSpecialCodeForWprice(String str) {
+		String result = str;
+		if(StringUtils.isNotBlank(str)) {
+			return str.replaceAll("[\\!\\@#%\\^&\\*\\(\\)_\\+\\=\\|\\?/>,<\\:;'\"{}~`。，《》？、（）……￥！·——‘’“”｛｝【】：；\\\t\\\n]+", " ");
+		}
+		return result;//\\.
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(removeSpecialCodeForWprice("[1-2 $ 4.00,3-10 $ 3.80,≥11 $ 3.00]"));
+	}
 }
