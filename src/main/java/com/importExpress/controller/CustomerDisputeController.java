@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -182,7 +183,7 @@ public class CustomerDisputeController {
 			if(StringUtils.startsWith(disputeID, "PP")) {
 				showDisputeDetails = apiService.showDisputeDetails(disputeID,merchant);
 				LOG.info(showDisputeDetails);
-				System.out.println(showDisputeDetails);
+//				System.out.println(showDisputeDetails);
 				if(StringUtils.isNotEmpty(showDisputeDetails)) {
 					infoByDisputeID = JSONObject.parseObject(showDisputeDetails);
 				}
@@ -489,61 +490,97 @@ public class CustomerDisputeController {
      * @return
      */
     @RequestMapping("/evidence")
-    @ResponseBody
-    public String provideEvidence(HttpServletRequest request, HttpServletResponse response) {
+    public String provideEvidence(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeID = request.getParameter("disputeid");
     	String merchant = request.getParameter("merchant");
     	String content = request.getParameter("messageBodyForGeneric");
     	String fileLocation = request.getParameter("fileLocation");
-    	
+    	String evidence_type = request.getParameter("evidence_type");
+    	String carrier_name = request.getParameter("carrier_name");
+    	String tracking_number = request.getParameter("tracking_number");
+    	String refund_ids = request.getParameter("refund_ids");
+    	Map<String,File> fileMap = new HashMap<>();
     	LOG.info("fileLocation:"+fileLocation);
-    	File file = new File(fileLocation);
-    	
-    	//数据
-    	JSONObject data = new JSONObject();
-    	data.put("note", content);
-    	data.put("evidence_type", "PROOF_OF_FULFILLMENT");
-    	
-    	
-    	JSONObject returnAddress =  new JSONObject();
-    	returnAddress.put("address_line_1", "14,Kimberly st");
-    	returnAddress.put("address_line_2", "Open Road North");
-    	returnAddress.put("country_code", "US");
-    	returnAddress.put("admin_area_1", "Gotham City");
-    	returnAddress.put("admin_area_2", "Gotham");
-    	returnAddress.put("postal_code", "124566");
-    	
-    	JSONObject evidence_info =  new JSONObject();
-    	
-    	JSONObject tracking =  new JSONObject();
-    	tracking.put("carrier_name", "FEDEX");
-    	tracking.put("tracking_number", "122533485");
-    	
-    	List<JSONObject> tracking_info = new ArrayList<JSONObject>();
-    	tracking_info.add( tracking);
-    	
-    	evidence_info.put("tracking_info", tracking_info);
-    	
-    	
-    	data.put("evidence_info", evidence_info);
-    	
-    	data.put("return_shipping_address", returnAddress);
-    	
-    	
+    	if(StringUtils.isNotBlank(fileLocation)) {
+    		File file = new File(fileLocation);
+    		fileMap.put("file1", file);
+    	}
+    	JSONObject in = new JSONObject();
+        in.put("evidence_type", evidence_type);
+        
+        JSONObject evidence_info = new JSONObject();
+        if(StringUtils.isNotBlank(tracking_number) && StringUtils.isNotBlank(carrier_name)) {
+        	
+        	JSONArray tracking_info = new JSONArray();
+        	JSONObject info = new JSONObject();
+        	info.put("carrier_name", carrier_name);
+        	info.put("tracking_number", tracking_number);
+        	tracking_info.add(info);
+        	evidence_info.put("tracking_info", tracking_info);
+        }
+        
+        if(StringUtils.isNotBlank(refund_ids)) {
+        	JSONArray refund_id = new JSONArray();
+        	String[] refund_idss = refund_ids.split(",");
+        	for(String id : refund_idss) {
+        		refund_id.add(id);
+        	}
+        	evidence_info.put("refund_ids", refund_id);
+        }
+        
+        in.put("evidence_info", evidence_info);
+        in.put("notes", content);
+		
+        Map<String,Object> param = new HashMap<>();
+        param.put("input", in);
+        
+        
+        String address_line_1 = request.getParameter("address_line_1");
+        String address_line_2 = request.getParameter("address_line_2");
+        String address_line_3 = request.getParameter("address_line_3");
+        String country_code = request.getParameter("country_code");
+        String admin_area_1 = request.getParameter("admin_area_1");
+        String admin_area_2 = request.getParameter("admin_area_2");
+        String admin_area_3 = request.getParameter("admin_area_3");
+        String admin_area_4 = request.getParameter("admin_area_4");
+        String postal_code = request.getParameter("postal_code");
+        if(StringUtils.isNotBlank(postal_code) && StringUtils.isNotBlank(country_code)) {
+        	JSONObject returnAddress =  new JSONObject();
+        	returnAddress.put("address_line_1", address_line_1);
+        	returnAddress.put("address_line_2", address_line_2);
+        	if(StringUtils.isNotBlank(address_line_3)) {
+        		returnAddress.put("address_line_3", address_line_3);
+        	}
+        	if(StringUtils.isNotBlank(admin_area_3)) {
+        		returnAddress.put("admin_area_3", admin_area_3);
+        	}
+        	if(StringUtils.isNotBlank(admin_area_4)) {
+        		returnAddress.put("admin_area_4", admin_area_4);
+        	}
+        	returnAddress.put("country_code", country_code);
+        	returnAddress.put("admin_area_1", admin_area_1);
+        	returnAddress.put("admin_area_2", admin_area_2);
+        	returnAddress.put("postal_code", postal_code);
+        	param.put("return_shipping_address", returnAddress);
+        }
+//        System.out.println(param.toString());
     	String result = null;
 		try {
-			result = apiService.provideEvidence(disputeID, merchant, JSONObject.toJSONString(data),file);
+			if(StringUtils.isNotBlank(content)) {
+				result = apiService.provideEvidence(disputeID, merchant, param,fileMap);
+			}else {
+				attr.addFlashAttribute("sendResult", "Error:Please send a friendly message to the buyer");
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			result = e.getMessage();
-//			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
+			attr.addFlashAttribute("sendResult", "Error:"+e.getMessage());
 		}
     	LOG.info(result);
     	
-    	return result;
+    	return "redirect:/customer/dispute/info?disputeid="+disputeID+"&merchant="+merchant+"&isread=true";
     }
-    /**Acknowledge returned item
+    /**Acknowledge returned ite
      * @param request
      * @param response
      * @return
@@ -864,7 +901,7 @@ public class CustomerDisputeController {
     	
     	return "redirect:/customer/dispute/info?disputeid="+disputeID;
     }
-    @RequestMapping("/stripe/update")
+    @RequestMapping(value="/stripe/update",method= {RequestMethod.POST,RequestMethod.GET})
     public String stripeUpdate(HttpServletRequest request, HttpServletResponse response,RedirectAttributes attr) {
     	String disputeid = request.getParameter("disputeId");
     	String isRead = request.getParameter("isRead");
