@@ -1,6 +1,12 @@
 package com.importExpress.service.impl;
 
+import com.cbt.bean.UserBean;
 import com.cbt.jcys.util.HttpUtil;
+import com.cbt.util.DateFormatUtil;
+import com.cbt.warehouse.service.WarehouseServiceImpl;
+import com.ctc.wstx.util.DataUtil;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.TabCouponMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.TabCouponService;
@@ -8,6 +14,7 @@ import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +28,13 @@ import java.util.Map;
 @Service
 public class TabCouponServiceImpl implements TabCouponService {
 
-	@Autowired
+    private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(TabCouponServiceImpl.class);
+
+    @Autowired
 	private TabCouponMapper tabCouponMapper;
+
+    @Autowired
+    private SendMailFactory sendMailFactory;
 	
 	@Override
 	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid) {
@@ -108,17 +120,27 @@ public class TabCouponServiceImpl implements TabCouponService {
             result.put("message", "卷数量不足(已关联用户数+待关联用户数>卷总数量)");
             return result;
         }
+        //查询被关联用户信息
+        List<UserBean> userList = tabCouponMapper.queryLocalUser(useridList);
+        if (userList == null && useridList.size() == 0){
+            result.put("state", "false");
+            result.put("message", "未找到被关联的用户信息");
+            return result;
+        }
         //保存记录到本地
         tabCouponMapper.insertCouponUsers(tabCouponNew, useridList);
         //发送mq 到线上 {"id":"001-20181228-100","to":"1546185600","type":"2","userid":"1000"}
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
-            for (String userid : useridList) {
-                CouponUserRedisBean bean = new CouponUserRedisBean(couponCode, new Long(tabCouponNew.getTo().getTime()).toString(), userid);
+            for (UserBean userBean : userList) {
+                CouponUserRedisBean bean = new CouponUserRedisBean(couponCode, new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
                 sendMQ.sendCouponMsg(json);
             }
+            //异步发送邮件
+            Runnable task=new TabCouponServiceImpl.sendCouponMailTask(userList, tabCouponNew);
+            new Thread(task).start();
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
         } finally {
@@ -127,8 +149,42 @@ public class TabCouponServiceImpl implements TabCouponService {
             }
         }
         result.put("state", "true");
-        result.put("message", "关联用户id成功");
+        result.put("message", "关联用户id成功, 正在发送邮件通知客户。");
         return result;
+    }
+
+    class sendCouponMailTask implements Runnable{
+        private List<UserBean> list;
+        private TabCouponNew tabCouponNew;
+        public sendCouponMailTask(List<UserBean> list, TabCouponNew tabCouponNew) {
+            this.list=list;
+            this.tabCouponNew = tabCouponNew;
+        }
+
+        @Override
+        public void run() {
+            if (list == null || list.size() == 0){
+                return;
+            }
+            for (UserBean userBean : list) {
+                Map<String, Object> model = new HashMap<>();
+                try {
+                    //邮件信息
+                    model.put("firstName", userBean.getName());
+                    model.put("description", tabCouponNew.getDescribe());
+                    model.put("codeId", tabCouponNew.getId());
+                    model.put("validityPeriod", DateFormatUtil.getWithDaySkim(tabCouponNew.getFrom()) + "-" + DateFormatUtil.getWithDaySkim(tabCouponNew.getTo()));
+                    model.put("codeValue", "$" + tabCouponNew.getValue().split("-")[1]);
+
+                    model.put("email", userBean.getEmail());
+                    model.put("title", "A coupon was sent to your individual center!");
+
+                    sendMailFactory.sendMail(model.get("email").toString(), null, model.get("title").toString(), model, TemplateType.COUPON);
+                } catch (Exception e) {
+                    LOG.error("sendCouponMailTask 异步发送邮件 error, 邮件信息:" + JSONObject.fromObject(model).toString(), e);
+                }
+            }
+        }
     }
 
     @Override
