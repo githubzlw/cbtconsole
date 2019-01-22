@@ -2984,6 +2984,9 @@
 								<div style="width: 100%; word-wrap: break-word;">
 									供应商ID： <a target="_blank" style="color:red;" title="查看该供应商采购历史记录" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${pb.goodsShop}">${pb.goodsShop}</a><br>
 								</div>
+								<div style="width: 100%; word-wrap: break-word;">
+									供应商库存：${pb.shopInventory}<br>
+								</div>
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">

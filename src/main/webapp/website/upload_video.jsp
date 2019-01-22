@@ -62,11 +62,9 @@
                     html+="<td><div id='embed'></div><input type='button' onclick='uploadInPic(\""+dzOrderno+"\")' value='视频上传'/>|<input type='button' onclick='deleteVideoPath(\""+dzOrderno+"\");' value='删除视频'/></td>";
                     //视频展示
                     if(video_id != null && video_id !=""){
-                        videoUrl = 'http://www.vimeo.com/'+video_id;
-                        endpoint = 'http://www.vimeo.com/api/oembed.json';
-                        callback = 'embedVideo';
-                        url = endpoint + '?url=' + encodeURIComponent(videoUrl) + '&callback=' + callback + '&width=400';
-                        init();
+                      html+="<td><video id='video' controls preload='auto' width='400px' height='400px'>";
+                      html+="<source src='"+video_id+"' type='video/mp4'>";
+                      html+="</video></td>";
                     }else{
                         $("#embed").html("无视频");
                     }
@@ -93,9 +91,9 @@
                 msg : '请等待...'
             });
             $.ajax({
-                type: "GET",
-                url: "/cbtconsole/warehouse/deleteVideoPath?goods_pid="+goods_pid,
-                dataType:"json",
+                type:"post",
+                url:"/cbtconsole/warehouse/deleteVideoPath",
+                data:{"goods_pid":goods_pid},
                 success:function(data){
                     $.messager.progress('close');
                     if(data.msg == "0"){
@@ -160,7 +158,7 @@
 
         function closeUploadDialog() {
             $('#pic_dlg').dialog('close');
-            $("#uploadFileForm")[0].reset();
+            // $("#uploadFileForm")[0].reset();
         }
     </script>
 </head>

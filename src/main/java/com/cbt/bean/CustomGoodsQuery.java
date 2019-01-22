@@ -56,6 +56,16 @@ public class CustomGoodsQuery {
 	private int isSort;
 	private String unsellableReason;
 	private int isComplain = -1;//是否被投诉 0-为投诉  1-投诉
+	private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
+
+	public int getFromFlag() {
+		return fromFlag;
+	}
+
+	public void setFromFlag(int fromFlag) {
+		this.fromFlag = fromFlag;
+	}
+
 	public String getUnsellableReason() {
 		return unsellableReason;
 	}

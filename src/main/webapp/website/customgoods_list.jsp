@@ -567,6 +567,11 @@ b {
 					<span>暂无评论</span>
 				</c:if>
 				<c:if
+					test="${list.fromFlag > 0}">
+					<br>
+					<b>产品来源:${list.fromFlagDesc}</b>
+				</c:if>
+				<c:if
 					test="${list.isEdited > 0}">
 					<br>
 					<span>商品编辑:已编辑</span>

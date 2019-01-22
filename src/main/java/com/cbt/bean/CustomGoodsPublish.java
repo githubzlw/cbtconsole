@@ -103,6 +103,37 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int priceIsEdit;
     private int isUpdateImg;// 1自动设置第一张图片为橱窗图，2设置选中的封面图
     private String sizeInfoEn;
+
+    private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
+    private String fromFlagDesc;
+
+    public String getFromFlagDesc() {
+        return fromFlagDesc;
+    }
+
+    public void setFromFlagDesc(String fromFlagDesc) {
+        this.fromFlagDesc = fromFlagDesc;
+    }
+
+    public int getFromFlag() {
+        return fromFlag;
+    }
+
+    public void setFromFlag(int fromFlag) {
+        this.fromFlag = fromFlag;
+        if(fromFlag == 1){
+            fromFlagDesc = "店铺上线";
+        }else if(fromFlag == 2){
+            fromFlagDesc = "单个商品录入上线";
+        }else if(fromFlag == 3){
+            fromFlagDesc = "速卖通对标上线";
+        }else if(fromFlag == 4){
+            fromFlagDesc = "跨境上线";
+        }else if(fromFlag == 5){
+            fromFlagDesc = "爆款开发上线";
+        }
+    }
+
     public String getGoods_pid() {
         return goods_pid;
     }

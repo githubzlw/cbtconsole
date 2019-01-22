@@ -12,6 +12,7 @@
 		<result column="admName" property="admName"/>
 		<result column="reply_content" property="reply_content"/>
 		<result column="reply_time" property="reply_time"/>
+		<result column="whatsApp" property="whatsApp"/>
 	</resultMap>
 	
 	<sql id="all">
@@ -19,7 +20,7 @@
 	</sql>
 	
 	<select id="queryForList" resultMap="problemFeedBackResultMap">
-		select problem_report.id,problem_report.uid,problem_report.email,problem_report.problem,
+		select problem_report.id,problem_report.uid,problem_report.email,problem_report.problem,ifnull(problem_report.whatsApp,'') as whatsApp,
 			problem_report.type,problem_report.createtime,admin_r_user.admName ,problem_report.reply_content,problem_report.reply_time
 			from problem_report,admin_r_user 
 			where problem_report.email = admin_r_user.useremail 
