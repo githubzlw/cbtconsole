@@ -1,5 +1,6 @@
 package com.importExpress.mail;
 
+import com.cbt.util.SysParamUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +27,10 @@ public class SendMailFactory {
 
     @Autowired
     private SpringTemplateEngine thymeleafEngine;
+
+    private static String configPath= SysParamUtil.getParam("mail.save");
+
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYMMdd_HHmmss_SSS");
 
     @Async
     public void sendMail(String TO, String BCC, String SUBJECT, String BODY) {
@@ -79,11 +84,13 @@ public class SendMailFactory {
     }
 
     private void saveHtml(String preFileName,String content){
-        final String strTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
 
         try {
-            Path write = Files.write(Paths.get(preFileName.replace("/","_") + "_" + strTime + ".html"), content.getBytes());
-            logger.info("save to html,path:{}",write.toAbsolutePath().getFileName());
+            String strTime = LocalDateTime.now().format(formatter);
+            String fileName = preFileName.replace("/", "_").replace("emailTemplate_","") + "_" + strTime + ".html";
+            Path path = Paths.get(configPath,fileName);
+            Path write = Files.write(path, content.getBytes());
+            logger.info("save to html,path:[{}]",write);
         } catch (IOException e) {
             logger.error("saveHtml",e);
         }
