@@ -1276,11 +1276,17 @@ public class WarehouseCtrl {
 	public EasyUiJsonResult getUserInfo(HttpServletRequest request, Model model) throws ParseException {
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
+		if (adm == null) {
+			return json;
+		}
 		Map<String, Object> map = getStringObjectMap(request);
 		if(!(org.apache.commons.lang3.StringUtils.isNotBlank((String)map.get("userid"))&& org.apache.commons.lang3.StringUtils.isNumeric((String)map.get("userid")))){
 			json.setMessage("用户id 格式不正确");
 			return json;
 		}
+		map.put("roleType",String.valueOf(adm.getRoletype()));
 		userInfos = iWarehouseService.getUserInfoForPrice(map);
 		List<UserInfo> userInfoCount = iWarehouseService.getUserInfoForPriceCount(map);
 		json.setRows(userInfos);
