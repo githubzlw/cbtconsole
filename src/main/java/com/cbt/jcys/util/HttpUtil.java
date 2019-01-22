@@ -1,6 +1,8 @@
 package com.cbt.jcys.util;
 
+import com.importExpress.utli.SearchFileUtils;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -36,6 +38,7 @@ public class HttpUtil {
 			conn.setRequestProperty("connection", "Keep-Alive");
 			conn.setRequestProperty("Accept-Charset", charset);
 			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
 			
 			out = new OutputStreamWriter(conn.getOutputStream(), charset);
 			out.write(buildQuery(params, charset));
@@ -49,7 +52,8 @@ public class HttpUtil {
             }
 
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+            System.out.println("post连接异常, url:" + url);
 		} finally {
 			if (out != null) {
 				out.close();
@@ -95,6 +99,28 @@ public class HttpUtil {
 		return data.toString();
 	
 	}
+
+    /**
+     * 调用线上接口返回对应数据
+     * @param uri 线上接口地址（不用域名） 比如 /coupon/deleteCoupon
+     * @param params 可变参数，传入的依次为 变量名 变量值；变量名 变量值；...
+     * @return
+     */
+    public static String postCoupon(String uri, String... params){
+        if (StringUtils.isBlank(uri)){
+            return null;
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            for (int i = 0; i < params.length; i++) {
+                map.put(params[i++], params[i]);
+            }
+            return post(SearchFileUtils.importexpressPath + uri, "utf-8", map);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 	
 	public static void main(String[] args) throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();

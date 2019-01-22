@@ -70,6 +70,7 @@ table th {
 								tbody += results[i].uid;
 							}
 							tbody += "</td><td><a target='_blank' href='/cbtconsole/website/user.jsp?userid="+results[i].uid+"'>" + results[i].email + "</a></td>";
+							tbody+="<td>"+results[i].whatsApp+"</td>";
 							tbody += "<td>" + results[i].problem + "</td><td>";
 							if (results[i].type == 1) {
 								tbody += "注册页面反馈";
@@ -238,6 +239,7 @@ table th {
 					<th style="width: 80px; height: 27px">ID</th>
 					<th style="width: 80px">user_id</th>
 					<th style="width: 200px">邮箱</th>
+					<th style="width: 200px">WhatsApp</th>
 					<th>反馈问题</th>
 					<th style="width: 160px">类型</th>
 					<th style="width: 100px">销售</th>

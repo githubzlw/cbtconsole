@@ -481,6 +481,15 @@ public class SingleGoodsController {
         }
         offShelfParam.setSoldFlag(soldFlag);
 
+        String soldFlagStr2 = request.getParameter("soldFlag2");
+        int soldFlag2;
+        if (StringUtil.isNotBlank(soldFlagStr2)) {
+            soldFlag2 = Integer.valueOf(soldFlagStr2);
+        } else {
+            soldFlag2 = 0;
+        }
+        offShelfParam.setSoldFlag2(soldFlag2);
+
         try {
             List<NeedOffShelfBean> res = shopUrlService.queryNeedOffShelfByParam(offShelfParam);
             List<String> pids = new ArrayList<>(res.size());

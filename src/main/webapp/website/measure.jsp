@@ -1,161 +1,189 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page language="java" contentType="text/html; charset=utf-8"
+		 pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>自动测量</title>
-<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
-
-<script type="text/javascript" src="/cbtconsole/js/jquery-1.8.0.min.js"></script>
-<script type="text/javascript" src="/cbtconsole/js/warehousejs/thelibrary.js"></script>
-<script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.messager.js"></script>
-
-
-<link rel="stylesheet" href="/cbtconsole/css/warehousejs/measure.css" type="text/css">
-<!-- CSS goes in the document HEAD or added to your external stylesheet -->
-<!--  -->
-<script type="text/javascript">                             
-var i=0; //td id
-//包裹信息
-function getPackageInfo(){
-	var packageNo = $("#packageNo").val();
-	
-	//是否存在
-	
-	var si = $("input[id='"+packageNo+"']").size();
-	//alert(si);                                                         
-	if(si>0){                     
-		return;        
-	}                                           
-	                            
-	$.ajax({
-		type:"post", 
-		url:"/cbtconsole/warehouse/getPackageInfo",
-		dataType:"json",                                                       
-		data:{shipmentno : packageNo}, 
-		success : function(data){    
-			$("#packageNo").val("");            
-			if(data != null){           
-				var svolumeArray = new Array();
-				svolumeArray[0] = '';          
-				svolumeArray[1] = '';
-				svolumeArray[2] = '';
-
-				if(data.svolume!='' &&data.svolume!=null){
-					svolumeArray = data.svolume.split("*");
-				}
-				                                  
-				var tr =""+
-				"<tr id='tr"+i+"'> "+
-				"	<td><input type='text' id='packageNo"+i+"' value='"+packageNo+"' style='width: 50px' disabled='disabled'/><input type='hidden' id='"+packageNo+"' value='"+packageNo+"' /></td>"+            //包裹号
-				"	<td><input type='text' id='weight"+i+"' value='"+data.sweight+"' /></td>"+											           //重量
-				"	<td>"+
-				"		<input type='text' id='volumeLength"+i+"' value='"+svolumeArray[0]+"'  style='width: 50px'/>*"+                                     //体积
-				"		<input type='text' id='width"+i+"'  value='"+svolumeArray[1]+"' style='width: 50px'/>*"+
-				"		<input type='text' id='height"+i+"'  value='"+svolumeArray[2]+"' style='width: 50px'/>"+
-				"	</td>"+
-				"	<td><input type='button' value='删除'  onclick='delRow("+i+")'/></td>"+
-				"</tr>";
-				
-				$("#tabId").append(tr);
-				i++;//id加1
-			}
+	<style type="text/css">
+	</style>
+	<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="/cbtconsole/js/bootstrap/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
+	<title>自动测量</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+	<link rel="stylesheet" href="script/style.css" type="text/css">
+	<link rel="stylesheet" href="/cbtconsole/css/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="/cbtconsole/css/bootstrap/AdminLTE.min.css">
+	<script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+	<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+	<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+	<script type="text/javascript">
+	</script>
+	<style type="text/css">
+		.displaynone{display:none;}
+		.item_box{display:inline-block;margin-right:52px;}
+		.item_box select{width:150px;}
+		.mod_pay3 { width: 600px; position: fixed;
+			top: 100px; left: 15%;
+			z-index: 1011; background: gray;
+			padding: 5px; padding-bottom: 20px;
+			z-index: 1011; border: 15px solid #33CCFF; }
+		.w-group{margin-bottom: 10px;width: 60%;text-align: center;}
+		.w-label{float:left;}
+		.w-div{margin-left:120px;}
+		.w-remark{width:100%;}
+		table.imagetable {
+			font-family: verdana,arial,sans-serif;
+			font-size:11px;
+			color:#333333;
+			border-width: 1px;
+			border-color: #999999;
+			border-collapse: collapse;
 		}
-	});              
-}
-
-//删除行
-function delRow(id){
-	$("#tr"+id).remove();
-}
-
-//保存所有
-function saveAll(){
-	var volumeLength = "";
-  var width ="";
-  var height = "";
-  
-  var listmap= new Array();
-	var index=0;
-  for(var j=0; j<i; j++){
-  	
-  	if ( typeof($("#tr"+j).html()) != "undefined" ){ 
-  		volumeLength = $("#volumeLength"+j).val();
-  		width = $("#width"+j).val();
-  		height = $("#height"+j).val();
-  		
-  		var map = {}; 
-  		map['shipmentno'] = $("#packageNo"+j).val();
-  		map['sweight'] = $("#weight"+j).val();
-  		map['svolume'] = volumeLength+"*"+width+"*"+height;
-  	
-
-  		map['volumeweight']  = ((volumeLength * width * height) / 5000).toFixed(3);
-  		
-  		listmap[index] = map;
-  		index++;
-  	}
-  }                  
- // console.log(listmap);
-  var mainMap={};  
-	mainMap['listmap']=listmap;  
-	$.ajax({
-		type:"post", 
-		url:"/cbtconsole/warehouse/saveALl",
-		dataType:"json",  
-	    contentType : 'application/json;charset=utf-8', 
-	    data:JSON.stringify(mainMap),
-		success : function(data){  
-			if(Number(data)>0){
-				$("#msginfo").html("<h1>保存成功！</h1>");
-				window.setTimeout(function(){ 
-					history.go(0);
-				},1500);
-			}else{
-				$("#msginfo").html("<h1>失败！</h1>");
-				window.setTimeout(function(){ 
-					$("#msginfo").html(""); 
-				},1500); 
-			}
-			
+		table.imagetable th {
+			background:#b5cfd2 url('cell-blue.jpg');
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #999999;
 		}
-	});
-}
-function asdf(){
-	alert("132");             
-}
-</script>
+		.panel-title {
+			text-align: center;
+			height: 30px;
+			font-size: 24px;
+		}
+		table.imagetable td {
+			/* 	background:#dcddc0 url('cell-grey.jpg'); */
+			border-width: 1px;
+			padding: 8px;
+			border-style: solid;
+			border-color: #999999;
+			word-break: break-all;
+		}
+		.displaynone{display:none;}
+		.but_color {
+			background: #44a823;
+			width: 80px;
+			height: 24px;
+			border: 1px #aaa solid;
+			color: #fff;
+		}
 
+	</style>
+	<script type="text/javascript">
+        $(function(){
+            setDatagrid();
+            var opts = $("#easyui-datagrid").datagrid("options");
+            opts.url = "/cbtconsole/warehouse/getPackageInfo";
+
+        })
+
+        function setDatagrid() {
+            $('#easyui-datagrid').datagrid({
+                title : '自动测量',
+                //iconCls : 'icon-ok',
+                width : "100%",
+                fit : true,//自动补全
+                pageSize : 20,//默认选择的分页是每页20行数据
+                pageList : [ 20],//可以选择的分页集合
+                nowrap : true,//设置为true，当数据长度超出列宽时将会自动截取
+                striped : true,//设置为true将交替显示行背景。
+// 			collapsible : true,//显示可折叠按钮
+                toolbar : "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url : '',//url调用Action方法
+                loadMsg : '数据装载中......',
+                singleSelect : false,//为true时只能选择单行
+                fitColumns : true,//允许表格自动缩放，以适应父容器
+                idField:'itemid',
+                //sortName : 'xh',//当数据表格初始化时以哪一列来排序
+// 			sortOrder : 'desc',//定义排序顺序，可以是'asc'或者'desc'（正序或者倒序）。
+                pagination : true,//分页
+                rownumbers : true
+                //行数
+            });
+        }
+
+        function doQuery(page) {
+            var packageNo=$('#packageNo').val();
+            $("#easyui-datagrid").datagrid("load", {
+                "page":page,
+                "shipmentno":packageNo
+            });
+        }
+
+        function doReset(){
+            $("#packageNo").textbox('packageNo','');
+        }
+
+        function topCenter(msg){
+            $.messager.show({
+                title:'消息',
+                msg:msg,
+                showType:'slide',
+                style:{
+                    right:'',
+                    top:document.body.scrollTop+document.documentElement.scrollTop,
+                    bottom:''
+                }
+            });
+        }
+
+        function saveAll(){
+            var map = {};
+            var listmap= new Array();
+            var volumeLength = $("#volumeLength").val();
+            var width = $("#width").val();
+            var height = $("#height").val();
+            map['shipmentno'] = $("#packageNo").val();
+            map['sweight'] = $("#weight").val();
+            map['svolume'] = volumeLength+"*"+width+"*"+height;
+            map['volumeweight']  = ((volumeLength * width * height) / 5000).toFixed(3);
+            listmap[0] = map;
+            var mainMap={};
+            mainMap['listmap']=listmap;
+            $.ajax({
+                type:"post",
+                url:"/cbtconsole/warehouse/saveALl",
+                dataType:"json",
+                contentType : 'application/json;charset=utf-8',
+                data:JSON.stringify(mainMap),
+                success : function(data){
+                    if(Number(data)>0){
+                        topCenter("保存成功");
+                        $('#easyui-datagrid').datagrid('reload');
+                    }else{
+                        topCenter("保存失败");
+                    }
+
+                }
+            });
+		}
+
+
+	</script>
 </head>
-<body style="background-color : #F4FFF4;" onclick="">
-<div align="center">
-	<div><h1>自动测量</h1></div>
-	<div id="msginfo"></div>               
-	<br/><br/>                      
-	<!-- 扫描 -->
-	<div style="width: 800px">
-		出库号:<input id="packageNo" type='text' onkeypress="if (event.keyCode == 13) getPackageInfo()"/><input type="button" value="扫描" onclick="getPackageInfo()"/>
-	                           
-		<input type="button" value="保存所有" onclick="saveAll()" />
-		                      <input type="hidden"/>
-	</div>         
-	
-	<!-- 表格 -->
+<body text="#000000" onload="doQuery(1)">
+<div id="top_toolbar" style="padding: 5px; height: auto">
 	<div>
-		<table id="tabId" class="altrowstable" style="width: 800px">
-			<tr>
-				<td>出库号</td>
-				<td>重量(KG)</td>
-				<td>体积(CM<sup>3</sup>)</td>
-				<td>操作</td>
-			</tr>
-			
-		</table>
+		<form id="query_form" action="#" onsubmit="return false;" style="margin-left:100px;">
+			<input class="easyui-textbox" name="packageNo"  onkeypress="if (event.keyCode == 13) doQuery(1)" id="packageNo"  style="width:20%;"  data-options="label:'出库号:'">
+			<input class="but_color" type="button" value="扫描" onclick="doQuery(1)">
+			<input class="but_color" type="button" value="保存所有" onclick="saveAll()">
+		</form>
 	</div>
 </div>
 
+<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1500px;height:900px">
+	<thead>
+	<tr>
+		<th data-options="field:'shipmentno',width:25,align:'center'">出库号</th>
+		<th data-options="field:'sweight',width:40,align:'center'">重量(KG)</th>
+		<th data-options="field:'volumeweight',width:60,align:'center'">体积(CM<sup>3</sup>)</th>
+	</tr>
+	</thead>
+</table>
 </body>
-
 </html>

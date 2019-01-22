@@ -2999,7 +2999,7 @@
 		SELECT video_url as goods_pid,pid AS dzOrderno,CONCAT(remotpath,custom_main_image) as car_url from custom_benchmark_ready where pid=#{goods_pid} and valid=1;
 	</select>
 	<update id="updateCustomVideoUrl">
-		update custom_benchmark_ready set video_url=#{v_id} where pid=#{goods_pid}
+		update custom_benchmark_ready set video_url=#{path} where pid=#{goods_pid}
 	</update>
 	<update id="disabled">
 		update inspection_picture set state=#{state} where pic_path=#{picture} and isdelete=0

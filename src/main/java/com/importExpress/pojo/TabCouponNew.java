@@ -39,6 +39,25 @@ public class TabCouponNew {
 
 	private String userids;//折扣卷关联的用户id
 
+    private Integer shareFlag;//是否用于社交分享：0-默认值 用于关联客户；1-用于社交分享；
+    private String shareUrl;
+
+    public String getShareUrl() {
+        return shareUrl;
+    }
+
+    public void setShareUrl(String shareUrl) {
+        this.shareUrl = shareUrl;
+    }
+
+    public Integer getShareFlag() {
+        return shareFlag;
+    }
+
+    public void setShareFlag(Integer shareFlag) {
+        this.shareFlag = shareFlag;
+    }
+
     public String getUserids() {
         return userids;
     }
@@ -162,7 +181,7 @@ public class TabCouponNew {
 	}
 
 	public TabCouponNew(String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to,
-			int type, int valid, Integer userid) {
+			int type, int valid, Integer userid, Integer shareFlag) {
 		super();
 		this.id = id;
 		this.count = count;
@@ -174,6 +193,7 @@ public class TabCouponNew {
 		this.type = type;
 		this.valid = valid;
 		this.userid = userid;
+		this.shareFlag = shareFlag;
 	}
 	
 }

@@ -105,7 +105,11 @@ public class FreightUtlity {
                     if (StringUtils.isNotBlank(wholesalePriceTems[0])) {
                         Batch_Quantity0 = Integer.valueOf(wholesalePriceTems[0].toString().indexOf("-") > -1 ? wholesalePriceTems[0].toString().split("-")[0]  : wholesalePriceTems[0].toString().replace("≥", ""));
                     }
-                    if (StringUtils.isNotBlank(wholesalePriceTems[1])) {
+                    System.out.println("===============");
+                    Arrays.stream(wholesalePriceTems).forEach(e->{
+                        System.out.println("wholesalePriceTems-="+e);
+                    });
+                    if (wholesalePriceTems.length>=2 && StringUtils.isNotBlank(wholesalePriceTems[1])) {
                         Batch_Price0 = Double.parseDouble(wholesalePriceTems[1].toString().indexOf("-")>-1?wholesalePriceTems[1].toString().split("-")[0]:wholesalePriceTems[1].toString());
                     }
                     break;

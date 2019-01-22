@@ -66,6 +66,13 @@
 	color: #fff;
 }
 
+.flag_reg {
+    color: red;
+    position: relative;
+    top: 2px;
+    margin-left: 4px;
+}
+
 input, textarea, select, button {
 	font-size: 16px;
 	height: 28px;
@@ -100,11 +107,12 @@ input, textarea, select, button {
 
 <body>
 <script type="text/javascript">
+    //关联用户
     function addCouponUser() {
         var couponCode = $("#myModal_add_user").find("input[name='couponCode']").val();
         var userids = $("#add_user").val();
         if(userids == undefined || userids.length < 2){
-            alert("请输入关联的用户");
+            $.messager.alert('提示', "请输入关联的用户");
             return;
         }
         $.ajax({
@@ -117,9 +125,30 @@ input, textarea, select, button {
             dataType:"json",
             success: function(msg){
                 $('#myModal_add_user').modal('hide');
-                alert(msg.message);
+                $.messager.alert('提示', msg.message);
             }
         });
+    }
+
+    function changeDescribe() {
+        var valueLeft = $("input[name=valueLeft]").val();
+        if(valueLeft != undefined && valueLeft != ''){
+            $("input[name=describe]").val('If order over  $' + valueLeft);
+        } else {
+            $("input[name=describe]").val('');
+        }
+    }
+    function changeCouponId() {
+        var count = $("input[name=count]").val();
+        var couponCode = $("input[name=couponCode]").val();
+        var couponCodeArr = couponCode.split("-");
+
+        if(count != undefined && count != ''){
+            couponCodeArr[couponCodeArr.length-1] = count;
+        } else {
+            couponCodeArr[couponCodeArr.length-1] = '0';
+        }
+        $("input[name=couponCode]").val(couponCodeArr.join("-"));
     }
 </script>
 	<!-- 新增折扣卷模态框（Modal） -->
@@ -138,25 +167,25 @@ input, textarea, select, button {
 						style="float: left; font-size: 13px;">
 						<tr>
 							<td width="6%"></td>
-							<td width="14%">卷码</td>
-							<td width="80%"><input name="couponCode" type="text"
+							<td width="14%">卷码(自动生成)</td>
+							<td width="80%"><input name="couponCode" readonly type="text"
 								style="width: 500px" placeholder="示例:001-20180929-1000">
 								<span class="add-on" style="color: red;"></span></td>
 						</tr>
 						<tr>
 							<td></td>
-							<td>卷类别</td>
+							<td>卷类别(暂时只有一种)</td>
 							<td><select name="type" id="typeCodeMo" style="width: 500px"></select>
 								<!-- 满减卷规则 -->
 								<table id="type1" style="display: none;">
 									<tr>
-										<td width="108px">最低消费金额</td>
-										<td><input name="valueLeft" type="text" onkeyup="value=value.replace(/[^\d]/g,'')"
+                                        <td width="108px">最低消费金额<em class="flag_reg">*</em></td>
+										<td><input name="valueLeft" type="text" onchange="changeDescribe()" onkeyup="value=value.replace(/[^\d]/g,'')"
 											style="width: 360px" placeholder="该卷可用的最低消费金额(为0则不限制最低消费)">
 											<span class="add-on">$</span></td>
 									</tr>
 									<tr>
-										<td>抵扣金额</td>
+										<td>抵扣金额<em class="flag_reg">*</em></td>
 										<td><input name="valueRight" type="text" onkeyup="value=value.replace(/[^\d]/g,'')"
 											style="width: 360px" placeholder="该卷抵扣金额"> <span
 											class="add-on">$</span></td>
@@ -175,44 +204,53 @@ input, textarea, select, button {
 						</tr>
 						<tr>
 							<td></td>
-							<td>描述</td>
-								<td><input name="describe" type="text"
-									style="width: 500px" placeholder="示例:-3$ discount"> <span
+							<td>描述(自动生成)</td>
+								<td><input readonly name="describe" type="text"
+									style="width: 500px"> <span
 									class="add-on"></span></td>
 							</tr>
 						<tr>
 							<td></td>
-							<td>卷数量(发放数量)</td>
+							<td>卷数量(发放数量)<em class="flag_reg">*</em></td>
 							<td><input name="count" type="text"
-								placeholder="为0则不可用" style="width: 500px" onkeyup="value=value.replace(/[^\d]/g,'')"> <span
+								placeholder="为0则不可用" style="width: 500px" onchange="changeCouponId()" onkeyup="value=value.replace(/[^\d]/g,'')"> <span
 								class="add-on">张</span></td>
 						</tr>
 						<tr>
 							<td></td>
-							<td>领取开始时间</td>
-							<td><a class='input-group date' id='fromTime'
-								style="float: left;"> <input type='text'
-									class="form-control" name="fromTime"
-									style="width: 100px; height: 30px;" /> <span
-									class="input-group-addon"
-									style="float: left; width: 50px; height: 30px;"> <span
-										class="glyphicon glyphicon-calendar"></span>
-								</span>
-							</a></td>
+							<td>截止时间<em class="flag_reg">*</em></td>
+							<td>
+                                <a class='input-group date' id='fromTime'
+                                    style="float: left;"> <input type='text'
+                                        class="form-control" name="fromTime"
+                                        style="width: 100px; height: 30px;" /> <span
+                                        class="input-group-addon"
+                                        style="float: left; width: 50px; height: 30px;"> <span
+                                            class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </a>
+                                <span style="float:left;line-height: 30px;">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                                <a class='input-group date' id='toTime'
+                                   style="float: left;"> <input type='text'
+                                        class="form-control" name="toTime"
+                                        style="width: 100px; height: 30px;" /> <span
+                                        class="input-group-addon"
+                                        style="float: left; width: 50px; height: 30px;"> <span
+                                        class="glyphicon glyphicon-calendar"></span>
+								    </span>
+                                </a>
+                            </td>
 						</tr>
-						<tr>
-							<td></td>
-							<td>领取截止时间</td>
-							<td><a class='input-group date' id='toTime'
-								style="float: left;"> <input type='text'
-									class="form-control" name="toTime"
-									style="width: 100px; height: 30px;" /> <span
-									class="input-group-addon"
-									style="float: left; width: 50px; height: 30px;"> <span
-										class="glyphicon glyphicon-calendar"></span>
-								</span>
-							</a></td>
-						</tr>
+                        <tr>
+                            <td></td>
+                            <td>是否用于社交分享<em class="flag_reg">*</em></td>
+                            <td>
+                                <input type="radio" name="shareFlag" value="0" checked="checked" style="float: left;height: 20px;" />
+                                <span style="float: left;line-height: 30px;">&nbsp;用于关联客户&nbsp;&nbsp;</span>
+                                <input type="radio" name="shareFlag" value="1" style="float: left;height: 20px;" />
+                                <span style="float: left;line-height: 30px;">&nbsp;用于社交分享</span>
+                            </td>
+                        </tr>
 						<tr>
 							<td></td>
 							<td></td>
@@ -273,21 +311,17 @@ input, textarea, select, button {
                             </td>
 						</tr>
 						<tr>
-							<td>领取开始时间</td>
+							<td>截止时间</td>
                             <td>
-                                <input name="from" readonly type="text" style="width: 500px">
-                            </td>
-						</tr>
-						<tr>
-							<td>领取截止时间</td>
-                            <td>
-                                <input name="to" readonly type="text" style="width: 500px">
+                                <input name="from" readonly type="text" style="width: 100px">
+                                <span>&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                                <input name="to" readonly type="text" style="width: 100px">
                             </td>
 						</tr>
                         <tr>
-                            <td>已关联用户(多个用户用逗号隔开)</td>
+                            <td>已关联用户</td>
                             <td>
-                                <textarea rows="30" readonly cols="60" id="add_user_old" style="height: 100px;color: #595e6f;"></textarea>
+                                <span rows="30" id="add_user_old" style="color: #595e6f;"></span>
                             </td>
                         </tr>
                         <tr>
@@ -299,7 +333,7 @@ input, textarea, select, button {
 						<tr>
 							<td></td>
 							<td>
-                                <button onclick="addCouponUser()" style="width: 100px" >关联</button>
+                                <button onclick="addCouponUser()" >关联并发送邮件给客户</button>
                             </td>
 						</tr>
 					</table>
@@ -327,10 +361,10 @@ input, textarea, select, button {
 				}
 			});
 		});
-		$("input[name=couponCode]").focus(function(){
-			$("input[name=couponCode]").next().text("");
-			window.CHECK = true;
-		});
+//		$("input[name=couponCode]").focus(function(){
+//			$("input[name=couponCode]").next().text("");
+//			window.CHECK = true;
+//		});
 		//重置按钮
 		function formReset() {
 			$("input[name=couponCode]").val("");
@@ -342,17 +376,18 @@ input, textarea, select, button {
 			$("input[name=count]").val("");
 			$("input[name=fromTime]").val("");
 			$("input[name=toTime]").val("");
+            $("#addCoupon input[type='submit']").attr("disabled",false);//创建按钮可以点击
 		}
 		//表单校验
 		function formCheck() {
-			if (!window.CHECK) {
-				$("input[name=couponCode]").next().text("卷码重复, 未提交!");
-				return false;
-			}
-			if ($("input[name=couponCode]").val() == '') {
-				$("input[name=couponCode]").next().text("请输入卷码!");
-				return false;
-			}
+//			if (!window.CHECK) {
+//				$("input[name=couponCode]").next().text("卷码重复, 未提交!");
+//				return false;
+//			}
+//			if ($("input[name=couponCode]").val() == '') {
+//				$("input[name=couponCode]").next().text("请输入卷码!");
+//				return false;
+//			}
 			
 			if ($("#typeCodeMo").val() == "1") {
 				//1-满减卷
@@ -385,29 +420,71 @@ input, textarea, select, button {
 			if (!formCheck()) {
 				return false;
 			}
+            $("#addCoupon input[type='submit']").attr("disabled",true); //创建按钮不可点击
 			$.ajax({
 				type : "POST",
 				url : "/cbtconsole/coupon/addcoupon.do",
 				data : $("#addCoupon").serialize(),
 				dataType : "json",
 				success : function(msg) {
+                    $("#addCoupon input[type='submit']").attr("disabled",false);//创建按钮可以点击
 					if (msg.state == 'success') {
 						//保存成功
 						formReset();
 						$('#myModal').modal('hide');
 						$("#date-range-search").click();
+						if(msg.shareUrl != undefined && msg.shareUrl != ''){
+                            $.messager.alert('分享链接', '分享链接<br /><br />' + msg.shareUrl);
+                        }
 					} else {
 						$("input[name=couponCode]").next().text(msg.message);
 					}
 				}
 			});
+            history.pushState(null,null,location.origin + location.pathname);//url地址到默认
 			return false;
 		});
 		//删除卷
 		function delCoupon(couponCode) {
-			alert("功能待完善");
+            $.messager.confirm('提示','您确定要删除优惠卷' + couponCode + '吗?',function(r){
+                if(r){
+                    $.ajax({
+                        type: "GET",
+                        url: "/cbtconsole/coupon/delCoupon.do?couponCode=" + couponCode,
+                        dataType:"json",
+                        success: function(row){
+                            if(row.state){
+                                $("#date-range-search").click();
+                            }
+                            $.messager.alert('提示', row.message);
+                        }
+                    });
+                }
+            });
 		}
-		//关联用户
+        //删除关联用户
+        function deleteCouponUser(couponCode, userid) {
+            $.messager.confirm('提示','您确定要删除用户' + userid + '关联的优惠卷' + couponCode + '吗?',function(r){
+                if(r){
+                    $.ajax({
+                        type: "POST",
+                        url: "/cbtconsole/coupon/delCouponUser.do",
+                        data: {
+                            couponCode:couponCode,
+                            userid:userid
+                        },
+                        dataType:"json",
+                        success: function(row){
+                            if (row.state){
+                                $('#myModal_add_user').modal('hide');
+                            }
+                            $.messager.alert('提示', row.message);
+                        }
+                    });
+                }
+            });
+        }
+		//显示关联用户
 		function showAddCouponUser(couponCode) {
 		    //查询折扣卷信息
             $.ajax({
@@ -424,11 +501,36 @@ input, textarea, select, button {
                         $("#myModal_add_user").find("input[name='from']").val(formatterData(row.from));
                         $("#myModal_add_user").find("input[name='to']").val(formatterData(row.to));
                         $("#myModal_add_user").find("input[name='to']").val(formatterData(row.to));
-                        $("#add_user_old").val(row.userids);//已关联用户id
+                        //已关联用户id
+                        $("#add_user_old").html('');
+                        if (row.userids != undefined){
+                            var userArr = row.userids.split(",");
+                            if (userArr != undefined && userArr.length > 0){
+                                for(var i = 0; i < userArr.length; i++){
+                                    userArr[i] = userArr[i] + "&nbsp;<a href='#' onclick=\"deleteCouponUser(\'" + couponCode + "\', \'" + userArr[i] + "\')\">删除关联</a>"
+                                }
+                                $("#add_user_old").html(userArr.join(", "));
+                            }
+                        }
                         $('#myModal_add_user').modal('show');
                         $("#add_user").val('');
                     } else {
                         alert("未找到优惠卷数据");
+                    }
+                }
+            });
+		}
+		//查看分享链接
+		function showAddCouponShare(couponCode) {
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/coupon/queryTabCouponOne.do?couponCode=" + couponCode,
+                dataType:"json",
+                success: function(msg){
+                    if(msg != undefined && msg != ''){
+                        if(msg.shareFlag != undefined && msg.shareFlag == 1){
+                            $.messager.alert('分享链接', '分享链接<br /><br />' + msg.shareUrl);
+                        }
                     }
                 }
             });
@@ -486,15 +588,25 @@ input, textarea, select, button {
 				//初始化
 				$("#typeCode").val(0);
 			});
-			/*新增*/
-			$("#date-add").click(function() {
-				$('#myModal').modal('show');
-			});
+            $("#date-add").click(function() {
+                formReset();
+                //查询可用的卷码
+                $.ajax({
+                    type: "GET",
+                    url: "/cbtconsole/coupon/querycouponcode.do",
+                    dataType:"text",
+                    success: function(msg){
+                        $("input[name=couponCode]").val(msg);
+                        $('#myModal').modal('show');
+                    }
+                });
+            });
 			/*查询*/
 			$("#date-range-search")
 					.click(
 							function() {
-								var typeCode = $("#typeCode").val()
+								var typeCode = $("#typeCode").val();
+								var valid = $("#valid").val();
 								// 页数
 								var pageSize = $("#main-datagrid").datagrid(
 										"options").pageSize;
@@ -504,7 +616,8 @@ input, textarea, select, button {
 								$('#main-datagrid').datagrid("load", {
 									rows : pageSize,
 									page : pageNumber,
-									typeCode : typeCode
+									typeCode : typeCode,
+                                    valid : valid
 								});
 
 							});
@@ -549,7 +662,7 @@ input, textarea, select, button {
 						return "有效";
 						break;
 					case 0:
-						return "无效";
+						return "已删除";
 						break;
 				}
 			}
@@ -561,21 +674,40 @@ input, textarea, select, button {
 				switch (row.type) {
 				case 1:
 					//满减卷
-					return "最低消费金额-抵扣金额:" + row.value;
+					return "最低消费-抵扣-社交分享:" + row.value;
 				default:
 					break;
 				}
 			}
 			return '';
 		}
+		//是否用于社交分享
+		function formatterShareFlag(value, row, index) {
+			if (row.shareFlag != null) {
+			    if(row.shareFlag == 1){
+                    return '用于社交分享';
+                } else {
+                    return '用于关联客户';
+                }
+			}
+			return '';
+		}
 		//操作列
 		function formatterEdit(value, row, index) {
 			if (row.id != null) {
-				return '<a href=\"#\" onclick=\"delCoupon(\'' + row.id
-						+ '\')\"></a>'
-						//+ '\')\">删除</a>&nbsp;&nbsp;'
-                        + '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
+				var temHtml = '';
+				if(row.valid == 1){
+				    temHtml = '<a href=\"#\" onclick=\"delCoupon(\'' + row.id
+                        + '\')\">删除</a>&nbsp;&nbsp;';
+                }
+                if(row.shareFlag == 1){
+                    temHtml += '<a href=\"#\" onclick=\"showAddCouponShare(\'' + row.id
+                        + '\')\">查看分享链接</a>';
+                } else {
+                    temHtml += '<a href=\"#\" onclick=\"showAddCouponUser(\'' + row.id
                         + '\')\">关联用户</a>';
+                }
+                return temHtml;
 			}
 			return;
 		}
@@ -594,6 +726,9 @@ input, textarea, select, button {
 					<td align="center" style="width: 124px;"><span
 						style="float: left; line-height: 30px;">&nbsp;卷类别&nbsp;&nbsp;</span>
 					</td>
+					<td align="center" style="width: 124px;"><span
+						style="float: left; line-height: 30px;">&nbsp;是否有效&nbsp;&nbsp;</span>
+					</td>
 					<td style="width: 100px;">
 						<!--重置按钮-->
 					</td>
@@ -609,7 +744,16 @@ input, textarea, select, button {
 					<td align="center"><select class="form-control" id="typeCode"
 						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
 							<option value="0">0-全部</option>
-					</select></td>
+					</select>
+                    </td>
+					<!--是否有效-->
+					<td align="center"><select class="form-control" id="valid"
+						style="height: 30px; width: 120px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+							<option value="-1">0-全部</option>
+							<option value="1" >1-有效</option>
+							<option value="0">2-删除</option>
+					</select>
+                    </td>
 					<!--查询按钮-->
 					<td align="center">
 						<button type="button" id="date-range-search"
@@ -646,6 +790,7 @@ input, textarea, select, button {
 				<th
 					data-options="field:'rules',width:'380px',align:'center',formatter:formatterRules">券规则</th>
 				<th data-options="field:'describe',width:'100px',align:'center'">描述</th>
+				<th data-options="field:'shareFlag',width:'100px',align:'center',formatter:formatterShareFlag">是否用于社交分享</th>
 				<th
 					data-options="field:'from',width:'100px',align:'center',formatter:formatterData">领取开始时间</th>
 				<th
@@ -667,8 +812,8 @@ input, textarea, select, button {
 	//卷类别
 	var typeMap = {};
 	typeMap[1] = "满减券";
-	typeMap[2] = "折扣券";
-	typeMap[3] = "代金券";
+//	typeMap[2] = "折扣券";
+//	typeMap[3] = "代金券";
 	window.TYPECODEMAP = typeMap;
 	// 卷类别下拉框初始化
 	$.each(typeMap, function(index,value){
@@ -684,5 +829,10 @@ input, textarea, select, button {
 	});
 	$("#typeCodeMo").val(1);
 	$("#typeCodeMo").change();
+	//页面加载完成后进行查询
+    jQuery(function($){
+        $("#valid").val('1');
+        $("#date-range-search").click();
+    });
 </script>
 </html>
