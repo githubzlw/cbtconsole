@@ -187,6 +187,10 @@
         		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
 				+ row.disputeID+'&merchant='+ row.merchantID+'&isread='+row.read+ '">查看</a>';
         	}
+        	if(row.apiType.indexOf('Stripe')>-1){
+        		return '<a target="_blank" href="/cbtconsole/customer/dispute/info?disputeid='
+				+ row.disputeID+'&isread='+row.read+ '">查看</a>';
+        	}
         	return '';
 
     	}

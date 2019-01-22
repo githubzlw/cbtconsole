@@ -18,6 +18,15 @@ public class NeedOffShelfBean {
     private int startNum;
     private int limitNum;
     private int soldFlag;
+    private int soldFlag2;
+
+    public int getSoldFlag2() {
+        return soldFlag2;
+    }
+
+    public void setSoldFlag2(int soldFlag2) {
+        this.soldFlag2 = soldFlag2;
+    }
 
     public int getSoldFlag() {
         return soldFlag;
