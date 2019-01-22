@@ -1,17 +1,19 @@
 package com.cbt.stripe.impl;
 
-import com.cbt.stripe.StripeService;
-import com.stripe.Stripe;
-import com.stripe.exception.*;
-import com.stripe.model.Charge;
-import com.stripe.model.Dispute;
-import com.stripe.model.Refund;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.cbt.stripe.StripeService;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Charge;
+import com.stripe.model.Dispute;
+import com.stripe.model.File;
+import com.stripe.model.Refund;
 
 /**
  * @author lhao
@@ -57,22 +59,10 @@ public class StripeServiceImpl implements StripeService {
             logger.debug("charge=[{}]", charge.toJson());
             logger.info("charge.Status=[{}]", charge.getStatus());
             return charge;
-        } catch (AuthenticationException e) {
-            logger.error("AuthenticationException:", e);
+        } catch (StripeException e) {
+        	logger.error("StripeException:", e);
             throw new RuntimeException(e);
-        } catch (InvalidRequestException e) {
-            logger.error("InvalidRequestException:", e);
-            throw new RuntimeException(e);
-        } catch (APIConnectionException e) {
-            logger.error("APIConnectionException:", e);
-            throw new RuntimeException(e);
-        } catch (CardException e) {
-            logger.error("CardException:", e);
-            throw new RuntimeException(e);
-        } catch (APIException e) {
-            logger.error("APIException:", e);
-            throw new RuntimeException(e);
-        }
+		}
     }
 
     @Override
@@ -86,22 +76,10 @@ public class StripeServiceImpl implements StripeService {
         Refund refund = null;
         try {
             refund = Refund.create(params);
-        } catch (AuthenticationException e) {
-            logger.error("AuthenticationException:", e);
-            throw new RuntimeException(e);
-        } catch (InvalidRequestException e) {
-            logger.error("InvalidRequestException:", e);
-            throw new RuntimeException(e);
-        } catch (APIConnectionException e) {
-            logger.error("APIConnectionException:", e);
-            throw new RuntimeException(e);
-        } catch (CardException e) {
-            logger.error("CardException:", e);
-            throw new RuntimeException(e);
-        } catch (APIException e) {
-            logger.error("APIException:", e);
-            throw new RuntimeException(e);
-        }
+        } catch (StripeException e) {
+        	logger.error("StripeException:", e);
+        	throw new RuntimeException(e);
+		}
         logger.info(refund.toJson());
         if("succeeded".equals(refund.getStatus())){
             logger.info("refund succeeded.");
@@ -117,15 +95,7 @@ public class StripeServiceImpl implements StripeService {
 		Dispute retrieve;
 		try {
 			retrieve = Dispute.retrieve(disputeId);
-		} catch (AuthenticationException e) {
-			 throw new RuntimeException(e);
-		} catch (InvalidRequestException e) {
-			 throw new RuntimeException(e);
-		} catch (APIConnectionException e) {
-			 throw new RuntimeException(e);
-		} catch (CardException e) {
-			 throw new RuntimeException(e);
-		} catch (APIException e) {
+		} catch (StripeException e) {
 			 throw new RuntimeException(e);
 		}
 		return retrieve;
@@ -142,10 +112,22 @@ public class StripeServiceImpl implements StripeService {
 			params.put("evidence", evidence);
 			update = dp.update(params);
 			
-		} catch (AuthenticationException | InvalidRequestException | APIConnectionException | CardException
-				| APIException e) {
+		}catch (StripeException e) {
+			// TODO Auto-generated catch block
 			throw new RuntimeException(e);
 		}
 		return update;
+	}
+
+	@Override
+	public File createFile(Map<String, Object> fileParam) {
+		Stripe.apiKey = API_KEY;
+		File file = null;
+		try {
+			file = File.create(fileParam);
+		} catch (StripeException e) {
+			throw new RuntimeException(e);
+		}
+		return file;
 	}
 }

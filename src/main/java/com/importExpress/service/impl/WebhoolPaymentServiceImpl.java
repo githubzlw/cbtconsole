@@ -26,7 +26,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.stripe.model.Charge;
 import com.stripe.model.Event;
-import com.stripe.net.APIResource;
+import com.stripe.net.ApiResource;
 @Service
 public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -80,7 +80,7 @@ public class WebhoolPaymentServiceImpl implements WebhoolPaymentService {
 			for (String find : findAny) {
 				bean = new WebhookPaymentBean();
 				if(StringUtils.indexOf(find, "JSON:") > -1) {
-					Event event = APIResource.GSON.fromJson(find.split("JSON:")[1], Event.class);
+					Event event = ApiResource.GSON.fromJson(find.split("JSON:")[1], Event.class);
 					Long created = event.getCreated() * 1000L;
 					String creatTime = sdf.format(created);
 					bean.setTime(created);
