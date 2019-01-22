@@ -233,17 +233,24 @@
                         $(this).css('color', '#222');
                     }
                 });
+                $("#orderUserid").focus(function() {
+                	$('input[type=radio][name=funChange]').get(1).checked = "checked";
+                    if($(this).val() == "输入用户id") {
+                        $(this).val('');
+                        $(this).css('color', '#222');
+                    }
+                });
                 //操作订单状态中radio事件
             	/* $("#track_note").focus(function() {
             		$('input[type=radio][name=trackState]').get(1).checked = "checked";
                 }); */
                 //运单状态获取焦点事件
                 $("#trackState").focus(function() {
-                	$('input[type=radio][name=funChange]').get(1).checked = "checked";
+                	$('input[type=radio][name=funChange]').get(2).checked = "checked";
                 });
                 //运单预警获取焦点事件
                 $("#warning").focus(function() {
-                	$('input[type=radio][name=funChange]').get(2).checked = "checked";
+                	$('input[type=radio][name=funChange]').get(3).checked = "checked";
                 });
                 //操作订单运单状态
                 $("#myModal2_sub").click(function() {
@@ -312,25 +319,40 @@
                     //初始化
                     iniDatetime();
                     $('input[type=radio][name=timeRange]').get(0).checked = "checked";
-                    $('input[type=radio][name=funChange]').get(2).checked = "checked";
+                    $('input[type=radio][name=funChange]').get(3).checked = "checked";
                     $("#orderOrTrackNo").val("输入运单号或订单号查询");
                     $("#orderOrTrackNo").css("color","#C4C4C4");
+                    $("#orderUserid").val("输入用户id");
+                    $("#orderUserid").css("color","#C4C4C4");
                     $("#trackState").val(0);
                     $("#warning").val(0);
                     $("#adminSelect").val(0);
                 });
                 /*下架商品范围内时间的条件查询*/
                 $("#date-range-search").click(function() {
-                	var funChange = $('input[type=radio][name=funChange]:checked').val()
+                	var funChange = $('input[type=radio][name=funChange]:checked').val();
+                    var userid = $("#adminSelect").val();
+                    var trackState = $("#trackState").val();
                     //单个订单号或运单号查询
                     if(funChange == 2) {
                         var orderOrTrackNo = $("#orderOrTrackNo").val();
-                        //查询运单状态
-                        var trackState = $("#trackState").val();
                         $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
                         $('#main-datagrid').datagrid("load", {
                             orderOrTrackNo: orderOrTrackNo,
-                            funChange: funChange
+                            funChange: funChange,
+                            userid: userid
+                        });
+                        return;
+                    }
+                    //单个用户id查询
+                    if(funChange == 3) {
+                        var orderUserid = $("#orderUserid").val();
+                        //查询运单状态
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            orderUserid: orderUserid,
+                            funChange: funChange,
+                            userid: userid
                         });
                         return;
                     }
@@ -353,10 +375,7 @@
                         $("#errMsg").text("");
                     }
                     //查询
-                    var userid = $("#adminSelect").val();
                     if(funChange == 0) {
-                        //查询运单状态
-                        var trackState = $("#trackState").val();
                         $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
                         $('#main-datagrid').datagrid("load", {
                             rows: pageSize,
@@ -642,6 +661,10 @@
                         	<input type="radio" name="funChange" value="2" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单/订单/转单查询&nbsp;&nbsp;</span>
                         </td>
+                        <td align="center" style="width: 174px;">
+                        	<input type="radio" name="funChange" value="3" style="float: left;height: 20px;" />
+                        	<span style="float: left;line-height: 30px;">&nbsp;用户id或者邮箱&nbsp;&nbsp;</span>
+                        </td>
                         <td align="center" style="width: 184px;">
                         	<input type="radio" name="funChange" value="0" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单状态&nbsp;&nbsp;</span>
@@ -676,6 +699,10 @@
                         <!--通过运单号或订单号查询(时间选择失效)-->
                         <td align="center">
                             <input type="text" name="" id="orderOrTrackNo" value="输入运单号或订单号查询" style="height: 28px;width: 200px;color: #C4C4C4;" />
+                        </td>
+                        <!--通过用户id查询(时间选择失效)-->
+                        <td align="center">
+                            <input type="text" name="" id="orderUserid" value="输入用户id" style="height: 28px;width: 170px;color: #C4C4C4;" />
                         </td>
                         <!--运单状态-->
                         <td align="center">

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Map;
 
 @Controller
@@ -86,6 +87,7 @@ public class TabTrackInfoController {
         if (StringUtils.isNotBlank(useridStr) && !"0".equals(useridStr)) {
             userid = Integer.valueOf(useridStr);
         }
+
         //查询结果
         Map<String, Object> map = null;
         // 2-单个订单号或运单号的查询
@@ -99,66 +101,67 @@ public class TabTrackInfoController {
                 return json;
             }
             map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo, userid);
-            // 查询结果处理 并返回
-            if (map != null && map.size() > 0) {
-                json.setSuccess(true);
-                json.setRows(map.get("recordList"));
-                json.setTotal(Integer.parseInt(map.get("totalCount").toString()));
-            } else {
-                json.setRows("");
-                json.setSuccess(false);
-            }
-            return json;
-        }
-        //分页参数接收并处理
-        String rowsStr = request.getParameter("rows");
-        Integer rows = 20;
-        if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
-            rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
-        }
-        String pageStr = request.getParameter("page");
-        Integer page = 1;
-        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-            page = Integer.valueOf(pageStr);//无该参数时查询默认值1
-        }
-        //查询时间范围参数接收
-        String startDate = request.getParameter("startDate");
-        String endDate = request.getParameter("endDate");
-        if (!"".equals(startDate)) {
-            startDate += " 00:00";
-        }
-        if (!"".equals(endDate)) {
-            endDate += " 23:59";
-        }
-        //进行不同的查询
-        if (funChange == 0) {
-            // 查询运单状态
+        } else if (funChange == 3) {
+            // 3-根据用户id查询
             // 获取参数
-            String trackStateStr = request.getParameter("trackState");
-            int trackState;
-            if (trackStateStr == null || "".equals(trackStateStr) || !trackStateStr.matches("\\d+")) {
+            String orderUserid = request.getParameter("orderUserid");
+            if (StringUtils.isBlank(orderUserid)) {
                 //参数错误
                 json.setRows("");
                 json.setSuccess(false);
                 return json;
-            } else {
-                trackState = Integer.parseInt(trackStateStr);
             }
-            map = tabTrackInfoService.getRecordListByTrackState(page, rows, startDate, endDate, trackState, userid);
-        } else if (funChange ==1 ) {
-            // 查询运单预警
-            // 获取参数
-            String warningStr = request.getParameter("warning");
-            int warning;
-            if (warningStr == null || "".equals(warningStr) || !warningStr.matches("\\d+")) {
-                //参数错误
-                json.setRows("");
-                json.setSuccess(false);
-                return json;
-            } else {
-                warning = Integer.parseInt(warningStr);
+            map = tabTrackInfoService.getRecordListByUserid(orderUserid, userid);
+        } else {
+            //分页参数接收并处理
+            String rowsStr = request.getParameter("rows");
+            Integer rows = 20;
+            if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
+                rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
             }
-            map = tabTrackInfoService.getWarningRecordList(page, rows, startDate, endDate, warning, userid);
+            String pageStr = request.getParameter("page");
+            Integer page = 1;
+            if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+                page = Integer.valueOf(pageStr);//无该参数时查询默认值1
+            }
+            //查询时间范围参数接收
+            String startDate = request.getParameter("startDate");
+            String endDate = request.getParameter("endDate");
+            if (!"".equals(startDate)) {
+                startDate += " 00:00";
+            }
+            if (!"".equals(endDate)) {
+                endDate += " 23:59";
+            }
+            if (funChange == 0) {
+                // 查询运单状态
+                // 获取参数
+                String trackStateStr = request.getParameter("trackState");
+                int trackState;
+                if (trackStateStr == null || "".equals(trackStateStr) || !trackStateStr.matches("\\d+")) {
+                    //参数错误
+                    json.setRows("");
+                    json.setSuccess(false);
+                    return json;
+                } else {
+                    trackState = Integer.parseInt(trackStateStr);
+                }
+                map = tabTrackInfoService.getRecordListByTrackState(page, rows, startDate, endDate, trackState, userid);
+            } else if (funChange ==1 ) {
+                // 查询运单预警
+                // 获取参数
+                String warningStr = request.getParameter("warning");
+                int warning;
+                if (warningStr == null || "".equals(warningStr) || !warningStr.matches("\\d+")) {
+                    //参数错误
+                    json.setRows("");
+                    json.setSuccess(false);
+                    return json;
+                } else {
+                    warning = Integer.parseInt(warningStr);
+                }
+                map = tabTrackInfoService.getWarningRecordList(page, rows, startDate, endDate, warning, userid);
+            }
         }
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
@@ -166,7 +169,8 @@ public class TabTrackInfoController {
             json.setRows(map.get("recordList"));
             json.setTotal(Integer.parseInt(map.get("totalCount").toString()));
         } else {
-            json.setRows("");
+            json.setRows(new ArrayList<TabTrackInfo>());
+            json.setTotal(0);
             json.setSuccess(false);
         }
         return json;

@@ -76,6 +76,6 @@ public interface APIService {
 		 * @return
 		 * @throws Exception 
 		 */
-		String provideEvidence(String disputeID,String merchantID,String param,File fileName) throws Exception;
+		String provideEvidence(String disputeID,String merchantID,Map<String,Object> param,Map<String,File> fileMap) throws Exception;
 
 }

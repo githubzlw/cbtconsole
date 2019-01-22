@@ -12,6 +12,13 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/fine-uploader/jquery.fine-uploader.js"></script>
 <style type="text/css">
+table,table tr th, table tr td { border:12px solid #ebf6e0;font-weight: bold;text-align: left;}
+table { line-height: 25px; text-align: center; border-collapse: collapse;}
+.title_c{font-size: 25px;font-weight: bold;color: #2dadc2;text-align: left;margin-left: 11px;}   
+.td_title{width:300px;color:black;}
+.td_value{width:660px;color: black;}
+.td_value2{width:630px;height: 30px;}
+.td_back{background:#d2ddc7ad;}
 	.avatar.isMe {
     color: #333;
     border-color: #333;
@@ -95,8 +102,9 @@
     .hide{
     display: none;
     }
+
 	</style>
-<!--  
+
 <script type="text/template" id="qq-template-manual-trigger">
         <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Please upload a file here" style="min-height: 45px;">
             <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
@@ -161,19 +169,246 @@
             </dialog>
         </div>
     </script>
--->
+
 </head>
 
-<body>
+<body style="width: 100%" >
 <c:if test="${success ==0}">
-
 <div style="font-size: 18px;color: red;font-weight: bold;">
 ${message}
 </div>
+</c:if>
+
+<c:if test="${success == 1 && apiType!=0}">
+<div style="width: 90%;margin-left: 2%" align="center" >
+<div class="title_c">Detail</div>
+<table>
+<tr>
+<td class="td_title td_back">ID:</td>
+<td class="td_value">${dispute.id}</td>
+<td class="td_title td_back">Amount:</td>
+<td class="td_value"><em class="c_amount">${dispute.amount}</em> ${dispute.currency}</td>
+</tr>
+<tr>
+<td class="td_title td_back">Charge:</td>
+<td class="td_value">${dispute.charge }</td>
+<td class="td_title td_back">Reason:</td>
+<td class="td_value">${dispute.reason }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Balance Transaction:</td>
+<td class="td_value">${dispute.balanceTransaction }</td>
+<td class="td_title td_back">Status:</td>
+<td class="td_value">${dispute.status }</td>
+</tr>
+
+</table>
+<div class="title_c">Balance Transactions</div>
+<table>
+<tr>
+<td class="td_back">ID</td>
+<td class="td_back">Amount</td>
+<td class="td_back">Fee</td>
+<td class="td_back">Net</td>
+<td class="td_back">Time</td>
+<td class="td_back">Description</td>
+
+</tr>
+<c:forEach items="${dispute.balanceTransactions }" var="transaction">
+<tr>
+<td style="width:300px;">${transaction.id }</td>
+<td style="width:300px;"><em class="c_amount">${transaction.amount }</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_amount">${transaction.fee}</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_amount">${transaction.net}</em> ${transaction.currency}</td>
+<td style="width:300px;"><em class="c_time">${transaction.created }</em></td>
+<td style="width:500px;">${transaction.description }</td>
+
+</tr>
+</c:forEach>
+</table>
+<div class="title_c">Evidence</div>
+<table>
+<tr>
+<td class="td_title td_back">Product Description:</td>
+<td class="td_value">${dispute.evidenceSubObject.productDescription }</td>
+<td class="td_title td_back">Customer Name:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerName }</td>
+
+
+</tr>
+<tr>
+<td class="td_title td_back">Receipt:</td>
+<td class="td_value">${dispute.evidenceSubObject.receipt }</td>
+<td class="td_title td_back">Customer Email:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerEmailAddress }</td>
+
+</tr>
+
+<tr>
+<td class="td_title td_back">Shipping Date:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingDate }</td>
+<td class="td_title td_back">Billing Address:</td>
+<td class="td_value">${dispute.evidenceSubObject.billingAddress }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Tracking Number:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingTrackingNumber }</td>
+<td class="td_title td_back">Shipping Address:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingAddress }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Carrier:</td>
+<td class="td_value"><%-- ${dispute.evidenceSubObject.shippingCarrier } --%></td>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value">${dispute.evidenceSubObject.shippingDocumentation }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Policy:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationPolicy }</td>
+<td class="td_title td_back">Cancellation Policy Disclosure:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationPolicyDisclosure }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Rebuttal:</td>
+<td class="td_value">${dispute.evidenceSubObject.cancellationRebuttal }</td>
+<td class="td_title td_back">Customer Communication:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerCommunication }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Id:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeId }</td>
+<td class="td_title td_back">Duplicate Charge Explanation:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeExplanation }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Documentation:</td>
+<td class="td_value">${dispute.evidenceSubObject.duplicateChargeDocumentation }</td>
+<td class="td_title td_back">Refund Policy:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundPolicy }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Refund Policy Disclosure:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundPolicyDisclosure }</td>
+<td class="td_title td_back">Refund Refusal Explanation:</td>
+<td class="td_value">${dispute.evidenceSubObject.refundRefusalExplanation }</td>
+</tr>
+<tr>
+<td class="td_title td_back">Access Activity Log:</td>
+<td class="td_value">${dispute.evidenceSubObject.accessActivityLog }</td>
+<td class="td_title td_back">Customer Signature:</td>
+<td class="td_value">${dispute.evidenceSubObject.customerSignature }</td>
+</tr>
+
+
+
+</table>
+
+
+<c:if test="${status==0 }">
+<form action="/cbtconsole/customer/dispute/stripe/update" method="post">
+<div class="title_c">Please provide evidence</div>
+<input name="disputeId" value="${dispute.id}" type="hidden">
+<input name="resonFlag" value="${resonFlag }" type="hidden">
+<input name="isRead" value="${isread }" type="hidden">
+<table>
+<tr>
+<td class="td_title td_back">Product Description</td>
+<td class="td_value"><input name="product_description" value="" class="td_value2"></td>
+<c:if test="${ resonFlag==4}">
+<td class="td_title td_back">Access Activity Log</td>
+<td class="td_value"><input name="access_activity_log" value="" class="td_value2"></td>
+</c:if>
+<c:if test="${ resonFlag!=4}">
+<td class="td_title"></td>
+<td class="td_value"></td>
+</c:if>
+
+</tr>
+<c:if test="${resonFlag> 0 && resonFlag<5}">
+<tr>
+<td class="td_title td_back">Shipping Date:</td>
+<td class="td_value"><input name="shipping_date" value="" class="td_value2"></td>
+<td class="td_title td_back">Shipping Number:</td>
+<td class="td_value"><input name="shipping_number" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Carrier:</td>
+<td class="td_value"><input name="shipping_carrier" value="" class="td_value2"></td>
+<td class="td_title td_back">Shipping Address:</td>
+<td class="td_value"><input name="shipping_address" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
+<td class="td_title"></td>
+<td class="td_value"></td>
+</tr>
+</c:if>
+
+<c:if test="${resonFlag==5}">
+<tr>
+<td class="td_title td_back">Cancellation Policy:</td>
+<td class="td_value"><input name="cancellation_policy" value="" class="td_value2"></td>
+<td class="td_title td_back">Cancellation Policy Disclosure:</td>
+<td class="td_value"><input name="cancellation_policy_disclosure" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Cancellation Rebuttal:</td>
+<td class="td_value"><input name="cancellation_rebuttal" value="" class="td_value2"></td>
+<td class="td_title td_back">Customer Communication:</td>
+<td class="td_value"><input name="customer_communication" value="" class="td_value2"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==6}">
+<tr>
+<td class="td_title td_back">Duplicate Charge_id:</td>
+<td class="td_value"><input name="duplicate_charge_id" value="" class="td_value2"></td>
+<td class="td_title td_back">Duplicate Charge Explanation:</td>
+<td class="td_value"><input name="duplicate_charge_explanation" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Duplicate Charge Documentation:</td>
+<td class="td_value"><input name="duplicate_charge_documentation" value="" class="td_value2"></td>
+<c:if test="${resonFlag==0}">
+<td class="td_title td_back">Service Documentation:</td>
+<td class="td_value"><input name="service_documentation" value="" class="td_value2"></td>
+</c:if>
+<td class="td_title td_back">Shipping Documentation:</td>
+<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==7}">
+<tr>
+<td class="td_title td_back">Refund Policy:</td>
+<td class="td_value"><input name="refund_policy" value="" class="td_value2"></td>
+<td class="td_title td_back">Refund Policy Disclosure:</td>
+<td class="td_value"><input name="refund_policy_disclosure" value="" class="td_value2"></td>
+</tr>
+<tr>
+<td class="td_title td_back">Refund Refusal Explanation:</td>
+<td class="td_value"><input name="refund_refusal_explanation" value="" class="td_value2"></td>
+<td class="td_title"></td>
+<td class="td_value"></td>
+</tr>
+</c:if>
+<c:if test="${resonFlag==7}"></c:if>
+
+
+</table>
+
+<input type="submit" value="Submit">
+</form>
 
 </c:if>
 
-<c:if test="${success == 1}">
+
+
+</div>
+<br><br>
+<br><br>
+</c:if>
+
+<c:if test="${success == 1 && apiType==0}">
 <div style="width:980px; position: absolute;margin-left: 200px;">
 <div>
 <h1>消息</h1>
@@ -278,7 +513,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <section id="compose">
 <!-- || statusFlag ==1 -->
-<c:if test="${statusFlag==0 }">
+<c:if test="${statusFlag!=10 }">
 <div class="row">
 
 <div class="col-md-1 col-sm-2 col-xs-2 col-lg-1" style="float: left;">
@@ -289,7 +524,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="col-md-7 seller-response-options ">
 <span>How would you like to respond?</span>
-<c:if test="${statusFlag != 1}">
+<c:if test="${statusFlag != 10}">
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">
@@ -550,7 +785,7 @@ class=" edit">
  <br>
  <span class="field">
  <textarea cols="100" rows="5" id="textarea0" class="wishContent2000" name="messageBodyForGeneric"></textarea>
- <input type="text" size="3" maxlength="4"  value="2000" id="remlen2000" readonly="readonly">&nbsp;characters left<br></span>
+ <input type="text" size="3" maxlength="4"  value="2000" class="remlen2000" readonly="readonly">&nbsp;characters left<br></span>
 </p>
  </div>
  <p class="buttons">
@@ -834,46 +1069,9 @@ this problem will be resolved and closed.
 <input type="checkbox" class="vx_form-control" id="tracking-not-required" name="tracking-not-required" value="No Shipment Tracking">
 <label for="tracking-not-required">不要求提供跟踪信息</label></div> -->
 <br>
-<div class="vx_form-group vx_has-error-with-message vx_floatingLabel_active" data-label-content="跟踪号">
-<label for="trackingNumer">跟踪号</label>
+
 <br>
-<input style="height: 35px; width: 324px;" type="text" value="" class="vx_form-control" id="trackingNumer" name="trackingNumer" aria-required="true" placeholder="请输入跟踪号">
-<!-- <span class="vx_form-control-message ">请输入跟踪号。</span> --></div>
-<br>
-<div class="vx_form-group vx_floatingLabel">
-<label for="carrier">运送方式</label>
-<div class="vx_select" data-label-content="运送方式">
-<select id="carrier" name="carrier" class="validate vx_form-control" style="height: 50px; width: 329px;">
-<option value="CN_EMS">China EMS</option>
-<option value="FEDEX">FedEx</option>
-<option value="CN_TNT">TNT</option>
-<option value="UPS">UPS</option>
-<option value="BUYLOGIC">Buy Logic International</option>
-<option value="CHINA_POST">China Post</option>
-<option value="CNEXPS">CNE Express</option>
-<option value="CPACKET">cPacket</option>
-<option value="ARAMEX">Aramex</option>
-<option value="CN_EC">EC First Class</option>
-<option value="CN_EMPS">EMPS Express</option>
-<option value="YANWEN">YanWen</option>
-<option value="DHL">DHL Express</option>
-<option value="TNT">TNT</option>
-<option value="TOLL_IPEC">Toll IPEC</option>
-<option value="CN_SF_EXPRESS">SF EXPRESS</option>
-<option value="HK_HONGKONG_POST">HONGKONG Post</option>
-<option value="SG_SG_POST">Singapore Post</option>
-<option value="DHL_GLOBAL_ECOMMERCE">DHL Global Mail</option>
-<option value="UBI_LOGISTICS">UBI Logistics</option>
-<option value="EU_BPOST">Belgium Post</option>
-<option value="FOUR_PX_EXPRESS">Four PX Express</option>
-<option value="FLYT_EXPRESS">FLYT Express</option>
-<option value="INTERNATIONAL_BRIDGE">International Bridge</option>
-<option value="SFC_LOGISTICS">SFC Logistics</option>
-<option value="BQC_EXPRESS">BQC Express</option>
-<option value="ONE_WORLD">One World</option>
-<option value="CN_OTHER">Other</option>
-</select>
-</div></div></div></div>
+</div></div>
 
 </div>
 <div style="clear: both;"></div>
@@ -901,57 +1099,139 @@ this problem will be resolved and closed.
 
 
 </div>
-<c:if test="${statusFlag==9 }">
+<c:if test="${statusFlag==1 }">
 <div id="main" class="legacyErrors" style="margin-left: 60px;">
 <div class="layout1">
-
+<form action="/cbtconsole/customer/dispute/evidence" method="post">
 	 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 	 <input type="hidden" name="merchant" value="${merchant }">
+<input type="hidden" name="postalCode" id="postalCode" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.postal_code }">
+<input type="hidden" name="address_line_1" id="address_line_1" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.address_line_1}">
+<input type="hidden" name="address_line_2" id="address_line_2" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.address_line_2}">
+<input type="hidden" name="address_line_3" id="address_line_3" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.address_line_3}">
+<input type="hidden" name="admin_area_4" id="admin_area_4" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_4}">
+<input type="hidden" name="admin_area_3" id="admin_area_3" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_3}">
+<input type="hidden" name="admin_area_2" id="admin_area_2" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_2}">
+<input type="hidden" name="admin_area_1" id="admin_area_1" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.admin_area_1}">
+<input type="hidden" name="country_code" id="country_code" value="${result.extensions.merchandize_dispute_properties.return_shipping_address.country_code}">
+
+<div class="vx_form-group vx_floatingLabel" >
+<label for="carrier">类型</label>
+<div class="vx_select" data-label-content="类型">
+<select id="evidence_type" name="evidence_type" class="validate vx_form-control" style="height: 50px; width: 329px;">
+<option value="PROOF_OF_FULFILLMENT">PROOF OF FULFILLMENT</option>
+<option value="PROOF_OF_REFUND">PROOF OF REFUND</option>
+<option value="PROOF_OF_DELIVERY_SIGNATURE">PROOF OF DELIVERY SIGNATURE</option>
+<option value="PROOF_OF_RECEIPT_COPY">PROOF OF RECEIPT COPY</option>
+<option value="PROOF_OF_RESHIPMENT">PROOF OF_RESHIPMENT</option>
+<option value="BILLING_AGREEMENT">BILLING AGREEMENT</option>
+<option value="RETURN_POLICY">RETURN POLICY</option>
+<option value="ITEM_DESCRIPTION">ITEM DESCRIPTION</option>
+<option value="POLICE_REPORT">POLICE REPORT</option>
+<option value="AFFIDAVIT">AFFIDAVIT</option>
+<option value="PAID_WITH_OTHER_METHOD">PAID WITH OTHER METHOD</option>
+<option value="COPY_OF_CONTRACT">COPY OF CONTRACT</option>
+<option value="TERMINAL_ATM_RECEIPT">TERMINAL ATM_RECEIPT</option>
+<option value="PRICE_DIFFERENCE_REASON">PRICE DIFFERENCE REASON</option>
+<option value="SOURCE_CONVERSION_RATE">SOURCE CONVERSION RATE</option>
+<option value="BANK_STATEMENT">BANK STATEMENT</option>
+<option value="CREDIT_DUE_REASON">CREDIT DUE REASON</option>
+<option value="REQUEST_CREDIT_RECEIPT">REQUEST CREDIT RECEIPT</option>
+<option value="PROOF_OF_RETURN">PROOF OF RETURN</option>
+<option value="CHANGE_REASON">CHANGE REASON</option>
+<option value="CREATE">CREATE</option>
+<option value="OTHER">OTHER</option>
+</select>
+</div>
+</div>
+<div class="vx_form-group vx_floatingLabel" >
+<label for="carrier">运送方式</label>
+<div class="vx_select" data-label-content="运送方式">
+<select id="carrier" name="carrier_name" class="validate vx_form-control" style="height: 50px; width: 329px;">
+<option value=""></option>
+<option value="CN_EMS">China EMS</option>
+<option value="CN_FEDEX">FedEx</option>
+<option value="CN_TNT">TNT</option>
+<option value="CN_UPS">UPS</option>
+<option value="CN_CHINA_POST">China Post</option>
+<option value="HK_HONGKONG_POST">HONGKONG Post</option>
+<option value="CPACKET">cPacket</option>
+<option value="DHL">DHL Express</option>
+<option value="CNEXPS">CNE Express</option>
+<option value="BUYLOGIC">Buy Logic International</option>
+<option value="ARAMEX">Aramex</option>
+<option value="CN_EC">EC First Class</option>
+<option value="CN_EMPS">EMPS Express</option>
+<option value="YANWEN">YanWen</option>
+<option value="TOLL_IPEC">Toll IPEC</option>
+<option value="CN_SF_EXPRESS">SF EXPRESS</option>
+<option value="SG_SG_POST">Singapore Post</option>
+<option value="DHL_GLOBAL_ECOMMERCE">DHL Global Mail</option>
+<option value="UBI_LOGISTICS">UBI Logistics</option>
+<option value="EU_BPOST">Belgium Post</option>
+<option value="FOUR_PX_EXPRESS">Four PX Express</option>
+<option value="FLYT_EXPRESS">FLYT Express</option>
+<option value="INTERNATIONAL_BRIDGE">International Bridge</option>
+<option value="SFC_LOGISTICS">SFC Logistics</option>
+<option value="BQC_EXPRESS">BQC Express</option>
+<option value="ONE_WORLD">One World</option>
+<option value="CN_OTHER">Other</option>
+</select>
+</div>
+</div>
+
+<div class="vx_form-group vx_has-error-with-message vx_floatingLabel_active" data-label-content="跟踪号">
+<label for="trackingNumer">跟踪号</label>
+<br>
+<input style="height: 35px; width: 324px;" type="text" value="" class="vx_form-control" id="trackingNumer" name="tracking_number" aria-required="true" placeholder="请输入跟踪号">
+</div>
+<div class="vx_form-group vx_has-error-with-message vx_floatingLabel_active" data-label-content="退款号">
+<label for="refundNumer">退款号</label>
+<br>
+<input style="height: 35px; width: 324px;" type="text" value="" class="vx_form-control" id="refundNumer" name="refund_ids" aria-required="true" placeholder="请输入退款号">
+</div>
+ 
 	  <div class="form-group">
-	  <div class="col-sm-3 col-sm-offset-1">
-	    <label for="uploadPic" class="control-label" style="text-align: left;">Upload Files:</label>
-	    <div ><span style="color: red;">Note</span>:
-		    <ul style="margin-left: 15px;">
-		    	<li>1:jpg、png、gif 、pdf are allowed</li>
-		    	<li>2:Size：lease than 5M</li>
-		    </ul>
-	    </div>
-	  </div>
-	    <div class="col-sm-7">
+	    Select File:<span style="margin-left: 15px;"><span>1:jpg、png、gif 、pdf are allowed.</span> <span>2:lease than 5M.</span>
+		    </span>
+	    <div class="col-sm-7" style="width:300px;">
 	    	 <div id="fine-uploader-manual-trigger"></div>
-	    </div>
-	  </div>
-	   <div class="form-group">
-	    <label for="remark" class="col-sm-3 col-sm-offset-1 control-label" style="text-align: left;">Description(optional)</label>
-	    <div class="col-sm-7">
-	    	<textarea class="wishContent60" rows="4" cols="100" id="Description" name="messageBodyForGeneric"></textarea>
-	    	<br>
-	    	<span class="field">
-	    	<input type="text" value="60" id="remlen60" readonly="readonly" size="3" maxlength="3">
-	    	characters left</span>
-	    </div>
-	  </div>
-	  <div class="form-group">
-	    <div class="col-sm-offset-6 col-sm-8">
-	      <button type="button" id="subBtn" class="btn btn-success" onclick="submit()" >Submit</button>
+	      <button type="button" id="subBtn" class="btn btn-success" onclick="uploadclick()" >Attach File</button>
 	      <span class="errMsg"></span>
 	      <p class="conpwar"></p>
 	    </div>
+	   
 	  </div>
- 
+	<input type="hidden" id="fileLocation" name="fileLocation"/>  
+	<br>
+	<br>
+	<div class="form-group">
+	    <label for="remark" class="col-sm-3 col-sm-offset-1 control-label" style="text-align: left;">Description(optional)</label>
+	    <div class="col-sm-7">
+	    	<textarea class="wishContent2000" rows="4" cols="100" id="Description" name="messageBodyForGeneric" placeholder="Send a friendly message to the buyer"></textarea>
+	    	<br>
+	    	<span class="field">
+	    	<input type="text" value="2000" class="remlen2000" readonly="readonly" size="3" maxlength="3">
+	    	characters left</span>
+	    </div>
+ </div>
+<input type="submit" value="Send">
+</form>
+ <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div style="height: 100px;"></div>
  
  </div>
  </div>
 </c:if>
 </div>
-<form id="evidenceform" class="form-horizontal" action="/cbtconsole/customer/dispute/evidence"  method="post"  style="display:none;">
-<input type="hidden" name="disputeid" value="${result.dispute_id }">
-<input type="hidden" name="merchant" value="${merchant }">
-<input type="hidden" id="fileLocation" name="fileLocation"/>
-<input type="hidden" id="evidenceformcontent" name="messageBodyForGeneric"/>
-<input type="submit" value="submit">
 
-</form>
 <form action="/cbtconsole/customer/dispute/offer" method="post" id="makeoffer_form" style="display:none;">
 <input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
 <input type="hidden" name="userid" value="${userid}" readonly="readonly">
@@ -984,6 +1264,26 @@ var sendResult = '${sendResult}'
 if(sendResult !=''){
 	alert(sendResult);
 }
+$(function(){
+	$(".c_amount").each(function(){
+		var amount = $(this).html();
+		if(amount){
+			var len = amount.length;
+			amount = amount.substring(0,len-2)+"."+amount.substring(len-2);
+			$(this).html(amount);
+		}
+		
+	})
+	$(".c_time").each(function(){
+		var timestamp = parseInt($(this).html());
+		 var unixTimestamp = new Date(timestamp * 1000) ;
+		 var commonTime = unixTimestamp.toLocaleString();
+		 $(this).html(commonTime);
+		 
+	})
+})
+
+
 $("input:radio").click(function(){
 		if($(this).is(':checked')){
 			$(this).parents(".issuediv").find("#messageBodyForGeneric").val('');
@@ -1124,7 +1424,7 @@ $(".wishContent2000").on('input propertychange', function () {
 		$(this).val(_val.substring(0, 2000));
 	}
 	count = 2000 - $(this).val().length;
-	$("#remlen2000").val(count);
+	$(".remlen2000").val(count);
 });
 $(".wishContent60").on('input propertychange', function () {
     var _val = $(this).val();
@@ -1140,18 +1440,18 @@ $(".issu_button").each(function(){
 		$(this).parents(".sellerresponseform").hide();
 	})
 })
-function submit(){
-	 var complainText =$("#Description").val();
+function uploadclick(){
+	 /* var complainText =$("#Description").val();
 	 if(complainText==''){
 		 $('.errMsg').html('Note cannot be empty !');
 		 return false;
-	 }
+	 } */
+	 
 	document.getElementById("trigger-upload").click();
-	
 }
 </script>
 	<script>
-	/*  var manualUploader = new qq.FineUploader({
+	  var manualUploader = new qq.FineUploader({
          element: document.getElementById('fine-uploader-manual-trigger'),
          template: 'qq-template-manual-trigger',
          request: {
@@ -1172,13 +1472,13 @@ function submit(){
              accept:"image/jpg, image/gif , image/png, file/pdf"
          },
          callbacks: {
-         	开始上传 
+         	/* 开始上传  */
              onUpload: function (id, name) {
              },
-              选择文件后 
+              /* 选择文件后  */
              onSubmitted: function (id, name) {
              },
-             上传完成 
+             /* 上传完成 */ 
              onComplete : function(id, name, responseJSON) {
             	 var str="";
             	 if(responseJSON.success){
@@ -1191,8 +1491,6 @@ function submit(){
 					if(failed.length==0){
 						$("#upmessage").show(3000).delay(2000).hide(2000);
 	        			$("#upmessage").html("Upload successfully.");
-	        			$("#evidenceformcontent").val($("#Description").val());
-	        			$("#evidenceform").submit();
 					}else if(succeeded.length==0){
 						$("#upmessage").show(3000).delay(2000).hide(2000);
 	        			$("#upmessage").html("All failed.");
@@ -1205,7 +1503,7 @@ function submit(){
 
      qq(document.getElementById("trigger-upload")).attach("click", function() {
     	 manualUploader.uploadStoredFiles();
-     }); */
+     });
      
      function fnsubmint(){
     		

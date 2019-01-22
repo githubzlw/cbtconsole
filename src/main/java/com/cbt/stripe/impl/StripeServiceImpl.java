@@ -4,6 +4,7 @@ import com.cbt.stripe.StripeService;
 import com.stripe.Stripe;
 import com.stripe.exception.*;
 import com.stripe.model.Charge;
+import com.stripe.model.Dispute;
 import com.stripe.model.Refund;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,4 +110,42 @@ public class StripeServiceImpl implements StripeService {
             throw new RuntimeException("refund failed");
         }
     }
+
+	@Override
+	public Dispute dispute(String disputeId) {
+		Stripe.apiKey = API_KEY;
+		Dispute retrieve;
+		try {
+			retrieve = Dispute.retrieve(disputeId);
+		} catch (AuthenticationException e) {
+			 throw new RuntimeException(e);
+		} catch (InvalidRequestException e) {
+			 throw new RuntimeException(e);
+		} catch (APIConnectionException e) {
+			 throw new RuntimeException(e);
+		} catch (CardException e) {
+			 throw new RuntimeException(e);
+		} catch (APIException e) {
+			 throw new RuntimeException(e);
+		}
+		return retrieve;
+	}
+
+	@Override
+	public Dispute update(String disputeId, Map<String, Object> evidence) {
+		Stripe.apiKey = API_KEY;
+		Dispute update = null;
+		try {
+			Dispute dp = Dispute.retrieve(disputeId);
+			
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("evidence", evidence);
+			update = dp.update(params);
+			
+		} catch (AuthenticationException | InvalidRequestException | APIConnectionException | CardException
+				| APIException e) {
+			throw new RuntimeException(e);
+		}
+		return update;
+	}
 }

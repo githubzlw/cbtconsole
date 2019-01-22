@@ -82,7 +82,13 @@ public class HotManageController {
         }
 
         int startNum = 0;
-        int limitNum = 25;
+        int limitNum = 40;
+
+        String rowsStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowsStr) || "0".equals(rowsStr))) {
+            limitNum = Integer.valueOf(rowsStr);
+        }
+
         String pageStr = request.getParameter("page");
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
             startNum = (Integer.valueOf(pageStr) - 1) * limitNum;

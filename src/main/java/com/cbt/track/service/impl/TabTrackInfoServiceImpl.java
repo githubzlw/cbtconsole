@@ -102,7 +102,20 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         return map;
     }
 
-	@Override
+    @Override
+    public Map<String, Object> getRecordListByUserid(String orderUserid, Integer userid) {
+        List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByUserid(orderUserid, userid);
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        if (list != null && list.size() > 0) {
+            queryTrackInfo(list);//查询最新一条物流
+            map.put("recordList", list);
+            map.put("totalCount", list.size());
+        }
+        return map;
+    }
+
+    @Override
 	public boolean updatestate(TabTrackInfo tabTrackInfo) {
 		try {
 			tabTrackInfoMapping.updatestate(tabTrackInfo);
