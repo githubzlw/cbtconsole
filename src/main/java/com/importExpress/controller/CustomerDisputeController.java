@@ -208,6 +208,7 @@ public class CustomerDisputeController {
 					resonFlag = StringUtils.equals(reason, "MERCHANDISE_OR_SERVICE_NOT_RECEIVED") ? 1 : resonFlag;
 					//状态
 					String status = infoByDisputeID.getString("status");
+					statusFlag = StringUtils.equals("OPEN", status) ? 0 : statusFlag;
 					statusFlag = StringUtils.equals("WAITING_FOR_SELLER_RESPONSE", status) ? 1 : statusFlag;
 					statusFlag = StringUtils.equals("WAITING_FOR_BUYER_RESPONSE", status) ? 2 : statusFlag;
 					statusFlag = StringUtils.equals("UNDER_REVIEW", status) ? 3 : statusFlag;

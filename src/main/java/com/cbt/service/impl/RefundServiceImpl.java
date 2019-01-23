@@ -191,4 +191,9 @@ public class RefundServiceImpl implements RefundSSService {
         return refundDao.updateRefundState(userId,refundId,state);
     }
 
+    @Override
+    public double queryComplaintTotalAmount(int userId) {
+        return refundDao.queryComplaintTotalAmount(userId);
+    }
+
 }
