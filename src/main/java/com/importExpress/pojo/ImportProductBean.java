@@ -30,8 +30,26 @@ public class ImportProductBean {
 	private Integer soldFlag;//是否卖过
 	private Integer isEdit;//是否编辑过
     private String bargainNumber;
+    private String reasonName;//下架原因
+    private String shopName;//供应商名
 
-    public Integer getSoldFlag() {
+    public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
+	}
+
+	public String getReasonName() {
+		return reasonName;
+	}
+
+	public void setReasonName(String reasonName) {
+		this.reasonName = reasonName;
+	}
+
+	public Integer getSoldFlag() {
 		return soldFlag;
 	}
 

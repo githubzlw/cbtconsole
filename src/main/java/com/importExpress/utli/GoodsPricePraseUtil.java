@@ -1,12 +1,13 @@
 package com.importExpress.utli;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.StrUtils;
 import com.importExpress.pojo.ImportProductBean;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GoodsPricePraseUtil {
 
@@ -72,6 +73,9 @@ public class GoodsPricePraseUtil {
                 priceStrList = StrUtils.matchStrList("(\\d+\\.\\d{1,2})", priceStrs[0]);
                 String minPrice = "0";
                 String maxPrice = "0";
+                String weight_1688 = StrUtils.matchStr(gd.getWeight(), "(\\d+(\\.\\d+){0,1})");
+                double weight_final = Double.valueOf((weight_1688 == null || "".equals(weight_1688)) ? "0" : weight_1688);
+                double feePrice = FreightUtlity.getFeightWs(weight_final);
                 if (!priceStrList.isEmpty()) {
 //                    String price_1688 = priceStrList.get(0);
 //                    double factoryPrice = Double.valueOf(price_1688.split("-")[0]) / StrUtils.EXCHANGE_RATE;
@@ -88,8 +92,10 @@ public class GoodsPricePraseUtil {
                         }
                     }
 
-                    String changeMinPrice = String.valueOf(BigDecimalUtil.truncateDouble(Double.valueOf(minPrice) / StrUtils.EXCHANGE_RATE, 2));
-                    String changeMaxPrice = String.valueOf(BigDecimalUtil.truncateDouble(Double.valueOf(maxPrice) / StrUtils.EXCHANGE_RATE, 2));
+                    
+                    
+                    String changeMinPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(minPrice)+feePrice) / StrUtils.EXCHANGE_RATE, 2));
+                    String changeMaxPrice = String.valueOf(BigDecimalUtil.truncateDouble((Double.valueOf(maxPrice)+feePrice) / StrUtils.EXCHANGE_RATE, 2));
                     if ("0".equals(minPrice) && "0".equals(maxPrice)) {
                         gd.setShowPrice("--");
                     } else if ("0".equals(minPrice)) {

@@ -55,7 +55,7 @@ public class AliProductServiceImpl implements AliProductService {
     }
 
     @Override
-    public int develop1688Pid(String aliPid,String aliPrice, String pid, int adminId) {
+    public int develop1688Pid(String aliPid,String aliPrice, String pid, int adminId,String keyWord) {
         //更新标识
         aliProductMapper.setDevelop1688PidFlag(aliPid, pid, adminId);
         List<String> pids =  new ArrayList<>(1);
@@ -65,6 +65,8 @@ public class AliProductServiceImpl implements AliProductService {
         Goods1688OfferBean goods1688OfferBean = aliProductMapper.queryGoodsOffersByPid(pid);
         goods1688OfferBean.setAliPid(aliPid);
         goods1688OfferBean.setAliPrice(aliPrice);
+        goods1688OfferBean.setKeyWord(keyWord);
+        
         return singleGoodsDao.insertIntoSingleGoods(goods1688OfferBean);
     }
 

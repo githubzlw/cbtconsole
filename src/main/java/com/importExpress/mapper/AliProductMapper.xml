@@ -47,6 +47,9 @@
         <result column="sold_flag" property="soldFlag"/>
         <result column="is_edit" property="isEdit"/>
         <result column="bargain_number" property="bargainNumber"/>
+        <result column="reason_name" property="reasonName"/>
+        <result column="shop_name" property="shopName"/>
+        
     </resultMap>
 
     <resultMap id="goods1688OfferResultMap" type="com.importExpress.pojo.Goods1688OfferBean">
@@ -136,7 +139,8 @@
         select a.id,a.ali_pid,a.pid,b.price,a.match_local_path as img, b.sellunit as unit,b.catid1 as catid,b.weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.match_remote_path as remotpath,b.enname as name,
         b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
-        b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit
+        b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit,
+        (select unsellablereason_name from unsellablereason_master  where unsellablereason_id=b.unsellableReason and b.valid=0) as reason_name
         from aa_ali_product_lire a
         INNER JOIN custom_benchmark_ready b
         on a.pid = b.pid  
@@ -150,7 +154,8 @@
     <select id="query1688ByPython" resultMap="importProductResultMap">
         select a.id,a.ali_pid,b.goods_pid as pid,b.price,b.pic as img,b.set_weight as weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.goods_name as name,
-        a.deal_state,b.good_url as url,b.bargain_number
+        a.deal_state,b.good_url as url,
+        b.weight,b.shop_name,b.bargain_number as sold
         from aa_ali_product_python a,aa_goods_offers_python b
         where a.pid = b.goods_pid and a.ali_pid = #{aliPid}
         limit 4
