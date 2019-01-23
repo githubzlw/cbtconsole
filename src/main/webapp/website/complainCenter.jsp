@@ -474,7 +474,7 @@ function openDispute(id,userid){
 		data:{userid:userid},
 		success:function(res){
 			var result = eval('(' + res + ')')
-			var html = '该用户没有申诉,无法关联';
+			var html = '该用户没有申诉';
 			if(result.status){
 				html = '<table style=" border:1px solid #0094ff;font-size:20px;"><tr ><td ></td><td style=" border:1px solid #0094ff;">申诉号</td><td style=" border:1px solid #0094ff;">订单号</td><td style=" border:1px solid #0094ff;">申诉原因</td></tr>';
 				var json = result.data;
@@ -528,18 +528,6 @@ function openDispute(id,userid){
 			alert('error');
 		}
 	});
-	var html='<span>请输入申诉事件号(如：PP-D-13916157),'
-	+'<br>可以参考申诉管理界面输入对应的事件号 '
-	+'<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
-		
-	
-	
-	
-	
-	
-
-	 
-	
 }
 
 
