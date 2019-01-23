@@ -1119,13 +1119,13 @@ em {
 							</td>
 							<td style="width: 200px;"><c:if test="${orderd.state!=2 }">
 									<button
-										onclick="pricechange('${orderd.orderid}',${orderd.goodsid},${orderd.goodsprice}+'',${sd.index},${isDropshipOrder})"
+										onclick="pricechange('${orderd.orderid}',${orderd.id},${orderd.goodsprice}+'',${sd.index},${isDropshipOrder})"
 										${order.state==5||order.state==1?'':'disabled=disabled' }>价格更新</button>
 									<button
-										onclick="deliverychange('${orderd.orderid}',${orderd.goodsid},${orderd.delivery_time}+'',${sd.index},${isDropshipOrder})"
+										onclick="deliverychange('${orderd.orderid}',${orderd.id},${orderd.delivery_time}+'',${sd.index},${isDropshipOrder})"
 										${order.state==5||order.state==1?'':'disabled=disabled' }>交期偏长</button>
 									<button
-										onclick="rationchange('${orderd.orderid}',${orderd.goodsid},${orderd.yourorder}+'',${sd.index},${isDropshipOrder})"
+										onclick="rationchange('${orderd.orderid}',${orderd.id},${orderd.yourorder}+'',${sd.index},${isDropshipOrder})"
 										${order.state==5||order.state==1?'':'disabled=disabled' }>订量偏低</button>
 									<br />
 									<!--后台取消商品前台客户确认  start 5.9 屏蔽掉-->
@@ -1142,12 +1142,12 @@ em {
 									<!--直接取消商品不需要客户确认，直接给客户退钱 4.7 end-->
 									<c:if test="${isDropshipOrder!=1}">
 										<button
-											onclick="communicatechange('${orderd.orderid}',${orderd.goodsid},${isDropshipOrder})"
+											onclick="communicatechange('${orderd.orderid}',${orderd.id},${isDropshipOrder})"
 											${order.state==5||order.state==1?'':'disabled=disabled' }>需沟通</button>
 									</c:if>
 									<c:if test="${isDropshipOrder==1}">
 										<button
-											onclick="communicatechange('${orderd.orderid}',${orderd.goodsid},${isDropshipOrder})"
+											onclick="communicatechange('${orderd.orderid}',${orderd.id},${isDropshipOrder})"
 											${order.state==5||order.state==1?'':'disabled=disabled' }>需沟通</button>
 									</c:if>
 								<c:if test="${orderd.shopFlag==1}">

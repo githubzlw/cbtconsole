@@ -36,47 +36,52 @@ public class FreightFeeController {
 	@RequestMapping(value = "/getOrderFreight", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String getFreightFee(HttpServletRequest request, HttpServletResponse response) {
-		String weight = request.getParameter("weight");          //重量
-		String volumn = request.getParameter("volume");           //体积
-		String countId = request.getParameter("countryid");         //国家
-		String id=request.getParameter("sp_id");
-		if ("43".equals(countId)) {
-			countId = "36";
-		}
-		String shippingmethod = request.getParameter("transport"); //运输方式
-		String subShippingmethod = request.getParameter("subShippingmethod"); //子运输方式
-		subShippingmethod=StringUtil.isBlank(subShippingmethod)?"":subShippingmethod;
-		String volumes = request.getParameter("volumes");//体积  20*20*50
-		if ("SF".equals(shippingmethod)) {
-			shippingmethod = "JCEX";
-		}
-		//原飞航=
-		double weights_ = Double.parseDouble(weight == null || "".equals(weight) ? "0.00" : weight);
-		double volume_ = volumn == null ? 0 : Double.parseDouble(volumn == null || "undefined".equals(volumn) ? "0.00" : volumn);
-		Map freightFeeMap = freightFeeSerive.getFreightFee(weights_, volume_, countId, shippingmethod, subShippingmethod, volumes);
-		double freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
-		if (freightFee > 0) {
-			//获取订单实时汇率
-			double rate=freightFeeSerive.getOrderRate(id);
-			double fweight = weights_ > volume_ ? weights_ : volume_;
-			if (fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) >= 0.5) {
-				fweight = Double.valueOf(String.valueOf(fweight).split("\\.")[0]) + 1;
-			} else if (fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) > 0 && fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) < 0.5) {
-				fweight = Double.valueOf(String.valueOf(fweight).split("\\.")[0]) + 0.5;
+		double freightFee=0.00;
+		try{
+			String weight = request.getParameter("weight");          //重量
+			String volumn = request.getParameter("volume");           //体积
+			String countId = request.getParameter("countryid");         //国家
+			String id=request.getParameter("sp_id");
+			if ("43".equals(countId)) {
+				countId = "36";
 			}
-			if (fweight > 150) {
-				freightFee = freightFee - fweight * 5;
+			String shippingmethod = request.getParameter("transport"); //运输方式
+			String subShippingmethod = request.getParameter("subShippingmethod"); //子运输方式
+			subShippingmethod=StringUtil.isBlank(subShippingmethod)?"":subShippingmethod;
+			String volumes = request.getParameter("volumes");//体积  20*20*50
+			if ("SF".equals(shippingmethod)) {
+				shippingmethod = "JCEX";
 			}
-			freightFee = freightFee / rate;
-			DecimalFormat df = new DecimalFormat("######0.00");
-			freightFee = Double.valueOf(df.format(freightFee));
-		}else{
+			//原飞航=
+			double weights_ = Double.parseDouble(weight == null || "".equals(weight) ? "0.00" : weight);
+			double volume_ = volumn == null ? 0 : Double.parseDouble(volumn == null || "undefined".equals(volumn) ? "0.00" : volumn);
+			Map freightFeeMap = freightFeeSerive.getFreightFee(weights_, volume_, countId, shippingmethod, subShippingmethod, volumes);
+			freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
+			if (freightFee > 0) {
+				//获取订单实时汇率
+				double rate=freightFeeSerive.getOrderRate(id);
+				double fweight = weights_ > volume_ ? weights_ : volume_;
+				if (fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) >= 0.5) {
+					fweight = Double.valueOf(String.valueOf(fweight).split("\\.")[0]) + 1;
+				} else if (fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) > 0 && fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) < 0.5) {
+					fweight = Double.valueOf(String.valueOf(fweight).split("\\.")[0]) + 0.5;
+				}
+				if (fweight > 150) {
+					freightFee = freightFee - fweight * 5;
+				}
+				freightFee = freightFee / rate;
+				DecimalFormat df = new DecimalFormat("######0.00");
+				freightFee = Double.valueOf(df.format(freightFee));
+			}else{
+				freightFee=0.00;
+			}
+			if(shippingmethod.toLowerCase().equals("epacket") || shippingmethod.toLowerCase().equals("emsinten")){
+				shippingmethod="emsinten";
+			}
+			freightFeeSerive.updateFreightByexpressno(freightFee, "",id,subShippingmethod,shippingmethod);
+		}catch (Exception e){
 			freightFee=0.00;
 		}
-		if(shippingmethod.toLowerCase().equals("epacket") || shippingmethod.toLowerCase().equals("emsinten")){
-			shippingmethod="emsinten";
-		}
-		freightFeeSerive.updateFreightByexpressno(freightFee, "",id,subShippingmethod,shippingmethod);
 		return df.format(freightFee);
 	}
 
