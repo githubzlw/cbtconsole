@@ -308,8 +308,15 @@ public class AliProductMacthController {
             }
         }
 
+        
+        String keyWord = request.getParameter("keyword");
+        if (StringUtils.isBlank(keyWord)) {
+            json.setOk(false);
+            json.setMessage("获取keyword失败");
+            return json;
+        }
         try {
-            aliProductService.develop1688Pid(aliPid,aliPrice, pid,user.getId());
+            aliProductService.develop1688Pid(aliPid,aliPrice, pid,user.getId(),keyWord);
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
