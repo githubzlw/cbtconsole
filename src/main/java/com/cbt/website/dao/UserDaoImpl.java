@@ -1,5 +1,16 @@
 package com.cbt.website.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.LoggerFactory;
+
 import com.cbt.jdbc.DBHelper;
 import com.cbt.onlinesql.ctr.SaveSyncTable;
 import com.cbt.util.GetConfigureInfo;
@@ -10,18 +21,9 @@ import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.GradeDiscount;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.stripe.model.Event;
-import com.stripe.net.APIResource;
-import net.sf.json.JSONObject;
-import org.slf4j.LoggerFactory;
+import com.stripe.net.ApiResource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.sf.json.JSONObject;
 
 public class UserDaoImpl implements UserDao {
 
@@ -619,7 +621,7 @@ public class UserDaoImpl implements UserDao {
                 String info =rs.getString("ipninfo");
                 if(info.startsWith("<com.stripe.model.Event")){
                     //stripe format
-                    Event event = APIResource.GSON.fromJson(info.substring(info.indexOf("{")), Event.class);
+                    Event event = ApiResource.GSON.fromJson(info.substring(info.indexOf("{")), Event.class);
                     String value = event.toJson();
                     map.put("stripe", value);
                     //stripeJson.data.object.source.country
