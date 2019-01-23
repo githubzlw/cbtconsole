@@ -167,14 +167,15 @@
          }); 
     }
     
-    function develop1688Pid(aliPid, pid,aliPrice,obj) {
+    function develop1688Pid(aliPid, pid,aliPrice,obj,keyword) {
         $.ajax({
             type: "POST",
             url: "/cbtconsole/aliProductCtr/develop1688Pid",
             data: {
                 aliPid: aliPid,
                 pid: pid,
-                aliPrice: aliPrice
+                aliPrice: aliPrice,
+                keyword:keyword
             },
             success: function (data) {
                 if (data.ok) {
@@ -307,7 +308,8 @@
                                     <b style="color: green">在线</b>
                                 </c:if>
                                 <c:if test="${lireGd.valid == 0}">
-                                    <b style="color: green">下架</b>
+                                    <b style="color: red">下架</b>
+                                    <br><b style="color: red">原因：${lireGd.reasonName}</b>
                                 </c:if>
                                 <br><span>是否卖过:</span>
                                 <c:if test="${lireGd.soldFlag == 1}">
@@ -384,13 +386,14 @@
                                 <c:if test="${pyGd.sold > 0}">
                                     <br><span>销量:${pyGd.sold}</span>
                                 </c:if>
+                                <br><span>供应商名:${pyGd.shopName}</span>
                                 <br>
                                 <c:if test="${pyGd.dealState > 0}">
                                     <span><b class="b_sty">爆款对标</b></span>
                                 </c:if>
                                 <c:if test="${aliGd.dealState == 0}">
                                     <span><input type="button" class="s_btn p1688_${aliGd.aliPid}" value="爆款对标"
-                                                 onclick="develop1688Pid('${aliGd.aliPid}','${pyGd.pid}','${aliGd.aliPrice}',this)"/></span>
+                                                 onclick="develop1688Pid('${aliGd.aliPid}','${pyGd.pid}','${aliGd.aliPrice}',this,'${aliGd.keyword}')"/></span>
                                 </c:if>
                             </div>
                         </td>

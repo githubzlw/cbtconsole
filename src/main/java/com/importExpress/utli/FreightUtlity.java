@@ -1,22 +1,29 @@
 package com.importExpress.utli;
 
-import com.cbt.util.GetConfigureInfo;
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import okhttp3.*;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.StrUtils;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
 
 /**
  * *****************************************************************************************
@@ -274,4 +281,12 @@ public class FreightUtlity {
         }
         return Pattern.compile(reg).matcher(str).matches();
     }
+    
+	//运费 =   克重 * 0.08元/克 ->0.08
+	public static  double getFeightWs(double weight){
+		
+		double newFeight = 0.08 * weight * 1000;
+			
+		return new BigDecimal(newFeight).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
 }

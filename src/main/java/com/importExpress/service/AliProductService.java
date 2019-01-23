@@ -69,6 +69,6 @@ public interface AliProductService {
      * @param adminId
      * @return
      */
-    int develop1688Pid(String aliPid,String aliPrice, String pid,int adminId);
+    int develop1688Pid(String aliPid,String aliPrice, String pid,int adminId,String keyword);
     
 }
