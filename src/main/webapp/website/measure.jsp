@@ -169,7 +169,7 @@
 <div id="top_toolbar" style="padding: 5px; height: auto">
 	<div>
 		<form id="query_form" action="#" onsubmit="return false;" style="margin-left:100px;">
-			<input class="easyui-textbox" name="packageNo"  onkeypress="if (event.keyCode == 13) doQuery(1)" id="packageNo"  style="width:20%;"  data-options="label:'出库号:'">
+			出库号:<input  name="packageNo"  onkeypress="this.value=this.value.trim();if (event.keyCode == 13) doQuery(1)" id="packageNo"/>
 			<input class="but_color" type="button" value="扫描" onclick="doQuery(1)">
 			<input class="but_color" type="button" value="保存所有" onclick="saveAll()">
 		</form>
