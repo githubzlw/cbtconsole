@@ -172,7 +172,7 @@
             if (val == 0) {
                 return '硬下架';
             } else if (val == 1) {
-                return '上架';
+                return '下架后上架';
             } else if (val == 2) {
                 return '软下架';
             } else {
@@ -288,11 +288,11 @@
             <input id="query_endTime" class="Wdate" style="width: 110px; height: 24px;" type="text" value=""
                    onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
         </span>
-        <span> 状态: <select id="query_isOffShelf" style="font-size: 14px; height: 24px; width: 120px;">
+        <span> 在线状态: <select id="query_isOffShelf" style="font-size: 14px; height: 24px; width: 120px;">
                         <option value="-1" selected="selected">全部</option>
                         <option value="0">硬下架</option>
-                        <option value="1">上架</option>
-                        <option value="2">软下架</option>
+                        <option value="1">下架后上架</option>
+                        <option value="2">软下架(原1688下架等但同款>0)</option>
                     </select>
         </span>
         <span> 下架原因: <select id="query_reason" style="font-size: 14px; height: 24px; width: 160px;">
@@ -301,7 +301,7 @@
                                 <option value="2">2-不满足库存条件</option>
                                 <option value="3">3-销量无变化(低库存)</option>
                                 <option value="4">4-页面404</option>
-                                <option value="5">5-重复验证合格</option>
+                                <option value="5">5-重复验证合格(原本1688异常下架后重复验证合格上线的商品)</option>
                                 <option value="6">6-IP问题或运营直接下架</option>
                                 <option value="7">7-店铺整体禁掉</option>
                                 <option value="8">8-采样不合格</option>
@@ -321,13 +321,13 @@
                                 <option value="22">22-原因老数据没有展示详情图片</option>
                         </select>
         </span>
-        <span> 更新标识: <select id="query_updateFlag" style="font-size: 14px; height: 24px; width: 100px;">
+        <%--<span> 更新标识: <select id="query_updateFlag" style="font-size: 14px; height: 24px; width: 100px;">
                                 <option value="-1" selected="selected">全部</option>
                                 <option value="0">未更新</option>
                                 <option value="1">更新失败</option>
                                 <option value="2">更新成功</option>
                                 <option value="3">重新验证过</option>
-                        </select>
+                        </select>--%>
         </span>
         <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
                                 <option value="0" selected="selected">全部</option>
@@ -335,9 +335,12 @@
                         </select>
             <span> 有销量等筛选(<a href="#" id="refreshData">刷新临时数据</a>): <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
-                                <option value="3">全部(有销量+购物车中商品)</option>
-                                <option value="1">有销量</option>
+                                <option value="3">我们公司卖过的 或者 购物车中商品</option>
+                                <option value="1">我们公司卖过的</option>
                                 <option value="2">购物车中商品</option>
+                                <option value="4">人为编辑过</option>
+                                <option value="5">有库存的</option>
+                                <option value="6">有人为对标的</option>
                         </select>
             <span> 有跨境图片包: <select id="query_sold_flag2" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
@@ -356,7 +359,7 @@
         <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品图片</th>
         <th data-options="field:'catidName',align:'center',width:'150px'">所属类别</th>
         <th data-options="field:'isOffShelf',align:'center',width:'150px',formatter:formatIsOffShelf">上下架标识</th>
-        <th data-options="field:'updateFlag',align:'center',width:'150px',formatter:formatUpdateFlag">更新标识</th>
+        <%--<th data-options="field:'updateFlag',align:'center',width:'150px',formatter:formatUpdateFlag">更新标识</th>--%>
         <th data-options="field:'competitiveFlag',align:'center',width:'150px',formatter:formatCompetitiveFlag">精品标识</th>
         <th data-options="field:'neverOffFlag',align:'center',width:'150px',formatter:formatneverOffFlag">永不下架</th>
         <th data-options="field:'reason',align:'center',width:'150px',formatter:formatReason">下架原因</th>
