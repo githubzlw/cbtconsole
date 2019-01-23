@@ -27,7 +27,7 @@ public class InputData {
     private String ali_sold;
     private String ali_pid;
     private String ali_price;
-    private String ali_weight;
+	private String ali_weight;
     private String ali_freight;
     private String ali_sellunit;
     private String ali_morder;
@@ -90,7 +90,7 @@ public class InputData {
     private String score;
     private String is_edited;
     private Character crud;
-    private String rwKeyword;
+    private String rw_keyword;
     private String size_info_en;
 
     public String getSize_info_en() {
@@ -101,12 +101,12 @@ public class InputData {
         this.size_info_en = size_info_en;
     }
 
-    public String getRwKeyword() {
-		return rwKeyword;
+    public String getRw_keyword() {
+		return rw_keyword;
 	}
 
-	public void setRwKeyword(String rwKeyword) {
-		this.rwKeyword = rwKeyword;
+	public void setRw_keyword(String rw_keyword) {
+		this.rw_keyword = rw_keyword;
 	}
 
 	public String getId() {
