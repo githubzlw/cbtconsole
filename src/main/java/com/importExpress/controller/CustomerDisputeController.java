@@ -254,9 +254,8 @@ public class CustomerDisputeController {
 				resonFlag = "subscription canceled".equals(dispute.getReason().toLowerCase())? 5: resonFlag;
 				resonFlag = "duplicate".equals(dispute.getReason().toLowerCase())? 6: resonFlag;
 				resonFlag = "credit not processed".equals(dispute.getReason().toLowerCase())? 7: resonFlag;
-				
-				
-				
+				int submitFor = 0;
+				mv.addObject("submitFor", submitFor);
 			}	
 			mv.addObject("resonFlag", resonFlag);
 			mv.addObject("apiType", apiType);
@@ -629,7 +628,8 @@ public class CustomerDisputeController {
 			return map;
 		}
 		String uploadPath = SysParamUtil.getParam("uploadPath");
-		String saveFileUrl = uploadPath.endsWith("/")?uploadPath+"paypal":uploadPath+"/paypal";
+		String saveFileUrl = uploadPath.endsWith("/")?uploadPath+"dispute":uploadPath+"/dispute";
+		
 		saveFileUrl = saveFileUrl + "/" + System.currentTimeMillis() + "/";
 		
 		File headPath = new File(saveFileUrl);//获取文件夹路径
@@ -915,25 +915,33 @@ public class CustomerDisputeController {
     		evidence.put("shipping_number", request.getParameter("shipping_number"));
     		evidence.put("shipping_carrier", request.getParameter("shipping_carrier"));
     		evidence.put("shipping_address", request.getParameter("shipping_address"));
-    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    		evidence.put("shipping_documentation",uploadFile(request.getParameter("shipping_documentation")));
     		if(reson == 4) {
     			evidence.put("access_activity_log", request.getParameter("access_activity_log"));
     		}
     	}else if(reson == 5) {
-    		evidence.put("cancellation_policy", request.getParameter("cancellation_policy"));
     		evidence.put("cancellation_policy_disclosure", request.getParameter("cancellation_policy_disclosure"));
     		evidence.put("cancellation_rebuttal", request.getParameter("cancellation_rebuttal"));
-    		evidence.put("customer_communication", request.getParameter("customer_communication"));
+    		evidence.put("cancellation_policy",uploadFile(request.getParameter("cancellation_policy")));
+    		evidence.put("customer_communication",uploadFile(request.getParameter("customer_communication")));
     	}else if(reson == 6) {
     		evidence.put("duplicate_charge_id", request.getParameter("duplicate_charge_id"));
     		evidence.put("duplicate_charge_explanation", request.getParameter("duplicate_charge_explanation"));
-    		evidence.put("duplicate_charge_documentation", request.getParameter("duplicate_charge_documentation"));
-    		evidence.put("shipping_documentation", request.getParameter("shipping_documentation"));
+    		evidence.put("duplicate_charge_documentation", uploadFile(request.getParameter("duplicate_charge_documentation")));
+    		
+    		String  submitFor = request.getParameter("submit_for");
+    		if(StringUtils.isBlank(submitFor)) {
+    			evidence.put("shipping_documentation", uploadFile(request.getParameter("shipping_documentation")));
+    		}else if("service".equals(submitFor)) {
+    			evidence.put("service_documentation", uploadFile(request.getParameter("service_documentation")));
+    		}
+    		
     	}else if(reson == 7) {
     		evidence.put("refund_policy", request.getParameter("refund_policy"));
     		evidence.put("refund_policy_disclosure", request.getParameter("refund_policy_disclosure"));
     		evidence.put("refund_refusal_explanation", request.getParameter("refund_refusal_explanation"));
     	}
+    	
     	try {
     		stripeService.update(disputeid, evidence );
     		attr.addAttribute("sendResult", "Successed");
@@ -941,8 +949,24 @@ public class CustomerDisputeController {
 			attr.addAttribute("sendResult", e.getMessage());
 		}
     	
-    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread="+isRead;
+    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread=true";
     }
     
-    
+    /**
+     * @param file
+     * @return
+     */
+    public String uploadFile(String file) {
+    	if(StringUtils.isNotBlank(file)) {
+    		Map<String, Object> fileParam = new HashMap<String, Object>();
+    		fileParam.put("purpose", "dispute_evidence");
+    		fileParam.put("file", new File(file));
+    		com.stripe.model.File createFile = stripeService.createFile(fileParam);
+    		if(createFile == null) {
+    			return null;
+    		}
+    		return createFile.getFilename();
+    	}
+    	return null;
+    }
 }

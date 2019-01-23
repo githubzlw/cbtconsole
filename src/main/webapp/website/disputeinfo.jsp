@@ -169,6 +169,70 @@ table { line-height: 25px; text-align: center; border-collapse: collapse;}
             </dialog>
         </div>
     </script>
+<script type="text/template" id="qq-template-manual-trigger2">
+        <div class="qq-uploader-selector qq-uploader" qq-drop-area-text="Please upload a file here" style="min-height: 45px;">
+            <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+            </div>
+            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+                <span class="qq-upload-drop-area-text-selector"></span>
+            </div>
+            <div class="buttons">
+                <div class="qq-upload-button-selector qq-upload-button">
+                    <div>choose file</div>
+                </div>
+                <button type="button" id="trigger-upload2" class="btn btn-primary" style="display:none">
+                    <i class="icon-upload icon-white"></i>upload
+                </button>
+            </div>
+			<span id="upmessage" style="color:red"></span>
+            <span class="qq-drop-processing-selector qq-drop-processing">
+                <span>Processing dropped files...</span>
+                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+            </span>
+            <ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
+                <li>
+                    <div class="qq-progress-bar-container-selector">
+                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
+                    </div>
+                    <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+                    <img class="qq-thumbnail-selector" qq-max-size="100" qq-server-scale>
+                    <span class="qq-upload-file-selector qq-upload-file"></span>
+                    <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
+                    <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
+                    <span class="qq-upload-size-selector qq-upload-size"></span>
+                    <button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">cancel</button>
+                    <button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">reupload</button>
+                    <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">remove</button>
+                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+                </li>
+            </ul>
+
+            <dialog class="qq-alert-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">close</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-confirm-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">No</button>
+                    <button type="button" class="qq-ok-button-selector">Yes</button>
+                </div>
+            </dialog>
+
+            <dialog class="qq-prompt-dialog-selector">
+                <div class="qq-dialog-message-selector"></div>
+                <input type="text">
+                <div class="qq-dialog-buttons">
+                    <button type="button" class="qq-cancel-button-selector">Cancel</button>
+                    <button type="button" class="qq-ok-button-selector">Ok</button>
+                </div>
+            </dialog>
+        </div>
+    </script>
 
 </head>
 
@@ -178,7 +242,7 @@ table { line-height: 25px; text-align: center; border-collapse: collapse;}
 ${message}
 </div>
 </c:if>
-
+<input type="hidden" id="fileType" value="${apiType}">
 <c:if test="${success == 1 && apiType!=0}">
 <div style="width: 90%;margin-left: 2%" align="center" >
 <div class="title_c">Detail</div>
@@ -312,93 +376,101 @@ ${message}
 <input name="isRead" value="${isread }" type="hidden">
 <table>
 <tr>
-<td class="td_title td_back">Product Description</td>
-<td class="td_value"><input name="product_description" value="" class="td_value2"></td>
-<c:if test="${ resonFlag==4}">
-<td class="td_title td_back">Access Activity Log</td>
-<td class="td_value"><input name="access_activity_log" value="" class="td_value2"></td>
-</c:if>
-<c:if test="${ resonFlag!=4}">
-<td class="td_title"></td>
-<td class="td_value"></td>
-</c:if>
+	<td class="td_title td_back">Product Description</td>
+	<td class="td_value"><input name="product_description" value="" class="td_value2"></td>
+	<c:if test="${ resonFlag==4}">
+	<td class="td_title td_back">Access Activity Log</td>
+	<td class="td_value"><input name="access_activity_log" value="" class="td_value2"></td>
+	</c:if>
+	<c:if test="${ resonFlag!=4 && resonFlag>0&&resonFlag<5}">
+	<td class="td_title td_back">Shipping Documentation:</td>
+	<td class="td_value"> 
+	<div id="fine-uploader-manual-trigger"></div>
+	 <button type="button" id="subBtn" class="btn btn-success" onclick="uploadclick()" >Attach File</button>
+		      <input type="hidden" name="shipping_documentation" value="" id="filename"></td>
+	</c:if>
+	<c:if test="${ resonFlag==7}">
+	<td class="td_title td_back">Refund Refusal Explanation:</td>
+	<td class="td_value"><input name="refund_refusal_explanation" value="" class="td_value2"></td>
+	</c:if>
+</tr>
 
-</tr>
-<c:if test="${resonFlag> 0 && resonFlag<5}">
-<tr>
-<td class="td_title td_back">Shipping Date:</td>
-<td class="td_value"><input name="shipping_date" value="" class="td_value2"></td>
-<td class="td_title td_back">Shipping Number:</td>
-<td class="td_value"><input name="shipping_number" value="" class="td_value2"></td>
-</tr>
-<tr>
-<td class="td_title td_back">Shipping Carrier:</td>
-<td class="td_value"><input name="shipping_carrier" value="" class="td_value2"></td>
-<td class="td_title td_back">Shipping Address:</td>
-<td class="td_value"><input name="shipping_address" value="" class="td_value2"></td>
-</tr>
-<tr>
-<td class="td_title td_back">Shipping Documentation:</td>
-<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
-<td class="td_title"></td>
-<td class="td_value"></td>
-</tr>
+
+
+<c:if test="${resonFlag>0&&resonFlag<5}">
+	<tr>
+	<td class="td_title td_back">Shipping Date:</td>
+	<td class="td_value"><input name="shipping_date" value="" class="td_value2"></td>
+	<td class="td_title td_back">Shipping Number:</td>
+	<td class="td_value"><input name="shipping_number" value="" class="td_value2"></td>
+	</tr>
+	<tr>
+	<td class="td_title td_back">Shipping Carrier:</td>
+	<td class="td_value"><input name="shipping_carrier" value="" class="td_value2"></td>
+	<td class="td_title td_back">Shipping Address:</td>
+	<td class="td_value"><input name="shipping_address" value="" class="td_value2"></td>
+	</tr>
 </c:if>
 
 <c:if test="${resonFlag==5}">
-<tr>
-<td class="td_title td_back">Cancellation Policy:</td>
-<td class="td_value"><input name="cancellation_policy" value="" class="td_value2"></td>
-<td class="td_title td_back">Cancellation Policy Disclosure:</td>
-<td class="td_value"><input name="cancellation_policy_disclosure" value="" class="td_value2"></td>
-</tr>
-<tr>
-<td class="td_title td_back">Cancellation Rebuttal:</td>
-<td class="td_value"><input name="cancellation_rebuttal" value="" class="td_value2"></td>
-<td class="td_title td_back">Customer Communication:</td>
-<td class="td_value"><input name="customer_communication" value="" class="td_value2"></td>
-</tr>
+	<tr>
+	<td class="td_title td_back">Cancellation Policy Disclosure:</td>
+	<td class="td_value"><input name="cancellation_policy_disclosure" value="" class="td_value2"></td>
+	<td class="td_title td_back">Cancellation Rebuttal:</td>
+	<td class="td_value"><input name="cancellation_rebuttal" value="" class="td_value2"></td>
+	</tr>
+	<tr>
+	<td class="td_title td_back">Cancellation Policy:</td>
+	<td class="td_value"><div id="fine-uploader-manual-trigger"></div>
+	 <button type="button" id="subBtn" class="btn btn-success" onclick="uploadclick()" >Attach File</button>
+		      <input type="hidden" name="cancellation_policy" value="" id="filename"></td>
+	<td class="td_title td_back">Customer Communication:</td>
+	<td class="td_value"><div id="fine-uploader-manual-trigger2"></div>
+	 <button type="button" id="subBtn2" class="btn btn-success" onclick="uploadclick2()" >Attach File</button>
+		      <input type="hidden" name="customer_communication" value="" id="filename2"></td>
+	</tr>
 </c:if>
+
 <c:if test="${resonFlag==6}">
-<tr>
-<td class="td_title td_back">Duplicate Charge_id:</td>
-<td class="td_value"><input name="duplicate_charge_id" value="" class="td_value2"></td>
-<td class="td_title td_back">Duplicate Charge Explanation:</td>
-<td class="td_value"><input name="duplicate_charge_explanation" value="" class="td_value2"></td>
-</tr>
-<tr>
-<td class="td_title td_back">Duplicate Charge Documentation:</td>
-<td class="td_value"><input name="duplicate_charge_documentation" value="" class="td_value2"></td>
-<c:if test="${resonFlag==0}">
-<td class="td_title td_back">Service Documentation:</td>
-<td class="td_value"><input name="service_documentation" value="" class="td_value2"></td>
+	<tr>
+	<td class="td_title td_back">Duplicate Charge_id:</td>
+	<td class="td_value"><input name="duplicate_charge_id" value="" class="td_value2"></td>
+	<td class="td_title td_back">Duplicate Charge Explanation:</td>
+	<td class="td_value"><input name="duplicate_charge_explanation" value="" class="td_value2"></td>
+	</tr>
+	<tr>
+	<td class="td_title td_back">Duplicate Charge Documentation:</td>
+	<td class="td_value"><div id="fine-uploader-manual-trigger"></div>
+	 <button type="button" id="subBtn" class="btn btn-success" onclick="uploadclick()" >Attach File</button>
+		      <input type="hidden" name="duplicate_charge_documentation" value="" id="filename"></td>
+	<c:if test="${submitFor==1}">
+	<td class="td_title td_back">Service Documentation:</td>
+	<td class="td_value"><div id="fine-uploader-manual-trigger2"></div>
+	 <button type="button" id="subBtn2" class="btn btn-success" onclick="uploadclick2()" >Attach File</button>
+		      <input type="hidden" name="service_documentation" value="" id="filename2">
+		      </td>
+	</c:if>
+	<c:if test="${submitFor!=1}">
+	<td class="td_title td_back">Shipping Documentation:</td>
+	<td class="td_value"><div id="fine-uploader-manual-trigger2"></div>
+	 <button type="button" id="subBtn2" class="btn btn-success" onclick="uploadclick2()" >Attach File</button>
+		      <input type="hidden" name="shipping_documentation" value="" id="filename2">
+		      </td>
+		      </c:if>
+	</tr>
 </c:if>
-<td class="td_title td_back">Shipping Documentation:</td>
-<td class="td_value"><input name="shipping_documentation" value="" class="td_value2"></td>
-</tr>
-</c:if>
+
 <c:if test="${resonFlag==7}">
-<tr>
-<td class="td_title td_back">Refund Policy:</td>
-<td class="td_value"><input name="refund_policy" value="" class="td_value2"></td>
-<td class="td_title td_back">Refund Policy Disclosure:</td>
-<td class="td_value"><input name="refund_policy_disclosure" value="" class="td_value2"></td>
-</tr>
-<tr>
-<td class="td_title td_back">Refund Refusal Explanation:</td>
-<td class="td_value"><input name="refund_refusal_explanation" value="" class="td_value2"></td>
-<td class="td_title"></td>
-<td class="td_value"></td>
-</tr>
+	<tr>
+	<td class="td_title td_back">Refund Policy:</td>
+	<td class="td_value"><input name="refund_policy" value="" class="td_value2"></td>
+	<td class="td_title td_back">Refund Policy Disclosure:</td>
+	<td class="td_value"><input name="refund_policy_disclosure" value="" class="td_value2"></td>
+	</tr>
 </c:if>
-<c:if test="${resonFlag==7}"></c:if>
-
-
 </table>
-
 <input type="submit" value="Submit">
 </form>
-
 </c:if>
 
 
@@ -1449,6 +1521,9 @@ function uploadclick(){
 	 
 	document.getElementById("trigger-upload").click();
 }
+function uploadclick2(){
+	document.getElementById("trigger-upload2").click();
+}
 </script>
 	<script>
 	  var manualUploader = new qq.FineUploader({
@@ -1482,9 +1557,10 @@ function uploadclick(){
              onComplete : function(id, name, responseJSON) {
             	 var str="";
             	 if(responseJSON.success){
-           			var saveurl = responseJSON.saveLoaction;
-            		var jsonArray= responseJSON.names;
-           			$("#fileLocation").val(saveurl+jsonArray);
+	           			var saveurl = responseJSON.saveLoaction;
+	            		var jsonArray= responseJSON.names;
+	           			$("#fileLocation").val(saveurl+jsonArray);
+            			 $("#filename").val(responseJSON.names);
              	 }
 				},
 				onAllComplete : function (succeeded, failed) {
@@ -1505,47 +1581,57 @@ function uploadclick(){
     	 manualUploader.uploadStoredFiles();
      });
      
-     function fnsubmint(){
-    		
-    		var userid = $("#userid").val();
-    		var upfile = $("#upfile").val();
-    		 $.ajax({
-    			type:'POST',
-    			dataType:'text',
-    			url:'/cbtconsole/autoorder/add',
-    			data:{userid:userid,upfile:upfile},
-    			success:function(res){
-    				$(".qq-upload-list li").remove();
-    				if(res!=''){
-    					if(res=='0'){
-    						alert('请重新登录');
-    					}
-    					
-    					if(res=='-4'){
-    						alert('失败--state=-4');
-    					}
-    					if(res=='-3'){
-    						alert('失败--state=-3');
-    					}
-    					if(res=='-5'){
-    						alert('失败--用户无可用地址');
-    					}
-    					
-    					if(res.length>5){
-    						$("#redult").val("订单生成成功,订单号:"+res);
-    						$("#orderno").val(res);
-    						$("#payment_amount").val(price);
-    						$("#user_id").val(userid);
-    					}	
-    				}else{
-    					alert('添加失败，请重新添加');
-    				}
-    			},
-    			error:function(XMLResponse){
-    				alert('error');
-    			}
-    		}); 
-    		 $("#obt").attr("disabled", false); 
-    	}
+	  var manualUploader2 = new qq.FineUploader({
+         element: document.getElementById('fine-uploader-manual-trigger2'),
+         template: 'qq-template-manual-trigger2',
+         request: {
+             endpoint: '/cbtconsole/customer/dispute/uploads'
+         },
+         editFilename: {//编辑名字
+             enable: true
+         },
+         thumbnails: {
+             placeholders: {
+                 waitingPath: '/cbtconsole/img/waiting-generic.png',
+                 notAvailablePath: '/cbtconsole/img/not_available-generic.png'
+             }
+         },
+         validation: {
+             allowedExtensions: ['gif', 'jpg', 'png','pdf'],
+             sizeLimit:10000000, //5*1000*1000 bytes
+             accept:"image/jpg, image/gif , image/png, file/pdf"
+         },
+         callbacks: {
+         	/* 开始上传  */
+             onUpload: function (id, name) {
+             },
+              /* 选择文件后  */
+             onSubmitted: function (id, name) {
+             },
+             /* 上传完成 */ 
+             onComplete : function(id, name, responseJSON) {
+            	 var str="";
+            	 if(responseJSON.success){
+            			 $("#filename2").val(responseJSON.names);
+             	 }
+				},
+				onAllComplete : function (succeeded, failed) {
+					if(failed.length==0){
+						$("#upmessage2").show(3000).delay(2000).hide(2000);
+	        			$("#upmessage2").html("Upload successfully.");
+					}else if(succeeded.length==0){
+						$("#upmessage2").show(3000).delay(2000).hide(2000);
+	        			$("#upmessage2").html("All failed.");
+					}
+				}
+         },
+         autoUpload: false,
+         debug: true
+     });
+
+     qq(document.getElementById("trigger-upload2")).attach("click", function() {
+    	 manualUploader2.uploadStoredFiles();
+     });
+     
     </script>
 </html>

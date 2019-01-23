@@ -507,7 +507,7 @@
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
-            <version>5.38.0</version>
+            <version>7.17.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
