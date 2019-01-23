@@ -89,4 +89,9 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	public Map<String, Object> list(List<String> orderIdList);
+	
+	/**用户id获取所有申诉
+	 * @return
+	 */
+	public List<CustomerDisputeBean> getDisputeByUserid(String userid);
 }

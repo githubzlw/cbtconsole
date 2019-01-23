@@ -386,5 +386,19 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 		
     	return list;
 	}
+	@Override
+	public List<CustomerDisputeBean> getDisputeByUserid(String userid) {
+		if(StringUtils.isNotBlank(userid) && !"0".equals(userid)) {
+			List<CustomerDisputeVO> disputesFromMongo = getDisputesFromMongo();
+			
+			disputesFromMongo.stream().filter(d -> d.getUserid().equals(userid)).collect(Collectors.toList());
+			
+			
+			
+			
+			
+		}
+		return null;
+	}
 }
 
