@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.pojo.CustomerDisputeVO;
 
 public interface CustomerDisputeService {
 	
@@ -93,5 +94,5 @@ public interface CustomerDisputeService {
 	/**用户id获取所有申诉
 	 * @return
 	 */
-	public List<CustomerDisputeBean> getDisputeByUserid(String userid);
+	public List<CustomerDisputeVO> getDisputeByUserid(String userid);
 }

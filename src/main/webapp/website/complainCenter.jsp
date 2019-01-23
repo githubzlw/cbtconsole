@@ -466,6 +466,68 @@ function showmore(){
 	$("#showmorea").hide();
 }
 function openDispute(id,userid){
+	
+	$.ajax({
+		type:'POST',
+		dataType:'text',
+		url:'/cbtconsole/complain/disputes',
+		data:{userid:userid},
+		success:function(res){
+			var result = eval('(' + res + ')')
+			var html = '该用户没有申诉,无法关联';
+			if(result.status){
+				html = '<table style=" border:1px solid #0094ff;font-size:20px;"><tr ><td ></td><td style=" border:1px solid #0094ff;">申诉号</td><td style=" border:1px solid #0094ff;">订单号</td><td style=" border:1px solid #0094ff;">申诉原因</td></tr>';
+				var json = result.data;
+				for(var i=0;i<json.length;i++){
+					var dispute = json[i];
+					html +='<tr><td><input type="radio" class="c_radio c_'+dispute.disputeID+'" value="'+
+					dispute.disputeID+'"></td><td class="dispute_ids" style=" border:1px solid #0094ff;">'+dispute.disputeID
+					+'</td><td class="dispute_txt" style=" border:1px solid #0094ff;">'+dispute.orderNo
+					+'</td><td class="dispute_orderNo" style=" border:1px solid #0094ff;">'+dispute.reason+'</td></tr>';
+				}
+				html +='</table>';
+			}
+			$.dialog({
+				title : '关联申诉',
+				content : html,
+				max : false,
+				min : false,
+				lock : true,
+				drag : false,
+				fixed : false,
+				ok : function() {
+					var disputeid = "";
+					$(".c_radio").each(function(){
+						if($(this).is(":checked")){
+							disputeid += $(this).val()+",";
+						}
+					})
+					
+					if(disputeid !=''){
+					  $.ajax({
+							type:'POST',
+							dataType:'text',
+							url:'/cbtconsole/complain/dispute/update',
+							data:{id:id,disputeid:disputeid},
+							success:function(res){
+								location.reload(); 
+							},
+							error:function(XMLResponse){
+								alert('error');
+							}
+						}); 
+					}
+					
+				},
+				cancel : function() {
+				}
+			});
+
+		},
+		error:function(XMLResponse){
+			alert('error');
+		}
+	});
 	var html='<span>请输入申诉事件号(如：PP-D-13916157),'
 	+'<br>可以参考申诉管理界面输入对应的事件号 '
 	+'<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
@@ -475,35 +537,7 @@ function openDispute(id,userid){
 	
 	
 	
-	$.dialog({
-		title : '关联申诉',
-		content : html,
-		max : false,
-		min : false,
-		lock : true,
-		drag : false,
-		fixed : false,
-		ok : function() {
-			var disputeid = $(".dispute_id").val();
-			if(disputeid !=''){
-			  $.ajax({
-					type:'POST',
-					dataType:'text',
-					url:'/cbtconsole/complain/dispute/update',
-					data:{id:id,disputeid:disputeid},
-					success:function(res){
-						location.reload(); 
-					},
-					error:function(XMLResponse){
-						alert('error');
-					}
-				}); 
-			}
-			
-		},
-		cancel : function() {
-		}
-	});
+
 	 
 	
 }

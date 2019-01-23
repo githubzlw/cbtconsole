@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -387,16 +388,22 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
     	return list;
 	}
 	@Override
-	public List<CustomerDisputeBean> getDisputeByUserid(String userid) {
+	public List<CustomerDisputeVO> getDisputeByUserid(String userid) {
 		if(StringUtils.isNotBlank(userid) && !"0".equals(userid)) {
 			List<CustomerDisputeVO> disputesFromMongo = getDisputesFromMongo();
-			
-			disputesFromMongo.stream().filter(d -> d.getUserid().equals(userid)).collect(Collectors.toList());
-			
-			
-			
-			
-			
+			List<String> disputeList = new ArrayList<String>();
+			Stream<CustomerDisputeVO> filter = disputesFromMongo.stream().filter(d -> {
+				if(disputeList.contains(d.getDisputeID())) {
+	    			return false;
+	    		}
+				disputeList.add(d.getDisputeID());
+				return userid.equals(d.getUserid());
+				
+			});
+			if(filter == null) {
+				return null;
+			}
+			return filter.collect(Collectors.toList());
 		}
 		return null;
 	}

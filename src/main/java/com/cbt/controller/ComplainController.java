@@ -22,7 +22,6 @@ import com.cbt.bean.ComplainFile;
 import com.cbt.bean.ComplainVO;
 import com.cbt.method.service.OrderDetailsService;
 import com.cbt.method.service.OrderDetailsServiceImpl;
-import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.page.Page;
 import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.service.AdditionalBalanceService;
@@ -33,6 +32,7 @@ import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomComplainService;
 import com.importExpress.service.CustomerDisputeService;
 
@@ -290,9 +290,9 @@ public class ComplainController {
 		
 		String userid = request.getParameter("userid");
 		if(StringUtils.isNotBlank(userid) && !StringUtils.equals(userid, "0")) {
-			List<ComplainVO> complainByUserId = complainService.getComplainByUserId(userid);
-			map.put("data", complainByUserId);
-			map.put("status", complainByUserId != null && !complainByUserId.isEmpty());
+			List<CustomerDisputeVO> disputeByUserid = customerDisputeService.getDisputeByUserid(userid);
+			map.put("data", disputeByUserid);
+			map.put("status", disputeByUserid != null && !disputeByUserid.isEmpty());
 		}
 		return map;
 	}
