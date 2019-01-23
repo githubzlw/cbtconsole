@@ -58,6 +58,11 @@ public class CustomGoodsQuery {
 	private int isComplain = -1;//是否被投诉 0-为投诉  1-投诉
 	private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
 
+	private double finalWeightBegin;
+	private double finalWeightEnd;
+	private double minPrice;
+	private double maxPrice;
+
 	public int getFromFlag() {
 		return fromFlag;
 	}
@@ -73,8 +78,6 @@ public class CustomGoodsQuery {
 	public void setUnsellableReason(String unsellableReason) {
 		this.unsellableReason = unsellableReason;
 	}
-
-
 
 	public int getIsComplain() {
 		return isComplain;
@@ -330,5 +333,37 @@ public class CustomGoodsQuery {
 
 	public void setIsSort(int isSort) {
 		this.isSort = isSort;
+	}
+
+	public double getFinalWeightBegin() {
+		return finalWeightBegin;
+	}
+
+	public void setFinalWeightBegin(double finalWeightBegin) {
+		this.finalWeightBegin = finalWeightBegin;
+	}
+
+	public double getFinalWeightEnd() {
+		return finalWeightEnd;
+	}
+
+	public void setFinalWeightEnd(double finalWeightEnd) {
+		this.finalWeightEnd = finalWeightEnd;
+	}
+
+	public double getMinPrice() {
+		return minPrice;
+	}
+
+	public void setMinPrice(double minPrice) {
+		this.minPrice = minPrice;
+	}
+
+	public double getMaxPrice() {
+		return maxPrice;
+	}
+
+	public void setMaxPrice(double maxPrice) {
+		this.maxPrice = maxPrice;
 	}
 }
