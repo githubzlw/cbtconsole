@@ -131,6 +131,8 @@ public class CustomGoodsPublish extends CustomGoodsBean {
             fromFlagDesc = "跨境上线";
         }else if(fromFlag == 5){
             fromFlagDesc = "爆款开发上线";
+        }else if(fromFlag == 6){
+            fromFlagDesc = "亚马逊对标上线";
         }
     }
 
