@@ -282,5 +282,19 @@ public class ComplainController {
 		}
 		return map;
 	}
+	@RequestMapping(value = "/disputes", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object>  getdisputeByUserid(HttpServletRequest request, HttpServletResponse response){
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put("status", false);
+		
+		String userid = request.getParameter("userid");
+		if(StringUtils.isNotBlank(userid) && !StringUtils.equals(userid, "0")) {
+			List<ComplainVO> complainByUserId = complainService.getComplainByUserId(userid);
+			map.put("data", complainByUserId);
+			map.put("status", complainByUserId != null && !complainByUserId.isEmpty());
+		}
+		return map;
+	}
 	
 }

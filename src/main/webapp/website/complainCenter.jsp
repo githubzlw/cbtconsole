@@ -157,7 +157,7 @@ width:80px;height:80px;}
 								
 								<c:if test="${empty complain.disputeList }">
 								
-								<button type="button" class="btn btn-primary btn-sm" onclick="openDispute(${complain.id});">关联申诉</button>
+								<button type="button" class="btn btn-primary btn-sm" onclick="openDispute(${complain.id},${complain.userid });">关联申诉</button>
 								
 								</c:if>
 								
@@ -465,11 +465,16 @@ function showmore(){
 	$(".title_g").show();
 	$("#showmorea").hide();
 }
-function openDispute(id){
+function openDispute(id,userid){
 	var html='<span>请输入申诉事件号(如：PP-D-13916157),'
 	+'<br>可以参考申诉管理界面输入对应的事件号 '
 	+'<br>多个申诉之间用,隔开<br><input type="text" class="dispute_id"><br></span>';
 		
+	
+	
+	
+	
+	
 	$.dialog({
 		title : '关联申诉',
 		content : html,
