@@ -253,4 +253,11 @@ public interface RefundDaoPlus {
 	 */
 	boolean updateRefundState(int userId, int refundId, int state);
 
+	/**
+	 * 查询申诉退款的总额
+	 * @param userId
+	 * @return
+	 */
+	double queryComplaintTotalAmount(int userId);
+
 }
