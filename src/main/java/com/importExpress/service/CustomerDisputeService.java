@@ -3,9 +3,8 @@ package com.importExpress.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.importExpress.pojo.CustomerDisputeBean;
+import com.importExpress.pojo.CustomerDisputeVO;
 
 public interface CustomerDisputeService {
 	
@@ -91,4 +90,9 @@ public interface CustomerDisputeService {
 	 * @return
 	 */
 	public Map<String, Object> list(List<String> orderIdList);
+	
+	/**用户id获取所有申诉
+	 * @return
+	 */
+	public List<CustomerDisputeVO> getDisputeByUserid(String userid);
 }
