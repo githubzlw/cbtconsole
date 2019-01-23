@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.stripe.model.Charge;
 import com.stripe.model.Dispute;
+import com.stripe.model.File;
 import com.stripe.model.Refund;
 
 public interface StripeService {
@@ -24,4 +25,9 @@ public interface StripeService {
     Dispute dispute(String disputeId);
     
     Dispute update(String disputeId,Map<String,Object> evidence);
+    
+    
+    File createFile(Map<String,Object> fileParams);
+    
+    
 }

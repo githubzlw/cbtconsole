@@ -2,6 +2,7 @@ package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.util.DateFormatUtil;
+import com.cbt.util.StrUtils;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.InputData;
@@ -377,6 +378,11 @@ public class GoodsInfoUpdateOnlineUtil {
         JsonResult json = new JsonResult();
         File file = null;
         try {
+        	if(inputData != null) {
+        		inputData.setFinalName(StrUtils.removeChineseCode(checkAndReplaceQuotes(inputData.getFinalName())));
+        		inputData.setEnname(StrUtils.removeChineseCode(checkAndReplaceQuotes(inputData.getEnname())));
+        		inputData.setWprice(StrUtils.removeSpecialCodeForWprice(inputData.getWprice()));
+        	}
             file = writeToLocal(LOCAL_JSON_PATH + "/" + inputData.getPid() + "004.json", JsonUtils.objectToJsonNotNull(inputData));
             if (file != null) {
                 String result = okHttpUtils.postFileNoParam("file", MONGODB_UPDATE_GOODS_URL_LOCAL, file);
@@ -430,7 +436,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (json.isOk()) {
-            return updateOnlineAndSolr(inputData, isSolr);
+//            return updateOnlineAndSolr(inputData, isSolr);
         }
         return json.isOk();
     }

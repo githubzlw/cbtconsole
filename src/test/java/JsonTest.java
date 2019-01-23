@@ -1,8 +1,10 @@
+import org.junit.Test;
+
 import com.stripe.model.Charge;
 import com.stripe.model.Event;
-import com.stripe.net.APIResource;
+import com.stripe.net.ApiResource;
+
 import net.sf.json.JSONObject;
-import org.junit.Test;
 
 /**
  * @author luohao
@@ -130,7 +132,7 @@ public class JsonTest {
                 "}";
         System.out.println(json);
         String substring = json.substring(json.indexOf("{"));
-        Event event = APIResource.GSON.fromJson(substring, Event.class);
+        Event event = ApiResource.GSON.fromJson(substring, Event.class);
         Charge charge=(Charge)event.getData().getObject();
         //System.out.println(charge);
 
