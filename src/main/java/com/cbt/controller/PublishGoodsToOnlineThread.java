@@ -90,7 +90,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                                     // 上面小图60x60的，下面大图400x400的
                                     imgList.add(wdImg.replace("60x60", "400x400"));
                                     // 替换本地路径为远程路径
-                                    tempImgs.add(wdImg.replace(localShowPath, remoteShowPath));
+                                    tempImgs.add(wdImg.replace(localShowPath, remoteShowPath).replace(".400x400.", ".60x60."));
                                 } else {
                                     // 本地文件不存的，删除数据
                                     windowImgs.set(i, "");
@@ -99,7 +99,7 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 // 清空原来服务器上传的图片数据，原因：图片路劲对应服务器本地路劲已经失效，无法再同步到服务器
                                 windowImgs.set(i, "");
                             }else{
-                                tempImgs.add(wdImg);
+                                tempImgs.add(wdImg.replace(".400x400.", ".60x60."));
                             }
                         }
                         // 重新生成橱窗图的数据保存bean中

@@ -1911,7 +1911,7 @@
                 <c:if
 					test="${goods.fromFlag > 0}">
 					<br>
-					<b style="font-size: 16px;">产品来源:${goods.fromFlagDesc}</b>
+					<b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
 				</c:if>
                 <c:if
                     test="${goods.isEdited == 1 || goods.isEdited == 2}">

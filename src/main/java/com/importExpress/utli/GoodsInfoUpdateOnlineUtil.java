@@ -436,7 +436,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (json.isOk()) {
-//            return updateOnlineAndSolr(inputData, isSolr);
+            return updateOnlineAndSolr(inputData, isSolr);
         }
         return json.isOk();
     }
