@@ -275,7 +275,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setBm_flag(String.valueOf(bmFlag));
         inputData.setIsBenchmark(String.valueOf(isBenchmark));
         inputData.setFinalName(edName);
-        inputData.setRwKeyword(rwKeyword);
+        inputData.setRw_keyword(rwKeyword);
         inputData.setPid(pid);
         return updateLocalAndSolr(inputData, 0);
     }
@@ -436,7 +436,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (json.isOk()) {
-//            return updateOnlineAndSolr(inputData, isSolr);
+            return updateOnlineAndSolr(inputData, isSolr);
         }
         return json.isOk();
     }

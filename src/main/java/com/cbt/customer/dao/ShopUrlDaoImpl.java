@@ -3049,14 +3049,16 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 "cbr.catid1,ct18.name as catid_name,cbr.valid as isOffShelf,cbr.is_edited  " +
                 " from needoffshelf ns,cross_border.custom_benchmark_ready_newest cbr " +
                 " left join 1688_category ct18 on cbr.catid1 = ct18.category_id" +
-                " where 1=1 and ns.pid = cbr.pid ";
+                " where ns.update_flag = 2 and ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
         }
         if(offShelf.getSoldFlag() != 0){
             if (offShelf.getSoldFlag() == 3){
-                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid ) ";
+                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type IN (1,2)) ";
+            } else if (offShelf.getSoldFlag() == 6){
+                sql += " and cbr.bm_flag = 1 and cbr.ali_weight > 0 ";
             } else {
                 sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type = " + offShelf.getSoldFlag() + ") ";
             }
@@ -3154,14 +3156,16 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     public int queryNeedOffShelfByParamCount(NeedOffShelfBean offShelf) {
 
         String sql = "select count(0) from needoffshelf ns,cross_border.custom_benchmark_ready_newest cbr " +
-                " where 1=1 and ns.pid = cbr.pid ";
+                " where ns.update_flag = 2 and ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
         }
         if(offShelf.getSoldFlag() != 0){
             if (offShelf.getSoldFlag() == 3){
-                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid ) ";
+                sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type IN (1,2)) ";
+            } else if (offShelf.getSoldFlag() == 6){
+                sql += " and cbr.bm_flag = 1 and cbr.ali_weight > 0 ";
             } else {
                 sql += " and ns.pid IN (SELECT pid FROM alidata.needoffshelf_sold_pid WHERE type = " + offShelf.getSoldFlag() + ") ";
             }

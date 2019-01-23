@@ -346,16 +346,24 @@ public class QueryUserServiceImpl implements QueryUserService {
         List<String> pidList = queryUserMapper.queryBoughtGoods(startDate);
         //查询加过购物车的27 type=2
         List<String> pidList2 = queryUserMapper.queryCarProducts(startDate);
+        //查询人为编辑过的27 type=4
+        List<String> pidList4 = queryUserMapper.queryIsEditProducts();
+        //查询有库存的27 type=5
+        List<String> pidList5 = queryUserMapper.queryInventoryProducts();
         //保存到28
         DataSourceSelector.set("dataSource28hop");
         //清空原表中数据
         queryUserMapper.deleteNeedoffshelfSoldAll();
-        if (pidList != null && pidList.size() > 0) {
-            queryUserMapper.insertNeedoffshelfSoldPid(pidList, 1);
-        }
-        if (pidList2 != null && pidList2.size() > 0) {
-            queryUserMapper.insertNeedoffshelfSoldPid(pidList2, 2);
-        }
+        insertNeedoffshelfSoldPid(pidList, 1);
+        insertNeedoffshelfSoldPid(pidList2, 2);
+        insertNeedoffshelfSoldPid(pidList4, 4);
+        insertNeedoffshelfSoldPid(pidList5, 5);
         DataSourceSelector.restore();
+    }
+
+    public void insertNeedoffshelfSoldPid(List<String> list, Integer type){
+        if (list != null && list.size() > 0) {
+            queryUserMapper.insertNeedoffshelfSoldPid(list, type);
+        }
     }
 }
