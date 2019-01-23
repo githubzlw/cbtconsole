@@ -798,26 +798,14 @@ public class RefundDaoImpl implements RefundDaoPlus{
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, id);
 			rs = stmt.executeQuery();
-			while(rs.next()){
+			if(rs.next()){
 				total = rs.getDouble("usdappcount");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+			DBHelper.getInstance().closeResultSet(rs);
+			DBHelper.getInstance().closePreparedStatement(stmt);
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return total;
@@ -948,7 +936,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		String sql = "select r.userid, sum(r.account/e.exchange_rate)  as usdappcount "
 				+ "from refund r,exchange_rate e where r.currency=e.country  and r.valid=1  "
 				+ "and (r.status=0 or r.status=1) and r.userid in (";
-		Connection conn = DBHelper.getInstance().getConnection2();
+		Connection conn = DBHelper.getInstance().getConnection();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
 		Map<String, String> map = new HashMap<String, String>();
@@ -967,20 +955,8 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+			DBHelper.getInstance().closeResultSet(rs);
+			DBHelper.getInstance().closePreparedStatement(stmt);
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return map;
@@ -1458,5 +1434,29 @@ public class RefundDaoImpl implements RefundDaoPlus{
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return rs > 0;
+	}
+
+	@Override
+	public double queryComplaintTotalAmount(int userId) {
+		String sql = "select sum(amount_refunded) as total from customer_dispute_refund where user_id = ? and status = 2";
+		Connection conn = DBHelper.getInstance().getConnection();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+		double total = 0;
+		try {
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, userId);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				total = rs.getDouble(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closeResultSet(rs);
+			DBHelper.getInstance().closePreparedStatement(stmt);
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return total;
 	}
 }

@@ -248,9 +248,10 @@ public class UserController {
 
 
 
-        double totalApplyRefund = refundSSService.getApplyRefund(userId);// 总的申请退款或提现金额
+        double totalComplaintAmount =  refundSSService.queryComplaintTotalAmount(userId);// 申诉退款总金额
+        double totalApplyRefund = refundSSService.getApplyRefund(userId) + totalComplaintAmount;// 总的申请退款或提现金额
         //double totalApplyPaypal = refundSSService.getApplyPaypal(userId);// 总的已经退款或提现金额
-        double hasRefundAmount = refundSSService.getRefund(userId);// 已退款金额
+        double hasRefundAmount = refundSSService.getRefund(userId) + totalComplaintAmount;// 已退款金额
         financial.setHasRefundAmount(BigDecimalUtil.truncateDouble(hasRefundAmount, 2));
         double totalDealRefund = totalApplyRefund - hasRefundAmount;//退款或提现处理中
         financial.setDealRefundAmount(BigDecimalUtil.truncateDouble(totalDealRefund, 2));
@@ -270,7 +271,7 @@ public class UserController {
 
 
         //算法1：账号应有余额 = 总的实际到账金额 - 总的实际完成订单金额 + 额外奖励或补偿-实际发放的  退款或提现
-        dueBalance = actualPayAmount - actualOrderAmount + compensateAmount - totalApplyRefund;
+        dueBalance = actualPayAmount - actualOrderAmount + compensateAmount - (totalApplyRefund -totalComplaintAmount);
         financial.setDueBalance(BigDecimalUtil.truncateDouble(dueBalance, 2));
 
 
