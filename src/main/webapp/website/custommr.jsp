@@ -114,7 +114,7 @@ b {
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
-			"unsellableReason":"-1","fromFlag":"-1"
+			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"","minPrice":"","maxPrice":""
 	};
 	var isQuery =0;
 
@@ -280,6 +280,28 @@ b {
             $("#query_from_flag").val(fromFlag);
         }
 
+        var finalWeightBegin = sessionStorage.getItem("finalWeightBegin");
+        if(!(finalWeightBegin == null || finalWeightBegin == "")){
+            queryParams.finalWeightBegin = finalWeightBegin;
+            $("#query_final_weight_begin").val(finalWeightBegin);
+        }
+        var finalWeightEnd = sessionStorage.getItem("finalWeightEnd");
+        if(!(finalWeightEnd == null || finalWeightEnd == "")){
+            queryParams.finalWeightEnd = finalWeightEnd;
+            $("#query_final_weight_end").val(finalWeightEnd);
+        }
+        var minPrice = sessionStorage.getItem("minPrice");
+        if(!(minPrice == null || minPrice == "")){
+            queryParams.minPrice = minPrice;
+            $("#query_min_price").val(minPrice);
+        }
+        var maxPrice = sessionStorage.getItem("maxPrice");
+        if(!(maxPrice == null || maxPrice == "")){
+            queryParams.maxPrice = maxPrice;
+            $("#query_min_price").val(maxPrice);
+        }
+
+
 		createCateroryTree(queryParams.catid);
 		doQueryList();
         doStatistic();
@@ -358,6 +380,10 @@ b {
 		var isComplain = $("#is_complain").is(":checked")?"1":"0";
 		var unsellableReason=$("#unsellableReason").val();
 		var fromFlag = $("#query_from_flag").val();
+		var finalWeightBegin = $("#query_final_weight_begin").val();
+		var finalWeightEnd = $("#query_final_weight_end").val();
+		var minPrice = $("#query_min_price").val();
+		var maxPrice = $("#query_max_price").val();
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -392,6 +418,10 @@ b {
         queryParams.unsellableReason=unsellableReason;
         queryParams.isComplain = isComplain;
         queryParams.fromFlag = fromFlag;
+		queryParams.finalWeightBegin = finalWeightBegin;
+        queryParams.finalWeightEnd = finalWeightEnd;
+		queryParams.minPrice = minPrice;
+		queryParams.maxPrice = maxPrice;
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -438,6 +468,10 @@ b {
             sessionStorage.setItem("unsellableReason", queryParams.unsellableReason);
             sessionStorage.setItem("isComplain", queryParams.isComplain);
             sessionStorage.setItem("fromFlag", queryParams.fromFlag);
+            sessionStorage.setItem("finalWeightBegin", queryParams.finalWeightBegin);
+            sessionStorage.setItem("finalWeightEnd", queryParams.finalWeightEnd);
+            sessionStorage.setItem("minPrice", queryParams.minPrice);
+            sessionStorage.setItem("maxPrice", queryParams.maxPrice);
 
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
@@ -451,7 +485,8 @@ b {
 			+ "&editBeginTime=" + queryParams.editBeginTime + "&editEndTime=" + queryParams.editEndTime + "&weight1688Begin="
 			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
-			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag;
+			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
+			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -688,15 +723,17 @@ b {
 					<td>1688&nbsp;&nbsp;重量:<input id="query_1688_weight_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_1688_weight_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
-					<td>1688价格:<input id="query_1688_price_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
+					<td>1688&nbsp;&nbsp;&nbsp;价格:<input id="query_1688_price_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_1688_price_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
-					<td colspan="2"><input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
-						value="查询" style="height: 30px; width: 60px;" class="btn" />
-						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
-						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
-					</td>
-
+					<td colspan="2">查询排序:<select id="query_is_sort"
+						style="font-size: 18px; height: 28px;width: 140px;">
+							<option value="0" selected="selected">请选择</option>
+							<option value="1">搜索次数倒排序</option>
+							<option value="2">点击次数倒排序</option>
+							<%--<option value="3">已点击商品倒排序</option>--%>
+							<option value="4">按照类别排序</option>
+					</select></td>
 				</tr>
 				<tr>
 						<td colspan="3">
@@ -736,14 +773,17 @@ b {
 							<option value="4">跨境上线</option>
 							<option value="5">爆款开发上线</option>
 					</select></td>
-					<td>查询排序:<select id="query_is_sort"
-						style="font-size: 18px; height: 28px;width: 140px;">
-							<option value="0" selected="selected">请选择</option>
-							<option value="1">搜索次数倒排序</option>
-							<option value="2">点击次数倒排序</option>
-							<%--<option value="3">已点击商品倒排序</option>--%>
-							<option value="4">按照类别排序</option>
-					</select></td>
+					<td>售卖&nbsp;&nbsp;&nbsp;重量:<input id="query_final_weight_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
+						<span>-</span>
+						<input id="query_final_weight_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
+					<td>最高售卖价格:<input id="query_min_price" type="number" step="0.01" style="width: 50px;height: 22px;"/>
+						<span>-</span>
+						<input id="query_max_price" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
+					<td><input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+						value="查询" style="height: 30px; width: 60px;" class="btn" />
+						&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
+						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" />
+					</td>
 				</tr>
 				<%--<tr>--%>
 						<%----%>

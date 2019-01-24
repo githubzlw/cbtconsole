@@ -77,7 +77,7 @@ public class CustomGoodsController {
 		mv.addObject("recordList", recordList);
 		int count = recordList == null || recordList.isEmpty() ? 0 : recordList.get(0).getCount();
 
-		count = count % 40 == 0 ? count / 40 : count / 40 + 1;
+		count = count % 50 == 0 ? count / 50 : count / 50 + 1;
 
 		mv.addObject("totalpage", count);
 		mv.addObject("currentpage", page);
@@ -159,7 +159,7 @@ public class CustomGoodsController {
 		if (strPage == null || strPage.isEmpty() || !StrUtils.isMatch(strPage, "(\\d+)")) {
 			strPage = "1";
 		}
-		queryBean.setPage((Integer.valueOf(strPage) -1) * 40);
+		queryBean.setPage((Integer.valueOf(strPage) -1) * 50);
 
 		String catid = request.getParameter("catid");
 		if (StringUtils.isNotBlank(catid) && !"0".equals(catid)) {
@@ -335,6 +335,23 @@ public class CustomGoodsController {
 		}
 
 
+		String finalWeightBegin = request.getParameter("finalWeightBegin");
+		if(StringUtils.isNotBlank(finalWeightBegin) && !"0".equals(finalWeightBegin)){
+			queryBean.setFinalWeightBegin(Double.valueOf(finalWeightBegin));
+		}
+		String finalWeightEnd = request.getParameter("finalWeightEnd");
+		if(StringUtils.isNotBlank(finalWeightEnd) && !"0".equals(finalWeightEnd)){
+			queryBean.setFinalWeightEnd(Double.valueOf(finalWeightEnd));
+		}
+		String minPrice = request.getParameter("minPrice");
+		if(StringUtils.isNotBlank(minPrice) && !"0".equals(minPrice)){
+			queryBean.setMinPrice(Double.valueOf(minPrice));
+		}
+		String maxPrice = request.getParameter("maxPrice");
+		if(StringUtils.isNotBlank(maxPrice) && !"0".equals(maxPrice)){
+			queryBean.setMaxPrice(Double.valueOf(maxPrice));
+		}
+
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
 		goodsList.stream().forEach(c -> {
 			String complainId = c.getComplainId();
@@ -345,13 +362,13 @@ public class CustomGoodsController {
 		});
 
 		int count = customGoodsService.queryGoodsInfosCount(queryBean);
-		int amount = (count % 40 == 0 ? count / 40 : count / 40 + 1);
+		int amount = (count % 50 == 0 ? count / 50 : count / 50 + 1);
 		mv.addObject("catid", catid);
 		mv.addObject("goodsList", goodsList);
 		mv.addObject("totalpage", amount);
 		mv.addObject("totalNum", count);
 		mv.addObject("currentpage", strPage);
-		mv.addObject("pagingNum", 40);
+		mv.addObject("pagingNum", 50);
 		return mv;
 	}
 
@@ -366,7 +383,7 @@ public class CustomGoodsController {
 		if (strPage == null || strPage.isEmpty() || !StrUtils.isMatch(strPage, "(\\d+)")) {
 			strPage = "1";
 		}
-		queryBean.setPage((Integer.valueOf(strPage) -1) * 40);
+		queryBean.setPage((Integer.valueOf(strPage) -1) * 50);
 
 		String sttime = request.getParameter("sttime");
 		if (StringUtils.isNotBlank(sttime)) {
@@ -527,6 +544,23 @@ public class CustomGoodsController {
 		String fromFlag = request.getParameter("fromFlag");
 		if(StringUtils.isNotBlank(fromFlag)){
 			queryBean.setFromFlag(Integer.valueOf(fromFlag));
+		}
+
+		String finalWeightBegin = request.getParameter("finalWeightBegin");
+		if(StringUtils.isNotBlank(finalWeightBegin) && !"0".equals(finalWeightBegin)){
+			queryBean.setFinalWeightBegin(Double.valueOf(finalWeightBegin));
+		}
+		String finalWeightEnd = request.getParameter("finalWeightEnd");
+		if(StringUtils.isNotBlank(finalWeightEnd) && !"0".equals(finalWeightEnd)){
+			queryBean.setFinalWeightEnd(Double.valueOf(finalWeightEnd));
+		}
+		String minPrice = request.getParameter("minPrice");
+		if(StringUtils.isNotBlank(minPrice) && !"0".equals(minPrice)){
+			queryBean.setMinPrice(Double.valueOf(minPrice));
+		}
+		String maxPrice = request.getParameter("maxPrice");
+		if(StringUtils.isNotBlank(maxPrice) && !"0".equals(maxPrice)){
+			queryBean.setMaxPrice(Double.valueOf(maxPrice));
 		}
 
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);
@@ -934,7 +968,6 @@ public class CustomGoodsController {
 	 * 
 	 * @date 2016年12月23日
 	 * @author abc
-	 * @param pid
 	 * @return
 	 */
 	@RequestMapping(value = "/offshelf", method = { RequestMethod.POST, RequestMethod.GET })

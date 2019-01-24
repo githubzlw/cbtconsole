@@ -43,6 +43,8 @@
         <result column="complain_id" property="complainId"/>
         <result column="reviewCount" property="reviewCount"/>
         <result column="from_flag" property="fromFlag"/>
+        <result column="final_weight" property="finalWeight"/>
+        <result column="max_price" property="maxPrice"/>
     </resultMap>
 
 
@@ -350,7 +352,7 @@
     <select id="queryForListByParam" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
         select
         cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
-        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
@@ -476,6 +478,18 @@
             and cbu.from_flag = #{fromFlag}
         </if>
 
+        <if test="finalWeightBegin > 0">
+            and cbu.final_weight &gt;= #{finalWeightBegin}
+        </if>
+        <if test="finalWeightEnd > 0">
+            and cbu.final_weight &lt;= #{finalWeightEnd}
+        </if>
+        <if test="minPrice > 0">
+            and cbu.max_price &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice > 0">
+            and cbu.max_price &lt;= #{maxPrice}
+        </if>
 
         <if test="isSort == 1">
             order by cge.search_num desc
@@ -606,6 +620,18 @@
         <if test="fromFlag > -1">
             and cbu.from_flag = #{fromFlag}
         </if>
+        <if test="finalWeightBegin > 0">
+            and cbu.final_weight &gt;= #{finalWeightBegin}
+        </if>
+        <if test="finalWeightEnd > 0">
+            and cbu.final_weight &lt;= #{finalWeightEnd}
+        </if>
+        <if test="minPrice > 0">
+            and cbu.max_price &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice > 0">
+            and cbu.max_price &lt;= #{maxPrice}
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -716,6 +742,18 @@
         </if>
         <if test="fromFlag > -1">
             and cbu.from_flag = #{fromFlag}
+        </if>
+        <if test="finalWeightBegin > 0">
+            and cbu.final_weight &gt;= #{finalWeightBegin}
+        </if>
+        <if test="finalWeightEnd > 0">
+            and cbu.final_weight &lt;= #{finalWeightEnd}
+        </if>
+        <if test="minPrice > 0">
+            and cbu.max_price &gt;= #{minPrice}
+        </if>
+        <if test="maxPrice > 0">
+            and cbu.max_price &lt;= #{maxPrice}
         </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc

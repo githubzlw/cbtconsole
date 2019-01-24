@@ -540,7 +540,9 @@ b {
 				</td>
 			<!-- 名称 -->
 			<%--<td id="user_${index.index}"></td>--%>
-			<td>关键词:&nbsp;&nbsp;&nbsp;&nbsp;${list.keyword} <br>1688类别ID:&nbsp;&nbsp;&nbsp;&nbsp;${list.catid1}<br>
+			<td>关键词:&nbsp;&nbsp;&nbsp;&nbsp;${list.keyword} <br>1688类别ID:&nbsp;&nbsp;&nbsp;&nbsp;${list.catid1}
+				<br><span style="background-color: #10ec36;">售卖重量:[${list.finalWeight}]</span>
+				<br><span style="background-color: #10ec36;">最高售卖价格:[${list.maxPrice}]</span><br>
 				<textarea id="import_${list.pid}"
 						onchange="changeAfterEdit('${list.pid}',this)"
 						style="min-height: 160px; width: 98%; font-size: 16px;">${list.enname}</textarea>
