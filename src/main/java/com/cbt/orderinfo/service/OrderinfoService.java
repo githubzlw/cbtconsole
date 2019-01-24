@@ -858,8 +858,8 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	private void getRoTypeAndState(Map<String, ArrayList<Object[]>> changInfo, OrderDetailsBean odb) {
-		if (changInfo.get("order" + odb.getGoodsid()) != null) {
-			List<Object[]> changeInfoList = changInfo.get("order" + odb.getGoodsid());
+		if (changInfo.get("order" + odb.getId()) != null) {
+			List<Object[]> changeInfoList = changInfo.get("order" + odb.getId());
 			for (int i = 0; i < changeInfoList.size(); i++) {
 				int ropType = (Integer) changeInfoList.get(i)[0];
 				int del_state = (Integer) changeInfoList.get(i)[1];
