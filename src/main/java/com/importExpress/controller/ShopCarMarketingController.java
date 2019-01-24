@@ -421,8 +421,7 @@ public class ShopCarMarketingController {
 
         GoodsCarconfigWithBLOBs record = new GoodsCarconfigWithBLOBs();
 
-        String shopcar_show = listActive.toString();
-        record.setBuyformecarconfig(shopcar_show);
+        record.setBuyformecarconfig(listActive.toString());
         record.setUserid(userId);
         return goodsCarconfigService.updateGoodsCarConfig(record);
     }
