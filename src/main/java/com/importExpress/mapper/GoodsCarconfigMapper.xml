@@ -128,7 +128,7 @@
     ,
     <include refid="Blob_Column_List" />
     from goods_carconfig
-    where id = #{id,jdbcType=INTEGER}
+    where userid = #{id,jdbcType=INTEGER}
   </select>
 
   <select id="queryByIsNew" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >

@@ -19,6 +19,7 @@ import com.importExpress.utli.GoodsPriceUpdateUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendEmailNew;
 import com.importExpress.utli.SendMQ;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -247,6 +248,12 @@ public class ShopCarMarketingController {
             String emailTitle = "You have made some wonderful selections";
 
             //1.重新生成goods_carconfig数据，并进行保存
+
+            //获取原来的重新生成goods_carconfig数据
+            GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+
+            List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
+
             List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
             List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
@@ -255,17 +262,21 @@ public class ShopCarMarketingController {
             List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
             int isUpdatePrice = 0;
             for (ShopCarMarketing shopCar : shopCarMarketingList) {
-                //解析数据
-                if (shopCar.getPrice1() > 0) {
-                    isUpdatePrice++;
+                for(GoodsCarActiveSimplBean simplBean : listActive){
+                    if(shopCar.getItemid().equals(simplBean.getItemId())){
+                        //解析数据
+                        if (shopCar.getPrice1() > 0) {
+                            isUpdatePrice++;
+                        }
+                        genActiveSimplBeanByShopCar(simplBean,shopCar);
+                        break;
+                    }
                 }
-                showList.add(genShowBeanBeanByShopCar(shopCar));
-                activeList.add(genActiveBeanByShopCar(shopCar));
             }
 
             //判断是否有改价的情况，有改价更新并清空购物车
             if (isUpdatePrice > 0) {
-                boolean isSuccess = updateGoodsCarConfig(showList, activeList, Integer.valueOf(userIdStr));
+                boolean isSuccess = updateGoodsCarConfig(listActive, Integer.valueOf(userIdStr));
                 //更新成功后，发布邮件的时候全部更新线上
                 if (isSuccess) {
                     //2.清空redis数据
@@ -301,6 +312,9 @@ public class ShopCarMarketingController {
                 genHtmlEamil(userId,paramMap);
                 //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
             }
+            listActive.clear();
+            showList.clear();
+            activeList.clear();
             //4.更新跟进信息
             shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
             json.setOk(true);
@@ -403,14 +417,12 @@ public class ShopCarMarketingController {
         }
     }
 
-    private boolean updateGoodsCarConfig(List<GoodsCarShowBean> showList, List<GoodsCarActiveBeanUpdate> activeList, int userId) {
+    private boolean updateGoodsCarConfig(List<GoodsCarActiveSimplBean> listActive, int userId) {
 
         GoodsCarconfigWithBLOBs record = new GoodsCarconfigWithBLOBs();
-        String shopcar_active = activeList.toString();
-        record.setShopcarinfo(shopcar_active);
 
-        String shopcar_show = showList.toString();
-        record.setShopcarshowinfo(shopcar_show);
+        String shopcar_show = listActive.toString();
+        record.setBuyformecarconfig(shopcar_show);
         record.setUserid(userId);
         return goodsCarconfigService.updateGoodsCarConfig(record);
     }
@@ -528,6 +540,25 @@ public class ShopCarMarketingController {
         }
 
         return activeBean;
+    }
+
+
+
+    /**
+     * ShopCarMarketing反解析GoodsCarActiveBean
+     *
+     * @param activeBean
+     * @param shopCar
+     * @return
+     */
+    private void genActiveSimplBeanByShopCar(GoodsCarActiveSimplBean activeBean,ShopCarMarketing shopCar) {
+
+        activeBean.setPrice(shopCar.getGoogsPrice());
+        if (shopCar.getPrice1() > 0) {
+            activeBean.setPrice1(shopCar.getPrice1() + "@1");
+        } else {
+            activeBean.setPrice1("0");
+        }
     }
 
     @RequestMapping("/queryShopCarList")
