@@ -263,7 +263,7 @@ public class ShopCarMarketingController {
             int isUpdatePrice = 0;
             for (ShopCarMarketing shopCar : shopCarMarketingList) {
                 for(GoodsCarActiveSimplBean simplBean : listActive){
-                    if(shopCar.getItemid().equals(simplBean.getItemId())){
+                    if(shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())){
                         //解析数据
                         if (shopCar.getPrice1() > 0) {
                             isUpdatePrice++;
