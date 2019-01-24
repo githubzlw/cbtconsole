@@ -3044,12 +3044,12 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     public List<NeedOffShelfBean> queryNeedOffShelfByParam(NeedOffShelfBean offShelf) {
         List<NeedOffShelfBean> list = new ArrayList<NeedOffShelfBean>();
         //,cbr.is_edited
-        String sql = "select ns.id,ns.pid,ns.operateCount,ns.update_flag,ns.update_time," +
+        String sql = "select ns.id,ns.pid,ns.update_time," +
                 " concat(cbr.remotpath,cbr.custom_main_image) as img_url,cbr.unsellableReason as reason," +
-                "cbr.catid1,ct18.name as catid_name,cbr.valid as isOffShelf,cbr.is_edited  " +
-                " from needoffshelf ns,cross_border.custom_benchmark_ready_newest cbr " +
+                " cbr.catid1,ct18.name as catid_name,cbr.valid as isOffShelf,cbr.is_edited  " +
+                " from needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
                 " left join 1688_category ct18 on cbr.catid1 = ct18.category_id" +
-                " where ns.update_flag = 2 and ns.pid = cbr.pid ";
+                " where ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
@@ -3132,7 +3132,6 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 offShelfBean.setIsOffShelf(rs28.getInt("isOffShelf"));
                 offShelfBean.setPid(rs28.getString("pid"));
                 offShelfBean.setReason(rs28.getInt("reason"));
-                offShelfBean.setUpdateFlag(rs28.getInt("update_flag"));
                 offShelfBean.setUpdateTime(rs28.getString("update_time"));
                 offShelfBean.setImgUrl(rs28.getString("img_url") == null ? "" : rs28.getString("img_url"));
                 offShelfBean.setCatid(rs28.getString("catid1"));
@@ -3155,8 +3154,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public int queryNeedOffShelfByParamCount(NeedOffShelfBean offShelf) {
 
-        String sql = "select count(0) from needoffshelf ns,cross_border.custom_benchmark_ready_newest cbr " +
-                " where ns.update_flag = 2 and ns.pid = cbr.pid ";
+        String sql = "select count(0) from needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
+                " where ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
             sql += " and ns.pid = ?";
