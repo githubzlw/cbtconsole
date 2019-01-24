@@ -327,6 +327,9 @@
                                 </c:if>
                                 <br><span>人为编辑产品名:</span>
                                 <input type="text" id="${lireGd.pid}_name"  class="inp_sty" value=""/>
+                                <br><span>供应商:<b style="color: red">${lireGd.shopName}</b></span>
+                                <br><span>供应商评分:<b style="color: red">${lireGd.qualityShop}</b></span>
+                                <br><span>产品评分:<b style="color: red">${lireGd.qualityProduct}</b></span>
 
 
                                 <c:if test="${lireGd.dealState > 0}">
@@ -386,7 +389,9 @@
                                 <c:if test="${pyGd.sold > 0}">
                                     <br><span>销量:${pyGd.sold}</span>
                                 </c:if>
-                                <br><span>供应商名:${pyGd.shopName}</span>
+                                <br><span>供应商:<b style="color: red">${pyGd.shopName}</b></span>
+                                <br><span>供应商评分:<b style="color: red">${pyGd.qualityShop}</b></span>
+                                <br><span>产品评分:<b style="color: red">${pyGd.qualityProduct}</b></span>
                                 <br>
                                 <c:if test="${pyGd.dealState > 0}">
                                     <span><b class="b_sty">爆款对标</b></span>
