@@ -800,6 +800,9 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
     <update id="updateSizeChart">
          update ocr_img_sizechart set replace_img = #{imgname},replace_localpath = #{localpath},replace_time=now() where id=#{rowid}
     </update>
+    <update id="updateSizeChart_add">
+         update ocr_img_sizechart_addsizechart set replace_img = #{imgname},replace_localpath = #{localpath},replace_time=now() where id=#{rowid}
+    </update>
     <update id="updateSizeChartUpload">
          update ocr_img_sizechart set flag=2 where id in 
          <foreach collection="rowidArray" index="index" item="item" open="(" close=")" separator=",">
@@ -812,7 +815,12 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
             #{item}
         </foreach>
     </update>
-
+    <update id="updateSizeChartById_add">
+         update ocr_img_sizechart_addsizechart set flag = 1,update_userid=#{userid},update_time=now() where id in 
+         <foreach collection="rowidArray" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
     <select id="getSizeChart" resultType="java.util.Map">
 select cat.name,ocr.remotpath,ocr.pid,ocr.id  from ocr_img_sizechart  ocr
 left join 1688_category  cat on ocr.catid = cat.category_id
@@ -820,11 +828,25 @@ left join custom_benchmark_ready cu on cu.pid=ocr.pid
 where ocr.sizechart=2 and ocr.catid=#{catid} and cu.valid=1 and ocr.flag=0 limit  10
 </select>
 
+<select id="getSizeChart_add" resultType="java.util.Map">
+select cat.name,cu.remotpath,cu.custom_main_image,ocr.pid,ocr.id  from ocr_img_sizechart_addsizechart  ocr
+left join 1688_category  cat on ocr.catid = cat.category_id
+left join custom_benchmark_ready cu on cu.pid=ocr.pid
+where ocr.catid=#{catid} and cu.valid=1 and ocr.flag=0 limit  10
+</select>
+
 <select id="loadCategoryName" resultType="java.util.Map">
 select  cats.name,os.catid  from ocr_img_sizechart os 
 left join 1688_category cats on cats.category_id = os.catid
 left join custom_benchmark_ready cu on cu.pid=os.pid
 where os.path_catid like #{catid} and os.sizechart=2  and cu.valid=1 and os.flag=0   group by os.catid
+</select>
+
+<select id="loadCategoryName_add" resultType="java.util.Map">
+select cats.name,a.catid from ocr_img_sizechart_addsizechart a 
+left join 1688_category cats on cats.category_id = a.catid
+left join custom_benchmark_ready cu on cu.pid=a.pid
+where a.path_catid like #{catid} and cu.valid=1 and a.flag=0 group by a.catid
 </select>
 
     <select id="getDetailsChangeInfo" resultType="com.cbt.warehouse.pojo.ChangeGoodsLogPojo">

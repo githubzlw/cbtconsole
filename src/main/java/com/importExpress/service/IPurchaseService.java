@@ -281,11 +281,13 @@ public interface IPurchaseService {
 	int updateAutoOrderFlag(List<Integer> idsList);
 
 	List<Map<String, Object>> getSizeChart(String  catid);
-
+	List<Map<String, Object>> getSizeChart_add(String  catid);
 	List<Map<String, Object>> loadCategoryName(String catid);
+	List<Map<String, Object>> loadCategoryName_add(String catid);
 	public int updateSizeChart(String imgname,String localpath,int rowid);
+	public int updateSizeChart_add(String imgname,String localpath,int rowid);
 	public List<Map<String,Object>> getSizeChartPidInfo();
 	public int updateSizeChartUpload(List<Integer> rowidArray);
 	public int updateSizeChartById(List<Integer> rowidArray,int userid);
-
+	public int updateSizeChartById_add(List<Integer> rowidArray,int userid);
 }
