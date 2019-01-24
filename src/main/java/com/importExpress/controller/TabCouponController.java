@@ -46,12 +46,15 @@ public class TabCouponController {
      */
     @RequestMapping(value = "/list.do")
     @ResponseBody
-    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid) {
+    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid, Integer timeTo) {
     	if (StringUtils.isBlank(typeCode) || "0".equals(typeCode)) {
     		typeCode = null;
 		}
 		if(valid == -1){
     	    valid = null;
+        }
+        if(timeTo == 0){
+            timeTo = null;
         }
         //返回数据
         EasyUiJsonResult json = new EasyUiJsonResult();
@@ -67,7 +70,7 @@ public class TabCouponController {
             page = Integer.valueOf(pageStr);//无该参数时查询默认值1
         }
         // 查询
-        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid);
+        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid, timeTo);
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
             json.setSuccess(true);
@@ -295,7 +298,7 @@ public class TabCouponController {
             List<String> idList = Arrays.asList(userids.replace("，", ",").split(","));
             List<String> useridList = new ArrayList<String>();
             for (String userid : idList) {
-                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim())){
+                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim()) && !useridList.contains(userid.trim())){
                     useridList.add(userid.trim());
                 }
             }
