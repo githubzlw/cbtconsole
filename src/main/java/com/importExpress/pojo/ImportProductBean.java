@@ -31,9 +31,29 @@ public class ImportProductBean {
 	private Integer isEdit;//是否编辑过
     private String bargainNumber;
     private String reasonName;//下架原因
-    private String shopName;//供应商名
+    private String shopName;//供应商名 评
+    private String qualityShop; //供应商评分
+    private String qualityProduct; //产品评分
+    
+    
+    
+    public String getQualityShop() {
+		return qualityShop;
+	}
 
-    public String getShopName() {
+	public void setQualityShop(String qualityShop) {
+		this.qualityShop = qualityShop;
+	}
+
+	public String getQualityProduct() {
+		return qualityProduct;
+	}
+
+	public void setQualityProduct(String qualityProduct) {
+		this.qualityProduct = qualityProduct;
+	}
+
+	public String getShopName() {
 		return shopName;
 	}
 

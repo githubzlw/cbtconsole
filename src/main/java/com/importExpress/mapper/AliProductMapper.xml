@@ -49,6 +49,8 @@
         <result column="bargain_number" property="bargainNumber"/>
         <result column="reason_name" property="reasonName"/>
         <result column="shop_name" property="shopName"/>
+        <result column="quality_shop" property="qualityShop"/>
+        <result column="quality_product" property="qualityProduct"/>
         
     </resultMap>
 
@@ -140,7 +142,11 @@
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.match_remote_path as remotpath,b.enname as name,
         b.wprice,b.range_price,b.is_sold_flag,b.feeprice,a.deal_state,b.sold,b.morder,b.ali_pid as old_ali_pid,
         b.bm_flag ,b.isBenchmark,b.valid,b.sold_flag,ifnull(c.is_edited,0) as is_edit,
-        (select unsellablereason_name from unsellablereason_master  where unsellablereason_id=b.unsellableReason and b.valid=0) as reason_name
+        (select unsellablereason_name from unsellablereason_master  where unsellablereason_id=b.unsellableReason and b.valid=0) as reason_name,
+        (select level from supplier_scoring  where shop_id=b.shop_id ) as shop_name,
+				(select quality_avg from supplier_scoring  where shop_id=b.shop_id ) as quality_shop,
+				(select ROUND(avg(quality),0) from supplier_product  where goods_pid=a.pid ) as quality_product
+				
         from aa_ali_product_lire a
         INNER JOIN custom_benchmark_ready b
         on a.pid = b.pid  
@@ -155,7 +161,11 @@
         select a.id,a.ali_pid,b.goods_pid as pid,b.price,b.pic as img,b.set_weight as weight,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,b.goods_name as name,
         a.deal_state,b.good_url as url,
-        b.weight,b.shop_name,b.bargain_number as sold
+        b.weight,b.bargain_number as sold,
+        (select level from supplier_scoring  where shop_id=b.shop_id ) as shop_name,
+				(select quality_avg from supplier_scoring  where shop_id=b.shop_id ) as quality_shop,
+				(select ROUND(avg(quality),0) from supplier_product  where goods_pid=a.pid ) as quality_product
+				
         from aa_ali_product_python a,aa_goods_offers_python b
         where a.pid = b.goods_pid and a.ali_pid = #{aliPid}
         limit 4
