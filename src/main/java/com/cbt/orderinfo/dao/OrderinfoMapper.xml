@@ -872,7 +872,7 @@
         SELECT distinct ifnull(shop_id,'') FROM order_replenishment WHERE orderid=#{orderNo} AND goodsid=#{goodsid}
     </select>
     <select id="getOrderChange" resultType="com.cbt.bean.OrderChange">
-        select ropType,oldValue,newValue,del_state,goodId,dateline from order_change where orderNo=#{orderNo}  and  (((ropType  BETWEEN 2 AND 4)  and del_state=0 ) or (ropType=1 ) or (ropType=5 )) order by id desc
+        select ropType,oldValue,newValue,del_state,goodId,dateline from order_change where orderNo=#{orderNo}  and  (((ropType  BETWEEN 2 AND 4)) or (ropType=1 ) or (ropType=5 )) order by id desc
     </select>
     <select id="getOrder" resultType="com.cbt.bean.OrderBean">
         select GROUP_CONCAT(pm.paytype) AS paytypes,(select count(tb_complain.id) from tb_complain where complainState in(1,2) and  ref_orderid=order_no)complain,

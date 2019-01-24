@@ -979,6 +979,12 @@ em {
 										<span
 								style="color: red;">备注:</span> ${orderd.remark} <c:if
 									test="${orderd.extra_freight != 0}">&nbsp;额外运费:${orderd.extra_freight}</c:if>
+								<em id="change_delivery_${sd.index}" style="color: red;">
+									<c:if test="${not empty orderd.change_delivery }">
+										<br>
+										新交期：${orderd.change_delivery}
+									</c:if>
+								</em><br>
 							</td>
 							<td><input type="hidden"
 								value="${orderd.state},${order.state},${orderd.orsstate},${orderd.od_state},${orderd.checked}">
