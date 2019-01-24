@@ -11,9 +11,10 @@ import java.util.List;
 public interface TabCouponMapper {
 
 	List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
-                                          @Param("typeCode") String typeCode, @Param("valid") Integer valid);
+                                          @Param("typeCode") String typeCode, @Param("valid") Integer valid,
+                                          @Param("timeTo") Integer timeTo);
 
-	Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid);
+	Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo);
 
 	List<TabCouponType> queryTabCouponTypeCodeList();
 
@@ -25,7 +26,7 @@ public interface TabCouponMapper {
 
     TabCouponNew queryTabCouponOne(@Param("couponCode") String couponCode);
 
-    void insertCouponUsers(@Param("bean") TabCouponNew bean, @Param("list") List<String> list);
+    void insertCouponUsers(@Param("bean") TabCouponNew bean, @Param("list") List<UserBean> list);
 
     String queryTabCouponUser(@Param("couponCode") String couponCode);
 
@@ -35,7 +36,7 @@ public interface TabCouponMapper {
 
     void updateCouponUsers(@Param("couponCode") String couponCode, @Param("userid") String userid);
 
-    Long queryCouponUsersCount(@Param("couponCode") String couponCode);
+    List<String> queryCouponUsersCount(@Param("couponCode") String couponCode);
 
     List<UserBean> queryLocalUser(@Param("list") List<String> list);
 }

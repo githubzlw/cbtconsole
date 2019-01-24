@@ -585,7 +585,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <section id="compose">
 <!-- || statusFlag ==1 -->
-<c:if test="${statusFlag!=10 }">
+<c:if test="${statusFlag==0 }">
 <div class="row">
 
 <div class="col-md-1 col-sm-2 col-xs-2 col-lg-1" style="float: left;">
@@ -596,7 +596,7 @@ buyer test 给您发送了一条消息。您需要在${before}之前回复买家
 
 <div class="col-md-7 seller-response-options ">
 <span>How would you like to respond?</span>
-<c:if test="${statusFlag != 10}">
+<c:if test="${statusFlag == 0}">
 
 <div class="sr-onlyy">
 <input type="button" value="Message Buyer" id="messageBuyerRadio">

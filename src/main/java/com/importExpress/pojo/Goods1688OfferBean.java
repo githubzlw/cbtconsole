@@ -37,8 +37,18 @@ public class Goods1688OfferBean {
     private int from_flag;
     private String aliPid;
     private String aliPrice;
+    private String keyWord;
+    
 
-    public Integer getId() {
+    public String getKeyWord() {
+		return keyWord;
+	}
+
+	public void setKeyWord(String keyWord) {
+		this.keyWord = keyWord;
+	}
+
+	public Integer getId() {
         return id;
     }
 
@@ -361,6 +371,8 @@ public class Goods1688OfferBean {
                 .append(aliPid).append('\"');
         sb.append(",\"aliPrice\":\"")
                 .append(aliPrice).append('\"');
+        sb.append(",\"keyWord\":\"")
+        		.append(keyWord).append('\"');
         sb.append('}');
         return sb.toString();
     }

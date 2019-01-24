@@ -1385,8 +1385,8 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         String sql = "insert into single_goods_offers(goods_name, price,shop_id,bargain_number, standard, sku,"
                 + "color, pic, pics, pics1,iDetailData, iDetailConfig, detail,detail_url, weight, weight_url,addtime,"
                 + "serviceid, tag_name,catid, keywords, average_deliver_time,dl_flag,set_weight,goods_pid,good_url,"
-                + "crawl_flag,shop_name,from_flag,is_benchmarking,goods_type,ali_pid,ali_price) "
-                +" values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,1,?,?)";
+                + "crawl_flag,shop_name,from_flag,is_benchmarking,goods_type,ali_pid,ali_price,rw_keyword) "
+                +" values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,1,?,?,?)";
         PreparedStatement stmt31 = null;
         int rs = 0;
         try {
@@ -1424,6 +1424,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             stmt31.setInt(i++, goodsOffer.getFrom_flag());
             stmt31.setString(i++, goodsOffer.getAliPid() == null ? "" : goodsOffer.getAliPid());
             stmt31.setString(i++, goodsOffer.getAliPrice() == null ? "" : goodsOffer.getAliPrice());
+            stmt31.setString(i++, goodsOffer.getKeyWord() == null ? "" : goodsOffer.getKeyWord());
 
             rs = stmt31.executeUpdate();
         } catch (Exception e) {

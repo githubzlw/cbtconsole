@@ -748,24 +748,26 @@ public class ShopCarMarketingController {
                 totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
             }
             // 调用线上接口，获取客户支付运费,实际我司运费
-            getMinFreightByUserId(userId,carUserStatistic);
+            boolean isGetFreigthResult = getMinFreightByUserId(userId, carUserStatistic);
 
-            // 利润率计算
-            if(totalWhosePrice == 0){
-                estimateProfit = 0;
-                carUserStatistic.setTotalPrice(0);
-                carUserStatistic.setEstimateProfit(0);
-                carUserStatistic.setTotalWhosePrice(0);
-            }else {
-                estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / totalWhosePrice * 100D;
-                carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
-                carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
+            if(isGetFreigthResult){
+                // 利润率计算
+                if(totalWhosePrice == 0){
+                    estimateProfit = 0;
+                    carUserStatistic.setTotalPrice(0);
+                    carUserStatistic.setEstimateProfit(0);
+                    carUserStatistic.setTotalWhosePrice(0);
+                }else {
+                    estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / (totalPrice + carUserStatistic.getTotalFreight()) * 100D;
+                    carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                    carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
+                    carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
+                }
             }
-
             mv.addObject("success", 1);
             mv.addObject("userInfo", carUserStatistic);
             mv.addObject("goodsList", shopCarInfoList);
+            mv.addObject("isGetFreigthResult",isGetFreigthResult);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("queryShoppingCarByUserId error:" + e.getMessage());
@@ -776,8 +778,8 @@ public class ShopCarMarketingController {
         return mv;
     }
 
-    private double getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic) {
-
+    private boolean getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic) {
+        boolean resutl= false;
         double freight = 0;
         OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -797,6 +799,7 @@ public class ShopCarMarketingController {
                     carUserStatistic.setTotalFreight(BigDecimalUtil.truncateDouble(freight, 2));
                 }
                 carUserStatistic.setOffFreight(BigDecimalUtil.truncateDouble(json.getJSONObject("data").getDouble("freightCost"), 2));
+                resutl = true;
             } else {
                 System.err.println("getMinFreightByUserId error :<:<:<");
             }
@@ -804,8 +807,9 @@ public class ShopCarMarketingController {
             e.printStackTrace();
             System.err.println(e.getMessage());
             logger.error("getMinFreightByUserId error:" + e.getMessage());
+            resutl = false;
         }
-        return freight;
+        return resutl;
     }
 
 
