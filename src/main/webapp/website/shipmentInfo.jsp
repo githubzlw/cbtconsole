@@ -465,6 +465,7 @@ var curPage;
 					<option value="迅邮">迅邮</option>
 					<option value="大誉">大誉</option>
 					<option value="衡欣">衡欣</option>
+					<option value="DHL">DHL</option>
 				</select>
 				金额：<input type="text" name="amounts" id="amounts" class="remark" style="width: 250px;"/>
 			</div>
@@ -492,6 +493,7 @@ var curPage;
 					<option value="迅邮">迅邮</option>
 					<option value="大誉">大誉</option>
 					<option value="衡欣">衡欣</option>
+					<option value="DHL">DHL</option>
 				</select>
 			</div>
 		</div>
