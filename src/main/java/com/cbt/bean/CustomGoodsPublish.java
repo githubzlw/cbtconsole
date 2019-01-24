@@ -107,6 +107,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
     private String fromFlagDesc;
 
+    private String maxPrice;// 最高价格
+
+    public String getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(String maxPrice) {
+        this.maxPrice = maxPrice;
+    }
+
     public String getFromFlagDesc() {
         return fromFlagDesc;
     }
