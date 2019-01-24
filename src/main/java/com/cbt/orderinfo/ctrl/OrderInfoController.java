@@ -961,10 +961,46 @@ public class OrderInfoController{
 		return purchaseService.getSizeChart(catid);
 	}
 	
+	//替换尺码表用
 	@RequestMapping(value = "/loadCategoryName")
 	public @ResponseBody List<Map<String,Object>> loadCategoryName(HttpServletRequest request){
 		String catid = request.getParameter("catid");
 		return purchaseService.loadCategoryName(catid);
+	}
+	
+	//补充尺码表用
+	@RequestMapping(value = "/loadCategoryName_add")
+	public @ResponseBody List<Map<String,Object>> loadCategoryName_add(HttpServletRequest request){
+		String catid = request.getParameter("catid");
+		return purchaseService.loadCategoryName_add(catid);
+	}
+	//补充尺码表用
+	@RequestMapping(value = "/getSizeChart_add")
+	public @ResponseBody List<Map<String,Object>> getSizeChart_add(HttpServletRequest request){
+		String catid = request.getParameter("catid");
+		String rowidListstr = request.getParameter("rowidListstr");
+		List<Integer> rowidList = new ArrayList<Integer>();
+		if(StringUtils.isNotBlank(rowidListstr)) {
+			String[] rowidArrays = rowidListstr.split(",");
+			for(String idstr:rowidArrays) {
+				if(StringUtils.isBlank(idstr)) {
+					continue;
+				}else {
+					idstr = idstr.replaceAll("\\s*","");
+				}
+				rowidList.add(Integer.parseInt(idstr));
+			}
+		}
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		if(StringUtils.isNotBlank(admuserJson)) {
+			Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+			//标记为已处理
+			if(rowidList.size()>0&&adm!=null) {
+				purchaseService.updateSizeChartById_add(rowidList,adm.getId());
+			}
+			
+		}
+		return purchaseService.getSizeChart_add(catid);
 	}
 	
 	@RequestMapping(value = "/uploadImg")
@@ -1016,7 +1052,11 @@ public class OrderInfoController{
 			
 			Integer row_id = Integer.parseInt(rowid);
 			//更新上传图片路径和信息
-			row = purchaseService.updateSizeChart(imgName,path,row_id);
+			if("1".equals(request.getParameter("add"))) {
+				row = purchaseService.updateSizeChart_add(imgName,path,row_id);
+			}else {
+				row = purchaseService.updateSizeChart(imgName,path,row_id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			map.put("state", 0);

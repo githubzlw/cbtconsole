@@ -1847,8 +1847,16 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		return pruchaseMapper.getSizeChart(catid);
 	}
 	@Override
+	public List<Map<String,Object>> getSizeChart_add(String  catid) {
+		return pruchaseMapper.getSizeChart_add(catid);
+	}
+	@Override
 	public int updateSizeChart(String imgname,String localpath,int rowid) {
 		return pruchaseMapper.updateSizeChart(imgname,localpath, rowid);
+	}
+	@Override
+	public int updateSizeChart_add(String imgname,String localpath,int rowid) {
+		return pruchaseMapper.updateSizeChart_add(imgname,localpath, rowid);
 	}
 	@Override
 	public int updateSizeChartUpload(List<Integer> rowidArray) {
@@ -1862,12 +1870,18 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public List<Map<String,Object>> loadCategoryName(String catid) {
 		return pruchaseMapper.loadCategoryName(catid+"%");
 	}
-	
+	@Override
+	public List<Map<String,Object>> loadCategoryName_add(String catid) {
+		return pruchaseMapper.loadCategoryName_add(catid+"%");
+	}
 	@Override
 	public int updateSizeChartById(List<Integer> rowidArray,int userid) {
 		return pruchaseMapper.updateSizeChartById(rowidArray,userid);
 	}
-	
+	@Override
+	public int updateSizeChartById_add(List<Integer> rowidArray,int userid) {
+		return pruchaseMapper.updateSizeChartById_add(rowidArray,userid);
+	}
 	@Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);

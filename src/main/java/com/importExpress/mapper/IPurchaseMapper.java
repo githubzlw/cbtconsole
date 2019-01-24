@@ -513,8 +513,12 @@ public interface IPurchaseMapper {
 	
 	public List<Map<String,Object>> getSizeChart(@Param("catid")String  catid);
 	public List<Map<String,Object>> loadCategoryName(@Param("catid")String catid);
+	public List<Map<String,Object>> getSizeChart_add(@Param("catid")String  catid);
+	public List<Map<String,Object>> loadCategoryName_add(@Param("catid")String catid);
 	public List<Map<String,Object>> getSizeChartPidInfo();
 	public int updateSizeChart(@Param("imgname")String imgname,@Param("localpath")String localpath,@Param("rowid")int rowid);
+	public int updateSizeChart_add(@Param("imgname")String imgname,@Param("localpath")String localpath,@Param("rowid")int rowid);
 	public int updateSizeChartUpload(@Param("rowidArray")List<Integer> rowidArray);
 	public int updateSizeChartById(@Param("rowidArray")List<Integer> rowidArray,@Param("userid")int userid);
+	public int updateSizeChartById_add(@Param("rowidArray")List<Integer> rowidArray,@Param("userid")int userid);
 }
