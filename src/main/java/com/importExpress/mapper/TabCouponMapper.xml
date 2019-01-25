@@ -130,5 +130,11 @@
             #{item}
         </foreach>
     </select>
+
+    <!--long queryCouponCodeCount(@Param("couponCode") String couponCode);-->
+    <select id="queryCouponCodeCount" resultType="Long">
+        SELECT COUNT(1) FROM tab_coupon_new
+        WHERE id LIKE #{couponCode}
+    </select>
     
 </mapper>
