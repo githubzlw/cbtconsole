@@ -10,13 +10,13 @@ import java.util.Map;
 
 public interface TabCouponService {
 
-	Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid);
+	Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo);
 
 	List<TabCouponType> queryTabCouponTypeCodeList();
 
 	List<TabCouponRules> queryTabCouponRulesList();
 
-	void addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew) throws Exception;
+    Map<String, String> addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew, List<String> useridList) throws Exception;
 
 	Boolean checkCouponCode(String couponCode);
 

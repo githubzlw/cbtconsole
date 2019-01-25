@@ -25,6 +25,8 @@ public interface TabTrackInfoMapping {
 
     List<TabTrackInfo> getRecordListByOrderOrTrackNo(@Param("orderNo") String orderNo, @Param("trackNo") String trackNo, @Param("userid") Integer userid);
 
+    List<TabTrackInfo> getRecordListByUserid(@Param("orderUserid") String orderUserid, @Param("userid") Integer userid);
+
 	void updatestate(TabTrackInfo tabTrackInfo);
 
 	TabTrackInfo queryStateByTrackNo(@Param("trackNo") String trackNo);

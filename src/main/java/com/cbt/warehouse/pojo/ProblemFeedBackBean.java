@@ -35,7 +35,26 @@ public class ProblemFeedBackBean implements Serializable{
 	private String reply_content;
 	private String reply_time;
 	private String whatsApp;
-	public String getWhatsApp() {
+    private String business;//your business name
+    private String tellBusiness;//tell us about your business
+
+    public String getBusiness() {
+        return business;
+    }
+
+    public void setBusiness(String business) {
+        this.business = business;
+    }
+
+    public String getTellBusiness() {
+        return tellBusiness;
+    }
+
+    public void setTellBusiness(String tellBusiness) {
+        this.tellBusiness = tellBusiness;
+    }
+
+    public String getWhatsApp() {
 		return whatsApp;
 	}
 
