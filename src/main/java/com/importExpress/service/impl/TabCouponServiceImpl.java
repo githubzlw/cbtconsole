@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TabCouponServiceImpl implements TabCouponService {
@@ -37,9 +34,9 @@ public class TabCouponServiceImpl implements TabCouponService {
     private SendMailFactory sendMailFactory;
 	
 	@Override
-	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid) {
-		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid);
-		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid);
+	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo) {
+		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid, timeTo);
+		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid, timeTo);
 		
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
@@ -58,7 +55,8 @@ public class TabCouponServiceImpl implements TabCouponService {
 	}
 
 	@Override
-	public void addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew) throws Exception {
+	public Map<String, String> addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew, List<String> useridList) throws Exception {
+        Map<String, String> result = new HashMap<String, String>();
 		String json = JSONObject.fromObject(couponRedis).toString();
 		tabCouponNew.setMqlog(json);
 		//保存记录到本地
@@ -75,6 +73,19 @@ public class TabCouponServiceImpl implements TabCouponService {
                 sendMQ.closeConn();
             }
         }
+        result.put("state", "true");
+        result.put("message", "创建折扣卷成功!");
+        //关联用户id
+        if (useridList.size() > 0){
+            List<UserBean> userList = tabCouponMapper.queryLocalUser(useridList);
+            if (userList == null || userList.size() == 0){
+                result.put("message", "创建折扣卷成功, 但未找到被关联的用户信息, 未进行关联!");
+                return result;
+            }
+            insertCouponUsersAndSendMail(tabCouponNew, userList);
+            result.put("message", "创建折扣卷成功, 且关联用户id成功, 正在发送邮件通知客户。");
+        }
+        return result;
     }
 
 	@Override
@@ -107,39 +118,64 @@ public class TabCouponServiceImpl implements TabCouponService {
     @Override
     public Map<String, String> addCouponUser(String couponCode, List<String> useridList) {
         Map<String, String> result = new HashMap<String, String>();
+        //查询优惠卷信息
         TabCouponNew tabCouponNew = queryTabCouponOne(couponCode);
         if (tabCouponNew == null){
             result.put("state", "false");
             result.put("message", "未找到该优惠卷信息");
             return result;
         }
-        //查询本地已关联记录 查询数量
-        Long count = tabCouponMapper.queryCouponUsersCount(couponCode);
-        if (tabCouponNew.getCount() < count + useridList.size()){
-            result.put("state", "false");
-            result.put("message", "卷数量不足(已关联用户数+待关联用户数>卷总数量)");
-            return result;
-        }
         //查询被关联用户信息
         List<UserBean> userList = tabCouponMapper.queryLocalUser(useridList);
-        if (userList == null && useridList.size() == 0){
+        if (userList == null || userList.size() == 0){
             result.put("state", "false");
             result.put("message", "未找到被关联的用户信息");
             return result;
         }
+        //查询本地已关联记录 查询用户id
+        List<String> localUserList = tabCouponMapper.queryCouponUsersCount(couponCode);
+        //去除本地已关联记录
+        if (localUserList != null && localUserList.size() > 0){
+            Iterator<UserBean> iterator = userList.iterator();
+            while (iterator.hasNext()){
+                UserBean bean = iterator.next();
+                if (localUserList.contains(String.valueOf(bean.getId()))){
+                    iterator.remove();
+                }
+            }
+        }
+        if (userList == null || userList.size() == 0){
+            result.put("state", "false");
+            result.put("message", "未找到被关联的用户信息,或者关联的用户已进行了关联");
+            return result;
+        }
+
+        if (tabCouponNew.getCount() < userList.size()
+                || tabCouponNew.getCount() < localUserList.size() + userList.size()){
+            result.put("state", "false");
+            result.put("message", "卷数量不足(已关联用户数+待关联用户数>卷总数量)");
+            return result;
+        }
+        insertCouponUsersAndSendMail(tabCouponNew, userList);
+        result.put("state", "true");
+        result.put("message", "关联用户id成功, 正在发送邮件通知客户。");
+        return result;
+    }
+
+    public void insertCouponUsersAndSendMail(TabCouponNew tabCouponNew, List<UserBean> userList) {
         //保存记录到本地
-        tabCouponMapper.insertCouponUsers(tabCouponNew, useridList);
+        tabCouponMapper.insertCouponUsers(tabCouponNew, userList);
         //发送mq 到线上 {"id":"001-20181228-100","to":"1546185600","type":"2","userid":"1000"}
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
             for (UserBean userBean : userList) {
-                CouponUserRedisBean bean = new CouponUserRedisBean(couponCode, new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
+                CouponUserRedisBean bean = new CouponUserRedisBean(tabCouponNew.getId(), new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
                 sendMQ.sendCouponMsg(json);
             }
             //异步发送邮件
-            Runnable task=new TabCouponServiceImpl.sendCouponMailTask(userList, tabCouponNew);
+            Runnable task=new sendCouponMailTask(userList, tabCouponNew);
             new Thread(task).start();
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
@@ -148,9 +184,6 @@ public class TabCouponServiceImpl implements TabCouponService {
                 sendMQ.closeConn();
             }
         }
-        result.put("state", "true");
-        result.put("message", "关联用户id成功, 正在发送邮件通知客户。");
-        return result;
     }
 
     class sendCouponMailTask implements Runnable{
@@ -243,14 +276,20 @@ public class TabCouponServiceImpl implements TabCouponService {
             couponCode = "0001";
         }
 
-        String curTime = String.valueOf(System.currentTimeMillis());
-        couponCode += "-" + curTime.substring(curTime.length() - 6) + "-0";
-        
+        //防止卷码重复
+        String curTime = "";
+        long count = 1;
+        while (count > 0){
+            curTime = String.valueOf(System.currentTimeMillis()).substring(6, 12);
+            count = tabCouponMapper.queryCouponCodeCount("%" + curTime + "%");
+        }
+        couponCode += "-" + curTime + "-1";
         return couponCode;
     }
     
     public static void main(String[] args) {
-        System.out.println(new Date());
+        System.out.println(String.valueOf(System.currentTimeMillis()).substring(6, 6));
+        System.out.println(1);
     }
     
     

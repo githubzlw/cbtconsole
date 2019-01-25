@@ -595,7 +595,7 @@ public class OrderinfoService implements IOrderinfoService {
 		searchresultinfo.setGoods_img_url(String.valueOf(map.get("od_goods_img_url")).replace("80x80","400x400").replace("60x60","400x400"));
 		searchresultinfo.setImg(com.cbt.website.util.Utility.ImgMatch(map.get("img").replace("60x60","400x400").replace("80x80","400x400")));
 		searchresultinfo.setCurrency(String.valueOf(map.get("currency")));
-		searchresultinfo.setGoods_price(Double.parseDouble(String.valueOf(map.get("goods_price"))));
+		searchresultinfo.setGoods_price(Double.parseDouble(String.valueOf(map.get("odGoodsPrice"))));
 		searchresultinfo.setGoods_p_price(Double.parseDouble(String.valueOf(map.get("goods_p_price"))));
 		searchresultinfo.setPurchase_state(Integer.valueOf(String.valueOf(map.get("purchase_state"))));
 		searchresultinfo.setUsecount(Integer.valueOf(String.valueOf(map.get("usecount"))));
@@ -858,8 +858,8 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	private void getRoTypeAndState(Map<String, ArrayList<Object[]>> changInfo, OrderDetailsBean odb) {
-		if (changInfo.get("order" + odb.getGoodsid()) != null) {
-			List<Object[]> changeInfoList = changInfo.get("order" + odb.getGoodsid());
+		if (changInfo.get("order" + odb.getId()) != null) {
+			List<Object[]> changeInfoList = changInfo.get("order" + odb.getId());
 			for (int i = 0; i < changeInfoList.size(); i++) {
 				int ropType = (Integer) changeInfoList.get(i)[0];
 				int del_state = (Integer) changeInfoList.get(i)[1];

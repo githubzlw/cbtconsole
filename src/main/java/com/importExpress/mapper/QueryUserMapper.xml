@@ -337,5 +337,18 @@
     <delete id="deleteNeedoffshelfSoldAll">
         TRUNCATE TABLE alidata.needoffshelf_sold_pid
     </delete>
-	
+
+    <!--List<String> queryIsEditProducts();-->
+    <select id="queryIsEditProducts" resultType="String">
+        SELECT pid
+        FROM custom_goods_edit
+        WHERE is_edited = 1
+    </select>
+
+    <!--List<String> queryInventoryProducts();-->
+    <select id="queryInventoryProducts" resultType="String">
+        SELECT goods_pid
+        FROM inventory
+    </select>
+
 </mapper>

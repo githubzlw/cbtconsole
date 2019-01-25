@@ -176,7 +176,42 @@
 			sp.createtime ASC,
 			of.order_no
     </select>
-    
+
+    <!--List<TabTrackInfo> getRecordListByUserid(@Param("orderUserid") String orderUserid, @Param("userid") Integer userid);-->
+    <select id="getRecordListByUserid" resultType="com.cbt.bean.TabTrackInfo">
+        SELECT
+            au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate,
+		    ti.updat_date updatDate, ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
+		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					shipping_package
+			) sp
+		LEFT JOIN orderinfo of ON sp.orderid = of.order_no
+		LEFT JOIN cross_border_shop.tab_track_info ti
+			ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
+		LEFT JOIN cross_border_shop.tab_track_forward tf
+			ON sp.expressno = tf.track_no AND sp.transportcompany = tf.track_company
+		LEFT JOIN admin_r_user ar ON of.user_id = ar.userid
+        LEFT JOIN admuser au ON au.id = ar.adminid
+        LEFT JOIN user u ON u.id = of.user_id
+        <where>
+            <if test="userid != null">
+                ar.adminid = #{userid}
+            </if>
+            <if test="orderUserid != null">
+                AND (of.user_id = #{orderUserid} OR u.email LIKE '%${orderUserid}%')
+            </if>
+        </where>
+		ORDER BY
+			sp.createtime ASC,
+			of.order_no
+    </select>
+
     <!-- List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo); -->
 	<select id="getForwardListByTrackNo" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
