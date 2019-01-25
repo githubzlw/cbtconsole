@@ -198,9 +198,9 @@ input, textarea, select, button {
 							<td></td>
 							<td>截止时间<em class="flag_reg">*</em></td>
 							<td>
-                                <a class='input-group date' id='fromTime'
+                                <a class='input-group date'
                                     style="float: left;"> <input type='text'
-                                        class="form-control" name="fromTime"
+                                        class="form-control" name="fromTime" id='fromTime'
                                         style="width: 100px; height: 30px;" /> <span
                                         class="input-group-addon"
                                         style="float: left; width: 50px; height: 30px;"> <span
@@ -208,8 +208,8 @@ input, textarea, select, button {
                                     </span>
                                 </a>
                                 <span style="float:left;line-height: 30px;">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
-                                <a class='input-group date' id='toTime'
-                                   style="float: left;"> <input type='text'
+                                <a class='input-group date'
+                                   style="float: left;"> <input type='text' id='toTime'
                                         class="form-control" name="toTime"
                                         style="width: 100px; height: 30px;" /> <span
                                         class="input-group-addon"
@@ -224,7 +224,10 @@ input, textarea, select, button {
                             <td>是否用于社交分享<em class="flag_reg">*</em></td>
                             <td>
                                 <input type="radio" name="shareFlag" value="0" checked="checked" style="float: left;height: 20px;" />
-                                <span style="float: left;line-height: 30px;">&nbsp;用于关联客户&nbsp;&nbsp;</span>
+                                <span style="float: left;line-height: 30px;">&nbsp;用于关联客户(多个用户用逗号隔开, 可不录入)&nbsp;&nbsp;</span>
+                                <br /><br />
+                                <textarea rows="30" cols="52" name="userids" style="height: 100px;margin-left: 60px;"></textarea>
+                                <br />
                                 <input type="radio" name="shareFlag" value="1" style="float: left;height: 20px;" />
                                 <span style="float: left;line-height: 30px;">&nbsp;用于社交分享</span>
                             </td>
@@ -232,7 +235,7 @@ input, textarea, select, button {
 						<tr>
 							<td></td>
 							<td></td>
-							<td><input type="submit" value="创建" style="width: 100px">
+							<td><input type="submit" value="创建">
 								<input type="button" value="重置" onclick="formReset()"
 								style="margin-left: 30px"></td>
 						</tr>
@@ -332,6 +335,50 @@ input, textarea, select, button {
 	</div>
 
 	<script type="text/javascript">
+        //创建优惠卷时候关联用户id录入改变事件
+        $("textarea[name='userids']").keyup(function () {
+            if(!$.isEmptyObject($("textarea[name='userids']").val())){
+                $("#addCoupon input[type='submit']").val('创建优惠卷并发送邮件给客户');
+            } else {
+                $("#addCoupon input[type='submit']").val('创建');
+            }
+        });
+        //设置日期时间控件
+        function Datetime(dateId) {
+            $(dateId).parent().datetimepicker({
+                language : 'zh-CN',//显示中文
+                format : 'yyyy-mm-dd',//显示格式
+                minView : "month",//设置只显示到月份
+                initialDate : new Date(),
+                autoclose : true,//选中自动关闭
+                todayBtn : true,//显示今日按钮
+                pickerPosition : 'top-right',//显示位置
+                locale : moment.locale('zh-cn')
+            });
+        }
+        Datetime('#fromTime');
+        Datetime('#toTime');
+
+        function iniDatetime() {
+            //时间选择框日期初始化
+            var today = new Date();
+            var nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            //对日期格式进行处理
+            var date = new Date(nowdate);
+            var mon = date.getMonth() + 1;
+            var day = date.getDate();
+            var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("fromTime").value = mydate;
+            today = new Date();
+            today.setDate(today.getDate() + 180); //日期加180天
+            nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            date = new Date(nowdate);
+            mon = date.getMonth() + 1;
+            day = date.getDate();
+            mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("toTime").value = mydate;
+        }
+
 		//卷码校验 重复校验
 		$("input[name=couponCode]").blur(function(){
 			$.ajax({
@@ -354,16 +401,18 @@ input, textarea, select, button {
 //		});
 		//重置按钮
 		function formReset() {
+            iniDatetime();//时间初始化
 //			$("input[name=couponCode]").val("");
 			$("input[name=couponCode]").next().text("");
 			$("input[name=type]").val("");
-			$("input[name=valueLeft]").val("");
+			$("input[name=valueLeft]").val("50");
 			$("input[name=valueRight]").val("");
-			$("input[name=describe]").val("");
-			$("input[name=count]").val("");
-			$("input[name=fromTime]").val("");
-			$("input[name=toTime]").val("");
+			$("input[name=describe]").val("If order over  $50");
+			$("input[name=count]").val("1");
             $("#addCoupon input[type='submit']").attr("disabled",false);//创建按钮可以点击
+            $('input[type=radio][name=shareFlag]').get(0).checked = "checked";//是否用于社交分享
+            $("textarea[name='userids']").val('');//关联的用户ids
+            $("#addCoupon input[type='submit']").val('创建');
 		}
 		//表单校验
 		function formCheck() {
@@ -440,13 +489,15 @@ input, textarea, select, button {
 				dataType : "json",
 				success : function(msg) {
                     $("#addCoupon input[type='submit']").attr("disabled",false);//创建按钮可以点击
-					if (msg.state == 'success') {
+					if (msg.state == 'true') {
 						//保存成功
-						formReset();
-						$('#myModal').modal('hide');
-						$("#date-range-search").click();
-						if(msg.shareUrl != undefined && msg.shareUrl != ''){
+                        formReset();
+                        $('#myModal').modal('hide');
+                        $("#date-range-search").click();
+                        if(msg.shareUrl != undefined && msg.shareUrl != ''){
                             $.messager.alert('分享链接', '<br /><div style="word-wrap: break-word;">' + msg.shareUrl + '</div>');
+                        } else {
+                            $.messager.alert('提示', '<br /><div style="word-wrap: break-word;">' + msg.message + '</div>');
                         }
 					} else {
 						$("input[name=couponCode]").next().text(msg.message);
@@ -547,23 +598,8 @@ input, textarea, select, button {
                 }
             });
 		}
-		//设置日期时间控件
-		function Datetime(dateId) {
-			$(dateId).datetimepicker({
-				language : 'zh-CN',//显示中文
-				format : 'yyyy-mm-dd',//显示格式
-				minView : "month",//设置只显示到月份
-				initialDate : new Date(),
-				autoclose : true,//选中自动关闭
-				todayBtn : true,//显示今日按钮
-				pickerPosition : 'top-right',//显示位置
-				locale : moment.locale('zh-cn')
-			});
-		}
-		Datetime('#fromTime');
-		Datetime('#toTime');
 
-		function formatNum(val) {
+        function formatNum(val) {
 			return val < 10 ? "0" + val : val
 		}
 

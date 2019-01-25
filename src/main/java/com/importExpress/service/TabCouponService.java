@@ -16,7 +16,7 @@ public interface TabCouponService {
 
 	List<TabCouponRules> queryTabCouponRulesList();
 
-	void addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew) throws Exception;
+    Map<String, String> addCoupon(CouponRedisBean couponRedis, TabCouponNew tabCouponNew, List<String> useridList) throws Exception;
 
 	Boolean checkCouponCode(String couponCode);
 
