@@ -144,6 +144,15 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	//商品有库存但规格不一致
 	private String pidInventory;
 	private int isBenchmark;
+	private String noChnageRemark;
+	public String getNoChnageRemark() {
+		return noChnageRemark;
+	}
+
+	public void setNoChnageRemark(String noChnageRemark) {
+		this.noChnageRemark = noChnageRemark;
+	}
+
 	public int getIsBenchmark() {
 		return isBenchmark;
 	}

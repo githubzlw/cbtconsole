@@ -75,4 +75,8 @@ public interface QueryUserMapper {
     void insertNeedoffshelfSoldPid(@Param("list") List<String> list, @Param("type") Integer type);
 
     void deleteNeedoffshelfSoldAll();
+
+    List<String> queryIsEditProducts();
+
+    List<String> queryInventoryProducts();
 }

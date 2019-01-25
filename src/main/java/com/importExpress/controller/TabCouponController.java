@@ -46,12 +46,15 @@ public class TabCouponController {
      */
     @RequestMapping(value = "/list.do")
     @ResponseBody
-    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid) {
+    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid, Integer timeTo) {
     	if (StringUtils.isBlank(typeCode) || "0".equals(typeCode)) {
     		typeCode = null;
 		}
 		if(valid == -1){
     	    valid = null;
+        }
+        if(timeTo == 0){
+            timeTo = null;
         }
         //返回数据
         EasyUiJsonResult json = new EasyUiJsonResult();
@@ -67,7 +70,7 @@ public class TabCouponController {
             page = Integer.valueOf(pageStr);//无该参数时查询默认值1
         }
         // 查询
-        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid);
+        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid, timeTo);
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
             json.setSuccess(true);
@@ -132,6 +135,7 @@ public class TabCouponController {
     @ResponseBody
     public Map<String, String> addCoupon(HttpServletRequest request,
                                          String couponCode, //卷码
+                                         @RequestParam(value = "userids", defaultValue = "", required = false) String userids, //满减卷关联用户的id
                                          Integer type, //卷类别
                                          Integer shareFlag, //是否用于社交分享
                                          @RequestParam(value = "valueLeft", defaultValue = "0", required = false) Integer valueLeft, //慢减卷最低消费金额
@@ -179,6 +183,21 @@ public class TabCouponController {
             shareid = Md5Util.encoder(String.valueOf(System.currentTimeMillis())).substring(0, 6).toLowerCase();
     	    value += "-1-" + shareid;
         }
+        //关联用户id
+        List<String> useridList = new ArrayList<String>();
+        if (shareFlag != 1 && StringUtils.isNotBlank(userids)){
+            List<String> idList = Arrays.asList(userids.replace("，", ",").split(","));
+            for (String userid : idList) {
+                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim()) && !useridList.contains(userid.trim())){
+                    useridList.add(userid.trim());
+                }
+            }
+        }
+        if (useridList.size() > count){
+            resultMap.put("message", "关联的用户id数量多于创建的优惠卷数量!");
+            resultMap.put("state", "false");
+            return resultMap;
+        }
         //表单数据 (String id, String count, String leftCount, String describe, String value, String from, String to, String type, String valid)
         CouponRedisBean couponRedis = new CouponRedisBean(couponCode, count.toString(), count.toString(),
         		describe, value, new Long(fromDate.getTime()).toString(), new Long(toDate.getTime()).toString(),
@@ -187,12 +206,11 @@ public class TabCouponController {
         TabCouponNew tabCouponNew = new TabCouponNew(couponCode, count, count, describe,
         		value, fromDate, toDate, type, 1, userId, shareFlag);
         try {
-        	tabCouponService.addCoupon(couponRedis, tabCouponNew);
-        	resultMap.put("message", "保存成功!");
+            resultMap = tabCouponService.addCoupon(couponRedis, tabCouponNew, useridList);
         	if (shareFlag == 1) {
                 resultMap.put("shareUrl", SearchFileUtils.importexpressPath + "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid);
             }
-        	resultMap.put("state", "success");
+        	resultMap.put("state", "true");
 		} catch (Exception e) {
 			System.out.println(e);
 			resultMap.put("message", "保存异常" + e);
@@ -295,7 +313,7 @@ public class TabCouponController {
             List<String> idList = Arrays.asList(userids.replace("，", ",").split(","));
             List<String> useridList = new ArrayList<String>();
             for (String userid : idList) {
-                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim())){
+                if (StringUtils.isNotBlank(userid) && StringUtils.isNumeric(userid.trim()) && !useridList.contains(userid.trim())){
                     useridList.add(userid.trim());
                 }
             }
