@@ -12,15 +12,14 @@ public class GoodsCarConfigDaoImpl implements GoodsCarConfigDao {
 
     @Override
     public boolean updateGoodsCarConfig(GoodsCarconfigWithBLOBs record) {
-        String sql = "update goods_carconfig set shopCarinfo= ?,shopCarShowinfo=?,updateTime = now(),needCheck=0 where userid = ?";
+        String sql = "update goods_carconfig set buyForMeCarConfig= ?,updateTime = now(),needCheck=0 where userid = ?";
         Connection conn = DBHelper.getInstance().getConnection2(); // 27
         PreparedStatement stmt = null;
         int rs = 0;
         try {
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, record.getShopcarinfo());
-            stmt.setString(2, record.getShopcarshowinfo());
-            stmt.setInt(3, record.getUserid());
+            stmt.setString(1, record.getBuyformecarconfig());
+            stmt.setInt(2, record.getUserid());
             rs = stmt.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
