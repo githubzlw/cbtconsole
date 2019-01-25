@@ -1021,11 +1021,19 @@ em {
 											<br>
 											<br>
 											<font color="red">【替换货源】</font>
+											<c:if test="${not empty orderd.noChnageRemark }">
+												<br>
+												客户不同意备注:<span style="color: red;">${orderd.noChnageRemark}</span>
+											</c:if>
 										</c:if>
 										<c:if test="${orderd.orsstate==12 && order.state==5}">
 											<br>
 											<br>
 											<font color="red">【替换货源】</font>
+											<c:if test="${not empty orderd.noChnageRemark }">
+												<br>
+												客户不同意备注:<span style="color: red;">${orderd.noChnageRemark}</span>
+											</c:if>
 										</c:if>
 										<c:if test="${orderd.od_state==13 && order.state==1}">
 											<br>

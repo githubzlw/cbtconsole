@@ -706,11 +706,9 @@
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
         union ALL
-        SELECT 'noChange',COUNT(DISTINCT c.orderid) counts FROM cancel_replacement_record c
-        INNER JOIN orderinfo oi ON c.orderid=oi.order_no
-        INNER JOIN admin_r_user a ON oi.user_id=a.userid
-        INNER JOIN USER u ON oi.user_id=u.id
-        where   oi.state between 1 and 5 and c.flag=0
+        SELECT 'noChange',COUNT(DISTINCT c.orderid) counts FROM cancel_replacement_record c INNER JOIN orderinfo oi ON c.orderid=oi.order_no
+        INNER JOIN order_details od ON c.orderid=od.orderid AND c.goodsid=od.goodsid LEFT JOIN order_product_source ops ON od.orderid=ops.orderid AND od.id=ops.od_id
+        AND ops.purchase_state IN(3,4,5,6,8,13,12) WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1)
         and oi.user_id IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
         email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
         email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
@@ -828,6 +826,7 @@
         car_img,od.car_url, format(od.goodsprice,2) as goodsprice,od.yourorder,goodsfreight,od.remark,od.delivery_time,od.Actual_price,od.Actual_freight,od.Actual_weight, od.od_bulk_volume,od.od_total_weight,
         od.Actual_volume,od.goodsid,od.extra_freight,od.fileupload,od.freight_free,od.purchase_state,ifnull(od.purchase_time,ors.purchasetime) as purchase_time,purchase_confirmation,car_type,
         (SELECT z.id FROM zone z WHERE REPLACE(z.country,' ','')=REPLACE(adr.country,' ','')) new_zid ,
+        ifnull(cr.remark,'') as noChnageRemark,
         (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND IFNULL(sku,'---')!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,id.goodstatus,
@@ -836,6 +835,7 @@
         cbr.bm_flag,cbr.isBenchmark,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
         from order_details od
         left join order_address adr on od.orderid=adr.orderNo
+        left join cancel_replacement_record cr on cr.orderid=od.orderid and cr.goodsid=od.goodsid
         left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
         left join id_relationtable id on od.id=id.odid  and id.is_replenishment=1
         left join zone z ON adr.country=z.country   left join orderinfo oi ON oi.order_no=od.orderid
