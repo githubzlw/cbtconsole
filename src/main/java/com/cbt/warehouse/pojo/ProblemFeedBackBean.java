@@ -19,7 +19,7 @@ public class ProblemFeedBackBean implements Serializable{
 	
 	private String problem;//反馈提交的问题;
 	
-	private Date createtime;//提交反馈问题的时间;
+	private String createtime;//提交反馈问题的时间;
 
 	private int type;//提交问题所出的页面,1、注册页面；2、购物车页面；3、支付页面;
 	
@@ -152,11 +152,11 @@ public class ProblemFeedBackBean implements Serializable{
 		this.problem = problem;
 	}
 
-	public Date getCreatetime() {
+	public String getCreatetime() {
 		return createtime;
 	}
 	
-	public void setCreatetime(Date createtime) {
+	public void setCreatetime(String createtime) {
 		this.createtime = createtime;
 	}
 	

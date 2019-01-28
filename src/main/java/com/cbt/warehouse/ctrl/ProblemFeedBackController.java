@@ -1,6 +1,8 @@
 package com.cbt.warehouse.ctrl;
 
 import com.cbt.common.StringUtils;
+import com.cbt.customer.dao.GuestBookDaoImpl;
+import com.cbt.customer.dao.IGuestBookDao;
 import com.cbt.customer.service.GuestBookServiceImpl;
 import com.cbt.customer.service.IGuestBookService;
 import com.cbt.pojo.Admuser;
@@ -10,6 +12,9 @@ import com.cbt.warehouse.pojo.ProblemFeedBackBean;
 import com.cbt.warehouse.service.ProblemFeedBackService;
 import com.cbt.website.util.JsonResult;
 
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +42,8 @@ public class ProblemFeedBackController {
 
 	@Autowired
 	private ProblemFeedBackService problemFeedBackService;
+	@Autowired
+	private SendMailFactory sendMailFactory;
 	
 	/**
 	 * 客户返回页面回复客户反馈内容并发送邮件给客户
@@ -50,6 +57,7 @@ public class ProblemFeedBackController {
 	@ResponseBody
 	public JsonResult saveRepalyContent(HttpServletRequest request) {
 		JsonResult json = new JsonResult();
+		IGuestBookDao dao = new GuestBookDaoImpl();
 		IGuestBookService ibs = new GuestBookServiceImpl();
 		try{
 			String report_id=request.getParameter("report_id");
@@ -65,8 +73,20 @@ public class ProblemFeedBackController {
 			List<ProblemFeedBackBean> list=problemFeedBackService.getReportProblem(report_id);
 			if(list.size()>0){
 				ProblemFeedBackBean p=list.get(0);
-				int count = ibs.replyReport(p.getId(),text, date, p.getUserName(), p.getQustion(), p.getUserEmail(), p.getUserid(), p.getSale_email());
-				json.setOk(count>0);
+//				int count = ibs.replyReport(p.getId(),text, date, p.getUserName(), p.getQustion(), p.getUserEmail(), p.getUserid(), p.getSale_email());
+				int row=dao.replyReport(p.getId(), text,date);
+				if(row>0){
+					Map<String,Object> modelM = new HashedMap();
+					modelM.put("first_name",list.get(0).getUserEmail());
+					modelM.put("question",list.get(0).getQustion());
+					modelM.put("createtime",list.get(0).getCreatetime());
+					modelM.put("reply_content",text);
+					modelM.put("toHref","https://www.import-express.com/Goods/getShopCar");
+					sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
+					json.setOk(true);
+				}else{
+					json.setOk(false);
+				}
 			}else{
 				json.setOk(false);
 			}

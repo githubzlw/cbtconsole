@@ -1465,18 +1465,15 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 
 	@Override
 	public List<SearchResultInfo> getReplenishResultInfo(String expresstrackid) {
-		String sql = "SELECT DISTINCT rep_state purchase_state,ir.POSITION goodsPOSITION,od.id as odid,od.remark AS odremark,ir.goodstatus goodstatus,gc.seilUnit as gcUnit, lgi.itemid, o.userid,o.orderid,o.goodsid,o.rep_state goodsdataid, o.goods_title goods_name,o.goods_url,od.car_type,od.checked,od.seilUnit,"
-				+ " o.goods_p_url,CONCAT(SUBSTRING_INDEX(od.car_img,'.jpg',1),'.jpg') goods_img_url,"
-				+ "  CONCAT(SUBSTRING_INDEX(g.img,'.jpg',1),'.jpg') img,o.goods_price,o.goods_price goods_p_price,od.yourorder usecount,o.buycount,o.remark,orderstate.ordercount,orderstate.buycnt"
-				+ " ,(SELECT GROUP_CONCAT(DISTINCT(POSITION),',') FROM id_relationtable ir WHERE ir.orderid=o.orderid  and ir.is_delete <> 1) AS POSITION ,o.goods_type"
-				+ " FROM order_replenishment o  "
-				+ " INNER JOIN (SELECT DISTINCT  itemid FROM taobao_1688_order_history WHERE shipno = ?) lgi ON lgi.itemid = o.tb_1688_itemid"
-				+ " INNER JOIN order_details od ON od.goodsid=o.goodsid and od.orderid=o.orderid "
-				+ " INNER JOIN (SELECT orderid,COUNT(id) ordercount,SUM(state) buycnt FROM order_details WHERE order_details.state<2 GROUP BY orderid )  orderstate   ON  orderstate.orderid=o.orderid"
-				+ " LEFT JOIN id_relationtable ir ON ir.goodid = o.goodsid and ir.orderid=o.orderid and ir.is_delete =0"
-				+ " LEFT JOIN goods_typeimg g ON o.goodsid = g.goods_id   "
-				+ " LEFT JOIN goods_car gc ON gc.id=od.goodsid   "
-				+ " WHERE  ir.is_replenishment=1 and o.rep_state=0 AND TO_DAYS(NOW()) - TO_DAYS(o.createtime) <= 60 ORDER BY o.orderid;";
+		String sql = "SELECT DISTINCT rep_state purchase_state,ir.POSITION goodsPOSITION,od.id AS odid,od.remark AS odremark,ir.goodstatus goodstatus,od.seilUnit AS gcUnit, " +
+				" lgi.itemid, o.userid,o.orderid,o.goodsid,o.rep_state goodsdataid, o.goods_title goods_name,o.goods_url,od.car_type,od.checked,od.seilUnit, o.goods_p_url," +
+				" CONCAT(SUBSTRING_INDEX(od.car_img,'.jpg',1),'.jpg') goods_img_url,  CONCAT(SUBSTRING_INDEX(od.car_img,'.jpg',1),'.jpg') img,o.goods_price,o.goods_price goods_p_price," +
+				" od.yourorder usecount,o.buycount,o.remark,orderstate.ordercount,orderstate.buycnt ,(SELECT GROUP_CONCAT(DISTINCT(POSITION),',') FROM id_relationtable ir WHERE ir.orderid=o.orderid " +
+				" AND ir.is_delete <> 1) AS POSITION ,o.goods_type FROM order_replenishment o  " +
+				" INNER JOIN (SELECT DISTINCT  itemid FROM taobao_1688_order_history WHERE shipno = ?) lgi " +
+				" ON lgi.itemid = o.tb_1688_itemid  INNER JOIN order_details od ON od.id=o.od_id AND od.orderid=o.orderid  INNER JOIN (SELECT orderid,COUNT(id) ordercount,SUM(state) buycnt FROM order_details" +
+				"  WHERE order_details.state<2 GROUP BY orderid )  orderstate   ON  orderstate.orderid=o.orderid LEFT JOIN id_relationtable ir ON ir.odid = o.od_id AND ir.orderid=o.orderid  AND ir.is_delete =0   " +
+				" WHERE  ir.is_replenishment=1 AND o.rep_state=0 AND TO_DAYS(NOW()) - TO_DAYS(o.createtime) <= 60 ORDER BY o.orderid;";
 		// Connection conn = DBHelper.getInstance().getConnection();
 		// 本地化链接
 		Connection conn = DBHelper.getInstance().getConnection();

@@ -21,7 +21,7 @@
 		<if test="keyword != null">
 			and keyword like CONCAT('%', #{keyword}, '%') 
 		</if>
-		order by id desc limit #{offset},#{pageSize} 
+		order by issyn desc limit #{offset},#{pageSize}
 	</select>
 	
 	<select id="getCount" resultType="Integer">

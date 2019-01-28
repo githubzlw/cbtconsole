@@ -94,16 +94,15 @@ public class NewOrderDetailsCtr {
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
-			List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(iOrderinfoService.getBuyerAndAll()));
 
-			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
+//			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
 			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
 			//获取实际运费
-			Long start = System.currentTimeMillis();
-			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
-			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
+//			Long start = System.currentTimeMillis();
+//			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
+//			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
 			// 获取汇率
 			double rate =Double.valueOf(orderInfo.getExchange_rate());
 			//获取订单出运信息
@@ -146,17 +145,13 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("shippingtype",shippingtype);
 			request.setAttribute("ac_weight",ac_weight);
 			request.setAttribute("awes_freight",awes_freight);
-			if(freightCostByOrderno>0){
-				request.setAttribute("allFreight", freightCostByOrderno);
-			}else {
-				request.setAttribute("allFreight", freightFee);
-			}
+			request.setAttribute("allFreight", freightFee);
 			request.setAttribute("estimatefreight",estimatefreight*rate);
 			request.setAttribute("allWeight",allWeight);
 			//产品预计采购金额-
 			double es_buyAmount=0.00;
 			request.setAttribute("es_buyAmount",es_buyAmount);
-			String fileByOrderid = iOrderinfoService.getFileByOrderid(orderNo);
+			String fileByOrderid =orderInfo.getFileByOrderid();// iOrderinfoService.getFileByOrderid(orderNo);
 			String invoice="2";
 			if (fileByOrderid == null || fileByOrderid.length() < 10) {
 				invoice="0";
@@ -455,10 +450,10 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("lirun1", lirun1);
 			request.setAttribute("isDropshipOrder", orderInfo.getIsDropshipOrder());
 			// 查看订单对应邮件
-			IEmailReceiveService emailService = new EmailReceiveServiceImpl();
+//			IEmailReceiveService emailService = new EmailReceiveServiceImpl();
 			// 查看客户来往邮件
-			List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
-			request.setAttribute("emaillist", emaillist);
+//			List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
+//			request.setAttribute("emaillist", emaillist);
 			//用户信息    yyl - start
 			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 			Admuser admuserinfo = JSONObject.parseObject(admuserJson, Admuser.class);
