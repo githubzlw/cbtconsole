@@ -112,6 +112,15 @@ public class OrderBean implements Cloneable {
     private int payBackList;
     //优惠券优惠
     private String couponAmount;
+    private String fileByOrderid;
+    public String getFileByOrderid() {
+        return fileByOrderid;
+    }
+
+    public void setFileByOrderid(String fileByOrderid) {
+        this.fileByOrderid = fileByOrderid;
+    }
+
     public String getCouponAmount() {
         return couponAmount;
     }

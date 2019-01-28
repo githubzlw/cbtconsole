@@ -1289,29 +1289,13 @@ public class OrderinfoService implements IOrderinfoService {
 				couponAmount="0";
 			}
 			ob.setCouponAmount(couponAmount);
-			List<String> yhCount=pruchaseMapper.getProblem(orderNo,"1");//验货疑问总数
-			int checkeds=pruchaseMapper.getChecked(orderNo,"1");//验货无误总数
-			int cg=pruchaseMapper.getPurchaseCount(orderNo,"1");//采购总数
-			int rk=pruchaseMapper.getStorageCount(orderNo,"1");//入库总数
-			//判断该用户是否为黑名单
-			int backList=iWarehouseDao.getBackList(ob.getUserEmail());
-			int payBackList=0;
-			if(StringUtil.isNotBlank(ob.getPayUserName())){
-				payBackList=iWarehouseDao.getPayBackList(ob.getPayUserName());
-			}
-			String backFlag="";
-			if(backList>0 || payBackList>0){
-				backFlag="该用户为黑名单";
-			}
-			ob.setBackFlag(backFlag);
-			ob.setYhCount(yhCount.size());
-			ob.setCheckeds(checkeds);
-			ob.setCg(cg);
-			ob.setRk(rk);
+			ob.setYhCount(pruchaseMapper.getProblem(orderNo,"1").size());
+			ob.setCheckeds(pruchaseMapper.getChecked(orderNo,"1"));
+			ob.setCg(pruchaseMapper.getPurchaseCount(orderNo,"1"));
+			ob.setRk(pruchaseMapper.getStorageCount(orderNo,"1"));
 			String countryNameCn = Utility.getStringIsNull(ob.getCountryNameCN())? ob.getCountryNameCN() : "USA";
 			ob.setCountryNameCN(countryNameCn);
-			String dzconfirmtime =ob.getDzConfirmtime();
-			ob.setDzConfirmtime(Utility.getStringIsNull(dzconfirmtime)? dzconfirmtime.substring(0, dzconfirmtime.indexOf(" ")) : "");
+			ob.setDzConfirmtime(Utility.getStringIsNull(ob.getDzConfirmtime())? ob.getDzConfirmtime().substring(0, ob.getDzConfirmtime().indexOf(" ")) : "");
 			ob.setOrderNo(orderNo);
 			ob.setExchange_rate(StringUtil.isBlank(ob.getExchange_rate())?"6.3":ob.getExchange_rate());
 			String pay_price_tow = ob.getPay_price_tow();

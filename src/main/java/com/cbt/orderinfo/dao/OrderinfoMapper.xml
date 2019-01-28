@@ -879,7 +879,6 @@
         0 deliver,
         (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)  and ops.orderid = o.order_no) purchase,
         (SELECT COUNT(id) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as countOd,
-         (select DISTINCT pt.username from payment pt where pt.paystatus=1 and pt.paytype=0 and pt.username is not null and pt.username!='' and pt.orderid=o.order_no LIMIT 1) as payUserName,
         (SELECT SUM(checked) FROM order_details od WHERE od.orderid=o.order_no AND od.state&lt;2) as checked,
         (SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=o.order_no) as problem,
         (SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,
@@ -895,7 +894,7 @@
         (select email from admuser au where aru.adminid=au.id) adminemail,
         actual_lwh,memberFee,0 ordernum,ifnull(aru.admName,'') adminname,ifnull(aru.adminid,'') adminid,  actual_weight_estimate,actual_freight_c,packag_number,u.name username,
         u.email as userEmail,'' as buyer,exporttime,   '' storagetime,o.actual_weight_estimate as freightFee,  o.delivery_time as deliveryTime,  0  buyid,
-        o.orderRemark,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount as gradeDiscount,u.businessName
+        o.orderRemark,ifnull(pi.invoice,'') as fileByOrderid,if(o.exchange_rate&lt;=0,6.3,o.exchange_rate) as exchange_rate,o.cashback,o.firstdiscount,o.isDropshipOrder,o.share_discount,o.extra_discount,o.extra_discount,o.coupon_discount,o.grade_discount as gradeDiscount,u.businessName
         ,(select chinapostbig from zone z where a.country=z.country) countryNameCN ,vatbalance,if(sp.sweight>sp.volumeweight,sp.sweight,sp.volumeweight) as volumeweight,sp.svolume,
         (SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.blackVlue=u.email) as backList,
         (SELECT COUNT(1) FROM tblacklist a INNER JOIN order_address b ON a.blackVlue=b.address2 WHERE b.orderNo=o.order_no AND a.flag=0) as backAddressCount,
@@ -907,6 +906,7 @@
         left join  user_grade ug on ug.id= u.grade
         left join  shipping_package sp on sp.orderid=o.order_no
         LEFT JOIN payment pm ON pm.orderid=o.order_no
+        left join payment_invoice pi on pi.orderid=o.order_no
         left join  paymentconfirm  pf on pf.orderno=o.order_no where order_no =#{orderNo}
     </select>
     <!-- public String getDropshipOrderNoList(String orderNo); -->
