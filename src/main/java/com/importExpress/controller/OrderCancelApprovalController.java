@@ -25,6 +25,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 @Controller
@@ -41,6 +43,7 @@ public class OrderCancelApprovalController {
     @Autowired
     private PayPalService ppApiService;
     private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
+    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
     @RequestMapping("/queryForList")
@@ -382,8 +385,11 @@ public class OrderCancelApprovalController {
     }
 
     private void updateOnlineDealState(OrderCancelApproval approvalBean) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, -8);
         String sql = "update order_cancel_approval set deal_state =" + approvalBean.getDealState()
-                + " ,agree_amount = " + approvalBean.getAgreeAmount() + " where user_id = " + approvalBean.getUserId()
+                + " ,agree_amount = " + approvalBean.getAgreeAmount() + ",update_time = '"
+                + DATE_FORMAT.format(calendar.getTime()) + "' where user_id = " + approvalBean.getUserId()
                 + " and order_no = '" + approvalBean.getOrderNo() + "'";
         NotifyToCustomerUtil.sendSqlByMq(sql);
     }
