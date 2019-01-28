@@ -1,7 +1,9 @@
 package com.cbt.customer.service;
 
 import ceRong.tools.bean.DorpDwonBean;
+
 import com.cbt.bean.*;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -181,6 +183,17 @@ public interface IPictureComparisonService {
 
 	public int saveLireGood(TbGoodBean tbGoodBean);
 
+    /**
+     * 设置pid商品是否有效(上架或者下架)
+     *
+     * @param pid
+     * @param adminName
+     * @param adminId
+     * @param type
+     * @return
+     */
+    public int setGoodsValid(String pid, String adminName, int adminId, int type, String remark);
+    
 	public int insertLireSearchData(List<GoodsCheckBean> picIdList);
 
 	public int saveChangeGoodData(ChangeGoodBean chg);

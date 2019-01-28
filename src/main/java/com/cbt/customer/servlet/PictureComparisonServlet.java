@@ -9,19 +9,24 @@ import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.ParseGoodsUrl;
 import com.cbt.parse.service.SimilarImageSearch;
 import com.cbt.pojo.Admuser;
+import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.SplitPage;
 import com.cbt.util.StrUtils;
+
 import net.sf.json.JSONArray;
+
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +38,8 @@ public class PictureComparisonServlet extends HttpServlet {
 	private String chineseChar = "([\\一-\\龥]+)";
 	private final static int PAGESIZE = 40;
 	private static final long serialVersionUID = 1L;
-	
+    @Autowired
+    private CustomGoodsService customGoodsService;
 	
 	/**
 	 * 方法描述:ali图片下载
@@ -1917,6 +1923,11 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //			tbgood.setPidSource(Integer.valueOf(pidSource));
 			//1688产品插入
 			ips.saveLireGood(tbgood);
+			
+			//删除同款
+			ips.setGoodsValid(goodId, "yunying", 18, -1, "同款下架");
+            
+            
 			//更新已处理完避免再次出现
 //			tbgood.setDelFlag(1);
 //			int tbg = ips.updateSourceAliFlag(tbgood);

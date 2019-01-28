@@ -374,12 +374,18 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality1 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore1==0 }">否</c:if><c:if test="${gbb.proScore1!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory1==0 }">否</c:if><c:if test="${gbb.deepFactory1!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality1==0 }">否</c:if><c:if test="${gbb.shopQuality1!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon1==0 }"><em style="color:green">下架</em></c:if><c:if test="${gbb.proCon1!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId1 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore1!=0 }"><em style="color:#F00;"> ${gbb.proScore1 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold1!=0 }"><em style="color:#F00;"> ${gbb.proSold1 }</em></c:if>
+						 
 						<%--  <br> 销量:${gbb.proSold1 } --%>
 						 <br> <%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName1}',1);">
 					  			<input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName1}',2)">
 					  			<input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName1}',3)">
 					 				<input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName1}',4)"> --%>
-					  			<input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName1}',5)">
+					  			<input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName1}',5)">
 					  			<%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName1}',6)"> --%>
 				  </c:if>
 					  			
@@ -396,11 +402,16 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality2 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore2==0 }">否</c:if><c:if test="${gbb.proScore2!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory2==0 }">否</c:if><c:if test="${gbb.deepFactory2!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality2==0 }">否</c:if><c:if test="${gbb.shopQuality2!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon2==0 }"><em style="color:green;">下架</em></c:if><c:if test="${gbb.proCon2!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId2 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore2!=0 }"><em style="color:#F00;"> ${gbb.proScore2 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold2!=0 }"><em style="color:#F00;"> ${gbb.proSold2 }</em></c:if>
 						 <br><%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName2}',1);">
 					  <input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName2}',2)">
 					  <input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName2}',3)">
 					  <input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName2}',4)"> --%>
-					  <input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName2}',5)">
+					  <input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName2}',5)">
 					  <%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName2}',6)"> --%>
 					  </c:if>
 					</td>
@@ -416,11 +427,16 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality3 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore3==0 }">否</c:if><c:if test="${gbb.proScore3!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory3==0 }">否</c:if><c:if test="${gbb.deepFactory3!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality3==0 }">否</c:if><c:if test="${gbb.shopQuality3!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon3==0 }"><em style="color:green">下架</em></c:if><c:if test="${gbb.proCon3!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId3 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore3!=0 }"><em style="color:#F00;"> ${gbb.proScore3 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold3!=0 }"><em style="color:#F00;"> ${gbb.proSold3 }</em></c:if>
 						 <br><%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName3}',1);">
 					  <input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName3}',2)">
 					  <input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName3}',3)">
 					  <input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName3}',4)"> --%>
-					  <input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName3}',5)">
+					  <input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName3}',5)">
 					  <%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName3}',6)"> --%>
 					  </c:if>
 					</td>
@@ -436,11 +452,16 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality4 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore4==0 }">否</c:if><c:if test="${gbb.proScore4!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory4==0 }">否</c:if><c:if test="${gbb.deepFactory4!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality4==0 }">否</c:if><c:if test="${gbb.shopQuality4!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon4==0 }"><em style="color:green">下架</em></c:if><c:if test="${gbb.proCon4!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId4 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore4!=0 }"><em style="color:#F00;"> ${gbb.proScore4 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold4!=0 }"><em style="color:#F00;"> ${gbb.proSold4 }</em></c:if>
 						 <br> <%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName4}',1);">
 					  <input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName4}',2)">
 					  <input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName4}',3)">
 					  <input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName4}',4)"> --%>
-					  <input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName4}',5)">
+					  <input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName4}',5)">
 					  <%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName4}',6)"> --%>
 					  </c:if>
 					</td>
@@ -456,11 +477,16 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality5 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore5==0 }">否</c:if><c:if test="${gbb.proScore5!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory5==0 }">否</c:if><c:if test="${gbb.deepFactory5!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality5==0 }">否</c:if><c:if test="${gbb.shopQuality5!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon5==0 }"><em style="color:green">下架</em></c:if><c:if test="${gbb.proCon5!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId5 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore5!=0 }"><em style="color:#F00;"> ${gbb.proScore5 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold5!=0 }"><em style="color:#F00;"> ${gbb.proSold5 }</em></c:if>
 						 <br><%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName5}',1);">
 					  <input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName5}',2)">
 					  <input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName5}',3)">
 					  <input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName5}',4)"> --%>
-					  <input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName5}',5)">
+					  <input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName5}',5)">
 					  <%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName5}',6)"> --%>
 					  </c:if>
 					</td>
@@ -476,11 +502,16 @@
 						 <br> 销量:<em style="color:#F00;">${gbb.shopQuality6 }</em>
 						 <br> 是否对标:<c:if test="${gbb.proScore6==0 }">否</c:if><c:if test="${gbb.proScore6!=0 }"><em style="color:#F00;">是</em></c:if>
 						 <br> 是否卖过:<c:if test="${gbb.deepFactory6==0 }">否</c:if><c:if test="${gbb.deepFactory6!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否人为编辑过:<c:if test="${gbb.shopQuality6==0 }">否</c:if><c:if test="${gbb.shopQuality6!=0 }"><em style="color:#F00;">是</em></c:if>
+						 <br> 是否在线:<c:if test="${gbb.proCon6==0 }"><em style="color:green">下架</em></c:if><c:if test="${gbb.proCon6!=0 }"><em style="color:#F00;">在线</em></c:if>
+						 <br> 该卖家质量水准: <em style="color:#F00;">${gbb.shopId6 }</em>
+						 <br> 商品评分:<c:if test="${gbb.proScore6!=0 }"><em style="color:#F00;"> ${gbb.proScore6 }</em></c:if>
+						 <br> 店铺评分: <c:if test="${gbb.proSold6!=0 }"><em style="color:#F00;"> ${gbb.proSold6 }</em></c:if>
 						 <br><%-- <input type="button" value="侵权商品" onclick="fnQinQ('${gbb.goodsName6}',1);">
 					  	<input type="button" value="有中文" onclick="fnZhongW('${gbb.goodsName6}',2)">
 					  <input type="button" value="太难看" onclick="fnTaiNK('${gbb.goodsName6}',3)">
 					  <input type="button" value="是精品" onclick="fnJingP('${gbb.goodsName6}',4)"> --%>
-					  <input type="button" value="同款删除" onclick="fnXiaJ('${gbb.goodsName6}',5)">
+					  <input type="button" value="同款删除" style="height:40px;width:80px;" onclick="fnXiaJ('${gbb.goodsName6}',5)">
 					  <%-- <input type="button" value="同款" onclick="fnSame('${gbb.goodsName0}','${gbb.goodsName6}',6)"> --%>
 					  </c:if>
 					</td>
