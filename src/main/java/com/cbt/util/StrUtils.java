@@ -356,7 +356,7 @@ public class StrUtils {
 	public static String removeSpecialCodeForWprice(String str) {
 		String result = str;
 		if(StringUtils.isNotBlank(str)) {
-			return str.replaceAll("[\\!\\@#%\\^&\\*\\(\\)_\\+\\=\\|\\?/>,<\\:;'\"{}~`。，《》？、（）……￥！·——‘’“”｛｝【】：；\\\t\\\n]+", " ");
+			return str.replaceAll("[\\!\\@#%\\^&\\*\\(\\)_\\+\\=\\|\\?/><\\:;'\"{}~`。，《》？、（）……￥！·——‘’“”｛｝【】：；\\\t\\\n]+", " ");
 		}
 		return result;//\\.
 	}
