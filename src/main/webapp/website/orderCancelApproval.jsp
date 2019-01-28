@@ -71,8 +71,6 @@
 </style>
 <script>
     $(document).ready(function () {
-        var adminId = "${adminId}";
-        getAdminList(adminId);
         var dealState = "${dealState}";
         if (!(dealState == null || dealState == "")) {
             $("#query_deal_state").val(dealState);
@@ -82,34 +80,6 @@
             $("#query_type").val(type);
         }
     });
-
-    function getAdminList(adminId) {
-        $.ajax({
-            type: "POST",
-            url: "/cbtconsole/singleGoods/getAdminList",
-            data: {},
-            success: function (data) {
-                if (data.ok) {
-                    $("#query_admin_id").empty();
-                    var content = '<option value="0" selected="selected">全部</option>';
-                    var json = data.data;
-                    for (var i = 0; i < json.length; i++) {
-                        if (json[i].id == adminId) {
-                            content += '<option selected="select" value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
-                        } else {
-                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
-                        }
-                    }
-                    $("#query_admin_id").append(content);
-                } else {
-                    alert("获取用户列表失败，原因 :" + data.message);
-                }
-            },
-            error: function (res) {
-                alert("网络获取失败");
-            }
-        });
-    }
 
     function openOrderDeal(userId, orderNo, obj) {
         setChooseTr(obj);
@@ -139,9 +109,6 @@
     <form action="/cbtconsole/orderCancelApprovalCtr/queryForList" method="post">
         <span>客户ID:<input type="text" name="userId" class="inp_sty" value="${userId}"/></span>
         <span>订单号:<input type="text" name="orderNo" class="inp_sty" value="${orderNo}"/></span>
-        <span>
-            销售:<select id="query_admin_id" name="adminId" style="height: 28px;"></select>
-            </span>
         <span>类别:<select id="query_type" name="type" style="height: 28px;">
             <option value="0">全部</option>
             <option value="1">客户申请</option>
