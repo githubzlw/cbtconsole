@@ -6,12 +6,14 @@
         <result column="user_id" property="userId"/>
         <result column="order_no" property="orderNo"/>
         <result column="pay_price" property="payPrice"/>
+        <result column="agree_amount" property="agreeAmount"/>
         <result column="type" property="type"/>
         <result column="deal_state" property="dealState"/>
         <result column="create_time" property="createTime"/>
         <result column="user_email" property="userEmail"/>
         <result column="admin_id" property="adminId"/>
         <result column="admin_name" property="adminName"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <resultMap id="approvalDetailsResultMap" type="com.importExpress.pojo.OrderCancelApprovalDetails">
@@ -24,11 +26,14 @@
         <result column="deal_state" property="dealState"/>
         <result column="create_time" property="createTime"/>
         <result column="remark" property="remark"/>
+        <result column="available_m" property="userBalance"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <select id="queryForList" parameterType="com.importExpress.pojo.OrderCancelApproval" resultMap="approvalResultMap">
-        select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,u.available_m,u.user_email,u.admin_name,u.admin_id
+        select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,a.agree_amount,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,
+        u.available_m,u.user_email,u.admin_name,u.admin_id
         from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
         user_email,admuser.admName as
         admin_name,admuser.id as admin_id from `user`,admin_r_user,admuser where `user`.id = admin_r_user.userid
@@ -49,10 +54,23 @@
         <if test="adminId != null">
             and u.admin_id = #{adminId}
         </if>
-        order by a.createTime desc
+        order by a.create_time desc
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
+    </select>
+
+
+    <select id="queryForSingle" parameterType="com.importExpress.pojo.OrderCancelApproval" resultMap="approvalResultMap">
+        select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,a.agree_amount,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,
+        u.available_m,u.user_email,u.admin_name,u.admin_id
+        from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
+        user_email,admuser.admName as
+        admin_name,admuser.id as admin_id from `user`,admin_r_user,admuser where `user`.id = admin_r_user.userid
+        and admin_r_user.adminid = admuser.id) u on a.user_id=u.id
+        where 1 = 1
+        and a.id = #{id}
     </select>
 
     <select id="queryForListCount" parameterType="com.importExpress.pojo.OrderCancelApproval"
@@ -88,13 +106,13 @@
 	</select>
 
     <insert id="insertIntoApprovalDetails" parameterType="com.importExpress.pojo.OrderCancelApprovalDetails">
-		insert into order_cancel_approval_details(approval_id,order_no,pay_price,deal_state,admin_id)
-		values(#{approvalId},#{orderNo},#{payPrice},#{dealState},#{adminId})
+		insert into order_cancel_approval_details(approval_id,order_no,pay_price,deal_state,admin_id,remark)
+		values(#{approvalId},#{orderNo},#{payPrice},#{dealState},#{adminId},#{remark})
 	</insert>
 
     <update id="updateOrderCancelApprovalState" parameterType="com.importExpress.pojo.OrderCancelApproval">
 		update order_cancel_approval
-		set pay_price = #{payPrice},deal_state = #{dealState}
+		set agree_amount = #{agreeAmount},deal_state = #{dealState},update_time = now()
 		where id = #{id}
 	</update>
 

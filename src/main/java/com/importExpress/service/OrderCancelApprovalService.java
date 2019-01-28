@@ -15,6 +15,13 @@ public interface OrderCancelApprovalService {
     List<OrderCancelApproval> queryForList(OrderCancelApproval cancelApproval);
 
     /**
+     * 单个获取
+     * @param id
+     * @return
+     */
+    OrderCancelApproval queryForSingle(int id);
+
+    /**
      * 取消订单申请总数
      * @param cancelApproval
      * @return
@@ -41,5 +48,13 @@ public interface OrderCancelApprovalService {
      * @return
      */
     int updateOrderCancelApprovalState(OrderCancelApproval cancelApproval);
+
+    /**
+     * 根据userId和订单号查询是否存在的申请
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    int checkIsExistsApproval(int userId,String orderNo);
 
 }

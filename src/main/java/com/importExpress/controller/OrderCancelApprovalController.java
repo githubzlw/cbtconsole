@@ -1,5 +1,6 @@
 package com.importExpress.controller;
 
+import com.cbt.paypal.service.PayPalService;
 import com.cbt.systemcode.service.SecondaryValidationService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -10,6 +11,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Controller
@@ -34,6 +37,10 @@ public class OrderCancelApprovalController {
 
     @Autowired
     private SecondaryValidationService secondaryValidationService;
+
+    @Autowired
+    private PayPalService ppApiService;
+    private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
 
     @RequestMapping("/queryForList")
@@ -79,20 +86,20 @@ public class OrderCancelApprovalController {
         }
 
         String typeStr = request.getParameter("type");
-        int type = -1;
+        int type = 0;
         if (StringUtils.isNotBlank(typeStr)) {
             type = Integer.valueOf(typeStr);
         }
         mv.addObject("type", type);
 
 
-        int state = -1;
-        String stateStr = request.getParameter("state");
+        int dealState = -1;
+        String dealStateStr = request.getParameter("dealState");
 
-        if (StringUtils.isNotBlank(stateStr)) {
-            state = Integer.valueOf(stateStr);
+        if (StringUtils.isNotBlank(dealStateStr)) {
+            dealState = Integer.valueOf(dealStateStr);
         }
-        mv.addObject("state", state);
+        mv.addObject("dealState", dealState);
 
 
         int startNum = 0;
@@ -107,11 +114,11 @@ public class OrderCancelApprovalController {
         try {
 
             OrderCancelApproval cancelApproval = new OrderCancelApproval();
-            if (type > -1) {
+            if (type > 0) {
                 cancelApproval.setType(type);
             }
-            if (state > -1) {
-                cancelApproval.setDealState(state);
+            if (dealState > -1) {
+                cancelApproval.setDealState(dealState);
             }
             if (adminId > 0) {
                 cancelApproval.setAdminId(adminId);
@@ -124,19 +131,18 @@ public class OrderCancelApprovalController {
             int total = approvalService.queryForListCount(cancelApproval);
             for (OrderCancelApproval approvalBean : list) {
                 List<OrderCancelApprovalDetails> detailsList = approvalService.queryForDetailsList(approvalBean.getId());
-                for (OrderCancelApprovalDetails detailsBean : detailsList) {
+                for (OrderCancelApprovalDetails approvalDetail : detailsList) {
                     //判断各个状态
-
-                    if (detailsBean.getDealState() == 1) {
+                    if (approvalDetail.getDealState() == 1) {
                         //状态是1的为销售审批，放入销售审批详情
-                        approvalBean.setApproval1(detailsBean);
-                    } else if (detailsBean.getDealState() == 2) {
+                        approvalBean.setApproval1(approvalDetail);
+                    } else if (approvalDetail.getDealState() == 2) {
                         //状态是2的为主管审批，放入主管审批详情
-                        approvalBean.setApproval2(detailsBean);
-                    } else if (detailsBean.getDealState() == 3) {
+                        approvalBean.setApproval2(approvalDetail);
+                    } else if (approvalDetail.getDealState() == 3) {
                         //状态是3的为审批完成，已经退款
-                        approvalBean.setApproval3(detailsBean);
-                    } else if (detailsBean.getDealState() == 4) {
+                        approvalBean.setApproval3(approvalDetail);
+                    } else if (approvalDetail.getDealState() == 4) {
                         //状态是9的为驳回信息
                     }
                 }
@@ -197,16 +203,6 @@ public class OrderCancelApprovalController {
                 dealState = Integer.valueOf(dealStateStr);
             }
 
-            String actionFlagStr = request.getParameter("actionFlag");
-            int actionFlag = 0;
-            if (StringUtils.isBlank(actionFlagStr)) {
-                json.setMessage("获取操作状态失败,请重试");
-                json.setOk(false);
-                return json;
-            } else {
-                actionFlag = Integer.valueOf(actionFlagStr);
-            }
-
             String userIdStr = request.getParameter("userId");
             int userId = 0;
             if (StringUtils.isBlank(userIdStr) || "0".equals(userIdStr)) {
@@ -261,43 +257,46 @@ public class OrderCancelApprovalController {
             }
 
             String secvlidPwd = request.getParameter("secvlidPwd");
-            if (actionFlag > 1 && StringUtils.isBlank(secvlidPwd)) {
+            if (dealState > 2 && StringUtils.isBlank(secvlidPwd)) {
                 json.setOk(false);
                 json.setMessage("获取密码失败,请重试");
                 return json;
             }
 
             boolean isCheck;
-            if (actionFlag == 1 && operatorId == 1 && dealState == 3) {
+            if (dealState > 2) {
                 isCheck = secondaryValidationService.checkExistsPassword(operatorId, secvlidPwd);
             } else {
                 //操作状态是1的说明是销售，不需要校检密码
                 isCheck = true;
-
             }
             if (isCheck) {
                 OrderCancelApproval approvalBean = new OrderCancelApproval();
                 approvalBean.setId(approvalId);
                 approvalBean.setOrderNo(orderNo);
                 approvalBean.setDealState(dealState);
-                approvalBean.setPayPrice(refundAmount);
-
-                approvalService.updateOrderCancelApprovalState(approvalBean);
+                approvalBean.setAgreeAmount(refundAmount);
+                approvalBean.setUserId(userId);
 
                 OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
-
-
                 approvalDetails.setApprovalId(approvalId);
+                if(dealState < 4){
+                    approvalDetails.setDealState(dealState);
+                }else{
+                    approvalDetails.setDealState(4);
+                }
                 approvalDetails.setOrderNo(orderNo);
                 approvalDetails.setPayPrice(refundAmount);
                 approvalDetails.setAdminId(user.getId());
                 approvalDetails.setRemark(remark);
-                approvalService.insertIntoApprovalDetails(approvalDetails);
-                if (actionFlag != 4) {
-                    //使用MQ更新线上状态
-                    updateOnlineDealState(approvalBean);
-                }
 
+                approvalService.updateOrderCancelApprovalState(approvalBean);
+                approvalService.insertIntoApprovalDetails(approvalDetails);
+                //使用MQ更新线上状态
+                updateOnlineDealState(approvalBean);
+                if (dealState == 2 || dealState == 3) {
+                    json = refundOrderCancelByApi(approvalBean, approvalDetails);
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("二次密码验证失败,请重试");
@@ -314,8 +313,79 @@ public class OrderCancelApprovalController {
     }
 
 
-    private void updateOnlineDealState(OrderCancelApproval approvalBean) {
+    @RequestMapping("/queryApprovalDetails")
+    @ResponseBody
+    public ModelAndView queryApprovalDetails(HttpServletRequest request, HttpServletResponse response) {
 
+        ModelAndView mv = new ModelAndView("approvalDetails");
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtil.isBlank(admuserJson)) {
+            mv.addObject("success", 0);
+            mv.addObject("message", "请登录后操作");
+            return mv;
+        }
+
+        //获取申诉id
+        String approvalIdStr = request.getParameter("approvalId");
+        int approvalId = 0;
+        if (StringUtils.isBlank(approvalIdStr)) {
+            mv.addObject("success", 0);
+            mv.addObject("message", "获取申请ID失败,请重试");
+            return mv;
+        } else {
+            approvalId = Integer.valueOf(approvalIdStr);
+        }
+        try {
+            OrderCancelApproval approvalBean = approvalService.queryForSingle(approvalId);
+            List<OrderCancelApprovalDetails> approvalDetailsList = approvalService.queryForDetailsList(approvalId);
+            mv.addObject("success", 1);
+            mv.addObject("approvalBean", approvalBean);
+            mv.addObject("approvalDetails", approvalDetailsList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("approvalId：" + approvalId + ",queryApprovalDetails，原因 :" + e.getMessage());
+            mv.addObject("success", 0);
+            mv.addObject("message", "approvalId：" + approvalId + ",queryApprovalDetails，原因:" + e.getMessage());
+        }
+        return mv;
+    }
+
+
+    private JsonResult refundOrderCancelByApi(OrderCancelApproval approvalBean, OrderCancelApprovalDetails approvalDetails) {
+
+        JsonResult json = new JsonResult();
+        try {
+            json = ppApiService.reFundNew(approvalBean.getOrderNo(), decimalFormat.format(approvalBean.getAgreeAmount()));
+            if (json.isOk()) {
+                approvalBean.setDealState(3);
+                approvalDetails.setDealState(3);
+                approvalDetails.setRemark(approvalDetails.getRemark() + ",执行API退款成功！<br>退款交易号[" + json.getMessage() + "]");
+                approvalService.updateOrderCancelApprovalState(approvalBean);
+                approvalService.insertIntoApprovalDetails(approvalDetails);
+                //使用MQ更新线上状态
+                updateOnlineDealState(approvalBean);
+            } else {
+                logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
+                System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
+                json.setOk(false);
+                json.setMessage("退款失败,原因:[" + json.getMessage() + "],联系IT人员查看");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("userId:" + approvalBean.getUserId() + ",rdId:" + approvalBean.getId() + ",refundByPayPalApi error :" + e.getMessage());
+            System.err.println("userId:" + approvalBean.getUserId() + ",rdId:" + approvalBean.getId() + ",refundByPayPalApi error :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("退款失败,请联系IT人员查看");
+        }
+
+        return json;
+    }
+
+    private void updateOnlineDealState(OrderCancelApproval approvalBean) {
+        String sql = "update order_cancel_approval set deal_state =" + approvalBean.getDealState()
+                + " ,agree_amount = " + approvalBean.getAgreeAmount() + " where user_id = " + approvalBean.getUserId()
+                + " and order_no = '" + approvalBean.getOrderNo() + "'";
+        NotifyToCustomerUtil.sendSqlByMq(sql);
     }
 
 

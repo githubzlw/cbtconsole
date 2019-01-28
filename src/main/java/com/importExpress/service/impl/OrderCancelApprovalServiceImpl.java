@@ -1,5 +1,7 @@
 package com.importExpress.service.impl;
 
+import com.cbt.dao.RefundDaoPlus;
+import com.cbt.dao.impl.RefundDaoImpl;
 import com.importExpress.mapper.OrderCancelApprovalMapper;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
@@ -14,10 +16,16 @@ public class OrderCancelApprovalServiceImpl implements OrderCancelApprovalServic
     @Autowired
     private OrderCancelApprovalMapper approvalMapper;
 
+    private RefundDaoPlus refundDao = new RefundDaoImpl();
 
     @Override
     public List<OrderCancelApproval> queryForList(OrderCancelApproval cancelApproval) {
         return approvalMapper.queryForList(cancelApproval);
+    }
+
+    @Override
+    public OrderCancelApproval queryForSingle(int id) {
+        return approvalMapper.queryForSingle(id);
     }
 
     @Override
@@ -38,5 +46,10 @@ public class OrderCancelApprovalServiceImpl implements OrderCancelApprovalServic
     @Override
     public int updateOrderCancelApprovalState(OrderCancelApproval cancelApproval) {
         return approvalMapper.updateOrderCancelApprovalState(cancelApproval);
+    }
+
+    @Override
+    public int checkIsExistsApproval(int userId, String orderNo) {
+        return refundDao.checkIsExistsApproval(userId, orderNo);
     }
 }

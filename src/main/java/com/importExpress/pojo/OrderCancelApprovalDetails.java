@@ -7,7 +7,8 @@ public class OrderCancelApprovalDetails {
     private double payPrice;
     private Integer adminId;
     private String adminName;
-    private Integer dealState;// 0 已申请 1销售中 2主管审批 3审批通过 4驳回
+    private Integer dealState;// 0 待审批 1销售中 2主管审批 3审批通过 4驳回
+    private String dealStateDesc;
     private String createTime;
     private String remark;
 
@@ -65,6 +66,26 @@ public class OrderCancelApprovalDetails {
 
     public void setDealState(Integer dealState) {
         this.dealState = dealState;
+        // 0 待审批 1销售中 2主管审批 3审批通过 4驳回
+        if (dealState == 0) {
+            this.dealStateDesc = "待审批";
+        } else if (dealState == 1) {
+            this.dealStateDesc = "销售审批";
+        } else if (dealState == 2) {
+            this.dealStateDesc = "主管审批";
+        } else if (dealState == 3) {
+            this.dealStateDesc = "完成";
+        } else if (dealState == 4) {
+            this.dealStateDesc = "驳回";
+        }
+    }
+
+    public String getDealStateDesc() {
+        return dealStateDesc;
+    }
+
+    public void setDealStateDesc(String dealStateDesc) {
+        this.dealStateDesc = dealStateDesc;
     }
 
     public String getCreateTime() {

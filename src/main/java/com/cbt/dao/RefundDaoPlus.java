@@ -260,4 +260,13 @@ public interface RefundDaoPlus {
 	 */
 	double queryComplaintTotalAmount(int userId);
 
+
+	/**
+     * 根据userId和订单号查询是否存在的申请
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    int checkIsExistsApproval(int userId,String orderNo);
+
 }

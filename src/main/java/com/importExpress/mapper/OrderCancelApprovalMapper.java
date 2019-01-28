@@ -16,6 +16,13 @@ public interface OrderCancelApprovalMapper {
     List<OrderCancelApproval> queryForList(OrderCancelApproval cancelApproval);
 
     /**
+     * 单个获取
+     * @param id
+     * @return
+     */
+    OrderCancelApproval queryForSingle(@Param("id") int id);
+
+    /**
      * 取消订单申请总数
      * @param cancelApproval
      * @return
