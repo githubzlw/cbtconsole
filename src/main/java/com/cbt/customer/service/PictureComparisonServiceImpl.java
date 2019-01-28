@@ -5,6 +5,10 @@ import ceRong.tools.bean.DorpDwonBean;
 import com.cbt.bean.*;
 import com.cbt.customer.dao.IPictureComparisonDao;
 import com.cbt.customer.dao.PictureComparisonDaoImpl;
+import com.cbt.dao.CustomGoodsDao;
+import com.cbt.dao.impl.CustomGoodsDaoImpl;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +17,8 @@ import java.util.Map;
 public class PictureComparisonServiceImpl implements IPictureComparisonService {
 
 	IPictureComparisonDao dao = new PictureComparisonDaoImpl();
+	
+	private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 	
 	@Override
 	public List<GoodsFarBean> findByAliPicture(int maxC) {
@@ -398,6 +404,15 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 		return dao.saveDbLireGood(tbGoodBean);
 	}
 	
+    @Override
+    public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
+        // AWS更新
+        // MQ
+        // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
+        // MongoDB
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid,type);
+        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
+    }
 	
 	
 	@Override
