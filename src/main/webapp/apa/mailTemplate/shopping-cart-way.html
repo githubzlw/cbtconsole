@@ -68,7 +68,7 @@
     .estima_time_color{ font-weight: bold; font-size: 18px;}
     .estima_time_color a{ padding: 4px 8px; text-align: center; background-color: #3e9eea; color: #fff;
       border-radius: 4px; font-size: 16px; font-weight: 400; text-transform: uppercase; margin-left: 10px;}
-    .order_off i{ text-decoration: line-through; margin-left: 5px; color: #999;}
+    .order_off{color: #999; font-size: 14px;}
     .dismantling_box{ width: 100%; text-align: left; margin: 0px auto 0; }
     .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
     .order_first{ width: 100%; margin: 0 auto 15px; }
@@ -96,9 +96,14 @@
     .order_click{ text-align: left; color:#333;}
     .order_click a{ color:#01a4ef;}
     .way_box{ width: 100%; margin: 0px auto;}
-    .way_box table{width: 96%; margin: 0 auto; border: 1px solid #666;text-align: center;
-      color: #333;font-size: 16px; border-right: none; border-bottom: none;}
-    .way_box td, .way_box th {  border-right: 1px #666 solid;  border-bottom: 1px #666 solid; padding:10px 5px; }
+    .way_box table{width: 96%; margin: 0 auto; border: 1px solid #e2e2e2;text-align: center;
+      color: #333;font-size: 14px; border-right: none; border-bottom: none;}
+    .way_box table th{ background-color: #01A4EF; color:#fff;}
+    .way_box td, .way_box th {  border-right: 1px #e2e2e2 solid;  border-bottom: 1px #e2e2e2 solid; padding:10px 5px; }
+    .way_box table p{ margin-bottom: 0;}
+    .way_faa{ color: red;}
+    .way_box table .way_check{ background-color: #F4F4F4;}
+    .way_box table p b{ color: #f5a72c;}
 
 
     .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
@@ -259,16 +264,14 @@
                               <tbody>
                               <tr>
                                 <td>A</td>
-                                <td><em>7</em> days</td>
-                                <td>USD<em>7</em></td>
+                                <td><em>30</em> days</td>
+                                <td>USD<em>1,000</em></td>
                               </tr>
-                              <tr>
+                              <tr class="way_check">
                                 <td>B</td>
-                                <td><p><em>7</em> days</p>
-                                  <p>Faster √</p>
+                                <td><p><em>10</em> days<b>(Faster)</b></p>
                                 </td>
-                                <td><p>USD<em>7</em></p>
-                                  <p>Cheaper √</p>
+                                <td><p>USD<em>100</em><b>(Cheaper)</b></p>
                                 </td>
                               </tr>
                               </tbody>
