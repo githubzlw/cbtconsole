@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.OrderCancelApprovalMapper">
+    <resultMap id="approvalResultMap" type="com.importExpress.pojo.OrderCancelApproval">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="pay_price" property="payPrice"/>
+        <result column="type" property="type"/>
+        <result column="deal_state" property="dealState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+    </resultMap>
+
+    <resultMap id="approvalDetailsResultMap" type="com.importExpress.pojo.OrderCancelApprovalDetails">
+        <id column="id" property="id"/>
+        <result column="approval_id" property="approvalId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="pay_price" property="payPrice"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="deal_state" property="dealState"/>
+        <result column="create_time" property="createTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="queryForList" parameterType="com.importExpress.pojo.OrderCancelApproval" resultMap="approvalResultMap">
+        select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,u.available_m,u.user_email,u.admin_name,u.admin_id
+        from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
+        user_email,admuser.admName as
+        admin_name,admuser.id as admin_id from `user`,admin_r_user,admuser where `user`.id = admin_r_user.userid
+        and admin_r_user.adminid = admuser.id) u on a.user_id=u.id
+        where 1 = 1
+        <if test="userId != null">
+            and a.user_id = #{userId}
+        </if>
+        <if test="orderNo != null">
+            and a.order_no = #{orderNo}
+        </if>
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="dealState != null">
+            and a.deal_state = #{dealState}
+        </if>
+        <if test="adminId != null">
+            and u.admin_id = #{adminId}
+        </if>
+        order by a.createTime desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryForListCount" parameterType="com.importExpress.pojo.OrderCancelApproval"
+            resultType="java.lang.Integer">
+        select count(1)
+        from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
+        user_email,admuser.admName as
+        admin_name,admuser.id as admin_id from `user`,admin_r_user,admuser where `user`.id = admin_r_user.userid
+        and admin_r_user.adminid = admuser.id) u on a.user_id=u.id
+        where 1 = 1
+        <if test="userId != null">
+            and a.user_id = #{userId}
+        </if>
+        <if test="orderNo != null">
+            and a.order_no = #{orderNo}
+        </if>
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="dealState != null">
+            and a.deal_state = #{dealState}
+        </if>
+        <if test="adminId != null">
+            and u.admin_id = #{adminId}
+        </if>
+    </select>
+
+    <select id="queryForDetailsList" resultMap="approvalDetailsResultMap">
+		select a.id,a.approval_id,a.order_no,a.pay_price,a.deal_state,a.admin_id,b.admName as admin_name,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.remark
+		from order_cancel_approval_details a,admuser b
+		where approval_id = #{approvalId} and a.admin_id = b.id
+	</select>
+
+    <insert id="insertIntoApprovalDetails" parameterType="com.importExpress.pojo.OrderCancelApprovalDetails">
+		insert into order_cancel_approval_details(approval_id,order_no,pay_price,deal_state,admin_id)
+		values(#{approvalId},#{orderNo},#{payPrice},#{dealState},#{adminId})
+	</insert>
+
+    <update id="updateOrderCancelApprovalState" parameterType="com.importExpress.pojo.OrderCancelApproval">
+		update order_cancel_approval
+		set pay_price = #{payPrice},deal_state = #{dealState}
+		where id = #{id}
+	</update>
+
+
+</mapper>

@@ -37,7 +37,9 @@ import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
@@ -74,6 +76,9 @@ public class NewOrderDetailsCtr {
 	private IPurchaseService iPurchaseService;
 	@Autowired
 	private SendMailFactory sendMailFactory;
+
+	@Autowired
+    private OrderCancelApprovalService approvalService;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -1673,8 +1678,22 @@ public class NewOrderDetailsCtr {
 
 		JsonResult json = new JsonResult();
 
-		// jxw 2017-4-25添加订单状态判断,修改订单状态为-1(后台取消),操作人目前是adminId
+		// 走审批流程
+		int userId = Integer.parseInt(request.getParameter("userId"));
+		double actualPay = Double.parseDouble(request.getParameter("actualPay"));
+
+		OrderCancelApproval cancelApproval = new OrderCancelApproval();
+
+		cancelApproval.setUserId(userId);
+		cancelApproval.setOrderNo(orderNo);
+		cancelApproval.setPayPrice(actualPay);
+		cancelApproval.setType(2);
+		NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+
+
+		/*// jxw 2017-4-25添加订单状态判断,修改订单状态为-1(后台取消),操作人目前是adminId
 		boolean isCheck = CheckCanUpdateUtil.updateOnlineOrderInfoByLocal(orderNo, -1, adminId);
+
 		if (isCheck) {
 
 			int res = orderwsServer.iscloseOrder(orderNo);
@@ -1684,6 +1703,15 @@ public class NewOrderDetailsCtr {
 			} else {
 				//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
 				Map<String,Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(orderNo);
+
+
+
+
+				// 获取用户货币单位
+				// zlw add start
+
+
+
 				LOG.info("订单号:" + orderNo + ",更新线上orderinfo订单状态:" + -1);
 				res = orderwsServer.closeOrder(orderNo);
 				//判断取消订单是否是测试订单
@@ -1759,7 +1787,7 @@ public class NewOrderDetailsCtr {
 				LOG.info("closeGeneralOrder end");
 				json.setOk(true);
 			}
-		}
+		}*/
 		return json;
 
 	}
