@@ -2125,7 +2125,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	@Override
 	public List<GoodsCheckBean> findLireImgInfo(int selled, String cid, String shopId, int start, int end, int flag){
 		
-		upPidValid();
+//		upPidValid();
 		Connection conn = DBHelper.getInstance().getConnection();
 		List<GoodsCheckBean> gsfList = new ArrayList<GoodsCheckBean>();
 		String sql = "select sor_pid,res_pid1,res_pid2,res_pid3,res_pid4,res_pid5,res_pid6,img_path, ";
@@ -2135,7 +2135,39 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			sql= sql+"pro_score,pro_score1,pro_score2,pro_score3,pro_score4,pro_score5,pro_score6, ";
 			sql= sql+"deep_factory,deep_factory1,deep_factory2,deep_factory3,deep_factory4,deep_factory5,deep_factory6, ";
 			sql= sql+"valid,valid1,valid2,valid3,valid4,valid5,valid6, ";
-			sql= sql+"pro_sold,pro_sold1,pro_sold2,pro_sold3,pro_sold4,pro_sold5,pro_sold6 from  lire_img_custom where flag=2 limit ?, ?";
+			sql= sql+"pro_sold,pro_sold1,pro_sold2,pro_sold3,pro_sold4,pro_sold5,pro_sold6,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid1=b.pid ) as customer_valid1,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid2=b.pid ) as customer_valid2,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid3=b.pid ) as customer_valid3,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid4=b.pid ) as customer_valid4,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid5=b.pid ) as customer_valid5,";
+			sql= sql+"(select b.valid from custom_benchmark_ready b where lire_img_custom.res_pid6=b.pid ) as customer_valid6,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id1 ) as shop_name1,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id2 ) as shop_name2,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id3 ) as shop_name3,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id4 ) as shop_name4,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id5 ) as shop_name5,";
+			sql= sql+"(select level from supplier_scoring  where shop_id=lire_img_custom.shop_id6 ) as shop_name6,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id1 ) as quality_shop1,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id2 ) as quality_shop2,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id3 ) as quality_shop3,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id4 ) as quality_shop4,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id5 ) as quality_shop5,";
+			sql= sql+"(select quality_avg from supplier_scoring  where shop_id=lire_img_custom.shop_id6 ) as quality_shop6,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid1 ) as quality_product1,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid2 ) as quality_product2,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid3 ) as quality_product3,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid4 ) as quality_product4,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid5 ) as quality_product5,";
+			sql= sql+"(select ROUND(avg(quality),0) from supplier_product  where goods_pid=lire_img_custom.res_pid6 ) as quality_product6, ";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid1 ) as is_edit1,";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid2 ) as is_edit2,";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid3 ) as is_edit3,";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid4 ) as is_edit4,";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid5 ) as is_edit5,";
+			sql= sql+"(select is_edited from custom_goods_edit  where pid=lire_img_custom.res_pid6 ) as is_edit6";
+			
+			sql= sql+" from  lire_img_custom where flag=2 limit ?, ?";
 			
 			String path ="";
 			if(flag>0){
@@ -2180,31 +2212,41 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb.setTbprice5(rs.getString("yl_price6"));
 				//卖家在我司有多少产品
 				gfb.setProCon(rs.getInt("pro_con"));
-				gfb.setProCon1(rs.getInt("pro_con1"));
-				gfb.setProCon2(rs.getInt("pro_con2"));
-				gfb.setProCon3(rs.getInt("pro_con3"));
-				gfb.setProCon4(rs.getInt("pro_con4"));
-				gfb.setProCon5(rs.getInt("pro_con5"));
-				gfb.setProCon6(rs.getInt("pro_con6"));
-				//该卖家质量水准、
+				gfb.setProCon1(rs.getInt("customer_valid1"));
+				gfb.setProCon2(rs.getInt("customer_valid2"));
+				gfb.setProCon3(rs.getInt("customer_valid3"));
+				gfb.setProCon4(rs.getInt("customer_valid4"));
+				gfb.setProCon5(rs.getInt("customer_valid5"));
+				gfb.setProCon6(rs.getInt("customer_valid6"));
+				//是否人为编辑过
 				gfb.setShopQuality(rs.getInt("shop_quality"));
-				gfb.setShopQuality1(rs.getInt("shop_quality1"));
-				gfb.setShopQuality2(rs.getInt("shop_quality2"));
-				gfb.setShopQuality3(rs.getInt("shop_quality3"));
-				gfb.setShopQuality4(rs.getInt("shop_quality4"));
-				gfb.setShopQuality5(rs.getInt("shop_quality5"));
-				gfb.setShopQuality6(rs.getInt("shop_quality6"));
+				gfb.setShopQuality1(rs.getInt("is_edit1"));
+				gfb.setShopQuality2(rs.getInt("is_edit2"));
+				gfb.setShopQuality3(rs.getInt("is_edit3"));
+				gfb.setShopQuality4(rs.getInt("is_edit4"));
+				gfb.setShopQuality5(rs.getInt("is_edit5"));
+				gfb.setShopQuality6(rs.getInt("is_edit6"));
+				
+				//该卖家质量水准、
+				gfb.setShopId1(rs.getString("shop_name1"));
+				gfb.setShopId2(rs.getString("shop_name2"));
+				gfb.setShopId3(rs.getString("shop_name3"));
+				gfb.setShopId4(rs.getString("shop_name4"));
+				gfb.setShopId5(rs.getString("shop_name5"));
+				gfb.setShopId6(rs.getString("shop_name6"));
+				
 				//商品评分、
 				gfb.setProScore(rs.getInt("pro_score"));
-				gfb.setProScore1(rs.getInt("pro_score1"));
-				gfb.setProScore2(rs.getInt("pro_score2"));
-				gfb.setProScore3(rs.getInt("pro_score3"));
-				gfb.setProScore4(rs.getInt("pro_score4"));
-				gfb.setProScore5(rs.getInt("pro_score5"));
-				gfb.setProScore6(rs.getInt("pro_score6"));
+				gfb.setProScore1(rs.getInt("quality_product1"));
+				gfb.setProScore2(rs.getInt("quality_product2"));
+				gfb.setProScore3(rs.getInt("quality_product3"));
+				gfb.setProScore4(rs.getInt("quality_product4"));
+				gfb.setProScore5(rs.getInt("quality_product5"));
+				gfb.setProScore6(rs.getInt("quality_product6"));
+				
 				//1688深度验厂、
 				gfb.setDeepFactory(rs.getInt("deep_factory"));
-				gfb.setDeepFactory1(rs.getInt("deep_factory1"));
+				gfb.setDeepFactory1(rs.getInt("quality_shop1"));
 				gfb.setDeepFactory2(rs.getInt("deep_factory2"));
 				gfb.setDeepFactory3(rs.getInt("deep_factory3"));
 				gfb.setDeepFactory4(rs.getInt("deep_factory4"));
@@ -2212,34 +2254,34 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb.setDeepFactory6(rs.getInt("deep_factory6"));
 				//销量
 				gfb.setProSold(rs.getInt("pro_sold"));
-				gfb.setProSold1(rs.getInt("pro_sold1"));
-				gfb.setProSold2(rs.getInt("pro_sold2"));
-				gfb.setProSold3(rs.getInt("pro_sold3"));
-				gfb.setProSold4(rs.getInt("pro_sold4"));
-				gfb.setProSold5(rs.getInt("pro_sold5"));
-				gfb.setProSold6(rs.getInt("pro_sold6"));
+				gfb.setProSold1(rs.getInt("quality_product1"));
+				gfb.setProSold2(rs.getInt("quality_product2"));
+				gfb.setProSold3(rs.getInt("quality_product3"));
+				gfb.setProSold4(rs.getInt("quality_product4"));
+				gfb.setProSold5(rs.getInt("quality_product5"));
+				gfb.setProSold6(rs.getInt("quality_product6"));
 				
-				if(rs.getInt("valid")!=1){
-					gfb.setSourceImg("");
-				}
-				if(rs.getInt("valid1")!=1){
-					gfb.setTbImg1("");
-				}
-				if(rs.getInt("valid2")!=1){
-					gfb.setTbImg2("");
-				}
-				if(rs.getInt("valid3")!=1){
-					gfb.setTbImg3("");
-				}
-				if(rs.getInt("valid4")!=1){
-					gfb.setTbImg4("");
-				}
-				if(rs.getInt("valid5")!=1){
-					gfb.setTbImg5("");
-				}
-				if(rs.getInt("valid6")!=1){
-					gfb.setTbImg6("");
-				}
+//				if(rs.getInt("valid")!=1){
+//					gfb.setSourceImg("");
+//				}
+//				if(rs.getInt("valid1")!=1){
+//					gfb.setTbImg1("");
+//				}
+//				if(rs.getInt("valid2")!=1){
+//					gfb.setTbImg2("");
+//				}
+//				if(rs.getInt("valid3")!=1){
+//					gfb.setTbImg3("");
+//				}
+//				if(rs.getInt("valid4")!=1){
+//					gfb.setTbImg4("");
+//				}
+//				if(rs.getInt("valid5")!=1){
+//					gfb.setTbImg5("");
+//				}
+//				if(rs.getInt("valid6")!=1){
+//					gfb.setTbImg6("");
+//				}
 				gsfList.add(gfb);
 			}
 			
@@ -3198,7 +3240,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 //		String sql = "select count(*) as maxCount from alicachedatanew1_1 a, ali_goods_source_new_hx b where a.goods_pid=b.goods_pid and a.tbflag=1 and a.flag=0 ";
 		
 //		String sql = "select count(*) as maxCount from alicachedatanew1_1 where tbflag=1 and flag=0 ";
-		String sql = "select count(*) as maxCount from lire_img_custom where flag=0";
+		String sql = "select count(*) as maxCount from lire_img_custom where flag=2";
 //		//amazon
 //		if(flag==1){
 //			sql = "select count(*) as maxCount from alicachedatanew1_1 a where a.tbflag=1 and a.flag=0 and a.user_name='"+userName+"' and a.shelf_flag=2 ";
