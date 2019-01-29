@@ -11,7 +11,7 @@ import java.util.List;
 public interface IPreferentialDao {
 	
 	/**
-	 * 查询是否已申请
+	 * 查询是否待审批
 	 * （批量折扣）
 	 * @param user
 	 * 	用户信息
