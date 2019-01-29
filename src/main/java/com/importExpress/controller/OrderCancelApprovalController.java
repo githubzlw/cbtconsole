@@ -310,10 +310,12 @@ public class OrderCancelApprovalController {
                 approvalDetails.setAdminId(user.getId());
                 approvalDetails.setRemark(remark);
 
-                approvalService.updateOrderCancelApprovalState(approvalBean);
-                approvalService.insertIntoApprovalDetails(approvalDetails);
-                //使用MQ更新线上状态
-                updateOnlineDealState(approvalBean);
+                if(dealState < 2){
+                    approvalService.updateOrderCancelApprovalState(approvalBean);
+                    approvalService.insertIntoApprovalDetails(approvalDetails);
+                    //使用MQ更新线上状态
+                    updateOnlineDealState(approvalBean);
+                }
                 if (dealState == 2 || dealState == 3) {
                     json = refundOrderCancelByApi(approvalBean, approvalDetails);
                 }
@@ -376,7 +378,15 @@ public class OrderCancelApprovalController {
         JsonResult json = new JsonResult();
         try {
             json = ppApiService.reFundNew(approvalBean.getOrderNo(), decimalFormat.format(approvalBean.getAgreeAmount()));
+            OrderCancelApproval approvalOld =   approvalService.queryForSingle(approvalBean.getId());
             if (json.isOk()) {
+                if(approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2){
+                    approvalBean.setDealState(2);
+                    approvalService.updateOrderCancelApprovalState(approvalBean);
+                    approvalDetails.setDealState(2);
+                    approvalService.insertIntoApprovalDetails(approvalDetails);
+                }
+
                 approvalBean.setDealState(3);
                 approvalDetails.setDealState(3);
                 approvalDetails.setRemark(approvalDetails.getRemark() + ",执行API退款成功！<br>" + json.getMessage());
@@ -404,6 +414,13 @@ public class OrderCancelApprovalController {
                     }
                 }
             } else {
+                if(approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2){
+                    approvalBean.setDealState(2);
+                    approvalService.updateOrderCancelApprovalState(approvalBean);
+                    approvalDetails.setDealState(2);
+                    approvalDetails.setRemark(approvalDetails.getRemark() + "[退款失败，请重试]");
+                    approvalService.insertIntoApprovalDetails(approvalDetails);
+                }
                 logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
                 System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
                 json.setOk(false);
@@ -416,7 +433,6 @@ public class OrderCancelApprovalController {
             json.setOk(false);
             json.setMessage("退款失败,请联系IT人员查看");
         }
-
         return json;
     }
 
