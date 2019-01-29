@@ -841,7 +841,7 @@
         update custom_goods_edit a,custom_benchmark_ready b
         set b.enname = #{enname},b.img = #{img},b.endetail = #{endetail},
         b.eninfo=#{eninfo},b.goodsstate=#{goodsState},b.keyword=#{keyword},a.admin_id = #{adminId},
-        bm_flag=1,a.update_count = a.update_count + 1 ,b.fprice_str=#{fpriceStr}
+        bm_flag=1,a.update_count = a.update_count + 1 ,b.fprice_str=#{fpriceStr},b.size_info_en=#{sizeInfoEn}
         <if test="rangePrice != null">
             ,b.range_price=#{rangePrice},b.sku=#{sku}
         </if>
@@ -859,9 +859,6 @@
         </if>
         <if test="priceIsEdit > 0">
             ,a.price_is_edit=#{priceIsEdit}
-        </if>
-        <if test="sizeInfoEn != null">
-            ,b.size_info_en=#{sizeInfoEn}
         </if>
         <if test="customMainImage != null">
             ,b.custom_main_image=#{customMainImage}
