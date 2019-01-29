@@ -695,6 +695,8 @@
       ) a
     </select>
 
+
+
   <select id="queryBeyondFiveShipmentInfo" resultMap="BaseResultMap">
     SELECT a.* FROM (
     SELECT s.id,s.transportCompany,s.orderNo,s.sentTime,s.country,s.numbers,s.realweight,sp.svolume, sp.sweight,sp.volumeweight AS volumeweights,s.totalprice,IFNULL(s.fuelSurcharge,0) AS fuelSurcharge,
@@ -1356,6 +1358,20 @@ where 1 = 1 and sp.passFlag = 1  and sm.orderNo  = #{orderno}
     <if test='comps != "0"'>
       and comps=#{comps}
     </if>
+  </select>
+  <select id="getNoMatchAmount" resultType="INTEGER">
+    SELECT SUM(s.totalPrice) FROM shipment s LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
+    WHERE s.orderNo IS NOT NULL
+    <if test='company != "0"'>
+      and s.transportCompany = #{company}
+    </if>
+    <if test='senttimeBegin != ""'>
+      and s.sentTime >= #{senttimeBegin}
+    </if>
+    <if test='senttimeEnd != ""'>
+      and s.sentTime &lt;= #{senttimeEnd}
+    </if>
+    AND sp.id IS NULL
   </select>
   <select id="getDetailsCount" resultType="INTEGER">
      SELECT COUNT(DISTINCT od.id) FROM orderinfo oi 

@@ -155,7 +155,7 @@ var curPage;
 						tabStr+=("</tr>");
 					}
 					if (type == 0) {
-						$("#shipmentList tfoot").append("<tr><td colspan='14'><span style='color:red;font-size:20px'>"+res.remark+"</span>&nbsp;总条数:"+res.totalCount+"&nbsp;当前页:<span>"+res.currePage+"</span>&nbsp;总页数:"+res.totalPage+"<div class='demo'><div id='demo1'></div></div></td></tr>");
+						$("#shipmentList tfoot").append("<tr><td colspan='14'><span style='color:red;font-size:15px'>"+res.remark+"</span>&nbsp;总条数:"+res.totalCount+"&nbsp;当前页:<span>"+res.currePage+"</span>&nbsp;总页数:"+res.totalPage+"<div class='demo'><div id='demo1'></div></div></td></tr>");
 					}
 // 					else if (type == 2 || type == 3) {
 // 						$("#shipmentList tfoot").append("<tr><td colspan='19'><span style='color:red;font-size:20px'>物流商账单总运费:"+res.totalPrice+res.remark+"</span>&nbsp;总条数:"+res.totalCount+"&nbsp;当前页:<span>"+res.currePage+"</span>&nbsp;总页数:"+res.totalPage+"<div class='demo'><div id='demo1'></div></div></td></tr>");
