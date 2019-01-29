@@ -206,9 +206,9 @@
                     <c:if test="${aproval.dealState == 0}">
                         <input type="button" value="确认" class="btn_sty"
                                onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},1,this)"/>
-                        <br>
+                        <%--<br>
                         <input type="button" value="驳回" class="refuse_sty"
-                               onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},-1,this)"/>
+                               onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},-1,this)"/>--%>
                     </c:if>
                     <c:if test="${aproval.dealState == 1 || aproval.dealState == 2}">
                         <a href="javascript:void(0);" onclick="openDetails(${aproval.id},this)"
@@ -217,32 +217,15 @@
                             <br><br>
                             <input type="button" value="确认" class="btn_sty"
                                    onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},1,this)"/>
-                            <br>
+                            <%--<br>
                             <input type="button" value="驳回" class="refuse_sty"
-                                   onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>
+                                   onclick="beforeAddRemark(${aproval.id},4,${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},-1,this)"/>--%>
                         </c:if>
                     </c:if>
-                        <%--Emma可以进行线下转账操作--%>
-                    <c:if test="${aproval.dealState == 4}">
-                        <a href="javascript:void(0);" onclick="openDetails(${aproval.id},this)"
-                           title="查看流程详细">查看流程详细</a>
-                        <c:if test="${operatorId == 83 || operatorId == 8}">
-                            <br><br>
-                            <input type="button" value="执行退款" class="btn_sty"
-                                   onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.agreeAmount},'${aproval.orderNo}',${operatorId},3,this)"/>
-                            <input type="button" value="线下转账" class="btn_sty"
-                                   onclick="offLineRefund(${aproval.id},${aproval.type},${aproval.userId},'${aproval.orderNo}',${operatorId},this)"/>
-                        </c:if>
-                    </c:if>
-                    <c:if test="${aproval.dealState == 3}">
+                    <c:if test="${aproval.dealState >= 3}">
                         <a href="javascript:void(0);" onclick="openDetails(${aproval.id},this)"
                            title="查看流程详细">查看流程详细</a><br><br>
                         <b style="color: green;font-size: 18px;background-color: #efc6c6;">${aproval.dealStateDesc}</b>
-                    </c:if>
-                    <c:if test="${aproval.dealState == 9}">
-                        <a href="javascript:void(0);" onclick="openDetails(${aproval.id},this)"
-                           title="查看流程详细">查看流程详细</a><br><br>
-                        <b style="color: red;font-size: 18px;background-color: #d2cecc;">${aproval.dealStateDesc}</b>
                     </c:if>
                 </td>
             </tr>
