@@ -1211,6 +1211,7 @@ public class ShopCarMarketingController {
     @RequestMapping("/genShoppingCarMarketingEmail")
     public ModelAndView genShoppingCarMarketingEmail(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mv = new ModelAndView("shopCartMarketingEmail");
+        mv.setViewName("");
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
         if (user == null || user.getId() == 0) {
@@ -1229,6 +1230,16 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
+
+        String typeStr = request.getParameter("type");
+        if (StringUtils.isBlank(typeStr)) {
+            mv.addObject("message", "获取发送类型失败");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("type", typeStr);
+        }
+
         try {
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
