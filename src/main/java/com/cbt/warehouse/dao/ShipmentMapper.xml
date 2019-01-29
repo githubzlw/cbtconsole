@@ -592,7 +592,7 @@
 				 (
 					select * from (
 						select distinct sm.*   from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
-						where sm.orderNo is not null and sp.expressno is null 	
+						where sm.orderNo is not null and sp.expressno is null 	AND LOCATE('ZD',sm.orderNo)&lt;=0 AND LOCATE('EM',sm.orderNo)&lt;=0 AND LOCATE('ZD',sm.orderNo)&lt;=0 AND LOCATE('GGDZF',sm.orderNo)&lt;=0 AND LOCATE('SRPS',sm.orderNo)&lt;=0
 						<if test='company != "0"'>
 						and sm.transportCompany = #{company} 
 						</if>
@@ -655,7 +655,7 @@
     LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
     WHERE s.orderNo IS NOT NULL
       <if test='choiseType == "1"'>
-        and  sp.expressno is null
+        and  sp.expressno is null AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('EM',s.orderNo)&lt;=0 AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('GGDZF',s.orderNo)&lt;=0 AND LOCATE('SRPS',s.orderNo)&lt;=0
       </if>
       <if test='company != "0"'>
         and s.transportCompany = #{company}
@@ -680,7 +680,7 @@
       LEFT JOIN shipping_package sp ON s.orderNo=sp.expressno
       WHERE s.orderNo IS NOT NULL
       <if test='choiseType == "1"'>
-        and  sp.expressno is null
+        and  sp.expressno is null AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('EM',s.orderNo)&lt;=0 AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('GGDZF',s.orderNo)&lt;=0 AND LOCATE('SRPS',s.orderNo)&lt;=0
       </if>
       <if test='company != "0"'>
         and s.transportCompany = #{company}
@@ -853,7 +853,7 @@
 		   <if test='choiseType == "1"'>
 					select * from (
 						select distinct sm.* ,ifnull(sp.passFlag,0.00) as passFlag,ifnull(sp.sweight,0.00) as sweight,ifnull(sp.volumeweight,0.00) as volumeweights,ifnull(sp.createtime,'') as sp_time,ifnull(sm.flag_remark,'') as flag_remarks  from shipment sm left join shipping_package sp on sm.orderNo = sp.expressno 
-						where sm.orderNo is not null and sp.expressno is null 	
+						where sm.orderNo is not null and sp.expressno is null AND LOCATE('ZD',sm.orderNo)&lt;=0 AND LOCATE('EM',sm.orderNo)&lt;=0 AND LOCATE('ZD',sm.orderNo)&lt;=0 AND LOCATE('GGDZF',sm.orderNo)&lt;=0 AND LOCATE('SRPS',sm.orderNo)&lt;=0
 						<if test='company != "0"'>
 						and sm.transportCompany = #{company} 
 						</if>
