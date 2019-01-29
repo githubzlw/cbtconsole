@@ -1371,7 +1371,7 @@ where 1 = 1 and sp.passFlag = 1  and sm.orderNo  = #{orderno}
     <if test='senttimeEnd != ""'>
       and s.sentTime &lt;= #{senttimeEnd}
     </if>
-    AND sp.id IS NULL
+    AND sp.id IS NULL AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('EM',s.orderNo)&lt;=0 AND LOCATE('ZD',s.orderNo)&lt;=0 AND LOCATE('GGDZF',s.orderNo)&lt;=0 AND LOCATE('SRPS',s.orderNo)&lt;=0
   </select>
   <select id="getDetailsCount" resultType="INTEGER">
      SELECT COUNT(DISTINCT od.id) FROM orderinfo oi 
