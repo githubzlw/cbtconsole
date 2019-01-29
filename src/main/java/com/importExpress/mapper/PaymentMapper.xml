@@ -217,7 +217,7 @@
 
     <select id="checkIsPayPalOrStripePay" resultType="java.lang.Integer">
         select count(1) from payment
-        where paystatus=1 and paytype in(0,5) and userid = #{userId},orderid = #{orderNo}
+        where paystatus=1 and paytype in(0,5) and userid = #{userId} and orderid = #{orderNo}
     </select>
 
 </mapper>
