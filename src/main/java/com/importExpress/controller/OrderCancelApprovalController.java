@@ -5,12 +5,16 @@ import com.cbt.systemcode.service.SecondaryValidationService;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.PaymentDetails;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,10 +41,10 @@ public class OrderCancelApprovalController {
 
     @Autowired
     private OrderCancelApprovalService approvalService;
-
     @Autowired
     private SecondaryValidationService secondaryValidationService;
-
+    @Autowired
+    private PaymentServiceNew paymentServiceNew;
     @Autowired
     private PayPalService ppApiService;
     private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -125,6 +130,12 @@ public class OrderCancelApprovalController {
             }
             if (adminId > 0) {
                 cancelApproval.setAdminId(adminId);
+            }
+            if(userId > 0){
+                cancelApproval.setUserId(userId);
+            }
+            if(StringUtils.isNotBlank(orderNo)){
+                cancelApproval.setOrderNo(orderNo);
             }
             cancelApproval.setStartNum(startNum);
             cancelApproval.setLimitNum(limitNum);
@@ -244,13 +255,18 @@ public class OrderCancelApprovalController {
 
             String refundAmountStr = request.getParameter("refundAmount");
             double refundAmount = 0;
-            if (StringUtils.isBlank(refundAmountStr) || "0".equals(refundAmountStr)) {
-                json.setOk(false);
-                json.setMessage("获取退款金额失败,请重试");
-                return json;
+            if (dealState == 4) {
+                refundAmount = 0;
             } else {
-                refundAmount = Double.valueOf(refundAmountStr);
+                if (StringUtils.isBlank(refundAmountStr) || "0".equals(refundAmountStr)) {
+                    json.setOk(false);
+                    json.setMessage("获取退款金额失败,请重试");
+                    return json;
+                } else {
+                    refundAmount = Double.valueOf(refundAmountStr);
+                }
             }
+
 
             String remark = request.getParameter("remark");
             if (StringUtils.isBlank(remark)) {
@@ -260,14 +276,14 @@ public class OrderCancelApprovalController {
             }
 
             String secvlidPwd = request.getParameter("secvlidPwd");
-            if (dealState > 2 && StringUtils.isBlank(secvlidPwd)) {
+            if (dealState == 3 && StringUtils.isBlank(secvlidPwd)) {
                 json.setOk(false);
                 json.setMessage("获取密码失败,请重试");
                 return json;
             }
 
             boolean isCheck;
-            if (dealState > 2) {
+            if (dealState == 3) {
                 isCheck = secondaryValidationService.checkExistsPassword(operatorId, secvlidPwd);
             } else {
                 //操作状态是1的说明是销售，不需要校检密码
@@ -280,12 +296,13 @@ public class OrderCancelApprovalController {
                 approvalBean.setDealState(dealState);
                 approvalBean.setAgreeAmount(refundAmount);
                 approvalBean.setUserId(userId);
+                approvalBean.setAdminId(user.getId());
 
                 OrderCancelApprovalDetails approvalDetails = new OrderCancelApprovalDetails();
                 approvalDetails.setApprovalId(approvalId);
-                if(dealState < 4){
+                if (dealState < 4) {
                     approvalDetails.setDealState(dealState);
-                }else{
+                } else {
                     approvalDetails.setDealState(4);
                 }
                 approvalDetails.setOrderNo(orderNo);
@@ -362,12 +379,30 @@ public class OrderCancelApprovalController {
             if (json.isOk()) {
                 approvalBean.setDealState(3);
                 approvalDetails.setDealState(3);
-                approvalDetails.setRemark(approvalDetails.getRemark() + ",执行API退款成功！<br>退款交易号[" + json.getMessage() + "]");
+                approvalDetails.setRemark(approvalDetails.getRemark() + ",执行API退款成功！<br>" + json.getMessage());
                 approvalService.updateOrderCancelApprovalState(approvalBean);
                 approvalService.insertIntoApprovalDetails(approvalDetails);
                 //使用MQ更新线上状态
                 updateOnlineDealState(approvalBean);
                 // 添加一笔负的到账
+                approvalService.insertIntoPaymentByApproval(approvalBean.getUserId(), approvalBean.getOrderNo());
+                // 退给客户余额，如果有
+                List<PaymentDetails> paymentDetails = paymentServiceNew.queryPaymentDetails(approvalBean.getOrderNo());
+                if (paymentDetails != null && paymentDetails.size() > 0) {
+                    float balance = 0;
+                    for (PaymentDetails paymentDt : paymentDetails) {
+                        if (paymentDt.getPayType() == 2) {
+                            balance += paymentDt.getPaymentAmount();
+                        }
+                    }
+                    if (balance > 0) {
+                        UserDao dao = new UserDaoImpl();
+                        dao.updateUserAvailable(approvalBean.getUserId(),
+                                new BigDecimal(balance).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+                                " system closeOrder:" + approvalBean.getOrderNo(), approvalBean.getOrderNo(),
+                                String.valueOf(approvalBean.getAdminId()), 0, 0, 1);
+                    }
+                }
             } else {
                 logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
                 System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());

@@ -90,7 +90,7 @@
 
     function setChooseTr(obj) {
         //背景色变色
-        $(obj).parent().parent().parent().addClass("is_tr").siblings().removeClass("is_tr");
+        $(obj).parent().parent().addClass("is_tr").siblings().removeClass("is_tr");
     }
 
 
@@ -136,10 +136,10 @@
             <th width="130px">类型/状态</th>
             <th width="280px">详情</th>
             <th width="160px">操作时间</th>
-            <th width="190px">销售初审情况</th>
-            <th width="190px">主管审批情况</th>
-            <th width="190px">退款情况</th>
-            <th width="80px">操作按钮</th>
+            <th width="260px">销售初审情况</th>
+            <th width="260px">主管审批情况</th>
+            <th width="260px">退款情况</th>
+            <th width="100px">操作按钮</th>
         </tr>
         </thead>
         <tbody>
@@ -181,28 +181,28 @@
                         <span>操作时间:<br>${aproval.updateTime}</span>
                     </c:if>
                 </td>
-                <td style="width: 190px;">
+                <td style="width: 260px;">
                     <c:if test="${aproval.approval1 != null}">
                         <span>审批情况：${aproval.approval1.dealStateDesc}</span><br>
                         <span>理由：[${aproval.approval1.remark}]</span><br>
                         <span>操作时间：${aproval.approval1.createTime}</span><br>
                     </c:if>
                 </td>
-                <td style="width: 190px;">
+                <td style="width: 260px;">
                     <c:if test="${aproval.approval2 != null}">
                         <span>审批情况：${aproval.approval2.dealStateDesc}</span><br>
                         <span>理由：[${aproval.approval2.remark}]</span><br>
                         <span>操作时间：${aproval.approval2.createTime}</span><br>
                     </c:if>
                 </td>
-                <td style="width: 190px;">
+                <td style="width: 260px;">
                     <c:if test="${aproval.approval3 != null}">
                         <span>审批情况：${aproval.approval3.dealStateDesc}</span><br>
                         <span>理由：[${aproval.approval3.remark}]</span><br>
                         <span>操作时间：${aproval.approval3.createTime}</span><br>
                     </c:if>
                 </td>
-                <td style="width: 80px;">
+                <td style="width: 100px;">
                     <c:if test="${aproval.dealState == 0}">
                         <input type="button" value="确认" class="btn_sty"
                                onclick="beforeAddRemark(${aproval.id},${aproval.dealState},${aproval.userId},${aproval.payPrice},'${aproval.orderNo}',${operatorId},1,this)"/>
@@ -339,9 +339,9 @@
         var roleType = "${roleType}";
         if (dealState == 4) {
             //拒绝退款
-            var str = prompt('是否拒绝退款？请输入备注:', '');
+            var str = prompt('是否驳回？请输入备注:', '');
             if (str) {
-                rejectRefund(approvalId, 4, userId, orderNo, operatorId, str);
+                rejectApproval(approvalId, 4, userId, orderNo, operatorId,str);
             }
         } else if (dealState < 2) {
             if (dealState == 0) {
@@ -464,7 +464,7 @@
      * @param operatorId
      * @param remark
      */
-    function rejectRefund(approvalId, actionFlag, userId, orderNo, operatorId, remark) {
+    function rejectApproval(approvalId, dealState, userId, orderNo, operatorId, remark) {
         $.messager.progress({
             title: '正在执行',
             msg: '请等待...'
@@ -472,13 +472,14 @@
         $.ajax({
             type: 'POST',
             dataType: 'text',
-            url: '/cbtconsole/orderCancelApprovalCtr/rejectRefund',
+            url: '/cbtconsole/orderCancelApprovalCtr/setStateAndRemark',
             data: {
                 "approvalId": approvalId,
-                "actionFlag": actionFlag,
+                "dealState": dealState,
                 "userId": userId,
                 "orderNo": orderNo,
                 "operatorId": operatorId,
+                "refundAmount": 0,
                 "remark": remark
             },
             success: function (data) {

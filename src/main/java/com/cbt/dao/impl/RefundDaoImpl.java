@@ -1462,7 +1462,7 @@ public class RefundDaoImpl implements RefundDaoPlus{
 
 	@Override
 	public int checkIsExistsApproval(int userId, String orderNo) {
-		String querySql = "select count(1) from order_cancel_approval where user_id = ? and order_no = ?";
+		String querySql = "select count(1) from order_cancel_approval where user_id = ? and order_no = ? and deal_state != 4";
 		Connection connAws = DBHelper.getInstance().getConnection2();
 		ResultSet rs = null;
 		PreparedStatement stmt = null;
