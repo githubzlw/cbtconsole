@@ -101,10 +101,12 @@ public class ShipmentServiceImpl implements ShipmentService {
 			}
 			//统计物流商账单总运费、总预估运费、当月物流赔偿款、最终审核可支付总金额(已减赔偿款)
 			if(list!=null && list.size()>0){
+				//不匹配出运订单的物流
+				double noMatchAmount=shipmentMapper.getNoMatchAmount(map);
 				double compensation=shipmentMapper.getCompensationAmounts(map.get("senttimeBegin"),map.get("senttimeEnd"), map.get("company"));
 				double up_price=countMap.get("actual_freight")==null?0.00:countMap.get("actual_freight");
-				up_price=up_price-compensation;
-				result.setRemark("物流商账单总运费:【"+countMap.get("totalprice")+"】总预估运费:【"+(countMap.get("estimatefreight")==null?"0.00":countMap.get("estimatefreight"))+"】当月物流赔偿款:【"+compensation+"】最终审核可支付总金额(已减赔偿款):【"+up_price+"】");
+				up_price=up_price-compensation-noMatchAmount;
+				result.setRemark("物流商账单总运费:【"+countMap.get("totalprice")+"】总预估运费:【"+(countMap.get("estimatefreight")==null?"0.00":countMap.get("estimatefreight"))+"】当月物流赔偿款:【"+compensation+"】最终审核可支付总金额(已减赔偿款)(已减不存在运单金额):【"+df.format(up_price)+"】");
 				result.setCurrePage(Integer.valueOf(map.get("page")));
 				result.setPageSize(Integer.valueOf(map.get("pageSize")));
 				result.setRows(list);

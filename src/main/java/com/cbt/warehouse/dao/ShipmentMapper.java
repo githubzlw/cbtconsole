@@ -55,6 +55,8 @@ public interface ShipmentMapper {
 	 */
 	HashMap<String,Double> queryAllShipmentInfoCount(Map<String, String> map);
 
+	int getNoMatchAmount(Map<String, String> map);
+
 	/**
 	 * 运单&运费列表查询当前系统不存在的运单信息
 	 * @param map
