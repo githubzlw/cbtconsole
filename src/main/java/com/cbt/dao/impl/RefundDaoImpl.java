@@ -1484,4 +1484,28 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		}
 		return total;
 	}
+
+	@Override
+	public int insertIntoPaymentByApproval(int userId,String orderNo) {
+		String querySql = "insert into payment(userid,orderid,paymentid,payment_amount,payment_cc,orderdesc,username,"
+				+ "paystatus,createtime,paySID,payflag,paytype,payment_other,paymentno,transaction_fee) " +
+				"select userid,orderid,paymentid,(0 - payment_amount) as payment_amount,payment_cc,orderdesc,username," +
+				"paystatus,createtime,paySID,payflag,paytype,payment_other,paymentno,transaction_fee from payment"
+				+ " where orderid =? and userid = ? and paytype in(0,5) and paystatus = 1 ";
+		Connection connAws = DBHelper.getInstance().getConnection2();
+		PreparedStatement stmt = null;
+		int total = 0;
+		try {
+			stmt = connAws.prepareStatement(querySql);
+			stmt.setString(1, orderNo);
+			stmt.setInt(2, userId);
+			total = stmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closePreparedStatement(stmt);
+			DBHelper.getInstance().closeConnection(connAws);
+		}
+		return total;
+	}
 }

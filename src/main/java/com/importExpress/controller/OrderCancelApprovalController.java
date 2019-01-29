@@ -367,6 +367,7 @@ public class OrderCancelApprovalController {
                 approvalService.insertIntoApprovalDetails(approvalDetails);
                 //使用MQ更新线上状态
                 updateOnlineDealState(approvalBean);
+                // 添加一笔负的到账
             } else {
                 logger.error("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());
                 System.err.println("userId:" + approvalBean.getUserId() + ",approvalId:" + approvalBean.getId() + ",refundByPayPalApi error :" + json.getMessage());

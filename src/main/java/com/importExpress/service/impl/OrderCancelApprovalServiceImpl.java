@@ -52,4 +52,9 @@ public class OrderCancelApprovalServiceImpl implements OrderCancelApprovalServic
     public int checkIsExistsApproval(int userId, String orderNo) {
         return refundDao.checkIsExistsApproval(userId, orderNo);
     }
+
+    @Override
+    public int insertIntoPaymentByApproval(int userId, String orderNo) {
+        return refundDao.insertIntoPaymentByApproval(userId, orderNo);
+    }
 }
