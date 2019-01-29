@@ -34,4 +34,12 @@ public interface PaymentServiceNew {
      */
     List<PaymentDetails> queryPaymentDetails(String orderNo);
 
+    /**
+     * 查询是否PayPal或者stripe支付
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    int checkIsPayPalOrStripePay(int userId,String orderNo);
+
 }

@@ -269,4 +269,12 @@ public interface RefundDaoPlus {
      */
     int checkIsExistsApproval(int userId,String orderNo);
 
+	/**
+	 * 插入负的导致信息
+	 * @param userId
+	 * @param orderNo
+	 * @return
+	 */
+    int insertIntoPaymentByApproval(int userId,String orderNo);
+
 }
