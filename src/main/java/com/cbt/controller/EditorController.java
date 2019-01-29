@@ -790,6 +790,8 @@ public class EditorController {
             String wordSizeInfo = request.getParameter("wordSizeInfo");
             if(StringUtils.isNotBlank(wordSizeInfo)){
                 cgp.setSizeInfoEn(wordSizeInfo.replace("\\n","<br>"));
+            }else{
+                cgp.setSizeInfoEn("");
             }
 
             // 设置主图数据 mainImg
