@@ -1689,7 +1689,7 @@ public class NewOrderDetailsCtr {
                 int userId = Integer.parseInt(request.getParameter("userId"));
                 //根据订单号判断是否有PayPal或者stripe支付
                 int isPay = paymentServiceNew.checkIsPayPalOrStripePay(userId, orderNo);
-                if (isPay > 0) {
+                if (isPay > 0 && !orderNo.contains("_")) {
                     int isCheckApproval = approvalService.checkIsExistsApproval(userId, orderNo);
                     if (isCheckApproval > 0) {
                         json.setMessage("此订单已经在取消订单审批流程中");
