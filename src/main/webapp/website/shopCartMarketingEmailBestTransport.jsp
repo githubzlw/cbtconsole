@@ -47,13 +47,13 @@
                 </thead>
                 <tbody>
                 <tr align="center" >
-                    <td>A</td>
+                    <td><input id="old_method" value="A"/></td>
                     <td><input id="old_transport" value="XXX "/>days</td>
                     <td>$<input id="old_price" value="XXX"/></td>
                 </tr>
 
                 <tr align="center" >
-                    <td>B</td>
+                    <td><input id="new_method" value="B"/></td>
                     <td><input id="new_transport" value="XXX "/>days
                     <br><span style="color: red;">Faster √</span>
                     </td>
@@ -149,9 +149,14 @@
                 ischeck = 1;
             }
 
+            var oldMethod = $("#old_method").val();
+            if (oldMethod == null || oldMethod == "") {
+                $("#show_notice").text("请输入原来运输方式").show();
+                ischeck = 1;
+            }
             var oldTransport = $("#old_transport").val();
             if (oldTransport == null || oldTransport == "") {
-                $("#show_notice").text("请输入原来运输方式").show();
+                $("#show_notice").text("请输入原来运输天数").show();
                 ischeck = 1;
             }
             var oldPrice = $("#old_price").val();
@@ -159,9 +164,14 @@
                 $("#show_notice").text("请输入原来运费价格").show();
                 ischeck = 1;
             }
+            var newMethod = $("#new_method").val();
+            if (newMethod == null || newMethod == "") {
+                $("#show_notice").text("请输入新的运输方式").show();
+                ischeck = 1;
+            }
             var newTransport = $("#new_transport").val();
             if (newTransport == null || newTransport == "") {
-                $("#show_notice").text("请输入新的运输方式").show();
+                $("#show_notice").text("请输入新的运输天数").show();
                 ischeck = 1;
             }
             var newPrice = $("#new_price").val();
@@ -191,8 +201,10 @@
                         "adminName": adminName,
                         "adminEmail": adminEmail,
                         "whatsApp": whatsApp,
+                        "oldMethod": oldMethod,
                         "oldTransport": oldTransport,
                         "oldPrice": oldPrice,
+                        "newMethod": newMethod,
                         "newTransport": newTransport,
                         "newPrice": newPrice,
                         "savePrice": savePrice,

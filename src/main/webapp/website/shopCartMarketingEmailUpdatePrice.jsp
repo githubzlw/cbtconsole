@@ -165,7 +165,7 @@
             <div>
                 <p style="margin-bottom: 5px;margin-top:0;">We'll keep this deal valid for the next 48 hours</p>
                 <p style="margin-bottom: 5px;margin-top:0;">Hurry in to make sure you snag your most-coveted ImportExpress merch - don't let this be the one that got away!</p>
-                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel free to shoot me an email, I’ll get back to you in 24h!</p>
+                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel free to shoot me an email, I'll get back to you in 24h!</p>
 
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
                 <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>

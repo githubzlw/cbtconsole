@@ -196,7 +196,7 @@ public class ShopCarMarketingController {
          * 1. 【 不做变动 直接发送 】
             2.【给单个产品价格改价】（现在使用的）
             3.【操作运费】
-            4.【为客户选择最佳运输方式】
+            4.【为客户选择最佳运输天数】
          */
         String type = request.getParameter("type");
         if (StringUtils.isBlank(type)) {
@@ -208,10 +208,16 @@ public class ShopCarMarketingController {
         }
 
         if("4".equals(type)) {
+            String oldMethod = request.getParameter("oldMethod");
+            if (StringUtils.isBlank(oldMethod)) {
+                json.setOk(false);
+                json.setMessage("获取原始运输方式失败");
+                return json;
+            }
             String oldTransport = request.getParameter("oldTransport");
             if (StringUtils.isBlank(oldTransport)) {
                 json.setOk(false);
-                json.setMessage("获取原始运输方式失败");
+                json.setMessage("获取原始运输天数失败");
                 return json;
             }
             String oldPrice = request.getParameter("oldPrice");
@@ -220,10 +226,16 @@ public class ShopCarMarketingController {
                 json.setMessage("获取原始运费价格失败");
                 return json;
             }
+            String newMethod = request.getParameter("newMethod");
+            if (StringUtils.isBlank(newMethod)) {
+                json.setOk(false);
+                json.setMessage("获取新的运输方式失败");
+                return json;
+            }
             String newTransport = request.getParameter("newTransport");
             if (StringUtils.isBlank(newTransport)) {
                 json.setOk(false);
-                json.setMessage("获取新的运输方式失败");
+                json.setMessage("获取新的运输天数失败");
                 return json;
             }
             String newPrice = request.getParameter("newPrice");
@@ -238,8 +250,10 @@ public class ShopCarMarketingController {
                 json.setMessage("获取运费节省金额失败");
                 return json;
             }
+            paramMap.put("oldMethod",oldMethod);
             paramMap.put("oldTransport",oldTransport);
             paramMap.put("oldPrice",oldPrice);
+            paramMap.put("newMethod",newMethod);
             paramMap.put("newTransport",newTransport);
             paramMap.put("newPrice",newPrice);
             paramMap.put("savePrice",savePrice);
@@ -482,8 +496,10 @@ public class ShopCarMarketingController {
             }else if("3".equals(paramMap.get("type"))){
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_FREIGHT_COUPON);
             }else if("4".equals(paramMap.get("type"))){
+                modelM.put("oldMethod",paramMap.get("oldMethod"));
                 modelM.put("oldTransport",paramMap.get("oldTransport"));
                 modelM.put("oldPrice",paramMap.get("oldPrice"));
+                modelM.put("newMethod",paramMap.get("newMethod"));
                 modelM.put("newTransport",paramMap.get("newTransport"));
                 modelM.put("newPrice",paramMap.get("newPrice"));
                 modelM.put("savePrice",paramMap.get("savePrice"));

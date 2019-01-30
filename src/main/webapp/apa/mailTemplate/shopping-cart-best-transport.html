@@ -75,8 +75,8 @@
     .order_first2{ margin: 0 auto 0;}
     .order_first ul{ width: 100%; margin: 0 auto; overflow: hidden;box-sizing:border-box;}
     .order_li{ float: left; width:225px;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
-        list-style:none; height: 338px; overflow:hidden;text-align: left;box-sizing:border-box;}
-    .order_img{ width:100%; cursor: pointer; }
+        list-style:none; height: 338px; overflow:hidden;text-align: center;box-sizing:border-box;}
+    .order_img{ max-width:213px; max-height: 213px; overflow: hidden; cursor: pointer; }
     .a6S{opacity: 0.01; left: 163px; top: 380.406px; position: absolute; font-weight: normal;}
     .order_title{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; margin: 0 auto; text-align:left;}
     .order_size{ text-align: left; width: 98%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -249,7 +249,7 @@
                         <div class="order_first">
                           <div class="rece_shop">
                             <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
-                            <p>Recently you have added some items to your <a href="###">shopping cart</a>, and ticked
+                            <p>Recently you have added some items to your <a target="_blank" href="https://www.import-express.com/Goods/getShopCar">shopping cart</a>, and ticked
                               A  as your shipping method, however there is a faster and cheaper shipping method you have probably missed:</p>
                           </div>
                           <div class="way_box">
@@ -263,12 +263,12 @@
                               </thead>
                               <tbody>
                               <tr>
-                                <td>A</td>
+                                <td><span th:text="${oldMethod}">A</span></td>
                                 <td><em th:text="${oldTransport}">30</em> days</td>
                                 <td>USD&nbsp;<em th:text="${oldPrice}">1,000</em></td>
                               </tr>
                               <tr class="way_check">
-                                <td>B</td>
+                                <td><span th:text="${newMethod}">B</span></td>
                                 <td><p><em th:text="${newTransport}">10</em> days<b>(Faster)</b></p>
                                 </td>
                                 <td><p>USD&nbsp;<em th:text="${newPrice}">100</em><b>(Cheaper)</b></p>
