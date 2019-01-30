@@ -48,16 +48,16 @@
                 <tbody>
                 <tr align="center" >
                     <td>A</td>
-                    <td><input value="XXX days"/></td>
-                    <td>$<input value="XXX"/></td>
+                    <td><input id="old_transport" value="XXX "/>days</td>
+                    <td>$<input id="old_price" value="XXX"/></td>
                 </tr>
 
                 <tr align="center" >
                     <td>B</td>
-                    <td><input value="XXX days"/>
+                    <td><input id="new_transport" value="XXX "/>days
                     <br><span style="color: red;">Faster √</span>
                     </td>
-                    <td>$<input value="XXX"/>
+                    <td>$<input id="new_price" value="XXX"/>
                     <br><span style="color: red;">Cheaper √</span>
                     </td>
                 </tr>
@@ -68,7 +68,7 @@
             <br>
             <div style="width:600px;">
                 <span>We have updated your shopping cart with this better shipping method</span>
-                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;<input value="2"/></span>
+                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;<input id="save_price" value="2"/></span>
                 <span><a href="https://www.import-express.com" target="_blank"
                          style="font-size: 16px;border-radius: 4px;color: #fff;background-color: #3e9eea;padding:4px 8px;text-decoration: none;">BUY NOW</a></span>
             </div>
@@ -148,6 +148,33 @@
                 $("#show_notice").text("请输入WhatsApp").show();
                 ischeck = 1;
             }
+
+            var oldTransport = $("#old_transport").val();
+            if (oldTransport == null || oldTransport == "") {
+                $("#show_notice").text("请输入原来运输方式").show();
+                ischeck = 1;
+            }
+            var oldPrice = $("#old_price").val();
+            if (oldPrice == null || oldPrice == "" || oldPrice == 0) {
+                $("#show_notice").text("请输入原来运费价格").show();
+                ischeck = 1;
+            }
+            var newTransport = $("#new_transport").val();
+            if (newTransport == null || newTransport == "") {
+                $("#show_notice").text("请输入新的运输方式").show();
+                ischeck = 1;
+            }
+            var newPrice = $("#new_price").val();
+            if (newPrice == null || newPrice == "") {
+                $("#show_notice").text("请输入新的运费价格").show();
+                ischeck = 1;
+            }
+            var savePrice = $("#save_price").val();
+            if (savePrice == null || savePrice == "") {
+                $("#show_notice").text("请输入节省金额").show();
+                ischeck = 1;
+            }
+
             if (ischeck == 1) {
                 return false;
             } else {
@@ -163,7 +190,12 @@
                         "adminNameFirst": adminNameFirst,
                         "adminName": adminName,
                         "adminEmail": adminEmail,
-                        "whatsApp": whatsApp
+                        "whatsApp": whatsApp,
+                        "oldTransport": oldTransport,
+                        "oldPrice": oldPrice,
+                        "newTransport": newTransport,
+                        "newPrice": newPrice,
+                        "savePrice": savePrice
                         //"emailContent": emailContent,
                         //"model": model,
                     },

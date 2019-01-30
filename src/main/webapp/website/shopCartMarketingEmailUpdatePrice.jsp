@@ -246,7 +246,8 @@
                         "adminNameFirst": adminNameFirst,
                         "adminName": adminName,
                         "adminEmail": adminEmail,
-                        "whatsApp": whatsApp
+                        "whatsApp": whatsApp,
+                        "emailTitle":"Limited Time Offer JUST for you!"
                         //"emailContent": emailContent,
                         //"model": model,
                     },

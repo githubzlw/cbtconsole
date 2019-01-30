@@ -264,14 +264,14 @@
                               <tbody>
                               <tr>
                                 <td>A</td>
-                                <td><em>30</em> days</td>
-                                <td>USD<em>1,000</em></td>
+                                <td><em th:text="${oldTransport}">30</em> days</td>
+                                <td>USD<em th:text="${oldPrice}">1,000</em></td>
                               </tr>
                               <tr class="way_check">
                                 <td>B</td>
-                                <td><p><em>10</em> days<b>(Faster)</b></p>
+                                <td><p><em th:text="${newTransport}">10</em> days<b>(Faster)</b></p>
                                 </td>
-                                <td><p>USD<em>100</em><b>(Cheaper)</b></p>
+                                <td><p>USD<em th:text="${newPrice}">100</em><b>(Cheaper)</b></p>
                                 </td>
                               </tr>
                               </tbody>
@@ -280,7 +280,7 @@
 
                           <div class="order_usd order_usd_due">
                             <p class="order_off">We have updated your shopping cart with this better shipping method</p>
-                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${offCost}">7.2</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${savePrice}">100</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">But If there were actually any other reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email,  our team will absolutely try every effort to meet your satisfaction!</p>
                           <p class="order_rem_p"><strong>Import Express CHINA</strong><br/>

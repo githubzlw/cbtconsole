@@ -244,7 +244,8 @@
                         "adminNameFirst": adminNameFirst,
                         "adminName": adminName,
                         "adminEmail": adminEmail,
-                        "whatsApp": whatsApp
+                        "whatsApp": whatsApp,
+                        "emailTitle":"You Have Made Some Wonderful Selections!"
                         //"emailContent": emailContent,
                         //"model": model,
                     },
