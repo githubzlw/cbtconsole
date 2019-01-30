@@ -138,6 +138,7 @@
         var nScrollTop = 0;  //滚动到的当前位置
         var tempNScrollTop = 0;
 
+        var shopList = new Array();
 
         $(document).ready(function () {
             var pid = sessionStorage.getItem("pid");
@@ -328,30 +329,39 @@
 
         function chooseShopMainImg(shopId, imgUrl, obj, numStr) {
             $(".shop_check_1_" + shopId).each(function (i, item) {
-                $(this).prop("checked", false);
-                $(this).parent().parent().css("background-color","");
+                $(this).parent().parent().find("input[type='checkbox']").prop("checked", false);
+                $(this).parent().parent().find("input[type='checkbox']").parent().parent().css("background-color","");
             });
             $(".shop_check_2_" + shopId).each(function (i, item) {
-                $(this).prop("checked", false);
-                $(this).parent().parent().css("background-color","");
+                $(this).parent().parent().find("input[type='checkbox']").prop("checked", false);
+                $(this).parent().parent().find("input[type='checkbox']").parent().parent().css("background-color","");
             });
             $(".shop_check_3_" + shopId).each(function (i, item) {
-                $(this).prop("checked", false);
-                $(this).parent().parent().css("background-color","");
+                $(this).parent().parent().find("input[type='checkbox']").prop("checked", false);
+                $(this).parent().parent().find("input[type='checkbox']").parent().parent().css("background-color","");
             });
             $(".pid_shop_" + shopId).prop("checked", false);
+            var pidList = new Array();
+            for(j = 0; j < shopList.length; j++){
+                if (shopList[j].shopId == shopId && shopList[j].num == numStr) {
+                    var pidJson = {pid: shopList[j].pid, imgUrl: shopList[j].imgUrl};
+                    pidList.push(pidJson);
+                }
+            }
+
+            var count = pidList.length;
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/singleGoods/setMainImgByShopId",
                 data: {
-                    "shopId": shopId,
-                    "imgUrl": imgUrl
+                    "pidList": JSON.stringify(pidList),
+                    "shopId" : shopId
                 },
                 success: function (data) {
                     if (data.ok) {
                         //$(obj).prop("checked", true);
                         $(".shop_check_"+numStr+"_" + shopId).each(function (i, item) {
-                            $(this).prop("checked", true);
+                            $(this).parent().parent().find("input[type='checkbox']").prop("checked", true);
                         });
                         $(obj).parent().parent().css("background-color","#27ec27");
                     } else {
@@ -537,10 +547,11 @@
 
 
         function formatWindowImg1(val, row, index) {
+            checkAndAddShopData(row.shopId,row.pid,val,1);
             var content = '<div';
-            if(row.shopCheck == 1){
+            /*if(row.shopCheck == 1){
                 content += ' style="background-color: #27ec27"';
-            }
+            }*/
             content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
@@ -553,17 +564,19 @@
                 if (row.isUpdate == 0) {
                     content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,1)" ';
                 }
-                content += ((row.shopCheck == 1 || row.shopCheck == 9) ? 'checked="checked"' : '') + '/></span>';
+                /*content += ((row.shopCheck == 1 || row.shopCheck == 9) ? 'checked="checked"' : '') ;*/
+                content += '/></span>';
                 content += '</div>';
             }
             return content;
         }
 
         function formatWindowImg2(val, row, index) {
+            checkAndAddShopData(row.shopId,row.pid,val,2);
             var content = '<div';
-            if(row.shopCheck == 2){
+            /*if(row.shopCheck == 2){
                 content += ' style="background-color: #27ec27"';
-            }
+            }*/
             content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
@@ -576,17 +589,19 @@
                 if (row.isUpdate == 0) {
                     content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,2)" ';
                 }
-                content += ((row.shopCheck == 2 || row.shopCheck == 10) ? 'checked="checked"' : '') + '/></span>';
+                /*content += ((row.shopCheck == 2 || row.shopCheck == 10) ? 'checked="checked"' : '') ;*/
+                content += '/></span>';
                 content += '</div>';
             }
             return content;
         }
 
         function formatWindowImg3(val, row, index) {
+            checkAndAddShopData(row.shopId,row.pid,val,3);
             var content = '<div';
-            if(row.shopCheck == 3){
+            /*if(row.shopCheck == 3){
                 content += ' style="background-color: #27ec27"';
-            }
+            }*/
             content +='><img class="img_sty" src="/cbtconsole/img/beforeLoad.gif" data-original="'
                 + val + '" onclick="bigImg(\'' + val + '\')"/>';
             if (row.isUpdate > -1) {
@@ -599,7 +614,8 @@
                 if (row.isUpdate == 0) {
                     content += ' onclick="chooseShopMainImg(\'' + row.shopId + '\',\'' + val + '\',this,3)" ';
                 }
-                content += ((row.shopCheck == 3 || row.shopCheck == 7) ? 'checked="checked"' : '') + '/></span>';
+                /*content += ((row.shopCheck == 3 || row.shopCheck == 7) ? 'checked="checked"' : '') ;*/
+                content += '/></span>';
                 content += '</div>';
             }
             return content;
@@ -648,6 +664,11 @@
                     + 'onclick="doSameShopCheck(\'' + row.shopId + '\',1)">';
             }
             return content;
+        }
+
+        function checkAndAddShopData(shopId,pid,imgUrl,num) {
+            var json = {shopId: shopId, pid: pid, imgUrl: imgUrl, num: num};
+            shopList.push(json);
         }
     </script>
 
