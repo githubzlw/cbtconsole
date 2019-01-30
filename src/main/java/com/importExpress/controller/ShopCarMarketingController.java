@@ -229,6 +229,13 @@ public class ShopCarMarketingController {
         }*/
 
 
+        String type = request.getParameter("type");
+        if (StringUtils.isBlank(type)) {
+            json.setOk(false);
+            json.setMessage("获取发送类别失败失败");
+            return json;
+        }
+
         String userName;
         String userEmail = request.getParameter("userEmail");
         if (StringUtils.isBlank(userEmail)) {
@@ -1211,7 +1218,7 @@ public class ShopCarMarketingController {
     @RequestMapping("/genShoppingCarMarketingEmail")
     public ModelAndView genShoppingCarMarketingEmail(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView mv = new ModelAndView("shopCartMarketingEmail");
-        mv.setViewName("");
+
         String userJson = Redis.hget(request.getSession().getId(), "admuser");
         Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
         if (user == null || user.getId() == 0) {
@@ -1238,6 +1245,18 @@ public class ShopCarMarketingController {
             return mv;
         } else {
             mv.addObject("type", typeStr);
+        }
+
+        if ("1".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailNoChange");
+        } else if ("2".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailUpdatePrice");
+        }
+        if ("3".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailFreightCoupon");
+        }
+        if ("4".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailBestTransport");
         }
 
         try {

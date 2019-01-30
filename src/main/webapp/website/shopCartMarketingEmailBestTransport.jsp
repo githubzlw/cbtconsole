@@ -16,148 +16,73 @@
 </c:if>
 <c:if test="${success > 0}">
     <div>
+        <h2 style="text-align: center">最佳运输方式邮件预览</h2>
+        <img style="cursor: pointer"
+                 src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
-        <h2>邮件预览</h2>
+
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
         <div style="font-family: Times New Roman;">
-            <img style="cursor: pointer"
-                 src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
             <p style="margin-bottom: 10px;">
+            <h3 id="email_title" style="font-family: Times New Roman;margin-bottom:20px;">Faster And Cheaper Shipping Method For Your Consideration!</h3>
             <h3 style="font-family: Times New Roman;margin-bottom:20px;">Dear customer,</h3>
             <span>I'm <input id="admin_name_first" value="${adminName}">, Marketing Manager of Import Express.</span>
             <br>
-            <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
+            <span>Recently you have added some items to your shopping  cart, </span>
             <br>
-            <span>Is there anything I could help you with?</span>
-            <br>
-            <span>Here's your shopping cart list.</span>
+            <span>and ticked  A  as your shipping method, however there is a faster and cheaper shipping method you have probably missed:</span>
             </p>
 
             <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
                    cellpadding="1" cellspacing="0">
-                <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Price reduced items
-                </caption>
-                <tbody>
-                <tr>
-                    <td colspan="6" style="border-top: 1px solid;"></td>
-                </tr>
+                <thead>
                 <tr style="font-weight: bold;">
-                    <td align="center" width="350px">Item Name &amp; Details</td>
-                    <td align="center" width="140px">Item Price</td>
-                    <td align="center" width="140px">Quantity</td>
-                    <td align="center" width="140px">New Price</td>
-                    <td align="center" width="140px">Total Price</td>
-                    <td align="center" width="160px">Remark</td>
+                    <td align="center" width="200px">Shipping Method</td>
+                    <td align="center" width="200px">Shipping Time</td>
+                    <td align="center" width="200px">Shipping Cost</td>
                 </tr>
-                <c:forEach items="${updateList}" var="carInfo" varStatus="status">
-                    <tr>
-                        <td>
-                            <div style="width: 350px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${carInfo.goodsTitle}
-                            </div>
-                            <div><img style="cursor: pointer" width="50px;" height="50px;" src="${carInfo.googsImg}"/>
-                                <c:set var="typeList" value="${fn:split(carInfo.goodsType, ';')}"></c:set>
-                                <c:forEach var="typeStr" items="${typeList}">
-                                    <c:if test="${fn:length(typeStr) >0}">
-                                        <span style="border: 1px solid #E1E1E1;">${typeStr}</span>&nbsp;
-                                    </c:if>
-                                </c:forEach>
-                            </div>
-                        </td>
-                        <td align="center" width="140px">USD <span>${carInfo.price1}</span></td>
-                        <td align="center" width="140px">${carInfo.googsNumber}&nbsp;${carInfo.goodsunit}&nbsp;</td>
-                        <td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>
-                        <td align="center" width="140px">USD <span>${carInfo.totalPrice}</span></td>
-                        <td width="160px">${carInfo.remark}</td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-
-            <table style="width: 820px;font-size: 18px;text-align: right">
+                </thead>
                 <tbody>
-                <tr>
-                    <td>Products Cart Total:</td>
-                    <td style="width: 150px">USD&nbsp;&nbsp;${productCost}</td>
+                <tr align="center" >
+                    <td>A</td>
+                    <td><input value="XXX days"/></td>
+                    <td>$<input value="XXX"/></td>
                 </tr>
-                <tr>
-                    <td>Final Due:</td>
-                    <td style="width: 150px">USD&nbsp;&nbsp;${actualCost}</td>
+
+                <tr align="center" >
+                    <td>B</td>
+                    <td><input value="XXX days"/>
+                    <br><span style="color: red;">Faster √</span>
+                    </td>
+                    <td>$<input value="XXX"/>
+                    <br><span style="color: red;">Cheaper √</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
 
-            <c:if test="${fn:length(sourceList) > 0}">
-                <br>
-                <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_old_table" border="1"
-                       cellpadding="1" cellspacing="0">
-                    <caption style="float: left;font-weight: bold;font-size: 18px;padding:6px;">Others Items in your
-                        shopping Cart
-                    </caption>
-                    <tbody>
-                    <tr>
-                        <td colspan="6" style="border-top: 1px solid;"></td>
-                    </tr>
-                    <tr style="font-weight: bold;font-size: 12px;">
-                        <td align="center" width="350px">Item Name &amp; Details</td>
-                        <td align="center" width="140px">Item Price</td>
-                        <td align="center" width="140px">Quantity</td>
-                        <td align="center" width="140px">Total Price</td>
-                        <td align="center" width="160px">Remark</td>
-                    </tr>
-                    <c:forEach items="${sourceList}" var="carInfo" varStatus="status">
-                        <tr>
-                            <td>
-                                <div style="width: 350px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${carInfo.goodsTitle}
-                                </div>
-                                <div><img style="cursor: pointer" width="50px;" height="50px;"
-                                          src="${carInfo.googsImg}"/>
-                                    <c:set var="typeList" value="${fn:split(carInfo.goodsType, ';')}"></c:set>
-                                    <c:forEach var="typeStr" items="${typeList}">
-                                        <c:if test="${fn:length(typeStr) >0}">
-                                            <span style="border: 1px solid #E1E1E1;">${typeStr}</span>&nbsp;
-                                        </c:if>
-                                    </c:forEach>
-                                </div>
-                            </td>
-                            <td align="center" width="140px">USD <span>${carInfo.googsPrice}</span></td>
-                            <td align="center" width="140px">${carInfo.googsNumber}&nbsp;${carInfo.goodsunit}&nbsp;</td>
-                            <td align="center" width="140px">USD <span>${carInfo.totalPrice}</span></td>
-                            <td width="160px">${carInfo.remark}</td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-                <div style="margin-top:10px;">
-                    <a style="color: #0070C0;" href="https://www.import-express.com/Goods/getShopCar" target="_blank">View
-                        More...</a>
-                </div>
-            </c:if>
-            <table style="width: 820px;font-size: 18px;text-align: right">
-                <tbody>
-                <tr>
-                    <td>Shop Cart Total:</td>
-                    <td style="width: 150px">USD&nbsp;&nbsp;${totalProductCost}</td>
-                </tr>
-                <tr>
-                    <td>Shop Cart Final Due:</td>
-                    <td style="width: 150px">USD&nbsp;&nbsp;${totalActualCost}</td>
-                </tr>
-                </tbody>
-            </table>
 
-            <div style="width:500px;position:relative;top:-30px;">
-                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;${offCost}&nbsp;&nbsp;(${offRate}% Off)</span>
+            <br>
+            <div style="width:600px;">
+                <span>We have updated your shopping cart with this better shipping method</span>
+                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;<input value="2"/></span>
                 <span><a href="https://www.import-express.com" target="_blank"
                          style="font-size: 16px;border-radius: 4px;color: #fff;background-color: #3e9eea;padding:4px 8px;text-decoration: none;">BUY NOW</a></span>
             </div>
         </div>
+        <br>
         <div style="font-family: Times New Roman;">
             <div>
-                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel
-                    free to ask me by responding to this Email</p>
+                <p style="margin-bottom: 5px;margin-top:0;">
+                    <span>But If there were actually any other reasons why you didn't complete your purchase,</span>
+                    <br>
+                    <span>please don't hesitate to let me know by responding to this Email,</span>
+                    <br>
+                    <span>our team will absolutely try every effort to meet your satisfaction!</span>
+                      </p>
 
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
                 <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
@@ -168,7 +93,7 @@
                 <p style="margin-bottom: 5px;margin-top:0;">Yours Sincerely,</p>
                 <p style="margin-bottom: 5px;margin-top:0;"><input id="admin_name" value="${adminName}"/> | Marketing Manager</p>
                 <p style="margin-bottom: 5px;margin-top:0;"><b>Marketing Department</b></p>
-                <p style="margin-bottom: 5px;margin-top:0;">Email:<input id="admin_email" value="${adminEmail}"/></p>
+                <p style="margin-bottom: 5px;margin-top:0;">Email:<input id="admin_email" style="width: 280px;" value="${adminEmail}"/></p>
                 <p id="whats_app_pp_temp" style="margin-bottom: 5px;margin-top:0;"><span>WhatsApp: </span><input
                         id="whats_app" value="+86 136 3644 5063"/></p>
             </div>

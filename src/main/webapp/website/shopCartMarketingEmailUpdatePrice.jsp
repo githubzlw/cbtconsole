@@ -16,24 +16,26 @@
 </c:if>
 <c:if test="${success > 0}">
     <div>
+        <h2 style="text-align: center">产品改价邮件预览</h2>
+        <img style="cursor: pointer"
+                 src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
-        <h2>邮件预览</h2>
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
         <div style="font-family: Times New Roman;">
-            <img style="cursor: pointer"
-                 src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
+
             <p style="margin-bottom: 10px;">
+            <h3 id="email_title" style="font-family: Times New Roman;margin-bottom:20px;">Limited Time Offer JUST for you!</h3>
             <h3 style="font-family: Times New Roman;margin-bottom:20px;">Dear customer,</h3>
             <span>I'm <input id="admin_name_first" value="${adminName}">, Marketing Manager of Import Express.</span>
             <br>
-            <span>I noticed that you were about to pick up some products on our website but haven’t completed your order </span>
+            <span>Recently you have added some items to your shopping  cart. We greatly value your trust and confidence.</span>
             <br>
-            <span>Is there anything I could help you with?</span>
+            <span>To express our sincere appreciation for your loyalty to our business, </span>
             <br>
-            <span>Here's your shopping cart list.</span>
+            <span>we have reduced some unit prices in your shopping cart: </span>
             </p>
 
             <table style="width: 820px;font-size: 16px; border-color: #b6ff00;" id="email_update_table" border="1"
@@ -138,6 +140,11 @@
             <table style="width: 820px;font-size: 18px;text-align: right">
                 <tbody>
                 <tr>
+                    <td>
+                        Click here to see the rest items
+                    </td>
+                </tr>
+                <tr>
                     <td>Shop Cart Total:</td>
                     <td style="width: 150px">USD&nbsp;&nbsp;${totalProductCost}</td>
                 </tr>
@@ -156,8 +163,9 @@
         </div>
         <div style="font-family: Times New Roman;">
             <div>
-                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel
-                    free to ask me by responding to this Email</p>
+                <p style="margin-bottom: 5px;margin-top:0;">We'll keep this deal valid for the next 48 hours</p>
+                <p style="margin-bottom: 5px;margin-top:0;">Hurry in to make sure you snag your most-coveted ImportExpress merch - don't let this be the one that got away!</p>
+                <p style="margin-bottom: 5px;margin-top:0;">If you have any further concerns or questions please feel free to shoot me an email, I’ll get back to you in 24h!</p>
 
                 <p style="margin-bottom: 5px;margin-top:15px;"><b>ImportExpress CHINA</b></p>
                 <p style="margin-bottom: 5px;margin-top:0;">Best product source for small business!</p>
