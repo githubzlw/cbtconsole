@@ -20,7 +20,7 @@
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
-               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
+               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
 
     </div>
@@ -124,7 +124,7 @@
 </c:if>
 </body>
 <script>
-    function confirmAndSendEmail(userId, userEmail) {
+    function confirmAndSendEmail(userId, userEmail,type) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
             var ischeck = 0;
@@ -195,7 +195,9 @@
                         "oldPrice": oldPrice,
                         "newTransport": newTransport,
                         "newPrice": newPrice,
-                        "savePrice": savePrice
+                        "savePrice": savePrice,
+                        "type" : type,
+                        "emailTitle" : "Faster And Cheaper Shipping Method For Your Consideration!"
                         //"emailContent": emailContent,
                         //"model": model,
                     },

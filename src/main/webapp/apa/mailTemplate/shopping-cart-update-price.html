@@ -68,6 +68,7 @@
     .estima_time_color{ font-weight: bold; font-size: 18px;}
     .estima_time_color a{ padding: 4px 8px; text-align: center; background-color: #3e9eea; color: #fff;
       border-radius: 4px; font-size: 16px; font-weight: 400; text-transform: uppercase; margin-left: 10px;}
+    .xian{ border: 0.5px dashed #e3e3e3; margin: 5px 0 10px;}
     .order_off i{ text-decoration: line-through; margin-left: 5px; color: #999;}
     .dismantling_box{ width: 100%; text-align: left; margin: 0px auto 0; }
     .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
@@ -244,6 +245,7 @@
                               and confidence. To express our sincere appreciation for your loyalty to our business,
                               <b>we have reduced some unit prices in your shopping cart:</b> </p>
                           </div>
+                          <p class="estima_time">Item Name & Details:</p>
                           <ul class="clearfix">
                             <li class="order_li" th:each="carInfo:${updateList}">
 
@@ -260,7 +262,25 @@
                               <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong> <span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span></p>
                              </li>
                            </ul>
-                          <p class="order_click"><a href="###">Click here</a> to see the rest items</p>
+                          <div class="xian"></div>
+                          <p class="estima_time">Other Items in your shopping Cart:</p>
+                          <ul class="clearfix">
+                            <li class="order_li" th:each="carInfo:${sourceList}">
+
+                              <img th:src="${carInfo.googsImg}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
+                              <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
+
+                              <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
+                                <div class="order_size">
+                                  <span th:title="${typeStr}" th:text="${typeStr}">Size:S</span>
+                                </div>
+                              </div>
+
+                              <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
+                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong></p>
+                            </li>
+                          </ul>
+                          <p class="order_click"><a target="_blank" href="https://www.import-express.com/Goods/getShopCar">Click here</a> to see the rest items</p>
                           <div class="order_usd order_usd_due">
                             <p class="order_off"><strong>Products Cart Final Total:
                               <em>USD</em><em th:text="${totalActualCost}"> 15.00</em></strong><i><strong><em>USD</em><em th:text="${totalProductCost}"> 18.80</em></strong></i></p>

@@ -20,7 +20,7 @@
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
-               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
+               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
@@ -156,7 +156,7 @@
             </table>
 
             <div style="width:500px;position:relative;top:-30px;">
-                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;${offCost}&nbsp;&nbsp;(${offRate}% Off)</span>
+                <span style="font-weight: bold;font-size: 20px;margin-right:8px;">You have saved :USD&nbsp;${offCost}</span>
                 <span><a href="https://www.import-express.com" target="_blank"
                          style="font-size: 16px;border-radius: 4px;color: #fff;background-color: #3e9eea;padding:4px 8px;text-decoration: none;">BUY NOW</a></span>
             </div>
@@ -207,7 +207,7 @@
 </c:if>
 </body>
 <script>
-    function confirmAndSendEmail(userId, userEmail) {
+    function confirmAndSendEmail(userId, userEmail,type) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
             var ischeck = 0;
@@ -247,6 +247,7 @@
                         "adminName": adminName,
                         "adminEmail": adminEmail,
                         "whatsApp": whatsApp,
+                        "type":type,
                         "emailTitle":"Limited Time Offer JUST for you!"
                         //"emailContent": emailContent,
                         //"model": model,

@@ -17,7 +17,7 @@
 <c:if test="${success > 0}">
     <div>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
-               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
+               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
         <h2>邮件预览</h2>
     </div>
@@ -199,7 +199,7 @@
 </c:if>
 </body>
 <script>
-    function confirmAndSendEmail(userId, userEmail) {
+    function confirmAndSendEmail(userId, userEmail,type) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
             var ischeck = 0;
@@ -238,7 +238,9 @@
                         "adminNameFirst": adminNameFirst,
                         "adminName": adminName,
                         "adminEmail": adminEmail,
-                        "whatsApp": whatsApp
+                        "whatsApp": whatsApp,
+                        "type":type,
+                        "emailTitle":"Your Ultimate Shipping Rate Discount"
                         //"emailContent": emailContent,
                         //"model": model,
                     },

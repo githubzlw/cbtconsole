@@ -20,7 +20,7 @@
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
-               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
+               value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
     </div>
     <div style="height: auto;font-size:20px;" id="email_content">
@@ -205,7 +205,7 @@
 </c:if>
 </body>
 <script>
-    function confirmAndSendEmail(userId, userEmail) {
+    function confirmAndSendEmail(userId, userEmail,type) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
             var ischeck = 0;
@@ -245,6 +245,7 @@
                         "adminName": adminName,
                         "adminEmail": adminEmail,
                         "whatsApp": whatsApp,
+                        "type":type,
                         "emailTitle":"You Have Made Some Wonderful Selections!"
                         //"emailContent": emailContent,
                         //"model": model,
