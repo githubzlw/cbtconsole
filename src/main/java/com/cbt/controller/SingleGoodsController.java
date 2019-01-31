@@ -13,7 +13,9 @@ import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.KjPidBean;
 import com.importExpress.utli.EasyUiTreeUtils;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -921,29 +923,31 @@ public class SingleGoodsController {
             admuser = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 
         }
+        String pidList = request.getParameter("pidList");
+        if (StringUtil.isBlank(pidList)) {
+            json.setOk(false);
+            json.setMessage("获取数据失败");
+            return json;
+        }
         String shopId = request.getParameter("shopId");
-        if (StringUtil.isBlank(shopId)) {
-            json.setOk(false);
-            json.setMessage("获取店铺ID失败");
-            return json;
-        }
-
-        String imgUrl = request.getParameter("imgUrl");
-        if (StringUtil.isBlank(imgUrl)) {
-            json.setOk(false);
-            json.setMessage("获取图片路径失败");
-            return json;
-        }
         try {
-            if (imgUrl.contains("alicdn.")) {
-                imgUrl = "";
+
+            JSONArray jsonArray = JSONArray.fromObject(pidList);// 把String转换为json
+            List<KjPidBean> goodsInfos = (List<KjPidBean>) JSONArray.toCollection(jsonArray,KjPidBean.class);
+
+            for (KjPidBean pidBean : goodsInfos) {
+                String imgUrl = pidBean.getImgUrl();
+                if (imgUrl.contains("alicdn.")) {
+                    imgUrl = "";
+                }
+                if (imgUrl.contains(REMOTE_SHOW_URL)) {
+                    imgUrl = imgUrl.replace(REMOTE_SHOW_URL, LOCAL_FILE_PATH);
+                } else if (imgUrl.contains(LOCAL_SHOW_URL)) {
+                    imgUrl = imgUrl.replace(LOCAL_SHOW_URL, LOCAL_FILE_PATH);
+                }
+                sgGsService.setMainImgByPid(pidBean.getPid(), imgUrl);
             }
-            if (imgUrl.contains(REMOTE_SHOW_URL)) {
-                imgUrl = imgUrl.replace(REMOTE_SHOW_URL, LOCAL_FILE_PATH);
-            } else if (imgUrl.contains(LOCAL_SHOW_URL)) {
-                imgUrl = imgUrl.replace(LOCAL_SHOW_URL, LOCAL_FILE_PATH);
-            }
-            sgGsService.setMainImgByShopId(shopId, imgUrl);
+
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
