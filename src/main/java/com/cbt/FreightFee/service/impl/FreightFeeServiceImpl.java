@@ -42,6 +42,16 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				//如果预估《=0，则国家使用南非来预估
 				freightFee = getYFHFreightFee(fweight, "29", freightFee,subShippingmethod);
 			}
+		}else if (shippingmethod.equals("DHL")) {
+			if(fweight%Double.valueOf(String.valueOf(fweight).split("\\.")[0])>=0.5){
+				fweight=Double.valueOf(String.valueOf(fweight).split("\\.")[0])+1;
+			}else if(fweight%Double.valueOf(String.valueOf(fweight).split("\\.")[0])>0 && fweight%Double.valueOf(String.valueOf(fweight).split("\\.")[0])<0.5){
+				fweight=Double.valueOf(String.valueOf(fweight).split("\\.")[0])+0.5;
+			}
+			if(freightFee<=0){
+				//如果预估《=0，则国家使用南非来预估
+				freightFee = getDHLFreightFee(fweight, "29", freightFee,subShippingmethod);
+			}
 		}else if(shippingmethod.equals("大誉") || shippingmethod.equals("迅邮")){
 			if(fweight%Double.valueOf(String.valueOf(fweight).split("\\.")[0])>=0.5){
 				fweight=Double.valueOf(String.valueOf(fweight).split("\\.")[0])+1;
@@ -148,6 +158,118 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 		}
 		return freightFee;
 	}
+
+
+	/**
+	 * 计算DHL运费
+	 *
+	 * @param fweight
+	 * @param countId
+	 * @param freightFee
+	 * @return
+	 */
+	public double getDHLFreightFee(double fweight, String countId,
+	                               double freightFee,String subShippingmethod) {
+		if(countId.contains("AFRICA")){
+			countId="S.AFRICA";
+		}
+		ZoneBean zone = freightFeeMapper.getZone(countId);
+		if (zone != null && zone.getFedexie() != null) {
+			String fedexie = zone.getFedexie();//subShippingmethod;//
+			String country = zone.getCountry();
+			// 运费 = 首重价 + （（总重量-整除重量） 整除 整除重量 +1） * 续重价
+			// 墨西哥 150+40
+			if ("MEXICO".equals(country)) {
+				if (fweight <= 0.5) {
+					freightFee = 125;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 125 + Math.ceil((fweight - 0.5) / 0.5) * 35;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 45;
+				}
+			}else if("APAC".equals(country)){//亚太地区
+				if (fweight <= 0.5) {
+					freightFee = 125;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 125 + Math.ceil((fweight - 0.5) / 0.5) * 25;
+				}
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 45;
+				}
+			}
+			// 美国,加拿大,西欧等国家运费计算公式 120+25
+			if (fedexie.contains("西欧") || fedexie.contains("美国")
+					|| fedexie.contains("加拿大")) {
+				if (fweight <= 0.5) {
+					freightFee = 130;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 130 + Math.ceil((fweight - 0.5) / 0.5) * 30;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 42;
+				}
+			}
+			// 东欧国家 160+50
+			if (fedexie.contains("东欧")) {
+				if (fweight <= 0.5) {
+					freightFee = 160;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 160 + Math.ceil((fweight - 0.5) / 0.5) * 50;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 45;
+				}
+			}
+			// 澳洲 125+30
+			if (fedexie.contains("澳大利亚")) {
+				if (fweight <= 0.5) {
+					freightFee = 130;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 130 + Math.ceil((fweight - 0.5) / 0.5) * 30;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 45;
+				}
+			}
+			// 非洲国家 170+55
+			if (fedexie.contains("非洲")) {
+				if (fweight <= 0.5) {
+					freightFee = 180;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 180 + Math.ceil((fweight - 0.5) / 0.5) * 55;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 65;
+				}
+			}
+			// 南美国家 180+60
+			if ("Honduras".equals(country) || country.contains("AFRICA") || fedexie.contains("南美")) {
+				if (fweight <= 0.5) {
+					freightFee = 180;
+				}
+				if (fweight > 0.5 && fweight < 21) {
+					freightFee = 180 + Math.ceil((fweight - 0.5) / 0.5) * 40;
+				}
+				// 当重量超过21KG后的计算公式需求不明确
+				if (fweight > 21) {
+					freightFee = Math.ceil(fweight) * 65;
+				}
+			}
+		}
+		return freightFee;
+	}
 	
 
 	/**
@@ -195,10 +317,10 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 			if (fedexie.contains("西欧") || fedexie.contains("美国")
 					|| fedexie.contains("加拿大")) {
 				if (fweight <= 0.5) {
-					freightFee = 105;
+					freightFee = 120;
 				}
 				if (fweight > 0.5 && fweight < 21) {
-					freightFee = 105 + Math.ceil((fweight - 0.5) / 0.5) * 25;
+					freightFee = 120 + Math.ceil((fweight - 0.5) / 0.5) * 25;
 				}
 				// 当重量超过21KG后的计算公式需求不明确
 				if (fweight > 21) {
