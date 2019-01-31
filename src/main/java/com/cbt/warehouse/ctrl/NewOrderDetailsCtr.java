@@ -37,12 +37,13 @@ import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
-
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -74,6 +75,12 @@ public class NewOrderDetailsCtr {
 	private IPurchaseService iPurchaseService;
 	@Autowired
 	private SendMailFactory sendMailFactory;
+
+	@Autowired
+    private OrderCancelApprovalService approvalService;
+
+	@Autowired
+	private PaymentServiceNew paymentServiceNew;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -94,16 +101,15 @@ public class NewOrderDetailsCtr {
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
-			List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(iOrderinfoService.getBuyerAndAll()));
 
-			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
+//			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
 			// 订单信息
 			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
 			//获取实际运费
-			Long start = System.currentTimeMillis();
-			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
-			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
+//			Long start = System.currentTimeMillis();
+//			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
+//			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
 			// 获取汇率
 			double rate =Double.valueOf(orderInfo.getExchange_rate());
 			//获取订单出运信息
@@ -146,17 +152,13 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("shippingtype",shippingtype);
 			request.setAttribute("ac_weight",ac_weight);
 			request.setAttribute("awes_freight",awes_freight);
-			if(freightCostByOrderno>0){
-				request.setAttribute("allFreight", freightCostByOrderno);
-			}else {
-				request.setAttribute("allFreight", freightFee);
-			}
+			request.setAttribute("allFreight", freightFee);
 			request.setAttribute("estimatefreight",estimatefreight*rate);
 			request.setAttribute("allWeight",allWeight);
 			//产品预计采购金额-
 			double es_buyAmount=0.00;
 			request.setAttribute("es_buyAmount",es_buyAmount);
-			String fileByOrderid = iOrderinfoService.getFileByOrderid(orderNo);
+			String fileByOrderid =orderInfo.getFileByOrderid();// iOrderinfoService.getFileByOrderid(orderNo);
 			String invoice="2";
 			if (fileByOrderid == null || fileByOrderid.length() < 10) {
 				invoice="0";
@@ -455,10 +457,10 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("lirun1", lirun1);
 			request.setAttribute("isDropshipOrder", orderInfo.getIsDropshipOrder());
 			// 查看订单对应邮件
-			IEmailReceiveService emailService = new EmailReceiveServiceImpl();
+//			IEmailReceiveService emailService = new EmailReceiveServiceImpl();
 			// 查看客户来往邮件
-			List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
-			request.setAttribute("emaillist", emaillist);
+//			List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
+//			request.setAttribute("emaillist", emaillist);
 			//用户信息    yyl - start
 			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 			Admuser admuserinfo = JSONObject.parseObject(admuserJson, Admuser.class);
@@ -1673,93 +1675,123 @@ public class NewOrderDetailsCtr {
 
 		JsonResult json = new JsonResult();
 
+
 		// jxw 2017-4-25添加订单状态判断,修改订单状态为-1(后台取消),操作人目前是adminId
 		boolean isCheck = CheckCanUpdateUtil.updateOnlineOrderInfoByLocal(orderNo, -1, adminId);
+
 		if (isCheck) {
 
-			int res = orderwsServer.iscloseOrder(orderNo);
-			if (res > 0) {
-				json.setOk(false);
-				json.setMessage("该订单已取消，终止操作");
-			} else {
-				//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
-				Map<String,Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(orderNo);
-				LOG.info("订单号:" + orderNo + ",更新线上orderinfo订单状态:" + -1);
-				res = orderwsServer.closeOrder(orderNo);
-				//判断取消订单是否是测试订单
-//				boolean flag=orderwsServer.checkTestOrder(orderNo);
-				if (res > 0) {
-					// 释放该订单占用的库存
-					orderwsServer.cancelInventory(orderNo);
-					//对于没有使用库存订单的商品做库存增加到库存表中
-					orderwsServer.cancelInventory1(orderNo);
+            int res = orderwsServer.iscloseOrder(orderNo);
+            if (res > 0) {
+                json.setOk(false);
+                json.setMessage("该订单已取消，终止操作");
+            } else {
+                int userId = Integer.parseInt(request.getParameter("userId"));
+                //根据订单号判断是否有PayPal或者stripe支付
+                int isPay = paymentServiceNew.checkIsPayPalOrStripePay(userId, orderNo);
+                if (isPay > 0 && !orderNo.contains("_")) {
+                    int isCheckApproval = approvalService.checkIsExistsApproval(userId, orderNo);
+                    if (isCheckApproval > 0) {
+                        json.setMessage("此订单已经在取消订单审批流程中");
+                        json.setOk(false);
+                    } else {
+                        //获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
+                        Map<String, Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(orderNo);
 
-					//取消订单后，通知客户订单状态修改
-					NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()), orderNo,
-							Integer.valueOf(orderinfoMap.get("old_state").toString()), -1);
+                        // 获取用户货币单位
+                        // zlw add start
 
-				}
-				int userId = Integer.parseInt(request.getParameter("userId"));
+                        LOG.info("订单号:" + orderNo + ",更新线上orderinfo订单状态:" + -1);
+                        res = orderwsServer.closeOrder(orderNo);
+                        //判断取消订单是否是测试订单
+//				        boolean flag=orderwsServer.checkTestOrder(orderNo);
+                        if (res > 0) {
+                            // 释放该订单占用的库存
+                            orderwsServer.cancelInventory(orderNo);
+                            //对于没有使用库存订单的商品做库存增加到库存表中
+                            orderwsServer.cancelInventory1(orderNo);
 
-				// 获取用户货币单位
-				// zlw add start
-				float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-				float order_ac = Float.parseFloat(request.getParameter("order_ac"));
-				int isDropshipOrder = Integer.valueOf(request.getParameter("isDropshipOrder"));
-				if (isDropshipOrder == 2) {
-					actualPay = 0;
-					order_ac = 0;
-				}
-				UserDao dao = new UserDaoImpl();
-				order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
-				dao.updateUserAvailable(userId,
-						new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
-						" system closeOrder:" + orderNo,orderNo, String.valueOf(adminId), 0, order_ac, 1);
-				// zlw add end
+                            //取消订单后，通知客户订单状态修改
+                            NotifyToCustomerUtil.updateOrderState(Integer.valueOf(orderinfoMap.get("user_id").toString()), orderNo,
+                                    Integer.valueOf(orderinfoMap.get("old_state").toString()), -1);
 
-				// ssd add start
-				// 发送取消订单的提醒邮件
-				StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
-				sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
-						+ AppConfig.ip_email + "/img/logo.png' ></img></a>");
-				sbBuffer.append(
-						"<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
-				sbBuffer.append("<br><br>Order#: " + orderNo);
-				sbBuffer.append(
-						"<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
-				sbBuffer.append(
-						"<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-				sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
-				sbBuffer.append("<br>Thank you for shopping with us.");
-				sbBuffer.append("<br>To review your order status, click ");
-				sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
-				sbBuffer.append("<br><br>Sincerely,");
-				sbBuffer.append("<br>Import-Express Team");
-				//SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
+                            // 走审批流程
+                            double actualPay = Double.parseDouble(request.getParameter("actualPay"));
+                            OrderCancelApproval cancelApproval = new OrderCancelApproval();
+                            cancelApproval.setUserId(userId);
+                            cancelApproval.setOrderNo(orderNo);
+                            cancelApproval.setPayPrice(actualPay);
+                            cancelApproval.setType(2);
+                            NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+                            json.setOk(true);
+                        }else{
+                            json.setMessage("更新订单状态失败");
+                            json.setOk(false);
+                        }
+                    }
+                } else {
+                    // 获取用户货币单位
+                    // zlw add start
+                    float actualPay = Float.parseFloat(request.getParameter("actualPay"));
+                    float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+                    int isDropshipOrder = Integer.valueOf(request.getParameter("isDropshipOrder"));
+                    if (isDropshipOrder == 2) {
+                        actualPay = 0;
+                        order_ac = 0;
+                    }
+                    UserDao dao = new UserDaoImpl();
+                    order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                    dao.updateUserAvailable(userId,
+                            new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+                            " system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);
+                    // zlw add end
+                    json.setOk(true);
+                }
+                if (json.isOk()) {
+                    // ssd add start
+                    // 发送取消订单的提醒邮件
+                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
+                    sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
+                            + AppConfig.ip_email + "/img/logo.png' ></img></a>");
+                    sbBuffer.append(
+                            "<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
+                    sbBuffer.append("<br><br>Order#: " + orderNo);
+                    sbBuffer.append(
+                            "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
+                    sbBuffer.append(
+                            "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
+                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+                    sbBuffer.append("<br>Thank you for shopping with us.");
+                    sbBuffer.append("<br>To review your order status, click ");
+                    sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
+                    sbBuffer.append("<br><br>Sincerely,");
+                    sbBuffer.append("<br>Import-Express Team");
+                    //SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
-				model.put("email",confirmEmail);
-				model.put("name",toEmail);
-				model.put("accountLink",AppConfig.center_path);
-				model.put("orderNo",orderNo);
-				net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
-				String modeStr = jsonObject.toString();
-				try {
-					sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
-				} catch (Exception e) {
-					e.printStackTrace();
-					LOG.error("genOrderSplitEmail: email:"+model.get("email")+" model_json:"+ modeStr +" e.message:"+ e.getMessage());
-					json.setMessage("Failed to send mail, please contact the developer by screen, thank you！"+ e.getMessage());
-				}
-				// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
-				try {
-					insertChangeRecords(orderNo, -1, adminId);
-				} catch (Exception e) {
-					LOG.error("insertChangeRecords order[orderNo] error:" + e.getMessage());
-				}
-				LOG.info("closeGeneralOrder end");
-				json.setOk(true);
-			}
-		}
+                    model.put("email", confirmEmail);
+                    model.put("name", toEmail);
+                    model.put("accountLink", AppConfig.center_path);
+                    model.put("orderNo", orderNo);
+                    net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
+                    String modeStr = jsonObject.toString();
+                    try {
+                        sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());
+                        json.setMessage("Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage());
+                    }
+                    // jxw 2017-4-25 插入成功，插入信息放入更改记录表中
+                    try {
+                        insertChangeRecords(orderNo, -1, adminId);
+                    } catch (Exception e) {
+                        LOG.error("insertChangeRecords order[orderNo] error:" + e.getMessage());
+                    }
+                    LOG.info("closeGeneralOrder end");
+                    json.setOk(true);
+                }
+            }
+        }
 		return json;
 
 	}
