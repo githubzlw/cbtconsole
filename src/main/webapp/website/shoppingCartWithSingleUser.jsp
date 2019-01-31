@@ -207,7 +207,8 @@
         }
 
         function  openSendEmail(userId) {
-            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId;
+            var type = $("#send_type").val();
+            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId + "&type=" + type;
             var iWidth = 1680; //弹出窗口的宽度;
             var iHeight = 880; //弹出窗口的高度;
             var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
@@ -308,6 +309,16 @@
                         <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
+
+                       <span>邮件类型:
+                            <select id="send_type" style="height: 28px;width: 180px;">
+                            <option value="1" selected="selected">不做变动,直接发送</option>
+                            <option value="2">给单个产品价格改价</option>
+                            <%--<option value="3">操作运费</option>--%>
+                            <option value="4">为客户选择最佳运输方式</option>
+                            </select>
+                        </span>
+                        &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
