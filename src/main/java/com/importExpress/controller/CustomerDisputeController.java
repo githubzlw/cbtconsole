@@ -825,6 +825,7 @@ public class CustomerDisputeController {
         		result.put("state", true);
         		result.put("message",   "退款完成");
         		LOG.info(content);
+        		customerDisputeService.updateRefund(disputeid, offerAmount);
     		}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -833,7 +834,7 @@ public class CustomerDisputeController {
 		}
     	return  result;
     }
-    /**退款确定
+    /**退款拒绝
      * @param request
      * @param response
      * @return

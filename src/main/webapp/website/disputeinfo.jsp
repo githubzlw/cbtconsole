@@ -922,7 +922,8 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 
 <div style="margin-left: 60px;"  class="panel refund_form message_form hide">
 <!-- 退款 -->
-<form method="post" action="${resonFlag == 1?'/cbtconsole/customer/dispute/offer': '/cbtconsole/customer/dispute/acceptClaim'}" >
+<%-- action="${resonFlag == 1?'/cbtconsole/customer/dispute/offer': '/cbtconsole/customer/dispute/acceptClaim'}" --%>
+<form method="post" action="${'/cbtconsole/customer/dispute/acceptClaim'}" >
 <input type="hidden" name="gross_amount" id="gross_amount" value="${result.disputed_transactions[0].gross_amount.value }">
 <input type="hidden" name="buyer_request_amount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
@@ -933,8 +934,8 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 <input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
-<c:if test="${resonFlag == 0}">
 <input type="hidden" name="accept_claim_reason" value="DID_NOT_SHIP_ITEM">
+<c:if test="${resonFlag == 0}">
 <c:if test="${empty  result.offer.buyer_requested_amount.value}">
 <input type="hidden" name="refundAmount" value="${result.disputed_transactions[0].gross_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.disputed_transactions[0].gross_amount.currency_code }">
