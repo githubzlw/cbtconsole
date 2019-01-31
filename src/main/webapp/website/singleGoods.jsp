@@ -241,18 +241,22 @@
                 return '<span class="err_sty">流程第1步,正在抓取</span>';
             } else if (row.crawlFlag == 4) {
                 return '<span class="err_sty">流程第1步,抓取失败</span>';
-            } else if (row.clearFlag == 0) {
-                return '<span class="err_sty">流程第2步,数据待清洗</span>';
-            } else if (row.clearFlag == 1) {
-                return '<span class="err_sty">流程第2步,数据正在清洗</span>';
-            } else if (row.valid == 0) {
-                return '<span class="err_sty">流程第2步,数据清洗完成，商品数据无效</span>';
-            } else if (row.clearFlag == 3) {
-                return '<span class="err_sty">流程第3步,下载图片到本地失败</span>';
-            } else if (val == 0) {
-                return '<span class="err_sty">流程第4步,待数据同步</span>';
+            } else if (row.crawlFlag == 2) {
+                if (row.clearFlag == 0) {
+                    return '<span class="err_sty">流程第2步,数据待清洗</span>';
+                } else if (row.clearFlag == 1) {
+                    return '<span class="err_sty">流程第2步,数据正在清洗</span>';
+                } else if (row.valid == 0) {
+                    return '<span class="err_sty">流程第2步,数据清洗完成，商品数据无效</span>';
+                } else if (row.clearFlag == 3) {
+                    return '<span class="err_sty">流程第3步,下载图片到本地失败</span>';
+                } else if (val == 0) {
+                    return '<span class="err_sty">流程第4步,待数据同步</span>';
+                } else {
+                    return '<span class="err_sty">' + val + '</span>';
+                }
             } else {
-                return '<span class="err_sty">' + val + '</span>';
+                return '<span class="err_sty">流程第1步,抓取失败</span>';
             }
         }
         
