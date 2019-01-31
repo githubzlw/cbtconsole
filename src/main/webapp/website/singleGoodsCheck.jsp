@@ -304,7 +304,7 @@
 
         function choosePidMainImg(pid, imgUrl, obj) {
             $(".pid_check_" + pid).each(function (i, item) {
-                $(this).prop("checked", false);
+                $(this).parent().parent().find("input[type='checkbox']").prop("checked", false);
             });
             $.ajax({
                 type: "POST",
