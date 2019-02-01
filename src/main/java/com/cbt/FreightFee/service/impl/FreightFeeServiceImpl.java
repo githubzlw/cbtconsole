@@ -255,12 +255,12 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				}
 			}
 			// 南美国家 180+60
-			if ("Honduras".equals(country) || country.contains("AFRICA") || fedexie.contains("南美")) {
+			if ("Honduras".equals(country)  || fedexie.contains("南美")) {
 				if (fweight <= 0.5) {
 					freightFee = 180;
 				}
 				if (fweight > 0.5 && fweight < 21) {
-					freightFee = 180 + Math.ceil((fweight - 0.5) / 0.5) * 40;
+					freightFee = 180 + Math.ceil((fweight - 0.5) / 0.5) * 55;
 				}
 				// 当重量超过21KG后的计算公式需求不明确
 				if (fweight > 21) {
