@@ -46,6 +46,9 @@ import java.util.Map;
 public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
+    private static final String EMAIL_FOLLOW_URL = "https://www.import-express.com/followMe/index.do?fmc=";
+//    private static final String EMAIL_FOLLOW_URL = "http://127.0.0.1:8087/followMe/index.do?fmc=";
+
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
     @Autowired
     private GoodsCarconfigService goodsCarconfigService;
@@ -387,12 +390,15 @@ public class ShopCarMarketingController {
             paramMap.put("adminEmail", adminEmail);
             paramMap.put("whatsApp", whatsApp);
             paramMap.put("type", type);
-            genHtmlEamil(userId, paramMap);
-
-            //4.更新跟进信息
-            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
-            json.setOk(true);
-            json.setMessage("发送邮件成功！");
+            if (genHtmlEamil(userId, paramMap)) {
+                //4.更新跟进信息
+                shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
+                json.setOk(true);
+                json.setMessage("发送邮件成功！");
+            } else {
+                json.setOk(true);
+                json.setMessage("邮件失败，请重新发送！");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
@@ -405,9 +411,24 @@ public class ShopCarMarketingController {
     }
 
 
-    private void genHtmlEamil(int userId,Map<String,String> paramMap) {
+    private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
+        boolean isSuccess = false;
         try {
             Map<String, Object> modelM = new HashMap<String, Object>();
+
+            //查询客户的随机码
+            String followCode = userInfoService.queryFollowMeCodeByUserId(userId);
+            if(StringUtils.isBlank(followCode)){
+                followCode = userInfoService.queryForUUID();
+                userInfoService.updateUserFollowCode(followCode,userId);
+            }
+            followCode = userInfoService.queryFollowMeCodeByUserId(userId);
+            if(StringUtils.isBlank(followCode)){
+                return isSuccess;
+            }
+
+            modelM.put("followCode",EMAIL_FOLLOW_URL + followCode);
+
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
                 ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
@@ -505,10 +526,12 @@ public class ShopCarMarketingController {
                 modelM.put("savePrice",paramMap.get("savePrice"));
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_BEST_TRANSPORT);
             }
-
+            isSuccess = true;
         } catch (Exception e) {
+            isSuccess = false;
             e.printStackTrace();
         }
+        return isSuccess;
     }
 
     private boolean updateGoodsCarConfig(List<GoodsCarActiveSimplBean> listActive, int userId) {

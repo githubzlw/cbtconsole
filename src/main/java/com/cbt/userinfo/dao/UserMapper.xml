@@ -102,4 +102,22 @@
         WHERE id = #{id}
     </update>
 
+    <select id="queryFollowMeCodeByUserId" resultType="java.lang.String">
+        select follow_code from user where id = #{userId}
+    </select>
+
+    <select id="queryForUUID" resultType="java.lang.String">
+        SELECT UUID()
+    </select>
+
+    <select id="checkFollowMeCode" resultType="java.lang.Integer">
+        select count(0) from user where follow_code = #{followCode}
+    </select>
+
+    <update id="updateUserFollowCode">
+        update user set follow_code = #{followCode} where id = #{userId}
+    </update>
+
+
+
 </mapper>

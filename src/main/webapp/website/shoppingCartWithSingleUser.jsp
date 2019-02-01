@@ -282,13 +282,13 @@
             <caption><b style="font-size: 24px;color: #e65510;">客户【${userId}】购物车信息</b></caption>
             <tr>
                 <td>总产品金额:${userInfo.totalPrice}<em>$</em></td>
-                <td>预估国际运费:${userInfo.offFreight}<em>$</em></td>
+                <td>购物车运费:${userInfo.totalFreight}<em>$</em></td>
                 <td>总采购价:${userInfo.totalWhosePrice}<em>$</em></td>
                     <%--利润率 = （客户需要掏的钱-真实运费-采购额）/客户掏的钱--%>
                 <td>
                     <c:choose>
                         <c:when test="${isGetFreigthResult==true}">
-                           预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+客户支付运费-预估国际运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
+                           预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+购物车运费-线下采购运输运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
                         </c:when>
                         <c:otherwise>
                              <font color="red">没有获取到正确运费无法预估</font>
