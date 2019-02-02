@@ -8,6 +8,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +27,10 @@ public class parseOrderManageJob extends QuartzJobBean {
 
     public void flushOrderManage() throws Exception {
         logger.info("开始刷新订单管理页面数据===");
-        //CALL order_management_query('',-2,'',0,0,0,0,0,0,'',0,0,1,'')
+        Map<String,String> paramMap=new HashMap<String,String>();
         for(int i=1;i<=20;i++){
             int page=i>0?(i - 1) * 40:0;
-            List<Map<String, String>> list=iOrderinfoService.getOrderManagementQuery(0,-2, "0","0","", "",page,1,0,0,0,"",0,"");
+            List<Map<String, String>> list=iOrderinfoService.getOrderManagementQuery(paramMap);
             for(Map<String, String> map:list){
                 if(map.get("cancel_obj") == null){
                     map.put("cancel_obj","");
