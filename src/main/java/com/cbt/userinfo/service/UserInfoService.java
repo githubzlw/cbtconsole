@@ -111,4 +111,24 @@ public static void main(String[] args) {
         mapper.updateUserRemark(id);
     }
 
+	@Override
+	public String queryFollowMeCodeByUserId(int userId) {
+		return mapper.queryFollowMeCodeByUserId(userId);
+	}
+
+	@Override
+	public String queryForUUID() {
+		return mapper.queryForUUID();
+	}
+
+	@Override
+	public int checkFollowMeCode(String followCode) {
+		return mapper.checkFollowMeCode(followCode);
+	}
+
+	@Override
+	public int updateUserFollowCode(String followCode, int userId) {
+		return mapper.updateUserFollowCode(followCode, userId);
+	}
+
 }
