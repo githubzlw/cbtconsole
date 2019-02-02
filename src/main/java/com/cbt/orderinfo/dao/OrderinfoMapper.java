@@ -16,33 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface OrderinfoMapper {
-    /*int countByExample(OrderinfoExample example);
-
-    int deleteByExample(OrderinfoExample example);
-
-    int deleteByPrimaryKey(Integer orderid);
-
-    int insert(Orderinfo record);
-
-    int insertSelective(Orderinfo record);
-
-    List<Orderinfo> selectByExample(OrderinfoExample example);
-
-    Orderinfo selectByPrimaryKey(Integer orderid);
-
-    int updateByExampleSelective(@Param("record") Orderinfo record, @Param("example") OrderinfoExample example);
-
-    int updateByExample(@Param("record") Orderinfo record, @Param("example") OrderinfoExample example);
-
-    int updateByPrimaryKeySelective(Orderinfo record);
-
-    int updateByPrimaryKey(Orderinfo record);*/
 	/**
 	 * 订单数量
 	 * @return
 	 */
-	public int getOrdersCount(@Param("userID") int userID, @Param("state") int state, @Param("startdate") String startdate, @Param("enddate") String enddate, @Param("email") String email,
-                              @Param("orderno") String orderno, @Param("admuserid") int admuserid, @Param("buyid") int buyid, @Param("showUnpaid") int showUnpaid, @Param("type") String type, @Param("status") int status);
+	public int getOrdersCount(Map<String,String> paramMap);
 	/**
 	 * 订单信息
 	 * @return
@@ -397,26 +375,9 @@ public interface OrderinfoMapper {
 	public OrderBean getChildrenOrders(@Param("orderid") String orderid);
 	/**
 	 * 订单管理页面查询
-	 * @param userID
-	 * @param state
-	 * @param startdate
-	 * @param enddate
-	 * @param email
-	 * @param orderno
-	 * @param startpage
-	 * @param page
-	 * @param admuserid
-	 * @param buyid
-	 * @param showUnpaid
-	 * @param type
-	 * @param status
-	 * @param paymentid
 	 * @return
 	 */
-	public List<Map<String, String>> getOrderManagementQuery(@Param("userID") int userID, @Param("state") int state, @Param("startdate") String startdate, @Param("enddate") String enddate, @Param("email") String email,
-                                                             @Param("orderno") String orderno, @Param("startpage") int startpage, @Param("page") int page,
-                                                             @Param("admuserid") int admuserid, @Param("buyid") int buyid, @Param("showUnpaid") int showUnpaid, @Param("type") String type,
-                                                             @Param("status") int status, @Param("paymentid") String paymentid);
+	public List<Map<String, String>> getOrderManagementQuery(Map<String,String> paramMap);
 
 	public List<Map<String,String>> getAllOrderCatid(@Param("orderids") String orderids);
 	/**
