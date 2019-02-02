@@ -106,100 +106,6 @@
         <result column="memberFee" property="memberfee" jdbcType="DOUBLE" />
         <result column="sendOrderNo" property="sendorderno" jdbcType="VARCHAR" />
     </resultMap>
-    <!-- <select id="getOrdersCount" resultType="java.lang.Integer">
-          select  count(o.orderid)
-           from    orderinfo    o
-            <if test="startdate != null || enddate != null || type == 'overdelay' || type == 'ordermeg'">
-            left join (select orderid,min(createtime) createtime,min(paytype) paytype,min(paystatus) paystatus from payment where payflag='O' group by orderid ) pay on pay.orderid=o.order_no
-        </if>
-             <if test="email != null and email != ''">
-            inner join user  on o.user_id=user.id
-            </if>
-             <if test="admuserid != 0">
-      left  join admin_r_user  aru on  aru.userid=o.user_id
-      </if>
-        <if test="buyid != 0">
-       left join order_buy  on  o.order_no =order_buy.orderid
-       </if>
-        <choose>
-        <when test="type == 'agree'">
-           inner  join (select * from changegooddata where  changeflag=1 group by orderno)cg on orderno=  order_no    where o.state=5
-          </when>
-          <when test="type == 'suggest'">
-           inner  join (select * from changegooddata where  changeflag=0 group by orderno)cg on orderno=  order_no    where o.state = 5
-          </when>
-          <when test="type == 'purchase'">
-           inner  join (select * from order_product_source where  (purchase_state=5  and remark!=null) or purchase_state=12 group by orderid)ops on ops.orderid=order_no    where o.state=5
-          </when>
-          <when test="type == 'agree'">
-           inner  join (select * from changegooddata where  changeflag=1 group by orderno)cg on orderno=  order_no   where 1=1
-          </when>
-          <when test="type == 'suggest'">
-           inner  join (select * from changegooddata where  changeflag=0 group by orderno)cg on orderno=  order_no     where o.state = 5
-          </when>
-          <when test="type == 'purchase'">
-           inner  join (select * from order_product_source where  (purchase_state=5  and remark!=null) or purchase_state=12 group by orderid)ops on ops.orderid=order_no  where 1=1
-          </when>
-          <when test="type == 'deliver'">
-           inner  join (select * from order_fee where state=3 or  state=0 group by orderno)of on orderno=  order_no    where o.state in (5,2,1)
-          </when>
-          <when test="type == 'notshipping'">
-          left join (select *  from id_relationtable ir   group by ir.orderid having max(createtime) ) irc on irc.orderid=o.order_no
-           where o.state=2  and (date_add(irc.createtime, INTERVAL 2 day) &lt; now() )
-          </when>
-          <when test="type == 'overdelay'">
-              where ((date_add(pay.createtime, INTERVAL 2 day) &lt; now() and state = 5) or (date_add(pay.createtime, INTERVAL o.delivery_time-2 day) &lt; now() and state = 1) or ( date_add(pay.createtime, INTERVAL o.delivery_time day) &lt; now() and state = 2))
-          </when>
-          <when test="type == 'cacle'">
-              where state in (-1,6) and   to_days(now()) - to_days(create_time) &lt;= 10
-          </when>
-          <when test="type == 'cy'">
-              where state=3 and   to_days(now()) - to_days(create_time) &lt;= 60
-          </when>
-          <when test="type == 'ordermeg'">
-              where o.state &gt;0
-            AND o.state &lt; 6
-        AND aru.userid is null and to_days(pay.createtime)=to_days(now())
-          </when>
-          <otherwise>  where 1=1  </otherwise>
-      </choose>
-       <if test="userID != 0">
-                and o.user_ID=#{userID}
-       </if>
-       <choose>
-           <when test="state == -1 || state == 6 ">
-               and ( o.state=-1 or  o.state=6 )
-           </when>
-           <when test="state != -2">
-                and o.state=#{state}
-           </when>
-       </choose>
-        <if test="admuserid != 0">
-                and aru.adminid=#{admuserid}
-       </if>
-        <if test="buyid != 0">
-                and order_buy.buyid=#{buyid}
-       </if>
-        <if test="showUnpaid == 0">
-                and o.state != 0
-       </if>
-       <if test="startdate != null ">
-                 and to_days(pay.createtime) &gt; to_days(#{startdate})
-        </if>
-
-        <if test="enddate != null">
-                 and to_days(pay.createtime) &lt; to_days(#{enddate})
-        </if>
-         <if test="email != null and email != ''">
-                 and user.email = #{email}
-        </if>
-         <if test="orderno != null and orderno != ''">
-                 and order_no = #{orderno}
-        </if>
-          <if test="status == -1">
-            and  aru.admName is null
-        </if>
-      </select>-->
 
     <select id="getProblem" resultType="String">
      SELECT IFNULL(COUNT(id)-SUM(goodstatus),0) FROM id_relationtable WHERE orderid=#{orderid}
@@ -496,27 +402,21 @@
 
         and oc.ropType = 5 and oc.oldValue = 0 and oc.del_state = 0
         order by orderpaytime
-        <!--     <if test="showUnpaid == 1">
-                     o.create_time
-           </if>
-           <if test="showUnpaid == 0">
-                     pay.createtime
-           </if> -->
         desc LIMIT #{startpage},#{page}
     </select>
     <select id="getOrdersCount" resultType="java.lang.Integer">
-        <choose>
-            <when test="state == 7">
-                SELECT COUNT(a.order_no) FROM (select distinct o.order_no
-            </when>
-            <otherwise>  select count(distinct o.order_no) </otherwise>
-        </choose>
-        from orderinfo    o  inner join user  on o.user_id=user.id
-        left  join admin_r_user  aru on  aru.userid=o.user_id
-        left join order_buy  on  o.order_no =order_buy.orderid
-        <if test="state==7">
-            INNER JOIN order_details od ON o.order_no=od.orderid
-        </if>
+    <choose>
+        <when test="state == '7'">
+            SELECT COUNT(a.order_no) FROM (select distinct o.order_no
+        </when>
+        <otherwise>  select count(distinct o.order_no) </otherwise>
+    </choose>
+    from orderinfo    o  inner join user  on o.user_id=user.id
+    left  join admin_r_user  aru on  aru.userid=o.user_id
+    left join order_buy  on  o.order_no =order_buy.orderid
+    <if test="state=='7'">
+        INNER JOIN order_details od ON o.order_no=od.orderid
+    </if>
         <choose>
             <when test="type == 'agree'">
                 inner join  (select * from order_details where  od_state = 13 group by orderid)cgd where cgd.orderid=o.order_no   and o.state in (1,5)
@@ -563,20 +463,20 @@
                 where  o.isDropshipOrder&lt;>3 and (date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day) &lt; now() and date_add(orderpaytime, INTERVAL func_get_split_string(o.delivery_time,'-',2)-2 day)>now() and state = 2)
             </when>
             <when test="type == 'cacle'">
-  		      where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) &lt;= 10  and  orderpaytime is not null
+                where state in (-1,6) and   to_days(now()) - to_days(orderpaytime) &lt;= 10  and  orderpaytime is not null
             </when>
             <when test="type == 'cy'">
-  		    where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null
+                where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null
             </when>
             <when test="type == 'cyw'">
-  		       where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null AND order_no in(
-			   SELECT sp.orderid FROM (SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
-				INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no WHERE
-				((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
-				((datediff(ti.updat_date,ti.track_update) IS null OR datediff(ti.updat_date,ti.track_update) > 3 OR now() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6))))
+                where state=3 and   to_days(now()) - to_days(orderpaytime) &lt;= 60 and orderpaytime is not null AND order_no in(
+                SELECT sp.orderid FROM (SELECT transportcompany,expressno,orderid,createtime FROM shipping_package WHERE sflag = 3 ) sp
+                INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no WHERE
+                ((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
+                ((datediff(ti.updat_date,ti.track_update) IS null OR datediff(ti.updat_date,ti.track_update) > 3 OR now() > ti.order_deliverDate)) OR ti.track_state IN (4,5,6))))
             </when>
             <when test="type == 'latelyOrdermessage'">
-  		      where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
+                where orderremark != '' and (date_add(orderpaytime, INTERVAL 2 day) >  now()) and state in(1,2,3,4,5)  and  orderpaytime is not null
             </when>
             <when test="type == 'ordermessage'">
                 where orderremark != '' and state in(1,2,3,4,5)
@@ -602,7 +502,7 @@
             <when test="state == -1 || state == 6 ">
                 and ( o.state=-1 or  o.state=6 )
             </when>
-            <when test="state == 7 ">
+            <when test="state == 7">
                 and o.state=3 AND od.state&lt;2
             </when>
             <when test="state != -2">
@@ -615,11 +515,11 @@
         <if test="showUnpaid == 0">
             and o.state != 0
         </if>
-        <if test="startdate != null">
-        	and  o.orderpaytime >=#{startdate}
+        <if test="startdate_req != null">
+        	and  o.orderpaytime >=#{startdate_req}
         </if>
-        <if test="enddate !=null">
-        	and  o.orderpaytime &lt;=#{enddate}
+        <if test="enddate_req !=null">
+            and  o.orderpaytime &lt;=#{enddate_req}
         </if>
         <if test="email != null and email != ''">
             and email = #{email}
@@ -627,10 +527,10 @@
         <if test="orderno != null and orderno != ''">
             and o.order_no = #{orderno}
         </if>
-        <if test="status == -1">
+        <if test="status_ == '-1'">
             and  aru.admName is null
         </if>
-        <if test="state == 7">
+        <if test="state == '7'">
             GROUP BY o.order_no HAVING COUNT(od.id)-SUM(od.state)>0 ORDER BY o.orderpaytime  ) a
         </if>
     </select>
@@ -817,7 +717,7 @@
         WHERE orderid=#{orderNo} and paystatus=0 order by id desc limit 1
     </select>
     <select id="getOrderManagementQuery" resultType="java.util.Map">
-        {call order_management_query(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},${buyid},#{startdate},#{enddate},#{email},${status},${startpage},${page},#{paymentid})}
+        {call order_management_query_bak(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},0,#{startdate_req},#{enddate_req},#{email},${status_},${page},${page},#{paymentid})}
     </select>
     <select id="getOrdersDetails" resultType="com.cbt.bean.OrderDetailsBean">
         select DISTINCT oi.isDropshipOrder,adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,

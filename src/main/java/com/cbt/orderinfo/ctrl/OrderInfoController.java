@@ -653,63 +653,84 @@ public class OrderInfoController{
 		out.close();
 	}
 
+	public void getQueryParam(HttpServletRequest request,Map<String,String> paramMap,Admuser user,HttpServletResponse response){
+		String userID_req = request.getParameter("userid");
+		String state_req = request.getParameter("state");
+		String startdate_req = request.getParameter("startdate");
+		String enddate_req = request.getParameter("enddate");
+		int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
+		String orderno = request.getParameter("orderno");
+		orderno=StringUtil.isBlank(orderno)?"":orderno;
+		String email = request.getParameter("email");
+		email=StringUtil.isBlank(email)?"":email;
+		String paymentid=request.getParameter("paymentid");
+		paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
+		int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
+		String admuserid_str = request.getParameter("admuserid");
+		admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
+		request.setAttribute("admuserid_str",admuserid_str);
+		String type = request.getParameter("type");
+		type=StringUtil.isNotBlank(type)?type:"";
+		String status = request.getParameter("status");
+		int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
+		request.setAttribute("page", page);
+		page=page>0?(page - 1) * 40:0;
+		userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
+		int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
+		int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
+		int admuserid=user.getId();
+		if("0".equals(user.getRoletype())){
+			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
+		}
+		startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
+		enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
+		paramMap.put("userID",String.valueOf(userID));
+		paramMap.put("state",String.valueOf(state));
+		paramMap.put("startdate_req",startdate_req);
+		paramMap.put("enddate_req",enddate_req);
+		paramMap.put("orderno",orderno);
+		paramMap.put("page",String.valueOf(page));
+		paramMap.put("admuserid",String.valueOf(admuserid));
+		paramMap.put("showUnpaid",String.valueOf(showUnpaid));
+		paramMap.put("type",type);
+		paramMap.put("status_",String.valueOf(status_));
+		paramMap.put("paymentid",paymentid);
+		paramMap.put("email",email);
+		request.setAttribute("admuserid", admuserid);
+		request.setAttribute("strname", admuserid);
+		request.setAttribute("admName", user.getAdmName());
+		request.setAttribute("roletype", user.getRoletype());
+		request.setAttribute("strm", user.getRoletype());
+		request.setAttribute("showUnpaid", showUnpaid);
+		request.setAttribute("email", email);
+		request.setAttribute("type",type);
+	}
+
 
 	
 	@RequestMapping(value = "/getOrderInfo.do", method = RequestMethod.GET)
-	public String getOrderInfo(HttpServletRequest request, HttpServletResponse response, Model model) throws ParseException, IOException {
+	public String getOrderInfo(HttpServletRequest request, HttpServletResponse response, Model model){
+		long startTime=System.currentTimeMillis();
 		Map<String,String> paramMap=new HashMap<String,String>();
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 		try {
 			String admJson = Redis.hget(request.getSession().getId(), "admuser");
-			if(admJson == null){
+			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+			if(user == null){
 				return "main_login";
 			}
-			String ropType = request.getParameter("ropType");
-			String userID_req = request.getParameter("userid");
-			String state_req = request.getParameter("state");
-			String startdate_req = request.getParameter("startdate");
-			String enddate_req = request.getParameter("enddate");
-			int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
-			String orderno = request.getParameter("orderno");
-			String email = request.getParameter("email");
-			String paymentid=request.getParameter("paymentid");
-			paymentid=StringUtil.isBlank(paymentid)?"":paymentid;
-			int page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
-			int currentPage = Utility.getStringIsNull(request.getParameter("currentPage"))?Integer.parseInt(request.getParameter("currentPage")):1;
-			String buyid = request.getParameter("buyuser");
-			String admuserid_str = request.getParameter("admuserid");
-			admuserid_str=StringUtil.isBlank(admuserid_str)?"0":admuserid_str;
-			request.setAttribute("admuserid_str",admuserid_str);
-			String type = request.getParameter("type");
-			request.setAttribute("type",StringUtil.isNotBlank(type)?type:"");
-			String status = request.getParameter("status");
-			int status_ = Utility.getStringIsNull(status) ? Integer.parseInt(status) : 0;
-			int buyuser=StringUtil.isNotBlank(buyid)?Integer.parseInt(buyid):0;
-			page=page>0?(page - 1) * 40:0;
-			userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
-			int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
-			int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
-			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
-			String strm=user.getRoletype();
-			int admuserid=user.getId();
-			if("0".equals(strm)){
-				admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
-			}
-//			admuserid ="0".equals(strm) && Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
-			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
-			enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
-			if(StringUtil.isNotBlank(type) && "order_pending".equals(type)){
+			getQueryParam(request,paramMap,user,response);
+			if(StringUtil.isNotBlank(paramMap.get("type").toString()) && "order_pending".equals(paramMap.get("type").toString())){
 				list=iOrderinfoService.getorderPending();
 			}else{
-				list=iOrderinfoService.getOrderManagementQuery(userID, state, startdate_req, enddate_req, email, orderno, page, currentPage, admuserid, buyuser, showUnpaid, type,status_,paymentid);
-				for(int i=0;i<list.size();i++){
-					String orderid=list.get(i).get("order_no");
-					String problem=iOrderinfoService.getProblem(orderid);
-					list.get(i).put("problem", problem);
-				}
+				list=iOrderinfoService.getOrderManagementQuery(paramMap);
+//				for(int i=0;i<list.size();i++){
+//					String orderid=list.get(i).get("order_no");
+//					String problem=iOrderinfoService.getProblem(orderid);
+//					list.get(i).put("problem", problem);
+//				}
 			}
-		int count = getCount(showUnpaid, orderno, email, type, status_, buyuser, userID, state, admuserid, startdate_req, enddate_req, list);
+		int count = getCount(paramMap,list);
 		//获取订单号
 		StringBuilder sb = new StringBuilder();
 		if(list!=null && list.size()>0){
@@ -720,37 +741,24 @@ public class OrderInfoController{
 		}
 		request.setAttribute("orderws", net.sf.json.JSONArray.fromObject(list));
 		UserDao dao=new UserDaoImpl();
-//		List<ConfirmUserInfo> listAdm = getConfirmUserInfos(request, dao);
-		page = Utility.getStringIsNull(request.getParameter("page"))?Integer.parseInt(request.getParameter("page")):1;
 		//获取纯销售和采销一体账户信息
 		List<ConfirmUserInfo> sellAdm =iOrderinfoService.getAllSalesAndBuyer();
 		List<ConfirmUserInfo> purchaseAdm =  new ArrayList<ConfirmUserInfo>();
 		purchaseAdm = dao.getAllByRoleType(2);
-//		request.setAttribute("listAdm", JSONArray.toJSONString(listAdm));
 		request.setAttribute("sellAdm", JSONArray.toJSONString(sellAdm));
 		request.setAttribute("purchaseAdm", JSONArray.toJSONString(purchaseAdm));
 		request.setAttribute("count", count);
-		request.setAttribute("page", page);
-		request.setAttribute("admuserid", admuserid);
-		request.setAttribute("buyuser", buyuser);
-		request.setAttribute("strname", admuserid);
-		request.setAttribute("admName", user.getAdmName());
-		request.setAttribute("roletype", user.getRoletype());
-		request.setAttribute("strm", strm);
-		request.setAttribute("showUnpaid", showUnpaid);
-		request.setAttribute("email", email);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("订单管理查询用时:"+(System.currentTimeMillis()-startTime));
 		return "nordermgr";
 	}
 
-	private int getCount(int showUnpaid, String orderno, String email, String type, int status_, int buyuser, int userID, int state, int admuserid, String startdate, String enddate, List<Map<String, String>> list) {
+	private int getCount(Map<String,String> paramMap, List<Map<String, String>> list) {
 		int count = 0;
-		if(list!=null&&!list.isEmpty() && !"order_pending".equals(type)){
-			startdate="0".equals(startdate)?null:startdate;
-			enddate="0".equals(enddate)?null:enddate;
-			count = iOrderinfoService.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyuser, showUnpaid, type,status_ );
+		if(list!=null&&!list.isEmpty() && !"order_pending".equals(paramMap.get("type"))){
+			count = iOrderinfoService.getOrdersCount(paramMap);
 		}else{
 			count=list.size();
 		}
