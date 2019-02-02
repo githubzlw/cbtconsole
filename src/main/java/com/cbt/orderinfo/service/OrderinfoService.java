@@ -949,11 +949,10 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<Map<String, String>> getOrderManagementQuery(int userID, int state, String startdate, String enddate, String email, String orderno, int startpage, int page, int admuserid, int buyid,
-	                                                         int showUnpaid, String type, int status, String paymentid) {
+	public List<Map<String, String>> getOrderManagementQuery(Map<String,String> paramMap) {
 		long start=System.currentTimeMillis();
 		UserDao udao = new UserDaoImpl();
-		List<Map<String, String>> list=dao.getOrderManagementQuery(userID,state,StringUtils.isStrNull(startdate)?"":startdate,StringUtils.isStrNull(enddate)?"":enddate,StringUtils.isStrNull(email)?"":email, StringUtils.isStrNull(orderno)?"":orderno,startpage,page,admuserid,buyid,showUnpaid,StringUtils.isStrNull(type)?"":type,status,paymentid);
+		List<Map<String, String>> list=dao.getOrderManagementQuery(paramMap);
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
 			String tp="支付类型错误";
@@ -987,16 +986,20 @@ public class OrderinfoService implements IOrderinfoService {
 				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
+				String address_country_code=aMap.get("address_country_code");
+				if("US".equals(address_country_code)){
+					address_country_code="USA";
+				}
 				if("3".equals(ordertype)){
 					//B2B订单
 					addressFlag="3";
 				}else if(StringUtil.isBlank(addressCountry)){
 					//没有支付信息，
 					addressFlag="2";
-				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
+				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && !zCountry.equals(addressCountry) && !zCountry.equals(address_country_code)){
 					//两边都有编码但不一致
 					addressFlag="1";
-				}else{
+				}else if(StringUtil.isBlank(zCountry) || StringUtil.isBlank(addressCountry)){
 					logger.warn("二次校验，全称国家不一致： zCountry={},addressCountry={}", zCountry,addressCountry);
 					addressFlag="1";
 				}
@@ -1008,9 +1011,10 @@ public class OrderinfoService implements IOrderinfoService {
 			if(StringUtil.isBlank(exchange_rate) || Double.parseDouble(exchange_rate)<=0){
 				exchange_rate="6.3";
 			}
-			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
+			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(StringUtil.isBlank(map.get("estimatefreight"))?"0":map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
 		logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
+		System.out.println("订单管理查询总时间:"+(System.currentTimeMillis()-start));
 		return list;
 	}
 
@@ -1737,10 +1741,10 @@ public class OrderinfoService implements IOrderinfoService {
 		return dao.getOrders1(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
 	}
 	@Override
-	public int getOrdersCount(int userID, int state, String startdate,
-	                          String enddate, String email, String orderno, int admuserid,
-	                          int buyid, int showUnpaid,String type,int status) {
-		return dao.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyid, showUnpaid,type,status);
+	public int getOrdersCount(Map<String,String> paramMap) {
+		paramMap.put("startdate_req","0".equals(paramMap.get("startdate_req"))?null:paramMap.get("startdate_req"));
+		paramMap.put("enddate_req","0".equals(paramMap.get("enddate_req"))?null:paramMap.get("enddate_req"));
+		return dao.getOrdersCount(paramMap);
 	}
 
 	@Override
