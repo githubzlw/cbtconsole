@@ -91,7 +91,6 @@ public class WarehouseServiceImpl implements IWarehouseService {
         Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn.getWeight());
         new Thread(task).start();
 //        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
-        dao.updateGoodsWeightFlag(pid);
         return 1;
     }
 
@@ -107,6 +106,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         public void run() {
             try {
                 customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight); //jxw同步重量到产品库接口
+                dao.updateGoodsWeightFlag(pid);
             } catch (Exception e) {
                 LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);
             }
