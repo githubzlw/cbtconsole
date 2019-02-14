@@ -4,8 +4,10 @@ import com.cbt.dao.RefundDaoPlus;
 import com.cbt.dao.impl.RefundDaoImpl;
 import com.importExpress.mapper.OrderCancelApprovalMapper;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,5 +58,15 @@ public class OrderCancelApprovalServiceImpl implements OrderCancelApprovalServic
     @Override
     public int insertIntoPaymentByApproval(int userId, String orderNo) {
         return refundDao.insertIntoPaymentByApproval(userId, orderNo);
+    }
+
+    @Override
+    public int insertIntoOrderCancelApprovalAmount(OrderCancelApprovalAmount approvalAmount) {
+        // mq更新
+        String sql = "insert into order_cancel_approval_amount(approval_id,order_no,pay_type,pay_amount) " +
+                "values(" + approvalAmount.getApprovalId() + ",'" + approvalAmount.getOrderNo() + "',"
+                + approvalAmount.getPayType() + "," + approvalAmount.getPayAmount() + ")";
+        NotifyToCustomerUtil.sendSqlByMq(sql);
+        return approvalMapper.insertIntoOrderCancelApprovalAmount(approvalAmount);
     }
 }

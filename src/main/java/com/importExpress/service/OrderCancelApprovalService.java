@@ -1,6 +1,7 @@
 package com.importExpress.service;
 
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 
 import java.util.List;
@@ -64,5 +65,12 @@ public interface OrderCancelApprovalService {
 	 * @return
 	 */
     int insertIntoPaymentByApproval(int userId,String orderNo);
+
+    /**
+     * 插入审批完成后该订单的退款情况
+     * @param approvalAmount
+     * @return
+     */
+    int insertIntoOrderCancelApprovalAmount(OrderCancelApprovalAmount approvalAmount);
 
 }

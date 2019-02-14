@@ -1,6 +1,7 @@
 package com.importExpress.mapper;
 
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 import org.apache.ibatis.annotations.Param;
 
@@ -49,4 +50,18 @@ public interface OrderCancelApprovalMapper {
      * @return
      */
     int updateOrderCancelApprovalState(OrderCancelApproval cancelApproval);
+
+    /**
+     * 查询整单申请退款完结后的退款金额
+     * @param approvalId
+     * @return
+     */
+    List<OrderCancelApprovalAmount> queryApprovalAmountByApprovalId(@Param("approvalId") int approvalId);
+
+    /**
+     * 插入审批完成后该订单的退款情况
+     * @param approvalAmount
+     * @return
+     */
+    int insertIntoOrderCancelApprovalAmount(OrderCancelApprovalAmount approvalAmount);
 }
