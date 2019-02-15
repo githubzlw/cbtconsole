@@ -20,6 +20,9 @@ public class OrderCancelApproval {
     private Integer adminId;
     private String adminName;
     private double userBalance;
+    private String approvalRemark;
+    private String cancelRemark;
+    private Integer orderState;
 
     public OrderCancelApprovalDetails getApproval1() {
         return approval1;
@@ -202,6 +205,30 @@ public class OrderCancelApproval {
         this.userBalance = userBalance;
     }
 
+    public String getApprovalRemark() {
+        return approvalRemark;
+    }
+
+    public void setApprovalRemark(String approvalRemark) {
+        this.approvalRemark = approvalRemark;
+    }
+
+    public String getCancelRemark() {
+        return cancelRemark;
+    }
+
+    public void setCancelRemark(String cancelRemark) {
+        this.cancelRemark = cancelRemark;
+    }
+
+    public Integer getOrderState() {
+        return orderState;
+    }
+
+    public void setOrderState(Integer orderState) {
+        this.orderState = orderState;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("{");
@@ -213,12 +240,44 @@ public class OrderCancelApproval {
                 .append(orderNo).append('\"');
         sb.append(",\"payPrice\":")
                 .append(payPrice);
+        sb.append(",\"agreeAmount\":")
+                .append(agreeAmount);
         sb.append(",\"type\":")
                 .append(type);
+        sb.append(",\"typeDesc\":\"")
+                .append(typeDesc).append('\"');
         sb.append(",\"dealState\":")
                 .append(dealState);
+        sb.append(",\"dealStateDesc\":\"")
+                .append(dealStateDesc).append('\"');
         sb.append(",\"createTime\":\"")
                 .append(createTime).append('\"');
+        sb.append(",\"updateTime\":\"")
+                .append(updateTime).append('\"');
+        sb.append(",\"approval1\":")
+                .append(approval1);
+        sb.append(",\"approval2\":")
+                .append(approval2);
+        sb.append(",\"approval3\":")
+                .append(approval3);
+        sb.append(",\"userEmail\":\"")
+                .append(userEmail).append('\"');
+        sb.append(",\"adminId\":")
+                .append(adminId);
+        sb.append(",\"adminName\":\"")
+                .append(adminName).append('\"');
+        sb.append(",\"userBalance\":")
+                .append(userBalance);
+        sb.append(",\"approvalRemark\":\"")
+                .append(approvalRemark).append('\"');
+        sb.append(",\"cancelRemark\":\"")
+                .append(cancelRemark).append('\"');
+        sb.append(",\"orderState\":")
+                .append(orderState);
+        sb.append(",\"startNum\":")
+                .append(startNum);
+        sb.append(",\"limitNum\":")
+                .append(limitNum);
         sb.append('}');
         return sb.toString();
     }

@@ -174,6 +174,9 @@
                     </c:if>
                     <a href="javascript:void(0);" onclick="openOrderDeal(${aproval.userId},'${aproval.orderNo}',this)"
                        title="查看交易信息">查看交易信息</a><br>
+                    <c:if test="${not empty aproval.approvalRemark}">
+                        <span style="color: green;">客户备注:[${aproval.approvalRemark}]</span>
+                    </c:if>
                 </td>
                 <td style="width: 160px;">
                     <span>申请时间:<br>${aproval.createTime}</span><br>
