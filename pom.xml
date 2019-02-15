@@ -352,7 +352,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.32</version>
+            <version>5.1.47</version>
         </dependency>
         <dependency>
             <groupId>com.jfinal</groupId>
@@ -596,7 +596,6 @@
             <properties>
                 <package.environment>prod</package.environment>
             </properties>
-
         </profile>
     </profiles>
     <build>
