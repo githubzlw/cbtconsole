@@ -227,9 +227,10 @@
 		var userId = $("#userId").val();
 		var timeFrom = $("#timeFrom").val();
 		var timeTo = $("#timeTo").val();
+		var valid = $("#valid option:selected").val();
 		//state = $("#orderEnd").val();
 		//window.location = "${ctx}/orderInfo/getOrders?state="+state+"&orderNo="+orderNo+"&timeFrom="+timeFrom+"&timeTo="+timeTo+"&page=1";
-		window.location = "${ctx}/cbtconsole/customerServlet?action=getErrorInfo&className=PictureComparisonServlet&userId="+userId+"&timeFrom="+timeFrom+"&timeTo="+timeTo;
+		window.location = "${ctx}/cbtconsole/customerServlet?action=getErrorInfo&className=PictureComparisonServlet&userId="+userId+"&timeFrom="+timeFrom+"&timeTo="+timeTo+"&valid="+valid;
 	}
 
 	
@@ -241,6 +242,11 @@
 				<span style="line-height:25px;">用户id:</span><input type="text" id="userId" value="${userId}" class="rlcj" style="margin-right: 20px;"/>
 				<span style="line-height:25px;">时间:</span> <input id="timeFrom" class="Wdate rlcj" style="width:120px;" type="text" value="${timeFrom }" onclick="WdatePicker({skin:'whyGreen',lang:'en'})" /><span> ~</span>
 				<input id="timeTo" class="Wdate rlcj" type="text" style="width:120px;" value="${timeTo }" onfocus="WdatePicker({skin:'whyGreen',lang:'en'})" />
+				<span>下架商品点击统计选择：</span>
+				<select id="valid">
+  <option  value ="5" <c:if test="${valid=='5'}">selected="selected"</c:if>>否</option>
+  <option value ="10" <c:if test="${valid=='10'}">selected="selected"</c:if>>是</option>
+</select>
 				<input type="button" value="Search" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch();" />
 	</div>
 	<div style="width: 60%;min-width: 900px;max-width: 1400px;margin: 0 auto;">
