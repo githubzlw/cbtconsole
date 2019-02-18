@@ -40,20 +40,20 @@ public class PictureComparisonServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     @Autowired
     private CustomGoodsService customGoodsService;
-	
+
 	/**
 	 * 方法描述:ali图片下载
 	 * 
 	 */
 	public void pictureDown(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		int maxCount = ips.getMaxCount();
 
 		List<GoodsFarBean> goodsFarBeans = ips.findByAliPicture(maxCount);
 		if(goodsFarBeans !=null){
 			for(int i=0; i<goodsFarBeans.size(); i++){
-				
+
 //				String[] imgs = goodsFarBeans.get(i).getImg().split(",");
 //				for(int j=0; j<imgs.length; j++){
 //					int imgInt = j+1;
@@ -66,7 +66,7 @@ public class PictureComparisonServlet extends HttpServlet {
 //						}
 //					}
 //				}
-				
+
 				String imgs = goodsFarBeans.get(i).getImg();
 				String fileName = "F:/img/"+goodsFarBeans.get(i).getpId()+"/"+"ali"+"/"+"ali1.jpg";
 				Boolean flag = ImgDownload.execute(imgs, fileName);
@@ -76,12 +76,12 @@ public class PictureComparisonServlet extends HttpServlet {
 //						ips.updateImgUrlValid(goodsFarBeans.get(i).getpId());
 //					}
 //				}
-				
+
 			}
-			
+
 			request.setAttribute("aliCount", goodsFarBeans.size());
 		}
-		
+
 		try {
 			request.getRequestDispatcher("/website/picture_comparison.jsp").forward(request, response);
 		} catch (ServletException e) {
@@ -90,10 +90,10 @@ public class PictureComparisonServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 方法描述:新订单图片抓取
-	 * 
+	 *
 	 */
 //	public void newOrderPictureDown(HttpServletRequest request, HttpServletResponse response) {
 //
@@ -177,13 +177,13 @@ public class PictureComparisonServlet extends HttpServlet {
 //			e.printStackTrace();
 //		}
 //	}
-	
+
 	/**
 	 * 方法描述:淘宝图片下载
-	 * 
+	 *
 	 */
 	public void tbPictureDown(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		int maxCount = ips.getTbMaxCount();
 
@@ -202,17 +202,17 @@ public class PictureComparisonServlet extends HttpServlet {
 //			
 //			request.setAttribute("aliCount", goodsFarBeans.size());
 //		}
-		
+
 		if(goodsFarBeans !=null){
 			for(int i=0; i<goodsFarBeans.size(); i++){
 				String img = "http:"+goodsFarBeans.get(i).getTbimg();
 				String fileName = "F:/imgTb/"+goodsFarBeans.get(i).getTbPId()+"/"+"taobao"+"/"+"taobao1.jpg";
 				Boolean flag = ImgDownload.execute(img, fileName);
 			}
-			
+
 			request.setAttribute("aliCount", goodsFarBeans.size());
 		}
-		
+
 		try {
 			request.getRequestDispatcher("/website/taobao_down.jsp").forward(request, response);
 		} catch (ServletException e) {
@@ -221,20 +221,20 @@ public class PictureComparisonServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 方法描述:规格保存
-	 * 
+	 *
 	 */
 	public void tbStyleDown(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		int maxCount = ips.getTbStyMaxCount();
 
 		List<GoodsFarBean> goodsFarBeans = ips.findByTbStyUrl(maxCount);
 		if(goodsFarBeans !=null){
 			for(int i=0; i<goodsFarBeans.size(); i++){
-				
+
 				String url1 = goodsFarBeans.get(i).getTburl();
 				GoodsBean bean1= ParseGoodsUrl.parseGoodsw(url1, 0);
 				String style1 = JSONArray.fromObject(bean1.getType()).toString();
@@ -245,7 +245,7 @@ public class PictureComparisonServlet extends HttpServlet {
 				String style2 = JSONArray.fromObject(bean2.getType()).toString();
 				ips.updateStyle(goodsFarBeans.get(i).getTbPId(),"2",style2);
 				System.out.print(style2);
-				
+
 				String url3 = goodsFarBeans.get(i).getTburl2();
 				GoodsBean bean3= ParseGoodsUrl.parseGoodsw(url3, 0);
 				String style3 = JSONArray.fromObject(bean3.getType()).toString();
@@ -256,12 +256,12 @@ public class PictureComparisonServlet extends HttpServlet {
 				String style4 = JSONArray.fromObject(bean4.getType()).toString();
 				ips.updateStyle(goodsFarBeans.get(i).getTbPId(),"4",style4);
 				System.out.print(style4);
-				
+
 			}
-			
+
 			request.setAttribute("aliCount", goodsFarBeans.size());
 		}
-		
+
 		try {
 			request.getRequestDispatcher("/website/picture_comparison.jsp").forward(request, response);
 		} catch (ServletException e) {
@@ -270,16 +270,16 @@ public class PictureComparisonServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 方法描述:图片比较相似度
-	 * 
+	 *
 	 */
 	public void pictureCompare(HttpServletRequest request, HttpServletResponse response) {
 
 
 		SimilarImageSearch.pictureCompare();
-		
+
 		try {
 			request.getRequestDispatcher("/website/picture_comparison.jsp").forward(request, response);
 		} catch (ServletException e) {
@@ -288,14 +288,14 @@ public class PictureComparisonServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 方法描述:查询图片比较结果一览
 	 * author:zlw
 	 * date:2015年11月25日
 	 */
 	public void findAllPicture(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 		String similarityId = request.getParameter("similarityId");
 		//销量
@@ -310,19 +310,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -346,7 +346,7 @@ public class PictureComparisonServlet extends HttpServlet {
 			String tbPrice3=goodsCheckBeans.get(i).getTbprice3();
 			//淘宝4个产品最低价格
 			String minPrice=goodsCheckBeans.get(i).getMinPrice();
-			
+
 			//淘宝1个产品相似度值
 			int imgcheck0=goodsCheckBeans.get(i).getImgCheck0();
 			//淘宝2个产品相似度值
@@ -355,9 +355,9 @@ public class PictureComparisonServlet extends HttpServlet {
 			int imgcheck2=goodsCheckBeans.get(i).getImgCheck2();
 			//淘宝4个产品相似度值
 			int imgcheck3=goodsCheckBeans.get(i).getImgCheck3();
-			
+
 			//if(goodsCheckBeans.get(i).getMinImgCheck()<=10){
-				//红框选择： 
+				//红框选择：
 				//如果 第2个的相似度值 小于等于  第1个 （也就是比第一个更像),而且价格比第1个低，就选 第2个
 				if(imgcheck1 <= imgcheck0 && Double.valueOf(tbPrice1) < Double.valueOf(tbPrice)){
 					goodsCheckBeans.get(i).setTbFlag1("1");
@@ -365,12 +365,12 @@ public class PictureComparisonServlet extends HttpServlet {
 				//如果 第3个 比 第1个 更相似，而且 价格比第1个低 也比 第2个低， 就选 第3个。
 				else if(imgcheck2 < imgcheck0 && Double.valueOf(tbPrice2) < Double.valueOf(tbPrice) && Double.valueOf(tbPrice2) < Double.valueOf(tbPrice1)){
 					goodsCheckBeans.get(i).setTbFlag2("1");
-					
+
 				}else{
 					//默认选第1个 的价格
 					goodsCheckBeans.get(i).setTbFlag("1");
 				}
-				
+
 //				//淘宝价格重复最低价格选中
 //				if(tbPrice.equals(minPrice)){
 //					goodsCheckBeans.get(i).setTbFlag("1");
@@ -382,7 +382,7 @@ public class PictureComparisonServlet extends HttpServlet {
 //					goodsCheckBeans.get(i).setTbFlag3("1");
 //				}
 			//}
-			 
+
 		}
 		//总条数
 //		int goodsCheckCount = ips.getGoodsCheckCount(selled,similarityId,categoryId1);
@@ -403,8 +403,8 @@ public class PictureComparisonServlet extends HttpServlet {
 //		request.setAttribute("pageCount", page);
 		//每页
 //		request.setAttribute("pagesize", PAGESIZE);
-		
-		
+
+
 //		//相似度高的产品
 //		int count1 = ips.getTbCount1(categoryId1);
 //		request.setAttribute("count1", count1);
@@ -442,20 +442,20 @@ public class PictureComparisonServlet extends HttpServlet {
 		try {
 			request.getRequestDispatcher("/website/picturecompare.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	/**
 	 * 方法描述:查询图片比较结果一览
 	 * author:zlw
 	 * date:2016年03月30日
 	 */
 	public void findPictureCompare(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 		String similarityId = request.getParameter("similarityId");
 		//销量
@@ -470,19 +470,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -533,8 +533,8 @@ public class PictureComparisonServlet extends HttpServlet {
 //			}
 //				
 //		}
-		
-		
+
+
 		int resoultCount = ips.findResoultCount();
 		int count = ips.findCount(selled,similarityId,categoryId1);
 		SplitPage.buildPager(request, count, PAGESIZE, page);
@@ -550,20 +550,20 @@ public class PictureComparisonServlet extends HttpServlet {
 		try {
 			request.getRequestDispatcher("/website/lirepicturecompare.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * 方法描述:查询已筛选好数据
 	 * author:zlw
 	 */
 	public void findAllTaoBaoInfo(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 //		String similarityId = request.getParameter("similarityId");
 		//alipid
@@ -583,19 +583,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -611,7 +611,7 @@ public class PictureComparisonServlet extends HttpServlet {
 			List<GoodsCheckBean> goodsCheckBeans = ips.findTbGoodsDataCheck(selled,aliPid,getSourceTbl,start, PAGESIZE);
 			request.setAttribute("gbbs", goodsCheckBeans);
 		}
-		
+
 //		//总条数 批量筛选用
 //		int goodsCheckCount = ips.getTbgooddataCount();
 //		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
@@ -620,25 +620,25 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("categoryId1", categoryId1);
 		request.setAttribute("similarityId", aliPid);
 		request.setAttribute("ylbbPid", ylbbPid);
-		
+
 		try {
 			request.getRequestDispatcher("/website/taobaoSave.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * 方法描述:查询ali对标1688所以产品
 	 * author:zlw
 	 */
 	public void findAllYLbbInfo(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 //		String similarityId = request.getParameter("similarityId");
 		//无对标标识
@@ -660,19 +660,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -682,7 +682,7 @@ public class PictureComparisonServlet extends HttpServlet {
 			categoryList1=ips.getCategoryInfo1(cid);
 		}
 		request.setAttribute("categoryList1", categoryList1);
-		
+
 		//取得登录的用户名字
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -693,9 +693,9 @@ public class PictureComparisonServlet extends HttpServlet {
 //		if(!"".equals(getSourceTbl)){
 			//根据分类查结果
 			List<GoodsCheckBean> goodsCheckBeans = ips.findYLGoodsDataCheck(selled,noBenchFlag,aliPid,start, PAGESIZE);
-			
+
 			for(int i=0;i<goodsCheckBeans.size();i++){
-				
+
 				int sold = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold(), "(\\d+(\\.\\d+){0,1})"));
 				int sold1 = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold1(), "(\\d+(\\.\\d+){0,1})"));
 				int sold2 = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold2(), "(\\d+(\\.\\d+){0,1})"));
@@ -708,9 +708,9 @@ public class PictureComparisonServlet extends HttpServlet {
 				int sold9 = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold9(), "(\\d+(\\.\\d+){0,1})"));
 				int sold10 = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold10(), "(\\d+(\\.\\d+){0,1})"));
 				int sold11 = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold11(), "(\\d+(\\.\\d+){0,1})"));
-				
+
 				int[] soldAry = {sold,sold1,sold2,sold3,sold4,sold5,sold6,sold7,sold8,sold9,sold10,sold11};
-				
+
 				Arrays.sort(soldAry);
 				for(int k=soldAry.length-1; k>=0;k--){
 					if(k>8){
@@ -742,9 +742,9 @@ public class PictureComparisonServlet extends HttpServlet {
 					}else{
 						break;
 					}
-					
+
 				}
-				
+
 //				//解析规格
 //				List<TypeBean> typeList = getTypesList(goodsCheckBeans.get(i).getTypes());
 //						
@@ -767,15 +767,15 @@ public class PictureComparisonServlet extends HttpServlet {
 //					goodsCheckBeans.get(i).setShowTypeNum(showTypeQuantity);
 //				}
 			}
-			
-			
+
+
 //	        List<Comparator<GoodsCheckBean>> mCmpList = new ArrayList<Comparator<GoodsCheckBean>>();
 //	        mCmpList.add(soldASC); 
 //	        sort(goodsCheckBeans, mCmpList);
-			
+
 			request.setAttribute("gbbs", goodsCheckBeans);
 //		}
-		
+
 		//总条数 批量筛选用
 		int goodsCheckCount = ips.getYlbbGooddataCount(noBenchFlag,selled);
 		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
@@ -785,23 +785,23 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("similarityId", aliPid);
 		request.setAttribute("ylbbPid", ylbbPid);
 		request.setAttribute("selled", selled);
-		
+
 		try {
 			request.getRequestDispatcher("/website/ylbbSave.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * 方法描述:健康页面以及404跟踪页面
 	 */
 	public void getErrorInfo(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//无对标标识
 		String userId = request.getParameter("userId");
 		//alipid
@@ -810,6 +810,11 @@ public class PictureComparisonServlet extends HttpServlet {
 		String timeTo = request.getParameter("timeTo");
 		//销量
 		String su = request.getParameter("selled");
+		String valid1 = request.getParameter("valid");
+		if (valid1 ==null) {
+			valid1="5";
+		}
+		int valid=Integer.parseInt(valid1);
 		int selled = 0;
 		if(su != null && !"".equals(su)) {
 			request.setAttribute("selled", su);
@@ -820,19 +825,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -842,18 +847,18 @@ public class PictureComparisonServlet extends HttpServlet {
 			categoryList1=ips.getCategoryInfo1(cid);
 		}
 		request.setAttribute("categoryList1", categoryList1);
-		
+
 		//取得登录的用户名字
 //		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 //		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 //		noBenchFlag = adm.getAdmName();
 //		String getSourceTbl = "";
 		//根据分类查结果
-		List<GoodsCheckBean> goodsCheckBeans = ips.getErrorInfo(userId,timeFrom,timeTo,start, PAGESIZE);
-		
-		
+		List<GoodsCheckBean> goodsCheckBeans = ips.getErrorInfo(userId,timeFrom,timeTo,start,valid, PAGESIZE);
+
+
 		request.setAttribute("gbbs", goodsCheckBeans);
-		
+
 		//总条数 批量筛选用
 		int goodsCheckCount = ips.getErrorInfoCount(userId,timeFrom,timeTo);
 		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
@@ -863,23 +868,24 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("userId", userId);
 		request.setAttribute("timeFrom", timeFrom);
 		request.setAttribute("timeTo", timeTo);
-		
+		request.setAttribute("valid", valid);
+
 		try {
 			request.getRequestDispatcher("/website/health_page.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * 方法描述:查询lire查询产品
 	 */
 	public void findLireImgInfo(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 //		String similarityId = request.getParameter("similarityId");
 		//无对标标识
@@ -901,19 +907,19 @@ public class PictureComparisonServlet extends HttpServlet {
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * PAGESIZE;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -923,7 +929,7 @@ public class PictureComparisonServlet extends HttpServlet {
 			categoryList1=ips.getCategoryInfo1(cid);
 		}
 		request.setAttribute("categoryList1", categoryList1);
-		
+
 		//取得登录的用户名字
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -936,7 +942,7 @@ public class PictureComparisonServlet extends HttpServlet {
 		}
 			//根据分类查结果
 			List<GoodsCheckBean> goodsCheckBeans = ips.findLireImgInfo(selled,noBenchFlag,aliPid,start, PAGESIZE,flag);
-			
+
 //			for(int i=0;i<goodsCheckBeans.size();i++){
 //				
 //				int sold = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold(), "(\\d+(\\.\\d+){0,1})"));
@@ -989,9 +995,9 @@ public class PictureComparisonServlet extends HttpServlet {
 //				}
 //				
 //			}
-			
+
 			request.setAttribute("gbbs", goodsCheckBeans);
-		
+
 		//总条数 批量筛选用
 		int goodsCheckCount = ips.getLireImgCount(noBenchFlag,selled);
 //		int goodsCheckCount = 10;
@@ -1002,23 +1008,23 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("similarityId", aliPid);
 		request.setAttribute("ylbbPid", ylbbPid);
 		request.setAttribute("selled", selled);
-		
+
 		try {
 //			request.getRequestDispatcher("/website/lire_img_info.jsp").forward(request, response);
 			request.getRequestDispatcher("/website/lire_same_img_info.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
-	
+
+
+
+
 public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		//相似度
 //		String similarityId = request.getParameter("similarityId");
 		//无对标标识
@@ -1040,19 +1046,19 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		String categoryId = request.getParameter("categoryId");
 		//小分类
 		String categoryId1 = request.getParameter("categoryId1");
-		
+
 		String str = request.getParameter("page");
 		int page = 1;
 		if(str != null) {
 			page = Integer.parseInt(str);
 		}
 		int start = (page-1) * 400;
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		request.setAttribute("categoryList", categoryList);
-		
+
 		//取得二级分类
 		if("".equals(cid)||cid==null){
 			cid=categoryId;
@@ -1062,7 +1068,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			categoryList1=ips.getCategoryInfo1(cid);
 		}
 		request.setAttribute("categoryList1", categoryList1);
-		
+
 		//取得登录的用户名字
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
@@ -1070,7 +1076,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		String getSourceTbl = "";
 			//根据分类查结果
 			List<GoodsCheckBean> goodsCheckBeans = ips.findTbGoodsDataCheck(selled,noBenchFlag,aliPid,start, 400);
-			
+
 //			for(int i=0;i<goodsCheckBeans.size();i++){
 //				
 //				int sold = Integer.valueOf(StrUtils.matchStr(goodsCheckBeans.get(i).getGoodsSold(), "(\\d+(\\.\\d+){0,1})"));
@@ -1123,11 +1129,11 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //				}
 //				
 //			}
-			
-			
-			
+
+
+
 			request.setAttribute("gbbs", goodsCheckBeans);
-		
+
 		//总条数 批量筛选用
 //		int goodsCheckCount = ips.getYlbbGooddataCount(noBenchFlag,selled);
 		int goodsCheckCount = 60000;
@@ -1138,15 +1144,15 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		request.setAttribute("similarityId", aliPid);
 		request.setAttribute("ylbbPid", ylbbPid);
 		request.setAttribute("selled", selled);
-		
+
 		try {
 			request.getRequestDispatcher("/website/ylbbSaveValid.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 	public List<TypeBean> getTypesList(String types){
 		if(types != null && !types.isEmpty()){
@@ -1202,8 +1208,8 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		}
 		return null;
 	}
-	
-	
+
+
 	public List<ImportExSkuShow> combineSkuList(List<TypeBean> typeList, List<ImportExSku> skuList) {
 
 		List<ImportExSkuShow> cbSkuLst = new ArrayList<ImportExSkuShow>();
@@ -1259,11 +1265,11 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		skuList = null;
 		return cbSkuLst;
 	}
-	
-	
+
+
 	/**
 	 * 方法描述:查询货源工厂
-	 * 
+	 *
 	 */
 	public void findSuppliesFactory(HttpServletRequest request, HttpServletResponse response) {
 		String str = request.getParameter("page");
@@ -1291,16 +1297,16 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			request.setAttribute("times",times);
 			request.getRequestDispatcher("/website/sampingInfo.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	//数据更新 去掉下架的
 	public void validationDateUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
 		int flag = ips.validationDateUpdate("");
@@ -1314,10 +1320,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		out.flush();
 		out.close();
 	}
-	
+
 	//店铺聚合优化
 	public void shopPolymerization(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
 		List<GoodsCheckBean> beans = ips.getOneShopInFo("");
@@ -1333,33 +1339,33 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 							//更新表聚合店铺
 							ips.updatePolymerizationShopId(sourceShopId,sourceGoodsPid,aryShopId[j]);
 						}
-						
+
 					}
-					
+
 				}
 			}
-			
+
 			//更新时间
 			int id=0;
 			String parameter = request.getParameter("id");
 			if(!org.apache.commons.lang.StringUtils.isBlank(parameter)){
 				id=Integer.parseInt(parameter);
 			}
-			
+
 			ips.updateTime(id,2);
-			
+
 		}
-		
+
 		out.print(0);
 		out.flush();
 		out.close();
 	}
 
 
-	
+
 	/**
 	 * 方法描述:根据工厂ID查询工厂下面所有商品
-	 * 
+	 *
 	 */
 	public void fingGoodsByShopId(HttpServletRequest request, HttpServletResponse response) {
 		    IPictureComparisonService ips = new PictureComparisonServiceImpl();
@@ -1524,14 +1530,14 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		try {
 			request.getRequestDispatcher("/website/sampingInfoDetails.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+
+
 	public static String getSkuCount(String skuMap){
 		StringBuilder sb=new StringBuilder();
 		if(!StringUtils.isStrNull(skuMap) && skuMap.contains("skuMap:") && skuMap.contains(",end")){
@@ -1562,10 +1568,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		}
 		return sb.toString();
 	}
-	
-	
-	
-	
+
+
+
+
 //    //销量降序
 //    private Comparator<GoodsCheckBean> soldASC = new Comparator<GoodsCheckBean>() {  
 //    	  
@@ -1602,7 +1608,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); 
 //        Collections.sort(list, cmp);  
 //    }  
-	
+
 	/**
 	 * 方法描述:查询分类
 	 * author:zlw
@@ -1610,30 +1616,30 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 	 */
 	public void findCategory(HttpServletRequest request, HttpServletResponse response) {
 		String cid = request.getParameter("cid");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		//取得分类
 		List<CategoryBean> categoryList=ips.getCategoryInfo();
 		//取得二级分类
 		List<CategoryBean> categoryList1=ips.getCategoryInfo1(cid);
-		
+
 		request.setAttribute("categoryList1", categoryList1);
-				
+
 		request.setAttribute("categoryList", categoryList);
-		
+
 		try {
 			request.getRequestDispatcher("/website/picturecompare.jsp").forward(request, response);
 		} catch (ServletException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	//保存淘宝信息
 	public void saveTbgooddata(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodId");
 		String ylUrl = request.getParameter("tbUrl");
 		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
@@ -1642,14 +1648,14 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		String moqPrice = request.getParameter("moqPrice");
 		//1688类别
 		String catId = request.getParameter("catId");
-		
+
 		int idx = tbUrl.lastIndexOf("/");
 		//1688pid
 		String ylId = tbUrl.substring(idx+1,tbUrl.length());
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1671,26 +1677,26 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
-	
+
+
+
 	//保存淘宝信息
 	public void updateAliFlag(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodId");
 //		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
 //		String tbPrice = request.getParameter("tbPrice");
 //		String tbName = request.getParameter("tbName");
 //		String delFlag = request.getParameter("delFlag");
-		
+
 //		int idx = tbUrl.lastIndexOf("/");
 //		//1688pid
 //		String ylId = tbUrl.substring(idx+1,tbUrl.length());
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1700,7 +1706,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			tbgood.setDelFlag(1);
 //			//1688产品插入
 //			int tbg1 = ips.saveTbGood(tbgood);
-			
+
 			//删除1688产品数据
 			ips.delForGoodsPid(tbgood);
 			//更新已处理完避免再次出现
@@ -1714,20 +1720,20 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
+
+
 	//更新无对标
 	public void updateYlFlag(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodId");
 //		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
 		String delFlag = request.getParameter("delFlag");
 //		String sourceYlpid = request.getParameter("sourceYlpid");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1736,7 +1742,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			int tbg = ips.updateSourceAliFlag(tbgood);
 			//删除已选的对标商品
 			ips.delForGoodsPid(tbgood);
-			
+
 			out.print(tbg);
 			out.flush();
 			out.close();
@@ -1746,25 +1752,25 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
-	
+
+
+
 	//更新标识状态
 	public void updateAliInfoFlag(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodId");
 //		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
 		String delFlag = request.getParameter("delFlag");
 		String sourceYlpid = request.getParameter("sourceYlpid");
 		String ylWeight = request.getParameter("weight");
 		String lotUnit = request.getParameter("lotUnit");
-		
 
-		
+
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1789,10 +1795,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
+
 	public void updateYlPid(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodsPid = request.getParameter("goodsPid");
 		String sourceYlpid = request.getParameter("sourceYlpid");
 		String ylPid = request.getParameter("ylPid");
@@ -1801,7 +1807,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //		String delFlag = request.getParameter("delFlag");
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(ylPid != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodsPid);
@@ -1822,12 +1828,12 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
+
+
 	//保存对标商品信息
 	public void saveDbYlgooddata(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodId");
 		String ylUrl = request.getParameter("tbUrl");
 		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
@@ -1838,18 +1844,18 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		String catId = request.getParameter("catId");
 		//产品来源标识
 		String pidSource = request.getParameter("selled");
-		
+
 		int idx = tbUrl.lastIndexOf("/");
 		//1688pid
 		String ylId = tbUrl.substring(idx+1,tbUrl.length());
-		
+
 		String priorityFlag = request.getParameter("priorityFlag");
 		String sourceProFlag = request.getParameter("sourceProFlag");
 		String ylImg = request.getParameter("ylImg");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1876,14 +1882,14 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
+
+
 	//保存lire商品信息
 	public void saveDbLiredata(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodId = request.getParameter("goodsPid");
-		
+
 		String flag = request.getParameter("flag");
 //		String tbUrl = request.getParameter("tbUrl").replace(".html", "");
 //		String shopId = request.getParameter("shopId");
@@ -1901,10 +1907,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //		String priorityFlag = request.getParameter("priorityFlag");
 //		String sourceProFlag = request.getParameter("sourceProFlag");
 //		String ylImg = request.getParameter("ylImg");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodId);
@@ -1923,11 +1929,11 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 //			tbgood.setPidSource(Integer.valueOf(pidSource));
 			//1688产品插入
 			ips.saveLireGood(tbgood);
-			
+
 			//删除同款
 			ips.setGoodsValid(goodId, "yunying", 18, -1, "同款下架");
-            
-            
+
+
 			//更新已处理完避免再次出现
 //			tbgood.setDelFlag(1);
 //			int tbg = ips.updateSourceAliFlag(tbgood);
@@ -1940,12 +1946,12 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
+
+
 	//手工录入1688产品更新
 	public void updateDbYlbbPid(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String goodsPid = request.getParameter("goodsPid");
 		String ylUrl =request.getParameter("ylUrl");
 		String ylPid = "";
@@ -1958,10 +1964,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 		}
 		String priorityFlag = request.getParameter("priorityFlag");
 		String sourceProFlag = request.getParameter("sourceProFlag");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		if(goodsPid != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(goodsPid);
@@ -1987,39 +1993,39 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 		}
 	}
-	
-	
-	
+
+
+
 	//更新缓存表有无货源信息
 	public void updateCachedata(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		
+
 		String url = request.getParameter("url");
 		String flag = request.getParameter("flag");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		int tbg = ips.updateSourceFlag(url,Integer.valueOf(flag));
 		out.print(tbg);
 		out.flush();
 		out.close();
-		
+
 	}
-	
+
 	//保存淘宝信息
 	public void pageSaveTbgooddata(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		  
+
 		String pId = request.getParameter("pId");
 		String tbId = request.getParameter("tbId");
 		String delFlag = "0";
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
-		
+
 		GoodsCheckBean goodsCheckBean= ips.getGoodsDataCheck(Integer.valueOf(pId),tbId);
 		PrintWriter out = response.getWriter();
-		
+
 		if(pId != null){
 			TbGoodBean tbgood = new TbGoodBean();
 			tbgood.setGoodId(pId);
@@ -2048,7 +2054,7 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 				tbgood.setTbImg(goodsCheckBean.getTbImg3());
 				tbgood.setTbFlag(tbId);
 			}
-			
+
 			tbgood.setDelFlag(Integer.valueOf(delFlag));
 			int tbg = ips.saveTbGood(tbgood);
 			out.print(tbg);
@@ -2059,24 +2065,24 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.flush();
 			out.close();
 		}
-		
+
 	}
-	
-	
+
+
 	//保存lire信息
 	public void pageUpdateLireFlag(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		  
+
 		String pIds = request.getParameter("pId");
-		
+
 		String pidSors = request.getParameter("pidSor");
 //		String tbId = request.getParameter("tbId");
 //		String delFlag = "0";
-		
+
 		String[] pIdAry = pIds.split(",");
 		String[] pidSorsAry = pidSors.split(",");
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
-		
+
 		PrintWriter out = response.getWriter();
 		int tbg = 0;
 		if(pIds != null){
@@ -2100,37 +2106,37 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.flush();
 			out.close();
 		}
-		
+
 	}
-	
-	
+
+
 	//更新缓存表有货
 	public void updateCacheFlag(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException, ParseException {
-		  
+
 		String url = request.getParameter("url");
 		String flag = request.getParameter("flag");
-		
+
 		IPictureComparisonService ips = new PictureComparisonServiceImpl();
 		PrintWriter out = response.getWriter();
-		
+
 		int tbg = ips.updateSourceFlag(url,Integer.valueOf(flag));
 		out.print(tbg);
 		out.flush();
 		out.close();
-		
+
 	}
-	
+
 	/**
 	 * 去除不售卖的分类
-	 * @Title delNorSoldCategory 
+	 * @Title delNorSoldCategory
 	 * @Description TODO
 	 * @param request
 	 * @param response
 	 * @return void
 	 */
 	public void delNorSoldCategory(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		try {
 			String catid1 = request.getParameter("catid1");
 			String goodspid = request.getParameter("goodspid");
@@ -2147,15 +2153,15 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			//request.getRequestDispatcher("/customerServlet?action=findAllYLbbInfo&className=PictureComparisonServlet").forward(request, response);
 			//response.sendRedirect(request.getContextPath()+"/customerServlet?action=findAllYLbbInfo&className=PictureComparisonServlet");
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 		}
 	}
-	
+
 	//查看不售卖的商品
 	public void  getNoSoldCategory(HttpServletRequest request, HttpServletResponse response){
 		try {
-			
+
 			IPictureComparisonService ips = new PictureComparisonServiceImpl();
 			//保存分类,以便找回和修改shel_flag状态
 			List<Map<String,Object>> listmaps = ips.getNoSoldCategory();
@@ -2166,12 +2172,12 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			out.close();
 			//response.sendRedirect(request.getContextPath()+"/customerServlet?action=findAllYLbbInfo&className=PictureComparisonServlet");
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
-		}	
-		
+		}
+
 	}
-	
+
 	/**
 	 * 修改不售卖的分类为售卖状态
 	 */
@@ -2183,10 +2189,10 @@ public void findAllYLbbInfo1(HttpServletRequest request, HttpServletResponse res
 			int tbg  = ips.updateNoSoldCategoryToSold(lists);
 			response.sendRedirect(request.getContextPath()+"/customerServlet?action=findAllYLbbInfo&className=PictureComparisonServlet");
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
-		}	
-		
+		}
+
 	}
-	
+
 }
