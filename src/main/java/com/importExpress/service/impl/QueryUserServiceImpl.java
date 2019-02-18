@@ -1,12 +1,11 @@
 package com.importExpress.service.impl;
 
+import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
-import com.importExpress.pojo.GoodsInfoSpiderPO;
-import com.importExpress.pojo.ItemStaticFile;
-import com.importExpress.pojo.StandardGoodsFormDataPO;
+import com.importExpress.pojo.*;
 import com.importExpress.service.QueryUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -365,5 +364,55 @@ public class QueryUserServiceImpl implements QueryUserService {
         if (list != null && list.size() > 0) {
             queryUserMapper.insertNeedoffshelfSoldPid(list, type);
         }
+    }
+
+    @Override
+    public List<String> queryGoodsWeightNoSyn() {
+        return queryUserMapper.queryGoodsWeightNoSyn();
+    }
+
+    @Override
+    public EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType) {
+        List<UserBean> list = queryUserMapper.queryUserList((page - 1) * rows, rows, userType);
+        Integer totalCount = queryUserMapper.queryUserListCount(userType);
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        if (list != null && list.size() > 0) {
+            for (UserBean bean : list) {
+                bean.setType(userType.toString());
+            }
+            json.setSuccess(true);
+            json.setRows(list);
+            json.setTotal(totalCount);
+        } else {
+            json.setSuccess(false);
+            json.setRows("");
+            json.setTotal(0);
+
+        }
+        return json;
+    }
+
+    @Override
+    public Map<String, Object> queryUserOtherInfo(Integer id, Integer userType) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("userType", userType);
+        /*A 所有 录入了地址 但没下单的客户
+        B 所有 注册了，而且有Wechat 号 但没下单的客户
+        */
+        if (userType == 1){
+            result.put("address", queryUserMapper.queryUserAddressById(id));
+        } else if (userType == 2){
+            result.put("userEx", queryUserMapper.queryUserExById(id));
+        }
+        //每个客户显示 尽量多个内容， 比如 搜索词，比如 查看的 产品页数量。 多次打开的 产品页是哪个，当前购物车中 产品数量， 是否已经被“购物车营销跟进过”
+        //当前客户购物车产品数量
+        String shopCarShowinfo = queryUserMapper.queryGoodsCarCount(id);
+        if (StringUtils.isNotBlank(shopCarShowinfo)){
+            result.put("goodsCarCount", shopCarShowinfo.split("guId").length - 1);
+        } else {
+            result.put("goodsCarCount", 0);
+        }
+        return result;
     }
 }

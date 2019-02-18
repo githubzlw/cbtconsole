@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.cbt.bean.EasyUiJsonResult;
+import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.service.QueryUserService;
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +28,9 @@ public class QueryUserController {
 
     @Autowired
 	private QueryUserService queryUserService;
+
+    @Autowired
+    private IWarehouseService iWarehouseService;
 	
 	/**
 	 * http://127.0.0.1:8086/cbtconsole/queryuser/randomlist.do
@@ -386,6 +390,75 @@ public class QueryUserController {
             LOG.error("QueryUserController.refreshNeedOffShelfData error", e);
         }
         return result;
+    }
+
+    /**
+     * 同步所有未同步的实秤重量到产品库（调用蒋的接口）
+     * http://127.0.0.1:8086/cbtconsole/queryuser/synGoodsWeight.do
+     *
+     */
+    @RequestMapping(value = "synGoodsWeight", method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String, String> synGoodsWeight() {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            //查询待同步数据
+            List<String> pidList = queryUserService.queryGoodsWeightNoSyn();
+            if (null == pidList || pidList.size() == 0){
+                result.put("message", "未找到要同步实秤重量到产品库的商品");
+                result.put("state", "success");
+                return result;
+            }
+            //调用蒋接口同步
+            for (String pid : pidList) {
+                iWarehouseService.saveWeightFlag(pid);
+            }
+            result.put("message", "success");
+            return result;
+        } catch (Exception e){
+            result.put("message", "err");
+            return result;
+        }
+    }
+
+    /**
+     * 查询未下单的指定用户
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/list.do
+     *
+     * rows 每页行数			   为空则默认20
+     * page 当前页			   为空则默认1
+     * userType 查询用户类别 		1-录入收货地址 但没下单的客户;2-有Wechat号 但没下单的客户
+     *
+     * @return 返回的是easyui数据(json)格式
+     */
+    @RequestMapping(value = "/list.do")
+    @ResponseBody
+    public EasyUiJsonResult queryUserList(HttpServletRequest request, Integer userType) {
+        //分页参数接收并处理
+        String rowsStr = request.getParameter("rows");
+        Integer rows = 20;
+        if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
+            rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
+        }
+        String pageStr = request.getParameter("page");
+        Integer page = 1;
+        if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+            page = Integer.valueOf(pageStr);//无该参数时查询默认值1
+        }
+        // 查询
+        return queryUserService.queryUserList(page, rows, userType);
+    }
+    /**
+     * 查询用户相关信息
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/queryUserOtherInfo.do
+     *
+     * id 用户id
+     * userType 查询用户类别 		1-录入收货地址 但没下单的客户;2-有Wechat号 但没下单的客户
+     */
+    @RequestMapping(value = "/queryUserOtherInfo.do")
+    @ResponseBody
+    public Map<String, Object> queryUserOtherInfo(Integer id, Integer userType) {
+        return queryUserService.queryUserOtherInfo(id, userType);
     }
 
 }

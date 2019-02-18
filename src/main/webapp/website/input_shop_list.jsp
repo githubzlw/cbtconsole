@@ -191,9 +191,9 @@
 <body onload="$('#dlg').dialog('close');doQuery(1)">
 <div id="dlg" class="easyui-dialog" title="店铺url"
      data-options="modal:true"
-     style="width: 400px; height: 700px; padding: 10px;">
+     style="width: 410px; height: 740px; padding: 10px;">
     <input type="hidden" id="sid"/>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>类型:</label> <select name="urlType" id="urlType"
                                    onchange="showUrlType()">
         <option value="0">店铺</option>
@@ -202,73 +202,73 @@
     </div>
 
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺地址:</label><input name="shopUrl" id="detailShopUrl"
                                    style="width: 290px">
     </div>
 
-    <div style="margin-bottom: 20px; display: none" class="typeShopUrl">
+    <div style="margin-bottom: 10px; display: none" class="typeShopUrl">
         <label>店铺分类url:</label><input name="typeShopUrl" style="width: 275px">
     </div>
-    <div style="margin-bottom: 20px; display: none" class="typeShopUrl">
+    <div style="margin-bottom: 10px; display: none" class="typeShopUrl">
         <label>店铺分类url:</label><input name="typeShopUrl" style="width: 275px">
     </div>
-    <div style="margin-bottom: 20px; display: none" class="typeShopUrl">
+    <div style="margin-bottom: 10px; display: none" class="typeShopUrl">
         <label>店铺分类url:</label><input name="typeShopUrl" style="width: 275px">
     </div>
-    <div style="margin-bottom: 20px; display: none" class="typeShopUrl">
+    <div style="margin-bottom: 10px; display: none" class="typeShopUrl">
         <label>店铺分类url:</label><input name="typeShopUrl" style="width: 275px">
     </div>
-    <div style="margin-bottom: 20px; display: none" class="typeShopUrl">
+    <div style="margin-bottom: 10px; display: none" class="typeShopUrl">
         <label>店铺分类url:</label><input name="typeShopUrl" style="width: 275px">
     </div>
 
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺Id:</label><!--<input name="shopId" id="detailShopId"
 				style="width: 300px">  --><span id="detailShopId"></span>
     </div>
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>销量阀值:</label><input name="salesVolume" id="salesVolume"
                                    style="width: 290px">
     </div>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>下载数量:</label><input name="downloadNum" id="downloadNum"
                                    style="width: 290px">
         <!--<span style="margin-left: 53px;color:red;">下载商品数量请选择 20以上</span>-->
     </div>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺质量评分:</label><span id="shopQualityScore"></span>
     </div>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺服务评分:</label><span id="shopServiceScore"></span>
     </div>
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺级别:</label><span id="level"></span>
     </div>
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺名称:</label><input name="inputShopName" id="inputShopName"
                                    style="width: 290px">
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <label>店铺描述:</label><input name="inputShopDescription" id="inputShopDescription"
-                                   style="width: 290px">
+    <div style="margin-bottom: 10px;">
+        <label>店铺描述:</label>
+        <textarea name="inputShopDescription" id="inputShopDescription" style="width: 290px;height: 80px;"></textarea>
     </div>
     
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>店铺英文:</label><input name="inputShopEnName" id="inputShopEnName"
                                    style="width: 290px">
     </div>
     
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>品牌属性:</label><input name="inputShopBrand" id="inputShopBrand"
                                    style="width: 290px">
     </div>
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>是否启用:</label><select name="isValid" id="isValid">
         <option value="0">是</option>
         <option value="1">否</option>
@@ -276,7 +276,7 @@
     </div>
 
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <label>外贸标识:</label><select name="isTrade" id="is_trade">
         <option value="0">否</option>
         <option value="1">是</option>
@@ -297,7 +297,7 @@
      data-options="modal:true"
      style="width: 450px; height: 300px;">
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
         <br><br>
         <span style="width: 80px;">店铺 ID：</span> <input type="text" id="del_shop_id" style="width: 290px"
                                                         readonly="readonly"/>
@@ -326,7 +326,7 @@
      data-options="modal:true"
      style="width: 450px; height: 400px;">
 
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
     	<form method="post" enctype="multipart/form-data">
 	    	<table>
                 <input type="hidden" id="authorized_id" name="authorized_id"/>
