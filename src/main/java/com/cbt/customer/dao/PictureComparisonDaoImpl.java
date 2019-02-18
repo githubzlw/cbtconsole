@@ -1996,7 +1996,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	}
 	
 	@Override
-	public List<GoodsCheckBean> getErrorInfo(String userId, String timeFrom, String timeTo, int start, int end){
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeFrom, String timeTo, int start, int end,int valid){
 		
 		List<GoodsCheckBean> gsfList = new ArrayList<GoodsCheckBean>();
 		
@@ -2016,6 +2016,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   if(!"".equals(timeTo) && timeTo!=null){
 				   sql =sql+" and a.create_time <= '"+timeTo+"' ";
 			   }
+			   if (valid==10) {
+				sql+=" and a.valid=10 ";
+			}
 			   sql= sql+"order by a.create_time desc ";
 
 		
