@@ -169,9 +169,17 @@
 			ON sp.expressno = tf.track_no AND sp.transportcompany = tf.track_company
 		LEFT JOIN admin_r_user ar ON of.user_id = ar.userid
         LEFT JOIN admuser au ON au.id = ar.adminid
-        <if test="userid != null">
-            WHERE ar.adminid = #{userid}
-        </if>
+        <where>
+            <if test="userid != null">
+                ar.adminid = #{userid}
+            </if>
+            <if test="startDate != ''">
+                AND (of.orderpaytime >= #{startDate} OR of.orderpaytime IS NULL)
+            </if>
+            <if test="endDate != ''">
+                AND (#{endDate} >= of.orderpaytime OR of.orderpaytime IS NULL)
+            </if>
+        </where>
 		ORDER BY
 			sp.createtime ASC,
 			of.order_no
@@ -206,6 +214,12 @@
             <if test="orderUserid != null">
                 AND (of.user_id = #{orderUserid} OR u.email LIKE '%${orderUserid}%')
             </if>
+            <if test="startDate != ''">
+                AND (of.orderpaytime >= #{startDate} OR of.orderpaytime IS NULL)
+            </if>
+            <if test="endDate != ''">
+                AND (#{endDate} >= of.orderpaytime OR of.orderpaytime IS NULL)
+            </if>
         </where>
 		ORDER BY
 			sp.createtime ASC,
@@ -230,9 +244,17 @@
 			ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
 		LEFT JOIN admin_r_user ar ON of.user_id = ar.userid
         LEFT JOIN admuser au ON au.id = ar.adminid
-        <if test="userid != null">
-            WHERE ar.adminid = #{userid}
-        </if>
+        <where>
+            <if test="userid != null">
+                ar.adminid = #{userid}
+            </if>
+            <if test="startDate != ''">
+                AND (of.orderpaytime >= #{startDate} OR of.orderpaytime IS NULL)
+            </if>
+            <if test="endDate != ''">
+                AND (#{endDate} >= of.orderpaytime OR of.orderpaytime IS NULL)
+            </if>
+        </where>
 		ORDER BY
 			sp.createtime ASC,
 			of.order_no
