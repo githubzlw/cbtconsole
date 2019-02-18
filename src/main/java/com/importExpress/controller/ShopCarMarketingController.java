@@ -1441,4 +1441,66 @@ public class ShopCarMarketingController {
         }
         return mv;
     }
+
+
+    @RequestMapping("/queryFollowLogList")
+    @ResponseBody
+    public EasyUiJsonResult queryFollowLogList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+        FollowLogBean logBean = new FollowLogBean();
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+            logBean.setLimitNum(limitNum);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (StringUtils.isNotBlank(pageStr)) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        logBean.setStartNum(startNum);
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr) && !"0".equals(adminIdStr)) {
+            logBean.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            logBean.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String userEmail = request.getParameter("userEmail");
+        if (StringUtils.isNotBlank(userEmail)) {
+            logBean.setUserEmail(userEmail);
+        }
+
+        String followCode = request.getParameter("followCode");
+        if (StringUtils.isNotBlank(followCode)) {
+            logBean.setFollowCode(followCode);
+        }
+
+
+        try {
+
+            List<FollowLogBean> res = shopCarMarketingService.queryFollowLogList(logBean);
+            int count = shopCarMarketingService.queryFollowLogListCount(logBean);
+
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
 }

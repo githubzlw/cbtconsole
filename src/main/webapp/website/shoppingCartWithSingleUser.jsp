@@ -205,6 +205,11 @@
             var url = "/cbtconsole/userinfo/getUserInfo.do?userId=" + userId;
             window.open(url);
         }
+        
+        function openUserFollow() {
+            
+        }
+        
 
         function  openSendEmail(userId) {
             var type = $("#send_type").val();
@@ -324,6 +329,8 @@
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId})"/>
+                        &nbsp;&nbsp;
+                        <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId})"/>
                     </div>
                 </td>
             </tr>

@@ -46,15 +46,17 @@ public interface ShopCarMarketingService {
 
     /**
      * 更新客户的跟进信息
+     *
      * @param userId
      * @param adminId
      * @param content
      * @return
      */
-    int updateAndInsertUserFollowInfo(int userId,int adminId,String content);
+    int updateAndInsertUserFollowInfo(int userId, int adminId, String content);
 
     /**
      * 获取购物车营销列表
+     *
      * @param statistic
      * @return
      */
@@ -62,6 +64,7 @@ public interface ShopCarMarketingService {
 
     /**
      * 物车营销列表总数统计
+     *
      * @param statistic
      * @return
      */
@@ -73,5 +76,23 @@ public interface ShopCarMarketingService {
     int queryTrackingListCount(ShopTrackingBean param);
 
     List<ZoneBean> queryAllCountry();
+
+
+    /**
+     * 分页获取EDM跟踪列表
+     *
+     * @param logBean
+     * @return
+     */
+    List<FollowLogBean> queryFollowLogList(FollowLogBean logBean);
+
+
+    /**
+     * 获取EDM跟踪列表的总数
+     *
+     * @param logBean
+     * @return
+     */
+    int queryFollowLogListCount(FollowLogBean logBean);
 
 }
