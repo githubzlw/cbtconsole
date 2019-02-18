@@ -22,6 +22,7 @@ import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.QualityResult;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
+import com.importExpress.pojo.GoodsCarActiveSimplBean;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -1895,7 +1896,7 @@ public class OrderwsDao implements IOrderwsDao {
 
         String sql = "SELECT order_no,if(memberFee>=10,pay_price-memberFee,pay_price) as pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
-                +"(SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
+                +"(SELECT  ifnull(sum(amount),0)  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
                 + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
                 " FROM orderinfo o where LEFT(order_no,17) = LEFT(?,17) ";
@@ -7106,11 +7107,11 @@ public class OrderwsDao implements IOrderwsDao {
     public List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate, String endDate, int startNum,
                                                               int offSet) {
 
-        Connection conn = DBHelper.getInstance().getConnection2();
+        Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
         ResultSet rs = null;
         Statement stmt = null;
-        String sql = "select a.*,b.shopCarShowinfo from (select id,email,createtime from user where 1=1 ";
+        String sql = "select a.*,b.buyForMeCarConfig from (select id,email,createtime from user where 1=1 ";
         if (StringUtil.isNotBlank(beginDate)) {
             sql += " and createtime >= '" + beginDate + "'";
         }
@@ -7131,32 +7132,19 @@ public class OrderwsDao implements IOrderwsDao {
                 bhDtl.setUserId(rs.getInt("id"));
                 bhDtl.setEmail(rs.getString("email"));
                 bhDtl.setCreateTime(rs.getString("createtime"));
-                String carStr = rs.getString("shopCarShowinfo");
+                String carStr = rs.getString("buyForMeCarConfig");
                 if(org.apache.commons.lang3.StringUtils.isNotBlank(carStr)){
-                    List<GoodsCarBean> list_active = (List<GoodsCarBean>) JSONArray.toCollection(JSONArray.fromObject(carStr),GoodsCarBean.class);
-                    bhDtl.setCarNum(list_active.size());
-                    list_active.clear();
-                    list_active = null;
+                    List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carStr), GoodsCarActiveSimplBean.class);
+                    bhDtl.setCarNum(listActive.size());
+                    listActive.clear();
                 }
                 list.add(bhDtl);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
