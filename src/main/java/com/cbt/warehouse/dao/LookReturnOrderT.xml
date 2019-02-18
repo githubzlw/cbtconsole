@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.LookReturnOrderServiceNewMapper" >
+    <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.returndisplay" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="1688_order" property="a1688Order" jdbcType="VARCHAR" />
+        <result column="1688_shipno" property="a1688Shipno" jdbcType="VARCHAR" />
+        <result column="item" property="item" jdbcType="VARCHAR" />
+        <result column="item_number" property="itemNumber" jdbcType="INTEGER" />
+        <result column="apply_user" property="applyUser" jdbcType="VARCHAR" />
+        <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP" />
+        <result column="opt_user" property="optUser" jdbcType="VARCHAR" />
+        <result column="opt_time" property="optTime" jdbcType="TIMESTAMP" />
+        <result column="shipno" property="shipno" jdbcType="VARCHAR" />
+        <result column="change_shipno" property="changeShipno" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="INTEGER" />  
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP" /> 
+    </resultMap>
+   
+	<select id="FindReturndisplay" resultType="com.cbt.warehouse.pojo.returndisplay" >
+		<!-- SELECT 1688_order as a1688Order,1688_shipno as a1688Shipno,item,item_number as itemNumber,apply_user as applyUser,
+		apply_time as applyTime,opt_user as optUser,opt_time as optTime,shipno,change_shipno as changeShipno,State,end_time as endTime,
+		return_number as returnNumber,barcode as barcode,customer_info as customerorder,return_reason as returnReason from return_display as rd where 1=1 -->
+		
+		SELECT
+rd.id,		
+rd.customer_info as customerorder,
+rd.1688_order as a1688Order,
+rd.1688_shipno as a1688Shipno,
+rd.item,
+rd.item_number as itemNumber,
+rd.apply_user as applyUser,
+rd.apply_time as applyTime,
+rd.opt_user as optUser,
+rd.opt_time as optTime,
+rd.shipno,
+rd.change_shipno as changeShipno,
+rd.State,
+rd.end_time as endTime,
+rd.return_reason as returnReason,
+rd.barcode,
+rd.return_number as returnNumber,
+rd.tb_id as tbId,
+rd.sku,
+th.delivery_date as signtime,
+th.orderdate as placeDate,
+th.seller as sellerpeo,
+th.itemqty
+FROM
+return_display as rd ,
+taobao_1688_order_history as th where rd.tb_id=th.id 
+		
+     <if test="nameString != null">
+			 AND rd.opt_user=#{nameString} 
+	</if>
+	<if test="state != null">
+			 AND rd.state=#{state} 
+	</if>
+	
+	<if test="a1688Shipno != null">
+			 AND rd.shipno=#{a1688Shipno} 
+	</if>
+	<if test="optTimeStart != null">
+			 AND rd.opt_time&gt;#{optTimeStart} 
+	</if>
+	<if test="optTimeEnd != null">
+			 AND rd.opt_time&lt;#{optTimeEnd} 
+	</if>
+	<if test="state == null">
+			 AND rd.state !=5 
+	</if>
+		order by rd.State ASC limit #{page},50
+	</select>
+	<select id="selectCount" resultType="java.lang.Integer" >
+		SELECT count(*) 
+from return_display as rd where 1=1
+     <if test="nameString != null">
+			 AND rd.apply_user=#{nameString} 
+	</if>
+	<if test="state != null">
+			 AND rd.state=#{state} 
+	</if>
+	
+	 <if test="a1688Shipno != null">
+			 AND rd.1688_shipno=#{a1688Shipno} 
+	</if>
+	<if test="state == null">
+			 AND rd.state !=5 
+	</if>
+	</select>
+</mapper>

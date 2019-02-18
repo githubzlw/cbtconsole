@@ -16,6 +16,11 @@
 <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.imgbox.pack.js"></script>
 <!-- CSS goes in the document HEAD or added to your external stylesheet -->
 <link rel="stylesheet" href="/cbtconsole/css/warehousejs/lrtk.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.min.js"></script>
+<script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <style type="text/css">
 /* 表格样式 */
 table.altrowstable {
@@ -269,6 +274,25 @@ function saveRepalyContent(type){
 	});
 }
 
+function returnNu(orid,cusorder ) {
+	              var cusorder =$(" #cusorder ").val()
+	              var number =$(" #number ").val()
+	              var orid =$(" #orid ").val()
+	              var returnNO =$(" #returnNO ").val()
+				  $.post("/cbtconsole/Look/AddOrder", {
+						orid:orid,number:number,cusorder:cusorder,returnNO:returnNO
+					}, function(res) {
+						if(res.rows == 1){
+							$.messager.alert('提示','修改成功');
+						}else{
+							$.messager.alert('提示','不可重复退单');
+						}
+						 $('#user_remark').window('close');	
+					
+		});
+}
+
+
 function resetChecked(orderid,goodsid){
 	 window.location.href ="/cbtconsole/website/location_management.jsp?orderid="+orderid;
 }
@@ -276,11 +300,87 @@ function resetChecked(orderid,goodsid){
 function showType(orderid){
 	document.getElementById(""+orderid+"").style.display="inline-block";
 }
+function returnOr(str){
+	var cusorder=this.$(" #cusorder").val();
+	window.location.href ="/cbtconsole/AddReturnOrder/FindReturnOrder/"+cusorder;
 
+}
+ function returnNum(orid,cusorder) {
+	document.getElementById('cusorder').value=cusorder;
+	document.getElementById('orid').value=orid;
+	     $('#user_remark').window('open');         
+} 
+/* function returnNum(orid,cusorder) {
+    $('#user_remark .remark_list').html('');
+    $('#new_user_remark').val('');
+    //查询历史备注信息
+    $.ajax({
+        type: "POST",
+        url: "/cbtconsole/Look/getAllOrderByitem",
+        data: {cusOrder:cusorder,orid:orid},
+        dataType:"json",
+        success: function(msg){
+            if(msg != undefined){
+                var temHtml = '';
+                document.getElementById("tabl").innerHTML='';
+                $("table").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>总数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $(msg.rows).each(function (index, item) {
+                	
+                 	$("table").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
+                                
+                });
+                $('#user_remark .remark_list').html(temHtml);
+            }
+            $('#user_remark').window('open');
+        }
+    });
+} */
 </script>
 
 </head>
 <body style="background-color : #F4FFF4;">
+ <div id="user_remark" class="easyui-window" title="退货申请"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:auto;display: none;font-size: 16px;">
+            <div id="sediv" style="margin-left:20px;">
+            <div>客户订单：<input id="cusorder" value='' ></div>
+             <div>购物车ID：<input id="orid" value='' ></div>
+            <div>退货数量：<input id="number" value='' ></div>
+             <div>退货理由：<input id="returnNO" value='' ></div>      
+            </div>
+            <div style="margin:20px 0 20px 40px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton"
+                   onclick="returnNu()" style="width:80px" >提交申请</a>
+            </div>
+    </div> 
+   <!--  <div id="user_remark" class="easyui-window" title="退货申请"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:800px;height:auto;display: none;font-size: 16px;">
+            <div id="sediv" style="margin-left:20px;">
+                <table id="tabl" border="1" cellspacing="0">
+                
+               <tr >
+               <td style='width:20px'>选择</td>
+               <td>产品名</td>
+               <td>产品规格</td>
+               <td>总数量</td>
+               <td>退货原因</td>
+               <td>退货数量</td>
+               </tr>
+               </table> 
+            </div>
+            <div style="margin:20px 0 20px 40px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton"
+                   onclick="addUserRemark()" style="width:80px" >提交申请</a>部分退单选择此按钮，全单退可以使用下方按钮
+            </div>
+             <div style="margin:20px 0 20px 40px;">
+                <input class="but_color" type="button" value="整单提交" onclick="AddOll()">
+                <input type='radio' size='5' name='radioname' value='客户退单' id='c' />客户退单
+                <input type='radio' size='5' name='radioname' value='质量问题' id='c' />质量问题
+                <input type='radio' size='5' name='radioname' value='客户要求' id='c' />客户退单
+            </div>
+    </div> -->
+
 <form id="idForm" action="getOrderinfoPage.do" method="get">
 	<div align="center" >
 		
@@ -335,7 +435,10 @@ function showType(orderid){
 					<div>
 						<table width="1600px" class="altrowstable" id="alternatecolor${status.count}">
 							<tr class="someclass" ><td colspan="8"><div style="display:inline">
-							订单号:${strOrder }&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							订单号:${strOrder }&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+							
 							</div>
 							<div style="display:inline"><span style="display: none" id="${strOrder }">订单已取消</span></div>
 							</td></tr>
@@ -348,6 +451,7 @@ function showType(orderid){
 								<td width="70px"><font style="font-size : 15px;">仓库位置</font></td>
 								<td width="100px"><font style="font-size : 15px;">入库状态</font></td>
 								<td><font style="font-size : 15px;">入库备注</font></td>
+								<td width="70px"><font style="font-size : 15px;">操作</font></td>
 							</tr>
 							<c:forEach items="${oip.pagelist}" var="storageLocation" varStatus="s">
 								<c:if test="${storageLocation.orderid == strOrder}">
@@ -378,22 +482,27 @@ function showType(orderid){
 										</td>
 									   
 										<td><font style="font-size : 15px;">${storageLocation.position }</font></td>
-										<td><font style="font-size : 15px;">${storageLocation.goodstatus }</font></td>
+										<td><font style="font-size : 15px;">${storageLocation.goodstatus } </font></td>
 										<td>
+										
 												 <div style="overflow-y:scroll;height:150px;">
 													 <div class="w-font">
 														 <font style="font-size : 15px;">${storageLocation.warehouse_remark }</font>
 													 </div>
 												 </div>
+												 
 												 <div class="w-margin-top">
+												    
 												 	<input type="button" value="二次验货" class="repalyBtn" style="left:3px;" onclick="resetChecked('${storageLocation.orderid }',${storageLocation.goodid });"/>
 													 <c:if test="${storageLocation.is_refund == 0 && storageLocation.od_state == -1}">
 														 <input type="button" id="re_${storageLocation.orderid }${storageLocation.goodid }" value="退货" class="repalyBtn" style="left:3px;margin-left:380px;" onclick="refundGoods('${storageLocation.orderid }',${storageLocation.goodid });"/>
 													 </c:if>
 													<input type="button" value="回复" class="repalyBtn" onclick="doReplay(${storageLocation.user_id },'${storageLocation.orderid }',${storageLocation.goodid });"/>
-												</div>
 												
+													
+												</div>							
 										</td>
+										<td><input type="button" value="退货申请" align="center" onclick="returnNum(${storageLocation.odid},'${storageLocation.orderid }');"/></td>
 									</tr>
 								</c:if>
 							</c:forEach>        
