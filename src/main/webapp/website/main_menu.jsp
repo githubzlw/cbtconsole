@@ -129,6 +129,23 @@ function getUrlParam(url,name) {
     var r = url.match(reg); //匹配目标参数
     if (r != null) return unescape(r[2]); return null; //返回参数值
 }
+//内网外网网址 ?innerNetUrl=192.168.1.27:10013&outerNetUrl=27.115.38.42:10013
+function innerOuterNetUrl(btnUrl) {
+    //说明 数据库中存储时候默认存储内网的跳转地址，后面代码中检测到是外网的话 会用outerNetUrl替换innerNetUrl
+    if (btnUrl.indexOf("innerNetUrl=") != -1 && btnUrl.indexOf("outerNetUrl=") != -1) {
+        innerNetUrl = getUrlParam(btnUrl,"innerNetUrl"); //内网时跳转地址
+        outerNetUrl = getUrlParam(btnUrl,"outerNetUrl"); //外网时跳转地址
+        btnUrl = btnUrl.replace("&innerNetUrl=" + innerNetUrl,"").replace("innerNetUrl=" + innerNetUrl,"");
+        btnUrl = btnUrl.replace("&outerNetUrl=" + outerNetUrl,"").replace("outerNetUrl=" + outerNetUrl,"");
+        if (btnUrl.indexOf("?") + 1 == btnUrl.length) {
+            btnUrl = btnUrl.replace("?","");
+        }
+        if(location.hostname != 'localhost' && !(location.hostname.indexOf('192.168.') != -1)){
+            btnUrl = btnUrl.replace(innerNetUrl, outerNetUrl);//外网访问的，使用外网地址
+        }
+    }
+    return btnUrl;
+}
 	$(function() {
 		hideTable();
 		var json =
@@ -219,6 +236,8 @@ function getUrlParam(url,name) {
 					}
 					btnColor = "style=\"background-color: #" + btnColor + ";\""
 				}
+				//内网地址 外网地址
+                btnUrl = innerOuterNetUrl(btnUrl);
 				var content = '';
 				if (btnUrl.substring(0, 4) == "http" || btnUrl.substring(0, 3) == "ftp") {
 					content += '<td><a ' + btnColor + ' href="'+btnUrl+'" target="_blank" >';
@@ -602,7 +621,7 @@ function getUrlParam(url,name) {
 		dataType:"json",
 		success: function(msg){
 			if (msg != undefined) {
-				$("#update_file").append("<a style=\"color: black;\" target=\"_blank\" href=\"" + msg.url + "\">" + msg.authName + "</a><br />");
+				$("#update_file").append("<a style=\"color: black;\" target=\"_blank\" href=\"" + innerOuterNetUrl(msg.url) + "\">" + msg.authName + "</a><br />");
 				var regMark = /^\d{4}-\d{1,2}-\d{1,2}$/;
 				var regExpMark = new RegExp(regMark);
 				var reMarkStr = '';
