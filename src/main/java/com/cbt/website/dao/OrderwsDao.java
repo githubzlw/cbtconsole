@@ -1895,7 +1895,7 @@ public class OrderwsDao implements IOrderwsDao {
 
         String sql = "SELECT order_no,if(memberFee>=10,pay_price-memberFee,pay_price) as pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
-                +"(SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
+                +"(SELECT  ifnull(sum(amount),0)  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
                 + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
                 " FROM orderinfo o where LEFT(order_no,17) = LEFT(?,17) ";
