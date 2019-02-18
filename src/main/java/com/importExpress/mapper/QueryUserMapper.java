@@ -4,6 +4,7 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsInfoSpiderPO;
 import com.importExpress.pojo.ItemStaticFile;
 import com.importExpress.pojo.StandardGoodsFormDataPO;
+import com.importExpress.pojo.UserBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -79,4 +80,16 @@ public interface QueryUserMapper {
     List<String> queryIsEditProducts();
 
     List<String> queryInventoryProducts();
+
+    List<String> queryGoodsWeightNoSyn();
+
+    List<UserBean> queryUserList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("userType") Integer userType);
+
+    Integer queryUserListCount(@Param("userType") Integer userType);
+
+    List<String> queryUserAddressById(@Param("id") Integer id);
+
+    List<String> queryUserExById(@Param("id") Integer id);
+
+    String queryGoodsCarCount(@Param("id") Integer id);
 }

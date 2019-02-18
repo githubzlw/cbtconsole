@@ -351,4 +351,84 @@
         FROM inventory
     </select>
 
+    <!--List<String> queryGoodsWeightNoSyn();-->
+    <select id="queryGoodsWeightNoSyn" resultType="String">
+        SELECT pid
+        FROM package_goods_weight
+        WHERE del = 0 AND syn = 0
+    </select>
+
+    <!--List<UserBean> queryUserList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("userType") Integer userType);-->
+    <select id="queryUserList" resultType="com.importExpress.pojo.UserBean">
+        SELECT id, name, email, createtime, currency FROM user WHERE id IN(
+            SELECT tem.userid FROM (
+                <if test="userType == 1">
+                    SELECT DISTINCT userid FROM address
+                    WHERE userid != 0 AND userid NOT IN(
+                      SELECT DISTINCT user_id FROM orderinfo
+                    )
+                </if>
+                <if test="userType == 2">
+                    SELECT DISTINCT userid FROM user_ex
+                    WHERE (LENGTH(otheremail) > 0 OR LENGTH(otherphone) > 0 OR LENGTH(whatsapp) > 0
+                    OR LENGTH(facebook) > 0 OR LENGTH(tweater) > 0 OR LENGTH(kiki) > 0 OR LENGTH(skype) > 0)
+                    AND userid != 0 AND userid NOT IN(
+                      SELECT DISTINCT user_id FROM orderinfo
+                    )
+                </if>
+                LIMIT #{startBars}, #{rows}
+            ) tem
+        )
+    </select>
+
+    <!--Integer queryUserListCount(@Param("userType") Integer userType);-->
+    <select id="queryUserListCount" resultType="Integer">
+        <if test="userType == 1">
+            SELECT COUNT(DISTINCT userid) FROM address
+            WHERE userid != 0 AND userid NOT IN(
+                SELECT DISTINCT user_id FROM orderinfo
+            )
+        </if>
+        <if test="userType == 2">
+            SELECT COUNT(DISTINCT userid) FROM user_ex
+            WHERE (LENGTH(otheremail) > 0 OR LENGTH(otherphone) > 0 OR LENGTH(whatsapp) > 0
+            OR LENGTH(facebook) > 0 OR LENGTH(tweater) > 0 OR LENGTH(kiki) > 0 OR LENGTH(skype) > 0)
+            AND userid != 0 AND userid NOT IN(
+                SELECT DISTINCT user_id FROM orderinfo
+            )
+        </if>
+    </select>
+
+    <!--List<String> queryUserAddressById(@Param("id") Integer id);-->
+    <select id="queryUserAddressById" resultType="String">
+        SELECT CONCAT(
+        'Recipients:',IFNULL(recipients,'')
+        , '&lt;br />Street:', IFNULL(address,''), ' ', IFNULL(street,'')
+        , '&lt;br />City:', IFNULL(address2,'')
+        , '&lt;br />State:', IFNULL(statename,'')
+        , '&lt;br />Zip Code:', IFNULL(zip_code,'')
+        , '&lt;br />Phone:', IFNULL(phone_number,'')
+        ) FROM address WHERE userid = #{id}
+    </select>
+
+    <!--List<String> queryUserExById(@Param("id") Integer id);-->
+    <select id="queryUserExById" resultType="String">
+        SELECT CONCAT(
+        'Alternative Email:',IFNULL(otheremail,'')
+        , '&lt;br />Alternative Phone:', IFNULL(otherphone,'')
+        , '&lt;br />WhatsApp:', IFNULL(whatsapp,'')
+        , '&lt;br />Kik:', IFNULL(kiki,'')
+        , '&lt;br />Skype:', IFNULL(skype,'')
+        , '&lt;br />Facebook:', IFNULL(facebook,'')
+        , '&lt;br />Twitter:', IFNULL(tweater,'')
+        ) FROM user_ex WHERE userid = #{id}
+    </select>
+
+    <!--String queryGoodsCarCount(@Param("id") Integer id);-->
+    <select id="queryGoodsCarCount" resultType="String">
+        SELECT shopCarShowinfo
+    	FROM goods_carconfig
+    	WHERE userid = #{id} AND LENGTH(shopCarShowinfo) > 5
+    </select>
+
 </mapper>
