@@ -333,29 +333,6 @@
                 	var funChange = $('input[type=radio][name=funChange]:checked').val();
                     var userid = $("#adminSelect").val();
                     var trackState = $("#trackState").val();
-                    //单个订单号或运单号查询
-                    if(funChange == 2) {
-                        var orderOrTrackNo = $("#orderOrTrackNo").val();
-                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
-                        $('#main-datagrid').datagrid("load", {
-                            orderOrTrackNo: orderOrTrackNo,
-                            funChange: funChange,
-                            userid: userid
-                        });
-                        return;
-                    }
-                    //单个用户id查询
-                    if(funChange == 3) {
-                        var orderUserid = $("#orderUserid").val();
-                        //查询运单状态
-                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
-                        $('#main-datagrid').datagrid("load", {
-                            orderUserid: orderUserid,
-                            funChange: funChange,
-                            userid: userid
-                        });
-                        return;
-                    }
                     // 页数
                     var pageSize = $("#main-datagrid").datagrid("options").pageSize;
                     var pageNumber = 1;
@@ -399,6 +376,33 @@
                             userid: userid,
                             funChange: funChange
                         });
+                    }
+                    //单个订单号或运单号查询
+                    else if(funChange == 2) {
+                        var orderOrTrackNo = $("#orderOrTrackNo").val();
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            startDate: startDate,
+                            endDate: endDate,
+                            orderOrTrackNo: orderOrTrackNo,
+                            funChange: funChange,
+                            userid: userid
+                        });
+                        return;
+                    }
+                    //单个用户id查询
+                    else if(funChange == 3) {
+                        var orderUserid = $("#orderUserid").val();
+                        //查询运单状态
+                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
+                        $('#main-datagrid').datagrid("load", {
+                            startDate: startDate,
+                            endDate: endDate,
+                            orderUserid: orderUserid,
+                            funChange: funChange,
+                            userid: userid
+                        });
+                        return;
                     }
 
                 });
@@ -649,7 +653,7 @@
                     </tr>
                     <div style="clear:both"></div>
                     <tr height="30px">
-                        <td colspan="2" align="center" style="width: 154px;">
+                        <td colspan="2" align="center" style="width: 154px;background-color: #FFE4E1;">
                             <span style="float: left;line-height: 30px;">&nbsp;&nbsp;订单支付时间范围:&nbsp;&nbsp;</span>
                             <input type="radio" name="timeRange" value="1" checked="checked" style="float: left;height: 20px;" />
                             <span style="float: left;line-height: 30px;">&nbsp;范围&nbsp;&nbsp;</span>
@@ -657,24 +661,24 @@
                             <span style="float: left;line-height: 30px;">&nbsp;全部</span>
                         </td>
                         <!--<td align="center" style="width: 154px;">订单支付结束时间</td>-->
-                        <td align="center" style="width: 204px;">
+                        <td align="center" style="width: 204px;background-color: #C1FFC1;">
                         	<input type="radio" name="funChange" value="2" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单/订单/转单查询&nbsp;&nbsp;</span>
                         </td>
-                        <td align="center" style="width: 174px;">
+                        <td align="center" style="width: 174px;background-color: #C1FFC1;">
                         	<input type="radio" name="funChange" value="3" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;用户id或者邮箱&nbsp;&nbsp;</span>
                         </td>
-                        <td align="center" style="width: 184px;">
+                        <td align="center" style="width: 184px;background-color: #C1FFC1;">
                         	<input type="radio" name="funChange" value="0" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单状态&nbsp;&nbsp;</span>
                         </td>
-                        <td align="center" style="width: 184px;">
+                        <td align="center" style="width: 184px;background-color: #C1FFC1;">
                         	<input type="radio" name="funChange" value="1" checked="checked" style="float: left;height: 20px;" />
                         	<span style="float: left;line-height: 30px;">&nbsp;运单预警&nbsp;&nbsp;</span>
                         </td>
-                        <td align="center" style="width: 224px;">
-                        	<span style="float: left;line-height: 30px;">&nbsp;负责人(与左侧条件组合查询)&nbsp;&nbsp;</span>
+                        <td align="center" style="width: 224px;background-color: #76EEC6;">
+                        	<span style="float: left;line-height: 30px;">&nbsp;负责人&nbsp;&nbsp;</span>
                         </td>
                         <td style="width: 100px;"><!--重置按钮--></td>
                         <td style="width: 56px;"><!--查询按钮--></td>

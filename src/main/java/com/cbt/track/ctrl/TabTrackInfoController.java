@@ -87,6 +87,15 @@ public class TabTrackInfoController {
         if (StringUtils.isNotBlank(useridStr) && !"0".equals(useridStr)) {
             userid = Integer.valueOf(useridStr);
         }
+        //查询时间范围参数接收
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        if (!"".equals(startDate)) {
+            startDate += " 00:00";
+        }
+        if (!"".equals(endDate)) {
+            endDate += " 23:59";
+        }
 
         //查询结果
         Map<String, Object> map = null;
@@ -100,7 +109,7 @@ public class TabTrackInfoController {
                 json.setSuccess(false);
                 return json;
             }
-            map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo, userid);
+            map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo, userid, startDate, endDate);
         } else if (funChange == 3) {
             // 3-根据用户id查询
             // 获取参数
@@ -111,7 +120,7 @@ public class TabTrackInfoController {
                 json.setSuccess(false);
                 return json;
             }
-            map = tabTrackInfoService.getRecordListByUserid(orderUserid, userid);
+            map = tabTrackInfoService.getRecordListByUserid(orderUserid, userid, startDate, endDate);
         } else {
             //分页参数接收并处理
             String rowsStr = request.getParameter("rows");
@@ -123,15 +132,6 @@ public class TabTrackInfoController {
             Integer page = 1;
             if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
                 page = Integer.valueOf(pageStr);//无该参数时查询默认值1
-            }
-            //查询时间范围参数接收
-            String startDate = request.getParameter("startDate");
-            String endDate = request.getParameter("endDate");
-            if (!"".equals(startDate)) {
-                startDate += " 00:00";
-            }
-            if (!"".equals(endDate)) {
-                endDate += " 23:59";
             }
             if (funChange == 0) {
                 // 查询运单状态
