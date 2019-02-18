@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.LookReturnOrderMapper" >
+    <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.Returndetails" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="cusorder" property="cusorder" jdbcType="VARCHAR" />
+        <result column="purNum" property="purNum" jdbcType="INTEGER" />
+        <result column="tborder" property="tborder" jdbcType="VARCHAR" />
+        <result column="purSou" property="purSou" jdbcType="NUMERIC" />
+        <result column="waybill" property="waybill" jdbcType="VARCHAR" />
+        <result column="purManey" property="purManey" jdbcType="NUMERIC" />
+        <result column="returnOrder" property="returnOrder" jdbcType="VARCHAR" />
+        <result column="warehouse" property="warehouse" jdbcType="VARCHAR" />
+        <result column="returnNum" property="returnNum" jdbcType="INTEGER" />
+        <result column="returnMoney" property="returnMoney" jdbcType="NUMERIC" />
+        <result column="ordeerPeo" property="ordeerPeo" jdbcType="VARCHAR" />  
+        <result column="orderSale" property="orderSale" jdbcType="VARCHAR" /> 
+        <result column="returnApply" property="returnApply" jdbcType="VARCHAR" /> 
+        <result column="returnReason" property="returnReason" jdbcType="VARCHAR" /> 
+        <result column="placeDate" property="placeDate" jdbcType="TIMESTAMP" />   
+        <result column="deliveryDate" property="deliveryDate" jdbcType="TIMESTAMP" /> 
+         <result column="returnState" property="returnState" jdbcType="VARCHAR" /> 
+    </resultMap>
+   
+	<select id="SelectReturnOrder" resultType="com.cbt.warehouse.pojo.Returndetails" >
+		SELECT cusorder,purNum,returndate,tborder,purSou,waybill,purManey,returnState,returnOrder,warehouse,returnNum,returnMoney,ordeerPeo,orderSale,returnApply,returnReason,placeDate,deliveryDate
+from return_details as rd where 1=1
+     <if test="admuserid != null">
+			 AND rd.ordeerPeo=#{admuserid} 
+	</if>
+	<if test="returnState != null">
+			 AND rd.returnState=#{returnState} 
+	</if>
+	
+	 <if test="orderNum != null">
+			 AND rd.returnState=#{orderNum} 
+	</if>
+	<if test="returnState == null">
+			 AND rd.returnState !="退货申请" 
+	</if>
+	GROUP BY rd.cusorder
+		limit #{page},50
+	</select>
+	<select id="countPage" resultType="java.lang.Integer" >
+		SELECT count(distinct cusorder) 
+from return_details as rd where 1=1
+     <if test="admuserid != null">
+			 AND rd.ordeerPeo=#{admuserid} 
+	</if>
+	<if test="state != null">
+			 AND rd.returnState=#{state} 
+	</if>
+	
+	 <if test="orderNum != null">
+			 AND rd.returnState=#{orderNum} 
+	</if>
+	<if test="state == null">
+			 AND rd.returnState !="退货申请" 
+	</if>
+	</select>
+</mapper>
