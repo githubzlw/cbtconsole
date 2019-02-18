@@ -364,7 +364,7 @@ public class RefundController {
             }
 
             String secvlidPwd = request.getParameter("secvlidPwd");
-            if (actionFlag > 1 && StringUtils.isBlank(secvlidPwd)) {
+            if (actionFlag > 1 && StringUtils.isBlank(secvlidPwd) && user.getId() > 1) {
                 json.setOk(false);
                 json.setMessage("获取密码失败,请重试");
                 return json;
