@@ -289,13 +289,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     }else{
                         //1MOQ太高  2水印太多  3不适合运输的产品 4其他
                         if(errorFlag == 1){
-                            su.setInputShopDescription("MOQ太高");
+                            su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>MOQ太高</b>");
                         }else if(errorFlag == 2){
-                            su.setInputShopDescription("水印太多");
+                            su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>水印太多</b>");
                         }else if(errorFlag == 3){
-                            su.setInputShopDescription("不适合运输");
+                            su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>不适合运输</b>");
                         }else if(errorFlag == 4){
-                            su.setInputShopDescription("其他问题");
+                            su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>其他问题</b>");
                         }
                     }
 
@@ -311,11 +311,11 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 }else if(shopType == 1){
                     stateInfo += "<button class=\"remark_color\" onclick=\"setShopType('" + su.getShopId()
                             + "',2)\">侵权店铺</button>";
-                    su.setInputShopDescription("精品店铺");
+                    su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>精品店铺</b>");
                 }else if(shopType == 2){
                     stateInfo += "<button class=\"but_color\" onclick=\"setShopType('" + su.getShopId()
                             + "',1)\">精品店铺</button>";
-                    su.setInputShopDescription("侵权店铺");
+                    su.setInputShopDescription(su.getInputShopDescription() + "<br><b style='color:red;'>侵权店铺</b>");
                 }
                 int queryAuthorizedFlag = rs.getInt("authorized_flag");
                 /*if(queryAuthorizedFlag < 1){
@@ -630,12 +630,10 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             }
 
             String sql3 = "replace into shop_description(shop_id,input_shop_description) values(?,?) ";
-            if (!org.springframework.util.StringUtils.isEmpty(su.getInputShopDescription())) {
-                stmt1 = conn1.prepareStatement(sql3);
-                stmt1.setString(1, su.getShopId());
-                stmt1.setString(2, su.getInputShopDescription());
-                stmt1.executeUpdate();
-            }
+            stmt1 = conn1.prepareStatement(sql3);
+            stmt1.setString(1, su.getShopId());
+            stmt1.setString(2, StringUtils.isBlank(su.getInputShopDescription()) ? "" : su.getInputShopDescription());
+            stmt1.executeUpdate();
 
         } catch (Exception e) {
             e.printStackTrace();
