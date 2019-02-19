@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.beust.jcommander.Parameter;
 import com.cbt.pojo.Admuser;
 import com.cbt.warehouse.pojo.returnbill;
 import com.cbt.warehouse.pojo.returndisplay;
