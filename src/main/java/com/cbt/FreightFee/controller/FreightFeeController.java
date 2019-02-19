@@ -86,6 +86,12 @@ public class FreightFeeController {
 		return df.format(freightFee);
 	}
 
+	/**
+	 * 更新某个时间段的预估运费，手动调用接口
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("updateFee")
 	public String updateFee(HttpServletRequest request, HttpServletResponse response) {
 		List<Map<String, Object>> list = freightFeeSerive.getShippingInfo();
