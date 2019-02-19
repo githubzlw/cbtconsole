@@ -989,7 +989,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         String selectSql = "select a.goods_pid,a.kj_local_path,a.kj_remote_path,a.kj_eninfo,a.pic as main_img," +
                 "a.pics as imgs,a.is_pass,a.is_update,a.catid,b.`name` as category_name,a.shop_id,a.set_main_img," +
-                "ifnull(c.main_img,'') as shop_main_img " +
+                "'' as shop_main_img " +
                 "from kj_single_goods_offers a LEFT JOIN 1688_category b on a.catid = b.category_id " +
                 " left join kj_single_shop_offers c on a.shop_id = c.shop_id " +
                 "where  a.kj_unzip_flag = 1 and a.crawl_flag =2 ";

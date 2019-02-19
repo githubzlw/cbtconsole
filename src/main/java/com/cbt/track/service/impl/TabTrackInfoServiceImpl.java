@@ -71,10 +71,10 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 
 
     @Override
-    public Map<String, Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByOrderOrTrackNo("%" + orderOrTrackNo + "%", "%" + orderOrTrackNo + "%", userid);
+    public Map<String, Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid, String startDate, String endDate) {
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByOrderOrTrackNo("%" + orderOrTrackNo + "%", "%" + orderOrTrackNo + "%", userid, startDate, endDate);
         //通过转单运单查询
-    	List<TabTrackInfo> list2 = tabTrackInfoMapping.getForwardListByTrackNo("%" + orderOrTrackNo + "%", userid);
+    	List<TabTrackInfo> list2 = tabTrackInfoMapping.getForwardListByTrackNo("%" + orderOrTrackNo + "%", userid, startDate, endDate);
     	if(null != list2 && list2.size() > 0){
     		list.addAll(list2);
     	}
@@ -103,8 +103,8 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
     }
 
     @Override
-    public Map<String, Object> getRecordListByUserid(String orderUserid, Integer userid) {
-        List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByUserid(orderUserid, userid);
+    public Map<String, Object> getRecordListByUserid(String orderUserid, Integer userid, String startDate, String endDate) {
+        List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByUserid(orderUserid, userid, startDate, endDate);
 
         Map<String,Object> map = new HashMap<String, Object>();
         if (list != null && list.size() > 0) {

@@ -152,7 +152,7 @@ public interface IPictureComparisonDao {
 
 	public List<GoodsCheckBean> findYLGoodsDataCheck(int selled, String cid, String categoryId1, int start, int end);
 
-	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int end);
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int end, int valid);
 
 	public List<GoodsCheckBean> findSamplInfo(int selled, String cid, String categoryId1, int start, int end);
 

@@ -16,9 +16,9 @@ public interface TabTrackInfoService {
 
 //    List<TabTrackInfo> queryOrderNo();
 
-    Map<String,Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid);
+    Map<String,Object> getRecordListByOrderOrTrackNo(String orderOrTrackNo, Integer userid, String startDate, String endDate);
 
-    Map<String,Object> getRecordListByUserid(String orderUserid, Integer userid);
+    Map<String,Object> getRecordListByUserid(String orderUserid, Integer userid, String startDate, String endDate);
 
     boolean updatestate(TabTrackInfo tabTrackInfo);
 

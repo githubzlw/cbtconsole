@@ -22,6 +22,7 @@ import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.QualityResult;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
+import com.importExpress.pojo.GoodsCarActiveSimplBean;
 import com.importExpress.service.impl.SendMQServiceImpl;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -1895,7 +1896,7 @@ public class OrderwsDao implements IOrderwsDao {
 
         String sql = "SELECT order_no,if(memberFee>=10,pay_price-memberFee,pay_price) as pay_price ,foreign_freight ,product_cost ,actual_allincost ,"
                 + "pay_price_tow ,pay_price_three ,remaining_price ,currency,actual_ffreight,"
-                +"(SELECT  amount  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
+                +"(SELECT  ifnull(sum(amount),0)  FROM tab_coupon_use_record WHERE  order_no=o.order_no AND state=1) as couponAmount,"
                 + "coupon_discount,extra_discount,grade_discount,share_discount,discount_amount,cashback, "
                 + "service_fee,extra_freight,firstdiscount,vatbalance,actual_freight_c,processingfee,actual_lwh,memberFee" +
                 " FROM orderinfo o where LEFT(order_no,17) = LEFT(?,17) ";
@@ -7073,10 +7074,7 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and createtime <= '" + endDate + "'";
         }
-        sql += " and id not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')";
+        sql += " and id not in(select id from `user` where  is_test = 1)";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7109,21 +7107,18 @@ public class OrderwsDao implements IOrderwsDao {
     public List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate, String endDate, int startNum,
                                                               int offSet) {
 
-        Connection conn = DBHelper.getInstance().getConnection2();
+        Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
         ResultSet rs = null;
         Statement stmt = null;
-        String sql = "select a.*,b.shopCarShowinfo from (select id,email,createtime from user where 1=1 ";
+        String sql = "select a.*,b.buyForMeCarConfig from (select id,email,createtime from user where 1=1 ";
         if (StringUtil.isNotBlank(beginDate)) {
             sql += " and createtime >= '" + beginDate + "'";
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and createtime <= '" + endDate + "'";
         }
-        sql += " and id not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')";
+        sql += " and id not in(select id from `user` where  is_test = 1)";
         sql += ") a left join goods_carconfig b on a.id = b.userid and b.userid > 0 ";
         sql += " order by a.createtime desc";
         if (offSet > 0) {
@@ -7137,32 +7132,19 @@ public class OrderwsDao implements IOrderwsDao {
                 bhDtl.setUserId(rs.getInt("id"));
                 bhDtl.setEmail(rs.getString("email"));
                 bhDtl.setCreateTime(rs.getString("createtime"));
-                String carStr = rs.getString("shopCarShowinfo");
+                String carStr = rs.getString("buyForMeCarConfig");
                 if(org.apache.commons.lang3.StringUtils.isNotBlank(carStr)){
-                    List<GoodsCarBean> list_active = (List<GoodsCarBean>) JSONArray.toCollection(JSONArray.fromObject(carStr),GoodsCarBean.class);
-                    bhDtl.setCarNum(list_active.size());
-                    list_active.clear();
-                    list_active = null;
+                    List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carStr), GoodsCarActiveSimplBean.class);
+                    bhDtl.setCarNum(listActive.size());
+                    listActive.clear();
                 }
                 list.add(bhDtl);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -7183,10 +7165,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and createtime <= '" + beginDate + "'";
         }
         sql += ") GROUP BY userid) a "
-                + "where a.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')";
+                + "where a.userid not in(select id from `user` where  is_test = 1)";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7233,10 +7212,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and createtime <= '" + beginDate + "'";
         }
         sql += ") GROUP BY userid ) a,user b "
-                + "where a.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com') and a.userid = b.id";
+                + "where a.userid not in(select id from `user` where  is_test = 1) and a.userid = b.id";
         sql += " order by a.createtime desc";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
@@ -7381,10 +7357,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and datatime <= '" + endDate + "'";
         }
         sql += " group by userid) as b "
-                + " where b.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')";
+                + " where b.userid not in(select id from `user` where  is_test = 1)";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7430,10 +7403,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and datatime <= '" + endDate + "'";
         }
         sql += " group by userid) as b,user c "
-                + " where b.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com') and b.userid = c.id ";
+                + " where b.userid not in(select id from `user` where  is_test = 1) and b.userid = c.id ";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
         }
@@ -7482,10 +7452,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and datatime <= '" + endDate + "'";
         }
         sql += " group by userid) as b "
-                + " where b.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')" +
+                + " where b.userid not in(select id from `user` where  is_test = 1)" +
                 " and b.userid in(select user_id from orderinfo where create_time <= '" + endDate + "'"
                 + "group by user_id) and b.userid in(select user_id from orderinfo where create_time <= '" + endDate + "'"
                 + " group by user_id having count(user_id) > 1)";
@@ -7534,10 +7501,7 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and datatime <= '" + endDate + "'";
         }
         sql += " group by userid) as b,user c "
-                + " where b.userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')"
+                + " where b.userid not in(select id from `user` where  is_test = 1)"
                 + " and b.userid = c.id and b.userid in(select user_id from orderinfo where create_time <= '" + endDate + "'" +
                 " group by user_id having count(user_id) > 1)";
         if (offSet > 0) {
@@ -7587,11 +7551,8 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and create_time <= '" + endDate + "'";
         }
-        sql += " and LENGTH(order_no) = 16  group by user_id) a  "
-                + " where a.user_id not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')";
+        sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10) group by user_id) a  "
+                + " where a.user_id not in(select id from `user` where  is_test = 1)";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7636,11 +7597,8 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and create_time <= '" + endDate + "'";
         }
-        sql += " and LENGTH(order_no) = 16  group by user_id) a,user b  "
-                + " where a.user_id not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com') and a.user_id = b.id";
+        sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10)  group by user_id) a,user b  "
+                + " where a.user_id not in(select id from `user` where  is_test = 1) and a.user_id = b.id";
         sql += " order by a.create_time desc";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
@@ -7689,20 +7647,14 @@ public class OrderwsDao implements IOrderwsDao {
                 " create_time< '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where  " +
                 " create_time< '" + beginDate + "' and state in(1,2,3,4,5)) " +
-                " and user_id not in (select id from `user` where email like 'test%' " +
-                " or email like '%qq.com' or email like '%163.com' or email like '%ww.com' or email like 'rlef%' or email = 'undefined' " +
-                " or email like 'asdf%'  or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' " +
-                " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')" +
+                " and user_id not in (select id from `user` where  is_test = 1)" +
                 " group by user_id) a";*/
         String sql = "select count(0) from (select user_id from orderinfo where " +
                 " orderpaytime >= '" + beginDate + "' and " +
                 " orderpaytime <= '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where  " +
                 " orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5)) " +
-                " and user_id not in (select id from `user` where email like 'test%' " +
-                " or email like '%qq.com' or email like '%163.com' or email like '%ww.com' or email like 'rlef%' or email = 'undefined' " +
-                " or email like 'asdf%'  or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' " +
-                " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')" +
+                " and user_id not in (select id from `user` where  is_test = 1)" +
                 " group by user_id) a";
         int res = 0;
         try {
@@ -7746,10 +7698,7 @@ public class OrderwsDao implements IOrderwsDao {
                 " orderpaytime< '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where " +
                 " orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5))" +
-                " and user_id not in (select id from `user` where email like 'test%' " +
-                " or email like '%qq.com' or email like '%163.com' or email like '%ww.com' or email like 'rlef%' or email = 'undefined' " +
-                " or email like 'asdf%'  or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' " +
-                " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com')" +
+                " and user_id not in (select id from `user` where  is_test = 1)" +
                 " group by user_id) a, user b where a.user_id = b.id";
         sql += " order by a.create_time desc";
         if (offSet > 0) {
@@ -7843,11 +7792,8 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and view_date_day <= '" + endDate + "'";
         }
-        sql += " and (action ='pay' or action ='1,pay for product|Pay for all') "
-                + " and userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com') group by userid)a";
+        sql += " and (action ='pay' or action ='1,pay for product|Pay for all' or action='Pay Now paypal' or action='Pay Now stripe') "
+                + " and userid not in(select id from `user` where is_test = 1) group by userid)a";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7978,11 +7924,8 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and view_date_day <= '" + endDate + "'";
         }
-        sql += " and (action ='pay' or action ='1,pay for product|Pay for all') "
-                + " and userid not in(select id from `user` where email like 'test%' or email like '%qq.com' or email like '%163.com'"
-                + " or email like '%ww.com' or email like 'rlef%' or email = 'undefined' or email like 'asdf%' "
-                + " or email like 'importexpress@%' or email like 'ling@tes%' or email like '%@qq.com%' or email like '%@test%' "
-                + " or email like 'eee@%' or email like 'ceshi@%' or email like '%www@%' or email like '%aaaa@%' or email like '%@import-express.com') group by userid)a,user b "
+        sql += " and (action ='pay' or action ='1,pay for product|Pay for all' or action='Pay Now paypal' or action='Pay Now stripe') "
+                + " and userid not in(select id from `user` where  is_test = 1) group by userid)a,user b "
                 + " where a.userid = b.id";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
