@@ -103,8 +103,7 @@ public class DBHelper {
         dataSource = new DruidDataSource();
 
         dataSource.setDriverClassName(p.getProperty("driver"));
-        dataSource.setUrl(p.getProperty("url")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource.setUrl(p.getProperty("url"));
         dataSource.setUsername(p.getProperty("userName"));
         dataSource.setPassword(p.getProperty("userPass"));
         dataSource.setInitialSize(30);
@@ -133,8 +132,7 @@ public class DBHelper {
         dataSource2 = new ComboPooledDataSource();
         dataSource2.setUser(p.getProperty("userName127hop"));
         dataSource2.setPassword(p.getProperty("userPass127hop"));
-        dataSource2.setJdbcUrl(p.getProperty("url127hop")
-                + "?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useCompression=true&allowMultiQueries=true");
+        dataSource2.setJdbcUrl(p.getProperty("url127hop"));
         dataSource2.setDriverClass(p.getProperty("driver"));
         dataSource2.setInitialPoolSize(20);
         dataSource2.setMinPoolSize(10);

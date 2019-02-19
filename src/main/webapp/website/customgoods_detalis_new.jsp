@@ -968,10 +968,10 @@
                 success: function (data) {
                     var json = eval('(' + data + ')');
                     if(json.ok){
-                        showMessage("添加评论成功；2秒后刷新页面");
+                        showMessage("添加评论成功；1秒后刷新页面");
                         setTimeout(function () {
                             window.location.reload();
-                        }, 2000);
+                        }, 800);
                     }else{
                         showMessage("添加评论失败");
                     }
