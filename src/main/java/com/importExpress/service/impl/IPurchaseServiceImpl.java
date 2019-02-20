@@ -21,7 +21,7 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
 import com.cbt.warehouse.pojo.OrderInfoCountPojo;
@@ -78,7 +78,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	@Autowired
-	private IWarehouseDao dao;
+	private WarehouseMapper dao;
 	int total;
 	int goodsnum = 0;
 

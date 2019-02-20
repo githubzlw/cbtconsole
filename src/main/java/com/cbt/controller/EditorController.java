@@ -800,9 +800,9 @@ public class EditorController {
                 mainImg = mainImg.replace(orGoods.getRemotpath(),"");
                 // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
                 if(mainImg.contains(".60x60")){
-                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
+                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220").replace(orGoods.getRemotpath(),""));
                 }else if(mainImg.contains(".400x400")){
-                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
+                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220").replace(orGoods.getRemotpath(),""));
                 }
                 cgp.setShowMainImage(mainImg);
                 cgp.setIsUpdateImg(2);
@@ -824,12 +824,6 @@ public class EditorController {
             if (success > 0) {
                 customGoodsService.insertIntoGoodsEditBean(editBean);
                 //更新编辑标识
-                /*int isExists = customGoodsService.checkIsEditedByPid(cgp.getPid());
-                if(isExists > 0){
-                    customGoodsService.updatePidIsEdited(cgp.getPid(),user.getId());
-                }else{
-                    customGoodsService.insertPidIsEdited(orGoods.getShopId(),cgp.getPid(),user.getId());
-                }*/
                 editBean.setIs_edited(1);
                 editBean.setPublish_flag(0);
                 customGoodsService.updatePidIsEdited(editBean);
