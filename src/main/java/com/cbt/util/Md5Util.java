@@ -92,6 +92,8 @@ public class Md5Util {
 	
 	public static void main(String []args)
 	{
+
+		System.err.println(md5Operation("123"));
 		//13807097153c511fc195da484ab4f478
 		//System.out.println(Md5Util.encoder("a200792968043de41aefee5bfbd4f9ed#f14edcc15be6f8d3673c4431a40f2769"));
 	}
