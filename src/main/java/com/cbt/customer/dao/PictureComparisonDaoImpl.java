@@ -3232,7 +3232,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   sql =sql+" and a.create_time <= '"+timeTo+"' ";
 		   }
 		   if (valid==10) {
-			    sql = "select count(1) as maxCount from error_info a ";
+			    sql = "select count(distinct a.url) as maxCount from error_info a ";
 			   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
 			   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
 			   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
