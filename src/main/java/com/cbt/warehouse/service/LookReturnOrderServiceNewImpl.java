@@ -29,7 +29,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		String nameString=null;
-		if ("".equals(applyUser)||"全部".equals(applyUser)) {
+		if ("".equals(applyUser)||"全部".equals(applyUser)||"-1".equals(applyUser)) {
 			nameString=null;
 		}else {
 			Admuser us=this.lookReturnOrderServiceNewMapper.findUserName(applyUser);
