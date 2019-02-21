@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.ZoneBean;
@@ -36,7 +35,7 @@ import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.*;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.service.IWarehouseService;
@@ -63,7 +62,6 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
@@ -72,13 +70,7 @@ import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -146,7 +138,7 @@ public class WarehouseCtrl {
 	@Autowired
 	private IWarehouseService iWarehouseService;
 	@Autowired
-	private IWarehouseDao dao;
+	private WarehouseMapper dao;
 	@Autowired
 	private GeneralReportService generalReportService;
 	@Autowired

@@ -3,7 +3,7 @@ package com.cbt.warehouse.service;
 import com.cbt.bean.*;
 import com.cbt.pojo.page.Page;
 import com.cbt.userinfo.dao.UserMapper;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.dao.InquiryMapper;
 import com.cbt.warehouse.dao.OrderMapper;
 import com.cbt.warehouse.dao.SpiderMapper;
@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
 	private SpiderMapper spiderMapper;
 	
 	@Autowired
-	private IWarehouseDao dao;
+	private WarehouseMapper dao;
 	@Override
 	public List<OrderBean> getOrders(int userID, int state, int startpage,String orderNo,String timeFrom,String timeTo) {
 		return orderMapper.getOrders(userID, state, (startpage - 1) * 8, 8,orderNo,timeFrom,timeTo);
