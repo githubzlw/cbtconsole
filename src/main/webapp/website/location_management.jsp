@@ -72,6 +72,9 @@ table.imagetable td {
 	border: 1px #aaa solid;
 	color: #fff;
 }
+
+.window, .window-shadow {
+    position: fixed;}
 </style>
 <%
 String orderid=request.getParameter("orderid");
@@ -204,7 +207,7 @@ function getItem() {
             if(msg != undefined){
                 var temHtml = '';
                 document.getElementById("tabl").innerHTML='';
-                $("#tabl").append("<tr ><td style='width:20px'>选择</td><td>产品名</td><td>产品规格</td><td>总数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $("#tabl").append("<tr ><td style='width:20px'>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
                 $(msg.rows).each(function (index, item) {
                 	
                  	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' style='width:20px' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
@@ -234,7 +237,7 @@ function returnOr(uid) {
                 $("#cuso").html("");
                 $("#cuso").append(msg.rows1[0].customerorder);
                 document.getElementById("tabl").innerHTML='';
-                $("#tabl").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>总数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $("#tabl").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
                 $(msg.rows).each(function (index, item) {
                 	
                  	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
@@ -268,9 +271,9 @@ function AddOll() {
 			cusorder:cusorder,tbOrder:tbOrder,returnNO:returnNO
 		}, function(res) {
 			if(res.rows == 1){
-				$.messager.alert('提示','修改成功');
+				alert('修改成功');
 			}else{
-				$.messager.alert('提示','不可重复退单');
+				alert('不可重复退单');
 			}
 			
 			getItem();
@@ -304,7 +307,7 @@ function checkboxOnclick(checkbox){
                <td style='width:20px'>选择</td>
                <td>产品名</td>
                <td>产品规格</td>
-               <td>总数量</td>
+               <td>可退数量</td>
                <td>退货原因</td>
                <td>退货数量</td>
                </tr>
@@ -393,16 +396,19 @@ function addUserRemark() {
     	 cusOrder:g
 		}, function(res) {
 			if(res.rows == 1){
-				$.messager.alert('提示','修改成功');
+				alert('修改成功');
+				
 			}else if(res.rows==0){
-				$.messager.alert('提示','不可重复退单');
+				alert('不可重复退单');
 			}else if(res.rows==2){
-				$.messager.alert('提示','请勾选要退的商品');
+				alert('请勾选要退的商品');
 			}else if(res.rows==3){
-				$.messager.alert('提示','请填写数据');
+				alert('请填写数据');
 			}
 			else if(res.rows==4){
-				$.messager.alert('提示','退货数量不能大于总数量');
+				alert('退货数量不能大于可退数量');
+			}else if(res.rows==5){
+				alert('该商品已全部退货');
 			}
 						
 });            

@@ -155,7 +155,9 @@ p.thicker {font-weight: 900}
 .repalyDiv{width: 500px;background: #34db51;text-align: center;position: fixed;left: 40%;top: 43%;}
 .repalyBtn:hover{opacity: 1;}
 .w-margin-top{margin-top:40px;}
-
+.window, .window-shadow {
+    position: fixed;}
+</style>
 </style>
 <script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
 
@@ -279,13 +281,25 @@ function returnNu(orid,cusorder ) {
 	              var number =$(" #number ").val()
 	              var orid =$(" #orid ").val()
 	              var returnNO =$(" #returnNO ").val()
+	              var retur =$(" #reNum ").val()
+	              if(number > retur){
+	            	  alert('不可超过可退数量');  
+	            	  return;
+	              }
+	              if(returnNO==""||number==""){
+	            	  alert('请填写数据');  
+	              }
 				  $.post("/cbtconsole/Look/AddOrder", {
 						orid:orid,number:number,cusorder:cusorder,returnNO:returnNO
 					}, function(res) {
 						if(res.rows == 1){
-							$.messager.alert('提示','修改成功');
-						}else{
-							$.messager.alert('提示','不可重复退单');
+							alert('修改成功');
+						}else if(res.rows == 3){
+							alert('请填写数据');
+							return;
+						}
+						else{
+							alert('不可重复退单');
 						}
 						 $('#user_remark').window('close');	
 					
@@ -306,45 +320,38 @@ function returnOr(str){
 
 }
  function returnNum(orid,cusorder) {
-	document.getElementById('cusorder').value=cusorder;
-	document.getElementById('orid').value=orid;
-	     $('#user_remark').window('open');         
+	 $.ajax({
+	        type: "POST",
+	        url: "/cbtconsole/Look/getAllOrderByOrid",
+	        data: {orid:orid},
+	        dataType:"json",
+	        success: function(msg){
+	            if(msg.rows == 1){
+	            	alert('该订单已经全部退货');
+	            }else if(msg.rows == 2){
+	            	alert('该订单不存在于1688');
+	            }
+	            else {
+	            	document.getElementById('cusorder').value=cusorder;
+	            	document.getElementById('orid').value=orid;
+	            	document.getElementById('reNum').value=msg.rows.itemNumber;
+	            	$('#user_remark').window('open');         
+	            }
+	           
+	        }
+	    });
 } 
-/* function returnNum(orid,cusorder) {
-    $('#user_remark .remark_list').html('');
-    $('#new_user_remark').val('');
-    //查询历史备注信息
-    $.ajax({
-        type: "POST",
-        url: "/cbtconsole/Look/getAllOrderByitem",
-        data: {cusOrder:cusorder,orid:orid},
-        dataType:"json",
-        success: function(msg){
-            if(msg != undefined){
-                var temHtml = '';
-                document.getElementById("tabl").innerHTML='';
-                $("table").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>总数量</td><td>退货原因</td><td>退货数量</td></tr>");
-                $(msg.rows).each(function (index, item) {
-                	
-                 	$("table").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
-                                
-                });
-                $('#user_remark .remark_list').html(temHtml);
-            }
-            $('#user_remark').window('open');
-        }
-    });
-} */
 </script>
 
 </head>
 <body style="background-color : #F4FFF4;">
  <div id="user_remark" class="easyui-window" title="退货申请"
-         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true,"
          style="width:400px;height:auto;display: none;font-size: 16px;">
             <div id="sediv" style="margin-left:20px;">
             <div>客户订单：<input id="cusorder" value='' ></div>
              <div>购物车ID：<input id="orid" value='' ></div>
+             <div>可退数量：<input id="reNum" value=''></div>
             <div>退货数量：<input id="number" value='' ></div>
              <div>退货理由：<input id="returnNO" value='' ></div>      
             </div>

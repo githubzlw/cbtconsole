@@ -64,6 +64,12 @@ public interface LookReturnOrderServiceNewMapper {
 	Admuser findUserName(@Param("applyUser")String applyUser);
     @Select("SELECT odid as item FROM id_relationtable WHERE orderid=#{cusorder}")
 	List<returndisplay> FindOdid(@Param("cusorder")String cusorder);
+	@Update("UPDATE return_display SET state=1 WHERE id=#{ship} and state=0")
+	void UpdaeReturnOrderBy1(int ship);
+    @Select("SELECT SUM(return_number)AS returnNumber,item_number as itemNumber FROM return_display WHERE tb_id=#{tbId}")
+    returndisplay Finditnum(@Param("tbId")String tbId);
+    @Select("SELECT yourorder AS itemNumber FROM order_details WHERE id=#{orid}")
+	returndisplay FindOrderdetailsByOrid(@Param("orid")int orid);
 
 	
 }

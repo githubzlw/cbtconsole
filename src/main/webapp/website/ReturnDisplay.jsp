@@ -265,7 +265,7 @@ function returnOr(cusorder){
 		<table class="easyui-datagrid" id="easyui-datagrid"   style="width:1200px;height:900px">
 		<thead>	
 			<tr>
-				<th data-options="field:'customerorder',width:25,align:'center'">客户ID</th>
+				<th data-options="field:'customerorder',width:25,align:'center'">客户订单</th>
 				<th data-options="field:'sellerpeo',width:50,align:'center'">1688卖家信息</th>
 				<th data-options="field:'orderInfo',width:50,align:'center'">1688订单信息</th>
 				<th data-options="field:'item',width:30,align:'center'">商品ID</th>
