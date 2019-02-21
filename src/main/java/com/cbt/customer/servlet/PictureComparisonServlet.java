@@ -860,7 +860,7 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("gbbs", goodsCheckBeans);
 
 		//总条数 批量筛选用
-		int goodsCheckCount = ips.getErrorInfoCount(userId,timeFrom,timeTo);
+		int goodsCheckCount = ips.getErrorInfoCount(userId,timeFrom,timeTo,valid);
 		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
 		request.setAttribute("cid", cid);
 		request.setAttribute("categoryId", categoryId);
