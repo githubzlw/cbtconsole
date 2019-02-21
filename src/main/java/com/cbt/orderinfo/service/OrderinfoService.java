@@ -13,7 +13,7 @@ import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.util.DoubleUtil;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
 import com.cbt.website.bean.*;
@@ -43,7 +43,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Autowired
 	private OrderinfoMapper dao;
 	@Autowired
-	private IWarehouseDao iWarehouseDao;
+	private WarehouseMapper warehouseMapper;
 
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
@@ -460,14 +460,14 @@ public class OrderinfoService implements IOrderinfoService {
 					check="采购已对该商品授权";
 				}else if("2".equals(authorized_flag)){
 					//查询上一次该商品发货的订单信息
-					check=iWarehouseDao.getBatckInfo(goods_pid);
+					check= warehouseMapper.getBatckInfo(goods_pid);
 				}
 				check=StringUtil.isBlank(check)?"-":check;
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
-                SearchResultInfo weightAndSyn = iWarehouseDao.getGoodsWeight(map.get("goods_pid"));
+                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(map.get("goods_pid"));
                 if (null != weightAndSyn){
                     searchresultinfo.setWeight(weightAndSyn.getWeight());
                     searchresultinfo.setSyn(weightAndSyn.getSyn());
@@ -1298,10 +1298,10 @@ public class OrderinfoService implements IOrderinfoService {
 			int cg=pruchaseMapper.getPurchaseCount(orderNo,"1");//采购总数
 			int rk=pruchaseMapper.getStorageCount(orderNo,"1");//入库总数
 			//判断该用户是否为黑名单
-			int backList=iWarehouseDao.getBackList(ob.getUserEmail());
+			int backList= warehouseMapper.getBackList(ob.getUserEmail());
 			int payBackList=0;
 			if(StringUtil.isNotBlank(ob.getPayUserName())){
-				payBackList=iWarehouseDao.getPayBackList(ob.getPayUserName());
+				payBackList= warehouseMapper.getPayBackList(ob.getPayUserName());
 			}
 			String backFlag="";
 			if(backList>0 || payBackList>0){
