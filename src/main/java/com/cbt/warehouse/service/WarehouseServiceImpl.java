@@ -10,19 +10,15 @@ import com.cbt.pojo.*;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Util;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.Utility;
 import com.cbt.website.bean.*;
-import com.cbt.website.dao.ExpressTrackDaoImpl;
-import com.cbt.website.dao.IExpressTrackDao;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderwsServer;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
@@ -51,7 +47,7 @@ import java.util.regex.Pattern;
 public class WarehouseServiceImpl implements IWarehouseService {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(WarehouseServiceImpl.class);
     @Autowired
-    private IWarehouseDao dao;
+    private WarehouseMapper warehouseMapper;
     @Autowired
     private FreightFeeSerive freightFeeSerive;
     @Autowired
@@ -61,26 +57,26 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public outIdBean findOutId(Integer uid) {
 
-        return dao.findOutId(uid);
+        return warehouseMapper.findOutId(uid);
     }
 
 
 
     @Override
     public SearchResultInfo getWeight() {
-        return dao.getWeight();
+        return warehouseMapper.getWeight();
     }
 
     @Override
     public int saveWeight(Map<String, String> map) {
-        return dao.saveWeight(map);
+        return warehouseMapper.saveWeight(map);
     }
 
     //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
     @Override
     public int saveWeightFlag(String pid) {
         // 查询已保存的实秤重量
-        SearchResultInfo weightAndSyn = dao.getGoodsWeight(pid);
+        SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(pid);
         if (null == weightAndSyn){
             return 3;
         }
@@ -106,7 +102,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         public void run() {
             try {
                 customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight); //jxw同步重量到产品库接口
-                dao.updateGoodsWeightFlag(pid);
+                warehouseMapper.updateGoodsWeightFlag(pid);
             } catch (Exception e) {
                 LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);
             }
@@ -115,27 +111,27 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int updateQuestPicPath(String id, String path) {
-        return dao.updateQuestPicPath(id,path);
+        return warehouseMapper.updateQuestPicPath(id,path);
     }
 
     @Override
     public List<SampleGoodsBean> getSampleGoods(String [] pids) {
-        return dao.getSampleGoods(pids);
+        return warehouseMapper.getSampleGoods(pids);
     }
 
     @Override
     public List<SampleGoodsBean> getLiSameGoods(String[] pids, String [] shopIds, String [] pIds) {
-        return dao.getLiSameGoods(pids,shopIds,pIds);
+        return warehouseMapper.getLiSameGoods(pids,shopIds,pIds);
     }
 
     @Override
     public List<SampleGoodsBean> getRecommdedSameGoods(Map<String, String> map) {
-        return dao.getRecommdedSameGoods(map);
+        return warehouseMapper.getRecommdedSameGoods(map);
     }
 
     @Override
     public String getAllOrderPid(Map<String, String> map) {
-        return dao.getAllOrderPid(map);
+        return warehouseMapper.getAllOrderPid(map);
     }
 
     @Override
@@ -143,10 +139,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
         int row=0;
         boolean flag=true;
         //判断该商品是否有取消订单产生库存
-        Inventory i=dao.checkGoodsInvengory(map);
+        Inventory i=warehouseMapper.checkGoodsInvengory(map);
         if(i != null){
             //该商品有库存数据
-            OrderDetailsBean od=dao.getOrderDetails(map);
+            OrderDetailsBean od=warehouseMapper.getOrderDetails(map);
             if(od != null && od.getYourorder()>0){
                 int yourorder=od.getYourorder();
                 if(i.getFlag() == 1 && Integer.valueOf(i.getNew_remaining())<yourorder){
@@ -166,8 +162,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     double cancelAmount=yourorder*Double.parseDouble(goods_p_price);
                     map.put("cancelAmount",String.valueOf(cancelAmount));
                     map.put("flag",String.valueOf(i.getFlag()));
-                    row=dao.updateInventory(map);
-                   dao.updateIsRefund(map);
+                    row=warehouseMapper.updateInventory(map);
+                   warehouseMapper.updateIsRefund(map);
                 }
             }
         }
@@ -176,79 +172,79 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int saveQualityData(Map<String, String> map) {
-        int row=dao.saveQualityData(map);
+        int row=warehouseMapper.saveQualityData(map);
         if(row>0){
-            row=dao.queryQeId(map);
+            row=warehouseMapper.queryQeId(map);
             map.put("qid",String.valueOf(row));
-            dao.saveQualityDataLog(map);
+            warehouseMapper.saveQualityDataLog(map);
         }
         return row;
     }
 
     @Override
     public Map<String, String> getExchange(Map<String, String> map) {
-        return dao.getExchange(map);
+        return warehouseMapper.getExchange(map);
     }
 
     @Override
     public OrderInfoCountPojo getPresentationsData(Map<String, String> map) {
-        return dao.getPresentationsData(map);
+        return warehouseMapper.getPresentationsData(map);
     }
 
     @Override
     public OrderInfoCountPojo getOpenCountData(Map<String, String> map) {
-        return dao.getOpenCountData(map);
+        return warehouseMapper.getOpenCountData(map);
     }
 
     @Override
     public OrderInfoCountPojo getAddCarData(Map<String, String> map) {
-        return dao.getAddCarData(map);
+        return warehouseMapper.getAddCarData(map);
     }
 
     @Override
     public OrderInfoCountPojo getGoodsBuyData(Map<String, String> map) {
-        return dao.getGoodsBuyData(map);
+        return warehouseMapper.getGoodsBuyData(map);
     }
 
     @Override
     public OrderInfoCountPojo getGoodsSalesAmountData(Map<String, String> map) {
-        return dao.getGoodsSalesAmountData(map);
+        return warehouseMapper.getGoodsSalesAmountData(map);
     }
 
     @Override
     public OrderInfoCountPojo getCancelData(Map<String, String> map) {
-        return dao.getCancelData(map);
+        return warehouseMapper.getCancelData(map);
     }
 
     @Override
     public int updateQualityData(Map<String, String> map) {
-        int row=dao.updateQualityData(map);
+        int row=warehouseMapper.updateQualityData(map);
         if(row>0){
-            row=dao.queryQeId(map);
+            row=warehouseMapper.queryQeId(map);
             map.put("qid",String.valueOf(row));
-            dao.saveQualityDataLog(map);
+            warehouseMapper.saveQualityDataLog(map);
         }
         return row;
     }
 
     @Override
     public String getQualityEvaluation(Map<String, String> map) {
-        return dao.getQualityEvaluation(map);
+        return warehouseMapper.getQualityEvaluation(map);
     }
 
     @Override
     public int delInPic(Map<String, String> map) {
-        return dao.delInPic(map);
+        return warehouseMapper.delInPic(map);
     }
 
     @Override
     public int insertInspectionPicture(String pid, String picPath) {
-        return dao.insertInspectionPicture(pid,picPath);
+        return warehouseMapper.insertInspectionPicture(pid,picPath);
     }
 
     @Override
     public int disabled(Map<String, String> map) {
-        return dao.disabled(map);
+        return warehouseMapper.disabled(map);
     }
 
     @Override
@@ -256,17 +252,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
         int row=0;
         try{
             SendMQ sendMQ=new SendMQ();
-            String id=dao.queryQevId(map);
+            String id=warehouseMapper.queryQevId(map);
             if(StringUtil.isBlank(id)){
-                row=dao.insertEvaluation(map);
+                row=warehouseMapper.insertEvaluation(map);
                 sendMQ.sendMsg(new RunSqlModel("insert into goods_evaluation (goods_pid,evaluation,createtime) values('"+map.get("goods_pid")+"','"+map.get("evaluation")+"',now())"));
-                id=dao.queryQevId(map);
+                id=warehouseMapper.queryQevId(map);
             }else{
-                row=dao.updateEvaluation(map);
+                row=warehouseMapper.updateEvaluation(map);
                 sendMQ.sendMsg(new RunSqlModel("update goods_evaluation set evaluation='"+map.get("evaluation")+"' where goods_pid='"+map.get("goods_pid")+"'"));
             }
             map.put("ge_id",id);
-            dao.insertEvaluationLog(map);
+            warehouseMapper.insertEvaluationLog(map);
             sendMQ.closeConn();
         }catch (Exception e){
             e.printStackTrace();
@@ -278,9 +274,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public int insInsp(Map<String, String> map) {
 	    int checked=0;
     	try{
-		    checked=dao.checnInspIsExit(map);
+		    checked=warehouseMapper.checnInspIsExit(map);
 		    if(checked<=0){
-			    checked=dao.insertInspPath(map);
+			    checked=warehouseMapper.insertInspPath(map);
 		    }else{
 			    checked=0;
 		    }
@@ -298,13 +294,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public OrderAddress getAddressByOrderID(String orderNo) {
 
-        return dao.getAddressByOrderID(orderNo);
+        return warehouseMapper.getAddressByOrderID(orderNo);
     }
 
     @Override
     public List<PurchaseDetailsBean> getPurchaseDetails(String orderNo) {
 
-        return dao.getPurchaseDetails(orderNo);
+        return warehouseMapper.getPurchaseDetails(orderNo);
     }
 
     @Override
@@ -321,38 +317,38 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
 
         List<PurchaseBean> pbList = new ArrayList<PurchaseBean>();
-        return dao.getOutByID(userid,sql);
+        return warehouseMapper.getOutByID(userid,sql);
     }
 
     @Override
     public void callResult(Map<String, String> param) {
 
-        dao.callResult(param);
+        warehouseMapper.callResult(param);
     }
 
     @Override
     public void callUpdateIdrelationtable(Map<String, String> param) {
 
-        dao.callUpdateIdrelationtable(param);
+        warehouseMapper.callUpdateIdrelationtable(param);
     }
 
     @Override
     public void insertStorage_location(String a, String b, String c, String d,
                                        String e) {
 
-        dao.insertStorage_location(a, b, c, d, e);
+        warehouseMapper.insertStorage_location(a, b, c, d, e);
 
     }
 
     @Override
     public List<StorageLocationBean> getAllStorageLocationByPage(int startNum,int endNum) {
 
-        return dao.getAllStorageLocationByPage(startNum,endNum);
+        return warehouseMapper.getAllStorageLocationByPage(startNum,endNum);
     }
 
     @Override
     public List<StorageLocationBean> getOrderinfoPage(Map<String, Object> map) {
-        List<StorageLocationBean> list=dao.getOrderinfoPage(map);
+        List<StorageLocationBean> list=warehouseMapper.getOrderinfoPage(map);
         for (int i = 0; i < list.size(); i++) {
             StorageLocationBean s = list.get(i);
             if (s.getChecked() == 0 && "1".equals(s.getGoodstatus())) {
@@ -414,7 +410,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int getCountOrderinfo(Map<String, Object> map) {
 
-        return dao.getCountOrderinfo(map);
+        return warehouseMapper.getCountOrderinfo(map);
     }
 
     @Override
@@ -426,7 +422,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
      */
     public List<String> getsourceValidation(Map<String, Object> map) {
 
-        return dao.getsourceValidation(map);
+        return warehouseMapper.getsourceValidation(map);
     }
 
     @Override
@@ -435,7 +431,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
      */
     public List<String> getBuyerName(String admuserid) {
 
-        return dao.getBuyerName(admuserid);
+        return warehouseMapper.getBuyerName(admuserid);
     }
 
     @Override
@@ -444,7 +440,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
      */
     public String getBuyerNames(String admuserid) {
 
-        return dao.getBuyerNames(admuserid);
+        return warehouseMapper.getBuyerNames(admuserid);
     }
 
     @Override
@@ -456,7 +452,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
      */
     public List<String> getsourceValidationForBuy(Map<String, Object> map) {
 
-        return dao.getsourceValidationForBuy(map);
+        return warehouseMapper.getsourceValidationForBuy(map);
     }
 
     @Override
@@ -465,9 +461,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
         List<StorageLocationBean> newlist2 = new ArrayList<StorageLocationBean>();
         List<StorageLocationBean> list1 = new ArrayList<StorageLocationBean>();
         List<StorageLocationBean> list2 = new ArrayList<StorageLocationBean>();
-        list1 = dao.getOrderInfoInspection(map);
+        list1 = warehouseMapper.getOrderInfoInspection(map);
         if(list1.size()>0){
-            List<String>  orderList = dao.checkOrders(list1,0);
+            List<String>  orderList = warehouseMapper.checkOrders(list1,0);
             for(StorageLocationBean bean:list1){
                 if(!orderList.contains(bean.getOrder_no())){
                     newlist1.add(bean);
@@ -475,13 +471,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
         }
         //获取dropship信息
-        list2 = dao.getDropShipOrderInfoInspection(map);
+        list2 = warehouseMapper.getDropShipOrderInfoInspection(map);
         for(StorageLocationBean bean:list2){
             StringBuffer stringBuffer = new StringBuffer(bean.getUser_id());
             bean.setUser_id(stringBuffer.insert(1, "D").toString());
         }
         if(list2.size()>0){
-            List<String>  dropOrderList = dao.checkOrders(list2,1);
+            List<String>  dropOrderList = warehouseMapper.checkOrders(list2,1);
             for(StorageLocationBean bean:list2){
                 if(!dropOrderList.contains(bean.getOrder_no())){
                     newlist2.add(bean);
@@ -523,9 +519,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
         List<StorageLocationBean> newlist2 = new ArrayList<StorageLocationBean>();
         List<StorageLocationBean> list1 = new ArrayList<StorageLocationBean>();
         List<StorageLocationBean> list2 = new ArrayList<StorageLocationBean>();
-        list1 = dao.getOrderInfoInspectionall(map);
+        list1 = warehouseMapper.getOrderInfoInspectionall(map);
         if(list1.size()>0){
-            List<String>  orderList = dao.checkOrders(list1,0);
+            List<String>  orderList = warehouseMapper.checkOrders(list1,0);
             for(StorageLocationBean bean:list1){
                 if(!orderList.contains(bean.getOrder_no())){
                     newlist1.add(bean);
@@ -533,13 +529,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
         }
         //获取dropship信息
-        list2 = dao.getDropShipOrderInfoInspectionall(map);
+        list2 = warehouseMapper.getDropShipOrderInfoInspectionall(map);
         for(StorageLocationBean bean:list2){
             StringBuffer stringBuffer = new StringBuffer(bean.getUser_id());
             bean.setUser_id(stringBuffer.insert(1, "D").toString());
         }
         if(list2.size()>0){
-            List<String>  dropOrderList = dao.checkOrders(list2,1);
+            List<String>  dropOrderList = warehouseMapper.checkOrders(list2,1);
             for(StorageLocationBean bean:list2){
                 if(!dropOrderList.contains(bean.getOrder_no())){
                     newlist2.add(bean);
@@ -578,31 +574,31 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int getCountOrderInfoInspection(Map<String, Object> map) {
 
-        int count = dao.getCountOrderInfoInspection(map);
-        count +=dao.getCountDropShipOrderInfoInspection(map);
+        int count = warehouseMapper.getCountOrderInfoInspection(map);
+        count +=warehouseMapper.getCountDropShipOrderInfoInspection(map);
         return count;
     }
 
     @Override
     public int insertOrderfeeFromOrderInfo(Map<String, Object> map,int dropshipFlag) {
         map.put("dropshipFlag",dropshipFlag);
-        return dao.insertOrderfeeFromOrderInfo(map);
+        return warehouseMapper.insertOrderfeeFromOrderInfo(map);
     }
 
     @Override
     public String getOrderidAddress(Map<String, Object> map) {
 
-        return dao.getOrderidAddress(map);
+        return warehouseMapper.getOrderidAddress(map);
     }
 
     @Override
     public List<OrderInfoPrint> getOrderidPrinInfo(Map<String, Object> map) {
 
-        List<OrderInfoPrint> list1 = dao.getOrderidPrinInfo(map);
+        List<OrderInfoPrint> list1 = warehouseMapper.getOrderidPrinInfo(map);
         for(OrderInfoPrint bean:list1){
             bean.setIsDropshipFlag(0);
         }
-        List<OrderInfoPrint> list2 = dao.getDropshipOrderidPrinInfo(map);
+        List<OrderInfoPrint> list2 = warehouseMapper.getDropshipOrderidPrinInfo(map);
         for(OrderInfoPrint ob:list2){
             ob.setIsDropshipFlag(1);
         }
@@ -616,76 +612,76 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int delteFromOrderFeeByOrderid(Map<String, Object> map) {
 
-        return dao.delteFromOrderFeeByOrderid(map);
+        return warehouseMapper.delteFromOrderFeeByOrderid(map);
     }
 
     @Override
     public List<Forwarder> getForwarder(Map<String, Object> map) {
 
-        return dao.getForwarder(map);
+        return warehouseMapper.getForwarder(map);
     }
 
     @Override
     public int getCountForwarder(Map<String, Object> map) {
 
-        return dao.getCountForwarder(map);
+        return warehouseMapper.getCountForwarder(map);
     }
 
     @Override
     public List<Logisticsinfo> getlogisticsidAndState(Map<String, Object> map) {
 
-        return dao.getlogisticsidAndState(map);
+        return warehouseMapper.getlogisticsidAndState(map);
     }
 
     @Override
     public String getOrderCreateTime(Map<String, Object> map,int dropshipFlag) {
         map.put("dropshipFlag",dropshipFlag);
-        return dao.getOrderCreateTime(map);
+        return warehouseMapper.getOrderCreateTime(map);
     }
 
 	@Override
 	public int getUndeliveredOrder(String orderId) {
     	int remark=0;
-		remark=dao.getUndeliveredOrder(orderId);
+		remark=warehouseMapper.getUndeliveredOrder(orderId);
 		return remark;
 	}
 
 	@Override
     public Logisticsinfo getlogisticsinfo(Map<String, Object> map) {
 
-        return dao.getlogisticsinfo(map);
+        return warehouseMapper.getlogisticsinfo(map);
     }
     /**
      * 手动录入退样运单号
      */
     @Override
     public int refundShipnoEntry(Map<String, Object> map) {
-        int row=dao.refundShipnoEntry(map);
+        int row=warehouseMapper.refundShipnoEntry(map);
         if(row>0){
             //标记商品在采购状态为退货标识
-            dao.updateRefundFlag(map);
+            warehouseMapper.updateRefundFlag(map);
         }
         return row;
     }
     @Override
     public List<String> getRefundGoodsPid(String goodsid, String orderid) {
 
-        return dao.getRefundGoodsPid(goodsid,orderid);
+        return warehouseMapper.getRefundGoodsPid(goodsid,orderid);
     }
     @Override
     public String getState(Map<String, Object> map) {
 
-        return dao.getState(map);
+        return warehouseMapper.getState(map);
     }
     @Override
     public int getStoragCount(Map<String, Object> map) {
 
-        return dao.getStoragCount(map);
+        return warehouseMapper.getStoragCount(map);
     }
 
     @Override
     public int updateInventoryCount(Map<String, Object> map) {
-        int row=dao.updateInventoryCount(map);
+        int row=warehouseMapper.updateInventoryCount(map);
         return row;
     }
 
@@ -693,63 +689,63 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public List<OrderProductSurcePojo> getlogisticsAndOrderProductSurc(
             Map<String, Object> map) {
 
-        return dao.getlogisticsAndOrderProductSurc(map);
+        return warehouseMapper.getlogisticsAndOrderProductSurc(map);
     }
 
     @Override
     public List<OrderInfoPrint> getIdrelationtable(Map<String, Object> map) {
 
-        return dao.getIdrelationtable(map);
+        return warehouseMapper.getIdrelationtable(map);
     }
 
     @Override
     public int getCountIdrelationtable(Map<String, Object> map) {
 
-        return dao.getCountIdrelationtable(map);
+        return warehouseMapper.getCountIdrelationtable(map);
     }
 
     @Override
     public int updateFromOrderFeeByOrderid(Map<String, Object> map) {
 
-        return dao.updateFromOrderFeeByOrderid(map);
+        return warehouseMapper.updateFromOrderFeeByOrderid(map);
     }
 
     @Override
     public int updateExperssNo(Map<String, Object> map) {
 
-        return dao.updateExperssNo(map);
+        return warehouseMapper.updateExperssNo(map);
     }
 
     @Override
     public List<OrderFeePojo> getOrderFee(Map<String, Object> map) {
 
-        return dao.getOrderFee(map);
+        return warehouseMapper.getOrderFee(map);
     }
 
     @Override
     public OrderInfoPojo getOutOrderInfo(Map<String, Object> map) {
 
-        return dao.getOutOrderInfo(map);
+        return warehouseMapper.getOutOrderInfo(map);
     }
 
 
     @Override
     public OrderDetailsBean queryVideo(Map<String, String> map) {
-        return dao.queryVideo(map);
+        return warehouseMapper.queryVideo(map);
     }
 
     @Override
     public int updateCustomVideoUrl(Map<String, String> map) {
-        return dao.updateCustomVideoUrl(map);
+        return warehouseMapper.updateCustomVideoUrl(map);
     }
 
     @Override
     public List<SearchResultInfo> queryPictureInfos(Map<String, String> map) {
-        List<SearchResultInfo> list=dao.queryPictureInfos(map);
+        List<SearchResultInfo> list=warehouseMapper.queryPictureInfos(map);
         for (SearchResultInfo s : list) {
             s.setCurrency("<a title='查看产品单页信息' target='_blank' href='https://www.import-express.com/goodsinfo/cbtconsole-1"+s.getOrderid()+".html'><img src='"+(s.getInvoice()+s.getCurrency())+"' style='width:220px;'></img></a>");
             StringBuilder sb=new StringBuilder(3);
-            List<SearchResultInfo> ps=dao.getPicturePath(s.getOrderid());
+            List<SearchResultInfo> ps=warehouseMapper.getPicturePath(s.getOrderid());
             int index=1;
             for(int i=0;i<ps.size();i++){
                 SearchResultInfo p=ps.get(i);
@@ -804,72 +800,72 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int queryPictureInfosCount(Map<String, String> map) {
 
-        return dao.queryPictureInfosCount(map);
+        return warehouseMapper.queryPictureInfosCount(map);
     }
 
     @Override
     public List<OrderFeePojo> getFpxCountryCode() {
 
-        return dao.getFpxCountryCode();
+        return warehouseMapper.getFpxCountryCode();
     }
 
     @Override
     public List<OrderInfoPojo> getFpxProductCode() {
 
-        return dao.getFpxProductCode();
+        return warehouseMapper.getFpxProductCode();
     }
 
     @Override
     public int updateOrderFeeByOrderid(Map<String, Object> map) {
 
-        return dao.updateOrderFeeByOrderid(map);
+        return warehouseMapper.updateOrderFeeByOrderid(map);
     }
 
     @Override
     public List<OrderFeePojo> getCodemaster() {
 
-        return dao.getCodemaster();
+        return warehouseMapper.getCodemaster();
     }
 
     @Override
     public List<OrderInfoPojo> getOutCount() {
 
-        return dao.getOutCount();
+        return warehouseMapper.getOutCount();
     }
 
     @Override
     public OrderInfoPojo getPaymentFy(Map<String, Object> map) {
 
-        return dao.getPaymentFy(map);
+        return warehouseMapper.getPaymentFy(map);
     }
 
     @Override
     public String getOrderProblem(Map<String, Object> map) {
 
-        return dao.getOrderProblem(map);
+        return warehouseMapper.getOrderProblem(map);
     }
 
     @Override
     public int updateOrderinfoAll(Map<String, Object> map) {
 
-        return dao.updateOrderinfoAll(map);
+        return warehouseMapper.updateOrderinfoAll(map);
     }
 
     @Override
     public int updateOrderinfo(Map<String, Object> map) {
 
-        return dao.updateOrderinfo(map);
+        return warehouseMapper.updateOrderinfo(map);
     }
 
     @Override
     public List<OrderInfoPojo> getNotMoneyOrderinfo(Map<String, Object> map) {
 
-        return dao.getNotMoneyOrderinfo(map);
+        return warehouseMapper.getNotMoneyOrderinfo(map);
     }
 
     @Override
     public List<OrderFeePojo> getOrderfeeFreight(Map<String, Object> map, HttpServletRequest request) {
-        List<OrderFeePojo> list=dao.getOrderfeeFreight(map);
+        List<OrderFeePojo> list=warehouseMapper.getOrderfeeFreight(map);
         double exchange_rate = 1;
         Map<String, Double> maphl = Currency.getMaphl(request);
         for (int i = 0; i < list.size(); i++) {
@@ -892,24 +888,24 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int getOrderfeeFreightCount(Map<String, Object> map) {
 
-        return dao.getOrderfeeFreightCount(map);
+        return warehouseMapper.getOrderfeeFreightCount(map);
     }
 
     @Override
     public AdmuserPojo getAdmuserSendMailInfo(Map<String, Object> map) {
 
-        return dao.getAdmuserSendMailInfo(map);
+        return warehouseMapper.getAdmuserSendMailInfo(map);
     }
 
     @Override
     public OrderInfoCountPojo getOrderInfoCountByState(Map<String, Object> map) {
 
-        return dao.getOrderInfoCountByState(map);
+        return warehouseMapper.getOrderInfoCountByState(map);
     }
 
     @Override
     public List<TaoBaoOrderInfo> getBuyReturnManage(String goodsid,int page,String state,String startTime,String endTime) {
-        List<TaoBaoOrderInfo> list=dao.getBuyReturnManage(goodsid,page,state,startTime,endTime);
+        List<TaoBaoOrderInfo> list=warehouseMapper.getBuyReturnManage(goodsid,page,state,startTime,endTime);
         for(TaoBaoOrderInfo t:list){
             t.setItemname("<a target='_blank' href='"+t.getItemurl()+"'>"+(t.getItemname().substring(0,t.getItemname().length()/3))+"</a>");
             t.setImgurl("<img style='width:100px;height:100px;' src='"+t.getImgurl()+"'></img>");
@@ -927,14 +923,14 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int getBuyReturnManageCount(String goodsid,String state,String startTime,String endTime) {
-        return dao.getBuyReturnManageCount(goodsid,state,startTime,endTime);
+        return warehouseMapper.getBuyReturnManageCount(goodsid,state,startTime,endTime);
     }
 
     @Override
     public List<UserInfo> getUserInfoForPrice(Map<String, Object> map) {
-        List<UserInfo> userInfos=dao.getUserInfoForPrice(map);
+        List<UserInfo> userInfos=warehouseMapper.getUserInfoForPrice(map);
         DecimalFormat df = new DecimalFormat("0.00");
-        List<ConfirmUserInfo> list = dao.getAllAdmuser();
+        List<ConfirmUserInfo> list = warehouseMapper.getAllAdmuser();
         for (int i = 0; i < userInfos.size(); i++) {
             UserInfo userInfo = userInfos.get(i);
             StringBuffer admuser = new StringBuffer();
@@ -1008,7 +1004,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getCurrency()
                     + "\')>"
                     + String.format("%.2f", goods_price) + "</a>");
-            String gname = dao.getGname(userInfo.getGid());
+            String gname = warehouseMapper.getGname(userInfo.getGid());
             userInfo.setGrade(gname);
             if (StringUtils.isStrNull(userInfo.getBusinessName())) {
                 userInfo.setBusinessName("无");
@@ -1018,7 +1014,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
     @Override
     public List<ShopManagerPojo> getShopManagerList(Map<String, Object> map) {
-        List<ShopManagerPojo> list=dao.getShopManagerList(map);
+        List<ShopManagerPojo> list=warehouseMapper.getShopManagerList(map);
         for (ShopManagerPojo s : list) {
             s.setShop_id("<a href='/cbtconsole/website/shop_manager_details.jsp?id=" + s.getId() + "&status="+s.getRemark()+"' target='_blank'>"+ s.getShop_id() + "</a>");
             if ("0".equals(s.getRemark())) {
@@ -1069,13 +1065,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public int getShopManagerListCount(Map<String, Object> map) {
 
-        return dao.getShopManagerListCount(map);
+        return warehouseMapper.getShopManagerListCount(map);
     }
     @Override
     public List<RefundSamplePojo> searchRefundSample(Map<String, Object> map) {
         StringBuilder sb=new StringBuilder();
         DecimalFormat    df   = new DecimalFormat("######0.00");
-        List<RefundSamplePojo> list=dao.searchRefundSample(map);
+        List<RefundSamplePojo> list=warehouseMapper.searchRefundSample(map);
         StringBuilder pids=new StringBuilder();
         for (RefundSamplePojo r : list) {
             String state="建议退货";
@@ -1096,7 +1092,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 //            Map<String,String> map3=new HashMap<String, String>();
 //            Map<String,String> map4=new HashMap<String, String>();
 //            Map<String,String> map5=new HashMap<String, String>();
-//            List<Map<String, String>> map1=dao.getShopIdForPid(sb.toString().substring(0,sb.toString().length()-1));
+//            List<Map<String, String>> map1=warehouseMapper.getShopIdForPid(sb.toString().substring(0,sb.toString().length()-1));
 //            DataSourceSelector.restore();
 //            for (Map<String, String> map2 : map1) {
 //                map3.put(map2.get("1688_pid"), map2.get("shop_id"));
@@ -1115,12 +1111,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return list;
     }
     public List<RefundSamplePojo> searchRefundSampleCount(Map<String, Object> map) {
-        List<RefundSamplePojo> list=dao.searchRefundSampleCount(map);
+        List<RefundSamplePojo> list=warehouseMapper.searchRefundSampleCount(map);
         return list;
     }
     @Override
     public List<TaoBaoOrderInfo> searchRefundOrder(Map<String, Object> map) {
-        List<TaoBaoOrderInfo> list=dao.searchRefundOrder(map);
+        List<TaoBaoOrderInfo> list=warehouseMapper.searchRefundOrder(map);
         for (TaoBaoOrderInfo t : list) {
             //当退货数量大于采购数量时，屏蔽整单退货按钮
             if(Integer.valueOf(t.getCounts())>=Integer.valueOf(t.getItemqty())){
@@ -1135,24 +1131,24 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public List<TaoBaoOrderInfo> searchRefundOrderCount(Map<String, Object> map) {
 
-        return dao.searchRefundOrderCount(map);
+        return warehouseMapper.searchRefundOrderCount(map);
     }
 
     @Override
     public List<TaoBaoOrderInfo> searchMonthlyRefund(Map<String, Object> map) {
 
-        return dao.searchMonthlyRefund(map);
+        return warehouseMapper.searchMonthlyRefund(map);
     }
     @Override
     public List<TaoBaoOrderInfo> searchMonthlyRefundCount(
             Map<String, Object> map) {
 
-        return dao.searchMonthlyRefundCount(map);
+        return warehouseMapper.searchMonthlyRefundCount(map);
     }
 
     @Override
     public List<ShopManagerPojo> getPriorityCategory(Map<String, Object> map) {
-        List<ShopManagerPojo> list=dao.getPriorityCategory(map);
+        List<ShopManagerPojo> list=warehouseMapper.getPriorityCategory(map);
         for(ShopManagerPojo s:list){
             if("1".equals(s.getStatus())){
                 s.setStatus("<span style='color:red'>停用</span>");
@@ -1166,7 +1162,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             String enName=s.getEnName();
             String category=s.getCategory();
             if(StringUtil.isBlank(enName) && StringUtil.isNotBlank(category)){
-                String names=dao.getEnName(category);
+                String names=warehouseMapper.getEnName(category);
                 s.setEnName(names);
             }
         }
@@ -1175,13 +1171,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int getPriorityCategoryCount(Map<String, Object> map) {
-        return dao.getPriorityCategoryCount(map);
+        return warehouseMapper.getPriorityCategoryCount(map);
     }
 
     @Override
     public List<ShopManagerPojo> getShopBuyLogInfo(Map<String, String> map) {
-        List<ShopManagerPojo> list=dao.getShopBuyLogInfo(map);
-        List<ShopManagerPojo> shopSupplier=dao.getShopSupplier(map);
+        List<ShopManagerPojo> list=warehouseMapper.getShopBuyLogInfo(map);
+        List<ShopManagerPojo> shopSupplier=warehouseMapper.getShopSupplier(map);
         for(ShopManagerPojo s:list){
             s.setShopId("<a target='_blank' href='/cbtconsole/supplierscoring/supplierproducts?shop_id="+s.getShopId()+"'>"+s.getShopId()+"</a>");
         }
@@ -1198,12 +1194,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int getShopBuyLogInfoCount(Map<String, String> map) {
-        return dao.getShopBuyLogInfoCount(map);
+        return warehouseMapper.getShopBuyLogInfoCount(map);
     }
 
     @Override
     public List<BlackList> getUserBackList(Map<String, String> map) {
-        List<BlackList> list=dao.getUserBackList(map);
+        List<BlackList> list=warehouseMapper.getUserBackList(map);
         for(BlackList b:list){
             StringBuilder op=new StringBuilder();
             String flag=b.getFlag();
@@ -1230,13 +1226,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<BlackList> getUserBackListCount(Map<String, String> map) {
-        return dao.getUserBackListCount(map);
+        return warehouseMapper.getUserBackListCount(map);
     }
 
     @Override
     public List<ShopManagerPojo> getShopManagerDetailsList(Map<String, Object> map) {
         Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-        List<ShopManagerPojo> list=dao.getShopManagerDetailsList(map);
+        List<ShopManagerPojo> list=warehouseMapper.getShopManagerDetailsList(map);
         for (ShopManagerPojo s : list) {
             StringBuffer b = new StringBuffer("<div style='text-align:center;height:auto;overflow:auto;'>");
             String detail = s.getImgs();
@@ -1272,61 +1268,61 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public List<com.cbt.pojo.AdmuserPojo> getAllBuyer(int id) {
 
-        return dao.getAllBuyer(id);
+        return warehouseMapper.getAllBuyer(id);
     }
 
     @Override
     public List<ZoneBean> getAllZone() {
-        return dao.getAllZone();
+        return warehouseMapper.getAllZone();
     }
 
     @Override
     public int addSampleRemark(Map<String, Object> map) {
 
-        return dao.addSampleRemark(map);
+        return warehouseMapper.addSampleRemark(map);
     }
     @Override
     public int deleteSource(Map<String,Object> map) {
 
-        return dao.deleteSource(map);
+        return warehouseMapper.deleteSource(map);
     }
 
     @Override
     public int updateCatePrice(Map<String, String> map) {
-        return dao.updateCatePrice(map);
+        return warehouseMapper.updateCatePrice(map);
     }
 
     @Override
     public int updatePrice(Map<String, Object> map) {
 
-        return dao.updatePrice(map);
+        return warehouseMapper.updatePrice(map);
     }
 
     @Override
     public BuyerCommentPojo getBuyerCommentPojo(Map<String, String> map) {
-        return dao.getBuyerCommentPojo(map);
+        return warehouseMapper.getBuyerCommentPojo(map);
     }
 
     @Override
     public int saveCommentContent(Map<String, String> map) {
-        return dao.saveCommentContent(map);
+        return warehouseMapper.saveCommentContent(map);
     }
 
     @Override
     public int insertStorageProblemOrder(Map<String, Object> map) {
 
-        return dao.insertStorageProblemOrder(map);
+        return warehouseMapper.insertStorageProblemOrder(map);
     }
 
     @Override
     public int saveClothingData(Map<String, String> map) {
 
-        return dao.saveClothingData(map);
+        return warehouseMapper.saveClothingData(map);
     }
 
     @Override
     public List<RedManProductBean> getRedProduct(Map<String, String> map) {
-        List<RedManProductBean> list=dao.getRedProduct(map);
+        List<RedManProductBean> list=warehouseMapper.getRedProduct(map);
         for(RedManProductBean p:list){
             String pids=p.getPids();
             StringBuilder pid=new StringBuilder();
@@ -1339,7 +1335,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 }
             }
             if(StringUtil.isNotBlank(pid.toString())){
-                List<CustomGoodsBean> cList=dao.getCustomPids(pid.toString());
+                List<CustomGoodsBean> cList=warehouseMapper.getCustomPids(pid.toString());
                 pid.setLength(0);
                 for(CustomGoodsBean c:cList){
                     pid.append("<a target='_blank'title='"+c.getEnname().replace("'","")+"' href='https://www.import-express.com/goodsinfo/cbtconsole-1"+c.getPid()+".html'><img src='"+(c.getRemotpath()+c.getCustomMainImage())+"'></img></a>");
@@ -1362,12 +1358,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<RedManProductBean> getRedProductCount(Map<String, String> map) {
-        return dao.getRedProductCount(map);
+        return warehouseMapper.getRedProductCount(map);
     }
 
     @Override
     public int insertShipno(Map<String, String> map) {
-        return dao.insertShipno(map);
+        return warehouseMapper.insertShipno(map);
     }
 
     /**
@@ -1381,7 +1377,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try{
-            list=dao.getPurchaseSamplingStatistics(map);
+            list=warehouseMapper.getPurchaseSamplingStatistics(map);
             if(list.size()>0){
                 conn28 = DBHelper.getInstance().getConnection6();
                 conn = DBHelper.getInstance().getConnection();
@@ -1443,17 +1439,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<Inventory> getAllUser() {
-        return dao.getAllUser();
+        return warehouseMapper.getAllUser();
     }
 
     @Override
     public List<PurchaseSamplingStatisticsPojo> salesPerformanceCount(Map<String, Object> map) {
-        return dao.salesPerformanceCount(map);
+        return warehouseMapper.salesPerformanceCount(map);
     }
 
 	@Override
 	public List<PurchaseSamplingStatisticsPojo> salesPerformanDetails(Map<String, String> map) {
-		List<PurchaseSamplingStatisticsPojo> list=dao.salesPerformanDetails(map);
+		List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.salesPerformanDetails(map);
 		for(PurchaseSamplingStatisticsPojo p:list){
 			p.setGoodsname("<a target='_blank' href='https://www.import-express.com/goodsinfo/cbtconsole-1"+p.getGoods_pid()+".html'>"+(p.getGoodsname().substring(0,p.getGoodsname().length()/3))+"...</a>");
 			if("0".equals(p.getState())){
@@ -1473,12 +1469,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
 	@Override
 	public List<PurchaseSamplingStatisticsPojo> salesPerformanDetailsCount(Map<String, String> map) {
-		return dao.salesPerformanDetailsCount(map);
+		return warehouseMapper.salesPerformanDetailsCount(map);
 	}
 
 	@Override
     public List<PurchaseSamplingStatisticsPojo> weightProblemDetails(Map<String, String> map) {
-        List<PurchaseSamplingStatisticsPojo> list=dao.weightProblemDetails(map);
+        List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.weightProblemDetails(map);
 //        0：速卖通或1688重量大于2kg；1：速卖通重量为0或空；2：1688重量为0或空；3：速卖通重量/1688重量>200%；4：1688重量/速卖通重量>200%；
 //        5：速卖通有批量 && 速卖通和1688重量相差小于50%(速卖通为分母)；6：原来清洗的重量/反推重量>1.3 && 工厂价>20人民币；7：速卖通和1688重量相差超过30%(速卖通为分母) && 工厂价>20人民币；
 //        8：速卖通和1688重量相差超过100%(速卖通为分母) && 工厂价<20人民币；9：1688价格<20元 而 1688起批量>1；10:1688重量与ali重量(1688为分母或ali为分母)偏差30%；
@@ -1512,25 +1508,25 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<PurchaseSamplingStatisticsPojo> weightProblemDetailsCount(Map<String, String> map) {
-        List<PurchaseSamplingStatisticsPojo> list=dao.weightProblemDetailsCount(map);
+        List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.weightProblemDetailsCount(map);
         return list;
     }
 
 	@Override
 	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsList(Map<String, String> map) {
-		List<PurchaseSamplingStatisticsPojo> list=dao.monthSalesEffortsList(map);
+		List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.monthSalesEffortsList(map);
 		return list;
 	}
 
 	@Override
 	public List<PurchaseSamplingStatisticsPojo> monthSalesEffortsListCount(Map<String, String> map) {
-		List<PurchaseSamplingStatisticsPojo> list=dao.monthSalesEffortsListCount(map);
+		List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.monthSalesEffortsListCount(map);
 		return list;
 	}
 
 	@Override
     public List<PurchaseSamplingStatisticsPojo> getCleaningQuality(Map<String, String> map) {
-        List<PurchaseSamplingStatisticsPojo> list=dao.getCleaningQuality(map);
+        List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.getCleaningQuality(map);
         int allWeightCount=0;
         int allShelfCount=0;
         for(PurchaseSamplingStatisticsPojo p:list){
@@ -1548,18 +1544,18 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
     @Override
     public List<PurchaseSamplingStatisticsPojo> getCleaningQualityCount(Map<String, Object> map) {
-        return dao.getCleaningQualityCount(map);
+        return warehouseMapper.getCleaningQualityCount(map);
     }
 
     @Override
     public List<PurchaseSamplingStatisticsPojo> salesPerformance(Map<String, Object> map) {
         //人为编辑过的产品
-        List<PurchaseSamplingStatisticsPojo> list=dao.salesPerformance(map);
+        List<PurchaseSamplingStatisticsPojo> list=warehouseMapper.salesPerformance(map);
         int openCount=0,addCount=0,buyCount=0,cancelCount=0,editCount=0;
         double saleCount=0.00;
         for(PurchaseSamplingStatisticsPojo p:list){
             map.put("admName",p.getAdmName());
-            p.setEditCount(dao.getEditCount(map));
+            p.setEditCount(warehouseMapper.getEditCount(map));
             openCount+= Integer.valueOf(StringUtil.isBlank(p.getOpenCount())?"0":p.getOpenCount());
             addCount+= Integer.valueOf(StringUtil.isBlank(p.getAddCount())?"0":p.getAddCount());
             buyCount+= Integer.valueOf(StringUtil.isBlank(p.getBuyCount())?"0":p.getBuyCount());
@@ -1568,13 +1564,13 @@ public class WarehouseServiceImpl implements IWarehouseService {
             saleCount+=Double.parseDouble(StringUtil.isBlank(p.getSaleCount())?"0.00":p.getSaleCount());
             p.setBuyCount("<a target='_blank' href='/cbtconsole/website/salesPerformanDetails.jsp?admName="+p.getAdmName()+"&editTime="+map.get("updatetime")+"' title='查看购买商品详情'>"+p.getBuyCount()+"</a>");
 //            //产品在搜索结果中被呈现次数
-//            p.setPresentations(dao.getPresentations(p.getPid(),p.getUpdatetime()));
+//            p.setPresentations(warehouseMapper.getPresentations(p.getPid(),p.getUpdatetime()));
 //            //产品页面被打开次数
-//            p.setOpenCount(dao.getOpenCount(p.getPid(),p.getUpdatetime()));
+//            p.setOpenCount(warehouseMapper.getOpenCount(p.getPid(),p.getUpdatetime()));
 //            //产品被加购物车次数
-//            p.setAddCarCount(dao.getAddCarCount(p.getPid(),p.getUpdatetime()));
+//            p.setAddCarCount(warehouseMapper.getAddCarCount(p.getPid(),p.getUpdatetime()));
 //            //产品被购买次数
-//            Map<String,String> buyMap=dao.getBuyCount(p.getPid(),p.getUpdatetime());
+//            Map<String,String> buyMap=warehouseMapper.getBuyCount(p.getPid(),p.getUpdatetime());
 //            if(buyMap != null && buyMap.get("buyCount") != null){
 //                p.setBuyCount(String.valueOf(buyMap.get("buyCount")));
 //            }
@@ -1582,7 +1578,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 //                p.setSalesAmount(String.valueOf(buyMap.get("salesAmount")));
 //            }
 //            //产品被取消次数
-//            p.setCancalCount(dao.getCancelCount(p.getPid(),p.getUpdatetime()));
+//            p.setCancalCount(warehouseMapper.getCancelCount(p.getPid(),p.getUpdatetime()));
         }
         PurchaseSamplingStatisticsPojo pp=new PurchaseSamplingStatisticsPojo();
         pp.setAdmName("<span style='color:red'>总计");
@@ -1600,31 +1596,31 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public List<PurchaseSamplingStatisticsPojo> getPurchaseSamplingStatisticsCount(
             Map<String, Object> map) {
 
-        return dao.getPurchaseSamplingStatisticsCount(map);
+        return warehouseMapper.getPurchaseSamplingStatisticsCount(map);
     }
     @Override
     public String getAliPid(String goods_pid) {
 
-        return dao.getAliPid(goods_pid);
+        return warehouseMapper.getAliPid(goods_pid);
     }
     @Override
     public List<Inventory> getHavebarcode() {
 
-        return dao.getHavebarcode();
+        return warehouseMapper.getHavebarcode();
     }
     @Override
     public int getShopManagerListDetailsCount(Map<String, Object> map) {
 
-        return dao.getShopManagerListDetailsCount(map);
+        return warehouseMapper.getShopManagerListDetailsCount(map);
     }
     @Override
     public int updateShopState(Map<String, Object> map) {
 
-        return dao.updateShopState(map);
+        return warehouseMapper.updateShopState(map);
     }
     @Override
     public List<UserInfo> getUserInfoForPriceCount(Map<String, Object> map) {
-        List<UserInfo> userInfos=dao.getUserInfoForPriceCount(map);
+        List<UserInfo> userInfos=warehouseMapper.getUserInfoForPriceCount(map);
         return userInfos;
     }
 
@@ -1632,78 +1628,78 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public Tb1688Pojo getTbState(Map<String, Object> map) {
 
-        return dao.getTbState(map);
+        return warehouseMapper.getTbState(map);
     }
 
     @Override
     public List<AllProblemPojo> getAllProblem(Map<String, Object> map) {
 
-        return dao.getAllProblem(map);
+        return warehouseMapper.getAllProblem(map);
     }
 
     @Override
     public int getTotalNumber(Map<String, Object> map) {
 
-        return dao.getTotalNumber(map);
+        return warehouseMapper.getTotalNumber(map);
     }
 
     @Override
     public List<String> getAllProposal(Map<String, Object> map) {
 
-        return dao.getAllProposal(map);
+        return warehouseMapper.getAllProposal(map);
     }
     @Override
     public int insertShopId(Map<String, Object> map) {
 
-        return dao.insertShopId(map);
+        return warehouseMapper.insertShopId(map);
     }
     @Override
     public List<OrderReplenishmentPojo> getIsReplenishment(Map<String, Object> map) {
-        return dao.getIsReplenishment(map);
+        return warehouseMapper.getIsReplenishment(map);
     }
     @Override
     public List<DisplayBuyInfo> displayBuyLog(Map<String, Object> map) {
 
-        return dao.displayBuyLog(map);
+        return warehouseMapper.displayBuyLog(map);
     }
     @Override
     public Map<String, String> getCompanyInfo(String goods_pid) {
 
-        return dao.getCompanyInfo(goods_pid);
+        return warehouseMapper.getCompanyInfo(goods_pid);
     }
     @Override
     public int insertDeclareinfo(Map<String, Object> map) {
 
-        return dao.insertDeclareinfo(map);
+        return warehouseMapper.insertDeclareinfo(map);
     }
 
     @Override
     public List<JcexPrintInfo> getJcexPrintInfo(Map<String, Object> map) {
 
-        return dao.getJcexPrintInfo(map);
+        return warehouseMapper.getJcexPrintInfo(map);
     }
 
     @Override
     public int updateDeclareinfoByOrderid(Map<String, Object> map) {
 
-        return dao.updateDeclareinfoByOrderid(map);
+        return warehouseMapper.updateDeclareinfoByOrderid(map);
     }
 
     @Override
     public List<Integer> queryUser() {
-        return dao.queryUser();
+        return warehouseMapper.queryUser();
     }
 
     @Override
     public int delteOrderReplenishment(Map<String, Object> map) {
 
-        return dao.delteOrderReplenishment(map);
+        return warehouseMapper.delteOrderReplenishment(map);
     }
 
     @Override
     public String getOrderAddress(Map<String, Object> map) {
 
-        return dao.getOrderAddress(map);
+        return warehouseMapper.getOrderAddress(map);
     }
 
     @Override
@@ -1711,7 +1707,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         int row=0;
         try{
             SendMQ sendMQ=new SendMQ();
-            row=dao.addKeyword(map);
+            row=warehouseMapper.addKeyword(map);
             if(row>0){
                 sendMQ.sendMsg(new RunSqlModel("insert into priority_category(keyword,category) values('"+map.get("keyword")+"','"+map.get("cateId")+"')"));
             }
@@ -1727,7 +1723,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         int row=0;
         try{
             SendMQ sendMQ=new SendMQ();
-            row=dao.editKeyword(map);
+            row=warehouseMapper.editKeyword(map);
             if(row>0){
                 sendMQ.sendMsg(new RunSqlModel("update priority_category set category="+map.get("cid")+" where id="+map.get("id")+""));
             }
@@ -1743,7 +1739,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         int row=0;
         try{
             SendMQ sendMQ=new SendMQ();
-            row=dao.updateStateCategory(map);
+            row=warehouseMapper.updateStateCategory(map);
             if(row>0){
                 sendMQ.sendMsg(new RunSqlModel("update priority_category set status="+map.get("state")+" where id="+map.get("id")+""));
             }
@@ -1755,160 +1751,160 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
     @Override
     public int checkedGoods(Map<String, String> map) {
-        return dao.checkedGoods(map);
+        return warehouseMapper.checkedGoods(map);
     }
 
     @Override
     public int productAuthorization(Map<String, String> map) {
-        int ret=dao.checkIsExit(map);
+        int ret=warehouseMapper.checkIsExit(map);
         if(ret>0){
-            ret=dao.updateAuthorizedFlag(map);
+            ret=warehouseMapper.updateAuthorizedFlag(map);
         }else{
-            ret=dao.insertAuthorizedFlag(map);
+            ret=warehouseMapper.insertAuthorizedFlag(map);
         }
         return ret;
     }
 
     @Override
     public int insertOrderRemark(Map<String, Object> map) {
-        int count=dao.findOrderRemark(map);
+        int count=warehouseMapper.findOrderRemark(map);
         if(count>0){
-            return dao.updateOrderRemark(map);
+            return warehouseMapper.updateOrderRemark(map);
         }else{
-            return dao.insertOrderRemark(map);
+            return warehouseMapper.insertOrderRemark(map);
         }
     }
 
     @Override
     public CustomsRegulationsPojo getCustomsRegulationsPojo(String orderid) {
-        return dao.getCustomsRegulationsPojo(orderid);
+        return warehouseMapper.getCustomsRegulationsPojo(orderid);
     }
 
     @Override
     public int insertWarningInfo(Map<String, String> map) {
-        return dao.insertWarningInfo(map);
+        return warehouseMapper.insertWarningInfo(map);
     }
 
     @Override
     public List<Map<String,String>> getGoodsCar(Map<String, Object> map) {
 
-        return dao.getGoodsCar(map);
+        return warehouseMapper.getGoodsCar(map);
     }
 
     @Override
     public List<CustomGoodsBean> getAllGoodsInfos(String goods_pids) {
 
-        return dao.getAllGoodsInfos(goods_pids);
+        return warehouseMapper.getAllGoodsInfos(goods_pids);
     }
 
     @Override
     public int insertOrderInfo(Orderinfo oi) {
 
-        return dao.insertOrderInfo(oi);
+        return warehouseMapper.insertOrderInfo(oi);
     }
 
     @Override
     public OrderDetailsBean getOldDetails(String pid) {
-        return dao.getOldDetails(pid);
+        return warehouseMapper.getOldDetails(pid);
     }
 
 	@Override
 	public OrderDetailsBean getCustomBeack(String pid) {
-		return dao.getCustomBeack(pid);
+		return warehouseMapper.getCustomBeack(pid);
 	}
 
 	@Override
     public int insertOrderDetails(List<OrderDetailsBean> list) {
 
-        return dao.insertOrderDetails(list);
+        return warehouseMapper.insertOrderDetails(list);
     }
 
     @Override
     public int getOrderDetailsExit(String goods_pid, String car_type) {
 
-        return dao.getOrderDetailsExit(goods_pid,car_type);
+        return warehouseMapper.getOrderDetailsExit(goods_pid,car_type);
     }
 
     @Override
     public void insertGd(List<OrderDetailsBean> list) {
 
-        dao.insertGd(list);
+        warehouseMapper.insertGd(list);
     }
 
     @Override
     public int updateGdOdid() {
-        return   dao.updateGdOdid();
+        return   warehouseMapper.updateGdOdid();
     }
 
     @Override
     public List<OrderDetailsBean> getOrderDetailsByOrderid(String orderid) {
 
-        return dao.getOrderDetailsByOrderid(orderid);
+        return warehouseMapper.getOrderDetailsByOrderid(orderid);
     }
 
     @Override
     public int updateCrossBorder(String goods_pid) {
 
-        return dao.updateCrossBorder(goods_pid);
+        return warehouseMapper.updateCrossBorder(goods_pid);
     }
 
     @Override
     public int updateCrossShopr(String goods_pid) {
 
-        return dao.updateCrossShopr(goods_pid);
+        return warehouseMapper.updateCrossShopr(goods_pid);
     }
     @Override
     public int updateShop(String goods_pid) {
 
-        return dao.updateShop(goods_pid);
+        return warehouseMapper.updateShop(goods_pid);
     }
 
     @Override
     public int updateSamplFlag(String goodsPid,int count) {
 
-        return dao.updateSamplFlag(goodsPid,count);
+        return warehouseMapper.updateSamplFlag(goodsPid,count);
     }
 
     @Override
     public String getHsCode(Map<String, Object> map) {
 
-        return dao.getHsCode(map);
+        return warehouseMapper.getHsCode(map);
     }
 
     @Override
     public String getShipmentno() {
 
-        return dao.getShipmentno();
+        return warehouseMapper.getShipmentno();
     }
 
     @Override
     public int batchInsertSP(List<Map<String, String>> list) {
-        return dao.batchInsertSP(list);
+        return warehouseMapper.batchInsertSP(list);
     }
 
     @Override
     public int deleteShippingPackage(Map<String, String> map) {
-        return dao.deleteShippingPackage(map);
+        return warehouseMapper.deleteShippingPackage(map);
     }
 
     @Override
     public int selectShippingPackage(Map<String, String> map) {
-        return dao.selectShippingPackage(map);
+        return warehouseMapper.selectShippingPackage(map);
     }
 
     @Override
     public List<Map<String, String>> getMaxImg(Map<String, String> map) {
-        return dao.getMaxImg(map);
+        return warehouseMapper.getMaxImg(map);
     }
 
     @Override
     public List<Map<String, String>> getCntSum(Map<String, String> map) {
-        return dao.getCntSum(map);
+        return warehouseMapper.getCntSum(map);
     }
 
     @Override
     public List<ShippingPackage> getPackageInfo(Map<String, String> map) {
-        List<ShippingPackage> list=dao.getPackageInfo(map);
+        List<ShippingPackage> list=warehouseMapper.getPackageInfo(map);
         list.stream().forEach(s->{
             s.setShipmentno("<input type='text' id='packageNo' value='"+map.get("shipmentno")+"' style='width: 50px' disabled='disabled'/><input type='hidden' id='"+map.get("shipmentno")+"' value='"+map.get("shipmentno")+"' />");
             s.setSweight("<input type='text' id='weight' value='"+s.getSweight()+"' />");
@@ -1928,18 +1924,18 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int batchUpdateShippingPackage(List<Map<String, String>> list) {
-        return dao.batchUpdateShippingPackage(list);
+        return warehouseMapper.batchUpdateShippingPackage(list);
     }
 
     @Override
     public List<ShippingPackage> getPackageInfoList(Map<String, String> map) {
         List<ShippingPackage> list =new ArrayList<ShippingPackage>();
         try{
-            list = dao.getPackageInfoList(map);
+            list = warehouseMapper.getPackageInfoList(map);
             for(ShippingPackage bean:list){
                 bean.setIsDropshipFlag(0);
             }
-            List<ShippingPackage> dropshipList = dao.getDropshipPackageInfoList(map);
+            List<ShippingPackage> dropshipList = warehouseMapper.getDropshipPackageInfoList(map);
             for(ShippingPackage bean:dropshipList){
                 bean.setIsDropshipFlag(1);
             }
@@ -1956,69 +1952,69 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<ShippingPackage> getShippingPackageById(Map<String, String> map) {
-        return dao.getShippingPackageById(map);
+        return warehouseMapper.getShippingPackageById(map);
     }
 
     @Override
     public int bgUpdate(List<Map<String, String>> list) {
-        return dao.bgUpdate(list);
+        return warehouseMapper.bgUpdate(list);
     }
 
     @Override
     public List<SbxxPojo> getSbxxList(Map<String, String> map) {
-        return dao.getSbxxList(map);
+        return warehouseMapper.getSbxxList(map);
     }
 
     @Override
     public int insertSbxx(Map<String, String> map) {
-        return dao.insertSbxx(map);
+        return warehouseMapper.insertSbxx(map);
     }
 
     @Override
     public int updateOpsState(Map<String, String> map) {
-        return dao.updateOpsState(map);
+        return warehouseMapper.updateOpsState(map);
     }
 
     @Override
     public int updateOrderinfoNumber(Map<String, String> map) {
-        return dao.updateOrderinfoNumber(map);
+        return warehouseMapper.updateOrderinfoNumber(map);
     }
 
     @Override
     public int updateOrderinfoState(Map<String, String> map) {
         //更新订单的状态
-        return dao.updateOrderinfoState(map);
+        return warehouseMapper.updateOrderinfoState(map);
     }
     @Override
     public int updateChildOrderinfoState(Map<String, String> mapc) {
         //更新dropship子订单的状态
-        return dao.updateChildOrderinfoState(mapc);
+        return warehouseMapper.updateChildOrderinfoState(mapc);
     }
 
     @Override
     public int GetSetOrdrerState(Map<String, String> map) {
-        return dao.GetSetOrdrerState(map);
+        return warehouseMapper.GetSetOrdrerState(map);
     }
 
     @Override
     public int updateOrder(Map<String, String> map) {
-        return dao.updateOrder(map);
+        return warehouseMapper.updateOrder(map);
     }
 
 
     @Override
     public int updateorderDetailsState(Map<String, String> map) {
-        return dao.updateorderDetailsState(map);
+        return warehouseMapper.updateorderDetailsState(map);
     }
 
     @Override
     public int getOdIsState(Map<String, String> map) {
-        return dao.getOdIsState(map);
+        return warehouseMapper.getOdIsState(map);
     }
 
     @Override
     public List<JcexPrintInfo> getJcexPrintInfoPlck(Map<String, Object> map) {
-        List<JcexPrintInfo> jcexList=dao.getJcexPrintInfoPlck(map);
+        List<JcexPrintInfo> jcexList=warehouseMapper.getJcexPrintInfoPlck(map);
         for (int i = 0; i < jcexList.size(); i++) {
             String orderid = jcexList.get(i).getOrderno();
             PurchaseServer purchaseServer = new PurchaseServerImpl();
@@ -2037,7 +2033,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             jcexList.get(i).setPay_curreny("USD");
             Map<String, Object> map1 = new HashMap<String, Object>();
             map.put("productName", jcexList.get(i).getProductname());
-            String ret = dao.getHsCode(map1);
+            String ret = warehouseMapper.getHsCode(map1);
             jcexList.get(i).setHscode(ret);
             map1.clear();
             String useridAndOrderid = "";
@@ -2058,7 +2054,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<JcexPrintInfo> getJcexPrintInfoPlckCount(Map<String, Object> map) {
-        List<JcexPrintInfo> jcexList=dao.getJcexPrintInfoPlckCount(map);
+        List<JcexPrintInfo> jcexList=warehouseMapper.getJcexPrintInfoPlckCount(map);
         for (int i = 0; i < jcexList.size(); i++) {
             String orderid = jcexList.get(i).getOrderno();
             PurchaseServer purchaseServer = new PurchaseServerImpl();
@@ -2077,7 +2073,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             jcexList.get(i).setPay_curreny("USD");
             Map<String, Object> map1 = new HashMap<String, Object>();
             map.put("productName", jcexList.get(i).getProductname());
-            String ret = dao.getHsCode(map1);
+            String ret = warehouseMapper.getHsCode(map1);
             jcexList.get(i).setHscode(ret);
             map1.clear();
             String useridAndOrderid = "";
@@ -2096,11 +2092,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<Forwarder> getForwarderplck(Map<String, Object> map) {
-        List<Forwarder>  list = dao.getForwarderplck(map);
+        List<Forwarder>  list = warehouseMapper.getForwarderplck(map);
 //        for(Forwarder bean :list){
 //            bean.setIsDropshipFlag(0);
 //        }
-//        List<Forwarder>  fwList = dao.getDropshipForwarderplck(map);
+//        List<Forwarder>  fwList = warehouseMapper.getDropshipForwarderplck(map);
 //        for(Forwarder bean :fwList){
 //            bean.setIsDropshipFlag(1);
 //        }
@@ -2110,8 +2106,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int getCountForwarderplck(Map<String, Object> map) {
-        int count = dao.getCountForwarderplck(map);
-//        int count2 = dao.getDropshipCountForwarderplck(map);
+        int count = warehouseMapper.getCountForwarderplck(map);
+//        int count2 = warehouseMapper.getDropshipCountForwarderplck(map);
 //        count+=count2;
         return count;
     }
@@ -2155,313 +2151,313 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int updateExperssNoPlck(Map<String, Object> map) {
-        return dao.updateExperssNoPlck(map);
+        return warehouseMapper.updateExperssNoPlck(map);
     }
 
     @Override
     public int updateGoodsDistribution(Map<String, String> map) {
-        return dao.updateGoodsDistribution(map);
+        return warehouseMapper.updateGoodsDistribution(map);
     }
 
     @Override
     public int updateRemainingPrice(Map<String, String> map) {
-        return dao.updateRemainingPrice(map);
+        return warehouseMapper.updateRemainingPrice(map);
     }
 
     @Override
     public int updateODPState(Map<String, String> map) {
-        return dao.updateODPState(map);
+        return warehouseMapper.updateODPState(map);
     }
 
     @Override
     public int updateSendMail(Map<String, String> map) {
-        return dao.updateSendMail(map);
+        return warehouseMapper.updateSendMail(map);
     }
     @Override
     public int insertId_relationtable(Map<String, String> map) {
-        return dao.insertId_relationtable(map);
+        return warehouseMapper.insertId_relationtable(map);
     }
     @Override
     public int xlsbatch(List<Map<String, String>> list) {
-        return dao.xlsbatch(list);
+        return warehouseMapper.xlsbatch(list);
     }
 
     @Override
     public int addGoodsInventory(Map<String,String> map) {
-        return dao.addGoodsInventory(map);
+        return warehouseMapper.addGoodsInventory(map);
     }
 
     @Override
     public String getUserName(String userid) {
-        return dao.getUserName(userid);
+        return warehouseMapper.getUserName(userid);
     }
 
     @Override
     public List<GoodsInventory>  addGoodsInvent(String orderid) {
-        dao.addGoodsInvent(orderid);
-        List<GoodsInventory> list = dao.selectInventByOrderId(orderid);
+        warehouseMapper.addGoodsInvent(orderid);
+        List<GoodsInventory> list = warehouseMapper.selectInventByOrderId(orderid);
         return  list;
     }
 
     @Override
     public int  insertSp(String shipmentno) {
-        return dao.insertSp(shipmentno);
+        return warehouseMapper.insertSp(shipmentno);
     }
 
     @Override
     public int selectOrderFeeByOrderid(Map<String, Object> map) {
-        List<String>  list = dao.selectOrderFeeByOrderid(map);
+        List<String>  list = warehouseMapper.selectOrderFeeByOrderid(map);
         int res = list.size();
         return res;
     }
 
     @Override
     public List<String> getOrderNoList(Map<String, Object> map) {
-        return dao.getOrderNoList(map);
+        return warehouseMapper.getOrderNoList(map);
     }
     @Override
     public String getSpId(String orderids) {
 
-        return dao.getSpId(orderids);
+        return warehouseMapper.getSpId(orderids);
     }
 
     @Override
     public int upOrderInfo(Map<String, Object> map) {
-        return 	dao.upOrderInfo(map);
+        return 	warehouseMapper.upOrderInfo(map);
     }
 
     @Override
     public int upId_relationtable(Map<String, Object> map) {
-        return  dao.upId_relationtable(map);
+        return  warehouseMapper.upId_relationtable(map);
     }
 
     @Override
     public int upOrderFee(Map<String, Object> map) {
-        return  dao.upOrderFee(map);
+        return  warehouseMapper.upOrderFee(map);
     }
 
     @Override
     public int upWaraingState(Map<String, Object> map) {
-        return  dao.upWaraingState(map);
+        return  warehouseMapper.upWaraingState(map);
     }
 
     @Override
     public String getMegerOrder(String orderId) {
-        return  dao.getMegerOrder(orderId);
+        return  warehouseMapper.getMegerOrder(orderId);
     }
 
     @Override
     public List<String> getOrderFeeOrderNO(String orderno) {
-        return  dao.getOrderFeeOrderNO(orderno);
+        return  warehouseMapper.getOrderFeeOrderNO(orderno);
     }
 
     @Override
     public int updateDropshipState(Map<String, Object> map) {
-        return dao.updateDropshipState(map);
+        return warehouseMapper.updateDropshipState(map);
     }
 
     @Override
     public String checkState(String orderno) {
         //查询子单对应主单，主单所包含的子单总数
-        int sum = dao.selectCountByparent_order_no(orderno);
+        int sum = warehouseMapper.selectCountByparent_order_no(orderno);
         //查询子单对应主单，状态为3的个数
-        int count = dao.selectSumByState(orderno);
+        int count = warehouseMapper.selectSumByState(orderno);
         String order= null;
         if(count==sum){
             //如果子单状态都为3,则返回主订单号
-            order = dao.selectDropshipOrderNo(orderno);
+            order = warehouseMapper.selectDropshipOrderNo(orderno);
         }
         return order;
     }
 
     @Override
     public int updateMainDropshipState(String mainOrder) {
-        return dao.updateMainDropshipState(mainOrder);
+        return warehouseMapper.updateMainDropshipState(mainOrder);
     }
 
     @Override
     public List<LocationManagementInfo> getLocationManagementInfo(Map<Object, Object> map) {
 
-        return dao.getLocationManagementInfo(map);
+        return warehouseMapper.getLocationManagementInfo(map);
     }
 
     @Override
     public List<LocationManagementInfo> getLocationManagementInfoByOrderid(
             String orderid) {
 
-        return dao.getLocationManagementInfoByOrderid(orderid);
+        return warehouseMapper.getLocationManagementInfoByOrderid(orderid);
     }
 
     @Override
     public int resetLocation(Map<String, String> map) {
 
-        return dao.resetLocation(map);
+        return warehouseMapper.resetLocation(map);
     }
 
     @Override
     public int updateFlag(String id, String type) {
-        return dao.updateFlag(id,type);
+        return warehouseMapper.updateFlag(id,type);
     }
 
     @Override
     public int updatebackEmail(String id, String newBlackVlue,String type) {
-        return dao.updatebackEmail(id,newBlackVlue,type);
+        return warehouseMapper.updatebackEmail(id,newBlackVlue,type);
     }
 
     @Override
     public int addBackUser(String blackVlue, String type,String userName) {
-        return dao.addBackUser(blackVlue,type,userName);
+        return warehouseMapper.addBackUser(blackVlue,type,userName);
     }
 
     @Override
     public int searchCount(Map<Object, Object> map) {
 
-        return dao.searchCount(map);
+        return warehouseMapper.searchCount(map);
     }
 
     @Override
     public void inertLocationTracking(Map<String, String> map) {
 
-        dao.inertLocationTracking(map);
+        warehouseMapper.inertLocationTracking(map);
     }
 
     @Override
     public List<LocationTracking> getLocationTracking(Map<Object, Object> map) {
 
-        return dao.getLocationTracking(map);
+        return warehouseMapper.getLocationTracking(map);
     }
 
     @Override
     public int searchCount1() {
 
-        return dao.searchCount1();
+        return warehouseMapper.searchCount1();
     }
 
     @Override
     public String getCreateTime(String barcode) {
-        return dao.getCreateTime(barcode);
+        return warehouseMapper.getCreateTime(barcode);
     }
 
     @Override
     public int noInspection() {
 
-        List<String> rows=dao.noInspection();
+        List<String> rows=warehouseMapper.noInspection();
         return rows!=null?rows.size():0;
     }
 
     @Override
     public List<LocationManagementInfo> getCheckOrders(String orderids, int num) {
 
-        return dao.getCheckOrders(orderids,num);
+        return warehouseMapper.getCheckOrders(orderids,num);
     }
 
     @Override
     public List<StorageLocationBean> getAllOutboundorder(Map<Object, Object> map) {
 
-        return dao.getAllOutboundorder(map);
+        return warehouseMapper.getAllOutboundorder(map);
     }
 
     @Override
     public List<OrderDetailsBean> getOrderDetailsInfo(Map<Object, Object> map) {
 
-        return dao.getOrderDetailsInfo(map);
+        return warehouseMapper.getOrderDetailsInfo(map);
     }
 
     @Override
     public int updateState(Map<String, String> map) {
 
-        return dao.updateState(map);
+        return warehouseMapper.updateState(map);
     }
 
     @Override
     public int getMid() {
 
-        return dao.getMid();
+        return warehouseMapper.getMid();
     }
 
     @Override
     public int getShortTerm() {
 
-        return dao.getShortTerm();
+        return warehouseMapper.getShortTerm();
     }
 
     @Override
     public String getOrderIdByBarcode(String barcode) {
 
-        return dao.getOrderIdByBarcode(barcode);
+        return warehouseMapper.getOrderIdByBarcode(barcode);
     }
 
     @Override
     public List<String> getSaleOrderid(String shipno) {
-        return dao.getSaleOrderid(shipno);
+        return warehouseMapper.getSaleOrderid(shipno);
     }
 
     @Override
     public List<StorageInspectionLogPojo> getStorageInspectionLogInfo(Map<String, String> map) {
-        return dao.getStorageInspectionLogInfo(map);
+        return warehouseMapper.getStorageInspectionLogInfo(map);
     }
 
 
     @Override
     public LocationManagementInfo getTaoBaoInfos(String orderid) {
 
-        return dao.getTaoBaoInfos(orderid);
+        return warehouseMapper.getTaoBaoInfos(orderid);
     }
 
     @Override
     public int getAcounts(String orderid) {
 
-        return dao.getAcounts(orderid);
+        return warehouseMapper.getAcounts(orderid);
     }
 
     @Override
     public int getAmounts(String orderid) {
 
-        return dao.getAmounts(orderid);
+        return warehouseMapper.getAmounts(orderid);
     }
 
     @Override
     public List<TaoBaoOrderInfo> getPurchaseOrderDetails(Map<Object, Object> map) {
 
-        return dao.getPurchaseOrderDetails(map);
+        return warehouseMapper.getPurchaseOrderDetails(map);
     }
 
     @Override
     public int updateIsRead(String orderid) {
 
-        return dao.updateIsRead(orderid);
+        return warehouseMapper.updateIsRead(orderid);
     }
 
     @Override
     public List<String> getInfos(int admid) {
 
-        return dao.getInfos(admid);
+        return warehouseMapper.getInfos(admid);
     }
 
     @Override
     public List<Tb1688Account> getAllBuy() {
 
-        return dao.getAllBuy();
+        return warehouseMapper.getAllBuy();
     }
 
     @Override
     public void updateMessageY(String ids) {
 
-        dao.updateMessageY(ids);
+        warehouseMapper.updateMessageY(ids);
     }
 
     @Override
     public OrderBean getUserOrderInfoByOrderNo(String orderNo) {
-        return dao.getUserOrderInfoByOrderNo(orderNo);
+        return warehouseMapper.getUserOrderInfoByOrderNo(orderNo);
     }
 
     @Override
     public int updateBarcodeByOrderNo(String orderid) {
 
-        List<String>  list = dao.selectBarcideByOrderNo(orderid);
+        List<String>  list = warehouseMapper.selectBarcideByOrderNo(orderid);
         int ret = 0 ;
         if(list.size()>0){
-            ret = dao.updateBarcodeByOrderNo(list);
+            ret = warehouseMapper.updateBarcodeByOrderNo(list);
         }
         return ret;
     }
@@ -2469,80 +2465,80 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public List<TaoBaoOrderInfo> getAllCount(Map<Object, Object> map) {
 
-        return dao.getAllCount(map);
+        return warehouseMapper.getAllCount(map);
     }
 
     @Override
     public int queryOrderState(Map<String, String> map) {
 
-        return dao.queryOrderState(map);
+        return warehouseMapper.queryOrderState(map);
     }
 
     @Override
     public int updateOrderState(Map<String, String> map) {
 
-        return dao.updateOrderState(map);
+        return warehouseMapper.updateOrderState(map);
     }
 
     @Override
     public int updateAllDetailsState(Map<String, String> map) {
 
-        return dao.updateAllDetailsState(map);
+        return warehouseMapper.updateAllDetailsState(map);
     }
 
     @Override
     public int updateTbState(Map<String, String> map) {
-        return dao.updateTbState(map);
+        return warehouseMapper.updateTbState(map);
     }
 
     @Override
     public int insertRemark(Map<String, String> map) {
 
-        return dao.insertRemark(map);
+        return warehouseMapper.insertRemark(map);
     }
 
     @Override
     public List<String> allLibraryCount() {
 
-        return dao.allLibraryCount();
+        return warehouseMapper.allLibraryCount();
     }
 
     @Override
     public int getStockOrderInfo() {
 
-        return dao.getStockOrderInfo();
+        return warehouseMapper.getStockOrderInfo();
     }
 
     @Override
     public List<StorageLocationBean> allLibrary(Map<Object, Object> map) {
 
-        return dao.allLibrary(map);
+        return warehouseMapper.allLibrary(map);
     }
 
     @Override
     public void treasuryNote(String orderNo, int goodsid, String remarkContent) {
-        dao.treasuryNote(orderNo, goodsid, remarkContent);
+        warehouseMapper.treasuryNote(orderNo, goodsid, remarkContent);
     }
     @Override
     public int updateCheckForNote(String orderNo, int goodsid) {
-        return dao.updateCheckForNote(orderNo, goodsid);
+        return warehouseMapper.updateCheckForNote(orderNo, goodsid);
     }
     @Override
     public Integer[] deleteOrderGoods(String orderNo, int goodId, int userid,
                                       int purchase_state, List<ClassDiscount> cdList, HttpServletResponse response) {
-        int res = dao.getDelOrder(orderNo);//根据订单号获取当前订单有多少个商品未取消
+        int res = warehouseMapper.getDelOrder(orderNo);//根据订单号获取当前订单有多少个商品未取消
 
-        dao.updateOrderChange2State(orderNo, goodId, null);//更新order_change
+        warehouseMapper.updateOrderChange2State(orderNo, goodId, null);//更新order_change
 
-        Map<String, Object> orderinfoMap = dao.getOrderinfoByOrderNo(orderNo);//获取当前订单的信息
+        Map<String, Object> orderinfoMap = warehouseMapper.getOrderinfoByOrderNo(orderNo);//获取当前订单的信息
 
         String remaining = String.valueOf(orderinfoMap.get("remaining_price"));
 
         orderinfoMap.put("remaining_price", Utility.getStringIsNull(remaining) ? remaining : "0");
 
-        List<OrderDetailsBean> orderDetails = dao.getDelOrderByOrderNoAndStatus(orderNo, goodId);//获取订单改商品的订单详情
+        List<OrderDetailsBean> orderDetails = warehouseMapper.getDelOrderByOrderNoAndStatus(orderNo, goodId);//获取订单改商品的订单详情
 
-        int deleteCtpoOrderGoods = dao.updateOrderDetails2StateByGoodId(orderNo, goodId);//修改订单详情状态=2
+        int deleteCtpoOrderGoods = warehouseMapper.updateOrderDetails2StateByGoodId(orderNo, goodId);//修改订单详情状态=2
         if (deleteCtpoOrderGoods < 0) {
             deleteCtpoOrderGoods = 0;
         }
@@ -2559,7 +2555,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         double payprice = Double.parseDouble(orderinfoMap.get("pay_price").toString());//.get("pay_price").toString()
         //获取用户货币单位
 //		String currency_u = userMapper.getCurrencyById(userid);
-        double userAccount =Double.parseDouble(String.valueOf(dao.getBalance_currency(userid).get("available_m")));
+        double userAccount =Double.parseDouble(String.valueOf(warehouseMapper.getBalance_currency(userid).get("available_m")));
         double exchange_rate = 1;
         String pay_price = "";
         if(orderinfoMap != null && deleteCtpoOrderGoods == 1){
@@ -2617,7 +2613,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         //订单所欠费用大于商品费用->修改订单表的订单所欠费用(订单所欠费用-商品费用)
                         available_r = new BigDecimal(r_price - available).setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
                         pay_price = new BigDecimal(payprice).setScale(2,   BigDecimal.ROUND_HALF_UP).toString();
-                        dao.updateOrderPayPrice1(userid, orderNo, pay_price, null,discount_amount,share_discount,product_cost,available_r,cashback);
+                        warehouseMapper.updateOrderPayPrice1(userid, orderNo, pay_price, null,discount_amount,share_discount,product_cost,available_r,cashback);
                     }else{
                         //订单所欠费用小于商品费用->删除的商品放入余额（商品费用-订单所欠费用）
                         available_r = new BigDecimal(available - r_price).setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -2640,12 +2636,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
                             rr.setBalanceAfter(userAccount+available_ru);
                             rr.setRemark("cancel:"+orderNo+",goodsid:"+goodId);
                             rr.setCurrency(currency);
-                            dao.addRechargeRecord(rr);
-                            dao.upUserPrice(userid, available_ru, order_ac);
-                            dao.updateOrderPayPrice1(userid, orderNo, pay_price, null, discount_amount,share_discount,product_cost, 0.0,cashback);
+                            warehouseMapper.addRechargeRecord(rr);
+                            warehouseMapper.upUserPrice(userid, available_ru, order_ac);
+                            warehouseMapper.updateOrderPayPrice1(userid, orderNo, pay_price, null, discount_amount,share_discount,product_cost, 0.0,cashback);
                             //社交分享--同步更新分享者优惠折扣
                             try {
-                                dao.updateAcceptPriceByOrderNo(orderNo,pay_price);
+                                warehouseMapper.updateAcceptPriceByOrderNo(orderNo,pay_price);
                             } catch (Exception e) {
                                 LOG.error("直接取消商品", e);
                             }
@@ -2658,12 +2654,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
         if(res == 1 && deleteCtpoOrderGoods == 1){
             //将订单状态改为已删除状态 后台取消为-1，前台客户取消为6
-            dao.upOrderPurchase(purchase_state, orderNo, -1);
+            warehouseMapper.upOrderPurchase(purchase_state, orderNo, -1);
             //删除对应消息删除message 表中有确认价格信息的数据
-            dao.delMessageByOrderid(orderNo, "Order #");
+            warehouseMapper.delMessageByOrderid(orderNo, "Order #");
             //更新社交分享 accept_share 状态
             try {
-                int ret = dao.updateAcceptShareByOrderNo(orderNo);
+                int ret = warehouseMapper.updateAcceptShareByOrderNo(orderNo);
                 if(ret>0){
                     //清除cookie 中的 shareID
                     Cookie cookie = new Cookie("shareID",null);
@@ -2675,8 +2671,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
             return new Integer[]{deleteCtpoOrderGoods,6};
         }else{
-            dao.upOrderPurchase(purchase_state, orderNo, 5);
-            Integer orderstate =  dao.checkUpOrderState(orderNo);
+            warehouseMapper.upOrderPurchase(purchase_state, orderNo, 5);
+            Integer orderstate =  warehouseMapper.checkUpOrderState(orderNo);
             return new Integer[]{deleteCtpoOrderGoods,orderstate};
 //			return new Integer[]{deleteCtpoOrderGoods,5};
         }
@@ -2684,41 +2680,41 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<OrderBean> getOrderInfo(int userid, String order_no) {
-        return dao.getOrderInfoByOrder_noAndUserid( userid, order_no.split(","));
+        return warehouseMapper.getOrderInfoByOrder_noAndUserid( userid, order_no.split(","));
     }
 
     @Override
     public int insertBuluInfo(List<Map<String, Object>> bgList) {
-        return  dao.insertBuluInfo(bgList);
+        return  warehouseMapper.insertBuluInfo(bgList);
     }
 
     @Override
     public String getOrderInfoStateByOrderNo(String orderNo) {
-        return dao.getOrderInfoStateByOrderNo(orderNo);
+        return warehouseMapper.getOrderInfoStateByOrderNo(orderNo);
     }
 
     @Override
     public int getOrderDetailsStateByOrderNoAndGoodsid(String orderNo, int odid) {
-        return dao.getOrderDetailsStateByOrderNoAndGoodsid(orderNo, odid);
+        return warehouseMapper.getOrderDetailsStateByOrderNoAndGoodsid(orderNo, odid);
     }
 
     @Override
     public int updateOrderSourceState(String orderid) {
 
-        return dao.updateOrderSourceState(orderid);
+        return warehouseMapper.updateOrderSourceState(orderid);
     }
 
     @Override
     public int checkAuthorizedFlag(String orderid) {
         int ret=0;
         Map<String,String> map=new HashMap<String,String>();
-        List<String> oList=dao.getAllGoodsPidsByOrderNo(orderid);
+        List<String> oList=warehouseMapper.getAllGoodsPidsByOrderNo(orderid);
         for(String pid:oList){
             map.put("goodsPid",pid);
-            ret=dao.checkIsExit(map);
+            ret=warehouseMapper.checkIsExit(map);
             if(ret<=0){
                 map.put("flag","2");
-                ret=dao.insertAuthorizedFlag(map);
+                ret=warehouseMapper.insertAuthorizedFlag(map);
             }
         }
         return ret;
@@ -2726,7 +2722,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public int insertGoodsInventory(String orderid) {
-        return dao.insertGoodsInventory(orderid);
+        return warehouseMapper.insertGoodsInventory(orderid);
     }
 
     @Override
@@ -2741,10 +2737,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
             }
         }
         //更新orderinfo 订单信息
-        dao.updateBuluOrderState(bgList);
+        warehouseMapper.updateBuluOrderState(bgList);
         //更新dropshipOrder 订单信息
-        dao.updateBuluDropShipOrderState(list);
-        return dao.updateBuluOrderState(bgList);
+        warehouseMapper.updateBuluDropShipOrderState(list);
+        return warehouseMapper.updateBuluOrderState(bgList);
     }
 
     @Override
@@ -2764,7 +2760,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         ArrayList<String> picturepaths = new ArrayList<String>();
         resMap.put("picturepaths", picturepaths);
         // order_details.picturepath		orderid,picturepath
-        List<Map<String, Object>> orderDetailss = dao.getOrderDetailsByOrderidIn(remarksList);
+        List<Map<String, Object>> orderDetailss = warehouseMapper.getOrderDetailsByOrderidIn(remarksList);
         for (Map<String, Object> orderDetails : orderDetailss) {
             Object picturepath = orderDetails.get("picturepath");
             if (picturepath != null && !"".equals(picturepath.toString())){
@@ -2780,7 +2776,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         ArrayList<String> ftpPicPaths = new ArrayList<String>();
         resMap.put("ftpPicPaths", ftpPicPaths);
         // products packed 出货照片 orderinfo.ftpPicPath 		order_no,ftpPicPath
-        List<Map<String, Object>> orderinfos = dao.getOrderinfoByOrderNoIn(remarksList);
+        List<Map<String, Object>> orderinfos = warehouseMapper.getOrderinfoByOrderNoIn(remarksList);
         for (Map<String, Object> orderinfo : orderinfos) {
             Object ftpPicPath = orderinfo.get("ftpPicPath");
             if (ftpPicPath != null && !"".equals(ftpPicPath.toString())){
@@ -2800,7 +2796,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
     @Override
     public void insertChangeLog(Map<String, Object> map) {
     	//保存运单变更记录 （用于退回等订单将原物流保存到新物流商） ly 2018/08/22 15:36
-    	dao.insertChangeLog(map);
+    	warehouseMapper.insertChangeLog(map);
     }
 
 }

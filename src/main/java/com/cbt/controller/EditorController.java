@@ -87,6 +87,11 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if(goods.getValid() == 0 && StringUtils.isBlank(goods.getOffReason())){
+            goods.setOffReason("老数据");
+        }else if(goods.getValid() == 2 && goods.getUnsellAbleReason() == 0){
+            goods.setUnsellAbleReasonDesc("老数据");
+        }
 
         if (goods == null) {
             mv.addObject("uid", -1);
@@ -543,6 +548,11 @@ public class EditorController {
             }
             // 获取商品信息
             CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            if(orGoods.getValid() == 0 && StringUtils.isBlank(orGoods.getOffReason())){
+                orGoods.setOffReason("老数据");
+            }else if(orGoods.getValid() == 2 && orGoods.getUnsellAbleReason() == 0){
+                orGoods.setUnsellAbleReasonDesc("老数据");
+            }
 
             //判断售卖单位是否一致
 //            if(sellUtil.equalsIgnoreCase(orGoods.getSellUnit())){
@@ -800,9 +810,9 @@ public class EditorController {
                 mainImg = mainImg.replace(orGoods.getRemotpath(),"");
                 // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
                 if(mainImg.contains(".60x60")){
-                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
+                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220").replace(orGoods.getRemotpath(),""));
                 }else if(mainImg.contains(".400x400")){
-                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
+                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220").replace(orGoods.getRemotpath(),""));
                 }
                 cgp.setShowMainImage(mainImg);
                 cgp.setIsUpdateImg(2);
@@ -824,12 +834,6 @@ public class EditorController {
             if (success > 0) {
                 customGoodsService.insertIntoGoodsEditBean(editBean);
                 //更新编辑标识
-                /*int isExists = customGoodsService.checkIsEditedByPid(cgp.getPid());
-                if(isExists > 0){
-                    customGoodsService.updatePidIsEdited(cgp.getPid(),user.getId());
-                }else{
-                    customGoodsService.insertPidIsEdited(orGoods.getShopId(),cgp.getPid(),user.getId());
-                }*/
                 editBean.setIs_edited(1);
                 editBean.setPublish_flag(0);
                 customGoodsService.updatePidIsEdited(editBean);

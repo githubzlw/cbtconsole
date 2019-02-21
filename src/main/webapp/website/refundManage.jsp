@@ -376,14 +376,15 @@
             }
         } else if (actionFlag == 1) {
             if (state == 0) {
-                if(roleType == 3 || roleType == 4){
+                showDivSecvlid(refundId,type,state,1,userId,amount,orderNo,operatorId);
+                /*if(roleType == 3 || roleType == 4){
                     //销售同意退款
                     showDivSecvlid(refundId,type,state,1,userId,amount,orderNo,operatorId);
                 }else{
                     alert("需要销售同意，您无权限操作！");
                     hideDivRemark();
                     return false;
-                }
+                }*/
             } else if (state == 1 || state == 2) {
                 if(roleType == 0){
                     //主管同意退款
