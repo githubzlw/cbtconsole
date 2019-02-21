@@ -87,6 +87,11 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if(goods.getValid() == 0 && StringUtils.isBlank(goods.getOffReason())){
+            goods.setOffReason("老数据");
+        }else if(goods.getValid() == 2 && goods.getUnsellAbleReason() == 0){
+            goods.setUnsellAbleReasonDesc("老数据");
+        }
 
         if (goods == null) {
             mv.addObject("uid", -1);
@@ -543,6 +548,11 @@ public class EditorController {
             }
             // 获取商品信息
             CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            if(orGoods.getValid() == 0 && StringUtils.isBlank(orGoods.getOffReason())){
+                orGoods.setOffReason("老数据");
+            }else if(orGoods.getValid() == 2 && orGoods.getUnsellAbleReason() == 0){
+                orGoods.setUnsellAbleReasonDesc("老数据");
+            }
 
             //判断售卖单位是否一致
 //            if(sellUtil.equalsIgnoreCase(orGoods.getSellUnit())){

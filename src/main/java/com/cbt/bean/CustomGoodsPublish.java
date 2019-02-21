@@ -752,6 +752,8 @@ public class CustomGoodsPublish extends CustomGoodsBean {
             unsellAbleReasonDesc = "大于400美元商品下架";
         } else if (unsellAbleReason == 22) {
             unsellAbleReasonDesc = "老数据没有展示详情图片";
+        } else if (unsellAbleReason == 23) {
+            unsellAbleReasonDesc = "对应1688商品成交量小于4";
         }
     }
 
