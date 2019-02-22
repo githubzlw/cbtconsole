@@ -182,6 +182,15 @@
 		#authorized_dlg table td{
 			padding: 4px;
 		}
+
+        td > .datagrid-cell {
+            text-align: left !important;
+            padding: 5px 0;
+        }
+
+        td > .datagrid-cell > button {
+            margin-bottom: 10px;
+        }
     </style>
 <%
   String admName=request.getParameter("admName");
@@ -457,6 +466,11 @@
         </select>
             &nbsp;&nbsp;品牌属性:<input class="easyui-textbox" name="shopBrand" id="shopBrand"
                                     style="width:240px; margin-top: 10px;"/>
+            &nbsp;&nbsp;标记翻译产品描述:<select id="translate_description" class="easyui-combobox" name="translateDescription" style="width:100px;">
+                <option value="-1">全选</option>
+                <option value="0">未标记</option>
+                <option value="1">已标记</option>
+            </select>
             &nbsp;&nbsp;<input
                 class="but_color" type="button" value="查询" onclick="doQuery(1)">
             &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
@@ -596,6 +610,7 @@
         var timeTo = $("#timeTo").val();
         var is_on = $("#is_on").combobox('getValue');
         var ready_del = $("#ready_del").combobox('getValue');
+        var translate_description = $("#translate_description").combobox('getValue');
         var isAuto = $("#is_auto").combobox('getValue');
         var state_id = $("#state_id").combobox('getValue');
         var shopType = $("#shop_type").combobox('getValue');
@@ -612,6 +627,7 @@
             "timeTo": timeTo,
             "isOn": is_on,
             "readyDel": ready_del,
+            "translateDescription": translate_description,
             "isAuto": isAuto,
             "state": state_id,
             "shopType":shopType,
@@ -1076,6 +1092,25 @@
             }
         });
     }
+
+
+    function setShopTranslate(shopId,translateFlag) {
+        $.ajax({
+            url: '/cbtconsole/ShopUrlC/setShopTranslate.do',
+            type: "post",
+            data: {
+                "shopId" : shopId,
+                "translateFlag" :translateFlag
+            },
+            success: function (data) {
+                if (data.ok) {
+                    $("#easyui-datagrid").datagrid("reload");
+                } else {
+                    $.messager.alert('提示', data.message,'error');
+                }
+            }
+        });
+    }
     
     //授权文件问题 总数显示
     $.ajax({
@@ -1104,7 +1139,6 @@
 			}
 		}
 	});
-
 
 </script>
 

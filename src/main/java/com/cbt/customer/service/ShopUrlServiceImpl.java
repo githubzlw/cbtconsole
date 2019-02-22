@@ -247,5 +247,10 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return dao.deleteGoodsByPid(pid);
     }
 
+    @Override
+    public int setShopTranslate(String shopId) {
+        return dao.setShopTranslate(shopId);
+    }
+
 
 }

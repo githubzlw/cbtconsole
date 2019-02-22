@@ -328,4 +328,11 @@ public interface IShopUrlService {
      */
     boolean deleteGoodsByPid(String pid);
 
+    /**
+     * 设置翻译1688产品描述店铺标识
+     * @param shopId
+     * @return
+     */
+    int setShopTranslate(String shopId);
+
 }

@@ -116,6 +116,7 @@ public class ShopUrlController {
         String isOnStr = request.getParameter("isOn");
         String isAutoStr = request.getParameter("isAuto");
         String readyDelStr = request.getParameter("readyDel");
+        String translateDescriptionStr = request.getParameter("translateDescription");
         String stateStr = request.getParameter("state");
         String shopTypeStr = request.getParameter("shopType");
         String authorizedFlagStr = request.getParameter("authorizedFlag");
@@ -150,6 +151,10 @@ public class ShopUrlController {
         int readyDel = -1;
         if (!StringUtils.isBlank(readyDelStr)) {
             readyDel = Integer.valueOf(readyDelStr);
+        }
+        int translateDescription = -1;
+        if (!StringUtils.isBlank(translateDescriptionStr)) {
+            translateDescription = Integer.valueOf(translateDescriptionStr);
         }
 
         if (time1 != null && time1 != "") {
@@ -3555,6 +3560,42 @@ public class ShopUrlController {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/setShopTranslate.do")
+    @ResponseBody
+    public JsonResult setShopTranslate(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
+
+        try {
+            shopUrlService.setShopTranslate(shopId);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
 
     private float genFloatWidthTwoDecimalPlaces(float numVal) {

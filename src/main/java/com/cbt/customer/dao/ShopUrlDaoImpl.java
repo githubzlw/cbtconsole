@@ -274,6 +274,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setSalesVolume(rs.getInt("sales_volume_threshold"));
                 su.setIsAuto(rs.getInt("is_auto"));
 
+                su.setIsTranslateDescription(rs.getInt("is_translate_description"));
+
                 String stateInfo = "";
                 if (onlineStatus == 0) {
                     stateInfo = "<button class=\"but_color\" onclick=\"edit(" + su.getId() + "," + su.getIsAuto() + ")\">编辑</button>";
@@ -323,6 +325,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                             + "')\">授权店铺</button>";
                 }*/
                 su.setAuthorizedFlag(queryAuthorizedFlag);
+
+                if(su.getIsTranslateDescription() > 0){
+                    stateInfo += "<b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
+                }else{
+                    stateInfo += "<button class=\"but_color\" onclick=\"setShopTranslate('" + su.getShopId()
+                            + "',1)\">标识翻译产品描述</button>";
+                }
                 su.setStateInfo(stateInfo);
 
                 // + "<button style=\"margin-left: 10px;\" onclick=\"delreply("
@@ -3296,6 +3305,29 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs > 0;
+    }
+
+    @Override
+    public int setShopTranslate(String shopId) {
+        {
+            Connection conn = DBHelper.getInstance().getConnection5();
+            PreparedStatement stmt = null;
+            String upSql = "update shop_url_bak set is_translate_description = 1 where shop_id = ? ";
+            int rs = 0;
+            try {
+                stmt = conn.prepareStatement(upSql);
+                stmt.setString(1, shopId);
+                rs = stmt.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("shopId:" + shopId + ",setShopTranslate error: " + e.getMessage());
+                LOG.error("shopId:" + shopId + ",setShopTranslate error: " + e.getMessage());
+            } finally {
+                DBHelper.getInstance().closePreparedStatement(stmt);
+                DBHelper.getInstance().closeConnection(conn);
+            }
+            return rs;
+        }
     }
 
 }
