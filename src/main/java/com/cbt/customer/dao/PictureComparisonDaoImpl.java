@@ -2023,28 +2023,31 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   
 			   sql= sql+"order by a.create_time desc LIMIT "+start+","+end+"";
 			   if (valid==10) {
-				   sql= " select b.email,a.user_id,a.url,COUNT(a.url) as count,a.create_time from error_info a ";
-				   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
-				   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
-				   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
-				   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
-				   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
-					sql+=" and a.valid=10 ";
+				   sql= " SELECT c.*,COUNT(c.url) as count,d.unsellableReason_name,d.cur_time FROM (SELECT a.*,b.email from error_info as a LEFT JOIN `user` as b "
+				   		+ "ON a.user_id=b.id and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' "
+				   		+ "and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%' and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'"
+				   		+ " and b.email  not  like  '789@222.com'  ) as c LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id) AS d on c.pid=d.pid  ";
+				  // sql= sql+" JOIN user b on a.user_id=b.id LEFT JOIN custom_benchmark_ready as cbr ON a.pid=cbr.pid ";
+				  // sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+				   //sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+				   //sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+				  // sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
+					sql+=" where c.valid=10 ";
 					if(!"".equals(userId) && userId!=null){
 						   
 						   if ("-1".equals(userId)) {
-								sql+=" and a.user_id !=0 ";
+								sql+=" and c.user_id !=0 ";
 							}else {
-								sql =sql+" and a.user_id = '"+userId+"' ";	
+								sql =sql+" and c.user_id = '"+userId+"' ";	
 							}
 					   }
 					   if(!"".equals(timeFrom) && timeFrom!=null){
-						   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
+						   sql =sql+" and c.create_time >= '"+timeFrom+"' ";
 					   }
 					   if(!"".equals(timeTo) && timeTo!=null){
-						   sql =sql+" and a.create_time <= '"+timeTo+"' ";
+						   sql =sql+" and c.create_time <= '"+timeTo+"' ";
 					   }
-					   sql+=" GROUP BY a.url ORDER BY a.create_time DESC LIMIT "+start+","+end+"";
+					   sql+=" GROUP BY c.url ORDER BY count DESC, c.create_time DESC LIMIT "+start+","+end+"";
 				}
             
 		
@@ -2063,6 +2066,9 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb.setCreatetime(rs.getString("create_time"));
 				if (valid ==10) {
 				gfb.setAddress(rs.getString("count"));
+				gfb.setAliCatName(rs.getString("unsellableReason_name"));
+				gfb.setAligSourceUrl(rs.getString("cur_time"));
+				gfb.setAliStyImg(rs.getString("ip"));
 				}
 				
 				gsfList.add(gfb);

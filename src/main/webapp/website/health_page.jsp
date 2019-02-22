@@ -265,7 +265,11 @@
 				<th>用户id</th>
 				<th>访问url</th>
 				<th>时间</th>
-				<th>${valid==10?"次数":"" }</th>
+				${valid==10?"<th>客户ip</th>":"" }
+				${valid==10?"<th>下架原因</th>":"" }
+				${valid==10?"<th>下架时间</th>":"" }
+				${valid==10?"<th>次数</th>":"" }
+				
 			</Tr>
 			
 			<c:forEach items="${gbbs }" var="gbb" varStatus="i">
@@ -282,7 +286,12 @@
 					<td> 
 						${gbb.createtime}
 					</td>
-					<td>${gbb.address }</td>
+					
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aliStyImg }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aliCatName }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aligSourceUrl }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.address }</td>
+					
 				</Tr>
 			</c:forEach>
 		</table>
