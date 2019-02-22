@@ -905,6 +905,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     @Override
     public List<TaoBaoOrderInfo> getBuyReturnManage(String goodsid,int page,String state,String startTime,String endTime) {
+    	
+    	
+    	
         List<TaoBaoOrderInfo> list=warehouseMapper.getBuyReturnManage(goodsid,page,state,startTime,endTime);
         for(TaoBaoOrderInfo t:list){
             t.setItemname("<a target='_blank' href='"+t.getItemurl()+"'>"+(t.getItemname().substring(0,t.getItemname().length()/3))+"</a>");
