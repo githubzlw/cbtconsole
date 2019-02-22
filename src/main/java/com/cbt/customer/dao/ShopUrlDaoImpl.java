@@ -106,7 +106,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel,int shopTypeFlag,
-                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
+                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids, int translateDescription) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
         String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b " +
@@ -153,6 +153,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if(authorizedFlag > -1){
             sql += " and a.authorized_flag = " + authorizedFlag;
+        }
+        if(translateDescription > -1){
+            sql += " and a.is_translate_description = " + translateDescription;
         }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
@@ -364,7 +367,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
     @Override
     public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
-                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
+                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,
+                     int ennameBrandFlag,String shopids, int translateDescription) {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -406,6 +410,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if(authorizedFlag > -1){
             sql += " and authorized_flag = " + authorizedFlag;
+        }
+        if(translateDescription > -1){
+            sql += " and is_translate_description = " + translateDescription;
         }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
