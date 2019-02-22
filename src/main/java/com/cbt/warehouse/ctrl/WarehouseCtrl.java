@@ -6112,7 +6112,7 @@ public class WarehouseCtrl {
 			s.setJcexFreight(freightFee);
 			list.get(i).setEstimatefreight(df.format(Double.valueOf(s.getEstimatefreight())*s.getExchange_rate()));
 			String orderid = list.get(i).getOrderid();
-			s.setSumcgprice(String.valueOf(Double.parseDouble(s.getSumcgprice())+s.getPid_amount()));
+			s.setSumcgprice(String.valueOf(Double.parseDouble(StringUtil.isBlank(s.getSumcgprice())?"0.00":s.getSumcgprice())+s.getPid_amount()));
 			PurchaseServer purchaseServer = new PurchaseServerImpl();
 			// UserOrderDetails uod =
 			// purchaseServer.getUserDetails(orderid+",");

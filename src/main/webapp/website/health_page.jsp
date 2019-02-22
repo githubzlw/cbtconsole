@@ -227,6 +227,10 @@
 		var userId = $("#userId").val();
 		var timeFrom = $("#timeFrom").val();
 		var timeTo = $("#timeTo").val();
+		var cal=document.getElementById("cal").checked
+		if(cal==true){
+			userId=-1;
+		}
 		var valid = $("#valid option:selected").val();
 		//state = $("#orderEnd").val();
 		//window.location = "${ctx}/orderInfo/getOrders?state="+state+"&orderNo="+orderNo+"&timeFrom="+timeFrom+"&timeTo="+timeTo+"&page=1";
@@ -239,7 +243,7 @@
 <body>
 <div align="left"><span onmousemove="$(this).css('color','#ff6e02');" onmouseout="$(this).css('color','#7AB63F');" onclick="window.location.href=history.go(-1)" style="color: #7AB63F;cursor: pointer;"><em  style="font-size: 19px;">&nbsp;</em></span></div>	<br>
 	<div align="center" style="display: block;height: 30px;text-align: center;margin-bottom: 20px;">
-				<span style="line-height:25px;">用户id:</span><input type="text" id="userId" value="${userId}" class="rlcj" style="margin-right: 20px;"/>
+				<span style="line-height:25px;">用户id:</span><input type="text" id="userId" value="${userId==-1?'':userId}" class="rlcj" style="margin-right: 20px;"/>
 				<span style="line-height:25px;">时间:</span> <input id="timeFrom" class="Wdate rlcj" style="width:120px;" type="text" value="${timeFrom }" onclick="WdatePicker({skin:'whyGreen',lang:'en'})" /><span> ~</span>
 				<input id="timeTo" class="Wdate rlcj" type="text" style="width:120px;" value="${timeTo }" onfocus="WdatePicker({skin:'whyGreen',lang:'en'})" />
 				<span>下架商品点击统计选择：</span>
@@ -247,8 +251,13 @@
   <option  value ="5" <c:if test="${valid=='5'}">selected="selected"</c:if>>否</option>
   <option value ="10" <c:if test="${valid=='10'}">selected="selected"</c:if>>是</option>
 </select>
+<span >游客过滤：<input id='cal' type='checkbox' ${userId==-1?"checked='checked'":"" } value='' ></span>
+
 				<input type="button" value="Search" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch();" />
+				<span>（一个产品被点击后被发现是下架了就记录.方便 李芳每天在 群里面公布所有被点击了3次以上的 下架商品）</span>
+				
 	</div>
+	
 	<div style="width: 60%;min-width: 900px;max-width: 1400px;margin: 0 auto;">
 		<table id="table1" align="center" border="1px" style="font-size: 13px;width:100%;" cellpadding="0" cellspacing="0" >
 			<Tr>
@@ -256,6 +265,11 @@
 				<th>用户id</th>
 				<th>访问url</th>
 				<th>时间</th>
+				${valid==10?"<th>客户ip</th>":"" }
+				${valid==10?"<th>下架原因</th>":"" }
+				${valid==10?"<th>下架时间</th>":"" }
+				${valid==10?"<th>次数</th>":"" }
+				
 			</Tr>
 			
 			<c:forEach items="${gbbs }" var="gbb" varStatus="i">
@@ -272,6 +286,12 @@
 					<td> 
 						${gbb.createtime}
 					</td>
+					
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aliStyImg }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aliCatName }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.aligSourceUrl }</td>
+				<td ${valid==10?"":"style='display:none;'" }>${gbb.address }</td>
+					
 				</Tr>
 			</c:forEach>
 		</table>
