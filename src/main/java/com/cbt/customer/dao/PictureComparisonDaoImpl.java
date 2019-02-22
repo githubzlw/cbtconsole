@@ -2008,7 +2008,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
 			   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
 			   if(!"".equals(userId) && userId!=null){
-				   sql =sql+" and a.user_id = '"+userId+"' ";
+				   if ("-1".equals(userId)) {
+						sql+=" and a.user_id !=0 ";
+					}else {
+						sql =sql+" and a.user_id = '"+userId+"' ";	
+					}
 			   }
 			   if(!"".equals(timeFrom) && timeFrom!=null){
 				   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
@@ -2016,11 +2020,33 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   if(!"".equals(timeTo) && timeTo!=null){
 				   sql =sql+" and a.create_time <= '"+timeTo+"' ";
 			   }
+			   
+			   sql= sql+"order by a.create_time desc LIMIT "+start+","+end+"";
 			   if (valid==10) {
-				sql+=" and a.valid=10 ";
-			}
-			   sql= sql+"order by a.create_time desc ";
-
+				   sql= " select b.email,a.user_id,a.url,COUNT(a.url) as count,a.create_time from error_info a ";
+				   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
+				   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+				   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+				   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+				   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
+					sql+=" and a.valid=10 ";
+					if(!"".equals(userId) && userId!=null){
+						   
+						   if ("-1".equals(userId)) {
+								sql+=" and a.user_id !=0 ";
+							}else {
+								sql =sql+" and a.user_id = '"+userId+"' ";	
+							}
+					   }
+					   if(!"".equals(timeFrom) && timeFrom!=null){
+						   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
+					   }
+					   if(!"".equals(timeTo) && timeTo!=null){
+						   sql =sql+" and a.create_time <= '"+timeTo+"' ";
+					   }
+					   sql+=" GROUP BY a.url ORDER BY a.create_time DESC LIMIT "+start+","+end+"";
+				}
+            
 		
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -2035,6 +2061,10 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 				gfb.setUserName(rs.getString("user_id"));
 				gfb.setUrl(rs.getString("url"));
 				gfb.setCreatetime(rs.getString("create_time"));
+				if (valid ==10) {
+				gfb.setAddress(rs.getString("count"));
+				}
+				
 				gsfList.add(gfb);
 			}
 			
@@ -3180,7 +3210,7 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	
 	
 	@Override
-	public int getErrorInfoCount(String userId,String timeFrom,String timeTo) {
+	public int getErrorInfoCount(String userId,String timeFrom,String timeTo,int valid) {
 		
 		String sql = "select count(1) as maxCount from error_info a ";
 		sql =sql +"LEFT JOIN user b on a.user_id=b.id ";
@@ -3189,7 +3219,11 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 	    sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
 	    sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
 		if(!"".equals(userId) && userId!=null){
-			   sql =sql+" and a.user_id = '"+userId+"' ";
+			if ("-1".equals(userId)) {
+				sql+=" and a.user_id !=0 ";
+			}else {
+				sql =sql+" and a.user_id = '"+userId+"' ";	
+			}
 		   }
 		   if(!"".equals(timeFrom) && timeFrom!=null){
 			   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
@@ -3197,6 +3231,30 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		   if(!"".equals(timeTo) && timeTo!=null){
 			   sql =sql+" and a.create_time <= '"+timeTo+"' ";
 		   }
+		   if (valid==10) {
+			    sql = "select count(distinct a.url) as maxCount from error_info a ";
+			   sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
+			   sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
+			   sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
+			   sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
+			   sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
+				sql+=" and a.valid=10 ";
+				if(!"".equals(userId) && userId!=null){
+					
+					 if ("-1".equals(userId)) {
+							sql+=" and a.user_id !=0 ";
+						}else {
+							sql =sql+" and a.user_id = '"+userId+"' ";	
+						}
+				   }
+				   if(!"".equals(timeFrom) && timeFrom!=null){
+					   sql =sql+" and a.create_time >= '"+timeFrom+"' ";
+				   }
+				   if(!"".equals(timeTo) && timeTo!=null){
+					   sql =sql+" and a.create_time <= '"+timeTo+"' ";
+				   }
+				  
+			}
 //		sql =sql +"";
 		
 		Connection conn = DBHelper.getInstance().getConnection();

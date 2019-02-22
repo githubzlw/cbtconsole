@@ -50,7 +50,7 @@ public interface IPictureComparisonDao {
 
 	public int getYlbbGooddataCount(String userName, int flag);
 
-	public int getErrorInfoCount(String userId,String timeF,String timeE);
+	public int getErrorInfoCount(String userId,String timeF,String timeE,int valid);
 	
 	public int getLireImgCount(String userName, int flag);
 
