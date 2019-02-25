@@ -250,6 +250,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
                             json.setData(detailedRefund);
+                            json.setTotal(0L);
                             json.setMessage("交易号[" + detailedRefund.getId() + "]");
                         } else {
                             json.setOk(false);
@@ -286,6 +287,7 @@ public class PayPalServiceImpl implements com.cbt.paypal.service.PayPalService {
                             refundResultInfoMapper.insertSelective(refundResultInfo);
                             json.setOk(true);
                             json.setData(detailedRefund);
+                            json.setTotal(5L);
                             json.setMessage("交易号[" + detailedRefund.getId() + "]");
                         } else {
                             json.setOk(false);

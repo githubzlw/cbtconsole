@@ -12,6 +12,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.pojo.OrderCancelApprovalDetails;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.PaymentServiceNew;
@@ -377,9 +378,19 @@ public class OrderCancelApprovalController {
 
         JsonResult json = new JsonResult();
         try {
+
+
             json = ppApiService.reFundNew(approvalBean.getOrderNo(), decimalFormat.format(approvalBean.getAgreeAmount()));
             OrderCancelApproval approvalOld =   approvalService.queryForSingle(approvalBean.getId());
             if (json.isOk()) {
+                // 执行金额插入
+                OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
+                approvalAmount.setApprovalId(approvalBean.getId());
+                approvalAmount.setOrderNo(approvalBean.getOrderNo());
+                approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
+                approvalAmount.setPayType(json.getTotal().intValue());
+                approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
+
                 if(approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2){
                     approvalBean.setDealState(2);
                     approvalService.updateOrderCancelApprovalState(approvalBean);
@@ -411,6 +422,10 @@ public class OrderCancelApprovalController {
                                 new BigDecimal(balance).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
                                 " system closeOrder:" + approvalBean.getOrderNo(), approvalBean.getOrderNo(),
                                 String.valueOf(approvalBean.getAdminId()), 0, 0, 1);
+                        // 插入退款金额
+                        approvalAmount.setPayAmount((double)balance);
+                        approvalAmount.setPayType(2);
+                        approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
                     }
                 }
             } else {

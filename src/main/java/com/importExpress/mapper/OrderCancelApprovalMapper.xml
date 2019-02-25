@@ -14,6 +14,9 @@
         <result column="admin_id" property="adminId"/>
         <result column="admin_name" property="adminName"/>
         <result column="update_time" property="updateTime"/>
+        <result column="approval_remark" property="approvalRemark"/>
+        <result column="cancel_remark" property="cancelRemark"/>
+        <result column="order_state" property="orderState"/>
     </resultMap>
 
     <resultMap id="approvalDetailsResultMap" type="com.importExpress.pojo.OrderCancelApprovalDetails">
@@ -30,8 +33,18 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="approvalAmountResultMap" type="com.importExpress.pojo.OrderCancelApprovalAmount">
+        <id column="id" property="id"/>
+        <result column="approval_id" property="approvalId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="pay_amount" property="payAmount"/>
+        <result column="pay_type" property="payType"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
     <select id="queryForList" parameterType="com.importExpress.pojo.OrderCancelApproval" resultMap="approvalResultMap">
         select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,a.agree_amount,
+        a.approval_remark,a.cancel_remark,a.order_state,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,
         u.available_m,u.user_email,u.admin_name,u.admin_id
         from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
@@ -63,6 +76,7 @@
 
     <select id="queryForSingle" parameterType="com.importExpress.pojo.OrderCancelApproval" resultMap="approvalResultMap">
         select a.id,a.user_id,a.order_no,a.pay_price,a.type,a.deal_state,a.agree_amount,
+        a.approval_remark,a.cancel_remark,a.order_state,
         DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,
         u.available_m,u.user_email,u.admin_name,u.admin_id
         from order_cancel_approval a left join (select `user`.id,`user`.name,`user`.available_m,`user`.email as
@@ -116,5 +130,14 @@
 		where id = #{id}
 	</update>
 
+    <select id="queryApprovalAmountByApprovalId" resultMap="approvalAmountResultMap">
+        select id,approval_id,order_no,pay_type,pay_amount,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        from order_cancel_approval_amount
+        where approval_id = #{approvalId}
+    </select>
 
+    <insert id="insertIntoOrderCancelApprovalAmount" parameterType="com.importExpress.pojo.OrderCancelApprovalAmount">
+        insert into order_cancel_approval_amount(approval_id,order_no,pay_type,pay_amount)
+        values(#{approvalId},#{orderNo},#{payType},#{payAmount})
+    </insert>
 </mapper>

@@ -158,11 +158,14 @@ public class NotifyToCustomerUtil {
 
     public static void insertIntoOrderCancelApproval(OrderCancelApproval cancelApproval){
 
-        StringBuffer sql = new StringBuffer("insert into order_cancel_approval(user_id,order_no,pay_price,type) values(");
+        StringBuffer sql = new StringBuffer("insert into order_cancel_approval(user_id,order_no,pay_price,type," +
+                "deal_state,order_state) values(");
         sql.append(cancelApproval.getUserId()+",");
         sql.append("'"+cancelApproval.getOrderNo()+"',");
         sql.append(cancelApproval.getPayPrice()+",");
-        sql.append(cancelApproval.getType()+")");
+        sql.append(cancelApproval.getType()+",");
+        sql.append(cancelApproval.getDealState()+",");
+        sql.append(cancelApproval.getOrderState()+")");
         sendSqlByMq(sql.toString());
 
     }
