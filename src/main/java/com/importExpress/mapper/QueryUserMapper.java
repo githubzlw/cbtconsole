@@ -92,4 +92,6 @@ public interface QueryUserMapper {
     List<String> queryUserExById(@Param("id") Integer id);
 
     String queryGoodsCarCount(@Param("id") Integer id);
+
+    void updateNeedoffshellEditFlag(@Param("list") List<String> list);
 }

@@ -415,4 +415,20 @@ public class QueryUserServiceImpl implements QueryUserService {
         }
         return result;
     }
+
+    @Override
+    public Map<String, Object> updateNeedoffshellEditFlag(String pids) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        String[] split = pids.split(",");
+        List<String> pidList = Arrays.asList(pids.split(","));
+        if (pidList == null || pidList.size() == 0){
+            result.put("message", "未选择商品!");
+            return result;
+        }
+        DataSourceSelector.set("dataSource28hop");
+        queryUserMapper.updateNeedoffshellEditFlag(pidList);
+        DataSourceSelector.restore();
+        result.put("message", "更新成功!");
+        return result;
+    }
 }

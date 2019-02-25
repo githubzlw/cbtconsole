@@ -461,4 +461,10 @@ public class QueryUserController {
         return queryUserService.queryUserOtherInfo(id, userType);
     }
 
+    @RequestMapping("/updateNeedoffshellEditFlag")
+    @ResponseBody
+    public Map<String, Object> updateNeedoffshellEditFlag(String pids) {
+        return queryUserService.updateNeedoffshellEditFlag(pids);
+    }
+
 }

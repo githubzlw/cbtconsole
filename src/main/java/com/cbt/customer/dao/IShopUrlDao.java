@@ -11,10 +11,10 @@ public interface IShopUrlDao {
 
     List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end,
                           String timeFrom, String timeTo, int isOn, int state, int isAuto, int readyDel, int shopType,
-                          int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids);
+                          int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids, int translateDescription);
 
     int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
-              int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids);
+              int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids, int translateDescription);
 
     int delById(int id);
 
@@ -433,5 +433,12 @@ public interface IShopUrlDao {
      * @return
      */
     boolean deleteGoodsByPid(String pid);
+
+    /**
+     * 设置翻译1688产品描述店铺标识
+     * @param shopId
+     * @return
+     */
+    int setShopTranslate(String shopId);
 
 }
