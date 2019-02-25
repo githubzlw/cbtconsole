@@ -302,15 +302,16 @@ public class CustomerDisputeServiceImpl implements CustomerDisputeService {
 	    			
 	    			JSONObject data = (JSONObject)document.get("data");
 	    			JSONObject objectd = (JSONObject)data.get("object");
+	    			bean.setDisputeID(objectd.getString("id"));
 	    			
 	    			JSONArray balanceTransactions = objectd.getJSONArray("balance_transactions");
-	    			
-	                JSONObject balanceTransaction = (JSONObject)balanceTransactions.get(0);
-	                bean.setDisputeID(objectd.getString("id"));
-	                String net = String.valueOf(balanceTransaction.getString("net"));
-	                net = net.substring(1,net.length() - 2) + "." + net.substring(net.length() - 2);
-	                
-	                bean.setValue(net + " " + balanceTransaction.getString("currency").toUpperCase());
+	    			if(balanceTransactions != null && balanceTransactions.size() > 0) {
+	    				JSONObject balanceTransaction = (JSONObject)balanceTransactions.get(0);
+	    				String net = String.valueOf(balanceTransaction.getString("net"));
+	    				net = net.substring(1,net.length() - 2) + "." + net.substring(net.length() - 2);
+	    				
+	    				bean.setValue(net + " " + balanceTransaction.getString("currency").toUpperCase());
+	    			}
 	                bean.setTime(document.getLongValue("created") * 1000L);
 	                bean.setUpdateTime(sdf.format(bean.getTime()));
 	                String charge = objectd.getString("charge");

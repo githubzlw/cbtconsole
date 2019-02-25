@@ -1008,7 +1008,7 @@ public class PictureComparisonServlet extends HttpServlet {
 		request.setAttribute("similarityId", aliPid);
 		request.setAttribute("ylbbPid", ylbbPid);
 		request.setAttribute("selled", selled);
-
+		
 		try {
 //			request.getRequestDispatcher("/website/lire_img_info.jsp").forward(request, response);
 			request.getRequestDispatcher("/website/lire_same_img_info.jsp").forward(request, response);

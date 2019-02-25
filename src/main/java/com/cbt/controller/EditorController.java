@@ -15,6 +15,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.utli.GoodsPriceUpdateUtil;
+import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -276,7 +277,13 @@ public class EditorController {
             if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
                 //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
-                double priceXs = (Double.valueOf(goods.getAliGoodsPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                String aliPirce;
+                if (goods.getAliGoodsPrice().contains("-")) {
+                    aliPirce = goods.getAliGoodsPrice().split("-")[1];
+                } else {
+                    aliPirce = goods.getAliGoodsPrice();
+                }
+                double priceXs = (Double.valueOf(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
                 //加价率
                 oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
@@ -1687,15 +1694,12 @@ public class EditorController {
                         boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 400, 200);
                         if (checked) {
                             // 压缩图片400x400
-                            String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400"
-                                    + fileSuffix;
-
-                            boolean is400 = ImageCompression.reduceImgByWidth(400, localDiskPath + localFilePath,
-                                    localDiskPath + localFilePath400x400);
+                            String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400" + fileSuffix;
                             // 压缩图片60x60
                             String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
-                            boolean is60 = ImageCompression.reduceImgByWidth(60, localDiskPath + localFilePath,
-                                    localDiskPath + localFilePath60x60);
+
+                            boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                            boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
                             if (is60 && is400) {
                                 newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
                                 json.setOk(true);
@@ -1780,7 +1784,7 @@ public class EditorController {
                     String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
                     String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                     // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    String localFilePath =  "importimg/" + pid + "/" + saveFilename + fileSuffix;
                     // 文件流输出到本地服务器指定路径
                     ImgDownload.writeImageToDisk(file.getBytes(), localDiskPath + localFilePath);
 
@@ -1789,29 +1793,28 @@ public class EditorController {
                     if (checked) {
                         // 压缩图片400x400
                         String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400" + fileSuffix;
-                        boolean is400 = ImageCompression.reduceImgByWidth(400, localDiskPath + localFilePath,
-                                localDiskPath + localFilePath400x400);
                         // 压缩图片60x60
                         String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
-                        boolean is60 = ImageCompression.reduceImgByWidth(60, localDiskPath + localFilePath,
-                                localDiskPath + localFilePath60x60);
+
+                        boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                        boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
                         if (is60 && is400) {
                             json.setData(ftpConfig.getLocalShowPath() + localFilePath60x60);
                             json.setOk(true);
-                            json.setMessage("上传本地图片成功");
+                            json.setMessage("上传橱窗图本地图片成功");
                         } else {
                             // 判断分辨率不通过删除图片
-                            File file400 = new File(localFilePath400x400);
-                            if (file400.exists()) {
-                                file400.delete();
-                            }
                             File file60 = new File(localFilePath60x60);
                             if (file60.exists()) {
                                 file60.delete();
                             }
+                            File file400 = new File(localFilePath400x400);
+                            if (file400.exists()) {
+                                file400.delete();
+                            }
                             // 压缩失败整体终止执行
                             json.setOk(false);
-                            json.setMessage("压缩图片60x60和400x400失败，终止执行");
+                            json.setMessage("压缩图片60x60或400x400失败，终止上传");
                         }
                     } else {
                         // 图片分辨率小于400*200整体终止执行

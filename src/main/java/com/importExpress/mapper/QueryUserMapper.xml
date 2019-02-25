@@ -431,4 +431,14 @@
     	WHERE userid = #{id} AND LENGTH(shopCarShowinfo) > 5
     </select>
 
+    <!--void updateNeedoffshellEditFlag(@Param("list") List<String> list);-->
+    <update id="updateNeedoffshellEditFlag">
+        UPDATE alidata.needoffshelf_all_log
+        SET edit_flag = 1
+        WHERE pid IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
 </mapper>

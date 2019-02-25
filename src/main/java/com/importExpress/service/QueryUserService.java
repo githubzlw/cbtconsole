@@ -43,4 +43,6 @@ public interface QueryUserService {
     EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType);
 
     Map<String,Object> queryUserOtherInfo(Integer id, Integer userType);
+
+    Map<String, Object> updateNeedoffshellEditFlag(String pids);
 }

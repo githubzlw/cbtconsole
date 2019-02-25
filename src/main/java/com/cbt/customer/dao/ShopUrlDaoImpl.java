@@ -106,7 +106,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel,int shopTypeFlag,
-                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
+                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids, int translateDescription) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
         String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b " +
@@ -153,6 +153,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if(authorizedFlag > -1){
             sql += " and a.authorized_flag = " + authorizedFlag;
+        }
+        if(translateDescription > -1){
+            sql += " and a.is_translate_description = " + translateDescription;
         }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
@@ -274,6 +277,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setSalesVolume(rs.getInt("sales_volume_threshold"));
                 su.setIsAuto(rs.getInt("is_auto"));
 
+                su.setIsTranslateDescription(rs.getInt("is_translate_description"));
+
                 String stateInfo = "";
                 if (onlineStatus == 0) {
                     stateInfo = "<button class=\"but_color\" onclick=\"edit(" + su.getId() + "," + su.getIsAuto() + ")\">编辑</button>";
@@ -323,6 +328,13 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                             + "')\">授权店铺</button>";
                 }*/
                 su.setAuthorizedFlag(queryAuthorizedFlag);
+
+                if(su.getIsTranslateDescription() > 0){
+                    stateInfo += "<b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
+                }else{
+                    stateInfo += "<button class=\"but_color\" onclick=\"setShopTranslate('" + su.getShopId()
+                            + "',1)\">标识翻译产品描述</button>";
+                }
                 su.setStateInfo(stateInfo);
 
                 // + "<button style=\"margin-left: 10px;\" onclick=\"delreply("
@@ -355,7 +367,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
     @Override
     public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
-                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids) {
+                     int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,
+                     int ennameBrandFlag,String shopids, int translateDescription) {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -397,6 +410,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if(authorizedFlag > -1){
             sql += " and authorized_flag = " + authorizedFlag;
+        }
+        if(translateDescription > -1){
+            sql += " and is_translate_description = " + translateDescription;
         }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
@@ -3064,6 +3080,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if (offShelf.getSoldFlag2() == 1){
             sql += " and cbr.from_flag = 4 ";
         }
+        if (offShelf.getSoldFlag3() != 0){
+            sql += " and ns.edit_flag = " + offShelf.getSoldFlag3();
+        }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
         }
@@ -3169,6 +3188,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if (offShelf.getSoldFlag2() == 1){
             sql += " and cbr.from_flag = 4 ";
+        }
+        if (offShelf.getSoldFlag3() != 0){
+            sql += " and ns.edit_flag = " + offShelf.getSoldFlag3();
         }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
@@ -3296,6 +3318,29 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs > 0;
+    }
+
+    @Override
+    public int setShopTranslate(String shopId) {
+        {
+            Connection conn = DBHelper.getInstance().getConnection5();
+            PreparedStatement stmt = null;
+            String upSql = "update shop_url_bak set is_translate_description = 1 where shop_id = ? ";
+            int rs = 0;
+            try {
+                stmt = conn.prepareStatement(upSql);
+                stmt.setString(1, shopId);
+                rs = stmt.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("shopId:" + shopId + ",setShopTranslate error: " + e.getMessage());
+                LOG.error("shopId:" + shopId + ",setShopTranslate error: " + e.getMessage());
+            } finally {
+                DBHelper.getInstance().closePreparedStatement(stmt);
+                DBHelper.getInstance().closeConnection(conn);
+            }
+            return rs;
+        }
     }
 
 }
