@@ -38,6 +38,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.PaymentServiceNew;
@@ -1692,6 +1693,8 @@ public class NewOrderDetailsCtr {
                 json.setMessage("该订单已取消，终止操作");
             } else {
                 int userId = Integer.parseInt(request.getParameter("userId"));
+                //获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
+                Map<String, Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(orderNo);
                 //根据订单号判断是否有PayPal或者stripe支付
                 int isPay = paymentServiceNew.checkIsPayPalOrStripePay(userId, orderNo);
                 if (isPay > 0 && !orderNo.contains("_")) {
@@ -1700,8 +1703,7 @@ public class NewOrderDetailsCtr {
                         json.setMessage("此订单已经在取消订单审批流程中");
                         json.setOk(false);
                     } else {
-                        //获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
-                        Map<String, Object> orderinfoMap = iPurchaseService.queryUserIdAndStateByOrderNo(orderNo);
+
 
                         // 获取用户货币单位
                         // zlw add start
@@ -1727,6 +1729,8 @@ public class NewOrderDetailsCtr {
                             cancelApproval.setOrderNo(orderNo);
                             cancelApproval.setPayPrice(actualPay);
                             cancelApproval.setType(2);
+                            cancelApproval.setDealState(0);
+                            cancelApproval.setOrderState(Integer.valueOf(orderinfoMap.get("old_state").toString()));
                             NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
                             json.setOk(true);
                         }else{
@@ -1750,6 +1754,18 @@ public class NewOrderDetailsCtr {
                             new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
                             " system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);
                     // zlw add end
+
+					// 执行取消完成后，插入退款数据
+					OrderCancelApproval cancelApproval = new OrderCancelApproval();
+					cancelApproval.setUserId(userId);
+					cancelApproval.setOrderNo(orderNo);
+					cancelApproval.setPayPrice(actualPay);
+					cancelApproval.setType(2);
+					cancelApproval.setDealState(3);
+					cancelApproval.setAgreeAmount(actualPay);
+					cancelApproval.setOrderState(Integer.valueOf(orderinfoMap.get("old_state").toString()));
+					NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+
                     json.setOk(true);
                 }
                 if (json.isOk()) {
