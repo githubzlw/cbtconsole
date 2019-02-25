@@ -65,6 +65,28 @@
         $(document).ready(function () {
             setDatagrid();
         });
+        //标记为已处理
+        function updateFlag3() {
+            //选择的商品
+            var checkArr = new Array();
+            $("input[name='ck']:checked").parent().parent().parent().find("td[field='pid'] div")
+                .each(function(index,item){
+                    checkArr.push(item.innerHTML);
+                });
+            if(checkArr == undefined || checkArr.length == 0){
+                alert("未选择商品!");
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: "/cbtconsole/queryuser/updateNeedoffshellEditFlag.do",
+                    data: {"pids":checkArr.join(",")},
+                    dataType:"json",
+                    success: function(msg){
+                        alert(msg.message);
+                    }
+                });
+            }
+        }
 
         function setDatagrid() {
             $('#neef_off_easyui-datagrid').datagrid({
@@ -76,7 +98,7 @@
                 toolbar: "#neef_off_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
                 url: '/cbtconsole/singleGoods/queryOffShelfList',//url调用Action方法
                 loadMsg: '数据装载中......',
-                singleSelect: true,//为true时只能选择单行
+//                singleSelect: true,//为true时只能选择单行
                 fitColumns: true,//允许表格自动缩放，以适应父容器
                 rownumbers: true,
                 nowrap: false,
@@ -148,6 +170,7 @@
             }
             var soldFlag = $("#query_sold_flag").val();
             var soldFlag2 = $("#query_sold_flag2").val();
+            var soldFlag3 = $("#query_sold_flag3").val();
             $("#neef_off_easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "catid":catid,
@@ -158,7 +181,8 @@
                 "updateFlag": updateFlag,
                 "neverFlag": neverFlag,
                 "soldFlag":soldFlag,
-                "soldFlag2":soldFlag2
+                "soldFlag2":soldFlag2,
+                "soldFlag3":soldFlag3
             });
         }
 
@@ -346,8 +370,17 @@
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="1">有跨境图片包</option>
                         </select>
+            <span> 是否处理过: <select id="query_sold_flag3" style="font-size: 14px; height: 24px; width: 120px;">
+                                <option value="0" selected="selected">不进行筛选</option>
+                                <option value="1">处理过的</option>
+                                <option value="2">未处理过</option>
+                        </select>
         </span>
         <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
+                <br />
+                <span>
+                    <a href="#" onclick="updateFlag3()" style="text-decoration: none;position: relative;top: 12px;line-height: 14px;">将选择的标记为处理过</a>
+                </span>
     </form>
 </div>
 
@@ -355,6 +388,7 @@
        class="easyui-datagrid">
     <thead>
     <tr>
+        <th field="ck" checkbox="true"></th>
         <th data-options="field:'pid',align:'center',width:'110px'">PID</th>
         <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品图片</th>
         <th data-options="field:'catidName',align:'center',width:'150px'">所属类别</th>
