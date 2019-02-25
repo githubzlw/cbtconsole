@@ -277,7 +277,13 @@ public class EditorController {
             if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
                 //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
-                double priceXs = (Double.valueOf(goods.getAliGoodsPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                String aliPirce;
+                if (goods.getAliGoodsPrice().contains("-")) {
+                    aliPirce = goods.getAliGoodsPrice().split("-")[1];
+                } else {
+                    aliPirce = goods.getAliGoodsPrice();
+                }
+                double priceXs = (Double.valueOf(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
                 //加价率
                 oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
