@@ -39,7 +39,20 @@ public class ShopUrl {
 
 	private int authorizedFlag;//授权标识  0未授权 1已授权
 	private int isTrade;//外贸部门使用标识 1外贸使用
-	
+
+	/**
+	 * 标记翻译1688产品描述店铺 0默认未标记 1标记
+	 */
+	private int isTranslateDescription;
+
+	public int getIsTranslateDescription() {
+		return isTranslateDescription;
+	}
+
+	public void setIsTranslateDescription(int isTranslateDescription) {
+		this.isTranslateDescription = isTranslateDescription;
+	}
+
 	//授权文件相关
 	private ShopUrlAuthorizedInfoPO authorizedInfo = new ShopUrlAuthorizedInfoPO();
 

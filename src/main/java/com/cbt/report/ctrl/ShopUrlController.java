@@ -116,6 +116,7 @@ public class ShopUrlController {
         String isOnStr = request.getParameter("isOn");
         String isAutoStr = request.getParameter("isAuto");
         String readyDelStr = request.getParameter("readyDel");
+        String translateDescriptionStr = request.getParameter("translateDescription");
         String stateStr = request.getParameter("state");
         String shopTypeStr = request.getParameter("shopType");
         String authorizedFlagStr = request.getParameter("authorizedFlag");
@@ -151,6 +152,10 @@ public class ShopUrlController {
         if (!StringUtils.isBlank(readyDelStr)) {
             readyDel = Integer.valueOf(readyDelStr);
         }
+        int translateDescription = -1;
+        if (!StringUtils.isBlank(translateDescriptionStr)) {
+            translateDescription = Integer.valueOf(translateDescriptionStr);
+        }
 
         if (time1 != null && time1 != "") {
             timeFrom = time1;
@@ -182,9 +187,9 @@ public class ShopUrlController {
             shopids=shopUrlService.getShopList(admName,days);
         }
         List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, 25, timeFrom, timeTo, isOn,
-                state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids);
+                state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids,translateDescription);
         int total = shopUrlService.total(shopId,shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
-                authorizedFileFlag,ennameBrandFlag,shopids);
+                authorizedFileFlag,ennameBrandFlag,shopids,translateDescription);
         json.setRows(findAll);
         json.setTotal(total);
         return json;
@@ -200,13 +205,13 @@ public class ShopUrlController {
     	Map<String, Integer> result = new HashMap<String, Integer>();
     	try {
     		//1-已授权但无授权文件
-    		int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,1,-1,null);
+    		int authorizedFileFlag1 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,1,-1,null, -1);
     		result.put("authorizedFileFlag1", authorizedFileFlag1);
     		//2-授权文件到期
-    		int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,2,-1,null);
+    		int authorizedFileFlag2 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,2,-1,null, -1);
     		result.put("authorizedFileFlag2", authorizedFileFlag2);
     		//3-已授权但无授权文件+授权文件到期
-    		int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,3,-1,null);
+    		int authorizedFileFlag3 = shopUrlService.total(null, null, null, null, null, null, -1, -1, -1, -1,-1,-1,3,-1,null, -1);
     		result.put("authorizedFileFlag3", authorizedFileFlag3);
     		result.put("state", 1);
 		} catch (Exception e) {
@@ -3555,6 +3560,42 @@ public class ShopUrlController {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/setShopTranslate.do")
+    @ResponseBody
+    public JsonResult setShopTranslate(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
+
+        try {
+            shopUrlService.setShopTranslate(shopId);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，更新标识失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
 
     private float genFloatWidthTwoDecimalPlaces(float numVal) {
