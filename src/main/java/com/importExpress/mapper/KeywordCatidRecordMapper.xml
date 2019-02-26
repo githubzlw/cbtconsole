@@ -25,7 +25,7 @@
 	</select>
 	
 	<select id="getCount" resultType="Integer">
-		select count(id) from synonym where 1=1
+		select count(id) from synonym where 1=1 and isDelete=0
 		<if test="keyword != null">
 			and keyword like CONCAT('%', #{keyword}, '%') 
 		</if>
