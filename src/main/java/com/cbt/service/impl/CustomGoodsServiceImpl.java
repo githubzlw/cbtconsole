@@ -526,7 +526,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             } else {
                 count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }
-            if(count > -1){
+            /*if(count > -1){
                 //插入sku信息
                 customGoodsDao.deleteSkuByPid(bean.getPid());
                 List<CustomBenchmarkSkuNew> list = customGoodsDao.querySkuByPid(bean.getPid());
@@ -535,7 +535,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 }else{
                     System.err.println("pid:" + bean.getPid() + ",sku list is empty");
                 }
-            }
+            }*/
         }
 
         return count > 0;
