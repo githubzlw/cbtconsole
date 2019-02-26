@@ -4,6 +4,7 @@ import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.OnlineGoodsCheck;
 import org.apache.ibatis.annotations.Param;
@@ -128,18 +129,22 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<CategoryBean> queryCategoryByParam(CustomGoodsQuery goodsQuery);
+
     /**
      * 添加商品评论
+     *
      * @param map
      * @return
      */
-    public int addReviewRemark(Map<String,String> map);
+    public int addReviewRemark(Map<String, String> map);
+
     /**
      * 编辑商品评论
+     *
      * @param map
      * @return
      */
-    public int updateReviewRemark(Map<String,String> map);
+    public int updateReviewRemark(Map<String, String> map);
 
 
     /**
@@ -225,8 +230,10 @@ public interface CustomGoodsMapper {
      * @return
      */
     int updateGoodsDetailsByInfo(CustomGoodsPublish goodsPublish);
+
     /**
      * 查询商品评论内容
+     *
      * @param pid
      * @return
      */
@@ -248,5 +255,39 @@ public interface CustomGoodsMapper {
     int queryOnlineGoodsForListCount(OnlineGoodsCheck queryPm);
 
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
+
+    /**
+     * 查询根据链接获取的md5相同的数量
+     *
+     * @param pid
+     * @param url
+     * @return
+     */
+    int queryMd5ImgByUrlCount(@Param("pid") String pid, @Param("url") String url);
+
+    /**
+     * 查询根据链接获取的md5相同的bean
+     *
+     * @param pid
+     * @param url
+     * @return
+     */
+    List<GoodsMd5Bean> queryMd5ImgByUrlList(@Param("pid") String pid, @Param("url") String url);
+
+
+    /**
+     * 根据PID查询数据信息
+     * @param pidList
+     * @return
+     */
+    List<CustomGoodsPublish>  queryGoodsByPidList(@Param("pidList") List<String> pidList);
+
+
+    /**
+     * 更新详情数据
+     * @param gd
+     * @return
+     */
+    int updatePidEnInfo(CustomGoodsPublish gd);
 
 }

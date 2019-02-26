@@ -171,6 +171,14 @@
         <result column="click_num" property="clickNum"/>
     </resultMap>
 
+    <resultMap id="goodsMd5BeanResultMap" type="com.importExpress.pojo.GoodsMd5Bean">
+        <result column="pid" property="pid"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="local_path" property="localPath"/>
+        <result column="remote_path" property="remotePath"/>
+        <result column="goods_md5" property="goodsMd5"/>
+    </resultMap>
+
     <insert id="insertPidIsEdited">
         insert into custom_goods_edit(pid,shop_id,admin_id)
         values(#{pid},#{shopId},#{adminId})
@@ -970,5 +978,37 @@
     <insert id="addReviewRemark">
         insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score})
     </insert>
+
+
+    <select id="queryMd5ImgByUrlCount" resultType="java.lang.Integer">
+        select count(0)
+        from custom_goods_md5
+        where pid = #{pid} and remote_path = #{url}
+    </select>
+
+    <select id="queryMd5ImgByUrlList" resultMap="goodsMd5BeanResultMap">
+        select pid,shop_id,local_path,remote_path,goods_md5
+        from custom_goods_md5
+        where pid = #{pid} and remote_path = #{url}
+    </select>
+
+
+
+    <select id="queryGoodsByPidList" parameterType="java.util.ArrayList" resultMap="queryGoodsResultMap">
+        select
+        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo
+        from custom_benchmark_ready cbu
+        where 1=1 and pid in
+        <foreach collection="pidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updatePidEnInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_benchmark_ready set eninfo = #{eninfo}
+        where pid = #{pid}
+    </update>
 
 </mapper>
