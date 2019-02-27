@@ -19,7 +19,7 @@ public class ShopCarInfo {
     private double cartWeight;
     private String aliPid;
     private String aliImg;
-    private double aliPrice;
+    private String aliPrice;
     private double priceRate;
     private String catid1;
     private String goodsTitle;
@@ -156,11 +156,11 @@ public class ShopCarInfo {
         this.aliImg = aliImg;
     }
 
-    public double getAliPrice() {
+    public String getAliPrice() {
         return aliPrice;
     }
 
-    public void setAliPrice(double aliPrice) {
+    public void setAliPrice(String aliPrice) {
         this.aliPrice = aliPrice;
     }
 

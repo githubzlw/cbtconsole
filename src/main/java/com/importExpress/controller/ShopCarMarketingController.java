@@ -265,7 +265,7 @@ public class ShopCarMarketingController {
                 for(GoodsCarActiveSimplBean simplBean : listActive){
                     if(shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())){
                         //解析数据
-                        if (shopCar.getPrice1() > 0) {
+                        if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                             isUpdatePrice++;
                         }
                         genActiveSimplBeanByShopCar(simplBean,shopCar);
@@ -371,7 +371,7 @@ public class ShopCarMarketingController {
                     }
                 }
                 shopCar.setTypeList(typeList);
-                if (shopCar.getPrice1() > 0) {
+                if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
                     productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
                     actualCost += totalPrice;
@@ -490,7 +490,7 @@ public class ShopCarMarketingController {
         //activeBean.setoNum(shopCar.getoNum());
         activeBean.setPerWeight(shopCar.getPerWeight());
         activeBean.setPrice(shopCar.getGoogsPrice());
-        if (shopCar.getPrice1() > 0) {
+        if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
             activeBean.setPrice1(shopCar.getPrice1() + "@1");
         } else {
             activeBean.setPrice1("0");
@@ -553,7 +553,7 @@ public class ShopCarMarketingController {
     private void genActiveSimplBeanByShopCar(GoodsCarActiveSimplBean activeBean,ShopCarMarketing shopCar) {
 
         activeBean.setPrice(shopCar.getGoogsPrice());
-        if (shopCar.getPrice1() > 0) {
+        if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
             activeBean.setPrice1(shopCar.getPrice1() + "@1");
         } else {
             activeBean.setPrice1("0");
@@ -762,7 +762,12 @@ public class ShopCarMarketingController {
                 //计算加价率
                 if ((carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1) || carInfo.getIsBenchmark() == 2) {
                     //对标时
-                    double priceXs = (Double.valueOf(carInfo.getAliPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                    double priceXs = 0;
+                    if(carInfo.getAliPrice().contains("-")){
+                        priceXs = (Double.valueOf(carInfo.getAliPrice().split("-")[0]) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                    }else {
+                        priceXs = (Double.valueOf(carInfo.getAliPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                    }
                     //加价率
                     oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
                     carInfo.setPriceRate(BigDecimalUtil.truncateDouble(oldProfit, 2));
@@ -883,7 +888,7 @@ public class ShopCarMarketingController {
                 if (tempType.length() > 0) {
                     shopCar.setGoodsType(tempType);
                 }
-                if (shopCar.getPrice1() > 0) {
+                if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
                     productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
                     actualCost += totalPrice;
@@ -1261,7 +1266,7 @@ public class ShopCarMarketingController {
                 if (tempType.length() > 0) {
                     shopCar.setGoodsType(tempType);
                 }
-                if (shopCar.getPrice1() > 0) {
+                if (shopCar.getPrice1() != null && shopCar.getPrice1()    > 0) {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
                     productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
                     actualCost += totalPrice;
