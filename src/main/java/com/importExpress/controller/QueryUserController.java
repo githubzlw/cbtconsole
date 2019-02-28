@@ -445,9 +445,50 @@ public class QueryUserController {
         if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
             page = Integer.valueOf(pageStr);//无该参数时查询默认值1
         }
+        //查询时间范围参数接收
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        if (StringUtils.isNotBlank(startDate)) {
+            startDate += " 00:00";
+        } else {
+            startDate = null;
+        }
+        if (StringUtils.isNotBlank(endDate)) {
+            endDate += " 23:59";
+        } else {
+            endDate = null;
+        }
         // 查询
-        return queryUserService.queryUserList(page, rows, userType);
+        return queryUserService.queryUserList(page, rows, userType, startDate, endDate);
     }
+
+    /**
+     * 查询未下单的指定用户 数据导出
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/listCsv.do
+     *
+     * userType 查询用户类别 		1-录入收货地址 但没下单的客户;2-有Wechat号 但没下单的客户...
+     *
+     */
+    @RequestMapping(value = "/listCsv.do")
+    @ResponseBody
+    public Map<String, String> queryUserListCsv(HttpServletRequest request, Integer userType) {
+        //查询时间范围参数接收
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        if (StringUtils.isNotBlank(startDate)) {
+            startDate += " 00:00";
+        } else {
+            startDate = null;
+        }
+        if (StringUtils.isNotBlank(endDate)) {
+            endDate += " 23:59";
+        } else {
+            endDate = null;
+        }
+        // 查询
+        return queryUserService.queryUserListCsv(userType, startDate, endDate);
+    }
+
     /**
      * 查询用户相关信息
      * 		http://127.0.0.1:8086/cbtconsole/queryuser/queryUserOtherInfo.do
