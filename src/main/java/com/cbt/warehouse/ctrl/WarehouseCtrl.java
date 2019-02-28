@@ -123,6 +123,7 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/warehouse")
 public class WarehouseCtrl {
+	private static final String UPLOAD_IMG_PATH = "/usr/local/goodsimg/importcsvimg/inspectionImg/";
 	// 上传文件存储目录
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
@@ -369,7 +370,7 @@ public class WarehouseCtrl {
 				String dir="";
 				String old_name="";
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + order.format(data)+old_name+".jpg";
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + order.format(data)+old_name+".jpg";
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -381,7 +382,8 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				picPath=Util.PIC_URL+localFilePath+"";
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath);
 					picPath=Util.PIC_URL+localFilePath+"";
 				}
 			}
@@ -8641,7 +8643,7 @@ public class WarehouseCtrl {
 				String dir="";
 				String old_name=new_pid+"_new.jpg";
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -8652,7 +8654,8 @@ public class WarehouseCtrl {
 				System.out.println("新上传的文件路径："+imgPath);
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath);
 				}
 				int row=0;
 				if(flag){
@@ -8707,13 +8710,14 @@ public class WarehouseCtrl {
 				}
 				// 检查配置文件信息是否正常读取
 				String imgUploadPath = ftpConfig.getLocalDiskPath();
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				System.out.println("新上传的文件名："+(tims+old_name));
 				System.out.println("新上传的文件路径："+(imgUploadPath + localFilePath));
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
+					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath);
 				}
 				int row=0;
 				if(flag){
@@ -8797,7 +8801,7 @@ public class WarehouseCtrl {
 					old_name=pics[1];
 				}
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -8825,7 +8829,8 @@ public class WarehouseCtrl {
 	public boolean uploadPic(String storePath,String imgPath,String orderid,String goodsid,int index,String i_id){
 		boolean flag=false;
 		try {
-			flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
+			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
+			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath);
 			if(flag){
 				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();
