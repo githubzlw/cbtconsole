@@ -820,7 +820,7 @@
     function updateReply(type) {
         var id = $("#sid").val();
         var detailShopUrl = $('#detailShopUrl').val();
-        // var detailShopId = $('#detailShopId').val()
+        var detailShopId = $('#detailShopId').text();
         var salesVolume = $('#salesVolume').val();
         var downloadNum = $('#downloadNum').val();
         var isValid = $('#isValid').val();
@@ -849,7 +849,7 @@
         var params = {
             "id": id,
             "shopUrl": detailShopUrl,
-            //"shopId":detailShopId,
+            "shopId": detailShopId,
             "salesVolume": salesVolume,
             "downloadNum": downloadNum,
             "isValid": isValid,
