@@ -981,15 +981,17 @@
 
 
     <select id="queryMd5ImgByUrlCount" resultType="java.lang.Integer">
-        select count(0)
+        select count(0) from custom_goods_md5
+        where goods_md5 = (select goods_md5
         from custom_goods_md5
-        where pid = #{pid} and remote_path = #{url}
+        where pid = #{pid} and remote_path = #{url}) and ifnull(goods_md5,'') != ''
     </select>
 
     <select id="queryMd5ImgByUrlList" resultMap="goodsMd5BeanResultMap">
-        select pid,shop_id,local_path,remote_path,goods_md5
+        select pid,shop_id,local_path,remote_path,goods_md5 from custom_goods_md5
+        where goods_md5 = (select goods_md5
         from custom_goods_md5
-        where pid = #{pid} and remote_path = #{url}
+        where pid = #{pid} and remote_path = #{url}) and ifnull(goods_md5,'') != ''
     </select>
 
 

@@ -4,7 +4,7 @@ public class GoodsMd5Bean {
     private Integer id;
     private String pid;
     private String shopId;
-    private String md5;
+    private String goodsMd5;
     private String localPath;
     private String remotePath;
 
@@ -32,12 +32,12 @@ public class GoodsMd5Bean {
         this.shopId = shopId;
     }
 
-    public String getMd5() {
-        return md5;
+    public String getGoodsMd5() {
+        return goodsMd5;
     }
 
-    public void setMd5(String md5) {
-        this.md5 = md5;
+    public void setGoodsMd5(String goodsMd5) {
+        this.goodsMd5 = goodsMd5;
     }
 
     public String getLocalPath() {
@@ -65,8 +65,8 @@ public class GoodsMd5Bean {
                 .append(pid).append('\"');
         sb.append(",\"shopId\":\"")
                 .append(shopId).append('\"');
-        sb.append(",\"md5\":\"")
-                .append(md5).append('\"');
+        sb.append(",\"goodsMd5\":\"")
+                .append(goodsMd5).append('\"');
         sb.append(",\"localPath\":\"")
                 .append(localPath).append('\"');
         sb.append(",\"remotePath\":\"")
