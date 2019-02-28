@@ -133,7 +133,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 customGoodsDao.publishTo28(bean);
             }
 
-            //更新SkuGoodsOffers和SingleOffersChild信息
+            /*//更新SkuGoodsOffers和SingleOffersChild信息
             int count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
             //如果存在SkuGoodsOffers信息直接更新SkuGoodsOffers
             if (count > 0) {
@@ -141,7 +141,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             } else {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
-            }
+            }*/
         }
         return res;
     }
