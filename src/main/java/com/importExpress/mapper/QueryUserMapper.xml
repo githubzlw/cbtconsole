@@ -667,7 +667,7 @@
 
     <!--String querySearchKeywords(@Param("id") Integer id);-->
     <select id="querySearchKeywords" resultType="String">
-        SELECT GROUP_CONCAT(REPLACE(REPLACE(a.keywords,'%20',' '),'%26','&amp;'), '; ') FROM (
+        SELECT GROUP_CONCAT(REPLACE(REPLACE(a.keywords,'%20',' '),'%26','&amp;') separator '; ') FROM (
             SELECT CONCAT('搜索词:', keywords,', 搜索时间:',showPageTime) keywords,userid FROM searchproductlog
             WHERE userid = #{id} AND LENGTH(keywords) > 0
             ORDER BY showPageTime DESC
