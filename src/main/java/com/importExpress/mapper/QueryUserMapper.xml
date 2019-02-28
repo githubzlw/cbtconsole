@@ -358,44 +358,278 @@
         WHERE del = 0 AND syn = 0
     </select>
 
-    <!--List<UserBean> queryUserList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("userType") Integer userType);-->
-    <select id="queryUserList" resultType="com.importExpress.pojo.UserBean">
-        SELECT id, name, email, createtime, currency FROM user WHERE id IN(
-            SELECT tem.userid FROM (
-                <if test="userType == 1">
-                    SELECT DISTINCT userid FROM address
-                    WHERE userid != 0 AND userid NOT IN(
-                      SELECT DISTINCT user_id FROM orderinfo
-                    )
+    <!--List<UserXlsBean> queryUserList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("userType") Integer userType, @Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="queryUserList" resultType="com.importExpress.pojo.UserXlsBean">
+        <if test="userType == 1">
+            select tmp_a.id, tmp_a.name, tmp_a.email, au.admName, tmp_b.createtime, tmp_a.currency
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.currency
+            from USER u
+            INNER JOIN address a ON a.userid=u.id
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and u.id not in (
+            select user_id from orderinfo
+            )
+            )tmp_a left join (
+            select userid, createtime
+            from address
+            group by userid
+            having max(createtime)
+            )tmp_b on tmp_a.id=tmp_b.userid
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_b.createtime >= #{startDate}
                 </if>
-                <if test="userType == 2">
-                    SELECT DISTINCT userid FROM user_ex
-                    WHERE (LENGTH(otheremail) > 0 OR LENGTH(otherphone) > 0 OR LENGTH(whatsapp) > 0
-                    OR LENGTH(facebook) > 0 OR LENGTH(tweater) > 0 OR LENGTH(kiki) > 0 OR LENGTH(skype) > 0)
-                    AND userid != 0 AND userid NOT IN(
-                      SELECT DISTINCT user_id FROM orderinfo
-                    )
+                <if test="endDate != null">
+                    and tmp_b.createtime &lt;= #{endDate}
                 </if>
-                LIMIT #{startBars}, #{rows}
-            ) tem
-        )
+            </where>
+            order by tmp_b.createtime desc
+        </if>
+
+        <if test="userType == 2">
+            select tmp_a.id, tmp_a.name, tmp_a.email, au.admName, tmp_a.createtime, tmp_a.currency, tmp_a.whatsapp
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.createtime, u.currency, a.whatsapp
+            from USER u
+            INNER JOIN user_ex a ON a.userid=u.id AND LENGTH(a.whatsapp) > 0
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and u.id not in (
+            select user_id from orderinfo
+            )
+            )tmp_a
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_a.createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and tmp_a.createtime &lt;= #{endDate}
+                </if>
+            </where>
+            order by tmp_a.createtime desc
+        </if>
+
+        <if test="userType == 3">
+            select c.id, c.name, c.email, c.currency, au.admName, a.orderid, a.orderdesc, a.OperationDate 'createtime',
+            case when b.state=0 then '未付款'
+            when b.state=1 then '购买中'
+            when b.state=2 then '已到仓库'
+            when b.state=3 then '出运中'
+            when b.state=4 then '完结'
+            when b.state=5 then '确认价格中'
+            when b.state=7 then '预订单'
+            end 'state', b.product_cost,
+            case when p.paystatus=0 then '支付失败'
+            when p.paystatus=1 then '支付成功'
+            when p.paystatus=2 then '进行中'
+            else '' end as 'paystatus'
+            from (
+            select DISTINCT orderid, orderdesc, OperationDate
+            from paylog a
+            where 1 = 1
+            <if test="startDate != null">
+                AND OperationDate >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND OperationDate &lt;= #{endDate}
+            </if>
+            and orderdesc REGEXP '发起paypal支付'
+            and not EXISTS (
+            select 1 from paylog b
+            where a.orderid=b.orderid and b.orderdesc REGEXP '发起paypal支付回调'
+            )
+            )a
+            left join orderinfo b on a.orderid=b.order_no
+            left join user c on b.user_id=c.id
+            left join admin_r_user au on au.userid=c.id
+            left join payment p on p.orderid=b.order_no
+            where c.id in (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and b.state not in (-1, 6)
+            and IFNULL(p.paystatus, 0) != 1
+            ORDER BY a.OperationDate DESC
+        </if>
+
+        <if test="userType == 4">
+            select tmp_a.id, tmp_a.name, tmp_a.email, au.admName, tmp_a.createtime, tmp_a.currency
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.createtime, u.currency
+            from USER u
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and u.id not in (
+            select user_id from orderinfo where state not in (-1, 6)
+            )
+            )tmp_a
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_a.createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and tmp_a.createtime &lt;= #{endDate}
+                </if>
+            </where>
+            order by tmp_a.createtime desc
+        </if>
+        <if test="startBars != null">
+            LIMIT #{startBars}, #{rows};
+        </if>
     </select>
 
-    <!--Integer queryUserListCount(@Param("userType") Integer userType);-->
+    <!--Integer queryUserListCount(@Param("userType") Integer userType, @Param("startDate") String startDate, @Param("endDate") String endDate);-->
     <select id="queryUserListCount" resultType="Integer">
         <if test="userType == 1">
-            SELECT COUNT(DISTINCT userid) FROM address
-            WHERE userid != 0 AND userid NOT IN(
-                SELECT DISTINCT user_id FROM orderinfo
+            select COUNT(1)
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.currency
+            from USER u
+            INNER JOIN address a ON a.userid=u.id
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
             )
+            and u.id not in (
+            select user_id from orderinfo
+            )
+            )tmp_a left join (
+            select userid, createtime
+            from address
+            group by userid
+            having max(createtime)
+            )tmp_b on tmp_a.id=tmp_b.userid
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_b.createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and tmp_b.createtime &lt;= #{endDate}
+                </if>
+            </where>
         </if>
+
         <if test="userType == 2">
-            SELECT COUNT(DISTINCT userid) FROM user_ex
-            WHERE (LENGTH(otheremail) > 0 OR LENGTH(otherphone) > 0 OR LENGTH(whatsapp) > 0
-            OR LENGTH(facebook) > 0 OR LENGTH(tweater) > 0 OR LENGTH(kiki) > 0 OR LENGTH(skype) > 0)
-            AND userid != 0 AND userid NOT IN(
-                SELECT DISTINCT user_id FROM orderinfo
+            select COUNT(1)
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.createtime, u.currency
+            from USER u
+            INNER JOIN user_ex a ON a.userid=u.id AND LENGTH(a.whatsapp) > 0
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
             )
+            and u.id not in (
+            select user_id from orderinfo
+            )
+            )tmp_a
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_a.createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and tmp_a.createtime &lt;= #{endDate}
+                </if>
+            </where>
+        </if>
+
+        <if test="userType == 3">
+            select COUNT(1)
+            from (
+            select DISTINCT orderid, orderdesc, OperationDate
+            from paylog a
+            where 1 = 1
+            <if test="startDate != null">
+                AND OperationDate >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND OperationDate &lt;= #{endDate}
+            </if>
+            and orderdesc REGEXP '发起paypal支付'
+            and not EXISTS (
+            select 1 from paylog b
+            where a.orderid=b.orderid and b.orderdesc REGEXP '发起paypal支付回调'
+            )
+            )a
+            left join orderinfo b on a.orderid=b.order_no
+            left join user c on b.user_id=c.id
+            left join admin_r_user au on au.userid=c.id
+            left join payment p on p.orderid=b.order_no
+            where c.id in (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and b.state not in (-1, 6)
+            and IFNULL(p.paystatus, 0) != 1
+        </if>
+
+        <if test="userType == 4">
+            select COUNT(1)
+            from (
+            SELECT DISTINCT u.name, u.email, u.id, u.createtime, u.currency
+            from USER u
+            WHERE u.id IN (
+            SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+            email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+            email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+            email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+            email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
+            and u.id not in (
+            select user_id from orderinfo where state not in (-1, 6)
+            )
+            )tmp_a
+            left join admin_r_user au on au.userid=tmp_a.id
+            <where>
+                <if test="startDate != null">
+                    tmp_a.createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and tmp_a.createtime &lt;= #{endDate}
+                </if>
+            </where>
         </if>
     </select>
 
@@ -424,11 +658,21 @@
         ) FROM user_ex WHERE userid = #{id}
     </select>
 
-    <!--String queryGoodsCarCount(@Param("id") Integer id);-->
-    <select id="queryGoodsCarCount" resultType="String">
-        SELECT shopCarShowinfo
-    	FROM goods_carconfig
-    	WHERE userid = #{id} AND LENGTH(shopCarShowinfo) > 5
+    <!--String queryClickGoodsCount(@Param("id") Integer id);-->
+    <select id="queryClickGoodsCount" resultType="String">
+        SELECT COUNT(DISTINCT b.pid) FROM searchproductlog a
+        LEFT JOIN searchclickproductlog b ON a.searchMD5 = b.searchMD5
+        WHERE userid = #{id} AND createtime >= CURDATE() - INTERVAL 7 DAY
+    </select>
+
+    <!--String querySearchKeywords(@Param("id") Integer id);-->
+    <select id="querySearchKeywords" resultType="String">
+        SELECT GROUP_CONCAT(REPLACE(REPLACE(a.keywords,'%20',' '),'%26','&amp;'), '; ') FROM (
+            SELECT CONCAT('搜索词:', keywords,', 搜索时间:',showPageTime) keywords,userid FROM searchproductlog
+            WHERE userid = #{id} AND LENGTH(keywords) > 0
+            ORDER BY showPageTime DESC
+            LIMIT 15
+        ) a GROUP BY a.userid
     </select>
 
     <!--void updateNeedoffshellEditFlag(@Param("list") List<String> list);-->
@@ -440,5 +684,15 @@
             #{item}
         </foreach>
     </update>
+
+    <!--List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);-->
+    <select id="queryCarGoodsCount" resultType="map">
+        SELECT userid, LENGTH(shopCarShowinfo) - LENGTH(REPLACE(shopCarShowinfo,'"guId"','"guI"'))  'total'
+        FROM goods_carconfig WHERE userid IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+        AND LENGTH(shopCarShowinfo) > 0
+    </select>
 
 </mapper>

@@ -114,8 +114,21 @@ tr .td_class{width:230px;}
 		});
 		var opts = $("#easyui-datagrid").datagrid("options");
 		opts.url = "/cbtconsole/warehouse/getUserInfo.do";
+
+		//参数中的userid填入用户ID
+        var userid = getUrlParam('userid');
+        if (!$.isEmptyObject(userid)){
+            $("#userid").val(userid);
+            doQuery(1);
+        }
 	})
 
+    // 获取url中参数
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
 	function setDatagrid() {
 		$('#easyui-datagrid').datagrid({
 			title : '用户信息管理',
