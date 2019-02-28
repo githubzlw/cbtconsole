@@ -564,5 +564,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return GoodsInfoUpdateOnlineUtil.updatePidEnInfo(gd);
     }
 
+    @Override
+    public int updateMd5ImgDeleteFlag(String pid, String url) {
+        return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url);
+    }
+
 
 }

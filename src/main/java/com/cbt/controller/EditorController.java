@@ -2916,6 +2916,8 @@ public class EditorController {
                     deleteAndUpdateGoodsImg(gd, pidMap.get(gd.getPid()));
                 }
             }
+            // 更新回收标识
+            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath);
             md5BeanList.clear();
             pidList.clear();
             pidMap.clear();

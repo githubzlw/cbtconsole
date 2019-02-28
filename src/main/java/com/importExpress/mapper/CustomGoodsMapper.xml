@@ -374,7 +374,7 @@
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
-        
+
         where 1=1
         <if test="catid !=null">
             and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
@@ -897,7 +897,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-             and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -933,7 +933,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -949,7 +949,8 @@
         </if>
     </select>
 
-    <select id="queryCategoryList" resultMap="categoryResultMap" parameterType="com.importExpress.pojo.OnlineGoodsCheck">
+    <select id="queryCategoryList" resultMap="categoryResultMap"
+            parameterType="com.importExpress.pojo.OnlineGoodsCheck">
         select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,
         path,lv from 1688_category where lv > 0) cat1688 left join
         (select a.catid1,count(a.catid1) as total from custom_benchmark_ready a left join custom_goods_edit b
@@ -959,7 +960,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -995,7 +996,6 @@
     </select>
 
 
-
     <select id="queryGoodsByPidList" parameterType="java.util.ArrayList" resultMap="queryGoodsResultMap">
         select
         cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
@@ -1011,6 +1011,14 @@
     <update id="updatePidEnInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
         update custom_benchmark_ready set eninfo = #{eninfo}
         where pid = #{pid}
+    </update>
+
+    <update id="updateMd5ImgDeleteFlag">
+        update custom_goods_md5 a,
+                (select goods_md5 from custom_goods_md5 where pid = #{pid}
+                  and remote_path = #{url} and ifnull(goods_md5,'') != '') b
+        set a.is_delete = 1
+        where a.goods_md5 = b.goods_md5
     </update>
 
 </mapper>

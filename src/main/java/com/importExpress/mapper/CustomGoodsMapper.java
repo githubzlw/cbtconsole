@@ -290,4 +290,12 @@ public interface CustomGoodsMapper {
      */
     int updatePidEnInfo(CustomGoodsPublish gd);
 
+    /**
+     * 更新MD5删除的图片标记
+     * @param pid
+     * @param url
+     * @return
+     */
+    int updateMd5ImgDeleteFlag(@Param("pid") String pid, @Param("url") String url);
+
 }
