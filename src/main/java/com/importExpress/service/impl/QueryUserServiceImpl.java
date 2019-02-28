@@ -2,6 +2,7 @@ package com.importExpress.service.impl;
 
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.util.DateFormatUtil;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
@@ -372,14 +373,26 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
-    public EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType) {
-        List<UserBean> list = queryUserMapper.queryUserList((page - 1) * rows, rows, userType);
-        Integer totalCount = queryUserMapper.queryUserListCount(userType);
+    public EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType, String startDate, String endDate) {
+        List<UserXlsBean> list = queryUserMapper.queryUserList((page - 1) * rows, rows, userType, startDate, endDate);
+        Integer totalCount = queryUserMapper.queryUserListCount(userType, startDate, endDate);
 
         EasyUiJsonResult json = new EasyUiJsonResult();
         if (list != null && list.size() > 0) {
-            for (UserBean bean : list) {
-                bean.setType(userType.toString());
+            //查询购物车商品数量
+            List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
+            HashMap<String, String> newMap = new HashMap<>();
+            if (resMap != null || resMap.size() > 0){
+                for (HashMap<String, String> bean : resMap) {
+                    newMap.put(bean.get("userid"), bean.get("total"));
+                }
+            }
+            for (UserXlsBean bean : list) {
+                bean.setUserType(userType);
+                Object carNum = newMap.get(bean.getId());
+                if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
+                    bean.setCarNum(carNum.toString());
+                }
             }
             json.setSuccess(true);
             json.setRows(list);
@@ -391,6 +404,90 @@ public class QueryUserServiceImpl implements QueryUserService {
 
         }
         return json;
+    }
+
+    @Override
+    public Map<String, String> queryUserListCsv(Integer userType, String startDate, String endDate) {
+        Map<String, String> result = new HashMap<>();
+        List<UserXlsBean> list = queryUserMapper.queryUserList(null, null, userType, startDate, endDate);
+        if (list != null && list.size() > 0) {
+            //查询购物车商品数量
+            List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
+            HashMap<String, String> newMap = new HashMap<>();
+            if (resMap != null || resMap.size() > 0){
+                for (HashMap<String, String> bean : resMap) {
+                    newMap.put(bean.get("userid"), bean.get("total"));
+                }
+            }
+            for (UserXlsBean bean : list) {
+                Object carNum = newMap.get(bean.getId());
+                if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
+                    bean.setCarNum(carNum.toString());
+                }
+                if(bean.getAdmName() == null){
+                    bean.setAdmName("");
+                }
+            }
+            //拼接对应数据
+            StringBuffer sb = new StringBuffer();
+            if (userType == 1){
+                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,最后录入收货地址时间,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append(bean.getId()).append(",")
+                        .append(bean.getName()).append(",")
+                        .append(bean.getEmail()).append(",")
+                        .append(bean.getCurrency()).append(",")
+                        .append(bean.getAdmName()).append(",")
+                        .append(bean.getCarNum()).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
+                }
+            } else if (userType == 2){
+                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,whatsApp,用户创建时间,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append(bean.getId()).append(",")
+                        .append(bean.getName()).append(",")
+                        .append(bean.getEmail()).append(",")
+                        .append(bean.getCurrency()).append(",")
+                        .append(bean.getAdmName()).append(",")
+                        .append(bean.getCarNum()).append(",")
+                        .append(bean.getWhatsapp()).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
+                }
+            } else if (userType == 3){
+                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,订单号,订单状态,支付日志,订单价格,支付状态,支付操作时间,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append(bean.getId()).append(",")
+                        .append(bean.getName()).append(",")
+                        .append(bean.getEmail()).append(",")
+                        .append(bean.getCurrency()).append(",")
+                        .append(bean.getAdmName()).append(",")
+                        .append(bean.getCarNum()).append(",")
+                        .append(bean.getOrderid()).append(",")
+                        .append(bean.getState()).append(",")
+                        .append(bean.getOrderdesc()).append(",")
+                        .append(bean.getProduct_cost()).append(",")
+                        .append(bean.getPaystatus()).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
+                }
+            } else if (userType == 4){
+                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,用户创建时间,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append(bean.getId()).append(",")
+                        .append(bean.getName()).append(",")
+                        .append(bean.getEmail()).append(",")
+                        .append(bean.getCurrency()).append(",")
+                        .append(bean.getAdmName()).append(",")
+                        .append(bean.getCarNum()).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
+                }
+            }
+            result.put("csv", sb.toString());
+            result.put("state", "success");
+        } else {
+            result.put("state", "false");
+            result.put("message", "未找到对应数据");
+        }
+        return result;
     }
 
     @Override
@@ -406,12 +503,19 @@ public class QueryUserServiceImpl implements QueryUserService {
             result.put("userEx", queryUserMapper.queryUserExById(id));
         }
         //每个客户显示 尽量多个内容， 比如 搜索词，比如 查看的 产品页数量。 多次打开的 产品页是哪个，当前购物车中 产品数量， 是否已经被“购物车营销跟进过”
-        //当前客户购物车产品数量
-        String shopCarShowinfo = queryUserMapper.queryGoodsCarCount(id);
-        if (StringUtils.isNotBlank(shopCarShowinfo)){
-            result.put("goodsCarCount", shopCarShowinfo.split("guId").length - 1);
+        //最近一周查看的产品数量
+        String queryClickGoodsCount = queryUserMapper.queryClickGoodsCount(id);
+        if (StringUtils.isNotBlank(queryClickGoodsCount)){
+            result.put("queryClickGoodsCount", queryClickGoodsCount);
         } else {
-            result.put("goodsCarCount", 0);
+            result.put("queryClickGoodsCount", 0);
+        }
+        //最近15个搜索词
+        String searchKeywords = queryUserMapper.querySearchKeywords(id);
+        if (StringUtils.isNotBlank(searchKeywords)){
+            result.put("searchKeywords", searchKeywords);
+        } else {
+            result.put("searchKeywords", "");
         }
         return result;
     }

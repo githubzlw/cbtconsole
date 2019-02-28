@@ -164,16 +164,148 @@
                         $userinfo.append($("<div>",{html:bean}));
                     })
                 }
-                /*购物车商品数量*/
+                //最近一周查看的产品数量
                 var $userinfoother = $("#myModal .userinfoother");
                 $userinfoother.empty();
-                $userinfoother.append("<h4>购物车商品数量:" + msg.goodsCarCount + "</h4>");
+                $userinfoother.append("<h4>最近一周查看的产品数量: " + msg.queryClickGoodsCount + "</h4>");
+                $userinfoother.append("<h4>最近15个搜索词: " + msg.searchKeywords + "</h4>");
                 $('#myModal').modal('show');
             }
         });
     }
 
+    /*导出*/
+    Window.EXPORTEXCELFLAG = true; //导出数据按钮是否可点击：false-正在导出；true-可导出；
+    function exportExcel() {
+        $("#exportExcel").val("导出中...")
+        if(!Window.EXPORTEXCELFLAG){
+            alert("正在导出, 请等待...");
+            return;
+        }
+        Window.EXPORTEXCELFLAG = false;
+        var userType = $("#userType").val();
+        //获取起止时间
+        var startDate = $("#nowdate1").val();
+        var endDate = $("#nowdate2").val();
+        //判断开始时间是否早于结束时间 并提示
+        if((new Date(startDate)) > (new Date(endDate))) {
+            /*开启错误提示*/
+            $("#errMsg").text("开始时间应该不晚于结束时间。");
+            //延时1.5s隐藏
+            setTimeout(function() {
+                $("#errMsg").text("");
+            }, 1500);
+            Window.EXPORTEXCELFLAG = true;
+            $("#exportExcel").val("导出")
+            return;
+        } else {
+            $("#errMsg").text("");
+        }
+        //查询并数据并保存到csv文件
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/queryuser/listCsv.do",
+            data: {
+                userType: userType,
+                startDate: startDate,
+                endDate: endDate
+            },
+            dataType:"json",
+            success: function(msg){
+                if (msg.state == 'success'){
+                    var str = encodeURIComponent(msg.csv);
+                    var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+                    var downloadLink = document.createElement("a");
+                    downloadLink.href = uri;
+                    downloadLink.weight="100";
+                    downloadLink.download = $("#userType option[value='" + $("#userType").val() + "']").text().substr(2)
+                        + "_" + startDate + "_" + endDate + ".csv";
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                } else {
+                    alert(msg.message);
+                }
+                Window.EXPORTEXCELFLAG = true;
+                $("#exportExcel").val("导出");
+            }
+        });
+    }
+
     $(function () {
+        //未下单用户类型 改变事件
+        $("#userType").change(function() {
+            var userType = $("#userType").val();
+            $("#main-datagrid").datagrid("options").url = "";
+            // 显示的数据列
+            if(userType == 3){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'id',title:'用户ID',width:'6%',align:'center',formatter:formatterUserid},
+                        {field:'name',title:'用户名称',width:'8%',align:'center'},
+                        {field:'email',title:'用户邮箱',width:'8%',align:'center'},
+                        {field:'currency',title:'国家',width:'8%',align:'center'},
+                        {field:'admName',title:'销售',width:'8%',align:'center'},
+                        {field:'carNum',title:'购物车商品数量',width:'6%',align:'center'},
+                        {field:'orderid',title:'订单号',width:'8%',align:'center'},
+                        {field:'state',title:'订单状态',width:'8%',align:'center'},
+                        {field:'orderdesc',title:'支付日志',width:'8%',align:'center'},
+                        {field:'product_cost',title:'订单价格',width:'8%',align:'center'},
+                        {field:'paystatus',title:'支付状态',width:'8%',align:'center'},
+                        {field:'createtime',title:'支付操作时间',width:'8%',align:'center',formatter:formatterData2},
+                        {field:'otherinfo',title:'其他',width:'8%',align:'center',formatter:formatterOtherInfo}
+                    ]]
+                });
+            } else if(userType == 1){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'id',title:'用户ID',width:'10%',align:'center',formatter:formatterUserid},
+                        {field:'name',title:'用户名称',width:'14%',align:'center'},
+                        {field:'email',title:'用户邮箱',width:'14%',align:'center'},
+                        {field:'currency',title:'国家',width:'14%',align:'center'},
+                        {field:'admName',title:'销售',width:'14%',align:'center'},
+                        {field:'carNum',title:'购物车商品数量',width:'10%',align:'center'},
+                        {field:'createtime',title:'最后录入收货地址时间',width:'14%',align:'center',formatter:formatterData2},
+                        {field:'otherinfo',title:'其他',width:'10%',align:'center',formatter:formatterOtherInfo}
+                    ]]
+                });
+            } else if(userType == 2){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'id',title:'用户ID',width:'10%',align:'center',formatter:formatterUserid},
+                        {field:'name',title:'用户名称',width:'14%',align:'center'},
+                        {field:'email',title:'用户邮箱',width:'14%',align:'center'},
+                        {field:'currency',title:'国家',width:'10%',align:'center'},
+                        {field:'admName',title:'销售',width:'10%',align:'center'},
+                        {field:'carNum',title:'购物车商品数量',width:'10%',align:'center'},
+                        {field:'whatsapp',title:'whatsApp',width:'10%',align:'center'},
+                        {field:'createtime',title:'用户创建时间',width:'12%',align:'center',formatter:formatterData2},
+                        {field:'otherinfo',title:'其他',width:'10%',align:'center',formatter:formatterOtherInfo}
+                    ]]
+                });
+            } else if(userType == 4){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'id',title:'用户ID',width:'10%',align:'center',formatter:formatterUserid},
+                        {field:'name',title:'用户名称',width:'14%',align:'center'},
+                        {field:'email',title:'用户邮箱',width:'14%',align:'center'},
+                        {field:'currency',title:'国家',width:'14%',align:'center'},
+                        {field:'admName',title:'销售',width:'14%',align:'center'},
+                        {field:'carNum',title:'购物车商品数量',width:'10%',align:'center'},
+                        {field:'createtime',title:'用户创建时间',width:'14%',align:'center',formatter:formatterData2},
+                        {field:'otherinfo',title:'其他',width:'10%',align:'center',formatter:formatterOtherInfo}
+                    ]]
+                });
+            }
+            // 清空
+            $('#main-datagrid').datagrid('loadData',{total:0,rows:[]});
+        });
+        $("#userType").change();
+
         //设置datagrid属性
         $('#main-datagrid').datagrid({
             width: "100%",
@@ -209,20 +341,72 @@
         $("#date-range-search")
             .click(
                 function () {
-                    var userType = $("#userType").val()
-                    // 页数
+                    var userType = $("#userType").val();
+                    //分页
                     var pageSize = $("#main-datagrid").datagrid(
                         "options").pageSize;
                     var pageNumber = 1;
+                    //获取起止时间
+                    var startDate = $("#nowdate1").val();
+                    var endDate = $("#nowdate2").val();
+                    //判断开始时间是否早于结束时间 并提示
+                    if((new Date(startDate)) > (new Date(endDate))) {
+                        /*开启错误提示*/
+                        $("#errMsg").text("开始时间应该不晚于结束时间。");
+                        //延时1.5s隐藏
+                        setTimeout(function() {
+                            $("#errMsg").text("");
+                        }, 1500);
+                        return;
+                    } else {
+                        $("#errMsg").text("");
+                    }
                     //查询对标商品
                     $("#main-datagrid").datagrid("options").url = "/cbtconsole/queryuser/list.do";
                     $('#main-datagrid').datagrid("load", {
                         rows: pageSize,
                         page: pageNumber,
-                        userType: userType
+                        userType: userType,
+                        startDate: startDate,
+                        endDate: endDate
                     });
-
                 });
+
+        //设置日期时间控件
+        function Datetime(dateId, nowdateId) {
+            $(dateId).datetimepicker({
+                language: 'zh-CN', //显示中文
+                format: 'yyyy-mm-dd', //显示格式
+                minView: "month", //设置只显示到月份
+                initialDate: new Date(),
+                autoclose: true, //选中自动关闭
+                todayBtn: true, //显示今日按钮
+                locale: moment.locale('zh-cn')
+            });
+        }
+        Datetime('#datetimepicker1');
+        Datetime('#datetimepicker2');
+        //初始化时间
+        function iniDatetime() {
+            //时间选择框日期初始化
+            var today = new Date();
+            var nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            //对日期格式进行处理
+            var date = new Date(nowdate);
+            var mon = date.getMonth() + 1;
+            var day = date.getDate();
+            var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("nowdate2").value = mydate;
+            today = new Date();
+            today.setDate(today.getDate() - 7); //日期减7天
+            nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            date = new Date(nowdate);
+            mon = date.getMonth() + 1;
+            day = date.getDate();
+            mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("nowdate1").value = mydate;
+        }
+        iniDatetime();
 
     });
 
@@ -245,13 +429,11 @@
         }
     }
 
-    /*时间格式化 年月日*/
-    function formatterData(value) {
-        if (value != null) {
+    /*时间格式化2*/
+    function formatterData2(value, row, index) {
+        if(value != null) {
             var date = new Date(value);
-            return date.getFullYear() + '-'
-                + formatNum(date.getMonth() + 1) + '-'
-                + formatNum(date.getDate()) + ' ';
+            return date.getFullYear() + '-' + formatNum(date.getMonth() + 1) + '-' + formatNum(date.getDate()) + ' ' + formatNum(date.getHours()) + ':' + formatNum(date.getMinutes());
         } else {
             return "";
         }
@@ -260,7 +442,7 @@
     /*用户id格式化*/
     function formatterUserid(value, row, index) {
         if(row.id != null) {
-            return '<a href="/cbtconsole/userinfo/getUserInfo.do?userId=' + row.id + '" target=black>' + row.id + ' </a>';
+            return '<a href="/cbtconsole/website/user.jsp?userid=' + row.id + '" target=black>' + row.id + ' </a>';
         }
         return;
     }
@@ -268,7 +450,7 @@
     /*其它信息按钮*/
     function formatterOtherInfo(value, row, index) {
         if(row.id != null) {
-            return '<a href="#" onclick="alert_modal(\'' + row.id + '\', \'' + row.type + '\')">其它信息</a>';
+            return '<a href="#" onclick="alert_modal(\'' + row.id + '\', \'' + row.userType + '\')">其它信息</a>';
         }
         return;
     }
@@ -285,20 +467,47 @@
             </tr>
             <div style="clear: both"></div>
             <tr height="30px">
+                <td colspan="2" align="center" style="width: 154px;">
+                    <span style="float: left;line-height: 30px;">&nbsp;&nbsp;时间范围&nbsp;&nbsp;</span>
+                </td>
                 <td align="center" style="width: 274px;"><span
                         style="float: left; line-height: 30px;">&nbsp;未下单用户类型&nbsp;&nbsp;</span>
                 </td>
                 <td style="width: 100px;">
                     <!--查询按钮-->
                 </td>
+                <td style="width: 100px;">
+                    <!--导出按钮-->
+                </td>
+                <td>
+                    <!--提示信息-->
+                </td>
             </tr>
             <tr>
+                <!--开始时间-->
+                <td align="center">
+                    <a class='input-group date' id='datetimepicker1' style="float: left;">
+                        <input type='text' class="form-control" id='nowdate1' style="width: 100px; height: 30px;" />
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+			                <span class="glyphicon glyphicon-calendar"></span>
+                                </span></a>
+                </td>
+                <!--结束时间-->
+                <td align="center">
+                    <a class='input-group date' id='datetimepicker2' style="float: left;">
+                        <input type='text' class="form-control" id='nowdate2' style="width: 100px; height: 30px;" />
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+				                <span class="glyphicon glyphicon-calendar"></span>
+                                </span></a>
+                </td>
                 <!--typeCode-->
                 <td align="center"><select class="form-control" id="userType"
                                            style="height: 30px; width: 270px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
                     <!--<option value="0">0-全部</option>-->
-                    <option value="1">1-录入收货地址 但没下单的客户</option>
-                    <option value="2">2-有Wechat号 但没下单的客户</option>
+                    <option value="1">1-录入收货地址 但没下单的客户(时间条件是最后录入收货地址时间)</option>
+                    <option value="2">2-有WhatsApp号 但没下单的客户(时间条件是用户创建时间)</option>
+                    <option value="3">3-Paypal支付失败用户(时间条件是支付操作时间)</option>
+                    <option value="4">4-完成注册但未下单客户(时间条件是用户创建时间)</option>
                 </select></td>
                 <!--查询按钮-->
                 <td align="center">
@@ -307,6 +516,14 @@
                             style="height: 30px; width: 98px; text-align: center;">查询
                     </button>
                 </td>
+                <!--导出按钮-->
+                <td align="center">
+                    <input type="button" onclick="exportExcel();" id="exportExcel"
+                            class="btn btn-default"
+                            style="height: 30px; width: 98px; text-align: center;" value="导出" />
+                </td>
+                <!--提示信息-->
+                <td id="errMsg" style="color: red;"></td>
             </tr>
         </table>
     </div>
@@ -315,24 +532,6 @@
 <table id="main-datagrid" firstLoad="false"
        style="width: 100%; height: 100%" class="easyui-datagrid">
     <thead>
-    <tr>
-        <th data-options="field:'id',width:'100px',align:'center',formatter:formatterUserid">用户ID</th>
-        <th
-                data-options="field:'name',width:'100px',align:'center'">用户名称
-        </th>
-        <th
-                data-options="field:'email',width:'100px',align:'center'">用户邮箱
-        </th>
-        <th
-                data-options="field:'createtime',width:'100px',align:'center',formatter:formatterData">用户注册时间
-        </th>
-        <th
-                data-options="field:'currency',width:'100px',align:'center'">国家
-        </th>
-        <th
-                data-options="field:'otherinfo',width:'100px',align:'center',formatter:formatterOtherInfo">其它信息
-        </th>
-    </tr>
     </thead>
     <tbody>
     </tbody>
