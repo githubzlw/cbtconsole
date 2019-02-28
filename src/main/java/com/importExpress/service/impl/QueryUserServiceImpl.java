@@ -381,15 +381,15 @@ public class QueryUserServiceImpl implements QueryUserService {
         if (list != null && list.size() > 0) {
             //查询购物车商品数量
             List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
-            HashMap<String, String> newMap = new HashMap<>();
+            Map<String, String> newMap = new HashMap<String, String>();
             if (resMap != null || resMap.size() > 0){
                 for (HashMap<String, String> bean : resMap) {
-                    newMap.put(bean.get("userid"), bean.get("total"));
+                    newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
                 }
             }
             for (UserXlsBean bean : list) {
                 bean.setUserType(userType);
-                Object carNum = newMap.get(bean.getId());
+                String carNum = newMap.get(String.valueOf(bean.getId()));
                 if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
                     bean.setCarNum(carNum.toString());
                 }
@@ -413,14 +413,14 @@ public class QueryUserServiceImpl implements QueryUserService {
         if (list != null && list.size() > 0) {
             //查询购物车商品数量
             List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
-            HashMap<String, String> newMap = new HashMap<>();
+            Map<String, String> newMap = new HashMap<String, String>();
             if (resMap != null || resMap.size() > 0){
                 for (HashMap<String, String> bean : resMap) {
-                    newMap.put(bean.get("userid"), bean.get("total"));
+                    newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
                 }
             }
             for (UserXlsBean bean : list) {
-                Object carNum = newMap.get(bean.getId());
+                String carNum = newMap.get(String.valueOf(bean.getId()));
                 if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
                     bean.setCarNum(carNum.toString());
                 }
