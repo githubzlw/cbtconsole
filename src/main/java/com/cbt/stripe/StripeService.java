@@ -2,6 +2,7 @@ package com.cbt.stripe;
 
 import java.util.Map;
 
+import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Dispute;
 import com.stripe.model.File;
@@ -24,7 +25,7 @@ public interface StripeService {
     
     Dispute dispute(String disputeId);
     
-    Dispute update(String disputeId,Map<String,Object> evidence);
+    Dispute update(String disputeId,Map<String,Object> evidence)throws StripeException;
     
     
     File createFile(Map<String,Object> fileParams);
