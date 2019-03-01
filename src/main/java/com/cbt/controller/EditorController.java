@@ -159,7 +159,7 @@ public class EditorController {
         request.setAttribute("showattribute", pInfo);
 
 
-        request.setAttribute("isSoldFlag", goods.getSoldFlag());
+        request.setAttribute("isSoldFlag", goods.getIsSoldFlag());
 
 
         // 处理Sku数据
@@ -222,7 +222,7 @@ public class EditorController {
             double oldProfit = 0;
             double singlePrice = 0;
             String singlePriceStr = "0";
-            if (goods.getSoldFlag() > 0) {
+            if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
                 //先取range_price 为空则再取feeprice
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
                     if(goods.getRangePrice().contains("-")){

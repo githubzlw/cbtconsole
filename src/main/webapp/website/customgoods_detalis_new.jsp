@@ -1939,6 +1939,9 @@
             </c:if>--%> <c:if test="${goods.soldFlag >0}">
                 <br>
                 <b style="font-size: 16px;">是否售卖:${goods.soldFlag ==1 ? '卖过':'没有卖过'}</b>
+            </c:if> <c:if test="${goods.isSoldFlag >= 0}">
+                <br>
+                <b style="font-size: 16px;">是否免邮:${goods.isSoldFlag > 0 ? '免邮':'非免邮'}</b>
             </c:if> <c:if test="${goods.addCarFlag >0}">
                 <br>
                 <b style="font-size: 16px;">是否加入购物车:${goods.carValue}</b>
