@@ -1,5 +1,28 @@
 package com.importExpress.service.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.ocean.rawsdk.ApiExecutor;
 import com.alibaba.trade.param.AlibabaTradeFastAddress;
 import com.alibaba.trade.param.AlibabaTradeFastCargo;
@@ -47,22 +70,6 @@ import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 public class IPurchaseServiceImpl implements IPurchaseService {
@@ -1029,9 +1036,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				getStraightAddress(shop_id_1688,map,address,straight_flag);
 				//将值填入bean中
 				getBeanValue(map, purchaseBean);
-				purchaseBean.setStraight_flag(straight_flag);
-				purchaseBean.setStraight_address(StringUtils.isStrNull(address)?"":address);
-				pruchaseMapper.updateOrderDetailsFlag(straight_flag,String.valueOf(map.get("order_no")),String.valueOf(map.get("od_id")));
+//				purchaseBean.setStraight_flag(straight_flag);
+//				purchaseBean.setStraight_address(StringUtils.isStrNull(address)?"":address);
+				purchaseBean.setStraight_flag(Integer.valueOf(String.valueOf(map.get("straight_flag"))));
+				purchaseBean.setStraight_address(StringUtils.isStrNull(map.get("shopAddress"))?"":String.valueOf(map.get("shopAddress")));
+//				pruchaseMapper.updateOrderDetailsFlag(straight_flag,String.valueOf(map.get("order_no")),String.valueOf(map.get("od_id")));
 				setInvoiceVaue(purchaseBean, fileByOrderid);
 				String inventoryRemark="";
 				//查询该商品是否有使用库存
@@ -1378,7 +1387,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	 * @param address
 	 * @param straight_flag
 	 */
-	public void getStraightAddress(String shop_id_1688,Map<String,String> map,String address,int straight_flag){
+	/*public void getStraightAddress(String shop_id_1688,Map<String,String> map,String address,int straight_flag){
 		String level="";
 		String s_id="";
 		String quality="";
@@ -1402,8 +1411,48 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("shopAddress",address);
 		map.put("quality",quality);
 		map.put("straight_flag",String.valueOf(straight_flag));
-	}
+	}*/
 
+	
+	/**
+	 * 获取供应商直发地址
+	 * @param shop_id_1688
+	 * @param map
+	 * @param address
+	 * @param straight_flag
+	 */
+	public void getStraightAddress(String shop_id_1688,Map<String,String> map,String address,int straight_flag){
+		String level="";
+		String s_id="";
+		String quality="";
+//		if(Integer.valueOf(String.valueOf(map.get("straight_flag"))) == 0){
+			if(map.get("shop_id") != null){
+				s_id=map.get("goodsShop");
+			}else{
+				s_id="0000";
+			}
+			Map<String, String> shopMap=pruchaseMapper.getShopIdByGoodsPid(String.valueOf(map.get("goodsShop")));
+			if(shopMap != null){
+				address=shopMap.get("address");
+				level=shopMap.get("level");
+				quality=shopMap.get("quality_avg");
+				if(Integer.valueOf(String.valueOf(map.get("straight_flag"))) == 0){
+					if(!StringUtils.isStrNull(address) && !StringUtils.isStrNull(level) && (address.contains("广东") || address.contains("义乌")) && "直发供应商".equals(level)){
+						straight_flag=1;
+					}
+				}else{
+					straight_flag = Integer.valueOf(String.valueOf(map.get("straight_flag")));
+				}
+				
+			}
+//		}
+		map.put("level",StringUtil.isBlank(level)?"":level);
+		map.put("shopAddress",address);
+		map.put("quality",quality);
+		map.put("straight_flag",String.valueOf(straight_flag));
+	}
+	
+	
 	private void setInvoiceVaue(PurchasesBean purchaseBean, String fileByOrderid) {
 		if (fileByOrderid == null || fileByOrderid.length() < 10) {
 			purchaseBean.setInvoice(0);
@@ -1788,7 +1837,13 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		purchaseBean.setCbrWeight(map.get("cbrWeight"));
 		purchaseBean.setCarWeight(map.get("od_total_weight"));
 		purchaseBean.setGoodsShop(String.valueOf(map.get("goodsShop")));
-		purchaseBean.setStraight_time(StringUtils.isStrNull(map.get("straight_time"))?"无":map.get("straight_time"));
+//		purchaseBean.setStraight_time(StringUtils.isStrNull(map.get("straight_time"))?"无":map.get("straight_time"));
+		if(StringUtils.isEmpty(map.get("straight_time"))){
+			purchaseBean.setStraight_time("无");
+		}else{
+			purchaseBean.setStraight_time(String.valueOf(map.get("straight_time")).substring(0, 10));
+		}
+		
 		purchaseBean.setSource_shop_id("");
 		String oistate=String.valueOf(map.get("oistate"));
 		purchaseBean.setOistate(oistate);
