@@ -13,11 +13,8 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
-import com.importExpress.utli.NotifyToCustomerUtil;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -110,7 +107,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 // 更新27和28表数据
                 customGoodsDao.updateCustomBenchmarkSkuNew(bean.getPid(), insertList);
                 // 使用MQ更新AWS服务器数据
-                GoodsInfoUpdateOnlineUtil.updateCustomBenchmarkSkuNewByMq(bean.getPid(),insertList);
+                GoodsInfoUpdateOnlineUtil.updateCustomBenchmarkSkuNewByMq(bean.getPid(), insertList);
                 insertList.clear();
             }
         }
@@ -122,11 +119,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 使用MQ更新AWS服务器数据
         // GoodsInfoUpdateOnlineUtil.publishToOnlineByMq(bean);
 
-        int res = 0 ;
+        int res = 0;
         // 使用MongoDB更新AWS服务器数据
-        if(GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean)){
+        if (GoodsInfoUpdateOnlineUtil.publishToOnlineByMongoDB(bean)) {
             // 更新27
-            customGoodsDao.publish(bean,0);
+            customGoodsDao.publish(bean, 0);
             // 更新28并重试一次
             res = customGoodsDao.publishTo28(bean);
             if (res == 0) {
@@ -145,9 +142,6 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         }
         return res;
     }
-
-
-
 
 
     @Override
@@ -271,13 +265,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int setGoodsValid(String pid, String adminName, int adminId, int type,String remark) {
+    public int setGoodsValid(String pid, String adminName, int adminId, int type, String remark) {
         // AWS更新
         // MQ
         // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
         // MongoDB
-        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid,type);
-        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6,remark);
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
+        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
 
     @Override
@@ -336,11 +330,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag) {
-        return customGoodsDao.upCustomerReady(pid, aliPid,aliPrice,bmFlag,isBenchmark,edName,rwKeyword,flag);
+    public boolean upCustomerReady(String pid, String aliPid, String aliPrice, int bmFlag, int isBenchmark, String edName, String rwKeyword, int flag) {
+        return customGoodsDao.upCustomerReady(pid, aliPid, aliPrice, bmFlag, isBenchmark, edName, rwKeyword, flag);
     }
-    
-    
+
+
     @Override
     public boolean setNeverOff(String pid) {
         return customGoodsDao.setNeverOff(pid);
@@ -359,10 +353,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updatePidIsEdited(GoodsEditBean editBean) {
         //如果有对标标识，则进行非对标的相关数据清除
-        if(editBean.getBenchmarking_flag() == 1){
+        if (editBean.getBenchmarking_flag() == 1) {
             CustomGoodsPublish good = customGoodsDao.getGoods(editBean.getPid(), 0);
             double finalWeight = 0;
-            if(StringUtils.isNotBlank(good.getFinalWeight())){
+            if (StringUtils.isNotBlank(good.getFinalWeight())) {
                 finalWeight = Double.valueOf(good.getFinalWeight());
             }
             customGoodsDao.setNoBenchmarking(editBean.getPid(), finalWeight);
@@ -446,8 +440,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int updateGoodsWeightByPid(String pid, double newWeight,double oldWeight,int weightIsEdit) {
-        return customGoodsMapper.updateGoodsWeightByPid(pid, newWeight,oldWeight,weightIsEdit);
+    public int updateGoodsWeightByPid(String pid, double newWeight, double oldWeight, int weightIsEdit) {
+        return customGoodsMapper.updateGoodsWeightByPid(pid, newWeight, oldWeight, weightIsEdit);
     }
 
     @Override
@@ -547,5 +541,33 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         customGoodsDao.insertIntoSingleOffersChild(orGoods.getPid(), Double.valueOf(orGoods.getFinalWeight()));
         return customGoodsDao.updatePromotionFlag(pid);
     }
+
+    @Override
+    public int queryMd5ImgByUrlCount(String pid, String url) {
+        return customGoodsMapper.queryMd5ImgByUrlCount(pid, url);
+    }
+
+    @Override
+    public List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url) {
+        return customGoodsMapper.queryMd5ImgByUrlList(pid, url);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsByPidList(List<String> pidList) {
+        return customGoodsMapper.queryGoodsByPidList(pidList);
+    }
+
+    @Override
+    public boolean updatePidEnInfo(CustomGoodsPublish gd) {
+        customGoodsDao.updatePidEnInfo(gd);
+        customGoodsMapper.updatePidEnInfo(gd);
+        return GoodsInfoUpdateOnlineUtil.updatePidEnInfo(gd);
+    }
+
+    @Override
+    public int updateMd5ImgDeleteFlag(String pid, String url) {
+        return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url);
+    }
+
 
 }

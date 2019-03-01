@@ -578,4 +578,12 @@ public interface CustomGoodsDao {
 	int updatePromotionFlag(String pid);
 
 
+	/**
+     * 更新详情数据
+     * @param gd
+     * @return
+     */
+    int updatePidEnInfo(CustomGoodsPublish gd);
+
+
 }

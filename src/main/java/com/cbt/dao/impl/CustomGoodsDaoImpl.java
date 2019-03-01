@@ -4097,5 +4097,28 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return count;
     }
 
+    @Override
+    public int updatePidEnInfo(CustomGoodsPublish gd) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "update custom_benchmark_ready_newest set eninfo = ? where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, gd.getEninfo());
+            stmt28.setString(2, gd.getPid());
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + gd.getPid() + ",updatePidEnInfo error :" + e.getMessage());
+            LOG.error("pid:" + gd.getPid() + ",updatePidEnInfo error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
 
 }
