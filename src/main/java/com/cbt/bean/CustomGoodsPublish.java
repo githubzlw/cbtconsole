@@ -39,7 +39,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private int sourceProFlag;// 货源属性 1:同店铺商品,2:同款商品 ,3:对标商品,4:1688商品(原始老数据)
     private String sourceProValue;// 货源属性值
 
-    private int soldFlag;// 是否售卖0全部1:卖过,2:没有卖过
+    private int soldFlag; // 是否售卖0全部1:卖过,2:没有卖过
     private int priorityFlag;// 商品优先级 1:核心,2：非核心
 
     private int addCarFlag;// 是否加入购物车 0全部，1已加入购物车，2未加入购物车，3已加入购物车后删除
@@ -108,6 +108,7 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String fromFlagDesc;
 
     private String maxPrice;// 最高价格
+    private int isSoldFlag; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
 
     public String getMaxPrice() {
         return maxPrice;

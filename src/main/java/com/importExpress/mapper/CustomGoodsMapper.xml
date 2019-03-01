@@ -29,7 +29,8 @@
         <result column="is_abnormal" property="isAbnormal"/>
         <result column="bm_flag" property="bmFlag"/>
         <result column="source_pro_flag" property="sourceProFlag"/>
-        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="sold_flag" property="soldFlag"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
         <result column="priorityFlag" property="priorityFlag"/>
         <result column="is_add_car_flag" property="addCarFlag"/>
         <result column="source_used_flag" property="sourceUsedFlag"/>
@@ -83,7 +84,8 @@
         <result column="is_abnormal" property="isAbnormal"/>
         <result column="bm_flag" property="bmFlag"/>
         <result column="source_pro_flag" property="sourceProFlag"/>
-        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="sold_flag" property="soldFlag"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
         <result column="priorityFlag" property="priorityFlag"/>
         <result column="is_add_car_flag" property="addCarFlag"/>
         <result column="source_used_flag" property="sourceUsedFlag"/>
@@ -425,7 +427,7 @@
             and cbu.source_pro_flag = #{sourceProFlag}
         </if>
         <if test="soldFlag > 0">
-            and cbu.is_sold_flag = #{soldFlag}
+            and cbu.sold_flag = #{soldFlag}
         </if>
         <if test="priorityFlag > 0">
             and cbu.priority_flag = #{priorityFlag}
@@ -497,6 +499,12 @@
         </if>
         <if test="maxPrice > 0">
             and cbu.max_price &lt;= #{maxPrice}
+        </if>
+        <if test="isSoldFlag == 0">
+            and cbu.is_sold_flag = 0
+        </if>
+        <if test="isSoldFlag > 0">
+            and cbu.is_sold_flag &gt; 0
         </if>
 
         <if test="isSort == 1">
@@ -569,7 +577,7 @@
             and cbu.source_pro_flag = #{sourceProFlag}
         </if>
         <if test="soldFlag > 0">
-            and cbu.is_sold_flag = #{soldFlag}
+            and cbu.sold_flag = #{soldFlag}
         </if>
         <if test="priorityFlag > 0">
             and cbu.priority_flag = #{priorityFlag}
@@ -639,6 +647,12 @@
         </if>
         <if test="maxPrice > 0">
             and cbu.max_price &lt;= #{maxPrice}
+        </if>
+        <if test="isSoldFlag == 0">
+            and cbu.is_sold_flag = 0
+        </if>
+        <if test="isSoldFlag > 0">
+            and cbu.is_sold_flag &gt; 0
         </if>
     </select>
 
