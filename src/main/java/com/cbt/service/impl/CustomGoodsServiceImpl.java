@@ -543,13 +543,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int queryMd5ImgByUrlCount(String pid, String url) {
-        return customGoodsMapper.queryMd5ImgByUrlCount(pid, url);
+    public int queryMd5ImgByUrlCount(String pid, String url, String shopId) {
+        return customGoodsMapper.queryMd5ImgByUrlCount(pid, url, shopId);
     }
 
     @Override
-    public List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url) {
-        return customGoodsMapper.queryMd5ImgByUrlList(pid, url);
+    public List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url, String shopId) {
+        return customGoodsMapper.queryMd5ImgByUrlList(pid, url, shopId);
     }
 
     @Override
@@ -565,8 +565,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int updateMd5ImgDeleteFlag(String pid, String url) {
-        return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url);
+    public int updateMd5ImgDeleteFlag(String pid, String url, String shopId) {
+        return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url, shopId);
     }
 
 
