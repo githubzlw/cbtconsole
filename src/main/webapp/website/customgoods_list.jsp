@@ -593,7 +593,7 @@ b {
 					<br>
 					<span>是否售卖:${list.soldFlag ==1 ? '卖过':'没有卖过'}</span>
 				</c:if>
-				<br><span>是否免邮:${list.soldFlag > 0 ? '免邮':'非免邮'}</span>
+				<br><span>是否免邮:${list.isSoldFlag > 0 ? '免邮':'非免邮'}</span>
 				<c:if test="${list.addCarFlag >0}">
 					<br>
 					<span>是否加入购物车:${list.carValue}</span>

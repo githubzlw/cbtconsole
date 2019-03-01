@@ -110,7 +110,7 @@ b {
 	var queryParams = {
 			"state":"0", "page":"1", "catid":"0","sttime":"", "edtime":"", "adminid":"0",
 			"isEdited":"-1", "isAbnormal":"-1", "isBenchmark":"-1","weightCheck":"-1",
-			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"0",
+			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"-1",
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
@@ -684,9 +684,9 @@ b {
 
 					<td>是否售卖:<select id="query_sold_flag"
 						style="font-size: 18px; height: 28px;">
-							<option value="0" selected="selected">请选择</option>
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">没有卖过</option>
 							<option value="1">卖过</option>
-							<option value="2">没有卖过</option>
 					</select></td>
 
 

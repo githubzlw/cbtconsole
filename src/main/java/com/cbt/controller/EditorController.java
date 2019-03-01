@@ -189,7 +189,7 @@ public class EditorController {
         }
 
         //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
-        if (goods.getSoldFlag() > 0) {
+        if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
             if (StringUtils.isNotBlank(goods.getFeeprice())) {
                 request.setAttribute("feePrice", goods.getFeeprice());
             } else {
