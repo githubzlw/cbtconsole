@@ -102,20 +102,14 @@ public class StripeServiceImpl implements StripeService {
 	}
 
 	@Override
-	public Dispute update(String disputeId, Map<String, Object> evidence) {
+	public Dispute update(String disputeId, Map<String, Object> evidence) throws StripeException {
 		Stripe.apiKey = API_KEY;
 		Dispute update = null;
-		try {
-			Dispute dp = Dispute.retrieve(disputeId);
-			
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("evidence", evidence);
-			update = dp.update(params);
-			
-		}catch (StripeException e) {
-			// TODO Auto-generated catch block
-			throw new RuntimeException(e);
-		}
+		Dispute dp = Dispute.retrieve(disputeId);
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("evidence", evidence);
+		update = dp.update(params);
 		return update;
 	}
 
