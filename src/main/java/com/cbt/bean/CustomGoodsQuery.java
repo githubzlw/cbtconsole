@@ -62,10 +62,10 @@ public class CustomGoodsQuery {
 	private double finalWeightEnd;
 	private double minPrice;
 	private double maxPrice;
-	private int isSoldFlag; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
+	private int isSoldFlag = -1; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
 
 	public int getIsSoldFlag() {
-		return isSoldFlag = -1;
+		return isSoldFlag;
 	}
 
 	public void setIsSoldFlag(int isSoldFlag) {
