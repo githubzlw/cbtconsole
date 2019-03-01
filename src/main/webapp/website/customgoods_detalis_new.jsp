@@ -2031,7 +2031,7 @@
                 <a target="_blank"
                    href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a><br>
                 <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>&nbsp;&nbsp;&nbsp;
-                <button class="s_btn" style="width: 180px;" onclick="beforeDeleteMd5('${goods.pid}')">删除同店铺相同MD5图片</button>
+                <button class="s_btn" style="width: 180px;" onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片</button>
             </div>
 
 
@@ -2118,7 +2118,7 @@
 </body>
 <script type="text/javascript">
 
-    function beforeDeleteMd5(goodsPid) {
+    function beforeDeleteMd5(goodsPid,shopId) {
         $.messager.prompt('提示', '请输入详情图片链接(详情图片选中->鼠标右击->选择“复制图片地址”->粘贴)', function (url) {
             if (url) {
                 if (url.indexOf("http") == -1) {
@@ -2130,11 +2130,12 @@
                         url: '/cbtconsole/editc/queryMd5ByImgUrl',
                         data: {
                             "pid": goodsPid,
+                            "shopId": shopId,
                             "url": url
                         },
                         success: function (json) {
                             if (json.ok) {
-                                confirmAndDelete(json, goodsPid, url)
+                                confirmAndDelete(json, goodsPid, url,shopId)
                             } else {
                                 $.messager.alert("提醒", json.message, "error");
                             }
@@ -2149,7 +2150,7 @@
         });
     }
 
-    function confirmAndDelete(json, goodsPid, url) {
+    function confirmAndDelete(json, goodsPid, url,shopId) {
         $.messager.confirm('提醒', '当前商品的店铺下存在相同的MD5图片数为' + json.total + ',是否删除?', function (r) {
             if (r) {
                 if (json.total > 0) {
@@ -2159,6 +2160,7 @@
                         url: '/cbtconsole/editc/deleteImgByMd5',
                         data: {
                             "pid": goodsPid,
+                            "shopId": shopId,
                             "url": url
                         },
                         success: function (json) {

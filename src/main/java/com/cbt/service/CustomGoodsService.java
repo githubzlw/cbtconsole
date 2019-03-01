@@ -606,18 +606,20 @@ public interface CustomGoodsService {
      *
      * @param pid
      * @param url
+     * @param shopId
      * @return
      */
-    int queryMd5ImgByUrlCount(String pid, String url);
+    int queryMd5ImgByUrlCount(String pid, String url, String shopId);
 
     /**
      * 查询根据链接获取的md5相同的bean
      *
      * @param pid
      * @param url
+     * @param shopId
      * @return
      */
-    List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url);
+    List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url, String shopId);
 
 
     /**
@@ -640,9 +642,10 @@ public interface CustomGoodsService {
      * 更新MD5删除的图片标记
      * @param pid
      * @param url
+     * @param shopId
      * @return
      */
-    int updateMd5ImgDeleteFlag(String pid, String url);
+    int updateMd5ImgDeleteFlag(String pid, String url, String shopId);
 
 
 }
