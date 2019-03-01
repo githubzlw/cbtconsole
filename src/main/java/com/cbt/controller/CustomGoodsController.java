@@ -569,6 +569,11 @@ public class CustomGoodsController {
 			queryBean.setMaxPrice(Double.valueOf(maxPrice));
 		}
 
+		String isSoldFlag = request.getParameter("isSoldFlag");
+		if(StringUtils.isNotBlank(isSoldFlag)){
+			queryBean.setIsSoldFlag(Integer.valueOf(isSoldFlag));
+		}
+
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);
 		int count = customGoodsService.queryGoodsInfosCount(queryBean);
 
