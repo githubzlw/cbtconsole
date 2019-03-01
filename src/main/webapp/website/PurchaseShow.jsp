@@ -2962,14 +2962,15 @@
 								<div style="width: 100%; word-wrap: break-word;">
 									供应商地址： 【${pb.shopAddress}】<font class="cc"><span style="color:red">
 									<c:if test="${pb.straight_flag==1}">
-										广东【建议直发】
+										【建议直发】
 									</c:if>
 									<c:if test="${pb.straight_flag==2}">
-										广东【确认直发】【${pb.straight_time}】<a href="/cbtconsole/website/straight_hair_list.jsp?goods_pid=${pb.goods_pid}" target="_blank">直发列表</a>
+										【确认直发】【${pb.straight_time}】<a href="/cbtconsole/website/straight_hair_list.jsp?goods_pid=${pb.goods_pid}" target="_blank">直发列表</a>
 									</c:if>
 									</span></font>
 									<c:if test="${pb.straight_flag==1}">
-										<button onclick="determineStraighthair('${pb.orderNo}','${pb.od_id}','${pb.od_id}')">直发</button>
+										<%-- <button onclick="determineStraighthair('${pb.orderNo}','${pb.od_id}','${pb.od_id}')">直发</button> --%>
+										<button onclick="determineStraighthair('${pb.orderNo}','${pb.goodsid}','${pb.od_id}')">直发</button>
 									</c:if>
 								</div>
 								<div style="width: 100%; word-wrap: break-word;">

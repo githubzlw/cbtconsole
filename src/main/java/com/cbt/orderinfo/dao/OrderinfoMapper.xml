@@ -738,10 +738,10 @@
         left join order_address adr on od.orderid=adr.orderNo
         left join cancel_replacement_record cr on cr.orderid=od.orderid and cr.goodsid=od.goodsid
         left join order_product_source ors on ors.od_id=od.id and  od.orderid=ors.orderid
-        left join id_relationtable id on od.id=id.odid  and id.is_replenishment=1
+        left join id_relationtable id on od.id=id.odid  and id.is_replenishment=1 and  od.orderid=id.orderid
         left join zone z ON adr.country=z.country   left join orderinfo oi ON oi.order_no=od.orderid
         left join dropshiporder dso on od.dropshipid = dso.child_order_no
-        left join goods_communication_info gci on  od.id=gci.odid
+        left join goods_communication_info gci on  od.id=gci.odid and  od.orderid=gci.orderid
         LEFT join custom_benchmark_ready  cbr ON cbr.pid = od.goods_pid
         where od.orderid=#{orderNo}  order by dropshipid, car_url,od.id
     </select>
