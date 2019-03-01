@@ -914,7 +914,7 @@ public class CustomerDisputeController {
     	evidence.put("product_description", request.getParameter("product_description"));
     	if(reson < 5 && reson >0) {
     		evidence.put("shipping_date", request.getParameter("shipping_date"));
-    		evidence.put("shipping_number", request.getParameter("shipping_number"));
+    		evidence.put("shipping_tracking_number", request.getParameter("shipping_number"));
     		evidence.put("shipping_carrier", request.getParameter("shipping_carrier"));
     		evidence.put("shipping_address", request.getParameter("shipping_address"));
     		evidence.put("shipping_documentation",uploadFile(request.getParameter("shipping_documentation")));
@@ -945,13 +945,13 @@ public class CustomerDisputeController {
     	}
     	
     	try {
-    		stripeService.update(disputeid, evidence );
+    		Dispute dispute = stripeService.update(disputeid, evidence );
     		attr.addAttribute("sendResult", "Successed");
 		} catch (Exception e) {
 			attr.addAttribute("sendResult", e.getMessage());
 		}
     	
-    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread=true";
+    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"&isread=true";
     }
     
     /**
