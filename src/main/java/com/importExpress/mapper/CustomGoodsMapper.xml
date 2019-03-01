@@ -984,15 +984,15 @@
     <select id="queryMd5ImgByUrlCount" resultType="java.lang.Integer">
         select count(0) from custom_goods_md5
         where goods_md5 = (select goods_md5
-        from custom_goods_md5
-        where pid = #{pid} and remote_path = #{url}) and ifnull(goods_md5,'') != ''
+        from custom_goods_md5 where pid = #{pid} and remote_path = #{url} and shop_id = #{shopId})
+        and shop_id = #{shopId} and ifnull(goods_md5,'') != ''
     </select>
 
     <select id="queryMd5ImgByUrlList" resultMap="goodsMd5BeanResultMap">
         select pid,shop_id,local_path,remote_path,goods_md5 from custom_goods_md5
         where goods_md5 = (select goods_md5
-        from custom_goods_md5
-        where pid = #{pid} and remote_path = #{url}) and ifnull(goods_md5,'') != ''
+        from custom_goods_md5 where pid = #{pid} and remote_path = #{url} and shop_id = #{shopId})
+        and shop_id = #{shopId} and ifnull(goods_md5,'') != ''
     </select>
 
 
@@ -1016,9 +1016,9 @@
     <update id="updateMd5ImgDeleteFlag">
         update custom_goods_md5 a,
                 (select goods_md5 from custom_goods_md5 where pid = #{pid}
-                  and remote_path = #{url} and ifnull(goods_md5,'') != '') b
+                  and remote_path = #{url} and ifnull(goods_md5,'') != '' and shop_id = #{shopId}) b
         set a.is_delete = 1
-        where a.goods_md5 = b.goods_md5
+        where a.goods_md5 = b.goods_md5 and a.shop_id = #{shopId}
     </update>
 
 </mapper>

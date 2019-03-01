@@ -263,7 +263,7 @@ public interface CustomGoodsMapper {
      * @param url
      * @return
      */
-    int queryMd5ImgByUrlCount(@Param("pid") String pid, @Param("url") String url);
+    int queryMd5ImgByUrlCount(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
     /**
      * 查询根据链接获取的md5相同的bean
@@ -272,7 +272,7 @@ public interface CustomGoodsMapper {
      * @param url
      * @return
      */
-    List<GoodsMd5Bean> queryMd5ImgByUrlList(@Param("pid") String pid, @Param("url") String url);
+    List<GoodsMd5Bean> queryMd5ImgByUrlList(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
 
     /**
@@ -296,6 +296,6 @@ public interface CustomGoodsMapper {
      * @param url
      * @return
      */
-    int updateMd5ImgDeleteFlag(@Param("pid") String pid, @Param("url") String url);
+    int updateMd5ImgDeleteFlag(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
 }

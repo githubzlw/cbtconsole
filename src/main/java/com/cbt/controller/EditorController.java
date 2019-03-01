@@ -2840,6 +2840,13 @@ public class EditorController {
             return json;
         }
 
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
         String url = request.getParameter("url");
         if (StringUtils.isBlank(url)) {
             json.setOk(false);
@@ -2848,10 +2855,10 @@ public class EditorController {
         }
         try {
             String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
-            int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath);
+            int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath,shopId);
             List<GoodsMd5Bean> md5BeanList;
             if (total > 1) {
-                md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath);
+                md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
                 json.setRows(md5BeanList);
             }
             json.setOk(true);
@@ -2888,6 +2895,13 @@ public class EditorController {
             return json;
         }
 
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
         String url = request.getParameter("url");
         if (StringUtils.isBlank(url)) {
             json.setOk(false);
@@ -2897,7 +2911,7 @@ public class EditorController {
         try {
 
             String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
-            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath);
+            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
             List<String> pidList = new ArrayList(md5BeanList.size());
             Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();
             for (GoodsMd5Bean md5Bean : md5BeanList) {
@@ -2917,7 +2931,7 @@ public class EditorController {
                 }
             }
             // 更新回收标识
-            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath);
+            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath,shopId);
             md5BeanList.clear();
             pidList.clear();
             pidMap.clear();
