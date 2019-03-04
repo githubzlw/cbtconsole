@@ -987,16 +987,26 @@ public class OrderinfoService implements IOrderinfoService {
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
 				String address_country_code=aMap.get("address_country_code");
-				if("US".equals(address_country_code)){
+				//Rewriter
+				//Rewrite <V1.0.1> Start：cjc 2019/3/4 15:02:58 TODO 不是到为什么USA 的ipn 回调简称US非要改成 USA 去掉
+				/*if("US".equals(address_country_code)){
 					address_country_code="USA";
-				}
+				}*/
+				//End：
+
 				if("3".equals(ordertype)){
 					//B2B订单
 					addressFlag="3";
 				}else if(StringUtil.isBlank(addressCountry)){
 					//没有支付信息，
 					addressFlag="2";
-				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && !zCountry.equals(addressCountry) && !zCountry.equals(address_country_code)){
+				//Rewriter
+				//Rewrite <V1.0.1> Start：cjc 2019/3/4 14:56:41
+				//}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && !zCountry.equals(addressCountry) && !odCode.equals(address_country_code)){
+				//End：
+				//Added <V1.0.1> Start： cjc 2019/3/4 14:57:03 TODO jack 建议说只用对比简称就行
+				}else if(StringUtil.isNotBlank(odCode) && StringUtil.isNotBlank(address_country_code) && !odCode.equals(address_country_code)){
+				//End：
 					//两边都有编码但不一致
 					addressFlag="1";
 				}else if(StringUtil.isBlank(zCountry) || StringUtil.isBlank(addressCountry)){
@@ -1341,6 +1351,7 @@ public class OrderinfoService implements IOrderinfoService {
 			address.setStatename(ob.getStatename());
 			address.setAddress2(ob.getAddress2());
 			address.setRecipients(ob.getRecipients());
+			address.setStreet(ob.getStreet());
 			ob.setAddress(address);
 			ob.setOrderNumber(ob.getOrdernum() == 1);
 			ob.setPay_price(Double.parseDouble(Utility.formatPrice(String.valueOf(ob.getPay_price())).replaceAll(",", "")));
