@@ -41,6 +41,7 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,8 +171,16 @@ public class NewOrderDetailsCtr {
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
 			Double es_prices=0.00;
 			double feeWeight=0.00;
+			Map<String,Double> shopShippingCostMap= new HashedMap();
+			Double ShippingCost = 0d;
+			shopShippingCostMap.put("shopShippingCost",0d);
 			for (int i = 0; i < odb.size(); i++) {
 				OrderDetailsBean o = odb.get(i);
+				if(!shopShippingCostMap.containsKey(o.getCbrShopid())){
+					Double shopShippingCost = shopShippingCostMap.get("shopShippingCost");
+					shopShippingCostMap.put("shopShippingCost",shopShippingCost+=5d);
+					shopShippingCostMap.put(o.getCbrShopid(),shopShippingCost+=5d);
+				}
 				if (StringUtil.isNotBlank(o.getConfirm_userid()) && Integer.valueOf(o.getPurchase_state())>2) {
 					//对于已经确认采购的商品查询是否有物流信息
 					getShippStatus(o);
@@ -420,6 +429,7 @@ public class NewOrderDetailsCtr {
 			if(odb.size()>0){
 				pid_amount=odb.get(0).getPid_amount();
 			}
+			pid_amount = shopShippingCostMap.get("shopShippingCost");
 //			if(buy<=0){
 //				pid_amount=0.00;
 //			}
