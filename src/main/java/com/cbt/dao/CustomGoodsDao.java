@@ -6,6 +6,7 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.UpdateTblModel;
 
@@ -584,6 +585,13 @@ public interface CustomGoodsDao {
      * @return
      */
     int updatePidEnInfo(CustomGoodsPublish gd);
+
+    /**
+     * 检查店铺公共图片删除表是否存在此图片
+     * @param shopMd5Bean
+     * @return
+     */
+	int checkShopGoodsImgIsMarkByParam(ShopMd5Bean shopMd5Bean);
 
 
 }

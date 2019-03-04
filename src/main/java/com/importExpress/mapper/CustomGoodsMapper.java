@@ -298,4 +298,26 @@ public interface CustomGoodsMapper {
      */
     int updateMd5ImgDeleteFlag(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
+
+    /**
+     * 获取相同店铺下的商品信息
+     * @param shopMd5Bean
+     * @return
+     */
+	List<ShopMd5Bean> queryForMd5List(ShopMd5Bean shopMd5Bean);
+
+    /**
+     *
+     * @param shopMd5Bean
+     * @return
+     */
+	int queryForMd5ListCount(ShopMd5Bean shopMd5Bean);
+
+    /**
+     * 跟进店铺ID查询商品的MD5数据
+     * @param shopId
+     * @return
+     */
+	List<GoodsMd5Bean> queryGoodsMd5ByShopId(@Param("shopId") String shopId);
+
 }

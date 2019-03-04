@@ -4121,4 +4121,33 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     }
 
 
+    @Override
+    public int checkShopGoodsImgIsMarkByParam(ShopMd5Bean shopMd5Bean) {
+        {
+            Connection conn28 = DBHelper.getInstance().getConnection5();
+            PreparedStatement stmt28 = null;
+            ResultSet rs = null;
+            String querySql = "select count(0) from shop_goods_img_delete where shop_id = ? and SUBSTRING_INDEX(img, '/', -1) = ?";
+            int count = 0;
+            try {
+                stmt28 = conn28.prepareStatement(querySql);
+                stmt28.setString(1, shopMd5Bean.getShopId());
+                stmt28.setString(2, shopMd5Bean.getMd5Img());
+                rs = stmt28.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("shopId:" + shopMd5Bean.getShopId() + ",checkShopGoodsImgIsMarkByParam error :" + e.getMessage());
+                LOG.error("shopId:" + shopMd5Bean.getShopId() + ",checkShopGoodsImgIsMarkByParam error :" + e.getMessage());
+            } finally {
+                DBHelper.getInstance().closePreparedStatement(stmt28);
+                DBHelper.getInstance().closeConnection(conn28);
+                DBHelper.getInstance().closeResultSet(rs);
+            }
+            return count;
+        }
+    }
+
 }

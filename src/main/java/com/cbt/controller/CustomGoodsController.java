@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.bean.*;
 import com.importExpress.pojo.OnlineGoodsStatistic;
 import com.importExpress.utli.EasyUiTreeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,12 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.cbt.bean.CategoryBean;
-import com.cbt.bean.CustomGoodsBean;
-import com.cbt.bean.CustomGoodsPublish;
-import com.cbt.bean.CustomGoodsQuery;
-import com.cbt.bean.CustomRecord;
-import com.cbt.bean.FileBean;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Redis;
@@ -1053,6 +1048,91 @@ public class CustomGoodsController {
 
 		return "";
 	}
+
+
+	/**
+	 * 跟进店铺分组查询md5数据
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/queryForMd5List")
+    @ResponseBody
+    public EasyUiJsonResult queryForMd5List(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtils.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+        ShopMd5Bean md5Bean = new ShopMd5Bean();
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowStr) || "0".equals(rowStr))) {
+            limitNum = Integer.valueOf(rowStr);
+            md5Bean.setLimitNum(limitNum);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (!(StringUtils.isBlank(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        md5Bean.setStartNum(startNum);
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isNotBlank(shopId)) {
+            md5Bean.setShopId(shopId);
+        }
+
+
+        try {
+            List<ShopMd5Bean> res = customGoodsService.queryForMd5List(md5Bean);
+            int count = customGoodsService.queryForMd5ListCount(md5Bean);
+            for(ShopMd5Bean shopMd5Bean : res){
+                md5Bean.setMd5Img(shopMd5Bean.getMd5Img().substring(shopMd5Bean.getMd5Img().lastIndexOf("/") + 1));
+                shopMd5Bean.setIsMark(customGoodsService.checkShopGoodsImgIsMarkByParam(md5Bean));
+            }
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/queryGoodsMd5ByShopId", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView queryGoodsMd5ByShopId(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("goodsMd5Show");
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            mv.addObject("isShow", 0);
+            mv.addObject("message", "获取店铺ID失败");
+            return mv;
+        }
+        try {
+            List<GoodsMd5Bean> list = customGoodsService.queryGoodsMd5ByShopId(shopId);
+            mv.addObject("isShow", 1);
+            mv.addObject("list", list);
+            mv.addObject("showTotal", list.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+            mv.addObject("isShow", 0);
+            mv.addObject("message", "查询失败，原因 :" + e.getMessage());
+            LOG.error("查询失败，原因 :" + e.getMessage());
+        }
+        return mv;
+    }
+
+
 
 	/**
 	 * 删除文件及文件夹
