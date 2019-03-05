@@ -24,6 +24,7 @@
     <result column="oprate_adm" property="oprateAdm" jdbcType="VARCHAR" />
     <result column="api_type" property="apiType" jdbcType="VARCHAR" />
     <result column="refuse_reason" property="refuseReason" jdbcType="VARCHAR" />
+    <result column="reason" property="reason" jdbcType="VARCHAR" />
     
   </resultMap>
   
@@ -33,12 +34,12 @@
       transaction_id, remark,refund_type,return_shipping_address,
       gross_amount,buyer_request_amount,seller_offered_amount,currency_code,
       offer_type,accept_claim_reason,api_type,
-      oprate_adm,create_time,update_time
+      oprate_adm,create_time,update_time,reason
       )
     values (#{disputeID},#{userid},#{orderNo},#{merchantID},#{transactionID},#{remark},
     #{refundType},#{returnShippingAddress},#{grossAmount},#{buyerRequestAmount},
     #{sellerOfferedAmount},#{currencyCode},#{offerType},#{acceptClaimReason},#{apiType},
-    #{oprateAdm},now(),now()
+    #{oprateAdm},now(),now(),#{reason}
       )
   </insert>
   
@@ -65,7 +66,7 @@
 	remark,status,refund_type,return_shipping_address,merchant_id,
 	gross_amount,buyer_request_amount,seller_offered_amount,amount_refunded,
 	currency_code,offer_type,accept_claim_reason,create_time,
-	update_time,oprate_adm,api_type,refuse_reason
+	update_time,oprate_adm,api_type,refuse_reason,reason
     
      from customer_dispute_refund 
        where 1=1
@@ -85,7 +86,7 @@
 	remark,status,refund_type,return_shipping_address,merchant_id,
 	gross_amount,buyer_request_amount,seller_offered_amount,amount_refunded,
 	currency_code,offer_type,accept_claim_reason,create_time,
-	update_time,oprate_adm,api_type,refuse_reason from 
+	update_time,oprate_adm,api_type,refuse_reason,reason from 
 	customer_dispute_refund where dispute_id = #{disputeid} limit 1;
   </select>
  
