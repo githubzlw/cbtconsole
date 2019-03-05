@@ -523,6 +523,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			int fp=pruchaseMapper.getFpCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给采购多少个商品
 			int rk=pruchaseMapper.getStorageCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配采购的商品中入库了多少商品
 			int cg=pruchaseMapper.getPurchaseCount(p.getOrderid(),map.get("admuserid").toString());//该订单分配给该采购采购了多少商品\
+			int bsFlag =pruchaseMapper.checkPurchaseCount(p.getOrderid());//采购数量是否正确标识，不对：1，正确：0。
 //            int noShipInfo=dao.getNoShipInfo(p.getOrderid(),map.get("admuserid").toString());
 			//查询该订单有多少没有物流信息的商品数
 			int index_num=0;
@@ -537,7 +538,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			//判断采购订单状态
 			getGoodsStatus(p, checked, problem, fp, rk, cg);
 			p.setProduct_cost(p.getProduct_cost()+" USD");
-			p.setOption("<a target='_blank' href='/cbtconsole/warehouse/getSampleGoods?orderid="+p.getOrderid()+"'>建议采样</a>");
+			String mesStr = "";
+			if(bsFlag==1){
+				mesStr= "<span style='color:red'>采购数量不对</span>&nbsp";
+			}
+			p.setOption(mesStr+"<a target='_blank' href='/cbtconsole/warehouse/getSampleGoods?orderid="+p.getOrderid()+"'>建议采样</a>");
 			int goods_info=pruchaseMapper.getGoodsInfo(p.getOrderid(),map.get("admuserid").toString());
 			//拼接显示页面的订单号信息
 			getOrderIdInfo(map, p, fp, goods_info);

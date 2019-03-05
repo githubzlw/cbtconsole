@@ -366,6 +366,8 @@ public class CustomerDisputeController {
     	bean.setCurrencyCode(currencyCode);
     	bean.setRefundType("1");
     	bean.setApiType("paypal");
+    	String reason = request.getParameter("reason");
+    	bean.setReason(reason);
     	
     	
     	String postalCode = request.getParameter("postalCode");
@@ -459,6 +461,9 @@ public class CustomerDisputeController {
     	bean.setCurrencyCode(currencyCode);
     	bean.setRefundType("0");
     	bean.setApiType("paypal");
+    	
+    	String reason = request.getParameter("reason");
+    	bean.setReason(reason);
     	
     	
     	String invoice_id = request.getParameter("invoice_id");
@@ -797,7 +802,17 @@ public class CustomerDisputeController {
         			JSONObject Amount = new JSONObject();
         			Amount.put("value", offerAmount);
         			Amount.put("currency_code", currencyCode);
-        			data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
+        			if(StringUtils.equals(refundType, "0")) {
+//        				For MERCHANDISE_OR_SERVICE_NOT_RECEIVED dsiputes, 
+//        				refund amount cannot be specified in accept claim as this feature is not yet 
+//        				supported in PayPal Dispute system. You cannot specify the refund amount in an accept claim call.
+        				if(!StringUtils.equals(comfirmByDisputeID.getReason(), "MERCHANDISE_OR_SERVICE_NOT_RECEIVED")) {
+        					data.put("refund_amount", Amount);
+        				}
+        			}else {
+        				data.put("offer_amount" , Amount);
+        				
+        			}
         		}
         		customerDisputeService.updateStatus(disputeID, "1");
         		String refundResult = null;
@@ -805,6 +820,7 @@ public class CustomerDisputeController {
         			
                 	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
                 	data.put("invoice_id", invoice_id);
+                	
             		LOG.info("claim : "+JSONObject.toJSONString(data));
                 	refundResult = apiService.acceptClaim(disputeID, merchant, data);
             	}else {
