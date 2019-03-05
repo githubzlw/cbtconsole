@@ -692,4 +692,12 @@ public class GoodsInfoUtils {
         }
         return false;
     }
+
+    public static String changeLocalPathToRemotePath(String localPath) {
+        if (StringUtils.isNotBlank(localPath)) {
+            return localPath.replace(SERVICE_LOCAL_PATH, SERVICE_SHOW_URL_3);
+        } else {
+            return null;
+        }
+    }
 }

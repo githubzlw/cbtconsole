@@ -9,6 +9,7 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.pojo.SkuValPO;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;

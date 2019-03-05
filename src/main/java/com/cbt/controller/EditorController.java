@@ -3,6 +3,7 @@ package com.cbt.controller;
 import com.alibaba.fastjson.JSON;
 import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.bean.Set;
 import com.cbt.parse.service.*;
 import com.cbt.parse.service.ImgDownload;
@@ -63,6 +64,9 @@ public class EditorController {
 
     @Autowired
     private CustomGoodsService customGoodsService;
+
+    @Autowired
+    private IShopUrlService shopUrlService;
 
     @SuppressWarnings({"static-access", "unchecked"})
     @RequestMapping(value = "/detalisEdit", method = {RequestMethod.POST, RequestMethod.GET})
@@ -2914,6 +2918,7 @@ public class EditorController {
             List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
             List<String> pidList = new ArrayList(md5BeanList.size());
             Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();
+            List<ShopGoodsInfo> deleteGoodsInfos = new ArrayList<>();
             for (GoodsMd5Bean md5Bean : md5BeanList) {
                 pidList.add(md5Bean.getPid());
                 if (pidMap.containsKey(md5Bean.getPid())) {
@@ -2923,6 +2928,13 @@ public class EditorController {
                     childList.add(md5Bean);
                     pidMap.put(md5Bean.getPid(), childList);
                 }
+                ShopGoodsInfo delGd = new ShopGoodsInfo();
+                delGd.setShopId(shopId);
+                delGd.setPid(md5Bean.getPid());
+                delGd.setImgUrl(md5Bean.getRemotePath().substring(md5Bean.getRemotePath().indexOf(md5Bean.getPid()) + 1));
+                delGd.setLocalPath(md5Bean.getLocalPath());
+                delGd.setRemotePath(GoodsInfoUtils.changeLocalPathToRemotePath(md5Bean.getRemotePath()));
+                deleteGoodsInfos.add(delGd);
             }
             List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsByPidList(pidList);
             for (CustomGoodsPublish gd : goodsList) {
@@ -2932,10 +2944,13 @@ public class EditorController {
             }
             // 更新回收标识
             customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath,shopId);
+            // 插入公共图片表中
+            shopUrlService.insertShopGoodsDeleteImgs(deleteGoodsInfos, user.getId());
             md5BeanList.clear();
             pidList.clear();
             pidMap.clear();
             goodsList.clear();
+            deleteGoodsInfos.clear();
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2962,7 +2977,7 @@ public class EditorController {
                 }
             }
             gd.setEninfo(nwDoc.html());
-            customGoodsService.updatePidEnInfo(gd);
+            // customGoodsService.updatePidEnInfo(gd);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());

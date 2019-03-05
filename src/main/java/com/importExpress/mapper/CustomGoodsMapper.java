@@ -3,10 +3,7 @@ package com.importExpress.mapper;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
-import com.importExpress.pojo.GoodsEditBean;
-import com.importExpress.pojo.GoodsMd5Bean;
-import com.importExpress.pojo.GoodsParseBean;
-import com.importExpress.pojo.OnlineGoodsCheck;
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -307,7 +304,7 @@ public interface CustomGoodsMapper {
 	List<ShopMd5Bean> queryForMd5List(ShopMd5Bean shopMd5Bean);
 
     /**
-     *
+     *获取相同店铺下的商品信息总数
      * @param shopMd5Bean
      * @return
      */
@@ -318,6 +315,29 @@ public interface CustomGoodsMapper {
      * @param shopId
      * @return
      */
-	List<GoodsMd5Bean> queryGoodsMd5ByShopId(@Param("shopId") String shopId);
+	List<GoodsMd5Bean> queryShopGoodsByMd5(@Param("md5Val") String shopId);
+
+    /**
+     * 根据MD5数据标识已删除
+     * @param goodsMd5
+     * @param shopId
+     * @return
+     */
+	int updateImgDeleteByMd5(@Param("goodsMd5") String goodsMd5, @Param("shopId") String shopId);
+
+
+	/**
+     * 获取不同店铺下的商品信息
+     * @param shopMd5Bean
+     * @return
+     */
+	List<ShopMd5Bean> queryMd5NoSameList(ShopMd5Bean shopMd5Bean);
+
+    /**
+     *获取不同店铺下的商品信息总数
+     * @param shopMd5Bean
+     * @return
+     */
+	int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean);
 
 }

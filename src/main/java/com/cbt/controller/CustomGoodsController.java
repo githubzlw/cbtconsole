@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cbt.bean.*;
+import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.OnlineGoodsStatistic;
+import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.EasyUiTreeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1109,17 +1111,123 @@ public class CustomGoodsController {
     }
 
 
-    @RequestMapping(value = "/queryGoodsMd5ByShopId", method = {RequestMethod.POST, RequestMethod.GET})
-    public ModelAndView queryGoodsMd5ByShopId(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView mv = new ModelAndView("goodsMd5Show");
+    /**
+     * 标记已删除
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/updateImgDeleteByMd5")
+    @ResponseBody
+    public JsonResult updateImgDeleteByMd5(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtils.isBlank(admuserJson)) {
+            json.setOk(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+
         String shopId = request.getParameter("shopId");
         if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取店铺ID失败");
+            return json;
+        }
+
+        String md5 = request.getParameter("md5");
+        if (StringUtils.isBlank(md5)) {
+            json.setOk(false);
+            json.setMessage("获取MD5失败");
+            return json;
+        }
+
+
+        try {
+            customGoodsService.updateImgDeleteByMd5(md5, shopId);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+
+    @RequestMapping("/queryMd5NoSameList")
+    @ResponseBody
+    public EasyUiJsonResult queryMd5NoSameList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtils.isBlank(admuserJson)) {
+            json.setSuccess(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+        ShopMd5Bean md5Bean = new ShopMd5Bean();
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowStr = request.getParameter("rows");
+        if (!(StringUtils.isBlank(rowStr) || "0".equals(rowStr))) {
+            limitNum = Integer.valueOf(rowStr);
+            md5Bean.setLimitNum(limitNum);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (!(StringUtils.isBlank(pageStr) || "0".equals(pageStr))) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        md5Bean.setStartNum(startNum);
+
+        String md5Val = request.getParameter("md5Val");
+        if (StringUtils.isNotBlank(md5Val)) {
+            md5Bean.setMd5Val(md5Val);
+        }
+
+
+        try {
+            List<ShopMd5Bean> res = customGoodsService.queryMd5NoSameList(md5Bean);
+            int count = customGoodsService.queryMd5NoSameListCount(md5Bean);
+            for(ShopMd5Bean shopMd5Bean : res){
+                md5Bean.setMd5Img(shopMd5Bean.getMd5Img().substring(shopMd5Bean.getMd5Img().lastIndexOf("/") + 1));
+                shopMd5Bean.setIsMark(customGoodsService.checkShopGoodsImgIsMarkByParam(md5Bean));
+            }
+            json.setSuccess(true);
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    /**
+     * 根据MD5获取相同MD5的商品
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/queryShopGoodsByMd5", method = {RequestMethod.POST, RequestMethod.GET})
+    public ModelAndView queryShopGoodsByMd5(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("sameMd5ImgShow");
+        String md5Val = request.getParameter("md5Val");
+        if (StringUtils.isBlank(md5Val)) {
             mv.addObject("isShow", 0);
-            mv.addObject("message", "获取店铺ID失败");
+            mv.addObject("message", "获取MD5值失败");
             return mv;
         }
         try {
-            List<GoodsMd5Bean> list = customGoodsService.queryGoodsMd5ByShopId(shopId);
+            List<GoodsMd5Bean> list = customGoodsService.queryShopGoodsByMd5(md5Val);
             mv.addObject("isShow", 1);
             mv.addObject("list", list);
             mv.addObject("showTotal", list.size());

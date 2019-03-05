@@ -183,6 +183,7 @@
 
     <resultMap id="shopMd5BeanResultMap" type="com.importExpress.pojo.ShopMd5Bean">
         <result column="shop_id" property="shopId"/>
+        <result column="pid" property="pid"/>
         <result column="shop_name" property="shopName"/>
         <result column="goods_md5" property="md5Val"/>
         <result column="remote_path" property="md5Img"/>
@@ -191,7 +192,7 @@
     </resultMap>
 
 
-    <resultMap id="goodsMd5BeanResultMap" type="com.importExpress.pojo.GoodsMd5Bean">
+    <resultMap id="goodsMd5DeatilsResultMap" type="com.importExpress.pojo.GoodsMd5Bean">
         <id column="id" property="id"/>
         <result column="pid" property="pid"/>
         <result column="valid" property="valid"/>
@@ -1063,7 +1064,7 @@
 
     <select id="queryForMd5List" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
         select * from (
-        select shop_id,goods_md5,count(goods_md5) as md5_num,remote_path,is_delete from custom_goods_md5
+        select shop_id,pid,goods_md5,count(goods_md5) as md5_num,remote_path,is_delete from custom_goods_md5
         where 1=1 and is_delete = 0
         <if test="shopId != null">
             and shop_id = #{shopId}
@@ -1085,10 +1086,43 @@
     </select>
 
 
-    <select id="queryGoodsMd5ByShopId" resultMap="goodsMd5BeanResultMap" parameterType="com.importExpress.pojo.GoodsMd5Bean">
+    <update id="updateImgDeleteByMd5">
+        update custom_goods_md5
+        set is_delete = 1
+        where goods_md5 = #{goodsMd5} and shop_id = #{shopId}
+    </update>
+
+    <select id="queryMd5NoSameList" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
+        from (
+            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
+            where 1=1 and is_delete = 0
+            <if test="md5Val != null">
+                and goods_md5 = #{md5Val}
+            </if>
+            group by shop_id,goods_md5
+        ) a group by a.goods_md5 HAVING count(goods_md5) > 1
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select count(0) from (select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
+        from (
+            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
+            where 1=1 and is_delete = 0
+            <if test="md5Val != null">
+                and goods_md5 = #{md5Val}
+            </if>
+            group by shop_id,goods_md5
+        ) a group by a.goods_md5 HAVING count(goods_md5) > 1) b
+    </select>
+
+    <select id="queryShopGoodsByMd5" resultMap="goodsMd5DeatilsResultMap">
         select a.id,a.pid,a.shop_id,a.goods_md5,a.local_path,a.remote_path,b.valid
         from custom_goods_md5 a,custom_benchmark_ready b
-        where 1=1 and a.shop_id = #{shopId} and a.pid = b.pid and a.is_delete = 0
+        where 1=1 and a.goods_md5 = #{md5Val} and a.pid = b.pid and a.is_delete = 0
         order by a.goods_md5
     </select>
 
