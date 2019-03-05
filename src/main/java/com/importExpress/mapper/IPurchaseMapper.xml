@@ -664,6 +664,17 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         ops.orderid =#{orderid} AND od.state<![CDATA[<]]>2 AND o.state>0 AND o.state<![CDATA[<]]>6
         AND ops.purchase_state IN(3,4,6,8,12,13)
     </select>
+    
+    <select id="checkPurchaseCount" resultType="INTEGER">
+        select case when sum(ops.buycount) &lt;sum(od.yourorder) then 1 else 0 end  as bsFlag
+				from order_details od 
+				INNER JOIN order_product_source   ops
+				ON ops.orderid=od.orderid AND ops.goodsid=od.goodsid
+				and ops.purchase_state=3
+        and od.orderid=#{orderid}
+    </select>
+    
+    
     <select id="getStorageCount" resultType="INTEGER">
         select ifnull(count(distinct id.id),0) from goods_distribution g
         inner join id_relationtable id on g.orderid=id.orderid and g.odid=id.odid and id.is_replenishment=1 and id.is_delete=0
