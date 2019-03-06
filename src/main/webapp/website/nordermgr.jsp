@@ -152,9 +152,9 @@ function fn(va) {
 		}else if(json[i].state == 3 && fnComparisonDate(delivery_time,nowDate)){
             showImg += "<span class='spiconbl'>超期</span>";
 		}
-		if(json[i].purchase > 0 && json[i].state == 5){
-			showImg += "<span class='spiconbr'>货源问题</span>";
-		}
+		// if(json[i].purchase > 0 && json[i].state == 5){
+		// 	showImg += "<span class='spiconbr'>货源问题</span>";
+		// }
 		if(json[i].deliver > 0){
 			showImg += "<span class='spiconbr'>出货问题</span>";
 		}
@@ -197,7 +197,7 @@ function fn(va) {
         //商品数量
 		var countOd = json[i].countOd;
         //是否有问题验货
-		var problem = json[i].problem;
+		var problems = json[i].problems;
         //是否有问题验货
 		var no_checked = json[i].no_checked;
         //添加国家
@@ -229,7 +229,7 @@ function fn(va) {
 			}else if(Number(no_checked)>0){
 				state_text = "已到仓库，未校验";
 				color = "#cca4e3;color:white";
-			}else if(problem!="0"){
+			}else if(problems!="0"){
 				state_text = "已到仓库，校验有问题";
 				color = "#FF8C00;color:white";
 			}else{
@@ -286,7 +286,6 @@ function fn(va) {
 		//显示订单总数量,采购数量,入库数量
         //入库数量
 		var  NOWarehouses  = json[i].number_of_warehouses;
-        var  problems  = json[i].problems;
 		//采购数量
 		$("#table tr:eq(" + row + ") td:eq(14)").after("<td style='font-size:19px;text-align:center;vertical-align:middle;'>" + NOWarehouses + "/"+ problems + "/" + json[i].purchase_number + "/"+ json[i].details_number+ "</td>");
 		if (Number(json[i].purchase_number) >= Number(json[i].details_number) && Number(json[i].details_number) != 0) {

@@ -637,6 +637,7 @@ The buyer can keep the item(s).
 <p>Confirm the details below and click the <strong>Process Refund</strong> 
 button to send this refund and close the case.</p>
 <form method="post" name="MIPSrefundConfirm" action="/cbtconsole/customer/dispute/acceptClaim" class="edit">
+<input type="hidden" name="reason" value="${result.reason }">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 <input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
@@ -698,6 +699,7 @@ If you are transacting with a non-U.S. or non-Canadian buyer who is
 unable to provide an online tracking number, you will be asked to confirm 
 delivery as a courtesy to the buyer before a refund will be issued.</p>
 <form method="post" name="MIPSrefundConfirm" action="/cbtconsole/customer/dispute/offer" class="edit">
+<input type="hidden" name="reason" value="${result.reason }">
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 <input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
@@ -750,6 +752,7 @@ Offer the buyer a partial refund in an attempt to close this claim.</label>
 </div><div id="messageBox"></div><div id="main">
 <div class="layout1">
 <form class="edit" id="partialRefund" method="post" action="/cbtconsole/customer/dispute/offer">
+<input type="hidden" name="reason" value="${result.reason }">
 <p>To offer a partial refund, enter the amount you are offering to the buyer below and click 
 <span class="emphasis">Calculate</span> 
 to determine the Net Refund Amount and the Fee Refunded. Click 
@@ -922,7 +925,9 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 
 <div style="margin-left: 60px;"  class="panel refund_form message_form hide">
 <!-- 退款 -->
-<form method="post" action="${resonFlag == 1?'/cbtconsole/customer/dispute/offer': '/cbtconsole/customer/dispute/acceptClaim'}" >
+<%-- action="${resonFlag == 1?'/cbtconsole/customer/dispute/offer': '/cbtconsole/customer/dispute/acceptClaim'}" --%>
+<form method="post" action="${'/cbtconsole/customer/dispute/acceptClaim'}" >
+<input type="hidden" name="reason" value="${result.reason }">
 <input type="hidden" name="gross_amount" id="gross_amount" value="${result.disputed_transactions[0].gross_amount.value }">
 <input type="hidden" name="buyer_request_amount" value="${result.offer.buyer_requested_amount.value }">
 <input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
@@ -933,8 +938,8 @@ Note:内部使用,意在销售客服通知Ling,该申诉需要退款
 <input type="hidden" name="disputeid" value="${result.dispute_id }">
 <input type="hidden" name="merchant" value="${merchant }">
 <input type="hidden" name="invoice_id" value="${result.disputed_transactions[0].seller_transaction_id }">
-<c:if test="${resonFlag == 0}">
 <input type="hidden" name="accept_claim_reason" value="DID_NOT_SHIP_ITEM">
+<c:if test="${resonFlag == 0}">
 <c:if test="${empty  result.offer.buyer_requested_amount.value}">
 <input type="hidden" name="refundAmount" value="${result.disputed_transactions[0].gross_amount.value }">
 <input type="hidden" name="refundCurrency" value="${result.disputed_transactions[0].gross_amount.currency_code }">
@@ -1305,6 +1310,7 @@ this problem will be resolved and closed.
 </div>
 
 <form action="/cbtconsole/customer/dispute/offer" method="post" id="makeoffer_form" style="display:none;">
+<input type="hidden" name="reason" value="${result.reason }">
 <input type="hidden" name="orderNo" value="${orderNo }" readonly="readonly">
 <input type="hidden" name="userid" value="${userid}" readonly="readonly">
 <input type="hidden" name="gross_amount" value="${result.disputed_transactions[0].gross_amount.value }">

@@ -366,6 +366,8 @@ public class CustomerDisputeController {
     	bean.setCurrencyCode(currencyCode);
     	bean.setRefundType("1");
     	bean.setApiType("paypal");
+    	String reason = request.getParameter("reason");
+    	bean.setReason(reason);
     	
     	
     	String postalCode = request.getParameter("postalCode");
@@ -459,6 +461,9 @@ public class CustomerDisputeController {
     	bean.setCurrencyCode(currencyCode);
     	bean.setRefundType("0");
     	bean.setApiType("paypal");
+    	
+    	String reason = request.getParameter("reason");
+    	bean.setReason(reason);
     	
     	
     	String invoice_id = request.getParameter("invoice_id");
@@ -797,7 +802,17 @@ public class CustomerDisputeController {
         			JSONObject Amount = new JSONObject();
         			Amount.put("value", offerAmount);
         			Amount.put("currency_code", currencyCode);
-        			data.put(StringUtils.equals(refundType, "0") ? "refund_amount" : "offer_amount" , Amount);
+        			if(StringUtils.equals(refundType, "0")) {
+//        				For MERCHANDISE_OR_SERVICE_NOT_RECEIVED dsiputes, 
+//        				refund amount cannot be specified in accept claim as this feature is not yet 
+//        				supported in PayPal Dispute system. You cannot specify the refund amount in an accept claim call.
+        				if(!StringUtils.equals(comfirmByDisputeID.getReason(), "MERCHANDISE_OR_SERVICE_NOT_RECEIVED")) {
+        					data.put("refund_amount", Amount);
+        				}
+        			}else {
+        				data.put("offer_amount" , Amount);
+        				
+        			}
         		}
         		customerDisputeService.updateStatus(disputeID, "1");
         		String refundResult = null;
@@ -805,6 +820,7 @@ public class CustomerDisputeController {
         			
                 	data.put("accept_claim_reason", comfirmByDisputeID.getAcceptClaimReason());
                 	data.put("invoice_id", invoice_id);
+                	
             		LOG.info("claim : "+JSONObject.toJSONString(data));
                 	refundResult = apiService.acceptClaim(disputeID, merchant, data);
             	}else {
@@ -825,6 +841,7 @@ public class CustomerDisputeController {
         		result.put("state", true);
         		result.put("message",   "退款完成");
         		LOG.info(content);
+        		customerDisputeService.updateRefund(disputeid, offerAmount);
     		}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -833,7 +850,7 @@ public class CustomerDisputeController {
 		}
     	return  result;
     }
-    /**退款确定
+    /**退款拒绝
      * @param request
      * @param response
      * @return
@@ -913,7 +930,7 @@ public class CustomerDisputeController {
     	evidence.put("product_description", request.getParameter("product_description"));
     	if(reson < 5 && reson >0) {
     		evidence.put("shipping_date", request.getParameter("shipping_date"));
-    		evidence.put("shipping_number", request.getParameter("shipping_number"));
+    		evidence.put("shipping_tracking_number", request.getParameter("shipping_number"));
     		evidence.put("shipping_carrier", request.getParameter("shipping_carrier"));
     		evidence.put("shipping_address", request.getParameter("shipping_address"));
     		evidence.put("shipping_documentation",uploadFile(request.getParameter("shipping_documentation")));
@@ -944,13 +961,13 @@ public class CustomerDisputeController {
     	}
     	
     	try {
-    		stripeService.update(disputeid, evidence );
+    		Dispute dispute = stripeService.update(disputeid, evidence );
     		attr.addAttribute("sendResult", "Successed");
 		} catch (Exception e) {
 			attr.addAttribute("sendResult", e.getMessage());
 		}
     	
-    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"$isread=true";
+    	return "redirect:/customer/dispute/info?disputeid="+disputeid+"&isread=true";
     }
     
     /**

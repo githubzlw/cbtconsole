@@ -469,29 +469,13 @@ public interface IOrderinfoService {
 
 	/**
 	 * 订单管理页面查询
-	 * @param userID
-	 * @param state
-	 * @param startdate
-	 * @param enddate
-	 * @param email
-	 * @param orderno
-	 * @param startpage
-	 * @param page
-	 * @param admuserid
-	 * @param buyid
-	 * @param showUnpaid
-	 * @param type
-	 * @param status
-	 * @param paymentid
 	 * @return
 	 */
-	public List<Map<String, String>> getOrderManagementQuery(int userID, int state, String startdate, String enddate, String email,
-                                                             String orderno, int startpage, int page, int admuserid, int buyid, int showUnpaid, String type, int status, String paymentid);
+	public List<Map<String, String>> getOrderManagementQuery(Map<String,String> paramMap);
 	//有订单留言的订单
 	public List<Map<String, String>> getOrders1(int userID, int state, Date startdate, Date enddate, String email,
                                                 String orderno, int startpage, int page, int admuserid, int buyid, int showUnpaid, String type, int status);
-	public int getOrdersCount(int userID, int state, String startdate, String enddate, String email,
-                              String orderno, int admuserid, int buyid, int showUnpaid, String type, int status);
+	public int getOrdersCount(Map<String,String> paramMap);
 	
 	/**
 	 * 统计订单每个状态的数量

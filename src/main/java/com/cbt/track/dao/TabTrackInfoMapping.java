@@ -23,14 +23,17 @@ public interface TabTrackInfoMapping {
     Integer getRecordCountByTrackState(@Param("startDate") String startDate, @Param("endDate") String endDate,
                                        @Param("trackState") int trackState, @Param("userid") Integer userid);
 
-    List<TabTrackInfo> getRecordListByOrderOrTrackNo(@Param("orderNo") String orderNo, @Param("trackNo") String trackNo, @Param("userid") Integer userid);
+    List<TabTrackInfo> getRecordListByOrderOrTrackNo(@Param("orderNo") String orderNo, @Param("trackNo") String trackNo, @Param("userid") Integer userid,
+                                                     @Param("startDate") String startDate, @Param("endDate") String endDate);
 
-    List<TabTrackInfo> getRecordListByUserid(@Param("orderUserid") String orderUserid, @Param("userid") Integer userid);
+    List<TabTrackInfo> getRecordListByUserid(@Param("orderUserid") String orderUserid, @Param("userid") Integer userid,
+                                             @Param("startDate") String startDate, @Param("endDate") String endDate);
 
 	void updatestate(TabTrackInfo tabTrackInfo);
 
 	TabTrackInfo queryStateByTrackNo(@Param("trackNo") String trackNo);
 
-	List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo, @Param("userid") Integer userid);
+	List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo, @Param("userid") Integer userid,
+                                               @Param("startDate") String startDate, @Param("endDate") String endDate);
 
 }

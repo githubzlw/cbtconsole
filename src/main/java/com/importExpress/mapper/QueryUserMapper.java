@@ -4,8 +4,10 @@ import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsInfoSpiderPO;
 import com.importExpress.pojo.ItemStaticFile;
 import com.importExpress.pojo.StandardGoodsFormDataPO;
+import com.importExpress.pojo.UserXlsBean;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,4 +81,24 @@ public interface QueryUserMapper {
     List<String> queryIsEditProducts();
 
     List<String> queryInventoryProducts();
+
+    List<String> queryGoodsWeightNoSyn();
+
+    List<UserXlsBean> queryUserList(@Param("startBars") Integer startBars, @Param("rows") Integer rows, @Param("userType") Integer userType,
+                                    @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    Integer queryUserListCount(@Param("userType") Integer userType,
+                               @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<String> queryUserAddressById(@Param("id") Integer id);
+
+    List<String> queryUserExById(@Param("id") Integer id);
+
+    String queryClickGoodsCount(@Param("id") Integer id);
+
+    void updateNeedoffshellEditFlag(@Param("list") List<String> list);
+
+    List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);
+
+    String querySearchKeywords(@Param("id") Integer id);
 }

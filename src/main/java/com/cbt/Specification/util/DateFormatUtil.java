@@ -2,6 +2,7 @@ package com.cbt.Specification.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -68,6 +69,21 @@ public class DateFormatUtil {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String getCurrentYearAndMonth() {
+		String str;
+		Calendar cal = Calendar.getInstance();
+		if (cal.get(Calendar.MONTH) + 1 < 10) {
+			str = cal.get(Calendar.YEAR) + "-0" + (cal.get(Calendar.MONTH) + 1);
+		} else {
+			str = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1);
+		}
+		return str;
+	}
+
+	public static void main(String[] args) {
+		System.err.println(getCurrentYearAndMonth());
 	}
 
 }

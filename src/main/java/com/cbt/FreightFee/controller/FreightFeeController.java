@@ -1,6 +1,7 @@
 package com.cbt.FreightFee.controller;
 
 import com.cbt.FreightFee.service.FreightFeeSerive;
+import com.cbt.util.Util;
 import com.cbt.warehouse.util.StringUtil;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class FreightFeeController {
 			freightFee=Double.valueOf(freightFeeMap.get("freightFee").toString());
 			if (freightFee > 0) {
 				//获取订单实时汇率
-				double rate=freightFeeSerive.getOrderRate(id);
+				double rate=Double.parseDouble(String.valueOf(Util.EXCHANGE_RATE));
 				double fweight = weights_ > volume_ ? weights_ : volume_;
 				if (fweight % Double.valueOf(String.valueOf(fweight).split("\\.")[0]) >= 0.5) {
 					fweight = Double.valueOf(String.valueOf(fweight).split("\\.")[0]) + 1;
@@ -85,6 +86,12 @@ public class FreightFeeController {
 		return df.format(freightFee);
 	}
 
+	/**
+	 * 更新某个时间段的预估运费，手动调用接口
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("updateFee")
 	public String updateFee(HttpServletRequest request, HttpServletResponse response) {
 		List<Map<String, Object>> list = freightFeeSerive.getShippingInfo();
@@ -114,7 +121,7 @@ public class FreightFeeController {
 				continue;
 			}
 			String id=map.get("id").toString();
-			double rate=freightFeeSerive.getOrderRate(id);
+			double rate=Double.parseDouble(String.valueOf(Util.EXCHANGE_RATE));
 			double weights_ = Double.parseDouble(weight);//实重
 			double volume_ = Double.parseDouble(volumn);//抛重
 			//获取新的运费
@@ -162,7 +169,7 @@ public class FreightFeeController {
 					continue;
 				}
 				String id=map.get("id").toString();
-				double rate=freightFeeSerive.getOrderRate(id);
+				double rate=Double.parseDouble(String.valueOf(Util.EXCHANGE_RATE));
 				double weights_ = Double.parseDouble(weight);//实重
 				double volume_ = Double.parseDouble(volumn);//抛重
 				System.out.println("id======"+map.get("id").toString());

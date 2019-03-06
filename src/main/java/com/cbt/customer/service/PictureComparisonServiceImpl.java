@@ -110,8 +110,8 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	}
 	
 	@Override
-	public int getErrorInfoCount(String userId,String timeF,String timeE){
-		return dao.getErrorInfoCount(userId,timeF,timeE);
+	public int getErrorInfoCount(String userId,String timeF,String timeE,int valid){
+		return dao.getErrorInfoCount(userId,timeF,timeE,valid);
 	}
 	
 	
@@ -306,8 +306,8 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	}
 	
 	@Override
-	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int end) {
-		return dao.getErrorInfo(userId,timeF,timeE,start,end);
+	public List<GoodsCheckBean> getErrorInfo(String userId, String timeF, String timeE, int start, int valid, int end) {
+		return dao.getErrorInfo(userId,timeF,timeE,start,end,valid);
 	}
 	
 	

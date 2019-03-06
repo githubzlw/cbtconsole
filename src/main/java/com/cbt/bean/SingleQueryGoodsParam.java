@@ -10,6 +10,15 @@ public class SingleQueryGoodsParam {
 	private int limitNum;
 	private int drainageFlag;
 	private int goodsType;
+	private String shopId;
+
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
+	}
 
 	public String getPid() {
 		return pid;

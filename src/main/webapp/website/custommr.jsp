@@ -110,11 +110,11 @@ b {
 	var queryParams = {
 			"state":"0", "page":"1", "catid":"0","sttime":"", "edtime":"", "adminid":"0",
 			"isEdited":"-1", "isAbnormal":"-1", "isBenchmark":"-1","weightCheck":"-1",
-			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"0",
+			"bmFlag":"0",  "sourceProFlag":"0", "priorityFlag":"0","soldFlag":"-1",
 			"addCarFlag":"0","sourceUsedFlag":"-1", "ocrMatchFlag":"0", "infringingFlag":"-1",
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
-			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"","minPrice":"","maxPrice":""
+			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"","minPrice":"","maxPrice":"","isSoldFlag":"-1"
 	};
 	var isQuery =0;
 
@@ -301,6 +301,12 @@ b {
             $("#query_min_price").val(maxPrice);
         }
 
+        var isSoldFlag = sessionStorage.getItem("isSoldFlag");
+        if(!(isSoldFlag == null || isSoldFlag == "" || isSoldFlag == '-1')){
+            queryParams.isSoldFlag = isSoldFlag;
+            $("#query_is_sold_flag").val(isSoldFlag);
+        }
+
 
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -384,6 +390,7 @@ b {
 		var finalWeightEnd = $("#query_final_weight_end").val();
 		var minPrice = $("#query_min_price").val();
 		var maxPrice = $("#query_max_price").val();
+		var isSoldFlag = $("#query_is_sold_flag").val();
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -422,6 +429,8 @@ b {
         queryParams.finalWeightEnd = finalWeightEnd;
 		queryParams.minPrice = minPrice;
 		queryParams.maxPrice = maxPrice;
+		queryParams.isSoldFlag = isSoldFlag;
+
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
 		doQueryList();
@@ -472,6 +481,7 @@ b {
             sessionStorage.setItem("finalWeightEnd", queryParams.finalWeightEnd);
             sessionStorage.setItem("minPrice", queryParams.minPrice);
             sessionStorage.setItem("maxPrice", queryParams.maxPrice);
+			sessionStorage.setItem("isSoldFlag", queryParams.isSoldFlag);
 
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
@@ -486,7 +496,7 @@ b {
 			+ queryParams.weight1688Begin + "&weight1688End=" + queryParams.weight1688End + "&price1688Begin=" + queryParams.price1688Begin
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
-			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice;
+			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice+"&isSoldFlag="+queryParams.isSoldFlag;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -674,9 +684,9 @@ b {
 
 					<td>是否售卖:<select id="query_sold_flag"
 						style="font-size: 18px; height: 28px;">
-							<option value="0" selected="selected">请选择</option>
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">没有卖过</option>
 							<option value="1">卖过</option>
-							<option value="2">没有卖过</option>
 					</select></td>
 
 
@@ -736,9 +746,9 @@ b {
 					</select></td>
 				</tr>
 				<tr>
-						<td colspan="3">
+						<td colspan="2">
 						产品下架原因:<select id="unsellableReason"
-						style="font-size: 18px; height: 28px;width: 480px;">
+						style="font-size: 18px; height: 28px;width: 280px;">
 						<option value="-1" selected="selected">请选择</option>
 						<option value="1">1688货源下架</option>
 						<option value="2">不满足库存条件</option>
@@ -763,6 +773,12 @@ b {
 							<option value="21">大于400美元商品下架</option>
 						</select>
 						</td>
+					<td>是否免邮:<select id="query_is_sold_flag"
+						style="font-size: 18px; height: 28px;width: 125px;">
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">非免邮</option>
+							<option value="1">免邮</option>
+					</select></td>
 					<td>产品来源:<select id="query_from_flag"
 						style="font-size: 18px; height: 28px;width: 180px;">
 							<option value="-1" selected="selected">请选择</option>

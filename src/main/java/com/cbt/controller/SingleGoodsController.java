@@ -92,6 +92,11 @@ public class SingleGoodsController {
         if (pid == null || "".equals(pid)) {
             pid = "";
         }
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            shopId = "";
+        }
+
         String sttime = request.getParameter("sttime");
         if (sttime == null || "".equals(sttime)) {
             sttime = "";
@@ -110,8 +115,8 @@ public class SingleGoodsController {
             admid = Integer.valueOf(admidStr);
         }
         String stateStr = request.getParameter("state");
-        int state = 0;
-        if (!(stateStr == null || "".equals(stateStr) || "0".equals(stateStr))) {
+        int state = -1;
+        if (!(stateStr == null || "".equals(stateStr))) {
             state = Integer.valueOf(stateStr);
         }
         int drainageFlag = 0;
@@ -129,6 +134,7 @@ public class SingleGoodsController {
         try {
             SingleQueryGoodsParam queryPm = new SingleQueryGoodsParam();
             queryPm.setPid(pid);
+            queryPm.setShopId(shopId);
             queryPm.setEdtime(edtime);
             queryPm.setSttime(sttime);
             queryPm.setAdmid(admid);
@@ -491,6 +497,15 @@ public class SingleGoodsController {
             soldFlag2 = 0;
         }
         offShelfParam.setSoldFlag2(soldFlag2);
+
+        String soldFlagStr3 = request.getParameter("soldFlag3");
+        int soldFlag3;
+        if (StringUtil.isNotBlank(soldFlagStr3)) {
+            soldFlag3 = Integer.valueOf(soldFlagStr3);
+        } else {
+            soldFlag3 = 0;
+        }
+        offShelfParam.setSoldFlag3(soldFlag3);
 
         try {
             List<NeedOffShelfBean> res = shopUrlService.queryNeedOffShelfByParam(offShelfParam);

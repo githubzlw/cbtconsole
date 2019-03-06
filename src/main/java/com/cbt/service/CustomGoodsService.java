@@ -5,6 +5,7 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.GoodsParseBean;
 import com.importExpress.pojo.OnlineGoodsCheck;
 
@@ -24,17 +25,19 @@ public interface CustomGoodsService {
 
     /**
      * 添加商品评论
+     *
      * @param map
      * @return
      */
-    public int addReviewRemark(Map<String,String> map);
+    public int addReviewRemark(Map<String, String> map);
 
     /**
      * 编辑商品评论
+     *
      * @param map
      * @return
      */
-    public int updateReviewRemark(Map<String,String> map);
+    public int updateReviewRemark(Map<String, String> map);
 
     /**
      * 查询参数下类别和商品总数统计
@@ -282,6 +285,7 @@ public interface CustomGoodsService {
 
     /**
      * 查询商品评论内容
+     *
      * @param pid
      * @return
      */
@@ -386,9 +390,9 @@ public interface CustomGoodsService {
      * @return
      */
     boolean setNoBenchmarking(String pid, double finalWeight);
-    
+
     /**
-     * 更新对标关联数据 
+     * 更新对标关联数据
      * 精准对标更新产品表ali_pid,ali_price,bm_flag=1,isBenchmark=1,
      *
      * @param pid
@@ -398,8 +402,8 @@ public interface CustomGoodsService {
      * @param isBenchmark
      * @return
      */
-    boolean upCustomerReady(String pid,String aliPid,String aliPrice,int bmFlag, int isBenchmark,String edName,String rwKeyword,int flag);
-    
+    boolean upCustomerReady(String pid, String aliPid, String aliPrice, int bmFlag, int isBenchmark, String edName, String rwKeyword, int flag);
+
     /**
      * 设置永不下架标识
      *
@@ -564,7 +568,7 @@ public interface CustomGoodsService {
      * @param weightIsEdit
      * @return
      */
-    int updateGoodsWeightByPid(String pid, double newWeight,double oldWeight,int weightIsEdit);
+    int updateGoodsWeightByPid(String pid, double newWeight, double oldWeight, int weightIsEdit);
 
     /**
      * 更新和锁定利润率
@@ -589,9 +593,59 @@ public interface CustomGoodsService {
     boolean refreshPriceRelatedData(CustomGoodsPublish bean);
 
     /**
-	 * 更新28促销flag
-	 * @param pid
-	 * @return
-	 */
-	int updatePromotionFlag(String pid);
+     * 更新28促销flag
+     *
+     * @param pid
+     * @return
+     */
+    int updatePromotionFlag(String pid);
+
+
+    /**
+     * 查询根据链接获取的md5相同的数量
+     *
+     * @param pid
+     * @param url
+     * @param shopId
+     * @return
+     */
+    int queryMd5ImgByUrlCount(String pid, String url, String shopId);
+
+    /**
+     * 查询根据链接获取的md5相同的bean
+     *
+     * @param pid
+     * @param url
+     * @param shopId
+     * @return
+     */
+    List<GoodsMd5Bean> queryMd5ImgByUrlList(String pid, String url, String shopId);
+
+
+    /**
+     * 根据PID查询数据信息
+     *
+     * @param pidList
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByPidList(List<String> pidList);
+
+    /**
+     * 更新详情数据
+     *
+     * @param gd
+     * @return
+     */
+    boolean updatePidEnInfo(CustomGoodsPublish gd);
+
+    /**
+     * 更新MD5删除的图片标记
+     * @param pid
+     * @param url
+     * @param shopId
+     * @return
+     */
+    int updateMd5ImgDeleteFlag(String pid, String url, String shopId);
+
+
 }

@@ -29,7 +29,8 @@
         <result column="is_abnormal" property="isAbnormal"/>
         <result column="bm_flag" property="bmFlag"/>
         <result column="source_pro_flag" property="sourceProFlag"/>
-        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="sold_flag" property="soldFlag"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
         <result column="priorityFlag" property="priorityFlag"/>
         <result column="is_add_car_flag" property="addCarFlag"/>
         <result column="source_used_flag" property="sourceUsedFlag"/>
@@ -83,7 +84,8 @@
         <result column="is_abnormal" property="isAbnormal"/>
         <result column="bm_flag" property="bmFlag"/>
         <result column="source_pro_flag" property="sourceProFlag"/>
-        <result column="is_sold_flag" property="soldFlag"/>
+        <result column="sold_flag" property="soldFlag"/>
+        <result column="is_sold_flag" property="isSoldFlag"/>
         <result column="priorityFlag" property="priorityFlag"/>
         <result column="is_add_car_flag" property="addCarFlag"/>
         <result column="source_used_flag" property="sourceUsedFlag"/>
@@ -169,6 +171,14 @@
         <result column="img" property="imgs"/>
         <result column="eninfo" property="eninfo"/>
         <result column="click_num" property="clickNum"/>
+    </resultMap>
+
+    <resultMap id="goodsMd5BeanResultMap" type="com.importExpress.pojo.GoodsMd5Bean">
+        <result column="pid" property="pid"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="local_path" property="localPath"/>
+        <result column="remote_path" property="remotePath"/>
+        <result column="goods_md5" property="goodsMd5"/>
     </resultMap>
 
     <insert id="insertPidIsEdited">
@@ -366,7 +376,7 @@
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
-        
+
         where 1=1
         <if test="catid !=null">
             and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
@@ -416,8 +426,8 @@
         <if test="sourceProFlag > 0">
             and cbu.source_pro_flag = #{sourceProFlag}
         </if>
-        <if test="soldFlag > 0">
-            and cbu.is_sold_flag = #{soldFlag}
+        <if test="soldFlag > -1">
+            and cbu.sold_flag = #{soldFlag}
         </if>
         <if test="priorityFlag > 0">
             and cbu.priority_flag = #{priorityFlag}
@@ -489,6 +499,12 @@
         </if>
         <if test="maxPrice > 0">
             and cbu.max_price &lt;= #{maxPrice}
+        </if>
+        <if test="isSoldFlag == 0">
+            and cbu.is_sold_flag = 0
+        </if>
+        <if test="isSoldFlag > 0">
+            and cbu.is_sold_flag &gt; 0
         </if>
 
         <if test="isSort == 1">
@@ -560,8 +576,8 @@
         <if test="sourceProFlag > 0">
             and cbu.source_pro_flag = #{sourceProFlag}
         </if>
-        <if test="soldFlag > 0">
-            and cbu.is_sold_flag = #{soldFlag}
+        <if test="soldFlag > -1">
+            and cbu.sold_flag = #{soldFlag}
         </if>
         <if test="priorityFlag > 0">
             and cbu.priority_flag = #{priorityFlag}
@@ -632,6 +648,12 @@
         <if test="maxPrice > 0">
             and cbu.max_price &lt;= #{maxPrice}
         </if>
+        <if test="isSoldFlag == 0">
+            and cbu.is_sold_flag = 0
+        </if>
+        <if test="isSoldFlag > 0">
+            and cbu.is_sold_flag &gt; 0
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -686,8 +708,8 @@
         <if test="sourceProFlag > 0">
             and cbu.source_pro_flag = #{sourceProFlag}
         </if>
-        <if test="soldFlag > 0">
-            and cbu.is_sold_flag = #{soldFlag}
+        <if test="soldFlag > -1">
+            and cbu.sold_flag = #{soldFlag}
         </if>
         <if test="priorityFlag > 0">
             and cbu.priority_flag = #{priorityFlag}
@@ -754,6 +776,12 @@
         </if>
         <if test="maxPrice > 0">
             and cbu.max_price &lt;= #{maxPrice}
+        </if>
+        <if test="isSoldFlag == 0">
+            and cbu.is_sold_flag = 0
+        </if>
+        <if test="isSoldFlag > 0">
+            and cbu.is_sold_flag &gt; 0
         </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
@@ -889,7 +917,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-             and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -925,7 +953,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -941,7 +969,8 @@
         </if>
     </select>
 
-    <select id="queryCategoryList" resultMap="categoryResultMap" parameterType="com.importExpress.pojo.OnlineGoodsCheck">
+    <select id="queryCategoryList" resultMap="categoryResultMap"
+            parameterType="com.importExpress.pojo.OnlineGoodsCheck">
         select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,
         path,lv from 1688_category where lv > 0) cat1688 left join
         (select a.catid1,count(a.catid1) as total from custom_benchmark_ready a left join custom_goods_edit b
@@ -951,7 +980,7 @@
             and a.pid = #{pid}
         </if>
         <if test="catid != null">
-            and a.catid1 in(select category_id from 1688_category  where find_in_set(#{catid},path))
+            and a.catid1 in(select category_id from 1688_category where find_in_set(#{catid},path))
         </if>
         <if test="clickNum == 1">
             and b.click_num &lt; 10
@@ -970,5 +999,46 @@
     <insert id="addReviewRemark">
         insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score})
     </insert>
+
+
+    <select id="queryMd5ImgByUrlCount" resultType="java.lang.Integer">
+        select count(0) from custom_goods_md5
+        where goods_md5 = (select goods_md5
+        from custom_goods_md5 where pid = #{pid} and remote_path = #{url} and shop_id = #{shopId})
+        and shop_id = #{shopId} and ifnull(goods_md5,'') != ''
+    </select>
+
+    <select id="queryMd5ImgByUrlList" resultMap="goodsMd5BeanResultMap">
+        select pid,shop_id,local_path,remote_path,goods_md5 from custom_goods_md5
+        where goods_md5 = (select goods_md5
+        from custom_goods_md5 where pid = #{pid} and remote_path = #{url} and shop_id = #{shopId})
+        and shop_id = #{shopId} and ifnull(goods_md5,'') != ''
+    </select>
+
+
+    <select id="queryGoodsByPidList" parameterType="java.util.ArrayList" resultMap="queryGoodsResultMap">
+        select
+        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo
+        from custom_benchmark_ready cbu
+        where 1=1 and pid in
+        <foreach collection="pidList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updatePidEnInfo" parameterType="com.cbt.bean.CustomGoodsPublish">
+        update custom_benchmark_ready set eninfo = #{eninfo}
+        where pid = #{pid}
+    </update>
+
+    <update id="updateMd5ImgDeleteFlag">
+        update custom_goods_md5 a,
+                (select goods_md5 from custom_goods_md5 where pid = #{pid}
+                  and remote_path = #{url} and ifnull(goods_md5,'') != '' and shop_id = #{shopId}) b
+        set a.is_delete = 1
+        where a.goods_md5 = b.goods_md5 and a.shop_id = #{shopId}
+    </update>
 
 </mapper>

@@ -14,7 +14,9 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.utli.GoodsPriceUpdateUtil;
+import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -87,6 +89,11 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+        if (goods.getValid() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+            goods.setOffReason("老数据");
+        } else if (goods.getValid() == 2 && goods.getUnsellAbleReason() == 0) {
+            goods.setUnsellAbleReasonDesc("老数据");
+        }
 
         if (goods == null) {
             mv.addObject("uid", -1);
@@ -124,7 +131,7 @@ public class EditorController {
 
         mv.addObject("shopId", queryId);
         //查询商品评论信息
-        List<CustomGoodsPublish> reviewList=customGoodsService.getAllReviewByPid(pid);
+        List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
         request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
         // 取出主图筛选数量
         GoodsPictureQuantity pictureQt = customGoodsService.queryPictureQuantityByPid(pid);
@@ -153,7 +160,7 @@ public class EditorController {
         request.setAttribute("showattribute", pInfo);
 
 
-        request.setAttribute("isSoldFlag", goods.getSoldFlag());
+        request.setAttribute("isSoldFlag", goods.getIsSoldFlag());
 
 
         // 处理Sku数据
@@ -182,7 +189,7 @@ public class EditorController {
         }
 
         //判断是否是免邮商品(isSoldFlag > 0)，如果是则显示免邮价格显示
-        if (goods.getSoldFlag() > 0) {
+        if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
             if (StringUtils.isNotBlank(goods.getFeeprice())) {
                 request.setAttribute("feePrice", goods.getFeeprice());
             } else {
@@ -216,12 +223,12 @@ public class EditorController {
             double oldProfit = 0;
             double singlePrice = 0;
             String singlePriceStr = "0";
-            if (goods.getSoldFlag() > 0) {
+            if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
                 //先取range_price 为空则再取feeprice
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    if(goods.getRangePrice().contains("-")){
+                    if (goods.getRangePrice().contains("-")) {
                         singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                    }else{
+                    } else {
                         singlePriceStr = goods.getRangePrice().trim();
                     }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
@@ -237,9 +244,9 @@ public class EditorController {
             } else {
                 //先取range_price 为空则wprice 再为空取price
                 if (StringUtils.isNotBlank(goods.getRangePrice())) {
-                    if(goods.getRangePrice().contains("-")){
+                    if (goods.getRangePrice().contains("-")) {
                         singlePriceStr = goods.getRangePrice().split("-")[1].trim();
-                    }else{
+                    } else {
                         singlePriceStr = goods.getRangePrice().trim();
                     }
                 } else if (StringUtils.isNotBlank(goods.getFeeprice())) {
@@ -271,7 +278,13 @@ public class EditorController {
             if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
                 //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
-                double priceXs = (Double.valueOf(goods.getAliGoodsPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                String aliPirce;
+                if (goods.getAliGoodsPrice().contains("-")) {
+                    aliPirce = goods.getAliGoodsPrice().split("-")[1];
+                } else {
+                    aliPirce = goods.getAliGoodsPrice();
+                }
+                double priceXs = (Double.valueOf(aliPirce) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
                 //加价率
                 oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
@@ -543,6 +556,11 @@ public class EditorController {
             }
             // 获取商品信息
             CustomGoodsPublish orGoods = customGoodsService.queryGoodsDetails(pidStr, 0);
+            if (orGoods.getValid() == 0 && StringUtils.isBlank(orGoods.getOffReason())) {
+                orGoods.setOffReason("老数据");
+            } else if (orGoods.getValid() == 2 && orGoods.getUnsellAbleReason() == 0) {
+                orGoods.setUnsellAbleReasonDesc("老数据");
+            }
 
             //判断售卖单位是否一致
 //            if(sellUtil.equalsIgnoreCase(orGoods.getSellUnit())){
@@ -707,9 +725,9 @@ public class EditorController {
             }
 
             // 判断是否改价 wprice range_price feeprice price  fprice_str
-            if(checkPriceIsUpdate(cgp,orGoods)){
+            if (checkPriceIsUpdate(cgp, orGoods)) {
                 System.err.println("pid:" + pidStr + ",not update price");
-            }else{
+            } else {
                 cgp.setPriceIsEdit(1);
             }
 
@@ -788,21 +806,21 @@ public class EditorController {
 
             // 获取文字尺码表
             String wordSizeInfo = request.getParameter("wordSizeInfo");
-            if(StringUtils.isNotBlank(wordSizeInfo)){
-                cgp.setSizeInfoEn(wordSizeInfo.replace("\\n","<br>"));
-            }else{
+            if (StringUtils.isNotBlank(wordSizeInfo)) {
+                cgp.setSizeInfoEn(wordSizeInfo.replace("\\n", "<br>"));
+            } else {
                 cgp.setSizeInfoEn("");
             }
 
             // 设置主图数据 mainImg
             String mainImg = request.getParameter("mainImg");
-            if(StringUtils.isNotBlank(mainImg)){
-                mainImg = mainImg.replace(orGoods.getRemotpath(),"");
+            if (StringUtils.isNotBlank(mainImg)) {
+                mainImg = mainImg.replace(orGoods.getRemotpath(), "");
                 // 进行主图相关的修改  替换主图数据，压缩图片为285x285或者285x380,上传服务器
-                if(mainImg.contains(".60x60")){
-                    cgp.setCustomMainImage(mainImg.replace(".60x60",".220x220"));
-                }else if(mainImg.contains(".400x400")){
-                    cgp.setCustomMainImage(mainImg.replace(".400x400",".220x220"));
+                if (mainImg.contains(".60x60")) {
+                    cgp.setCustomMainImage(mainImg.replace(".60x60", ".220x220").replace(orGoods.getRemotpath(), ""));
+                } else if (mainImg.contains(".400x400")) {
+                    cgp.setCustomMainImage(mainImg.replace(".400x400", ".220x220").replace(orGoods.getRemotpath(), ""));
                 }
                 cgp.setShowMainImage(mainImg);
                 cgp.setIsUpdateImg(2);
@@ -824,12 +842,6 @@ public class EditorController {
             if (success > 0) {
                 customGoodsService.insertIntoGoodsEditBean(editBean);
                 //更新编辑标识
-                /*int isExists = customGoodsService.checkIsEditedByPid(cgp.getPid());
-                if(isExists > 0){
-                    customGoodsService.updatePidIsEdited(cgp.getPid(),user.getId());
-                }else{
-                    customGoodsService.insertPidIsEdited(orGoods.getShopId(),cgp.getPid(),user.getId());
-                }*/
                 editBean.setIs_edited(1);
                 editBean.setPublish_flag(0);
                 customGoodsService.updatePidIsEdited(editBean);
@@ -842,11 +854,11 @@ public class EditorController {
                     String ip = request.getRemoteAddr();
 
                     if (ip.contains("1.34") || ip.contains("38.42") || ip.contains("1.27") || ip.contains("1.9")) {
-                        if(cgp.getIsUpdateImg() == 0){
+                        if (cgp.getIsUpdateImg() == 0) {
                             cgp.setIsUpdateImg(1);
                             // 设置图片信息
                         }
-                    }else{
+                    } else {
                         cgp.setIsUpdateImg(0);
                     }
                     if (StringUtils.isNotBlank(updateTimeStr)) {
@@ -881,48 +893,48 @@ public class EditorController {
         return json;
     }
 
-    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp,CustomGoodsPublish orGoods){
+    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp, CustomGoodsPublish orGoods) {
         int count = 0;
         // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
         // wprice
-        if(StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())){
-            if(cgp.getWprice().equals(orGoods.getWprice())){
-                count ++;
+        if (StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())) {
+            if (cgp.getWprice().equals(orGoods.getWprice())) {
+                count++;
             }
-        }else if(StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())){
-            count ++;
+        } else if (StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())) {
+            count++;
         }
         // range_price
-        if(StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())){
-            if(cgp.getRangePrice().equals(orGoods.getRangePrice())){
-                count ++;
+        if (StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())) {
+            if (cgp.getRangePrice().equals(orGoods.getRangePrice())) {
+                count++;
             }
-        }else if(StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())){
-            count ++;
+        } else if (StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())) {
+            count++;
         }
         // feeprice
-        if(StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())){
-            if(cgp.getFeeprice().equals(orGoods.getFeeprice())){
-                count ++;
+        if (StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())) {
+            if (cgp.getFeeprice().equals(orGoods.getFeeprice())) {
+                count++;
             }
-        }else if(StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())){
-            count ++;
+        } else if (StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())) {
+            count++;
         }
         // price
-        if(StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())){
-            if(cgp.getPrice().equals(orGoods.getPrice())){
-                count ++;
+        if (StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())) {
+            if (cgp.getPrice().equals(orGoods.getPrice())) {
+                count++;
             }
-        }else if(StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())){
-            count ++;
+        } else if (StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())) {
+            count++;
         }
         // fprice_str
-        if(StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())){
-            if(cgp.getFpriceStr().equals(orGoods.getFpriceStr())){
-                count ++;
+        if (StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())) {
+            if (cgp.getFpriceStr().equals(orGoods.getFpriceStr())) {
+                count++;
             }
-        }else if(StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())){
-            count ++;
+        } else if (StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())) {
+            count++;
         }
 
         return count == 5;
@@ -1683,15 +1695,12 @@ public class EditorController {
                         boolean checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 400, 200);
                         if (checked) {
                             // 压缩图片400x400
-                            String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400"
-                                    + fileSuffix;
-
-                            boolean is400 = ImageCompression.reduceImgByWidth(400, localDiskPath + localFilePath,
-                                    localDiskPath + localFilePath400x400);
+                            String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400" + fileSuffix;
                             // 压缩图片60x60
                             String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
-                            boolean is60 = ImageCompression.reduceImgByWidth(60, localDiskPath + localFilePath,
-                                    localDiskPath + localFilePath60x60);
+
+                            boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                            boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
                             if (is60 && is400) {
                                 newImgUrl += ";" + ftpConfig.getLocalShowPath() + localFilePath60x60;
                                 json.setOk(true);
@@ -1785,29 +1794,28 @@ public class EditorController {
                     if (checked) {
                         // 压缩图片400x400
                         String localFilePath400x400 = "importimg/" + pid + "/" + saveFilename + ".400x400" + fileSuffix;
-                        boolean is400 = ImageCompression.reduceImgByWidth(400, localDiskPath + localFilePath,
-                                localDiskPath + localFilePath400x400);
                         // 压缩图片60x60
                         String localFilePath60x60 = "importimg/" + pid + "/" + saveFilename + ".60x60" + fileSuffix;
-                        boolean is60 = ImageCompression.reduceImgByWidth(60, localDiskPath + localFilePath,
-                                localDiskPath + localFilePath60x60);
+
+                        boolean is400 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 5);
+                        boolean is60 = ImageCompressionByNoteJs.compressByOkHttp(localDiskPath + localFilePath, 6);
                         if (is60 && is400) {
                             json.setData(ftpConfig.getLocalShowPath() + localFilePath60x60);
                             json.setOk(true);
-                            json.setMessage("上传本地图片成功");
+                            json.setMessage("上传橱窗图本地图片成功");
                         } else {
                             // 判断分辨率不通过删除图片
-                            File file400 = new File(localFilePath400x400);
-                            if (file400.exists()) {
-                                file400.delete();
-                            }
                             File file60 = new File(localFilePath60x60);
                             if (file60.exists()) {
                                 file60.delete();
                             }
+                            File file400 = new File(localFilePath400x400);
+                            if (file400.exists()) {
+                                file400.delete();
+                            }
                             // 压缩失败整体终止执行
                             json.setOk(false);
-                            json.setMessage("压缩图片60x60和400x400失败，终止执行");
+                            json.setMessage("压缩图片60x60或400x400失败，终止上传");
                         }
                     } else {
                         // 图片分辨率小于400*200整体终止执行
@@ -1830,6 +1838,7 @@ public class EditorController {
 
     /**
      * 编辑产品评论内容
+     *
      * @param request
      * @param response
      * @return
@@ -1839,37 +1848,37 @@ public class EditorController {
     public JsonResult updateReviewRemark(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         json.setOk(true);
-        try{
+        try {
             String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-            com.cbt.pojo.Admuser adm =(com.cbt.pojo.Admuser)SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
-            if(adm==null){
+            com.cbt.pojo.Admuser adm = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+            if (adm == null) {
                 json.setOk(false);
             }
-            Map<String,String> paramMap=new HashMap<String,String>();
-            String oldCreateTime=request.getParameter("oldCreateTime");
-            String goods_pid=request.getParameter("goods_pid");
+            Map<String, String> paramMap = new HashMap<String, String>();
+            String oldCreateTime = request.getParameter("oldCreateTime");
+            String goods_pid = request.getParameter("goods_pid");
 
-            String edit_remark=request.getParameter("edit_remark");
-            String editcountry=request.getParameter("editcountry");
-            String edit_score=request.getParameter("edit_score");
-            String update_flag=request.getParameter("update_flag");
-            paramMap.put("oldCreateTime",oldCreateTime);
-            paramMap.put("goods_pid",goods_pid);
-            paramMap.put("edit_remark",edit_remark);
-            paramMap.put("editcountry",editcountry);
-            paramMap.put("edit_score",edit_score);
-            paramMap.put("update_flag",update_flag);
-            paramMap.put("review_name",adm.getAdmName());
-            int index=customGoodsService.updateReviewRemark(paramMap);
-            if(index>0){
+            String edit_remark = request.getParameter("edit_remark");
+            String editcountry = request.getParameter("editcountry");
+            String edit_score = request.getParameter("edit_score");
+            String update_flag = request.getParameter("update_flag");
+            paramMap.put("oldCreateTime", oldCreateTime);
+            paramMap.put("goods_pid", goods_pid);
+            paramMap.put("edit_remark", edit_remark);
+            paramMap.put("editcountry", editcountry);
+            paramMap.put("edit_score", edit_score);
+            paramMap.put("update_flag", update_flag);
+            paramMap.put("review_name", adm.getAdmName());
+            int index = customGoodsService.updateReviewRemark(paramMap);
+            if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ=new SendMQ();
-                String sql="update goods_review set review_remark='"+edit_remark+"',country='"+editcountry+"',review_score='"+edit_score+"',review_flag='"+update_flag+"',updatetime=now() where goods_pid='"+goods_pid+"' and createtime='"+oldCreateTime+"'";
+                SendMQ sendMQ = new SendMQ();
+                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
-            json.setOk(index>0?true:false);
-        }catch (Exception e){
+            json.setOk(index > 0 ? true : false);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return json;
@@ -1877,6 +1886,7 @@ public class EditorController {
 
     /**
      * 添加产品评论内容
+     *
      * @param request
      * @param response
      * @return
@@ -1887,34 +1897,34 @@ public class EditorController {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JsonResult json = new JsonResult();
         json.setOk(true);
-        try{
+        try {
             String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-            com.cbt.pojo.Admuser adm =(com.cbt.pojo.Admuser)SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
-            if(adm==null){
+            com.cbt.pojo.Admuser adm = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
+            if (adm == null) {
                 json.setOk(false);
             }
-            Map<String,String> paramMap=new HashMap<String,String>();
-            String goods_pid=request.getParameter("goods_pid");
-            String review_remark=request.getParameter("review_remark");
-            String review_score=request.getParameter("review_score");
-            String country=request.getParameter("country");
-            paramMap.put("goods_pid",goods_pid);
-            paramMap.put("review_remark",review_remark);
-            paramMap.put("review_score",review_score);
-            paramMap.put("country",country);
-            paramMap.put("review_name",adm.getAdmName());
-            String createTime=df.format(new Date());
-            paramMap.put("createTime",createTime);
-            int index=customGoodsService.addReviewRemark(paramMap);
-            if(index>0){
+            Map<String, String> paramMap = new HashMap<String, String>();
+            String goods_pid = request.getParameter("goods_pid");
+            String review_remark = request.getParameter("review_remark");
+            String review_score = request.getParameter("review_score");
+            String country = request.getParameter("country");
+            paramMap.put("goods_pid", goods_pid);
+            paramMap.put("review_remark", review_remark);
+            paramMap.put("review_score", review_score);
+            paramMap.put("country", country);
+            paramMap.put("review_name", adm.getAdmName());
+            String createTime = df.format(new Date());
+            paramMap.put("createTime", createTime);
+            int index = customGoodsService.addReviewRemark(paramMap);
+            if (index > 0) {
                 //插入数据到线上
-                SendMQ sendMQ=new SendMQ();
-                String sql=" insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('"+goods_pid+"','"+country+"','"+adm.getAdmName()+"','"+createTime+"','"+review_remark+"','"+review_score+"')";
+                SendMQ sendMQ = new SendMQ();
+                String sql = " insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + review_remark + "','" + review_score + "')";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
-            json.setOk(index>0?true:false);
-        }catch (Exception e){
+            json.setOk(index > 0 ? true : false);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return json;
@@ -2271,7 +2281,7 @@ public class EditorController {
             //boolean is = customGoodsService.setGoodsFlagByPid(editBean);
             customGoodsService.updatePidIsEdited(editBean);
             customGoodsService.insertIntoGoodsEditBean(editBean);
-            if(promotion_flag > 0){
+            if (promotion_flag > 0) {
                 customGoodsService.updatePromotionFlag(pid);
             }
             json.setOk(true);
@@ -2760,14 +2770,14 @@ public class EditorController {
             Map<String, List<String>> pidMapNews = new HashMap<>(limitNum + 1);
             Map<String, List<String>> pidMapOlds = new HashMap<>(limitNum + 1);
             for (GoodsEditBean gdEd : editList) {
-                if(StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())){
-                    if(gdEd.getNew_title().equals(gdEd.getOld_title())){
+                if (StringUtils.isNotBlank(gdEd.getOld_title()) && StringUtils.isNotBlank(gdEd.getNew_title())) {
+                    if (gdEd.getNew_title().equals(gdEd.getOld_title())) {
                         gdEd.setNew_title("");
                     }
                 }
                 if (pidMapOlds.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getOld_title())) {
-                        if (checkListContains(pidMapOlds.get(gdEd.getPid()),gdEd.getOld_title())) {
+                        if (checkListContains(pidMapOlds.get(gdEd.getPid()), gdEd.getOld_title())) {
                             gdEd.setOld_title("");
                         } else {
                             pidMapOlds.get(gdEd.getPid()).add(gdEd.getOld_title());
@@ -2780,7 +2790,7 @@ public class EditorController {
                 }
                 if (pidMapNews.containsKey(gdEd.getPid())) {
                     if (StringUtils.isNotBlank(gdEd.getNew_title())) {
-                        if (checkListContains(pidMapNews.get(gdEd.getPid()),gdEd.getNew_title())) {
+                        if (checkListContains(pidMapNews.get(gdEd.getPid()), gdEd.getNew_title())) {
                             gdEd.setNew_title("");
                         } else {
                             pidMapNews.get(gdEd.getPid()).add(gdEd.getNew_title());
@@ -2809,13 +2819,165 @@ public class EditorController {
         return json;
     }
 
-    private boolean checkListContains(List<String> list,String str){
+    @RequestMapping(value = "/queryMd5ByImgUrl")
+    @ResponseBody
+    public JsonResult queryMd5ByImgUrl(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        // 获取需要编辑的内容
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
+        String url = request.getParameter("url");
+        if (StringUtils.isBlank(url)) {
+            json.setOk(false);
+            json.setMessage("获取图片链接错误失败");
+            return json;
+        }
+        try {
+            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
+            int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath,shopId);
+            List<GoodsMd5Bean> md5BeanList;
+            if (total > 1) {
+                md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
+                json.setRows(md5BeanList);
+            }
+            json.setOk(true);
+            json.setTotal((long) total);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",queryMd5ByImgUrl error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",queryMd5ByImgUrl error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("查询Md5错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/deleteImgByMd5")
+    @ResponseBody
+    public JsonResult deleteImgByMd5(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        // 获取需要编辑的内容
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
+        String url = request.getParameter("url");
+        if (StringUtils.isBlank(url)) {
+            json.setOk(false);
+            json.setMessage("获取图片链接错误失败");
+            return json;
+        }
+        try {
+
+            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
+            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
+            List<String> pidList = new ArrayList(md5BeanList.size());
+            Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();
+            for (GoodsMd5Bean md5Bean : md5BeanList) {
+                pidList.add(md5Bean.getPid());
+                if (pidMap.containsKey(md5Bean.getPid())) {
+                    pidMap.get(md5Bean.getPid()).add(md5Bean);
+                } else {
+                    List<GoodsMd5Bean> childList = new ArrayList<>();
+                    childList.add(md5Bean);
+                    pidMap.put(md5Bean.getPid(), childList);
+                }
+            }
+            List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsByPidList(pidList);
+            for (CustomGoodsPublish gd : goodsList) {
+                if (pidMap.containsKey(gd.getPid())) {
+                    deleteAndUpdateGoodsImg(gd, pidMap.get(gd.getPid()));
+                }
+            }
+            // 更新回收标识
+            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath,shopId);
+            md5BeanList.clear();
+            pidList.clear();
+            pidMap.clear();
+            goodsList.clear();
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",deleteImgByMd5 error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",deleteImgByMd5 error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("删除Md5错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
+        try {
+
+            Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+            // 移除所有的页面效果 kse标签,实际div
+            Elements imgEls = nwDoc.getElementsByTag("img");
+            for (Element imgEl : imgEls) {
+                for (GoodsMd5Bean md5Bean : md5BeanList) {
+                    if (md5Bean.getRemotePath().contains(imgEl.attr("src"))) {
+                        imgEl.remove();
+                    }
+                }
+            }
+            gd.setEninfo(nwDoc.html());
+            customGoodsService.updatePidEnInfo(gd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            LOG.error("pid:" + gd.getPid() + ",deleteAndUpdateGoodsImg error:" + e.getMessage());
+        }
+    }
+
+
+    private boolean checkListContains(List<String> list, String str) {
         boolean isOk = false;
-        if(list == null || list.isEmpty() || StringUtils.isBlank(str)){
+        if (list == null || list.isEmpty() || StringUtils.isBlank(str)) {
             return isOk;
-        }else{
-            for(String tempStr : list){
-                if(str.equals(tempStr)){
+        } else {
+            for (String tempStr : list) {
+                if (str.equals(tempStr)) {
                     isOk = true;
                     break;
                 }

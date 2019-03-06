@@ -97,6 +97,15 @@ public interface IPurchaseMapper {
 	 * @return
 	 */
 	int getPurchaseCount(@Param("orderid") String orderid, @Param("admuserid") String admuserid);
+	
+	/**
+	 * 检查采购数量是否正确
+	 * @param orderid
+	 * @param admuserid
+	 * @return
+	 */
+	int checkPurchaseCount(@Param("orderid") String orderid);
+	
 	/**
 	 * 获取某个采购的订单分配商品数量
 	 * @param orderid

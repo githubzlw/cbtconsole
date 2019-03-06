@@ -633,6 +633,9 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
             querySql += " and sgo.goods_pid = ?";
         }
+        if (StringUtils.isNotBlank(queryPm.getShopId())) {
+            querySql += " and sgo.shop_id = ?";
+        }
         if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
             querySql += " and sgo.create_time >= ? ";
         }
@@ -644,6 +647,19 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         }
         if (queryPm.getGoodsType() > -1) {
             querySql += " and sgo.goods_type = ?";
+        }
+        if (queryPm.getState() > -1) {
+            if(queryPm.getState() == 0){
+                querySql += " and sgo.crawl_flag = 0 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 1){
+                querySql += " and sgo.crawl_flag not in(0,1,2,9,11) and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 2){
+                querySql += " and sgo.crawl_flag = 2 and sgo.clear_flag = 0 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 3){
+                querySql += " and sgo.crawl_flag = 2 and sgo.clear_flag = 2 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 4){
+                querySql += " and ifnull(sgr.sync_flag,0) = 1";
+            }
         }
         querySql += " order by sgo.create_time desc limit ?,?";
         PreparedStatement stmt = null;
@@ -657,6 +673,9 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             }
             if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
                 stmt.setString(count++, queryPm.getPid());
+            }
+            if (StringUtils.isNotBlank(queryPm.getShopId())) {
+                stmt.setString(count++, queryPm.getShopId());
             }
             if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
                 stmt.setString(count++, queryPm.getSttime());
@@ -734,24 +753,41 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
     @Override
     public int queryForListCount(SingleQueryGoodsParam queryPm) {
         Connection conn28 = DBHelper.getInstance().getConnection6();
-        String querySql = "select count(0) from single_goods_offers where 1=1 ";
+        String querySql = "select count(sgo.id) from single_goods_offers sgo left join useful_data.single_goods_ready sgr " +
+                "on sgo.goods_pid = sgr.pid where 1=1 ";
         if (queryPm.getAdmid() > 0) {
-            querySql += " and admin_id = ?";
+            querySql += " and sgo.admin_id = ?";
         }
         if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
-            querySql += " and goods_pid = ?";
+            querySql += " and sgo.goods_pid = ?";
+        }
+        if (StringUtils.isNotBlank(queryPm.getShopId())) {
+            querySql += " and sgo.shop_id = ?";
         }
         if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
-            querySql += " and create_time >= ? ";
+            querySql += " and sgo.create_time >= ? ";
         }
         if (!(queryPm.getEdtime() == null || "".equals(queryPm.getEdtime()))) {
-            querySql += " and create_time <= ?";
+            querySql += " and sgo.create_time <= ?";
         }
         if (queryPm.getDrainageFlag() > 0) {
-            querySql += " and drainage_flag = ?";
+            querySql += " and sgo.drainage_flag = ?";
         }
         if (queryPm.getGoodsType() > -1) {
-            querySql += " and goods_type = ?";
+            querySql += " and sgo.goods_type = ?";
+        }
+        if (queryPm.getState() > -1) {
+            if(queryPm.getState() == 0){
+                querySql += " and sgo.crawl_flag = 0 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 1){
+                querySql += " and sgo.crawl_flag not in(0,1,2,9,11) and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 2){
+                querySql += " and sgo.crawl_flag = 2 and sgo.clear_flag = 0 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 3){
+                querySql += " and sgo.crawl_flag = 2 and sgo.clear_flag = 2 and ifnull(sgr.sync_flag,0) = 0";
+            }else if(queryPm.getState() == 4){
+                querySql += " and ifnull(sgr.sync_flag,0) = 1";
+            }
         }
         PreparedStatement stmt = null;
         ResultSet rss = null;
@@ -764,6 +800,9 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
             }
             if (!(queryPm.getPid() == null || "".equals(queryPm.getPid()))) {
                 stmt.setString(total++, queryPm.getPid());
+            }
+            if (StringUtils.isNotBlank(queryPm.getShopId())) {
+                stmt.setString(total++, queryPm.getShopId());
             }
             if (!(queryPm.getSttime() == null || "".equals(queryPm.getSttime()))) {
                 stmt.setString(total++, queryPm.getSttime());
@@ -950,7 +989,7 @@ public class SingleGoodsDaoImpl implements SingleGoodsDao {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         String selectSql = "select a.goods_pid,a.kj_local_path,a.kj_remote_path,a.kj_eninfo,a.pic as main_img," +
                 "a.pics as imgs,a.is_pass,a.is_update,a.catid,b.`name` as category_name,a.shop_id,a.set_main_img," +
-                "ifnull(c.main_img,'') as shop_main_img " +
+                "'' as shop_main_img " +
                 "from kj_single_goods_offers a LEFT JOIN 1688_category b on a.catid = b.category_id " +
                 " left join kj_single_shop_offers c on a.shop_id = c.shop_id " +
                 "where  a.kj_unzip_flag = 1 and a.crawl_flag =2 ";

@@ -26,7 +26,15 @@ public class CustomerDisputeBean {
 	
 	private String amount;//金额+货币
 	private String adminRolyType;//登录人员权限
+	private String reason;//申诉理由
 	
+	
+	public String getReason() {
+		return reason;
+	}
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 	public String getAdminRolyType() {
 		return adminRolyType;
 	}

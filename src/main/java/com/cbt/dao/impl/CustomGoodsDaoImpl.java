@@ -714,7 +714,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         upsql += " where pid=?";
         Connection conn = null;
         conn = DBHelper.getInstance().getConnection();
-        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=? where pid = ?";
+        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=?,custom_main_image=? where pid = ?";
         ResultSet rs = null;
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;
@@ -763,7 +763,8 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt = conn.prepareStatement(upLocalSql);
                 stmt.setString(1, bean.getImg());
                 stmt.setString(2, bean.getEninfo());
-                stmt.setString(3, bean.getPid());
+                stmt.setString(3, bean.getShowMainImage().replace(bean.getRemotpath(),""));
+                stmt.setString(4, bean.getPid());
                 result = stmt.executeUpdate();
             }
 
@@ -4089,6 +4090,29 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
             e.printStackTrace();
             System.out.println("pid:" + pid + ",updatePromotionFlag error :" + e.getMessage());
             LOG.error("pid:" + pid + ",updatePromotionFlag error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
+    @Override
+    public int updatePidEnInfo(CustomGoodsPublish gd) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "update custom_benchmark_ready_newest set eninfo = ? where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, gd.getEninfo());
+            stmt28.setString(2, gd.getPid());
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + gd.getPid() + ",updatePidEnInfo error :" + e.getMessage());
+            LOG.error("pid:" + gd.getPid() + ",updatePidEnInfo error :" + e.getMessage());
         } finally {
             DBHelper.getInstance().closePreparedStatement(stmt28);
             DBHelper.getInstance().closeConnection(conn28);

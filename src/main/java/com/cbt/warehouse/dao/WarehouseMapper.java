@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface IWarehouseDao {
+public interface WarehouseMapper {
 	public outIdBean findOutId(@Param("uid") Integer uid);
 	public OrderAddress getAddressByOrderID(@Param("orderNo") String orderNo);
 	public List<PurchaseDetailsBean> getPurchaseDetails(@Param("orderNo") String orderNo);

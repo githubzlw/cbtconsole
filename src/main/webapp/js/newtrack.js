@@ -1072,9 +1072,9 @@ function search() {
                                 + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
                                 /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
-                                str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                             } else {
-                                str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                             }
                             str += '<br />';
                             if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1082,7 +1082,7 @@ function search() {
                             } else {
                                 str += '<span name="save_weight_flag">已同步到产品库</span>';
                             }
-                            str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';
+                            /*str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';*/
                             str += '<span id="tip_'+json[i].orderid+json[i].odid+'" style="color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
                         }else{
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>客户下单数量:<span id="'+json[i].orderid+'_count'+json[i].odid+'" style="font-size:35px;">'
@@ -1435,9 +1435,9 @@ function search() {
                                     + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
                                     /*+ '<input type="button"  value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">'*/
                                 if (json[i].weight == undefined) {
-                                    str += '<span name="save_weight">未保存过重量!</span><input type="button" value="保存商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                    str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                                 } else {
-                                    str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="修改商品重量" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                    str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                                 }
                                 str += '<br />';
                                 if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1445,7 +1445,7 @@ function search() {
                                 } else {
                                     str += '<span name="save_weight_flag">已同步到产品库</span>';
                                 }
-                                str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';
+                                /*str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';*/
                                 str += '<span id="tip_\'+json[i].orderid+json[i].odid+\'" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
                             }else{
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>客户下单数量:<span id="'+json[i].orderid+'_count'+json[i].odid+'" style="font-size:35px;">'
@@ -1701,7 +1701,7 @@ function saveWeight(orderid,odid,pid){
         return;
     }
     var reg = new RegExp("^\\d+([.]{1}\\d+)?$");//重量录入值校验正则
-    if(!reg.test(weight)){
+    if(!reg.test(weight) || weight <= 0){
         document.getElementById("tip_"+orderid+odid).innerHTML = "录入单件商品重量值不正确!";
         return;
     }
@@ -1722,6 +1722,7 @@ function saveWeight(orderid,odid,pid){
             }else if(Number(data) == 2){
                 document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量的数据问题!";
             }
+            saveWeightFlag(orderid,odid,pid);//将修改商品重量 和 将重量同步到产品库 按钮合并（这里改动的页面中的）
         }
     });
 }

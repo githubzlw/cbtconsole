@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.auto.ctrl.OrderAutoServlet;
 import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.ZoneBean;
@@ -36,7 +35,7 @@ import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.*;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.service.IWarehouseService;
@@ -63,7 +62,6 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.importExpress.controller.TabSeachPageController;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
@@ -72,13 +70,7 @@ import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpPost;
@@ -131,6 +123,7 @@ import java.util.regex.Pattern;
 @Controller
 @RequestMapping("/warehouse")
 public class WarehouseCtrl {
+	private static final String UPLOAD_IMG_PATH = "/usr/local/goodsimg/importcsvimg/inspectionImg/";
 	// 上传文件存储目录
 	private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 	private static final String UPLOAD_DIRECTORY = "upload";
@@ -146,7 +139,7 @@ public class WarehouseCtrl {
 	@Autowired
 	private IWarehouseService iWarehouseService;
 	@Autowired
-	private IWarehouseDao dao;
+	private WarehouseMapper dao;
 	@Autowired
 	private GeneralReportService generalReportService;
 	@Autowired
@@ -377,7 +370,7 @@ public class WarehouseCtrl {
 				String dir="";
 				String old_name="";
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + order.format(data)+old_name+".jpg";
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + order.format(data)+old_name+".jpg";
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -389,7 +382,8 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				picPath=Util.PIC_URL+localFilePath+"";
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath);
 					picPath=Util.PIC_URL+localFilePath+"";
 				}
 			}
@@ -6120,7 +6114,7 @@ public class WarehouseCtrl {
 			s.setJcexFreight(freightFee);
 			list.get(i).setEstimatefreight(df.format(Double.valueOf(s.getEstimatefreight())*s.getExchange_rate()));
 			String orderid = list.get(i).getOrderid();
-			s.setSumcgprice(String.valueOf(Double.parseDouble(s.getSumcgprice())+s.getPid_amount()));
+			s.setSumcgprice(String.valueOf(Double.parseDouble(StringUtil.isBlank(s.getSumcgprice())?"0.00":s.getSumcgprice())+s.getPid_amount()));
 			PurchaseServer purchaseServer = new PurchaseServerImpl();
 			// UserOrderDetails uod =
 			// purchaseServer.getUserDetails(orderid+",");
@@ -7258,7 +7252,7 @@ public class WarehouseCtrl {
 						modelM.put("orderid",orderid);
 						modelM.put("recipients",ob.getRecipients());
 						modelM.put("street",ob.getStreet());
-						modelM.put("street1","");
+						modelM.put("street1",ob.getAddresss());
 						modelM.put("city",ob.getAddress2());
 						modelM.put("state",ob.getStatename());
 						modelM.put("country",ob.getCountry());
@@ -8649,7 +8643,7 @@ public class WarehouseCtrl {
 				String dir="";
 				String old_name=new_pid+"_new.jpg";
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -8660,7 +8654,8 @@ public class WarehouseCtrl {
 				System.out.println("新上传的文件路径："+imgPath);
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
 				}
 				int row=0;
 				if(flag){
@@ -8715,13 +8710,14 @@ public class WarehouseCtrl {
 				}
 				// 检查配置文件信息是否正常读取
 				String imgUploadPath = ftpConfig.getLocalDiskPath();
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				System.out.println("新上传的文件名："+(tims+old_name));
 				System.out.println("新上传的文件路径："+(imgUploadPath + localFilePath));
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
-					flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
+					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
+					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
 				}
 				int row=0;
 				if(flag){
@@ -8805,7 +8801,7 @@ public class WarehouseCtrl {
 					old_name=pics[1];
 				}
 				// 本地服务器磁盘全路径
-				String localFilePath ="2020-08/" + tims+old_name;
+				String localFilePath = DateFormatUtil.getCurrentYearAndMonth() + "/" + tims+old_name;
 				// 文件流输出到本地服务器指定路径
 				if (ftpConfig == null) {
 					ftpConfig = GetConfigureInfo.getFtpConfig();
@@ -8833,7 +8829,8 @@ public class WarehouseCtrl {
 	public boolean uploadPic(String storePath,String imgPath,String orderid,String goodsid,int index,String i_id){
 		boolean flag=false;
 		try {
-			flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
+			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
+			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")));
 			if(flag){
 				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();

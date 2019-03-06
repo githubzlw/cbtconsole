@@ -352,6 +352,12 @@ public class CustomGoodsController {
 			queryBean.setMaxPrice(Double.valueOf(maxPrice));
 		}
 
+		String isSoldFlag = request.getParameter("isSoldFlag");
+		if(StringUtils.isNotBlank(isSoldFlag)){
+			queryBean.setIsSoldFlag(Integer.valueOf(isSoldFlag));
+		}
+
+
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
 		goodsList.stream().forEach(c -> {
 			String complainId = c.getComplainId();
@@ -561,6 +567,11 @@ public class CustomGoodsController {
 		String maxPrice = request.getParameter("maxPrice");
 		if(StringUtils.isNotBlank(maxPrice) && !"0".equals(maxPrice)){
 			queryBean.setMaxPrice(Double.valueOf(maxPrice));
+		}
+
+		String isSoldFlag = request.getParameter("isSoldFlag");
+		if(StringUtils.isNotBlank(isSoldFlag)){
+			queryBean.setIsSoldFlag(Integer.valueOf(isSoldFlag));
 		}
 
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);

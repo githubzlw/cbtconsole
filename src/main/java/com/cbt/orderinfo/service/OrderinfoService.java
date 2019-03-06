@@ -13,7 +13,7 @@ import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.util.DoubleUtil;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.IWarehouseDao;
+import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.UtilAll;
 import com.cbt.website.bean.*;
@@ -43,7 +43,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Autowired
 	private OrderinfoMapper dao;
 	@Autowired
-	private IWarehouseDao iWarehouseDao;
+	private WarehouseMapper warehouseMapper;
 
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
@@ -460,14 +460,14 @@ public class OrderinfoService implements IOrderinfoService {
 					check="采购已对该商品授权";
 				}else if("2".equals(authorized_flag)){
 					//查询上一次该商品发货的订单信息
-					check=iWarehouseDao.getBatckInfo(goods_pid);
+					check= warehouseMapper.getBatckInfo(goods_pid);
 				}
 				check=StringUtil.isBlank(check)?"-":check;
 				searchresultinfo.setAuthorizedFlag(check);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
-                SearchResultInfo weightAndSyn = iWarehouseDao.getGoodsWeight(map.get("goods_pid"));
+                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(map.get("goods_pid"));
                 if (null != weightAndSyn){
                     searchresultinfo.setWeight(weightAndSyn.getWeight());
                     searchresultinfo.setSyn(weightAndSyn.getSyn());
@@ -949,11 +949,10 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<Map<String, String>> getOrderManagementQuery(int userID, int state, String startdate, String enddate, String email, String orderno, int startpage, int page, int admuserid, int buyid,
-	                                                         int showUnpaid, String type, int status, String paymentid) {
+	public List<Map<String, String>> getOrderManagementQuery(Map<String,String> paramMap) {
 		long start=System.currentTimeMillis();
 		UserDao udao = new UserDaoImpl();
-		List<Map<String, String>> list=dao.getOrderManagementQuery(userID,state,StringUtils.isStrNull(startdate)?"":startdate,StringUtils.isStrNull(enddate)?"":enddate,StringUtils.isStrNull(email)?"":email, StringUtils.isStrNull(orderno)?"":orderno,startpage,page,admuserid,buyid,showUnpaid,StringUtils.isStrNull(type)?"":type,status,paymentid);
+		List<Map<String, String>> list=dao.getOrderManagementQuery(paramMap);
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
 			String tp="支付类型错误";
@@ -987,16 +986,30 @@ public class OrderinfoService implements IOrderinfoService {
 				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
 				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
 				String addressCountry=aMap.get("address_country");
+				String address_country_code=aMap.get("address_country_code");
+				//Rewriter
+				//Rewrite <V1.0.1> Start：cjc 2019/3/4 15:02:58 TODO 不是到为什么USA 的ipn 回调简称US非要改成 USA 去掉
+				/*if("US".equals(address_country_code)){
+					address_country_code="USA";
+				}*/
+				//End：
+
 				if("3".equals(ordertype)){
 					//B2B订单
 					addressFlag="3";
 				}else if(StringUtil.isBlank(addressCountry)){
 					//没有支付信息，
 					addressFlag="2";
-				}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && zCountry.equals(addressCountry)){
+				//Rewriter
+				//Rewrite <V1.0.1> Start：cjc 2019/3/4 14:56:41
+				//}else if(StringUtil.isNotBlank(zCountry) && StringUtil.isNotBlank(addressCountry) && !zCountry.equals(addressCountry) && !odCode.equals(address_country_code)){
+				//End：
+				//Added <V1.0.1> Start： cjc 2019/3/4 14:57:03 TODO jack 建议说只用对比简称就行
+				}else if(StringUtil.isNotBlank(odCode) && StringUtil.isNotBlank(address_country_code) && !odCode.equals(address_country_code)){
+				//End：
 					//两边都有编码但不一致
 					addressFlag="1";
-				}else{
+				}else if(StringUtil.isBlank(zCountry) || StringUtil.isBlank(addressCountry)){
 					logger.warn("二次校验，全称国家不一致： zCountry={},addressCountry={}", zCountry,addressCountry);
 					addressFlag="1";
 				}
@@ -1008,9 +1021,10 @@ public class OrderinfoService implements IOrderinfoService {
 			if(StringUtil.isBlank(exchange_rate) || Double.parseDouble(exchange_rate)<=0){
 				exchange_rate="6.3";
 			}
-			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
+			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(StringUtil.isBlank(map.get("estimatefreight"))?"0":map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
 		logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
+		System.out.println("订单管理查询总时间:"+(System.currentTimeMillis()-start));
 		return list;
 	}
 
@@ -1289,10 +1303,25 @@ public class OrderinfoService implements IOrderinfoService {
 				couponAmount="0";
 			}
 			ob.setCouponAmount(couponAmount);
-			ob.setYhCount(pruchaseMapper.getProblem(orderNo,"1").size());
-			ob.setCheckeds(pruchaseMapper.getChecked(orderNo,"1"));
-			ob.setCg(pruchaseMapper.getPurchaseCount(orderNo,"1"));
-			ob.setRk(pruchaseMapper.getStorageCount(orderNo,"1"));
+			List<String> yhCount=pruchaseMapper.getProblem(orderNo,"1");//验货疑问总数
+			int checkeds=pruchaseMapper.getChecked(orderNo,"1");//验货无误总数
+			int cg=pruchaseMapper.getPurchaseCount(orderNo,"1");//采购总数
+			int rk=pruchaseMapper.getStorageCount(orderNo,"1");//入库总数
+			//判断该用户是否为黑名单
+			int backList= warehouseMapper.getBackList(ob.getUserEmail());
+			int payBackList=0;
+			if(StringUtil.isNotBlank(ob.getPayUserName())){
+				payBackList= warehouseMapper.getPayBackList(ob.getPayUserName());
+			}
+			String backFlag="";
+			if(backList>0 || payBackList>0){
+				backFlag="该用户为黑名单";
+			}
+			ob.setBackFlag(backFlag);
+			ob.setYhCount(yhCount.size());
+			ob.setCheckeds(checkeds);
+			ob.setCg(cg);
+			ob.setRk(rk);
 			String countryNameCn = Utility.getStringIsNull(ob.getCountryNameCN())? ob.getCountryNameCN() : "USA";
 			ob.setCountryNameCN(countryNameCn);
 			ob.setDzConfirmtime(Utility.getStringIsNull(ob.getDzConfirmtime())? ob.getDzConfirmtime().substring(0, ob.getDzConfirmtime().indexOf(" ")) : "");
@@ -1321,6 +1350,7 @@ public class OrderinfoService implements IOrderinfoService {
 			address.setStatename(ob.getStatename());
 			address.setAddress2(ob.getAddress2());
 			address.setRecipients(ob.getRecipients());
+			address.setStreet(ob.getStreet());
 			ob.setAddress(address);
 			ob.setOrderNumber(ob.getOrdernum() == 1);
 			ob.setPay_price(Double.parseDouble(Utility.formatPrice(String.valueOf(ob.getPay_price())).replaceAll(",", "")));
@@ -1721,10 +1751,10 @@ public class OrderinfoService implements IOrderinfoService {
 		return dao.getOrders1(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
 	}
 	@Override
-	public int getOrdersCount(int userID, int state, String startdate,
-	                          String enddate, String email, String orderno, int admuserid,
-	                          int buyid, int showUnpaid,String type,int status) {
-		return dao.getOrdersCount(userID, state, startdate, enddate, email, orderno, admuserid, buyid, showUnpaid,type,status);
+	public int getOrdersCount(Map<String,String> paramMap) {
+		paramMap.put("startdate_req","0".equals(paramMap.get("startdate_req"))?null:paramMap.get("startdate_req"));
+		paramMap.put("enddate_req","0".equals(paramMap.get("enddate_req"))?null:paramMap.get("enddate_req"));
+		return dao.getOrdersCount(paramMap);
 	}
 
 	@Override

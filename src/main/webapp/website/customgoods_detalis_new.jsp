@@ -968,10 +968,10 @@
                 success: function (data) {
                     var json = eval('(' + data + ')');
                     if(json.ok){
-                        showMessage("添加评论成功；2秒后刷新页面");
+                        showMessage("添加评论成功；1秒后刷新页面");
                         setTimeout(function () {
                             window.location.reload();
-                        }, 2000);
+                        }, 800);
                     }else{
                         showMessage("添加评论失败");
                     }
@@ -1939,6 +1939,9 @@
             </c:if>--%> <c:if test="${goods.soldFlag >0}">
                 <br>
                 <b style="font-size: 16px;">是否售卖:${goods.soldFlag ==1 ? '卖过':'没有卖过'}</b>
+            </c:if> <c:if test="${goods.isSoldFlag >= 0}">
+                <br>
+                <b style="font-size: 16px;">是否免邮:${goods.isSoldFlag > 0 ? '免邮':'非免邮'}</b>
             </c:if> <c:if test="${goods.addCarFlag >0}">
                 <br>
                 <b style="font-size: 16px;">是否加入购物车:${goods.carValue}</b>
@@ -2027,7 +2030,8 @@
                                                                                                         href="${goods.aliGoodsUrl}">速卖通原链接</a><br><br>
                 <a target="_blank"
                    href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a><br>
-                <button onclick="openReviewDiv()">添加产品评价</button>
+                <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>&nbsp;&nbsp;&nbsp;
+                <button class="s_btn" style="width: 180px;" onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片</button>
             </div>
 
 
@@ -2113,6 +2117,71 @@
 </c:if>
 </body>
 <script type="text/javascript">
+
+    function beforeDeleteMd5(goodsPid,shopId) {
+        $.messager.prompt('提示', '请输入详情图片链接(详情图片选中->鼠标右击->选择“复制图片地址”->粘贴)', function (url) {
+            if (url) {
+                if (url.indexOf("http") == -1) {
+                    $.messager.alert("提醒", "输入链接地址错误", "info");
+                } else {
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: '/cbtconsole/editc/queryMd5ByImgUrl',
+                        data: {
+                            "pid": goodsPid,
+                            "shopId": shopId,
+                            "url": url
+                        },
+                        success: function (json) {
+                            if (json.ok) {
+                                confirmAndDelete(json, goodsPid, url,shopId)
+                            } else {
+                                $.messager.alert("提醒", json.message, "error");
+                            }
+                        },
+                        error: function () {
+                            $.messager.alert("提醒", "执行失败，请重试", "error");
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
+    function confirmAndDelete(json, goodsPid, url,shopId) {
+        $.messager.confirm('提醒', '当前商品的店铺下存在相同的MD5图片数为' + json.total + ',是否删除?', function (r) {
+            if (r) {
+                if (json.total > 0) {
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: '/cbtconsole/editc/deleteImgByMd5',
+                        data: {
+                            "pid": goodsPid,
+                            "shopId": shopId,
+                            "url": url
+                        },
+                        success: function (json) {
+                            if (json.ok) {
+                                $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            } else {
+                                $.messager.alert("提醒", json.message, "error");
+                            }
+                        },
+                        error: function () {
+                            $.messager.alert("提醒", "执行失败，请重试", "error");
+                        }
+                    });
+                }
+
+            }
+        });
+    }
 
     function allSamePrice(obj) {
         if ($(obj).attr("checked")) {
@@ -2228,29 +2297,30 @@
 
         function editAndLockProfit(pid,type,newProfit) {
             $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    url: '/cbtconsole/editc/editAndLockProfit',
-                    data: {
-                        "pid": pid,
-                        "editProfit": newProfit,
-                        "type": type
-                    },
-                    success: function (json) {
-                        if (json.ok) {
-                            $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 500);
-                        } else {
-                            $.messager.alert("提醒", json.message, "error");
-                        }
-                    },
-                    error: function () {
-                        $.messager.alert("提醒", "执行失败，请重试", "error");
+                type: 'POST',
+                dataType: 'json',
+                url: '/cbtconsole/editc/editAndLockProfit',
+                data: {
+                    "pid": pid,
+                    "editProfit": newProfit,
+                    "type": type
+                },
+                success: function (json) {
+                    if (json.ok) {
+                        $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        $.messager.alert("提醒", json.message, "error");
                     }
-                });
+                },
+                error: function () {
+                    $.messager.alert("提醒", "执行失败，请重试", "error");
+                }
+            });
         }
+
     }
 </script>
 </html>

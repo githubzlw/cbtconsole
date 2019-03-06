@@ -190,6 +190,10 @@
             if (pid == null || pid == "") {
                 pid = "";
             }
+            var shopId = $("#query_shop_id").val();
+            if (shopId == null || shopId == "") {
+                shopId = "";
+            }
             var sttime = $("#query_sttime").val();
             if (sttime == null || sttime == "") {
                 sttime = "";
@@ -206,10 +210,11 @@
             var goodsType = $("#query_goods_type").val();
             var state = $("#query_state").val();
             if (state == null || state == "") {
-                state = 0;
+                state = -1;
             }
             $("#single_easyui-datagrid").datagrid("load", {
                 "pid": pid,
+                "shopId":shopId,
                 "sttime": sttime,
                 "edtime": edtime,
                 "admid": admid,
@@ -230,6 +235,7 @@
         }
 
         function formatUploadResult(val, row, index) {
+
             if (val == 1) {
                 return '<span class="suc_sty">发布成功</span>';
             } else if (val > 1) {
@@ -237,22 +243,26 @@
                     + '</span>';
             } else if (row.crawlFlag == 0) {
                 return '<span class="err_sty">数据还未进行处理，请等待</span>';
-            } else if (row.crawlFlag == 1) {
+            } else if (row.crawlFlag == 1 || row.crawlFlag == 11 || row.crawlFlag == 9) {
                 return '<span class="err_sty">流程第1步,正在抓取</span>';
             } else if (row.crawlFlag == 4) {
                 return '<span class="err_sty">流程第1步,抓取失败</span>';
-            } else if (row.clearFlag == 0) {
-                return '<span class="err_sty">流程第2步,数据待清洗</span>';
-            } else if (row.clearFlag == 1) {
-                return '<span class="err_sty">流程第2步,数据正在清洗</span>';
-            } else if (row.valid == 0) {
-                return '<span class="err_sty">流程第2步,数据清洗完成，商品数据无效</span>';
-            } else if (row.clearFlag == 3) {
-                return '<span class="err_sty">流程第3步,下载图片到本地失败</span>';
-            } else if (val == 0) {
-                return '<span class="err_sty">流程第4步,待数据同步</span>';
+            } else if (row.crawlFlag == 2) {
+                if (row.clearFlag == 0) {
+                    return '<span class="err_sty">流程第2步,数据待清洗</span>';
+                } else if (row.clearFlag == 1) {
+                    return '<span class="err_sty">流程第2步,数据正在清洗</span>';
+                } else if (row.valid == 0) {
+                    return '<span class="err_sty">流程第2步,数据清洗完成，商品数据无效</span>';
+                } else if (row.clearFlag == 3) {
+                    return '<span class="err_sty">流程第3步,下载图片到本地失败</span>';
+                } else if (val == 0) {
+                    return '<span class="err_sty">流程第4步,待数据同步</span>';
+                } else {
+                    return '<span class="err_sty">' + val + '</span>';
+                }
             } else {
-                return '<span class="err_sty">' + val + '</span>';
+                return '<span class="err_sty">流程第1步,抓取失败</span>';
             }
         }
         
@@ -495,40 +505,44 @@
 <div id="single_top_toolbar" style="padding: 5px; height: auto">
     <form id="single_query_form" action="#" onsubmit="return false;">
 			<span> PID: <input type="text" id="pid_id"
-                               style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
+                               style="width: 170px; height: 24px" value=""/></span>&nbsp;&nbsp;
+        <span> 店铺ID: <input type="text" id="query_shop_id"
+                            style="width: 130px; height: 24px" value=""/></span>&nbsp;&nbsp;<span>
 				时间: <input id="query_sttime" class="Wdate"
-                           style="width: 110px; height: 24px" type="text" value=""
+                           style="width: 100px; height: 24px" type="text" value=""
                            onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				<span>&nbsp;-&nbsp;</span><input id="query_edtime" class="Wdate"
-                                                 style="width: 110px; height: 24px;" type="text" value=""
+                                                 style="width: 100px; height: 24px;" type="text" value=""
                                                  onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-			</span>&nbsp;&nbsp;&nbsp;&nbsp; <span> 编辑人: <select id="query_admid"
-                                                                style="font-size: 16px; height: 24px; width: 120px;">
+			</span>&nbsp;&nbsp;<span> 编辑人: <select id="query_admid"
+                                                   style="font-size: 16px; height: 24px; width: 120px;">
 					<option value="0" selected="selected">全部</option>
-			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span> 对标标识: <select id="query_goods_type"
-                                                                         style="font-size: 16px; height: 24px; width: 140px;">
+			</select></span>&nbsp;&nbsp;<span> 对标标识: <select id="query_goods_type"
+                                                             style="font-size: 16px; height: 24px; width: 120px;">
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">非对标</option>
                     <option value="1">AliExpress对标</option>
                     <option value="2">Amazon对标</option>
 
-			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span> 引流标识: <select
+			</select></span>&nbsp;&nbsp;<span> 引流标识: <select
             id="query_drainage_flag"
-            style="font-size: 16px; height: 24px; width: 120px;">
+            style="font-size: 16px; height: 24px; width: 100px;">
 					<option value="0" selected="selected">全部</option>
                     <option value="1">引流商品</option>
                     <option value="2">非引流商品</option>
 
-			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <!-- <span> 状态: <select id="query_state"
-            style="font-size: 16px; height: 24px; width: 120px;">
+			</select></span>&nbsp;&nbsp;
+        <span> 状态: <select id="query_state"
+                           style="font-size: 16px; height: 24px; width: 100px;">
                 <option value="-1" selected="selected">全部</option>
-                <option value="0">上线流程中</option>
-                <option value="1">上线成功</option>
-                <option value="2">上线失败</option>
-        </select></span> -->
-        &nbsp;&nbsp;&nbsp;&nbsp; <span><input type="button"
-                                              class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <option value="0">待抓取</option>
+                <option value="1">抓取失败</option>
+                <option value="2">待清洗</option>
+                <option value="3">待同步</option>
+                <option value="4">同步成功</option>
+        </select></span>&nbsp;&nbsp;
+        &nbsp;&nbsp;<span><input type="button"
+                                 class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <span><input type="button" class="enter_btn" value="录入1688商品"
                      onclick="enterGoods()"/></span>
         <%--<span><a href="/cbtconsole/website/singleGoodsCheck.jsp" target="_blank">跨境商品审核</a></span>--%>

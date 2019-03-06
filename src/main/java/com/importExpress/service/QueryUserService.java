@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 
@@ -36,4 +37,14 @@ public interface QueryUserService {
     long updateAuthInfo(AuthInfo authInfo, String url, String urlFlag, String colorFlag);
 
     void updateNeedOffShelfData();
+
+    List<String> queryGoodsWeightNoSyn();
+
+    EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType, String startDate, String endDate);
+
+    Map<String,Object> queryUserOtherInfo(Integer id, Integer userType);
+
+    Map<String, Object> updateNeedoffshellEditFlag(String pids);
+
+    Map<String,String> queryUserListCsv(Integer userType, String startDate, String endDate);
 }
