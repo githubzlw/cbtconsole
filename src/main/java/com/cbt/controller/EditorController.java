@@ -2977,7 +2977,7 @@ public class EditorController {
                 }
             }
             gd.setEninfo(nwDoc.html());
-            // customGoodsService.updatePidEnInfo(gd);
+            customGoodsService.updatePidEnInfo(gd);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());
