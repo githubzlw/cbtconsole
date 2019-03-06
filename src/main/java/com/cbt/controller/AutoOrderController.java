@@ -237,7 +237,7 @@ public class AutoOrderController {
 			Map<String, String> addressMap = new HashMap<String, String>();
 			addressMap.put("orderno", orderNo);
 			addressMap.put("addressid", String.valueOf(address_id));
-			addressMap.put("country", address.getCountry());
+			addressMap.put("country", address.getCountryname());
 			addressMap.put("statename", address.getStatename());
 			addressMap.put("address", address.getAddress());
 			addressMap.put("address2", address.getAddress2());
