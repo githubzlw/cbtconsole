@@ -350,6 +350,9 @@
 		.imagetable tr td:last-child {
 			border-right: 1px solid #ddd;
 		}
+		.window, .window-shadow {
+    position: fixed;}
+</style>
 	</style>
 </head>
 <script type="text/javascript">
@@ -3172,23 +3175,26 @@
         var num =$(" #num ").val()
         var odid =$(" #odid ").val()
         if(number>num){
-        	$.messager.alert('提示','退货数量不能大于总数量');
+        	alert('退货数量不能大于总数量');
         	return;
         }
 		  $.post("/cbtconsole/Look/AddOrderByOdid", {
 				number:number,cusorder:cusorder,returnNO:returnNO,odid:odid,num:num
 			}, function(res) {
 				if(res.rows == 0){
-					$.messager.alert('提示','修改成功');
+					alert('修改成功');
 				}else if(res.rows == 1){
-					$.messager.alert('提示','该订单已发起退货');
+					alert('该订单已发起退货');
 				}
 			else if(res.rows == 2){
-				$.messager.alert('提示','请填写数据');
+				alert('请填写数据');
 				return;
 			}
 			else if(res.rows == 3){
-				$.messager.alert('提示','该商品还未采购可直接取消采购');
+				alert('该商品还未采购可直接取消采购');
+				return;
+			}else if(res.rows == 4){
+				alert('退货数量不可大于总数');
 				return;
 			}
 				$('#user_remark').window('close');

@@ -8,14 +8,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.pojo.orderJson;
@@ -111,6 +107,10 @@ public class ReturnsManagement {
 		System.err.println("订单号："+orid);
 		String cusorder=request.getParameter("cusorder");
 		String returnNO=request.getParameter("returnNO");
+		if (returnNO==null||"".equals(returnNO)||number==0) {
+			json.setRows(3);
+			return json;
+		}
 		System.err.println("运单号"+number);
 		json=this.lookReturnOrderServiceNew.AddOrder(number,orid,cusorder,returnNO,adm.getAdmName());
 		 return json;
@@ -223,6 +223,13 @@ public class ReturnsManagement {
 	public EasyUiJsonResult FindOdid(@RequestParam("cusorder")String cusorder){
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		json=this.lookReturnOrderServiceNew.FindOdid(cusorder);		
+		 return json;
+	}	
+	@RequestMapping(value = "/getAllOrderByOrid")
+	@ResponseBody
+	public EasyUiJsonResult getAllOrderByOrid(@RequestParam("orid")String orid){
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		json=this.lookReturnOrderServiceNew.getAllOrderByOrid(orid);		
 		 return json;
 	}	
 }

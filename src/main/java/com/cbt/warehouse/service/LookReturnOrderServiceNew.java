@@ -41,6 +41,8 @@ public interface LookReturnOrderServiceNew {
 
 	EasyUiJsonResult FindOdid(String cusorder);
 
+	EasyUiJsonResult getAllOrderByOrid(String orid);
+
 	
 
 	

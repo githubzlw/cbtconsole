@@ -58,13 +58,13 @@ taobao_1688_order_history as th where rd.tb_id=th.id
 	</if>
 	
 	<if test="a1688Shipno != null">
-			 AND rd.shipno=#{a1688Shipno} 
+			 AND (rd.shipno=#{a1688Shipno} or rd.1688_shipno=#{a1688Shipno} or rd.change_shipno=#{a1688Shipno}) 
 	</if>
 	<if test="optTimeStart != null">
-			 AND rd.opt_time&gt;#{optTimeStart} 
+			 AND (rd.opt_time&gt;#{optTimeStart} or rd.apply_time&gt;#{optTimeStart}) 
 	</if>
 	<if test="optTimeEnd != null">
-			 AND rd.opt_time&lt;#{optTimeEnd} 
+			 AND (rd.opt_time&lt;#{optTimeEnd} or rd.apply_time&lt;#{optTimeEnd}) 
 	</if>
 	<if test="state == null">
 			 AND rd.state !=5 
