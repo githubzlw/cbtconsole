@@ -87,402 +87,409 @@ public class NewOrderDetailsCtr {
 		DataSourceSelector.restore();
 		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
 		DecimalFormat df = new DecimalFormat("######0.00");
-		//try {
-			String orderNo = request.getParameter("orderNo");
-			if(StringUtils.isNotBlank(orderNo)){
-				orderNo = orderNo.replaceAll("'","");
-			}
-			String payTime = request.getParameter("paytime");
-			request.setAttribute("payToTime", payTime);
-			// 获取所有采购人员信息
-			List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
-			request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
+		String orderNo = request.getParameter("orderNo");
+		if(StringUtils.isNotBlank(orderNo)){
+			orderNo = orderNo.replaceAll("'","");
+		}
+		String payTime = request.getParameter("paytime");
+		request.setAttribute("payToTime", payTime);
+		// 获取所有采购人员信息
+		List<Admuser> aublist=iOrderinfoService.getBuyerAndAll();
+		request.setAttribute("aublist", net.sf.json.JSONArray.fromObject(aublist));
 
-			String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
-			// 订单信息
-			OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
-			//获取实际运费
-			Long start = System.currentTimeMillis();
-			double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
-			System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
-			// 获取汇率
-			double rate =Double.valueOf(orderInfo.getExchange_rate());
-			//获取订单出运信息
-			List<ShippingBean> spb=iOrderinfoService.getShipPackmentInfo(orderNo);
-			String actual_freight="654321";
-			String transportcompany="-";
-			String shippingtype="-";
-			String awes_freight="-";
-			Double actualFreight=0.00;
-			Double awesFreight=0.00;
-			//eric称重重量包裹
-			Double ac_weight=0.00;
-			if(spb .size()>0){
-				for(ShippingBean s:spb){
-					if(s != null && StringUtil.isNotBlank(s.getTransportcompany())){
-						actualFreight += StringUtil.isBlank(s.getActual_freight())?0.00:Double.parseDouble(s.getActual_freight());
-						if(!transportcompany.contains(s.getTransportcompany())){
-							transportcompany =transportcompany+";"+(StringUtil.isBlank(s.getTransportcompany())?"":s.getTransportcompany());
-						}
-						if(!shippingtype.contains(s.getShippingtype())){
-							shippingtype=shippingtype+";"+(StringUtil.isBlank(s.getShippingtype())?"":s.getShippingtype());
-						}
-						awesFreight=awesFreight+Double.parseDouble(s.getEstimatefreight())*rate;
-						ac_weight+=Double.parseDouble(StringUtil.isBlank(s.getAc_weight())?"0.00":s.getAc_weight());
+		String allFreight = String.valueOf(iOrderinfoService.getAllFreightByOrderid(orderNo));
+		// 订单信息
+		OrderBean orderInfo =iOrderinfoService.getOrders(orderNo);
+		//获取实际运费
+		Long start = System.currentTimeMillis();
+		double freightCostByOrderno = FreightUtlity.getFreightByOrderno(orderNo);
+		System.out.println("花费时间： = " + (System.currentTimeMillis() - start));
+		// 获取汇率
+		double rate =Double.valueOf(orderInfo.getExchange_rate());
+		//获取订单出运信息
+		List<ShippingBean> spb=iOrderinfoService.getShipPackmentInfo(orderNo);
+		String actual_freight="654321";
+		String transportcompany="-";
+		String shippingtype="-";
+		String awes_freight="-";
+		Double actualFreight=0.00;
+		Double awesFreight=0.00;
+		//eric称重重量包裹
+		Double ac_weight=0.00;
+		if(spb .size()>0){
+			for(ShippingBean s:spb){
+				if(s != null && StringUtil.isNotBlank(s.getTransportcompany())){
+					actualFreight += StringUtil.isBlank(s.getActual_freight())?0.00:Double.parseDouble(s.getActual_freight());
+					if(!transportcompany.contains(s.getTransportcompany())){
+						transportcompany =transportcompany+";"+(StringUtil.isBlank(s.getTransportcompany())?"":s.getTransportcompany());
 					}
+					if(!shippingtype.contains(s.getShippingtype())){
+						shippingtype=shippingtype+";"+(StringUtil.isBlank(s.getShippingtype())?"":s.getShippingtype());
+					}
+					awesFreight=awesFreight+Double.parseDouble(s.getEstimatefreight())*rate;
+					ac_weight+=Double.parseDouble(StringUtil.isBlank(s.getAc_weight())?"0.00":s.getAc_weight());
 				}
-				actual_freight=df.format(actualFreight);
-				awes_freight=df.format(awesFreight);
 			}
-			//获取预估运费 start
-			double freightFee =orderInfo.getFreightFee();
-			//getFreightFee(allFreight, orderInfo);
-			// 获取预估运费 end
-			//出运国际运费（公式计算）
-			double estimatefreight=iOrderinfoService.getEstimatefreight(orderNo);
-			//获取产品表中公式计算的重量
-			double allWeight=iOrderinfoService.getAllWeight(orderNo);
-			request.setAttribute("actual_freight",actual_freight);
-			request.setAttribute("transportcompany",transportcompany);
-			request.setAttribute("shippingtype",shippingtype);
-			request.setAttribute("ac_weight",ac_weight);
-			request.setAttribute("awes_freight",awes_freight);
-			if(freightCostByOrderno>0){
-				request.setAttribute("allFreight", freightCostByOrderno);
+			actual_freight=df.format(actualFreight);
+			awes_freight=df.format(awesFreight);
+		}
+		//获取预估运费 start
+		double freightFee =orderInfo.getFreightFee();
+		//getFreightFee(allFreight, orderInfo);
+		// 获取预估运费 end
+		//出运国际运费（公式计算）
+		double estimatefreight=iOrderinfoService.getEstimatefreight(orderNo);
+		//获取产品表中公式计算的重量
+		double allWeight=iOrderinfoService.getAllWeight(orderNo);
+		request.setAttribute("actual_freight",actual_freight);
+		request.setAttribute("transportcompany",transportcompany);
+		request.setAttribute("shippingtype",shippingtype);
+		request.setAttribute("ac_weight",ac_weight);
+		request.setAttribute("awes_freight",awes_freight);
+		if(freightCostByOrderno>0){
+			request.setAttribute("allFreight", freightCostByOrderno);
+		}else {
+			request.setAttribute("allFreight", freightFee);
+		}
+		request.setAttribute("estimatefreight",estimatefreight*rate);
+		request.setAttribute("allWeight",allWeight);
+		//产品预计采购金额-
+		double es_buyAmount=0.00;
+		request.setAttribute("es_buyAmount",es_buyAmount);
+		String fileByOrderid = iOrderinfoService.getFileByOrderid(orderNo);
+		String invoice="2";
+		if (fileByOrderid == null || fileByOrderid.length() < 10) {
+			invoice="0";
+		} else if (fileByOrderid.indexOf(".pdf") > -1){
+			invoice="1";
+		}
+		request.setAttribute("invoice", invoice);
+		// 更改购物车表的商品备注为已读
+		iOrderinfoService.updateGoodsCarMessage(orderNo);
+		// 订单商品详情
+		List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+		Double es_prices=0.00;
+		double feeWeight=0.00;
+		Map<String,Double> shopShippingCostMap= new HashedMap();
+		Double ShippingCost = 0d;
+		shopShippingCostMap.put("shopShippingCost",0d);
+		double notFreeWeight = 0d;
+		for (int i = 0; i < odb.size(); i++) {
+			OrderDetailsBean o = odb.get(i);
+			if(!shopShippingCostMap.containsKey(o.getCbrShopid())){
+				Double shopShippingCost = shopShippingCostMap.get("shopShippingCost");
+				shopShippingCostMap.put("shopShippingCost",shopShippingCost+=5d);
+				shopShippingCostMap.put(o.getCbrShopid(),shopShippingCost+=5d);
+			}
+			if (StringUtil.isNotBlank(o.getConfirm_userid()) && Integer.valueOf(o.getPurchase_state())>2) {
+				//对于已经确认采购的商品查询是否有物流信息
+				getShippStatus(o);
+			}
+			es_prices+=o.getEs_price();
+			if(o.getIs_sold_flag() != 0){
+				feeWeight+=o.getOd_total_weight();
 			}else {
-				request.setAttribute("allFreight", freightFee);
+				notFreeWeight+=o.getOd_total_weight();
 			}
-			request.setAttribute("estimatefreight",estimatefreight*rate);
-			request.setAttribute("allWeight",allWeight);
-			//产品预计采购金额-
-			double es_buyAmount=0.00;
-			request.setAttribute("es_buyAmount",es_buyAmount);
-			String fileByOrderid = iOrderinfoService.getFileByOrderid(orderNo);
-			String invoice="2";
-			if (fileByOrderid == null || fileByOrderid.length() < 10) {
-				invoice="0";
-			} else if (fileByOrderid.indexOf(".pdf") > -1){
-				invoice="1";
-			}
-			request.setAttribute("invoice", invoice);
-			// 更改购物车表的商品备注为已读
-			iOrderinfoService.updateGoodsCarMessage(orderNo);
-			// 订单商品详情
-			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
-			Double es_prices=0.00;
-			double feeWeight=0.00;
-			Map<String,Double> shopShippingCostMap= new HashedMap();
-			Double ShippingCost = 0d;
-			shopShippingCostMap.put("shopShippingCost",0d);
-			for (int i = 0; i < odb.size(); i++) {
-				OrderDetailsBean o = odb.get(i);
-				if(!shopShippingCostMap.containsKey(o.getCbrShopid())){
-					Double shopShippingCost = shopShippingCostMap.get("shopShippingCost");
-					shopShippingCostMap.put("shopShippingCost",shopShippingCost+=5d);
-					shopShippingCostMap.put(o.getCbrShopid(),shopShippingCost+=5d);
-				}
-				if (StringUtil.isNotBlank(o.getConfirm_userid()) && Integer.valueOf(o.getPurchase_state())>2) {
-					//对于已经确认采购的商品查询是否有物流信息
-					getShippStatus(o);
-				}
-				es_prices+=o.getEs_price();
-				if(o.getIs_sold_flag() != 0){
-					feeWeight+=o.getOd_total_weight();
+		}
+		String format = df.format(feeWeight);
+		request.setAttribute("feeWeight", format);
+		Forwarder forw = null;
+		int state = orderInfo.getState();
+		// zp 修改 到账信息和订单信息一起查
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("id", orderInfo.getDzId());
+		map.put("orderno", orderInfo.getDzOrderno());
+		map.put("confirmname", orderInfo.getDzConfirmname());
+		map.put("confirmtime", orderInfo.getDzConfirmtime());
+		// 收集order_detail的 id
+		String str_oid = "";
+		// 计算订单总金额
+		float sumPrice = 0;
+		String purchasetime_order = "";
+		double preferential_price = 0;
+		for (int i = 0; i < odb.size(); i++) {
+			if (state == 1) {
+				preferential_price += odb.get(i).getPreferential_price();
+				String purchase_time = odb.get(i).getPurchase_time();
+				if (Utility.getStringIsNull(purchase_time) && Utility.getStringIsNull(purchasetime_order)) {
+					long purchase_time_long = Long.valueOf(purchase_time.replaceAll("[-\\s:]", "").replaceAll(".0", ""));
+					long purchasetime_order_long = Long.valueOf(purchasetime_order.replaceAll("[-\\s:]", "").replaceAll(".0", ""));
+					purchasetime_order = purchase_time_long > purchasetime_order_long ? purchase_time: purchasetime_order;
+				}else {
+					purchasetime_order = purchase_time;
 				}
 			}
-			request.setAttribute("feeWeight",df.format(feeWeight));
-			Forwarder forw = null;
-			int state = orderInfo.getState();
-			// zp 修改 到账信息和订单信息一起查
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", orderInfo.getDzId());
-			map.put("orderno", orderInfo.getDzOrderno());
-			map.put("confirmname", orderInfo.getDzConfirmname());
-			map.put("confirmtime", orderInfo.getDzConfirmtime());
-			// 收集order_detail的 id
-			String str_oid = "";
-			// 计算订单总金额
-			float sumPrice = 0;
-			String purchasetime_order = "";
-			double preferential_price = 0;
-			for (int i = 0; i < odb.size(); i++) {
-				if (state == 1) {
-					preferential_price += odb.get(i).getPreferential_price();
-					String purchase_time = odb.get(i).getPurchase_time();
-					if (Utility.getStringIsNull(purchase_time) && Utility.getStringIsNull(purchasetime_order)) {
-						long purchase_time_long = Long.valueOf(purchase_time.replaceAll("[-\\s:]", "").replaceAll(".0", ""));
-						long purchasetime_order_long = Long.valueOf(purchasetime_order.replaceAll("[-\\s:]", "").replaceAll(".0", ""));
-						purchasetime_order = purchase_time_long > purchasetime_order_long ? purchase_time: purchasetime_order;
-					}else {
-						purchasetime_order = purchase_time;
-					}
-				}
-				if (odb.get(i).getOrsstate() > 0) {
-					sumPrice += odb.get(i).getSumGoods_p_price();
-				}
-				str_oid = str_oid + odb.get(i).getId() + ",";
-				String goods_img = odb.get(i).getGoods_img();
-				if (goods_img != null && goods_img.equals("/img/1.png")) {
-					odb.get(i).setGoods_img("/cbtconsole/img/1.png");
-				}
-				if(StringUtil.isNotBlank(odb.get(i).getPrice1688())){
-					odb.get(i).setPrice1688(odb.get(i).getPrice1688().replaceAll("\\s*", "").replaceAll("\\$", "￥"));
-				}
+			if (odb.get(i).getOrsstate() > 0) {
+				sumPrice += odb.get(i).getSumGoods_p_price();
 			}
-			String arrive_time1 = "";
-			String arrive_time = orderInfo.getMode_transport();
-			int arrive = 0;
-			String shipMethod = "0";
-			if (!Utility.getStringIsNull(orderInfo.getExpect_arrive_time())) {
-				arrive_time1 = orderInfo.getExpect_arrive_time();
-				arrive = -1;
+			str_oid = str_oid + odb.get(i).getId() + ",";
+			String goods_img = odb.get(i).getGoods_img();
+			if (goods_img != null && goods_img.equals("/img/1.png")) {
+				odb.get(i).setGoods_img("/cbtconsole/img/1.png");
 			}
-			if (Utility.getStringIsNull(arrive_time) && arrive_time.indexOf("@") > -1) {
-				String[] strings = arrive_time.split("@");
-				arrive_time = strings[1];
-				shipMethod = strings[0];
-				if (arrive_time.indexOf("-") > -1) {
-					String[] arrive_time_ = arrive_time.split("-");
-					int max = Utility.getIsInt(arrive_time_[1]) ? Integer.parseInt(arrive_time_[1]) : 0;
-					arrive = max;
-				} else {
-					arrive = Utility.getIsInt(arrive_time) ? Integer.parseInt(arrive_time) : 0;
-				}
-				if (arrive != 0 && arrive != -1) {
-					Calendar c = Calendar.getInstance();
-					if (Utility.getStringIsNull(orderInfo.getTransport_time())) {
-						Date parse = null;
-						try {
-							parse = sf.parse(orderInfo.getTransport_time());
-						} catch (ParseException e) {
-							e.printStackTrace();
-							LOG.error("订单详情：",orderNo+e.getMessage());
-						}
-						c.setTime(parse);
-					}
-					c.add(Calendar.DAY_OF_MONTH, arrive);
-					arrive_time = sf.format(c.getTime());
-				}
-			}else {
-				arrive_time = "";
+			if(StringUtil.isNotBlank(odb.get(i).getPrice1688())){
+				odb.get(i).setPrice1688(odb.get(i).getPrice1688().replaceAll("\\s*", "").replaceAll("\\$", "￥"));
 			}
-			List<Map<String, String>> pays =iOrderinfoService.getOrdersPays(orderNo);
-			request.setAttribute("pays", pays);
-			if (state == 3) {
-				forw=iOrderinfoService.getForwarder(orderNo);
-				// 读取物流信息
-				List<CodeMaster> logisticsList=iOrderinfoService.getLogisticsInfo();
-				request.setAttribute("logisticsList", logisticsList);
-			} else if (state == 4) {
-				Evaluate evaluate =iOrderinfoService.getEvaluate(orderNo);
-				request.setAttribute("evaluate", evaluate);
-			} else if (state != 0 || state != -1 || state != 7) {
-				String pay_time = "";
-				for (int i = 0; i < pays.size(); i++) {
-					String order_pay = pays.get(i).get("orderid");
-					if (orderNo.equals(order_pay)) {
-						pay_time = String.valueOf(pays.get(i).get("createtime"));
-					}
-				}
-				if (Utility.getStringIsNull(pay_time)) {
-					// 支付时间+最长国内交期+国际运输时间<当前时间
-					Calendar c = Calendar.getInstance();
+		}
+		String arrive_time1 = "";
+		String arrive_time = orderInfo.getMode_transport();
+		int arrive = 0;
+		String shipMethod = "0";
+		if (!Utility.getStringIsNull(orderInfo.getExpect_arrive_time())) {
+			arrive_time1 = orderInfo.getExpect_arrive_time();
+			arrive = -1;
+		}
+		if (Utility.getStringIsNull(arrive_time) && arrive_time.indexOf("@") > -1) {
+			String[] strings = arrive_time.split("@");
+			arrive_time = strings[1];
+			shipMethod = strings[0];
+			if (arrive_time.indexOf("-") > -1) {
+				String[] arrive_time_ = arrive_time.split("-");
+				int max = Utility.getIsInt(arrive_time_[1]) ? Integer.parseInt(arrive_time_[1]) : 0;
+				arrive = max;
+			} else {
+				arrive = Utility.getIsInt(arrive_time) ? Integer.parseInt(arrive_time) : 0;
+			}
+			if (arrive != 0 && arrive != -1) {
+				Calendar c = Calendar.getInstance();
+				if (Utility.getStringIsNull(orderInfo.getTransport_time())) {
+					Date parse = null;
 					try {
-						c.setTime(sf.parse(pay_time));
+						parse = sf.parse(orderInfo.getTransport_time());
 					} catch (ParseException e) {
 						e.printStackTrace();
 						LOG.error("订单详情：",orderNo+e.getMessage());
 					}
-					if (state == 5) {
-						c.add(Calendar.DAY_OF_MONTH, 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
-							request.setAttribute("delivery_warning", "(采购预警" + sf.format(c.getTime()) + ")");
-						}
-					} else if (state == 1) {
-						c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime() - 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
-							request.setAttribute("delivery_warning", "(入库预警" + sf.format(c.getTime()) + ")");
-						}
-					} else if (state == 2) {
-						c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime());
-						if ((new Date().getTime()) > c.getTime().getTime()) {
-							request.setAttribute("delivery_warning", "(出运预警" + sf.format(c.getTime()) + ")");
-						}
+					c.setTime(parse);
+				}
+				c.add(Calendar.DAY_OF_MONTH, arrive);
+				arrive_time = sf.format(c.getTime());
+			}
+		}else {
+			arrive_time = "";
+		}
+		List<Map<String, String>> pays =iOrderinfoService.getOrdersPays(orderNo);
+		request.setAttribute("pays", pays);
+		if (state == 3) {
+			forw=iOrderinfoService.getForwarder(orderNo);
+			// 读取物流信息
+			List<CodeMaster> logisticsList=iOrderinfoService.getLogisticsInfo();
+			request.setAttribute("logisticsList", logisticsList);
+		} else if (state == 4) {
+			Evaluate evaluate =iOrderinfoService.getEvaluate(orderNo);
+			request.setAttribute("evaluate", evaluate);
+		} else if (state != 0 || state != -1 || state != 7) {
+			String pay_time = "";
+			for (int i = 0; i < pays.size(); i++) {
+				String order_pay = pays.get(i).get("orderid");
+				if (orderNo.equals(order_pay)) {
+					pay_time = String.valueOf(pays.get(i).get("createtime"));
+				}
+			}
+			if (Utility.getStringIsNull(pay_time)) {
+				// 支付时间+最长国内交期+国际运输时间<当前时间
+				Calendar c = Calendar.getInstance();
+				try {
+					c.setTime(sf.parse(pay_time));
+				} catch (ParseException e) {
+					e.printStackTrace();
+					LOG.error("订单详情：",orderNo+e.getMessage());
+				}
+				if (state == 5) {
+					c.add(Calendar.DAY_OF_MONTH, 2);
+					if ((new Date().getTime()) > c.getTime().getTime()) {
+						request.setAttribute("delivery_warning", "(采购预警" + sf.format(c.getTime()) + ")");
+					}
+				} else if (state == 1) {
+					c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime() - 2);
+					if ((new Date().getTime()) > c.getTime().getTime()) {
+						request.setAttribute("delivery_warning", "(入库预警" + sf.format(c.getTime()) + ")");
+					}
+				} else if (state == 2) {
+					c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime());
+					if ((new Date().getTime()) > c.getTime().getTime()) {
+						request.setAttribute("delivery_warning", "(出运预警" + sf.format(c.getTime()) + ")");
 					}
 				}
 			}
-			if (arrive != 0) {
-				request.setAttribute("expect_arrive_time", arrive == -1 ? arrive_time1 : arrive_time);
-			}
-			if (str_oid.length() > 0) {
-				str_oid = str_oid.substring(0, str_oid.length() - 1);
-			}
-			request.setAttribute("str_oid", str_oid);
-			request.setAttribute("shipMethod", shipMethod);
-			request.setAttribute("orderNo", orderNo);
-			request.setAttribute("orderDetail", odb);
-			request.setAttribute("order_state", orderInfo.getState());
-			IZoneServer os = new ZoneServer();
-			request.setAttribute("countryList",os.getAllZone());
-			// 实际运费
-			Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
-			request.setAttribute("actual_ffreight_", actual_ffreight_);
-			request.setAttribute("foreign_freight", StringUtil.isNotBlank(orderInfo.getForeign_freight())?Double.parseDouble(orderInfo.getForeign_freight()):0.00);
-			request.setAttribute("service_fee",StringUtil.isNotBlank(orderInfo.getService_fee())?Double.parseDouble(orderInfo.getService_fee()):0.00);
-			request.setAttribute("actual_lwh",StringUtil.isNotBlank(orderInfo.getActual_lwh())?Double.parseDouble(orderInfo.getActual_lwh()):0.00);
-			request.setAttribute("firstdiscount",StringUtil.isNotBlank(orderInfo.getFirstdiscount())?Double.parseDouble(orderInfo.getFirstdiscount()):0.00);
-			// service_fee是从数据表读取的
-			request.setAttribute("service_fee", Utility.getIsDouble(orderInfo.getService_fee())? Double.parseDouble(orderInfo.getService_fee()) : 0);
-			request.setAttribute("cashback", orderInfo.getCashback());
-			String mode_transport = "";
-			int isFree = 0;
-			if (Utility.getStringIsNull(orderInfo.getMode_transport())) {
-				String[] mode_transport_ = orderInfo.getMode_transport().split("@");
-				int transportLength=mode_transport_.length;
-				for (int j = 0; j < transportLength; j++) {
-					int afterLength=transportLength - 2;
-					if (j == afterLength && Utility.getIsDouble(mode_transport_[afterLength]) && Double.parseDouble(mode_transport_[afterLength]) == 0) {
-						if (mode_transport_[transportLength - 1].equals("all")) {
-							mode_transport_[transportLength - 1] = "免邮";
-							isFree = 1;
-						} else {
-							mode_transport_[transportLength - 1] = "不知重量";
-							isFree = 1;
-						}
-					}
-					if (j == transportLength - 1 && mode_transport_[j].equals("product")) {
-						mode_transport_[j] = "未付运费";
-					}else if (j == transportLength - 1 && mode_transport_[j].equals("all") && isFree != 1) {
-						mode_transport_[j] = "全付";
-					}
-					mode_transport += mode_transport_[j];
-					if (mode_transport.indexOf(".") > -1) {
-						mode_transport = mode_transport.split("\\.")[0];
-					}
-					if (j != transportLength - 1)
-						mode_transport += "@";
-				}
-			}
-			request.setAttribute("isSplitOrder", orderInfo.getIsDropshipOrder());
-			orderInfo.setApplicable_credit(new BigDecimal(orderInfo.getApplicable_credit()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-			// 订单批量优惠总
-			request.setAttribute("preferential_price", preferential_price);
-			request.setAttribute("sumPrice", sumPrice);
-			// 订单采购时间
-			request.setAttribute("purchasetime_order", purchasetime_order);
-			// 查询用户相关订单->同一客户，还没出货的 订单
-			request.setAttribute("orderNos", iOrderinfoService.getOrderNos(orderInfo.getUserid(),orderNo));
-			// 判断订单时候有替代产品
-			int count = orderInfo.getPackage_style();
-			request.setAttribute("count", count);
-			/* 抵扣赠送运费操作---2016.7.25.abc---start */
-			// 订单在未付运费的情况下和全付的时候后期需要增加运费的情况下
-			if (orderInfo.getState() == 2) {
-				double unpaid_freight = 0.0;
-				if (mode_transport.indexOf("未付运费") > -1 || mode_transport.indexOf("全付") > -1) {
-					unpaid_freight = orderInfo.getRemaining_price();
-				}
-				// 客户还需付款
-				if (orderInfo.getRemaining_price() > 0) {
-					request.setAttribute("unpaid_freight", unpaid_freight);
-					request.setAttribute("freight_deduction", "1");
-				}
-			}
-			/* 抵扣赠送运费操作---2016.7.25.abc----end */
-			request.setAttribute("mode_transport", mode_transport);
-			request.setAttribute("isFree", isFree);
-			request.setAttribute("forwarder", forw);
-			request.setAttribute("paymentconfirm", map);
-			// 7.21 订单详情页面增加利润率
-			String[] strs = mode_transport.split("@");
-			int jq = 0;
-			if (strs.length > 1 && strs[1].indexOf("-") > 0) {
-				String[] jqs = null;
-				if (strs[1].indexOf("Days") > 0) {
-					jqs = strs[1].substring(0, strs[1].indexOf(" Days")).split("-");
-				} else {
-					jqs = strs[1].split("-");
-				}
-				for (int j = 0; j < jqs.length; j++) {
-					jq += Integer.parseInt(jqs[j]);
-				}
-			}
-			double sale =orderInfo.getPay_price() * rate;
-			if(orderInfo.getMemberFee()>10){
-				sale-=orderInfo.getMemberFee()* rate;
-			}
-			double buy = 0.0;
-			double volume = 0.0;
-			double weight = 0.0;
-			double goodsWeight=0.00;
-			for (int i = 0; i < odb.size(); i++) {
-				if (odb.get(i).getState() != 2) {
-					buy += odb.get(i).getSumGoods_p_price();
-					volume += odb.get(i).getOd_bulk_volume();
-					weight += odb.get(i).getOd_total_weight();
-					if(StringUtil.isNotBlank(odb.get(i).getFinal_weight())){
-						goodsWeight+=Double.parseDouble(odb.get(i).getFinal_weight());
+		}
+		if (arrive != 0) {
+			request.setAttribute("expect_arrive_time", arrive == -1 ? arrive_time1 : arrive_time);
+		}
+		if (str_oid.length() > 0) {
+			str_oid = str_oid.substring(0, str_oid.length() - 1);
+		}
+		request.setAttribute("str_oid", str_oid);
+		request.setAttribute("shipMethod", shipMethod);
+		request.setAttribute("orderNo", orderNo);
+		request.setAttribute("orderDetail", odb);
+		request.setAttribute("order_state", orderInfo.getState());
+		IZoneServer os = new ZoneServer();
+		request.setAttribute("countryList",os.getAllZone());
+		// 实际运费
+		Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
+		request.setAttribute("actual_ffreight_", actual_ffreight_);
+		request.setAttribute("foreign_freight", StringUtil.isNotBlank(orderInfo.getForeign_freight())?Double.parseDouble(orderInfo.getForeign_freight()):0.00);
+		request.setAttribute("service_fee",StringUtil.isNotBlank(orderInfo.getService_fee())?Double.parseDouble(orderInfo.getService_fee()):0.00);
+		request.setAttribute("actual_lwh",StringUtil.isNotBlank(orderInfo.getActual_lwh())?Double.parseDouble(orderInfo.getActual_lwh()):0.00);
+		request.setAttribute("firstdiscount",StringUtil.isNotBlank(orderInfo.getFirstdiscount())?Double.parseDouble(orderInfo.getFirstdiscount()):0.00);
+		// service_fee是从数据表读取的
+		request.setAttribute("service_fee", Utility.getIsDouble(orderInfo.getService_fee())? Double.parseDouble(orderInfo.getService_fee()) : 0);
+		request.setAttribute("cashback", orderInfo.getCashback());
+		String mode_transport = "";
+		int isFree = 0;
+		if (Utility.getStringIsNull(orderInfo.getMode_transport())) {
+			String[] mode_transport_ = orderInfo.getMode_transport().split("@");
+			int transportLength=mode_transport_.length;
+			for (int j = 0; j < transportLength; j++) {
+				int afterLength=transportLength - 2;
+				if (j == afterLength && Utility.getIsDouble(mode_transport_[afterLength]) && Double.parseDouble(mode_transport_[afterLength]) == 0) {
+					if (mode_transport_[transportLength - 1].equals("all")) {
+						mode_transport_[transportLength - 1] = "免邮";
+						isFree = 1;
+					} else {
+						mode_transport_[transportLength - 1] = "不知重量";
+						isFree = 1;
 					}
 				}
+				if (j == transportLength - 1 && mode_transport_[j].equals("product")) {
+					mode_transport_[j] = "未付运费";
+				}else if (j == transportLength - 1 && mode_transport_[j].equals("all") && isFree != 1) {
+					mode_transport_[j] = "全付";
+				}
+				mode_transport += mode_transport_[j];
+				if (mode_transport.indexOf(".") > -1) {
+					mode_transport = mode_transport.split("\\.")[0];
+				}
+				if (j != transportLength - 1)
+					mode_transport += "@";
 			}
-			double pid_amount=0.00;
-			if(odb.size()>0){
-				pid_amount=odb.get(0).getPid_amount();
+		}
+		request.setAttribute("isSplitOrder", orderInfo.getIsDropshipOrder());
+		orderInfo.setApplicable_credit(new BigDecimal(orderInfo.getApplicable_credit()).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+		// 订单批量优惠总
+		request.setAttribute("preferential_price", preferential_price);
+		request.setAttribute("sumPrice", sumPrice);
+		// 订单采购时间
+		request.setAttribute("purchasetime_order", purchasetime_order);
+		// 查询用户相关订单->同一客户，还没出货的 订单
+		request.setAttribute("orderNos", iOrderinfoService.getOrderNos(orderInfo.getUserid(),orderNo));
+		// 判断订单时候有替代产品
+		int count = orderInfo.getPackage_style();
+		request.setAttribute("count", count);
+		/* 抵扣赠送运费操作---2016.7.25.abc---start */
+		// 订单在未付运费的情况下和全付的时候后期需要增加运费的情况下
+		if (orderInfo.getState() == 2) {
+			double unpaid_freight = 0.0;
+			if (mode_transport.indexOf("未付运费") > -1 || mode_transport.indexOf("全付") > -1) {
+				unpaid_freight = orderInfo.getRemaining_price();
 			}
-			pid_amount = shopShippingCostMap.get("shopShippingCost");
+			// 客户还需付款
+			if (orderInfo.getRemaining_price() > 0) {
+				request.setAttribute("unpaid_freight", unpaid_freight);
+				request.setAttribute("freight_deduction", "1");
+			}
+		}
+		/* 抵扣赠送运费操作---2016.7.25.abc----end */
+		request.setAttribute("mode_transport", mode_transport);
+		request.setAttribute("isFree", isFree);
+		request.setAttribute("forwarder", forw);
+		request.setAttribute("paymentconfirm", map);
+		// 7.21 订单详情页面增加利润率
+		String[] strs = mode_transport.split("@");
+		int jq = 0;
+		if (strs.length > 1 && strs[1].indexOf("-") > 0) {
+			String[] jqs = null;
+			if (strs[1].indexOf("Days") > 0) {
+				jqs = strs[1].substring(0, strs[1].indexOf(" Days")).split("-");
+			} else {
+				jqs = strs[1].split("-");
+			}
+			for (int j = 0; j < jqs.length; j++) {
+				jq += Integer.parseInt(jqs[j]);
+			}
+		}
+		double sale =orderInfo.getPay_price() * rate;
+		if(orderInfo.getMemberFee()>10){
+			sale-=orderInfo.getMemberFee()* rate;
+		}
+		double buy = 0.0;
+		double volume = 0.0;
+		double weight = 0.0;
+		double goodsWeight=0.00;
+		for (int i = 0; i < odb.size(); i++) {
+			OrderDetailsBean orderDetailsBean = odb.get(i);
+			if (orderDetailsBean.getState() != 2) {
+				buy += orderDetailsBean.getSumGoods_p_price();
+				volume += orderDetailsBean.getOd_bulk_volume();
+				weight += orderDetailsBean.getOd_total_weight();
+				if(StringUtil.isNotBlank(orderDetailsBean.getFinal_weight())){
+					double parseDouble = Double.parseDouble(orderDetailsBean.getFinal_weight());
+					goodsWeight+= parseDouble;
+				}
+			}
+		}
+		double pid_amount=0.00;
+		if(odb.size()>0){
+			pid_amount=odb.get(0).getPid_amount();
+		}
+		pid_amount = shopShippingCostMap.get("shopShippingCost");
 //			if(buy<=0){
 //				pid_amount=0.00;
 //			}
-			//订单商品总重量
-			orderInfo.setVolumeweight(String.valueOf(Math.round(weight * 1000) / 1000.0));
-			request.setAttribute("order", orderInfo);
-			request.setAttribute("avg_jq", jq / 2);
-			request.setAttribute("sale", Math.round(sale * 100) / 100.0);
-			request.setAttribute("buy", Math.round((buy) * 100) / 100.0);
-			request.setAttribute("volume", Math.round(volume * 1000) / 1000.0);
-			request.setAttribute("weight", Math.round(weight * 1000) / 1000.0);
-			request.setAttribute("piaAmount",pid_amount);
-			request.setAttribute("es_prices",es_prices);
-			request.setAttribute("goodsWeight",goodsWeight);
-			String countryid = "";
-			if (odb.size() != 0 && odb != null) {
-				countryid = odb.get(0).getCountry();
-				if ("42".equals(countryid)|| "43".equals(countryid)) {
-					countryid = "36";
-				}
+
+		//订单商品总重量
+		orderInfo.setVolumeweight(String.valueOf(Math.round(weight * 1000) / 1000.0));
+		request.setAttribute("order", orderInfo);
+		request.setAttribute("avg_jq", jq / 2);
+		request.setAttribute("sale", Math.round(sale * 100) / 100.0);
+		request.setAttribute("buy", Math.round((buy) * 100) / 100.0);
+		request.setAttribute("volume", Math.round(volume * 1000) / 1000.0);
+		request.setAttribute("weight", Math.round(weight * 1000) / 1000.0);
+		request.setAttribute("piaAmount",pid_amount);
+		request.setAttribute("es_prices",es_prices);
+		request.setAttribute("goodsWeight",goodsWeight);
+		String countryid = "";
+		if (odb.size() != 0 && odb != null) {
+			countryid = odb.get(0).getCountry();
+			if ("42".equals(countryid)|| "43".equals(countryid)) {
+				countryid = "36";
 			}
-			request.setAttribute("country", countryid);
-			request.setAttribute("countryName",(orderInfo.getMode_transport() == null || "".equals(orderInfo.getMode_transport())) ? "USA": strs[2]);
-			request.setAttribute("orderNo", orderInfo.getOrderNo());
-			request.setAttribute("rate", rate);
-			request.setAttribute("userid", orderInfo.getUserid());
-			String lirun1 = null;
-			if (sale == 0.0 || buy == 0.0) {
-				lirun1 = "--";
-			} else {
-				lirun1 = String.format("%.2f", ((sale - buy) / sale * 100)) + "%";
-			}
-			request.setAttribute("lirun1", lirun1);
-			request.setAttribute("isDropshipOrder", orderInfo.getIsDropshipOrder());
-			// 查看订单对应邮件
-			IEmailReceiveService emailService = new EmailReceiveServiceImpl();
-			// 查看客户来往邮件
-			List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
-			request.setAttribute("emaillist", emaillist);
-			//用户信息    yyl - start
-			String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
-			Admuser admuserinfo = JSONObject.parseObject(admuserJson, Admuser.class);
-			request.setAttribute("admuserinfo", admuserinfo);
-			//根据产品id 和 订单号 去查询销售评论状态
-			List<String> lists = new ArrayList<String>();
-			for (OrderDetailsBean orderDetailsBean : odb) {
-				lists.add(orderDetailsBean.getGoods_pid());
-			}
-			request.setAttribute("lists", lists);
-		//} catch (Exception e) {
-			/*e.printStackTrace();
-			LOG.error("查询详情失败，原因：" + e.getMessage());*/
-		//}
+		}
+		request.setAttribute("country", countryid);
+		request.setAttribute("countryName",(orderInfo.getMode_transport() == null || "".equals(orderInfo.getMode_transport())) ? "USA": strs[2]);
+		request.setAttribute("orderNo", orderInfo.getOrderNo());
+		request.setAttribute("rate", rate);
+		request.setAttribute("userid", orderInfo.getUserid());
+		String lirun1 = null;
+		if (sale == 0.0 || buy == 0.0) {
+			lirun1 = "--";
+		} else {
+			lirun1 = String.format("%.2f", ((sale - buy) / sale * 100)) + "%";
+		}
+		request.setAttribute("lirun1", lirun1);
+		request.setAttribute("isDropshipOrder", orderInfo.getIsDropshipOrder());
+		// 查看订单对应邮件
+		IEmailReceiveService emailService = new EmailReceiveServiceImpl();
+		// 查看客户来往邮件
+		List<EmailReceive1> emaillist = iOrderinfoService.getall(orderNo);
+		request.setAttribute("emaillist", emaillist);
+		//用户信息    yyl - start
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser admuserinfo = JSONObject.parseObject(admuserJson, Admuser.class);
+		request.setAttribute("admuserinfo", admuserinfo);
+		//根据产品id 和 订单号 去查询销售评论状态
+		List<String> lists = new ArrayList<String>();
+		for (OrderDetailsBean orderDetailsBean : odb) {
+			lists.add(orderDetailsBean.getGoods_pid());
+		}
+		request.setAttribute("lists", lists);
+		//Added <V1.0.1> Start： cjc 2019/3/6 17:13:17 TODO 如果非免邮商品大于0，且运费为0，计算利润不算运费
+		if (notFreeWeight > 1.0 && actual_ffreight_<=0) {
+			request.setAttribute("allFreight", 0d);
+		}
+		//End：
 		return "order_details_new";
 	}
 
