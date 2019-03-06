@@ -2963,6 +2963,54 @@ public class EditorController {
     }
 
 
+    @RequestMapping(value = "/setNewAliPidInfo")
+    @ResponseBody
+    public JsonResult setNewAliPidInfo(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+
+        String aliPid = request.getParameter("aliPid");
+        if (StringUtils.isBlank(aliPid)) {
+            json.setOk(false);
+            json.setMessage("获取aliPid失败");
+            return json;
+        }
+
+        String aliPrice = request.getParameter("aliPrice");
+        if (StringUtils.isBlank(aliPrice)) {
+            json.setOk(false);
+            json.setMessage("获取aliPrice失败");
+            return json;
+        }
+        try {
+            customGoodsService.setNewAliPidInfo(pid,aliPid,aliPrice);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",setNewAliPidInfo error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",setNewAliPidInfo error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("设置错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
 

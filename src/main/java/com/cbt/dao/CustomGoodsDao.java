@@ -594,4 +594,13 @@ public interface CustomGoodsDao {
 	int checkShopGoodsImgIsMarkByParam(ShopMd5Bean shopMd5Bean);
 
 
+	/**
+     * 设置产品对标信息(28数据库)
+     * @param pid
+     * @param aliPid
+     * @param aliPrice
+     * @return
+     */
+	int setNewAliPidInfo(String pid, String aliPid, String aliPrice);
+
 }

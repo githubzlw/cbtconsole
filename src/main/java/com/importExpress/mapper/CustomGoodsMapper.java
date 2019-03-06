@@ -340,4 +340,14 @@ public interface CustomGoodsMapper {
      */
 	int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean);
 
+
+	/**
+     * 设置产品对标信息
+     * @param pid
+     * @param aliPid
+     * @param aliPrice
+     * @return
+     */
+	int setNewAliPidInfo(@Param("pid") String pid, @Param("aliPid") String aliPid, @Param("aliPrice") String aliPrice);
+
 }

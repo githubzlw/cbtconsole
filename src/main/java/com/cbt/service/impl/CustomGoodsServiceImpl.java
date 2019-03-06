@@ -604,4 +604,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryMd5NoSameListCount(shopMd5Bean);
     }
 
+    @Override
+    public int setNewAliPidInfo(String pid, String aliPid, String aliPrice) {
+        customGoodsDao.setNewAliPidInfo(pid, aliPid, aliPrice);
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        customGoodsDao.insertIntoSingleOffersChild(pid, Double.valueOf(orGoods.getFinalWeight()));
+        return customGoodsMapper.setNewAliPidInfo(pid, aliPid, aliPrice);
+    }
+
 }

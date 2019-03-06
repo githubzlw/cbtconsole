@@ -1126,4 +1126,10 @@
         order by a.goods_md5
     </select>
 
+    <update id="setNewAliPidInfo">
+        update custom_benchmark_ready
+        set ali_pid = #{aliPid},ali_price = #{aliPrice}
+        where pid = #{pid}
+    </update>
+
 </mapper>

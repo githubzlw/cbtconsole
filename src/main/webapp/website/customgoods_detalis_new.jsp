@@ -49,6 +49,7 @@
             closeSizeInfoEnDialog();
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
+            // closeNewAliPidDlg('close');
         });
 
         function relieveDisabled(obj) {
@@ -1093,6 +1094,57 @@
                 }
             });
         }
+        
+        
+        function beforeSetAliInfo(pid, isBenchmark, bmFlag, aliPid) {
+            if((isBenchmark == 1 && bmFlag == 1) || isBenchmark == 2){
+                $.messager.confirm('提示', '已经存在对标(AliPid:'+aliPid+'),是否重新对标？', function (rs) {
+                if (rs) {
+                    $("#new_ali_pid").val(aliPid);
+                    $('#set_new_aliPid_dlg').dialog('open');
+                }
+            });
+            }else{
+                $('#set_new_aliPid_dlg').dialog('open');
+            }
+        }
+
+
+        function closeNewAliPidDlg() {
+            $('#set_new_aliPid_dlg').dialog('close');
+        }
+
+        function setNewAliPidInfo(pid) {
+            var aliPid = $("#new_ali_pid").val();
+            var aliPrice = $("#new_ali_price").val();
+            if (aliPid && aliPrice) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'text',
+                    url: '/cbtconsole/editc/setNewAliPidInfo',
+                    data: {
+                        "pid": pid,
+                        "aliPid": aliPid,
+                        "aliPrice": aliPrice
+                    },
+                    success: function (data) {
+                        var json = eval('(' + data + ')');
+                        if (json.ok) {
+                            showMessage("执行成功");
+                            closeNewAliPidDlg();
+                        } else {
+                            $.messager.alert("提醒", json.message, "info");
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert("提醒", "执行错误，请联系管理员", "error");
+                    }
+                });
+            } else {
+                showMessage("请输入相关数据");
+            }
+
+        }
 
         function setGoodsRepairedByPid(pid) {
             $.messager.confirm('提示', '是否确认设置已修复？', function (rs) {
@@ -1580,6 +1632,34 @@
     </div>
 
 
+    <div id="set_new_aliPid_dlg" class="easyui-dialog" title="修改对标信息"
+         data-options="modal:true"
+         style="width: 280px; height: 200px; padding: 10px;">
+        <br>
+        <table>
+            <tr>
+                <td>AliPid:</td>
+                <td><input id="new_ali_pid" type="text" style="height: 20px;"/></td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>AliPrice:</td>
+                <td><input id="new_ali_price" type="text" style="height: 20px;"/></td>
+            </tr>
+        </table>
+        <br>
+
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="setNewAliPidInfo('${goods.pid}')" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeNewAliPidDlg()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+
     <div class="allMain">
         <div class="s_top">
 				<span class="s_last2"> <label for="query_pid"><b>PID:</b></label>
@@ -2021,6 +2101,7 @@
                     <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
                 </c:if>
+                <br><span class="s_btn" onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
                 &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
 
                 <br><a target="_blank"

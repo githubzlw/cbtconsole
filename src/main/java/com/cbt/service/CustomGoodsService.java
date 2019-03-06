@@ -697,4 +697,13 @@ public interface CustomGoodsService {
      */
 	int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean);
 
+    /**
+     * 设置产品对标信息
+     * @param pid
+     * @param aliPid
+     * @param aliPrice
+     * @return
+     */
+	int setNewAliPidInfo(String pid, String aliPid, String aliPrice);
+
 }
