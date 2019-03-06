@@ -395,7 +395,8 @@ public class ShopCarMarketingController {
                 json.setOk(true);
                 json.setMessage("邮件失败，请重新发送！");
             }
-        } catch (Exception e) {
+        
+            }} catch (Exception e) {
             e.printStackTrace();
             System.err.println("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
             logger.error("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
@@ -405,7 +406,7 @@ public class ShopCarMarketingController {
         }
         return json;
     }
-
+    
 
     private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
         boolean isSuccess = false;
@@ -482,10 +483,6 @@ public class ShopCarMarketingController {
                             sourceCount++;
                         }
                     }
-                }
-<<<<<<< HEAD
-                shopCarMarketingList.clear();
-=======
                 shopCar.setTypeList(typeList);
                 if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
@@ -507,7 +504,6 @@ public class ShopCarMarketingController {
                 }
             }
             shopCarMarketingList.clear();
->>>>>>> refs/heads/master
 
 
                 double offCost = productCost - actualCost;
