@@ -197,7 +197,7 @@
         <result column="pid" property="pid"/>
         <result column="valid" property="valid"/>
         <result column="shop_id" property="shopId"/>
-        <result column="goods_md5" property="md5Val"/>
+        <result column="goods_md5" property="goodsMd5"/>
         <result column="remote_path" property="remotePath"/>
         <result column="local_path" property="localPath"/>
     </resultMap>

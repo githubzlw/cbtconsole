@@ -11,6 +11,8 @@ public class GoodsMd5Bean {
     private String localPath;
     private String remotePath;
     private String imgShow;
+    private int valid;
+    private int isMark;
 
     public Integer getId() {
         return id;
@@ -69,6 +71,22 @@ public class GoodsMd5Bean {
 
     public void setImgShow(String imgShow) {
         this.imgShow = imgShow;
+    }
+
+    public int getValid() {
+        return valid;
+    }
+
+    public void setValid(int valid) {
+        this.valid = valid;
+    }
+
+    public int getIsMark() {
+        return isMark;
+    }
+
+    public void setIsMark(int isMark) {
+        this.isMark = isMark;
     }
 
     @Override

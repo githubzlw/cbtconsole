@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cbt.bean.*;
+import com.cbt.customer.service.IShopUrlService;
+import com.cbt.util.GoodsInfoUtils;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.OnlineGoodsStatistic;
 import com.importExpress.pojo.ShopMd5Bean;
@@ -49,6 +51,9 @@ public class CustomGoodsController {
 
 	@Autowired
 	private CustomGoodsService customGoodsService;
+
+	@Autowired
+    private IShopUrlService shopUrlService;
 
 	/**
 	 * 列出指定产品的操作记录
@@ -1225,9 +1230,17 @@ public class CustomGoodsController {
             mv.addObject("isShow", 0);
             mv.addObject("message", "获取MD5值失败");
             return mv;
+        }else{
+            mv.addObject("md5Val", md5Val);
         }
         try {
             List<GoodsMd5Bean> list = customGoodsService.queryShopGoodsByMd5(md5Val);
+            ShopMd5Bean shopMd5Bean = new ShopMd5Bean();
+            for(GoodsMd5Bean md5Bean : list){
+            	shopMd5Bean.setMd5Img(md5Bean.getImgShow().substring(md5Bean.getImgShow().lastIndexOf("/") + 1));
+            	shopMd5Bean.setShopId(md5Bean.getShopId());
+                md5Bean.setIsMark(customGoodsService.checkShopGoodsImgIsMarkByParam(shopMd5Bean));
+			}
             mv.addObject("isShow", 1);
             mv.addObject("list", list);
             mv.addObject("showTotal", list.size());
@@ -1240,6 +1253,118 @@ public class CustomGoodsController {
         return mv;
     }
 
+
+    /**
+     * 标记公共图片
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/setShopImgFlag")
+    @ResponseBody
+    public JsonResult setShopImgFlag(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtils.isBlank(admuserJson)) {
+            json.setOk(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+
+        String pids = request.getParameter("pids");
+        if (StringUtils.isBlank(pids)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+
+        String md5Val = request.getParameter("md5Val");
+        if (StringUtils.isBlank(md5Val)) {
+            json.setOk(false);
+            json.setMessage("获取md5失败");
+            return json;
+        }
+        try {
+            String[] pidArr = pids.split("-");
+            List<String> pidList = new ArrayList<>(pidArr.length);
+            for(String pid : pidArr){
+                if(StringUtils.isNotBlank(pid)){
+                    pidList.add(pid);
+                }
+            }
+
+            List<GoodsMd5Bean> list = customGoodsService.queryShopGoodsByMd5(md5Val);
+            List<ShopGoodsInfo> deleteGoodsInfos = new ArrayList<>();
+            for (GoodsMd5Bean md5Bean : list) {
+                if(pidList.contains(md5Bean.getPid())){}
+                ShopGoodsInfo delGd = new ShopGoodsInfo();
+                delGd.setShopId(md5Bean.getShopId());
+                delGd.setPid(md5Bean.getPid());
+                delGd.setImgUrl(md5Bean.getRemotePath().substring(md5Bean.getRemotePath().indexOf(md5Bean.getPid()) + 1));
+                delGd.setLocalPath(md5Bean.getLocalPath());
+                delGd.setRemotePath(GoodsInfoUtils.changeLocalPathToRemotePath(md5Bean.getRemotePath()));
+                deleteGoodsInfos.add(delGd);
+            }
+            // 插入公共图片表中
+            shopUrlService.insertShopGoodsDeleteImgs(deleteGoodsInfos, user.getId());
+            list.clear();
+            deleteGoodsInfos.clear();
+
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("更新失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("更新失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    /**
+     * 批量下架商品
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping("/batchOffGoods")
+    @ResponseBody
+    public JsonResult batchOffGoods(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+        String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (StringUtils.isBlank(admuserJson)) {
+            json.setOk(false);
+            json.setMessage("用户未登陆");
+            return json;
+        }
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+
+        String pids = request.getParameter("pids");
+        if (StringUtils.isBlank(pids)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        try {
+            String[] pidArr = pids.split(",");
+            for(String pid : pidArr){
+                if(StringUtils.isNotBlank(pid)){
+                    // customGoodsService.updateStateList(2, pid, user.getId());
+                    customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), 0, "同款下架");
+                }
+            }
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("更新失败，原因 :" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("更新失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
 
 
 	/**
