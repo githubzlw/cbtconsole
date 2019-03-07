@@ -61,4 +61,12 @@ public interface UserMapper {
     void insertUserRemark(@Param("userid") int userid, @Param("remark") String remark);
 
     void updateUserRemark(@Param("id") String id);
+
+    String queryFollowMeCodeByUserId(@Param("userId") int userId);
+
+    String queryForUUID();
+
+    int checkFollowMeCode(@Param("followCode") String followCode);
+
+    int updateUserFollowCode(@Param("followCode") String followCode,@Param("userId") int userId);
 }

@@ -39,6 +39,8 @@ public class PaymentDetails {
             this.payTypeDesc = "Wire Transfer";
         } else if (payType == 2) {
             this.payTypeDesc = "余额支付";
+        } else if (payType == 5) {
+            this.payTypeDesc = "Stripe支付";
         }
     }
 

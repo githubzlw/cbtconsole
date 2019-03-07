@@ -207,6 +207,7 @@
                 <td>Country</td>
                 <td>Zip Code</td>
                 <td>Phone</td>
+                <td>状态</td>
             </tr>
             <c:forEach items="${addresslist}" var="address">
                 <tr>
@@ -217,6 +218,11 @@
                     <td>${address.countryname}</td>
                     <td>${address.zip_code}</td>
                     <td>${address.phone_number}</td>
+                    <td>
+                        <c:if test="${address.delflag==1}">用户删除</c:if>
+                        <c:if test="${address.delflag==2}">用户修改前地址</c:if>
+                        <c:if test="${address.delflag==0}">正常</c:if>
+                    </td>
                 </tr>
             </c:forEach>
         </table>

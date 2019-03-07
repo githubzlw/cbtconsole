@@ -1324,8 +1324,7 @@ public class OrderinfoService implements IOrderinfoService {
 			ob.setRk(rk);
 			String countryNameCn = Utility.getStringIsNull(ob.getCountryNameCN())? ob.getCountryNameCN() : "USA";
 			ob.setCountryNameCN(countryNameCn);
-			String dzconfirmtime =ob.getDzConfirmtime();
-			ob.setDzConfirmtime(Utility.getStringIsNull(dzconfirmtime)? dzconfirmtime.substring(0, dzconfirmtime.indexOf(" ")) : "");
+			ob.setDzConfirmtime(Utility.getStringIsNull(ob.getDzConfirmtime())? ob.getDzConfirmtime().substring(0, ob.getDzConfirmtime().indexOf(" ")) : "");
 			ob.setOrderNo(orderNo);
 			ob.setExchange_rate(StringUtil.isBlank(ob.getExchange_rate())?"6.3":ob.getExchange_rate());
 			String pay_price_tow = ob.getPay_price_tow();

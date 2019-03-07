@@ -60,4 +60,13 @@ public interface IUserInfoService {
     void insertUserRemark(int userid, String remark);
 
     void updateUserRemark(String id);
+
+
+    String queryFollowMeCodeByUserId(int userId);
+
+    String queryForUUID();
+
+    int checkFollowMeCode(String followCode);
+
+    int updateUserFollowCode(String followCode,int userId);
 }

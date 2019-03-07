@@ -145,6 +145,18 @@
     </resultMap>
 
 
+    <resultMap id="followLogResultMap" type="com.importExpress.pojo.FollowLogBean">
+        <id column ="id" property="id"/>
+        <result column ="user_id" property="userId"/>
+        <result column ="user_email" property="userEmail"/>
+        <result column ="admin_id" property="adminId"/>
+        <result column ="admin_name" property="adminName"/>
+        <result column ="follow_code" property="followCode"/>
+        <result column ="create_time" property="createTime"/>
+        <result column ="user_ip" property="userIp"/>
+    </resultMap>
+
+
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -994,7 +1006,7 @@
             where id = #{shopCar.id,jdbcType=INTEGER}
         </foreach>
     </update>
-    
+
     <delete id="deleteShopCarBatch" parameterType="java.util.List">
         delete from shop_car_marketing where id in
         <foreach collection="list" item="shopCar" open="(" separator="," close=")">
@@ -1790,6 +1802,58 @@
 
     <select id="queryAllCountry" resultMap="zoneResultMap">
         select id,country,fedexie,area from zone where id != 43 order by country
+    </select>
+
+    <select id="queryFollowLogList" resultMap="followLogResultMap" parameterType="com.importExpress.pojo.FollowLogBean">
+        select date_format(lg.create_time,'%Y-%m-%d %H:%i:%s') as create_time,lg.follow_code,lg.user_ip,
+        au.user_id,au.user_email,au.admin_id,au.admin_name
+        from
+        email_direct_marketing_log lg,(select admin_r_user.userid as user_id,user.email as user_email,user.follow_code,
+        admin_r_user.adminid as admin_id,admuser.admName as admin_name
+        from admin_r_user,admuser,user
+        where user.id = admin_r_user.userid and admin_r_user.adminid = admuser.id
+        ) au
+        where lg.follow_code = au.follow_code
+        <if test="userId != null">
+            and au.user_id = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and au.user_email = #{userEmail}
+        </if>
+        <if test="adminId != null">
+            and au.admin_id = #{adminId}
+        </if>
+        <if test="followCode != null">
+            and lg.follow_code = #{followCode}
+        </if>
+        order by lg.create_time desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+
+    <select id="queryFollowLogListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.FollowLogBean">
+        select count(0)
+        from
+        email_direct_marketing_log lg,(select admin_r_user.userid as user_id,user.email as user_email,user.follow_code,
+        admin_r_user.adminid as admin_id,admuser.admName as admin_name
+        from admin_r_user,admuser,user
+        where user.id = admin_r_user.userid and admin_r_user.adminid = admuser.id
+        ) au
+        where lg.follow_code = au.follow_code
+        <if test="userId != null">
+            and au.user_id = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and au.user_email = #{userEmail}
+        </if>
+        <if test="adminId != null">
+            and au.admin_id = #{adminId}
+        </if>
+        <if test="followCode != null">
+            and lg.follow_code = #{followCode}
+        </if>
     </select>
 
 </mapper>

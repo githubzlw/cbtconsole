@@ -205,9 +205,15 @@
             var url = "/cbtconsole/userinfo/getUserInfo.do?userId=" + userId;
             window.open(url);
         }
+        
+        function openUserFollow() {
+            
+        }
+        
 
         function  openSendEmail(userId) {
-            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId;
+            var type = $("#send_type").val();
+            var url = "/cbtconsole/shopCarMarketingCtr/genShoppingCarMarketingEmail?userId=" + userId + "&type=" + type;
             var iWidth = 1680; //弹出窗口的宽度;
             var iHeight = 880; //弹出窗口的高度;
             var iTop = (window.screen.availHeight - 30 - iHeight) / 2; //获得窗口的垂直位置;
@@ -281,13 +287,13 @@
             <caption><b style="font-size: 24px;color: #e65510;">客户【${userId}】购物车信息</b></caption>
             <tr>
                 <td>总产品金额:${userInfo.totalPrice}<em>$</em></td>
-                <td>预估国际运费:${userInfo.offFreight}<em>$</em></td>
+                <td>购物车运费:${userInfo.totalFreight}<em>$</em></td>
                 <td>总采购价:${userInfo.totalWhosePrice}<em>$</em></td>
                     <%--利润率 = （客户需要掏的钱-真实运费-采购额）/客户掏的钱--%>
                 <td>
                     <c:choose>
                         <c:when test="${isGetFreigthResult==true}">
-                           预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+客户支付运费-预估国际运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
+                           预估利润率:${userInfo.estimateProfit}<em>%</em>【(商品总价+购物车运费-线下采购运输运费-商品采购价)/商品采购价(${userInfo.totalPrice}+${userInfo.totalFreight}-${userInfo.offFreight}-${userInfo.totalWhosePrice})/(${userInfo.totalPrice}+${userInfo.totalFreight}))】
                         </c:when>
                         <c:otherwise>
                              <font color="red">没有获取到正确运费无法预估</font>
@@ -308,11 +314,23 @@
                         <%--<input class="btn_sty" type="button" value="基本跟进" onclick="enterSimpleEmail()"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="购物车价格比较" onclick="enterShopCarEmail(${userId})"/>--%>
+
+                       <span>邮件类型:
+                            <select id="send_type" style="height: 28px;width: 180px;">
+                            <option value="1" selected="selected">不做变动,直接发送</option>
+                            <option value="2">给单个产品价格改价</option>
+                            <%--<option value="3">操作运费</option>--%>
+                            <option value="4">为客户选择最佳运输方式</option>
+                            </select>
+                        </span>
+                        &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="发送邮件" onclick="openSendEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="竞争对手对比" onclick="openComparedEmail(${userId})"/>
                         &nbsp;&nbsp;
                         <input class="btn_sty" type="button" value="查看客户信息" onclick="openUserInfo(${userId})"/>
+                        &nbsp;&nbsp;
+                        <input class="btn_sty" type="button" value="查看EDM跟踪" onclick="openUserFollow(${userId})"/>
                     </div>
                 </td>
             </tr>

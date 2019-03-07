@@ -69,8 +69,8 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     }
 
     @Override
-    public int updateGoodsCarPrice(int goodsId, int userId, double goodsPrice,double newPrice) {
-        return shopCarMarketingMapper.updateGoodsCarPrice(goodsId, userId, goodsPrice,newPrice);
+    public int updateGoodsCarPrice(int goodsId, int userId, double goodsPrice, double newPrice) {
+        return shopCarMarketingMapper.updateGoodsCarPrice(goodsId, userId, goodsPrice, newPrice);
     }
 
     @Override
@@ -96,9 +96,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public List<ShopCarInfo> queryShopCarInfoByUserId(int userId) {
         List<ShopCarInfo> resultList = shopCarMarketingMapper.queryShopCarInfoByUserId(userId);
-        if(!(resultList == null  || resultList.isEmpty())){
-            for(ShopCarInfo carInfo : resultList){
-                if(!(carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1)){
+        if (!(resultList == null || resultList.isEmpty())) {
+            for (ShopCarInfo carInfo : resultList) {
+                if (!(carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1)) {
                     carInfo.setAliPid(null);
                 }
             }
@@ -114,7 +114,7 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public int updateAndInsertUserFollowInfo(int userId, int adminId, String content) {
         shopCarMarketingMapper.insertIntoShopCarFollow(userId, adminId, content);
-        return shopCarMarketingMapper.updateUserFollowTime(userId,adminId);
+        return shopCarMarketingMapper.updateUserFollowTime(userId, adminId);
     }
 
     @Override
@@ -140,6 +140,16 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
     @Override
     public List<ZoneBean> queryAllCountry() {
         return shopCarMarketingMapper.queryAllCountry();
+    }
+
+    @Override
+    public List<FollowLogBean> queryFollowLogList(FollowLogBean logBean) {
+        return shopCarMarketingMapper.queryFollowLogList(logBean);
+    }
+
+    @Override
+    public int queryFollowLogListCount(FollowLogBean logBean) {
+        return shopCarMarketingMapper.queryFollowLogListCount(logBean);
     }
 
 }

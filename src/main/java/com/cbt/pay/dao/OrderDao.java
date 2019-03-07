@@ -288,8 +288,8 @@ public class OrderDao implements IOrderDao{
 	@Override
 	public List<Address> getUserAddr(int userid) {
 		// TODO Auto-generated method stub
-		String sql ="select address.*,zone.country as countryname from address,zone where userid="+userid+
-				" and zone.id=address.country and (ISNULL(address.delflag) or address.delflag='0') order by createtime";
+        String sql ="select address.*,zone.country as countryname from address,zone where userid="+userid+
+                " and zone.id=address.country order by delflag ASC,createtime DESC";
 		Connection conn = DBHelper.getInstance().getConnection2();
 		List<Address> address = new ArrayList<Address>();
 		Address defAddress = new Address();
@@ -315,6 +315,7 @@ public class OrderDao implements IOrderDao{
 					defAddress.setRecipients(rs.getString("recipients"));
 					defAddress.setDefaultaddress(rs.getInt("defaultaddress"));
 					defAddress.setStreet(rs.getString("street"));
+                    defAddress.setDelflag(rs.getString("delflag"));
 					flag=1;
 					continue;
 				}
@@ -331,6 +332,7 @@ public class OrderDao implements IOrderDao{
 				temp.setRecipients(rs.getString("recipients"));
 				temp.setDefaultaddress(rs.getInt("defaultaddress"));
 				temp.setStreet(rs.getString("street"));
+                temp.setDelflag(rs.getString("delflag"));
 				address.add(temp);
 			}
 			if(flag == 1){

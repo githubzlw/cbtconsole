@@ -1459,4 +1459,53 @@ public class RefundDaoImpl implements RefundDaoPlus{
 		}
 		return total;
 	}
+
+	@Override
+	public int checkIsExistsApproval(int userId, String orderNo) {
+		String querySql = "select count(1) from order_cancel_approval where user_id = ? and order_no = ? and deal_state < 4";
+		Connection connAws = DBHelper.getInstance().getConnection2();
+		ResultSet rs = null;
+		PreparedStatement stmt = null;
+		int total = 0;
+		try {
+			stmt = connAws.prepareStatement(querySql);
+			stmt.setInt(1, userId);
+			stmt.setString(2, orderNo);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
+				total = rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closeResultSet(rs);
+			DBHelper.getInstance().closePreparedStatement(stmt);
+			DBHelper.getInstance().closeConnection(connAws);
+		}
+		return total;
+	}
+
+	@Override
+	public int insertIntoPaymentByApproval(int userId,String orderNo) {
+		String querySql = "insert into payment(userid,orderid,paymentid,payment_amount,payment_cc,orderdesc,username,"
+				+ "paystatus,createtime,paySID,payflag,paytype,payment_other,paymentno,transaction_fee) " +
+				"select userid,orderid,paymentid,(0 - payment_amount) as payment_amount,payment_cc,orderdesc,username," +
+				"paystatus,createtime,paySID,payflag,paytype,payment_other,paymentno,transaction_fee from payment"
+				+ " where orderid =? and userid = ? and paytype in(0,5) and paystatus = 1 ";
+		Connection connAws = DBHelper.getInstance().getConnection2();
+		PreparedStatement stmt = null;
+		int total = 0;
+		try {
+			stmt = connAws.prepareStatement(querySql);
+			stmt.setString(1, orderNo);
+			stmt.setInt(2, userId);
+			total = stmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closePreparedStatement(stmt);
+			DBHelper.getInstance().closeConnection(connAws);
+		}
+		return total;
+	}
 }
