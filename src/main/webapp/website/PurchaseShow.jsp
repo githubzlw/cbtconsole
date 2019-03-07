@@ -2285,9 +2285,57 @@
         }
         return check_val;
     }
+    function returnNu() {
+        var cusorder =$(" #cusorder ").val()
+        var number =$(" #number ").val()
+        var returnNO =$(" #returnNO ").val()
+        var num =$(" #num ").val()
+        var odid =$(" #odid ").val()
+        if(number>num){
+        	alert('退货数量不能大于总数量');
+        	return;
+        }
+		  $.post("/cbtconsole/Look/AddOrderByOdid", {
+				number:number,cusorder:cusorder,returnNO:returnNO,odid:odid,num:num
+			}, function(res) {
+				if(res.rows == 0){
+					alert('修改成功');
+				}else if(res.rows == 1){
+					alert('该订单已发起退货');
+				}
+			else if(res.rows == 2){
+				alert('请填写数据');
+				return;
+			}
+			else if(res.rows == 3){
+				alert('该商品还未采购可直接取消采购');
+				return;
+			}else if(res.rows == 4){
+				alert('退货数量不可大于总数');
+				return;
+			}
+				$('#user_remark').window('close');
+			
+});
+}
 </script>
 
 <body onload="FnLoading();" id="bodyid" style="background-color: #F0FFFF;">
+ <div id="user_remark" class="easyui-window" title="退货申请"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:auto;display: none;font-size: 16px;">
+            <div id="sediv" style="margin-left:20px;">
+             <div>客户订单号：<input id="cusorder" value='' ></div>
+            <div>购物车Id：&nbsp;&nbsp;&nbsp;<input id="odid" value='' ></div>  
+              <div>总数量：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="num" value='' ></div>
+            <div>退货数量：&nbsp;&nbsp;&nbsp;<input id="number" value='' ></div>
+             <div>退货理由：&nbsp;&nbsp;&nbsp;<input id="returnNO" value='' ></div>      
+            </div>
+            <div style="margin:20px 0 20px 40px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton"
+                   onclick="returnNu()" style="width:80px" >提交申请</a>
+            </div>
+    </div>
 <div align="center">
 
 </div>

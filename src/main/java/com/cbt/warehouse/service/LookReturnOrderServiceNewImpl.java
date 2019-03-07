@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.tools.ant.taskdefs.condition.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -229,6 +230,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 							listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
 							listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
 						}
+						System.out.println(listItem.size());
 					}else {
 						listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
 						listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
@@ -237,27 +239,36 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				json.setRows(listItem);
 				return json;
 			}else if(mid==1) {
-				listItem=this.lookReturnOrderServiceNewMapper.getAllItem(listOr.get(0).getA1688Order());
-				for (int j = 0; j < listItem.size(); j++) {
-					returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(listItem.get(j).getTbId());
-					if (itnum !=null) {
-						int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
-						if (itemNum<=0) {
-							listItem.remove(j);
-							j--;
-							}else {
-								listItem.get(j).setItemNumber(itemNum);	
-								listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
-								listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
-							}			
-				}else {
-					listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
-					listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+				for (int g = 0; g < listOr.size(); g++) {
+					listItem=this.lookReturnOrderServiceNewMapper.getAllItem(listOr.get(g).getA1688Order());
+					for (int j = 0; j < listItem.size(); j++) {
+						returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(listItem.get(j).getTbId());
+						if (itnum !=null) {
+							int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
+							if (itemNum<=0) {
+								listItem.remove(j);
+								j--;
+								}else {
+									listItem.get(j).setItemNumber(itemNum);	
+									listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+									listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+								}			
+					}else {
+						listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+						listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+					}
+					}
+					if (listItem.size()==0) {
+						listOr.remove(g);
+						g--;
+						
+					}else {
+						break;
+					}
 				}
-				}
-				if (listItem.size()==0) {
+				if (listOr.size()==0) {
 					json.setRows(5);
-					return json;
+					return json;	
 				}
 				json.setRows(listItem);
 				return json;
@@ -284,7 +295,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		List<returndisplay> list=this.lookReturnOrderServiceNewMapper.getAllItem(re.get(0).getA1688Order());
 		for (int i = 0; i < list.size(); i++) {
 			returndisplay ls=this.lookReturnOrderServiceNewMapper.Finditnum(list.get(i).getTbId());
-			if (ls !=null) {
+			if (ls !=null && ls.getItemNumber()-ls.getReturnNumber()<=0) {
 				list.remove(i);
 				i--;
 			}
