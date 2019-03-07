@@ -46,6 +46,7 @@
         <result column="from_flag" property="fromFlag"/>
         <result column="final_weight" property="finalWeight"/>
         <result column="max_price" property="maxPrice"/>
+        <result column="weight" property="weight1688"/>
     </resultMap>
 
 
@@ -117,6 +118,7 @@
         <result column="country" property="country"/>
         <result column="size_info_en" property="sizeInfoEn"/>
         <result column="from_flag" property="fromFlag"/>
+        <result column="weight" property="weight1688"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -367,7 +369,7 @@
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
         admin_name,
-        ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,
+        ifnull(adu.id,0) as admin_id,ifnull(cge.is_edited,0) as is_edited,cbu.is_sold_flag,cbu.weight,
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,
@@ -505,6 +507,9 @@
         </if>
         <if test="isSoldFlag > 0">
             and cbu.is_sold_flag &gt; 0
+        </if>
+        <if test="isWeigthZero == 1">
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
         </if>
 
         <if test="isSort == 1">
@@ -654,6 +659,9 @@
         <if test="isSoldFlag > 0">
             and cbu.is_sold_flag &gt; 0
         </if>
+        <if test="isWeigthZero == 1">
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -783,6 +791,9 @@
         <if test="isSoldFlag > 0">
             and cbu.is_sold_flag &gt; 0
         </if>
+        <if test="isWeigthZero == 1">
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
+        </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
@@ -793,7 +804,7 @@
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
-        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,
+        cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
         ifnull(cbn.ocrcontent1,'') as ocrSizeInfo1,ifnull(cbn.ocrcontent2,'') as ocrSizeInfo2,ifnull(cbn.ocrcontent3,'') as ocrSizeInfo3,
         cbu.ali_price,cbu.matchSource,ifnull(cge.infringing_flag,0) as infringing_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
