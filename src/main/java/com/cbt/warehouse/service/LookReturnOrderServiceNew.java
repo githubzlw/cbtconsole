@@ -37,7 +37,7 @@ public interface LookReturnOrderServiceNew {
 	orderJson getAllOrderByitem(String cusOrder, String orid);
 
 	EasyUiJsonResult AddOrderByOdid(int number, String odid, String cusorder,
-			String returnNO, String admName, int num);
+			String returnNO, String admName, int num,String goodsid);
 
 	EasyUiJsonResult FindOdid(String cusorder);
 

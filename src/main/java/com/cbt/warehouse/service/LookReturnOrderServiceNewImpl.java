@@ -386,26 +386,37 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 
 	@Override
 	public EasyUiJsonResult AddOrderByOdid(int number, String odid,
-			String cusorder, String returnNO, String admName, int num) {
+			String cusorder, String returnNO, String admName, int num,String goodsid) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		returndisplay re=new returndisplay();
 		int orid=Integer.parseInt(odid);
-		re=this.lookReturnOrderServiceNewMapper.FindReturndisplayByOrid(orid);
-		if (re==null) {
-			re=this.lookReturnOrderServiceNewMapper.FindOrderdetailsByOrid(orid);
-		}else {
-			returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(re.getTbId());
+		returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(odid);
+		if (itnum !=null) {
 			int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
-			if (itemNum <=0) {
+			if (itemNum ==0) {
+				json.setRows(1);
+				return json;
+			}
+			if (itemNum<0) {
 				json.setRows(4);
 				return json;
 			}
+		}
+		
+		re=this.lookReturnOrderServiceNewMapper.FindReturndisplayByOrid(orid);
+		
+		if (re==null) {
+			re=this.lookReturnOrderServiceNewMapper.FindOrderdetailsByOrid(orid);
 		}
 		
 		if (re==null) {
 		json.setRows("3");
 		return json;
 		}
+		if (re.getTbId()==null) {
+			re.setTbId(odid);
+		}
+		
 		re.setCustomerorder(cusorder);
 		re.setApplyUser(admName);
 		Date currentTime = new Date();

@@ -128,6 +128,7 @@ public class ReturnsManagement {
 			json.setRows(2);
 			return json;
 		}
+		String goodsid=request.getParameter("goodsid");
 		String cusorder=request.getParameter("cusorder");
 		String odid=request.getParameter("odid");
 		int num=Integer.parseInt(request.getParameter("num"));
@@ -136,7 +137,7 @@ public class ReturnsManagement {
 			json.setRows(2);
 			return json;
 		}
-		json=this.lookReturnOrderServiceNew.AddOrderByOdid(number,odid,cusorder,returnNO,adm.getAdmName(),num);
+		json=this.lookReturnOrderServiceNew.AddOrderByOdid(number,odid,cusorder,returnNO,adm.getAdmName(),num,goodsid);
 		 return json;
 	}
 	@RequestMapping(value = "/LookOrder")
