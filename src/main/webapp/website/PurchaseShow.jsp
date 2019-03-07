@@ -2285,6 +2285,15 @@
         }
         return check_val;
     }
+    //发起退货
+    function returnNum(odid,cusorder,num) {
+    	document.getElementById('cusorder').value=cusorder;
+    	document.getElementById('num').value=num;
+    	document.getElementById('odid').value=odid;
+    	     $('#user_remark').window('open');
+    	        
+    	   
+    }
     function returnNu() {
         var cusorder =$(" #cusorder ").val()
         var number =$(" #number ").val()
@@ -3167,6 +3176,7 @@
 							</div>
 							<div class="w-margin-top">
 								<input type="button" value="备注或回复" onclick="doReplay1('${pb.orderNo}','${pb.goodsid}','${pb.od_id}');" class="repalyBtn" />
+								<input type="button" id="${pb.od_id}" stype="display:none" value="发起退货" onclick="returnNum('${pb.od_id}','${pb.orderNo}','${pb.googs_number}');" class="repalyBtn" />
 							</div>
 						</td>
 					</tr>
