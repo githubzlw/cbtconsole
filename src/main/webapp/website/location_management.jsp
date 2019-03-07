@@ -204,7 +204,8 @@ function getItem() {
         data: {cusOrder:cusOrder,tbOrder:tbOrder,mid:0},
         dataType:"json",
         success: function(msg){
-            if(msg != undefined){
+        	
+            if(msg.rows[0] != undefined){
                 var temHtml = '';
                 document.getElementById("tabl").innerHTML='';
                 $("#tabl").append("<tr ><td style='width:20px'>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
@@ -213,6 +214,9 @@ function getItem() {
                  	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' style='width:20px' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
                      
                 });
+            }else{
+            	alert("订单已全部退货")
+            	$('#user_remark').window('close');	
             }
         }
     });
@@ -231,7 +235,7 @@ function returnOr(uid) {
         	var opts = $("#easyui-datagrid").datagrid("options");
         	opts.url = "/cbtconsole/Look/LookReturnOrder?mid=1";
         	
-            if(msg != undefined){
+            if(msg.rows[0] != undefined){
                 var temHtml = '';
                 document.getElementById("select_id").innerHTML='';
                 $("#cuso").html("");
@@ -248,10 +252,14 @@ function returnOr(uid) {
                 $('#user_remark .remark_list').html(temHtml);
                 $(msg.rows1).each(function (index, item) {
            		
-           		 $("#select_id").append("<option id='' value='"+item.a1688Order+"'>"+item.a1688Order+"</option>");  
+           		 $("#select_id").append("<option id='' value='"+item.a1688Order+"'>"+item.a1688Order+"</option>");
+           		 $('#user_remark').window('open');
            	 })
+            }else{
+            	alert("订单已全部退货")
+            	$('#user_remark').window('close');	
             }
-            $('#user_remark').window('open');
+           
         }
     });
 }
@@ -321,7 +329,7 @@ function checkboxOnclick(checkbox){
                 <input class="but_color" type="button" value="整单提交" onclick="AddOll()">
                 <input type='radio' size='5' name='radioname' value='客户退单' id='c' />客户退单
                 <input type='radio' size='5' name='radioname' value='质量问题' id='c' />质量问题
-                <input type='radio' size='5' name='radioname' value='客户要求' id='c' />客户退单
+                <input type='radio' size='5' name='radioname' value='客户要求' id='c' />客户要求
             </div>
     </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
@@ -410,7 +418,7 @@ function addUserRemark() {
 			}else if(res.rows==5){
 				alert('该商品已全部退货');
 			}
-						
+			getItem();			
 });            
 }
 
