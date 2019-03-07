@@ -580,9 +580,9 @@ public interface CustomGoodsService {
      */
     int editAndLockProfit(String pid, int type, double editProfit);
 
-    JsonResult setGoodsWeightByWeigher(String pid, String newWeight);
+    JsonResult setGoodsWeightByWeigher(String pid, String newWeight, int weightIsEdit);
 
-    JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight);
+    JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit);
 
     List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm);
 
@@ -590,7 +590,7 @@ public interface CustomGoodsService {
 
     List<CategoryBean> queryCategoryList(OnlineGoodsCheck queryPm);
 
-    boolean refreshPriceRelatedData(CustomGoodsPublish bean);
+    boolean refreshPriceRelatedData(CustomGoodsPublish bean, String newWeight);
 
     /**
      * 更新28促销flag

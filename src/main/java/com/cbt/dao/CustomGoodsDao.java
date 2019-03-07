@@ -560,7 +560,7 @@ public interface CustomGoodsDao {
 
     int updateSkuGoodsOffers(String pid, double finalWeight);
 
-    int updateSourceProFlag(String pid);
+    int updateSourceProFlag(String pid, String finalWeight);
 
     int insertIntoSingleOffersChild(String pid, double finalWeight);
 
