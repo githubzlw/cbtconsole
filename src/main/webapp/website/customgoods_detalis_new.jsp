@@ -1908,6 +1908,9 @@
         </div>
         <div class="s_r">
             <div class="table_su">
+                <c:if test="${goods.goodsState == 5}">
+					<b style="color: red;font-size: 26px;">产品待发布</b><br>
+				</c:if>
                 <c:if
 					test="${goods.fromFlag > 0}">
 					<br>
