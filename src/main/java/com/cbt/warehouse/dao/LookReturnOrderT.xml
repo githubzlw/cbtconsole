@@ -47,8 +47,8 @@ th.orderdate as placeDate,
 th.seller as sellerpeo,
 th.itemqty
 FROM
-return_display as rd ,
-taobao_1688_order_history as th where rd.tb_id=th.id 
+return_display as rd LEFT JOIN
+taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1 
 		
      <if test="nameString != null">
 			 AND rd.opt_user=#{nameString} 
