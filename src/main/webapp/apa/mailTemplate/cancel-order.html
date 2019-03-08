@@ -74,7 +74,7 @@
   .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
   .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
   .footer-wrap{width: 100%;margin: 0 auto;clear: both !important;background-color: #e5e5e5;border-top: 1px solid #b3b3b3;font-size: 12px;color: #656565;line-height: 30px;}
-  .thanks_so{ margin-bottom: 5px; }
+  .thanks_so{ margin-bottom: 5px; text-align:left; }
   .please_note{ width: 96%; padding: 1%; border: 1px solid #dfdfdf; background-color: #f6f6f6; text-align:left; color: #555;box-sizing:border-box;}
   .please_note h3{ font-size: 14px; font-weight:bold; margin-bottom: 5px;}
   .please_note p{ color: #666; font-size: 13px; margin-bottom:0;}
@@ -209,7 +209,8 @@
                                 <p>Your order <span th:text="${orderNo}"></span> fails to be approved and it has been cancelled.</p>
                                 <p>The order amount has been returned to your balance. </p>
                                 <p>You can continue to shop with the balance or withdraw it to your PAYPAL account.</p>
-                                <p>And you can search this order in <a href="www.import-express.com/orderInfo/getOrders?state=-1">Order History</a> in individual center</p>
+                                <p>And you can search this order in <a  href="https://www.import-express.com/orderInfo/getOrders?state=-1"
+                                        target="_blank" style="color:#01a4ef;">Order History</a> in individual center</p>
                               </div>
                               <!--<p class="cancel_p">Due to the supply reasons, please go to your order in <a href="https://www.import-express.com/user/toEmailPage?uid=9268f083-23ee-4b2b-8c51-b88694f75894&url=%2FprocessesServlet%3Faction%3DemailLink%26className%3DOrderInfo%26orderNo%3DQA18474027512271" th:href="${accountLink}">your account</a> to check your item status by click 【Need Your Action】 and we will continue purchase for you after your confirmation, or go to your order to 【Cancel Item】and refund will be done automatically.</p>-->
                             </td>
@@ -220,9 +221,9 @@
                           <tr>
                             <td class="body-signature-cell">                              
                               <p class="thanks_so">Thanks so much,</p>
-                              <p>ImportExpress</p>
+                              <p class="thanks_so">ImportExpress</p>
                               <div class="please_note">
-                                <h3>PLEASE NOTE:</h3>
+                                <h3 style="font-size: 14px; font-weight:bold; margin-bottom: 5px;">PLEASE NOTE:</h3>
                                 <p>This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any question or concern
                                   , access your account <a href="https://www.import-express.com/user/loginNew" th:href="${accountLink}">here</a>.</p>
                               </div>

@@ -57,4 +57,12 @@ public interface PaymentMapper {
      * @return
      */
     List<Map<String,Object>> listStripeByTransactionId(@Param("list")List<String> paypalids);
+
+    /**
+     * 查询是否PayPal或者stripe支付
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    int checkIsPayPalOrStripePay(@Param("userId") int userId,@Param("orderNo") String orderNo);
 }

@@ -34,4 +34,9 @@ public class PaymentServiceNewImpl implements PaymentServiceNew {
     public List<PaymentDetails> queryPaymentDetails(String orderNo) {
         return paymentMapper.queryPaymentDetails(orderNo);
     }
+
+    @Override
+    public int checkIsPayPalOrStripePay(int userId, String orderNo) {
+        return paymentMapper.checkIsPayPalOrStripePay(userId, orderNo);
+    }
 }
