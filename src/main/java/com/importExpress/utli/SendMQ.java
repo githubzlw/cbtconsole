@@ -42,6 +42,10 @@ public class SendMQ {
     private Channel channel;
 
     static{
+        System.err.println("host:" + SysParamUtil.getParam("rabbitmq.host"));
+        System.err.println("port:" + SysParamUtil.getParam("rabbitmq.port"));
+        System.err.println("username:" + SysParamUtil.getParam("rabbitmq.username"));
+        System.err.println("password:" + SysParamUtil.getParam("rabbitmq.password"));
         config.put("host",SysParamUtil.getParam("rabbitmq.host"));
         config.put("port",SysParamUtil.getParam("rabbitmq.port"));
         config.put("username",SysParamUtil.getParam("rabbitmq.username"));

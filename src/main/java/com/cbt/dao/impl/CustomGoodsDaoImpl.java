@@ -9,13 +9,12 @@ import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.GoodsEditBean;
+import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.pojo.SkuValPO;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.UpdateTblModel;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -3866,7 +3865,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         Connection conn31 = DBHelper.getInstance().getConnection6();
         PreparedStatement stmt31 = null;
         String updateSql = "replace into single_goods_offers_child(good_url,goods_pid,set_weight,change_mark," +
-                "crawl_flag,service_ip) values(?,?,?,1,0,'')";
+                "crawl_flag,service_ip,create_time) values(?,?,?,1,0,'',now())";
         int count = -1;
         try {
             stmt31 = conn31.prepareStatement(updateSql);
@@ -4121,5 +4120,56 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return count;
     }
 
+
+    @Override
+    public int checkShopGoodsImgIsMarkByParam(ShopMd5Bean shopMd5Bean) {
+        Connection conn28 = DBHelper.getInstance().getConnection5();
+        PreparedStatement stmt28 = null;
+        ResultSet rs = null;
+        String querySql = "select count(0) from shop_goods_img_delete where shop_id = ? and SUBSTRING_INDEX(img, '/', -1) = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(querySql);
+            stmt28.setString(1, shopMd5Bean.getShopId());
+            stmt28.setString(2, shopMd5Bean.getMd5Img());
+            rs = stmt28.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("shopId:" + shopMd5Bean.getShopId() + ",checkShopGoodsImgIsMarkByParam error :" + e.getMessage());
+            LOG.error("shopId:" + shopMd5Bean.getShopId() + ",checkShopGoodsImgIsMarkByParam error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closeResultSet(rs);
+        }
+        return count;
+    }
+
+    @Override
+    public int setNewAliPidInfo(String pid, String aliPid, String aliPrice) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "update custom_benchmark_ready_newest set ali_pid = ?, ali_price = ? where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, aliPid);
+            stmt28.setString(2, aliPrice);
+            stmt28.setString(3, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",setNewAliPidInfo error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",setNewAliPidInfo error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
 
 }

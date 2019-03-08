@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片MD5不同店铺展示</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #no_same_md5_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #no_same_md5_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-row{
+            height: 26px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        .combobox-item{
+            font-size: 14px !important;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+        });
+
+        function setDatagrid() {
+            $('#no_same_md5_easyui-datagrid').datagrid({
+                title: '图片MD5不同店铺展示',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#no_same_md5_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/cutom/queryMd5NoSameList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+
+        function doQuery() {
+            var md5Val = $("#query_goods_md5").val();
+            $("#no_same_md5_easyui-datagrid").datagrid("load", {
+                "md5Val": md5Val
+            });
+        }
+
+        function doResetForm() {
+            $("#no_same_md5_query_form")[0].reset();
+        }
+
+        function formatImg(val, row, index) {
+            return '<img style="max-height: 180px;max-width: 180px;" src="'+val+'"/>';
+        }
+
+        function formatDelete(val, row, index) {
+            if(val == 0){
+                return '未删除';
+            }else{
+                return '已删除';
+            }
+        }
+
+        function formatMark(val, row, index) {
+            if(val == 0){
+                return '未标记';
+            }else{
+                return '已标记';
+            }
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<a target="_blank" href="/cbtconsole/cutom/queryShopGoodsByMd5?md5Val='
+                + row.md5Val + '">查看详情</a>';
+            return content;
+        }
+
+
+    </script>
+</head>
+<body>
+
+<div id="no_same_md5_toolbar" style="padding: 5px; height: auto">
+    <form id="no_same_md5_query_form" action="#" onsubmit="return false;">
+        <span>MD5:<input id="query_goods_md5" type="text" value="" style="width: 220px;height: 22px;"/></span>
+        <!--<span>是否删除:<select id="query_is_delete">
+            <option value="-1">全部</option>
+            <option value="0">未删除</option>
+            <option value="1">已删除</option>
+        </select></span>-->
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+        <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
+    </form>
+</div>
+
+<table id="no_same_md5_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <!--<th data-options="field:'shopId',align:'center',width:'220px'">店铺ID</th>-->
+        <th data-options="field:'imgShow',align:'center',width:'120px',formatter:formatImg">图片</th>
+        <th data-options="field:'md5Val',align:'center',width:'160px'">MD5</th>
+        <th data-options="field:'md5Num',align:'center',width:'120px'">图片数量</th>
+        <!--<th data-options="field:'isDelete',align:'center',width:'80px',formatter:formatDelete">是否删除</th>-->
+        <th data-options="field:'isMark',align:'center',width:'80px',formatter:formatMark">是否标记</th>
+        <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,5 +1,8 @@
 package com.importExpress.pojo;
 
+import com.cbt.util.GoodsInfoUtils;
+import org.apache.commons.lang3.StringUtils;
+
 public class GoodsMd5Bean {
     private Integer id;
     private String pid;
@@ -7,6 +10,9 @@ public class GoodsMd5Bean {
     private String goodsMd5;
     private String localPath;
     private String remotePath;
+    private String imgShow;
+    private int valid;
+    private int isMark;
 
     public Integer getId() {
         return id;
@@ -54,6 +60,33 @@ public class GoodsMd5Bean {
 
     public void setRemotePath(String remotePath) {
         this.remotePath = remotePath;
+        if(StringUtils.isNotBlank(remotePath)){
+            this.imgShow = GoodsInfoUtils.changeLocalPathToRemotePath(remotePath);
+        }
+    }
+
+    public String getImgShow() {
+        return imgShow;
+    }
+
+    public void setImgShow(String imgShow) {
+        this.imgShow = imgShow;
+    }
+
+    public int getValid() {
+        return valid;
+    }
+
+    public void setValid(int valid) {
+        this.valid = valid;
+    }
+
+    public int getIsMark() {
+        return isMark;
+    }
+
+    public void setIsMark(int isMark) {
+        this.isMark = isMark;
     }
 
     @Override
