@@ -49,7 +49,7 @@
             closeSizeInfoEnDialog();
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
-            // closeNewAliPidDlg('close');
+            closeNewAliPidDlg('close');
         });
 
         function relieveDisabled(obj) {

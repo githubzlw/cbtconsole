@@ -1146,4 +1146,9 @@
         where pid = #{pid}
     </update>
 
+    <select id="queryPidListByState" resultType="java.lang.String">
+        select pid from custom_benchmark_ready
+        where goodsstate = #{state}
+    </select>
+
 </mapper>

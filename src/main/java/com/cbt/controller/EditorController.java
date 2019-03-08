@@ -3010,6 +3010,34 @@ public class EditorController {
     }
 
 
+    @RequestMapping(value = "/publicToOnline")
+    @ResponseBody
+    public JsonResult publicToOnline(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        try {
+            List<String> pidList = customGoodsService.queryPidListByState(5);
+            json.setOk(true);
+            json.setMessage("执行成功");
+
+            for(String pid : pidList){
+                PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
+                pbThread.start();
+                try{
+                    Thread.sleep(20000);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            pidList.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("publicToOnline 执行错误：" + e.getMessage());
+            LOG.error("publicToOnline 执行错误：" + e.getMessage());
+        }
+        return json;
+    }
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
