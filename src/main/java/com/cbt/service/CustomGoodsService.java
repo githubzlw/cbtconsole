@@ -706,4 +706,10 @@ public interface CustomGoodsService {
      */
 	int setNewAliPidInfo(String pid, String aliPid, String aliPrice);
 
+	/**
+     * 根据状态获取PID数据
+     * @param state
+     * @return
+     */
+    List<String> queryPidListByState(int state);
 }
