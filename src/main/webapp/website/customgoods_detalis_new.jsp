@@ -1852,6 +1852,9 @@
                                 <p class="ul_size">
                                     <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>
                                     <input type="button" value="修改重量" class="s_btn" onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
+                                    <c:if test="${goods.isWeigthZero > 0}">
+                                        <b style="color: red;font-size: 18px;">*抓取1688重量为空</b>
+                                    </c:if>
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -1908,6 +1911,9 @@
         </div>
         <div class="s_r">
             <div class="table_su">
+                <c:if test="${goods.goodsState == 5}">
+					<b style="color: red;font-size: 26px;">产品待发布</b><br>
+				</c:if>
                 <c:if
 					test="${goods.fromFlag > 0}">
 					<br>

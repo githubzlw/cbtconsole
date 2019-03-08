@@ -63,6 +63,15 @@ public class CustomGoodsQuery {
 	private double minPrice;
 	private double maxPrice;
 	private int isSoldFlag = -1; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
+	private int isWeigthZero;
+
+	public int getIsWeigthZero() {
+		return isWeigthZero;
+	}
+
+	public void setIsWeigthZero(int isWeigthZero) {
+		this.isWeigthZero = isWeigthZero;
+	}
 
 	public int getIsSoldFlag() {
 		return isSoldFlag;

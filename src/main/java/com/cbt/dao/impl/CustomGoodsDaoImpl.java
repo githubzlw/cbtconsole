@@ -3840,14 +3840,15 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     }
 
     @Override
-    public int updateSourceProFlag(String pid) {
+    public int updateSourceProFlag(String pid, String finalWeight) {
         Connection conn28 = DBHelper.getInstance().getConnection8();
         PreparedStatement stmt28 = null;
-        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7 where pid = ?";
+        String querySql = "update custom_benchmark_ready_newest set source_pro_flag = 7,final_weight = ? where pid = ?";
         int count = -1;
         try {
             stmt28 = conn28.prepareStatement(querySql);
-            stmt28.setString(1, pid);
+            stmt28.setString(1, finalWeight);
+            stmt28.setString(2, pid);
             count = stmt28.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

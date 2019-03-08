@@ -101,7 +101,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
         @Override
         public void run() {
             try {
-                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight); //jxw同步重量到产品库接口
+                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight, 2); //jxw同步重量到产品库接口
                 warehouseMapper.updateGoodsWeightFlag(pid);
             } catch (Exception e) {
                 LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);
