@@ -183,6 +183,27 @@
         <result column="goods_md5" property="goodsMd5"/>
     </resultMap>
 
+    <resultMap id="shopMd5BeanResultMap" type="com.importExpress.pojo.ShopMd5Bean">
+        <result column="shop_id" property="shopId"/>
+        <result column="pid" property="pid"/>
+        <result column="shop_name" property="shopName"/>
+        <result column="goods_md5" property="md5Val"/>
+        <result column="remote_path" property="md5Img"/>
+        <result column="md5_num" property="md5Num"/>
+        <result column="is_delete" property="isDelete"/>
+    </resultMap>
+
+
+    <resultMap id="goodsMd5DeatilsResultMap" type="com.importExpress.pojo.GoodsMd5Bean">
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="valid" property="valid"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="goods_md5" property="goodsMd5"/>
+        <result column="remote_path" property="remotePath"/>
+        <result column="local_path" property="localPath"/>
+    </resultMap>
+
     <insert id="insertPidIsEdited">
         insert into custom_goods_edit(pid,shop_id,admin_id)
         values(#{pid},#{shopId},#{adminId})
@@ -1053,6 +1074,76 @@
                   and remote_path = #{url} and ifnull(goods_md5,'') != '' and shop_id = #{shopId}) b
         set a.is_delete = 1
         where a.goods_md5 = b.goods_md5 and a.shop_id = #{shopId}
+    </update>
+
+    <select id="queryForMd5List" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select * from (
+        select shop_id,pid,goods_md5,count(goods_md5) as md5_num,remote_path,is_delete from custom_goods_md5
+        where 1=1 and is_delete = 0
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+        GROUP BY shop_id,goods_md5 HAVING count(goods_md5) > 1) a
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryForMd5ListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select count(0) from (
+        select shop_id,goods_md5,count(goods_md5) as md5_num from custom_goods_md5
+        where 1=1 and is_delete = 0
+        <if test="shopId != null">
+            and shop_id = #{shopId}
+        </if>
+        GROUP BY shop_id,goods_md5 HAVING count(goods_md5) > 1) a
+    </select>
+
+
+    <update id="updateImgDeleteByMd5">
+        update custom_goods_md5
+        set is_delete = 1
+        where goods_md5 = #{goodsMd5} and shop_id = #{shopId}
+    </update>
+
+    <select id="queryMd5NoSameList" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
+        from (
+            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
+            where 1=1 and is_delete = 0
+            <if test="md5Val != null">
+                and goods_md5 = #{md5Val}
+            </if>
+            group by shop_id,goods_md5
+        ) a group by a.goods_md5 HAVING count(goods_md5) > 1
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+    </select>
+
+    <select id="queryMd5NoSameListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
+        select count(0) from (select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
+        from (
+            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
+            where 1=1 and is_delete = 0
+            <if test="md5Val != null">
+                and goods_md5 = #{md5Val}
+            </if>
+            group by shop_id,goods_md5
+        ) a group by a.goods_md5 HAVING count(goods_md5) > 1) b
+    </select>
+
+    <select id="queryShopGoodsByMd5" resultMap="goodsMd5DeatilsResultMap">
+        select a.id,a.pid,a.shop_id,a.goods_md5,a.local_path,a.remote_path,b.valid
+        from custom_goods_md5 a,custom_benchmark_ready b
+        where 1=1 and a.goods_md5 = #{md5Val} and a.pid = b.pid and a.is_delete = 0
+        order by a.goods_md5
+    </select>
+
+    <update id="setNewAliPidInfo">
+        update custom_benchmark_ready
+        set ali_pid = #{aliPid},ali_price = #{aliPrice}
+        where pid = #{pid}
     </update>
 
 </mapper>

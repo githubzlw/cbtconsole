@@ -577,5 +577,47 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url, shopId);
     }
 
+    @Override
+    public List<ShopMd5Bean> queryForMd5List(ShopMd5Bean shopMd5Bean) {
+        return customGoodsMapper.queryForMd5List(shopMd5Bean);
+    }
+
+    @Override
+    public int queryForMd5ListCount(ShopMd5Bean shopMd5Bean) {
+        return customGoodsMapper.queryForMd5ListCount(shopMd5Bean);
+    }
+
+    @Override
+    public List<GoodsMd5Bean> queryShopGoodsByMd5(String md5Val) {
+        return customGoodsMapper.queryShopGoodsByMd5(md5Val);
+    }
+
+    @Override
+    public int checkShopGoodsImgIsMarkByParam(ShopMd5Bean shopMd5Bean) {
+        return customGoodsDao.checkShopGoodsImgIsMarkByParam(shopMd5Bean);
+    }
+
+    @Override
+    public int updateImgDeleteByMd5(String goodsMd5, String shopId) {
+        return customGoodsMapper.updateImgDeleteByMd5(goodsMd5, shopId);
+    }
+
+    @Override
+    public List<ShopMd5Bean> queryMd5NoSameList(ShopMd5Bean shopMd5Bean) {
+        return customGoodsMapper.queryMd5NoSameList(shopMd5Bean);
+    }
+
+    @Override
+    public int queryMd5NoSameListCount(ShopMd5Bean shopMd5Bean) {
+        return customGoodsMapper.queryMd5NoSameListCount(shopMd5Bean);
+    }
+
+    @Override
+    public int setNewAliPidInfo(String pid, String aliPid, String aliPrice) {
+        customGoodsDao.setNewAliPidInfo(pid, aliPid, aliPrice);
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        customGoodsDao.insertIntoSingleOffersChild(pid, Double.valueOf(orGoods.getFinalWeight()));
+        return customGoodsMapper.setNewAliPidInfo(pid, aliPid, aliPrice);
+    }
 
 }
