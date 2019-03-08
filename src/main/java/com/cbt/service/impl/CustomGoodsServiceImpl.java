@@ -2,10 +2,8 @@ package com.cbt.service.impl;
 
 import com.cbt.bean.*;
 import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.controller.EditorController;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
-import com.cbt.parse.service.DownloadMain;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -14,7 +12,6 @@ import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -450,13 +447,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public JsonResult setGoodsWeightByWeigher(String pid, String newWeight) {
+    public JsonResult setGoodsWeightByWeigher(String pid, String newWeight, int weightIsEdit) {
         JsonResult json = new JsonResult();
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
-        boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), 2) > 0;
+        boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), weightIsEdit) > 0;
         if (is) {
-            // 重新刷新价格数据
+            /*// 重新刷新价格数据
             String url = EditorController.SHOPGOODSWEIGHTCLEARURL + "pid=" + pid + "&finalWeight=" + newWeight
                     + "&sourceTable=custom_benchmark_ready&database=27";
             String resultJson = DownloadMain.getContentClient(url, null);
@@ -471,7 +468,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             } else {
                 json.setOk(true);
                 json.setMessage("执行成功");
-            }
+            }*/
+
+            json.setOk(true);
+            json.setMessage("执行成功");
         } else {
             json.setOk(false);
             json.setMessage("执行错误，请重试");
@@ -480,15 +480,23 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight) {
-        JsonResult json = setGoodsWeightByWeigher(pid, newWeight);
-        if (json.isOk()) {
-            CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
-            boolean isSuccess = refreshPriceRelatedData(orGoods);
-            if (!isSuccess) {
+    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit) {
+        JsonResult json = new JsonResult();
+        // 获取商品信息
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), weightIsEdit) > 0;
+        if (is) {
+            boolean isSuccess = refreshPriceRelatedData(orGoods,newWeight);
+            if (isSuccess) {
+                json.setOk(true);
+                json.setMessage("更新数据成功");
+            } else {
                 json.setOk(false);
                 json.setMessage("更新数据失败");
             }
+        } else {
+            json.setOk(false);
+            json.setMessage("更新数据失败");
         }
         return json;
     }
@@ -509,16 +517,16 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public boolean refreshPriceRelatedData(CustomGoodsPublish bean) {
+    public boolean refreshPriceRelatedData(CustomGoodsPublish bean, String newWeight) {
         //更新28库的custom_benchmark_ready_newest [source_pro_flag]=7
-        int count = customGoodsDao.updateSourceProFlag(bean.getPid());
+        int count = customGoodsDao.updateSourceProFlag(bean.getPid(), newWeight);
         if (count > -1) {
             //更新SkuGoodsOffers和SingleOffersChild信息
             count = customGoodsDao.checkSkuGoodsOffers(bean.getPid());
             if (count > 0) {
-                count = customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+                count = customGoodsDao.updateSkuGoodsOffers(bean.getPid(), Double.valueOf(newWeight));
             } else {
-                count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
+                count = customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(newWeight));
             }
             /*if(count > -1){
                 //插入sku信息

@@ -2599,7 +2599,7 @@ public class EditorController {
         }
 
         try {
-            boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
+            //boolean is = customGoodsService.updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(weight), 1) > 0;
             /*if (is) {
                 // 重新刷新价格数据
                 String ip = request.getRemoteAddr();
@@ -2625,7 +2625,7 @@ public class EditorController {
                 json.setMessage("执行错误，请重试");
             }*/
             // 修改重量非直接显示价格数据更新
-            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight);
+            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,1);
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
@@ -2652,7 +2652,7 @@ public class EditorController {
             json.setMessage("获取商品重量失败");
             return json;
         }
-        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight);
+        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,2);
     }
 
 

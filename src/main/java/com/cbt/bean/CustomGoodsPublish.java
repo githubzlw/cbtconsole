@@ -109,6 +109,28 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String maxPrice;// 最高价格
     private int isSoldFlag; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
+    private String weight1688; // 1688重量
+    private int isWeigthZero;// 1688重量为空标识  1是空的 0不是
+
+    public int getIsWeigthZero() {
+        return isWeigthZero;
+    }
+
+    public void setIsWeigthZero(int isWeigthZero) {
+        this.isWeigthZero = isWeigthZero;
+    }
+
+
+    public String getWeight1688() {
+        return weight1688;
+    }
+
+    public void setWeight1688(String weight1688) {
+        this.weight1688 = weight1688;
+        if(StringUtils.isBlank(weight1688) || "0".equals(weight1688)){
+            isWeigthZero = 1;
+        }
+    }
 
     public String getMaxPrice() {
         return maxPrice;

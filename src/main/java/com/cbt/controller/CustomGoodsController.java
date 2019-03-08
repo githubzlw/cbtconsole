@@ -357,6 +357,12 @@ public class CustomGoodsController {
 			queryBean.setIsSoldFlag(Integer.valueOf(isSoldFlag));
 		}
 
+		String isWeigthZero = request.getParameter("isWeigthZero");
+		if(StringUtils.isNotBlank(isWeigthZero)){
+			queryBean.setIsWeigthZero(Integer.valueOf(isWeigthZero));
+		}
+
+
 
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
 		goodsList.stream().forEach(c -> {
@@ -572,6 +578,11 @@ public class CustomGoodsController {
 		String isSoldFlag = request.getParameter("isSoldFlag");
 		if(StringUtils.isNotBlank(isSoldFlag)){
 			queryBean.setIsSoldFlag(Integer.valueOf(isSoldFlag));
+		}
+
+		String isWeigthZero = request.getParameter("isWeigthZero");
+		if(StringUtils.isNotBlank(isWeigthZero)){
+			queryBean.setIsWeigthZero(Integer.valueOf(isWeigthZero));
 		}
 
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);
