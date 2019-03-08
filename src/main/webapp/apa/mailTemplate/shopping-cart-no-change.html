@@ -75,8 +75,8 @@
     .order_first2{ margin: 0 auto 0;}
     .order_first ul{ width: 100%; margin: 0 auto; overflow: hidden;box-sizing:border-box;}
     .order_li{ float: left; width:225px;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
-        list-style:none; height: 338px; overflow:hidden;text-align: left;box-sizing:border-box;}
-    .order_img{ width:100%; cursor: pointer; }
+        list-style:none; height: 338px; overflow:hidden;text-align: center;box-sizing:border-box;}
+    .order_img{ max-width:213px; max-height: 213px; overflow: hidden; cursor: pointer; }
     .a6S{opacity: 0.01; left: 163px; top: 380.406px; position: absolute; font-weight: normal;}
     .order_title{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; margin: 0 auto; text-align:left;}
     .order_size{ text-align: left; width: 98%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -244,7 +244,7 @@
                           </div>
                           <ul class="clearfix">
 
-                            <li class="order_li" th:each="carInfo:${updateList}">
+                            <li class="order_li" th:each="carInfo:${sourceList}">
 
                               <img th:src="${carInfo.googsImg}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
                                <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
@@ -256,7 +256,8 @@
                               </div>
 
                                <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
-                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong> <span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span></p>
+                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong>
+                                <!--<span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span>--></p>
                              </li>
                            </ul>
                           <p class="order_rem_p">If there were any reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email, our team will absolutely try every effort to meet your satisfaction!</p>
@@ -273,6 +274,7 @@
                             <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
                             <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
+                            <span style="display:none;"><img th:src="${followCode}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>

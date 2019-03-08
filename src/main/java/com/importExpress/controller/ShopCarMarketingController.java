@@ -23,7 +23,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.*;
@@ -37,12 +36,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/shopCarMarketingCtr")
 public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
+
+    private static final String EMAIL_FOLLOW_URL = "https://www.import-express.com/followMe/index.do?fmc=";
+//    private static final String EMAIL_FOLLOW_URL = "http://127.0.0.1:8087/followMe/index.do?fmc=";
 
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
     @Autowired
@@ -187,6 +192,83 @@ public class ShopCarMarketingController {
             json.setMessage("用户未登录");
             return json;
         }
+
+        Map<String, String> paramMap = new HashMap<>();
+
+        /**
+         * 1. 【 不做变动 直接发送 】
+            2.【给单个产品价格改价】（现在使用的）
+            3.【操作运费】
+            4.【为客户选择最佳运输天数】
+         */
+        String type = request.getParameter("type");
+        if (StringUtils.isBlank(type)) {
+            json.setOk(false);
+            json.setMessage("获取发送类别失败");
+            return json;
+        }else{
+            paramMap.put("type",type);
+        }
+
+        if("4".equals(type)) {
+            String oldMethod = request.getParameter("oldMethod");
+            if (StringUtils.isBlank(oldMethod)) {
+                json.setOk(false);
+                json.setMessage("获取原始运输方式失败");
+                return json;
+            }
+            String oldTransport = request.getParameter("oldTransport");
+            if (StringUtils.isBlank(oldTransport)) {
+                json.setOk(false);
+                json.setMessage("获取原始运输天数失败");
+                return json;
+            }
+            String oldPrice = request.getParameter("oldPrice");
+            if (StringUtils.isBlank(oldPrice) || "0".equals(oldPrice)) {
+                json.setOk(false);
+                json.setMessage("获取原始运费价格失败");
+                return json;
+            }
+            String newMethod = request.getParameter("newMethod");
+            if (StringUtils.isBlank(newMethod)) {
+                json.setOk(false);
+                json.setMessage("获取新的运输方式失败");
+                return json;
+            }
+            String newTransport = request.getParameter("newTransport");
+            if (StringUtils.isBlank(newTransport)) {
+                json.setOk(false);
+                json.setMessage("获取新的运输天数失败");
+                return json;
+            }
+            String newPrice = request.getParameter("newPrice");
+            if (StringUtils.isBlank(newPrice) || "0".equals(newPrice)) {
+                json.setOk(false);
+                json.setMessage("获取新的运费价格失败");
+                return json;
+            }
+            String savePrice = request.getParameter("savePrice");
+            if (StringUtils.isBlank(savePrice) || "0".equals(savePrice)) {
+                json.setOk(false);
+                json.setMessage("获取运费节省金额失败");
+                return json;
+            }
+            paramMap.put("oldMethod",oldMethod);
+            paramMap.put("oldTransport",oldTransport);
+            paramMap.put("oldPrice",oldPrice);
+            paramMap.put("newMethod",newMethod);
+            paramMap.put("newTransport",newTransport);
+            paramMap.put("newPrice",newPrice);
+            paramMap.put("savePrice",savePrice);
+        }
+
+        String emailTitle = request.getParameter("emailTitle");
+        if (StringUtils.isBlank(emailTitle)) {
+            json.setOk(false);
+            json.setMessage("获取邮件标题失败");
+            return json;
+        }
+
         String userIdStr = request.getParameter("userId");
         if (StringUtils.isBlank(userIdStr)) {
             json.setOk(false);
@@ -229,6 +311,8 @@ public class ShopCarMarketingController {
         }*/
 
 
+
+
         String userName;
         String userEmail = request.getParameter("userEmail");
         if (StringUtils.isBlank(userEmail)) {
@@ -243,17 +327,15 @@ public class ShopCarMarketingController {
             }
         }
         try {
-
             int userId = Integer.valueOf(userIdStr);
-            String emailTitle = "You have made some wonderful selections";
 
-            //1.重新生成goods_carconfig数据，并进行保存
+            if ("1".equals(type) || "2".equals(type)) {
+                //1.重新生成goods_carconfig数据，并进行保存
 
-            //获取原来的重新生成goods_carconfig数据
-            GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+                //获取原来的重新生成goods_carconfig数据
+                GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
 
-            List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
-
+                List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
             List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
             List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
@@ -268,58 +350,53 @@ public class ShopCarMarketingController {
                         if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                             isUpdatePrice++;
                         }
-                        genActiveSimplBeanByShopCar(simplBean,shopCar);
-                        break;
                     }
                 }
-            }
 
-            //判断是否有改价的情况，有改价更新并清空购物车
-            if (isUpdatePrice > 0) {
-                boolean isSuccess = updateGoodsCarConfig(listActive, Integer.valueOf(userIdStr));
-                //更新成功后，发布邮件的时候全部更新线上
-                if (isSuccess) {
-                    //2.清空redis数据
-                    //使用MQ清空购物车数据
-                    //redis示例
-                    SendMQ sendMQ = new SendMQ();
-                    RedisModel redisModel = new RedisModel(new String[]{userIdStr});
-                    redisModel.setType("3");
-                    sendMQ.sendMsg(redisModel);
-                    sendMQ.closeConn();
-                } else {
-                    json.setOk(false);
-                    json.setMessage("更新失败,请重试");
-                    return json;
+                //判断是否有改价的情况，有改价更新并清空购物车
+                if (isUpdatePrice > 0) {
+                    boolean isSuccess = updateGoodsCarConfig(listActive, Integer.valueOf(userIdStr));
+                    //更新成功后，发布邮件的时候全部更新线上
+                    if (isSuccess) {
+                        //2.清空redis数据
+                        //使用MQ清空购物车数据
+                        //redis示例
+                        SendMQ sendMQ = new SendMQ();
+                        RedisModel redisModel = new RedisModel(new String[]{userIdStr});
+                        redisModel.setType("3");
+                        sendMQ.sendMsg(redisModel);
+                        sendMQ.closeConn();
+                    } else {
+                        json.setOk(false);
+                        json.setMessage("更新失败,请重试");
+                        return json;
+                    }
                 }
+                listActive.clear();
+                showList.clear();
+                activeList.clear();
             }
-            Map<String,String> paramMap = new HashMap<>();
-            //3.发送邮件给客户
-            //Added <V1.0.1> Start： cjc 2018/11/6 20:28 TODO 给客户发送邮件
-            boolean modelB = StringUtils.isNotBlank(request.getParameter("model"));
-            if (modelB) {
-                String modelStr = request.getParameter("model");
-                Map<String, Object> model = SerializeUtil.JsonToMapStr(modelStr);
-                sendMailFactory.sendMail(String.valueOf(model.get("userEmail")), null, emailTitle, model, TemplateType.SHOPPING_CART_MARKETING);
-            } else {
 
-                paramMap.put("userEmail",userEmail);
-                paramMap.put("emailTitle",emailTitle);
-                paramMap.put("adminNameFirst",adminNameFirst);
-                paramMap.put("adminName",adminName);
-                paramMap.put("adminEmail",adminEmail);
-                paramMap.put("whatsApp",whatsApp);
-                genHtmlEamil(userId,paramMap);
-                //sendEmailNew.send(user.getEmail(), "", userEmail, emailContent, emailTitle, "", 1);
+
+            //3.发送邮件给客户
+            paramMap.put("userEmail", userEmail);
+            paramMap.put("emailTitle", emailTitle);
+            paramMap.put("adminNameFirst", adminNameFirst);
+            paramMap.put("adminName", adminName);
+            paramMap.put("adminEmail", adminEmail);
+            paramMap.put("whatsApp", whatsApp);
+            paramMap.put("type", type);
+            if (genHtmlEamil(userId, paramMap)) {
+                //4.更新跟进信息
+                shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
+                json.setOk(true);
+                json.setMessage("发送邮件成功！");
+            } else {
+                json.setOk(true);
+                json.setMessage("邮件失败，请重新发送！");
             }
-            listActive.clear();
-            showList.clear();
-            activeList.clear();
-            //4.更新跟进信息
-            shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
-            json.setOk(true);
-            json.setMessage("发送邮件成功！");
-        } catch (Exception e) {
+        
+            }} catch (Exception e) {
             e.printStackTrace();
             System.err.println("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
             logger.error("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
@@ -329,47 +406,83 @@ public class ShopCarMarketingController {
         }
         return json;
     }
+    
 
+    private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
+        boolean isSuccess = false;
+        try {
+            Map<String, Object> modelM = new HashMap<String, Object>();
 
-    private void genHtmlEamil(int userId,Map<String,String> paramMap){
-        try{
-            //查询当前客户存在的购物车数据
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(userId);
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
-            //格式化处理规格数据
-            double productCost = 0;
-            double actualCost = 0;
-            double totalProductCost = 0;
-            double totalActualCost = 0;
-            List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
-            List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
-            int sourceCount = 0;
-            for (ShopCarMarketing shopCar : shopCarMarketingList) {
-                String tempType = "";
-                if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
-                    String[] splitFirst = shopCar.getGoodsType().split(",");
-                    for (String spCh : splitFirst) {
-                        String[] spScList = spCh.split("@");
-                        tempType += spScList[0] + ";";
-                        spScList = null;
+            //查询客户的随机码
+            String followCode = userInfoService.queryFollowMeCodeByUserId(userId);
+            if(StringUtils.isBlank(followCode)){
+                followCode = userInfoService.queryForUUID();
+                userInfoService.updateUserFollowCode(followCode,userId);
+            }
+            followCode = userInfoService.queryFollowMeCodeByUserId(userId);
+            if(StringUtils.isBlank(followCode)){
+                return isSuccess;
+            }
+
+            modelM.put("followCode",EMAIL_FOLLOW_URL + followCode);
+
+            if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
+                //查询当前客户存在的购物车数据
+                ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
+                ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
+                marketingCriteria.andUseridEqualTo(userId);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+                //格式化处理规格数据
+                double productCost = 0;
+                double actualCost = 0;
+                double totalProductCost = 0;
+                double totalActualCost = 0;
+                List<ShopCarMarketing> resultList = new ArrayList<ShopCarMarketing>();
+                List<ShopCarMarketing> sourceList = new ArrayList<ShopCarMarketing>();
+                int sourceCount = 0;
+                for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                    String tempType = "";
+                    if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
+                        String[] splitFirst = shopCar.getGoodsType().split(",");
+                        for (String spCh : splitFirst) {
+                            String[] spScList = spCh.split("@");
+                            tempType += spScList[0] + ";";
+                            spScList = null;
+                        }
+                        splitFirst = null;
                     }
-                    splitFirst = null;
-                }
-                if (tempType.length() > 0) {
-                    shopCar.setGoodsType(tempType);
-                }
-                shopCar.setGoogsImg(shopCar.getGoogsImg().replace(".60x60",".400x400"));
-                List<String> typeList= new ArrayList<>();
-                if(StringUtils.isNotBlank(shopCar.getGoodsType())){
-                    String[] tempList = shopCar.getGoodsType().split(";");
-                    for(String str : tempList){
-                        if(StringUtils.isNotBlank(str)){
-                            typeList.add(str);
+                    if (tempType.length() > 0) {
+                        shopCar.setGoodsType(tempType);
+                    }
+                    shopCar.setGoogsImg(shopCar.getGoogsImg().replace(".60x60", ".400x400"));
+                    List<String> typeList = new ArrayList<>();
+                    if (StringUtils.isNotBlank(shopCar.getGoodsType())) {
+                        String[] tempList = shopCar.getGoodsType().split(";");
+                        for (String str : tempList) {
+                            if (StringUtils.isNotBlank(str)) {
+                                typeList.add(str);
+                            }
                         }
                     }
-                }
+                    shopCar.setTypeList(typeList);
+                    if (shopCar.getPrice1() > 0) {
+                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                        productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                        actualCost += totalPrice;
+                        totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                        totalActualCost += totalPrice;
+                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                        resultList.add(shopCar);
+                    } else {
+                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                        totalProductCost += totalPrice;
+                        totalActualCost += totalPrice;
+                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                        if (sourceCount < 5) {
+                            sourceList.add(shopCar);
+                            sourceCount++;
+                        }
+                    }
                 shopCar.setTypeList(typeList);
                 if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                     double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
@@ -392,29 +505,49 @@ public class ShopCarMarketingController {
             }
             shopCarMarketingList.clear();
 
-            Map<String,Object> modelM = new HashMap<String,Object>();
-            double offCost = productCost - actualCost;
+
+                double offCost = productCost - actualCost;
 
                 modelM.put("productCost", BigDecimalUtil.truncateDouble(productCost, 2));
                 modelM.put("actualCost", BigDecimalUtil.truncateDouble(actualCost, 2));
                 modelM.put("totalProductCost", BigDecimalUtil.truncateDouble(totalProductCost, 2));
                 modelM.put("totalActualCost", BigDecimalUtil.truncateDouble(totalActualCost, 2));
-                if(productCost > 0){
+                if (productCost > 0) {
                     modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
                 }
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
+            }
 
-                modelM.put("userEmail", paramMap.get("userEmail"));
-                modelM.put("adminNameFirst", paramMap.get("adminNameFirst"));
-                modelM.put("adminName", paramMap.get("adminName"));
-                modelM.put("adminEmail", paramMap.get("adminEmail"));
-                modelM.put("whatsApp", paramMap.get("whatsApp"));
-			    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART);
-        }catch (Exception e){
+
+            modelM.put("userEmail", paramMap.get("userEmail"));
+            modelM.put("adminNameFirst", paramMap.get("adminNameFirst"));
+            modelM.put("adminName", paramMap.get("adminName"));
+            modelM.put("adminEmail", paramMap.get("adminEmail"));
+            modelM.put("whatsApp", paramMap.get("whatsApp"));
+            if("1".equals(paramMap.get("type"))){
+                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_NO_CHANGE);
+            }else if("2".equals(paramMap.get("type"))){
+                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_UPDATE_PRICE);
+            }else if("3".equals(paramMap.get("type"))){
+                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_FREIGHT_COUPON);
+            }else if("4".equals(paramMap.get("type"))){
+                modelM.put("oldMethod",paramMap.get("oldMethod"));
+                modelM.put("oldTransport",paramMap.get("oldTransport"));
+                modelM.put("oldPrice",paramMap.get("oldPrice"));
+                modelM.put("newMethod",paramMap.get("newMethod"));
+                modelM.put("newTransport",paramMap.get("newTransport"));
+                modelM.put("newPrice",paramMap.get("newPrice"));
+                modelM.put("savePrice",paramMap.get("savePrice"));
+                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_BEST_TRANSPORT);
+            }
+            isSuccess = true;
+        } catch (Exception e) {
+            isSuccess = false;
             e.printStackTrace();
         }
+        return isSuccess;
     }
 
     private boolean updateGoodsCarConfig(List<GoodsCarActiveSimplBean> listActive, int userId) {
@@ -1234,6 +1367,28 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
+
+        String typeStr = request.getParameter("type");
+        if (StringUtils.isBlank(typeStr)) {
+            mv.addObject("message", "获取发送类型失败");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("type", typeStr);
+        }
+
+        if ("1".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailNoChange");
+        } else if ("2".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailUpdatePrice");
+        }
+        if ("3".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailFreightCoupon");
+        }
+        if ("4".equals(typeStr)) {
+            mv.setViewName("shopCartMarketingEmailBestTransport");
+        }
+
         try {
             //查询客户信息
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
@@ -1307,4 +1462,66 @@ public class ShopCarMarketingController {
         }
         return mv;
     }
+
+
+    @RequestMapping("/queryFollowLogList")
+    @ResponseBody
+    public EasyUiJsonResult queryFollowLogList(HttpServletRequest request, HttpServletResponse response) {
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+        FollowLogBean logBean = new FollowLogBean();
+
+        int startNum = 0;
+        int limitNum = 30;
+        String rowsStr = request.getParameter("rows");
+        if (StringUtils.isNotBlank(rowsStr)) {
+            limitNum = Integer.valueOf(rowsStr);
+            logBean.setLimitNum(limitNum);
+        }
+
+        String pageStr = request.getParameter("page");
+        if (StringUtils.isNotBlank(pageStr)) {
+            startNum = (Integer.valueOf(pageStr) - 1) * limitNum;
+        }
+        logBean.setStartNum(startNum);
+
+        String adminIdStr = request.getParameter("adminId");
+        if (StringUtils.isNotBlank(adminIdStr) && !"0".equals(adminIdStr)) {
+            logBean.setAdminId(Integer.parseInt(adminIdStr));
+        }
+
+        String userIdStr = request.getParameter("userId");
+        if (StringUtils.isNotBlank(userIdStr)) {
+            logBean.setUserId(Integer.parseInt(userIdStr));
+        }
+
+        String userEmail = request.getParameter("userEmail");
+        if (StringUtils.isNotBlank(userEmail)) {
+            logBean.setUserEmail(userEmail);
+        }
+
+        String followCode = request.getParameter("followCode");
+        if (StringUtils.isNotBlank(followCode)) {
+            logBean.setFollowCode(followCode);
+        }
+
+
+        try {
+
+            List<FollowLogBean> res = shopCarMarketingService.queryFollowLogList(logBean);
+            int count = shopCarMarketingService.queryFollowLogListCount(logBean);
+
+            json.setRows(res);
+            json.setTotal(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("查询失败，原因 :" + e.getMessage());
+            json.setSuccess(false);
+            json.setMessage("查询失败，原因:" + e.getMessage());
+        }
+        return json;
+    }
+
+
 }

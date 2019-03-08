@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车营销发送邮件跟踪日志</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #follow_log_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        #follow_log_toolbar {
+            padding: 20px 28px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-row {
+            height: 26px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 90px;
+            height: 28px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        .combobox-item {
+            font-size: 14px !important;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            getAdminList();
+        });
+
+        function setDatagrid() {
+            $('#follow_log_easyui-datagrid').datagrid({
+                title: '购物车营销发送邮件跟踪日志',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#follow_log_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/shopCarMarketingCtr/queryFollowLogList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 30,//默认选择的分页是每页50行数据
+                pageList: [30, 50],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+
+        function doQuery() {
+            var followCode = $("#query_follow_code").val();
+            var userId = $("#query_user_id").val();
+            var userEmail = $("#query_user_email").val();
+            var adminId = $("#query_admin_id").val();
+
+            $("#follow_log_easyui-datagrid").datagrid("load", {
+                "followCode": followCode,
+                "userId": userId,
+                "userEmail": userEmail,
+                "adminId": adminId
+            });
+        }
+
+        function doResetForm() {
+            $("#follow_log_query_form")[0].reset();
+        }
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        $("#query_follow_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                        $("#query_follow_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function formatUserId(val, row, index) {
+            return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '">' + val + '</a>';
+        }
+
+        function formatOperation(val, row, index) {
+            var content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
+                row.userId + '" target="_blank">跟进</a>';
+            return content;
+        }
+
+    </script>
+</head>
+<body>
+
+<div id="follow_log_toolbar" style="padding: 5px; height: auto">
+    <form id="follow_log_query_form" action="#" onsubmit="return false;">
+
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 120px;height: 22px;"/></span>
+        &nbsp;&nbsp;<span>客户邮箱:<input id="query_user_email" type="text" value=""
+                                      style="width: 200px;height: 22px;"/></span>
+        &nbsp;&nbsp;<span>跟踪码:<input id="query_follow_code" type="text" value=""
+                                     style="width: 200px;height: 22px;"/></span>
+        &nbsp;&nbsp;<span>销售: <select id="query_admin_id"
+                                      style="font-size: 16px; height: 26px; width: 90px;">
+					<option value="-1" selected="selected">全部</option>
+            </select></span>&nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+        <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
+    </form>
+</div>
+
+<table id="follow_log_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
+        <th data-options="field:'userEmail',width:'150px'">用户Email</th>
+        <th data-options="field:'createTime',align:'center',width:'130px'">客户阅览邮件时间</th>
+        <th data-options="field:'followCode',align:'center',width:'280px'">客户跟踪码</th>
+        <th data-options="field:'userIp',align:'center',width:'130px'">客户IP</th>
+        <th data-options="field:'adminName',align:'center',width:'100px'">销售</th>
+        <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

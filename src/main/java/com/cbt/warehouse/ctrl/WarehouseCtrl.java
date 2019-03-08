@@ -5709,7 +5709,7 @@ public class WarehouseCtrl {
 					info.setAmount(String.valueOf(amounts));
 					info.setAcounts(String.valueOf(acountss));
 				}
-				info.setOperation("<button onclick=\"resetLocation('"+info.getBarcode()+"','"+info.getShort_term()+"')\">清空库位</button>");
+				info.setOperation("<button onclick=\"resetLocation('"+info.getBarcode()+"','"+info.getShort_term()+"')\">清空库位</button>/<button onclick=\"returnOr('"+info.getOrderids()+"')\">发起退货</button>");
 				order_nos.append("'").append(orderids).append("'").append(",");
 				//获取该库位最后一次入库时间、最后一次出库时间、最后一次强制清空时间
 				String createtime=iWarehouseService.getCreateTime(info.getBarcode());

@@ -15,8 +15,18 @@ public class Address {
 	private String createtime;
 	private String modifytime;
 	private int defaultaddress;
+    private String delflag;
 	private String street;
-	public int getId() {
+
+    public String getDelflag() {
+        return delflag;
+    }
+
+    public void setDelflag(String delflag) {
+        this.delflag = delflag;
+    }
+
+    public int getId() {
 		return id;
 	}
 	public void setId(int id) {

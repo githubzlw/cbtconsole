@@ -72,6 +72,9 @@ table.imagetable td {
 	border: 1px #aaa solid;
 	color: #fff;
 }
+
+.window, .window-shadow {
+    position: fixed;}
 </style>
 <%
 String orderid=request.getParameter("orderid");
@@ -170,11 +173,165 @@ function focus(){
 		$("#barcode").textbox('setValue','');
 	}
 }
+/* function returnOr(cusorder){
+	//if(cusorder==""||cusorder==null){
+//		alert("该订单不存在");
+//		return;
+//	}
+	window.location.href ="/cbtconsole/AddReturnOrder/FindReturnOrder/"+cusorder;
 
+} */
+/* function returnOr(orderid) {
+	if (orderid == null || orderid == "") {
+		$.messager.alert('提示', '获取订单号失败,请重试');
+	} else {
+		window
+				.open(
+						"/cbtconsole/website/ReApply.jsp?orderid="
+								+ orderid,
+						"windows",
+						"height=400,width=800,top=500,left=500,toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no");
+	}
+} */
+
+function getItem() {   
+    var tbOrder=this.$("#select_id option:selected").val();
+    var cusOrder = $('#cuso').text();
+   
+    $.ajax({
+        type: "POST",
+        url: "/cbtconsole/Look/getAllOrder",
+        data: {cusOrder:cusOrder,tbOrder:tbOrder,mid:0},
+        dataType:"json",
+        success: function(msg){
+        	
+            if(msg.rows[0] != undefined){
+                var temHtml = '';
+                document.getElementById("tabl").innerHTML='';
+                $("#tabl").append("<tr ><td style='width:20px'>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $(msg.rows).each(function (index, item) {
+                	
+                 	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' style='width:20px' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
+                     
+                });
+            }else{
+            	alert("订单已全部退货")
+            	$('#user_remark').window('close');	
+            }
+        }
+    });
+}
+function returnOr(uid) {
+    $('#user_remark .remark_list').html('');
+    $("#user_remark input[name='userid']").val(uid);
+    $('#new_user_remark').val('');
+    //查询历史备注信息
+    $.ajax({
+        type: "POST",
+        url: "/cbtconsole/Look/getAllOrder",
+        data: {cusOrder:uid,mid:1},
+        dataType:"json",
+        success: function(msg){
+        	var opts = $("#easyui-datagrid").datagrid("options");
+        	opts.url = "/cbtconsole/Look/LookReturnOrder?mid=1";
+        	
+            if(msg.rows[0] != undefined){
+                var temHtml = '';
+                document.getElementById("select_id").innerHTML='';
+                $("#cuso").html("");
+                $("#cuso").append(msg.rows1[0].customerorder);
+                document.getElementById("tabl").innerHTML='';
+                $("#tabl").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $(msg.rows).each(function (index, item) {
+                	
+                 	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
+                  
+                	/* $("table").append("<tr ><td >1</td><td>"+item.item+"</td><td>产品规格</td><td>"+item.itemNumber+"</td><td></td><td></td></tr>"); */
+
+                });
+                $('#user_remark .remark_list').html(temHtml);
+                $(msg.rows1).each(function (index, item) {
+           		
+           		 $("#select_id").append("<option id='' value='"+item.a1688Order+"'>"+item.a1688Order+"</option>");
+           		 $('#user_remark').window('open');
+           	 })
+            }else{
+            	alert("订单已全部退货")
+            	$('#user_remark').window('close');	
+            }
+           
+        }
+    });
+}
+function AddOll() {
+	 var tbOrder=this.$("#select_id option:selected").val();
+	 var cusorder = $('#cuso').text();
+	 alert(cusorder)
+	 var returnNO = $("input[name='radioname']checked").val();
+	 var isAutoSend = document.getElementsByName('radioname');
+	 for (var i = 0; i < isAutoSend.length; i++) {
+	 if (isAutoSend[i].checked == true) {
+	 returnNO=isAutoSend[i].value; 
+	 }
+	 }
+	 alert(returnNO)
+	  $.post("/cbtconsole/Look/AddRetAllOrder", {
+			cusorder:cusorder,tbOrder:tbOrder,returnNO:returnNO
+		}, function(res) {
+			if(res.rows == 1){
+				alert('修改成功');
+			}else{
+				alert('不可重复退单');
+			}
+			
+			getItem();
+});
+}
+function checkboxOnclick(checkbox){
+	 
+	if ( checkbox.checked == true){
+	 this.value=2;
+	 
+	}else{
+	 
+	this.value=1;
+	 
+	}
+	 
+	}
 
 </script>
 </head>
 <body text="#000000" onload="doQuery(1);">
+<div id="user_remark" class="easyui-window" title="退货申请"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:800px;height:auto;display: none;font-size: 16px;">
+            <div id="sediv" style="margin-left:20px;">
+              选择订单号： <select id="select_id" onchange="getItem()"></select>
+              <div id="cuso"></div>
+                <table id="tabl" border="1" cellspacing="0">
+                
+               <tr >
+               <td style='width:20px'>选择</td>
+               <td>产品名</td>
+               <td>产品规格</td>
+               <td>可退数量</td>
+               <td>退货原因</td>
+               <td>退货数量</td>
+               </tr>
+               </table> 
+            </div>
+            <div style="margin:20px 0 20px 40px;">
+                <a href="javascript:void(0)" class="easyui-linkbutton"
+                   onclick="addUserRemark()" style="width:80px" >提交申请</a>部分退单选择此按钮，全单退可以使用下方按钮
+            </div>
+             <div style="margin:20px 0 20px 40px;">
+                <input class="but_color" type="button" value="整单提交" onclick="AddOll()">
+                <input type='radio' size='5' name='radioname' value='客户退单' id='c' />客户退单
+                <input type='radio' size='5' name='radioname' value='质量问题' id='c' />质量问题
+                <input type='radio' size='5' name='radioname' value='客户要求' id='c' />客户要求
+            </div>
+    </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<form id="query_form" action="#" onsubmit="return false;">
@@ -221,8 +378,49 @@ function focus(){
 				<th data-options="field:'is_company',width:20,align:'center'">库位位置</th>
 				<th data-options="field:'createtime',width:38,align:'center'">时间记录</th>
 				<th data-options="field:'operation',width:30,align:'center'">操作</th>
+				
 			</tr>
 		</thead>
 	</table>
 </body>
+<script type="text/javascript">
+function addUserRemark() {
+	var tbOrder=this.$("#select_id option:selected").val();
+    var cusOrder = $('#cuso').text();
+    var der =$("#retu").val();
+   var g="";
+     $("#tabl tr").each(function(){
+    	
+    	 $(this).find('input').each(function(){   
+    		 var value = $(this).val();  
+    			g+=value+","; 
+    	
+    	}); 	
+     });
+     g+=tbOrder+",";
+	 g+=cusOrder;   
+ 
+     $.post("/cbtconsole/Look/AddAllOrder", {
+    	 cusOrder:g
+		}, function(res) {
+			if(res.rows == 1){
+				alert('修改成功');
+				
+			}else if(res.rows==0){
+				alert('不可重复退单');
+			}else if(res.rows==2){
+				alert('请勾选要退的商品');
+			}else if(res.rows==3){
+				alert('请填写数据');
+			}
+			else if(res.rows==4){
+				alert('退货数量不能大于可退数量');
+			}else if(res.rows==5){
+				alert('该商品已全部退货');
+			}
+			getItem();			
+});            
+}
+
+</script>
 </html>

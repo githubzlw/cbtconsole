@@ -469,9 +469,6 @@ em {
 				<tr>
 					<td class="ormtittd">
 						<span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a>
-						<c:if test="${not empty order.backFlag}">
-							<span style="color:red">${order.backFlag}</span>
-						</c:if>
 						<br>
 						<span style="color: red; display: none" id="other_id"></span>
 					</td>
