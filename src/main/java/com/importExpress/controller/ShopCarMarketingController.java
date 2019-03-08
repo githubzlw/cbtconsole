@@ -336,19 +336,23 @@ public class ShopCarMarketingController {
                 GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
 
                 List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
-            List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
-            List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(userId);
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
-            int isUpdatePrice = 0;
-            for (ShopCarMarketing shopCar : shopCarMarketingList) {
-                for(GoodsCarActiveSimplBean simplBean : listActive){
-                    if(shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())){
-                        //解析数据
-                        if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
-                            isUpdatePrice++;
+
+                List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
+                List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
+                ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
+                ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
+                marketingCriteria.andUseridEqualTo(userId);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+                int isUpdatePrice = 0;
+                for (ShopCarMarketing shopCar : shopCarMarketingList) {
+                    for (GoodsCarActiveSimplBean simplBean : listActive) {
+                        if (shopCar.getItemid().equals(simplBean.getItemId()) && shopCar.getGoodsType().equals(simplBean.getTypes())) {
+                            //解析数据
+                            if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
+                                isUpdatePrice++;
+                            }
+                            genActiveSimplBeanByShopCar(simplBean, shopCar);
+                            break;
                         }
                     }
                 }
@@ -392,11 +396,10 @@ public class ShopCarMarketingController {
                 json.setOk(true);
                 json.setMessage("发送邮件成功！");
             } else {
-                json.setOk(true);
+                json.setOk(false);
                 json.setMessage("邮件失败，请重新发送！");
             }
-        
-            }} catch (Exception e) {
+            } catch (Exception e) {
             e.printStackTrace();
             System.err.println("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
             logger.error("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
@@ -415,16 +418,16 @@ public class ShopCarMarketingController {
 
             //查询客户的随机码
             String followCode = userInfoService.queryFollowMeCodeByUserId(userId);
-            if(StringUtils.isBlank(followCode)){
+            if (StringUtils.isBlank(followCode)) {
                 followCode = userInfoService.queryForUUID();
-                userInfoService.updateUserFollowCode(followCode,userId);
+                userInfoService.updateUserFollowCode(followCode, userId);
             }
             followCode = userInfoService.queryFollowMeCodeByUserId(userId);
-            if(StringUtils.isBlank(followCode)){
+            if (StringUtils.isBlank(followCode)) {
                 return isSuccess;
             }
 
-            modelM.put("followCode",EMAIL_FOLLOW_URL + followCode);
+            modelM.put("followCode", EMAIL_FOLLOW_URL + followCode);
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
@@ -483,27 +486,27 @@ public class ShopCarMarketingController {
                             sourceCount++;
                         }
                     }
-                shopCar.setTypeList(typeList);
-                if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                    actualCost += totalPrice;
-                    totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                    totalActualCost += totalPrice;
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    resultList.add(shopCar);
-                } else {
-                    double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                    totalProductCost += totalPrice;
-                    totalActualCost += totalPrice;
-                    shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    if(sourceCount < 5){
-                        sourceList.add(shopCar);
-                        sourceCount ++;
+                    shopCar.setTypeList(typeList);
+                    if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
+                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                        productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                        actualCost += totalPrice;
+                        totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
+                        totalActualCost += totalPrice;
+                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                        resultList.add(shopCar);
+                    } else {
+                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
+                        totalProductCost += totalPrice;
+                        totalActualCost += totalPrice;
+                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                        if (sourceCount < 5) {
+                            sourceList.add(shopCar);
+                            sourceCount++;
+                        }
                     }
                 }
-            }
-            shopCarMarketingList.clear();
+                shopCarMarketingList.clear();
 
 
                 double offCost = productCost - actualCost;
@@ -526,20 +529,20 @@ public class ShopCarMarketingController {
             modelM.put("adminName", paramMap.get("adminName"));
             modelM.put("adminEmail", paramMap.get("adminEmail"));
             modelM.put("whatsApp", paramMap.get("whatsApp"));
-            if("1".equals(paramMap.get("type"))){
+            if ("1".equals(paramMap.get("type"))) {
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_NO_CHANGE);
-            }else if("2".equals(paramMap.get("type"))){
+            } else if ("2".equals(paramMap.get("type"))) {
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_UPDATE_PRICE);
-            }else if("3".equals(paramMap.get("type"))){
+            } else if ("3".equals(paramMap.get("type"))) {
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_FREIGHT_COUPON);
-            }else if("4".equals(paramMap.get("type"))){
-                modelM.put("oldMethod",paramMap.get("oldMethod"));
-                modelM.put("oldTransport",paramMap.get("oldTransport"));
-                modelM.put("oldPrice",paramMap.get("oldPrice"));
-                modelM.put("newMethod",paramMap.get("newMethod"));
-                modelM.put("newTransport",paramMap.get("newTransport"));
-                modelM.put("newPrice",paramMap.get("newPrice"));
-                modelM.put("savePrice",paramMap.get("savePrice"));
+            } else if ("4".equals(paramMap.get("type"))) {
+                modelM.put("oldMethod", paramMap.get("oldMethod"));
+                modelM.put("oldTransport", paramMap.get("oldTransport"));
+                modelM.put("oldPrice", paramMap.get("oldPrice"));
+                modelM.put("newMethod", paramMap.get("newMethod"));
+                modelM.put("newTransport", paramMap.get("newTransport"));
+                modelM.put("newPrice", paramMap.get("newPrice"));
+                modelM.put("savePrice", paramMap.get("savePrice"));
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_BEST_TRANSPORT);
             }
             isSuccess = true;
