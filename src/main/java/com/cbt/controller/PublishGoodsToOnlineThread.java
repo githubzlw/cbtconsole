@@ -182,6 +182,10 @@ public class PublishGoodsToOnlineThread extends Thread {
                                 downImgUrl = goods.getShowMainImage();
                             }
                             isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
+                            if(!isSuccess){
+                                // 重新下载一次
+                                isSuccess = ImgDownload.downFromImgService(downImgUrl, localDownImg);
+                            }
 
                             System.err.println("down[" + goods.getShowMainImage() + "] to [" + localDownImg + "]");
                             if (isSuccess) {
