@@ -198,7 +198,7 @@ public class GuestBookServiceImpl implements IGuestBookService{
 			} else {
 				gBookBean.setEmail(gBookBean.getEmail() + "<br>");
 			}
-			gBookBean.setPname("<span title='" + gBookBean.getPname() + "'></span><a href='" + gBookBean.getPurl()
+			gBookBean.setPname("<span title='" + gBookBean.getPname() + "'></span><a href='https://www.importx.com" + gBookBean.getPurl()
 					+ "'  target='_blank'>" + gBookBean.getPname().substring(0, +gBookBean.getPname().length() / 3)
 					+ "...</a>");
 			if (gBookBean.getOnlineUrl() == null || "".endsWith(gBookBean.getOnlineUrl())) {
