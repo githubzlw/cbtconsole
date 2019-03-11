@@ -272,7 +272,7 @@ b {
         var isComplain = sessionStorage.getItem("isComplain");
         if(!(isComplain == null || isComplain == "" || isComplain != '1')){
             queryParams.isComplain = isComplain;
-            $("#is_complain").attr("checked",'true');//全选 
+            $("#is_complain").attr("checked",'true');//全选
         }
         // fromFlag
 		var fromFlag = sessionStorage.getItem("fromFlag");

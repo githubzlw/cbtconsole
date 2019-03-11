@@ -2801,7 +2801,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     @Override
     public boolean updateCustomBenchmarkSkuNew(String pid, List<CustomBenchmarkSkuNew> insertList) {
         Connection conn27 = DBHelper.getInstance().getConnection();
-        Connection connAws = DBHelper.getInstance().getConnection2();
+        // Connection connAws = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
 
 
@@ -2813,16 +2813,16 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
 
         PreparedStatement stmt27 = null;
         PreparedStatement stmt28 = null;
-        PreparedStatement stmtAws = null;
+        // PreparedStatement stmtAws = null;
 
         try {
             conn27.setAutoCommit(false);
-            connAws.setAutoCommit(false);
+            // connAws.setAutoCommit(false);
             conn28.setAutoCommit(false);
 
             stmt27 = conn27.prepareStatement(updateSql);
             stmt28 = conn28.prepareStatement(updateSql);
-            stmtAws = connAws.prepareStatement(updateSql);
+            // stmtAws = connAws.prepareStatement(updateSql);
             SkuValPO skuValPO;
             for (CustomBenchmarkSkuNew skuNew : insertList) {
                 stmt27.setString(1, skuNew.getWprice());
@@ -2850,51 +2850,53 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 stmt28.setString(10, skuNew.getSkuPropIds());
                 stmt28.addBatch();
 
-                stmtAws.setString(1, skuNew.getWprice());
-                stmtAws.setDouble(2, skuValPO.getActSkuCalPrice());
-                stmtAws.setDouble(3, skuValPO.getActSkuMultiCurrencyCalPrice());
-                stmtAws.setDouble(4, skuValPO.getActSkuMultiCurrencyDisplayPrice());
-                stmtAws.setDouble(5, skuValPO.getSkuCalPrice());
-                stmtAws.setDouble(6, skuValPO.getSkuMultiCurrencyCalPrice());
-                stmtAws.setString(7, skuNew.getFinalWeight());
-                stmtAws.setDouble(8, skuValPO.getActSkuMultiCurrencyDisplayPrice());
-                stmtAws.setString(9, pid);
-                stmtAws.setString(10, skuNew.getSkuPropIds());
-                stmtAws.addBatch();
+//                stmtAws.setString(1, skuNew.getWprice());
+//                stmtAws.setDouble(2, skuValPO.getActSkuCalPrice());
+//                stmtAws.setDouble(3, skuValPO.getActSkuMultiCurrencyCalPrice());
+//                stmtAws.setDouble(4, skuValPO.getActSkuMultiCurrencyDisplayPrice());
+//                stmtAws.setDouble(5, skuValPO.getSkuCalPrice());
+//                stmtAws.setDouble(6, skuValPO.getSkuMultiCurrencyCalPrice());
+//                stmtAws.setString(7, skuNew.getFinalWeight());
+//                stmtAws.setDouble(8, skuValPO.getActSkuMultiCurrencyDisplayPrice());
+//                stmtAws.setString(9, pid);
+//                stmtAws.setString(10, skuNew.getSkuPropIds());
+//                stmtAws.addBatch();
             }
 
-            count = stmtAws.executeBatch().length;
+            count = stmt28.executeBatch().length;
             if (count > 0) {
                 count = 0;
-                count = stmt28.executeBatch().length;
+                count = stmt27.executeBatch().length;
                 if (count > 0) {
-                    count = 0;
-                    count = stmt27.executeBatch().length;
-                    if (count > 0) {
-                        connAws.commit();
-                        conn28.commit();
-                        conn27.commit();
-                    } else {
-                        connAws.rollback();
-                        conn28.rollback();
-                        conn27.rollback();
-                    }
+                    // connAws.commit();
+                    conn28.commit();
+                    conn27.commit();
                 } else {
-                    connAws.rollback();
+                    // connAws.rollback();
                     conn28.rollback();
+                    conn27.rollback();
                 }
             } else {
-                connAws.rollback();
+                // connAws.rollback();
+                conn28.rollback();
             }
+
+            /*count = stmtAws.executeBatch().length;
+            if (count > 0) {
+                count = 0;
+
+            } else {
+                // connAws.rollback();
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("pid:" + pid + " updateCustomBenchmarkSkuNew error :" + e.getMessage());
             LOG.error("pid:" + pid + " updateCustomBenchmarkSkuNew error :" + e.getMessage());
-            try {
-                connAws.rollback();
+            /*try {
+                // connAws.rollback();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-            }
+            }*/
             try {
                 conn28.rollback();
             } catch (SQLException e1) {
@@ -2908,9 +2910,9 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         } finally {
             DBHelper.getInstance().closePreparedStatement(stmt27);
             DBHelper.getInstance().closePreparedStatement(stmt28);
-            DBHelper.getInstance().closePreparedStatement(stmtAws);
+            // DBHelper.getInstance().closePreparedStatement(stmtAws);
             DBHelper.getInstance().closeConnection(conn27);
-            DBHelper.getInstance().closeConnection(connAws);
+            // DBHelper.getInstance().closeConnection(connAws);
             DBHelper.getInstance().closeConnection(conn28);
         }
 

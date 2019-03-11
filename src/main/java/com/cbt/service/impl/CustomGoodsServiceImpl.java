@@ -104,7 +104,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 // 更新27和28表数据
                 customGoodsDao.updateCustomBenchmarkSkuNew(bean.getPid(), insertList);
                 // 使用MQ更新AWS服务器数据
-                GoodsInfoUpdateOnlineUtil.updateCustomBenchmarkSkuNewByMq(bean.getPid(), insertList);
+                // GoodsInfoUpdateOnlineUtil.updateCustomBenchmarkSkuNewByMq(bean.getPid(), insertList);
                 insertList.clear();
             }
         }
