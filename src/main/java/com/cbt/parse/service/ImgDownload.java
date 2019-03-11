@@ -41,6 +41,8 @@ public class ImgDownload {
 			File file = new File(fileName);
 			if (!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();// 返回此抽象路径名父目录的抽象路径名；创建
+			}else if(file.exists() && file.isFile()){
+				file.delete();
 			}
 
 			fileOutputStream = new FileOutputStream(file);
