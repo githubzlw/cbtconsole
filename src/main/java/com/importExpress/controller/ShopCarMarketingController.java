@@ -468,7 +468,7 @@ public class ShopCarMarketingController {
                         }
                     }
                     shopCar.setTypeList(typeList);
-                    if (shopCar.getPrice1() > 0) {
+                    if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                         double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
                         productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
                         actualCost += totalPrice;
