@@ -620,4 +620,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.setNewAliPidInfo(pid, aliPid, aliPrice);
     }
 
+    @Override
+    public List<String> queryPidListByState(int state) {
+        return customGoodsMapper.queryPidListByState(state);
+    }
 }

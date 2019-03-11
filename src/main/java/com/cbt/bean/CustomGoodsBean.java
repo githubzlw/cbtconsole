@@ -193,16 +193,7 @@ public class CustomGoodsBean {
     }
 
     public void setImg(String img) {
-        if (StringUtils.isNotBlank(img)) {
-            // 统一400图片
-            if (img.indexOf("60x60") >= 0) {
-                this.img = img.replace("60x60", "400x400");
-            } else {
-                this.img = img;
-            }
-        } else {
-            this.img = "";
-        }
+        this.img = img;
     }
 
     public String getUrl() {

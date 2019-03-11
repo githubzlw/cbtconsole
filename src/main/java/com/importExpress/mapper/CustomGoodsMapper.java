@@ -350,4 +350,11 @@ public interface CustomGoodsMapper {
      */
 	int setNewAliPidInfo(@Param("pid") String pid, @Param("aliPid") String aliPid, @Param("aliPrice") String aliPrice);
 
+
+	/**
+     * 根据状态获取PID数据
+     * @param state
+     * @return
+     */
+    List<String> queryPidListByState(@Param("state") int state);
 }
