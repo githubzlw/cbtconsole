@@ -394,12 +394,12 @@
         cbu.is_add_car_flag,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.off_reason,'') as off_reason,
         ifnull(cge.click_num,0) as click_num,
         ifnull(cbc.complain_id,'') as complain_id,
-        (select count(1) from goods_review where goods_pid=cbu.pid) as reviewCount
+        ifnull(cbc.complain_id,0) as reviewCount
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
-
+        left join (select count(0) as reviewCount,goods_pid from goods_review group by goods_pid) gr on gr.goods_pid=cbu.pid
         where 1=1
         <if test="catid !=null">
             and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
