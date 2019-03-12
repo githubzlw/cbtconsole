@@ -1744,35 +1744,40 @@ public class NewOrderDetailsCtr {
                         }
                     }
                 } else {
-                    // 获取用户货币单位
-                    // zlw add start
-                    float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-                    float order_ac = Float.parseFloat(request.getParameter("order_ac"));
-                    int isDropshipOrder = Integer.valueOf(request.getParameter("isDropshipOrder"));
-                    if (isDropshipOrder == 2) {
-                        actualPay = 0;
-                        order_ac = 0;
-                    }
-                    UserDao dao = new UserDaoImpl();
-                    order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
-                    dao.updateUserAvailable(userId,
-                            new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
-                            " system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);
-                    // zlw add end
+					res = orderwsServer.closeOrder(orderNo);
+					if (res > 0) {
+						// 获取用户货币单位
+						// zlw add start
+						float actualPay = Float.parseFloat(request.getParameter("actualPay"));
+						float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+						int isDropshipOrder = Integer.valueOf(request.getParameter("isDropshipOrder"));
+						if (isDropshipOrder == 2) {
+							actualPay = 0;
+							order_ac = 0;
+						}
+						UserDao dao = new UserDaoImpl();
+						order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+						dao.updateUserAvailable(userId,
+								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
+								" system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);
+						// zlw add end
 
-					// 执行取消完成后，插入退款数据
-					OrderCancelApproval cancelApproval = new OrderCancelApproval();
-					cancelApproval.setUserId(userId);
-					cancelApproval.setOrderNo(orderNo);
-					cancelApproval.setPayPrice(actualPay);
-					cancelApproval.setType(2);
-					cancelApproval.setDealState(3);
-					cancelApproval.setAgreeAmount(actualPay);
-					cancelApproval.setOrderState(Integer.valueOf(orderinfoMap.get("old_state").toString()));
-					NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+						// 执行取消完成后，插入退款数据
+						OrderCancelApproval cancelApproval = new OrderCancelApproval();
+						cancelApproval.setUserId(userId);
+						cancelApproval.setOrderNo(orderNo);
+						cancelApproval.setPayPrice(actualPay);
+						cancelApproval.setType(2);
+						cancelApproval.setDealState(3);
+						cancelApproval.setAgreeAmount(actualPay);
+						cancelApproval.setOrderState(Integer.valueOf(orderinfoMap.get("old_state").toString()));
+						NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+						json.setOk(true);
+					} else {
+						json.setOk(false);
+					}
 
-                    json.setOk(true);
-                }
+				}
                 if (json.isOk()) {
                     // ssd add start
                     // 发送取消订单的提醒邮件
