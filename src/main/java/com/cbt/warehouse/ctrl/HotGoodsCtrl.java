@@ -820,7 +820,8 @@ public class HotGoodsCtrl {
                 SendMQ sendMQ = new SendMQ();
                 for (String key : pidsMap.keySet()) {
                     String value = pidsMap.get(key);
-                    String sql = "update hot_selling_goods set is_on = " + value + " where goods_pid = '" + key + "'";
+                    String sql = "update hot_selling_goods set is_on = " + value + " where goods_pid = '" + key
+                            + "' and hot_selling_id ='"+categoryId+"'";
                     System.err.println(sql);
                     sendMQ.sendMsg(new RunSqlModel(sql));
                 }
