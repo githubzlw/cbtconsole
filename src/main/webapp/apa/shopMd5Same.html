@@ -54,6 +54,21 @@
         .combobox-item{
             font-size: 14px !important;
         }
+
+        .div_sty_img {
+            border: 5px solid #000;
+            text-align: center;
+            background-color: #FFF7FB;
+            width: 750px;
+            height: 750px;
+            position: fixed;
+            top: 90px;
+            left: 15%;
+            margin-left: 400px;
+            padding: 5px;
+            padding-bottom: 20px;
+            z-index: 1011;
+        }
     </style>
 
     <script type="text/javascript">
@@ -106,7 +121,7 @@
         }
 
         function formatImg(val, row, index) {
-            return '<img style="max-height: 180px;max-width: 180px;" src="'+val+'"/>';
+            return '<img style="max-height: 180px;max-width: 180px;" src="'+val+'" onclick="bigImg(\''+val+'\')"/>';
         }
 
         function formatDelete(val, row, index) {
@@ -159,6 +174,18 @@
             }
         }
 
+        function bigImg(img) {
+            $('#big_img').empty();
+            var htm_ = "<img style='max-width:700px;max-height:700px;' src=" + img
+                + "><br><input class='s_btn' type='button' value='关闭' onclick='closeBigImg()' />";
+            $("#big_img").append(htm_);
+            $("#big_img").css("display", "block");
+        }
+
+        function closeBigImg() {
+            $("#big_img").css("display", "none");
+            $('#big_img').empty();
+        }
     </script>
 </head>
 <body>
@@ -192,5 +219,6 @@
     </tbody>
 </table>
 
+<div class="div_sty_img" style="display: none;" id="big_img"></div>
 </body>
 </html>
