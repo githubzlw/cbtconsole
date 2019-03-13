@@ -248,10 +248,14 @@
         goods_p_url=#{resource},last_goods_p_url=#{resource},tb_1688_itemid=#{itemid},last_tb_1688_itemid=#{itemid},shop_id=#{shop_id} where orderid=#{orderNo} and od_id=#{o_odid}
     </update>
     <insert id="insertOrderSource">
+<!--         insert into order_product_source(adminid,userid,addtime,orderid,confirm_time,
+        goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,
+        usecount,buycount,purchase_state,od_id,tb_1688_itemid,shop_id,tborderid) values(#{admid},#{newuserid},now(),#{orderNo},now(),#{newgoodsid},
+        #{newgoodsdata_id},#{goods_url},#{resource},#{newcar_img},#{newgoodsprice},#{price},#{newgoodsname},#{newyourorder},#{buycount},0,#{newid},#{itemid},#{shop_id},'') -->
         insert into order_product_source(adminid,userid,addtime,orderid,confirm_time,
         goodsid,goodsdataid,goods_url,goods_p_url,goods_img_url,goods_price,goods_p_price,goods_name,
         usecount,buycount,purchase_state,od_id,tb_1688_itemid,shop_id,tborderid) values(#{admid},#{newuserid},now(),#{orderNo},now(),#{newgoodsid},
-        #{newgoodsdata_id},#{goods_url},#{resource},#{newcar_img},#{newgoodsprice},#{price},#{newgoodsname},#{newyourorder},#{buycount},0,#{newid},#{itemid},#{shop_id},'')
+        #{newgoodsdata_id},#{goods_url},#{resource},#{newcar_img},#{newgoodsprice},#{price},#{newgoodsname},#{newyourorder},#{newyourorder},0,#{newid},#{itemid},#{shop_id},'')
     </insert>
     <select id="ShowRmark" resultType="com.cbt.bean.OrderProductSource">
         select bargainRemark,deliveryRemark,colorReplaceRemark,sizeReplaceRemark,orderNumRemarks,questionsRemarks,unquestionsRemarks,againRemarks  from order_product_source where orderid=#{orderNo} and goodsdataid=#{goodsdataid} and od_id=#{odid}
