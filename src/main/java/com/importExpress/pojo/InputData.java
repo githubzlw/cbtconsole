@@ -92,8 +92,18 @@ public class InputData {
     private Character crud;
     private String rw_keyword;
     private String size_info_en;
+    private String custom_video_flag;
+    
 
-    public String getSize_info_en() {
+    public String getCustom_video_flag() {
+		return custom_video_flag;
+	}
+
+	public void setCustom_video_flag(String custom_video_flag) {
+		this.custom_video_flag = custom_video_flag;
+	}
+
+	public String getSize_info_en() {
         return size_info_en;
     }
 
