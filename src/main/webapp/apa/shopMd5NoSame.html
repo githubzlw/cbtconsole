@@ -54,6 +54,21 @@
         .combobox-item{
             font-size: 14px !important;
         }
+
+        .div_sty_img {
+            border: 5px solid #000;
+            text-align: center;
+            background-color: #FFF7FB;
+            width: 750px;
+            height: 750px;
+            position: fixed;
+            top: 90px;
+            left: 15%;
+            margin-left: 400px;
+            padding: 5px;
+            padding-bottom: 20px;
+            z-index: 1011;
+        }
     </style>
 
     <script type="text/javascript">
@@ -106,7 +121,7 @@
         }
 
         function formatImg(val, row, index) {
-            return '<img style="max-height: 180px;max-width: 180px;" src="'+val+'"/>';
+            return '<img style="max-height: 180px;max-width: 180px;" src="'+val+'" onclick="bigImg(\''+val+'\')"/>';
         }
 
         function formatDelete(val, row, index) {
@@ -131,6 +146,18 @@
             return content;
         }
 
+        function bigImg(img) {
+            $('#big_img').empty();
+            var htm_ = "<img style='max-width:700px;max-height:700px;' src=" + img
+                + "><br><input class='s_btn' type='button' value='关闭' onclick='closeBigImg()' />";
+            $("#big_img").append(htm_);
+            $("#big_img").css("display", "block");
+        }
+
+        function closeBigImg() {
+            $("#big_img").css("display", "none");
+            $('#big_img').empty();
+        }
 
     </script>
 </head>
@@ -155,7 +182,7 @@
         <!--<th data-options="field:'shopId',align:'center',width:'220px'">店铺ID</th>-->
         <th data-options="field:'imgShow',align:'center',width:'120px',formatter:formatImg">图片</th>
         <th data-options="field:'md5Val',align:'center',width:'160px'">MD5</th>
-        <th data-options="field:'md5Num',align:'center',width:'120px'">图片数量</th>
+        <th data-options="field:'md5Num',align:'center',width:'120px'">店铺数量</th>
         <!--<th data-options="field:'isDelete',align:'center',width:'80px',formatter:formatDelete">是否删除</th>-->
         <th data-options="field:'isMark',align:'center',width:'80px',formatter:formatMark">是否标记</th>
         <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
@@ -164,6 +191,8 @@
     <tbody>
     </tbody>
 </table>
+
+<div class="div_sty_img" style="display: none;" id="big_img"></div>
 
 </body>
 </html>
