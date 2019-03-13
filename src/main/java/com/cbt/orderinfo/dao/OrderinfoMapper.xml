@@ -509,6 +509,11 @@
                 and o.state=#{state}
             </when>
         </choose>
+        <if test="trackState != -2">
+            and o.order_no in (SELECT sp.orderid FROM shipping_package sp
+            INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
+            AND ti.track_state = #{trackState})
+        </if>
         <if test="admuserid != 0">
             and aru.adminid=#{admuserid}
         </if>
@@ -717,7 +722,7 @@
         WHERE orderid=#{orderNo} and paystatus=0 order by id desc limit 1
     </select>
     <select id="getOrderManagementQuery" resultType="java.util.Map">
-        {call order_management_query_bak(#{orderno},${state},#{type},${userID},${admuserid},${showUnpaid},0,#{startdate_req},#{enddate_req},#{email},${status_},${page},${page},#{paymentid})}
+        {call order_management_query_bak(#{orderno},${state},${trackState},#{type},${userID},${admuserid},${showUnpaid},0,#{startdate_req},#{enddate_req},#{email},${status_},${page},${page},#{paymentid})}
     </select>
     <select id="getOrdersDetails" resultType="com.cbt.bean.OrderDetailsBean">
         select DISTINCT oi.isDropshipOrder,adr.country,ifnull(cast(getExchangeRMB(ors.goods_price*(ifnull(buycount,1)),ifnull(ors.currency,'USD'))as DECIMAL(10,2)),0) as sumGoods_price,
