@@ -1077,26 +1077,24 @@
     </update>
 
     <select id="queryForMd5List" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
-        select * from (
-        select shop_id,pid,goods_md5,count(goods_md5) as md5_num,remote_path,is_delete from custom_goods_md5
-        where 1=1 and is_delete = 0
+        select shop_id,pid,goods_md5,md5_num,remote_path,is_delete
+        from custom_goods_md5_same
+        where 1=1
         <if test="shopId != null">
             and shop_id = #{shopId}
         </if>
-        GROUP BY shop_id,goods_md5 HAVING count(goods_md5) > 1) a
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
     </select>
 
     <select id="queryForMd5ListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
-        select count(0) from (
-        select shop_id,goods_md5,count(goods_md5) as md5_num from custom_goods_md5
-        where 1=1 and is_delete = 0
+        select count(0)
+        from custom_goods_md5_same
+        where 1=1
         <if test="shopId != null">
             and shop_id = #{shopId}
         </if>
-        GROUP BY shop_id,goods_md5 HAVING count(goods_md5) > 1) a
     </select>
 
 
@@ -1107,30 +1105,24 @@
     </update>
 
     <select id="queryMd5NoSameList" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
-        select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
-        from (
-            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
-            where 1=1 and is_delete = 0
-            <if test="md5Val != null">
-                and goods_md5 = #{md5Val}
-            </if>
-            group by shop_id,goods_md5
-        ) a group by a.goods_md5 HAVING count(goods_md5) > 1
+        select shop_id,pid,goods_md5,md5_num,remote_path,is_delete
+        from custom_goods_md5_no_same
+        where 1=1
+        <if test="md5Val != null">
+            and goods_md5 = #{md5Val}
+        </if>
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
         </if>
     </select>
 
     <select id="queryMd5NoSameListCount" resultType="java.lang.Integer" parameterType="com.importExpress.pojo.ShopMd5Bean">
-        select count(0) from (select shop_id,goods_md5,remote_path,count(goods_md5) as md5_num,is_delete
-        from (
-            select shop_id,goods_md5,remote_path,pid,is_delete from custom_goods_md5
-            where 1=1 and is_delete = 0
-            <if test="md5Val != null">
-                and goods_md5 = #{md5Val}
-            </if>
-            group by shop_id,goods_md5
-        ) a group by a.goods_md5 HAVING count(goods_md5) > 1) b
+        select count(0)
+        from custom_goods_md5_no_same
+        where 1=1
+        <if test="md5Val != null">
+            and goods_md5 = #{md5Val}
+        </if>
     </select>
 
     <select id="queryShopGoodsByMd5" resultMap="goodsMd5DeatilsResultMap">

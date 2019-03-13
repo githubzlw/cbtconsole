@@ -334,6 +334,11 @@ public class ShopCarMarketingController {
 
                 //获取原来的重新生成goods_carconfig数据
                 GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
+                if(StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
+                    json.setOk(false);
+                    json.setMessage("客户购物车信息为空");
+                    return json;
+                }
 
                 List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
 
@@ -1397,6 +1402,15 @@ public class ShopCarMarketingController {
             Map<String, Object> listu = userInfoService.getUserCount(Integer.valueOf(userIdStr));
             mv.addObject("userEmail", listu.get("email"));
             listu.clear();
+
+            //获取原来的重新生成goods_carconfig数据
+            GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(Integer.valueOf(userIdStr));
+            if(StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10){
+                mv.addObject("message", "客户购物车信息为空");
+                mv.addObject("success", 0);
+                return mv;
+            }
+
             //查询当前客户存在的购物车数据
             ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
             ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
