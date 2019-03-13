@@ -6484,7 +6484,11 @@ public class WarehouseCtrl {
 				modelM.put("name",ob.getEmail());
 				modelM.put("orderid",orderid);
 				modelM.put("recipients",ob.getRecipients());
-				modelM.put("street",ob.getStreet());
+				if(org.apache.commons.lang3.StringUtils.isNotBlank(ob.getAddresss())){
+					modelM.put("street",ob.getAddresss() + " " + ob.getStreet());
+				}else{
+					modelM.put("street",ob.getStreet());
+				}
 				modelM.put("street1","");
 				modelM.put("city",ob.getAddress2());
 				modelM.put("state",ob.getStatename());

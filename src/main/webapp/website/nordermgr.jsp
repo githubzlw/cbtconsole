@@ -712,16 +712,16 @@ $(document).ready(function(){
 								<option value="8" ${param.state==8?'selected="selected"':''}>采样订单</option>
 						</select>
 						</td>
-						<%--<td style="width: 80px;">运单状态<select id="trackState"
+						<td style="width: 80px;">运单状态<select id="trackState"
 							name="trackState" style="width: 87px;">
 								<option value="0" ${param.trackState==0?'selected="selected"':''}>全部订单</option>
-								<option value="2" ${param.trackState==2?'selected="selected"':''}>出运中</option>
+								<option value="2" ${param.trackState==2?'selected="selected"':''}>已发货</option>
 								<option value="3" ${param.trackState==3?'selected="selected"':''}>已签收</option>
 								<option value="4" ${param.trackState==4?'selected="selected"':''}>退回</option>
 								<option value="5" ${param.trackState==5?'selected="selected"':''}>异常</option>
 								<option value="6" ${param.trackState==6?'selected="selected"':''}>内部异常</option>
 								<option value="7" ${param.trackState==7?'selected="selected"':''}>手动标记为正常</option>
-						</select>--%>
+						</select>
 						</td>
 						<td style="width: 115px;">销售负责人： <select id="adminusersc"
 							name="adminuser" style="width: 87px;">

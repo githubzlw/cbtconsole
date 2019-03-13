@@ -54,8 +54,8 @@
         }
 
         .div_sty {
-            width: 185px;
-            height: 215px;
+            width: 225px;
+            height: 235px;
         }
 
         .s_btn {
@@ -261,7 +261,7 @@
                         <c:if test="${imgGd.valid == 1}">
                             <span>商品状态：上架</span>
                         </c:if>
-                        <c:if test="${imgGd.valid != 0}">
+                        <c:if test="${imgGd.valid != 1}">
                             <span>商品状态：下架</span>
                         </c:if>
                         <br>
@@ -275,11 +275,11 @@
 
                     </div>
                 </td>
-                <c:if test="${count % 10 == 0}">
+                <c:if test="${count % 8 == 0}">
                     </tr>
                 </c:if>
             </c:forEach>
-            <c:if test="${count % 10 > 0}">
+            <c:if test="${count % 8 > 0}">
                 </tr>
             </c:if>
         </table>

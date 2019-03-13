@@ -28,7 +28,6 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +51,6 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -656,6 +654,7 @@ public class OrderInfoController{
 	public void getQueryParam(HttpServletRequest request,Map<String,String> paramMap,Admuser user,HttpServletResponse response){
 		String userID_req = request.getParameter("userid");
 		String state_req = request.getParameter("state");
+		String trackState_req = request.getParameter("trackState");
 		String startdate_req = request.getParameter("startdate");
 		String enddate_req = request.getParameter("enddate");
 		int showUnpaid = Integer.parseInt(request.getParameter("showUnpaid"));
@@ -678,6 +677,7 @@ public class OrderInfoController{
 		userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
 		int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
 		int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
+		int trackState = Utility.getStringIsNull(trackState_req) ? Integer.parseInt(trackState_req) : -2;
 		int admuserid=user.getId();
 		if("0".equals(user.getRoletype())){
 			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
@@ -686,6 +686,7 @@ public class OrderInfoController{
 		enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
 		paramMap.put("userID",String.valueOf(userID));
 		paramMap.put("state",String.valueOf(state));
+		paramMap.put("trackState",String.valueOf(trackState));
 		paramMap.put("startdate_req",startdate_req);
 		paramMap.put("enddate_req",enddate_req);
 		paramMap.put("orderno",orderno);
