@@ -369,7 +369,7 @@
 			separator=";">
 			update hot_selling_goods set is_on = #{value}
 			where
-			goods_pid = #{key}
+			goods_pid = #{key} and hot_selling_id = #{categoryId}
 		</foreach>
 	</update>
 	

@@ -204,7 +204,7 @@ public interface HotGoodsMapper {
 	 * @return
 	 * @return int
 	 */
-	public int useHotGoodsByState(@Param("pidsMap") Map<String, String> pidsMap);
+	public int useHotGoodsByState(@Param("pidsMap") Map<String, String> pidsMap, @Param("categoryId") int categoryId);
 	
 	/**
 	 * 

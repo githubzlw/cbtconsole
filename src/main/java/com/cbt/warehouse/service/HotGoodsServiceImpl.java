@@ -140,7 +140,7 @@ public class HotGoodsServiceImpl implements HotGoodsService {
 		for (String key : pidsMap.keySet()) {
 			hotManageMapper.insertHotSellingUpdateLog(hotId, key, adminId, Integer.valueOf(pidsMap.get(key)));
 		}
-		return hotGoodsMapper.useHotGoodsByState(pidsMap);
+		return hotGoodsMapper.useHotGoodsByState(pidsMap, hotId);
 	}
 
 	@Override
