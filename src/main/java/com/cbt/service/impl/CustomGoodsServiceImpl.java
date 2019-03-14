@@ -588,6 +588,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updateMd5ImgDeleteFlag(String pid, String url, String shopId) {
+        // 更新临时表数据
+        customGoodsMapper.deleteMd5ImgSameTempFlag(pid, url, shopId);
         return customGoodsMapper.updateMd5ImgDeleteFlag(pid, url, shopId);
     }
 
@@ -612,8 +614,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public int updateImgDeleteByMd5(String goodsMd5, String shopId) {
-        return customGoodsMapper.updateImgDeleteByMd5(goodsMd5, shopId);
+    public int updateImgDeleteByMd5(String goodsMd5) {
+        // 更新临时表数据
+        customGoodsMapper.deleteMd5ImgNoSameTempFlag(goodsMd5);
+        return customGoodsMapper.updateImgDeleteByMd5(goodsMd5);
     }
 
     @Override
