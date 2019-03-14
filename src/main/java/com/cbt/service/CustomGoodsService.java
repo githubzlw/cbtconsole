@@ -579,7 +579,7 @@ public interface CustomGoodsService {
 
     JsonResult setGoodsWeightByWeigher(String pid, String newWeight, int weightIsEdit);
 
-    JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit);
+    JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit, int adminId);
 
     List<OnlineGoodsCheck> queryOnlineGoodsForList(OnlineGoodsCheck queryPm);
 
@@ -712,4 +712,11 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryPidListByState(int state);
+
+    /**
+     * 插入价格或者重量记录
+     * @param editBean
+     * @return
+     */
+    int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean);
 }

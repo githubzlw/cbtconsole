@@ -119,6 +119,7 @@
         <result column="size_info_en" property="sizeInfoEn"/>
         <result column="from_flag" property="fromFlag"/>
         <result column="weight" property="weight1688"/>
+        <result column="add_price_lv" property="addPriceLv"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -150,6 +151,24 @@
         <result column="price_1688" property="price_1688"/>
         <result column="search_num" property="search_num"/>
         <result column="click_num" property="click_num"/>
+
+        <result column="price_old" property="price_old"/>
+        <result column="wprice_old" property="wprice_old"/>
+        <result column="feeprice_old" property="feeprice_old"/>
+        <result column="range_price_old" property="range_price_old"/>
+        <result column="weight_old" property="weight_old"/>
+        <result column="revise_weight_old" property="revise_weight_old"/>
+        <result column="final_weight_old" property="final_weight_old"/>
+        <result column="fprice_str_old" property="fprice_str_old"/>
+
+        <result column="price_new" property="price_new"/>
+        <result column="wprice_new" property="wprice_new"/>
+        <result column="feeprice_new" property="feeprice_new"/>
+        <result column="range_price_new" property="range_price_new"/>
+        <result column="weight_new" property="weight_new"/>
+        <result column="revise_weight_new" property="revise_weight_new"/>
+        <result column="final_weight_new" property="final_weight_new"/>
+        <result column="fprice_str_new" property="fprice_str_new"/>
     </resultMap>
 
 
@@ -324,10 +343,20 @@
           #{benchmarking_flag},#{describe_good_flag},#{never_off_flag},#{publish_flag},#{repaired_flag},#{promotion_flag})
     </insert>
 
+
+    <insert id="insertIntoGoodsPriceOrWeight" parameterType="com.importExpress.pojo.GoodsEditBean">
+        insert into custom_goods_edited_log(pid,admin_id,price_old,wprice_old,feeprice_old,range_price_old,weight_old,revise_weight_old,final_weight_old
+        ,price_new,wprice_new,feeprice_new,range_price_new,weight_new,revise_weight_new,final_weight_new)
+        values(#{pid},#{admin_id},#{price_old},#{wprice_old},#{feeprice_old},#{range_price_old},#{weight_old},#{revise_weight_old},#{final_weight_old},
+        #{price_new},#{wprice_new},#{feeprice_new},#{range_price_new},#{weight_new},#{revise_weight_new},#{final_weight_new})
+    </insert>
+
     <select id="queryGoodsEditBean" parameterType="com.importExpress.pojo.GoodsEditBean" resultMap="goodsEditResultMap">
         select a.id,a.pid,a.old_title,a.new_title,a.admin_id,b.admName as admin_name,a.weight_flag,a.ugly_flag,
         a.benchmarking_flag,a.describe_good_flag,a.never_off_flag,a.publish_flag,a.repaired_flag,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
+        a.price_old,a.wprice_old,a.feeprice_old,a.range_price_old,a.weight_old,a.revise_weight_old,a.final_weight_old,a.fprice_str_old,
+        a.price_new,a.wprice_new,a.feeprice_new,a.range_price_new,a.weight_new,a.revise_weight_new,a.final_weight_new,a.fprice_str_new
         from custom_goods_edited_log a left join admuser b
         on a.admin_id = b.id
         where 1=1
@@ -530,7 +559,7 @@
             and cbu.is_sold_flag &gt; 0
         </if>
         <if test="isWeigthZero == 1">
-            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
         </if>
 
         <if test="isSort == 1">
@@ -681,7 +710,7 @@
             and cbu.is_sold_flag &gt; 0
         </if>
         <if test="isWeigthZero == 1">
-            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
         </if>
     </select>
 
@@ -813,7 +842,7 @@
             and cbu.is_sold_flag &gt; 0
         </if>
         <if test="isWeigthZero == 1">
-            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0')
+            and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
         </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
@@ -821,7 +850,7 @@
 
 
     <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
-        select cbu.pid,cbu.enname,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,
+        select cbu.pid,cbu.enname,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
@@ -897,6 +926,7 @@
         <if test="weightIsEdit == 1">
             ,b.goodsstate = 5
         </if>
+        ,b.weight = case when (b.weight = '' or b.weight is null or b.weight = '0' or b.weight = '0.0') then #{newWeight} else b.weight end
         where a.pid = b.pid and  b.pid = #{pid}
     </update>
 

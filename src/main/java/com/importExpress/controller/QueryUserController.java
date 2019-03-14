@@ -1,6 +1,8 @@
 package com.importExpress.controller;
 
 import com.cbt.bean.EasyUiJsonResult;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.service.QueryUserService;
@@ -399,9 +401,12 @@ public class QueryUserController {
      */
     @RequestMapping(value = "synGoodsWeight", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, String> synGoodsWeight() {
+    public Map<String, String> synGoodsWeight(HttpServletRequest request) {
         Map<String, String> result = new HashMap<String, String>();
         try {
+            String sessionId = request.getSession().getId();
+			String userJson = Redis.hget(sessionId, "admuser");
+			com.cbt.website.userAuth.bean.Admuser user = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil.JsonToObj(userJson, com.cbt.website.userAuth.bean.Admuser.class);
             //查询待同步数据
             List<String> pidList = queryUserService.queryGoodsWeightNoSyn();
             if (null == pidList || pidList.size() == 0){
@@ -411,7 +416,7 @@ public class QueryUserController {
             }
             //调用蒋接口同步
             for (String pid : pidList) {
-                iWarehouseService.saveWeightFlag(pid);
+                iWarehouseService.saveWeightFlag(pid, user.getId());
             }
             result.put("message", "success");
             return result;
