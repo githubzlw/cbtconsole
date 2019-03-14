@@ -54,8 +54,8 @@
         }
 
         .div_sty {
-            width: 225px;
-            height: 235px;
+            width: 232px;
+            height: 277px;
         }
 
         .s_btn {
@@ -222,11 +222,9 @@
 
     <div class="div_sty_img" style="display: none;" id="big_img"></div>
     <div>
-        <h1 align="center">同MD5店铺图片展示(<span style="color:green">总数:${showTotal}</span>)</h1>
+        <h2 align="center">同MD5店铺图片展示(<span style="color:green">总数:${showTotal}</span>)</h2>
         <div>
-
-				<span><b
-                        style="color: red; font-size: 18px;">请点击图片查看放大的图片</b></span>
+            <span><b style="color: red; font-size: 18px;">请点击图片查看放大的图片</b></span>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input class="select_ckb" type="button" onclick="chooseImgBox(1)" value="全选"/>
             &nbsp;&nbsp;&nbsp;
@@ -238,7 +236,8 @@
             &nbsp;&nbsp;
             <input class="option_ckb" type="button" onclick="batchOffGoods()" value="批量下架"/>
         </div>
-        <table border="1" cellpadding="0" cellspacing="0" align="center">
+        <br>
+        <table border="1" cellpadding="0" cellspacing="0" align="left">
             <c:set var="count" value="0"/>
             <c:forEach items="${list}" var="imgGd">
                 <c:set var="count" value="${count+1 }"/>
@@ -255,8 +254,9 @@
                                      href="/cbtconsole/editc/detalisEdit?pid=${imgGd.pid}">${imgGd.pid}</a></span>
                         <br>
                         <span>ShopId:${imgGd.shopId}</span>
-                        <br> <img class="img_sty" src="/cbtconsole/img/yuanfeihang/loaderTwo.gif"
-                                  data-original="${imgGd.imgShow}" onclick="bigImg('${imgGd.imgShow}')"/>
+                        <br> <%--<img class="img_sty" src="/cbtconsole/img/yuanfeihang/loaderTwo.gif"
+                                  data-original="${imgGd.imgShow}" onclick="bigImg('${imgGd.imgShow}')"/>--%>
+                            <img class="img_sty" src="${imgGd.imgShow}" onclick="bigImg('${imgGd.imgShow}')"/>
                         <br>
                         <c:if test="${imgGd.valid == 1}">
                             <span>商品状态：上架</span>
