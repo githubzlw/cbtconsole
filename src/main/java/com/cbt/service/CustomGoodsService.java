@@ -677,10 +677,9 @@ public interface CustomGoodsService {
 	/**
      * 根据MD5数据标识已删除
      * @param goodsMd5
-     * @param shopId
      * @return
      */
-	int updateImgDeleteByMd5(String goodsMd5, String shopId);
+	int updateImgDeleteByMd5(String goodsMd5);
 
 
 	/**

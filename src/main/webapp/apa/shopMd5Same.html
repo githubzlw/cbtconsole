@@ -111,8 +111,10 @@
 
         function doQuery() {
             var shopId = $("#query_shop_id").val();
+            var md5Num = $("#query_md5_num").val();
             $("#md5_easyui-datagrid").datagrid("load", {
-                "shopId": shopId
+                "shopId": shopId,
+                "md5Num": md5Num
             });
         }
 
@@ -193,11 +195,11 @@
 <div id="md5_toolbar" style="padding: 5px; height: auto">
     <form id="md5_query_form" action="#" onsubmit="return false;">
         <span>店铺ID:<input id="query_shop_id" type="text" value="" style="width: 220px;height: 22px;"/></span>
-        <!--<span>是否删除:<select id="query_is_delete">
-            <option value="-1">全部</option>
-            <option value="0">未删除</option>
-            <option value="1">已删除</option>
-        </select></span>-->
+        <span>相同数量:<select id="query_md5_num" style="width: 100px;height: 22px;">
+            <option value="0">全部</option>
+            <option value="1">相同数量<=5</option>
+            <option value="2">相同数量>5</option>
+        </select></span>
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
     </form>

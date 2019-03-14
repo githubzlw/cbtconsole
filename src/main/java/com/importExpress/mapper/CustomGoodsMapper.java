@@ -295,6 +295,16 @@ public interface CustomGoodsMapper {
      */
     int updateMd5ImgDeleteFlag(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
 
+    /**
+     * 删除同店铺MD5临时表数据
+     * @param pid
+     * @param url
+     * @param shopId
+     * @return
+     */
+    int deleteMd5ImgSameTempFlag(@Param("pid") String pid, @Param("url") String url, @Param("shopId") String shopId);
+
+
 
     /**
      * 获取相同店铺下的商品信息
@@ -320,11 +330,17 @@ public interface CustomGoodsMapper {
     /**
      * 根据MD5数据标识已删除
      * @param goodsMd5
-     * @param shopId
      * @return
      */
-	int updateImgDeleteByMd5(@Param("goodsMd5") String goodsMd5, @Param("shopId") String shopId);
+	int updateImgDeleteByMd5(@Param("goodsMd5") String goodsMd5);
 
+
+	/**
+     * 删除非同店铺MD5临时表数据
+     * @param goodsMd5
+     * @return
+     */
+    int deleteMd5ImgNoSameTempFlag(@Param("goodsMd5") String goodsMd5);
 
 	/**
      * 获取不同店铺下的商品信息
