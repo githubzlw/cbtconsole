@@ -61,7 +61,7 @@ public class InputData {
     private String isNewCloud;
     private String finalName;
     private String sellunit;
-    private String cur_time;
+    private String cur_time;//若更新solr  该字段一定要设置
     private String bm_flag;
     private String source_pro_flag;
     private String is_sold_flag;
@@ -89,11 +89,21 @@ public class InputData {
     private String core_flag;
     private String score;
     private String is_edited;
-    private Character crud;
+    private Character crud;//u表示更新；c表示创建，d表示删除
     private String rw_keyword;
     private String size_info_en;
+    private String custom_video_flag;
+    
 
-    public String getSize_info_en() {
+    public String getCustom_video_flag() {
+		return custom_video_flag;
+	}
+
+	public void setCustom_video_flag(String custom_video_flag) {
+		this.custom_video_flag = custom_video_flag;
+	}
+
+	public String getSize_info_en() {
         return size_info_en;
     }
 
