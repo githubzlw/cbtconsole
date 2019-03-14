@@ -1106,6 +1106,11 @@ public class CustomGoodsController {
             md5Bean.setShopId(shopId);
         }
 
+        String md5NumStr = request.getParameter("md5Num");
+        if (StringUtils.isNotBlank(md5NumStr) && !"0".equals(md5NumStr)) {
+            md5Bean.setMd5Num(Integer.valueOf(md5NumStr));
+        }
+
 
         try {
             List<ShopMd5Bean> res = customGoodsService.queryForMd5List(md5Bean);
@@ -1161,7 +1166,7 @@ public class CustomGoodsController {
 
 
         try {
-            customGoodsService.updateImgDeleteByMd5(md5, shopId);
+            customGoodsService.updateImgDeleteByMd5(md5);
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1305,6 +1310,8 @@ public class CustomGoodsController {
                     pidList.add(pid);
                 }
             }
+
+            customGoodsService.updateImgDeleteByMd5(md5Val);
 
             List<GoodsMd5Bean> list = customGoodsService.queryShopGoodsByMd5(md5Val);
             List<ShopGoodsInfo> deleteGoodsInfos = new ArrayList<>();

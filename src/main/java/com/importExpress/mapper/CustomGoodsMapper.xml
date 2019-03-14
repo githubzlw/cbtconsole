@@ -1106,12 +1106,25 @@
         where a.goods_md5 = b.goods_md5 and a.shop_id = #{shopId}
     </update>
 
+    <delete id="deleteMd5ImgSameTempFlag">
+        delete from custom_goods_md5_same where shop_id = #{shopId}
+        and goods_md5 in(select goods_md5 from custom_goods_md5 where pid = #{pid}
+        and remote_path = #{url} and ifnull(goods_md5,'') != '' and shop_id = #{shopId})
+    </delete>
+
+
     <select id="queryForMd5List" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
         select shop_id,pid,goods_md5,md5_num,remote_path,is_delete
         from custom_goods_md5_same
         where 1=1
         <if test="shopId != null">
             and shop_id = #{shopId}
+        </if>
+        <if test="md5Num == 1">
+            and md5_num &lt;= 5
+        </if>
+        <if test="md5Num == 2">
+            and md5_num &gt; 5
         </if>
         <if test="limitNum > 0">
             limit #{startNum},#{limitNum}
@@ -1125,14 +1138,26 @@
         <if test="shopId != null">
             and shop_id = #{shopId}
         </if>
+        <if test="md5Num == 1">
+            and md5_num &lt;= 5
+        </if>
+        <if test="md5Num == 2">
+            and md5_num &gt; 5
+        </if>
     </select>
 
 
     <update id="updateImgDeleteByMd5">
         update custom_goods_md5
         set is_delete = 1
-        where goods_md5 = #{goodsMd5} and shop_id = #{shopId}
+        where goods_md5 = #{goodsMd5}
     </update>
+
+
+    <delete id="deleteMd5ImgNoSameTempFlag">
+        delete from custom_goods_md5_no_same
+        where goods_md5 = #{goodsMd5}
+    </delete>
 
     <select id="queryMd5NoSameList" resultMap="shopMd5BeanResultMap" parameterType="com.importExpress.pojo.ShopMd5Bean">
         select shop_id,pid,goods_md5,md5_num,remote_path,is_delete
