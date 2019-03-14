@@ -3501,7 +3501,7 @@
 		 INNER JOIN USER u ON oi.user_id=u.id
 		 INNER JOIN admin_r_user a ON u.id=a.userid
 		 INNER JOIN admuser ad ON a.adminid=ad.id
-		 WHERE LOCATE(oi.order_no,#{orderNo})
+		 WHERE LOCATE(oi.order_no,#{orderNo}) limit 1
 	</select>
 	<select id="getBuyReturnManageCount" resultType="INTEGER">
 		SELECT count(distinct t.id) FROM order_details od
