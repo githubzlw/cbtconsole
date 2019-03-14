@@ -357,4 +357,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryPidListByState(@Param("state") int state);
+
+    /**
+     * 插入价格或者重量记录
+     * @param editBean
+     * @return
+     */
+    int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean);
 }
