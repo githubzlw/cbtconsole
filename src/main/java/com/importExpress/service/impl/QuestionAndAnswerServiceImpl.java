@@ -4,6 +4,7 @@ import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.mapper.QueAnsMapper;
 import com.importExpress.pojo.QueAns;
 import com.importExpress.service.QuestionAndAnswerService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,11 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
                                     int adminId, int replyFlag, int replyStatus,String startdate, String enddate, int page) {
 		List<QueAns> list=queAnsMapper.findByQuery(goodsPid, goodsName, adminId,replyFlag,replyStatus, startdate,enddate, page);
 		for(QueAns q:list){
-			if(StringUtil.isNotBlank(q.getReply_content())){
+            String purl = q.getPurl();
+            if (StringUtils.isNotBlank(purl) && !purl.startsWith("http")){
+                q.setPurl("https://www.importx.com" + purl);
+            }
+            if(StringUtil.isNotBlank(q.getReply_content())){
 				q.setReply_content(q.getReply_content().replace("\n",""));
 			}
 			String flag="0";
