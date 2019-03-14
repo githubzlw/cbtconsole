@@ -480,12 +480,26 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
     @Override
-    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit) {
+    public JsonResult setGoodsWeightByWeigherNew(String pid, String newWeight, int weightIsEdit, int adminId) {
         JsonResult json = new JsonResult();
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
         boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), weightIsEdit) > 0;
         if (is) {
+            // 插入日志记录
+            GoodsEditBean editBean = new GoodsEditBean();
+            editBean.setAdmin_id(adminId);
+            if(StringUtils.isBlank(orGoods.getWeight()) || "0".equals(orGoods.getWeight()) || "0.00".equals(orGoods.getWeight())){
+                editBean.setWeight_old(orGoods.getWeight());
+                editBean.setWeight_new(newWeight);
+            }
+            editBean.setRevise_weight_old(orGoods.getReviseWeight());
+            editBean.setFinal_weight_old(orGoods.getFinalWeight());
+            editBean.setRevise_weight_new(newWeight);
+            editBean.setFinal_weight_new(newWeight);
+            editBean.setPid(pid);
+            customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
+
             boolean isSuccess = refreshPriceRelatedData(orGoods,newWeight);
             if (isSuccess) {
                 json.setOk(true);
@@ -624,4 +638,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public List<String> queryPidListByState(int state) {
         return customGoodsMapper.queryPidListByState(state);
     }
+
+    @Override
+    public int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean) {
+        return customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
+    }
+
+
 }

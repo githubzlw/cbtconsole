@@ -1,5 +1,7 @@
 package com.importExpress.pojo;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class GoodsEditBean {
 
     private int id;
@@ -28,7 +30,194 @@ public class GoodsEditBean {
     private int limitNum;
     private int startNum;
     private int promotion_flag;
+    private String price_old;
+    private String wprice_old;
+    private String feeprice_old;
+    private String range_price_old;
+    private String weight_old;
+    private String revise_weight_old;
+    private String final_weight_old;
+    private String fprice_str_old;
 
+    private String price_new;
+    private String wprice_new;
+    private String feeprice_new;
+    private String range_price_new;
+    private String weight_new;
+    private String revise_weight_new;
+    private String final_weight_new;
+    private String fprice_str_new;
+
+    private int priceShowFlag;
+    private int weightShowFlag;
+
+    public int getPriceShowFlag() {
+        return priceShowFlag;
+    }
+
+    public void setPriceShowFlag(int priceShowFlag) {
+        this.priceShowFlag = priceShowFlag;
+    }
+
+    public int getWeightShowFlag() {
+        return weightShowFlag;
+    }
+
+    public void setWeightShowFlag(int weightShowFlag) {
+        this.weightShowFlag = weightShowFlag;
+    }
+
+    public String getFprice_str_old() {
+        return fprice_str_old;
+    }
+
+    public void setFprice_str_old(String fprice_str_old) {
+        this.fprice_str_old = fprice_str_old;
+    }
+
+    public String getFprice_str_new() {
+        return fprice_str_new;
+    }
+
+    public void setFprice_str_new(String fprice_str_new) {
+        this.fprice_str_new = fprice_str_new;
+        if(StringUtils.isNotBlank(fprice_str_new)){
+            priceShowFlag ++;
+        }
+    }
+
+    public String getPrice_old() {
+        return price_old;
+    }
+
+    public void setPrice_old(String price_old) {
+        this.price_old = price_old;
+    }
+
+    public String getWprice_old() {
+        return wprice_old;
+    }
+
+    public void setWprice_old(String wprice_old) {
+        this.wprice_old = wprice_old;
+    }
+
+    public String getFeeprice_old() {
+        return feeprice_old;
+    }
+
+    public void setFeeprice_old(String feeprice_old) {
+        this.feeprice_old = feeprice_old;
+    }
+
+    public String getRange_price_old() {
+        return range_price_old;
+    }
+
+    public void setRange_price_old(String range_price_old) {
+        this.range_price_old = range_price_old;
+    }
+
+    public String getWeight_old() {
+        return weight_old;
+    }
+
+    public void setWeight_old(String weight_old) {
+        this.weight_old = weight_old;
+    }
+
+    public String getRevise_weight_old() {
+        return revise_weight_old;
+    }
+
+    public void setRevise_weight_old(String revise_weight_old) {
+        this.revise_weight_old = revise_weight_old;
+    }
+
+    public String getFinal_weight_old() {
+        return final_weight_old;
+    }
+
+    public void setFinal_weight_old(String final_weight_old) {
+        this.final_weight_old = final_weight_old;
+    }
+
+    public String getPrice_new() {
+        return price_new;
+    }
+
+    public void setPrice_new(String price_new) {
+        this.price_new = price_new;
+        if(StringUtils.isNotBlank(price_new)){
+            priceShowFlag ++;
+        }
+    }
+
+    public String getWprice_new() {
+        return wprice_new;
+    }
+
+    public void setWprice_new(String wprice_new) {
+        this.wprice_new = wprice_new;
+        if(StringUtils.isNotBlank(wprice_new)){
+            priceShowFlag ++;
+        }
+    }
+
+    public String getFeeprice_new() {
+        return feeprice_new;
+    }
+
+    public void setFeeprice_new(String feeprice_new) {
+        this.feeprice_new = feeprice_new;
+        if(StringUtils.isNotBlank(feeprice_new)){
+            priceShowFlag ++;
+        }
+    }
+
+    public String getRange_price_new() {
+        return range_price_new;
+    }
+
+    public void setRange_price_new(String range_price_new) {
+        this.range_price_new = range_price_new;
+        if(StringUtils.isNotBlank(range_price_new)){
+            priceShowFlag ++;
+        }
+    }
+
+    public String getWeight_new() {
+        return weight_new;
+    }
+
+    public void setWeight_new(String weight_new) {
+        this.weight_new = weight_new;
+        if(StringUtils.isNotBlank(weight_new)){
+            weightShowFlag ++;
+        }
+    }
+
+    public String getRevise_weight_new() {
+        return revise_weight_new;
+    }
+
+    public void setRevise_weight_new(String revise_weight_new) {
+        this.revise_weight_new = revise_weight_new;
+        if(StringUtils.isNotBlank(revise_weight_new)){
+            weightShowFlag ++;
+        }
+    }
+
+    public String getFinal_weight_new() {
+        return final_weight_new;
+    }
+
+    public void setFinal_weight_new(String final_weight_new) {
+        this.final_weight_new = final_weight_new;
+        if(StringUtils.isNotBlank(final_weight_new)){
+            weightShowFlag ++;
+        }
+    }
 
     public int getId() {
         return id;

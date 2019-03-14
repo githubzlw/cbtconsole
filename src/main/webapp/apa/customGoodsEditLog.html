@@ -200,6 +200,38 @@
                 return "";
             }
         }
+
+        function formatWeightShowFlag(val, row, index) {
+            var content = '';
+            if(val > 0){
+                content = '<div><span>原重:'+row.final_weight_old+'</span><span>,现重:'+row.final_weight_new+'; </span></div>';
+            }
+            return content;
+        }
+
+        function formatPriceShowFlag(val, row, index) {
+            var content = '';
+            if(val > 0){
+                content = '<div>';
+                if(row.price_new){
+                    content += '<span>原price:'+row.price_old+'</span><span>,现price:'+row.price_new+'; </span><br>';
+                }
+                if(row.wprice_new){
+                    content += '<span>原wprice:'+row.wprice_old+'</span><span>,现wprice:'+row.wprice_new+'; </span><br>';
+                }
+                if(row.feeprice_new){
+                    content += '<span>原feeprice:'+row.feeprice_old+'</span><span>,现feeprice:'+row.feeprice_new+'; </span><br>';
+                }
+                if(row.range_price_new){
+                    content += '<span>原rangePrice:'+row.range_price_old+'</span><span>,现rangePrice:'+row.range_price_new+'; </span><br>';
+                }
+                if(row.fprice_str_new){
+                    content += '<span>原bizPrice:'+row.fprice_str_old+'</span><span>,bizPrice:'+row.fprice_str_new+'; </span><br>';
+                }
+                content += '</div>';
+            }
+            return content;
+        }
     </script>
 
 </head>
@@ -239,13 +271,15 @@
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'pid',width:'100px',formatter:formatPid">PID</th>
-        <th data-options="field:'old_title',align:'center',width:'350px'">原标题</th>
-        <th data-options="field:'new_title',align:'center',width:'350px'">新标题</th>
-        <th data-options="field:'weight_flag',align:'center',width:'80px',formatter:formatWeight">重量不合理标注</th>
-        <th data-options="field:'ugly_flag',align:'center',width:'65px',formatter:formatUgly">难看标注</th>
-        <th data-options="field:'repaired_flag',align:'center',width:'65px',formatter:formatRepaired">修复标注</th>
-        <th data-options="field:'benchmarking_flag',align:'center',width:'65px',formatter:formatBenchmarking">对标情况改变</th>
+        <th data-options="field:'pid',width:'90px',formatter:formatPid">PID</th>
+        <th data-options="field:'old_title',align:'center',width:'230px'">原标题</th>
+        <th data-options="field:'new_title',align:'center',width:'230px'">新标题</th>
+        <th data-options="field:'weight_flag',align:'center',width:'70px',formatter:formatWeight">重量不合理标注</th>
+        <th data-options="field:'ugly_flag',align:'center',width:'50px',formatter:formatUgly">难看标注</th>
+        <th data-options="field:'repaired_flag',align:'center',width:'50px',formatter:formatRepaired">修复标注</th>
+        <th data-options="field:'benchmarking_flag',align:'center',width:'50px',formatter:formatBenchmarking">对标改变</th>
+        <th data-options="field:'weightShowFlag',align:'center',width:'120px',formatter:formatWeightShowFlag">重量修改</th>
+        <th data-options="field:'priceShowFlag',align:'center',width:'150px',formatter:formatPriceShowFlag">价格修改</th>
         <th data-options="field:'admin_name',align:'center',width:'50px'">操作人</th>
         <th data-options="field:'create_time',align:'center',width:'120px'">操作时间</th>
     </tr>
