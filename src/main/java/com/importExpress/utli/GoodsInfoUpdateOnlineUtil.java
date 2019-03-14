@@ -668,6 +668,7 @@ public class GoodsInfoUpdateOnlineUtil {
     		InputData inputData = new InputData('u');
     		inputData.setPid(l);
     		inputData.setCustom_video_flag("1");
+    		inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
     		GoodsInfoUpdateOnlineUtil.updateLocalAndSolr(inputData , 1);
     		
     	}
