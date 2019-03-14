@@ -279,7 +279,7 @@ public class EditorController {
 
 
             //计算加价率
-            if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
+            /*if ((goods.getIsBenchmark() == 1 && goods.getBmFlag() == 1) || goods.getIsBenchmark() == 2) {
                 //对标时
                 //priceXs = (aliFinalPrice(速卖通价格)-feepriceSingle(运费0.076)/StrUtils.EXCHANGE_RATE(6.6))/(factory(1688人民币p1价格)/StrUtils.EXCHANGE_RATE(6.6));
                 String aliPirce;
@@ -299,7 +299,7 @@ public class EditorController {
                 //加价率= 0.55+类别调整值
                 oldProfit = 0.55 + catXs;
                 goods.setOldProfit(BigDecimalUtil.truncateDouble(oldProfit, 2));
-            }
+            }*/
         } else {
             System.err.println("pid:" + pid + ",wholePrice is null");
         }
@@ -728,8 +728,9 @@ public class EditorController {
                 }
             }
 
+            GoodsEditBean editBean = new GoodsEditBean();
             // 判断是否改价 wprice range_price feeprice price  fprice_str
-            if (checkPriceIsUpdate(cgp, orGoods)) {
+            if (checkPriceIsUpdate(cgp, orGoods, editBean)) {
                 System.err.println("pid:" + pidStr + ",not update price");
             } else {
                 cgp.setPriceIsEdit(1);
@@ -830,7 +831,7 @@ public class EditorController {
                 cgp.setIsUpdateImg(2);
             }
 
-            GoodsEditBean editBean = new GoodsEditBean();
+
 
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
@@ -844,11 +845,17 @@ public class EditorController {
 
             int success = customGoodsService.saveEditDetalis(cgp, tempName, tempId, Integer.valueOf(type));
             if (success > 0) {
-                customGoodsService.insertIntoGoodsEditBean(editBean);
+
+                if(editBean.getPriceShowFlag() > 0){
+                    customGoodsService.insertIntoGoodsPriceOrWeight(editBean);
+                } else{
+                    customGoodsService.insertIntoGoodsEditBean(editBean);
+                }
                 //更新编辑标识
                 editBean.setIs_edited(1);
                 editBean.setPublish_flag(0);
                 customGoodsService.updatePidIsEdited(editBean);
+
 
 
                 json.setOk(true);
@@ -897,50 +904,80 @@ public class EditorController {
         return json;
     }
 
-    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp, CustomGoodsPublish orGoods) {
+    private boolean checkPriceIsUpdate(CustomGoodsPublish cgp, CustomGoodsPublish orGoods, GoodsEditBean editBean) {
+        // 插入日志记录
         int count = 0;
         // 判断是否改价 wprice range_price feeprice price  fprice_str,判断相同的，加一
         // wprice
         if (StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())) {
             if (cgp.getWprice().equals(orGoods.getWprice())) {
                 count++;
+            } else{
+                editBean.setWprice_old(orGoods.getWprice());
+                editBean.setWprice_new(cgp.getWprice());
             }
         } else if (StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())) {
             count++;
+        } else{
+            editBean.setWprice_old(orGoods.getWprice());
+            editBean.setWprice_new(cgp.getWprice());
         }
         // range_price
         if (StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())) {
             if (cgp.getRangePrice().equals(orGoods.getRangePrice())) {
                 count++;
+            } else{
+                editBean.setRange_price_old(orGoods.getRangePrice());
+                editBean.setRange_price_new(cgp.getRangePrice());
             }
         } else if (StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())) {
             count++;
+        } else{
+            editBean.setRange_price_old(orGoods.getRangePrice());
+            editBean.setRange_price_new(cgp.getRangePrice());
         }
         // feeprice
         if (StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())) {
             if (cgp.getFeeprice().equals(orGoods.getFeeprice())) {
                 count++;
+            } else{
+                editBean.setFeeprice_old(orGoods.getFeeprice());
+                editBean.setFeeprice_new(cgp.getFeeprice());
             }
         } else if (StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())) {
             count++;
+        } else{
+            editBean.setFeeprice_old(orGoods.getFeeprice());
+            editBean.setFeeprice_new(cgp.getFeeprice());
         }
         // price
         if (StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())) {
             if (cgp.getPrice().equals(orGoods.getPrice())) {
                 count++;
+            } else{
+                editBean.setPrice_old(orGoods.getPrice());
+                editBean.setPrice_new(cgp.getPrice());
             }
         } else if (StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())) {
             count++;
+        } else{
+            editBean.setPrice_old(orGoods.getPrice());
+            editBean.setPrice_new(cgp.getPrice());
         }
         // fprice_str
         if (StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())) {
             if (cgp.getFpriceStr().equals(orGoods.getFpriceStr())) {
                 count++;
+            } else{
+                editBean.setFprice_str_old(orGoods.getFpriceStr());
+                editBean.setFprice_str_new(cgp.getFpriceStr());
             }
         } else if (StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())) {
             count++;
+        } else{
+            editBean.setFprice_str_old(orGoods.getFpriceStr());
+            editBean.setFprice_str_new(cgp.getFpriceStr());
         }
-
         return count == 5;
     }
 
@@ -2629,7 +2666,7 @@ public class EditorController {
                 json.setMessage("执行错误，请重试");
             }*/
             // 修改重量非直接显示价格数据更新
-            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,1);
+            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,1, user.getId());
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
@@ -2644,8 +2681,18 @@ public class EditorController {
 
     @RequestMapping(value = "/setGoodsWeightByWeigher")
     @ResponseBody
-    public JsonResult setGoodsWeightByWeigher(String pid, String newWeight) {
+    public JsonResult setGoodsWeightByWeigher(HttpServletRequest request,String pid, String newWeight) {
         JsonResult json = new JsonResult();
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
         if (StringUtils.isBlank(pid)) {
             json.setOk(false);
             json.setMessage("获取商品PID失败");
@@ -2656,7 +2703,7 @@ public class EditorController {
             json.setMessage("获取商品重量失败");
             return json;
         }
-        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,2);
+        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,2, user.getId());
     }
 
 

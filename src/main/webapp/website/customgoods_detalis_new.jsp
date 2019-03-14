@@ -1941,7 +1941,7 @@
                                 <p class="goods_color">加价率:</p>
                                 <p class="ul_size">
                                     <span class="goods_cur">
-                                        原始[${goods.oldProfit}]
+                                        原始[${goods.addPriceLv}]
                                     </span>
                                     <c:if test="${goods.editProfit > 0}">
                                             修改[${goods.editProfit}]
@@ -1950,8 +1950,8 @@
                                         <b style="color:red;">(已锁定)</b>
                                     </c:if>
                                     <c:if test="${goods.lockProfit == 0}">
-                                        <input type="button" value="修改利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',0,${goods.oldProfit})"/>
-                                        <input type="button" value="锁定利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',1,${goods.editProfit})"/>
+                                        <input type="button" value="修改利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',0,${goods.addPriceLv})"/>
+                                        <input type="button" value="锁定利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',1,${goods.addPriceLv})"/>
                                     </c:if>
                                 </p>
                             </div>

@@ -185,7 +185,7 @@
             });
         }
 
-        function doQuery() {
+        function doQuery(flag) {
             var pid = $("#pid_id").val();
             if (pid == null || pid == "") {
                 pid = "";
@@ -212,16 +212,30 @@
             if (state == null || state == "") {
                 state = -1;
             }
-            $("#single_easyui-datagrid").datagrid("load", {
-                "pid": pid,
-                "shopId":shopId,
-                "sttime": sttime,
-                "edtime": edtime,
-                "admid": admid,
-                "state": state,
-                "drainageFlag":drainageFlag,
-                "goodsType":goodsType
-            });
+            if (flag > 0) {
+                $("#single_easyui-datagrid").datagrid("reload", {
+                    "pid": pid,
+                    "shopId": shopId,
+                    "sttime": sttime,
+                    "edtime": edtime,
+                    "admid": admid,
+                    "state": state,
+                    "drainageFlag": drainageFlag,
+                    "goodsType": goodsType
+                });
+            } else {
+                $("#single_easyui-datagrid").datagrid("load", {
+                    "pid": pid,
+                    "shopId": shopId,
+                    "sttime": sttime,
+                    "edtime": edtime,
+                    "admid": admid,
+                    "state": state,
+                    "drainageFlag": drainageFlag,
+                    "goodsType": goodsType
+                });
+            }
+
         }
 
         function formatImg(val, row, index) {
@@ -396,7 +410,8 @@
                         closeDialog();
                         showMessage('保存成功，请等待数据的处理！');
                         setTimeout(function () {
-                            window.location.reload();
+                            //window.location.reload();
+                            doQuery(1);
                         }, 1000);
                     } else {
                         $.messager.alert("提醒", '执行错误:' + data.message, "info");
@@ -425,7 +440,8 @@
                                 closeDialog();
                                 showMessage('执行成功，页面即将刷新！');
                                 setTimeout(function () {
-                                    window.location.reload();
+                                    //window.location.reload();
+                                    doQuery(1);
                                 }, 1000);
                             } else {
                                 $.messager.alert("提醒", '执行错误:' + data.message, "info");
@@ -542,7 +558,7 @@
                 <option value="4">同步成功</option>
         </select></span>&nbsp;&nbsp;
         &nbsp;&nbsp;<span><input type="button"
-                                 class="enter_btn" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                 class="enter_btn" value="查询" onclick="doQuery(0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <span><input type="button" class="enter_btn" value="录入1688商品"
                      onclick="enterGoods()"/></span>
         <%--<span><a href="/cbtconsole/website/singleGoodsCheck.jsp" target="_blank">跨境商品审核</a></span>--%>

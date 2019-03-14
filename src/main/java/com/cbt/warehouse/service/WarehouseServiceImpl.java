@@ -74,7 +74,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
     @Override
-    public int saveWeightFlag(String pid) {
+    public int saveWeightFlag(String pid, int adminId) {
         // 查询已保存的实秤重量
         SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(pid);
         if (null == weightAndSyn){
@@ -84,7 +84,7 @@ public class WarehouseServiceImpl implements IWarehouseService {
             return 4;
         }
         //调整到异步处理
-        Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn.getWeight());
+        Runnable task=new SetGoodsWeightByWeigherTask(pid, weightAndSyn.getWeight(), adminId);
         new Thread(task).start();
 //        customGoodsService.setGoodsWeightByWeigherNew(pid, weightAndSyn.getWeight()); //jxw同步重量到产品库接口
         return 1;
@@ -93,15 +93,17 @@ public class WarehouseServiceImpl implements IWarehouseService {
     class SetGoodsWeightByWeigherTask implements Runnable{
         public String pid;
         public String newWeight;
-        public SetGoodsWeightByWeigherTask(String pid, String newWeight) {
+        public int adminId;
+        public SetGoodsWeightByWeigherTask(String pid, String newWeight, int adminId) {
             this.pid=pid;
             this.newWeight=newWeight;
+            this.adminId=adminId;
         }
 
         @Override
         public void run() {
             try {
-                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight, 2); //jxw同步重量到产品库接口
+                customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight, 2, adminId); //jxw同步重量到产品库接口
                 warehouseMapper.updateGoodsWeightFlag(pid);
             } catch (Exception e) {
                 LOG.error("SetGoodsWeightByWeigherTask 异步更新实秤重量 error", e);

@@ -112,6 +112,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String weight1688; // 1688重量
     private int isWeigthZero;// 1688重量为空标识  1是空的 0不是
 
+    private double addPriceLv;// 加价率
+
+    public double getAddPriceLv() {
+        return addPriceLv;
+    }
+
+    public void setAddPriceLv(double addPriceLv) {
+        this.addPriceLv = addPriceLv;
+    }
+
     public int getIsWeigthZero() {
         return isWeigthZero;
     }

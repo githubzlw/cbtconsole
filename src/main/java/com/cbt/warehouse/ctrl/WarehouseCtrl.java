@@ -496,6 +496,9 @@ public class WarehouseCtrl {
     public void saveWeightFlag(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         try{
+        	String sessionId = request.getSession().getId();
+			String userJson = Redis.hget(sessionId, "admuser");
+			com.cbt.website.userAuth.bean.Admuser user = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil.JsonToObj(userJson, com.cbt.website.userAuth.bean.Admuser.class);
             String pid=request.getParameter("pid");
             //数据校验
             if (StringUtil.isBlank(pid) || pid.length() < 3) {
@@ -503,7 +506,7 @@ public class WarehouseCtrl {
                 out.close();
                 return;
             }
-            int result = iWarehouseService.saveWeightFlag(pid);
+            int result = iWarehouseService.saveWeightFlag(pid, user.getId());
             out.print(result);
         }catch(Exception e){
             out.print(0);
