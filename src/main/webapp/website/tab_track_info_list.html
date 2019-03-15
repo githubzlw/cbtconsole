@@ -351,8 +351,12 @@
                     } else {
                         $("#errMsg").text("");
                     }
-                    //查询
-                    if(funChange == 0) {
+                    //其他条件
+                    var warning = $("#warning").val();
+                    var orderOrTrackNo = $("#orderOrTrackNo").val();
+                    var orderUserid = $("#orderUserid").val();
+                    if(Window.EXPORTEXCELFLAG){
+                        //查询
                         $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
                         $('#main-datagrid').datagrid("load", {
                             rows: pageSize,
@@ -361,53 +365,62 @@
                             startDate: startDate,
                             endDate: endDate,
                             userid: userid,
-                            funChange: funChange
-                        });
-                    } else if(funChange == 1) {
-                        //查询运单预警
-                        var warning = $("#warning").val();
-                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
-                        $('#main-datagrid').datagrid("load", {
-                            rows: pageSize,
-                            page: pageNumber,
+                            funChange: funChange,
                             warning: warning,
-                            startDate: startDate,
-                            endDate: endDate,
-                            userid: userid,
-                            funChange: funChange
-                        });
-                    }
-                    //单个订单号或运单号查询
-                    else if(funChange == 2) {
-                        var orderOrTrackNo = $("#orderOrTrackNo").val();
-                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
-                        $('#main-datagrid').datagrid("load", {
-                            startDate: startDate,
-                            endDate: endDate,
                             orderOrTrackNo: orderOrTrackNo,
-                            funChange: funChange,
-                            userid: userid
+                            orderUserid: orderUserid
                         });
-                        return;
-                    }
-                    //单个用户id查询
-                    else if(funChange == 3) {
-                        var orderUserid = $("#orderUserid").val();
-                        //查询运单状态
-                        $("#main-datagrid").datagrid("options").url = "/cbtconsole/tabtrackinfo/list.do";
-                        $('#main-datagrid').datagrid("load", {
-                            startDate: startDate,
-                            endDate: endDate,
-                            orderUserid: orderUserid,
-                            funChange: funChange,
-                            userid: userid
+                    } else {
+                        //导出 查询并数据并保存到csv文件
+                        $.ajax({
+                            type: "GET",
+                            url: "/cbtconsole/tabtrackinfo/list.do",
+                            data: {
+                                trackState: trackState,
+                                startDate: startDate,
+                                endDate: endDate,
+                                userid: userid,
+                                funChange: funChange,
+                                warning: warning,
+                                orderOrTrackNo: orderOrTrackNo,
+                                orderUserid: orderUserid,
+                                export: true
+                            },
+                            dataType:"json",
+                            success: function(msg){
+                                Window.EXPORTEXCELFLAG = true;
+                                $("#exportExcel").text("导出");
+                                if (msg.success == true){
+                                    var str = encodeURIComponent(msg.message);
+                                    var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+                                    var downloadLink = document.createElement("a");
+                                    downloadLink.href = uri;
+                                    downloadLink.weight="100";
+                                    downloadLink.download = "export_track_list_" + startDate + "_" + endDate + "_" + funChange + ".csv";
+                                    document.body.appendChild(downloadLink);
+                                    downloadLink.click();
+                                    document.body.removeChild(downloadLink);
+                                } else {
+                                    alert(msg.message);
+                                }
+                            }
                         });
-                        return;
                     }
-
                 });
 
             });
+
+            /*导出*/
+            Window.EXPORTEXCELFLAG = true; //导出数据按钮是否可点击：false-正在导出；true-可导出；
+            function exportExcel() {
+                $("#exportExcel").text("导出中...")
+                if(!Window.EXPORTEXCELFLAG){
+                    alert("正在导出, 请等待...");
+                    return;
+                }
+                Window.EXPORTEXCELFLAG = false;
+                $("#date-range-search").click();
+            }
 
             /* 单条运单操作 */
             function formatterOperation(value, row, index) {
@@ -682,6 +695,7 @@
                         </td>
                         <td style="width: 100px;"><!--重置按钮--></td>
                         <td style="width: 56px;"><!--查询按钮--></td>
+                        <td style="width: 156px;"><!--导出按钮--></td>
                     </tr>
                     <tr>
                         <!--开始时间-->
@@ -745,6 +759,10 @@
                         <td align="center">
                             <button type="button" id="date-range-reset" class="btn btn-default" style="height: 30px;text-align: left;">重置</button>
                         </td>
+                        <!--导出按钮-->
+                        <td align="center">
+                            <button type="button" onclick="exportExcel()" id="exportExcel" class="btn btn-default" style="height: 30px;text-align: left;">导出</button>
+                        </td>
                         <td id="errMsg" style="color: royalblue;"></td>
                     </tr>
                 </table>
@@ -756,7 +774,8 @@
         <table id="main-datagrid" firstLoad="false" style="width: 100%; height: 100%" class="easyui-datagrid">
             <thead>
                 <tr>
-                    <th data-options="field:'id',width:'120px',align:'center'">用户id</th>
+                    <th data-options="field:'id',width:'120px',align:'center'">用户ID</th>
+                    <th data-options="field:'email',width:'120px',align:'center'">用户邮箱</th>
                     <th data-options="field:'orderNo',width:'150px',align:'center',formatter:formatterOrderNo">主单号</th>
                     <!--<th data-options="field:'orderList',width:'150px',align:'center'">合并订单列表</th>-->
                     <th data-options="field:'admName',width:'150px',align:'center'">负责人</th>

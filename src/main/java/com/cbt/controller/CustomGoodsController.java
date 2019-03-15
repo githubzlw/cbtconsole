@@ -364,6 +364,11 @@ public class CustomGoodsController {
 			queryBean.setIsWeigthZero(Integer.valueOf(isWeigthZero));
 		}
 
+		String isWeigthCatid = request.getParameter("isWeigthCatid");
+		if(StringUtils.isNotBlank(isWeigthCatid)){
+			queryBean.setIsWeigthCatid(Integer.valueOf(isWeigthCatid));
+		}
+
 
 
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
@@ -585,6 +590,11 @@ public class CustomGoodsController {
 		String isWeigthZero = request.getParameter("isWeigthZero");
 		if(StringUtils.isNotBlank(isWeigthZero)){
 			queryBean.setIsWeigthZero(Integer.valueOf(isWeigthZero));
+		}
+
+		String isWeigthCatid = request.getParameter("isWeigthCatid");
+		if(StringUtils.isNotBlank(isWeigthCatid)){
+			queryBean.setIsWeigthCatid(Integer.valueOf(isWeigthCatid));
 		}
 
 		List<CategoryBean> categorys = customGoodsService.queryCateroryByParam(queryBean);

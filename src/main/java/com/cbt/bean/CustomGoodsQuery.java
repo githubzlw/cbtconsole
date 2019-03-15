@@ -64,6 +64,15 @@ public class CustomGoodsQuery {
 	private double maxPrice;
 	private int isSoldFlag = -1; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
 	private int isWeigthZero;
+	private int isWeigthCatid;
+
+	public int getIsWeigthCatid() {
+		return isWeigthCatid;
+	}
+
+	public void setIsWeigthCatid(int isWeigthCatid) {
+		this.isWeigthCatid = isWeigthCatid;
+	}
 
 	public int getIsWeigthZero() {
 		return isWeigthZero;

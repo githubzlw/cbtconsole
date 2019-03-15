@@ -648,5 +648,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
     }
 
+    @Override
+    public Map<String, String> queryNewAliPriceByAliPid(String aliPid) {
+        return customGoodsDao.queryNewAliPriceByAliPid(aliPid);
+    }
+
+    @Override
+    public int updateWeightFlag(String pid, int flag) {
+        return customGoodsMapper.updateWeightFlag(pid, flag);
+    }
+
 
 }
