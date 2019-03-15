@@ -4174,4 +4174,32 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return count;
     }
 
+    @Override
+    public Map<String, String> queryNewAliPriceByAliPid(String aliPid) {
+        Connection conn28 = DBHelper.getInstance().getConnection5();
+        PreparedStatement stmt28 = null;
+        ResultSet rs = null;
+        String querySql = "select goods_pid,new_price,new_time from  goods_price_historys where goods_pid = ? order by new_time desc limit 1";
+        Map<String, String> map = new HashMap<>();
+        try {
+            stmt28 = conn28.prepareStatement(querySql);
+            stmt28.setString(1, aliPid);
+            rs = stmt28.executeQuery();
+            if(rs.next()){
+                map.put("new_price",rs.getString("new_price"));
+                map.put("new_time",rs.getString("new_time"));
+                map.put("goods_pid",rs.getString("goods_pid"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("aliPid:" + aliPid + ",queryNewAliPriceByAliPid error :" + e.getMessage());
+            LOG.error("aliPid:" + aliPid + ",queryNewAliPriceByAliPid error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+            DBHelper.getInstance().closeResultSet(rs);
+        }
+        return map;
+    }
+
 }
