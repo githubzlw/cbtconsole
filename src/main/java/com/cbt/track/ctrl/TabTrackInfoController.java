@@ -3,6 +3,7 @@ package com.cbt.track.ctrl;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.TabTrackInfo;
 import com.cbt.track.service.TabTrackInfoService;
+import com.cbt.util.DateFormatUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -70,6 +72,8 @@ public class TabTrackInfoController {
     public EasyUiJsonResult queryByRepeatList(HttpServletRequest request) {
         //返回数据
         EasyUiJsonResult json = new EasyUiJsonResult();
+        //导出标志
+        Boolean export = "true".equals(request.getParameter("export"))?true:false;
         //需要查询的信息
         String funChangeStr = request.getParameter("funChange");
         int funChange;
@@ -122,16 +126,23 @@ public class TabTrackInfoController {
             }
             map = tabTrackInfoService.getRecordListByUserid(orderUserid, userid, startDate, endDate);
         } else {
-            //分页参数接收并处理
-            String rowsStr = request.getParameter("rows");
-            Integer rows = 20;
-            if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
-                rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
-            }
-            String pageStr = request.getParameter("page");
-            Integer page = 1;
-            if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-                page = Integer.valueOf(pageStr);//无该参数时查询默认值1
+            //如果导出 则不分页
+            Integer rows = null;
+            Integer page = null;
+            if(!export){
+                //分页参数接收并处理
+                String rowsStr = request.getParameter("rows");
+                if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
+                    rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
+                } else {
+                    rows = 20;
+                }
+                String pageStr = request.getParameter("page");
+                if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
+                    page = Integer.valueOf(pageStr);//无该参数时查询默认值1
+                } else {
+                    page = 1;
+                }
             }
             if (funChange == 0) {
                 // 查询运单状态
@@ -164,18 +175,69 @@ public class TabTrackInfoController {
             }
         }
         // 查询结果处理 并返回
-        if (map != null && map.size() > 0) {
-            json.setSuccess(true);
-            json.setRows(map.get("recordList"));
-            json.setTotal(Integer.parseInt(map.get("totalCount").toString()));
-        } else {
-            json.setRows(new ArrayList<TabTrackInfo>());
-            json.setTotal(0);
+        if (export){
+            if (map != null && map.size() > 0) {
+                List<TabTrackInfo> res = (List<TabTrackInfo>) map.get("recordList");
+                if (res != null && res.size() > 0) {
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("用户ID,用户邮箱,主单号,负责人,运单号,物流公司,转单号,转单物流公司,运单状态,订单支付时间,出货时间,运单完成时间,\r\n");
+                    for (TabTrackInfo bean : res) {
+                        sb.append(bean.getId()).append(",")
+                                .append(bean.getEmail()).append(",")
+                                .append(bean.getOrderNo()).append(",")
+                                .append(bean.getAdmName()).append(",")
+                                .append(bean.getTrackNo()).append(",")
+                                .append(bean.getTrackCompany()).append(",")
+                                .append(bean.getForwardNo()==null?"":"'" + bean.getForwardNo()).append(",")
+                                .append(bean.getForwardCompany()==null?"":bean.getForwardCompany().replaceAll(",", " ")).append(",")
+                                .append(formatterTrackState(bean.getTrackState())).append(",") //运单状态
+                                .append(DateFormatUtil.getWithSeconds(bean.getOrderPaytime())).append(",")
+                                .append(DateFormatUtil.getWithSeconds(bean.getSenttime())).append(",")
+                                .append(DateFormatUtil.getWithSeconds(bean.getDeliveredTime())).append(",\r\n");
+                    }
+                    json.setSuccess(true);
+                    String message = sb.toString().replaceAll(",null,", ",,");
+                    message = message.replaceAll(",null,", ",,");
+                    json.setMessage(message);
+                    return json;
+                }
+            }
             json.setSuccess(false);
+            json.setMessage("该条件下查询不到数据");
+        } else {
+            if (map != null && map.size() > 0) {
+                json.setSuccess(true);
+                json.setRows(map.get("recordList"));
+                json.setTotal(Integer.parseInt(map.get("totalCount").toString()));
+            } else {
+                json.setRows(new ArrayList<TabTrackInfo>());
+                json.setTotal(0);
+                json.setSuccess(false);
+            }
         }
         return json;
     }
-    
+
+    public static String formatterTrackState(Integer trackState){
+        if (trackState == null){
+            return "";
+        }
+        switch(trackState) {
+            case 3:
+                return "已签收";
+            case 4:
+                return "退回";
+            case 5:
+                return "异常";
+            case 6:
+                return "内部异常";
+            case 7:
+                return "手动标记正常";
+            default:
+                return "已发货";
+        }
+    }
+
     /**
      * 操作运单状态
      * /tabtrackinfo/updatestate?trackNo=3A5V435358583&trackNote=备注11&trackState=2

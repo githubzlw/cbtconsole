@@ -39,7 +39,7 @@
 
 	<select id="getWarningRecordList" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
-            au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+            ar.useremail 'email',au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
 		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate, ti.updat_date updatDate, 
 		    ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
 		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany
@@ -98,12 +98,14 @@
         ORDER BY
 			sp.createtime ASC,
 			of.order_no
-        LIMIT #{startBars},#{rows}
+        <if test="rows != null">
+            LIMIT #{startBars},#{rows}
+        </if>
     </select>
 
     <select id="getRecordListByTrackState" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
-            au.admName,of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+            ar.useremail 'email',au.admName,of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
 		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate, 
 		    ti.updat_date updatDate, ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
 		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany
@@ -143,12 +145,14 @@
         ORDER BY
 			sp.createtime ASC,
 			of.order_no
-        LIMIT #{startBars},#{rows}
+        <if test="rows != null">
+            LIMIT #{startBars},#{rows}
+        </if>
     </select>
 
     <select id="getRecordListByOrderOrTrackNo" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
-            au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+            ar.useremail 'email', au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
 		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate, 
 		    ti.updat_date updatDate, ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
 		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany
@@ -188,7 +192,7 @@
     <!--List<TabTrackInfo> getRecordListByUserid(@Param("orderUserid") String orderUserid, @Param("userid") Integer userid);-->
     <select id="getRecordListByUserid" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
-            au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+            ar.useremail 'email', au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
 		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate,
 		    ti.updat_date updatDate, ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
 		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany
@@ -229,7 +233,7 @@
     <!-- List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo); -->
 	<select id="getForwardListByTrackNo" resultType="com.cbt.bean.TabTrackInfo">
         SELECT
-			au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
+            ar.useremail 'email', au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList, sp.transportcompany trackCompany, sp.expressno trackNo,
 		    ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate, 
 		    ti.updat_date updatDate, ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
 		    sp.createtime senttime,tf.track_no_forward forwardNo,tf.track_company_forward forwardCompany

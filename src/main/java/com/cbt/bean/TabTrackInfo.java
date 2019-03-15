@@ -56,6 +56,16 @@ public class TabTrackInfo implements Serializable{
 
     private Date upStateTime;//手动标记正常时间
 
+    private String email;//客户邮箱
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Date getUpStateTime() {
         return upStateTime;
     }

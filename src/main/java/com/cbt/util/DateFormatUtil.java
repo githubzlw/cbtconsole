@@ -41,6 +41,9 @@ public class DateFormatUtil {
 	 * @return
 	 */
 	public static String getWithSeconds(Date date) {
+	    if (date == null){
+	        return "";
+        }
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return df.format(date);
 	}
