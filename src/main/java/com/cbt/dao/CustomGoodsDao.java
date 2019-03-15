@@ -603,4 +603,10 @@ public interface CustomGoodsDao {
      */
 	int setNewAliPidInfo(String pid, String aliPid, String aliPrice);
 
+	/**
+     * 查询最新的抓取aliprice价格数据
+     * @return
+     */
+    Map<String,String> queryNewAliPriceByAliPid(String aliPid);
+
 }

@@ -63,7 +63,7 @@ b {
 }
 
 .tr_disable {
-	background-color: #d4d3d3 import;
+	background-color: #d4d3d3 important;
 }
 
 .tr_edited {
@@ -586,6 +586,9 @@ b {
 				</c:if> <c:if test="${list.bmFlag >0}">
 					<br>
 					<span>人为对标货源:${list.bmFlag ==1 ? '是':'不是'}</span>
+				</c:if> <c:if test="${list.weightFlag > 0}">
+					<br>
+					<span style="color: red;">重量超过类别上下限</span>
 				</c:if> <%--<c:if test="${list.sourceProFlag >0}">
 					<br>
 					<span>货源属性:${list.sourceProValue}</span>

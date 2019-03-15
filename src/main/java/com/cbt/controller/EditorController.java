@@ -93,7 +93,7 @@ public class EditorController {
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
-        if (goods.getValid() == 0 && StringUtils.isBlank(goods.getOffReason())) {
+        if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0) {
             goods.setOffReason("老数据");
         } else if (goods.getValid() == 2 && goods.getUnsellAbleReason() == 0) {
             goods.setUnsellAbleReasonDesc("老数据");
@@ -304,6 +304,15 @@ public class EditorController {
             System.err.println("pid:" + pid + ",wholePrice is null");
         }
 
+        // 判断是精准对标的
+        if(goods.getBmFlag() == 1 &&  goods.getIsBenchmark() == 1){
+            // 获取实时对标信息
+            Map<String, String> priceMap = customGoodsService.queryNewAliPriceByAliPid(goods.getAliGoodsPid());
+            if(priceMap.size() > 1){
+                goods.setCrawlAliDate(priceMap.get("new_time"));
+                goods.setCrawlAliPrice(priceMap.get("new_price"));
+            }
+        }
 
         // 直接使用远程路径
         String localpath = goods.getRemotpath();
@@ -374,7 +383,7 @@ public class EditorController {
                 // 远程访问获取ali商品信息
                 String resultJson = DownloadMain.getContentClient(ContentConfig.CRAWL_ALI_URL + aliUrl,
                         null);
-                JSONObject goodsObj = new JSONObject().fromObject(resultJson);
+                JSONObject goodsObj = JSONObject.fromObject(resultJson);
                 algood = (GoodsBean) JSONObject.toBean(goodsObj, GoodsBean.class);
             }
 
@@ -3085,6 +3094,40 @@ public class EditorController {
         }
         return json;
     }
+
+
+    @RequestMapping(value = "/updateWeightFlag")
+    @ResponseBody
+    public JsonResult updateWeightFlag(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        try {
+            customGoodsService.updateWeightFlag(pid,0);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",updateWeightFlag error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",updateWeightFlag error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("设置错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {

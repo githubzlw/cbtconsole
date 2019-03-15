@@ -1935,6 +1935,11 @@
                                     <c:if test="${goods.isWeigthZero > 0}">
                                         <b style="color: red;font-size: 18px;">*抓取1688重量为空</b>
                                     </c:if>
+                                    <c:if test="${goods.weightFlag > 0}">
+                                        &nbsp;&nbsp;&nbsp;<input type="button" value="确认重量没有问题" class="s_btn" onclick="updateWeightFlag('${goods.pid}',this)"/>
+                                        <b style="font-size: 16px;color: red;">*重量超过类别上下限</b>
+                                    </c:if>
+
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -1991,66 +1996,68 @@
         </div>
         <div class="s_r">
             <div class="table_su">
-                <c:if test="${goods.goodsState == 5}">
-					<b style="color: red;font-size: 26px;">产品待发布</b><br>
-				</c:if>
-                <c:if
-					test="${goods.fromFlag > 0}">
-					<br>
-					<b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
-				</c:if>
-                <c:if
-                    test="${goods.isEdited == 1 || goods.isEdited == 2}">
-                <b style="font-size: 16px;"> 编辑状态：已编辑</b>
-                <br>
-                <b style="font-size: 16px;">编辑时间：${goods.updatetime}</b>
-                <br>
-                <b style="font-size: 16px;">编辑人：${goods.admin}</b>
-                <br>
-            </c:if> <c:if test="${goods.promotionFlag >0}">
-                <br>
-                <b style="font-size: 16px;color: red;">促销商品</b>
-            </c:if><c:if test="${goods.isAbnormal >0}">
-                <br>
-                <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
-            </c:if> <c:if test="${goods.isBenchmark >0}">
-                <br>
-                <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>
-            </c:if> <c:if test="${goods.bmFlag >0}">
-                <br>
-                <b style="font-size: 16px;">人为对标货源:${goods.bmFlag ==1 ? '是':'不是'}</b>
-            </c:if> <%--<c:if test="${goods.sourceProFlag >0}">
+                <div>
+                    <c:if test="${goods.goodsState == 5}">
+                        <b style="color: red;font-size: 26px;">产品待发布</b><br>
+                    </c:if>
+                    <c:if
+                            test="${goods.fromFlag > 0}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">产品来源:${goods.fromFlagDesc}</b><br>
+                    </c:if>
+                    <c:if
+                            test="${goods.isEdited == 1 || goods.isEdited == 2}">
+                        <b style="font-size: 16px;"> 编辑状态：已编辑</b>
+                        <br>
+                        <b style="font-size: 16px;">编辑时间：${goods.updatetime}</b>
+                        <br>
+                        <b style="font-size: 16px;">编辑人：${goods.admin}</b>
+                        <br>
+                    </c:if> <c:if test="${goods.promotionFlag >0}">
+                    <br>
+                    <b style="font-size: 16px;color: red;">促销商品</b>
+                </c:if><c:if test="${goods.isAbnormal >0}">
+                    <br>
+                    <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
+                </c:if> <c:if test="${goods.isBenchmark >0}">
+                    <br>
+                    <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>
+                </c:if> <c:if test="${goods.bmFlag >0}">
+                    <br>
+                    <b style="font-size: 16px;">人为对标货源:${goods.bmFlag ==1 ? '是':'不是'}</b>
+                </c:if> <%--<c:if test="${goods.sourceProFlag >0}">
                 <br>
                 <b style="font-size: 16px;">货源属性:${goods.sourceProValue}</b>
             </c:if>--%> <c:if test="${goods.soldFlag >0}">
-                <br>
-                <b style="font-size: 16px;">是否售卖:${goods.soldFlag ==1 ? '卖过':'没有卖过'}</b>
-            </c:if> <c:if test="${goods.isSoldFlag >= 0}">
-                <br>
-                <b style="font-size: 16px;">是否免邮:${goods.isSoldFlag > 0 ? '免邮':'非免邮'}</b>
-            </c:if> <c:if test="${goods.addCarFlag >0}">
-                <br>
-                <b style="font-size: 16px;">是否加入购物车:${goods.carValue}</b>
-            </c:if> <c:if test="${goods.priorityFlag >0}">
-                <br>
-                <b style="font-size: 16px;">商品优先级:${goods.priorityFlag ==1 ? '核心':'非核心'}</b>
-            </c:if>
-            <br>
-			<b style="font-size: 16px;">点击数:${goods.clickNum}</b>
-            <%--<c:if test="${goods.sourceUsedFlag >0}">
-                <br>
-                <b style="font-size: 16px;">OCR货源可用度:${goods.sourceUsedFlag ==2 ? '描述很精彩':'可用'}</b>
-            </c:if>
-				<c:if test="${goods.sourceUsedFlag  == 0}">
                     <br>
-                    <b style="font-size: 16px;">OCR货源可用度:不可用</b>
-                </c:if> <c:if test="${goods.ocrMatchFlag >0}">
+                    <b style="font-size: 16px;">是否售卖:${goods.soldFlag ==1 ? '卖过':'没有卖过'}</b>
+                </c:if> <c:if test="${goods.isSoldFlag >= 0}">
                     <br>
-                    <b style="font-size: 16px;">OCR判断:${goods.ocrMatchValue}</b>
-                </c:if> --%><c:if test="${goods.rebidFlag >0}">
+                    <b style="font-size: 16px;">是否免邮:${goods.isSoldFlag > 0 ? '免邮':'非免邮'}</b>
+                </c:if> <c:if test="${goods.addCarFlag >0}">
+                    <br>
+                    <b style="font-size: 16px;">是否加入购物车:${goods.carValue}</b>
+                </c:if> <c:if test="${goods.priorityFlag >0}">
+                    <br>
+                    <b style="font-size: 16px;">商品优先级:${goods.priorityFlag ==1 ? '核心':'非核心'}</b>
+                </c:if>
+                    <br>
+                    <b style="font-size: 16px;">点击数:${goods.clickNum}</b>
+                        <%--<c:if test="${goods.sourceUsedFlag >0}">
+                            <br>
+                            <b style="font-size: 16px;">OCR货源可用度:${goods.sourceUsedFlag ==2 ? '描述很精彩':'可用'}</b>
+                        </c:if>
+                            <c:if test="${goods.sourceUsedFlag  == 0}">
+                                <br>
+                                <b style="font-size: 16px;">OCR货源可用度:不可用</b>
+                            </c:if> <c:if test="${goods.ocrMatchFlag >0}">
+                                <br>
+                                <b style="font-size: 16px;">OCR判断:${goods.ocrMatchValue}</b>
+                            </c:if> --%>
+                        <c:if test="${goods.rebidFlag >0}">
                     <br>
                     <b style="font-size: 16px;">是否重新对标:是</b>
-                </c:if> <c:if test="${goods.goodsState >0}">
+                    </c:if> <c:if test="${goods.goodsState >0}">
                     <br>
                     <b style="font-size: 16px;">发布状态:${goods.goodsStateValue}</b>
                 </c:if> <c:if test="${not empty goods.publishtime}">
@@ -2060,65 +2067,93 @@
                     <br>
                     <b style="font-size: 16px;">更新时间:${goods.updatetime}</b>
                 </c:if>
-                <c:if test="${goods.infringingFlag > 0}">
+                    <c:if test="${goods.infringingFlag > 0}">
+                        <br>
+                        <b style="color: red;font-size: 16px;">${list.infringingFlag == 1 ? '此商品侵权':'8月人为精选'}</b>
+                    </c:if>
+                    <c:if test="${goods.matchSource == 4}">
+                        <br>
+                        <b style="color: red;font-size: 16px;">对标亚马逊商品</b>
+                        <br>
+                        <b style="color: red;font-size: 16px;">ASIN码:${goods.aliGoodsPid}</b>
+                        <br>
+                        <b style="color: red;font-size: 16px;">亚马逊价格:${goods.aliGoodsPrice}</b>
+                    </c:if>
+                    <c:if test="${goods.valid == 0}">
+                        <br>
+                        <b style="font-size: 16px;">下架原因:${goods.offReason}</b>
+                    </c:if>
+                    <c:if test="${goods.valid == 2}">
+                        <br>
+                        <b style="font-size: 16px;">软下架原因:${goods.unsellAbleReasonDesc}</b>
+                    </c:if>
+                    <c:if test="${goods.weightNotFlag > 0}">
+                        <br>
+                        <b style="font-size: 16px;">重量不合理</b>
+                    </c:if>
+                    <c:if test="${goods.uglyFlag > 0}">
+                        <br>
+                        <b style="font-size: 16px;">难看</b>
+                    </c:if>
+                    <c:if test="${goods.repairedFlag > 0}">
+                        <br>
+                        <b style="font-size: 16px;color: green;">产品已修复</b>
+                    </c:if>
+                    </span> </div>
+                <br>
+                <div>
+                    <span class="s_btn" onclick="addKeyWordWeight('${goods.shopId}','${goods.catid1}','${goods.pid}')">添加关键词重量</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="addBenchmarking('${goods.pid}')">亚马逊对标数据</span>
+                    &nbsp;&nbsp;<span class="s_btn"
+                                      onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0,0)">难看中文多</span>
+                    &nbsp;&nbsp;<span class="s_btn"
+                                      onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0,0)">重量不合理</span>
+                    &nbsp;&nbsp;<span class="s_btn"
+                                      onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1,0)">不具备独特性可舍弃</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="openEditLog('${goods.pid}')">查看编辑日志</span>
+                    <c:if test="${goods.isBenchmark == 1 && goods.bmFlag == 1}">
+                        <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                        &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
+                    </c:if>
+                    <c:if test="${goods.isBenchmark == 2}">
+                        <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
+                        &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
+                    </c:if>
+                    <br><span class="s_btn"
+                              onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
+                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
                     <br>
-                    <b style="color: red;font-size: 16px;">${list.infringingFlag == 1 ? '此商品侵权':'8月人为精选'}</b>
-                </c:if>
-                <c:if test="${goods.matchSource == 4}">
-                    <br>
-                    <b style="color: red;font-size: 16px;">对标亚马逊商品</b>
-                    <br>
-                    <b style="color: red;font-size: 16px;">ASIN码:${goods.aliGoodsPid}</b>
-                    <br>
-                    <b style="color: red;font-size: 16px;">亚马逊价格:${goods.aliGoodsPrice}</b>
-                </c:if>
-                <c:if test="${goods.valid == 0}">
-					<br>
-					<b  style="font-size: 16px;">下架原因:${goods.offReason}</b>
-				</c:if>
-                <c:if test="${goods.valid == 2}">
-					<br>
-					<b style="font-size: 16px;">软下架原因:${goods.unsellAbleReasonDesc}</b>
-				</c:if>
-                <c:if test="${goods.weightNotFlag > 0}">
-					<br>
-					<b style="font-size: 16px;">重量不合理</b>
-				</c:if>
-                <c:if test="${goods.uglyFlag > 0}">
-					<br>
-					<b style="font-size: 16px;">难看</b>
-				</c:if>
-                <c:if test="${goods.repairedFlag > 0}">
-					<br>
-					<b style="font-size: 16px;color: green;">产品已修复</b>
-				</c:if>
-			</span> <br> <br>
-                <span class="s_btn" onclick="addKeyWordWeight('${goods.shopId}','${goods.catid1}','${goods.pid}')">添加关键词重量</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="addBenchmarking('${goods.pid}')">亚马逊对标数据</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,1,0,0,0,0,0)">难看中文多</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',1,0,0,0,0,0,0)">重量不合理</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,0,1,0)">不具备独特性可舍弃</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="openEditLog('${goods.pid}')">查看编辑日志</span>
-                <c:if test="${goods.isBenchmark == 1 && goods.bmFlag == 1}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
-                </c:if>
-                <c:if test="${goods.isBenchmark == 2}">
-                    <br><span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,1,0,0,0,0)">对标不准确</span>
-                    &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,2,0,0,0,0)">对标准确</span>
-                </c:if>
-                <br><span class="s_btn" onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
-                &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
+                    <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>&nbsp;&nbsp;&nbsp;
+                    <button class="s_btn" style="width: 180px;"
+                            onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片
+                    </button>
 
-                <br><a target="_blank"
+                </div>
+                <br>
+                <div>
+                    <a target="_blank"
                        href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
-                       style="color: #ff0000;">重新对标</a> <br> <a target="_blank"
-                                                                href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a> <br> <a target="_blank"
-                                                                                                        href="${goods.aliGoodsUrl}">速卖通原链接</a><br><br>
-                <a target="_blank"
-                   href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a><br>
-                <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>&nbsp;&nbsp;&nbsp;
-                <button class="s_btn" style="width: 180px;" onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片</button>
+                       style="color: #ff0000;">重新对标</a> &nbsp;&nbsp;&nbsp;
+                    <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
+                    &nbsp;&nbsp;&nbsp; <a target="_blank"
+                            href="${goods.aliGoodsUrl}">速卖通原链接</a>
+                    <c:if test="${shopId > 0}">
+                        &nbsp;&nbsp;&nbsp;
+                        <a target="_blank"
+                           href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a>
+                    </c:if>
+                </div>
+                <br>
+                <div style="font-size: 16px;background-color: #a2f387;">
+                    <h3 style="text-align: center">1688和ali数据详情</h3>
+                    <span><b>1688原始价: ${goods.wholesalePrice}</b></span><br>
+                    <span><b>抓取1688产品重量: ${goods.weight1688}</b></span>
+                    <br><br>
+                    <c:if test="${goods.bmFlag == 1 && goods.isBenchmark == 1}">
+                        <span><b>速卖通对标价: ${goods.crawlAliPrice}</b></span><br>
+                        <span><b>对标价的抓取时间: ${goods.crawlAliDate}</b></span>
+                    </c:if>
+                </div>
             </div>
 
 
@@ -2322,6 +2357,10 @@
                     if(weight == newWeight){
                         $.messager.alert("提醒", "新的重量和原重量相同", "info");
                     }else{
+                        $.messager.progress({
+                            title: '正在更新',
+                            msg: '请等待...'
+                        });
                         $.ajax({
                             type: 'POST',
                             dataType: 'json',
@@ -2332,6 +2371,7 @@
                                 "weight": weight
                             },
                             success: function (json) {
+                                $.messager.progress('close');
                                 if (json.ok) {
                                     $.messager.alert("提醒", "执行成功，页面即将刷新", "info");
                                     setTimeout(function () {
@@ -2342,6 +2382,7 @@
                                 }
                             },
                             error: function () {
+                                $.messager.progress('close');
                                 $.messager.alert("提醒", "执行失败，请重试", "error");
                             }
                         });
@@ -2352,6 +2393,28 @@
                 }
             }else{
                 showMessage('未输入新的重量或取消输入！');
+            }
+        });
+    }
+
+    function updateWeightFlag(pid, obj) {
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: '/cbtconsole/editc/updateWeightFlag',
+            data: {
+                "pid": pid
+            },
+            success: function (json) {
+                if (json.ok) {
+                    $.messager.alert("提醒", "更新成功", "info");
+                    $(obj).hide();
+                } else {
+                    $.messager.alert("提醒", json.message, "error");
+                }
+            },
+            error: function () {
+                $.messager.alert("提醒", "执行失败，请重试", "error");
             }
         });
     }

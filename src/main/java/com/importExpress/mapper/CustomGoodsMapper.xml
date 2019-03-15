@@ -47,6 +47,7 @@
         <result column="final_weight" property="finalWeight"/>
         <result column="max_price" property="maxPrice"/>
         <result column="weight" property="weight1688"/>
+        <result column="weight_flag" property="weightFlag"/>
     </resultMap>
 
 
@@ -120,6 +121,7 @@
         <result column="from_flag" property="fromFlag"/>
         <result column="weight" property="weight1688"/>
         <result column="add_price_lv" property="addPriceLv"/>
+        <result column="weight_flag" property="weightFlag"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -414,7 +416,7 @@
     <select id="queryForListByParam" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
         select
         cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,
-        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,cbu.weight_flag,
         cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,
         ifnull(cge.infringing_flag,0) as infringing_flag,cbu.priority_flag,ifnull(cge.rebid_flag,0) as rebid_flag,
         ifnull(cge.update_time,'') as update_time,ifnull(cge.publish_time,'') as publish_time,ifnull(adu.admName,'') as
@@ -560,6 +562,9 @@
         </if>
         <if test="isWeigthZero == 1">
             and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
+        </if>
+        <if test="isWeigthCatid == 1">
+            and cbu.weight_flag = 1
         </if>
 
         <if test="isSort == 1">
@@ -712,6 +717,9 @@
         <if test="isWeigthZero == 1">
             and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
         </if>
+        <if test="isWeigthCatid == 1">
+            and cbu.weight_flag = 1
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -844,6 +852,9 @@
         <if test="isWeigthZero == 1">
             and (cbu.weight = '' or cbu.weight is null or cbu.weight = '0' or cbu.weight = '0.0' or cbu.weight = '0.00')
         </if>
+        <if test="isWeigthCatid == 1">
+            and cbu.weight_flag = 1
+        </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
@@ -851,7 +862,7 @@
 
     <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
         select cbu.pid,cbu.enname,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
-        cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,
+        cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
@@ -921,7 +932,7 @@
 
     <update id="updateGoodsWeightByPid">
         update custom_goods_edit a,custom_benchmark_ready b
-        set b.revise_weight=#{newWeight},b.final_weight=#{newWeight},
+        set b.revise_weight=#{newWeight},b.final_weight=#{newWeight},b.source_pro_flag = 7,b.weight_flag = 0,
         a.weight_is_edit = #{weightIsEdit},a.old_weight = #{oldWeight},a.price_is_edit = 0
         <if test="weightIsEdit == 1">
             ,b.goodsstate = 5
@@ -1197,5 +1208,9 @@
         select pid from custom_benchmark_ready
         where goodsstate = #{state}
     </select>
+
+    <update id="updateWeightFlag">
+        update custom_benchmark_ready set weight_flag = #{flag} where pid = #{pid}
+    </update>
 
 </mapper>
