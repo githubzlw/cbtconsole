@@ -509,7 +509,7 @@
                 and o.state=#{state}
             </when>
         </choose>
-        <if test="trackState != -2">
+        <if test="trackState > 0">
             and o.order_no in (SELECT sp.orderid FROM shipping_package sp
             INNER JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
             AND ti.track_state = #{trackState})
