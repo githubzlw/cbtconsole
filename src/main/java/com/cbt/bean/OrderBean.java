@@ -113,7 +113,17 @@ public class OrderBean implements Cloneable {
     //优惠券优惠
     private String couponAmount;
     private String fileByOrderid;
-    public String getFileByOrderid() {
+    //投诉标识
+    private int complainFlag;
+    public int getComplainFlag() {
+		return complainFlag;
+	}
+
+	public void setComplainFlag(int complainFlag) {
+		this.complainFlag = complainFlag;
+	}
+
+	public String getFileByOrderid() {
         return fileByOrderid;
     }
 
