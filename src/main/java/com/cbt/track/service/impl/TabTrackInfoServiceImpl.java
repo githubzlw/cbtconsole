@@ -35,7 +35,7 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 
     @Override
     public Map<String, Object> getWarningRecordList(Integer page, Integer rows, String startDate, String endDate, int warning, Integer userid) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getWarningRecordList((page-1)*rows, rows, startDate, endDate, warning, userid);
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getWarningRecordList(page==null?null:(page-1)*rows, rows, startDate, endDate, warning, userid);
         Integer totalCount = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, warning, userid);
         queryTrackInfo(list);//查询最新一条物流
         Map<String,Object> map = new HashMap<String, Object>();
@@ -46,7 +46,7 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 
     @Override
     public Map<String, Object> getRecordListByTrackState(Integer page, Integer rows, String startDate, String endDate, int trackState, Integer userid) {
-    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByTrackState((page-1)*rows, rows, startDate, endDate, trackState, userid);
+    	List<TabTrackInfo> list = tabTrackInfoMapping.getRecordListByTrackState(page==null?null:(page-1)*rows, rows, startDate, endDate, trackState, userid);
         Integer totalCount = tabTrackInfoMapping.getRecordCountByTrackState(startDate, endDate, trackState, userid);
         queryTrackInfo(list);//查询最新一条物流
         Map<String,Object> map = new HashMap<String, Object>();

@@ -114,6 +114,25 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private double addPriceLv;// 加价率
 
+    private String crawlAliPrice; // 抓取ali价格
+    private String crawlAliDate; // 抓取ali价格时间
+
+    public String getCrawlAliPrice() {
+        return crawlAliPrice;
+    }
+
+    public void setCrawlAliPrice(String crawlAliPrice) {
+        this.crawlAliPrice = crawlAliPrice;
+    }
+
+    public String getCrawlAliDate() {
+        return crawlAliDate;
+    }
+
+    public void setCrawlAliDate(String crawlAliDate) {
+        this.crawlAliDate = crawlAliDate;
+    }
+
     public double getAddPriceLv() {
         return addPriceLv;
     }

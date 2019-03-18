@@ -718,4 +718,18 @@ public interface CustomGoodsService {
      * @return
      */
     int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean);
+
+    /**
+     * 查询最新的抓取aliprice价格数据
+     * @return
+     */
+    Map<String,String> queryNewAliPriceByAliPid(String aliPid);
+
+    /**
+     * 更新WeightFlag状态
+     * @param pid
+     * @param flag
+     * @return
+     */
+    int updateWeightFlag(String pid, int flag);
 }

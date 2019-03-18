@@ -677,7 +677,7 @@ public class OrderInfoController{
 		userID_req = userID_req!=null&& !userID_req.equals("") ?userID_req.replaceAll("\\D+", ""):"0";
 		int userID = userID_req !=null && !userID_req.equals("") ? Integer.parseInt(userID_req) : 0;
 		int state = Utility.getStringIsNull(state_req) ? Integer.parseInt(state_req) : -2;
-		int trackState = Utility.getStringIsNull(trackState_req) ? Integer.parseInt(trackState_req) : -2;
+		int trackState = Utility.getStringIsNull(trackState_req) ? Integer.parseInt(trackState_req) : 0;
 		int admuserid=user.getId();
 		if("0".equals(user.getRoletype())){
 			admuserid = Utility.getStringIsNull(admuserid_str) ? Integer.parseInt(admuserid_str) : 0;
@@ -752,7 +752,7 @@ public class OrderInfoController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("订单管理查询用时:"+(System.currentTimeMillis()-startTime));
+		// System.out.println("订单管理查询用时:"+(System.currentTimeMillis()-startTime));
 		return "nordermgr";
 	}
 

@@ -115,7 +115,7 @@ b {
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
 			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"",
-			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0"
+			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0"
 	};
 	var isQuery =0;
 
@@ -316,6 +316,13 @@ b {
 			}
         }
 
+        var isWeigthCatid = sessionStorage.getItem("isWeigthCatid");
+        if(!(isWeigthCatid == null || isWeigthCatid == "")){
+            queryParams.isWeigthZero = isWeigthCatid;
+            if(isWeigthCatid > 0){
+                $("#is_weight_catid").attr("checked",'true');
+			}
+        }
 		createCateroryTree(queryParams.catid);
 		doQueryList();
         doStatistic();
@@ -400,6 +407,9 @@ b {
 		var maxPrice = $("#query_max_price").val();
 		var isSoldFlag = $("#query_is_sold_flag").val();
 		var isWeigthZero = $("#is_weight_zero").is(":checked")?"1":"0";
+		var isWeigthCatid = $("#is_weight_catid").is(":checked")?"1":"0";
+
+
 
 		queryParams.catid = "0";
 		queryParams.page = "1";
@@ -440,6 +450,7 @@ b {
 		queryParams.maxPrice = maxPrice;
 		queryParams.isSoldFlag = isSoldFlag;
 		queryParams.isWeigthZero = isWeigthZero;
+		queryParams.isWeigthCatid = isWeigthCatid;
 
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
@@ -493,6 +504,7 @@ b {
             sessionStorage.setItem("maxPrice", queryParams.maxPrice);
 			sessionStorage.setItem("isSoldFlag", queryParams.isSoldFlag);
 			sessionStorage.setItem("isWeigthZero", queryParams.isWeigthZero);
+			sessionStorage.setItem("isWeigthCatid", queryParams.isWeigthCatid);
 
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
@@ -508,7 +520,7 @@ b {
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
 			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice
-				+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero;
+				+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid;
 
 			$('#goods_list').attr('src',url);
 		}
@@ -573,7 +585,7 @@ b {
 
 	<c:if test="${uid > 0}">
 		<div class="align_center">
-			<table style="width: 90%;">
+			<table style="width: 98%;">
 				<tr>
 					<td><span
 						style="margin-right: 15px; font-size: 16px; font-weight: bold;">当前操作人:<span
@@ -614,7 +626,8 @@ b {
 					<td colspan="2"><p style="background-color: #e6dba1;">在线商品统计【
 						在线数:<span style="color: red" id="online_total">0</span>
 						/ 当前用户录入数:<span style="color: red" id="input_total">0</span>
-						/ 当前用户编辑数:<span style="color: red" id="edit_total">0</span>】</p>
+						/ 当前用户编辑数:<span style="color: red" id="edit_total">0</span>】
+					</p>
 					</td>
 				</tr>
 				<tr>
@@ -675,6 +688,9 @@ b {
 						新下架时间晚于:<input id="query_offline_time" class="Wdate"
 						style="width: 95px; height: 26px" type="text" value="${param.sttime}"
 						onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})" />
+						<input type="button" onclick="jumpToTranslation()"
+						value="翻译词典" style="height: 26px; width: 90px;margin-left: 83px;" class="btn" />
+					</td>
 				</tr>
 				<tr>
 					<td>人为对标货源:<select id="query_bm_flag"
@@ -756,8 +772,9 @@ b {
 							<%--<option value="3">已点击商品倒排序</option>--%>
 							<option value="4">按照类别排序</option>
 					</select>
-					&nbsp;&nbsp;<input type="button" onclick="jumpToTranslation()"
-						value="翻译词典管理" style="height: 30px; width: 90px;" class="btn" /></td>
+						&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+						value="查询" style="height: 30px; width: 60px;" class="btn" />
+					</td>
 				</tr>
 				<tr>
 						<td colspan="2">
@@ -809,9 +826,9 @@ b {
 					<td>最高售卖价格:<input id="query_min_price" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_max_price" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
-					<td><input type="checkbox" id="is_complain">是否被投诉&nbsp;&nbsp;
-						<input type="checkbox" id="is_weight_zero">1688重量为空&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
-						value="查询" style="height: 30px; width: 60px;" class="btn" />
+					<td><input type="checkbox" id="is_complain">是否被投诉&nbsp;
+						<input type="checkbox" id="is_weight_zero">1688重量为空&nbsp;
+						<input type="checkbox" id="is_weight_catid">重量超过类别上下限
 					</td>
 				</tr>
 				<%--<tr>--%>

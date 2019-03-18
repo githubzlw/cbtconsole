@@ -814,7 +814,7 @@ public class OrderwsServlet extends HttpServlet {
 		for (int i = 0; i < odb.size(); i++) {
 			if (odb.get(i).getState() != 2) { // order_detail的state为2表示已取消的商品，采购额等不计算在内
 				buy += odb.get(i).getSumGoods_p_price();
-				volume += odb.get(i).getOd_bulk_volume();
+				//volume += odb.get(i).getOd_bulk_volume();
 				weight += odb.get(i).getOd_total_weight();
 			}
 		}
@@ -1191,7 +1191,7 @@ public class OrderwsServlet extends HttpServlet {
 		for (int i = 0; i < odb.size(); i++) {
 			if (odb.get(i).getState() != 2) { // order_detail的state为2表示已取消的商品，采购额等不计算在内
 				buy += odb.get(i).getSumGoods_p_price();
-				volume += odb.get(i).getOd_bulk_volume();
+				//volume += odb.get(i).getOd_bulk_volume();
 				weight += odb.get(i).getOd_total_weight();
 			}
 		}

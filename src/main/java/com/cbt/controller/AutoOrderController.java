@@ -224,7 +224,7 @@ public class AutoOrderController {
 			long time = new Date().getTime();
 			detailBean.setGoods_url("http://import-express.com/"+time+".html");
 			detailBean.setGoods_img("/img/1.png");
-			detailBean.setOd_bulk_volume(0.001);
+			detailBean.setOd_bulk_volume("");
 			detailBean.setOd_total_weight(0.001);
 			detailBean.setGoodsid(1400);
 			orderdetails.add(detailBean);

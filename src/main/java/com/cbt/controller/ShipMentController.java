@@ -416,9 +416,10 @@ public class ShipMentController {
 		}else{
 			Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
 			String strm=user.getRoletype();
-			if("0".equals(strm)){
+			/*if("0".equals(strm)){
 				res = 1;
-			}
+			}*/
+			res = 1;
 		}
 		request.setAttribute("res", 0);
 		map.put("avgTime", df.format(avgTime));

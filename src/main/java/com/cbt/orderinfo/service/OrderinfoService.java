@@ -1023,8 +1023,8 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(StringUtil.isBlank(map.get("estimatefreight"))?"0":map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
-		logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
-		System.out.println("订单管理查询总时间:"+(System.currentTimeMillis()-start));
+		// logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
+		// System.out.println("订单管理查询总时间:"+(System.currentTimeMillis()-start));
 		return list;
 	}
 

@@ -380,4 +380,12 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsPriceOrWeight(GoodsEditBean editBean);
+
+    /**
+     * 更新WeightFlag状态
+     * @param pid
+     * @param flag
+     * @return
+     */
+    int updateWeightFlag(@Param("pid") String pid, @Param("flag") int flag);
 }
