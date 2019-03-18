@@ -1683,7 +1683,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				orderDetailsBean.setGoods_class(rs.getInt("goods_class"));
 				orderDetailsBean.setExtra_freight(rs.getDouble("extra_freight"));
 				orderDetailsBean.setBuy_for_me(rs.getInt("buy_for_me"));
-				orderDetailsBean.setOd_bulk_volume(rs.getDouble("od_bulk_volume"));
+				orderDetailsBean.setOd_bulk_volume(rs.getString("od_bulk_volume"));
 				orderDetailsBean.setOd_total_weight(rs.getDouble("od_total_weight"));
 				orderDetailsBean.setDiscount_ratio(rs.getDouble("discount_ratio"));
 				orderDetailsBean.setFlag(rs.getInt("flag"));
@@ -2186,7 +2186,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				orderDetailsBean.setGoods_class(rs.getInt("goods_class"));
 				orderDetailsBean.setExtra_freight(rs.getDouble("extra_freight"));
 				orderDetailsBean.setBuy_for_me(rs.getInt("buy_for_me"));
-				orderDetailsBean.setOd_bulk_volume(rs.getDouble("od_bulk_volume"));
+				orderDetailsBean.setOd_bulk_volume(rs.getString("od_bulk_volume"));
 				orderDetailsBean.setOd_total_weight(rs.getDouble("od_total_weight"));
 				orderDetailsBean.setDiscount_ratio(rs.getDouble("discount_ratio"));
 				orderDetailsBean.setFlag(rs.getInt("flag"));

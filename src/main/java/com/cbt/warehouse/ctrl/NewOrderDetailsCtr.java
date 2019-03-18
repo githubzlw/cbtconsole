@@ -421,7 +421,7 @@ public class NewOrderDetailsCtr {
 			for (int i = 0; i < odb.size(); i++) {
 				if (odb.get(i).getState() != 2) {
 					buy += odb.get(i).getSumGoods_p_price();
-					volume += odb.get(i).getOd_bulk_volume();
+					//volume += odb.get(i).getOd_bulk_volume();
 					weight += odb.get(i).getOd_total_weight();
 					if(StringUtil.isNotBlank(odb.get(i).getFinal_weight())){
 						goodsWeight+=Double.parseDouble(odb.get(i).getFinal_weight());
@@ -1283,7 +1283,7 @@ public class NewOrderDetailsCtr {
 			for (int i = 0; i < odb.size(); i++) {
 				if (odb.get(i).getState() != 2) {
 					buy += odb.get(i).getSumGoods_p_price();
-					volume += odb.get(i).getOd_bulk_volume();
+					//volume += odb.get(i).getOd_bulk_volume();
 					weight += odb.get(i).getOd_total_weight();
 				}
 			}
