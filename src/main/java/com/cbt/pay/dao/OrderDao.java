@@ -135,7 +135,7 @@ public class OrderDao implements IOrderDao{
 				stmt.setString(19, orderdetails.get(i).getGoods_type());
 				int freight_free = orderdetails.get(i).getFreight_free();
 				stmt.setInt(20, freight_free);
-				stmt.setDouble(21, orderdetails.get(i).getOd_bulk_volume());
+				stmt.setString(21, orderdetails.get(i).getOd_bulk_volume());
 				stmt.setDouble(22, orderdetails.get(i).getOd_total_weight());
 				stmt.addBatch();
 			}

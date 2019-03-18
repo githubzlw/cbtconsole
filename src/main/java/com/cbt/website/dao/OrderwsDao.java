@@ -744,7 +744,7 @@ public class OrderwsDao implements IOrderwsDao {
                 // 拆分采购备注
                 String oremark = "";
                 // 新增 到账
-                odb.setOd_bulk_volume(rs.getDouble("od_bulk_volume"));
+                odb.setOd_bulk_volume(rs.getString("od_bulk_volume"));
                 odb.setAli_price(
                         StringUtils.isStrNull(rs.getString("ali_price")) ? "非精确对标" : rs.getString("ali_price"));
                 odb.setOd_total_weight(rs.getDouble("od_total_weight"));
@@ -1119,7 +1119,7 @@ public class OrderwsDao implements IOrderwsDao {
 
                 String oremark = "";
                 // 新增 到账
-                odb.setOd_bulk_volume(rs.getDouble("od_bulk_volume"));
+                odb.setOd_bulk_volume(rs.getString("od_bulk_volume"));
                 odb.setOd_total_weight(rs.getDouble("od_total_weight"));
                 odb.setCountry(rs.getString("country"));
                 odb.setSumGoods_price(rs.getFloat("sumGoods_price")); // 金额
