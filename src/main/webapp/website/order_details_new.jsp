@@ -268,9 +268,8 @@ em {
 	<div class="mask"></div>
 	<div
 		style="width: 50px; height: 50px; position: fixed; right: 50px; top: 800px; background:no-repeat;">
-		<img src="/cbtconsole/img/website/top.png">
+		<a href="#top"> <img src="/cbtconsole/img/website/top.png"></a>
 	</div>
-	<a href="#top"> </a>
 		<div class="mod_pay3" style="display: none;" id="repalyDiv1">
 		<div>
 				<a href="javascript:void(0)" class="show_x"
