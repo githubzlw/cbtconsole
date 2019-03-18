@@ -805,6 +805,7 @@
         (SELECT COUNT(v.id) FROM tblacklist v WHERE v.flag=0 AND v.blackVlue=u.email) as backList,
         (SELECT COUNT(1) FROM tblacklist a INNER JOIN order_address b ON a.blackVlue=b.address2 WHERE b.orderNo=o.order_no AND a.flag=0) as backAddressCount,
         (SELECT COUNT(t.id) FROM payment f INNER JOIN tblacklist t ON f.username=t.blackVlue  WHERE f.orderid=o.order_no AND f.username&lt;>'' AND f.paystatus=1 AND t.flag=0) as payBackList
+        ,(SELECT COUNT(id) FROM tb_complain WHERE ref_orderid IS NOT NULL AND complainState&lt;2 AND INSTR(ref_orderid ,o.order_no)&gt;0 ) as  complainFlag
         from orderinfo o left join order_address a on o.order_no=a.orderNo
         left join zone z ON a.country=z.country left join user u  on  u.id =o.user_id
         left join order_fee of  on  of.orderno =o.order_no

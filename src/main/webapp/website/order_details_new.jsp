@@ -614,6 +614,11 @@ em {
 							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;"
 								onclick="jumpDetails('${order.orderNo}', '${order.dropShipList}')">客户的订单页</a>&nbsp;&nbsp;
 	 					</c:if>
+	 					
+	 					<c:if test="${order.complainFlag >0 }">
+							<a class="ordmlink" target="_blank" href="/cbtconsole/complain/searchComplainByParam?userid=${order.userid}&creatTime=&complainState=-1&username=&toPage=1&currentPage=1">有申诉</a>&nbsp;&nbsp;
+	 					</c:if>
+	 					
 					</td>
 					<td  style="margin-left:100px">
 						<c:if test="${evaluate.evaluate != null && evaluate.evaluate !=''}">
