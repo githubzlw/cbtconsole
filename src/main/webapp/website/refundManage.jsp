@@ -344,6 +344,7 @@
             <td>账号：<input type="hidden" id="option_admin_id" value=""></td>
             <td><select id="select_op_id" disabled="disabled">
                 <option value="1" selected="selected">Ling</option>
+                <option value="6" selected="selected">IVY</option>
                 <option value="8" selected="selected">Mandy</option>
                 <option value="83" selected="selected">EmmaXie</option>
             </select></td>
@@ -391,7 +392,7 @@
 
                     if(state == 1){
                         //Ling退款
-                        if(operatorId == 1 || operatorId == 8){
+                        if(operatorId == 1 || operatorId == 8 || operatorId == 6){
                             showDivSecvlid(refundId,type,state,state + 1,userId,amount,orderNo,operatorId);
                         }else{
                             alert("需要Ling或者Mandy同意，您无权限操作！");

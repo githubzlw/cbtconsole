@@ -101,47 +101,48 @@ ul#img_sf_1{ list-style:none;float:center; display:inline;}
 ul#img_sf_1 li{float:left; width:150px; height:60px; display:inline; margin:2px 2px 2px 5px;}
 ul#img_sf_11 li a{width:150px; height:60px; display:block;}
 ul#img_sf_1 li a img{width:100%; height:100%; border:1px #999 solid;}
- ul#img_sf_1 li a:hover{ z-index:100; margin:-32px 0px 0px -32px; position:absolute;} 
- ul#img_sf_1 li a img :hover{width:600px; height:600px; border:1px #999 solid;} 
+ ul#img_sf_1 li a:hover{ z-index:100; margin:-32px 0px 0px -32px; position:absolute;}
+ul#img_sf_1 li a img:hover{width:200px; height:200px; border:1px #999 solid;}
+/**/
 ul#img_sf_1 li {
-    width: 100px;
-    height: 100px;}
-    .qq-uploader {
-    position: relative;
-    min-height: 200px;
-    max-height: 490px;
-    overflow-y: hidden;
-    width: inherit;
-    border-radius: 6px;
-    background-color: #FDFDFD;
-    border: 1px dashed #CCC;
-    padding: 20px;
+   width: 100px;
+   height: 100px;}
+   .qq-uploader {
+   position: relative;
+   min-height: 200px;
+   max-height: 490px;
+   overflow-y: hidden;
+   width: inherit;
+   border-radius: 6px;
+   background-color: #FDFDFD;
+   border: 1px dashed #CCC;
+   padding: 20px;
 }
 .trigger-upload {
-    color: #fff;
-    background-color: #00ABC7;
-    font-size: 14px;
-    padding: 7px 20px;
-    background-image: none;
-    border: 0;
-    cursor: pointer;
+   color: #fff;
+   background-color: #00ABC7;
+   font-size: 14px;
+   padding: 7px 20px;
+   background-image: none;
+   border: 0;
+   cursor: pointer;
 }
 .main .w-buttom{padding:0;margin-bottom:20px;}
 .qq-upload-button {
-    margin-right: 15px;
+   margin-right: 15px;
 }
 .qq-upload-button {
-    display: inline;
-    width: 105px;
-    margin-bottom: 10px;
-    padding: 7px 10px;
-    text-align: center;
-    float: left;
-    border: medium none;
-    background: rgb(255, 108, 0) none repeat scroll 0% 0%;
-    color: #FFF;
-    border-radius: 2px;
-	box-shadow: 0 1px 1px rgba(255,255,255,.37) inset, 1px 0 1px rgba(255,255,255,.07) inset, 0 1px 0 rgba(0,0,0,.36), 0 -2px 12px rgba(0,0,0,.08) inset;
+   display: inline;
+   width: 105px;
+   margin-bottom: 10px;
+   padding: 7px 10px;
+   text-align: center;
+   float: left;
+   border: medium none;
+   background: rgb(255, 108, 0) none repeat scroll 0% 0%;
+   color: #FFF;
+   border-radius: 2px;
+   box-shadow: 0 1px 1px rgba(255,255,255,.37) inset, 1px 0 1px rgba(255,255,255,.07) inset, 0 1px 0 rgba(0,0,0,.36), 0 -2px 12px rgba(0,0,0,.08) inset;
 } 
 </style>
 <script type="text/template" id="qq-template-manual-trigger">

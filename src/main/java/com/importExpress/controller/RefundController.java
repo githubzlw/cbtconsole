@@ -156,8 +156,8 @@ public class RefundController {
         if (chooseState == 0) {
             //chooseState=0表示待审批，如果是管理员，则待审批是销售同意状态
             if ("0".equals(adm.getRoletype())) {
-                if(83 == adm.getId()){
-                    //如果是Emma，则是主管审批状态
+                if(8 == adm.getId() || 83 == adm.getId()){
+                    //如果是Emma或者Mandy，则是主管审批状态
                     state = 2;
                 }else{
                     //操作人是Ling，则是销售审批状态
