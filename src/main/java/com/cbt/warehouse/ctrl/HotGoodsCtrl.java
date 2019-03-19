@@ -879,7 +879,7 @@ public class HotGoodsCtrl {
                 json.setMessage("获取当前商品的价格失败");
                 return json;
             } else {
-                double price = Double.valueOf(goods.getPrice());
+                double price = Double.valueOf(goods.getMaxPrice());
                 double amazonPrice = Double.valueOf(amazonPriceStr);
                 BigDecimal bdMargin = new BigDecimal((amazonPrice - price) / amazonPrice * 100);
                 json.setOk(true);
