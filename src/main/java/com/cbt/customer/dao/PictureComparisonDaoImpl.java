@@ -2023,16 +2023,24 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   
 			   sql= sql+"order by a.create_time desc LIMIT "+start+","+end+"";
 			   if (valid==10) {
-				   sql= " SELECT c.*,COUNT(c.pid) as count,d.unsellableReason_name,d.cur_time FROM (SELECT a.*,b.email,b.is_test from error_info as a LEFT JOIN `user` as b "
-				   		+ "ON a.user_id=b.id  "
-				   		+ "  ) as c LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id) AS d on c.pid=d.pid  ";
-				  // sql= sql+" JOIN user b on a.user_id=b.id LEFT JOIN custom_benchmark_ready as cbr ON a.pid=cbr.pid ";
+//				   sql= " SELECT c.*,COUNT(c.pid) as count,d.unsellableReason_name,d.cur_time FROM (SELECT a.*,b.email,b.is_test from error_info as a LEFT JOIN `user` as b "
+//				   		+ "ON a.user_id=b.id  "
+//				   		+ "  ) as c LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id) AS d on c.pid=d.pid  ";
+//				   sql= sql+" JOIN user b on a.user_id=b.id LEFT JOIN custom_benchmark_ready as cbr ON a.pid=cbr.pid ";
 				  // sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
 				   //sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
 				   //sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
 				  // sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
-					sql+=" where c.valid=10  AND (c.is_test IS NULL OR c.is_test =0) and d.unsellableReason_name is NOT NULL";
-					if(!"".equals(userId) && userId!=null){
+//					sql+=" where c.valid=10  AND (c.is_test IS NULL OR c.is_test =0) and d.unsellableReason_name is NOT NULL";
+					
+					
+					sql="SELECT l.* ,d.unsellableReason_name,d.cur_time FROM (SELECT * FROM "
+                  +"(SELECT c.id,c.create_time,c.ip,c.pid,c.url,c.user_id,c.valid,c.email,c.is_test,COUNT(c.pid) as count FROM"
+                  +"(SELECT a.id,a.create_time,a.ip,a.pid,a.url,a.user_id,a.valid,b.email,b.is_test from error_info  a "
+                  +" LEFT JOIN `user`  b "
+				   	+"	ON a.user_id=b.id  "
+				   	+"	  )  c WHERE c.valid=10 AND pid regexp '^[0-9]+$'  AND (c.is_test IS NULL OR c.is_test =0)";
+				   	if(!"".equals(userId) && userId!=null){
 						   
 						   if ("-1".equals(userId)) {
 								sql+=" and c.user_id !=0 ";
@@ -2046,7 +2054,27 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 					   if(!"".equals(timeTo) && timeTo!=null){
 						   sql =sql+" and c.create_time <= '"+timeTo+"' ";
 					   }
-					   sql+=" GROUP BY c.pid ORDER BY count DESC, c.create_time DESC LIMIT "+start+","+end+"";
+				   	sql+= " GROUP BY c.pid ) h WHERE h.count >2) as l " 
+
+                      +" LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN "
+                   +" unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id where um.unsellableReason_name is NOT NULL ) AS d on l.pid=d.pid  where d.unsellableReason_name is NOT NULL"
+					+"  ORDER BY count DESC, l.create_time DESC LIMIT "+start+","+end+"";
+					
+//					if(!"".equals(userId) && userId!=null){
+//						   
+//						   if ("-1".equals(userId)) {
+//								sql+=" and c.user_id !=0 ";
+//							}else {
+//								sql =sql+" and c.user_id = '"+userId+"' ";	
+//							}
+//					   }
+//					   if(!"".equals(timeFrom) && timeFrom!=null){
+//						   sql =sql+" and c.create_time >= '"+timeFrom+"' ";
+//					   }
+//					   if(!"".equals(timeTo) && timeTo!=null){
+//						   sql =sql+" and c.create_time <= '"+timeTo+"' ";
+//					   }
+//					   sql+=" GROUP BY c.pid ORDER BY count DESC, c.create_time DESC LIMIT "+start+","+end+"";
 				}
             
 		
@@ -3238,36 +3266,33 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 			   sql =sql+" and a.create_time <= '"+timeTo+"' ";
 		   }
 		   if (valid==10) {
-			    //sql = "select count(distinct a.url) as maxCount from error_info a ";
-			    
-			   //sql= sql+"LEFT JOIN user b on a.user_id=b.id ";
-			   sql= " SELECT COUNT(distinct c.pid) as maxCount FROM (SELECT a.*,b.email,b.is_test from error_info as a LEFT JOIN `user` as b "
-				   		+ "ON a.user_id=b.id  "
-				   		+ "  ) as c LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id) AS d on c.pid=d.pid  ";
-				  // sql= sql+" JOIN user b on a.user_id=b.id LEFT JOIN custom_benchmark_ready as cbr ON a.pid=cbr.pid ";
-			  // sql= sql+"and b.email  not  like  'test%' and user_id<>1128 and  b.email  not  like  '%qq.com' and  b.email  not  like  '%163.com' ";
-			  // sql= sql+"and b.email  not  like  'Xielulu1026%'   and b.email  not  like  'lifangha740%'  ";
-			  // sql= sql+"and b.email  not  like  'jackluo666@aliyun.com'   and b.email  not  like  'Jennyblack1982@hotmail.com'   ";
-			  // sql= sql+"and b.email  not  like  '789@222.com'  where 1=1 ";
-				sql+=" where c.valid=10 and (c.is_test IS NULL OR c.is_test =0) and d.unsellableReason_name is NOT NULL ";
-				if(!"".equals(userId) && userId!=null){
-					
-					 if ("-1".equals(userId)) {
-							sql+=" and c.user_id !=0 ";
-						}else {
-							sql =sql+" and c.user_id = '"+userId+"' ";	
-						}
-				   }
-				   if(!"".equals(timeFrom) && timeFrom!=null){
-					   sql =sql+" and c.create_time >= '"+timeFrom+"' ";
-				   }
-				   if(!"".equals(timeTo) && timeTo!=null){
-					   sql =sql+" and c.create_time <= '"+timeTo+"' ";
-				   }
-				  
-			}
-//		sql =sql +"";
-		
+			   sql="SELECT count(1) as maxCount FROM (SELECT * FROM "
+		                  +"(SELECT c.id,c.create_time,c.ip,c.pid,c.url,c.user_id,c.valid,c.email,c.is_test,COUNT(c.pid) as count FROM"
+		                  +"(SELECT a.id,a.create_time,a.ip,a.pid,a.url,a.user_id,a.valid,b.email,b.is_test from error_info  a "
+		                  +" LEFT JOIN `user`  b "
+						   	+"	ON a.user_id=b.id  "
+						   	+"	  )  c WHERE c.valid=10 AND pid regexp '^[0-9]+$'  AND (c.is_test IS NULL OR c.is_test =0)";
+						   	if(!"".equals(userId) && userId!=null){
+								   
+								   if ("-1".equals(userId)) {
+										sql+=" and c.user_id !=0 ";
+									}else {
+										sql =sql+" and c.user_id = '"+userId+"' ";	
+									}
+							   }
+							   if(!"".equals(timeFrom) && timeFrom!=null){
+								   sql =sql+" and c.create_time >= '"+timeFrom+"' ";
+							   }
+							   if(!"".equals(timeTo) && timeTo!=null){
+								   sql =sql+" and c.create_time <= '"+timeTo+"' ";
+							   }
+						   	sql+= " GROUP BY c.pid ) h WHERE h.count >2) as l " 
+
+		                      +" LEFT JOIN (SELECT f.unsellableReason,f.pid,f.cur_time,um.unsellableReason_name FROM custom_benchmark_ready as f LEFT JOIN "
+		                   +" unsellablereason_master as um ON f.unsellableReason=um.unsellableReason_id where um.unsellableReason_name is NOT NULL ) AS d on l.pid=d.pid  where d.unsellableReason_name is NOT NULL";
+							
+							
+		   }
 		Connection conn = DBHelper.getInstance().getConnection();
 		int mCount=0;
 		ResultSet rs = null;
