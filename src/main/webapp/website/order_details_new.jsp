@@ -632,6 +632,18 @@ em {
 						 </c:if>
 					</td>
 				</tr>
+				
+				<tr>
+					<td colspan="4">
+						<c:if test="${fn:length(userIds) > 0}">
+							<span>同地址不同账号客户ID:</span>
+								<c:forEach items="${userIds}" var="userid_correlation">
+									${userid_correlation}
+	 							</c:forEach>
+						</c:if>
+					</td>
+				</tr>
+				
 				<tr>
 					<td colspan="4">
 						<input type="hidden" value="${isDropshipOrder}">
