@@ -342,6 +342,14 @@ public interface IOrderinfoService {
 	public List<String> getOrderNos(int userId, String orderNo);
 
 	/**
+	 * 获取对同地址不同账号客户
+	 * @return
+	 */
+	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode );
+	
+	
+	
+	/**
 	 * dp订单实际支付金额
 	 * @param orderNo
 	 * @return
