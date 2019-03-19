@@ -438,6 +438,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int updateGoodsWeightByPid(String pid, double newWeight, double oldWeight, int weightIsEdit) {
+        // 数据库字段值revise_weight 人为修改重量 =  newWeight
+        // 数据库字段值final_weight最终展示重量 =  newWeight
+        // 数据库字段值 source_pro_flag = 7 标识是人为修改的重量
+        // 数据库字段值weight 如果weight值是空的或者0，设置数weight =  newWeight
+        // 数据库字段值old_weight,记录老的重量数据，old_weight = oldWeight
         return customGoodsMapper.updateGoodsWeightByPid(pid, newWeight, oldWeight, weightIsEdit);
     }
 
@@ -484,6 +489,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         JsonResult json = new JsonResult();
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        // 更新27数据库重量信息
         boolean is = updateGoodsWeightByPid(pid, Double.valueOf(newWeight), Double.valueOf(orGoods.getFinalWeight()), weightIsEdit) > 0;
         if (is) {
             // 插入日志记录
@@ -532,7 +538,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public boolean refreshPriceRelatedData(CustomGoodsPublish bean, String newWeight) {
-        //更新28库的custom_benchmark_ready_newest [source_pro_flag]=7
+        // 更新28库的custom_benchmark_ready_newest [source_pro_flag]=7
+        // 数据库字段值final_weight最终展示重量 =  newWeight
+        // 数据库字段值 source_pro_flag = 7 标识是人为修改的重量
         int count = customGoodsDao.updateSourceProFlag(bean.getPid(), newWeight);
         if (count > -1) {
             //更新SkuGoodsOffers和SingleOffersChild信息

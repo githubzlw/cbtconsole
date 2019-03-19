@@ -44,6 +44,15 @@ public class CustomGoodsBean {
     private int isNewCloud;//是否新品云商品
     private String updateTimeAll;
     private String customMainImage;
+    private String maxPrice;
+
+    public String getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(String maxPrice) {
+        this.maxPrice = maxPrice;
+    }
 
     private int count;//
 

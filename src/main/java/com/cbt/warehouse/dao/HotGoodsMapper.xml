@@ -74,6 +74,7 @@
 		<result column="price" property="price" />
 		<result column="wprice" property="wprice" />
 		<result column="isNewCloud" property="isNewCloud" />
+		<result column="max_price" property="maxPrice" />
 	</resultMap>
 
 	<sql id="hotSellingCategoryColumn">
@@ -328,18 +329,9 @@
 		(
 		select
 		id,catid,catid1,pid,custom_main_image as img,
-		localpath,remotpath,enname,price,wprice,isNewCloud
+		localpath,remotpath,enname,price,wprice,isNewCloud,max_price
 		from
-		custom_benchmark_ready where pid =#{pid,jdbcType=VARCHAR} and valid
-		=1
-		UNION
-		select id,catid,catid1,pid,custom_main_image as img,
-		localpath,remotpath,enname,price,wprice,isNewCloud
-		from
-		custom_benchmark_ready_cloud
-
-		where pid =#{pid,jdbcType=VARCHAR} and
-		valid =1
+		custom_benchmark_ready where pid =#{pid,jdbcType=VARCHAR} and valid = 1
 		) cbr left join (select pid,name from custom_1688_goods where
 		pid
 		=#{pid,jdbcType=VARCHAR}) c8g
