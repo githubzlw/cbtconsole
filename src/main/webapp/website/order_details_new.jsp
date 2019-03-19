@@ -638,7 +638,7 @@ em {
 						<c:if test="${fn:length(userIds) > 0}">
 							<span>同地址不同账号客户ID:</span>
 								<c:forEach items="${userIds}" var="userid_correlation">
-									${userid_correlation}
+									<span class="ormtittdred">${userid_correlation}</span>
 	 							</c:forEach>
 						</c:if>
 					</td>

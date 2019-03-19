@@ -897,7 +897,7 @@
     </select>
     
     <select id="getSameAdrDifAccount" resultType="java.lang.String">
-        select userid from address where userid&lt;>#{userId} and address=#{address} and street=#{street} and zip_code=#{zipCode}
+        select DISTINCT userid from address where userid&lt;>#{userId} and address=#{address} and street=#{street} and zip_code=#{zipCode}
     </select>
     
     <select id="getall" resultType="com.cbt.email.entity.EmailReceive1">
