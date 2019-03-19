@@ -380,6 +380,12 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("purchasetime_order", purchasetime_order);
 			// 查询用户相关订单->同一客户，还没出货的 订单
 			request.setAttribute("orderNos", iOrderinfoService.getOrderNos(orderInfo.getUserid(),orderNo));
+			
+			//对同地址不同账号客户进行警告
+			request.setAttribute("userIds", iOrderinfoService.getSameAdrDifAccount(orderInfo.getUserid(),orderInfo.getAddress().getAddress()
+					,orderInfo.getAddress().getStreet(),orderInfo.getAddress().getZip_code()));
+			
+			
 			// 判断订单时候有替代产品
 			int count = orderInfo.getPackage_style();
 			request.setAttribute("count", count);
