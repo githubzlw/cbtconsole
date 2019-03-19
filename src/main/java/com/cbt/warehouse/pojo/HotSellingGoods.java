@@ -60,6 +60,16 @@ public class HotSellingGoods implements Serializable {
 	private double virtualOldPrice;
 	private int promotionFlag;//促销flag: 0不促销，1促销
 
+	private String goodsPath;
+
+	public String getGoodsPath() {
+		return goodsPath;
+	}
+
+	public void setGoodsPath(String goodsPath) {
+		this.goodsPath = goodsPath;
+	}
+
 	public int getId() {
 		return id;
 	}

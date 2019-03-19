@@ -711,7 +711,11 @@
                 <span>ASIN码:${goods.asinCode}</span><br>
                 <span>利润率:${goods.profitMargin}</span><em>%</em><br>
                 <b style="color:${goods.isOn > 0 ? 'green':'red'};">状态:${goods.isOn > 0 ? '开启':'关闭'}</b>&nbsp;&nbsp;
-                <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a><br>
+                <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.goodsPid}">编辑商品详情</a>
+                <c:if test="${goods.isSoldFlag > 1}">
+                    &nbsp;&nbsp;<b style="background-color: #e2305b;color: #f1eb0a;">免邮商品</b>
+                </c:if>
+                <br>
                 <c:if test="${goods.promotionFlag > 0}">
                     <b style="color:red;">促销商品</b><br>
                 </c:if>
