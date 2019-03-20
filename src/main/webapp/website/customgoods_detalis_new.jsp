@@ -1935,8 +1935,8 @@
                                     <c:if test="${goods.isWeigthZero > 0}">
                                         <b style="color: red;font-size: 18px;">*抓取1688重量为空</b>
                                     </c:if>
+                                    &nbsp;&nbsp;&nbsp;<input type="button" value="确认重量没有问题" class="s_btn" onclick="updateWeightFlag('${goods.pid}',this)"/>
                                     <c:if test="${goods.weightFlag > 0}">
-                                        &nbsp;&nbsp;&nbsp;<input type="button" value="确认重量没有问题" class="s_btn" onclick="updateWeightFlag('${goods.pid}',this)"/>
                                         <b style="font-size: 16px;color: red;">*重量超过类别上下限</b>
                                     </c:if>
 
