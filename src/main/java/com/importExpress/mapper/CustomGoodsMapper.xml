@@ -934,9 +934,6 @@
         update custom_goods_edit a,custom_benchmark_ready b
         set b.revise_weight=#{newWeight},b.final_weight=#{newWeight},b.source_pro_flag = 7,b.weight_flag = 0,
         a.weight_is_edit = #{weightIsEdit},a.old_weight = #{oldWeight},a.price_is_edit = 0
-        <if test="weightIsEdit == 1">
-            ,b.goodsstate = 5
-        </if>
         ,b.weight = case when (b.weight = '' or b.weight is null or b.weight = '0' or b.weight = '0.0') then #{newWeight} else b.weight end
         where a.pid = b.pid and  b.pid = #{pid}
     </update>
