@@ -248,8 +248,8 @@
 				<input id="timeTo" class="Wdate rlcj" type="text" style="width:120px;" value="${timeTo }" onfocus="WdatePicker({skin:'whyGreen',lang:'en'})" />
 				<span>下架商品点击统计选择：</span>
 				<select id="valid">
-  <option  value ="5" <c:if test="${valid=='5'}">selected="selected"</c:if>>否</option>
-  <option value ="10" <c:if test="${valid=='10'}">selected="selected"</c:if>>是</option>
+  <option  value ="5" <c:if test="${valid=='5'}">selected="selected"</c:if>>原404统计</option>
+  <option value ="10" <c:if test="${valid=='10'}">selected="selected"</c:if>>下架商品点击统计</option>
 </select>
 <span >游客过滤：<input id='cal' type='checkbox' ${userId==-1?"checked='checked'":"" } value='' ></span>
 
