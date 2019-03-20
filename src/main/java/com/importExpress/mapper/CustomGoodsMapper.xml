@@ -1210,7 +1210,10 @@
     </select>
 
     <update id="updateWeightFlag">
-        update custom_benchmark_ready set weight_flag = #{flag} where pid = #{pid}
+        update custom_benchmark_ready
+        set weight_flag = #{flag}
+        ,weight = case when (weight = '' or weight is null or weight = '0' or weight = '0.0') then final_weight else weight end
+        where pid = #{pid}
     </update>
 
 </mapper>
