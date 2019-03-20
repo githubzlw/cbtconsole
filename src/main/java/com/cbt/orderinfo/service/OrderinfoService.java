@@ -1449,6 +1449,12 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
+	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode) {
+		return dao.getSameAdrDifAccount(userId,address,street,zipCode);
+	}
+	
+	
+	@Override
 	public double getAcPayPrice(String orderNo) {
 		return dao.getAcPayPrice(orderNo);
 	}

@@ -421,6 +421,14 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	public List<String> getOrderNos(@Param("userId") int userId, @Param("orderNo") String orderNo);
+	
+	/**
+	 * 获取对同地址不同账号客户
+	 * @return
+	 */
+	public List<String> getSameAdrDifAccount(@Param("userId") int userId, @Param("address") String address,
+			@Param("street") String street,@Param("zipCode") String zipCode);
+	
 	/**
 	 * dp订单实际支付金额
 	 * @param orderNo

@@ -791,7 +791,7 @@
         (SELECT COUNT(od.orderid) FROM order_details od LEFT JOIN id_relationtable id ON  od.id=id.odid
         WHERE od.orderid=o.order_no AND od.checked=0 AND id.goodstatus=1 AND id.is_replenishment=1) as no_checked,
         pf.id dzid, pf.orderno dzorderno,o.processingfee, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
-        a.address as addresss,o.user_id as userid,o.actual_allincost,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,REPLACE(a.country,' ','') AS country,
+        a.address as addresss,o.user_id as userid,o.actual_allincost,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,a.country AS country,
         (select country from zone z where z.id=IF(a.country=43,36,a.country)) countryName ,
         (SELECT z.id FROM zone z WHERE REPLACE(IF(z.country=43,36,z.country),' ','')=REPLACE(IF(a.country=43,36,a.country),' ','')) new_zid ,a.street,
         a.statename,a.phonenumber,a.zipcode,packag_style as package_style,mode_transport,expect_arrive_time,ug.grade,
@@ -895,6 +895,11 @@
     <select id="getOrderNos" resultType="java.lang.String">
         select order_no from orderinfo where (state=5 or state=1 or state=2) and user_id = ${userId} and order_no&lt;>#{orderNo} ORDER BY orderid desc  limit 10
     </select>
+    
+    <select id="getSameAdrDifAccount" resultType="java.lang.String">
+        select DISTINCT userid from address where userid&lt;>#{userId} and address=#{address} and street=#{street} and zip_code=#{zipCode}
+    </select>
+    
     <select id="getall" resultType="com.cbt.email.entity.EmailReceive1">
         select * from(select er.id,er.cname,er.title,er.content,er.create_time as createTime,er.sale_name as saleName,er.customer_id as customerId,er.orderid from email_receive1 er where er.orderid=#{orderNo}
         union

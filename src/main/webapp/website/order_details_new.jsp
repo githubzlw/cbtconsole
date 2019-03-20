@@ -268,9 +268,8 @@ em {
 	<div class="mask"></div>
 	<div
 		style="width: 50px; height: 50px; position: fixed; right: 50px; top: 800px; background:no-repeat;">
-		<img src="/cbtconsole/img/website/top.png">
+		<a href="#top"> <img src="/cbtconsole/img/website/top.png"></a>
 	</div>
-	<a href="#top"> </a>
 		<div class="mod_pay3" style="display: none;" id="repalyDiv1">
 		<div>
 				<a href="javascript:void(0)" class="show_x"
@@ -632,6 +631,18 @@ em {
 						 </c:if>
 					</td>
 				</tr>
+				
+				<tr>
+					<td colspan="4">
+						<c:if test="${fn:length(userIds) > 0}">
+							<span>同地址不同账号客户ID:</span>
+								<c:forEach items="${userIds}" var="userid_correlation">
+									<span class="ormtittdred">${userid_correlation}</span>
+	 							</c:forEach>
+						</c:if>
+					</td>
+				</tr>
+				
 				<tr>
 					<td colspan="4">
 						<input type="hidden" value="${isDropshipOrder}">

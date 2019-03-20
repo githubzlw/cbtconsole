@@ -63,9 +63,11 @@
   /* Complaint */
   .business_test{ margin: 8px 0 5px; color: #333; }
   .business_question545{margin: 8px 0 0; color: #333; }
-  .track_p{ margin-bottom: 5px; text-align: left; margin-top: 10px;}
+  .track_p{ margin-bottom: 5px; text-align: left; margin-top: 0px; color: #333333; margin-bottom: 2px;}
+  .track_p b{ color: #656565;}
   .track_p a{ color:#01a4ef; }
   .track_p a:hover{ text-decoration: underline;}
+  .user_id_ple{ text-align: left; color: #333333; margin-bottom: 12px;}
 
   .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
   .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
@@ -188,7 +190,7 @@
                 <td>
                   <table class="soapbox">
                     <tr>
-                      <td class="soapbox-title" th:text="${title}">Your ImportExpress order has substitutes need your confirm before purchase!</td>
+                      <td class="soapbox-title" th:text="${title}">Some of the products in your order are out-of-stock</td>
                     </tr>
                   </table>
                   
@@ -196,11 +198,11 @@
                     <tr>
                       <td class="body-padding"></td>
                       <td class="body-padded">
-                        <div class="body-title">Dea <span th:text="${email}">first_name</span>,</div>
-                        <p class="user_id_ple">Order #:<i th:text="${orderNo}">QA18474027512271</i></p>
-                        <p class="track_p"> Unfortunately, we are not able to buy the following items for you. We are suggesting alternatives for your review.</p>
+                        <p class="user_id_ple">Unfortunately, the following products are out of stock now. </p>
+                        <p class="track_p">Here is a suggesting alternative for your review.</p>
+                        <p class="track_p">If you agree, please click <b>agree</b>,</p>
+                        <p class="track_p">Otherwise click <b>disagree</b>, and we’ll refund you.</p>
                         <p class="track_p"><a target="_blank" href="" th:href="${clickHereForDetails}">Click here for details. </a> </p>
-                        <p class="track_p" th:text="${reason3}"> 123123123123123123123</p>
                         <table class="body-signature-block">
                           <tr>
                             <td class="body-signature-cell">
