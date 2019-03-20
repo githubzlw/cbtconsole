@@ -381,11 +381,6 @@ public class NewOrderDetailsCtr {
 			// 查询用户相关订单->同一客户，还没出货的 订单
 			request.setAttribute("orderNos", iOrderinfoService.getOrderNos(orderInfo.getUserid(),orderNo));
 			
-			//对同地址不同账号客户进行警告
-			request.setAttribute("userIds", iOrderinfoService.getSameAdrDifAccount(orderInfo.getUserid(),orderInfo.getAddress().getAddress()
-					,orderInfo.getAddress().getStreet(),orderInfo.getAddress().getZip_code()));
-			
-			
 			// 判断订单时候有替代产品
 			int count = orderInfo.getPackage_style();
 			request.setAttribute("count", count);
@@ -470,6 +465,15 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("orderNo", orderInfo.getOrderNo());
 			request.setAttribute("rate", rate);
 			request.setAttribute("userid", orderInfo.getUserid());
+			
+			//对同地址不同账号客户进行警告
+			request.setAttribute("userIds", iOrderinfoService.getSameAdrDifAccount(orderInfo.getUserid(),
+					StrUtils.matchStr(orderInfo.getAddress().getAddress(), "(\\d+(\\.\\d+){0,1})"),
+					StrUtils.matchStr(orderInfo.getAddress().getStreet(),"(\\d+(\\.\\d+){0,1})"),
+					orderInfo.getAddress().getZip_code(),countryid,orderInfo.getAddress().getAddress2(),
+					orderInfo.getAddress().getRecipients()));
+			
+			
 			String lirun1 = null;
 			if (sale == 0.0 || buy == 0.0) {
 				lirun1 = "--";

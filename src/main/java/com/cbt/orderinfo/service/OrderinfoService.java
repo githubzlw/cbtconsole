@@ -23,6 +23,7 @@ import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1449,8 +1450,8 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode) {
-		return dao.getSameAdrDifAccount(userId,address,street,zipCode);
+	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode,String country, String city, String recipients) {
+		return dao.getSameAdrDifAccount(userId,address,street,zipCode,country,city,recipients);
 	}
 	
 	

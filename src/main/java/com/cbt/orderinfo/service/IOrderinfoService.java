@@ -345,8 +345,8 @@ public interface IOrderinfoService {
 	 * 获取对同地址不同账号客户
 	 * @return
 	 */
-	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode );
-	
+	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode,
+			String country, String city, String recipients);
 	
 	
 	/**

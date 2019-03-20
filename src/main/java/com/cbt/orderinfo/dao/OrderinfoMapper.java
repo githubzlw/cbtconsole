@@ -427,7 +427,8 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	public List<String> getSameAdrDifAccount(@Param("userId") int userId, @Param("address") String address,
-			@Param("street") String street,@Param("zipCode") String zipCode);
+			@Param("street") String street,@Param("zipCode") String zipCode,@Param("country") String country,
+			@Param("city") String city,@Param("recipients") String  recipients);
 	
 	/**
 	 * dp订单实际支付金额
