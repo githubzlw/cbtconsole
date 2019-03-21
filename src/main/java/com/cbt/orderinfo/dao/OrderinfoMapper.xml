@@ -862,7 +862,7 @@
     <select id="getForwarder" resultType="com.cbt.bean.Forwarder">
         select orderid order_no,expressno express_no, transportcompany logistics_name,'' as transport_details,'' as new_state ,createtime,''as isneed
         from shipping_package where
-        orderid=#{orderNo} OR (LOCATE(#{orderNo},remarks)>0 AND LOCATE(#{orderNo},orderid)&lt;=0)
+        orderid=#{orderNo} OR (LOCATE(#{orderNo},remarks)>0 AND LOCATE(#{orderNo},orderid)&lt;=0) order by id desc limit 1
     </select>
     <select id="getLogisticsInfo" resultType="com.cbt.bean.CodeMaster">
         select code_id as codeId,code_name as codeName from codemaster where code_type='001' and delete_flg=0

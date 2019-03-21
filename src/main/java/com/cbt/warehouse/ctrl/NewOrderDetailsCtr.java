@@ -10,9 +10,6 @@ import com.cbt.change.util.ErrorLogDao;
 import com.cbt.change.util.OnlineOrderInfoDao;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.IRechargeRecordSSMDao;
-import com.cbt.email.entity.EmailReceive1;
-import com.cbt.email.service.EmailReceiveServiceImpl;
-import com.cbt.email.service.IEmailReceiveService;
 import com.cbt.fee.service.IZoneServer;
 import com.cbt.fee.service.ZoneServer;
 import com.cbt.messages.ctrl.InsertMessageNotification;
@@ -38,7 +35,6 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.pojo.OrderCancelApprovalAmount;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.PaymentServiceNew;
@@ -332,14 +328,14 @@ public class NewOrderDetailsCtr {
 			request.setAttribute("order_state", orderInfo.getState());
 			IZoneServer os = new ZoneServer();
 			request.setAttribute("countryList",os.getAllZone());
-			// 实际运费
+		// 实际运 费
 			Double actual_ffreight_ = Utility.getIsDouble(orderInfo.getActual_ffreight())? Double.parseDouble(orderInfo.getActual_ffreight()) : 0;
 			request.setAttribute("actual_ffreight_", actual_ffreight_);
 			request.setAttribute("foreign_freight", StringUtil.isNotBlank(orderInfo.getForeign_freight())?Double.parseDouble(orderInfo.getForeign_freight()):0.00);
 			request.setAttribute("service_fee",StringUtil.isNotBlank(orderInfo.getService_fee())?Double.parseDouble(orderInfo.getService_fee()):0.00);
 			request.setAttribute("actual_lwh",StringUtil.isNotBlank(orderInfo.getActual_lwh())?Double.parseDouble(orderInfo.getActual_lwh()):0.00);
 			request.setAttribute("firstdiscount",StringUtil.isNotBlank(orderInfo.getFirstdiscount())?Double.parseDouble(orderInfo.getFirstdiscount()):0.00);
-			// service_fee是从数据表读取的
+			// service_fee是从数据表读取的 test
 			request.setAttribute("service_fee", Utility.getIsDouble(orderInfo.getService_fee())? Double.parseDouble(orderInfo.getService_fee()) : 0);
 			request.setAttribute("cashback", orderInfo.getCashback());
 			String mode_transport = "";

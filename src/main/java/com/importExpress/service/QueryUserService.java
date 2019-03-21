@@ -3,6 +3,7 @@ package com.importExpress.service;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.GoodsReview;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +48,9 @@ public interface QueryUserService {
     Map<String, Object> updateNeedoffshellEditFlag(String pids);
 
     Map<String,String> queryUserListCsv(Integer userType, String startDate, String endDate);
+
+    EasyUiJsonResult queryGoodsReviewList(Integer page, Integer rows, String goodsPid, String reviewRemark, Integer type,
+                                     Integer reviewFlag, String startDate, String endDate);
+
+    GoodsReview queryGoodsReviewById(Integer id);
 }
