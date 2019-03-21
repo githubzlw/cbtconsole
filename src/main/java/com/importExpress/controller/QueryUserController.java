@@ -5,6 +5,7 @@ import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.website.userAuth.bean.AuthInfo;
+import com.importExpress.pojo.GoodsReview;
 import com.importExpress.service.QueryUserService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -512,5 +513,59 @@ public class QueryUserController {
     public Map<String, Object> updateNeedoffshellEditFlag(String pids) {
         return queryUserService.updateNeedoffshellEditFlag(pids);
     }
+
+    /**
+     * 查询未下单的指定用户
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/goodsReviewList.do
+     *
+     *
+     * @return 返回的是easyui数据(json)格式
+     */
+    @RequestMapping(value = "/queryGoodsReviewList.do")
+    @ResponseBody
+    public EasyUiJsonResult queryGoodsReviewList(@RequestParam(value = "rows", defaultValue = "20", required = false) Integer rows,
+                                            @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+                                            @RequestParam(value = "startDate", defaultValue = "", required = false) String startDate,
+                                            @RequestParam(value = "endDate", defaultValue = "", required = false) String endDate,
+                                            @RequestParam(value = "goodsPid", defaultValue = "", required = false) String goodsPid,
+                                            @RequestParam(value = "reviewRemark", defaultValue = "", required = false) String reviewRemark,
+                                            @RequestParam(value = "type", defaultValue = "-1", required = false) Integer type,
+                                            @RequestParam(value = "reviewFlag", defaultValue = "-1", required = false) Integer reviewFlag) {
+        if (StringUtils.isNotBlank(startDate)) {
+            startDate += " 00:00";
+        } else {
+            startDate = null;
+        }
+        if (StringUtils.isNotBlank(endDate)) {
+            endDate += " 23:59";
+        } else {
+            endDate = null;
+        }
+        if (StringUtils.isBlank(goodsPid)) {
+            goodsPid = null;
+        }
+        if (StringUtils.isBlank(reviewRemark)) {
+            reviewRemark = null;
+        } else {
+            reviewRemark = "%" + reviewRemark + "%";
+        }
+        // 查询
+        return queryUserService.queryGoodsReviewList(page, rows, goodsPid, reviewRemark, type, reviewFlag, startDate, endDate);
+    }
+
+    /**
+     * 根据id查询对应评论数据
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/queryGoodsReviewById.do?id=
+     *
+     */
+    @RequestMapping(value = "/queryGoodsReviewById.do")
+    @ResponseBody
+    public GoodsReview queryGoodsReviewById(Integer id) {
+        if (id == null || id == 0){
+            return null;
+        }
+        return queryUserService.queryGoodsReviewById(id);
+    }
+
 
 }

@@ -1,10 +1,7 @@
 package com.importExpress.mapper;
 
 import com.cbt.website.userAuth.bean.AuthInfo;
-import com.importExpress.pojo.GoodsInfoSpiderPO;
-import com.importExpress.pojo.ItemStaticFile;
-import com.importExpress.pojo.StandardGoodsFormDataPO;
-import com.importExpress.pojo.UserXlsBean;
+import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
@@ -101,4 +98,15 @@ public interface QueryUserMapper {
     List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);
 
     String querySearchKeywords(@Param("id") Integer id);
+
+    Integer queryGoodsReviewListCount(@Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
+                                 @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
+                                 @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<GoodsReview> queryGoodsReviewList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                      @Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
+                                      @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
+                                      @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    GoodsReview queryGoodsReviewById(@Param("id") Integer id);
 }

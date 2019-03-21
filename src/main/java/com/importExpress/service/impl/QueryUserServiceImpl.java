@@ -373,6 +373,30 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
+    public EasyUiJsonResult queryGoodsReviewList(Integer page, Integer rows, String goodsPid, String reviewRemark, Integer type, Integer reviewFlag,
+                                            String startDate, String endDate) {
+        List<GoodsReview> list = queryUserMapper.queryGoodsReviewList((page - 1) * rows, rows, goodsPid, reviewRemark, type, reviewFlag, startDate, endDate);
+        Integer totalCount = queryUserMapper.queryGoodsReviewListCount(goodsPid, reviewRemark, type, reviewFlag, startDate, endDate);
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        if (list != null && list.size() > 0) {
+            json.setSuccess(true);
+            json.setRows(list);
+            json.setTotal(totalCount);
+        } else {
+            json.setSuccess(false);
+            json.setRows("");
+            json.setTotal(0);
+        }
+        return json;
+    }
+
+    @Override
+    public GoodsReview queryGoodsReviewById(Integer id) {
+        return queryUserMapper.queryGoodsReviewById(id);
+    }
+
+    @Override
     public EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType, String startDate, String endDate) {
         List<UserXlsBean> list = queryUserMapper.queryUserList((page - 1) * rows, rows, userType, startDate, endDate);
         Integer totalCount = queryUserMapper.queryUserListCount(userType, startDate, endDate);

@@ -695,4 +695,73 @@
         AND LENGTH(shopCarShowinfo) > 0
     </select>
 
+    <!--Integer queryGoodsReviewListCount(@Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
+                                 @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
+                                 @Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="queryGoodsReviewListCount" resultType="Integer">
+        SELECT COUNT(1)
+        FROM goods_review
+        <where>
+            <if test="type != -1">
+                type = #{type}
+            </if>
+            <if test="reviewFlag != -1">
+                AND review_flag = #{reviewFlag}
+            </if>
+            <if test="goodsPid != null">
+                AND goods_pid = #{goodsPid}
+            </if>
+            <if test="reviewRemark != null">
+                AND review_remark LIKE #{reviewRemark}
+            </if>
+            <if test="startDate != null">
+                AND createtime >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND #{endDate} >= createtime
+            </if>
+        </where>
+    </select>
+
+    <!--List<GoodsReview> queryGoodsReviewList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                      @Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
+                                      @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
+                                      @Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="queryGoodsReviewList" resultType="com.importExpress.pojo.GoodsReview">
+        SELECT id, goods_pid goodsPid, country, review_name reviewName, review_score reviewScore,
+          createtime, updatetime, review_remark reviewRemark, type, review_flag reviewFlag
+        FROM goods_review
+        <where>
+            <if test="type != -1">
+                type = #{type}
+            </if>
+            <if test="reviewFlag != -1">
+                AND review_flag = #{reviewFlag}
+            </if>
+            <if test="goodsPid != null">
+                AND goods_pid = #{goodsPid}
+            </if>
+            <if test="reviewRemark != null">
+                AND review_remark LIKE #{reviewRemark}
+            </if>
+            <if test="startDate != null">
+                AND createtime >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND #{endDate} >= createtime
+            </if>
+        </where>
+        ORDER BY createtime DESC
+        LIMIT #{startBars},#{rows}
+    </select>
+
+    <!--GoodsReview queryGoodsReviewById(@Param("id") Integer id);-->
+    <select id="queryGoodsReviewById" resultType="com.importExpress.pojo.GoodsReview">
+        SELECT id, goods_pid goodsPid, country, review_name reviewName, review_score reviewScore,
+          createtime, updatetime, review_remark reviewRemark, type, review_flag reviewFlag
+        FROM goods_review
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
 </mapper>
