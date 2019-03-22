@@ -42,8 +42,9 @@ public class ErrorFeedbackController {
 		String  startTime = request.getParameter("startTime");      //开始时间
 		String  endTime  = request.getParameter("endTime");        //结束时间
 		String  delFlag = request.getParameter("delFlag");        //是否已处理标识
-	    
+
 		String  pagen =   request.getParameter("page");
+
 	    if(StrUtils.isNullOrEmpty(pagen)){
 	    	pagen = "1";
 	    }
@@ -122,7 +123,7 @@ public class ErrorFeedbackController {
 		remark= remark==null||remark==""?null:remark;
 		int	ret = errorFeedbackService.updateErrorFlag(id,remark);
 		String json = JSON.toJSONString(ret);
-		return json ; 
+		return json ;
 	}
 	
 	
