@@ -1,10 +1,9 @@
 package com.cbt.ocr.ctrl;
 
 import com.alibaba.fastjson.JSON;
-import com.cbt.ocr.dao.Distinguish_PictureDao;
-import com.cbt.ocr.pojo.CustomGoods;
 import com.cbt.ocr.service.Distinguish_PictureService;
 import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.CustomGoods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestHandler;

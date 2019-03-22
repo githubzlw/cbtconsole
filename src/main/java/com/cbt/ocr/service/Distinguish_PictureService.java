@@ -1,6 +1,6 @@
 package com.cbt.ocr.service;
 
-import com.cbt.ocr.pojo.CustomGoods;
+import com.cbt.pojo.CustomGoods;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public interface Distinguish_PictureService {
 	 * @param isdelete
 	 * @return
 	 */
-	public List<CustomGoods> showDistinguish_Pircture(@Param("pid") String pid, @Param("shopid") String shopid, @Param("isdelete") int isdelete,@Param("page") int page);
+	public List<CustomGoods> showDistinguish_Pircture(@Param("pid") String pid, @Param("shopid") String shopid, @Param("isdelete") int isdelete, @Param("page") int page);
 
 	/***
 	 * 查询OCR识别错误图片的总数
