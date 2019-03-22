@@ -136,6 +136,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String dfinal_weight;
 	private double es_price;//1688预计采购价格
 
+
 	private String cbrShopid;
 	private String cbrdShop_id;
 
@@ -378,6 +379,10 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	 * 1688价格
 	 */
 	private String price1688;
+	/**
+	 * 1688产品利润
+	 */
+	private double pd_profit_price;
 	/**
 	 * ali 连接
 	 * @return
@@ -1134,8 +1139,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	}
 	public void setAgainRemarks(String againRemarks) {
 		this.againRemarks = againRemarks;
-	}  
-    
-    
-    
+	}
+	public double getPd_profit_price() { return pd_profit_price; }
+	public void setPd_profit_price(double pd_profit_price) { this.pd_profit_price = pd_profit_price; }
 }
