@@ -139,7 +139,7 @@
                     function (index) {
                         var tdArr = $(this).find("td");
                         var catidPam = {};
-                        var categoryId = tdArr.eq(1).text();
+                        var categoryId = tdArr.eq(1).find("span").text();
                         catidPam["categoryId"] = categoryId;
                         var avgWeight = tdArr.eq(5).find(".avg_weight").val();
                         if (avgWeight == null || avgWeight == "0"
@@ -374,7 +374,7 @@
                         <td>
                             <input type="checkbox" class="check_sty" onclick="chooseBox(this)" value="${shopInfo.categoryId}"/>
                         </td>
-                        <td>${shopInfo.categoryId}
+                        <td><span>${shopInfo.categoryId}</span>
                         <c:if test="${shopInfo.isForbid > 0}">
                             <br><b style="color: red;">(屏蔽类别)</b>
                         </c:if>
