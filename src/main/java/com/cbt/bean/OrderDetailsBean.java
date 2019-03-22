@@ -145,15 +145,6 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String pidInventory;
 	private int isBenchmark;
 	private String noChnageRemark;
-
-	public String getOd_bulk_volume() {
-		return od_bulk_volume;
-	}
-
-	public void setOd_bulk_volume(String od_bulk_volume) {
-		this.od_bulk_volume = od_bulk_volume;
-	}
-
 	public String getNoChnageRemark() {
 		return noChnageRemark;
 	}
@@ -378,6 +369,10 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	 * 1688价格
 	 */
 	private String price1688;
+	/**
+	 * 产品实际利润率
+	 */
+	private double pd_profit_price;
 	/**
 	 * ali 连接
 	 * @return
@@ -620,6 +615,12 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		this.orsstate = orsstate;
 	}
 
+	public String getOd_bulk_volume() {
+		return od_bulk_volume;
+	}
+	public void setOd_bulk_volume(String od_bulk_volume) {
+		this.od_bulk_volume = od_bulk_volume;
+	}
 	public double getOd_total_weight() {
 		return od_total_weight;
 	}
@@ -1134,8 +1135,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	}
 	public void setAgainRemarks(String againRemarks) {
 		this.againRemarks = againRemarks;
-	}  
-    
-    
-    
+	}
+	public double getPd_profit_price() { return pd_profit_price; }
+	public void setPd_profit_price(double pd_profit_price) { this.pd_profit_price = pd_profit_price; }
 }

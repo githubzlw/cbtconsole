@@ -1952,7 +1952,7 @@ public class NewOrderDetailsCtr {
 			LOG.error(e.getMessage());
 		}
 
-		if (adm.getRoletype() == 0) {
+		if (adm.getRoletype() == 0 || adm.getRoletype() == 4) {
 			return "paymentConfirm";
 		} else {
 			return "paymentConfirm1";

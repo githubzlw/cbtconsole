@@ -1,0 +1,61 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.ocr.dao.Distinguish_PictureDao">
+
+	<resultMap id="resultMap" type="com.cbt.pojo.CustomGoods">
+		<id column="id" property="id" javaType="INTEGER"/>
+        <result column="pid" property="pid"/>
+        <result column="shop_id" property="shopid" />
+        <result column="local_path" property="localpath" />
+        <result column="remote_path" property="remotepath" />
+        <result column="goods_md5" property="goodsmd5" />
+        <result column="create_time" property="createtime" />
+        <result column="is_delete" property="isdelete" />
+        <result column="ocr_need_delete" property="ocrneeddelete" />
+	</resultMap>
+
+    <select id="showDistinguish_Pircture"  resultMap="resultMap" >
+        SELECT * FROM custom_goods_md5 where 1=1 and ocr_need_delete=1
+        <if test="pid != null and pid != ''">
+            and pid=#{pid}
+        </if>
+        <if test="shopid != null and shopid != ''">
+            and shop_id=#{shopid}
+        </if>
+        <if test="isdelete !=2">
+            and is_delete=#{isdelete}
+        </if>
+        limit #{page},20
+    </select>
+
+    <select id="queryDistinguish_PirctureCount"  resultType="java.lang.Integer" >
+        SELECT COUNT(1) FROM custom_goods_md5 where 1=1 and ocr_need_delete=1
+        <if test="pid != null and pid != '' ">
+            and pid=#{pid}
+        </if>
+        <if test="shopid != null and shopid != ''">
+            and shop_id=#{shopid}
+        </if>
+        <if test="isdelete != 2">
+            and is_delete=#{isdelete}
+        </if>
+    </select>
+
+    <update id="updatePirctu_risdelete">
+        UPDATE custom_goods_md5 SET create_time=NOW(),
+        <if test="ocrneeddelete == 2 or ocrneeddelete == 0">
+             ocr_need_delete=1
+        </if>
+        <if test="ocrneeddelete == 1">
+             ocr_need_delete=2
+        </if>
+        where id=#{id}
+    </update>
+
+    <update id="updateSomePirctu_risdelete"  parameterType="list">
+        update custom_goods_md5  SET  ocr_need_delete=2 where
+        <foreach collection="list" separator="or" item="i" index="index">
+            id = ${i.id}
+        </foreach>
+
+    </update>
+</mapper>

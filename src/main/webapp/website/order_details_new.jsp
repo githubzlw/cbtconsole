@@ -614,11 +614,11 @@ em {
 							<a class="ordmlink" style="text-decoration: underline;cursor: pointer;"
 								onclick="jumpDetails('${order.orderNo}', '${order.dropShipList}')">客户的订单页</a>&nbsp;&nbsp;
 	 					</c:if>
-	 					
+
 	 					<c:if test="${order.complainFlag >0 }">
 							<a class="ordmlink" target="_blank" href="/cbtconsole/complain/searchComplainByParam?userid=${order.userid}&creatTime=&complainState=-1&username=&toPage=1&currentPage=1">有申诉</a>&nbsp;&nbsp;
 	 					</c:if>
-	 					
+
 					</td>
 					<td  style="margin-left:100px">
 						<c:if test="${evaluate.evaluate != null && evaluate.evaluate !=''}">
@@ -631,7 +631,7 @@ em {
 						 </c:if>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td colspan="4">
 						<c:if test="${fn:length(userIds) > 0}">
@@ -642,7 +642,7 @@ em {
 						</c:if>
 					</td>
 				</tr>
-				
+
 				<tr>
 					<td colspan="4">
 						<input type="hidden" value="${isDropshipOrder}">
@@ -1209,7 +1209,10 @@ em {
 								style="word-wrap: break-word; word-break: break-all; width: 240px;">
 								<font  class="newsourceurl">
 
-
+								<span id="spanurl${sd.index}">
+											<p>利润率:<fmt:formatNumber value="${orderd.pd_profit_price}" pattern="#0.00" type="number" maxFractionDigits="2"/>
+											%</p>
+								</span>
 								<a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
 
 								<span id="spanurl${sd.index}" style="color:red;">
