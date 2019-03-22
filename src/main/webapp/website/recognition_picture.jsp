@@ -36,20 +36,6 @@
 #Img1{ width:150px; height:150px;}/*
 #Img1:hover{ width:300px; height:300px;position: absolute;}*/
 
-/*div{
-	width: 300px;
-	height: 300px;
-	border: #000 solid 1px;
-	margin: 50px auto;
-	overflow: hidden;
-}
-div img{
-	cursor: pointer;
-	transition: all 0.6s;
-}*/
-/*div img:hover{
-	transform: scale(1.5);
-}*/
 .div{
 	float: left; padding: 10px;
 	border: 2px solid aquamarine;
