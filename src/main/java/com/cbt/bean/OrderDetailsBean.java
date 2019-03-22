@@ -615,10 +615,10 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		this.orsstate = orsstate;
 	}
 
-	public double getOd_bulk_volume() {
+	public String getOd_bulk_volume() {
 		return od_bulk_volume;
 	}
-	public void setOd_bulk_volume(double od_bulk_volume) {
+	public void setOd_bulk_volume(String od_bulk_volume) {
 		this.od_bulk_volume = od_bulk_volume;
 	}
 	public double getOd_total_weight() {
@@ -1002,7 +1002,6 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		return buycount;
 	}
 	/**
-	 * @param 替代购买数量
 	 */
 	public void setBuycount(int buycount) {
 		this.buycount = buycount;
