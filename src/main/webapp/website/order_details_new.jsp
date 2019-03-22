@@ -1209,6 +1209,10 @@ em {
 								style="word-wrap: break-word; word-break: break-all; width: 240px;">
 								<font  class="newsourceurl">
 
+								<span id="spanurl${sd.index}">
+											<p>利润率:<fmt:formatNumber value="${orderd.pd_profit_price}" pattern="#0.00" type="number" maxFractionDigits="2"/>
+											%</p>
+								</span>
 
 								<a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
 
