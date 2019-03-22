@@ -136,7 +136,6 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String dfinal_weight;
 	private double es_price;//1688预计采购价格
 
-
 	private String cbrShopid;
 	private String cbrdShop_id;
 
@@ -146,15 +145,6 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String pidInventory;
 	private int isBenchmark;
 	private String noChnageRemark;
-
-	public String getOd_bulk_volume() {
-		return od_bulk_volume;
-	}
-
-	public void setOd_bulk_volume(String od_bulk_volume) {
-		this.od_bulk_volume = od_bulk_volume;
-	}
-
 	public String getNoChnageRemark() {
 		return noChnageRemark;
 	}
@@ -380,7 +370,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	 */
 	private String price1688;
 	/**
-	 * 1688产品利润
+	 * 产品实际利润率
 	 */
 	private double pd_profit_price;
 	/**
@@ -625,6 +615,12 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		this.orsstate = orsstate;
 	}
 
+	public double getOd_bulk_volume() {
+		return od_bulk_volume;
+	}
+	public void setOd_bulk_volume(double od_bulk_volume) {
+		this.od_bulk_volume = od_bulk_volume;
+	}
 	public double getOd_total_weight() {
 		return od_total_weight;
 	}
@@ -1006,6 +1002,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		return buycount;
 	}
 	/**
+	 * @param 替代购买数量
 	 */
 	public void setBuycount(int buycount) {
 		this.buycount = buycount;
