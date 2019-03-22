@@ -14,6 +14,7 @@ public interface Distinguish_PictureService {
 	 * @param shopid
 	 * @param isdelete
 	 * @return
+	 *
 	 */
 	public List<CustomGoods> showDistinguish_Pircture(@Param("pid") String pid, @Param("shopid") String shopid, @Param("isdelete") int isdelete, @Param("page") int page);
 

@@ -27,6 +27,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		if(list.size()>0){
 			list.get(0).setCount(count);
 		}
+
 		return list;
 	}
 

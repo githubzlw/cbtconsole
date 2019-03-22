@@ -24,6 +24,7 @@ public class Distinguish_PictureContorller {
 	@Autowired
 	public Distinguish_PictureService  distinguish_pictureService;
 
+
 	/**
 	 * 查询OCR识别错误图片
 	 * @param request

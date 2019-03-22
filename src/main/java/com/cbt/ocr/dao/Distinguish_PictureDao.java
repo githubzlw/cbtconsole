@@ -17,4 +17,5 @@ public interface Distinguish_PictureDao {
 	public int updatePirctu_risdelete(@Param("id")int id,@Param("ocrneeddelete")int ocrneeddelete);
 
 	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList);
+
 }

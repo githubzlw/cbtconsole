@@ -3,6 +3,7 @@ package com.cbt.pojo;
 import java.sql.Timestamp;
 
 public class CustomGoods {
+	//
 	private Integer id;
 	private String pid;
 	private String shopid;
