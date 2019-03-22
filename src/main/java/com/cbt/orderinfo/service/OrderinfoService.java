@@ -953,6 +953,7 @@ public class OrderinfoService implements IOrderinfoService {
 		long start=System.currentTimeMillis();
 		UserDao udao = new UserDaoImpl();
 		List<Map<String, String>> list=dao.getOrderManagementQuery(paramMap);
+		long start2=System.currentTimeMillis();
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
 			String tp="支付类型错误";
@@ -977,14 +978,16 @@ public class OrderinfoService implements IOrderinfoService {
 			String addressFlag="0";
 			String odCode=map.get("odCode");
 			String ipnaddress=map.get("ipnaddress");
-			if(StringUtils.isEmpty(ipnaddress)){
-				ipnaddress = udao.getIpnaddress(orderInfo.getOrderNo()).get("ipnaddress");
+            Map<String, String> ipnaddress1 = udao.getIpnaddress(orderInfo.getOrderNo());
+            ipnaddress = ipnaddress1.get("address_country_code");
+            if(StringUtils.isEmpty(ipnaddress)){
+                ipnaddress = ipnaddress1.get("ipnaddress");
 			}
 			String zCountry=map.get("zCountry");
 			String ordertype=String.valueOf(map.get("ordertype"));
 			if((StringUtil.isBlank(odCode) || StringUtil.isBlank(ipnaddress) || !ipnaddress.equals(odCode)) && tp.indexOf("paypal")>-1){
 				logger.warn("简称国家不一致： odCode={},ipnaddress={}", odCode,ipnaddress);
-				Map<String,String> aMap = udao.getIpnaddress(orderInfo.getOrderNo());
+				Map<String,String> aMap = ipnaddress1;
 				String addressCountry=aMap.get("address_country");
 				String address_country_code=aMap.get("address_country_code");
 				//Rewriter
@@ -1023,8 +1026,13 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			map.put("estimatefreight",String.valueOf(Double.parseDouble(String.valueOf(StringUtil.isBlank(map.get("estimatefreight"))?"0":map.get("estimatefreight")))*Double.parseDouble(exchange_rate)));
 		}
-		// logger.info("订单管理查询总时间:"+(System.currentTimeMillis()-start));
-		// System.out.println("订单管理查询总时间:"+(System.currentTimeMillis()-start));
+		  long end = System.currentTimeMillis();
+		 logger.info("订单管理查询总时间:"+(end-start));
+		 //System.out.println("订单管理查询总时间:"+(end-start)+"list.size()"+list.size());
+        //System.out.println("查存储过程时间 = " + (start2 - start)+" 解析时间："+ (end - start2));
+		 if((System.currentTimeMillis()-start)>2000){
+		     logger.error("订单管理查询总时间超过2s,list size:[{}]",list.size());
+         }
 		return list;
 	}
 
