@@ -370,6 +370,10 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	 */
 	private String price1688;
 	/**
+	 * 产品实际利润率
+	 */
+	private double pd_profit_price;
+	/**
 	 * ali 连接
 	 * @return
 	 */
@@ -1132,8 +1136,7 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	}
 	public void setAgainRemarks(String againRemarks) {
 		this.againRemarks = againRemarks;
-	}  
-    
-    
-    
+	}
+	public double getPd_profit_price() { return pd_profit_price; }
+	public void setPd_profit_price(double pd_profit_price) { this.pd_profit_price = pd_profit_price; }
 }
