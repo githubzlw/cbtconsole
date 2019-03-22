@@ -1608,12 +1608,11 @@ public class OrderinfoService implements IOrderinfoService {
 			odb.setPrice1688(price1688);
 			//产品实际预估利润
 			if(odb.getOldValue()!=null){
-				double profit_price=Double.parseDouble(odb.getGoodsprice())*6.75;
-				odb.setPd_profit_price(((profit_price-Double.parseDouble(odb.getOldValue()))/profit_price)*100);
+				double profit_price=Double.parseDouble(odb.getGoodsprice())*6.6;
+				odb.setPd_profit_price((profit_price/Double.parseDouble(odb.getOldValue()))*100);
 			}else{
 				odb.setPd_profit_price(0.00);
 			}
-
 
 			odb.setFreight(odb.getGoodsfreight());
 			String goods_pid = StringUtil.isBlank(odb.getGoods_pid())? "0" : odb.getGoods_pid();
