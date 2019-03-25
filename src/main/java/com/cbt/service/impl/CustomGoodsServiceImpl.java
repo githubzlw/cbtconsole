@@ -267,8 +267,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // MQ
         // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
         // MongoDB
-        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
-        return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb2(pid, type);
+        return customGoodsDao.setGoodsValid2(pid, adminName, adminId, type, 24, remark);
     }
 
     @Override
