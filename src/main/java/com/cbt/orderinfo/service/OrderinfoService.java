@@ -1042,8 +1042,8 @@ public class OrderinfoService implements IOrderinfoService {
 		}
 		  long end = System.currentTimeMillis();
 		 logger.info("订单管理查询总时间:"+(end-start));
-		 //System.out.println("订单管理查询总时间:"+(end-start)+"list.size()"+list.size());
-        //System.out.println("查存储过程时间 = " + (start2 - start)+" 解析时间："+ (end - start2));
+		 System.out.println("订单管理查询总时间:"+(end-start)+"list.size()"+list.size());
+        System.out.println("查存储过程时间 = " + (start2 - start)+" 解析时间："+ (end - start2));
 		 if((System.currentTimeMillis()-start)>2000){
 		     logger.error("订单管理查询总时间超过2s,list size:[{}]",list.size());
          }

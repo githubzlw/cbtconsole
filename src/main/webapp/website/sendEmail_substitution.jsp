@@ -158,7 +158,8 @@ String url = UUIDUtil.getAutoLoginPath("/orderInfo/getChangeProduct?flag=1&order
 	发件人:<input type="text" id="copyEmail" value="${param.sendEmail}">&nbsp;&nbsp;&nbsp;
 	<input type="hidden" id="orderNo" value="${param.orderno}">
 	<input type="hidden" id="userId" value="${param.userId}">
-	<br>标题:<input style="width: 260px;" type="text" lang="100" value="Your ImportExpress order has substitutes need your confirm before purchase!" id="titleinfo">
+	<%--<br>标题:<input style="width: 260px;" type="text" lang="100" value="Your ImportExpress order has substitutes need your confirm before purchase!" id="titleinfo">--%>
+	<br>标题:<input style="width: 260px;" type="text" lang="100" value="Alternatives for Unavailable Item(s) in Your Current Order!" id="titleinfo">
 	<input type="button" id="send_bt" value="确认并发送邮件" style="font-size: 14px;font-weight: bold;" onclick="fnSendEmail();"><br>
 	邮件显示内容：
 	<br>
