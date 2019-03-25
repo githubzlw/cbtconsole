@@ -491,25 +491,6 @@ public class ShopCarMarketingController {
                             sourceCount++;
                         }
                     }
-                    shopCar.setTypeList(typeList);
-                    if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
-                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                        productCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                        actualCost += totalPrice;
-                        totalProductCost += shopCar.getPrice1() * shopCar.getGoogsNumber();
-                        totalActualCost += totalPrice;
-                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                        resultList.add(shopCar);
-                    } else {
-                        double totalPrice = Double.valueOf(shopCar.getGoogsPrice()) * shopCar.getGoogsNumber();
-                        totalProductCost += totalPrice;
-                        totalActualCost += totalPrice;
-                        shopCar.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                        if (sourceCount < 5) {
-                            sourceList.add(shopCar);
-                            sourceCount++;
-                        }
-                    }
                 }
                 shopCarMarketingList.clear();
 
