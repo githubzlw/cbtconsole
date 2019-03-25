@@ -5,7 +5,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Reorder</title>
+    <title>Add Order To Onling Test Goods Cart</title>
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
 
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.8.0.min.js"></script>
@@ -26,17 +26,17 @@
         var orderNo = '${orderNo}';
     </script>
 </head>
-<body style="background-color : #F4FFF4;" onclick="">
+<body style="background-color : white;" onclick="">
 <div align="center">
-    <div><h1>Reorder</h1></div>
+    <div><h1>Add Order To Onling Test Goods Cart</h1></div>
     <div id="msginfo"></div>
     <br/><br/>
     <!-- 表格 -->
     <div>
         <table id="tabId" class="altrowstable" style="width: 800px">
             <tr>
-                <td>订单号:</td>
-                <td>用户id:</td>
+                <td>需要添加的订单号:</td>
+                <td>测试用户id:</td>
                 <td>操作</td>
             </tr>
             <tr>
@@ -49,6 +49,9 @@
                 <td>
                     <input type="button" value="Reorder" onclick="reorder()">
                 </td>
+            </tr>
+            <tr>
+                <td  colspan="3" align="center" valign="middle" > 添加本订单到线上购物车</td>
             </tr>
         </table>
         <div id="message">
@@ -74,23 +77,24 @@
                     if(result != null){
                         var content = '<div></div><span style="color: orange">'+result+'</span><br>';
                         $.dialog({
-                                title : 'reorder result!',
-                                content : content,
-                                max : false,
-                                min : false,
-                                lock : true,
-                                drag : false,
-                                fixed : true,
-                                ok : function() {
+                            title : '添加订单商品到指定用户结果!',
+                            content : content,
+                            max : false,
+                            min : false,
+                            lock : true,
+                            drag : false,
+                            fixed : true,
+                            ok : function() {
 
-                                },
-                                cancel : function() {
-                                }
-                            });
+                            },
+                            cancel : function() {
+                            }
+                        });
                     }
                 }
             }
         );
     }
 </script>
+<script type="text/javascript" src="https://cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>
 </html>

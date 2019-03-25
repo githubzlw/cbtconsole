@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -82,11 +83,16 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
 //            DataSourceSelector.restore();
             //查询订单是否存在
             //过滤订单数字和字母
-            orderNo = orderNo.replaceAll("[^(a-zA-Z0-9)]", "");
+            orderNo = orderNo.replaceAll("[^(a-zA-Z0-9\\_)]", "");
             //查询订单是否存在
 //            DataSourceSelector.set("dataSource127hop");
             List<Map<String, Object>> ListGoods = this.getGoodsInfoByOrderNo(orderNo, null);
 //            DataSourceSelector.restore();
+            if(null == userBean){
+                message = "user is null!";
+            }else if(null == ListGoods){
+                message = "get goods error!";
+            }
             if(userBean != null && ListGoods != null){
                 //新购物车中需要插入goods_car表的产品
                 List<GoodsCarActiveBean> listActive_new_1 = new ArrayList<GoodsCarActiveBean>();
@@ -295,7 +301,15 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                    /* DataSourceSelector.set("dataSource127hop");
                     int count = saveShpCarInfoToDateBase(Integer.parseInt(userId),list_active,list_show);
                     DataSourceSelector.restore();*/
-                    String sql = "update goods_carconfig set shopCarShowinfo = '"+SerializeUtil.ListToJson(list_show).replaceAll("'","") +"', shopCarinfo='"+SerializeUtil.ListToJson(list_active)+"' where userid="+userId;
+                   // String sql = "update goods_carconfig set shopCarShowinfo = '"+SerializeUtil.ListToJson(list_show).replaceAll("'","") +"', shopCarinfo='"+SerializeUtil.ListToJson(list_active)+"' where userid="+userId;
+                    //Added <V1.0.1> Start： cjc 2019/3/22 17:41:01 Description :使用新的数据结构
+                    //step v1. @author: cjc @date：2019/3/22 17:44:19   Description : 合并
+                    List<GoodsCarActiveSimplBean> list_goods = activeShowBeanToSimpleBeanAdapter(list_active,list_show);
+                    String GoodsCarActiveSimplBeanJson = SerializeUtil.ListToJson(list_goods);
+                    String sql = "update goods_carconfig set buyForMeCarConfig = '"+GoodsCarActiveSimplBeanJson.replaceAll("'","") +"' where userid="+userId;
+
+                    //End：
+
                     try {
                         SendMQ sendMQ = new SendMQ();
                         sendMQ.sendMsg(new RunSqlModel(sql));
@@ -517,5 +531,63 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
         record.setShopcarshowinfo(shopcar_show);
         count = goodsCarconfigMapper.updateByExampleSelective(record, example);
         return count;
+    }
+    public static List<GoodsCarActiveSimplBean> activeShowBeanToSimpleBeanAdapter(List<GoodsCarActiveBean> list_active,List<GoodsCarShowBean> list_show){
+        List<GoodsCarActiveSimplBean> redisGoodsList = new ArrayList<GoodsCarActiveSimplBean>();
+        if(list_active==null||list_show==null) {
+            return redisGoodsList;
+        }
+        if(list_active.size()==0||list_show.size()==0) {
+            return redisGoodsList;
+        }
+        Iterator<GoodsCarActiveBean> iterator_active = list_active.iterator();
+        Iterator<GoodsCarShowBean> iterator_show = list_show.iterator();
+        while(iterator_active.hasNext()) {
+            GoodsCarActiveBean activeBean = iterator_active.next();
+            GoodsCarShowBean showBean = null;
+            boolean isTrue = false;
+            while(iterator_show.hasNext()) {
+                showBean = iterator_show.next();
+                if(activeBean!=null&&showBean!=null&&showBean.getGuId().equals(activeBean.getGuId())) {
+                    isTrue = true;
+                    break;
+                }
+            }
+            if(!isTrue) {
+                continue;
+            }
+            GoodsCarActiveSimplBean redisGoods = new GoodsCarActiveSimplBean();
+            redisGoods.setBizPriceDiscount(activeBean.getBizPriceDiscount());
+            redisGoods.setCategoryDiscountRate(activeBean.getCategoryDiscountRate());
+            redisGoods.setComparePrices(activeBean.getComparePrices());
+            redisGoods.setGbPrice(activeBean.getGbPrice());
+            redisGoods.setGroupBuyId(activeBean.getGroupBuyId());
+            redisGoods.setItemId(activeBean.getItemId());
+            redisGoods.setNumber(activeBean.getNumber());
+            redisGoods.setPrice(activeBean.getPrice());
+            redisGoods.setPrice1(String.valueOf(activeBean.getPrice1()));
+            redisGoods.setPrice2(activeBean.getPrice2());
+            redisGoods.setPrice3(activeBean.getPrice3());
+            redisGoods.setPrice4(showBean.getPrice4());
+            redisGoods.setPriceList(activeBean.getPriceList());
+            redisGoods.setPriceListSize(activeBean.getPriceListSize());
+            redisGoods.setRemark(showBean.getRemark());
+            redisGoods.setSessionId(showBean.getSessionId());
+            redisGoods.setShopCount(activeBean.getShopCount());
+            redisGoods.setSkuid_1688(showBean.getSkuid_1688());
+            redisGoods.setSpec_id(showBean.getSkuid_1688());
+            redisGoods.setTypes(showBean.getTypes());
+            redisGoods.setUrlMD5(activeBean.getUrlMD5());
+            //redisGoods.setImg_url(showBean.getImg_url());
+            if(StringUtils.isNotBlank(redisGoods.getComparePrices())) {
+                if(Double.parseDouble(redisGoods.getComparePrices()) <= Double.parseDouble(redisGoods.getPrice())) {
+                    redisGoods.setComparePrices("0");
+                }
+            }else {
+                redisGoods.setComparePrices("0");
+            }
+            redisGoodsList.add(redisGoods);
+        }
+        return redisGoodsList;
     }
 }
