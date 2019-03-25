@@ -292,11 +292,8 @@ public class AutoOrderController {
 	    fileByOrderid = fileByOrderid==null?"":fileByOrderid;
 	    fileByOrderid = fileByOrderid.endsWith(",")?
 	    		fileByOrderid.substring(0,fileByOrderid.length()-1):fileByOrderid;
-	    
+		fileByOrderid = fileByOrderid.replaceAll("F:","/root/F:");
 	    String[] files = fileByOrderid.split(",");
-		Arrays.stream(files).forEach(e->{
-			e="/root/"+e;
-		});
 	    if(Integer.valueOf(index)<files.length){
 	    	fileByOrderid = files[Integer.valueOf(index)];
 	    }
