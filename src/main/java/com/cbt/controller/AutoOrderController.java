@@ -294,6 +294,9 @@ public class AutoOrderController {
 	    		fileByOrderid.substring(0,fileByOrderid.length()-1):fileByOrderid;
 	    
 	    String[] files = fileByOrderid.split(",");
+		Arrays.stream(files).forEach(e->{
+			e="/root/"+e;
+		});
 	    if(Integer.valueOf(index)<files.length){
 	    	fileByOrderid = files[Integer.valueOf(index)];
 	    }
