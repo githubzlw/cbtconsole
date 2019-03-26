@@ -169,7 +169,10 @@ public class CustomerRelationshipManagementController {
         SendMQ sendMQ = null;
         String userIdStr = String.valueOf(userId);
         sendMQ = new SendMQ();
-        sendMQ.sendMsg(new RedisModel(new String[]{userIdStr}));
+        RedisModel redisModel= new RedisModel();
+        redisModel.setType("3");
+        redisModel.setUserid(new String[]{userIdStr});
+        sendMQ.sendMsg(redisModel);
         sendMQ.closeConn();
         return message;
     }
