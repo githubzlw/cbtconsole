@@ -102,7 +102,7 @@ ul#img_sf_1 li{float:left; width:150px; height:60px; display:inline; margin:2px 
 ul#img_sf_11 li a{width:150px; height:60px; display:block;}
 ul#img_sf_1 li a img{width:100%; height:100%; border:1px #999 solid;}
  ul#img_sf_1 li a:hover{ z-index:100; margin:-32px 0px 0px -32px; position:absolute;}
-ul#img_sf_1 li a img:hover{width:200px; height:200px; border:1px #999 solid;}
+ul#img_sf_1 li a img:hover{width:650px; height:650px; border:1px #999 solid;}
 /**/
 ul#img_sf_1 li {
    width: 100px;
