@@ -262,7 +262,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setValid((type == 1 ? "1" : "2"));
         inputData.setGoodsstate(type == 1 ? "4" : "2");
         inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
-        inputData.setUnsellableReason("6");
+        inputData.setUnsellableReason("24");
         inputData.setPid(pid);
         return updateLocalAndSolr(inputData, 1);
     }
