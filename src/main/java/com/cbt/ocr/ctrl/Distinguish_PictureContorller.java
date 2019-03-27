@@ -27,6 +27,7 @@ public class Distinguish_PictureContorller {
 
 	/**
 	 * 查询OCR识别错误图片
+	 * @User  zlc
 	 * @param request
 	 * @param page
 	 * @param pid
@@ -35,18 +36,26 @@ public class Distinguish_PictureContorller {
 	 * @return
 	 */
 	@RequestMapping(value = "FindCustomGoodsInfo")
-	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String  shopid,String  isdelete){
-
+	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String  shopid,String  isdelete,String type){
+		//初始的判断以及赋值
 		if (StrUtils.isNullOrEmpty(page))
 			page="1";
 		if (StrUtils.isNullOrEmpty(isdelete))
 			isdelete="2";
-
+		if (StrUtils.isNullOrEmpty(type))
+			type="2";
+		//标识是属于什么页面 1、修正无中文字页面 2、修正有中文字页面
+		String picturedata=null;
+		if(type.equals("2"))
+		picturedata="修正无中文字页面";
+		else
+		picturedata="修正有中文字页面";
 		int pageNO=Integer.parseInt(page);
 		int isdeleteNo=Integer.parseInt(isdelete);
+		int type_=Integer.parseInt(type);
 
-		System.out.println("pid,shopid,isdeleteNo,pageNO"+pid+","+shopid+","+isdeleteNo+","+pageNO+",");
-		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,shopid,isdeleteNo,pageNO);
+		//查询出页面数据   custom_goods_md5 中符合条件的数据
+		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,shopid,isdeleteNo,pageNO,type_);
 
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
@@ -55,6 +64,8 @@ public class Distinguish_PictureContorller {
 		}
 
 		request.setAttribute("pid",pid);
+		request.setAttribute("type",type_);
+		request.setAttribute("picturedata",picturedata);
 		request.setAttribute("shopid",shopid);
 		request.setAttribute("isdeleteNo",isdeleteNo);
 		request.setAttribute("currentPage", pageNO);
@@ -64,29 +75,17 @@ public class Distinguish_PictureContorller {
 
 	return "recognition_picture";
 	}
-
 	/****
-	 * * 单条更新线上是否删除状态
-	 * @param
-	 */
-/*	@RequestMapping(value = "updateis_delete")
-	@ResponseBody
-	public String updateDistinguish_Pircture_is_delete(HttpServletRequest request,int id,int ocrneeddelete){
-		System.out.println("id+ocrneeddelete"+id+","+ocrneeddelete);
-		int	ret = distinguish_pictureService.updatePirctu_risdelete(id,ocrneeddelete);
-		String json = JSON.toJSONString(ret);
-		return json;
-	}*/
-	/****
+	 * @User  zlc
 	 * 批发更新线上是否删除状态
 	 * @param request
 	 * @param mainMap
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap){
+	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList);
+		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type);
 		String  json = JSON.toJSONString(ret);
 		return   json ;
 	}

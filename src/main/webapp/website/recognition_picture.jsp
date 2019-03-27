@@ -153,7 +153,7 @@ div.margin2 {
 
 <script type="text/javascript">
 
-function fnjump(obj){
+function fnjump(obj,type){
 	var page=$("#page").val();
 	if(page==""){
 		page = "1";
@@ -176,16 +176,15 @@ function fnjump(obj){
     var pid = $("#pid").val();
     var shopid = $("#shopid").val();
     var isdelete = $("#isdelete").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete;}
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete+"&type="+type;}
 
 
-function search(){
+function search(type){
 	var pid = $("#pid").val();
 	var shopid = $("#shopid").val();
 	var isdelete = $("#isdelete").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete;
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete+"&type="+type;
 }
-
 
 
 function  reset(){
@@ -227,7 +226,7 @@ function fnselect(){
 
 
 
-function  updateSomes(){
+function  updateSomes(type){
 	var  mainMap ={};
 	var erList= new Array();  
 	var id = "";
@@ -247,7 +246,7 @@ function  updateSomes(){
 		console.log(mainMap);            
 	 	$.ajax({
 			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete",
+			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type,
 			dataType:"json",
 			contentType : 'application/json;charset=utf-8', 
 		    data:JSON.stringify(mainMap),
@@ -265,7 +264,7 @@ function  updateSomes(){
 </script>
 </head>
 <body>
-<h1 align="center"><b>取消OCR识别错误图片</b></h1>
+<h1 align="center"><b>取消OCR识别错误图片<span style="color: red">《${picturedata}》</span></b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
 	<div class="main">
 		<div class="main-head"></div>
@@ -290,8 +289,17 @@ function  updateSomes(){
 						</select>
 					</div>
 					<div class="left left-margin">
-						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span> <span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<br/><span class="wenzi"  onclick="updateSomes()" ><a href="#" style="text-decoration:none"><font color="white">批量纠正</font></a></span>
+						<span class="wenzi"  onclick="search(2);"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
+						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
+						<c:if test="${type==2}">
+						<span class="wenzi"  onclick="search(1)" ><a href="#" style="text-decoration:none"><font color="white">查看无中文图</font></a></span>
+						<span class="wenzi"  onclick=""><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
+						</c:if>
+						<span class="wenzi"  onclick="updateSomes(${type})" ><a href="#" style="text-decoration:none"><font color="white">批量纠正</font></a></span>
+						<c:if test="${type==1}">
+							<span style="color: red">(点击查询返回修正无中文字页面)</span>
+						</c:if>
+
 					</div>
 				</div>
 			</div>
@@ -302,50 +310,11 @@ function  updateSomes(){
 		</div>
 		<div class="main-table">
 			<table class="table">
-				<%--<tr>
-				<th><label><input type="checkbox" class="checkbox-all"   id="checked" onclick="fnselect()">全选</label></th>
-				&lt;%&ndash;<th>序号</th>
-                <th>商品编号</th>
-                <th>商铺编号</th>
-                <th>本地图片地址</th>
-                <th>商品照片</th>
-                <th>商品标识码</th>
-                <th>图片扫描时间</th>
-                <th>线上状态</th>
-                <th>是否线上删除</th>&ndash;%&gt;
-			</tr>--%>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:200px; height:200px;">
+						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;">
 						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;"/>
 					</div>
-<%--				 <tr>
-					<td><input type="checkbox"   name="cbox"  class="id"  value="${customGoodsList.id }"/></td>
-					 <td>${status.index+1 }</td>
-					 <td>${customGoodsList.pid }</td>
-					<td>${customGoodsList.shopid }</td>
-					<td>${customGoodsList.localpath }</td>
-					 <td ><img src="${customGoodsList.remotepath }" id="Img1"></img></td>
-					 <td>${customGoodsList.goodsmd5 }</td>
-					 <td>${customGoodsList.createtime }</td>
-					<td>
-					 <c:if test="${customGoodsList.isdelete==0 }">
-					   <span><font color="red">未删除</font></span>
-					 </c:if>
-					  <c:if test="${customGoodsList.isdelete==1 }">
-					   <span>已删除</span>
-						</c:if>
-					</td>
-					<td name="ocrneeddelete">&lt;%&ndash;update()&ndash;%&gt;
-						<c:if test="${customGoodsList.ocrneeddelete==2 || customGoodsList.ocrneeddelete==0}">
-						<a href="#" class="a-link" onclick="update(${customGoodsList.ocrneeddelete},${customGoodsList.id })">标记为待删除</a>
-						</c:if>
-					 <c:if test="${customGoodsList.ocrneeddelete==1 }">
-					 <span>已标记为待删除</span><br/><a href="#" onclick="update(${customGoodsList.ocrneeddelete},${customGoodsList.id })"
-											 class="a-link">取消待删除</a>
-					</td>
-					 </c:if>
-				</tr>--%>
 				</c:forEach>
 			</table>
 		</div>
@@ -356,11 +325,11 @@ function  updateSomes(){
 		
 		总共:&nbsp;&nbsp;<span id="pagetotal">${currentPage}<em>/</em> ${totalpage}</span>
 		页&nbsp;&nbsp;
-		<input type="button" value="上一页" onclick="fnjump(-1)" class="btn">
-		<input type="button" value="下一页" onclick="fnjump(1)" class="btn">
+		<input type="button" value="上一页" onclick="fnjump(-1,${type})" class="btn">
+		<input type="button" value="下一页" onclick="fnjump(1,${type})" class="btn">
 		
 		第<input id="page" type="text" value="${currentPage}" style="height: 26px;">
-		<input type="button" value="查询" onclick="fnjump(0)" class="btn">
+		<input type="button" value="查询" onclick="fnjump(0,${type})" class="btn">
 		</div>
 	</div>
 </body>
