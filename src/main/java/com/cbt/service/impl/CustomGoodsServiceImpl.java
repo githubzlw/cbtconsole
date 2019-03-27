@@ -270,6 +270,15 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
+    @Override
+    public int setGoodsValid2(String pid, String adminName, int adminId, int type, String remark) {
+        // AWS更新
+        // MQ
+        // GoodsInfoUpdateOnlineUtil.setGoodsValidByMq(pid,type);
+        // MongoDB
+        GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb2(pid, type);
+        return customGoodsDao.setGoodsValid2(pid, adminName, adminId, type, 24, remark);
+    }
 
     @Override
     public boolean batchDeletePids(String[] pidLst) {

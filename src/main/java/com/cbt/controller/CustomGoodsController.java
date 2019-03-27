@@ -1,21 +1,22 @@
 package com.cbt.controller;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.cbt.bean.*;
 import com.cbt.customer.service.IShopUrlService;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.service.CustomGoodsService;
 import com.cbt.util.GoodsInfoUtils;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
+import com.cbt.website.userAuth.bean.Admuser;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.pojo.OnlineGoodsStatistic;
 import com.importExpress.pojo.ShopMd5Bean;
 import com.importExpress.utli.EasyUiTreeUtils;
+import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,17 +27,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.cbt.parse.service.StrUtils;
-import com.cbt.service.CustomGoodsService;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.website.bean.ConfirmUserInfo;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.cbt.website.userAuth.bean.Admuser;
-import com.cbt.website.util.JsonResult;
-
-import net.sf.json.JSONArray;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/cutom")
@@ -1381,7 +1378,8 @@ public class CustomGoodsController {
             for(String pid : pidArr){
                 if(StringUtils.isNotBlank(pid)){
                     // customGoodsService.updateStateList(2, pid, user.getId());
-                    customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), 0, "同款下架");
+//                    customGoodsService.setGoodsValid(pid, user.getAdmName(), user.getId(), 0, "同款下架");
+                    customGoodsService.setGoodsValid2(pid, user.getAdmName(), user.getId(), 0, "同款下架");
                 }
             }
             json.setOk(true);

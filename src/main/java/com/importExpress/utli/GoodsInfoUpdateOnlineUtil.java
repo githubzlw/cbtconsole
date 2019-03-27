@@ -257,6 +257,15 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setPid(pid);
         return updateLocalAndSolr(inputData, 1);
     }
+    public static boolean setGoodsValidByMongoDb2(String pid, int type) {
+        InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
+        inputData.setValid((type == 1 ? "1" : "2"));
+        inputData.setGoodsstate(type == 1 ? "4" : "2");
+        inputData.setCur_time(DateFormatUtil.getWithSeconds(new Date()));
+        inputData.setUnsellableReason("6");
+        inputData.setPid(pid);
+        return updateLocalAndSolr(inputData, 1);
+    }
 
     public static boolean setNoBenchmarkingMongoDb(String pid) {
         // String updateSqlAws = "update custom_benchmark_ready set ali_weight='',bm_flag=2,isBenchmark=3 where pid = ?";
