@@ -313,17 +313,6 @@ public interface CustomGoodsDao {
 	public int setGoodsValid(String pid, String adminName, int adminId, int type, int reason, String remark);
 
 	/**
-	 * 设置pid商品是否有效(上架或者下架)
-	 * @param pid
-	 * @param adminName
-	 * @param adminId
-	 * @param type
-	 * @param reason
-	 * @return
-	 */
-	public int setGoodsValid2(String pid, String adminName, int adminId, int type, int reason, String remark);
-
-	/**
 	 *
 	 * @Title updateGoodsState
 	 * @Description 根据PID更新发布状态
