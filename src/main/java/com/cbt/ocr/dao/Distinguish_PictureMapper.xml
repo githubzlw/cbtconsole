@@ -14,7 +14,13 @@
 	</resultMap>
 
     <select id="showDistinguish_Pircture"  resultMap="resultMap" >
-        SELECT * FROM custom_goods_md5 where 1=1 and ocr_need_delete=1
+        SELECT * FROM custom_goods_md5 where 1=1
+        <if test="type==1">
+            and ocr_need_delete=2
+        </if>
+        <if test="type==2">
+            and ocr_need_delete=1
+        </if>
         <if test="pid != null and pid != ''">
             and pid=#{pid}
         </if>
@@ -24,11 +30,17 @@
         <if test="isdelete !=2">
             and is_delete=#{isdelete}
         </if>
-        limit #{page},20
+        limit #{page},21
     </select>
 
     <select id="queryDistinguish_PirctureCount"  resultType="java.lang.Integer" >
-        SELECT COUNT(1) FROM custom_goods_md5 where 1=1 and ocr_need_delete=1
+        SELECT COUNT(1) FROM custom_goods_md5 where 1=1
+        <if test="type==1">
+            and ocr_need_delete=2
+        </if>
+        <if test="type==2">
+            and ocr_need_delete=1
+        </if>
         <if test="pid != null and pid != '' ">
             and pid=#{pid}
         </if>
@@ -40,22 +52,16 @@
         </if>
     </select>
 
-    <update id="updatePirctu_risdelete">
-        UPDATE custom_goods_md5 SET create_time=NOW(),
-        <if test="ocrneeddelete == 2 or ocrneeddelete == 0">
-             ocr_need_delete=1
-        </if>
-        <if test="ocrneeddelete == 1">
-             ocr_need_delete=2
-        </if>
-        where id=#{id}
-    </update>
-
     <update id="updateSomePirctu_risdelete"  parameterType="list">
+        update custom_goods_md5  SET  ocr_need_delete=1 where
+        <foreach collection="list" separator="or" item="i" index="index">
+            id = ${i.id}
+        </foreach>
+    </update>
+    <update id="updateSomePirctu_risdelete_tow"  parameterType="list">
         update custom_goods_md5  SET  ocr_need_delete=2 where
         <foreach collection="list" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
-
     </update>
 </mapper>

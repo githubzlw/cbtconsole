@@ -257,7 +257,6 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setPid(pid);
         return updateLocalAndSolr(inputData, 1);
     }
-
     public static boolean setGoodsValidByMongoDb2(String pid, int type) {
         InputData inputData = new InputData('u'); // u表示更新；c表示创建，d表示删除
         inputData.setValid((type == 1 ? "1" : "2"));

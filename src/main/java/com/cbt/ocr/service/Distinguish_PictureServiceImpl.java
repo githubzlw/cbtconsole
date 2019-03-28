@@ -16,10 +16,10 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	public Distinguish_PictureDao distinguish_PictureDao;
 
 	@Override
-	public List<CustomGoods> showDistinguish_Pircture(String pid, String shopid, int isdelete, int page) {
+	public List<CustomGoods> showDistinguish_Pircture(String pid, String shopid, int isdelete, int page,int type) {
 		page=(page-1)*40;
-		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,shopid,isdelete,page);
-		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,shopid,isdelete);
+		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,shopid,isdelete,page,type);
+		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,shopid,isdelete,type);
 		String len="/usr/local/goodsimg";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
@@ -32,18 +32,16 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public int queryDistinguish_PirctureCount(String pid, String shopid, int isdelete) {
-		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,shopid,isdelete);
+	public int queryDistinguish_PirctureCount(String pid, String shopid, int isdelete,int type) {
+		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,shopid,isdelete,type);
 	}
-
 	@Override
-	public int updatePirctu_risdelete(int id, int ocrneeddelete) {
-
-		return distinguish_PictureDao.updatePirctu_risdelete(id,ocrneeddelete);
-	}
-
-	@Override
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList) {
-		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList);
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type) {
+		int data;
+		if(type==1)
+			data=distinguish_PictureDao.updateSomePirctu_risdelete(bgList);
+		else
+			data=distinguish_PictureDao.updateSomePirctu_risdelete_tow(bgList);
+		return data;
 	}
 }

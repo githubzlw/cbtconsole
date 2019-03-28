@@ -642,4 +642,5 @@ public interface OrderinfoMapper {
 	public String getDropshipOrderNoList(String orderNo);
 
     void updateBusiess(Map<String, String> map);
+    int updateOrderDetailsState(@Param("odid")String odid, @Param("orderid") String orderid);
 }

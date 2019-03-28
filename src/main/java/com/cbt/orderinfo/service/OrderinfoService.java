@@ -313,6 +313,10 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			//等于1为到库操作，其余为验货有疑问
 			if(Integer.valueOf(map.get("status")) != 1){
+				//Added <V1.0.1> Start： cjc 2019/3/27 17:28:32 Description : 验货有疑问 后续操作
+				// TODO 1. 更新商品状态为采购中 2.更新入库记录为无效记录  是否需要启用待数据验证
+				//dao.updateOrderDetailsState(map.get("odid"),map.get("orderid"));
+				//End：
 				return row;
 			}
 			sql="update storage_problem_order set flag=1 where shipno='"+map.get("shipno")+"'";

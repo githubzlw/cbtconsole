@@ -98,13 +98,14 @@ background:rgb(255, 108, 0) none repeat scroll 0% 0%;
     #subBtn{background: rgb(0, 156, 255) none repeat scroll 0% 0%;width: 120px;}
     #subBtn:hover{background:rgb(81, 178, 240) none repeat scroll 0% 0%;}
 ul#img_sf_1{ list-style:none;float:center; display:inline;}
-ul#img_sf_1 li{float:left; width:150px; height:60px; display:inline; margin:2px 2px 2px 5px;}
-ul#img_sf_11 li a{width:150px; height:60px; display:block;}
-ul#img_sf_1 li a img{width:100%; height:100%; border:1px #999 solid;}
- ul#img_sf_1 li a:hover{ z-index:100; margin:-32px 0px 0px -32px; position:absolute;}
-ul#img_sf_1 li a img:hover{width:200px; height:200px; border:1px #999 solid;}
+ul#img_sf_1 li{float:left; width:60px; height:150px; display:inline; margin:2px 2px 2px 5px;}
+ul#img_sf_11 li a{width:60px; height:150px; display:block;}
+ul#img_sf_1 li a img{width:100%; border:1px #999 solid;}
+ ul#img_sf_1 li a:hover{ z-index:100; margin:-16px 0px 0px -16px; position:absolute;}
+ul#img_sf_1 li a img:hover{width: 100%; height: 100%; border:1px #999 solid;}
 /**/
 ul#img_sf_1 li {
+
    width: 100px;
    height: 100px;}
    .qq-uploader {
@@ -503,7 +504,7 @@ $(function(){
 		            }  
 		        });  
 	    });  
-	})	
+	});
 	$("input[name='qqfile']").attr("accept","image/gif, image/jpeg , image/png");
 })
 

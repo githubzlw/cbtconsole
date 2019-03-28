@@ -3,6 +3,7 @@ package com.importExpress.service.impl;
 import com.importExpress.mapper.OutofstockdemandtableMapper;
 import com.importExpress.pojo.Outofstockdemandtable;
 import com.importExpress.pojo.OutofstockdemandtableExample;
+import com.importExpress.service.CustomBenchmarkService;
 import com.importExpress.service.OutofstockdemandService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 public class OutofstockdemandServiceImpl implements OutofstockdemandService {
     @Autowired
     private OutofstockdemandtableMapper out;
+    @Autowired
+    private CustomBenchmarkService custombenchmarkskuservice;
     @Override
     public int countByExample(OutofstockdemandtableExample example) {
         return out.countByExample(example);
@@ -113,6 +117,29 @@ public class OutofstockdemandServiceImpl implements OutofstockdemandService {
             criteria.andEmailEqualTo(email);
         }
         List<Outofstockdemandtable> list = out.selectByExample(example);
+        list.stream().forEach(e ->{
+            e.setCtime(sdf.format(e.getCreatime()));
+            e.setEtime(sdf.format(e.getUpdatetime()));
+            e.setItemid("<a href ='https://www.import-express.com/goodsinfo/cbtconsole-1"+e.getItemid()+".html' target='_blank'>"+e.getItemid()+"</a>");
+            String emails = e.getEmail();
+            e.setEmail("<a href=\"mailto:"+emails+"\">"+emails+"</a>");
+            String goodstype = e.getGoodstype();
+            e.setGoodstype("");
+            String[] split = goodstype.split("@");
+            if(split.length>0){
+                Arrays.asList(split).stream().forEach(j ->{
+                    String typename = "";
+                    String s = j.replaceAll("[^(0-9)]", "");
+                    if(StringUtils.isNotBlank(s)){
+                        String typeNameByDataBase = custombenchmarkskuservice.selectTypeNameBySkuId(s);
+                        e.setGoodstype(e.getGoodstype()+typeNameByDataBase+"||");
+                    }else{
+                        e.setGoodstype(e.getGoodstype()+typename+j+"||");
+                    }
+
+               });
+            }
+        });
         return list;
     }
 }
