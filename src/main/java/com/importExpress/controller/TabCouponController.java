@@ -162,7 +162,7 @@ public class TabCouponController {
         //用于权限校验 直接给销售$6美元以下现金券的发放权限 超过$6的需要管理员权限
         if (valueRight >= 6){
             if (!"0".endsWith(user.getRoletype())){
-                resultMap.put("message", "发放$6及超过$6的优惠卷需要管理员权限!");
+                resultMap.put("message", "发放6$及超过6$的优惠卷需要管理员权限!");
                 resultMap.put("code", "4");
                 resultMap.put("state", "false");
                 return resultMap;
