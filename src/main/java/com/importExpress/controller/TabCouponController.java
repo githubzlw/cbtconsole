@@ -33,7 +33,7 @@ public class TabCouponController {
 	
 	@Autowired
 	private TabCouponService tabCouponService;
-	
+
 	/**
      * 查询对标商品数据 列表，有分页，有条件
      * 		http://127.0.0.1:8086/cbtconsole/coupon/list.do
@@ -158,7 +158,16 @@ public class TabCouponController {
         	return resultMap;
 		}
         //登陆用户id
-        Integer userId = user.getId(); 
+        Integer userId = user.getId();
+        //用于权限校验 直接给销售$6美元以下现金券的发放权限 超过$6的需要管理员权限
+        if (valueRight >= 6){
+            if (!"0".endsWith(user.getRoletype())){
+                resultMap.put("message", "发放$6及超过$6的优惠卷需要管理员权限!");
+                resultMap.put("code", "4");
+                resultMap.put("state", "false");
+                return resultMap;
+            }
+        }
         //数据解析
         Date fromDate = null;
         Date toDate = null;
