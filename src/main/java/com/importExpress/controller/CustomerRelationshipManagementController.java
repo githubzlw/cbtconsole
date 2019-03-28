@@ -239,12 +239,6 @@ public class CustomerRelationshipManagementController {
             total = outofstockdemandList.stream().count();
             outofstockdemandList = outofstockdemandList.stream().skip(startNum).limit(limitNum).collect(Collectors.toList());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
-            outofstockdemandList.stream().forEach(e -> {
-                e.setCtime(sdf.format(e.getCreatime()));
-                e.setEtime(sdf.format(e.getUpdatetime()));
-                e.setItemid("<a href ='https://www.import-express.com/goodsinfo/cbtconsole-1"+e.getItemid()+".html' target='_blank'>"+e.getItemid()+"</a>");
-                    }
-            );
             json.setTotal((int) total);
             json.setRows(outofstockdemandList);
             json.setSuccess(true);
