@@ -1373,4 +1373,8 @@
             )
         </foreach>
     </insert>
+    <update id="updateOrderDetailsState" >
+        UPDATE order_details SET state=1 WHERE orderid=#{orderid} AND id=#{odid};
+        UPDATE id_relationtable SET is_delete = 1 WHERE orderid=#{orderid} AND odid=#{odid};
+    </update>
 </mapper>

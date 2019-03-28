@@ -419,7 +419,12 @@ public class HotManageController {
 
             int isOnTotal = 0;
             for (HotSellingGoods goods : goodsList) {
-
+                String goodsImgUrl = goods.getGoodsImg();
+                if(goodsImgUrl.indexOf("http")>-1){
+                    if(goodsImgUrl.split("http").length > 2){
+                        goods.setGoodsImg("http"+ goodsImgUrl.split("http")[2]);
+                    }
+                }
                 if("1".equals(goods.getIsOn())){
                     isOnTotal ++;
                 }
