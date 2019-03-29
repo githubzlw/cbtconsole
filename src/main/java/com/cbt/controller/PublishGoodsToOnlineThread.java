@@ -3,11 +3,14 @@ package com.cbt.controller;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.ChangeEntypeUtils;
+import com.cbt.util.FirstLetterUtitl;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
 import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.utli.ImageCompressionByNoteJs;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -61,6 +64,10 @@ public class PublishGoodsToOnlineThread extends Thread {
 
             // 根据pid获取商品信息
             CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            
+            goods.setEntypeNew(ChangeEntypeUtils.getEntypeNew(goods.getEntype(),goods.getSku(), "")); 
+          
+            
             goods.setIsUpdateImg(isUpdateImg);
             // 判断是否处于发布中的状态
             if (goods.getGoodsState() != 1) {
