@@ -6088,10 +6088,15 @@ public class WarehouseCtrl {
 		return JSONArray.fromObject(list).toString();
 	}
 
+	public static String LOCALHOST; //本地服务器地址
+
 	// 获得包裹列表
 	@RequestMapping(value = "/getPackageInfoList", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
 	public String getPackageInfoList(HttpServletRequest request,
 									 HttpServletResponse response) {
+	    if (LOCALHOST == null) {
+            LOCALHOST = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+        }
 		DecimalFormat df = new DecimalFormat("#.00");
 		Map<String, String> map = new HashMap<String, String>();
 		List<ShippingPackage> list = iWarehouseService.getPackageInfoList(map);

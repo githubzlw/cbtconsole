@@ -93,9 +93,17 @@ public class InputData {
     private String rw_keyword;
     private String size_info_en;
     private String custom_video_flag;
-    
+    private String entype_new ;//新的尺码表
 
-    public String getCustom_video_flag() {
+    public String getEntype_new() {
+		return entype_new;
+	}
+
+	public void setEntype_new(String entype_new) {
+		this.entype_new = entype_new;
+	}
+
+	public String getCustom_video_flag() {
 		return custom_video_flag;
 	}
 

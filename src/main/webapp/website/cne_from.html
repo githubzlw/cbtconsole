@@ -1,0 +1,27 @@
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title></title>
+    </head>
+
+    <body>
+
+        <form id="PriceForm" name="PriceForm" action="http://www.cne.com/cgi-bin/Ginfo.dll?EmsPriceQueryi" method="post" target="_blank">
+            <input value="cnexx" name="w">
+            <input value="cmodel:emsprice" name="cmodel">
+            <input name="type" value="20">
+            <span>目的地:</span>
+            <input name="cdes" onfocus="this.value=''" onblur="QueryDes();" onkeypress="GO(eval(fweight));" value="中文国家名或二字代码">
+            	实　重: 
+            <input name="fweight"> KG　类　型:
+            <select name="itype">
+                <option value="0">文件</option>
+                <option value="1" selected="">包裹</option>
+            </select>
+            <button value="提交" type="submit" class="btn1_mouseout" title="开始资费计算" onmouseover="this.className='btn1_mouseover'" onmouseout="this.className='btn1_mouseout'" style="margin:0 0 2 0px">开始资费计算</button>
+        </form>
+
+    </body>
+
+</html>
