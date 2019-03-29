@@ -48,6 +48,7 @@
         <result column="max_price" property="maxPrice"/>
         <result column="weight" property="weight1688"/>
         <result column="weight_flag" property="weightFlag"/>
+        
     </resultMap>
 
 
@@ -122,6 +123,7 @@
         <result column="weight" property="weight1688"/>
         <result column="add_price_lv" property="addPriceLv"/>
         <result column="weight_flag" property="weightFlag"/>
+         <result column="category_name" property="categoryName"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -861,7 +863,7 @@
 
 
     <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
-        select cbu.pid,cbu.enname,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
+        select cbu.pid,cbu.enname,cbu.category_name,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,

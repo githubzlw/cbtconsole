@@ -1,12 +1,15 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.util.ChangeEntypeUtils;
 import com.cbt.util.DateFormatUtil;
+import com.cbt.util.FirstLetterUtitl;
 import com.cbt.util.StrUtils;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.CustomBenchmarkSkuNew;
 import com.importExpress.pojo.InputData;
 import com.importExpress.pojo.SkuValPO;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -113,10 +116,13 @@ public class GoodsInfoUpdateOnlineUtil {
      */
     public static boolean publishToOnlineByMongoDB(CustomGoodsPublish bean) {
         InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
-
+        
+        bean.setEnname(FirstLetterUtitl.getNameNew(bean.getEnname(),bean.getCategoryName())); //对标题名字过短的进行拼接
+        inputData.setEntype_new(bean.getEntypeNew());
+        
         inputData.setKeyword(bean.getKeyword());
         inputData.setEninfo(checkAndReplaceQuotes(bean.getEninfo()));
-        inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
+       // inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
         inputData.setWeight(bean.getWeight());
         inputData.setImg(bean.getImg());
         inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
