@@ -3083,6 +3083,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if (offShelf.getSoldFlag3() != 0){
             sql += " and ns.edit_flag = " + offShelf.getSoldFlag3();
         }
+        if (offShelf.getSourceFlag() != -1){
+            sql += " and ns.source = " + offShelf.getSourceFlag();
+        }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
         }
@@ -3191,6 +3194,9 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if (offShelf.getSoldFlag3() != 0){
             sql += " and ns.edit_flag = " + offShelf.getSoldFlag3();
+        }
+        if (offShelf.getSourceFlag() != -1){
+            sql += " and ns.source = " + offShelf.getSourceFlag();
         }
         if(offShelf.getIsOffShelf() > -1){
             sql += " and cbr.valid = ?";
