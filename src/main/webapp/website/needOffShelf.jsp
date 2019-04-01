@@ -171,6 +171,7 @@
             var soldFlag = $("#query_sold_flag").val();
             var soldFlag2 = $("#query_sold_flag2").val();
             var soldFlag3 = $("#query_sold_flag3").val();
+            var source = $("#query_source").val();
             $("#neef_off_easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "catid":catid,
@@ -182,7 +183,8 @@
                 "neverFlag": neverFlag,
                 "soldFlag":soldFlag,
                 "soldFlag2":soldFlag2,
-                "soldFlag3":soldFlag3
+                "soldFlag3":soldFlag3,
+                "source":source
             });
         }
 
@@ -369,6 +371,10 @@
             <span> 有跨境图片包: <select id="query_sold_flag2" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="1">有跨境图片包</option>
+                        </select>
+            <span> 数据源筛选: <select id="query_source" style="font-size: 14px; height: 24px; width: 120px;">
+                                <option value="-1" selected="selected">不进行筛选</option>
+                                <option value="2">商品拯救行动V4中F点要拯救的商品</option>
                         </select>
             <span> 是否处理过: <select id="query_sold_flag3" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
