@@ -11,21 +11,21 @@ public interface Distinguish_PictureService {
 	/***
 	 * 按条件查询OCR识别错误图片
 	 * @param pid
-	 * @param shopid
+	 * @param
 	 * @param isdelete
 	 * @return
 	 *
 	 */
-	public List<CustomGoods> showDistinguish_Pircture(@Param("pid") String pid, @Param("shopid") String shopid, @Param("isdelete") int isdelete, @Param("page") int page, @Param("type")int type);
+	public List<CustomGoods> showDistinguish_Pircture(@Param("pid") String pid, @Param("isdelete") int isdelete, @Param("page") int page, @Param("type")String type);
 
 	/***
 	 * 查询OCR识别错误图片的总数
 	 * @param pid
-	 * @param shopid
+	 * @param
 	 * @param isdelete
 	 * @return
 	 */
-	public int queryDistinguish_PirctureCount(@Param("pid")String pid,@Param("shopid")String shopid,@Param("isdelete")int isdelete, @Param("type")int type);
+	public int queryDistinguish_PirctureCount(@Param("pid")String pid,@Param("isdelete")int isdelete, @Param("type")String type);
 
 	/***
 	 *批发更新线上是否删除状态
@@ -33,4 +33,6 @@ public interface Distinguish_PictureService {
 	 * @return
 	 */
 	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type);
+
+
 }
