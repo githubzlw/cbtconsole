@@ -372,7 +372,9 @@
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="1">有跨境图片包</option>
                         </select>
-            <span> 数据源筛选: <select id="query_source" style="font-size: 14px; height: 24px; width: 120px;">
+            <span> 数据源筛选
+                <a href="https://img.import-express.com/importcsvimg/stock_picture/researchimg/1554172194483.70268.zip">原始文档</a>:
+                <select id="query_source" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="-1" selected="selected">不进行筛选</option>
                                 <option value="2">商品拯救行动V4中F点要拯救的商品</option>
                         </select>

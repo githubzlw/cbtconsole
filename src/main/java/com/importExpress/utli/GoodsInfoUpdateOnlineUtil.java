@@ -122,7 +122,7 @@ public class GoodsInfoUpdateOnlineUtil {
         
         inputData.setKeyword(bean.getKeyword());
         inputData.setEninfo(checkAndReplaceQuotes(bean.getEninfo()));
-       // inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
+        inputData.setEnname(checkAndReplaceQuotes(bean.getEnname()));
         inputData.setWeight(bean.getWeight());
         inputData.setImg(bean.getImg());
         inputData.setEndetail(checkAndReplaceQuotes(bean.getEndetail()));
