@@ -349,6 +349,7 @@
             });
 
         }
+        refreshOnlineGoodsHtml
 
         function refreshOnlineGoodsJson(){
 		$("#gen_show_notice").show();
@@ -356,7 +357,7 @@
 		$(".refresh_color").attr("disabled",true);
 		$.ajax({
 			type : "POST",
-			url : "https://www.import-express.com/popProducts/refreshHotJson",
+			url : "https://www.import-express.com/popProducts/refreshHotJson/0",
 			data : {},
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);
@@ -369,6 +370,25 @@
 			}
 		});
 	}
+        function refreshOnlineGoodsHtml(){
+    		$("#gen_show_notice").show();
+    		$(".refresh_color").css("background","#aaa");
+    		$(".refresh_color").attr("disabled",true);
+    		$.ajax({
+    			type : "POST",
+    			url : "https://www.import-express.com/popProducts/refreshHotJson/1",
+    			data : {},
+    			success : function(data) {
+    				$(".refresh_color").attr("disabled",false);
+    				$(".refresh_color").css("background","#44a823");
+    				if(data==1){
+    					$("#gen_show_notice").text("刷新成功！");
+    				}else{
+    					$("#gen_show_notice").text("刷新失败，请重试，如果还不行，请联系IT！");
+    				}
+    			}
+    		});
+    	}
     </script>
 </head>
 <body>
@@ -407,7 +427,8 @@
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
             <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
             <span><input type="button" class="but_color" value="录入类别" onclick="enterCategory(0,0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <input class="refresh_color" type="button" value="刷新最新热卖商品到线上" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
+            <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
+            <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（新html）" onclick="refreshOnlineGoodsHtml()" style="cursor:pointer"/>
             <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
     </form>
 </div>
