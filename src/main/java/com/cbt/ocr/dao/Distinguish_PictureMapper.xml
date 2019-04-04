@@ -12,20 +12,18 @@
         <result column="is_delete" property="isdelete" />
         <result column="ocr_need_delete" property="ocrneeddelete" />
 	</resultMap>
-
+    <sql id="Distinguish_Pircture_List">
+      id,pid,shop_id,local_path,remote_path,goods_md5,create_time,is_delete,ocr_need_delete
+    </sql>
     <select id="showDistinguish_Pircture"  resultMap="resultMap" >
-        SELECT * FROM custom_goods_md5 where 1=1
-        <if test="type==1">
-            and ocr_need_delete=2
-        </if>
-        <if test="type==2">
-            and ocr_need_delete=1
+        SELECT
+        <include refid="Distinguish_Pircture_List"/>
+        FROM custom_goods_md5 where 1=1
+        <if test="type != null and type != '' ">
+            and ocr_need_delete=#{type}
         </if>
         <if test="pid != null and pid != ''">
             and pid=#{pid}
-        </if>
-        <if test="shopid != null and shopid != ''">
-            and shop_id=#{shopid}
         </if>
         <if test="isdelete !=2">
             and is_delete=#{isdelete}
@@ -35,17 +33,11 @@
 
     <select id="queryDistinguish_PirctureCount"  resultType="java.lang.Integer" >
         SELECT COUNT(1) FROM custom_goods_md5 where 1=1
-        <if test="type==1">
-            and ocr_need_delete=2
-        </if>
-        <if test="type==2">
-            and ocr_need_delete=1
+        <if test="type != null and type != '' ">
+            and ocr_need_delete=#{type}
         </if>
         <if test="pid != null and pid != '' ">
             and pid=#{pid}
-        </if>
-        <if test="shopid != null and shopid != ''">
-            and shop_id=#{shopid}
         </if>
         <if test="isdelete != 2">
             and is_delete=#{isdelete}
