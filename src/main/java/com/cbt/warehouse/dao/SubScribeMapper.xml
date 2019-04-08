@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.SubScribeMapper" >
+	<resultMap type="com.cbt.bean.Subscribe" id="SubscribeMap">
+		<id column="id" property="id" />
+		<result column="email" property="email" />
+		<result column="create_time" property="create_time" />
+		<result column="label" property="label" />
+	</resultMap>
+	<sql id="SubscribeColumn">
+		id,email,create_time,label
+	</sql>
+	<select id="queryAllSubscribe" resultMap="SubscribeMap" parameterType="com.cbt.bean.Subscribe">
+		  SELECT
+		  <include refid="SubscribeColumn"/>
+		  FROM subscribe_email WHERE 1=1
+		  <if test=" email !=null">
+			and  email LIKE CONCAT('%',#{email},'%')
+		  </if>
+		  <if test=" limitNum > 0">
+		  limit #{startNum},#{limitNum}
+		  </if>
+	</select>
+	<select id="queryAllSubscribeConut" resultType="int" parameterType="com.cbt.bean.Subscribe">
+		SELECT count(1)
+		FROM subscribe_email WHERE 1=1
+		<if test=" email !=null">
+			and  email LIKE CONCAT('%',#{email},'%')
+		</if>
+	</select>
+</mapper>
