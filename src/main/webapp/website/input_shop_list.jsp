@@ -120,7 +120,7 @@
 
         .but_color {
             background: #44a823;
-            width: 70px;
+            /*width: 70px;*/
             height: 24px;
             border: 1px #aaa solid;
             color: #fff;
@@ -796,7 +796,7 @@
 
 
     function doAdd() {
-        $('#sid').val('')
+        $('#sid').val('');
         $('#inputShopName').val('');
         $('#inputShopDescription').val('');
         $('#inputShopEnName').val('');
@@ -870,13 +870,37 @@
             data: params,
             success: function (data) {
                 if (!data.ok) {
-                    $.messager.alert('提示', data.message);
+                    if(data.total > 0){
+                        $.messager.confirm("提示", "已经存在此店铺，需要重新抓取数据吗？", function (rs) {
+                            if (rs) {
+                                reDownShopGoods(data.data);
+                            }
+                        });
+                    }else{
+                        $.messager.alert('提示', data.message);
+                    }
                 } else {
                     $('#dlg').dialog('close');
                     var number = $('#easyui-datagrid').datagrid('options').pageNumber;
                     setTimeout(function () {
                         doQuery(number);
                     }, 2000)
+                }
+            }
+        });
+    }
+
+    function reDownShopGoods(shopId) {
+        $.ajax({
+            url: '/cbtconsole/ShopUrlC/reDownShopGoods.do',
+            type: "post",
+            data: {"shopId":shopId},
+            success: function (data) {
+                if (data.ok) {
+                    $('#dlg').dialog('close');
+                    $('#easyui-datagrid').datagrid("reload");
+                } else {
+                    $.messager.alert('提示', data.message);
                 }
             }
         });

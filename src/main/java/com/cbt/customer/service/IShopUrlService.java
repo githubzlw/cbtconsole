@@ -335,4 +335,19 @@ public interface IShopUrlService {
      */
     int setShopTranslate(String shopId);
 
+    /**
+     * 检查店铺ID是否已经存在
+     * @param shopId
+     * @return
+     */
+    int checkExistsShopByShopId(String shopId);
+
+    /**
+     * 重新进行店铺商品下载
+     * @param shopId
+     * @param adminId
+     * @return
+     */
+    int reDownShopGoods(String shopId, int adminId);
+
 }
