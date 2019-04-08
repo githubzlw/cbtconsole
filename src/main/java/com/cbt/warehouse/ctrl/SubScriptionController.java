@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+/***
+ * 客户订阅
+ * user:zlc
+ */
 @Controller
 @RequestMapping("SubScription")
 public class SubScriptionController {
@@ -22,6 +26,12 @@ public class SubScriptionController {
 	@Autowired
 	private SubScribeService subScribeService;
 
+	/***
+	 * 客户订阅信息的查询
+	 * @param request
+	 * @param response
+	 * @return json格式的信息
+	 */
 	@RequestMapping("querySubScription")
 	@ResponseBody
 	public EasyUiJsonResult querySubScription(HttpServletRequest request, HttpServletResponse response){
@@ -52,8 +62,9 @@ public class SubScriptionController {
 			param.setEmail(email);
 			param.setStartNum(startNum);
 			param.setLimitNum(limitNum);
-
+			//客户订阅信息查询
 			List<Subscribe> res = subScribeService.queryAllSubscribe(param);
+			//客户订阅总数查询
 			int count = subScribeService.queryAllSubscribeConut(param);
 
 			json.setSuccess(true);
