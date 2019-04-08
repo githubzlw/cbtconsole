@@ -25,9 +25,6 @@
         <if test="pid != null and pid != ''">
             and pid=#{pid}
         </if>
-        <if test="isdelete !=2">
-            and is_delete=#{isdelete}
-        </if>
         limit #{page},21
     </select>
 
@@ -38,9 +35,6 @@
         </if>
         <if test="pid != null and pid != '' ">
             and pid=#{pid}
-        </if>
-        <if test="isdelete != 2">
-            and is_delete=#{isdelete}
         </if>
     </select>
 
