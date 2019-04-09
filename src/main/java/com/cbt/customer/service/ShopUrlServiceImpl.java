@@ -253,5 +253,15 @@ public class ShopUrlServiceImpl implements IShopUrlService {
         return dao.setShopTranslate(shopId);
     }
 
+    @Override
+    public int checkExistsShopByShopId(String shopId) {
+        return dao.checkExistsShopByShopId(shopId);
+    }
+
+    @Override
+    public int reDownShopGoods(String shopId, int adminId) {
+        return dao.reDownShopGoods(shopId, adminId);
+    }
+
 
 }
