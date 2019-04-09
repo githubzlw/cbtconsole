@@ -1001,7 +1001,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     }
 
     @Override
-    public boolean updateStateList(int state, String pids, int adminid) {
+    public boolean updateStateList(int state, String pids, int adminid, String reason) {
         Connection conn = DBHelper.getInstance().getConnection();
         // Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
@@ -1013,7 +1013,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         if (state == 4) {
             upSql += ",a.publish_time=now()";
         }else if(state == 2){
-            upSql += ",a.off_time=now()";
+            upSql += ",a.off_time=now(),a.off_reason=?,b.unsellableReason = 6";
         }
         upSql += " where a.pid = b.pid and b.pid =? ";
         // String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
@@ -1044,7 +1044,12 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     stmt.setInt(1, state == 4 ? 1 : 0);
                     stmt.setInt(2, state);
                     stmt.setInt(3, adminid);
-                    stmt.setString(4, pid);
+                    if(state == 2){
+                        stmt.setString(4, reason);
+                        stmt.setString(5, pid);
+                    }else{
+                        stmt.setString(4, pid);
+                    }
                     stmt.addBatch();
 
                     stmt28.setInt(1, state == 4 ? 1 : 0);

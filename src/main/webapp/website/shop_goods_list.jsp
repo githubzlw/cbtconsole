@@ -129,11 +129,15 @@
     %>
 
 </head>
-<body onload="doQuery(1)">
+<body <%--onload="doQuery(1)"--%>>
 
 <div id="top_toolbar" style="padding: 5px; height: auto">
-    <form id="query_form" action="#" style="margin-left:350px;" onsubmit="return false;">
-        <input class="but_color" type="button" value="批量下架" onclick="unshelveGoods()">
+    <form id="query_form" action="#" style="margin-left:50px;" onsubmit="return false;">
+        <span>店铺ID:<input id="query_shop_id" type="text" style="width: 240px;height: 28px;"/></span>
+        &nbsp;
+        <input class="but_color" type="button" value="查询" onclick="doQueryByThis()">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input class="but_color" type="button" style="background-color: red;" value="批量下架" onclick="unshelveGoods()">
     </form>
 </div>
 
@@ -205,7 +209,7 @@
             striped: true,//设置为true将交替显示行背景。
 // 			collapsible : true,//显示可折叠按钮
             toolbar: "#top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-            url: '/cbtconsole/ShopUrlC/findAllGoods?shopId=<%=shop_id%>',//url调用Action方法
+            url: '/cbtconsole/ShopUrlC/findAllGoods',//url调用Action方法
             loadMsg: '数据装载中......',
             singleSelect: false,//为true时只能选择单行
             fitColumns: true,//允许表格自动缩放，以适应父容器
@@ -216,6 +220,9 @@
             rownumbers: true
             //行数
         });
+        var shopId="<%=shop_id%>";
+        $("#query_shop_id").val(shopId);
+        doQueryByThis();
     }
 
     function doQuery(page) {
@@ -225,39 +232,51 @@
             "shopId": shopId
         });
     }
+
+    function doQueryByThis() {
+        var shopId = $("#query_shop_id").val();
+        $("#easyui-datagrid").datagrid("load", {
+            "shopId": shopId
+        });
+    }
     
     function unshelveGoods() {
         var shopId = "<%=shop_id%>";
         var pids = [];
         var rows = $('#easyui-datagrid').datagrid('getSelections');
-        for(var i=0; i<rows.length; i++){
+        for (var i = 0; i < rows.length; i++) {
             pids.push(rows[i].pid);
         }
-        if(pids.length > 0){
+        if (pids.length > 0) {
             //alert("shopId:" + shopId + "@" + pids.toString());
-            $.ajax({
-                url: '/cbtconsole/cutom/offshelf',
-                type: "post",
-                data: {
-                    "shopId":shopId,
-                    "pid":pids.toString()
-                },
-                success: function (data) {
-                    if ("" == data || !data) {
-                        $.messager.alert('提示', "执行错误，请重试");
-                    } else {
-                        if("1" == data){
-                            $("#easyui-datagrid").datagrid("reload");
-                        }else{
-                            $.messager.alert('提示', "执行失败，请重试");
+            $.messager.prompt('提醒', '请输入下架原因', function (reason) {
+                if (reason) {
+                    $.ajax({
+                        url: '/cbtconsole/cutom/offshelf',
+                        type: "post",
+                        data: {
+                            "shopId": shopId,
+                            "reason": reason,
+                            "pid": pids.toString()
+                        },
+                        success: function (data) {
+                            if ("" == data || !data) {
+                                $.messager.alert('提示', "执行错误，请重试");
+                            } else {
+                                if ("1" == data) {
+                                    $("#easyui-datagrid").datagrid("reload");
+                                } else {
+                                    $.messager.alert('提示', "执行失败，请重试");
+                                }
+                            }
                         }
-                    }
+                    });
                 }
+
             });
-        }else{
+        } else {
             $.messager.alert('提示', "请选择需要删除的商品");
         }
-
     }
 
 </script>
