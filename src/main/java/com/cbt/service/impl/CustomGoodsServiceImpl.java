@@ -179,12 +179,12 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
 
     @Override
-    public boolean updateStateList(int state, String pids, int adminid) {
+    public boolean updateStateList(int state, String pids, int adminid, String reason) {
         // AWS更新
         // GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateByMQ(state, pids, adminid);
         GoodsInfoUpdateOnlineUtil.batchUpdateGoodsStateMongoDB(state, pids, adminid);
         // 本地更新
-        return customGoodsDao.updateStateList(state, pids, adminid);
+        return customGoodsDao.updateStateList(state, pids, adminid, reason);
     }
 
     @Override

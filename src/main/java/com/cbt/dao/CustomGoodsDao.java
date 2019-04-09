@@ -166,9 +166,11 @@ public interface CustomGoodsDao {
 	 *            2-产品下架 3-发布失败 4-发布成功
 	 * @param adminid
 	 *            操作人id
+	 * @param reason
+	 *            下架原因
 	 * @return
 	 */
-	public boolean updateStateList(int state, String pids, int adminid);
+	public boolean updateStateList(int state, String pids, int adminid, String reason);
 
 	/**
 	 * 更新线上产品状态
