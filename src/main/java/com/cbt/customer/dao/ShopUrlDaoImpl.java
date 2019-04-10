@@ -3378,21 +3378,34 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public int reDownShopGoods(String shopId, int adminId) {
         Connection conn = DBHelper.getInstance().getConnection5();
-        PreparedStatement stmt = null;
-        String upSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
-                "spider_goods_flag = 0,service_ip='',admin_id = ?,sales_volume_threshold = 0,download_num = 1000  where shop_id = ? ";
+        Statement stmt = null;
+        String upShopSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
+                "spider_goods_flag = 0,service_ip='',admin_id = " + adminId
+                + ",sales_volume_threshold = 0,download_num = 1000  where shop_id = '" + shopId + "' ";
+        String clearSql = "update shop_clear_state set online_state = 0,shop_state = 0 where shop_id = '" + shopId + "'";
         int count = 0;
         try {
-            stmt = conn.prepareStatement(upSql);
-            stmt.setInt(1, adminId);
-            stmt.setString(2, shopId);
-            count = stmt.executeUpdate();
+            conn.setAutoCommit(false);
+            stmt = conn.createStatement();
+            stmt.addBatch(upShopSql);
+            stmt.addBatch(clearSql);
+            count = stmt.executeBatch().length;
+            if (count > 0) {
+                conn.commit();
+            } else {
+                conn.rollback();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("shopId:" + shopId + ",reDownShopGoods error: " + e.getMessage());
             LOG.error("shopId:" + shopId + ",reDownShopGoods error: " + e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
         } finally {
-            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return count;

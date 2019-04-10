@@ -24,8 +24,11 @@ public class OKHttpUtils {
 	private static int total = 0;
 
 	static {
-		client = new OkHttpClient();
-		client.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
+		/*client = new OkHttpClient().Builder().connectTimeout(600, TimeUnit.SECONDS).readTimeout(300, TimeUnit.SECONDS)
+		.writeTimeout(300, TimeUnit.SECONDS);*/
+
+		client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
+        .readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS).build();
 	}
 	
 	/**
@@ -109,7 +112,7 @@ public class OKHttpUtils {
       
   
   //发送post请求o
-      Request request = new Request.Builder().url(url)
+      Request request = new Request.Builder().addHeader("Connection", "close").url(url)
       		.headers(mHeaders).post(requestBody.build()).build();
 	  Response response = new OkHttpClient().newBuilder()
 				.connectTimeout(50, TimeUnit.SECONDS)
@@ -136,7 +139,7 @@ public class OKHttpUtils {
 		RequestBody formBody = RequestBody.create(MediaType.parse(mediaType), param);
 		
 		//发送patch请求
-		Request request = new Request.Builder()
+		Request request = new Request.Builder().addHeader("Connection", "close")
 									.url(url)
 									.headers(mHeaders)
 									.patch(formBody)
@@ -160,7 +163,7 @@ public class OKHttpUtils {
 				.setType(MultipartBody.FORM)
 				.addFormDataPart("uploadFile", file.getName(), fileBody)
 				.build();
-		Request request = new Request.Builder().addHeader("Accept","*/*")
+		Request request = new Request.Builder().addHeader("Accept","*/*").addHeader("Connection", "close")
 				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
 				.post(body)
 				.url(url)
@@ -186,7 +189,7 @@ public class OKHttpUtils {
 				.setType(MultipartBody.FORM)
 				.addFormDataPart(uploadFileName, file.getName(), fileBody)
 				.build();
-		Request request = new Request.Builder().addHeader("Accept","*/*")
+		Request request = new Request.Builder().addHeader("Accept","*/*").addHeader("Connection", "close")
 				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
 				.post(body)
 				.url(url)
@@ -205,8 +208,8 @@ public class OKHttpUtils {
 		total++;
 		if (total % 100 == 0) {
 			total = 0;
-			client = new OkHttpClient();
-			client.newBuilder().connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS);
+			client = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS)
+        	.readTimeout(300, TimeUnit.SECONDS).writeTimeout(300, TimeUnit.SECONDS).build();
 		}
 	}
 
