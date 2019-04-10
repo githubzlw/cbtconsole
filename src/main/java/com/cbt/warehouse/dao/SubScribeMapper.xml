@@ -17,9 +17,11 @@
 		  <if test=" email !=null">
 			and  email LIKE CONCAT('%',#{email},'%')
 		  </if>
+		  ORDER BY create_time DESC
 		  <if test=" limitNum > 0">
 		  limit #{startNum},#{limitNum}
 		  </if>
+
 	</select>
 	<select id="queryAllSubscribeConut" resultType="int" parameterType="com.cbt.bean.Subscribe">
 		SELECT count(1)
