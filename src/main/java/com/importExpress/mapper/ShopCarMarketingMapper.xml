@@ -1748,7 +1748,7 @@
 
     <select id="queryTrackingList" parameterType="com.importExpress.pojo.ShopTrackingBean" resultMap="shopTrackingResultMap">
         select * from (select a.user_id,a.create_time as follow_time,a.admin_id,c.admName,b.orderid as order_no,
-        b.payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
+        sum(ifnull(b.payment_amount,0)) as payment_amount,date_format(b.createtime,'%Y-%m-%d %H:%i:%s') as order_pay_time
         from shop_car_follow a  LEFT JOIN  payment b on a.user_id = b.userid and DATE_SUB(a.create_time,INTERVAL 8 HOUR) &lt;=b.createtime
         and b.createtime &lt;= DATE_ADD(a.create_time,INTERVAL 7 DAY)
 	    LEFT JOIN admuser c on a.admin_id = c.id

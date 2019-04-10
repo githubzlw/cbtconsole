@@ -1014,6 +1014,11 @@ public class CustomGoodsController {
 		String sessionId = request.getSession().getId();
 		String userJson = Redis.hget(sessionId, "admuser");
 		boolean is = false;
+
+		String reason = request.getParameter("reason");
+		if(StringUtils.isBlank(reason)){
+			reason = "批量下架";
+		}
 		try{
 
 			Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
@@ -1023,7 +1028,7 @@ public class CustomGoodsController {
 			pid = pid.endsWith(",") ? pid.substring(0, pid.length() - 1) : pid;
 
 			// 本地产品下架 2-产品下架 3-发布失败 4-发布成功
-			is = customGoodsService.updateStateList(2, pid, user.getId());
+			is = customGoodsService.updateStateList(2, pid, user.getId(), reason);
 			rs = "1";
 		}catch (Exception e){
 			e.printStackTrace();

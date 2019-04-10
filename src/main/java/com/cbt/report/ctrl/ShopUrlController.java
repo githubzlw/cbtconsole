@@ -107,6 +107,7 @@ public class ShopUrlController {
             shopUserName = "";
         }
         String str = request.getParameter("page");
+        String rowStr = request.getParameter("rows");
         String date = request.getParameter("createTime");
         // String type = request.getParameter("questionType");
         String shopId = request.getParameter("shopId");
@@ -181,12 +182,16 @@ public class ShopUrlController {
         } else {
             page = Integer.parseInt(str);
         }
-        int start = (page - 1) * 25;
+        int rows = 25;
+        if(StringUtils.isNotBlank(rowStr)){
+            rows = Integer.valueOf(rowStr);
+        }
+        int start = (page - 1) * rows;
         String shopids="";
         if(StringUtil.isNotBlank(admName)){
             shopids=shopUrlService.getShopList(admName,days);
         }
-        List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, 25, timeFrom, timeTo, isOn,
+        List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, rows, timeFrom, timeTo, isOn,
                 state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids,translateDescription);
         int total = shopUrlService.total(shopId,shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
                 authorizedFileFlag,ennameBrandFlag,shopids,translateDescription);
@@ -304,6 +309,18 @@ public class ShopUrlController {
             jr.setOk(false);
             jr.setMessage("黑名单店铺，不能执行操作");
             return jr;
+        }
+
+
+        if(StringUtils.isBlank(sid)) {
+            boolean isExists = shopUrlService.checkExistsShopByShopId(shopId) > 0;
+            if (isExists) {
+                jr.setOk(false);
+                jr.setMessage("店铺id已经存在");
+                jr.setTotal(1L);
+                jr.setData(shopId);
+                return jr;
+            }
         }
 
         int isChange = 0;
@@ -3596,6 +3613,42 @@ public class ShopUrlController {
         }
         return json;
     }
+
+    @RequestMapping(value = "/reDownShopGoods.do")
+    @ResponseBody
+    public JsonResult reDownShopGoods(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+        String shopId = request.getParameter("shopId");
+        if (StringUtils.isBlank(shopId)) {
+            json.setOk(false);
+            json.setMessage("获取shopId失败");
+            return json;
+        }
+
+
+        try {
+            shopUrlService.reDownShopGoods(shopId,user.getId());
+            json.setOk(true);
+        } catch (Exception e) {
+            e.getStackTrace();
+            json.setOk(false);
+            json.setMessage("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
+            LOG.error("shopId:" + shopId + "，设置重新下载失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
 
 
 

@@ -3349,4 +3349,53 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
     }
 
+    @Override
+    public int checkExistsShopByShopId(String shopId) {
+        Connection conn = DBHelper.getInstance().getConnection5();
+        PreparedStatement stmt = null;
+        String querySql = "select count(0) from shop_url_bak where shop_id = ? ";
+        ResultSet rs = null;
+        int count = 0;
+        try {
+            stmt = conn.prepareStatement(querySql);
+            stmt.setString(1, shopId);
+            rs = stmt.executeQuery();
+            if(rs.next()){
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",checkExistsShopByShopId error: " + e.getMessage());
+            LOG.error("shopId:" + shopId + ",checkExistsShopByShopId error: " + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+            DBHelper.getInstance().closeResultSet(rs);
+        }
+        return count;
+    }
+
+    @Override
+    public int reDownShopGoods(String shopId, int adminId) {
+        Connection conn = DBHelper.getInstance().getConnection5();
+        PreparedStatement stmt = null;
+        String upSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
+                "spider_goods_flag = 0,service_ip='',admin_id = ?,sales_volume_threshold = 0,download_num = 1000  where shop_id = ? ";
+        int count = 0;
+        try {
+            stmt = conn.prepareStatement(upSql);
+            stmt.setInt(1, adminId);
+            stmt.setString(2, shopId);
+            count = stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("shopId:" + shopId + ",reDownShopGoods error: " + e.getMessage());
+            LOG.error("shopId:" + shopId + ",reDownShopGoods error: " + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return count;
+    }
+
 }

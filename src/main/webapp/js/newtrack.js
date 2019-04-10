@@ -764,9 +764,10 @@ function search() {
     var flag="0";
     var remarkUserId="";
     var buyUrl="";
+    var jsonObj="";
     $.post("/cbtconsole/order/getGoodsData",{expresstrackid : expresstrackid},
            function(res){
-            var jsonObj =JSON.parse(res);
+            jsonObj =JSON.parse(res);
             if (res == "[]") {
                 $("#taobaoInfos").html("");
                 $("#div1").html('');
@@ -783,7 +784,7 @@ function search() {
                     str += '<td width="220px"><br><div>商品名称：'
                         + jsonObj[i].itemname
                         + '</div></br><div>';
-                    str += '<div style="float:left;"><a href="'+jsonObj[i].itemurl+'" target="_blank">';
+                    str += '<div style="float:left;"><a href="'+jsonObj[i].imgurl+'" target="_blank">';
                     str += '<img width="300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
                     str += '<div style="float:right;width:280px;">';
                     str += '<p style = "font-size:12px;">商品单价：'
@@ -854,9 +855,8 @@ function search() {
                     if(order_num>1){
                         $("#ydid").append("<span style='color:red;font-size:30px;'>【注意:该包裹对应了多个销售订单】</span>");
                     }
-                    for (var i = 0; i < json.length; i++) {
+                    for (var i = 0; i < jsonObj.length; i++) {
                         userBuyCount= Number(userBuyCount)+Number(json[i].buycount);
-                        img=json[i].goods_img_url;
                         if (preorderid == json[i].orderid) {
                         } else {
                             if(json[i].orderstate=0)
@@ -906,15 +906,17 @@ function search() {
                             + json[i].goods_name
                             + '</span></div><div>';
                         str += '<div style="float:left;"><a href="'+json[i].goods_url+'" target="_blank">';
-                        if(json[i].img){
+                        /*if(json[i].img){
                             if (json[i].img[0].length > 5 && json[i].img != null && json[i].img != "undefined") {
                                 str += '<img width="300px" height="300px" src="'+json[i].img+'"/></a></div>';
                             } else{
                                 str += '<img width= "300px" height="300px" src="'+img+'"/></a></div>';
                             }
                         }else{
-                            str += '<img width= "300px" height="300px" src="'+img+'"/></a></div>';
-                        }
+
+                        }*/
+                        str += '<img width= "300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
+
                         str += '<div style="float:right;width:280px;">';
                         var pt=0;
                         str += '<p id='+"position"+ json[i].odid+'>位置:<font color="red">';
@@ -951,11 +953,12 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                             }
-                            if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
+                            /*if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
                                 str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
                             } else{
                                 str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                            }
+                            }*/
+                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                         } else if (json[i].purchase_state == 2) {
                             if(checked=="0"){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
@@ -989,11 +992,7 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p> ';
                             }
-                            if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                            } else{
-                                str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                            }
+                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                         }
                         else if (json[i].purchase_state == 4) {
                             if(checked=="0"){
@@ -1009,60 +1008,36 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                             }
-                            if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                            } else{
-                                str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                            }
+                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                         }else if (json[i].purchase_state == 5) {
                             if(json[i].goodstatus == 2){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:该货没到"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                                } else{
-                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 3){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:破损"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                                } else{
-                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 4){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:有疑问"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                                } else{
-                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 5){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:数量不够"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                                } else{
-                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                             }
                             else{
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                                } else{
-                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                             }
                         }
                         if(checked=="1"){
@@ -1273,6 +1248,10 @@ function search() {
                         str += '</div>'
                         str += '</div></td></tr></table>';
                         preorderid = json[i].orderid;
+                        //判断数据 是否出现
+                        if(jsonObj.length>json.length){
+                            break;
+                        }
                     }
                     str+='</div>';
                     $("#div").html('');
@@ -1282,6 +1261,7 @@ function search() {
                         $("#sureAllTrack").css("display", "block");
                         $("#canceAllTrack").css("display", "block");
                     }
+
                 }
             });
         //补货

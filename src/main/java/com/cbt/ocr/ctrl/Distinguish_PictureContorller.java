@@ -3,7 +3,10 @@ package com.cbt.ocr.ctrl;
 import com.alibaba.fastjson.JSON;
 import com.cbt.ocr.service.Distinguish_PictureService;
 import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.Admuser;
 import com.cbt.pojo.CustomGoods;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestHandler;
@@ -31,31 +34,38 @@ public class Distinguish_PictureContorller {
 	 * @param request
 	 * @param page
 	 * @param pid
-	 * @param shopid
+	 * @param
 	 * @param isdelete
 	 * @return
 	 */
 	@RequestMapping(value = "FindCustomGoodsInfo")
-	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String  shopid,String  isdelete,String type){
+	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String  isdelete,String type){
+		//获取当前用户
+		String sessionId = request.getSession().getId();
+		String authJson = Redis.hget(sessionId, "userauth");
+		String userJson = Redis.hget(sessionId, "admuser");
+		Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+		System.out.println(user.getAdmName());
 		//初始的判断以及赋值
 		if (StrUtils.isNullOrEmpty(page))
 			page="1";
 		if (StrUtils.isNullOrEmpty(isdelete))
 			isdelete="2";
 		if (StrUtils.isNullOrEmpty(type))
-			type="2";
+			type="0";
 		//标识是属于什么页面 1、修正无中文字页面 2、修正有中文字页面
 		String picturedata=null;
-		if(type.equals("2"))
-		picturedata="修正无中文字页面";
+		if(type.equals("0"))
+		picturedata="未处理页面";
+		else if(type.equals("1"))
+		picturedata="有中文字页面";
 		else
-		picturedata="修正有中文字页面";
+		picturedata="无中文字页面";
 		int pageNO=Integer.parseInt(page);
 		int isdeleteNo=Integer.parseInt(isdelete);
-		int type_=Integer.parseInt(type);
 
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
-		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,shopid,isdeleteNo,pageNO,type_);
+		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,isdeleteNo,pageNO,type);
 
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
@@ -64,9 +74,9 @@ public class Distinguish_PictureContorller {
 		}
 
 		request.setAttribute("pid",pid);
-		request.setAttribute("type",type_);
+		request.setAttribute("username",user.getAdmName());
+		request.setAttribute("type",type);
 		request.setAttribute("picturedata",picturedata);
-		request.setAttribute("shopid",shopid);
 		request.setAttribute("isdeleteNo",isdeleteNo);
 		request.setAttribute("currentPage", pageNO);
 		request.setAttribute("totalpage", totalpage);

@@ -152,7 +152,15 @@ div.margin2 {
 </style>
 
 <script type="text/javascript">
-
+	$(function () {
+		//默认勾选所有数据
+        $("input[class='cbox']").prop('checked',true );//全选
+		//当选择的是线上已删除状态的条件时，禁用所有单选框和下架商品的按钮
+		if($("#isdelete").val()==1){
+		$("input[class='cbox']").prop('checked',false );//反选
+        $("input[class='cbox']").prop('disabled',true );
+		}
+    });
 function fnjump(obj,type){
 	var page=$("#page").val();
 	if(page==""){
@@ -174,16 +182,16 @@ function fnjump(obj,type){
 	
 	$("#page").val(page);
     var pid = $("#pid").val();
-    var shopid = $("#shopid").val();
+    var type = $("#type").val();
     var isdelete = $("#isdelete").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete+"&type="+type;}
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&isdelete="+isdelete+"&type="+type;}
 
 
-function search(type){
+function search(){
 	var pid = $("#pid").val();
-	var shopid = $("#shopid").val();
+	var type = $("#type").val();
 	var isdelete = $("#isdelete").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete+"&type="+type;
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&isdelete="+isdelete+"&type="+type;
 }
 
 
@@ -210,23 +218,21 @@ function  update(ocrneeddelete,id){
 			})
 }
 
-/* 全选  */
-function fnselect(){
-	if($("#checked").prop("checked") == true){
-		$("input[class='cbox']").prop('checked',true );//全选
-		$("#table:not(:first)").each(function(){
-			  if($(this).css("display")=="none"){
-				  $(this).find("input[class='cbox']").prop('checked',false);
-			  }
-		});
-	}else{
-		$("input[class='cbox']").prop('checked',false);//反选
-	} 
-}
-
-
+    function fnselect(){
+        if($("#checked").prop("checked") == true){
+            $("input[class='cbox']").prop('checked',true );//全选
+            $("#table:not(:first)").each(function(){
+                if($(this).css("display")=="none"){
+                    $(this).find("input[class='cbox']").prop('checked',false);
+                }
+            });
+        }else{
+            $("input[class='cbox']").prop('checked',false);//反选
+        }
+    }
 
 function  updateSomes(type){
+   	if(confirm("确定要删除选择的图片？")){
 	var  mainMap ={};
 	var erList= new Array();  
 	var id = "";
@@ -252,14 +258,15 @@ function  updateSomes(type){
 		    data:JSON.stringify(mainMap),
 			success:function(res){
 				if(res==0){
-					$("#tip").html("执行失败  !")
+					$("#tip").html("删除失败  !")
 				}else{
-					$("#tip").html("执行成功 !");
+					$("#tip").html("删除成功 !");
 					window.location.reload();
 				}
 			}
 		})  
 	}
+    }
 }
 </script>
 </head>
@@ -272,36 +279,45 @@ function  updateSomes(type){
 			<div class="main-float">
 				<div class="main-top">
 					<div class="left">
-						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" />
+						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" placeholder="请输入商品id"/>
 					</div>
 					<div class="left left-margin">
-						<span class="wenzi">商铺编号：</span> <input type="text" id="shopid"  value="${shopid }" class="inputText" />
 						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
 					</div>
 				</div>
 				<div class="main-top margin2">
 					
 					<div class="left">
-						 <span class="wenzi">是否删除</span> <select   id="isdelete" class="selectText">
-							<option value=""  <c:if test="${isdeleteNo=='2'}">selected</c:if>></option>
+						 <span class="wenzi">线上状态：</span> <select   id="isdelete" class="selectText">
+							<option value=""  <c:if test="${isdeleteNo=='2'}">selected</c:if>>请选择</option>
 							<option value="0" <c:if test="${isdeleteNo=='0'}">selected</c:if>>未删除</option>
-							<option value="1" <c:if test="${isdeleteNo=='1'}">selected</c:if>>删除</option>
+							<option value="1" <c:if test="${isdeleteNo=='1'}">selected</c:if>>已删除</option>
 						</select>
 					</div>
+				</div>
+
+				<div class="main-top margin2">
+
+					<div class="left">
+						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
+						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
+						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
+						<option value="1" <c:if test="${type==1}">selected</c:if>>含中文字图片（且待线上删除）</option>
+						<option value="2" <c:if test="${type==2}">selected</c:if>>不含中文字图片</option>
+					</select>
+					</div>
 					<div class="left left-margin">
-						<span class="wenzi"  onclick="search(2);"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
+						<input type="hidden" value="${username}" id="user_">
+						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<c:if test="${type==2}">
-						<span class="wenzi"  onclick="search(1)" ><a href="#" style="text-decoration:none"><font color="white">查看无中文图</font></a></span>
-						<span class="wenzi"  onclick=""><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
-						</c:if>
-						<span class="wenzi"  onclick="updateSomes(${type})" ><a href="#" style="text-decoration:none"><font color="white">批量纠正</font></a></span>
+						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">删除图片</font></a></span>
 						<c:if test="${type==1}">
 							<span style="color: red">(点击查询返回修正无中文字页面)</span>
 						</c:if>
-
 					</div>
 				</div>
+
+
 			</div>
 		</div>
 		<div class="left left-margin">
@@ -313,7 +329,7 @@ function  updateSomes(type){
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
 						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;">
-						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;"/>
+						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 					</div>
 				</c:forEach>
 			</table>
