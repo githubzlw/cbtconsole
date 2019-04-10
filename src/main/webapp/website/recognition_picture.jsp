@@ -183,15 +183,13 @@ function fnjump(obj,type){
 	$("#page").val(page);
     var pid = $("#pid").val();
     var type = $("#type").val();
-    var isdelete = $("#isdelete").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&isdelete="+isdelete+"&type="+type;}
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&type="+type;}
 
 
 function search(){
 	var pid = $("#pid").val();
 	var type = $("#type").val();
-	var isdelete = $("#isdelete").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&isdelete="+isdelete+"&type="+type;
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&type="+type;
 }
 
 
@@ -283,19 +281,9 @@ function  updateSomes(type){
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
+						<span style="color:blue">(当前处理人员：${username})</span>
 					</div>
 				</div>
-				<div class="main-top margin2">
-					
-					<div class="left">
-						 <span class="wenzi">线上状态：</span> <select   id="isdelete" class="selectText">
-							<option value=""  <c:if test="${isdeleteNo=='2'}">selected</c:if>>请选择</option>
-							<option value="0" <c:if test="${isdeleteNo=='0'}">selected</c:if>>未删除</option>
-							<option value="1" <c:if test="${isdeleteNo=='1'}">selected</c:if>>已删除</option>
-						</select>
-					</div>
-				</div>
-
 				<div class="main-top margin2">
 
 					<div class="left">
