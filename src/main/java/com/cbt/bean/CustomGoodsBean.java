@@ -141,10 +141,10 @@ public class CustomGoodsBean {
 
     public void setPublishtime(String publishtime) {
         this.updateTimeAll = publishtime;
-        if (publishtime == null || "".equals(publishtime) || publishtime.length() < 10) {
+        if (publishtime == null || "".equals(publishtime) || publishtime.length() < 19) {
             this.publishtime = publishtime;
         } else {
-            this.publishtime = publishtime.substring(0, 10);
+            this.publishtime = publishtime.substring(0, 19);
         }
     }
 
