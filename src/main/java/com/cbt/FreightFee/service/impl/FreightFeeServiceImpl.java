@@ -9,13 +9,14 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Slf4j
 @Service
 public class FreightFeeServiceImpl implements FreightFeeSerive {
 
@@ -399,7 +400,7 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				webClient.setAjaxController(new NicelyResynchronizingAjaxController());// 设置ajax请求
 				webClient.getOptions().setTimeout(10000);
 				webClient.waitForBackgroundJavaScript(3000);
-				final HtmlPage page = webClient.getPage("http://www.cnexps.com/cnexx/13/d.htm");
+				final HtmlPage page = webClient.getPage("http://www.cne.com/cnexx/13/d.htm");
 				final HtmlForm form = page.getFormByName("PriceForm");
 				final HtmlTextInput code = form.getInputByName("cdes");
 				code.setValueAttribute(zone.getChinapostbig());
@@ -479,6 +480,8 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				///webClient.closeAllWindows();
 			}
 		} catch (Exception e) {
+			/*e.printStackTrace();*/
+			log.error("获取预估运费错误,shippingMehtod:{},e.message:{[]}",shippingmethod,e.getMessage());
 			freightFee=0.00;
 		}
 		map.put("freightFee",freightFee);

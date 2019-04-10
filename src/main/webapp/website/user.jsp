@@ -206,10 +206,26 @@ tr .td_class{width:230px;}
 						+ currency, "_blank");
 	}
 	function userlogin(userid, name, currency) {
-		window.open(
-				"http://www.import-express.com/simulateLogin/login?userName="
-						+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
-						+ currency, "_blank");
+		//获取加密信息
+		$.ajax({
+			type:'post',
+			url:'../warehouse/encodeStr',
+			data:{
+				str:userid
+			},
+			success:function(data){
+				if(data != null){
+					userid = data;
+					window.open(s
+							"http://www.import-express.com/simulateLogin/login?userName="
+							+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
+							+ currency, "_blank");
+				}else{
+					alert("加密用户名报错勒！！");
+				}
+			}
+		});
+
 	}
 	function toShopCar(userid, name, currency) {
 		window.open(
@@ -562,7 +578,7 @@ tr .td_class{width:230px;}
 		style="width: 1800px; height: 900px">
 		<thead>
 			<tr>
-				<th data-options="field:'userid',width:80,align:'center',formatter:formatterUserid">用户ID</th>
+				<th data-options="field:'userid',width:80,align:'c/getUserInfo.doenter',formatter:formatterUserid">用户ID</th>
 				<th data-options="field:'businessName',width:50,align:'center'">business name</th>
 				<th data-options="field:'email',width:80,align:'center'">注册邮箱</th>
 				<th data-options="field:'creattime',width:80,align:'center'">创建时间</th>

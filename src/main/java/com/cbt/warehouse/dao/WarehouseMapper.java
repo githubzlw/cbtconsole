@@ -8,10 +8,11 @@ import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.website.bean.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
-
+@Repository
 public interface WarehouseMapper {
 	public outIdBean findOutId(@Param("uid") Integer uid);
 	public OrderAddress getAddressByOrderID(@Param("orderNo") String orderNo);
