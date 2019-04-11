@@ -116,7 +116,7 @@ public class UserLoginController {
             try {
                 admuserList = admuserDao.queryForList();
             } catch (Exception e) {
-
+                LOG.error("admuserDao.queryForList()：", e);
             }
         }
         for (Admuser admuser : admuserList) {

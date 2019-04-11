@@ -216,7 +216,7 @@ tr .td_class{width:230px;}
 			success:function(data){
 				if(data != null){
 					userid = data;
-					window.open(s
+					window.open(
 							"http://www.import-express.com/simulateLogin/login?userName="
 							+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
 							+ currency, "_blank");
