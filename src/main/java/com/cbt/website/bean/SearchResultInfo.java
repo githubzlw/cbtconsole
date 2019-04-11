@@ -64,6 +64,7 @@ public class SearchResultInfo {
 	private String evaluation;
 	private int order_num;//1688包裹对应的销售订单数量
 	private String isExitPhone;
+	private String source1688_img;
 	public String getValid() {
 		return valid;
 	}
@@ -344,6 +345,7 @@ public class SearchResultInfo {
 	public void setImgList(List<SearchTaobaoInfo> imgList) {
 		this.imgList = imgList;
 	}
+
 	/**
 	 * @return 入库商品状态1.到货了;2.该到没到;3.破损;4.有疑问;5.数量不够
 	 */
@@ -417,12 +419,17 @@ public class SearchResultInfo {
 				+ ", usecount=" + usecount + ", buycount=" + buycount
 				+ ", ordercount=" + ordercount + ", orderbuycount="
 				+ orderbuycount + ", strcar_type=" + strcar_type + ", remark="
-				+ remark + ", imgList=" + imgList + "]";
+				+ remark + ", imgList=" + imgList + ", source1688_img=" + source1688_img + "]";
 	}
 
 
+	public String getSource_img() {
+		return source1688_img;
+	}
 
-
+	public void setSource_img(String source_img) {
+		this.source1688_img = source_img;
+	}
 }
 
 
