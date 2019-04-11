@@ -245,6 +245,8 @@ public class UserLoginController {
                 return json;
             }
             json = userService.resetPwd(admName, oldPwd, newPwd);
+            //修改完密码从新获取用户list
+            admuserList = admuserDao.queryForList();
         } catch (Exception e) {
             json.setOk(false);
             json.setMessage("密码修改失败，原因:" + e.getMessage());
