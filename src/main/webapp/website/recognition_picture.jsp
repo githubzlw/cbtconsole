@@ -41,6 +41,28 @@
 	border: 2px solid aquamarine;
 }
 
+.div img{
+
+	width: 100%;
+
+	height: 100%;
+
+	cursor: pointer;
+
+	transition: all 0.6s;
+
+	-ms-transition: all 0.8s;
+
+}
+
+.div img:hover{
+
+	transform: scale(1.8);
+
+	-ms-transform: scale(1.8);
+
+}
+
 
 html, body {
 	height: 100%;
@@ -258,7 +280,7 @@ function  updateSomes(type){
 				if(res==0){
 					$("#tip").html("删除失败  !")
 				}else{
-					$("#tip").html("删除成功 !");
+					$("#tip").html("已到待删除列成功 !");
 					window.location.reload();
 				}
 			}
@@ -291,7 +313,6 @@ function  updateSomes(type){
 						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
 						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
 						<option value="1" <c:if test="${type==1}">selected</c:if>>含中文字图片（且待线上删除）</option>
-						<option value="2" <c:if test="${type==2}">selected</c:if>>不含中文字图片</option>
 					</select>
 					</div>
 					<div class="left left-margin">
@@ -316,7 +337,7 @@ function  updateSomes(type){
 			<table class="table">
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;">
+						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }">
 						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 					</div>
 				</c:forEach>

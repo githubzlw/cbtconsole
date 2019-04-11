@@ -51,16 +51,17 @@ public class Distinguish_PictureContorller {
 			type="0";
 		//标识是属于什么页面 1、修正无中文字页面 2、修正有中文字页面
 		String picturedata=null;
-		if(type.equals("0"))
-		picturedata="未处理页面";
-		else if(type.equals("1"))
-		picturedata="有中文字页面";
-		else
-		picturedata="无中文字页面";
+		if(type.equals("0")){
+			picturedata="未处理页面";
+		}else if(type.equals("1")) {
+			picturedata = "有中文字页面";
+		}else {
+			picturedata = "无中文字页面";
+		}
 		int pageNO=Integer.parseInt(page);
-
+		int type_=Integer.parseInt(type);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
-		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,type);
+		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,type_);
 
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
@@ -69,7 +70,6 @@ public class Distinguish_PictureContorller {
 		}
 
 		request.setAttribute("pid",pid);
-		request.setAttribute("username",user.getAdmName());
 		request.setAttribute("username",user.getAdmName());
 		request.setAttribute("type",type);
 		request.setAttribute("picturedata",picturedata);
@@ -88,9 +88,9 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type){
+	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type,String userName){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type);
+		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type,userName);
 		String  json = JSON.toJSONString(ret);
 		return   json ;
 	}

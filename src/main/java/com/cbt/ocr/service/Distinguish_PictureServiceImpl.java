@@ -16,7 +16,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	public Distinguish_PictureDao distinguish_PictureDao;
 
 	@Override
-	public List<CustomGoods> showDistinguish_Pircture(String pid,int page,String type) {
+	public List<CustomGoods> showDistinguish_Pircture(String pid,int page,int type) {
 		page=(page-1)*40;
 		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,page,type);
 		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,type);
@@ -32,16 +32,17 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public int queryDistinguish_PirctureCount(String pid, String type) {
+	public int queryDistinguish_PirctureCount(String pid, int type) {
 		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,type);
 	}
 	@Override
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type) {
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName) {
 		int data;
-		if(type==2)
-			data=distinguish_PictureDao.updateSomePirctu_risdelete(bgList);
-		else
-			data=distinguish_PictureDao.updateSomePirctu_risdelete_tow(bgList);
+		if(type==0) {
+			data = distinguish_PictureDao.updateSomePirctu_risdelete(bgList,userName);
+		}else {
+			data = distinguish_PictureDao.updateSomePirctu_risdelete_tow(bgList,userName);
+		}
 		return data;
 	}
 }
