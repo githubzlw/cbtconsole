@@ -159,6 +159,9 @@ public class FreightFeeController {
 				}
 				String weight = map.get("sweight").toString();
 				String volumn = map.get("volumeweight") == null || map.get("volumeweight").toString() == "null" ? "0" : map.get("volumeweight").toString();
+				if("NaN".equals(volumn)){
+					volumn="0";
+				}
 				String svolumn = map.get("svolume").toString();//体积
 				Object countIds = map.get("country");
 				String countId = countIds.toString();
