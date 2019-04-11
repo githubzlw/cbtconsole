@@ -507,19 +507,6 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
 				searchresultinfo.setOrderremark(orderremark);
 				info.add(searchresultinfo);
-				System.out.println("第一次Goods_img_url");
-				for (int i=0;i<info.size();i++){
-					System.out.println(info.get(i).getGoods_img_url());
-				}
-				System.out.println("getImg");
-				for (int i=0;i<info.size();i++){
-					System.out.println(info.get(i).getImg());
-				}
-				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
-				System.out.println("第二次Goods_img_url");
-				for (int i=0;i<info.size();i++){
-					System.out.println(info.get(i).getGoods_img_url());
-				}
 			}
 			//一个1688包裹对应的采购订单数量
 			if(info.size()>0){

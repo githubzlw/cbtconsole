@@ -2,6 +2,7 @@ package com.cbt.FreightFee.service.impl;
 
 import com.cbt.FreightFee.dao.FreightFeeMapper;
 import com.cbt.FreightFee.service.FreightFeeSerive;
+import com.cbt.warehouse.ctrl.WarehouseCtrl;
 import com.cbt.warehouse.pojo.TransitPricecost;
 import com.cbt.warehouse.pojo.ZoneBean;
 import com.cbt.warehouse.util.StringUtil;
@@ -397,30 +398,31 @@ public class FreightFeeServiceImpl implements FreightFeeSerive {
 				final WebClient webClient = new WebClient(BrowserVersion.CHROME);
 				webClient.getOptions().setCssEnabled(true);// 设置css是否生效
 				webClient.getOptions().setJavaScriptEnabled(true);// 设置js是否生效
-				webClient.setAjaxController(new NicelyResynchronizingAjaxController());// 设置ajax请求
-				webClient.getOptions().setTimeout(10000);
-				webClient.waitForBackgroundJavaScript(3000);
-				final HtmlPage page = webClient.getPage("http://www.cne.com/cnexx/13/d.htm");
+//				webClient.setAjaxController(new NicelyResynchronizingAjaxController());// 设置ajax请求
+//				webClient.getOptions().setTimeout(10000);
+//				webClient.waitForBackgroundJavaScript(3000);
+//				final HtmlPage page = webClient.getPage("http://www.cnexps.com/cnexx/13/d.htm");
+                final HtmlPage page = webClient.getPage(WarehouseCtrl.LOCALHOST + "/website/cne_from.html");
 				final HtmlForm form = page.getFormByName("PriceForm");
 				final HtmlTextInput code = form.getInputByName("cdes");
 				code.setValueAttribute(zone.getChinapostbig());
 				final HtmlTextInput fw = form.getInputByName("fweight");
 				fw.setValueAttribute(String.valueOf(fweight));
-				if (volume.indexOf("*") > -1) {
-					String[] vos = volume.split("\\*");
-					for (int i = 0; i < vos.length; i++) {
-						if (i == 0) {
-							final HtmlTextInput il = form.getInputByName("il");
-							il.setValueAttribute(String.valueOf(vos[0]));
-						} else if (i == 1) {
-							final HtmlTextInput iw = form.getInputByName("iw");
-							iw.setValueAttribute(String.valueOf(vos[1]));
-						} else if (i == 2) {
-							final HtmlTextInput ih = form.getInputByName("ih");
-							ih.setValueAttribute(String.valueOf(vos[2]));
-						}
-					}
-				}
+//				if (volume.indexOf("*") > -1) {
+//					String[] vos = volume.split("\\*");
+//					for (int i = 0; i < vos.length; i++) {
+//						if (i == 0) {
+//							final HtmlTextInput il = form.getInputByName("il");
+//							il.setValueAttribute(String.valueOf(vos[0]));
+//						} else if (i == 1) {
+//							final HtmlTextInput iw = form.getInputByName("iw");
+//							iw.setValueAttribute(String.valueOf(vos[1]));
+//						} else if (i == 2) {
+//							final HtmlTextInput ih = form.getInputByName("ih");
+//							ih.setValueAttribute(String.valueOf(vos[2]));
+//						}
+//					}
+//				}
 				HtmlButton btnSubmit = null;
 				HtmlPage new_page = null;
 				DomNodeList<DomElement> domElements = page

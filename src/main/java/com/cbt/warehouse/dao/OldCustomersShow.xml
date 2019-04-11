@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.warehouse.dao.OldCustomShowMapper" >
+    <resultMap id="BaseResultMap" type="com.cbt.warehouse.pojo.OldCustom" >
+         <result column="user_id" property="userId"  />
+        <result column="delivered_time" property="deliveredTime"  />
+        <result column="order_no" property="orderNo"  />
+        <result column="username" property="userName" />
+        <result column="createdate" property="createDate"  />
+        <result column="useremail" property="userEmail"  />
+        <result column="admName" property="admiName" />
+        <result column="senddate" property="senddate"/>
+    </resultMap>
+   
+	<select id="FindOldCustoms" resultType="com.cbt.warehouse.pojo.OldCustom" >
+		SELECT user_id as userId,order_no,delivered_time as deliveredTime,username,createdate,useremail,admName as admiName,senddate FROM(SELECT o.user_id, o.order_no,o.delivered_time,us.username,us.createdate,us.useremail,us.admName,us.adminid FROM(SELECT * FROM(SELECT create_time AS delivered_time,user_id,order_no FROM orderinfo c WHERE NOT EXISTS
+(SELECT create_time,user_id,order_no FROM orderinfo f WHERE f.user_id= c.user_id AND f.create_time>c.create_time And state not in(0,-1,6,7) ) 
+  GROUP BY user_id )h)o
+INNER JOIN admin_r_user us on o.user_id=us.userid )s 
+LEFT JOIN (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 ORDER BY senddate DESC)f GROUP BY cid) y 
+ON s.user_id=y.cid  where 1=1  
+       <if test="admName != null">
+			 AND admName=#{admName} 
+	</if>
+	<if test="staTime != null">
+			 AND delivered_time&gt;#{staTime} 
+	</if>
+	
+	 <if test="enTime != null">
+			 AND delivered_time &lt;#{enTime} 
+	</if>
+	<if test="email != null">
+			 AND useremail like CONCAT('%','${email}','%' )
+	</if>
+	<if test="id != null">
+			 AND user_id like CONCAT('%','${id}','%' )
+	</if>
+	<if test="cuName != null">
+			 AND username like CONCAT('%','${cuName}','%' )
+	</if> 
+		ORDER BY delivered_time DESC limit #{page},#{pagesize}
+	</select>
+	<select id="getOldCustomCount" resultType="java.lang.Integer" >
+	SELECT count(1) FROM(SELECT o.user_id, o.order_no,o.delivered_time,us.username,us.createdate,us.useremail,us.admName,us.adminid FROM(SELECT * FROM(SELECT create_time AS delivered_time,user_id,order_no FROM orderinfo c WHERE NOT EXISTS
+(SELECT create_time,user_id,order_no FROM orderinfo f WHERE f.user_id= c.user_id AND f.create_time>c.create_time AND state not in(0,-1,6,7)) 
+ GROUP BY user_id )h)o
+INNER JOIN admin_r_user us on o.user_id=us.userid )s 
+LEFT JOIN (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 ORDER BY senddate DESC)f GROUP BY cid) y 
+ON s.user_id=y.cid  where 1=1 
+      <if test="admName != null">
+			 AND admName=#{admName} 
+	</if>
+	<if test="staTime != null">
+			 AND delivered_time&gt;#{staTime} 
+	</if>
+	
+	 <if test="enTime != null">
+			 AND delivered_time &lt;#{enTime} 
+	</if>
+	<if test="email != null">
+			 AND useremail like CONCAT('%','${email}','%' )
+	</if>
+	<if test="id != null">
+			 AND user_id like CONCAT('%','${id}','%' )
+	</if>
+	<if test="cuName != null">
+			 AND username like CONCAT('%','${cuName}','%' )
+	</if> 
+	</select>
+	
+	
+	<select id="getOrderCount" resultType="java.lang.Integer" >
+	SELECT COUNT(1) from orderinfo WHERE user_id=#{usid} AND state not in(0,-1,6,7)
+	<if test="order != null">
+			 AND order_no like CONCAT('%','${order}','%' )
+	</if> 
+	</select>
+	
+	<select id="FindOrderByUsid" resultType="com.cbt.bean.Orderinfo" >
+	SELECT order_no as orderNo,user_id,product_cost as productCost,pay_price as payPrice,create_time as createTime,orderpaytime from orderinfo WHERE user_id=#{usid} AND state not in(0,-1,6,7)
+	<if test="order != null">
+			 AND order_no like CONCAT('%','${order}','%' )
+	</if> 
+	limit #{start},#{pagesize}
+	</select>
+</mapper>

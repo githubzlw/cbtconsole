@@ -1001,7 +1001,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
     }
 
     @Override
-    public boolean updateStateList(int state, String pids, int adminid) {
+    public boolean updateStateList(int state, String pids, int adminid, String reason) {
         Connection conn = DBHelper.getInstance().getConnection();
         // Connection remoteConn = DBHelper.getInstance().getConnection2();
         Connection conn28 = DBHelper.getInstance().getConnection8();
@@ -1013,7 +1013,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         if (state == 4) {
             upSql += ",a.publish_time=now()";
         }else if(state == 2){
-            upSql += ",a.off_time=now()";
+            upSql += ",a.off_time=now(),a.off_reason=?,b.unsellableReason = 6";
         }
         upSql += " where a.pid = b.pid and b.pid =? ";
         // String upRemoteSql = "update custom_benchmark_ready set valid=?,goodsstate=?,cur_time = NOW() where pid = ?";
@@ -1044,7 +1044,12 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                     stmt.setInt(1, state == 4 ? 1 : 0);
                     stmt.setInt(2, state);
                     stmt.setInt(3, adminid);
-                    stmt.setString(4, pid);
+                    if(state == 2){
+                        stmt.setString(4, reason);
+                        stmt.setString(5, pid);
+                    }else{
+                        stmt.setString(4, pid);
+                    }
                     stmt.addBatch();
 
                     stmt28.setInt(1, state == 4 ? 1 : 0);
@@ -2197,6 +2202,66 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
                 //rs = 0;
                 stmt28 = conn28.prepareStatement(up28Sql);
                 stmt28.setInt(1, type == 1 ? 1 : 0);
+                stmt28.setInt(2, type == 1 ? 4 : 2);
+                stmt28.setInt(3, reason);
+                stmt28.setInt(4, (reason > 0 || type == 1) ? 0 : 2);
+                stmt28.setString(5, pid);
+                //rs = stmt28.executeUpdate();
+                stmt28.executeUpdate();
+            } else {
+                conn.rollback();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + " setGoodsValid error :" + e.getMessage());
+            LOG.error("pid:" + pid + " setGoodsValid error :" + e.getMessage());
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            DBHelper.getInstance().closeConnection(conn);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return rs;
+    }
+
+    @Override
+    public int setGoodsValid2(String pid, String adminName, int adminId, int type, int reason,String remark) {
+
+        Connection conn = DBHelper.getInstance().getConnection();
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        String upSql = "update custom_goods_edit a,custom_benchmark_ready b " +
+                "set b.valid=?,b.goodsstate=?,b.unsellableReason = ?,a.admin_id=?,a.update_count=a.update_count + 1 ";
+        if (type == 1) {
+            upSql += ",a.publish_time=sysdate()";
+        } else {
+            upSql += ",a.off_time=sysdate(),a.off_reason=?";
+        }
+        upSql += "  where a.pid = b.pid and b.pid = ? ";
+        PreparedStatement stmt = null;
+        PreparedStatement stmt28 = null;
+        String up28Sql = "update custom_benchmark_ready_newest set valid=?,goodsstate=?,unsellableReason = ?,flag=? where pid = ?";
+        int rs = 0;
+        try {
+            conn.setAutoCommit(false);
+            rs = 0;
+            stmt = conn.prepareStatement(upSql);
+            int count27 = 1;
+            // type为-1 下架该商品 1 检查通过
+            stmt.setInt(count27++, type == 1 ? 1 : 2);
+            stmt.setInt(count27++, type == 1 ? 4 : 2);
+            stmt.setInt(count27++, reason);
+            stmt.setInt(count27++, adminId);
+            if (type < 1) {
+                stmt.setString(count27++, remark);
+            }
+            stmt.setString(count27++, pid);
+
+            rs = stmt.executeUpdate();
+            if (rs > 0) {
+                conn.commit();
+                //rs = 0;
+                stmt28 = conn28.prepareStatement(up28Sql);
+                stmt28.setInt(1, type == 1 ? 1 : 2);
                 stmt28.setInt(2, type == 1 ? 4 : 2);
                 stmt28.setInt(3, reason);
                 stmt28.setInt(4, (reason > 0 || type == 1) ? 0 : 2);

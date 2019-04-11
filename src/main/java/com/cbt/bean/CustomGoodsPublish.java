@@ -116,8 +116,26 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String crawlAliPrice; // 抓取ali价格
     private String crawlAliDate; // 抓取ali价格时间
+    private String entypeNew ;//新的尺码表
+    private String categoryName ;//产品名称太短增加类别名称
 
-    public String getCrawlAliPrice() {
+    public String getEntypeNew() {
+		return entypeNew;
+	}
+
+	public void setEntypeNew(String entypeNew) {
+		this.entypeNew = entypeNew;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+
+	public String getCrawlAliPrice() {
         return crawlAliPrice;
     }
 

@@ -152,8 +152,16 @@ div.margin2 {
 </style>
 
 <script type="text/javascript">
-
-function fnjump(obj){
+	$(function () {
+		//默认勾选所有数据
+        $("input[class='cbox']").prop('checked',true );//全选
+		//当选择的是线上已删除状态的条件时，禁用所有单选框和下架商品的按钮
+		if($("#isdelete").val()==1){
+		$("input[class='cbox']").prop('checked',false );//反选
+        $("input[class='cbox']").prop('disabled',true );
+		}
+    });
+function fnjump(obj,type){
 	var page=$("#page").val();
 	if(page==""){
 		page = "1";
@@ -174,18 +182,17 @@ function fnjump(obj){
 	
 	$("#page").val(page);
     var pid = $("#pid").val();
-    var shopid = $("#shopid").val();
+    var type = $("#type").val();
     var isdelete = $("#isdelete").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete;}
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&isdelete="+isdelete+"&type="+type;}
 
 
 function search(){
 	var pid = $("#pid").val();
-	var shopid = $("#shopid").val();
+	var type = $("#type").val();
 	var isdelete = $("#isdelete").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&shopid="+shopid+"&isdelete="+isdelete;
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&isdelete="+isdelete+"&type="+type;
 }
-
 
 
 function  reset(){
@@ -211,23 +218,21 @@ function  update(ocrneeddelete,id){
 			})
 }
 
-/* 全选  */
-function fnselect(){
-	if($("#checked").prop("checked") == true){
-		$("input[class='cbox']").prop('checked',true );//全选
-		$("#table:not(:first)").each(function(){
-			  if($(this).css("display")=="none"){
-				  $(this).find("input[class='cbox']").prop('checked',false);
-			  }
-		});
-	}else{
-		$("input[class='cbox']").prop('checked',false);//反选
-	} 
-}
+    function fnselect(){
+        if($("#checked").prop("checked") == true){
+            $("input[class='cbox']").prop('checked',true );//全选
+            $("#table:not(:first)").each(function(){
+                if($(this).css("display")=="none"){
+                    $(this).find("input[class='cbox']").prop('checked',false);
+                }
+            });
+        }else{
+            $("input[class='cbox']").prop('checked',false);//反选
+        }
+    }
 
-
-
-function  updateSomes(){
+function  updateSomes(type){
+   	if(confirm("确定要删除选择的图片？")){
 	var  mainMap ={};
 	var erList= new Array();  
 	var id = "";
@@ -247,25 +252,26 @@ function  updateSomes(){
 		console.log(mainMap);            
 	 	$.ajax({
 			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete",
+			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type,
 			dataType:"json",
 			contentType : 'application/json;charset=utf-8', 
 		    data:JSON.stringify(mainMap),
 			success:function(res){
 				if(res==0){
-					$("#tip").html("执行失败  !")
+					$("#tip").html("删除失败  !")
 				}else{
-					$("#tip").html("执行成功 !");
+					$("#tip").html("删除成功 !");
 					window.location.reload();
 				}
 			}
 		})  
 	}
+    }
 }
 </script>
 </head>
 <body>
-<h1 align="center"><b>取消OCR识别错误图片</b></h1>
+<h1 align="center"><b>取消OCR识别错误图片<span style="color: red">《${picturedata}》</span></b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
 	<div class="main">
 		<div class="main-head"></div>
@@ -273,27 +279,45 @@ function  updateSomes(){
 			<div class="main-float">
 				<div class="main-top">
 					<div class="left">
-						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" />
+						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" placeholder="请输入商品id"/>
 					</div>
 					<div class="left left-margin">
-						<span class="wenzi">商铺编号：</span> <input type="text" id="shopid"  value="${shopid }" class="inputText" />
 						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
 					</div>
 				</div>
 				<div class="main-top margin2">
 					
 					<div class="left">
-						 <span class="wenzi">是否删除</span> <select   id="isdelete" class="selectText">
-							<option value=""  <c:if test="${isdeleteNo=='2'}">selected</c:if>></option>
+						 <span class="wenzi">线上状态：</span> <select   id="isdelete" class="selectText">
+							<option value=""  <c:if test="${isdeleteNo=='2'}">selected</c:if>>请选择</option>
 							<option value="0" <c:if test="${isdeleteNo=='0'}">selected</c:if>>未删除</option>
-							<option value="1" <c:if test="${isdeleteNo=='1'}">selected</c:if>>删除</option>
+							<option value="1" <c:if test="${isdeleteNo=='1'}">selected</c:if>>已删除</option>
 						</select>
 					</div>
+				</div>
+
+				<div class="main-top margin2">
+
+					<div class="left">
+						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
+						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
+						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
+						<option value="1" <c:if test="${type==1}">selected</c:if>>含中文字图片（且待线上删除）</option>
+						<option value="2" <c:if test="${type==2}">selected</c:if>>不含中文字图片</option>
+					</select>
+					</div>
 					<div class="left left-margin">
-						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span> <span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<br/><span class="wenzi"  onclick="updateSomes()" ><a href="#" style="text-decoration:none"><font color="white">批量纠正</font></a></span>
+						<input type="hidden" value="${username}" id="user_">
+						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
+						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
+						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">删除图片</font></a></span>
+						<c:if test="${type==1}">
+							<span style="color: red">(点击查询返回修正无中文字页面)</span>
+						</c:if>
 					</div>
 				</div>
+
+
 			</div>
 		</div>
 		<div class="left left-margin">
@@ -302,50 +326,11 @@ function  updateSomes(){
 		</div>
 		<div class="main-table">
 			<table class="table">
-				<%--<tr>
-				<th><label><input type="checkbox" class="checkbox-all"   id="checked" onclick="fnselect()">全选</label></th>
-				&lt;%&ndash;<th>序号</th>
-                <th>商品编号</th>
-                <th>商铺编号</th>
-                <th>本地图片地址</th>
-                <th>商品照片</th>
-                <th>商品标识码</th>
-                <th>图片扫描时间</th>
-                <th>线上状态</th>
-                <th>是否线上删除</th>&ndash;%&gt;
-			</tr>--%>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:200px; height:200px;">
-						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;"/>
+						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;">
+						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 					</div>
-<%--				 <tr>
-					<td><input type="checkbox"   name="cbox"  class="id"  value="${customGoodsList.id }"/></td>
-					 <td>${status.index+1 }</td>
-					 <td>${customGoodsList.pid }</td>
-					<td>${customGoodsList.shopid }</td>
-					<td>${customGoodsList.localpath }</td>
-					 <td ><img src="${customGoodsList.remotepath }" id="Img1"></img></td>
-					 <td>${customGoodsList.goodsmd5 }</td>
-					 <td>${customGoodsList.createtime }</td>
-					<td>
-					 <c:if test="${customGoodsList.isdelete==0 }">
-					   <span><font color="red">未删除</font></span>
-					 </c:if>
-					  <c:if test="${customGoodsList.isdelete==1 }">
-					   <span>已删除</span>
-						</c:if>
-					</td>
-					<td name="ocrneeddelete">&lt;%&ndash;update()&ndash;%&gt;
-						<c:if test="${customGoodsList.ocrneeddelete==2 || customGoodsList.ocrneeddelete==0}">
-						<a href="#" class="a-link" onclick="update(${customGoodsList.ocrneeddelete},${customGoodsList.id })">标记为待删除</a>
-						</c:if>
-					 <c:if test="${customGoodsList.ocrneeddelete==1 }">
-					 <span>已标记为待删除</span><br/><a href="#" onclick="update(${customGoodsList.ocrneeddelete},${customGoodsList.id })"
-											 class="a-link">取消待删除</a>
-					</td>
-					 </c:if>
-				</tr>--%>
 				</c:forEach>
 			</table>
 		</div>
@@ -356,11 +341,11 @@ function  updateSomes(){
 		
 		总共:&nbsp;&nbsp;<span id="pagetotal">${currentPage}<em>/</em> ${totalpage}</span>
 		页&nbsp;&nbsp;
-		<input type="button" value="上一页" onclick="fnjump(-1)" class="btn">
-		<input type="button" value="下一页" onclick="fnjump(1)" class="btn">
+		<input type="button" value="上一页" onclick="fnjump(-1,${type})" class="btn">
+		<input type="button" value="下一页" onclick="fnjump(1,${type})" class="btn">
 		
 		第<input id="page" type="text" value="${currentPage}" style="height: 26px;">
-		<input type="button" value="查询" onclick="fnjump(0)" class="btn">
+		<input type="button" value="查询" onclick="fnjump(0,${type})" class="btn">
 		</div>
 	</div>
 </body>
