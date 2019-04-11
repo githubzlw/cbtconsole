@@ -299,10 +299,9 @@ public class ShopUrlController {
         if (StringUtils.isBlank(shopId) && urlType.equals("0")) {
             shopId = shopUrl.substring(8, shopUrl.indexOf(".1688.com/"));
             shopUrl = shopUrl.substring(0, shopUrl.indexOf(".1688.com/") + 10);
-        } else {
-            // shopId = typeShopUrls[0].substring(8, typeShopUrls[0].indexOf(".1688.com/"));
+        } else if (StringUtils.isBlank(shopId) && urlType.equals("1")) {
+            shopId = typeShopUrls[0].substring(8, typeShopUrls[0].indexOf(".1688.com/"));
         }
-
 
         boolean isBlack = shopUrlService.checkIsBlackShopByShopId(shopId);
         if(isBlack){

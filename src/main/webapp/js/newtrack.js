@@ -784,7 +784,7 @@ function search() {
                     str += '<td width="220px"><br><div>商品名称：'
                         + jsonObj[i].itemname
                         + '</div></br><div>';
-                    str += '<div style="float:left;"><a href="'+jsonObj[i].imgurl+'" target="_blank">';
+                    str += '<div style="float:left;"><a href="'+jsonObj[i].itemurl+'" target="_blank">';
                     str += '<img width="300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
                     str += '<div style="float:right;width:280px;">';
                     str += '<p style = "font-size:12px;">商品单价：'
@@ -912,8 +912,6 @@ function search() {
                             } else{
                                 str += '<img width= "300px" height="300px" src="'+img+'"/></a></div>';
                             }
-                        }else{
-
                         }*/
                         str += '<img width= "300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
 
@@ -953,6 +951,7 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                             }
+                            //临时更改，后期可能需要重新处理
                             /*if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
                                 str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
                             } else{
@@ -973,11 +972,7 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p> ';
                             }
-                            if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
-                                str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
-                            } else{
-                                str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                            }
+                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
                         } else if (json[i].purchase_state == 3) {
                             if(checked=="0"){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
