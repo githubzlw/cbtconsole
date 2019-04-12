@@ -784,7 +784,7 @@ function search() {
                     str += '<td width="220px"><br><div>商品名称：'
                         + jsonObj[i].itemname
                         + '</div></br><div>';
-                    str += '<div style="float:left;"><a href="'+jsonObj[i].imgurl+'" target="_blank">';
+                    str += '<div style="float:left;"><a href="'+jsonObj[i].itemurl+'" target="_blank">';
                     str += '<img width="300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
                     str += '<div style="float:right;width:280px;">';
                     str += '<p style = "font-size:12px;">商品单价：'
