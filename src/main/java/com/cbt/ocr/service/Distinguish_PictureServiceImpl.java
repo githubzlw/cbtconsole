@@ -37,12 +37,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 	@Override
 	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName) {
-		int data;
-		if(type==0) {
-			data = distinguish_PictureDao.updateSomePirctu_risdelete(bgList,userName);
-		}else {
-			data = distinguish_PictureDao.updateSomePirctu_risdelete_tow(bgList,userName);
-		}
-		return data;
+
+		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,type,userName);
 	}
 }

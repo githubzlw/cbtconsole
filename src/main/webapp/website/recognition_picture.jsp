@@ -57,9 +57,9 @@
 
 .div img:hover{
 
-	transform: scale(1.8);
+	transform: scale(2.2);
 
-	-ms-transform: scale(1.8);
+	-ms-transform: scale(2.2);
 
 }
 
@@ -182,6 +182,9 @@ div.margin2 {
 		$("input[class='cbox']").prop('checked',false );//反选
         $("input[class='cbox']").prop('disabled',true );
 		}
+
+		//给分类类别赋值
+
     });
 function fnjump(obj,type){
 	var page=$("#page").val();
@@ -269,10 +272,11 @@ function  updateSomes(type){
 		alert("请至少选择一个！");
 	}else{
 		mainMap['bgList'] = erList;
-		console.log(mainMap);            
+		console.log(mainMap);
+        var userName=$("#userName").val();
 	 	$.ajax({
 			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type,
+			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type+"&userName="+userName,
 			dataType:"json",
 			contentType : 'application/json;charset=utf-8', 
 		    data:JSON.stringify(mainMap),
@@ -303,7 +307,7 @@ function  updateSomes(type){
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
-						<span style="color:blue">(当前处理人员：${username})</span>
+						<span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span>
 					</div>
 				</div>
 				<div class="main-top margin2">
@@ -312,15 +316,18 @@ function  updateSomes(type){
 						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
 						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
 						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
-						<option value="1" <c:if test="${type==1}">selected</c:if>>含中文字图片（且待线上删除）</option>
+						<option value="1" <c:if test="${type==1}">selected</c:if>>已处理(且待线上删除)</option>
 					</select>
 					</div>
 					<div class="left left-margin">
 						<input type="hidden" value="${username}" id="user_">
 						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">删除图片</font></a></span>
-						<c:if test="${type==1}">
+						<c:if test="${type==0}">
+							<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">逻辑删除</font></a></span>
+						</c:if>
+						<%--<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">一键删除线上图片</font></a></span>
+						--%><c:if test="${type==1}">
 							<span style="color: red">(点击查询返回修正无中文字页面)</span>
 						</c:if>
 					</div>

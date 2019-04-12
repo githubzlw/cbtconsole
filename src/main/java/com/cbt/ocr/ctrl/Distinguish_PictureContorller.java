@@ -54,9 +54,7 @@ public class Distinguish_PictureContorller {
 		if(type.equals("0")){
 			picturedata="未处理页面";
 		}else if(type.equals("1")) {
-			picturedata = "有中文字页面";
-		}else {
-			picturedata = "无中文字页面";
+			picturedata = "已处理页面(待删除）";
 		}
 		int pageNO=Integer.parseInt(page);
 		int type_=Integer.parseInt(type);
@@ -89,6 +87,14 @@ public class Distinguish_PictureContorller {
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
 	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type,String userName){
+		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
+		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type,userName);
+		String  json = JSON.toJSONString(ret);
+		return   json ;
+	}
+	@RequestMapping(value = "FindCategory")
+	@ResponseBody
+	public String FindCategory(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type,String userName){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
 		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type,userName);
 		String  json = JSON.toJSONString(ret);

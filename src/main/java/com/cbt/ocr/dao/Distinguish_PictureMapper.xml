@@ -48,13 +48,14 @@
     </select>
 
     <update id="updateSomePirctu_risdelete">
-        update custom_goods_md5  SET  ocr_need_date=1,user_operation=#{userName} where
-        <foreach collection="bgList" separator="or" item="i" index="index">
-            id = ${i.id}
-        </foreach>
-    </update>
-    <update id="updateSomePirctu_risdelete_tow">
-        update custom_goods_md5  SET  ocr_need_date=0 where
+        update custom_goods_md5  SET
+        <if test="type==0">
+            ocr_need_date=1,
+        </if>
+        <if test="type==1">
+            ocr_need_date=0,
+        </if>
+        user_operation=#{userName} where
         <foreach collection="bgList" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
