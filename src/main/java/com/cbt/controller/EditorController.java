@@ -125,15 +125,15 @@ public class EditorController {
         }
 
         // 根据shopid查询店铺数据
-        int queryId = 0;
+        /*int queryId = 0;
         if (!(goods.getShopId() == null || "".equals(goods.getShopId()))) {
             ShopManagerPojo spmg = customGoodsService.queryByShopId(goods.getShopId());
             if (spmg != null) {
                 queryId = spmg.getId();
             }
-        }
+        }*/
 
-        mv.addObject("shopId", queryId);
+        mv.addObject("shopId", goods.getShopId());
         //查询商品评论信息
         List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
         request.setAttribute("reviewList", JSONArray.fromObject(reviewList));

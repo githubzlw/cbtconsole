@@ -2296,7 +2296,11 @@
 		select gname from grade_discount where gid=#{gid}
 	</select>
 	<select id="getShopManagerList" resultType="com.cbt.website.bean.ShopManagerPojo">
-		SELECT DISTINCT s.*,GROUP_CONCAT(a.pic SEPARATOR '@') AS imgs FROM shop_manager s LEFT JOIN ali1688_company_offers_details a ON s.shop_id=a.shop_id WHERE 1=1
+		SELECT DISTINCT s.*
+		/*,GROUP_CONCAT(a.pic SEPARATOR '@') AS imgs*/
+		FROM shop_manager s
+		/*LEFT JOIN ali1688_company_offers_details a ON s.shop_id=a.shop_id */
+		WHERE 1=1
 		<if test="shop_name != null">
 			and s.shop_name like '%${shop_name}%'
 		</if>
