@@ -15,9 +15,23 @@
         <result column="user_operation" property="useroperation" />
         <result column="ocr_need_date" property="ocrneeddate" />
 	</resultMap>
+    <resultMap id="Category1688Map" type="com.cbt.pojo.Category1688">
+        <id column="id" property="id" javaType="INTEGER"/>
+        <result column="lv" property="lv"/>
+        <result column="category_id" property="categoryid" />
+        <result column="name" property="name" />
+    </resultMap>
     <sql id="Distinguish_Pircture_List">
       id,pid,shop_id,local_path,remote_path,goods_md5,create_time,is_delete,ocr_need_delete,catgrid,user_operation,ocr_need_date
     </sql>
+    <sql id="Category1688_List">
+        id,lv,category_id,name
+    </sql>
+    <select id="showCategory1688_type"  resultMap="Category1688Map" >
+        SELECT
+        <include refid="Category1688_List"/>
+        FROM 1688_category Where lv=1
+    </select>
     <select id="showDistinguish_Pircture"  resultMap="resultMap" >
         SELECT
         <include refid="Distinguish_Pircture_List"/>

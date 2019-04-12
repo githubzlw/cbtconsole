@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.ocr.service.Distinguish_PictureService;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -92,12 +93,16 @@ public class Distinguish_PictureContorller {
 		String  json = JSON.toJSONString(ret);
 		return   json ;
 	}
+
+	/**
+	 * 查询最简单的一级类型数据显示到页面上
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "FindCategory")
 	@ResponseBody
-	public String FindCategory(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type,String userName){
-		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type,userName);
-		String  json = JSON.toJSONString(ret);
-		return   json ;
+	public List<Category1688> FindCategory(HttpServletRequest request){
+		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
+		return  ret ;
 	}
 }

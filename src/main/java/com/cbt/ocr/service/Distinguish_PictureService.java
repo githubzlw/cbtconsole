@@ -1,5 +1,6 @@
 package com.cbt.ocr.service;
 
+import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import org.apache.ibatis.annotations.Param;
 
@@ -34,5 +35,5 @@ public interface Distinguish_PictureService {
 	 */
 	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName);
 
-
+	public List<Category1688> showCategory1688_type();
 }

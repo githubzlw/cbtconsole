@@ -1,6 +1,7 @@
 package com.cbt.ocr.service;
 
 import com.cbt.ocr.dao.Distinguish_PictureDao;
+import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,4 +41,8 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 
 		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,type,userName);
 	}
+	@Override
+	public List<Category1688> showCategory1688_type(){
+		return distinguish_PictureDao.showCategory1688_type();
+	};
 }

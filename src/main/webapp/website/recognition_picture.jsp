@@ -183,8 +183,26 @@ div.margin2 {
         $("input[class='cbox']").prop('disabled',true );
 		}
 
-		//给分类类别赋值
-
+		$("#type").empty();
+		var cilValue=$("#type");
+        cilValue.append('<option value="">Pls Select</option>');
+        //给分类类别赋值
+        $.ajax({
+            type:'post',
+            url:"${ctx}/Distinguish_Picture/FindCategory",
+            dataType:"json",
+            success:function(res){
+                if(res.length>0){
+                    var html = [];
+                    for (var i = 0; i < res.length; i++) {
+                        cilValue.append('<option value="'+res[i].category_name+'">'+res[i].name+'</option>');
+                    }
+                    // cilValue.append(html.join(''));
+                }else{
+                    alert("获取一级列表失败");
+				}
+            }
+        })
     });
 function fnjump(obj,type){
 	var page=$("#page").val();
@@ -314,9 +332,9 @@ function  updateSomes(type){
 
 					<div class="left">
 						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
-						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
+						<%--<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
 						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
-						<option value="1" <c:if test="${type==1}">selected</c:if>>已处理(且待线上删除)</option>
+						<option value="1" <c:if test="${type==1}">selected</c:if>>已处理(且待线上删除)</option>--%>
 					</select>
 					</div>
 					<div class="left left-margin">
