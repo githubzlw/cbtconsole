@@ -1396,6 +1396,10 @@ function OrderAddress() {
 	$("#OrderAddress").attr("onclick", "updateOrderAddress()");
 }
 function updateOrderAddress() {
+	var isDropFlag = document.getElementById("is_drop_flag").value;
+	if(!isDropFlag || isDropFlag == null || isDropFlag == ""){
+		isDropFlag = 0;
+	}
 	var address = document.getElementById("orderstreet").value;
 	var address2 = document.getElementById("ordercity").value;
 	var statename = document.getElementById("orderstate").value;
@@ -1418,6 +1422,7 @@ function updateOrderAddress() {
 					statename : statename,
 					countryid : countryid,
 					zipcode : zipcode,
+					isDropFlag : isDropFlag,
 					phonenumber : phonenumber,
 					recipients : recipients,
 					street : street
