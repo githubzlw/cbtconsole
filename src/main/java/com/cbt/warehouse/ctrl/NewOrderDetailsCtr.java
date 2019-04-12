@@ -493,6 +493,7 @@ public class NewOrderDetailsCtr {
 				lists.add(orderDetailsBean.getGoods_pid());
 			}
 			request.setAttribute("lists", lists);
+			request.setAttribute("isDropFlag",0);
 		//} catch (Exception e) {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/
@@ -1015,6 +1016,8 @@ public class NewOrderDetailsCtr {
 			Forwarder forw = null;
 			int state = order.getState();
 
+			IZoneServer os = new ZoneServer();
+			request.setAttribute("countryList",os.getAllZone());
 			// zp 修改 到账信息和订单信息一起查
 			Map<String, Object> map = new HashMap<String, Object>();
 
@@ -1342,6 +1345,7 @@ public class NewOrderDetailsCtr {
 				lists.add(orderDetailsBean.getGoods_pid());
 			}
 			request.setAttribute("lists", lists);
+			request.setAttribute("isDropFlag",1);
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.error("查询dropship子订单详情失败，原因：" + e.getMessage());
