@@ -50,6 +50,14 @@
 		window.location = "getOldCustomShow?admName="+admName+"&email="+email+"&staTime="+timeFrom+"&enTime="+timeTo+"&id="+userId+"&cuName="+cuName+"&page=1";
 		//window.location = "${ctx}/cbtconsole/customerServlet?action=getErrorInfo&className=PictureComparisonServlet&userId="+userId+"&timeFrom="+timeFrom+"&timeTo="+timeTo+"&valid="+valid;
 	}
+    function resetGoods(){
+       $("#userId").val("");
+        $("#timeFrom").val("");
+         $("#timeTo").val("");
+       $("#cuName").val("");
+        $("#email").val("");
+         $("#admName").val("-1");
+    }
 	$(function(){ 
 		 $.ajax({
              type:"post",
@@ -75,14 +83,15 @@
 <div align="left"><span onmousemove="$(this).css('color','#ff6e02');" onmouseout="$(this).css('color','#7AB63F');" onclick="window.location.href=history.go(-1)" style="color: #7AB63F;cursor: pointer;"><em  style="font-size: 19px;">&nbsp;</em></span></div>	<br>
 	<div align="center" style="display: block;height: 30px;text-align: center;margin-bottom: 20px;">
 	            <select id="admName">
-                <option value="${admName}">${admName=="-1"?"销售选择":admName}</option>          
+                <option value="${admName}">${admName=="-1"?"销售选择":admName}</option>
                  </select>
 	            <span style="line-height:25px;">用户名:</span><input type="text" id="cuName" value="${cuName==null?"":cuName}" class="rlcj" style="margin-right: 20px;"/> 
 	            <span style="line-height:25px;">用户邮箱:</span><input type="text" id="email" value="${email==null?"":email}" class="rlcj" style="margin-right: 20px;"/>
 				<span style="line-height:25px;">用户id:</span><input type="text" id="userId" value="${id==null?"":id}" class="rlcj" style="margin-right: 20px;"/>
 				<span style="line-height:25px;">时间:</span> <input id="timeFrom" class="Wdate rlcj" style="width:120px;" type="text" value="${timeFrom }" onclick="WdatePicker({skin:'whyGreen',lang:'en'})" /><span> ~</span>
 				<input id="timeTo" class="Wdate rlcj" type="text" style="width:120px;" value="${timeTo }" onfocus="WdatePicker({skin:'whyGreen',lang:'en'})" />
-				<input type="button" value="Search" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch();" />
+				<input type="button" value="查找" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch();" />
+		       <input type="button" value="重置" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="resetGoods()" />
 				
 	</div>
 	

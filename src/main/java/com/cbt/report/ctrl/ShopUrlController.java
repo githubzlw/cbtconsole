@@ -1532,7 +1532,7 @@ public class ShopUrlController {
         return mv;
     }
 
-    private Map<String, String> genImgMd5(String localPath, List<String> tempImgList) {
+    private Map<String, String> genImgMd5(String localPath, List<String> tempImgList) throws IOException {
         Map<String, String> resultMap = new HashMap<String, String>();
         String resultStr = "";
         String filenames = "";
@@ -1542,7 +1542,7 @@ public class ShopUrlController {
         String url = "http://192.168.1.28:3000/calcuMD5?path=" + localPath.replace("\\", "/")
                 + "&filenames=" + filenames.substring(1);
         BufferedReader in = null;
-        try {
+        //try {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
             URLConnection connection = realUrl.openConnection();
@@ -1550,7 +1550,8 @@ public class ShopUrlController {
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent",
-                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
+                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NTshowShopPublicImgTest 5.1;SV1)");
+            connection.setReadTimeout(20 * 1000);
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
@@ -1562,12 +1563,12 @@ public class ShopUrlController {
             while ((line = in.readLine()) != null) {
                 resultStr += line;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("发送GET请求出现异常！" + e.getMessage());
-        }
+        //} catch (Exception e) {
+            //e.printStackTrace();
+            //System.err.println("发送GET请求出现异常！" + e.getMessage());
+        //}
         // 使用finally块来关闭输入流
-        finally {
+        //finally {
             try {
                 if (in != null) {
                     in.close();
@@ -1575,7 +1576,7 @@ public class ShopUrlController {
             } catch (Exception e2) {
                 e2.printStackTrace();
             }
-        }
+        //}
         if (StringUtils.isNotBlank(resultStr)) {
             try {
                 JSONObject myJson = JSONObject.fromObject(resultStr);
@@ -1704,7 +1705,16 @@ public class ShopUrlController {
                                     tempImgList.add(imgUrl);
                                 }
                             }
-                            Map<String, String> tempMap = genImgMd5(imgGd.getLocalPath(), tempImgList);
+                            Map<String, String> tempMap = new HashMap();
+                            try{
+                                tempMap = genImgMd5(imgGd.getLocalPath(), tempImgList);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                System.err.println("发送GET请求出现异常！" + e.getMessage());
+                                LOG.error("发送GET请求出现异常！" + e.getMessage());
+                                //step v1. @author: cjc @date：2019/3/29 11:55:35   Description : 请求失败就break
+                                break;
+                            }
                             tempImgList.clear();
                             if (tempMap.size() > 0) {
                                 resultMap.putAll(tempMap);

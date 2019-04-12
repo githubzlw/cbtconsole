@@ -3,11 +3,12 @@ package com.cbt.FreightFee.dao;
 import com.cbt.warehouse.pojo.TransitPricecost;
 import com.cbt.warehouse.pojo.ZoneBean;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
-
+@Repository
 public interface FreightFeeMapper {
 
 	ZoneBean getZone(@Param("countId") String countId);

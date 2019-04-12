@@ -64,6 +64,9 @@
              })
        
 	});
+    function resetGood(){
+        $("#order").val("");
+    }
 	
 </script>
 </head>
@@ -73,7 +76,8 @@
 	            <span style="line-height:25px;">订单号:</span><input type="text" id="order" value="${order==null?"":order}" class="rlcj" style="margin-right: 20px;"/> 
 	           
 				
-				<input type="button" value="Search" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch('${usid}');" />
+				<input type="button" value="查找" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch('${usid}');" />
+		<input type="button" value="重置" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="resetGood()" />
 				
 	</div>
 	

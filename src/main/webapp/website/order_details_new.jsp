@@ -720,7 +720,9 @@ em {
 						<tr>
 							<td>Recipients:</td>
 							<td><input id="orderrecipients" type="text" maxlength="50"
-								value="${order.address.recipients}" style="width: 200px" disabled="disabled"></td>
+								value="${order.address.recipients}" style="width: 200px" disabled="disabled">
+								<input id="is_drop_flag" type="hidden" value="${isDropFlag}"/>
+							</td>
 						</tr>
 						<tr>
 							<td>Street:</td>
