@@ -1132,16 +1132,19 @@ public class WarehouseCtrl {
 	 * @throws ParseException
 	 * @return EasyUiJsonResult
 	 */
-	@RequestMapping(value = "/getShopManager", method = RequestMethod.POST)
+	@RequestMapping(value = "/getShopManager")
 	@ResponseBody
 	public EasyUiJsonResult getShopManager(HttpServletRequest request, Model model) throws ParseException {
-		DataSourceSelector.set("dataSource28hop");
+		// DataSourceSelector.set("dataSource28hop");
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, Object> map = new HashMap<String, Object>();
 		String shop_name = request.getParameter("shop_name");
 		String remark = request.getParameter("remark");
 		if (shop_name == null || "".equals(shop_name)) {
 			shop_name = null;
+		}
+		if(StringUtils.isStrNull(remark)){
+			remark = "-1";
 		}
 		int page = Integer.parseInt(request.getParameter("page"));
 		if (page > 0) {
