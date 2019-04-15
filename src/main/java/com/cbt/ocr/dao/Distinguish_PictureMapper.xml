@@ -1,52 +1,79 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.cbt.ocr.dao.Distinguish_PictureDao">
-
-	<resultMap id="resultMap" type="com.cbt.pojo.CustomGoods">
-		<id column="id" property="id" javaType="INTEGER"/>
+    <resultMap id="resultMap" type="com.cbt.pojo.CustomGoods">
+        <id column="id" property="id" javaType="INTEGER"/>
         <result column="pid" property="pid"/>
-        <result column="shop_id" property="shopid" />
-        <result column="local_path" property="localpath" />
-        <result column="remote_path" property="remotepath" />
-        <result column="goods_md5" property="goodsmd5" />
-        <result column="create_time" property="createtime" />
-        <result column="is_delete" property="isdelete" />
-        <result column="ocr_need_delete" property="ocrneeddelete" />
-	</resultMap>
-    <sql id="Distinguish_Pircture_List">
-      id,pid,shop_id,local_path,remote_path,goods_md5,create_time,is_delete,ocr_need_delete
-    </sql>
-    <select id="showDistinguish_Pircture"  resultMap="resultMap" >
-        SELECT
-        <include refid="Distinguish_Pircture_List"/>
-        FROM custom_goods_md5 where 1=1
-        <if test="type != null and type != '' ">
-            and ocr_need_delete=#{type}
+        <result column="shop_id" property="shopid"/>
+        <result column="local_path" property="localpath"/>
+        <result column="remote_path" property="remotepath"/>
+        <result column="goods_md5" property="goodsmd5"/>
+        <result column="create_time" property="createtime"/>
+        <result column="is_delete" property="isdelete"/>
+        <result column="ocr_need_delete" property="ocrneeddelete"/>
+        <result column="catgrid" property="catgrid"/>
+        <result column="user_operation" property="useroperation"/>
+        <result column="ocr_need_date" property="ocrneeddate"/>
+        <collection property="Category1688Map" javaType="com.cbt.pojo.Category1688" resultMap="Category1688Map"/>
+    </resultMap>
+    <resultMap id="Category1688Map" type="com.cbt.pojo.Category1688">
+        <id column="id" property="id" javaType="INTEGER"/>
+        <result column="lv" property="lv"/>
+        <result column="category_id" property="categoryid"/>
+        <result column="name" property="name"/>
+        <collection property="CustombenchmarkReady" javaType="com.cbt.pojo.CustombenchmarkReady"
+                    resultMap="CustombenchmarkReady"/>
+    </resultMap>
+    <resultMap id="CustombenchmarkReady" type="com.cbt.pojo.CustombenchmarkReady">
+        <id column="id" property="id" javaType="INTEGER"/>
+        <result column="catid1" property="catid1"/>
+        <result column="path_catid" property="pathcatid"/>
+        <result column="pid" property="pid"/>
+    </resultMap>
+
+    <select id="showDistinguish_Pircture" resultMap="resultMap">
+        SELECT cdm.* FROM
+        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
+        WHERE cbr.`pid`=cdm.`pid`
+        AND c.category_id=cbr.`catid1`
+        AND cdm.ocr_need_delete=1
+        AND cdm.ocr_need_date=0
+        <if test="type != null and type != ''">
+            and c.category_id=#{type}
         </if>
         <if test="pid != null and pid != ''">
             and pid=#{pid}
         </if>
-        limit #{page},21
+        limit #{page},28
     </select>
 
-    <select id="queryDistinguish_PirctureCount"  resultType="java.lang.Integer" >
-        SELECT COUNT(1) FROM custom_goods_md5 where 1=1
-        <if test="type != null and type != '' ">
-            and ocr_need_delete=#{type}
+    <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM
+        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
+        WHERE cbr.`pid`=cdm.`pid`
+        AND c.category_id=cbr.`catid1`
+        AND cdm.ocr_need_delete=1
+        AND cdm.ocr_need_date=0
+        <if test="type != null and type != ''">
+            and c.category_id=#{type}
         </if>
-        <if test="pid != null and pid != '' ">
+        <if test="pid != null and pid != ''">
             and pid=#{pid}
         </if>
     </select>
 
-    <update id="updateSomePirctu_risdelete"  parameterType="list">
-        update custom_goods_md5  SET  ocr_need_delete=1 where
-        <foreach collection="list" separator="or" item="i" index="index">
-            id = ${i.id}
-        </foreach>
-    </update>
-    <update id="updateSomePirctu_risdelete_tow"  parameterType="list">
-        update custom_goods_md5  SET  ocr_need_delete=2 where
-        <foreach collection="list" separator="or" item="i" index="index">
+    <sql id="Category1688_List">
+        id,lv,category_id,name
+    </sql>
+    <select id="showCategory1688_type" resultMap="Category1688Map">
+        SELECT
+        <include refid="Category1688_List"/>
+        FROM 1688_category Where lv  != 1 and lv != 0
+    </select>
+    <update id="updateSomePirctu_risdelete">
+        update custom_goods_md5 SET
+        ocr_need_date=1,
+        user_operation=#{userName} where
+        <foreach collection="bgList" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
     </update>

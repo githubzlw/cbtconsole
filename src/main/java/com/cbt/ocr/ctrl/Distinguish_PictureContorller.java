@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.ocr.service.Distinguish_PictureService;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -38,7 +39,7 @@ public class Distinguish_PictureContorller {
 	 * @return
 	 */
 	@RequestMapping(value = "FindCustomGoodsInfo")
-	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String type){
+	public String showDistinguish_Pircture(HttpServletRequest request,String page,String pid,String type,String type2){
 		//获取当前用户
 		String sessionId = request.getSession().getId();
 		String authJson = Redis.hget(sessionId, "userauth");
@@ -47,20 +48,10 @@ public class Distinguish_PictureContorller {
 		//初始的判断以及赋值
 		if (StrUtils.isNullOrEmpty(page))
 			page="1";
-		if (StrUtils.isNullOrEmpty(type))
-			type="0";
-		//标识是属于什么页面 1、修正无中文字页面 2、修正有中文字页面
-		String picturedata=null;
-		if(type.equals("0"))
-		picturedata="未处理页面";
-		else if(type.equals("1"))
-		picturedata="有中文字页面";
-		else
-		picturedata="无中文字页面";
 		int pageNO=Integer.parseInt(page);
-
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
 		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,type);
+		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
 
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
@@ -70,12 +61,11 @@ public class Distinguish_PictureContorller {
 
 		request.setAttribute("pid",pid);
 		request.setAttribute("username",user.getAdmName());
-		request.setAttribute("username",user.getAdmName());
 		request.setAttribute("type",type);
-		request.setAttribute("picturedata",picturedata);
 		request.setAttribute("currentPage", pageNO);
 		request.setAttribute("totalpage", totalpage);
 		request.setAttribute("customGoodsList",customGoodsList);
+		request.setAttribute("ret",ret);
 
 
 	return "recognition_picture";
@@ -88,10 +78,22 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,int type){
+	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String type,String userName){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type);
+		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type,userName);
 		String  json = JSON.toJSONString(ret);
 		return   json ;
+	}
+
+	/**
+	 * 查询最简单的一级类型数据显示到页面上
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "FindCategory")
+	@ResponseBody
+	public List<Category1688> FindCategory(HttpServletRequest request){
+		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
+		return  ret ;
 	}
 }

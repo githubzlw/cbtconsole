@@ -41,6 +41,33 @@
 	border: 2px solid aquamarine;
 }
 
+.div2{
+	width: 1000px;
+	height: 20px;
+	border: 2px solid aquamarine;
+}
+.div img{
+
+	width: 100%;
+
+	height: 100%;
+
+	cursor: pointer;
+
+	transition: all 0.6s;
+
+	-ms-transition: all 0.8s;
+
+}
+
+.div img:hover{
+
+	transform: scale(2.2);
+
+	-ms-transform: scale(2.2);
+
+}
+
 
 html, body {
 	height: 100%;
@@ -160,6 +187,30 @@ div.margin2 {
 		$("input[class='cbox']").prop('checked',false );//反选
         $("input[class='cbox']").prop('disabled',true );
 		}
+
+        /*$("#type").empty();
+        var cilValue=$("#type");
+        cilValue.append('<option value="">Pls Select</option>');
+        //给分类类别赋值
+        $.ajax({
+            type:'post',
+            url:"${ctx}/Distinguish_Picture/FindCategory",
+            dataType:"json",
+            success:function(res){
+                if(res.length>0){
+                    var html = [];
+                    for (var i = 0; i < res.length; i++) {
+                        if(){
+                            cilValue.append('<option value="'+res[i].categoryid+'">'+res[i].name+'</option>');
+						}
+                        cilValue.append('<option value="'+res[i].categoryid+'">'+res[i].name+'</option>');
+                    }
+                    // cilValue.append(html.join(''));
+                }else{
+                    alert("获取一级列表失败");
+				}
+            }
+        })*/
     });
 function fnjump(obj,type){
 	var page=$("#page").val();
@@ -183,12 +234,14 @@ function fnjump(obj,type){
 	$("#page").val(page);
     var pid = $("#pid").val();
     var type = $("#type").val();
+    var type2 = $("#type2").val();
     window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&type="+type;}
 
 
 function search(){
 	var pid = $("#pid").val();
 	var type = $("#type").val();
+    var type2 = $("#type2").val();
 	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&type="+type;
 }
 
@@ -247,10 +300,11 @@ function  updateSomes(type){
 		alert("请至少选择一个！");
 	}else{
 		mainMap['bgList'] = erList;
-		console.log(mainMap);            
+		console.log(mainMap);
+        var userName=$("#userName").val();
 	 	$.ajax({
 			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type,
+			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type+"&userName="+userName,
 			dataType:"json",
 			contentType : 'application/json;charset=utf-8', 
 		    data:JSON.stringify(mainMap),
@@ -258,7 +312,7 @@ function  updateSomes(type){
 				if(res==0){
 					$("#tip").html("删除失败  !")
 				}else{
-					$("#tip").html("删除成功 !");
+					$("#tip").html("已到待删除列成功 !");
 					window.location.reload();
 				}
 			}
@@ -269,7 +323,7 @@ function  updateSomes(type){
 </script>
 </head>
 <body>
-<h1 align="center"><b>取消OCR识别错误图片<span style="color: red">《${picturedata}》</span></b></h1>
+<h1 align="center"><b>取消OCR识别错误图片<span style="color: red"></span></b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
 	<div class="main">
 		<div class="main-head"></div>
@@ -281,27 +335,27 @@ function  updateSomes(type){
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
-						<span style="color:blue">(当前处理人员：${username})</span>
+						<span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span>
 					</div>
 				</div>
 				<div class="main-top margin2">
 
 					<div class="left">
 						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
-						<option value=""  <c:if test="${type==3}">selected</c:if>>请选择</option>
-						<option value="0"  <c:if test="${type==0}">selected</c:if>>未处理图片</option>
-						<option value="1" <c:if test="${type==1}">selected</c:if>>含中文字图片（且待线上删除）</option>
-						<option value="2" <c:if test="${type==2}">selected</c:if>>不含中文字图片</option>
+						<option value="">请选择(全部)</option>
+						<c:forEach items="${ret}" var="ret" >
+						<option value="${ret.categoryid}" <c:if test="${ret.categoryid==type}"> selected </c:if>>${ret.name}</option>
+						</c:forEach>
 					</select>
 					</div>
+					<%--<div class="left">
+						<span class="wenzi">图片分类：</span> <input type="text" id="type2"  value="${pid }" class="inputText" placeholder="手动输入类别查询"/>
+					</div>--%>
 					<div class="left left-margin">
 						<input type="hidden" value="${username}" id="user_">
 						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">删除图片</font></a></span>
-						<c:if test="${type==1}">
-							<span style="color: red">(点击查询返回修正无中文字页面)</span>
-						</c:if>
+						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">逻辑删除</font></a></span>
 					</div>
 				</div>
 
@@ -314,9 +368,16 @@ function  updateSomes(type){
 		</div>
 		<div class="main-table">
 			<table class="table">
+				<c:if test="${customGoodsList=='' || customGoodsList==null}">
+					<div class="div2">
+						<span style="color: red">查询数据不存在</span>
+					</div>
+				</c:if>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;">
+						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }">
+						<br/>
+						id:<input type="text"  value="${customGoodsList.id }"/>
 						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 					</div>
 				</c:forEach>
