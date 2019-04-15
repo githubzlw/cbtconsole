@@ -17,7 +17,7 @@ public interface Distinguish_PictureService {
 	 * @return
 	 *
 	 */
-	public List<CustomGoods> showDistinguish_Pircture( String pid,  int page,int type);
+	public List<CustomGoods> showDistinguish_Pircture( String pid,  int page,String type);
 
 	/***
 	 * 查询OCR识别错误图片的总数
@@ -26,14 +26,14 @@ public interface Distinguish_PictureService {
 	 * @param
 	 * @return
 	 */
-	public int queryDistinguish_PirctureCount(String pid,int type);
+	public int queryDistinguish_PirctureCount(String pid,String type);
 
 	/***
 	 *批发更新线上是否删除状态
 	 * @param bgList
 	 * @return
 	 */
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName);
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String type,String userName);
 
 	public List<Category1688> showCategory1688_type();
 }

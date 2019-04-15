@@ -24,6 +24,7 @@ public class Category1688 {
 	private int  enable;
 	private String  newarrivaldate;
 	private String  minvolumeweight;
+	private CustombenchmarkReady  CustombenchmarkReady;
 
 	public Integer getId() {
 		return id;
@@ -191,5 +192,13 @@ public class Category1688 {
 
 	public void setMinvolumeweight(String minvolumeweight) {
 		this.minvolumeweight = minvolumeweight;
+	}
+
+	public com.cbt.pojo.CustombenchmarkReady getCustombenchmarkReady() {
+		return CustombenchmarkReady;
+	}
+
+	public void setCustombenchmarkReady(com.cbt.pojo.CustombenchmarkReady custombenchmarkReady) {
+		CustombenchmarkReady = custombenchmarkReady;
 	}
 }
