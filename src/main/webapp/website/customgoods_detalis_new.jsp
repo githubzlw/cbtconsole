@@ -2137,10 +2137,10 @@
                     <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
                     &nbsp;&nbsp;&nbsp; <a target="_blank"
                             href="${goods.aliGoodsUrl}">速卖通原链接</a>
-                    <c:if test="${shopId > 0}">
+                    <c:if test="${not empty shopId}">
                         &nbsp;&nbsp;&nbsp;
                         <a target="_blank"
-                           href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=danyi9${shopId}">产品店铺链接</a>
+                           href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=${shopId}">产品店铺链接</a>
                     </c:if>
                 </div>
                 <br>

@@ -69,6 +69,10 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
@@ -1132,16 +1136,19 @@ public class WarehouseCtrl {
 	 * @throws ParseException
 	 * @return EasyUiJsonResult
 	 */
-	@RequestMapping(value = "/getShopManager", method = RequestMethod.POST)
+	@RequestMapping(value = "/getShopManager")
 	@ResponseBody
 	public EasyUiJsonResult getShopManager(HttpServletRequest request, Model model) throws ParseException {
-		DataSourceSelector.set("dataSource28hop");
+		// DataSourceSelector.set("dataSource28hop");
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, Object> map = new HashMap<String, Object>();
 		String shop_name = request.getParameter("shop_name");
 		String remark = request.getParameter("remark");
 		if (shop_name == null || "".equals(shop_name)) {
 			shop_name = null;
+		}
+		if(StringUtils.isStrNull(remark)){
+			remark = "-1";
 		}
 		int page = Integer.parseInt(request.getParameter("page"));
 		if (page > 0) {
@@ -8955,5 +8962,41 @@ public class WarehouseCtrl {
         result.put("imagehost", SearchFileUtils.IMAGEHOSTURL);
 		return result;
 	}
+	@RequestMapping("/query")
+	public String getFreightByCountryIdWeight(){
+		OkHttpClient okHttpClient = new OkHttpClient();
 
+		okhttp3.RequestBody formBody = new FormBody.Builder()
+				.add("cdes", "美国")
+				.add("cdes", "美国")
+				.add("fweight","7.51")
+				.add("itype","1")
+				.add("w","cnexx")
+				.add("cmodel","cmodel:emsprice")
+				.add("type","20")
+				.add("itype","1")
+				.build();
+		/*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
+		String url = "http://www.cne.com/cgi-bin/Ginfo.dll?EmsPriceQueryi";
+		Request request = new Request.Builder().addHeader("Accept","*/*")
+				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+				.url(url).post(formBody).build();
+		try {
+			Response response = okHttpClient.newCall(request).execute();
+			String resultStr = response.body().string();
+			System.out.print(resultStr);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	@RequestMapping(value = "/encodeStr", method = RequestMethod.POST)
+	@ResponseBody
+	public String getUserInfo(String str){
+		String encodeStr = "";
+		if(null!=str && !"".equals(str)){
+			encodeStr = DESUtils.encode(str);
+		}
+		return encodeStr;
+	}
 }

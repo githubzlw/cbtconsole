@@ -320,6 +320,8 @@ public class OrderwsServlet extends HttpServlet {
 		String phonenumber = request.getParameter("phonenumber");
 		String recipients = request.getParameter("recipients");
 		String street = request.getParameter("street");
+		String isDropFlag = request.getParameter("isDropFlag");
+
 		Address addr = new Address();
 		IOrderDao orderDao = new OrderDao();
 		addr.setAddress(address);
@@ -329,7 +331,11 @@ public class OrderwsServlet extends HttpServlet {
 		addr.setZip_code(zipcode);
 		addr.setPhone_number(phonenumber);
 		addr.setRecipients(recipients);
-		addr.setStreet(street);
+		if("1".equals(isDropFlag)){
+			addr.setStreet(address);
+		}else{
+			addr.setStreet(street);
+		}
 		orderDao.updateOnlineOrderAddress(addr, orderid); //更新线上地址数据  2018/08/27 10:38 ly
 		int res = orderDao.updateOrderAddress(addr, orderid);
 		PrintWriter out = response.getWriter();

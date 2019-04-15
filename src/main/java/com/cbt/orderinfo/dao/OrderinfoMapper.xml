@@ -921,7 +921,7 @@
         select (select count(tb_complain.id) from tb_complain where complainState in(1,2) and  ref_orderid=child_order_no)complain,
         0 deliver, (select count(ops.id) from order_product_source ops  where  ((purchase_state=5  and remark!=null) or purchase_state=12)
         and ops.orderid = o.child_order_no) purchase, pf.id dzid, pf.orderno dzOrderno, pf.confirmname dzconfirmname,pf.confirmtime dzconfirmtime,
-        a.address as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,
+        a.street as addresss,o.user_id as userid,actual_ffreight,pay_price_tow,remaining_price, actual_weight,actual_volume,custom_discuss_other,o.state,a.address2,
         (select id from zone z where z.id=a.country or z.country=a.country) as country,
         (select IF(exchange_rate&lt;=0,6.3,exchange_rate) from orderinfo where order_no=o.parent_order_no) as exchange_rate,
         (select country from zone z where z.id=a.country or z.country=a.country) countryName , a.statename,a.phonenumber,a.zipcode,packag_style,mode_transport,

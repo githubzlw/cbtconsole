@@ -855,8 +855,9 @@ function search() {
                     if(order_num>1){
                         $("#ydid").append("<span style='color:red;font-size:30px;'>【注意:该包裹对应了多个销售订单】</span>");
                     }
-                    for (var i = 0; i < jsonObj.length; i++) {
+                    for (var i = 0; i < json.length; i++) {
                         userBuyCount= Number(userBuyCount)+Number(json[i].buycount);
+                        img=json[i].goods_img_url;
                         if (preorderid == json[i].orderid) {
                         } else {
                             if(json[i].orderstate=0)
@@ -905,7 +906,8 @@ function search() {
                         str += '<div>商品名称：<span id="name_'+json[i].odid+'">'
                             + json[i].goods_name
                             + '</span></div><div>';
-                        str += '<div style="float:left;"><a href="'+json[i].goods_url+'" target="_blank">';
+                        str += '<div style="float:left;"><a href="https://www.import-express.com/goodsinfo/classic-vintage-heart-peach-heart-appearance-box-po-necklace-many-18888-122322005-1'+json[i].goods_pid+'.html" target="_blank">';
+                        //str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
                         /*if(json[i].img){
                             if (json[i].img[0].length > 5 && json[i].img != null && json[i].img != "undefined") {
                                 str += '<img width="300px" height="300px" src="'+json[i].img+'"/></a></div>';
@@ -913,8 +915,8 @@ function search() {
                                 str += '<img width= "300px" height="300px" src="'+img+'"/></a></div>';
                             }
                         }*/
-                        str += '<img width= "300px" height="300px" src="'+jsonObj[i].imgurl+'"/></a></div>';
-
+                        //修正图片显示   大图显示  电商产品单页主图  点击显示  线上产品 详情
+                        str += '<img width= "300px" height="300px" src="'+json[i].goods_img_url+'"/></a></div>';
                         str += '<div style="float:right;width:280px;">';
                         var pt=0;
                         str += '<p id='+"position"+ json[i].odid+'>位置:<font color="red">';
@@ -942,7 +944,7 @@ function search() {
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "确认采购货源"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                            }else if(checked=="1" && json[i].checked==0){
+                            }else if(chescked=="1" && json[i].checked==0){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "未验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
@@ -957,7 +959,8 @@ function search() {
                             } else{
                                 str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
                             }*/
-                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                            str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';source1688_img
+                            str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                         } else if (json[i].purchase_state == 2) {
                             if(checked=="0"){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
@@ -972,7 +975,8 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p> ';
                             }
-                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                            str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                            str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                         } else if (json[i].purchase_state == 3) {
                             if(checked=="0"){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
@@ -987,7 +991,8 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p> ';
                             }
-                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                            str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                            str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                         }
                         else if (json[i].purchase_state == 4) {
                             if(checked=="0"){
@@ -1003,36 +1008,42 @@ function search() {
                                     + "已验货"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                             }
-                            str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                            str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                            str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                         }else if (json[i].purchase_state == 5) {
                             if(json[i].goodstatus == 2){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:该货没到"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 3){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:破损"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 4){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:有疑问"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             else if(json[i].goodstatus == 5){
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + "货源问题:数量不够"
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             else{
                                 str += '<p id='+"status"+ json[i].odid+'>状态:<font color="red">'
                                     + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
-                                str += '<img width= "150" height="150" src="'+jsonObj[i].imgurl+'"/></a></div>';
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                         }
                         if(checked=="1"){
@@ -1243,10 +1254,6 @@ function search() {
                         str += '</div>'
                         str += '</div></td></tr></table>';
                         preorderid = json[i].orderid;
-                        //判断数据 是否出现
-                        if(jsonObj.length>json.length){
-                            break;
-                        }
                     }
                     str+='</div>';
                     $("#div").html('');
@@ -1256,7 +1263,6 @@ function search() {
                         $("#sureAllTrack").css("display", "block");
                         $("#canceAllTrack").css("display", "block");
                     }
-
                 }
             });
         //补货
@@ -1334,8 +1340,7 @@ function search() {
                             str += '<div>商品名称：<span id="name_'+json[i].odid+'">'
                                 + json[i].goods_name
                                 + '</span></div><div>';
-                            str += '<div style="float:left;"><a href="'+json[i].goods_url+'" target="_blank">';
-                            if(json[i].img){
+                            str += '<div style="float:left;"><a href="https://www.import-express.com/goodsinfo/classic-vintage-heart-peach-heart-appearance-box-po-necklace-many-18888-122322005-1'+json[i].goods_pid+'.html" target="_blank">';/*if(json[i].img){
                                 if (json[i].img[0].length > 5 && json[i].img != null && json[i].img != "undefined") {
                                     str += '<img width="300px" height="300px" src="'+json[i].img+'"/></a></div>';
                                 } else{
@@ -1343,7 +1348,8 @@ function search() {
                                 }
                             }else{
                                 str += '<img  width = "300px" height="300px" src="'+img+'"/></a></div>';
-                            }
+                            }*/
+                            str += '<img width= "300px" height="300px" src="'+json[i].goods_img_url+'"/></a></div>';
                             str += '<div style="float:right;width:280px;">';
                             var pt=0;
                             str += '<p id='+"position"+ json[i].odid+'>位置:<font color="red">';
@@ -1377,11 +1383,13 @@ function search() {
                                         + "未验货"
                                         + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                                 }
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
+                                /*if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
                                     str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
                                 } else{
                                     str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                }*/
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';source1688_img
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }else if(json[i].purchase_state == 1){
                                 if(checked=="0"){
                                     str += '<p id='+"status"+ json[i].odid+'>状态:<font color="green">'
@@ -1396,11 +1404,13 @@ function search() {
                                         + "未验货"
                                         + '</font></p><p class="strcarype">规格:'+json[i].strcar_type+'</p>';
                                 }
-                                if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
+                               /* if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
                                     str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
                                 } else{
                                     str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
-                                }
+                                }*/
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';source1688_img
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             if(checked=="1"){
                             	console.log(1);
@@ -1421,7 +1431,7 @@ function search() {
                                     str += '<span name="save_weight_flag">已同步到产品库</span>';
                                 }
                                 /*str += '<input type="button" value="将重量同步至产品库" style="margin-left:5px" onclick="saveWeightFlag(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')"><br />';*/
-                                str += '<span id="tip_\'+json[i].orderid+json[i].odid+\'" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
+                                str += '<span id="tip_'+json[i].orderid+json[i].odid+'" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="'+json[i].orderid+'_count'+json[i].odid+'" value="'+json[i].usecount+'"><input type="text" style="width: 40px;" id="'+json[i].orderid+'count_'+json[i].odid+'" value=""/>piece</h3></p>';
                             }else{
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>客户下单数量:<span id="'+json[i].orderid+'_count'+json[i].odid+'" style="font-size:35px;">'
                                     + json[i].usecount

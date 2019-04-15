@@ -23,7 +23,7 @@ public interface OldCustomShowMapper {
 
 	int getOldCustomCount(@Param("admName")String admName, @Param("staTime")String staTime, @Param("enTime")String enTime,
 			@Param("email")String email, @Param("id")String id, @Param("cuName")String cuName);
-    @Select("SELECT id,admName FROM admuser ")
+    @Select("SELECT id,admName FROM admuser WHERE roleType=3 OR roleType=4 ")
 	List<Admuser> FindAllAdm();
     
 	List<Orderinfo> FindOrderByUsid(@Param("usid")String usid,  @Param("start")int start,  @Param("pagesize")int pagesize,  @Param("order")String order);
