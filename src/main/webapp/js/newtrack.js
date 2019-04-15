@@ -115,7 +115,7 @@ function updatecanceltatus(isok, orderid,odid, goodid, index, repState) {
  * @param index
  * @param repState
  */
-function updategoodstatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
+function updategoodstatus(isok,goods_pid, orderid, goodid, itemid, taobaoprice, shipno,
                           strcartype, usid, goodspprice,position,odid, goodurl, status, index, repState) {
     position=position.replace("CR-","");
     var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
@@ -128,6 +128,9 @@ function updategoodstatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     var seiUnit = "";
     var _count = "";
     var record_ = "";
+    if(!$(goods_state).is(":checked")){
+        goods_pid=1;
+    }
     if (checked == "1") {
         seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
         seiUnit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
@@ -173,6 +176,7 @@ function updategoodstatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                 url : '/cbtconsole/order/updateGoodStatus',
                  // url : '/cbtconsole/WebsiteServlet?action=updateGoodStatus&className=ExpressTrackServlet',
                 data : {
+                    'goods_pid':goods_pid,
                     'orderid' : orderid,
                     'goodid' : goodid,
                     'status' : status,
@@ -403,7 +407,7 @@ function addInventory(barcode,inventory_count,orderid,odid,count,record_,unit,go
  * @param index
  * @param repState
  */
-function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
+function updateCheckStatus(isok,goods_pid, orderid, goodid, itemid, taobaoprice, shipno,
                            strcartype, usid, goodspprice,position,odid,isDropshipOrder, goodurl, status, index, repState) {
     position=position.replace("CR-","");
     var seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
@@ -411,6 +415,9 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     if (unit == null || unit == "null" || unit == "") {
         unit = "1";
     }
+    if(!$(goods_state).is(":checked")){
+        goods_pid=1;
+         }
     var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
         .val();
     var barcode = document.getElementById("code_" + odid + "").innerHTML;//库位
@@ -439,6 +446,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
             type : "post",
             async : true,
             data : {
+                goods_pid : goods_pid,
                 orderid : orderid,
                 goodid : goodid,
                 status : status,
@@ -519,12 +527,17 @@ function allTrack(type) {
     var userName = $("#h_b6").val();
     var count = "0";
     var tbOrderId = $("#tborderid").val();
+    var goodsAll=0;
+    if($(goods_state).is(":checked")){
+        goodsAll=1;
+    }
     $ .ajax({
             // url : "/cbtconsole/WebsiteServlet?action=updateCheckStatus&className=ExpressTrackServlet",
             url : "/cbtconsole/order/allTrack",
             type : "post",
             async : true,
             data : {
+                goodsAll:goodsAll,
                 type : type,
                 shipno : shipno,
                 barcode : barcode,
@@ -894,6 +907,7 @@ function search() {
                                 barcode_info += '<div style="font-size: 20px;font-weight:bold;">备注内容(对内):'
                                 var orderremark = json[i].orderremark;
                                 for (var j = 0; j < orderremark.length; j++) {
+                                    barcode_info += '<p><<input type="checkbox" id="goodsAll" style="color: red;" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                                     barcode_info +='<p>'+'备注人员：' + orderremark[j][2] + ',内容：' + orderremark[j][1] + '</p>';
                                 }
                                 barcode_info += '</div>';
@@ -1070,11 +1084,14 @@ function search() {
                         str += '</div>';
                         str += '<div style="clear:both;"></div>';
                         str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /><a target="_blank" style="display:none;color:red;text-decoration:underline;font-size: 20px;margin-left: 60px" id="chuku_'+json[i].orderid+'_'+json[i].odid+'" href="/cbtconsole/warehouse/getDetailsForOrderid?orderid='+json[i].orderid+'&pageNum=1&pageSize=300">全部到库跳转到新出货审核页面</a></div><br><div style="clear:both;">';
+                        str += '<p><<input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                         var reg=new RegExp("'","g");
                         //判断商品是否已经存放
                         if(checked=="0"){
                             flag_storage="1";
                             str += '<button style="height: 30px;width:80px;" name = "arrival'+i+'" onclick="updategoodstatus(this,\''
+                                + json[i].goods_pid
+                                + '\',\''
                                 + json[i].orderid
                                 + '\',\''
                                 + json[i].goodsid
@@ -1106,6 +1123,8 @@ function search() {
                                 + '\','+i+')">入库取消</button>';
                         }else{
                             str += '<button style="height: 30px;width:80px;" name = "arrival'+i+'" onclick="updateCheckStatus(this,\''
+                                + json[i].goods_pid
+                                + '\',\''
                                 + json[i].orderid
                                 + '\',\''
                                 + json[i].goodsid
@@ -1323,6 +1342,7 @@ function search() {
                                     barcode_info += '<div style="font-size: 20px;font-weight:bold;">备注内容(对内):'
                                     var orderremark = json[i].orderremark;
                                     for (var j = 0; j < orderremark.length; j++) {
+                                        barcode_info += '<p><<input type="checkbox" name="cha" value="货物偏差">货物偏差</p>';
                                         barcode_info +='<p>'+'备注人员：' + orderremark[j][2] + ',内容：' + orderremark[j][1] + '</p>';
                                     }
                                     barcode_info += '</div>';
@@ -1434,9 +1454,12 @@ function search() {
                             str += '</div>';
                             str += '<div style="clear:both;"></div>';
                             str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /></div><div style="clear:both;">';
+                            str += '<p><<input type="checkbox" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                             //判断商品是否已经存放
                             if(checked=="0"){
                                 str += '<button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
+                                    + json[i].goods_pid
+                                    + '\',\''
                                     + json[i].orderid
                                     + '\',\''
                                     + json[i].goodsid
@@ -1468,6 +1491,8 @@ function search() {
                                     + '\','+i+')">入库取消</button>';
                             }else{
                                 str += '<button style="height: 30px;width:80px;" onclick="updateCheckStatus(this,\''
+                                    + json[i].goods_pid
+                                    + '\',\''
                                     + json[i].orderid
                                     + '\',\''
                                     + json[i].goodsid

@@ -19,6 +19,7 @@ import com.cbt.warehouse.util.Utility;
 import com.cbt.website.bean.*;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
@@ -2802,6 +2803,60 @@ public class WarehouseServiceImpl implements IWarehouseService {
     public void insertChangeLog(Map<String, Object> map) {
     	//保存运单变更记录 （用于退回等订单将原物流保存到新物流商） ly 2018/08/22 15:36
     	warehouseMapper.insertChangeLog(map);
+    }
+
+    @Override
+    public int FindOrderCount(String admuserid) {
+        int count=0;
+        try {
+            count= this.warehouseMapper.FindOrderCount();
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
+    @Override
+    public  List<CustomGoodsBean> getBadgoods() {
+        try {
+            List<String> list=this.warehouseMapper.FindAllPid();
+            List<CustomGoodsBean> goodsBeans=new ArrayList<>();
+            int i=0;
+            for (String pid:list) {
+                CustomGoodsBean goodsBean = this.warehouseMapper.selectByPid(pid);
+                goodsBeans.add(goodsBean);
+            }
+            return goodsBeans;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    @Override
+    public int getBadgoodsCount() {
+        try {
+            int conut=this.warehouseMapper.FindCount();
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int AddBadOrder(String pid, Double price) {
+
+        try {
+            int conut=this.warehouseMapper.AddBadOrder(pid,price);
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

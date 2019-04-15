@@ -1838,6 +1838,38 @@ public class OrderinfoService implements IOrderinfoService {
 	public  int updateOrderinfomodeTransport(String modeTransport,String orderNo){
 		return dao.updateOrderinfomodeTransport(modeTransport,orderNo);
 	}
+
+	@Override
+	public Boolean UpdateGoodsState(String goods_pid) {
+
+		int b= 0;
+		try {
+			b = this.dao.UpdateGoodsState(goods_pid);
+			if (b==0){
+            b=this.dao.InserGoodsState(goods_pid);
+            }
+			return b>0?true:false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	@Override
+	public Boolean UpdateAllGoodsState(String tbOrderId) {
+		try {
+			List<String>list =this.dao.FindAllGoodsPid(tbOrderId);
+			boolean b = false;
+			for (String goods_pid:list){
+                b=this.UpdateGoodsState(goods_pid);
+            }
+            return b;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 }
 
 

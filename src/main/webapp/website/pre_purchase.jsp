@@ -285,7 +285,18 @@
                     }
                 }
             });
+            $.ajax({//获取为处理差货
+                type:"post",
+                url:"/cbtconsole/purchase/getOrderCount.do",
+                data:{admuserid:admuserid},
+                dataType:"json",
+                async:true,
+                success : function(data1){
+                   // $("#OrderCount").val("差货待处理");
 
+                        $("#OrderCount").val("差货待处理+"+data1.total);
+                }
+            });
 
             //超过1天未发货
             $.ajax({
@@ -428,6 +439,9 @@
                 }
             });
         }
+        function BadgoodsLook(){
+            window.open("/cbtconsole/purchase/getBadgoods")
+        }
 
         function purchasing_allocation(){
             $.ajax({
@@ -478,6 +492,7 @@
 		疑似没有购买记录(订单):<span onclick="doQuery(1,5);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_5" style="color:red;width:38px;text-decoration:underline">0</span>
 		采购超24H无物流信息(订单):<span onclick="doQuery(1,7);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_7" style="color:red;width:38px;text-decoration:underline">0</span>
 		入库失败包裹(商品):<span onclick="doQuery(1,6);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_6" style="color:red;width:38px;text-decoration:underline">0</span>
+		<input type="button" style="size: 30px;color: #ff1e28" id="OrderCount" onclick="BadgoodsLook()" value="差货待处理">
 	</div>
 	<input type="hidden" id="old_admuserid" value="0"/><input type="hidden" id="v_info_1"/><input type="hidden" id="v_info_2"/><input type="hidden" id="v_info_3"/>
 	<input type="hidden" id="v_info_4"/><input type="hidden" id="v_info_5"/><input type="hidden" id="v_info_6"/><input type="hidden" id="v_info_7"/>
@@ -531,6 +546,7 @@
 	</c:if>
 	<a target="_blank" href="/cbtconsole/website/purchase_order_details.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">问题包裹反查</a>
 	<%--<a target="_blank" href="/cbtconsole/website/comfirmOrderAndGenerate.jsp;" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">一键生成1688未付款订单</a>--%>
+
 </div>
 <table class="easyui-datagrid" id="easyui-datagrid"
 	   style="width: 1800px; height: 900px">

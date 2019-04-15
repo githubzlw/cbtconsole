@@ -8,11 +8,12 @@ import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.website.bean.*;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
-@Repository
+
 public interface WarehouseMapper {
 	public outIdBean findOutId(@Param("uid") Integer uid);
 	public OrderAddress getAddressByOrderID(@Param("orderNo") String orderNo);
@@ -1405,4 +1406,14 @@ public interface WarehouseMapper {
 	public List<Map<String, Object>> getOrderDetailsByOrderidIn(List<String> remarksList);
 	
 	public void insertChangeLog(Map<String, Object> map);
-} 
+    @Select("SELECT COUNT(1) FROM goods_list_search WHERE Goods_state=1")
+    int FindOrderCount();
+    @Select("SELECT pid FROM goods_list_search  WHERE Goods_state=1")
+	List<String> FindAllPid();
+    @Select("SELECT a.pid,a.price,a.catid1,a.`name`,b.name as keyword from custom_benchmark_ready a LEFT JOIN 1688_category b ON a.catid1=b.category_id WHERE pid=#{pid}")
+	CustomGoodsBean selectByPid(@Param("pid") String pid);
+    @Select("SELECT COUNT(1) from goods_list_search WHERE Goods_state=1")
+	int FindCount();
+    @Update("update goods_list_search SET price=#{price} WHERE pid=#{pid}")
+	int AddBadOrder(@Param("pid") String pid, @Param("price") Double price);
+}

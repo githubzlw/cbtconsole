@@ -350,6 +350,10 @@ public class OrderInfoController{
 				//验货无误成功，判断该订单是否全部到库并且验货无误
 				num = iOrderinfoService.checkOrderState(map.get("orderid"));
 			}
+			String goods_pid=request.getParameter("goods_pid");//添加质量差的商品
+			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
+				Boolean b=this.iOrderinfoService.UpdateGoodsState(goods_pid);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -441,6 +445,10 @@ public class OrderInfoController{
 			int count = Integer.valueOf(request.getParameter("count"));
 			map.put("count",String.valueOf(count));
 			res = iOrderinfoService.updateGoodStatus(map);
+			String goods_pid=request.getParameter("goods_pid");//统计质量差的商品
+			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
+				Boolean b=this.iOrderinfoService.UpdateGoodsState(goods_pid);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -505,6 +513,10 @@ public class OrderInfoController{
 					map.put("adminId", String.valueOf(adm.getId()));
 					iOrderinfoService.updatecanceltatus(map);
 				}
+			}
+			String goodsAll=request.getParameter("goodsAll");
+			if ("1".equals(goodsAll)){
+				Boolean b=this.iOrderinfoService.UpdateAllGoodsState(tbOrderId)	;
 			}
 		}catch (Exception e){
 			e.printStackTrace();

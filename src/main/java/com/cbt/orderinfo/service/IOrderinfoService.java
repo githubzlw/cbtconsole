@@ -510,4 +510,8 @@ public interface IOrderinfoService {
 	int getCountryIdByName(String countryNameEn);
 
 	int updateOrderinfomodeTransport(String modeTransport, String orderNo);
+
+	Boolean UpdateGoodsState(String goods_pid);
+
+	Boolean UpdateAllGoodsState(String tbOrderId);
 }
