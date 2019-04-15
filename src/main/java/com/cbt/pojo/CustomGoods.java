@@ -18,6 +18,7 @@ public class CustomGoods {
 	private String catgrid;
 	private String useroperation;
 	private int ocrneeddate;
+	private Category1688 Category1688Map;
 
 
 	public String getShopid() { return shopid; }
@@ -82,4 +83,11 @@ public class CustomGoods {
 	}
 
 
+	public Category1688 getCategory1688Map() {
+		return Category1688Map;
+	}
+
+	public void setCategory1688Map(Category1688 category1688Map) {
+		Category1688Map = category1688Map;
+	}
 }
