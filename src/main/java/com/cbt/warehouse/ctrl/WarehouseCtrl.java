@@ -108,6 +108,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8995,7 +8997,11 @@ public class WarehouseCtrl {
 	public String getUserInfo(String str){
 		String encodeStr = "";
 		if(null!=str && !"".equals(str)){
-			encodeStr = DESUtils.encode(str);
+			try{
+				encodeStr = URLEncoder.encode(DESUtils.encode(str));
+			}catch(Exception e){
+				LOG.error(" 加密用户名错误 USERID:{}",str);
+			}
 		}
 		return encodeStr;
 	}
