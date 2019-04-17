@@ -37,7 +37,7 @@
 #Img1:hover{ width:300px; height:300px;position: absolute;}*/
 
 .div{
-	float: left; padding: 10px;
+	float: left; padding: 30px;
 	border: 2px solid aquamarine;
 }
 
@@ -187,32 +187,30 @@ div.margin2 {
 		$("input[class='cbox']").prop('checked',false );//反选
         $("input[class='cbox']").prop('disabled',true );
 		}
-
-        /*$("#type").empty();
-        var cilValue=$("#type");
-        cilValue.append('<option value="">Pls Select</option>');
-        //给分类类别赋值
-        $.ajax({
-            type:'post',
-            url:"${ctx}/Distinguish_Picture/FindCategory",
+       /*$.ajax({
+            type: "GET",
+            url: "${ctx}/Distinguish_Picture/FindCategory",
             dataType:"json",
-            success:function(res){
-                if(res.length>0){
-                    var html = [];
-                    for (var i = 0; i < res.length; i++) {
-                        if(){
-                            cilValue.append('<option value="'+res[i].categoryid+'">'+res[i].name+'</option>');
-						}
-                        cilValue.append('<option value="'+res[i].categoryid+'">'+res[i].name+'</option>');
+            success: function(msg){
+                alert("数据装载错误");
+                if (msg.length>0) {
+                    $("#type").empty();
+                    var content = '<option value="" selected="selected">全部</option>';
+                    for (var i = 0; i < msg.length; i++) {
+                        content += '<option value="' + json[i].categoryid + '" ">' + json[i].enable + '</option>';
                     }
-                    // cilValue.append(html.join(''));
-                }else{
-                    alert("获取一级列表失败");
-				}
+                    $("#type").append(content);
+                    alert("数据装载错误");
+                } else {
+                    console.log("获取用户列表失败，原因 :" + data.message);
+                }
+            },
+            error: function (res) {
+                console.log("网络获取失败");
             }
-        })*/
+        });*/
     });
-function fnjump(obj,type){
+function fnjump(obj){
 	var page=$("#page").val();
 	if(page==""){
 		page = "1";
@@ -233,16 +231,22 @@ function fnjump(obj,type){
 	
 	$("#page").val(page);
     var pid = $("#pid").val();
-    var type = $("#type").val();
-    var type2 = $("#type2").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&type="+type;}
+    var imgtype = $("#imgtype").val();
+    var state = $("#state").val();
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&imgtype="+imgtype+"&state="+state;}
 
 
 function search(){
 	var pid = $("#pid").val();
-	var type = $("#type").val();
-    var type2 = $("#type2").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&type="+type;
+	var imgtype = $("#imgtype").val();
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&imgtype="+imgtype;
+}
+function search2(){
+        var pid = $("#pid").val();
+        var imgtype = $("#imgtype").val();
+        var state = $("#state").val();
+        var Change_user = $("#Change_user").val();
+        window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&imgtype="+imgtype+"&state="+state+"&Change_user="+Change_user;
 }
 
 
@@ -285,8 +289,8 @@ function  update(ocrneeddelete,id){
 function  updateSomes(type){
    	if(confirm("确定要删除选择的图片？")){
 	var  mainMap ={};
-	var erList= new Array();  
-	var id = "";
+	var erList= new Array();
+    var id = "";
 	var ocrneeddelete ="";
     var sbi = 0;
 	$(".cbox:checked").each(function(){
@@ -323,7 +327,7 @@ function  updateSomes(type){
 </script>
 </head>
 <body>
-<h1 align="center"><b>取消OCR识别错误图片<span style="color: red"></span></b></h1>
+<h1 align="center"><b>删除有中文的图片</b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
 	<div class="main">
 		<div class="main-head"></div>
@@ -334,28 +338,44 @@ function  updateSomes(type){
 						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" placeholder="请输入商品id"/>
 					</div>
 					<div class="left left-margin">
-						<span style="color: red">(用于人工进行检查OCR程序对图片的识别错误更正)</span>
+						<span style="color: red">备注：(人工进行对图片的删除)</span>
 						<span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span>
+						状态位:<select   id="state" class="selectText"  onchange="search2()">
+							<option value="0" <c:if test="${state==0}"> selected </c:if>>未处理</option>
+							<option value="1" <c:if test="${state==1}"> selected </c:if>>已处理(含中文)</option>
+							<option value="2" <c:if test="${state==2}"> selected </c:if>>已处理(不含中文)</option>
+						</select>
+						处理人员:<select   id="Change_user" class="selectText"  onchange="search2()">
+							<option value="">全部</option>
+							<c:forEach items="${customGoodsList2}" var="ret">
+								<c:if test="${ret.useroperation!=null}">
+								<option value="${ret.useroperation}" <c:if test="${ret.useroperation==Change_user}"> selected </c:if>>${ret.useroperation}</option>
+								</c:if>
+							</c:forEach>
+						</select>
 					</div>
 				</div>
 				<div class="main-top margin2">
 
 					<div class="left">
-						<span class="wenzi">图片分类：</span> <select   id="type" class="selectText">
+						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()">
 						<option value="">请选择(全部)</option>
 						<c:forEach items="${ret}" var="ret" >
-						<option value="${ret.categoryid}" <c:if test="${ret.categoryid==type}"> selected </c:if>>${ret.name}</option>
+								<option value="${ret.categoryid}" <c:if test="${ret.categoryid==imgtype}"> selected </c:if>>${ret.name}(${ret.id})</option>
+
 						</c:forEach>
 					</select>
 					</div>
-					<%--<div class="left">
-						<span class="wenzi">图片分类：</span> <input type="text" id="type2"  value="${pid }" class="inputText" placeholder="手动输入类别查询"/>
-					</div>--%>
 					<div class="left left-margin">
 						<input type="hidden" value="${username}" id="user_">
 						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<span class="wenzi"  onclick="updateSomes(${type})"><a href="#" style="text-decoration:none"><font color="white">逻辑删除</font></a></span>
+						<c:if test="${state==null}">
+						<span class="wenzi"  onclick="updateSomes(1)"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
+							<span class="wenzi"  onclick="updateSomes(2)"><a href="#" style="text-decoration:none"><font color="white">添加受保护</font></a></span>
+							<span style="color: blue">(添加到（已处理不含中文）)</span>
+						</c:if>
+						<span style="color: red">(可以选择图片分类：选择全部，点击查询可回到未处理状态位信息)</span>
 					</div>
 				</div>
 
@@ -368,16 +388,16 @@ function  updateSomes(type){
 		</div>
 		<div class="main-table">
 			<table class="table">
-				<c:if test="${customGoodsList=='' || customGoodsList==null}">
+				<c:if test="${isdate==0}">
 					<div class="div2">
-						<span style="color: red">查询数据不存在</span>
+						<span style="color: red;font-size: 24px">查询数据不存在</span>
 					</div>
 				</c:if>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
 						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }">
 						<br/>
-						id:<input type="text"  value="${customGoodsList.id }"/>
+						pid:<input type="text"  value="${customGoodsList.pid }"/>
 						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 					</div>
 				</c:forEach>
@@ -390,11 +410,11 @@ function  updateSomes(type){
 		
 		总共:&nbsp;&nbsp;<span id="pagetotal">${currentPage}<em>/</em> ${totalpage}</span>
 		页&nbsp;&nbsp;
-		<input type="button" value="上一页" onclick="fnjump(-1,${type})" class="btn">
-		<input type="button" value="下一页" onclick="fnjump(1,${type})" class="btn">
+		<input type="button" value="上一页" onclick="fnjump(-1)" class="btn">
+		<input type="button" value="下一页" onclick="fnjump(1)" class="btn">
 		
 		第<input id="page" type="text" value="${currentPage}" style="height: 26px;">
-		<input type="button" value="查询" onclick="fnjump(0,${type})" class="btn">
+		<input type="button" value="查询" onclick="fnjump(0)" class="btn">
 		</div>
 	</div>
 </body>

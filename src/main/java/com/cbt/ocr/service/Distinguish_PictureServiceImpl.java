@@ -3,7 +3,6 @@ package com.cbt.ocr.service;
 import com.cbt.ocr.dao.Distinguish_PictureDao;
 import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +16,10 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	public Distinguish_PictureDao distinguish_PictureDao;
 
 	@Override
-	public List<CustomGoods> showDistinguish_Pircture(String pid,int page,String type) {
-		page=(page-1)*40;
-		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,page,type);
-		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,type);
+	public List<CustomGoods> showDistinguish_Pircture(String pid,int page,String imgtype,String state,String Change_user) {
+		page=(page-1)*30;
+		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,page,imgtype,state,Change_user);
+		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,imgtype,state,Change_user);
 		String len="/usr/local/goodsimg";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
@@ -33,11 +32,16 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public int queryDistinguish_PirctureCount(String pid, String type) {
-		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,type);
+	public List<CustomGoods> showDistinguish_Pircture_2() {
+
+		return distinguish_PictureDao.showDistinguish_Pircture_2();
 	}
 	@Override
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String type,String userName) {
+	public int queryDistinguish_PirctureCount(String pid, String imgtype,String state,String Change_user) {
+		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,imgtype,state,Change_user);
+	}
+	@Override
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName) {
 
 		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,type,userName);
 	}
