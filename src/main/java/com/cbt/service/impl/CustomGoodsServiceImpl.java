@@ -35,6 +35,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public int addReviewRemark(Map<String, String> map) {
+        //保存一条记录 和 保存原表
         return customGoodsMapper.addReviewRemark(map);
     }
 
