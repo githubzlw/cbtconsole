@@ -179,6 +179,7 @@ div.margin2 {
 </style>
 
 <script type="text/javascript">
+
 	$(function () {
 		//默认勾选所有数据
         $("input[class='cbox']").prop('checked',true );//全选
@@ -187,29 +188,29 @@ div.margin2 {
 		$("input[class='cbox']").prop('checked',false );//反选
         $("input[class='cbox']").prop('disabled',true );
 		}
-       /*$.ajax({
+        <!--<c:if test="msg[i].categoryid==${Change_user}"> selected </c:if>-->
+        $.ajax({
             type: "GET",
             url: "${ctx}/Distinguish_Picture/FindCategory",
             dataType:"json",
             success: function(msg){
-                alert("数据装载错误");
-                if (msg.length>0) {
-                    $("#type").empty();
-                    var content = '<option value="" selected="selected">全部</option>';
+					var content="";
+                    $("#imgtype").empty();
+               		 content += '<option value="">请选择(全部)</option>';
                     for (var i = 0; i < msg.length; i++) {
-                        content += '<option value="' + json[i].categoryid + '" ">' + json[i].enable + '</option>';
+                        content += '<option value="'+msg[i].categoryid+'">'+msg[i].name+'('+msg[i].id+')</option>';
                     }
-                    $("#type").append(content);
-                    alert("数据装载错误");
-                } else {
-                    console.log("获取用户列表失败，原因 :" + data.message);
-                }
+                    $("#imgtype").append(content);
+
             },
-            error: function (res) {
+            error: function (msg) {
                 console.log("网络获取失败");
             }
-        });*/
+        });
     });
+function byPower() {
+
+}
 function fnjump(obj){
 	var page=$("#page").val();
 	if(page==""){
@@ -348,9 +349,7 @@ function  updateSomes(type){
 						处理人员:<select   id="Change_user" class="selectText"  onchange="search2()">
 							<option value="">全部</option>
 							<c:forEach items="${customGoodsList2}" var="ret">
-								<c:if test="${ret.useroperation!=null}">
-								<option value="${ret.useroperation}" <c:if test="${ret.useroperation==Change_user}"> selected </c:if>>${ret.useroperation}</option>
-								</c:if>
+								<option value="${ret.admname}" <c:if test="${ret.admname==Change_user}"> selected </c:if>>${ret.admname}</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -358,7 +357,7 @@ function  updateSomes(type){
 				<div class="main-top margin2">
 
 					<div class="left">
-						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()">
+						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()" onfocus="byPower()">
 						<option value="">请选择(全部)</option>
 						<c:forEach items="${ret}" var="ret" >
 								<option value="${ret.categoryid}" <c:if test="${ret.categoryid==imgtype}"> selected </c:if>>${ret.name}(${ret.id})</option>

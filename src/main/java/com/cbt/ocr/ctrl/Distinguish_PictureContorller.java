@@ -1,6 +1,5 @@
 package com.cbt.ocr.ctrl;
 
-import com.alibaba.fastjson.JSON;
 import com.cbt.ocr.service.Distinguish_PictureService;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
@@ -8,17 +7,14 @@ import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.website.bean.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +51,8 @@ public class Distinguish_PictureContorller {
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
 		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,imgtype,state,Change_user);
 		//处理人员查询显示
-		//TODO 需优化  查询时间多久
-		List<CustomGoods> customGoodsList2=distinguish_pictureService.showDistinguish_Pircture_2();
+		//TODO 需优化  查询时间过久
+		List<Admuser> customGoodsList2=distinguish_pictureService.showDistinguish_Pircture_2();
 
 		//给页面数据一个解释
 		if(customGoodsList.size()==0){
@@ -70,8 +66,8 @@ public class Distinguish_PictureContorller {
 		}
 
 		//分类类别
-		//TODO 需优化   查询时间多久
-		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
+		//TODO 需优化   查询时间过久
+		//List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
 
 		//页面动态锁定信息
 		request.setAttribute("pid",pid);
@@ -84,7 +80,7 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
-		request.setAttribute("ret",ret);
+		//request.setAttribute("ret",ret);
 
 
 	return "recognition_picture";
@@ -112,18 +108,7 @@ public class Distinguish_PictureContorller {
 	@RequestMapping(value = "FindCategory")
 	@ResponseBody
 	public List<Category1688> FindCategory(HttpServletRequest request){
-		/*System.out.println("查询分类开始......");
 		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
-		try {
-		for (int i=0;i<ret.size();i++){
-			if(distinguish_pictureService.queryDistinguish_PirctureCount("",ret.get(i).getCategoryid())>0){
-				ret.get(i).setId(i);
-				ret.get(i).setEnable(distinguish_pictureService.queryDistinguish_PirctureCount("",ret.get(i).getCategoryid()));
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		}*/
-		return  null;
+		return  ret;
 	}
 }

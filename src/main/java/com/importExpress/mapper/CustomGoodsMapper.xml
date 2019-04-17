@@ -1073,7 +1073,8 @@
         group by a.catid1) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
     <insert id="addReviewRemark">
-        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score})
+        insert into goods_review_log(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
+        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
     </insert>
 
 
