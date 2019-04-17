@@ -1,8 +1,8 @@
 package com.cbt.ocr.service;
 
+import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public interface Distinguish_PictureService {
 	 *
 	 */
 	public List<CustomGoods> showDistinguish_Pircture( String pid,  int page,String imgtype,String state,String Change_user);
-	public List<CustomGoods> showDistinguish_Pircture_2();
+	public List<Admuser> showDistinguish_Pircture_2();
 
 	/***
 	 * 查询OCR识别错误图片的总数

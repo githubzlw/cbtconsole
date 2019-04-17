@@ -1,6 +1,7 @@
 package com.cbt.ocr.service;
 
 import com.cbt.ocr.dao.Distinguish_PictureDao;
+import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public List<CustomGoods> showDistinguish_Pircture_2() {
+	public List<Admuser> showDistinguish_Pircture_2() {
 
 		return distinguish_PictureDao.showDistinguish_Pircture_2();
 	}

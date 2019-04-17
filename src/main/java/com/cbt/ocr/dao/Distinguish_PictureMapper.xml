@@ -12,23 +12,18 @@
         <result column="ocr_need_delete" property="ocrneeddelete"/>
         <result column="catgrid" property="catgrid"/>
         <result column="user_operation" property="useroperation"/>
-        <result column="ocr_need_date" property="ocrneeddate"/><!--
-        <collection property="Category1688Map" javaType="com.cbt.pojo.Category1688" resultMap="Category1688Map"/>-->
+        <result column="ocr_need_date" property="ocrneeddate"/>
+    </resultMap>
+    <resultMap id="UserMap" type="com.cbt.pojo.Admuser">
+        <id column="id" property="id" javaType="INTEGER"/>
+        <result column="admName" property="admname"/>
     </resultMap>
     <resultMap id="Category1688Map" type="com.cbt.pojo.Category1688">
         <id column="id" property="id" javaType="INTEGER"/>
         <result column="lv" property="lv"/>
         <result column="category_id" property="categoryid"/>
         <result column="name" property="name"/>
-        <!--<collection property="CustombenchmarkReady" javaType="com.cbt.pojo.CustombenchmarkReady"
-                    resultMap="CustombenchmarkReady"/>-->
     </resultMap>
-   <!-- <resultMap id="CustombenchmarkReady" type="com.cbt.pojo.CustombenchmarkReady">
-        <id column="id" property="id" javaType="INTEGER"/>
-        <result column="catid1" property="catid1"/>
-        <result column="path_catid" property="pathcatid"/>
-        <result column="pid" property="pid"/>
-    </resultMap>-->
 
     <select id="showDistinguish_Pircture" resultMap="resultMap">
     SELECT cdm.id,cdm.pid,cdm.remote_path FROM custom_goods_md5 cdm
@@ -51,9 +46,8 @@
     limit #{page},30
 </select>
 
-    <select id="showDistinguish_Pircture_2" resultMap="resultMap">
-        SELECT * FROM custom_goods_md5 c
-        GROUP BY c.user_operation
+    <select id="showDistinguish_Pircture_2" resultMap="UserMap">
+         SELECT admName FROM admuser where roleType=3 or roleType=4
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
