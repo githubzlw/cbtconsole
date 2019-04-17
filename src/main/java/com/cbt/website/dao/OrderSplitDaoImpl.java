@@ -2722,9 +2722,9 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 	@Override
 	public List<Object[]> getOrderDetails(String[] orderNos) {
-		String sql = "select od.orderid,od.id,od.yourorder,od.goodsprice,goodsname,googs_img,goods_type,"
-				+ "(select img from goods_typeimg where gc.id = goods_id) goods_typeimg from order_details od,"
-				+ "goods_car gc where gc.id=od.goodsid and ";
+		String sql = "select od.orderid,od.id,od.yourorder,od.goodsprice,od.goodsname ,REPLACE(od.car_img,'60x60','400x400') as googs_img," +
+				"od.car_type as goods_type,(select img from goods_typeimg where od.goodsid = goods_id) goods_typeimg " +
+				"from order_details od where ";
 		if (orderNos.length == 2) {
 			sql += "( od.orderid=? or od.orderid=? )";
 		} else {

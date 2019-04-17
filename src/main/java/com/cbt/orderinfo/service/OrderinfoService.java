@@ -796,6 +796,7 @@ public class OrderinfoService implements IOrderinfoService {
 				//判断订单是否全部到库
 				int counts=dao.getDetailsState(map);
 				if(counts == 0){
+					System.err.println("orderNo:" + orderid + ",验货无误");
 					dao.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}

@@ -162,6 +162,7 @@ public class GoodsInfoUpdateOnlineUtil {
         inputData.setSize_info_en(bean.getSizeInfoEn() == null ? "" : bean.getSizeInfoEn());
         inputData.setCustom_main_image(bean.getShowMainImage().replace(bean.getRemotpath(),""));
         inputData.setRemotpath(bean.getRemotpath());
+        inputData.setDescribe_good_flag(String.valueOf(bean.getDescribeGoodFlag()));
         //最终更新的json数据,json数据现在按照jack要求是写入文件，一条json数据对应一条语句 写在文件的一行，然后文件提供到jack
         return updateLocalAndSolr(inputData, 1);
     }
