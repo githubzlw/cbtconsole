@@ -12,52 +12,67 @@
         <result column="ocr_need_delete" property="ocrneeddelete"/>
         <result column="catgrid" property="catgrid"/>
         <result column="user_operation" property="useroperation"/>
-        <result column="ocr_need_date" property="ocrneeddate"/>
-        <collection property="Category1688Map" javaType="com.cbt.pojo.Category1688" resultMap="Category1688Map"/>
+        <result column="ocr_need_date" property="ocrneeddate"/><!--
+        <collection property="Category1688Map" javaType="com.cbt.pojo.Category1688" resultMap="Category1688Map"/>-->
     </resultMap>
     <resultMap id="Category1688Map" type="com.cbt.pojo.Category1688">
         <id column="id" property="id" javaType="INTEGER"/>
         <result column="lv" property="lv"/>
         <result column="category_id" property="categoryid"/>
         <result column="name" property="name"/>
-        <collection property="CustombenchmarkReady" javaType="com.cbt.pojo.CustombenchmarkReady"
-                    resultMap="CustombenchmarkReady"/>
+        <!--<collection property="CustombenchmarkReady" javaType="com.cbt.pojo.CustombenchmarkReady"
+                    resultMap="CustombenchmarkReady"/>-->
     </resultMap>
-    <resultMap id="CustombenchmarkReady" type="com.cbt.pojo.CustombenchmarkReady">
+   <!-- <resultMap id="CustombenchmarkReady" type="com.cbt.pojo.CustombenchmarkReady">
         <id column="id" property="id" javaType="INTEGER"/>
         <result column="catid1" property="catid1"/>
         <result column="path_catid" property="pathcatid"/>
         <result column="pid" property="pid"/>
-    </resultMap>
+    </resultMap>-->
 
     <select id="showDistinguish_Pircture" resultMap="resultMap">
-        SELECT cdm.* FROM
-        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
-        WHERE cbr.`pid`=cdm.`pid`
-        AND c.category_id=cbr.`catid1`
-        AND cdm.ocr_need_delete=1
+    SELECT cdm.id,cdm.pid,cdm.remote_path FROM custom_goods_md5 cdm
+    WHERE cdm.ocr_need_delete=1
+    <if test="Change_user != null and Change_user != ''">
+        AND cdm.user_operation=#{Change_user}
+    </if>
+    <if test="state == null || state == ''">
         AND cdm.ocr_need_date=0
-        <if test="type != null and type != ''">
-            and c.category_id=#{type}
-        </if>
-        <if test="pid != null and pid != ''">
-            and pid=#{pid}
-        </if>
-        limit #{page},28
+    </if>
+    <if test="state != null and state != ''">
+        AND cdm.ocr_need_date=#{state}
+    </if>
+    <if test="imgtype != null and imgtype != ''">
+        AND cdm.catgrid=#{imgtype}
+    </if>
+    <if test="pid != null and pid != ''">
+        AND cdm.pid=#{pid}
+    </if>
+    limit #{page},30
+</select>
+
+    <select id="showDistinguish_Pircture_2" resultMap="resultMap">
+        SELECT * FROM custom_goods_md5 c
+        GROUP BY c.user_operation
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM
-        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
-        WHERE cbr.`pid`=cdm.`pid`
-        AND c.category_id=cbr.`catid1`
-        AND cdm.ocr_need_delete=1
-        AND cdm.ocr_need_date=0
-        <if test="type != null and type != ''">
-            and c.category_id=#{type}
+        SELECT COUNT(1) FROM custom_goods_md5 cdm
+        WHERE cdm.ocr_need_delete=1
+        <if test="state == null || state == ''">
+            AND cdm.ocr_need_date=0
+        </if>
+        <if test="state != null and state != ''">
+            AND cdm.ocr_need_date=#{state}
+        </if>
+        <if test="Change_user != null and Change_user != ''">
+            AND cdm.user_operation=#{Change_user}
+        </if>
+        <if test="imgtype != null and imgtype != ''">
+        and cdm.catgrid=#{imgtype}
         </if>
         <if test="pid != null and pid != ''">
-            and pid=#{pid}
+        AND cdm.pid=#{pid}
         </if>
     </select>
 
@@ -65,14 +80,26 @@
         id,lv,category_id,name
     </sql>
     <select id="showCategory1688_type" resultMap="Category1688Map">
-        SELECT
-        <include refid="Category1688_List"/>
-        FROM 1688_category Where lv  != 1 and lv != 0
+       SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
+        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
+        WHERE cbr.`pid`=cdm.`pid`
+        AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
+        AND cdm.ocr_need_delete=1
+        AND cdm.ocr_need_date=0
+        GROUP BY c.category_id
     </select>
     <update id="updateSomePirctu_risdelete">
         update custom_goods_md5 SET
-        ocr_need_date=1,
-        user_operation=#{userName} where
+        <if test="type==1">
+            ocr_need_delete=1,
+            ocr_need_date=1,
+        </if>
+        <if test="type==2">
+            ocr_need_delete=2,
+            ocr_need_date=2,
+        </if>
+        user_operation=#{userName}
+        where
         <foreach collection="bgList" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
