@@ -1672,12 +1672,14 @@
             <span class="s_btn" onclick="setGoodsValid('${goods.pid}',-1)">下架该商品</span>
             <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
 
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <%--<span class="s_btn" >保存并发布</span>
             <span class="s_btn" >下架该商品</span>
             <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
-
-            <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
-            <span class="s_last">*点击后数据直接更新线上</span>
+            <c:if test="${goods.describeGoodFlag == 0}">
+                <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
+            </c:if>
+            <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
             <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0,0)">标识永不下架</span>
             <c:if test="${goods.promotionFlag == 0}">
@@ -2019,7 +2021,10 @@
                 </c:if><c:if test="${goods.isAbnormal >0}">
                     <br>
                     <b style="font-size: 16px;">数据状态:${goods.abnormalValue}</b>
-                </c:if> <c:if test="${goods.isBenchmark >0}">
+                </c:if> <c:if test="${goods.describeGoodFlag > 0}">
+                    <br>
+                    <b style="font-size: 16px;color: red;">描述很精彩标记</b>
+                </c:if><c:if test="${goods.isBenchmark >0}">
                     <br>
                     <b style="font-size: 16px;">货源对标情况:${goods.isBenchmark ==1 ? '精确对标':'近似对标'}</b>
                 </c:if> <c:if test="${goods.bmFlag >0}">
