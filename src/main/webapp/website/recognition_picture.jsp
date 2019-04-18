@@ -9,7 +9,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>取消OCR识别错误图片</title>
+<title>OCR图片管理</title>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
@@ -372,10 +372,12 @@ function  updateSomes(type){
 							<span style="color: blue">(添加到（已处理不含中文）)</span>
 						</c:if>
 						<span style="color: red">(可以选择图片分类：选择全部，点击查询可回到未处理状态位信息)</span>
-					</div>
+						<c:if test="${state==1}">
+						<span class="wenzi"  onclick="" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">一键下架</font></a></span>
+						<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
+						</c:if>
+						</div>
 				</div>
-
-
 			</div>
 		</div>
 		<div class="left left-margin">
