@@ -2819,9 +2819,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
     }
 
     @Override
-    public  List<CustomGoodsBean> getBadgoods() {
+    public  List<CustomGoodsBean> getBadgoods(int start,int pagesize,String pidc) {
         try {
-            List<String> list=this.warehouseMapper.FindAllPid();
+             if ("".equals(pidc)){
+                 pidc=null;
+             }
+            List<String> list=this.warehouseMapper.FindAllPid(start,pagesize,pidc);
             List<CustomGoodsBean> goodsBeans=new ArrayList<>();
             int i=0;
             for (String pid:list) {
@@ -2858,5 +2861,56 @@ public class WarehouseServiceImpl implements IWarehouseService {
         }
         return 0;
     }
+
+    @Override
+    public int UpdateState(String pid) {
+        try {
+            int conut=this.warehouseMapper.UpdateState(pid);
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public List<badGoods> findAllCustomBypid(String pid, Double price,int pagesize,int start,String cupid) {
+        try {
+            if ("".equals(cupid)){
+                cupid=null;
+            }
+            List<badGoods> list=this.warehouseMapper.findAllCustomBypid(pid,price,pagesize,start,cupid);
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public int findAllCustomBypidCount(String pid, Double price,String cupid) {
+        try {
+            if ("".equals(cupid)){
+                cupid=null;
+            }
+            int count=this.warehouseMapper.findAllCustomBypidCount(pid,price,cupid);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int AddReviewGoods(String pid, String catid1, String name, String maxPrice) {
+        try {
+            int count=this.warehouseMapper.AddReviewGoods(pid,catid1,name,maxPrice);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 
 }

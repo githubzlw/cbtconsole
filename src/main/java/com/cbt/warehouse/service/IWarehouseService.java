@@ -1140,10 +1140,19 @@ public interface IWarehouseService {
     //查看差货未处理订单数
 	int FindOrderCount(String admuserid);
 
-    List<CustomGoodsBean> getBadgoods();
+    List<CustomGoodsBean> getBadgoods(int start,int pagesize,String pid);
 
 	int getBadgoodsCount();
 
 	int AddBadOrder(String pid, Double price);
+
+    int UpdateState(String pid);
+
+	List<badGoods> findAllCustomBypid(String pid, Double price,int pagesize,int start,String cupid);
+
+	int findAllCustomBypidCount(String pid, Double price,String cupid);
+
+	int AddReviewGoods(String pid,String catid1,String name,String maxPrice);
+
 }
  

@@ -7,6 +7,7 @@ import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.website.bean.*;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -1408,12 +1409,22 @@ public interface WarehouseMapper {
 	public void insertChangeLog(Map<String, Object> map);
     @Select("SELECT COUNT(1) FROM goods_list_search WHERE Goods_state=1")
     int FindOrderCount();
-    @Select("SELECT pid FROM goods_list_search  WHERE Goods_state=1")
-	List<String> FindAllPid();
+	@Select("<script>SELECT pid FROM goods_list_search  WHERE Goods_state=1 <when test='pidc!=null'> AND pid like \"%\"#{pidc}\"%\"</when> LIMIT #{start},#{pagesize}</script>")
+   // @Select("SELECT pid FROM goods_list_search  WHERE Goods_state=1 LIMIT #{start},#{pagesize}")
+	List<String> FindAllPid(@Param("start") int start,@Param("pagesize") int pagesize,@Param("pidc") String pidc);
     @Select("SELECT a.pid,a.price,a.catid1,a.`name`,b.name as keyword from custom_benchmark_ready a LEFT JOIN 1688_category b ON a.catid1=b.category_id WHERE pid=#{pid}")
 	CustomGoodsBean selectByPid(@Param("pid") String pid);
     @Select("SELECT COUNT(1) from goods_list_search WHERE Goods_state=1")
 	int FindCount();
     @Update("update goods_list_search SET price=#{price} WHERE pid=#{pid}")
 	int AddBadOrder(@Param("pid") String pid, @Param("price") Double price);
+    @Select("<script>SELECT pid,catid1,`name`,max_price as maxPrice FROM custom_benchmark_ready WHERE valid!=0 AND max_price &lt; #{price} AND catid1=(SELECT catid1 FROM custom_benchmark_ready WHERE pid=#{pid}) AND pid NOT in(SELECT pid FROM needoffshelf_goods) <if test='cupid!=null'>AND pid like \"%\"#{cupid}\"%\"</if> LIMIT #{start},#{pagesize}</script>")
+    List<badGoods> findAllCustomBypid(@Param("pid") String pid, @Param("price") Double price,@Param("pagesize")int pagesize,@Param("start")int start,@Param("cupid")String cupid);
+    @Update("UPDATE goods_list_search SET Goods_state=2 WHERE pid=#{pid}")
+	int UpdateState(@Param("pid") String pid);
+    @Select("<script>SELECT count(1) FROM custom_benchmark_ready WHERE valid!=0 AND max_price &lt; #{price} AND catid1=(SELECT catid1 FROM custom_benchmark_ready WHERE pid=#{pid}) AND pid NOT in(SELECT pid FROM needoffshelf_goods) <if test='cupid!=null'>AND pid like \"%\"#{cupid}\"%\"</if></script>")
+    int findAllCustomBypidCount(@Param("pid") String pid, @Param("price") Double price,@Param("cupid")String cupid);
+    //@Insert("INSERT INTO `crossshop`.`low_price_Bad_goods` ( `pid`, `catid1`, `name`, `max_price`, `shelves_because`) VALUES ( #{pid}, #{catid1}, #{name}, #{maxPrice}, '价格过低下架');")
+    @Insert("INSERT INTO needoffshelf_goods (pid, reason) VALUES (#{pid}, '17')")
+	int AddReviewGoods(@Param("pid") String pid,@Param("catid1") String catid1, @Param("name") String name, @Param("maxPrice") String maxPrice);
 }
