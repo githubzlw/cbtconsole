@@ -7,7 +7,7 @@ import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
-import com.cbt.website.bean.UserInfo;
+import org.apache.poi.util.SystemOutLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +24,6 @@ public class Distinguish_PictureContorller {
 
 	@Autowired
 	public Distinguish_PictureService  distinguish_pictureService;
-
 
 	/**
 	 * 查询OCR识别错误图片
@@ -50,6 +49,8 @@ public class Distinguish_PictureContorller {
 		int pageNO=Integer.parseInt(page);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
 		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,imgtype,state,Change_user);
+		if (StrUtils.isNullOrEmpty(state))
+			state="0";
 		//处理人员查询显示
 		//TODO 需优化  查询时间过久
 		List<Admuser> customGoodsList2=distinguish_pictureService.showDistinguish_Pircture_2();
@@ -64,11 +65,6 @@ public class Distinguish_PictureContorller {
 			totalpage = (Integer)customGoodsList.get(0).getCount();
 			totalpage = totalpage%30==0?totalpage/30:totalpage/30+1;
 		}
-
-		//分类类别
-		//TODO 需优化   查询时间过久
-		//List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
-
 		//页面动态锁定信息
 		request.setAttribute("pid",pid);
 		request.setAttribute("username",user.getAdmName());
@@ -80,7 +76,6 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
-		//request.setAttribute("ret",ret);
 
 
 	return "recognition_picture";
@@ -93,13 +88,22 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String type,String userName){
+	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName,Map<String,Object> myArray){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int type_=Integer.parseInt(type);
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,type_,userName);
-		return   ret ;
+		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName);
+		return  ret ;
 	}
-
+	/****
+	 * @User  zlc
+	 * 批发更新线上无需删除操作
+	 * @param request
+	 * @param
+	 */
+	@RequestMapping(value = "updateSomeis")
+	public void updateSomeDistinguish_Pircture(HttpServletRequest request,@RequestBody Map<String,Object> myArray,String userName){
+		List<Map<String, String>> maList = (List<Map<String, String>>)myArray.get("maList");
+		distinguish_pictureService.updateSomePirctu_risdelete_s(maList,userName);
+	}
 	/**
 	 * 查询最简单的一级类型数据显示到页面上
 	 * @param request
