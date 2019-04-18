@@ -42,8 +42,8 @@
 }
 
 .div2{
-	width: 1000px;
-	height: 20px;
+	width: 280px;
+	height: 50px;
 	border: 2px solid aquamarine;
 }
 .div img{
@@ -274,7 +274,6 @@ function  reset(){
             $("input[class='cbox']").prop('checked',false);//反选
         }
     }
-
 function  updateSomes(type){
    	if(confirm("确定要删除选择的图片？")){
 	var  mainMap ={};
@@ -368,7 +367,7 @@ function  updateSomes(type){
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
 						<c:if test="${state==0}">
 						<span class="wenzi"  onclick="updateSomes(1)"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
-						<span style="color: blue">(勾选添加到（已处理含中文），勾选添加到（已处理不含中文）)</span>
+						<span style="color: blue">(勾选添加到（已处理含中文），未勾选则添加到（已处理不含中文）)</span>
 						</c:if>
 						<span style="color: red">(选择全部，点击查询可回到未处理状态位信息)</span>
 						<%--<c:if test="${state==1}">
@@ -387,7 +386,7 @@ function  updateSomes(type){
 			<table class="table">
 				<c:if test="${isdate==0}">
 					<div class="div2">
-						<span style="color: red;font-size: 24px">查询数据不存在</span>
+						<span style="color: red;font-size: 40px">查询数据不存在</span>
 					</div>
 				</c:if>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
