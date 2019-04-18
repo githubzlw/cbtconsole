@@ -7,7 +7,6 @@ import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
-import com.cbt.website.bean.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +23,6 @@ public class Distinguish_PictureContorller {
 
 	@Autowired
 	public Distinguish_PictureService  distinguish_pictureService;
-
 
 	/**
 	 * 查询OCR识别错误图片
@@ -64,11 +62,6 @@ public class Distinguish_PictureContorller {
 			totalpage = (Integer)customGoodsList.get(0).getCount();
 			totalpage = totalpage%30==0?totalpage/30:totalpage/30+1;
 		}
-
-		//分类类别
-		//TODO 需优化   查询时间过久
-		//List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
-
 		//页面动态锁定信息
 		request.setAttribute("pid",pid);
 		request.setAttribute("username",user.getAdmName());

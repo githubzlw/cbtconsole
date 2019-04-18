@@ -177,7 +177,6 @@ div.margin2 {
 	color: #0000ff;
 }
 </style>
-
 <script type="text/javascript">
 
 	$(function () {
@@ -188,7 +187,7 @@ div.margin2 {
 		$("input[class='cbox']").prop('checked',false );//反选
         $("input[class='cbox']").prop('disabled',true );
 		}
-        <!--<c:if test="msg[i].categoryid==${Change_user}"> selected </c:if>-->
+
         $.ajax({
             type: "GET",
             url: "${ctx}/Distinguish_Picture/FindCategory",
@@ -198,19 +197,17 @@ div.margin2 {
                     $("#imgtype").empty();
                		 content += '<option value="">请选择(全部)</option>';
                     for (var i = 0; i < msg.length; i++) {
-                        content += '<option value="'+msg[i].categoryid+'">'+msg[i].name+'('+msg[i].id+')</option>';
-                    }
-                    $("#imgtype").append(content);
+                            content += '<option value="'+msg[i].categoryid+'">'+msg[i].name+'('+msg[i].id+')</option>';
 
+                          }
+                    $("#imgtype").append(content);
+                    $("#imgtype option[value=${imgtype}]").attr("selected","selected");
             },
-            error: function (msg) {
+            error: function () {
                 console.log("网络获取失败");
             }
         });
     });
-function byPower() {
-
-}
 function fnjump(obj){
 	var page=$("#page").val();
 	if(page==""){
@@ -342,7 +339,7 @@ function  updateSomes(type){
 						<span style="color: red">备注：(人工进行对图片的删除)</span>
 						<span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span>
 						状态位:<select   id="state" class="selectText"  onchange="search2()">
-							<option value="0" <c:if test="${state==0}"> selected </c:if>>未处理</option>
+							<option value="" <c:if test="${state==''}"> selected </c:if>>未处理</option>
 							<option value="1" <c:if test="${state==1}"> selected </c:if>>已处理(含中文)</option>
 							<option value="2" <c:if test="${state==2}"> selected </c:if>>已处理(不含中文)</option>
 						</select>
@@ -357,7 +354,7 @@ function  updateSomes(type){
 				<div class="main-top margin2">
 
 					<div class="left">
-						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()" onfocus="byPower()">
+						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()">
 						<option value="">请选择(全部)</option>
 						<c:forEach items="${ret}" var="ret" >
 								<option value="${ret.categoryid}" <c:if test="${ret.categoryid==imgtype}"> selected </c:if>>${ret.name}(${ret.id})</option>
@@ -369,7 +366,7 @@ function  updateSomes(type){
 						<input type="hidden" value="${username}" id="user_">
 						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<c:if test="${state==null}">
+						<c:if test="${state==0}">
 						<span class="wenzi"  onclick="updateSomes(1)"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
 							<span class="wenzi"  onclick="updateSomes(2)"><a href="#" style="text-decoration:none"><font color="white">添加受保护</font></a></span>
 							<span style="color: blue">(添加到（已处理不含中文）)</span>
