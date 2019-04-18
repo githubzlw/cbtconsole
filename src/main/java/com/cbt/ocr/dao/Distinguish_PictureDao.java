@@ -17,8 +17,9 @@ public interface Distinguish_PictureDao {
 
 	public int queryDistinguish_PirctureCount(@Param("pid")String pid, @Param("imgtype")String imgtype, @Param("state")String state, @Param("Change_user")String Change_user);
 
-	public int updateSomePirctu_risdelete(@Param("bgList")List<Map<String, String>> bgList,@Param("type")int type,@Param("userName")String userName);
+	public int updateSomePirctu_risdelete(@Param("bgList")List<Map<String, String>> bgList,@Param("userName")String userName);
 
+	public int updateSomePirctu_risdelete_s(@Param("bgList_s")List<Map<String, String>> bgList_s,@Param("userName")String userName);
 	public List<Category1688> showCategory1688_type();
 
 

@@ -178,7 +178,8 @@ div.margin2 {
 }
 </style>
 <script type="text/javascript">
-
+    var myArray=new Array();
+    var  maMap ={};
 	$(function () {
 		//默认勾选所有数据
         $("input[class='cbox']").prop('checked',true );//全选
@@ -206,6 +207,14 @@ div.margin2 {
             error: function () {
                 console.log("网络获取失败");
             }
+        });
+        var you = 0;
+        $(".cbox:checked").each(function(){
+            var elMap={};
+            elMap['id'] =this.value;
+            elMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
+            myArray[you] = elMap;
+            you++;
         });
     });
 function fnjump(obj){
@@ -253,24 +262,6 @@ function  reset(){
 	$("input[type='text']").val('');
 }
 
-
-function  update(ocrneeddelete,id){
-			$.ajax({
-				type:'post',
-				url:"${ctx}/Distinguish_Picture/updateSomeis_delete",
-				data:{id:id/*,ocrneeddelete:ocrneeddelete*/},
-				dataType:"json",
-				success:function(res){
-					if(res==1){
-						$("#tip").html("执行成功 !");
-						window.location.reload();
-					}else{
-						$("#tip").html("执行失败  !")
-					}
-				}
-			})
-}
-
     function fnselect(){
         if($("#checked").prop("checked") == true){
             $("input[class='cbox']").prop('checked',true );//全选
@@ -301,12 +292,21 @@ function  updateSomes(type){
 	if(erList.length == 0){
 		alert("请至少选择一个！");
 	}else{
-		mainMap['bgList'] = erList;
-		console.log(mainMap);
         var userName=$("#userName").val();
+        maMap['maList']=myArray;
+        console.log(mainMap);
+        $.ajax({
+            type:"post",
+            url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
+            dataType:"json",
+            contentType : 'application/json;charset=utf-8',
+            data:JSON.stringify(maMap)
+        });
+        mainMap['bgList'] = erList;
+		console.log(mainMap);
 	 	$.ajax({
 			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type+"&userName="+userName,
+			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?userName="+userName,
 			dataType:"json",
 			contentType : 'application/json;charset=utf-8', 
 		    data:JSON.stringify(mainMap),
@@ -314,7 +314,7 @@ function  updateSomes(type){
 				if(res==0){
 					$("#tip").html("删除失败  !")
 				}else{
-					$("#tip").html("已到待删除列成功 !");
+					$("#tip").html("删除成功 !");
 					window.location.reload();
 				}
 			}
@@ -368,14 +368,13 @@ function  updateSomes(type){
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
 						<c:if test="${state==0}">
 						<span class="wenzi"  onclick="updateSomes(1)"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
-							<span class="wenzi"  onclick="updateSomes(2)"><a href="#" style="text-decoration:none"><font color="white">添加受保护</font></a></span>
-							<span style="color: blue">(添加到（已处理不含中文）)</span>
+						<span style="color: blue">(勾选添加到（已处理含中文），勾选添加到（已处理不含中文）)</span>
 						</c:if>
-						<span style="color: red">(可以选择图片分类：选择全部，点击查询可回到未处理状态位信息)</span>
-						<c:if test="${state==1}">
-						<span class="wenzi"  onclick="" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">一键下架</font></a></span>
+						<span style="color: red">(选择全部，点击查询可回到未处理状态位信息)</span>
+						<%--<c:if test="${state==1}">
+						<span class="wenzi"  onclick="updateSomes(3)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">一键下架</font></a></span>
 						<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
-						</c:if>
+						</c:if>--%>
 						</div>
 				</div>
 			</div>

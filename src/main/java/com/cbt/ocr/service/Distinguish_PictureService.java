@@ -34,7 +34,8 @@ public interface Distinguish_PictureService {
 	 * @param bgList
 	 * @return
 	 */
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName);
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName);
+	public int updateSomePirctu_risdelete_s(List<Map<String, String>> bgList_s,String userName);
 
 	public List<Category1688> showCategory1688_type();
 }
