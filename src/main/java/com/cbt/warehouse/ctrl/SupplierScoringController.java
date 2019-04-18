@@ -62,6 +62,10 @@ public class SupplierScoringController {
 			String authorizedFlag=request.getParameter("authorizedFlag");
 			authorizedFlag=StringUtil.isBlank(authorizedFlag)?null:authorizedFlag;
 			String categoryName=request.getParameter("categoryName");
+			if (!"".equals(categoryName)&&categoryName !=null) {
+				String a = "\\\\\\" + "'";
+				categoryName = categoryName.replaceAll("'", a);
+			}
 			categoryName=StringUtil.isBlank(categoryName)?null:categoryName;
 			shop_id = StringUtils.isNotBlank(shop_id) ? new String(shop_id.getBytes("iso8859-1"), "utf-8"): null;
 			String level = request.getParameter("level");
