@@ -32,7 +32,6 @@
         AND cdm.user_operation=#{Change_user}
     </if>
     <if test="state == null || state == ''">
-        AND cdm.ocr_need_date=0
         AND cdm.ocr_need_delete=1
     </if>
     <if test="state != null and state != ''">
@@ -49,7 +48,7 @@
 </select>
 
     <select id="showDistinguish_Pircture_2" resultMap="UserMap">
-         SELECT admName FROM admuser
+         SELECT admName FROM admuser where roleType=4 OR roleType=5
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
