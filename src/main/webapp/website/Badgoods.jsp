@@ -106,7 +106,7 @@
 <div align="center" style="display: block;height: 30px;text-align: center;margin-bottom: 20px;">
     <span style="line-height:25px;">商品pid:</span><input type="text" id="cuName" value="${pid==null?"":pid}" class="rlcj" style="margin-right: 20px;"/>
     <input type="button" value="查找" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="infoSearch();" />
-    <input type="button" value="重置" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="resetGoods()" />
+    <input type="button" value="重置" class="rlcj" style="background: #7AB63F;padding: 0px 5px;color: #fff;margin-left: 10px;" onclick="resetGoods()" /><td>（操作完成或非价格因素可点击删除）</td>
 
 </div>
 
@@ -139,7 +139,7 @@
                 <td >如果是价格原因请输入建议采购价格</td>
                 <%--<td >勾选请输入建议采购价格<input type="checkbox" name="${gbb.pid}" id="${gbb.pid}" value=""></td>--%>
                 <td ><input type="text" id="${gbb.pid}d" ></td>
-                <td ><button onclick="updatBateprice('${gbb.pid}','${gbb.pid}d')">确认提交</button>&nbsp;&nbsp;&nbsp; <button onclick="updatBateState('${gbb.pid}')">非价格因素</button></td>
+                <td ><button onclick="updatBateprice('${gbb.pid}','${gbb.pid}d')">确认提交</button>&nbsp;&nbsp;&nbsp; <button onclick="updatBateState('${gbb.pid}')">删除</button></td>
 
             </Tr>
         </c:forEach>

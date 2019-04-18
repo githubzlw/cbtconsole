@@ -128,9 +128,9 @@ function updategoodstatus(isok,goods_pid, orderid, goodid, itemid, taobaoprice, 
     var seiUnit = "";
     var _count = "";
     var record_ = "";
-    if(!$(goods_state).is(":checked")){
-        goods_pid=1;
-    }
+    if (document.getElementById("goodsAll").checked==false){
+        goodsAll=1
+    };
     if (checked == "1") {
         seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
         seiUnit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
@@ -528,9 +528,12 @@ function allTrack(type) {
     var count = "0";
     var tbOrderId = $("#tborderid").val();
     var goodsAll=0;
-    if($(goods_state).is(":checked")){
-        goodsAll=1;
-    }
+    if (document.getElementById("goodsAll").checked==true){
+        goodsAll=1
+    };
+    // if($("#goodsAll").is(":checked")){
+    //     goodsAll=1;
+    // }
     $ .ajax({
             // url : "/cbtconsole/WebsiteServlet?action=updateCheckStatus&className=ExpressTrackServlet",
             url : "/cbtconsole/order/allTrack",
@@ -905,9 +908,10 @@ function search() {
                             barcode_info += '</div>';
                             if(json[i].orderremark.length>0){
                                 barcode_info += '<div style="font-size: 20px;font-weight:bold;">备注内容(对内):'
+                                barcode_info += '<p><input type="checkbox" id="goodsAll" style="color: red;" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                                 var orderremark = json[i].orderremark;
                                 for (var j = 0; j < orderremark.length; j++) {
-                                    barcode_info += '<p><<input type="checkbox" id="goodsAll" style="color: red;" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
+
                                     barcode_info +='<p>'+'备注人员：' + orderremark[j][2] + ',内容：' + orderremark[j][1] + '</p>';
                                 }
                                 barcode_info += '</div>';
@@ -1084,7 +1088,7 @@ function search() {
                         str += '</div>';
                         str += '<div style="clear:both;"></div>';
                         str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /><a target="_blank" style="display:none;color:red;text-decoration:underline;font-size: 20px;margin-left: 60px" id="chuku_'+json[i].orderid+'_'+json[i].odid+'" href="/cbtconsole/warehouse/getDetailsForOrderid?orderid='+json[i].orderid+'&pageNum=1&pageSize=300">全部到库跳转到新出货审核页面</a></div><br><div style="clear:both;">';
-                        str += '<p><<input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
+                        str += '<p><input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                         var reg=new RegExp("'","g");
                         //判断商品是否已经存放
                         if(checked=="0"){
@@ -1454,7 +1458,7 @@ function search() {
                             str += '</div>';
                             str += '<div style="clear:both;"></div>';
                             str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /></div><div style="clear:both;">';
-                            str += '<p><<input type="checkbox" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
+                            str += '<p><input type="checkbox" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                             //判断商品是否已经存放
                             if(checked=="0"){
                                 str += '<button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
