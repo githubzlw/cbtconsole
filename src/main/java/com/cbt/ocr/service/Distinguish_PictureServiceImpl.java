@@ -42,9 +42,14 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,imgtype,state,Change_user);
 	}
 	@Override
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,int type,String userName) {
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName) {
 
-		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,type,userName);
+		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,userName);
+	}
+	@Override
+	public int updateSomePirctu_risdelete_s(List<Map<String, String>> bgList_s,String userName) {
+
+		return distinguish_PictureDao.updateSomePirctu_risdelete_s(bgList_s,userName);
 	}
 	@Override
 	public List<Category1688> showCategory1688_type(){
