@@ -55,6 +55,11 @@ public class UserBehaviorStatisticsController {
         if (StringUtils.isNotBlank(endDate)) {
             endDate += " 23:59:59";
         }
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
         List<UserBehaviorBean> list = new ArrayList<UserBehaviorBean>(10);
         try {
 
@@ -62,7 +67,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean register = new UserBehaviorBean();
             register.setTypeDesc("注册用户数量");
             register.setTypeFlag(1);
-            int registerStatisticsNum = dao.statisticsRegisterUser(beginDate, endDate);
+            int registerStatisticsNum = dao.statisticsRegisterUser(beginDate, endDate, ipFlag);
             register.setStatisticsNum(registerStatisticsNum);
             list.add(register);
 
@@ -70,7 +75,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean addFirstAddress = new UserBehaviorBean();
             addFirstAddress.setTypeDesc("第一次录入收货地址的用户");
             addFirstAddress.setTypeFlag(2);
-            int addFirstAddressNum = dao.statisticsAddFirstAddress(beginDate, endDate);
+            int addFirstAddressNum = dao.statisticsAddFirstAddress(beginDate, endDate, ipFlag);
             addFirstAddress.setStatisticsNum(addFirstAddressNum);
             list.add(addFirstAddress);
 
@@ -80,7 +85,7 @@ public class UserBehaviorStatisticsController {
             addCarWithNoRegisterUser.setTypeFlag(3);
             addCarWithNoRegisterUser.setIsShow(0);
             addCarWithNoRegisterUser.setIsExport(0);
-            int addCarWithNoRegisterUserNum = dao.statisticsAddCarWithNoRegisterUser(beginDate, endDate);
+            int addCarWithNoRegisterUserNum = dao.statisticsAddCarWithNoRegisterUser(beginDate, endDate, ipFlag);
             addCarWithNoRegisterUser.setStatisticsNum(addCarWithNoRegisterUserNum);
             list.add(addCarWithNoRegisterUser);
 
@@ -90,7 +95,7 @@ public class UserBehaviorStatisticsController {
             addCarWithHasRegisterUser.setTypeFlag(4);
             addCarWithHasRegisterUser.setIsShow(0);
             addCarWithHasRegisterUser.setIsExport(0);
-            int addCarWithHasRegisterUserNum = dao.statisticsAddCarWithHasRegisterUser(beginDate, endDate);
+            int addCarWithHasRegisterUserNum = dao.statisticsAddCarWithHasRegisterUser(beginDate, endDate, ipFlag);
             addCarWithHasRegisterUser.setStatisticsNum(addCarWithHasRegisterUserNum);
             list.add(addCarWithHasRegisterUser);
 
@@ -100,7 +105,7 @@ public class UserBehaviorStatisticsController {
             addCarWithOldUser.setTypeFlag(5);
             addCarWithOldUser.setIsShow(0);
             addCarWithOldUser.setIsExport(0);
-            int addCarWithOldUserNum = dao.statisticsAddCarWithOldUser(beginDate, endDate);
+            int addCarWithOldUserNum = dao.statisticsAddCarWithOldUser(beginDate, endDate, ipFlag);
             addCarWithOldUser.setStatisticsNum(addCarWithOldUserNum);
             list.add(addCarWithOldUser);
 
@@ -120,7 +125,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
             makeOrderAllUser.setTypeDesc("下单的总客户数量");
             makeOrderAllUser.setTypeFlag(7);
-            int makeOrderAllUserNum = dao.statisticsMakeOrderAllUser(beginDate, endDate);
+            int makeOrderAllUserNum = dao.statisticsMakeOrderAllUser(beginDate, endDate, ipFlag);
             makeOrderAllUser.setStatisticsNum(makeOrderAllUserNum);
             list.add(makeOrderAllUser);
 
@@ -128,7 +133,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean makeOrderNewUser = new UserBehaviorBean();
             makeOrderNewUser.setTypeDesc("下单的新客户数量");
             makeOrderNewUser.setTypeFlag(8);
-            int makeOrderNewUserNum = dao.statisticsMakeOrderNewUser(beginDate, endDate);
+            int makeOrderNewUserNum = dao.statisticsMakeOrderNewUser(beginDate, endDate, ipFlag);
             makeOrderNewUser.setStatisticsNum(makeOrderNewUserNum);
             list.add(makeOrderNewUser);
 
@@ -136,7 +141,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean payOrderUser = new UserBehaviorBean();
             payOrderUser.setTypeDesc("付款按钮的用户数量");
             payOrderUser.setTypeFlag(9);
-            int payOrderUserNum = dao.statisticsPayOrderUser(beginDate, endDate);
+            int payOrderUserNum = dao.statisticsPayOrderUser(beginDate, endDate, ipFlag);
             payOrderUser.setStatisticsNum(payOrderUserNum);
             list.add(payOrderUser);
 
@@ -144,7 +149,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean RecentView = new UserBehaviorBean();
             RecentView.setTypeDesc("产品单页浏览总次数");
             RecentView.setTypeFlag(10);
-            int recentViewNum = dao.statisticsRecentView(beginDate, endDate);
+            int recentViewNum = dao.statisticsRecentView(beginDate, endDate, ipFlag);
             RecentView.setStatisticsNum(recentViewNum);
             list.add(RecentView);
 
@@ -152,14 +157,14 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean payLogInfo = new UserBehaviorBean();
             payLogInfo.setTypeDesc("Pay按钮点击独特人数");
             payLogInfo.setTypeFlag(11);
-            int payLogNum = dao.queryUserPayLog(beginDate, endDate);
+            int payLogNum = dao.queryUserPayLog(beginDate, endDate, ipFlag);
 	        payLogInfo.setStatisticsNum(payLogNum);
             list.add(payLogInfo);
             //9 点击添加购物车按钮数量
             UserBehaviorBean addToOrder = new UserBehaviorBean();
             addToOrder.setTypeDesc("Add to order 按钮点击次数");
             addToOrder.setTypeFlag(12);
-            payLogNum = dao.queryBehaviorRecord(beginDate, endDate);
+            payLogNum = dao.queryBehaviorRecord(beginDate, endDate, ipFlag);
             addToOrder.setStatisticsNum(payLogNum);
             list.add(addToOrder);
             json.setOk(true);
@@ -192,6 +197,11 @@ public class UserBehaviorStatisticsController {
         }
 
         String typeStr = request.getParameter("typeFlag");
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
         String pageStr = request.getParameter("page");
         int page = 1;
         if (StringUtils.isNotBlank(pageStr)) {
@@ -212,40 +222,40 @@ public class UserBehaviorStatisticsController {
             List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
             if ("1".equals(typeStr)) {
                 // 1.注册客户数量,过滤测试账号
-                list = dao.queryRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("2".equals(typeStr)) {
                 // 2.当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
-                list = dao.queryAddFirstAddressDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryAddFirstAddressDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("3".equals(typeStr)) {
                 // 3.1本日有添加购物车的客户数量 （未注册的客户）
-                list = dao.queryAddCarWithNoRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryAddCarWithNoRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("4".equals(typeStr)) {
                 // 3.2本日有添加购物车的客户数量 （有注册过的客户）
-                list = dao.queryAddCarWithHasRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryAddCarWithHasRegisterUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("5".equals(typeStr)) {
                 // 3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
-                list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("6".equals(typeStr)) {
                 // 3.4本日有添加购物车的客户数量 （所有客户）
-                list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("7".equals(typeStr)) {
                 // 4当日下单的 总客户数量 （点击数字后 显示 每人的用户ID 和邮箱）（过滤掉被取消的订单）（如果有拆单的情况，只
                 // count
                 // 母订单）
                 // （过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
-                list = dao.queryMakeOrderAllUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryMakeOrderAllUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("8".equals(typeStr)) {
                 // 5当日下单的 新客户数量
-                list = dao.queryMakeOrderNewUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryMakeOrderNewUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("9".equals(typeStr)) {
                 // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
-                list = dao.queryPayOrderUserDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryPayOrderUserDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             } else if ("10".equals(typeStr)) {
                 //产品单页浏览次数统计（同一用户一天访问多次同一个产品只算一次）
-                list = dao.queryUserRecentView(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryUserRecentView(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             }else if ("11".equals(typeStr)) {
                 //Pay按钮点击独特人数
-                list = dao.queryUserPayLogDetails(beginDate, endDate, (page - 1) * 20, row);
+                list = dao.queryUserPayLogDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             }
 
             json.setSuccess(true);
@@ -277,6 +287,11 @@ public class UserBehaviorStatisticsController {
         if (StringUtils.isNotBlank(endDateStr)) {
             endDateStr += " 23:59:59";
         }
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
 
         String typeStr = request.getParameter("typeFlag");
         try {
@@ -292,7 +307,7 @@ public class UserBehaviorStatisticsController {
                 // 1.注册客户数量,过滤测试账号
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -302,7 +317,7 @@ public class UserBehaviorStatisticsController {
                 // 2.当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -311,7 +326,7 @@ public class UserBehaviorStatisticsController {
                 // 3.1本日有添加购物车的客户数量 （未注册的客户）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -320,7 +335,7 @@ public class UserBehaviorStatisticsController {
                 // 3.2本日有添加购物车的客户数量 （有注册过的客户）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -329,7 +344,7 @@ public class UserBehaviorStatisticsController {
                 // 3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -338,9 +353,9 @@ public class UserBehaviorStatisticsController {
                 // 3.4本日有添加购物车的客户数量 （所有客户）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int noRegisterUser = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
-                    int hasRegisterUser = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
-                    int oldUser = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int noRegisterUser = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                    int hasRegisterUser = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                    int oldUser = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(noRegisterUser + hasRegisterUser + oldUser);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -352,7 +367,7 @@ public class UserBehaviorStatisticsController {
                 // （过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -361,7 +376,7 @@ public class UserBehaviorStatisticsController {
                 // 5当日下单的 新客户数量
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -370,7 +385,7 @@ public class UserBehaviorStatisticsController {
                 // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -379,7 +394,7 @@ public class UserBehaviorStatisticsController {
                 // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
                 for (int i = 1; i <= dateList.size() / 2; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.queryBehaviorRecord(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.queryBehaviorRecord(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -404,6 +419,11 @@ public class UserBehaviorStatisticsController {
         String endDate = request.getParameter("endDate");
 
         String typeStr = request.getParameter("typeFlag");
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
         if (StringUtils.isNotBlank(beginDate) && StringUtils.isNotBlank(endDate) && StringUtils.isNotBlank(typeStr)) {
             OutputStream ouputStream = null;
 	        beginDate += " 00:00:00";
@@ -417,58 +437,58 @@ public class UserBehaviorStatisticsController {
                     // 1.注册客户数量,过滤测试账号
                     typeDesc = "注册客户";
                     typeEnDesc = "Registered";
-                    list = dao.queryRegisterUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryRegisterUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("2".equals(typeStr)) {
                     // 2.当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
                     typeDesc = "录入收货地址的客户";
                     typeEnDesc = "EnterTheReceivingAddress";
-                    list = dao.queryAddFirstAddressDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryAddFirstAddressDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("3".equals(typeStr)) {
                     // 3.1本日有添加购物车的客户数量 （未注册的客户）
                     typeDesc = "有添加购物车的客户(未注册)";
                     typeEnDesc = "AddShoppingCart(unregistered)";
-                    list = dao.queryAddCarWithNoRegisterUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryAddCarWithNoRegisterUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("4".equals(typeStr)) {
                     typeDesc = "有添加购物车的客户(已注册)";
                     typeEnDesc = "AddShoppingCart(registeredAndFirst)";
                     // 3.2本日有添加购物车的客户数量 （有注册过的客户）
-                    list = dao.queryAddCarWithHasRegisterUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryAddCarWithHasRegisterUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("5".equals(typeStr)) {
                     typeDesc = "有添加购物车的客户(老客户)";
                     typeEnDesc = "AddShoppingCart(registeredOld)";
                     // 3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
-                    list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("6".equals(typeStr)) {
                     typeDesc = "有添加购物车的客户(所有客户)";
                     typeEnDesc = "AddShoppingCart(All)";
                     // 3.4本日有添加购物车的客户数量 （所有客户）
-                    list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryAddCarWithOldUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("7".equals(typeStr)) {
                     // 4当日下单的 总客户数量 （点击数字后 显示 每人的用户ID 和邮箱）（过滤掉被取消的订单）（如果有拆单的情况，只
                     // count 母订单） （过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
                     typeDesc = "下单的客户";
                     typeEnDesc = "MakeOrder(All)";
-                    list = dao.queryMakeOrderAllUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryMakeOrderAllUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("8".equals(typeStr)) {
                     // 5当日下单的 新客户数量
                     typeDesc = "下单的新客户";
                     typeEnDesc = "MakeOrder(New)";
-                    list = dao.queryMakeOrderNewUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryMakeOrderNewUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("9".equals(typeStr)) {
                     // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
                     typeDesc = "点击付款按钮的客户";
                     typeEnDesc = "PayOrder";
-                    list = dao.queryPayOrderUserDetails(beginDate, endDate, 0, 0);
+                    list = dao.queryPayOrderUserDetails(beginDate, endDate, 0, 0, ipFlag);
                 } else if ("10".equals(typeStr)) {
                     //产品单页浏览次数统计（同一用户一天访问多次同一个产品只算一次）
                     typeDesc = "产品单页浏览次数最多的50个商品";
                     typeEnDesc = "GoodsView";
-                    list = dao.queryUserRecentView(beginDate, endDate, 0, 0);
+                    list = dao.queryUserRecentView(beginDate, endDate, 0, 0, ipFlag);
                 }else if ("11".equals(typeStr)) {
 	                //Pay按钮点击独特人数
 	                typeDesc = "Pay按钮点击独特人数";
 	                typeEnDesc = "Pay_log";
-	                list = dao.queryUserPayLogDetails(beginDate, endDate, 0, 0);
+	                list = dao.queryUserPayLogDetails(beginDate, endDate, 0, 0, ipFlag);
                 }
 
                 if (StringUtils.isNotBlank(endDate)) {
@@ -617,6 +637,11 @@ public class UserBehaviorStatisticsController {
 
         String endDateStr = request.getParameter("endDate");
 
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
         String typeStr = request.getParameter("typeFlag");
         try {
 
@@ -632,7 +657,7 @@ public class UserBehaviorStatisticsController {
 
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -642,7 +667,7 @@ public class UserBehaviorStatisticsController {
                 // 2.当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -651,7 +676,7 @@ public class UserBehaviorStatisticsController {
                 // 3.1本日有添加购物车的客户数量 （未注册的客户）
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -660,7 +685,7 @@ public class UserBehaviorStatisticsController {
                 // 3.2本日有添加购物车的客户数量 （有注册过的客户）
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -669,7 +694,7 @@ public class UserBehaviorStatisticsController {
                 // 3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -678,7 +703,7 @@ public class UserBehaviorStatisticsController {
                 // 3.4本日有添加购物车的客户数量 （所有客户）
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -690,7 +715,7 @@ public class UserBehaviorStatisticsController {
                 // （过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -699,7 +724,7 @@ public class UserBehaviorStatisticsController {
                 // 5当日下单的 新客户数量
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -708,7 +733,7 @@ public class UserBehaviorStatisticsController {
                 // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
                 for (int i = 0; i < dateList.size() - 1; i++) {
                     UserBehaviorBean makeOrderAllUser = new UserBehaviorBean();
-                    int statisticsNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                    int statisticsNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                     makeOrderAllUser.setStatisticsNum(statisticsNum);
                     makeOrderAllUser.setRecordDate(dateList.get((i - 1) * 2).substring(0, 10));
                     list.add(makeOrderAllUser);
@@ -770,6 +795,11 @@ public class UserBehaviorStatisticsController {
 
         String beginDate = request.getParameter("beginDate");
         String endDate = request.getParameter("endDate");
+        String ipFlagStr = request.getParameter("ipFlag");
+        int ipFlag = 0;
+        if(StringUtils.isNotBlank(ipFlagStr)){
+            ipFlag = Integer.valueOf(ipFlagStr);
+        }
         List<UserBehaviorTotal> list = new ArrayList<UserBehaviorTotal>();
 
         if (StringUtils.isNotBlank(beginDate) && StringUtils.isNotBlank(endDate)) {
@@ -788,37 +818,37 @@ public class UserBehaviorStatisticsController {
 
                         int totalUser = 0;
                         // 1.注册客户数量,过滤测试账号
-                        int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        int statisticsNum = dao.statisticsRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         behaviorTotal.setRegisterUserNum(statisticsNum);
                         behaviorTotal.setQueryTime(dateList.get((i - 1) * 2).substring(0, 10));
 
                         // 2.当日录入收货地址的用户,过滤掉 已经有一个地址，录入更多地址的情况。 也就是说 要统计第一次录入地址的用户
-                        statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsAddFirstAddress(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         behaviorTotal.setFirstAddAdressNum(statisticsNum);
 
                         //3.1本日有添加购物车的客户数量 （未注册的客户）
-                        statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         behaviorTotal.setAddCarNoRegisterNum(statisticsNum);
                         totalUser += statisticsNum;
 
                         //3.2本日有添加购物车的客户数量 （有注册过的客户）
-                        statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         totalUser += statisticsNum;
 
                         //3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
-                        statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         totalUser += statisticsNum;
 
                         behaviorTotal.setAddCarAllUserNum(totalUser);
 
                         //4当日下单的 总客户数量 （点击数字后 显示 每人的用户ID 和邮箱）（过滤掉被取消的订单）（如果有拆单的情况，只
                         // count 母订单）（过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
-                        statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsMakeOrderAllUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         behaviorTotal.setMarkOrderTotalNum(statisticsNum);
 
 
                         // 5当日下单的 新客户数量
-                        statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1));
+                        statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         behaviorTotal.setMarkOrderNewNum(statisticsNum);
 
                         list.add(behaviorTotal);
