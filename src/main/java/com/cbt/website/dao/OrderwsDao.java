@@ -322,20 +322,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closePreparedStatement(stmt2);
             DBHelper.getInstance().closeConnection(conn);
         }
@@ -430,20 +418,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
 
@@ -464,13 +440,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -490,13 +460,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -565,20 +529,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return t;
@@ -594,13 +546,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
     }
@@ -623,20 +569,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return allWeight;
@@ -969,20 +903,8 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt2 != null) {
                 try {
                     stmt2.close();
@@ -1262,20 +1184,8 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt2 != null) {
                 try {
                     stmt2.close();
@@ -1344,13 +1254,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -1414,13 +1318,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -1673,20 +1571,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return ob;
@@ -1795,20 +1681,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return ob;
@@ -1831,20 +1705,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return row;
@@ -1872,20 +1734,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return paymentConfirm;
@@ -2018,20 +1868,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -2054,13 +1892,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -2138,20 +1970,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return forw;
@@ -2176,20 +1996,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return forw;
@@ -2212,13 +2020,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -2249,20 +2051,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return evaluate;
@@ -2352,13 +2142,7 @@ public class OrderwsDao implements IOrderwsDao {
             e.printStackTrace();
             result =0;
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
 
             DBHelper.getInstance().closePreparedStatement(stmt);
             DBHelper.getInstance().closePreparedStatement(stmt1);
@@ -2417,13 +2201,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
 
             DBHelper.getInstance().closeConnection(conn);
         }
@@ -2472,13 +2250,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
 
             DBHelper.getInstance().closeConnection(conn);
         }
@@ -2510,20 +2282,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return user;
@@ -2609,13 +2369,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
 //            if (stmt1 != null) {
 //                try {
 //                    stmt1.close();
@@ -2644,13 +2398,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -2698,13 +2446,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return orderinfo;
@@ -2729,20 +2471,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return total;
@@ -2766,20 +2496,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return total;
@@ -2809,20 +2527,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return map;
@@ -2871,13 +2577,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return payment;
@@ -2914,13 +2614,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt1 != null) {
                 try {
                     stmt1.close();
@@ -2961,20 +2655,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return order;
@@ -2998,20 +2680,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -3034,20 +2704,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3069,13 +2727,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3098,20 +2750,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3132,13 +2772,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3167,20 +2801,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3203,20 +2825,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return set;
@@ -3241,13 +2851,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3270,13 +2874,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3355,20 +2953,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
     }
@@ -3423,13 +3009,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -3466,20 +3046,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -3508,20 +3076,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3548,13 +3104,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt2 != null) {
                 try {
                     stmt2.close();
@@ -3589,20 +3139,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -3628,20 +3166,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -3668,13 +3194,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt2 != null) {
                 try {
                     stmt2.close();
@@ -3706,20 +3226,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -3803,20 +3311,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             if (stmt2 != null) {
                 try {
                     stmt2.close();
@@ -3848,20 +3344,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -3885,20 +3369,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3922,20 +3394,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -3959,13 +3419,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (cstmt != null) {
                 try {
                     cstmt.close();
@@ -4060,20 +3514,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4097,20 +3539,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4135,20 +3565,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4177,20 +3595,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4214,20 +3620,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4280,20 +3674,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4346,20 +3728,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4414,20 +3784,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4494,20 +3852,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4557,20 +3903,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4620,20 +3954,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4686,20 +4008,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4756,20 +4066,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -4822,20 +4120,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5035,20 +4321,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5132,20 +4406,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5227,20 +4489,8 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -5279,20 +4529,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return logisticsList;
@@ -5333,13 +4571,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (cstmt != null) {
                 try {
                     cstmt.close();
@@ -5367,13 +4599,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5394,13 +4620,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5423,20 +4643,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return orderNos;
@@ -5459,20 +4667,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5493,13 +4689,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5520,13 +4710,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5549,20 +4733,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5591,13 +4763,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (cstmt != null) {
                 try {
                     cstmt.close();
@@ -5637,13 +4803,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
 
             DBHelper.getInstance().closeConnection(conn);
         }
@@ -5675,13 +4835,7 @@ public class OrderwsDao implements IOrderwsDao {
                     e.printStackTrace();
                 }
             }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -5746,20 +4900,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return order;
@@ -5780,13 +4922,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -5817,20 +4953,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -5855,13 +4979,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -5957,13 +5075,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -5996,13 +5108,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -6085,13 +5191,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -6220,13 +5320,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -6258,13 +5352,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             if (pst != null) {
                 try {
                     pst.close();
@@ -6291,13 +5379,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -6322,13 +5404,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -6414,20 +5490,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return row;
@@ -6537,20 +5601,8 @@ public class OrderwsDao implements IOrderwsDao {
             e.printStackTrace();
             row = 0;
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return row;
@@ -6578,13 +5630,7 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             flag = false;
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return flag;
@@ -6607,13 +5653,7 @@ public class OrderwsDao implements IOrderwsDao {
                 count = rs.getInt(1);
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return count;
@@ -6636,13 +5676,7 @@ public class OrderwsDao implements IOrderwsDao {
                 count = rs.getInt(1);
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return count;
@@ -6664,13 +5698,7 @@ public class OrderwsDao implements IOrderwsDao {
                 count = rs.getInt(1);
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return count;
@@ -6696,13 +5724,7 @@ public class OrderwsDao implements IOrderwsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6729,13 +5751,7 @@ public class OrderwsDao implements IOrderwsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6754,13 +5770,7 @@ public class OrderwsDao implements IOrderwsDao {
             stmt.setString(2, mainOrderNo);
             rs = stmt.executeUpdate();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6787,13 +5797,7 @@ public class OrderwsDao implements IOrderwsDao {
                 isCancel = rs.getInt(1) == rs.getInt(2);
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return isCancel;
@@ -6823,13 +5827,7 @@ public class OrderwsDao implements IOrderwsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6855,13 +5853,7 @@ public class OrderwsDao implements IOrderwsDao {
                 rs = stmt.executeUpdate();
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6884,13 +5876,7 @@ public class OrderwsDao implements IOrderwsDao {
                 mainOrderNo = rs.getString(1);
             }
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return mainOrderNo;
@@ -6912,20 +5898,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return state;
@@ -6964,13 +5938,7 @@ public class OrderwsDao implements IOrderwsDao {
             }
 
         } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rs;
@@ -6995,20 +5963,8 @@ public class OrderwsDao implements IOrderwsDao {
             e.printStackTrace();
             System.err.println(e.getMessage());
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return total;
@@ -7042,27 +5998,15 @@ public class OrderwsDao implements IOrderwsDao {
             e.printStackTrace();
             System.err.println(e.getMessage());
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return fo;
     }
 
     @Override
-    public int statisticsRegisterUser(String beginDate, String endDate) {
+    public int statisticsRegisterUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7075,6 +6019,9 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and createtime <= '" + endDate + "'";
         }
         sql += " and id not in(select id from `user` where  is_test = 1)";
+        if(ipFlag > 0){
+            sql += " and id not in(select user_id from ip_record  where user_id > 0 and is_china =1)";
+        }
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7085,27 +6032,16 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }            DBHelper.getInstance().closeConnection(conn);
+            DBHelper.getInstance().closeResultSet(rs);
+            
+            DBHelper.getInstance().closeStatement(stmt);            DBHelper.getInstance().closeConnection(conn);
         }
         return res;
     }
 
     @Override
     public List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate, String endDate, int startNum,
-                                                              int offSet) {
+                                                              int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7119,6 +6055,9 @@ public class OrderwsDao implements IOrderwsDao {
             sql += " and createtime <= '" + endDate + "'";
         }
         sql += " and id not in(select id from `user` where  is_test = 1)";
+        if(ipFlag > 0){
+            sql += " and id not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
         sql += ") a left join goods_carconfig b on a.id = b.userid and b.userid > 0 ";
         sql += " order by a.createtime desc";
         if (offSet > 0) {
@@ -7151,7 +6090,7 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
-    public int statisticsAddFirstAddress(String beginDate, String endDate) {
+    public int statisticsAddFirstAddress(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7166,6 +6105,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         sql += ") GROUP BY userid) a "
                 + "where a.userid not in(select id from `user` where  is_test = 1)";
+        if(ipFlag > 0){
+            sql += " and a.userid not in(select user_id from ip_record  where user_id > 0 and is_china =1)";
+        }
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7176,20 +6118,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7197,7 +6127,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryAddFirstAddressDetails(String beginDate, String endDate, int startNum,
-                                                                 int offSet) {
+                                                                 int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7213,6 +6143,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         sql += ") GROUP BY userid ) a,user b "
                 + "where a.userid not in(select id from `user` where  is_test = 1) and a.userid = b.id";
+        if(ipFlag > 0){
+            sql += " and a.userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
         sql += " order by a.createtime desc";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
@@ -7230,27 +6163,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsAddCarWithNoRegisterUser(String beginDate, String endDate) {
+    public int statisticsAddCarWithNoRegisterUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7261,6 +6182,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and datatime <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and sessionid not in(select sessionid from ip_record  where user_id = 0 and is_china =1)";
         }
         sql += " group by sessionid) as a";
         int res = 0;
@@ -7273,20 +6197,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7294,7 +6206,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryAddCarWithNoRegisterUserDetails(String beginDate, String endDate,
-                                                                          int startNum, int offSet) {
+                                                                          int startNum, int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7306,6 +6218,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and datatime <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and sessionid not in(select sessionid from ip_record where user_id = 0 and sessionid is not null and is_china =1 )";
         }
         sql += " group by sessionid) as a";
         if (offSet > 0) {
@@ -7324,27 +6239,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsAddCarWithHasRegisterUser(String beginDate, String endDate) {
+    public int statisticsAddCarWithHasRegisterUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7355,6 +6258,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and datatime <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
         }
         sql += " group by userid) as b "
                 + " where b.userid not in(select id from `user` where  is_test = 1)";
@@ -7368,20 +6274,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7389,7 +6283,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryAddCarWithHasRegisterUserDetails(String beginDate, String endDate,
-                                                                           int startNum, int offSet) {
+                                                                           int startNum, int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7404,6 +6298,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         sql += " group by userid) as b,user c "
                 + " where b.userid not in(select id from `user` where  is_test = 1) and b.userid = c.id ";
+        if(ipFlag > 0){
+            sql += " and b.userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
         }
@@ -7419,27 +6316,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsAddCarWithOldUser(String beginDate, String endDate) {
+    public int statisticsAddCarWithOldUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7450,6 +6335,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and datatime <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
         }
         sql += " group by userid) as b "
                 + " where b.userid not in(select id from `user` where  is_test = 1)" +
@@ -7466,20 +6354,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7487,7 +6363,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryAddCarWithOldUserDetails(String beginDate, String endDate, int startNum,
-                                                                   int offSet) {
+                                                                   int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7499,6 +6375,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and datatime <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
         }
         sql += " group by userid) as b,user c "
                 + " where b.userid not in(select id from `user` where  is_test = 1)"
@@ -7519,27 +6398,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsMakeOrderAllUser(String beginDate, String endDate) {
+    public int statisticsMakeOrderAllUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7553,6 +6420,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10) group by user_id) a  "
                 + " where a.user_id not in(select id from `user` where  is_test = 1)";
+        if(ipFlag > 0){
+            sql += " and a.user_id not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
+        }
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7563,20 +6433,8 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7584,7 +6442,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryMakeOrderAllUserDetails(String beginDate, String endDate, int startNum,
-                                                                  int offSet) {
+                                                                  int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7596,6 +6454,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and create_time <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and user_id not in(select user_id from ip_record where user_id > 0 and is_china =1)";
         }
         sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10)  group by user_id) a,user b  "
                 + " where a.user_id not in(select id from `user` where  is_test = 1) and a.user_id = b.id";
@@ -7616,27 +6477,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsMakeOrderNewUser(String beginDate, String endDate) {
+    public int statisticsMakeOrderNewUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7654,8 +6503,11 @@ public class OrderwsDao implements IOrderwsDao {
                 " orderpaytime <= '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where  " +
                 " orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5)) " +
-                " and user_id not in (select id from `user` where  is_test = 1)" +
-                " group by user_id) a";
+                " and user_id not in (select id from `user` where  is_test = 1)" ;
+        if(ipFlag > 0){
+            sql += " and user_id not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
+        }
+        sql += " group by user_id) a";
         int res = 0;
         try {
             stmt = conn.createStatement();
@@ -7666,20 +6518,9 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
+            
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
@@ -7687,7 +6528,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryMakeOrderNewUserDetails(String beginDate, String endDate, int startNum,
-                                                                  int offSet) {
+                                                                  int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7698,9 +6539,11 @@ public class OrderwsDao implements IOrderwsDao {
                 " orderpaytime< '" + endDate + "' and state in(1,2,3,4,5)" +
                 " and user_id not in (select user_id from orderinfo where " +
                 " orderpaytime < '" + beginDate + "' and state in(1,2,3,4,5))" +
-                " and user_id not in (select id from `user` where  is_test = 1)" +
-                " group by user_id) a, user b where a.user_id = b.id";
-        sql += " order by a.create_time desc";
+                " and user_id not in (select id from `user` where  is_test = 1)";
+        if(ipFlag > 0){
+            sql += " and user_id not in (select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
+        sql += " group by user_id) a, user b where a.user_id = b.id order by a.create_time desc";
         if (offSet > 0) {
             sql += " limit " + startNum + "," + offSet + "";
         }
@@ -7717,32 +6560,25 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int statisticsRecentView(String beginDate, String endDate) {
+    public int statisticsRecentView(String beginDate, String endDate, int ipFlag) {
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
         Statement stmt = null;
-        String sql = "SELECT COUNT(a.pid) as counts FROM (SELECT r.sessionid,r.pid FROM recent_view r inner join custom_benchmark_ready c on r.pid=c.pid WHERE r.createtime>='"+beginDate+"' " +
-                    "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a ";
+        String sql = "SELECT COUNT(a.pid) as counts FROM (SELECT r.sessionid,r.pid FROM recent_view r inner join " +
+                "custom_benchmark_ready c on r.pid=c.pid WHERE r.createtime>='"+beginDate+"' " +
+                    "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL ";
+        if(ipFlag > 0){
+            sql += " and r.sessionid not in(select sessionid from ip_record where user_id =0 and sessionid is not null and is_china =1)";
+        }
+        sql += "GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a ";
         int res=0;
         try {
             stmt = conn.createStatement();
@@ -7750,8 +6586,13 @@ public class OrderwsDao implements IOrderwsDao {
             if (rs.next()) {
                 res += rs.getInt("counts");
             }
-            sql="SELECT COUNT(a.pid) as counts FROM (SELECT r.uid,r.pid FROM recent_view r inner join custom_benchmark_ready c on r.pid=c.pid WHERE r.createtime>='"+beginDate+"' " +
-                    "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid<>0 GROUP BY r.uid,r.pid,LEFT(r.createtime,10)) a ";
+            sql="SELECT COUNT(a.pid) as counts FROM (SELECT r.uid,r.pid FROM recent_view r inner join custom_benchmark_ready c " +
+                    "on r.pid=c.pid WHERE r.createtime>='"+beginDate+"' " +
+                    "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid<>0 " ;
+            if(ipFlag > 0){
+                sql += " and r.uid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+            }
+            sql += "GROUP BY r.uid,r.pid,LEFT(r.createtime,10)) a ";
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {
@@ -7760,27 +6601,15 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
     }
 
     @Override
-    public int statisticsPayOrderUser(String beginDate, String endDate) {
+    public int statisticsPayOrderUser(String beginDate, String endDate, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         ResultSet rs = null;
@@ -7791,6 +6620,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and view_date_day <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
         }
         sql += " and (action ='pay' or action ='1,pay for product|Pay for all' or action='Pay Now paypal' or action='Pay Now stripe') "
                 + " and userid not in(select id from `user` where is_test = 1) group by userid)a";
@@ -7804,33 +6636,22 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return res;
     }
 
     @Override
-    public List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate, String endDate, int startNum, int offSet) {
+    public List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate, String endDate, int startNum, int offSet, int ipFlag) {
         Connection conn = DBHelper.getInstance().getConnection();
         int num=0;
         ResultSet rs = null;
         Statement stmt = null;
         List<UserBehaviorDetails> list=new ArrayList<UserBehaviorDetails>();
-        String sql="SELECT Operationtime,username,orderid,orderAmount FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        String sql="SELECT Operationtime,username,orderid,orderAmount FROM paylog " +
+                "WHERE userid IN(select id from user where is_test = 0) and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
         try{
             if(StringUtil.isNotBlank(beginDate)){
                 sql+=" and Operationtime>='"+beginDate+"'";
@@ -7860,50 +6681,48 @@ public class OrderwsDao implements IOrderwsDao {
     }
 
     @Override
-    public List<UserBehaviorDetails> queryUserRecentView(String beginDate, String endDate, int startNum, int offSet) {
+    public List<UserBehaviorDetails> queryUserRecentView(String beginDate, String endDate, int startNum, int offSet, int ipFlag) {
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
         ResultSet rs = null;
         Statement stmt = null;
         String sql = "SELECT pid,b.counts FROM (\n" +
                 "SELECT pid,COUNT(sessionid) AS counts FROM (\n" +
-                "SELECT r.sessionid,r.pid FROM recent_view r inner join custom_benchmark_ready c on r.pid=c.pid WHERE r.createtime>='"+beginDate+"' " +
-                "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL\n" +
-                "GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid\n" +
+                "SELECT r.sessionid,r.pid FROM recent_view r inner join custom_benchmark_ready c " +
+                "on r.pid=c.pid WHERE r.createtime>='" + beginDate + "' " +
+                "AND r.createtime<='" + endDate + "' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL\n";
+        if (ipFlag > 0) {
+            sql += " and r.sessionid not in(select sessionid from ip_record where sessionid is not null and is_china =1 and user_id = 0))";
+        }
+        sql += "GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid\n" +
                 "UNION\n" +
                 "SELECT pid,COUNT(uid) AS counts FROM (\n" +
-                "SELECT r.uid,r.pid FROM recent_view r inner join custom_benchmark_ready c on r.pid=c.pid  WHERE r.createtime>='"+beginDate+"' " +
-                "AND r.createtime<='"+endDate+"' and c.valid=1 AND r.uid<>0 \n" +
-                "GROUP BY r.uid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid ) b ORDER BY b.counts DESC LIMIT 50";
+                "SELECT r.uid,r.pid FROM recent_view r inner join custom_benchmark_ready c on r.pid=c.pid  WHERE r.createtime>='" + beginDate + "' " +
+                "AND r.createtime<='" + endDate + "' and c.valid=1 AND r.uid<>0 \n";
+        if (ipFlag > 0) {
+            sql += " and r.uid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
+        sql += "GROUP BY r.uid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid ) b ORDER BY b.counts DESC ";
+        if (offSet > 0) {
+            sql += "LIMIT " + startNum + "," + offSet;
+        }
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 UserBehaviorDetails bhDtl = new UserBehaviorDetails();
                 bhDtl.setUserId(rs.getInt("counts"));
-                String pid=rs.getString("pid");
+                String pid = rs.getString("pid");
                 bhDtl.setPid(pid);
-                boolean flag=StringUtil.isNumeric(pid);
-                bhDtl.setEmail("<a title='跳转到产品单页' target='_blank' href='https://www.import-express.com/goodsinfo/a-"+(flag?"1"+pid+"":"3"+pid+"")+".html'>"+pid+"</a>");
+                boolean flag = StringUtil.isNumeric(pid);
+                bhDtl.setEmail("<a title='跳转到产品单页' target='_blank' href='https://www.import-express.com/goodsinfo/a-" + (flag ? "1" + pid + "" : "3" + pid + "") + ".html'>" + pid + "</a>");
                 list.add(bhDtl);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -7911,7 +6730,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public List<UserBehaviorDetails> queryPayOrderUserDetails(String beginDate, String endDate, int startNum,
-                                                              int offSet) {
+                                                              int offSet, int ipFlag) {
 
         Connection conn = DBHelper.getInstance().getConnection();
         List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
@@ -7923,6 +6742,9 @@ public class OrderwsDao implements IOrderwsDao {
         }
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and view_date_day <= '" + endDate + "'";
+        }
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
         }
         sql += " and (action ='pay' or action ='1,pay for product|Pay for all' or action='Pay Now paypal' or action='Pay Now stripe') "
                 + " and userid not in(select id from `user` where  is_test = 1) group by userid)a,user b "
@@ -7943,32 +6765,23 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
 
     @Override
-    public int queryUserPayLog(String beginDate, String endDate) {
+    public int queryUserPayLog(String beginDate, String endDate, int ipFlag) {
         Connection conn = DBHelper.getInstance().getConnection();
         int num=0;
         ResultSet rs = null;
         Statement stmt = null;
-        String sql="SELECT COUNT(1) as counts FROM paylog WHERE userid IN (SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND\n" + "            email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND\n" + "            email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND\n" + "            email NOT LIKE '%@china-synergy%'  AND email<>'sb33@gmail.com'  AND email<>'sbtest@gmail.com'  AND\n" + "            email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND\n" + "            email NOT LIKE 'zhouxueyun%') AND userid !='26018' AND userid!='25913' AND userid!='26593' \n" + "            AND userid!='26016' AND userid!='1128' AND userid!='24688' AND userid!='26617' AND userid!='21334' ";
+        String sql="SELECT COUNT(1) as counts FROM paylog WHERE userid IN (SELECT id FROM USER WHERE is_test = 0)";
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
         try{
             if(StringUtil.isNotBlank(beginDate)){
                 sql+=" and Operationtime>='"+beginDate+"'";
@@ -8013,31 +6826,22 @@ public class OrderwsDao implements IOrderwsDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
     }
     @Override
-    public int queryBehaviorRecord(String beginDate, String endDate) {
+    public int queryBehaviorRecord(String beginDate, String endDate, int ipFlag) {
         Connection conn = DBHelper.getInstance().getConnection();
         int num=0;
         ResultSet rs = null;
         Statement stmt = null;
         String sql="SELECT count(id) as counts FROM behavior_record WHERE action = 'Add to Order' ";
+        if(ipFlag > 0){
+            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
         try{
             if(StringUtil.isNotBlank(beginDate)){
                 sql+=" and view_date_time>='"+beginDate+"'";

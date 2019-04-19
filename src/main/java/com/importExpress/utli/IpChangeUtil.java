@@ -51,4 +51,8 @@ public class IpChangeUtil {
         return num;
     }
 
+    public static void main(String[] args) {
+        System.err.println(ipToLong("1.0.0.0"));
+    }
+
 }
