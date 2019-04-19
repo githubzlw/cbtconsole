@@ -128,7 +128,7 @@ function updategoodstatus(isok,goods_pid, orderid, goodid, itemid, taobaoprice, 
     var seiUnit = "";
     var _count = "";
     var record_ = "";
-    if (document.getElementById("goodsAll").checked==false){
+    if (document.getElementById("goods_state").checked==false){
         goodsAll=1
     };
     if (checked == "1") {
@@ -415,9 +415,9 @@ function updateCheckStatus(isok,goods_pid, orderid, goodid, itemid, taobaoprice,
     if (unit == null || unit == "null" || unit == "") {
         unit = "1";
     }
-    if(!$(goods_state).is(":checked")){
-        goods_pid=1;
-         }
+    if (document.getElementById("goods_state").checked==false){
+        goodsAll=1
+    };
     var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
         .val();
     var barcode = document.getElementById("code_" + odid + "").innerHTML;//库位
@@ -1083,11 +1083,11 @@ function search() {
                         str += '<div style="height: 50px;">'
                             + '<button style="font-size: 20px;" id="bt_'+json[i].orderid+'_'+json[i].odid+'" onclick="btnCap(\''+json[i].orderid+'\',\''+json[i].odid+'\')">拍摄</button><div id="pics_'+json[i].orderid+json[i].odid+'">'
                             +'</div><br />'
-                            + '<canvas onclick="AutoResizeImage(this)"  id="canvas_'+json[i].orderid+'_'+json[i].odid+'"></canvas>'
+                           + '<canvas onclick="AutoResizeImage(this)"  id="canvas_'+json[i].orderid+'_'+json[i].odid+'"></canvas>'
                             + '</div>';
                         str += '</div>';
                         str += '<div style="clear:both;"></div>';
-                        str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /><a target="_blank" style="display:none;color:red;text-decoration:underline;font-size: 20px;margin-left: 60px" id="chuku_'+json[i].orderid+'_'+json[i].odid+'" href="/cbtconsole/warehouse/getDetailsForOrderid?orderid='+json[i].orderid+'&pageNum=1&pageSize=300">全部到库跳转到新出货审核页面</a></div><br><div style="clear:both;">';
+                        str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /><a taiget="_blank" style="display:none;color:red;text-decoration:underline;font-size: 20px;margin-left: 60px" id="chuku_'+json[i].orderid+'_'+json[i].odid+'" href="/cbtconsole/warehouse/getDetailsForOrderid?orderid='+json[i].orderid+'&pageNum=1&pageSize=300">全部到库跳转到新出货审核页面</a></div><br><div style="clear:both;">';
                         str += '<p><input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                         var reg=new RegExp("'","g");
                         //判断商品是否已经存放
@@ -1458,7 +1458,7 @@ function search() {
                             str += '</div>';
                             str += '<div style="clear:both;"></div>';
                             str += '<div><span>入库备注:</span><textarea type="text" name="warehouseRemark'+i+'" style="height :30px;" /></div><div style="clear:both;">';
-                            str += '<p><input type="checkbox" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
+                            str += '<p><input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                             //判断商品是否已经存放
                             if(checked=="0"){
                                 str += '<button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
