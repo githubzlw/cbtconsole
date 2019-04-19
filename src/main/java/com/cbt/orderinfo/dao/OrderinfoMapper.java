@@ -9,7 +9,10 @@ import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.Date;
 import java.util.List;
@@ -643,4 +646,10 @@ public interface OrderinfoMapper {
 
     void updateBusiess(Map<String, String> map);
     int updateOrderDetailsState(@Param("odid")String odid, @Param("orderid") String orderid);
+    @Update("UPDATE goods_list_search SET goods_state=1 WHERE pid=#{goods_pid}")
+    int UpdateGoodsState(@Param("goods_pid") String goods_pid);
+    @Insert("insert into goods_list_search(pid,goods_state) values (#{goods_pid},1)")
+	int InserGoodsState(@Param("goods_pid")String goods_pid);
+    @Select("SELECT itemid as goods_pid from taobao_1688_order_history WHERE orderid=#{tbOrderId}")
+	List<String> FindAllGoodsPid(@Param("tbOrderId") String tbOrderId);
 }
