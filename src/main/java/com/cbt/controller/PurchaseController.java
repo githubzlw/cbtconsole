@@ -1,17 +1,13 @@
 package com.cbt.controller;
 
 import com.cbt.auto.ctrl.OrderAutoServlet;
+import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderProductSource;
-import com.cbt.bean.ShippingBean;
 import com.cbt.common.StringUtils;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Util;
+import com.cbt.util.*;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.util.StringUtil;
@@ -34,9 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -1174,5 +1168,108 @@ public class PurchaseController {
 		}
 		return actual_freight;
 	}
+	@RequestMapping(value = "/getOrderCount.do")
+	@ResponseBody
+	public orderJson getOrderCount(HttpServletRequest request,  Model model) {//查看差货数量
+		orderJson orderJson=new orderJson();
+		String admuserid=request.getParameter("admuserid");
+			int count = iWarehouseService.FindOrderCount(admuserid);
+       orderJson.setTotal(count);
+		return orderJson;
+	}
+	@RequestMapping(value = "/getBadgoods" ,produces = "text/html;charset=UTF-8")
+	public void getBadgoods(HttpServletRequest request,HttpServletResponse response, Model model,@RequestParam(value="page",defaultValue="1")int page) {//展示差货详情
+        String pid=request.getParameter("pid");
+        int pagesize=35;
+        int start = (page - 1) * pagesize;
+        List<CustomGoodsBean> goodsBeans=this.iWarehouseService.getBadgoods(start,pagesize,pid);
+        int goodsCheckCount=this.iWarehouseService.getBadgoodsCount();
+		SplitPage.buildPager(request, goodsCheckCount, pagesize, page);
+		request.setAttribute("goodsBeans",goodsBeans);
+        request.setAttribute("pid", pid);
+		try {
+			request.getRequestDispatcher("/website/Badgoods.jsp").forward(request, response);
+		} catch (ServletException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@RequestMapping(value = "/AddBadOrder")
+	@ResponseBody
+	public orderJson AddBadOrder(HttpServletRequest request,HttpServletResponse response) {//查看差货数量
+        orderJson orderJson=new orderJson();
+        String pid=request.getParameter("pid");
+		Double price= null;
+		try {
+			price = Double.parseDouble(request.getParameter("pid1"));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			orderJson.setTotal(0);
+			return orderJson;
+		}
 
+		int count = iWarehouseService.AddBadOrder(pid,price);
+		if (count==1){
+			orderJson.setTotal(1);
+		}else {
+			orderJson.setTotal(0);
+		}
+		return orderJson;
+
+	}
+	@RequestMapping(value = "/UpdateState")
+	@ResponseBody
+	public orderJson UpdateState(HttpServletRequest request,HttpServletResponse response  ) {
+		String pid=request.getParameter("pid");
+		orderJson orderJson=new orderJson();
+		int count = iWarehouseService.UpdateState(pid);
+		if (count==1){
+			orderJson.setMessage("操作成功");
+		}else {
+			orderJson.setMessage("保存失败");
+		}
+		return orderJson;
+	}
+	@RequestMapping(value = "/FindReviewShelves",produces = "text/html;charset=UTF-8")
+	public void FindReviewShelves(HttpServletRequest request,HttpServletResponse response,@RequestParam(value="page",defaultValue="1")int page) {
+	    String cupid=request.getParameter("cupid");
+		int pagesize = 35;
+		int start = (page - 1) * pagesize;
+		String pid = request.getParameter("pid");
+		Double price = null;
+		try {
+			price = Double.parseDouble(request.getParameter("price"));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		List<badGoods> list = this.iWarehouseService.findAllCustomBypid(pid, price, pagesize, start,cupid);
+		int goodsCheckCount = this.iWarehouseService.findAllCustomBypidCount(pid, price,cupid);
+		SplitPage.buildPager(request, goodsCheckCount, pagesize, page);
+		request.setAttribute("goodsBeans", list);
+        request.setAttribute("cupid", cupid);
+		request.setAttribute("pid", pid);
+		request.setAttribute("price", price);
+		try {
+			request.getRequestDispatcher("/website/Review_shelves.jsp").forward(request, response);
+		} catch (ServletException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@RequestMapping(value = "/AddReviewGoods")
+	@ResponseBody
+	public orderJson AddReviewGoods(HttpServletRequest request,HttpServletResponse response) {
+        String pid=request.getParameter("pid");
+        String catid1=request.getParameter("catid1");
+        String name=request.getParameter("name");
+        String maxPrice=request.getParameter("maxPrice");
+		orderJson orderJson=new orderJson();
+		int count = iWarehouseService.AddReviewGoods(pid,catid1,name,maxPrice);
+		if (count==1){
+			orderJson.setTotal(1);
+		}else {
+			orderJson.setTotal(0);
+		}
+		return orderJson;
+	}
 }

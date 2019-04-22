@@ -8,6 +8,7 @@ import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
 import com.cbt.website.bean.*;
+import com.cbt.website.util.JsonResult;
 import org.apache.ibatis.annotations.Param;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1134,6 +1135,24 @@ public interface IWarehouseService {
 	 */
 	public Map<String, Object> getDetailsByRemarks(String remarks);
 	
-	public void insertChangeLog(Map<String, Object> map);
+	public void insertChangeLog(Map<String, Object> map)
+			;
+    //查看差货未处理订单数
+	int FindOrderCount(String admuserid);
+
+    List<CustomGoodsBean> getBadgoods(int start,int pagesize,String pid);
+
+	int getBadgoodsCount();
+
+	int AddBadOrder(String pid, Double price);
+
+    int UpdateState(String pid);
+
+	List<badGoods> findAllCustomBypid(String pid, Double price,int pagesize,int start,String cupid);
+
+	int findAllCustomBypidCount(String pid, Double price,String cupid);
+
+	int AddReviewGoods(String pid,String catid1,String name,String maxPrice);
+
 }
  
