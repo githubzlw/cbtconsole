@@ -514,10 +514,6 @@ public class OrderInfoController{
 					iOrderinfoService.updatecanceltatus(map);
 				}
 			}
-			String goodsAll=request.getParameter("goodsAll");
-			if ("1".equals(goodsAll)){
-				Boolean b=this.iOrderinfoService.UpdateAllGoodsState(tbOrderId)	;
-			}
 		}catch (Exception e){
 			e.printStackTrace();
 		}
