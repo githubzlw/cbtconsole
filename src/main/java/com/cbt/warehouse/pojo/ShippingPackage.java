@@ -1,5 +1,6 @@
 package com.cbt.warehouse.pojo;
 
+import com.cbt.util.BigDecimalUtil;
 import com.cbt.website.bean.UserOrderDetails;
 
 import java.util.List;
@@ -57,6 +58,19 @@ public class ShippingPackage {
 	private double yfhFreight;
 	private double jcexFreight;
 	private int cacount;
+	/**
+	 * 客户付的钱-采购金额-预估运费
+	 */
+	private double subAmount;
+
+	public double getSubAmount() {
+		return subAmount;
+	}
+
+	public void setSubAmount(double subAmount) {
+		this.subAmount = BigDecimalUtil.truncateDouble(subAmount,2);
+	}
+
 	public int getCacount() {
 		return cacount;
 	}
