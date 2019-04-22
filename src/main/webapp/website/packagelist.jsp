@@ -433,7 +433,14 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 				</c:if>    
 			                                                                                                                                                                                                                                     
 			<tr <%-- id="${obj.shipmentno }"  --%>  class="${obj.orderid }"     bgcolor=${obj.overTimeFlag==1?"#FFD39B":"#d7ffee"}>
-			    <td style="width:50px"><input  type="checkbox" name="cbox" style="width:15px;height:15px;"  value="${obj.shipmentno}"></td>
+			    <td style="width:50px">
+					<c:if test="${obj.subAmount < -20 && empty obj.yjRemark}">
+						<input  type="checkbox" name="cbox" style="width:15px;height:15px;" disabled="disabled"  value="${obj.shipmentno}">
+					</c:if>
+					<c:if test="${obj.subAmount >= -20 || not empty obj.yjRemark}">
+						<input  type="checkbox" name="cbox" style="width:15px;height:15px;"  value="${obj.shipmentno}">
+					</c:if>
+				</td>
 				<td style="width: 10px" id='bgh${obj.shipmentno }'>${obj.shipmentno }</td> <!-- 包裹号 -->
 				<c:if test="${tid != obj.orderid }"><!-- 用户信息 -->                                
 					<td style="width: 150px;"  id="yhxxhb${obj.orderid }">       
@@ -471,6 +478,9 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 						<span>${obj.orderremark}</span>
 						=======================<br/>
 						警告：<span id="spjg${obj.orderid }">;<span id="fright_${obj.orderid }"></span>
+						<c:if test="${obj.subAmount < -20}">
+							<b style="color: red;">客户付的钱-采购金额-预估运费≤-20元(${obj.subAmount})</b>
+						</c:if>
 						</span>
 						=======================<br/>
 						运费预警：<span id="spjg1${obj.orderid }"></span><br>
