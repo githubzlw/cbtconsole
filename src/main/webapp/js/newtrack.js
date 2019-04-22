@@ -1089,7 +1089,7 @@ function search() {
                             str += '<p><input type="checkbox" id="goods_state" style="color: red" name="cha" value="1">商品质量差(质量差的商品请标记)</p>';
                         }
                         var reg=new RegExp("'","g");
-                        //判断商品是否已经存放
+                        //判断商品是否已经存放的
                         if(checked=="0"){
                             flag_storage="1";
                             str += '<button style="height: 30px;width:80px;" name = "arrival'+i+'" onclick="updategoodstatus(this,\''
