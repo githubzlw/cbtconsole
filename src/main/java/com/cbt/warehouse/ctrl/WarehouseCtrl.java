@@ -108,6 +108,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1136,16 +1138,19 @@ public class WarehouseCtrl {
 	 * @throws ParseException
 	 * @return EasyUiJsonResult
 	 */
-	@RequestMapping(value = "/getShopManager", method = RequestMethod.POST)
+	@RequestMapping(value = "/getShopManager")
 	@ResponseBody
 	public EasyUiJsonResult getShopManager(HttpServletRequest request, Model model) throws ParseException {
-		DataSourceSelector.set("dataSource28hop");
+		// DataSourceSelector.set("dataSource28hop");
 		EasyUiJsonResult json = new EasyUiJsonResult();
 		Map<String, Object> map = new HashMap<String, Object>();
 		String shop_name = request.getParameter("shop_name");
 		String remark = request.getParameter("remark");
 		if (shop_name == null || "".equals(shop_name)) {
 			shop_name = null;
+		}
+		if(StringUtils.isStrNull(remark)){
+			remark = "-1";
 		}
 		int page = Integer.parseInt(request.getParameter("page"));
 		if (page > 0) {
@@ -8992,7 +8997,11 @@ public class WarehouseCtrl {
 	public String getUserInfo(String str){
 		String encodeStr = "";
 		if(null!=str && !"".equals(str)){
-			encodeStr = DESUtils.encode(str);
+			try{
+				encodeStr = URLEncoder.encode(DESUtils.encode(str));
+			}catch(Exception e){
+				LOG.error(" 加密用户名错误 USERID:{}",str);
+			}
 		}
 		return encodeStr;
 	}

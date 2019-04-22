@@ -124,6 +124,7 @@
         <result column="add_price_lv" property="addPriceLv"/>
         <result column="weight_flag" property="weightFlag"/>
          <result column="category_name" property="categoryName"/>
+        <result column="describe_good_flag" property="describeGoodFlag"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -875,7 +876,7 @@
         ifnull(cge.is_edited,0) as is_edited,ifnull(cge.is_abnormal,0) as is_abnormal,ifnull(cge.edit_profit,0) as edit_profit,
         ifnull(cge.lock_profit,0) as lock_profit,ifnull(cge.off_reason,'') as off_reason,ifnull(cge.weight_flag,0) as weight_flag,
         ifnull(cge.ugly_flag,0) as ugly_flag,ifnull(cge.repaired_flag,0) as repaired_flag,ifnull(cge.click_num,0) as click_num,
-        ifnull(cge.weight_is_edit,0) as weight_is_edit
+        ifnull(cge.weight_is_edit,0) as weight_is_edit, ifnull(cge.describe_good_flag,0) as describe_good_flag
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
@@ -1072,7 +1073,8 @@
         group by a.catid1) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
     <insert id="addReviewRemark">
-        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score})
+        insert into goods_review_log(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
+        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
     </insert>
 
 

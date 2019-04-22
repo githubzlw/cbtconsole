@@ -15,6 +15,10 @@ public class CustomGoods {
 	private int ocrneeddelete;
 	private int count;
 	private String name;
+	private String catgrid;
+	private String useroperation;
+	private int ocrneeddate;
+	private Category1688 Category1688Map;
 
 
 	public String getShopid() { return shopid; }
@@ -60,10 +64,30 @@ public class CustomGoods {
 	public String getName() { return name; }
 
 	public void setName(String name) { this.name = name; }
+
+	public String getCatgrid() { return catgrid; }
+
+	public void setCatgrid(String catgrid) { this.catgrid = catgrid; }
+
+	public String getUseroperation() { return useroperation; }
+
+	public void setUseroperation(String useroperation) { this.useroperation = useroperation; }
+
+	public int getOcrneeddate() { return ocrneeddate; }
+
+	public void setOcrneeddate(int ocrneeddate) { this.ocrneeddate = ocrneeddate; }
 	@Override
 	public String toString(){
 		return "CustomGoods:[id="+ getId() +",shopid="+shopid+",localpath="+localpath+",remotepath="+remotepath+",goodsmd5"+goodsmd5
-				+",createtime="+createtime+",isdelete="+isdelete+",ocrneeddelete="+ocrneeddelete+",name="+name+"]";
+				+",createtime="+createtime+",isdelete="+isdelete+",ocrneeddelete="+ocrneeddelete+",name="+name+",catgrid="+catgrid+",useroperation="+useroperation+",ocrneeddate="+ocrneeddate+"]";
 	}
 
+
+	public Category1688 getCategory1688Map() {
+		return Category1688Map;
+	}
+
+	public void setCategory1688Map(Category1688 category1688Map) {
+		Category1688Map = category1688Map;
+	}
 }

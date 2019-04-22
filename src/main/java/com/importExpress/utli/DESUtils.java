@@ -5,44 +5,41 @@ import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.security.SecureRandom;
 
 /**
- * *****************************************************************************************
- *
- * @ClassName DESUtils
- * @Author: cjc
- * @Descripeion TODO DES对称加密工具类
- * @Date： 2019/4/10 17:41:54
- * @Version 1.0
- * <p>
- * <p>
- * Version    Date                ModifiedBy                 Content
- * --------   ---------           ----------                -----------------------
- * 1.0.0       17:41:542019/4/10     jack                       初版
- * ******************************************************************************************
+ * @author luohao
+ * @date 2019/4/10
  */
+
+
 public class DESUtils {
 
     // 常量
     public static final String UTF_8 = "UTF-8";
-    public static final String DES = "DES";
+    public static final String AES = "AES";
     // 密钥
-    private static Key key;
+    private static SecretKey key;
     // KEY种子
     private static String KEY_STR = "www.import-express.com";
 
     // 静态初始化
     static {
         try {
-            // KEY 生成器
-            KeyGenerator generator = KeyGenerator.getInstance(DES);
-            // 初始化,安全随机算子
-            generator.init(new SecureRandom(KEY_STR.getBytes(UTF_8)));
-            // 生成密钥
-            key = generator.generateKey();
-            generator = null;
+//            // KEY 生成器
+//            KeyGenerator generator = KeyGenerator.getInstance(AES);
+//            // 初始化,安全随机算子
+//            generator.init(new SecureRandom(KEY_STR.getBytes(UTF_8)));
+//            // 生成密钥
+//            key = generator.generateKey();
+
+            KeyGenerator kgen = KeyGenerator.getInstance(AES);
+            SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            secureRandom.setSeed(KEY_STR.getBytes(UTF_8));
+            kgen.init(128, secureRandom);
+            key = kgen.generateKey();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,8 +70,8 @@ public class DESUtils {
         try {
             // 根据编码格式获取字节数组
             byte[] sourceBytes = source.getBytes(UTF_8);
-            // DES 加密模式
-            Cipher cipher = Cipher.getInstance(DES);
+            // AES 加密模式
+            Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             // 加密后的字节数组
             byte[] encryptSourceBytes = cipher.doFinal(sourceBytes);
@@ -96,11 +93,11 @@ public class DESUtils {
     public static String decode(String encrypted) {
         // Base64解码器
         BASE64Decoder base64Decoder = new BASE64Decoder();
-        try {
+            try {
             // 先进行base64解码
             byte[] cryptedBytes = base64Decoder.decodeBuffer(encrypted);
-            // DES 解密模式
-            Cipher cipher = Cipher.getInstance(DES);
+            // AES 解密模式
+            Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.DECRYPT_MODE, key);
             // 解码后的字节数组
             byte[] decryptStrBytes = cipher.doFinal(cryptedBytes);

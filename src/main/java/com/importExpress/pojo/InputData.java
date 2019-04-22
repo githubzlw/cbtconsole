@@ -94,6 +94,18 @@ public class InputData {
     private String size_info_en;
     private String custom_video_flag;
     private String entype_new ;//新的尺码表
+    /**
+     * 描述很精彩标识
+     */
+    private String describe_good_flag;
+
+    public String getDescribe_good_flag() {
+        return describe_good_flag;
+    }
+
+    public void setDescribe_good_flag(String describe_good_flag) {
+        this.describe_good_flag = describe_good_flag;
+    }
 
     public String getEntype_new() {
 		return entype_new;

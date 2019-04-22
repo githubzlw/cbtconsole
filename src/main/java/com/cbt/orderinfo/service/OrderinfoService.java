@@ -25,6 +25,7 @@ import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.poi.util.SystemOutLogger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
-	
+
 	@Autowired
 	private TabTrackInfoMapping tabTrackInfoMapping;
 
@@ -506,6 +507,9 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
 				searchresultinfo.setOrderremark(orderremark);
+				//TODO zlc bug处理期，后期需要更改
+				searchresultinfo.setSource1688_img(map.get("source1688_img"));
+				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
@@ -792,6 +796,7 @@ public class OrderinfoService implements IOrderinfoService {
 				//判断订单是否全部到库
 				int counts=dao.getDetailsState(map);
 				if(counts == 0){
+					System.err.println("orderNo:" + orderid + ",验货无误");
 					dao.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}

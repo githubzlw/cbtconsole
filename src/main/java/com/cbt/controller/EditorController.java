@@ -2,6 +2,7 @@ package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.cbt.bean.*;
+import com.cbt.bean.TypeBean;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.bean.Set;
@@ -11,12 +12,10 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
-import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
-import com.importExpress.utli.GoodsPriceUpdateUtil;
 import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -125,15 +124,15 @@ public class EditorController {
         }
 
         // 根据shopid查询店铺数据
-        int queryId = 0;
+        /*int queryId = 0;
         if (!(goods.getShopId() == null || "".equals(goods.getShopId()))) {
             ShopManagerPojo spmg = customGoodsService.queryByShopId(goods.getShopId());
             if (spmg != null) {
                 queryId = spmg.getId();
             }
-        }
+        }*/
 
-        mv.addObject("shopId", queryId);
+        mv.addObject("shopId", goods.getShopId());
         //查询商品评论信息
         List<CustomGoodsPublish> reviewList = customGoodsService.getAllReviewByPid(pid);
         request.setAttribute("reviewList", JSONArray.fromObject(reviewList));
@@ -1969,7 +1968,7 @@ public class EditorController {
             if (index > 0) {
                 //插入数据到线上
                 SendMQ sendMQ = new SendMQ();
-                String sql = " insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + review_remark + "','" + review_score + "')";
+                String sql = "insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values('" + goods_pid + "','" + country + "','" + adm.getAdmName() + "','" + createTime + "','" + SendMQ.repCha(review_remark) + "','" + review_score + "')";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }

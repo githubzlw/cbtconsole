@@ -1428,6 +1428,13 @@ function search() {
                                  }*/
                                 str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';source1688_img
                                 str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
+                               /* if (json[i].img != null || json[i].img != undefined || json[i].img != '') {
+                                    str += '<p>图片: <img width = "150" height="150" src="'+img+'"/></p>';
+                                } else{
+                                    str += '<p>图片: <img width = "150" height="150" src="'+json[i].img+'"/></p>';
+                                }*/
+                                str += '<div style="float:left;"><a href="'+json[i].goods_p_url+'" target="_blank">';source1688_img
+                                str += '<img width= "150px" height="150px" src="'+json[i].source1688_img+'"/></a></div>';
                             }
                             if(checked=="1"){
                                 console.log(1);
