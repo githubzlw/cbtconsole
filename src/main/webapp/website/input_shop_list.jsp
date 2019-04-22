@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="com.cbt.util.Redis" %>
-<%@page import="com.cbt.util.SerializeUtil" %>
-<%@ page import="com.cbt.website.userAuth.bean.Admuser" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,8 +13,6 @@
             src="/cbtconsole/js/bootstrap/bootstrap.min.js"></script>
     <script type="text/javascript" src="/cbtconsole/js/report/datechoise.js"></script>
     <title>上线店铺录入</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
-    <link rel="stylesheet" href="script/style.css" type="text/css">
     <link rel="stylesheet"
           href="/cbtconsole/css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/cbtconsole/css/bootstrap/AdminLTE.min.css">
@@ -84,7 +79,7 @@
 
         table.imagetable {
             font-family: verdana, arial, sans-serif;
-            font-size: 11px;
+            font-size: 20px;
             color: #333333;
             border-width: 1px;
             border-color: #999999;
@@ -102,7 +97,7 @@
         .panel-title {
             text-align: center;
             height: 30px;
-            font-size: 24px;
+            font-size: 28px;
         }
 
         table.imagetable td {
@@ -126,7 +121,7 @@
             color: #fff;
             margin-left: 12px;
         }
-        
+
         .but_color2 {
             background: #44a823;
             width: 96px;
@@ -135,6 +130,7 @@
             color: #fff;
             margin-left: 12px;
         }
+
         .but_authorized {
             background: #2836e6;
             width: 70px;
@@ -143,7 +139,7 @@
             color: #fff;
             margin-left: 12px;
         }
-        
+
         .but_authorized2 {
             background: #2836e6;
             /* width: 96px; */
@@ -175,13 +171,14 @@
             height: 33px;
             text-align: center;
         }
-        
+
         #authorized_dlg table {
-			margin: 10px;
-		}
-		#authorized_dlg table td{
-			padding: 4px;
-		}
+            margin: 10px;
+        }
+
+        #authorized_dlg table td {
+            padding: 4px;
+        }
 
         td > .datagrid-cell {
             text-align: left !important;
@@ -192,7 +189,7 @@
             margin-bottom: 10px;
         }
     </style>
-<%
+    <%
   String admName=request.getParameter("admName");
   String days=request.getParameter("days");
 %>
@@ -392,9 +389,14 @@
     <div>
         <form id="query_form" action="#" style="margin-left: 10px;"
               onsubmit="return false;">
-            <input type="hidden" id="admName" name="admName">
-            <input type="hidden" id="days" name="days">
-            上线状态:<select id="state_id" class="easyui-combobox" name="isOn" style="width:150px;">
+            <div>
+
+                <input type="hidden" id="admName" name="admName">
+                <input type="hidden" id="days" name="days">
+                <span>店铺ID:<input class="easyui-textbox" name="shopId" id="shopId"
+                                  style="width:220px; margin-top: 10px;"/></span>
+                &nbsp;&nbsp;
+                <span>上线状态:<select id="state_id" class="easyui-combobox" name="isOn" style="width:150px;">
             <option value="-1">全选</option>
             <option value="0">代办</option>
             <option value="2">详情图片已下载</option>
@@ -404,22 +406,19 @@
             <option value="5">数据上传中</option>
             <option value="3">图片已上传美服</option>
             <option value="1">详情信息已下载</option>
-        </select>
-            &nbsp;&nbsp;录入来源:<select id="is_auto" class="easyui-combobox" name="isAuto" style="width:100px;">
+        </select></span>
+                &nbsp;&nbsp;<span>录入来源:<select id="is_auto" class="easyui-combobox" name="isAuto" style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">手动录入</option>
             <option value="1">自动导入</option>
-        </select>
+        </select></span>
 
-            &nbsp;&nbsp;店铺ID:<input class="easyui-textbox" name="shopId" id="shopId"
-                                    style="width:240px; margin-top: 10px;"/>
-
-            &nbsp;&nbsp;是否启用:<select id="is_on" class="easyui-combobox" name="isOn" style="width:100px;">
+                &nbsp;&nbsp;<span>是否启用:<select id="is_on" class="easyui-combobox" name="isOn" style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">启用</option>
             <option value="1">不启用</option>
-        </select>&nbsp;&nbsp;&nbsp;&nbsp;店铺英文及品牌属性筛选:<select id="enname_brand_flag" class="easyui-combobox" name="authorizedFlag"
-                                                 style="width:180px;">
+        </select></span>&nbsp;&nbsp;
+                <span>店铺英文及品牌属性筛选:<select id="enname_brand_flag" class="easyui-combobox" name="authorizedFlag" style="width:180px;">
             <option value="-1">无筛选</option>
             <option value="1">1-店铺英文为空</option>
             <option value="2">2-品牌属性为空</option>
@@ -427,56 +426,72 @@
             <option value="4">4-店铺英文不为空</option>
             <option value="5">5-品牌属性不为空</option>
             <option value="6">6-店铺英文+品牌属性都不为空</option>
-        </select>
-            &nbsp;&nbsp;负责人:<input class="easyui-textbox" name="shopUserName" id="shopUserName"
-                                   style="width: 80px; margin-top: 10px;"/>
+        </select></span>
+                &nbsp;&nbsp;<span>负责人:<input class="easyui-textbox" name="shopUserName" id="shopUserName"
+                                             style="width: 130px; margin-top: 10px;"/></span>
+                &nbsp;&nbsp;<span>开始时间:<input class="easyui-datebox" style="width: 100px;" name="timeFrom"
+                                              id="timeFrom" value="${param.timeFrom}"/></span>
+                &nbsp;&nbsp;<span>截止时间:<input class="easyui-datebox" style="width: 100px;" name="timeTo" id="timeTo"
+                                  value="${param.timeTo}"/></span>
 
-            &nbsp;&nbsp;开始时间:<input class="easyui-datebox" style="width: 100px;" name="timeFrom"
-                                    id="timeFrom" value="${param.timeFrom}"/>
-            截止时间:<input class="easyui-datebox" style="width: 100px;" name="timeTo" id="timeTo" value="${param.timeTo}"/>
-
-
-            <br>授权店铺:<select id="authorized_flag" class="easyui-combobox" name="authorizedFlag" style="width:150px;">
+            </div>
+            <div>
+                <span>品牌属性:<input class="easyui-textbox" name="shopBrand" id="shopBrand"
+                                  style="width:210px; margin-top: 10px;"/></span>
+                &nbsp;&nbsp;
+                <span>授权店铺:<select id="authorized_flag" class="easyui-combobox" name="authorizedFlag"
+                                   style="width:150px;">
             <option value="-1">全选</option>
             <option value="0">0-未去问是否给授权</option>
             <option value="1">1-已给授权</option>
             <option value="2">2-暂不给授权但可卖</option>
             <option value="3">3-不给授权</option>
-        </select>
-            &nbsp;&nbsp;店铺描述:<select id="shop_type" class="easyui-combobox" name="shopType" style="width:100px;">
+        </select></span>
+                &nbsp;&nbsp;<span>店铺描述:<select id="shop_type" class="easyui-combobox" name="shopType"
+                                               style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">正常</option>
             <option value="1">精品店铺</option>
             <option value="2">侵权店铺</option>
-        </select>
-            &nbsp;&nbsp;授权文件问题:<select id="authorized_file_flag" class="easyui-combobox" name="authorizedFlag"
-                                       style="width:207px;">
-            <option value="-1">无筛选</option>
-            <option value="1">1-已授权但无授权文件</option>
-            <option value="2">2-授权文件到期</option>
-            <option value="3">3-已授权但无授权文件+授权文件到期</option>
-        </select>
-            &nbsp;&nbsp;问题店铺:<select id="ready_del" class="easyui-combobox" name="readyDel" style="width:100px;">
+        </select></span>
+
+                &nbsp;&nbsp;<span>问题店铺:<select id="ready_del" class="easyui-combobox" name="readyDel"
+                                               style="width:100px;">
             <option value="-1">全选</option>
             <option value="0">正常</option>
             <option value="1">MOQ太高</option>
             <option value="2">水印太多</option>
             <option value="3">不适合运输</option>
             <option value="4">其他</option>
-        </select>
-            &nbsp;&nbsp;品牌属性:<input class="easyui-textbox" name="shopBrand" id="shopBrand"
-                                    style="width:240px; margin-top: 10px;"/>
-            &nbsp;&nbsp;标记翻译产品描述:<select id="translate_description" class="easyui-combobox" name="translateDescription" style="width:100px;">
+        </select></span>
+                &nbsp;&nbsp;<span>授权文件问题:<select id="authorized_file_flag" class="easyui-combobox" name="authorizedFlag"
+                                                 style="width:240px;">
+            <option value="-1">无筛选</option>
+            <option value="1">1-已授权但无授权文件</option>
+            <option value="2">2-授权文件到期</option>
+            <option value="3">3-已授权但无授权文件+授权文件到期</option>
+        </select></span>
+                &nbsp;&nbsp;<span>翻译产品描述:<select id="translate_description" class="easyui-combobox"
+                                                   name="translateDescription" style="width:95px;">
                 <option value="-1">全选</option>
                 <option value="0">未标记</option>
                 <option value="1">已标记</option>
-            </select>
-            &nbsp;&nbsp;<input
-                class="but_color" type="button" value="查询" onclick="doQuery(1)">
-            &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
-                               onclick="doReset()">
-            &nbsp;&nbsp;<input class="but_color" type="button"
-                               value="新增" onclick="doAdd()">
+            </select></span>
+                &nbsp;&nbsp;<span>店铺上线:<select id="is_shop_flag" class="easyui-combobox" name="isShopFlag"
+                                               style="width:100px;">
+                <option value="-1">全部</option>
+                <option value="1">是</option>
+                <option value="0">否</option>
+            </select></span>
+                <input
+                    class="but_color" type="button" value="查询" onclick="doQuery(1)">
+                &nbsp;&nbsp;<input class="but_color" type="button" value="重置"
+                                   onclick="doReset()">
+                &nbsp;&nbsp;<input class="but_color" type="button"
+                                   value="新增" onclick="doAdd()">
+
+            </div>
+
             <!--<input class="but_color" type="button" value="导入excel"
                 onclick="updateExcel()"> -->
         </form>
@@ -497,19 +512,19 @@
     <tr>
         <th data-options="field:'shopId',width:120,align:'center'">店铺ID</th>
         <%--<th data-options="field:'inputShopName',width:50,align:'center'">店铺名称</th>--%>
-        <th data-options="field:'shopUrl',width:140,align:'center'">店铺url</th>
-        <th data-options="field:'inputShopEnName',width:100,align:'center'">店铺英文</th>
-        <th data-options="field:'inputShopBrand',width:100,align:'center'">品牌属性</th>
-        <th data-options="field:'onLineNum',width:60,align:'center'">已在线商品</th>
-        <th data-options="field:'isValidView',width:40,align:'center'">是否启用</th>
-        <th data-options="field:'onlineStatusView',width:130,align:'center'">上线状态</th>
-        <th data-options="field:'updatetime',width:75,align:'center'">更新日期</th>
-        <th data-options="field:'admUser',width:50,align:'center'">编辑者</th>
-        <th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>
-        <th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>
-        <th data-options="field:'inputShopDescription',width:80,align:'center'">店铺描述</th>
-        <th data-options="field:'stateInfo',width:200,align:'center'">操作</th>
-        <th data-options="field:'authorizedInfo',width:230,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
+        <th data-options="field:'shopUrl',width:140,align:'center',formatter:formatShopInfo">店铺信息</th>
+        <%--<th data-options="field:'inputShopEnName',width:100,align:'center'">店铺英文</th>
+        <th data-options="field:'inputShopBrand',width:80,align:'center'">品牌属性</th>--%>
+        <th data-options="field:'onLineNum',width:100,align:'center',formatter:formatShopNum">已在线商品/状态</th>
+        <%--<th data-options="field:'isValidView',width:40,align:'center'">是否启用</th>--%>
+        <th data-options="field:'onlineStatusView',width:120,align:'center',formatter:formatState">启用/店铺上线/授权</th>
+        <th data-options="field:'updatetime',width:100,align:'center',formatter:formatUpdateInfo">更新信息</th>
+        <%--<th data-options="field:'admUser',width:50,align:'center'">编辑者</th>--%>
+        <%--<th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>--%>
+        <%--<th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>--%>
+        <th data-options="field:'stateInfo',width:120,align:'center'">操作</th>
+        <th data-options="field:'authorizedInfo',width:120,align:'center',formatter:formatAuthorizedInfo">授权操作</th>
+        <th data-options="field:'inputShopDescription',width:100,align:'center'">店铺描述</th>
     </tr>
     </thead>
 </table>
@@ -617,6 +632,7 @@
         var authorizedFlag = $("#authorized_flag").combobox('getValue');
         var authorizedFileFlag = $("#authorized_file_flag").combobox('getValue');
         var ennameBrandFlag = $("#enname_brand_flag").combobox('getValue');
+        var isShopFlag = $("#is_shop_flag").combobox('getValue');
         $("#easyui-datagrid").datagrid("load", {
             "page": page,
             "createTime": data,
@@ -628,6 +644,7 @@
             "isOn": is_on,
             "readyDel": ready_del,
             "translateDescription": translate_description,
+            "isShopFlag": isShopFlag,
             "isAuto": isAuto,
             "state": state_id,
             "shopType":shopType,
@@ -648,7 +665,62 @@
         }
         return content;
     }
-    
+
+    function formatShopInfo(val, row, index) {
+        var content = '<div>';
+        content += '<span>店铺英文:'+row.inputShopEnName+'</span>';
+        content += '<br><span>品牌属性:'+row.inputShopBrand+'</span>';
+        content += '<br><span>URL:<a href="'+val+'" target="_blank">'+val+'</a></span>';
+        content += '</div>';
+        return content;
+    }
+
+    function formatShopNum(val, row, index) {
+        var content = '<div>';
+        content += '<span>在线商品数:<a href="/cbtconsole/website/shop_goods_list.jsp?shop_id=' + row.shopId
+            + '" target="_blank"> ' + val + '(view)</a></span>';
+        content += '<br><br><span style="color: #44a823;">状态:'+row.onlineStatusView+'</span>';
+        content += '</div>';
+        return content;
+    }
+
+    function formatState(val, row, index) {
+        var content = '<div>';
+        content += '<span>是否启用:'+row.isValidView+'</span>';
+        if (row.isShopFlag == 1) {
+            content += '<br><span>是否店铺上线 :是</span>';
+        } else {
+            content += '<br><span style="color: red;">是否店铺上线:否</span>';
+        }
+        if(row.authorizedFlag == 1){
+            content += '<br><span>授权:已授权</span>';
+        }else if(row.authorizedFlag == 2){
+            content += '<br><span>授权:暂不给授权但可卖</span>';
+        }else if(row.authorizedFlag == 3){
+            content += '<br><span>授权:不给授权</span>';
+        }else if(row.authorizedFlag == 0){
+            content += '<br><span>授权:未问是否给授权</span>';
+        }else{
+            content += '<br><span>授权:</span>';
+        }
+        content += '</div>';
+        return content;
+    }
+
+    function formatUpdateInfo(val, row, index) {
+        var content = '<div>';
+        content += '<span>创建日期:'+row.createTime+'</span>';
+        /*content += '<br><span>更新日期:'+val+'</span>';*/
+        content += '<br><span>负责人:'+row.admUser+'</span>';
+        if (row.isAuto == 1) {
+            content += '<br><span>录入来源:自动导入</span>';
+        } else {
+            content += '<br><span>录入来源:手动录入</span>';
+        }
+        content += '</div>';
+        return content;
+    }
+
     function formatAuthorizedFlag(val, row, index) {
     	if (val == undefined) {
 			return '';

@@ -106,7 +106,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel,int shopTypeFlag,
-                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids, int translateDescription) {
+                                 int authorizedFlag,int authorizedFileFlag,int ennameBrandFlag,String shopids,
+                                 int translateDescription, int isShopFlag, String catid) {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
         String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b " +
@@ -157,6 +158,12 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         if(translateDescription > -1){
             sql += " and a.is_translate_description = " + translateDescription;
         }
+        if(isShopFlag > -1){
+            sql += " and a.is_shop_flag = " + isShopFlag;
+        }
+        if(StringUtils.isNotBlank(catid)){
+            sql += " and a.shop_id in(select shop_id from shop_categroy_data where category_id = '" + catid + "')";
+        }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
 			case 1: //已授权但无授权文件
@@ -196,6 +203,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     break;
             }
         }
+
 
         sql += " order by a.createtime desc limit " + start + ", " + end + "";
         System.out.println(sql);
@@ -330,7 +338,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setAuthorizedFlag(queryAuthorizedFlag);
 
                 if(su.getIsTranslateDescription() > 0){
-                    stateInfo += "<b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
+                    stateInfo += "<br><b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
                 }else{
                     stateInfo += "<button class=\"but_color\" onclick=\"setShopTranslate('" + su.getShopId()
                             + "',1)\">标识翻译产品描述</button>";
@@ -339,8 +347,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
 
                 // + "<button style=\"margin-left: 10px;\" onclick=\"delreply("
                 // + su.getId() + ")\">删除</button>");
-                su.setOnLineNum("<a href=\"/cbtconsole/website/shop_goods_list.jsp?shop_id=" + su.getShopId()
-                        + "\" target=\"_blank\">" + rs.getInt("on_line_num") + "(view)" + "</a>");
+                su.setOnLineNum(rs.getString("on_line_num"));
+                su.setIsShopFlag(rs.getInt("is_shop_flag"));
                 suList.add(su);
             }
         } catch (Exception e) {
@@ -368,7 +376,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn,
                      int state, int isAuto, int readyDel,int shopType,int authorizedFlag,int authorizedFileFlag,
-                     int ennameBrandFlag,String shopids, int translateDescription) {
+                     int ennameBrandFlag,String shopids, int translateDescription, int isShopFlag, String catid) {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -413,6 +421,12 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
         if(translateDescription > -1){
             sql += " and is_translate_description = " + translateDescription;
+        }
+        if(isShopFlag > -1){
+            sql += " and is_shop_flag = " + isShopFlag;
+        }
+        if(StringUtils.isNotBlank(catid)){
+            sql += " and shop_id in(select shop_id from shop_categroy_data where category_id = '" + catid + "')";
         }
         if(authorizedFileFlag > 0){
         	switch (authorizedFileFlag) {
