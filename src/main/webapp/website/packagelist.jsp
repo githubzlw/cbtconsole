@@ -198,7 +198,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
 			$("#sfyxch"+h_orderid).html("");              
 			$("#"+index).css("background-color","#D7FFEE");
 			//运费预警
-			var a=Number(document.getElementById("cgje"+order_no+"").innerHTML)+Number(document.getElementById("ygyf"+index+"").innerHTML);
+			/*var a=Number(document.getElementById("cgje"+order_no+"").innerHTML)+Number(document.getElementById("ygyf"+index+"").innerHTML);
 			var b=$("#payPrice"+order_no+"").val();
 			b=b.replace(",","");
 			if(Number(a)-Number(b)>10){
@@ -212,7 +212,7 @@ function getFreight_package(eur,weight,volume,countryid,index,day,user_id,order_
                 $("#yjremark"+order_no).attr('disabled',true);
                 $("#inRemark"+order_no+"").attr('disabled',true);
                 $("#plckid").attr('disabled',false);
-			}
+			}*/
 		}
 	});
 }
