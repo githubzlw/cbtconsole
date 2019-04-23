@@ -52,9 +52,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 			payedList.add(shipment);
 		}else{
 			//将不符合条件的运单信息插入UnExistOrPayedShipment 表
-//			for (Shipment shipment : payedList) {
-//				 int ret = shipmentMapper.insertUnExistOrPayedSelective(shipment);
-//			}
+			for (Shipment shipment : payedList) {
+				 int ret = shipmentMapper.insertUnExistOrPayedSelective(shipment);
+			}
 			payedList.get(0).setCount(count);
 		}
 		return payedList;

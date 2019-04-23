@@ -37,8 +37,27 @@ public class ShopUrl {
 
 	private int urlType;
 
-	private int authorizedFlag;//授权标识  0未授权 1已授权
-	private int isTrade;//外贸部门使用标识 1外贸使用
+	/**
+	 * 授权标识  0未授权 1已授权
+	 */
+	private int authorizedFlag;
+	/**
+	 * 外贸部门使用标识 1外贸使用
+	 */
+	private int isTrade;
+
+	/**
+	 * 是否店铺上线  1 是 0不是
+	 */
+	private int isShopFlag;
+
+	public int getIsShopFlag() {
+		return isShopFlag;
+	}
+
+	public void setIsShopFlag(int isShopFlag) {
+		this.isShopFlag = isShopFlag;
+	}
 
 	/**
 	 * 标记翻译1688产品描述店铺 0默认未标记 1标记
