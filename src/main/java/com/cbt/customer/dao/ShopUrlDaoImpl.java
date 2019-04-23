@@ -84,20 +84,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return su;
@@ -338,7 +325,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 su.setAuthorizedFlag(queryAuthorizedFlag);
 
                 if(su.getIsTranslateDescription() > 0){
-                    stateInfo += "<br><b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
+                    stateInfo += "<b style=\"margin-left:10px;color:red;\">已标识翻译产品描述</b>";
                 }else{
                     stateInfo += "<button class=\"but_color\" onclick=\"setShopTranslate('" + su.getShopId()
                             + "',1)\">标识翻译产品描述</button>";
@@ -354,20 +341,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return suList;
@@ -479,13 +453,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
+            
             if (stmt != null) {
                 try {
                     stmt.close();
@@ -720,20 +689,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
             DBHelper.getInstance().closeConnection(conn);
         }
         return sgList;
@@ -759,20 +715,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closePreparedStatement(stmt);
+            
             DBHelper.getInstance().closeConnection(conn);
         }
         return result;
@@ -904,13 +848,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return profits;
@@ -1019,13 +957,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return goodsList;
@@ -1071,13 +1003,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return goodsList;
@@ -1340,13 +1266,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return goodsList;
@@ -1469,13 +1389,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return bean;
@@ -2051,13 +1965,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn28);
         }
 
@@ -2146,13 +2054,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return categoryList;
@@ -2185,13 +2087,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         if (localPath == null) {
@@ -2227,13 +2123,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rsMap;
@@ -2268,13 +2158,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return rsMap;
@@ -2313,13 +2197,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return list;
@@ -2506,13 +2384,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return shopIds;
@@ -2558,13 +2430,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return goodsInfos;
@@ -2770,13 +2636,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return goodsInfos;
@@ -2997,13 +2857,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                     e.printStackTrace();
                 }
             }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+            DBHelper.getInstance().closeResultSet(rs);
             DBHelper.getInstance().closeConnection(conn);
         }
         return count > 0;

@@ -183,6 +183,7 @@
         td > .datagrid-cell {
             text-align: left !important;
             padding: 5px 0;
+            font-size: 12px;
         }
 
         td > .datagrid-cell > button {
@@ -387,7 +388,7 @@
 
 <div id="top_toolbar" style="padding: 5px; height: auto">
     <div>
-        <form id="query_form" action="#" style="margin-left: 10px;"
+        <form id="query_form" action="#" style="margin-left: 10px;font-size: 12px;"
               onsubmit="return false;">
             <div>
 
@@ -471,6 +472,9 @@
             <option value="2">2-授权文件到期</option>
             <option value="3">3-已授权但无授权文件+授权文件到期</option>
         </select></span>
+                &nbsp;&nbsp;<span>类别ID:
+                <input class="easyui-textbox" name="catid" id="catid_id"
+                                  style="width:122px; margin-top: 10px;"/></span>
                 &nbsp;&nbsp;<span>翻译产品描述:<select id="translate_description" class="easyui-combobox"
                                                    name="translateDescription" style="width:95px;">
                 <option value="-1">全选</option>
@@ -515,10 +519,10 @@
         <th data-options="field:'shopUrl',width:140,align:'center',formatter:formatShopInfo">店铺信息</th>
         <%--<th data-options="field:'inputShopEnName',width:100,align:'center'">店铺英文</th>
         <th data-options="field:'inputShopBrand',width:80,align:'center'">品牌属性</th>--%>
-        <th data-options="field:'onLineNum',width:100,align:'center',formatter:formatShopNum">已在线商品/状态</th>
+        <th data-options="field:'onLineNum',width:140,align:'center',formatter:formatShopNum">已在线商品/状态</th>
         <%--<th data-options="field:'isValidView',width:40,align:'center'">是否启用</th>--%>
         <th data-options="field:'onlineStatusView',width:120,align:'center',formatter:formatState">启用/店铺上线/授权</th>
-        <th data-options="field:'updatetime',width:100,align:'center',formatter:formatUpdateInfo">更新信息</th>
+        <th data-options="field:'updatetime',width:120,align:'center',formatter:formatUpdateInfo">更新信息</th>
         <%--<th data-options="field:'admUser',width:50,align:'center'">编辑者</th>--%>
         <%--<th data-options="field:'isAuto',width:50,align:'center',formatter:formatAuto">录入来源</th>--%>
         <%--<th data-options="field:'authorizedFlag',width:50,align:'center',formatter:formatAuthorizedFlag">授权标识</th>--%>
@@ -633,6 +637,7 @@
         var authorizedFileFlag = $("#authorized_file_flag").combobox('getValue');
         var ennameBrandFlag = $("#enname_brand_flag").combobox('getValue');
         var isShopFlag = $("#is_shop_flag").combobox('getValue');
+        var catid = $("#catid_id").textbox("getValue");
         $("#easyui-datagrid").datagrid("load", {
             "page": page,
             "createTime": data,
@@ -652,7 +657,8 @@
             "authorizedFileFlag":authorizedFileFlag,
             "ennameBrandFlag":ennameBrandFlag,
             "admName":admName,
-            "days":days
+            "days":days,
+            "catid":catid
         });
     }
 
@@ -667,7 +673,7 @@
     }
 
     function formatShopInfo(val, row, index) {
-        var content = '<div>';
+        var content = '<div style="font-size: 13px;">';
         content += '<span>店铺英文:'+row.inputShopEnName+'</span>';
         content += '<br><span>品牌属性:'+row.inputShopBrand+'</span>';
         content += '<br><span>URL:<a href="'+val+'" target="_blank">'+val+'</a></span>';
@@ -676,16 +682,16 @@
     }
 
     function formatShopNum(val, row, index) {
-        var content = '<div>';
-        content += '<span>在线商品数:<a href="/cbtconsole/website/shop_goods_list.jsp?shop_id=' + row.shopId
-            + '" target="_blank"> ' + val + '(view)</a></span>';
-        content += '<br><br><span style="color: #44a823;">状态:'+row.onlineStatusView+'</span>';
+        var content = '<div style="font-size: 13px;">';
+        content += '<b>在线商品数:<a href="/cbtconsole/website/shop_goods_list.jsp?shop_id=' + row.shopId
+            + '" target="_blank"><b style="color: red;"> ' + val + '</b>(view)</a></b>';
+        content += '<br><br><b style="color: #44a823;font-size: 14px;">状态:'+row.onlineStatusView+'</b>';
         content += '</div>';
         return content;
     }
 
     function formatState(val, row, index) {
-        var content = '<div>';
+        var content = '<div style="font-size: 13px;">';
         content += '<span>是否启用:'+row.isValidView+'</span>';
         if (row.isShopFlag == 1) {
             content += '<br><span>是否店铺上线 :是</span>';
@@ -697,7 +703,7 @@
         }else if(row.authorizedFlag == 2){
             content += '<br><span>授权:暂不给授权但可卖</span>';
         }else if(row.authorizedFlag == 3){
-            content += '<br><span>授权:不给授权</span>';
+            content += '<br><span style="color:red;">授权:不给授权</span>';
         }else if(row.authorizedFlag == 0){
             content += '<br><span>授权:未问是否给授权</span>';
         }else{
@@ -708,7 +714,7 @@
     }
 
     function formatUpdateInfo(val, row, index) {
-        var content = '<div>';
+        var content = '<div style="font-size: 13px;">';
         content += '<span>创建日期:'+row.createTime+'</span>';
         /*content += '<br><span>更新日期:'+val+'</span>';*/
         content += '<br><span>负责人:'+row.admUser+'</span>';
