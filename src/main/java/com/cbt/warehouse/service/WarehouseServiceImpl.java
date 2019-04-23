@@ -19,6 +19,7 @@ import com.cbt.warehouse.util.Utility;
 import com.cbt.website.bean.*;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
@@ -2803,5 +2804,113 @@ public class WarehouseServiceImpl implements IWarehouseService {
     	//保存运单变更记录 （用于退回等订单将原物流保存到新物流商） ly 2018/08/22 15:36
     	warehouseMapper.insertChangeLog(map);
     }
+
+    @Override
+    public int FindOrderCount(String admuserid) {
+        int count=0;
+        try {
+            count= this.warehouseMapper.FindOrderCount();
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
+    @Override
+    public  List<CustomGoodsBean> getBadgoods(int start,int pagesize,String pidc) {
+        try {
+             if ("".equals(pidc)){
+                 pidc=null;
+             }
+            List<String> list=this.warehouseMapper.FindAllPid(start,pagesize,pidc);
+            List<CustomGoodsBean> goodsBeans=new ArrayList<>();
+            int i=0;
+            for (String pid:list) {
+                CustomGoodsBean goodsBean = this.warehouseMapper.selectByPid(pid);
+                goodsBeans.add(goodsBean);
+            }
+            return goodsBeans;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    @Override
+    public int getBadgoodsCount() {
+        try {
+            int conut=this.warehouseMapper.FindCount();
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int AddBadOrder(String pid, Double price) {
+
+        try {
+            int conut=this.warehouseMapper.AddBadOrder(pid,price);
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int UpdateState(String pid) {
+        try {
+            int conut=this.warehouseMapper.UpdateState(pid);
+            return conut;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public List<badGoods> findAllCustomBypid(String pid, Double price,int pagesize,int start,String cupid) {
+        try {
+            if ("".equals(cupid)){
+                cupid=null;
+            }
+            List<badGoods> list=this.warehouseMapper.findAllCustomBypid(pid,price,pagesize,start,cupid);
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public int findAllCustomBypidCount(String pid, Double price,String cupid) {
+        try {
+            if ("".equals(cupid)){
+                cupid=null;
+            }
+            int count=this.warehouseMapper.findAllCustomBypidCount(pid,price,cupid);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int AddReviewGoods(String pid, String catid1, String name, String maxPrice) {
+        try {
+            int count=this.warehouseMapper.AddReviewGoods(pid,catid1,name,maxPrice);
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 
 }

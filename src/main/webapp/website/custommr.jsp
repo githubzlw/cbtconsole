@@ -83,13 +83,13 @@ b {
 .div_left {
 	float: left;
 	width: 350px;
-	height: 100%;
+	height: 97%;
 }
 
 .div_right {
 	float: left;
 	width: 1550px;
-	height: 100%;
+	height: 98%;
 }
 
 .td_style {
@@ -658,13 +658,19 @@ b {
 							<option value="2">非核心</option>
 					</select></td>
 
-					<td>货源属性:<select id="query_sourcePro_flag"
+					<%--<td>货源属性:<select id="query_sourcePro_flag"
 						style="font-size: 18px; height: 28px;">
 							<option value="0" selected="selected">请选择</option>
 							<option value="1">同店铺商品</option>
 							<option value="2">同款商品</option>
 							<option value="3">对标商品</option>
 							<option value="4">原始老数据</option>
+					</select></td>--%>
+					<td>是否免邮:<select id="query_is_sold_flag"
+						style="font-size: 18px; height: 28px;width: 125px;">
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">非免邮</option>
+							<option value="1">免邮</option>
 					</select></td>
 
 					<td>发布时间:<input id="query_publish_begin_time" class="Wdate"
@@ -693,13 +699,22 @@ b {
 					</td>
 				</tr>
 				<tr>
-					<td>人为对标货源:<select id="query_bm_flag"
+					<%--<td>人为对标货源:<select id="query_bm_flag"
 						style="font-size: 18px; height: 28px;">
 							<option value="0" selected="selected">请选择</option>
 							<option value="1">是</option>
 							<option value="2">否</option>
+					</select></td>--%>
+					<td>产品来源:<select id="query_from_flag"
+						style="font-size: 18px; height: 28px;width: 180px;">
+							<option value="-1" selected="selected">请选择</option>
+							<option value="0">原始产品</option>
+							<option value="1">店铺上线</option>
+							<option value="2">单个商品录入上线</option>
+							<option value="3">速卖通对标上线</option>
+							<option value="4">跨境上线</option>
+							<option value="5">爆款开发上线</option>
 					</select></td>
-
 
 					<td style="display:none">是否加入购物车:<select id="query_add_car_flag"
 						style="font-size: 18px; height: 28px;">
@@ -772,8 +787,6 @@ b {
 							<%--<option value="3">已点击商品倒排序</option>--%>
 							<option value="4">按照类别排序</option>
 					</select>
-						&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
-						value="查询" style="height: 30px; width: 60px;" class="btn" />
 					</td>
 				</tr>
 				<tr>
@@ -804,32 +817,21 @@ b {
 							<option value="21">大于400美元商品下架</option>
 						</select>
 						</td>
-					<td>是否免邮:<select id="query_is_sold_flag"
-						style="font-size: 18px; height: 28px;width: 125px;">
-							<option value="-1" selected="selected">请选择</option>
-							<option value="0">非免邮</option>
-							<option value="1">免邮</option>
-					</select></td>
-					<td>产品来源:<select id="query_from_flag"
-						style="font-size: 18px; height: 28px;width: 180px;">
-							<option value="-1" selected="selected">请选择</option>
-							<option value="0">原始产品</option>
-							<option value="1">店铺上线</option>
-							<option value="2">单个商品录入上线</option>
-							<option value="3">速卖通对标上线</option>
-							<option value="4">跨境上线</option>
-							<option value="5">爆款开发上线</option>
-					</select></td>
+
+					<td colspan="2"><input type="checkbox" id="is_complain">是否被投诉&nbsp;
+						<input type="checkbox" id="is_weight_zero">1688重量为空&nbsp;
+						<input type="checkbox" id="is_weight_catid">重量超过类别上下限
+					</td>
+
 					<td>售卖&nbsp;&nbsp;&nbsp;重量:<input id="query_final_weight_begin" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_final_weight_end" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
 					<td>最高售卖价格:<input id="query_min_price" type="number" step="0.01" style="width: 50px;height: 22px;"/>
 						<span>-</span>
 						<input id="query_max_price" type="number" step="0.01" style="width: 50px;height: 22px;"/></td>
-					<td><input type="checkbox" id="is_complain">是否被投诉&nbsp;
-						<input type="checkbox" id="is_weight_zero">1688重量为空&nbsp;
-						<input type="checkbox" id="is_weight_catid">重量超过类别上下限
-					</td>
+					<td>&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" onclick="doQueryWidthJump()"
+						value="查询" style="height: 30px; width: 60px;" class="btn" /></td>
+
 				</tr>
 				<%--<tr>--%>
 						<%----%>
