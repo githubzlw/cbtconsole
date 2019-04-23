@@ -1,6 +1,7 @@
 package com.cbt.bean;
 
 import com.importExpress.pojo.ShopUrlAuthorizedInfoPO;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -11,10 +12,10 @@ public class ShopUrl {
 	private String shopName;
 	private String inputShopName;
 	private String inputShopDescription;
-	private String inputShopEnName;
-	private String inputShopBrand;
+	private String inputShopEnName = "";
+	private String inputShopBrand = "";
 	private String shopUrl;
-	private String admUser;
+	private String admUser = "";
 	private int adminId;
 	private Date createTime;
 	private Date updatetime;
@@ -80,7 +81,9 @@ public class ShopUrl {
 	}
 
 	public void setInputShopEnName(String inputShopEnName) {
-		this.inputShopEnName = inputShopEnName;
+		if(StringUtils.isNotBlank(inputShopEnName)){
+			this.inputShopEnName = inputShopEnName;
+		}
 	}
 
 	public String getInputShopBrand() {
@@ -88,7 +91,9 @@ public class ShopUrl {
 	}
 
 	public void setInputShopBrand(String inputShopBrand) {
-		this.inputShopBrand = inputShopBrand;
+		if(StringUtils.isNotBlank(inputShopBrand)){
+			this.inputShopBrand = inputShopBrand;
+		}
 	}
 
 	public ShopUrlAuthorizedInfoPO getAuthorizedInfo() {
@@ -154,7 +159,9 @@ public class ShopUrl {
 	}
 
 	public void setAdmUser(String admUser) {
-		this.admUser = admUser;
+		if(StringUtils.isNotBlank(admUser)){
+			this.admUser = admUser;
+		}
 	}
 
 	public int getAdminId() {
