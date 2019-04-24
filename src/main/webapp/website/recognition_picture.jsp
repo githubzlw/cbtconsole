@@ -178,17 +178,9 @@ div.margin2 {
 }
 </style>
 <script type="text/javascript">
-    var myArray=new Array();
-    var  maMap ={};
+    /*var myArray=new Array();
+    var  maMap ={};*/
 	$(function () {
-		//默认勾选所有数据
-        $("input[class='cbox']").prop('checked',true );//全选
-		//当选择的是线上已删除状态的条件时，禁用所有单选框和下架商品的按钮
-		if($("#isdelete").val()==1){
-		$("input[class='cbox']").prop('checked',false );//反选
-        $("input[class='cbox']").prop('disabled',true );
-		}
-
         $.ajax({
             type: "GET",
             url: "${ctx}/Distinguish_Picture/FindCategory",
@@ -208,14 +200,14 @@ div.margin2 {
                 console.log("网络获取失败");
             }
         });
-        var you = 0;
+       /* var you = 0;
         $(".cbox:checked").each(function(){
             var elMap={};
             elMap['id'] =this.value;
             elMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
             myArray[you] = elMap;
             you++;
-        });
+        });*/
     });
 function fnjump(obj){
 	var page=$("#page").val();
@@ -292,15 +284,18 @@ function  updateSomes(type){
 		alert("请至少选择一个！");
 	}else{
         var userName=$("#userName").val();
-        maMap['maList']=myArray;
-        console.log(mainMap);
+        for(var i=0;i<${customGoodsList }.length;i++){
+			alert(${customGoodsList})
+		}
+       /* maMap['maList']=myArray;
+        console.log(maMap);
         $.ajax({
             type:"post",
             url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
             dataType:"json",
             contentType : 'application/json;charset=utf-8',
             data:JSON.stringify(maMap)
-        });
+        });*/
         mainMap['bgList'] = erList;
 		console.log(mainMap);
 	 	$.ajax({
@@ -311,16 +306,63 @@ function  updateSomes(type){
 		    data:JSON.stringify(mainMap),
 			success:function(res){
 				if(res==0){
-					$("#tip").html("删除失败  !")
+                    alert("删除失败  !")
 				}else{
-					$("#tip").html("删除成功 !");
+					alert("删除成功 !");
 					window.location.reload();
 				}
 			}
 		})  
 	}
-    }
+ }
 }
+    function  updateSomes2(type){
+        if(confirm("确定要下架选择的图片？")){
+            var  mainMap ={};
+            var erList= new Array();
+            var id = "";
+            var ocrneeddelete ="";
+            var sbi = 0;
+            $(".cbox:checked").each(function(){
+                var erMap={};
+                erMap['id'] =this.value;
+                erMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
+                erList[sbi] = erMap;
+                sbi++;
+            });
+            if(erList.length == 0){
+                alert("请至少选择一个！");
+            }else{
+                var userName=$("#userName").val();
+                /* maMap['maList']=myArray;
+                 console.log(maMap);
+                 $.ajax({
+                     type:"post",
+                     url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
+            dataType:"json",
+            contentType : 'application/json;charset=utf-8',
+            data:JSON.stringify(maMap)
+        });*/
+                mainMap['bgList'] = erList;
+                console.log(mainMap);
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}",
+                    dataType:"json",
+                    contentType : 'application/json;charset=utf-8',
+                    data:JSON.stringify(mainMap),
+                    success:function(res){
+                        if(res==0){
+                            alert("线上下架失败  !")
+                        }else{
+                            alert("线上下架成功 !");
+                            window.location.reload();
+                        }
+                    }
+                })
+            }
+        }
+    }
 </script>
 </head>
 <body>
@@ -332,7 +374,8 @@ function  updateSomes(type){
 			<div class="main-float">
 				<div class="main-top">
 					<div class="left">
-						<span class="wenzi">商品编号：</span> <input type="text" id="pid"  value="${pid }" class="inputText" placeholder="请输入商品id"/>
+						<h3><span style="color: red">最近修改时间：(人工进行对图片的删除)</span></h3>
+						<h3>单页显示数据：（35张）</h3>
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">备注：(人工进行对图片的删除)</span>
@@ -353,7 +396,7 @@ function  updateSomes(type){
 				<div class="main-top margin2">
 
 					<div class="left">
-						<span class="wenzi">图片分类：</span> <select   id="imgtype" class="selectText" onchange="search()">
+						<span class="wenzi">产品分类：</span> <select   id="imgtype" class="selectText" onchange="search()">
 						<option value="">请选择(全部)</option>
 						<c:forEach items="${ret}" var="ret" >
 								<option value="${ret.categoryid}" <c:if test="${ret.categoryid==imgtype}"> selected </c:if>>${ret.name}(${ret.id})</option>
@@ -366,8 +409,11 @@ function  updateSomes(type){
 						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
 						<c:if test="${state==0}">
-						<span class="wenzi"  onclick="updateSomes(1)"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
+						<span class="wenzi"  onclick="updateSomes(1)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
 						<span style="color: blue">(勾选添加到（已处理含中文），未勾选则添加到（已处理不含中文）)</span>
+						</c:if>
+						<c:if test="${state==1}">
+							<span class="wenzi"  onclick="updateSomes2()" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
 						</c:if>
 						<span style="color: red">(选择全部，点击查询可回到未处理状态位信息)</span>
 						<%--<c:if test="${state==1}">
@@ -393,9 +439,15 @@ function  updateSomes(type){
 					<div class="div">
 						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }">
 						<br/>
-						pid:<input type="text"  value="${customGoodsList.pid }"/>
-						<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
-					</div>
+							<%--md5:<input type="text"  value="${customGoodsList.goodsmd5}"/>--%>
+
+						<c:if test="${state==0}">
+							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
+						</c:if>
+						<c:if test="${state==1}">
+							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.goodsmd5 }" style="width: 30px; height: 30px;" />
+						</c:if>
+						</div>
 				</c:forEach>
 			</table>
 		</div>

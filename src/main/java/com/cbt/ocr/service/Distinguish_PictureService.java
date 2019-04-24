@@ -17,7 +17,7 @@ public interface Distinguish_PictureService {
 	 * @return
 	 *
 	 */
-	public List<CustomGoods> showDistinguish_Pircture( String pid,  int page,String imgtype,String state,String Change_user);
+	public List<CustomGoods> showDistinguish_Pircture( int page,String imgtype,String state,String Change_user);
 	public List<Admuser> showDistinguish_Pircture_2();
 
 	/***
@@ -27,7 +27,7 @@ public interface Distinguish_PictureService {
 	 * @param
 	 * @return
 	 */
-	public int queryDistinguish_PirctureCount(String pid,String imgtype,String state,String Change_user);
+	public int queryDistinguish_PirctureCount(String imgtype,String state,String Change_user);
 
 	/***
 	 *批发更新线上是否删除状态
@@ -35,7 +35,7 @@ public interface Distinguish_PictureService {
 	 * @return
 	 */
 	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName);
-	public int updateSomePirctu_risdelete_s(List<Map<String, String>> bgList_s,String userName);
+	public int updateSomePirctu_risdelete_s(List<Map<String, String>> maList,String userName);
 
 	public List<Category1688> showCategory1688_type();
 }

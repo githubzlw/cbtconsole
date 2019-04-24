@@ -30,13 +30,12 @@ public class Distinguish_PictureContorller {
 	 * @User  zlc
 	 * @param request
 	 * @param page
-	 * @param pid
 	 * @param
 	 * @return
 	 */
 	@RequestMapping(value = "FindCustomGoodsInfo")
 	public String showDistinguish_Pircture(HttpServletRequest request,
-	    String page,String pid,String imgtype,String state,String Change_user){
+	    String page,String imgtype,String state,String Change_user){
 		//获取当前用户
 		String sessionId = request.getSession().getId();
 		String authJson = Redis.hget(sessionId, "userauth");
@@ -48,7 +47,7 @@ public class Distinguish_PictureContorller {
 			page="1";
 		int pageNO=Integer.parseInt(page);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
-		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,imgtype,state,Change_user);
+		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pageNO,imgtype,state,Change_user);
 		if (StrUtils.isNullOrEmpty(state))
 			state="0";
 		//处理人员查询显示
@@ -63,10 +62,9 @@ public class Distinguish_PictureContorller {
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
 			totalpage = (Integer)customGoodsList.get(0).getCount();
-			totalpage = totalpage%30==0?totalpage/30:totalpage/30+1;
+			totalpage = totalpage%35==0?totalpage/35:totalpage/35+1;
 		}
 		//页面动态锁定信息
-		request.setAttribute("pid",pid);
 		request.setAttribute("username",user.getAdmName());
 		request.setAttribute("imgtype",imgtype);
 		request.setAttribute("Change_user",Change_user);
@@ -88,7 +86,7 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName,Map<String,Object> myArray){
+	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
 		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName);
 		return  ret ;
