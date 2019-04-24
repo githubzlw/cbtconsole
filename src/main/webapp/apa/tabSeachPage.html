@@ -338,7 +338,7 @@ function preview(id,importPath) {
 		success : function(data) {
 			var res = data;
 			if(res.status){
-				window.open(importPath+"/seachpage/detail?sid="+id,"_blank");
+				window.open(importPath+"/seachpage/detail?red=false&sid="+id,"_blank");
 			}else{
 				$.messager.alert('message',res.message);
 			}
@@ -1192,7 +1192,7 @@ function updateDetail() {
 	</div>
 <div style="z-index: 10;position: absolute;bottom: 50px;left: 30px;">
 	<a href="#" onclick="toStaticizeAll()">全部商品一键刷新到线上</a><br />
-	<a href="https://www.import-express.com/app/rlevel" target="_blank">编辑完后点击刷新线上数据</a>
+	<!--<a href="https://www.import-express.com/app/rlevel" target="_blank">编辑完后点击刷新线上数据</a>-->
 </div>
 </body>
 </html>
