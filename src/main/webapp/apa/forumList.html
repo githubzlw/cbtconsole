@@ -139,6 +139,18 @@
                 }
             }
         });
+        /*$.ajax({
+            timeout: 3000,
+            async: false,
+            type: "POST",
+            url: "/cbtconsole/Forum/FindForum_Class",
+            dataType: "json",
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#type").append("<option value='"+data[i].id+"'>" + data[i].forumClassName + "</option>");
+                }
+            }
+        });*/
     });
 
     //新增/修改评论 whj直接代码
@@ -367,7 +379,10 @@
             return "";
         }
     }
-
+    function  reset(){
+        $(".form-control").val('');
+        $("input[type='text']").val('');
+    }
     function formatterType(value, row, index) {
         if (row.detailsState != null) {
             if (row.detailsState == 0) {
@@ -478,6 +493,9 @@
                         style="float: left; line-height: 30px;">&nbsp;分类&nbsp;&nbsp;</span>
                 </td>
                 <td align="center" style="width: 110px;"><span
+                        style="float: left; line-height: 30px;">&nbsp;审核人&nbsp;&nbsp;</span>
+                </td>
+                <td align="center" style="width: 110px;"><span
                         style="float: left; line-height: 30px;">&nbsp;审核状态&nbsp;&nbsp;</span>
                 </td>
                 <td style="width: 100px;">
@@ -517,7 +535,12 @@
                                            style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
                     <option value="">全部</option>
                 </select></td>
-                <!--是否显示-->
+                <!--审核人-->
+                <td align="center"><select class="form-control" id="audit_user"
+                                           style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+                    <option value="">全部</option>
+                </select></td>
+                <!--审核状态-->
                 <td align="center"><select class="form-control" id="reviewFlag"
                                            style="height: 30px; width: 106px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
                     <option value="">全部</option>
@@ -534,7 +557,7 @@
                 <td align="center">
                     <button type="reset"
                             class="btn btn-default"
-                            style="height: 30px; width: 98px; text-align: center;">重置
+                            style="height: 30px; width: 98px; text-align: center;" onclick="reset()">重置
                     </button>
                 </td>
                 <!--新增按钮-->

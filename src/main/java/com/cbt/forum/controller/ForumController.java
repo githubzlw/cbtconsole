@@ -38,6 +38,7 @@ public class ForumController {
 	public EasyUiJsonResult FindForum_speech(@RequestParam(value = "rows",defaultValue ="20",required = false)Integer rows,
 	                                         @RequestParam(value = "page",defaultValue ="1",required = false)int page,
 	                                         @RequestParam(value = "posttitle",defaultValue ="",required = false)String posttitle,
+	                                         @RequestParam(value = "audit_user",defaultValue ="",required = false)String audit_user,
 	                                         @RequestParam(value = "type",defaultValue ="0",required = false)int type,
 	                                         @RequestParam(value = "reviewFlag",defaultValue ="0",required = false)Integer reviewFlag,
 	                                         @RequestParam(value = "startDate",defaultValue ="",required = false)String startDate,
@@ -55,7 +56,10 @@ public class ForumController {
 		if (StringUtils.isBlank(posttitle)) {
 			posttitle = null;
 		}
-		return forumService.FidForumList(page,rows,posttitle,type,reviewFlag,startDate,endDate);
+		if (StringUtils.isBlank(audit_user)) {
+			audit_user = null;
+		}
+		return forumService.FidForumList(page,rows,posttitle,type,reviewFlag,startDate,endDate,audit_user);
 	}
 
 	/***
@@ -111,6 +115,13 @@ public class ForumController {
 		json.setComment(forumService.FindForumUser());
 		return json;
 	}
+
+	/***
+	 * 删论坛帖子
+	 * @param request
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(value = "delete_forum_details_post")
 	@ResponseBody
 	public JsonResult delete_forum_details_post(HttpServletRequest request,int id){
@@ -133,11 +144,26 @@ public class ForumController {
 		}
 		return json;
 	}
+
+	/***
+	 *  查看单个帖子的详情信息
+	 * @param request
+	 * @param id
+	 * @return
+	 */
 	@RequestMapping(value = "FidForumList_one")
 	@ResponseBody
 	public List<ForumDetails> FidForumList_one(HttpServletRequest request,int id){
 
 		return forumService.FidForumList_one(id);
 	}
-
+	/***
+	 * 审核人员查询
+	 * @return
+	 */
+	@RequestMapping(value = "FindForum_audit_user")
+	@ResponseBody
+	public List<ForumClassification> FindForum_audit_user(){
+		return  forumService.FidForumClass();
+	}
 }

@@ -37,6 +37,9 @@
     <if test="posttitle !=null and posttitle!=''">
         AND  post_title=#{posttitle}
     </if>
+    <if test="audit_user !=null and audit_user!=''">
+        AND  audit_user=#{audit_user}
+    </if>
     <if test="type !=0">
         AND  post_class_id=#{type}
     </if>
@@ -64,6 +67,9 @@
         </if>
         <if test="type !=null and type!=''">
             AND  post_class_id=#{type}
+        </if>
+        <if test="audit_user !=null and audit_user!=''">
+            AND  audit_user=#{audit_user}
         </if>
         <if test="reviewFlag !=null and reviewFlag!=''">
             AND  audit_state=#{reviewFlag}

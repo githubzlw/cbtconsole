@@ -12,7 +12,7 @@ import java.util.List;
 public interface ForumService {
 
 	public EasyUiJsonResult FidForumList(Integer page,Integer rows,String posttitle
-			,int type, int reviewFlag,String startDate,String endDate);
+			,int type, int reviewFlag,String startDate,String endDate,String audit_user);
 
 	public List<ForumClassification> FidForumClass();
 

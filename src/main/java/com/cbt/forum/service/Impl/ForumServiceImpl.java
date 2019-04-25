@@ -48,10 +48,10 @@ public class ForumServiceImpl implements ForumService {
 
 	@Override
 	public EasyUiJsonResult FidForumList(Integer page,Integer rows,String posttitle
-			,int type, int reviewFlag,String startDate,String endDate) {
+			,int type, int reviewFlag,String startDate,String endDate,String audit_user) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
-		List<ForumDetails> list=forumDao.FidForumList((page-1)*rows,rows,posttitle,type,reviewFlag,startDate,endDate);
-		Integer count=forumDao.FidForumListConut(posttitle,type,reviewFlag,startDate,endDate);
+		List<ForumDetails> list=forumDao.FidForumList((page-1)*rows,rows,posttitle,type,reviewFlag,startDate,endDate,audit_user);
+		Integer count=forumDao.FidForumListConut(posttitle,type,reviewFlag,startDate,endDate,audit_user);
 		if(list!=null&&list.size()>0){
 			json.setRows(list);
 			json.setSuccess(true);

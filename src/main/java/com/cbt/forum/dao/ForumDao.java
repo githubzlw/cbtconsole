@@ -20,7 +20,7 @@ public interface ForumDao {
 	 * @return
 	 */
 	public List<ForumDetails> FidForumList(@Param("page")Integer page,@Param("rows")Integer rows,@Param("posttitle")String posttitle
-	,@Param("type")int type,@Param("reviewFlag")int reviewFlag,@Param("startDate")String startDate,@Param("endDate")String endDate);
+	,@Param("type")int type,@Param("reviewFlag")int reviewFlag,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("audit_user")String audit_user);
 	/***
 	 * 查询数据库帖子数据总数
 	 * @param posttitle
@@ -31,7 +31,7 @@ public interface ForumDao {
 	 * @return
 	 */
 	public Integer FidForumListConut(@Param("posttitle")String posttitle
-			,@Param("type")int type,@Param("reviewFlag")int reviewFlag,@Param("startDate")String startDate,@Param("endDate")String endDate);
+			,@Param("type")int type,@Param("reviewFlag")int reviewFlag,@Param("startDate")String startDate,@Param("endDate")String endDate,@Param("audit_user")String audit_user);
 
 	/***
 	 * 搜索帖子类型

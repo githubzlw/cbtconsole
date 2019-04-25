@@ -491,7 +491,9 @@
         });
 
     });
-
+    function  reset(){
+        $(".form-control").val('');
+    }
     function openReviewDiv(pid,id) {
             $("#add_forum_user").val("");
             if(pid==1){
@@ -678,7 +680,7 @@
                 <!--评论类型-->
                 <td align="center"><select class="form-control" id="type"
                                            style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
-                <option value="0">全部</option>
+                <option value="">全部</option>
                 </select></td>
                 <!--发帖人-->
                 <td align="center"><select class="form-control" id="forumUser"
@@ -702,7 +704,7 @@
                 <td align="center">
                     <button type="reset"
                             class="btn btn-default"
-                            style="height: 30px; width: 120px; text-align: center;">清楚筛选条件
+                            style="height: 30px; width: 120px; text-align: center;" onclick="reset()">清楚筛选条件
                     </button>
                 </td>
                 <!--新增按钮-->
