@@ -82,7 +82,17 @@
     </select>
     <update id="updateSomePirctu_risdelete">
         update custom_goods_md5 SET
-        ocr_need_date=1,
+        <if test="type==1">
+            ocr_need_date=1,
+        </if>
+        <if test="type==2">
+            ocr_need_delete=2,
+            ocr_need_date=2,
+        </if>
+        <if test="type==3">
+            ocr_need_delete=1,
+            ocr_need_date=1,
+        </if>
         user_operation=#{userName}
         where
         <foreach collection="bgList" separator="or" item="i" index="index">

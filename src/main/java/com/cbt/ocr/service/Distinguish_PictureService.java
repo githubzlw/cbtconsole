@@ -3,6 +3,7 @@ package com.cbt.ocr.service;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ public interface Distinguish_PictureService {
 
 	/***
 	 * 按条件查询OCR识别错误图片
-	 * @param pid
+	 * @param
 	 * @param
 	 * @param
 	 * @return
@@ -22,7 +23,7 @@ public interface Distinguish_PictureService {
 
 	/***
 	 * 查询OCR识别错误图片的总数
-	 * @param pid
+	 * @param
 	 * @param
 	 * @param
 	 * @return
@@ -34,7 +35,7 @@ public interface Distinguish_PictureService {
 	 * @param bgList
 	 * @return
 	 */
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName);
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName,int type);
 	public int updateSomePirctu_risdelete_s(List<Map<String, String>> maList,String userName);
 
 	public List<Category1688> showCategory1688_type();

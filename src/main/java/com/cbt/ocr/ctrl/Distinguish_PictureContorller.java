@@ -48,6 +48,11 @@ public class Distinguish_PictureContorller {
 		int pageNO=Integer.parseInt(page);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
 		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pageNO,imgtype,state,Change_user);
+
+		String []pidZ=new String[35];
+		for(int i=0;i<customGoodsList.size();i++){
+			pidZ[i]=customGoodsList.get(i).getId().toString();
+		}
 		if (StrUtils.isNullOrEmpty(state))
 			state="0";
 		//处理人员查询显示
@@ -74,6 +79,7 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
+		request.setAttribute("pidZ",pidZ);
 
 
 	return "recognition_picture";
@@ -86,9 +92,15 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName){
+	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName,int type){
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName);
+		int ret =0;
+		if(type==2){
+			/*ret=distinguish_pictureService.updateSomePirctu_risdelete_Chinese(bgList,userName);*/
+		}else if(type==1||type==3){
+			ret=distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName,type);
+		}
+
 		return  ret ;
 	}
 	/****

@@ -13,6 +13,7 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
+
 <!-- <link rel="stylesheet" href="/cbtconsole/js/bootstrap/bootstrap.min.css"> -->
 <style type="text/css">
 .table {
@@ -68,7 +69,14 @@
 
 }
 
-
+.mengceng{
+	width: 100%;
+	height:100%;
+	background: #999;
+	position: absolute;
+	opacity:0.5;
+	display: none;
+}
 html, body {
 	height: 100%;
 	font-family: "微软雅黑", Helvetica, Arial, sans-serif;
@@ -138,6 +146,8 @@ div.margin2 {
 
 .main-all {
 	overflow: hidden;
+	border: 1px dashed grey;
+	width: 1950px;
 }
 
 .main-center {
@@ -178,8 +188,6 @@ div.margin2 {
 }
 </style>
 <script type="text/javascript">
-    /*var myArray=new Array();
-    var  maMap ={};*/
 	$(function () {
         $.ajax({
             type: "GET",
@@ -200,14 +208,6 @@ div.margin2 {
                 console.log("网络获取失败");
             }
         });
-       /* var you = 0;
-        $(".cbox:checked").each(function(){
-            var elMap={};
-            elMap['id'] =this.value;
-            elMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
-            myArray[you] = elMap;
-            you++;
-        });*/
     });
 function fnjump(obj){
 	var page=$("#page").val();
@@ -229,31 +229,25 @@ function fnjump(obj){
 	}
 	
 	$("#page").val(page);
-    var pid = $("#pid").val();
     var imgtype = $("#imgtype").val();
     var state = $("#state").val();
-    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&pid="+pid+"&imgtype="+imgtype+"&state="+state;}
+    window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?page="+page+"&imgtype="+imgtype+"&state="+state;}
 
 
 function search(){
-	var pid = $("#pid").val();
+    $("#Tips").css("display","block");
+    $(".mengceng").css("display","block");
 	var imgtype = $("#imgtype").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&imgtype="+imgtype;
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?imgtype="+imgtype;
 }
 function search2(){
-        var pid = $("#pid").val();
+       $("#Tips").css("display","block");
+       $(".mengceng").css("display","block");
         var imgtype = $("#imgtype").val();
         var state = $("#state").val();
         var Change_user = $("#Change_user").val();
-        window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?pid="+pid+"&imgtype="+imgtype+"&state="+state+"&Change_user="+Change_user;
+        window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?imgtype="+imgtype+"&state="+state+"&Change_user="+Change_user;
 }
-
-
-function  reset(){
-	$(".selectText").val('');
-	$("input[type='text']").val('');
-}
-
     function fnselect(){
         if($("#checked").prop("checked") == true){
             $("input[class='cbox']").prop('checked',true );//全选
@@ -267,66 +261,66 @@ function  reset(){
         }
     }
 function  updateSomes(type){
-   	if(confirm("确定要删除选择的图片？")){
-	var  mainMap ={};
-	var erList= new Array();
-    var id = "";
-	var ocrneeddelete ="";
-    var sbi = 0;
-	$(".cbox:checked").each(function(){
-		  var erMap={}; 
-		  erMap['id'] =this.value;
-		  erMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
-		  erList[sbi] = erMap;
-		  sbi++;  		  
-	});
-	if(erList.length == 0){
-		alert("请至少选择一个！");
-	}else{
-        var userName=$("#userName").val();
-        for(var i=0;i<${customGoodsList }.length;i++){
-			alert(${customGoodsList})
-		}
-       /* maMap['maList']=myArray;
-        console.log(maMap);
-        $.ajax({
-            type:"post",
-            url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
-            dataType:"json",
-            contentType : 'application/json;charset=utf-8',
-            data:JSON.stringify(maMap)
-        });*/
-        mainMap['bgList'] = erList;
-		console.log(mainMap);
-	 	$.ajax({
-			type:"post",
-			url:"${ctx}/Distinguish_Picture/updateSomeis_delete?userName="+userName,
-			dataType:"json",
-			contentType : 'application/json;charset=utf-8', 
-		    data:JSON.stringify(mainMap),
-			success:function(res){
-				if(res==0){
-                    alert("删除失败  !")
-				}else{
-					alert("删除成功 !");
-					window.location.reload();
-				}
-			}
-		})  
-	}
- }
-}
-    function  updateSomes2(type){
-        if(confirm("确定要下架选择的图片？")){
+    if(type==1){
+        if(confirm("确定要删除选择的图片？")){
             var  mainMap ={};
             var erList= new Array();
-            var id = "";
-            var ocrneeddelete ="";
             var sbi = 0;
             $(".cbox:checked").each(function(){
                 var erMap={};
                 erMap['id'] =this.value;
-                erMap['ocrneeddelete'] = $("#ocrneeddelete"+this.value).val();
+                erList[sbi] = erMap;
+                sbi++;
+            });
+            var myArray=new Array();
+            var  maMap ={};
+            var you = 0;
+            $(".cbox:not(:checked)").each(function(){
+                var elMap={};
+                elMap['id'] =this.value;
+                myArray[you] = elMap;
+                you++;
+            });
+            if(erList.length == 0){
+                alert("请至少选择一个！");
+            }else{
+                var userName=$("#userName").val();
+                 maMap['maList']=myArray;
+                 console.log(maMap);
+                 $.ajax({
+                     type:"post",
+                     url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
+					dataType:"json",
+					contentType : 'application/json;charset=utf-8',
+					data:JSON.stringify(maMap)
+       			 });
+                mainMap['bgList'] = erList;
+                console.log(mainMap);
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}/Distinguish_Picture/updateSomeis_delete?userName="+userName+"&type="+type,
+                    dataType:"json",
+                    contentType : 'application/json;charset=utf-8',
+                    data:JSON.stringify(mainMap),
+                    success:function(res){
+                        if(res==0){
+                            alert("删除失败  !")
+                        }else{
+                            alert("删除成功 !");
+                            window.location.reload();
+                        }
+                    }
+                })
+            }
+        }
+	}else if(type==3){
+        if(confirm("确定要进行此操作？")){
+            var  mainMap ={};
+            var erList= new Array();
+            var sbi = 0;
+            $(".cbox:checked").each(function(){
+                var erMap={};
+                erMap['id'] =this.value;
                 erList[sbi] = erMap;
                 sbi++;
             });
@@ -334,37 +328,85 @@ function  updateSomes(type){
                 alert("请至少选择一个！");
             }else{
                 var userName=$("#userName").val();
-                /* maMap['maList']=myArray;
-                 console.log(maMap);
-                 $.ajax({
-                     type:"post",
-                     url:"${ctx}/Distinguish_Picture/updateSomeis?userName="+userName,
-            dataType:"json",
-            contentType : 'application/json;charset=utf-8',
-            data:JSON.stringify(maMap)
-        });*/
                 mainMap['bgList'] = erList;
                 console.log(mainMap);
                 $.ajax({
                     type:"post",
-                    url:"${ctx}",
+                    url:"${ctx}/Distinguish_Picture/updateSomeis_delete?userName="+userName+"&type="+type,
                     dataType:"json",
                     contentType : 'application/json;charset=utf-8',
                     data:JSON.stringify(mainMap),
                     success:function(res){
                         if(res==0){
-                            alert("线上下架失败  !")
+                            if(type==2){
+                                alert("添加到无中文失败  !")
+							}
+                            if(type==3){
+                                alert("添加到有中文失败  !")
+                            }
                         }else{
-                            alert("线上下架成功 !");
+                            if(type==2){
+                                alert("添加到无中文成功  !")
+                            }
+                            if(type==3){
+                                alert("添加到有中文成功  !")
+                            }
                             window.location.reload();
                         }
                     }
                 })
             }
         }
+	}else{
+            if(confirm("确定要进行此操作？")){
+                var  mainMap ={};
+                var erList= new Array();
+                var sbi = 0;
+                $(".cbox:checked").each(function(){
+                    var erMap={};
+                    erMap['id'] =this.value;
+                    erList[sbi] = erMap;
+                    sbi++;
+                });
+                if(erList.length == 0){
+                    alert("请至少选择一个！");
+                }else{
+                    var userName=$("#userName").val();
+                    mainMap['bgList'] = erList;
+                    console.log(mainMap);
+                    $.ajax({
+                        type:"post",
+                        url:"${ctx}",
+                        dataType:"json",
+                        contentType : 'application/json;charset=utf-8',
+                        data:JSON.stringify(mainMap),
+                        success:function(res){
+                            if(res==0){
+                                    alert("线上下架图片失败  !")
+                            }else{
+                                    alert("线上下架图片成功  !")
+                                window.location.reload();
+                            }
+                        }
+                    })
+                }
+            }
+	}
+    $("#Tips").css("display","block");
+    $(".mengceng").css("display","block");
+}
+    function  reset(){
+        $(".selectText").val('');
+        $("input[type='text']").val('');
+        search();
     }
+
 </script>
 </head>
+<div class="mengceng"></div>
+<div id="Tips" style="width: 500px;position: absolute;left: 650px;top: 300px;background-color: #00B1FF;display: none;z-index: 555;">
+	<h1 align="center" >数据正在装载中...</h1>
+</div>
 <body>
 <h1 align="center"><b>删除有中文的图片</b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
@@ -374,16 +416,16 @@ function  updateSomes(type){
 			<div class="main-float">
 				<div class="main-top">
 					<div class="left">
-						<h3><span style="color: red">最近修改时间：(人工进行对图片的删除)</span></h3>
+						<%--<h3><span style="color: red">最近修改时间：(人工进行对图片的删除)</span></h3>--%>
 						<h3>单页显示数据：（35张）</h3>
+						<h3><span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span></h3>
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">备注：(人工进行对图片的删除)</span>
-						<span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span>
 						状态位:<select   id="state" class="selectText"  onchange="search2()">
 							<option value="" <c:if test="${state==''}"> selected </c:if>>未处理</option>
-							<option value="1" <c:if test="${state==1}"> selected </c:if>>已处理(含中文)</option>
-							<option value="2" <c:if test="${state==2}"> selected </c:if>>已处理(不含中文)</option>
+							<option value="1" <c:if test="${state==1}"> selected </c:if>>含中文</option>
+							<option value="2" <c:if test="${state==2}"> selected </c:if>>无中文</option>
 						</select>
 						处理人员:<select   id="Change_user" class="selectText"  onchange="search2()">
 							<option value="">全部</option>
@@ -403,27 +445,31 @@ function  updateSomes(type){
 
 						</c:forEach>
 					</select>
+						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
+						<%--<c:if test="${state==1}">
+							<span class="wenzi"  onclick="updateSomes(2)"><a href="#" style="text-decoration:none"><font color="white">标记为无中文</font></a></span>
+						</c:if>--%>
+						<c:if test="${state==2}">
+							<span class="wenzi"  onclick="updateSomes(3)"><a href="#" style="text-decoration:none"><font color="white">标记为有中文</font></a></span>
+						</c:if>
 					</div>
 					<div class="left left-margin">
 						<input type="hidden" value="${username}" id="user_">
-						<span class="wenzi"  onclick="search();"><a href="#" style="text-decoration:none"><font color="white">查询</font></a></span>
-						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
 						<c:if test="${state==0}">
 						<span class="wenzi"  onclick="updateSomes(1)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
-						<span style="color: blue">(勾选添加到（已处理含中文），未勾选则添加到（已处理不含中文）)</span>
+							<span style="color: blue">(勾选添加到（含中文），未勾选添加到（无中文）)</span>
 						</c:if>
 						<c:if test="${state==1}">
-							<span class="wenzi"  onclick="updateSomes2()" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
+							<div style="border: 2px solid red">
+							<span class="wenzi"  onclick="updateSomes(2)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
+							<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
+							</div>
 						</c:if>
-						<span style="color: red">(选择全部，点击查询可回到未处理状态位信息)</span>
-						<%--<c:if test="${state==1}">
-						<span class="wenzi"  onclick="updateSomes(3)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">一键下架</font></a></span>
-						<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
-						</c:if>--%>
 						</div>
 				</div>
 			</div>
 		</div>
+		<br/>
 		<div class="left left-margin">
 			<label><input type="checkbox" class="checkbox-all"   id="checked" onclick="fnselect()" style="width: 30px; height: 30px;">全选</label>
 		</div>
@@ -441,11 +487,11 @@ function  updateSomes(type){
 						<br/>
 							<%--md5:<input type="text"  value="${customGoodsList.goodsmd5}"/>--%>
 
-						<c:if test="${state==0}">
+						<c:if test="${state!=1}">
 							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 						</c:if>
 						<c:if test="${state==1}">
-							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.goodsmd5 }" style="width: 30px; height: 30px;" />
+							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
 						</c:if>
 						</div>
 				</c:forEach>
