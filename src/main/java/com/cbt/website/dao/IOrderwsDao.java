@@ -1,10 +1,5 @@
 package com.cbt.website.dao;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.cbt.bean.*;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.TaoBaoOrderInfo;
@@ -15,6 +10,11 @@ import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.QualityResult;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
 import com.cbt.website.bean.UserBehavior;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ylm 后台订单管理
@@ -935,7 +935,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsRegisterUser(String beginDate,String endDate);
+	int statisticsRegisterUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -948,7 +948,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -959,7 +959,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsAddFirstAddress(String beginDate,String endDate);
+	int statisticsAddFirstAddress(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -972,7 +972,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryAddFirstAddressDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryAddFirstAddressDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -983,7 +983,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsAddCarWithNoRegisterUser(String beginDate,String endDate);
+	int statisticsAddCarWithNoRegisterUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -996,7 +996,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryAddCarWithNoRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryAddCarWithNoRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -1007,7 +1007,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsAddCarWithHasRegisterUser(String beginDate,String endDate);
+	int statisticsAddCarWithHasRegisterUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -1020,7 +1020,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryAddCarWithHasRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryAddCarWithHasRegisterUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -1031,7 +1031,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsAddCarWithOldUser(String beginDate,String endDate);
+	int statisticsAddCarWithOldUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -1044,7 +1044,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryAddCarWithOldUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryAddCarWithOldUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -1055,7 +1055,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsMakeOrderAllUser(String beginDate,String endDate);
+	int statisticsMakeOrderAllUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -1068,7 +1068,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryMakeOrderAllUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryMakeOrderAllUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -1079,7 +1079,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsMakeOrderNewUser(String beginDate,String endDate);
+	int statisticsMakeOrderNewUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 *
@@ -1092,7 +1092,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryMakeOrderNewUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryMakeOrderNewUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *
@@ -1103,7 +1103,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return int
 	 */
-	int statisticsPayOrderUser(String beginDate,String endDate);
+	int statisticsPayOrderUser(String beginDate,String endDate, int ipFlag);
 
 	/**
 	 * 产品单页浏览总次数
@@ -1111,7 +1111,7 @@ public interface IOrderwsDao {
 	 * @param endDate
 	 * @return
 	 */
-	int statisticsRecentView(String beginDate,String endDate);
+	int statisticsRecentView(String beginDate,String endDate, int ipFlag);
 	/**
 	 *
 	 * @Title queryPayOrderUserDetails
@@ -1123,7 +1123,7 @@ public interface IOrderwsDao {
 	 * @return
 	 * @return List<UserBehaviorDetails>
 	 */
-	List<UserBehaviorDetails> queryPayOrderUserDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryPayOrderUserDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 * 分组显示浏览次数最大的50个产品
@@ -1133,7 +1133,7 @@ public interface IOrderwsDao {
 	 * @param offSet
 	 * @return
 	 */
-	List<UserBehaviorDetails> queryUserRecentView(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryUserRecentView(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 
 	/**
 	 *Pay按钮点击独特人数
@@ -1143,7 +1143,7 @@ public interface IOrderwsDao {
 	 * @param offSet
 	 * @return
 	 */
-	List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate,String endDate,int startNum,int offSet);
+	List<UserBehaviorDetails> queryUserPayLogDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 	/**
 	 *
 	 * @Title queryExistsBehaviorData
@@ -1161,7 +1161,7 @@ public interface IOrderwsDao {
 	 * @param endDate
 	 * @return
 	 */
-	int queryUserPayLog(String beginDate,String endDate);
+	int queryUserPayLog(String beginDate,String endDate, int ipFlag);
 
-    int queryBehaviorRecord(String beginDate, String endDate);
+    int queryBehaviorRecord(String beginDate, String endDate, int ipFlag);
 }

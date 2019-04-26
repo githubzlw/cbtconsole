@@ -70,6 +70,61 @@ public class HttpUtil {
 		}
 		return result.toString();
 	}
+
+    public static String doGet(String httpUrl) {
+        StringBuffer htmlCode = new StringBuffer("");
+        InputStream in = null;
+        BufferedReader breader = null;
+        try {
+            URL url = new java.net.URL(httpUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "Mozilla/4.0");
+            connection.connect();
+//            connection.wait(10800000); // 3小时
+            in = connection.getInputStream();
+            breader = new BufferedReader(
+                    new InputStreamReader(in, "UTF-8"));
+            String currentLine;
+            while ((currentLine = breader.readLine()) != null) {
+                htmlCode.append(currentLine).append("\r\n");
+            }
+        } catch (Exception e) {
+        } finally {
+            if(in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+            if(breader != null) {
+                try {
+                    breader.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return htmlCode.toString();
+    }
+
+    /**
+     * @param httpUrl 访问的url
+     * @param contains 返回结果中包含内容
+     * @param num 如果返回结果不包含此内容的重试次数
+     * @return
+     */
+    public static String doGet(String httpUrl, String contains, Integer num) {
+        if (num == null || num == 0){
+            return "";
+        }
+        String refRes = doGet(httpUrl);
+        if (refRes.contains(contains)) {
+            //更新成功
+            return refRes;
+        } else {
+            return doGet(httpUrl, contains, --num);
+        }
+    }
 	
 	/**
 	 * 将map转换为请求字符串

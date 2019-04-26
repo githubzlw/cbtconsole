@@ -119,6 +119,19 @@ public class CustomGoodsPublish extends CustomGoodsBean {
     private String entypeNew ;//新的尺码表
     private String categoryName ;//产品名称太短增加类别名称
 
+    /**
+     * 描述很精彩标识
+     */
+    private int describeGoodFlag = -1;
+
+    public int getDescribeGoodFlag() {
+        return describeGoodFlag;
+    }
+
+    public void setDescribeGoodFlag(int describeGoodFlag) {
+        this.describeGoodFlag = describeGoodFlag;
+    }
+
     public String getEntypeNew() {
 		return entypeNew;
 	}

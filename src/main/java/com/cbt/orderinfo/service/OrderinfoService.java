@@ -796,6 +796,7 @@ public class OrderinfoService implements IOrderinfoService {
 				//判断订单是否全部到库
 				int counts=dao.getDetailsState(map);
 				if(counts == 0){
+					System.err.println("orderNo:" + orderid + ",验货无误");
 					dao.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
@@ -1841,6 +1842,38 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public  int updateOrderinfomodeTransport(String modeTransport,String orderNo){
 		return dao.updateOrderinfomodeTransport(modeTransport,orderNo);
+	}
+
+	@Override
+	public Boolean UpdateGoodsState(String goods_pid) {
+
+		int b= 0;
+		try {
+			b = this.dao.UpdateGoodsState(goods_pid);
+			if (b==0){
+            b=this.dao.InserGoodsState(goods_pid);
+            }
+			return b>0?true:false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	@Override
+	public Boolean UpdateAllGoodsState(String tbOrderId) {
+		try {
+			List<String>list =this.dao.FindAllGoodsPid(tbOrderId);
+			boolean b = false;
+			for (String goods_pid:list){
+                b=this.UpdateGoodsState(goods_pid);
+            }
+            return b;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
 

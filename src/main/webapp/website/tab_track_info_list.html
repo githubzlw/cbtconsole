@@ -646,11 +646,11 @@
             }
             /*格式化本地物流数据查看 formatterSourceType*/
             function formatterSourceType(value, row, index) {
-                if(row.sourceType != null) {
+//                if(row.sourceType != null) {
                     var trackNoStr = "'" + row.trackNo + "'";
                     return '<a onclick="alert_modal(' + trackNoStr + ');">本地</a><span>&nbsp;&nbsp;</span><a href="' + row.sourceType + '" target=black>原物流 </a>';
-                }
-                return;
+//                }
+//                return;
             }
         </script>
 

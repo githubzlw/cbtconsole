@@ -108,6 +108,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6134,6 +6136,9 @@ public class WarehouseCtrl {
 			// UserOrderDetails uod =
 			// purchaseServer.getUserDetails(orderid+",");
 			UserOrderDetails uod;
+			// 客户付的钱-采购金额-预估运费 ≥-20元 ， 提示 警告
+			list.get(i).setSubAmount(Double.valueOf(list.get(i).getSumprice()) * list.get(i).getExchange_rate()
+					- Double.valueOf(list.get(i).getSumcgprice()) - Double.valueOf(list.get(i).getEstimatefreight()));
 			try {
 				uod = purchaseServer.getUserAddr(orderid);
 				list.get(i).setUod(uod);
@@ -8995,7 +9000,11 @@ public class WarehouseCtrl {
 	public String getUserInfo(String str){
 		String encodeStr = "";
 		if(null!=str && !"".equals(str)){
-			encodeStr = DESUtils.encode(str);
+			try{
+				encodeStr = URLEncoder.encode(DESUtils.encode(str));
+			}catch(Exception e){
+				LOG.error(" 加密用户名错误 USERID:{}",str);
+			}
 		}
 		return encodeStr;
 	}

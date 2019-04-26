@@ -26,7 +26,7 @@ public class OnlineStatistics {
             today.setTimeInMillis(System.currentTimeMillis());
             today.add(Calendar.DATE, 0 - i);
             String todayStr = DateFormatUtil.getWithDay(today.getTime());
-            int registerStatisticsNum = orderwsDao.statisticsMakeOrderNewUser(todayStr + " 00:00:00", todayStr + " 23:59:59");
+            int registerStatisticsNum = orderwsDao.statisticsMakeOrderNewUser(todayStr + " 00:00:00", todayStr + " 23:59:59", 0);
             //System.err.println(todayStr + "@" + registerStatisticsNum);
 
             bean.setDataStart(todayStr + " 00:00:00");
