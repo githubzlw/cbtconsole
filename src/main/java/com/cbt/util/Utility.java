@@ -388,4 +388,40 @@ public class Utility {
 		// 返回固定的长度的随机数
 		return fixLenthString.substring(2, length + 2);
 	}
+	/**
+	 * @Title: ipToLong
+	 * @Author: cjc
+	 * @Despricetion: ip 转 long
+	 * @Date: 2019/4/26 11:09:36
+	 * @Param: [ip]
+	 * @Return: long
+	 */
+	public static long ipToLong(String ip) {
+		String[] ipArray = ip.split("\\.");
+		List ipNums = new ArrayList();
+		for (int i = 0; i < 4; ++i) {
+			ipNums.add(Long.valueOf(Long.parseLong(ipArray[i].trim())));
+		}
+		long ZhongIPNumTotal = ((Long) ipNums.get(0)).longValue() * 256L * 256L * 256L
+				+ ((Long) ipNums.get(1)).longValue() * 256L * 256L + ((Long) ipNums.get(2)).longValue() * 256L
+				+ ((Long) ipNums.get(3)).longValue();
+
+		return ZhongIPNumTotal;
+	}
+	/**
+	 * @Title: getIP
+	 * @Author: cjc
+	 * @Despricetion: long 转 ip
+	 * @Date: 2019/4/26 11:26:28
+	 * @Param: [ipaddr]
+	 * @Return: java.lang.String
+	 */
+	public static String getIP(long ipaddr) {
+		long y = ipaddr % 256;
+		long m = (ipaddr - y) / (256 * 256 * 256);
+		long n = (ipaddr - 256 * 256 *256 * m - y) / (256 * 256);
+		long x = (ipaddr - 256 * 256 *256 * m - 256 * 256 *n - y) / 256;
+		return m + "." + n + "." + x + "." + y;
+	}
+
 }	
