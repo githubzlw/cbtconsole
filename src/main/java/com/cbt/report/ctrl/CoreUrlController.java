@@ -144,9 +144,10 @@ public class CoreUrlController {
 		}
 		int start = (page - 1) * 30;
 		List<ShopUrl> findAll = shopUrlService.findAll(shopId, null, shopUserName, date, start, 30, timeFrom, timeTo, isOn,
-				state,-1,-1,-1,-1,-1,-1,"", -1);
+				state,-1,-1,-1,-1,-1,-1,
+				"", -1, -1, null);
 		int total = shopUrlService.total(shopId, null, shopUserName, date, timeFrom, timeTo, isOn, state,-1,-1,
-				-1,-1,-1,-1,"", -1);
+				-1,-1,-1,-1,"", -1, -1, null);
 		json.setRows(findAll);
 		json.setTotal(total);
 		return json;

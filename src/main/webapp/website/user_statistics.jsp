@@ -196,11 +196,16 @@
             if (endDate == null) {
                 endDate = "";
             }
+            var ipFlag = 0;
+            var isIp = $("#ip_flag").is(":checked");
+            if(isIp){
+                ipFlag = 1;
+            }
             if (beginDate == null || beginDate == "") {
                 $.messager.alert("提醒", "请选择开始时间时间", "info");
                 return;
             } else {
-                loadStatisticsData(beginDate, endDate);
+                loadStatisticsData(beginDate, endDate, ipFlag);
             }
         }
 
@@ -210,7 +215,7 @@
             doQuery();
         }
 
-        function loadStatisticsData(beginDate, endDate) {
+        function loadStatisticsData(beginDate, endDate, ipFlag) {
             $.messager.progress({
                 title: '正在查询',
                 msg: '请等待...'
@@ -222,7 +227,8 @@
                     url: '/cbtconsole/behaviorStatistics/getStatistics',
                     data: {
                         beginDate: beginDate,
-                        endDate: endDate
+                        endDate: endDate,
+                        ipFlag : ipFlag
                     },
                     success: function (data) {
                         $.messager.progress('close');
@@ -290,6 +296,11 @@
                 if (endDate == null) {
                     endDate = "";
                 }
+                var ipFlag = 0;
+                var isIp = $("#ip_flag").is(":checked");
+                if(isIp){
+                    ipFlag = 1;
+                }
                 if (beginDate == null || beginDate == "" || endDate == null
                     || endDate == "") {
                     $.messager.alert("提醒", "请选择开始时间或者结束时间", "info");
@@ -304,7 +315,8 @@
                         "beginDate": beginDate,
                         "endDate": endDate,
                         "total": total,
-                        "typeFlag": typeFlag
+                        "typeFlag": typeFlag,
+                        "ipFlag": ipFlag
                     });
                 }else if (typeFlag == 11) {
                     addTrBk(obj);
@@ -316,7 +328,8 @@
                         "beginDate": beginDate,
                         "endDate": endDate,
                         "total": total,
-                        "typeFlag": typeFlag
+                        "typeFlag": typeFlag,
+                        "ipFlag": ipFlag
                     });
                 }else if (typeFlag == 12) {
                     addTrBk(obj);
@@ -342,7 +355,8 @@
                         "beginDate": beginDate,
                         "endDate": endDate,
                         "total": total,
-                        "typeFlag": typeFlag
+                        "typeFlag": typeFlag,
+                        "ipFlag": ipFlag
                     });
                 }
             }
@@ -358,13 +372,18 @@
                 if (endDate == null) {
                     endDate = "";
                 }
+                var ipFlag = 0;
+                var isIp = $("#ip_flag").is(":checked");
+                if(isIp){
+                    ipFlag = 1;
+                }
                 if (beginDate == null || beginDate == "") {
                     $.messager.alert("提醒", "请选择开始时间时间", "info");
                     return;
                 } else {
                     addTrBk(obj);
                     window.location.href = "/cbtconsole/behaviorStatistics/exportStatisticsExcel?beginDate="
-                        + beginDate + "&endDate=" + endDate + "&typeFlag=" + typeFlag;
+                        + beginDate + "&endDate=" + endDate + "&typeFlag=" + typeFlag + "&ipFlag=" + ipFlag;
                 }
             } else {
                 $.messager.alert("提醒", "当前无数据，无法导出，请重新选择查询", "info");
@@ -381,6 +400,11 @@
                 if (endDate == null) {
                     endDate = "";
                 }
+                var ipFlag = 0;
+                var isIp = $("#ip_flag").is(":checked");
+                if(isIp){
+                    ipFlag = 1;
+                }
                 if (beginDate == null || beginDate == "" || endDate == null
                     || endDate == "") {
                     $.messager.alert("提醒", "请选择开始时间或者结束时间", "info");
@@ -395,7 +419,8 @@
                         "beginDate": beginDate,
                         "endDate": endDate,
                         "total": total,
-                        "typeFlag": typeFlag
+                        "typeFlag": typeFlag,
+                        "ipFlag": ipFlag
                     });
                 } else {
                     addTrBk(obj);
@@ -405,7 +430,8 @@
                     $("#statistics_every_day").datagrid("load", {
                         "beginDate": beginDate,
                         "endDate": endDate,
-                        "typeFlag": typeFlag
+                        "typeFlag": typeFlag,
+                        "ipFlag": ipFlag
                     });
                 }
             }
@@ -425,13 +451,18 @@
             if (endDate == null) {
                 endDate = "";
             }
+            var ipFlag = 0;
+            var isIp = $("#ip_flag").is(":checked");
+            if(isIp){
+                ipFlag = 1;
+            }
             if (beginDate == null || beginDate == "" || endDate == null
                 || endDate == "") {
                 $.messager.alert("提醒", "请选择开始时间或者结束时间", "info");
                 return;
             } else {
                 window.location.href = "/cbtconsole/behaviorStatistics/exportStatisticsAllExcel?beginDate="
-                    + beginDate + "&endDate=" + endDate;
+                    + beginDate + "&endDate=" + endDate + "&ipFlag" + ipFlag;
             }
         }
     </script>
@@ -445,12 +476,13 @@
         <form id="single_query_form" action="#" onsubmit="return false;">
 
 			<span>日期起:<input id="beginDate"
-                             style="width: 130px; height: 24px" name="beginDate"
+                             style="width: 85px; height: 24px" name="beginDate"
                              readonly="readonly"
                              onfocus="WdatePicker({isShowWeek:true,dateFmt:'yyyy-MM-dd'})"/></span>
             <span>至:<input
-                    id="endDate" style="width: 130px; height: 24px" name="endDate"
+                    id="endDate" style="width: 85px; height: 24px" name="endDate"
                     readonly="readonly" onfocus="WdatePicker({isShowWeek:true,dateFmt:'yyyy-MM-dd'})"/></span>
+            <span>过滤国内IP<input type="checkbox" id="ip_flag"/></span>
             <input
                     type="button" class="but_color_qy" onclick="doQuery()" value="查询">
             <input type="button" class="but_color" onclick="doChooseData(7)"
@@ -458,6 +490,7 @@
                                         onclick="doChooseData(30)" value="最近30天"> <input
                 type="button" class="but_color" onclick="doChooseData(90)"
                 value="最近90天">
+
         </form>
 
 

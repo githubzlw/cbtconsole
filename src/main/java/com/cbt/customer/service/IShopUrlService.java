@@ -12,12 +12,13 @@ public interface IShopUrlService {
 
     public List<ShopUrl> findAll(String shopId, String shopBrand, String shopUserName, String date, int start, int end, String timeFrom,
                                  String timeTo, int isOn, int state, int isAuto, int readyDel, int shopType, int authorizedFlag,
-                                 int authorizedFileFlag, int ennameBrandFlag, String shopids, int translateDescription);
+                                 int authorizedFileFlag, int ennameBrandFlag, String shopids, int translateDescription, int isShopFlag, String catid);
 
     public String getShopList(String admName, String days);
 
     public int total(String shopId, String shopBrand, String shopUserName, String date, String timeFrom, String timeTo, int isOn, int state,
-                     int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag, String shopids, int translateDescription);
+                     int isAuto, int readyDel, int shopType, int authorizedFlag, int authorizedFileFlag, int ennameBrandFlag,
+                     String shopids, int translateDescription, int isShopFlag, String catid);
 
     public int delById(int id);
 

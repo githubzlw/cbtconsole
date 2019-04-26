@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.jcys.util.HttpUtil;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
@@ -1050,6 +1051,10 @@ public class TabSeachPageController {
 		// 查询需要生成的静态页
 		List<TabSeachPageBean> list=new ArrayList<TabSeachPageBean>();
 		try{
+            //清除缓存数据
+            HttpUtil.doGet("https://www.import-express.com/seachpage/clear.do", "success", 3);
+            //已启用的关键词的静态页重新生成(缓存数据)
+            HttpUtil.doGet("https://www.import-express.com/app/rlevel.do", "status\":\"1", 3);
 			DataSourceSelector.set("dataSource127hop");
 			list = tabSeachPageService.queryStaticizeAll();
 			if (list == null || list.size() == 0) {
@@ -1059,7 +1064,7 @@ public class TabSeachPageController {
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("sid", bean.getId() + ""));
 				params.add(new BasicNameValuePair("keyword", bean.getKeyword()));
-				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params);
+				result = getContentClientPost(cbtstaticizePath + "/tabseachpage/staticize.do", params, "\"status\":true", 3);
 			}
 			result = "{\"status\":true,\"message\":\"静态页全部生成完毕, 总数量:" + list.size() + "\"}";
 
@@ -1131,7 +1136,8 @@ public class TabSeachPageController {
 			if (StringUtil.isNotBlank(bean.getFilename())) {
 				int res = tabSeachPageService.updateIsshow(Integer.parseInt(isshow), Integer.parseInt(id));
 				if (res > 0) {
-					if ("1".equals(isshow)) {
+                    HttpUtil.doGet("https://www.import-express.com/app/rlevel.do", "status\":\"1", 3);
+                    if ("1".equals(isshow)) {
 						result = "{\"status\":true,\"message\":\"启用成功\"}";
 					} else {
 						result = "{\"status\":true,\"message\":\"停用成功\"}";
@@ -1300,6 +1306,15 @@ public class TabSeachPageController {
 		}
 		return co;
 	}
+
+    public static String getContentClientPost(String urls, List<NameValuePair> params, String contains, Integer num) {
+        String refRes = getContentClientPost(urls, params);
+        if (refRes.contains(contains)) {
+            return refRes;
+        } else {
+            return getContentClientPost(urls, params, contains, --num);
+        }
+    }
 
 	/**
 	 * 得到产品单页静态化页面的名称
