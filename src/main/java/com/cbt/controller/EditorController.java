@@ -3243,6 +3243,52 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping(value = "/deletePidImgByUrl")
+    @ResponseBody
+    public JsonResult deletePidImgByUrl(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        String imgUrl = request.getParameter("imgUrl");
+        if (StringUtils.isBlank(imgUrl)) {
+            json.setOk(false);
+            json.setMessage("获取图片路径失败");
+            return json;
+        } else if (!(imgUrl.contains("http://") || imgUrl.contains("https://"))) {
+            json.setOk(false);
+            json.setMessage("图片路径格式错误");
+            return json;
+        }
+        try {
+            String fileName = imgUrl.substring(imgUrl.lastIndexOf("/"));
+            CustomGoodsPublish gd = customGoodsService.queryGoodsDetails(pid, 0);
+            Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+            // 移除所有的页面效果 kse标签,实际div
+            Elements imgEls = nwDoc.getElementsByTag("img");
+            for (Element imgEl : imgEls) {
+                if (imgEl.attr("src").contains(fileName)) {
+                    imgEl.remove();
+                }
+            }
+            gd.setEninfo(nwDoc.html());
+            customGoodsService.updatePidEnInfo(gd);
+            System.err.println(nwDoc.html());
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",deletePidImgByUrl error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",deletePidImgByUrl error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
