@@ -6658,7 +6658,7 @@ public class OrderwsDao implements IOrderwsDao {
             if(StringUtil.isNotBlank(endDate)){
                 sql+=" and paylog.Operationtime<='"+endDate+"'";
             }
-            sql+=" order by id desc ";
+            sql+=" order by paylog.id desc ";
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while(rs.next()){
