@@ -743,4 +743,14 @@ public interface CustomGoodsService {
      * @return
      */
     int updateWeightFlag(String pid, int flag);
+
+    /**
+     * 更新sku信息
+     * @param pid
+     * @param oldSku
+     * @param newSku
+     * @param adminId
+     * @return
+     */
+    int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight);
 }

@@ -465,7 +465,7 @@
             <span>至:<input
                     id="endDate" style="width: 85px; height: 24px" name="endDate"
                     readonly="readonly" onfocus="WdatePicker({isShowWeek:true,dateFmt:'yyyy-MM-dd'})"/></span>
-            <span>过滤国内IP<input type="checkbox" id="ip_flag"/></span>
+            <span>过滤国内IP<input type="checkbox" id="ip_flag" checked="checked"/></span>
             <input
                     type="button" class="but_color_qy" onclick="doQuery()" value="查询">
             <input type="button" class="but_color" onclick="doChooseData(7)"

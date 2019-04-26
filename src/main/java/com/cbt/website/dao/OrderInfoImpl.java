@@ -9,7 +9,6 @@ import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.util.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -62,28 +61,51 @@ public class OrderInfoImpl implements OrderInfoDao {
 	public int updateOrderinfoIpnAddress(String orderNo) {
 		Connection conn = DBHelper.getInstance().getConnection();
 		PreparedStatement stmt = null;
+		Statement stmtMm = null;
 		ResultSet rs = null;
 		int row=12;
 		String shorthand="";
-		try{
-			String orderNos=orderNo.indexOf("_")>-1?orderNo.split("_")[0]:orderNo;
-			String  sql="select paytype from payment where orderid='"+orderNos+"' and paystatus=1 and paytype<>0";
-			stmt=conn.prepareStatement(sql);
-			rs=stmt.executeQuery();
-			if(rs.next()){
+		try {
+			String orderNos = orderNo.indexOf("_") > -1 ? orderNo.split("_")[0] : orderNo;
+			String sql = "select paytype from payment where orderid='" + orderNos + "' and paystatus=1 and paytype<>0";
+			stmt = conn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+			if (rs.next()) {
 				return 1;
 			}
-			sql="SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo='"+orderNos+"'";
-			stmt=conn.prepareStatement(sql);
-			rs=stmt.executeQuery();
-			if(rs.next()){
-				shorthand=rs.getString("shorthand");
+			OrderBean orderBean = getOrderInfo(orderNo, null);
+			if (orderBean.getIsDropshipOrder() > 0) {
+				sql = "SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id " +
+						"OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo like '" + orderNo + "%' limit 1";
+				stmt = conn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				if (rs.next()) {
+					shorthand = rs.getString("shorthand");
+				}
+				if (StringUtil.isNotBlank(shorthand)) {
+					stmtMm = conn.createStatement();
+					sql = "update orderinfo set ipnaddress='" + shorthand + "' where order_no='" + orderNo + "'";
+					stmtMm.addBatch(sql);
+					sql = "update dropshiporder a,(SELECT IFNULL(z.shorthand,'') as shorthand,oa.orderNo FROM order_address oa INNER JOIN zone z " +
+							"ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','')) b " +
+							"set a.ipnaddress = b.shorthand where a.parent_order_no='" + orderNo + "' and b.orderNo = a.child_order_no";
+					stmtMm.addBatch(sql);
+					row = stmt.executeBatch().length;
+				}
+			} else {
+				sql = "SELECT IFNULL(z.shorthand,'') as shorthand FROM order_address oa INNER JOIN zone z ON REPLACE(oa.country,' ','')=z.id OR REPLACE(oa.country,' ','')=REPLACE(z.country,' ','') WHERE oa.orderNo='" + orderNos + "'";
+				stmt = conn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				if (rs.next()) {
+					shorthand = rs.getString("shorthand");
+				}
+				if (StringUtil.isNotBlank(shorthand)) {
+					sql = "update orderinfo set ipnaddress='" + shorthand + "' where order_no='" + orderNo + "'";
+					stmt = conn.prepareStatement(sql);
+					row = stmt.executeUpdate();
+				}
 			}
-			if(StringUtil.isNotBlank(shorthand)){
-				sql="update orderinfo set ipnaddress='"+shorthand+"' where order_no='"+orderNo+"'";
-				stmt=conn.prepareStatement(sql);
-				row=stmt.executeUpdate();
-			}
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}finally {
@@ -101,6 +123,7 @@ public class OrderInfoImpl implements OrderInfoDao {
 					e.printStackTrace();
 				}
 			}
+			DBHelper.getInstance().closeStatement(stmtMm);
 			DBHelper.getInstance().closeConnection(conn);
 		}
 		return row;

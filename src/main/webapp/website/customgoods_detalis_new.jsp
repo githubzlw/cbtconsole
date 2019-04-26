@@ -1922,7 +1922,12 @@
 
                             </c:if>
 
-
+                            <div class="goods_p">
+                                <p class="ul_size">
+                                    <%--<a href="/cbtconsole/editc/querySkuByPid?pid=${goods.pid}" target="_blank">编辑sku重量</a>--%>
+                                    <input type="button" class="s_btn" value="编辑sku重量" onclick="openSkuEdit('${goods.pid}')" />
+                                </p>
+                            </div>
                             <div class="goods_p">
                                 <p class="goods_color">bizPrice:</p>
                                 <p class="ul_size">
@@ -2475,7 +2480,11 @@
                 }
             });
         }
+    }
 
+    function openSkuEdit(pid) {
+        var param = "height=460,width=710,top=235,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
 </script>
 </html>
