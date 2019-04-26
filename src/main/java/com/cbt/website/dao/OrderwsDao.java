@@ -6650,14 +6650,13 @@ public class OrderwsDao implements IOrderwsDao {
         ResultSet rs = null;
         Statement stmt = null;
         List<UserBehaviorDetails> list=new ArrayList<UserBehaviorDetails>();
-        String sql="SELECT paylog.Operationtime,user.email,orderid,paylog.orderAmount FROM paylog ,user"
-                + " WHERE user.id = paylog.userid and paylog.userid IN(select id from user where is_test = 0) and paylog.userid not in (select user_id from ip_record where user_id > 0 and is_china =1)";
+        String sql="SELECT paylog.Operationtime,user.email,paylog.orderid,paylog.orderAmount FROM paylog ,user WHERE user.id = paylog.userid and paylog.userid IN(select id from user where is_test = 0) and paylog.userid not in (select user_id from ip_record where user_id > 0 and is_china =1)";
         try{
             if(StringUtil.isNotBlank(beginDate)){
-                sql+=" and Operationtime>='"+beginDate+"'";
+                sql+=" and paylog.Operationtime>='"+beginDate+"'";
             }
             if(StringUtil.isNotBlank(endDate)){
-                sql+=" and Operationtime<='"+endDate+"'";
+                sql+=" and paylog.Operationtime<='"+endDate+"'";
             }
             sql+=" order by id desc ";
             stmt = conn.createStatement();
