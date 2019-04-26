@@ -168,16 +168,16 @@ b {
 			queryParams.weightCheck = weightCheck;
 			$("#query_weight_check").val(weightCheck);
 		}
-		var bmFlag = sessionStorage.getItem("bmFlag");
+		/*var bmFlag = sessionStorage.getItem("bmFlag");
 		if(!(bmFlag == null || bmFlag == "" || bmFlag == "0")){
 			queryParams.bmFlag = bmFlag;
 			$("#query_bm_flag").val(bmFlag);
-		}
-		var sourceProFlag = sessionStorage.getItem("sourceProFlag");
+		}*/
+		/*var sourceProFlag = sessionStorage.getItem("sourceProFlag");
 		if(!(sourceProFlag == null || sourceProFlag == "" || sourceProFlag == "0")){
 			queryParams.sourceProFlag = sourceProFlag;
 			$("#query_sourcePro_flag").val(sourceProFlag);
-		}
+		}*/
 		var priorityFlag = sessionStorage.getItem("priorityFlag");
 		if(!(priorityFlag == null || priorityFlag == "" || priorityFlag == "0")){
 			queryParams.priorityFlag = priorityFlag;
@@ -421,8 +421,10 @@ b {
 		queryParams.isEdited = isEdited;
 		queryParams.isBenchmark = isBenchmark;
 		queryParams.weightCheck = weightCheck;
-		queryParams.bmFlag = bmFlag;
-		queryParams.sourceProFlag = sourceProFlag;
+		// queryParams.bmFlag = bmFlag;
+		queryParams.bmFlag = 0;
+		// queryParams.sourceProFlag = sourceProFlag;
+		queryParams.sourceProFlag = 0;
 		queryParams.priorityFlag = priorityFlag;
 		queryParams.addCarFlag = addCarFlag;
 		queryParams.sourceUsedFlag = sourceUsedFlag;
