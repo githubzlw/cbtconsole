@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.PostConstruct;
 import javax.jws.Oneway;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,6 +83,12 @@ public class CustomerRelationshipManagementController {
     private SendChaPsendEmailService sendChaPsendEmailService;
     @Autowired
     private OutofstockdemandService out;
+    @Autowired
+    private static ReorderService reorderService_ioc;
+    @PostConstruct
+    public void init() {
+        CustomerRelationshipManagementController.reorderService_ioc = this.reorderService;
+    }
     /**
      * @Title: queryTheNumCustomersUnderSaler
      * @Author: cjc
@@ -249,5 +256,14 @@ public class CustomerRelationshipManagementController {
             logger.error("获取数据失败，原因：" + e.getMessage());
         }
         return json;
+    }
+    @RequestMapping("/reAdd")
+    public String retrunGoodsCarDataByUserId(String userId){
+        String userid = "28525";
+       return reorderService_ioc.returnGoodsCarByUserId(userid);
+    }
+    public static void main(String[] arg){
+        String userid = "28525";
+        String s = reorderService_ioc.returnGoodsCarByUserId(userid);
     }
 }

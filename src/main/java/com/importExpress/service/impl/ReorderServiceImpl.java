@@ -68,6 +68,12 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             return listGoods;
         }
     }
+    @Override
+    public List<Map<String, Object>> getGoodsInfoByUserId(String userid) {
+        List<Map<String, Object>> listGoods =new ArrayList<Map<String, Object>>();
+        listGoods = spiderMapper.getGoodsInfoByUserid(userid);
+        return listGoods;
+    }
     @Autowired
     private OrderSplitService orderSplitService;
     @Override
@@ -178,7 +184,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                         double sampleFee = (Double) goodMap.get("sampleFee") == null ? 0.00 : (Double) goodMap.get("sampleFee");
                         //库存标识
                         int isStockFlag = (Integer) goodMap.get("is_stock_flag") == null ? 0 : (Integer) goodMap.get("is_stock_flag");
-                        GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(pid,String.valueOf(isStockFlag));
+                        //GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(pid,String.valueOf(isStockFlag));
                         int shopCount = (Integer) goodMap.get("shopCount") == null ? 0 : (Integer) goodMap.get("shopCount");
 
                         if(perWeight != null && !"".equals(perWeight) && perWeight.toLowerCase().contains("kg")){
@@ -589,5 +595,280 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             redisGoodsList.add(redisGoods);
         }
         return redisGoodsList;
+    }
+    @Override
+    public String returnGoodsCarByUserId(String userId){
+            String message = "Reorder failure!";
+            boolean b = StringUtils.isNotBlank(userId);
+            if(b){
+                //第一步先查询用户是否存在
+                //过滤数字
+                userId = userId.replaceAll("[^(0-9)]", "");
+//            DataSourceSelector.set("dataSource127hop");
+                UserBean userBean = orderSplitService.getUserFromId(Integer.parseInt(userId));
+//            DataSourceSelector.restore();
+                //查询订单是否存在
+                //过滤订单数字和字母
+                //查询订单是否存在
+//            DataSourceSelector.set("dataSource127hop");
+                List<Map<String, Object>> ListGoods = this.getGoodsInfoByUserId(userId);
+//            DataSourceSelector.restore();
+                if(null == userBean){
+                    message = "user is null!";
+                }else if(null == ListGoods){
+                    message = "get goods error!";
+                }
+                if(userBean != null && ListGoods != null){
+                    //新购物车中需要插入goods_car表的产品
+                    List<GoodsCarActiveBean> listActive_new_1 = new ArrayList<GoodsCarActiveBean>();
+                    List<GoodsCarShowBean> listShow_new_1 = new ArrayList<GoodsCarShowBean>();
+                    List<GoodsCarActiveBean> list_active = new ArrayList<>();
+                    List<GoodsCarShowBean> list_show = new ArrayList<>();
+                    int cartnumber = 0;//购物车数量
+                    int addAmount=0;
+                    Map<String, Object> mapInfo = null;
+                    Long start = 0l;
+                    Long end = 0l;
+                    if(ListGoods!=null){
+                        start = System.currentTimeMillis();
+
+                        List<String> goodsList=new ArrayList<>(20);
+                        for(Map item:ListGoods){
+                            goodsList.add((String)item.get("itemId"));
+                        }
+
+                        // List<String> offShelfGoodsList = spiderService.getOffShelfGoods(goodsList);
+                        for(int k=0;k<ListGoods.size();k++){
+                            Map<String,Object> goodMap = ListGoods.get(k);
+                            if(goodMap==null){
+                                logger.error("Reorder-Exception:userId:||goods_car_all视图无数据");
+                                continue;
+                            }else{
+                                if(goodMap.get("googs_number") == null || (int)goodMap.get("googs_number") == 0) {
+                                    logger.error("Reorder-Exception:userId:"+userId+"||googs_number为0，reorder数据异常！");
+                                    continue;
+                                }else if(goodMap.get("goodsUrlMD5") != null&&String.valueOf(goodMap.get("goodsUrlMD5")).substring(0,1).equalsIgnoreCase("A")) {
+                                    //去掉ali商品
+                                    continue;
+                                }
+                            }
+                            boolean upDateFlag = false;
+                            String priceListTem = "";
+                            String numTem = "";
+                            String priceTem = "";
+                            int originalPriceListSize = 0;
+                            String originalPrice = "";
+                            String pid = (String)goodMap.get("itemId");
+                            //获取产品所有id
+                            String catids = (String)goodMap.get("bizPriceDiscount");
+                            Integer isFreeShipProduct = 0;
+                            if(goodMap.get("isFreeShipProduct")!=null){
+                                isFreeShipProduct = (Integer)goodMap.get("isFreeShipProduct");
+                            }
+
+                            GoodsCarActiveBean goodsActiveInfo = new GoodsCarActiveBean();//经常更新且参与价格计算的购物车数据
+                            GoodsCarShowBean goodsCarShowInfo = new GoodsCarShowBean();//页面显示的购物车数据
+                            goodsCarShowInfo.setUserid(Integer.parseInt(userId));
+                            String goodsUuid = TypeUtils.itemIDToUUID((String)goodMap.get("itemId"), TypeUtils.urlToSourceType((String) goodMap.get("goods_url")));
+                            String startBizFactoryPrice = null;
+                            Double classDiscountDepositRate = 1d;
+                            String goodsUrl = (String) goodMap.get("goods_url");
+                            String shopId = (String) goodMap.get("shopId");
+                            double firstprice = 0;
+                            if(goodMap.get("firstprice") != null){
+                                firstprice = (double)goodMap.get("firstprice");
+                            }
+                            if(firstprice==0){
+                                firstprice = Double.parseDouble((String)goodMap.get("googs_price"));
+                            }
+                            double notFreePrice1 = goodMap.get("notfreeprice")==null ? 0 : (double)goodMap.get("notfreeprice") ;
+                            int goods_number = (int) goodMap.get("googs_number");
+                            String goods_img = (String) goodMap.get("googs_img");
+                            goods_img = goods_img==null?goods_img:goods_img.replaceAll("(//1(\\.\\d+)*/bmi/)", "//");
+                            String goods_title = ((String) goodMap.get("goods_title")).replace("\"", "");
+                            String remark = (String) goodMap.get("remark");
+                            String norm_least = (String) goodMap.get("norm_least");
+                            String delivery_time = StringUtils.isNotBlank((String)goodMap.get("delivery_time")) ? (String)goodMap.get("delivery_time"):"9-15";
+                            double price4 = goodMap.get("price4")!=null ? (double)goodMap.get("price4"):0;//添加购物车时，产品显示的免邮价
+                            String comparealiPrice = goodMap.get("comparealiPrice")!=null ? (String)goodMap.get("comparealiPrice"):"0";
+                            double freight = goodMap.get("freight")!=null ? (double)goodMap.get("freight"):0;//添加购物车时，产品的邮费
+                            String sellUnit = (String) goodMap.get("seilUnit");
+                            String goodsUnit = (String) goodMap.get("goodsUnit");
+                            String width = (String) goodMap.get("width");//体积
+                            String perWeight = (String) goodMap.get("perWeight");//单个产品重量,没有单位
+                            String guid = (String) goodMap.get("guid");
+                            //如果用户添加购物车所选的数量低于本数量 需要额外掏钱
+                            int sampleMoq = (Integer) goodMap.get("sampleMoq") == null ? 0 : (Integer) goodMap.get("sampleMoq");
+                            // 样品费用
+                            double sampleFee = (Double) goodMap.get("sampleFee") == null ? 0.00 : (Double) goodMap.get("sampleFee");
+                            //库存标识
+                            int isStockFlag = (Integer) goodMap.get("is_stock_flag") == null ? 0 : (Integer) goodMap.get("is_stock_flag");
+                            //GoodsInfoUpdateOnlineUtil.stockToOnlineByMongoDB(pid,String.valueOf(isStockFlag));
+                            int shopCount = (Integer) goodMap.get("shopCount") == null ? 0 : (Integer) goodMap.get("shopCount");
+
+                            if(perWeight != null && !"".equals(perWeight) && perWeight.toLowerCase().contains("kg")){
+                                perWeight = perWeight.toLowerCase().replace("kg", "");
+                            }
+                            int goods_class = goodMap.get("goods_class")!=null?(int) goodMap.get("goods_class"):0;//商品类别
+                            double spiderPrice = goodMap.get("spiderPrice")!=null?(double) goodMap.get("spiderPrice"):0;
+                            String priceListSizeStr = StrUtils.object2Str(goodMap.get("priceListSize"));
+                            String price_list = "";
+                            if(priceListSizeStr.split("@@@@@").length==2){
+                                price_list = priceListSizeStr.split("@@@@@")[1];
+                                priceListSizeStr = priceListSizeStr.split("@@@@@")[0];
+                            }
+                            if(priceListSizeStr.split("@@@@@").length==1){
+                                priceListSizeStr = priceListSizeStr.split("@@@@@")[0];
+                            }
+                            if(upDateFlag){
+                                price_list = priceListTem;
+                                priceListSizeStr = String.valueOf(originalPriceListSize);
+                            }
+                            priceListSizeStr = priceListSizeStr.replaceAll("(\\.\\d+)", "");
+                            int priceListSize = org.apache.commons.lang.StringUtils.isBlank(priceListSizeStr) ? 0 : Integer.valueOf(priceListSizeStr);
+                            startBizFactoryPrice = String.valueOf(notFreePrice1);
+                            delivery_time = StringUtils.isNotBlank(delivery_time) ? delivery_time : "5";
+                            String minTime = "3";
+                            String maxTime = "6";
+                            if(delivery_time.split("-").length==1){
+                                maxTime = delivery_time.split("-")[0];
+                            }else if(delivery_time.split("-").length==2){
+                                minTime = delivery_time.split("-")[0];
+                                maxTime = delivery_time.split("-")[1];
+                            }
+                            goodsActiveInfo.setUrlMD5(goodsUuid);
+                            goodsActiveInfo.setItemId((String)goodMap.get("itemId"));//商品id
+                            if(upDateFlag){
+                                goodsActiveInfo.setPrice(originalPrice);
+                            }else {
+                                goodsActiveInfo.setPrice((String)goodMap.get("googs_price"));
+
+                            }
+                            goodsActiveInfo.setFreight(0);
+                            goodsActiveInfo.setNumber(goods_number);
+                            goodsActiveInfo.setNorm_least(norm_least);
+                            goodsActiveInfo.setStartBizFactoryPrice(startBizFactoryPrice);
+                            goodsActiveInfo.setCategoryDiscountRate(classDiscountDepositRate!=null?Double.valueOf(classDiscountDepositRate):1.0);
+                            goodsActiveInfo.setPerWeight(perWeight);
+                            goodsActiveInfo.setMethod_feight((double)goodMap.get("method_feight"));
+                            goodsActiveInfo.setIsBattery((int) goodMap.get("isBattery"));
+                            goodsActiveInfo.setGoods_class(goods_class);
+                            goodsActiveInfo.setSeilUnit(sellUnit);
+                            goodsActiveInfo.setSpider_Price("0.00");
+                            goodsActiveInfo.setPriceListSize(String.valueOf(priceListSize));
+                            if(upDateFlag){
+                                goodsActiveInfo.setFirstprice(Double.valueOf(originalPrice));
+                            }else {
+                                goodsActiveInfo.setFirstprice(firstprice);
+                            }
+                            goodsActiveInfo.setFreight(freight);
+                            goodsActiveInfo.setPriceList(price_list);
+                            goodsActiveInfo.setProcessingTime(maxTime);
+                            goodsActiveInfo.setProcessingTimeMin(minTime);
+                            goodsActiveInfo.setBizPriceDiscount(catids);
+                            goodsActiveInfo.setIsFreeShipProduct(isFreeShipProduct);
+                            goodsActiveInfo.setComparePrices(comparealiPrice);
+                            goodsActiveInfo.setSampleFee(sampleFee);
+                            goodsActiveInfo.setSampleMoq(sampleMoq);
+                            goodsActiveInfo.setShopId(shopId);
+                            goodsActiveInfo.setIsStockFlag(isStockFlag);
+                            goodsActiveInfo.setShopCount(shopCount);
+
+                            goodsCarShowInfo.setSkuid_1688((String)goodMap.get("skuid_1688"));
+                            goodsCarShowInfo.setUrl(goodsUrl);
+                            goodsCarShowInfo.setId(0);
+                            goodsCarShowInfo.setShopId(shopId);//店铺id
+                            goodsCarShowInfo.setSeller("dd");//店铺名称
+                            goodsCarShowInfo.setName(goods_title);
+                            goodsCarShowInfo.setImg_url(goods_img);
+                            goodsCarShowInfo.setRemark(remark);
+                            goodsCarShowInfo.setWidth(width);
+                            goodsCarShowInfo.setGoodsUnit(goodsUnit);
+                            goodsCarShowInfo.setTypes((String)goodMap.get("goods_type"));
+                            goodsCarShowInfo.setFree_sc_days((String)goodMap.get("aliPosttime"));
+                            goodsCarShowInfo.setDelivery_time(delivery_time);
+                            goodsCarShowInfo.setUserid(Integer.parseInt(userId));
+                            goodsCarShowInfo.setPrice4(price4);
+                            goodsCarShowInfo.setComparePrices(comparealiPrice);
+                            /**
+                             * 与购物车原有商品合并
+                             * */
+                            int up = 0;//默认0,表示当前商品不存在于购物车中，如果存在为1
+                            if(up==0){
+                                int number1 = goodsActiveInfo.getNumber();
+                                goodsActiveInfo.setFreight(freight);
+                                //添加购物车
+                                goodsActiveInfo.setFirstnumber(number1);
+                                goodsActiveInfo.setFreeprice((double)goodMap.get("freeprice"));
+                                goodsActiveInfo.setNotfreeprice(notFreePrice1);
+                                goodsActiveInfo.setPrice3(notFreePrice1);
+                                goodsCarShowInfo.setPrice4(price4);//添加购物车时，产品单页显示的start price
+                                goodsActiveInfo.setPerWeight(perWeight);
+                                String volume = ParseGoodsUrl.calculateVolume(number1, width, sellUnit, goodsUnit);
+                                String weight1 = ParseGoodsUrl.calculateWeight(number1,goodsActiveInfo.getPerWeight(), sellUnit, goodsUnit);
+                                goodsActiveInfo.setBulk_volume(volume);
+                                goodsActiveInfo.setTotal_weight(weight1);
+                                goodsActiveInfo.setTotal_weight((String)goodMap.get("total_weight"));
+                                goodsActiveInfo.setGuId(guid);
+                                goodsActiveInfo.setState(0);
+                                goodsActiveInfo.setBizPriceDiscount(catids);
+                                goodsActiveInfo.setShopId(shopId);
+                                goodsCarShowInfo.setGuId(guid);
+                                list_show.add(goodsCarShowInfo);
+                                list_active.add(goodsActiveInfo);
+                                listActive_new_1.add(goodsActiveInfo);
+                                listShow_new_1.add(goodsCarShowInfo);
+                            }
+                            addAmount++;
+                        }
+                        // 向 goods_carconfig 表插入 activeList 和 showinfList 信息 在前台网站从新登陆则直接从数据库查询
+                        // 要使用mq
+                   /* DataSourceSelector.set("dataSource127hop");
+                    int count = saveShpCarInfoToDateBase(Integer.parseInt(userId),list_active,list_show);
+                    DataSourceSelector.restore();*/
+                        // String sql = "update goods_carconfig set shopCarShowinfo = '"+SerializeUtil.ListToJson(list_show).replaceAll("'","") +"', shopCarinfo='"+SerializeUtil.ListToJson(list_active)+"' where userid="+userId;
+                        //Added <V1.0.1> Start： cjc 2019/3/22 17:41:01 Description :使用新的数据结构
+                        //step v1. @author: cjc @date：2019/3/22 17:44:19   Description : 合并
+                        List<GoodsCarActiveSimplBean> list_goods = activeShowBeanToSimpleBeanAdapter(list_active,list_show);
+                        String GoodsCarActiveSimplBeanJson = SerializeUtil.ListToJson(list_goods);
+                        String sql = "update goods_carconfig set buyForMeCarConfig = '"+GoodsCarActiveSimplBeanJson.replaceAll("'","") +"' where userid="+userId;
+
+                        //End：
+
+                        try {
+                            SendMQ sendMQ = new SendMQ();
+                            //sendMQ.sendMsg(new RunSqlModel(sql));
+                            sendMQ.closeConn();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if(listActive_new_1.size()>0){
+                            /**
+                             * 向goods_car表异步插入购物车数据
+                             * */
+                            List<SpiderNewBean> spidersDB = new ArrayList<SpiderNewBean>();
+                            for (int i = 0; i < listActive_new_1.size(); i++) {
+                                SpiderNewBean spiderBean = new SpiderNewBean();
+                                GoodsCarActiveBean activeBean = listActive_new_1.get(i);
+                                GoodsCarShowBean showBean = new GoodsCarShowBean();
+                                for(GoodsCarShowBean gcsBean : listShow_new_1){
+                                    if(gcsBean.getGuId().equals(activeBean.getGuId())){
+                                        showBean = gcsBean;
+                                        spiderBean = combineSpdBean(activeBean,null,showBean);
+                                        spidersDB.add(spiderBean);
+                                        break;
+                                    }
+                                }
+                            }
+                            // 要使用mq
+                            /*int i = addGoogs_cars(Integer.valueOf(userId), spidersDB);
+                            if(i>0 ){
+                                message = "success!";
+                            }*/
+                        }
+                    }
+                }
+            }
+            return message;
     }
 }

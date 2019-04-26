@@ -72,6 +72,9 @@
         .payLog_div {
             float: right;width: 49%;height: 90%;
         }
+        .addtoorder_div {
+            float: right;width: 49%;height: 90%;
+        }
 
         #single_query_form {
             margin-left: 40px;
@@ -315,7 +318,21 @@
                         "total": total,
                         "typeFlag": typeFlag
                     });
-                } else {
+                }else if (typeFlag == 12) {
+                    addTrBk(obj);
+                    $(".addtoorder_div").show();
+                    $(".data_div").hide();
+                    $(".every_day_div").hide();
+                    $(".recent_view_div").hide();
+                    $(".payLog_div").hide();
+                    $("#statistics_easyui-datagrid4").datagrid("load", {
+                        "beginDate": beginDate,
+                        "endDate": endDate,
+                        "total": total,
+                        "typeFlag": typeFlag
+                    });
+                }
+                else {
                     addTrBk(obj);
                     $(".data_div").show();
                     $(".every_day_div").hide();
@@ -531,7 +548,7 @@
         </tbody>
     </table>
 </div>
-<div class="payLog_div">
+<div class="addtoorder_div">
     <h2>Add to order 按钮点击次数</h2>
     <table id="statistics_easyui-datagrid4" style="width: 99%; height: 750px;" class="easyui-datagrid">
         <thead>
