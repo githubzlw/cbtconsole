@@ -166,6 +166,7 @@ public class UserBehaviorStatisticsController {
             addToOrder.setTypeFlag(12);
             payLogNum = dao.queryBehaviorRecord(beginDate, endDate, ipFlag);
             addToOrder.setStatisticsNum(payLogNum);
+            addToOrder.setIsShow(0);
             list.add(addToOrder);
             json.setOk(true);
             json.setData(list);
