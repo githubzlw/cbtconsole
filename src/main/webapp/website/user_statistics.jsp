@@ -188,6 +188,7 @@
             $(".every_day_div").hide();
             $(".recent_view_div").hide();
             $(".payLog_div").hide();
+            $(".addtoorder_div").hide();
             var beginDate = $("#beginDate").val();
             if (beginDate == null) {
                 beginDate = "";
@@ -321,6 +322,7 @@
                 }else if (typeFlag == 11) {
                     addTrBk(obj);
                     $(".payLog_div").show();
+                    $(".addtoorder_div").hide();
                     $(".data_div").hide();
                     $(".every_day_div").hide();
                     $(".recent_view_div").hide();
