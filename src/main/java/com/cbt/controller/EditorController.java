@@ -871,9 +871,9 @@ public class EditorController {
                 String[] tpList = typeDeleteIds.split(",");
 
                 if (!(tpList.length == 0 || typeList.isEmpty())) {
-                    boolean notPt = true;
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
+                        boolean notPt = true;
                         for (String tpId : tpList) {
                             if (tpId.equals(tpBean.getId())) {
                                 notPt = false;
@@ -883,7 +883,6 @@ public class EditorController {
                         if (notPt) {
                             newTypeList.add(tpBean);
                         }
-                        notPt = true;
                     }
                     //cgp.setType(newTypeList.toString());
                 }
