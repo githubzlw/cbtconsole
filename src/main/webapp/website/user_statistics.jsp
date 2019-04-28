@@ -97,6 +97,9 @@
             var optsDay = $("#statistics_every_day").datagrid("options");
             optsDay.url = "/cbtconsole/behaviorStatistics/getStatisticsByEveryDay";
             doChooseData(7);
+            var optsAddToOrder = $("#statistics_easyui-datagrid4").datagrid("options");
+            optsAddToOrder.url = "/cbtconsole/behaviorStatistics/getStatisticsDatails";
+
         });
 
         function getFormatDate(subDayNum, isBegin) {
@@ -176,6 +179,36 @@
                 onLoadSuccess: function (data) {
                     if (data.success) {
                         $("#statistics_every_day").datagrid("resize");
+                    } else {
+                        $.message.alert("提示信息", data.message);
+                    }
+                }
+            });
+
+            $('#statistics_easyui-datagrid4').datagrid({
+                width: "100%",
+                //fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                url: '',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rowNumbers: true,
+                pageSize: 25,//默认选择的分页是每页50行数据
+                pageList: [25],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.progress('close');
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (data.success) {
+                        $("#statistics_easyui-datagrid").datagrid("resize");
                     } else {
                         $.message.alert("提示信息", data.message);
                     }
@@ -588,10 +621,10 @@
     <table id="statistics_easyui-datagrid4" style="width: 99%; height: 750px;" class="easyui-datagrid">
         <thead>
         <tr>
-            <th data-options="field:'createTime',align:'center',width:'180px'">日期</th>
-            <th data-options="field:'email',align:'center',width:'300px'">邮箱</th>
-            <th data-options="field:'pid',align:'center',width:'180px'">订单号</th>
-            <th data-options="field:'orderAmount',align:'center',width:'100px'">金额($)</th>
+            <th data-options="field:'userId',align:'center',width:'180px'">客户ID</th>
+            <th data-options="field:'email',align:'center',width:'180px'">sessionId</th>
+            <th data-options="field:'pid',align:'center',width:'180px'">PID</th>
+            <th data-options="field:'createTime',align:'center',width:'180px'">加入时间</th>
         </tr>
         </thead>
         <tbody>
