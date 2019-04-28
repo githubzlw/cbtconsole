@@ -155,6 +155,9 @@
                 success: function (data) {
                     $('.mask').hide();
                     showMessage(data.message);
+                    if(data.ok){
+                        window.location.reload();
+                    }
                 },
                 error: function (XMLResponse) {
                     $.messager.alert("提醒", "保存错误，请联系管理员", "error");

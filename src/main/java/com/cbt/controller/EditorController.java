@@ -552,7 +552,7 @@ public class EditorController {
             double finalWeight = 0;
             for (String singleSku : skuStrList) {
                 String[] slSkuList = singleSku.split("@");
-                String ppid = slSkuList[0];
+                String ppid = slSkuList[0].replace("_", ",");
                 String pWeight = slSkuList[1];
                 for (ImportExSku exSku : skuList) {
                     if (ppid.equals(exSku.getSkuPropIds())) {
