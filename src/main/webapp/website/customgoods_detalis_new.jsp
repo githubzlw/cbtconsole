@@ -2483,7 +2483,7 @@
     }
 
     function openSkuEdit(pid) {
-        var param = "height=460,width=710,top=235,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+        var param = "height=560,width=710,top=220,left=666,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
         window.open("/cbtconsole/editc/querySkuByPid?pid=" + pid, "windows", param);
     }
 </script>
