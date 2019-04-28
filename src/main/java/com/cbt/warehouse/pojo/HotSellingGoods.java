@@ -62,6 +62,19 @@ public class HotSellingGoods implements Serializable {
 
 	private String goodsPath;
 
+	/**
+	 * 1688货源异常但属于热卖区 = 26
+	 */
+	private int unsellableReason ;
+
+	public int getUnsellableReason() {
+		return unsellableReason;
+	}
+
+	public void setUnsellableReason(int unsellableReason) {
+		this.unsellableReason = unsellableReason;
+	}
+
 	public String getGoodsPath() {
 		return goodsPath;
 	}

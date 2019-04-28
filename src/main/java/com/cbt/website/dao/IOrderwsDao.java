@@ -1164,4 +1164,14 @@ public interface IOrderwsDao {
 	int queryUserPayLog(String beginDate,String endDate, int ipFlag);
 
     int queryBehaviorRecord(String beginDate, String endDate, int ipFlag);
+
+    /**
+	 *Add To Order按钮点击详情
+	 * @param beginDate
+	 * @param endDate
+	 * @param startNum
+	 * @param offSet
+	 * @return
+	 */
+	List<UserBehaviorDetails> queryUserAddToOrderDetails(String beginDate,String endDate,int startNum,int offSet, int ipFlag);
 }

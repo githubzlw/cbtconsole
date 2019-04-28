@@ -28,7 +28,6 @@ import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
-
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
@@ -6838,9 +6837,12 @@ public class OrderwsDao implements IOrderwsDao {
         ResultSet rs = null;
         Statement stmt = null;
         String sql="SELECT count(id) as counts FROM behavior_record WHERE action = 'Add to Order' ";
-        if(ipFlag > 0){
-            sql += " and userid not in(select user_id from ip_record where user_id > 0 and is_china =1)";
+        sql += " and ((userid > 0  and userid IN(select id from user where is_test = 0) ";
+        if (ipFlag > 0) {
+            sql += " and userid not in (select user_id from ip_record where user_id > 0 and is_china =1)";
         }
+        sql += ")";
+        sql += " or (userid = 0 and sessionid is not null))";
         try{
             if(StringUtil.isNotBlank(beginDate)){
                 sql+=" and view_date_time>='"+beginDate+"'";
@@ -6862,4 +6864,59 @@ public class OrderwsDao implements IOrderwsDao {
         }
         return num;
     }
+
+
+
+    @Override
+    public List<UserBehaviorDetails> queryUserAddToOrderDetails(String beginDate, String endDate, int startNum, int offSet, int ipFlag) {
+        Connection conn = DBHelper.getInstance().getConnection();
+        ResultSet rs = null;
+        Statement stmt = null;
+        List<UserBehaviorDetails> list = new ArrayList<UserBehaviorDetails>();
+        String sql = "select userid,sessionid,view_url,view_url_count,view_date_time from behavior_record where action = 'Add to Order' " +
+                "and ((userid > 0  and userid IN(select id from user where is_test = 0) ";
+        if (ipFlag > 0) {
+            sql += " and userid not in (select user_id from ip_record where user_id > 0 and is_china =1)";
+        }
+        sql += ")";
+        sql += " or (userid = 0 and sessionid is not null))";
+        if (StringUtil.isNotBlank(beginDate)) {
+            sql += " and view_date_time>='" + beginDate + "'";
+        }
+        if (StringUtil.isNotBlank(endDate)) {
+            sql += " and view_date_time<='" + endDate + "'";
+        }
+        sql += " order by view_date_time desc ";
+        if (offSet > 0) {
+            sql += " limit " + startNum + "," + offSet;
+        }
+        System.err.println(sql);
+        try {
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                UserBehaviorDetails u = new UserBehaviorDetails();
+                u.setCreateTime(rs.getString("view_date_time"));
+                u.setUserId(rs.getInt("userid"));
+                u.setEmail(rs.getString("sessionid"));
+                //u.setPid(rs.getString("view_url"));
+                String view_url = rs.getString("view_url");
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(view_url)) {
+                    u.setPid(view_url.substring(view_url.lastIndexOf("-") + 2, view_url.lastIndexOf(".html")));
+                }
+                u.setCarNum(rs.getInt("view_url_count"));
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+        } finally {
+            DBHelper.getInstance().closeStatement(stmt);
+            DBHelper.getInstance().closeResultSet(rs);
+            DBHelper.getInstance().closeConnection(conn);
+        }
+        return list;
+    }
+
+
 }

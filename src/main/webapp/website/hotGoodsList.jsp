@@ -717,7 +717,10 @@
                 </c:if>
                 <br>
                 <c:if test="${goods.promotionFlag > 0}">
-                    <b style="color:red;">促销商品</b><br>
+                    <b style="color:red;">促销商品</b>
+                </c:if>
+                <c:if test="${goods.unsellableReason == 26}">
+                    <br><b style="color:red;">1688货源异常</b>
                 </c:if>
                 <br><br>
                 <c:if test="${hotType == 2}">
