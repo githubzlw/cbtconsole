@@ -3295,6 +3295,80 @@ public class EditorController {
     }
 
 
+    @RequestMapping(value = "/deleteEnInfoImgByParam")
+    @ResponseBody
+    public JsonResult deleteEnInfoImgByParam(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
+        // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
+        String pidImgList = request.getParameter("pidImgList");
+        if (StringUtils.isBlank(pidImgList)) {
+            json.setOk(false);
+            json.setMessage("获取参数失败");
+            return json;
+        }
+        int pidTotal = 0;
+        int imgTotal = 0;
+        try {
+            // 解析数据
+            String[] list = pidImgList.split("@");
+            imgTotal = list.length;
+            Map<String, List<String>> pidImgMap = new HashMap<>(pidTotal);
+            for (String lStr : list) {
+                String[] tempList = lStr.split(";");
+                if (pidImgMap.containsKey(tempList[0])) {
+                    pidImgMap.get(tempList[0]).add(tempList[1]);
+                } else {
+                    List<String> imgList = new ArrayList<>();
+                    imgList.add(tempList[1]);
+                    pidImgMap.put(tempList[0], imgList);
+                }
+            }
+
+            for (String tempPid : pidImgMap.keySet()) {
+                pidTotal++;
+                // 循环删除数据
+                try {
+                    CustomGoodsPublish gd = customGoodsService.queryGoodsDetails(tempPid, 0);
+                    Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+                    // 移除所有的页面效果 kse标签,实际div
+                    Elements imgEls = nwDoc.getElementsByTag("img");
+                    int thisPidImgTotal = imgEls.size();
+                    for (Element imgEl : imgEls) {
+                        for (String tempImgUrl : pidImgMap.get(tempPid)) {
+                            String tempFileName = tempImgUrl.substring(tempImgUrl.lastIndexOf("/"));
+                            if (imgEl.attr("src").contains(tempFileName)) {
+                                imgEl.remove();
+                                thisPidImgTotal--;
+                            }
+                        }
+                    }
+                    gd.setEninfo(nwDoc.html());
+                    customGoodsService.updatePidEnInfo(gd);
+                    // 如果详情图片少于等于1张，标记软下架
+                    if (thisPidImgTotal <= 1) {
+                        customGoodsService.remarkSoftGoodsValid(tempPid, 27);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println(e.getMessage());
+                }
+            }
+            json.setOk(true);
+            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + " 删除成功!");
+            pidImgMap.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            System.err.println("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("imgTotal:" + imgTotal + ",执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {
 
