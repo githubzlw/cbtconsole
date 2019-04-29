@@ -3310,6 +3310,7 @@ public class EditorController {
         }
         int pidTotal = 0;
         int imgTotal = 0;
+        int deleteImgTotal = 0;
         try {
             // 解析数据
             String[] list = pidImgList.split("@");
@@ -3341,6 +3342,8 @@ public class EditorController {
                             if (imgEl.attr("src").contains(tempFileName)) {
                                 imgEl.remove();
                                 thisPidImgTotal--;
+                                deleteImgTotal ++;
+                                break;
                             }
                         }
                     }
@@ -3356,7 +3359,7 @@ public class EditorController {
                 }
             }
             json.setOk(true);
-            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + " 删除成功!");
+            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + ",成功删除:" + deleteImgTotal);
             pidImgMap.clear();
         } catch (Exception e) {
             e.printStackTrace();
