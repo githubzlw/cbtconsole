@@ -8,6 +8,7 @@
         <result column="post_title" property="postTitle" />
         <result column="post_user" property="postUser" />
         <result column="post_details" property="postDetails" />
+        <result column="post_pictrue" property="postPictrue" />
         <result column="audit_user" property="auditUser" />
         <result column="creatime" property="creatime" />
         <result column="audit_state" property="auditState" />

@@ -9,6 +9,7 @@ public class ForumDetails {
 	private String  postTitle;
 	private String  postUser;
 	private String  postDetails;
+	private String  postPictrue;
 	private String  auditUser;
 	private Date creatime;
 	private int auditState;
@@ -93,5 +94,13 @@ public class ForumDetails {
 
 	public void setAuditState(int auditState) {
 		this.auditState = auditState;
+	}
+
+	public String getPostPictrue() {
+		return postPictrue;
+	}
+
+	public void setPostPictrue(String postPictrue) {
+		this.postPictrue = postPictrue;
 	}
 }

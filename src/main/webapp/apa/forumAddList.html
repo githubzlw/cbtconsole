@@ -172,6 +172,7 @@
     }
     //新增/修改评论 whj直接代码
     function closeRemark() {
+        $(".add_forum").val('');
         $('#myModal').modal('hide');
         $('#myModal2').modal('hide');
     }
@@ -227,6 +228,7 @@
                     $.messager.alert("提醒", "error", "error");
                 }
             });
+            $(".add_forum").val('');
         } else {
             //编辑
             $.ajax({
@@ -297,15 +299,15 @@
                     </tr>
                     <tr>
                         <td width="100px">发帖人:</td>
-                        <td><input type="text" id="add_forum_user" style="width: 270px;"placeholder="请随机生成发帖名" readonly/><input type="button" onclick="random()" style="width: 130px;" value="随机生成"/></td>
+                        <td><input type="text" id="add_forum_user" class="add_forum" style="width: 270px;"placeholder="请随机生成发帖名" readonly/><input type="button" onclick="random()" style="width: 130px;" value="随机生成"/></td>
                     </tr>
                     <tr>
                         <td width="100px">标题:</td>
-                        <td><input type="text" id="add_forum_title" style="width: 400px;"/></td>
+                        <td><input type="text" id="add_forum_title" class="add_forum" style="width: 400px;"/></td>
                     </tr>
                     <tr>
                         <td>内容:</td>
-                        <td><textarea id="add_review_remark" style="width: 400px; height: 150px;"></textarea>
+                        <td><textarea id="add_review_remark" class="add_forum" style="width: 400px; height: 150px;"></textarea>
                         </td>
                     </tr>
                     <tr>
@@ -313,7 +315,7 @@
                         <td>
                             <div style="width: 400px; height:60px;border: 2px dashed slategrey" id="add_forum_pictrue"></div>
                             <label class="ui_button ui_button_primary" for="xFile">上传图片</label>
-                            <form><input type="file" id="xFile" style="position:absolute;clip:rect(0 0 0 0);" onchange="showPreview(this)"></form>
+                            <form><input type="file" id="xFile" style="position:absolute;clip:rect(0 0 0 0);" onchange="showPreview(this)" class="add_forum></form>
                         </td>
                     </tr>
                     <tr>
@@ -730,6 +732,7 @@
         <th data-options="field:'postTitle',width:'120px',align:'center'">帖子标题</th>
         <th data-options="field:'postUser',width:'60px',align:'center'">发帖人</th>
         <th data-options="field:'postDetails',width:'200px',align:'center'">发帖内容</th>
+        <th data-options="field:'postPictrue',width:'120px',align:'center'">帖子配图</th>
         <th data-options="field:'creatime',width:'120px',align:'center',formatter:formatterData">时间</th>
         <th data-options="field:'auditState',width:'50px',align:'center',formatter:formatterType">是否启用</th>
         <th data-options="field:'  ',width:'50px',align:'center',formatter:formatterEdit_">审核</th>
