@@ -39,4 +39,10 @@ public interface Distinguish_PictureService {
 	public int updateSomePirctu_risdelete_s(List<Map<String, String>> maList,String userName);
 
 	public List<Category1688> showCategory1688_type();
+
+	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map);
+
+	public int updateSomePirctu_risdelete_date(List<Map<String, String>> bgList);
+
+	public int FindRecognition_delete_count(Map<String, Object> map);
 }

@@ -46,6 +46,40 @@
     limit #{page},35
 </select>
 
+    <select id="FindRecognition_delete_details" resultMap="resultMap">
+    SELECT pid,remote_path,create_time
+    FROM `custom_goods_md5`
+    WHERE is_delete=1
+    AND ocr_need_delete=1
+    AND ocr_need_date=1
+    <if test="pid !=null and pid!=''">
+        AND pid=#{pid}
+    </if>
+    <if test="startTime !=null and startTime!=''">
+         AND create_time>=#{startTime}
+    </if>
+    <if test="endTime !=null and endTime!=''">
+         AND #{endTime}>=create_time
+    </if>
+        limit #{startNum},#{endNum}
+</select>
+    <select id="FindRecognition_delete_count"  resultType="int">
+        SELECT count(1)
+        FROM `custom_goods_md5`
+        WHERE is_delete=1
+        AND ocr_need_delete=1
+        AND ocr_need_date=1
+        <if test="pid !=null and pid!=''">
+            AND pid=#{pid}
+        </if>
+        <if test="startTime !=null and startTime!=''">
+            AND create_time>=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime!=''">
+            AND #{endTime}>=create_time
+        </if>
+    </select>
+
     <select id="showDistinguish_Pircture_2" resultMap="UserMap">
          SELECT admName FROM admuser where roleType=4 OR roleType=5
     </select>
@@ -109,6 +143,15 @@
         where
         <foreach collection="bgList_s" separator="or" item="i" index="index">
             id = ${i.id}
+        </foreach>
+    </update>
+    <update id="updateSomePirctu_risdelete_date">
+        update custom_goods_md5 SET
+        is_delete=1,
+        create_time=NOW()
+        where
+        <foreach collection="bgList_s" separator="or" item="i" index="index">
+            id = SUBSTRING_INDEX("${i.id}",",",1)
         </foreach>
     </update>
 </mapper>

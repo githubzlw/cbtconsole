@@ -16,6 +16,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	@Autowired
 	public Distinguish_PictureDao distinguish_PictureDao;
 
+
 	@Override
 	public List<CustomGoods> showDistinguish_Pircture(int page,String imgtype,String state,String Change_user) {
 		page=(page-1)*35;
@@ -55,4 +56,18 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	public List<Category1688> showCategory1688_type(){
 		return distinguish_PictureDao.showCategory1688_type();
 	};
+
+	@Override
+	public int FindRecognition_delete_count(Map<String, Object> map) {
+		return distinguish_PictureDao.FindRecognition_delete_count(map);
+	}
+
+	@Override
+	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
+		return distinguish_PictureDao.FindRecognition_delete_details(map);
+	}
+	@Override
+	public int updateSomePirctu_risdelete_date(List<Map<String, String>> bgList) {
+		return distinguish_PictureDao.updateSomePirctu_risdelete_date(bgList);
+	}
 }

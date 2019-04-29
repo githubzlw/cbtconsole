@@ -13,6 +13,10 @@ public interface Distinguish_PictureDao {
 
 	public List<CustomGoods> showDistinguish_Pircture(@Param("page")int page, @Param("imgtype")String imgtype, @Param("state")String state, @Param("Change_user")String Change_user);
 
+	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map);
+
+	public int FindRecognition_delete_count(Map<String, Object> map);
+
 	public List<Admuser> showDistinguish_Pircture_2();
 
 	public int queryDistinguish_PirctureCount( @Param("imgtype")String imgtype, @Param("state")String state, @Param("Change_user")String Change_user);
@@ -22,6 +26,7 @@ public interface Distinguish_PictureDao {
 	public int updateSomePirctu_risdelete_s(@Param("bgList_s")List<Map<String, String>> bgList_s,@Param("userName")String userName);
 	public List<Category1688> showCategory1688_type();
 
+	public int updateSomePirctu_risdelete_date(@Param("bgList_s")List<Map<String, String>> bgList);
 
 
 }

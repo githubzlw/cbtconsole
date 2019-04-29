@@ -383,12 +383,14 @@ function  updateSomes(type){
                     contentType : 'application/json;charset=utf-8',
                     data:JSON.stringify(mainMap),
                     success:function(res){
+                        //TODO 后期 需要进行修改
+                        window.location.reload();
                         if(res==0){
                             alert("线上下架图片失败  !")
                         }else{
                             alert("线上图片正在下架中.....  ")
                             window.location.reload();
-                        }
+                        }1500;
                     }
                 })
             }
@@ -422,6 +424,7 @@ function  updateSomes(type){
 						<%--<h3><span style="color: red">最近修改时间：(人工进行对图片的删除)</span></h3>--%>
 						<h3>单页显示数据：（35张）</h3>
 						<h3><span style="color:blue">(当前处理人员：${username})<input type="hidden" id="userName" value="${username}"></span></h3>
+						<h3><span style="color:blue"><a href="${ctx}/Distinguish_Picture/recognition_date_details" target="_blank">查看线下已下架图片记录</a></span></h3>
 					</div>
 					<div class="left left-margin">
 						<span style="color: red">备注：(人工进行对图片的删除)</span>
@@ -463,9 +466,12 @@ function  updateSomes(type){
 							<div style="border: 2px solid red">
 							<span class="wenzi"  onclick="updateSomes(2)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
 							<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
+
 							</div>
 						</c:if>
-						</div>
+						<%--&nbsp;&nbsp;&nbsp;
+						<span style="color: slateblue;font-size: 24px">最近删除操作线上时间是：<span style="color:green"></span>处理人是：<span style="color: green"></span></span>
+						--%></div>
 				</div>
 			</div>
 		</div>
@@ -491,7 +497,7 @@ function  updateSomes(type){
 							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 						</c:if>
 						<c:if test="${state==1}">
-							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id },${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
+							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id },${customGoodsList.pid},${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
 						</c:if>
 						</div>
 				</c:forEach>
