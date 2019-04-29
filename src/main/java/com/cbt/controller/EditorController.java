@@ -2136,59 +2136,65 @@ public class EditorController {
             if (json.isOk()) {
                 String localDiskPath = ftpConfig.getLocalDiskPath();
                 for (Element imgEl : imgEls) {
-                    System.out.println("src:" + imgEl.attr("src"));
-
                     String imgUrl = imgEl.attr("src");
-                    // 得到文件保存的名称
-                    if (imgUrl.indexOf("?") > -1) {
-                        imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
-                    }
-                    // 兼容没有http头部的src
-                    if (imgUrl.indexOf("//") == 0) {
-                        imgUrl = "http:" + imgUrl;
-                    }
-                    // 文件的后缀取出来
-                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                    // 生成唯一文件名称
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-                    // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    System.out.println("src:" + imgUrl);
+                    // 判断异常的图片直接过滤
+                    if (StringUtils.isNotBlank(imgUrl) && imgUrl.lastIndexOf(".") > -1) {
+                        // 得到文件保存的名称
+                        if (imgUrl.indexOf("?") > -1) {
+                            imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
+                        }
+                        // 兼容没有http头部的src
+                        if (imgUrl.indexOf("//") == 0) {
+                            imgUrl = "http:" + imgUrl;
+                        }
+                        // 文件的后缀取出来
+                        String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                        // 生成唯一文件名称
+                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        // 本地服务器磁盘全路径
+                        String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
 
-                    // 下载网络图片到本地
-                    boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
-                    if (is) {
-                        // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
-                        boolean checked = false;
-                        checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
-                        if (checked) {
-                            checked = false;
-                            String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
-                            checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                    localDiskPath + newLocalPath);
+                        // 下载网络图片到本地
+                        boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
+                        if (is) {
+                            // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
+                            boolean checked = false;
+                            checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (checked) {
-                                imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                checked = false;
+                                String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                        localDiskPath + newLocalPath);
+                                if (checked) {
+                                    imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                    break;
+                                }
                             } else {
-                                json.setOk(false);
-                                json.setMessage("压缩图片到700*700失败，终止执行");
-                                break;
+                                json.setOk(true);
+                                json.setMessage("图片上传本地成功");
+                                imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
                             }
                         } else {
-                            json.setOk(true);
-                            json.setMessage("图片上传本地成功");
-                            imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
+                            json.setOk(false);
+                            json.setMessage("下载图片失败，请重试！");
+                            break;
                         }
                     } else {
-                        json.setOk(false);
-                        json.setMessage("下载图片失败，请重试！");
-                        break;
+                        imgEl.remove();
                     }
+
+
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
-            json.setMessage("执行错误：" + e.getMessage());
-            LOG.error("执行错误：" + e.getMessage());
+            json.setMessage("pid:" + pid + ",执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + ",执行错误：" + e.getMessage());
         }
 
         if (nwDoc == null) {
