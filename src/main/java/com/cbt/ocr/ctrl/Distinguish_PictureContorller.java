@@ -48,11 +48,6 @@ public class Distinguish_PictureContorller {
 		int pageNO=Integer.parseInt(page);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
 		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pageNO,imgtype,state,Change_user);
-
-		String []pidZ=new String[35];
-		for(int i=0;i<customGoodsList.size();i++){
-			pidZ[i]=customGoodsList.get(i).getId().toString();
-		}
 		if (StrUtils.isNullOrEmpty(state))
 			state="0";
 		//处理人员查询显示
@@ -79,7 +74,6 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
-		request.setAttribute("pidZ",pidZ);
 
 
 	return "recognition_picture";
@@ -96,7 +90,14 @@ public class Distinguish_PictureContorller {
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
 		int ret =0;
 		if(type==2){
-			/*ret=distinguish_pictureService.updateSomePirctu_risdelete_Chinese(bgList,userName);*/
+			StringBuffer imgpath=new StringBuffer("");
+			for (int i=0;i<bgList.size();i++){
+				String [] splt=bgList.get(i).get("id").split(",");
+				imgpath=imgpath.append("pid:"+splt[0]+";"+"imgUrl:"+splt[1]+"@");
+			}
+			//提供给蒋先伟    线上下架图片的信息列
+			System.out.println(imgpath.substring(0,imgpath.length()-1));
+			ret =1;
 		}else if(type==1||type==3){
 			ret=distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName,type);
 		}
@@ -122,6 +123,13 @@ public class Distinguish_PictureContorller {
 	@RequestMapping(value = "FindCategory")
 	@ResponseBody
 	public List<Category1688> FindCategory(HttpServletRequest request){
+		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
+		return  ret;
+	}
+
+	@RequestMapping(value = "aa")
+	@ResponseBody
+	public List<Category1688> aa(HttpServletRequest request){
 		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
 		return  ret;
 	}

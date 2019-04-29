@@ -73,7 +73,7 @@
 	width: 100%;
 	height:100%;
 	background: #999;
-	position: absolute;
+	position: fixed;
 	opacity:0.5;
 	display: none;
 }
@@ -210,6 +210,8 @@ div.margin2 {
         });
     });
 function fnjump(obj){
+    $("#Tips").css("display","block");
+    $(".mengceng").css("display","block");
 	var page=$("#page").val();
 	if(page==""){
 		page = "1";
@@ -357,40 +359,40 @@ function  updateSomes(type){
                 })
             }
         }
-	}else{
-            if(confirm("确定要进行此操作？")){
-                var  mainMap ={};
-                var erList= new Array();
-                var sbi = 0;
-                $(".cbox:checked").each(function(){
-                    var erMap={};
-                    erMap['id'] =this.value;
-                    erList[sbi] = erMap;
-                    sbi++;
-                });
-                if(erList.length == 0){
-                    alert("请至少选择一个！");
-                }else{
-                    var userName=$("#userName").val();
-                    mainMap['bgList'] = erList;
-                    console.log(mainMap);
-                    $.ajax({
-                        type:"post",
-                        url:"${ctx}",
-                        dataType:"json",
-                        contentType : 'application/json;charset=utf-8',
-                        data:JSON.stringify(mainMap),
-                        success:function(res){
-                            if(res==0){
-                                    alert("线上下架图片失败  !")
-                            }else{
-                                    alert("线上下架图片成功  !")
-                                window.location.reload();
-                            }
+	}else if(type==2){
+        if(confirm("确定要进行此操作？")){
+            var  mainMap ={};
+            var erList= new Array();
+            var sbi = 0;
+            $(".cbox:checked").each(function(){
+                var erMap={};
+                erMap['id'] =this.value;
+                erList[sbi] = erMap;
+                sbi++;
+            });
+            if(erList.length == 0){
+                alert("请至少选择一个！");
+            }else{
+                var userName=$("#userName").val();
+                mainMap['bgList'] = erList;
+                console.log(mainMap);
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}/Distinguish_Picture/updateSomeis_delete?type="+type,
+                    dataType:"json",
+                    contentType : 'application/json;charset=utf-8',
+                    data:JSON.stringify(mainMap),
+                    success:function(res){
+                        if(res==0){
+                            alert("线上下架图片失败  !")
+                        }else{
+                            alert("线上图片正在下架中.....  ")
+                            window.location.reload();
                         }
-                    })
-                }
+                    }
+                })
             }
+        }
 	}
     $("#Tips").css("display","block");
     $(".mengceng").css("display","block");
@@ -401,10 +403,11 @@ function  updateSomes(type){
         search();
     }
 
+
 </script>
 </head>
 <div class="mengceng"></div>
-<div id="Tips" style="width: 500px;position: absolute;left: 650px;top: 300px;background-color: #00B1FF;display: none;z-index: 555;">
+<div id="Tips" style="width: 500px;position: fixed;left: 650px;top: 300px;background-color: #00B1FF;display: none;z-index: 555;">
 	<h1 align="center" >数据正在装载中...</h1>
 </div>
 <body>
@@ -446,9 +449,6 @@ function  updateSomes(type){
 						</c:forEach>
 					</select>
 						<span class="wenzi"  onclick="reset();"><a href="#" style="text-decoration:none"><font color="white">重置</font></a></span>
-						<%--<c:if test="${state==1}">
-							<span class="wenzi"  onclick="updateSomes(2)"><a href="#" style="text-decoration:none"><font color="white">标记为无中文</font></a></span>
-						</c:if>--%>
 						<c:if test="${state==2}">
 							<span class="wenzi"  onclick="updateSomes(3)"><a href="#" style="text-decoration:none"><font color="white">标记为有中文</font></a></span>
 						</c:if>
@@ -491,7 +491,7 @@ function  updateSomes(type){
 							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 						</c:if>
 						<c:if test="${state==1}">
-							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
+							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id },${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
 						</c:if>
 						</div>
 				</c:forEach>
@@ -507,8 +507,7 @@ function  updateSomes(type){
 		<input type="button" value="上一页" onclick="fnjump(-1)" class="btn">
 		<input type="button" value="下一页" onclick="fnjump(1)" class="btn">
 		
-		第<input id="page" type="text" value="${currentPage}" style="height: 26px;">
-		<input type="button" value="查询" onclick="fnjump(0)" class="btn">
+		第<input id="page" type="text" value="${currentPage}" onchange="fnjump(0)" style="height: 26px;">页
 		</div>
 	</div>
 </body>

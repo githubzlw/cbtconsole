@@ -28,6 +28,7 @@
     <select id="showDistinguish_Pircture" resultMap="resultMap">
     SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
     WHERE 1=1
+        AND cdm.is_delete=0
     <if test="Change_user != null and Change_user != ''">
         AND cdm.user_operation=#{Change_user}
     </if>
@@ -52,6 +53,7 @@
     <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM custom_goods_md5 cdm
         WHERE 1=1
+        AND cdm.is_delete=0
         <if test="state == null || state == ''">
             AND cdm.ocr_need_date=0
             AND cdm.ocr_need_delete=1
