@@ -3359,7 +3359,7 @@ public class EditorController {
                 }
             }
             json.setOk(true);
-            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + ",成功删除:" + deleteImgTotal);
+            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + ",success delete:" + deleteImgTotal);
             pidImgMap.clear();
         } catch (Exception e) {
             e.printStackTrace();
