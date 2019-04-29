@@ -15,6 +15,7 @@ public class ForumDetails {
 	private int auditState;
 	private int detailsState;
 	private int postOtherId;
+	private ForumClassification forumClass;
 
 	public Integer getId() {
 		return id;
@@ -102,5 +103,13 @@ public class ForumDetails {
 
 	public void setPostPictrue(String postPictrue) {
 		this.postPictrue = postPictrue;
+	}
+
+	public ForumClassification getForumClass() {
+		return forumClass;
+	}
+
+	public void setForumClass(ForumClassification forumClass) {
+		this.forumClass = forumClass;
 	}
 }

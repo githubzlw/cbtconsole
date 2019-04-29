@@ -14,6 +14,12 @@
         <result column="audit_state" property="auditState" />
         <result column="details_state" property="detailsState" />
         <result column="post_other_id" property="postOtherId" />
+        <collection property="forumClass"  javaType="com.cbt.forum.pojo.ForumClassification">
+            <id column="id" property="id"/>
+            <result column="pid" property="pid"/>
+            <result column="forum_class_id" property="forumClassId" />
+            <result column="forum_class_name" property="forumClassName" />
+        </collection>
 	</resultMap>
     <resultMap id="Forum_class_List" type="com.cbt.forum.pojo.ForumClassification">
         <id column="id" property="id" javaType="INTEGER"/>
@@ -33,32 +39,33 @@
     </sql>
     <select id="FidForumList" resultMap="ForumMap">
     select
-    <include refid="ForumColumn"/>
-    from forum_details WHERE 1=1
+    f.*,c.`forum_class_name` forum_class_name
+    from `forum_details` f,`forum_classification` c WHERE 1=1
+        AND f.`post_class_id`=c.`forum_class_id`
     <if test="posttitle !=null and posttitle!=''">
-        AND  post_title=#{posttitle}
+        AND  f.post_title=#{posttitle}
     </if>
     <if test="audit_user !=null and audit_user!=''">
-        AND  audit_user=#{audit_user}
+        AND  f.audit_user=#{audit_user}
     </if>
     <if test="type !=0">
-        AND  post_class_id=#{type}
+        AND  f.post_class_id=#{type}
     </if>
     <if test="reviewFlag !=0">
-        AND  audit_state=#{reviewFlag}
+        AND  f.audit_state=#{reviewFlag}
     </if>
     <if test="startDate != null">
-        AND creatime >= #{startDate}
+        AND f.creatime >= #{startDate}
     </if>
     <if test="endDate != null">
-        AND #{endDate} >= creatime
+        AND #{endDate} >= f.creatime
     </if>
     limit #{page},#{rows}
 </select>
     <select id="FidForumList_one" resultMap="ForumMap">
         select
-        <include refid="ForumColumn"/>
-        from forum_details WHERE id=#{id}
+        from  `forum_details`
+        WHERE id=#{id}
     </select>
     <select id="FidForumListConut" resultType="Integer">
         select count(1)
