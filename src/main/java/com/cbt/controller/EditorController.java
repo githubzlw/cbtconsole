@@ -2136,59 +2136,65 @@ public class EditorController {
             if (json.isOk()) {
                 String localDiskPath = ftpConfig.getLocalDiskPath();
                 for (Element imgEl : imgEls) {
-                    System.out.println("src:" + imgEl.attr("src"));
-
                     String imgUrl = imgEl.attr("src");
-                    // 得到文件保存的名称
-                    if (imgUrl.indexOf("?") > -1) {
-                        imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
-                    }
-                    // 兼容没有http头部的src
-                    if (imgUrl.indexOf("//") == 0) {
-                        imgUrl = "http:" + imgUrl;
-                    }
-                    // 文件的后缀取出来
-                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                    // 生成唯一文件名称
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-                    // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    System.out.println("src:" + imgUrl);
+                    // 判断异常的图片直接过滤
+                    if (StringUtils.isNotBlank(imgUrl) && imgUrl.lastIndexOf(".") > -1) {
+                        // 得到文件保存的名称
+                        if (imgUrl.indexOf("?") > -1) {
+                            imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
+                        }
+                        // 兼容没有http头部的src
+                        if (imgUrl.indexOf("//") == 0) {
+                            imgUrl = "http:" + imgUrl;
+                        }
+                        // 文件的后缀取出来
+                        String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                        // 生成唯一文件名称
+                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        // 本地服务器磁盘全路径
+                        String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
 
-                    // 下载网络图片到本地
-                    boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
-                    if (is) {
-                        // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
-                        boolean checked = false;
-                        checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
-                        if (checked) {
-                            checked = false;
-                            String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
-                            checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                    localDiskPath + newLocalPath);
+                        // 下载网络图片到本地
+                        boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
+                        if (is) {
+                            // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
+                            boolean checked = false;
+                            checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (checked) {
-                                imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                checked = false;
+                                String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                        localDiskPath + newLocalPath);
+                                if (checked) {
+                                    imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                    break;
+                                }
                             } else {
-                                json.setOk(false);
-                                json.setMessage("压缩图片到700*700失败，终止执行");
-                                break;
+                                json.setOk(true);
+                                json.setMessage("图片上传本地成功");
+                                imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
                             }
                         } else {
-                            json.setOk(true);
-                            json.setMessage("图片上传本地成功");
-                            imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
+                            json.setOk(false);
+                            json.setMessage("下载图片失败，请重试！");
+                            break;
                         }
                     } else {
-                        json.setOk(false);
-                        json.setMessage("下载图片失败，请重试！");
-                        break;
+                        imgEl.remove();
                     }
+
+
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
-            json.setMessage("执行错误：" + e.getMessage());
-            LOG.error("执行错误：" + e.getMessage());
+            json.setMessage("pid:" + pid + ",执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + ",执行错误：" + e.getMessage());
         }
 
         if (nwDoc == null) {
@@ -3284,6 +3290,83 @@ public class EditorController {
             System.err.println("pid:" + pid + ",deletePidImgByUrl error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/deleteEnInfoImgByParam")
+    @ResponseBody
+    public JsonResult deleteEnInfoImgByParam(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
+        // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
+        String pidImgList = request.getParameter("pidImgList");
+        if (StringUtils.isBlank(pidImgList)) {
+            json.setOk(false);
+            json.setMessage("获取参数失败");
+            return json;
+        }
+        int pidTotal = 0;
+        int imgTotal = 0;
+        int deleteImgTotal = 0;
+        try {
+            // 解析数据
+            String[] list = pidImgList.split("@");
+            imgTotal = list.length;
+            Map<String, List<String>> pidImgMap = new HashMap<>(pidTotal);
+            for (String lStr : list) {
+                String[] tempList = lStr.split(";");
+                if (pidImgMap.containsKey(tempList[0])) {
+                    pidImgMap.get(tempList[0]).add(tempList[1]);
+                } else {
+                    List<String> imgList = new ArrayList<>();
+                    imgList.add(tempList[1]);
+                    pidImgMap.put(tempList[0], imgList);
+                }
+            }
+
+            for (String tempPid : pidImgMap.keySet()) {
+                pidTotal++;
+                // 循环删除数据
+                try {
+                    CustomGoodsPublish gd = customGoodsService.queryGoodsDetails(tempPid, 0);
+                    Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+                    // 移除所有的页面效果 kse标签,实际div
+                    Elements imgEls = nwDoc.getElementsByTag("img");
+                    int thisPidImgTotal = imgEls.size();
+                    for (Element imgEl : imgEls) {
+                        for (String tempImgUrl : pidImgMap.get(tempPid)) {
+                            String tempFileName = tempImgUrl.substring(tempImgUrl.lastIndexOf("/"));
+                            if (imgEl.attr("src").contains(tempFileName)) {
+                                imgEl.remove();
+                                thisPidImgTotal--;
+                                deleteImgTotal ++;
+                                break;
+                            }
+                        }
+                    }
+                    gd.setEninfo(nwDoc.html());
+                    customGoodsService.updatePidEnInfo(gd);
+                    // 如果详情图片少于等于1张，标记软下架
+                    if (thisPidImgTotal <= 1) {
+                        customGoodsService.remarkSoftGoodsValid(tempPid, 27);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println(e.getMessage());
+                }
+            }
+            json.setOk(true);
+            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + ",success delete:" + deleteImgTotal);
+            pidImgMap.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            System.err.println("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("imgTotal:" + imgTotal + ",执行错误，原因：" + e.getMessage());
         }
         return json;
     }

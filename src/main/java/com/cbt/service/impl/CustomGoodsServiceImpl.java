@@ -686,5 +686,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
+    @Override
+    public int remarkSoftGoodsValid(String pid, int reason) {
+        return customGoodsMapper.remarkSoftGoodsValid(pid, reason);
+    }
+
 
 }

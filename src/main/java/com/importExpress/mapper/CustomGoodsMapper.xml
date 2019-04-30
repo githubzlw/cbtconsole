@@ -1228,4 +1228,9 @@
         values(#{pid},#{oldSku} ,#{newSku} ,#{adminId})
     </insert>
 
+    <insert id="remarkSoftGoodsValid">
+        insert into needoffshelf_goods(pid, reason)
+        values(#{pid}, #{reason})
+    </insert>
+
 </mapper>

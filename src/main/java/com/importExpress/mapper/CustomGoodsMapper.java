@@ -407,4 +407,13 @@ public interface CustomGoodsMapper {
      */
     int insertIntoSkuLog(@Param("pid") String pid, @Param("oldSku") String oldSku, @Param("newSku") String newSku,
                          @Param("adminId") int adminId);
+
+
+    /**
+     * 标记商品软下架
+     * @param pid
+     * @param reason
+     * @return
+     */
+    int remarkSoftGoodsValid(@Param("pid") String pid, @Param("reason") int reason);
 }
