@@ -753,4 +753,12 @@ public interface CustomGoodsService {
      * @return
      */
     int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight);
+
+    /**
+     * 标记商品软下架
+     * @param pid
+     * @param reason
+     * @return
+     */
+    int remarkSoftGoodsValid(String pid, int reason);
 }
