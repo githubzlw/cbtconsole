@@ -6137,7 +6137,12 @@ public class WarehouseCtrl {
 			// purchaseServer.getUserDetails(orderid+",");
 			UserOrderDetails uod;
 			// 客户付的钱-采购金额-预估运费 ≥-20元 ， 提示 警告
-			list.get(i).setSubAmount(Double.valueOf(list.get(i).getSumprice()) * list.get(i).getExchange_rate()
+			String str_sumprice=list.get(i).getSumprice();
+			if( str_sumprice==null || "".equals(str_sumprice) )
+			{
+				str_sumprice="0";
+			}
+			list.get(i).setSubAmount(Double.valueOf(str_sumprice) * list.get(i).getExchange_rate()
 					- Double.valueOf(list.get(i).getSumcgprice()) - Double.valueOf(list.get(i).getEstimatefreight()));
 			try {
 				uod = purchaseServer.getUserAddr(orderid);
