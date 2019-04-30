@@ -57,6 +57,7 @@
 		<result column="is_sold_flag" property="isSoldFlag" />
 		<result column="feeprice" property="feeprice" />
 		<result column="promotion_flag" property="promotionFlag" />
+		<result column="unsellableReason" property="unsellableReason" />
 
 	</resultMap>
 
@@ -157,7 +158,7 @@
 		from
 		(select b.enname as show_name,a.amazon_price,a.asin_code,a.goods_img,a.hot_selling_id,a.goods_url,a.goods_pid,
 		b.price as goods_price,b.wprice,b.range_price,b.sellunit as goods_unit,b.isNewCloud,a.profit_margin,a.id,a.is_on,
-		b.is_sold_flag,b.feeprice,b.promotion_flag
+		b.is_sold_flag,b.feeprice,b.promotion_flag,b.unsellableReason
 		from hot_selling_goods a,custom_benchmark_ready b
 		where a.hot_selling_id = #{hotCategoryId} and a.goods_pid = b.pid and b.valid =1) as aa
 		left join hot_goods_discount bb on aa.goods_pid =bb.goods_pid and aa.hot_selling_id =bb.hot_id

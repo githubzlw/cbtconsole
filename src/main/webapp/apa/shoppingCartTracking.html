@@ -32,23 +32,23 @@
         }
 
         #marketing_tracking_toolbar {
-            padding: 20px 28px !important;
+            padding: 20px 26px !important;
         }
 
         .datagrid-header .datagrid-cell span, .datagrid-cell,
         .datagrid-cell-group, .datagrid-header-rownumber,
         .datagrid-cell-rownumber {
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .datagrid-row {
-            height: 24px;
+            height: 26px;
         }
 
         .but_color {
             background: #44a823;
             width: 90px;
-            height: 28px;
+            height: 26px;
             border: 1px #aaa solid;
             color: #fff;
         }
@@ -136,6 +136,12 @@
             return val;
         }
 
+        function formatOrderNo(val, row, index) {
+            var content = '<a href="/cbtconsole/website/paycheck_details_new.jsp?orderNo=' +
+                val + '" target="_blank">'+val+'</a>';
+            return content;
+        }
+
         function formatOperation(val, row, index) {
             var content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
                 row.userId + '" target="_blank">跟进</a>';
@@ -181,7 +187,7 @@
     <thead>
     <tr>
         <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
-        <th data-options="field:'orderNo',width:'150px'">订单号</th>
+        <th data-options="field:'orderNo',width:'150px',formatter:formatOrderNo">订单号</th>
         <th data-options="field:'orderPayTime',align:'center',width:'150px'">下单时间</th>
         <th data-options="field:'orderPayAmount',align:'center',width:'100px'">下单金额(USD)</th>
         <th data-options="field:'adminName',align:'center',width:'100px'">销售</th>

@@ -205,6 +205,7 @@ public class GoodsInfoUtils {
             skuAtLst = null;
             ipes.setPpIds(ites.getSkuPropIds().replace(",", "_"));
             ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
+            ipes.setFianlWeight(ites.getFianlWeight());
             if (skuAttrs == null || "".equals(skuAttrs)) {
                 ipes = null;
             } else {

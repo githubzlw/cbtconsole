@@ -166,6 +166,7 @@ public class UserBehaviorStatisticsController {
             addToOrder.setTypeFlag(12);
             payLogNum = dao.queryBehaviorRecord(beginDate, endDate, ipFlag);
             addToOrder.setStatisticsNum(payLogNum);
+            addToOrder.setIsShow(1);
             list.add(addToOrder);
             json.setOk(true);
             json.setData(list);
@@ -256,6 +257,9 @@ public class UserBehaviorStatisticsController {
             }else if ("11".equals(typeStr)) {
                 //Pay按钮点击独特人数
                 list = dao.queryUserPayLogDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
+            }else if ("12".equals(typeStr)) {
+                //Pay按钮点击独特人数
+                list = dao.queryUserAddToOrderDetails(beginDate, endDate, (page - 1) * 20, row,ipFlag);
             }
 
             json.setSuccess(true);

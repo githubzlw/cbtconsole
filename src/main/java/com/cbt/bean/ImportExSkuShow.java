@@ -1,37 +1,47 @@
 package com.cbt.bean;
 
 public class ImportExSkuShow {
-	private String ppIds;
-	private String skuAttrs;
-	private float price;
+    private String ppIds;
+    private String skuAttrs;
+    private float price;
+    private double fianlWeight;
 
-	public String getPpIds() {
-		return ppIds;
-	}
+    public double getFianlWeight() {
+        return fianlWeight;
+    }
 
-	public void setPpIds(String ppIds) {
-		this.ppIds = ppIds;
-	}
+    public void setFianlWeight(double fianlWeight) {
+        this.fianlWeight = fianlWeight;
+    }
 
-	public String getSkuAttrs() {
-		return skuAttrs;
-	}
+    public String getPpIds() {
+        return ppIds;
+    }
 
-	public void setSkuAttrs(String skuAttrs) {
-		this.skuAttrs = skuAttrs;
-	}
+    public void setPpIds(String ppIds) {
+        this.ppIds = ppIds;
+    }
 
-	public float getPrice() {
-		return price;
-	}
+    public String getSkuAttrs() {
+        return skuAttrs;
+    }
 
-	public void setPrice(float price) {
-		this.price = price;
-	}
+    public void setSkuAttrs(String skuAttrs) {
+        this.skuAttrs = skuAttrs;
+    }
 
-	@Override
-	public String toString() {
-		return "{\"ppIds\":\"" + ppIds + "\", \"skuAttrs\":\"" + skuAttrs + "\", \"price\":\"" + price + "\"}";
-	}
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "{\"ppIds\":\"" + ppIds + "\", \"skuAttrs\":\"" + skuAttrs + "\", \"price\":\"" + price
+                + "\", \"fianlWeight\":\"" + fianlWeight + "\"}";
+    }
 
 }

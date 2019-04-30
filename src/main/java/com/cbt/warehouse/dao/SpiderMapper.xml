@@ -618,11 +618,22 @@
         values(#{userid},#{sessionid},#{userIP},#{keyWords},#{catid},#{sortType},#{pageNumber},#{year},#{month},#{day},now(),#{productShowIdList},#{allProductList},#{listSize},#{device},#{searchMD5},#{searchUserMD5})
     </insert>
     <update id="updateTheSearchLogOnSearchPage">
-        update searchproductlog set productShowIdList = #{productShowIdList} where id=#{rowid}
+        update searchproductlog set productShowIdLgoods_car_statisticist = #{productShowIdList} where id=#{rowid}
     </update>
     <insert id="saveTheClickCountOnSearchPage">
         insert into searchclickproductlog(pid,clickCount,searchMD5,searchUserMD5,createtime,updateTime)
         values(#{goods_id},1,#{searchmd5},#{searchusermd5},now(),now())
         on duplicate key update clickCount=clickCount+1,updateTime = now()
     </insert>
+    <!-- 根据userid获取购物车商品信息 -->
+    <select id="getGoodsInfoByUserid" resultType="java.util.Map">
+        select goods_url,goods_title,googs_seller,googs_img,googs_price,googs_number,freight,remark,datatime,itemId,shopId,norm_least,
+        pWprice,true_shipping,delivery_time,freight_free,width,perWeight,seilUnit,goodsUnit,bulk_volume,total_weight,per_weight,
+        free_shopping_company,free_sc_days,goodsdata_id,preferential,deposit_rate,guid,goods_type,feeprice,currency,goods_class,
+        extra_freight,source_url,catid,method_feight,isshipping_promote,price1,price2,price3,price4,comparealiPrice,theproductfrieght,notfreeprice,
+        isvolume,freeprice,firstprice,firstnumber,state,addPrice,isFeight,isBattery,aliPosttime,goodsUrlMD5,spiderPrice,priceListSize,guid,datatime,skuid_1688,isFreeShipProduct,
+        sampleFee,sampleMoq,is_stock_flag,shopCount
+        from goods_car_temp
+        where userid=#{orderNo}
+    </select>
 </mapper>

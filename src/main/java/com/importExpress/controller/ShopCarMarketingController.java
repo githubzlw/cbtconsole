@@ -326,7 +326,7 @@ public class ShopCarMarketingController {
                 userName = userEmail;
             }
         }
-        try {
+        //try {
             int userId = Integer.valueOf(userIdStr);
 
             if ("1".equals(type) || "2".equals(type)) {
@@ -370,11 +370,16 @@ public class ShopCarMarketingController {
                         //2.清空redis数据
                         //使用MQ清空购物车数据
                         //redis示例
-                        SendMQ sendMQ = new SendMQ();
-                        RedisModel redisModel = new RedisModel(new String[]{userIdStr});
-                        redisModel.setType("3");
-                        sendMQ.sendMsg(redisModel);
-                        sendMQ.closeConn();
+                        try {
+                            SendMQ sendMQ = new SendMQ();
+                            RedisModel redisModel = new RedisModel(new String[]{userIdStr});
+                            redisModel.setType("3");
+                            sendMQ.sendMsg(redisModel);
+                            sendMQ.closeConn();
+                        } catch (Exception e) {
+                            logger.error(" SendMQ error:{}",e);
+                            e.printStackTrace();
+                        }
                     } else {
                         json.setOk(false);
                         json.setMessage("更新失败,请重试");
@@ -404,14 +409,14 @@ public class ShopCarMarketingController {
                 json.setOk(false);
                 json.setMessage("邮件失败，请重新发送！");
             }
-            } catch (Exception e) {
+            /*} catch (Exception e) {
             e.printStackTrace();
             System.err.println("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
             logger.error("userId:" + userIdStr + ",confirmAndSendEmail error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("执行失败，原因：" + e.getMessage());
             return json;
-        }
+        }*/
         return json;
     }
     

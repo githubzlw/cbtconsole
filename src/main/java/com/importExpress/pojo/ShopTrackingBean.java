@@ -1,5 +1,7 @@
 package com.importExpress.pojo;
 
+import com.cbt.util.BigDecimalUtil;
+
 public class ShopTrackingBean {
     private int userId;
     private String followTime;
@@ -41,7 +43,7 @@ public class ShopTrackingBean {
     }
 
     public void setOrderPayAmount(double orderPayAmount) {
-        this.orderPayAmount = orderPayAmount;
+        this.orderPayAmount = BigDecimalUtil.truncateDouble(orderPayAmount, 2);
     }
 
     public String getOrderPayTime() {
