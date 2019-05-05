@@ -266,7 +266,7 @@ function returnOr(uid) {
 function AddOll() {
 	 var tbOrder=this.$("#select_id option:selected").val();
 	 var cusorder = $('#cuso').text();
-	 alert(cusorder)
+	 //alert(cusorder)
 	 var returnNO = $("input[name='radioname']checked").val();
 	 var isAutoSend = document.getElementsByName('radioname');
 	 for (var i = 0; i < isAutoSend.length; i++) {
@@ -274,7 +274,7 @@ function AddOll() {
 	 returnNO=isAutoSend[i].value; 
 	 }
 	 }
-	 alert(returnNO)
+	 //alert(returnNO)
 	  $.post("/cbtconsole/Look/AddRetAllOrder", {
 			cusorder:cusorder,tbOrder:tbOrder,returnNO:returnNO
 		}, function(res) {
