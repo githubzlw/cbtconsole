@@ -29,12 +29,29 @@ table td {
 	    var r = url.substr(1).match(reg); //匹配目标参数
 	    if (r != null) return unescape(r[2]); return null; //返回参数值
 	}
+    //模拟登陆进行了加密
+    function userlogin(that) {
+        var url = $(that).attr("url");
+        var userid = getUrlParam(url.substring(url.indexOf("?")), "userName");
+        $.ajax({
+            type:'post',
+            url:'../warehouse/encodeStr',
+            data:{
+                str:userid
+            },
+            success:function(data){
+                if(data != null){
+                    window.open(url.replace("userName=" + userid, "userName=" + data), "_blank");
+                }else{
+                    alert("加密用户名报错勒！！");
+                }
+            }
+        });
+    }
 	function addTableData(tableId, item) {
-		console.log(getUrlParam(item, "time"));
-		console.log(getUrlParam(item, "password"));
-		$("#" + tableId).append("<tr><td>" + getUrlParam(item, "password") 
-				+ "</td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "").replace("https://www.import-express.com", "http://beta.importx.com") 
-				+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"" + item.replace(/\s+/g, "") 
+		$("#" + tableId).append("<tr><td>" + getUrlParam(item, "password")
+				+ "</td><td><a target=\"_blank\" href=\"javascript:;\" onclick='userlogin(this)' url=\"" + item.replace(/\s+/g, "").replace("https://www.import-express.com", "http://beta.importx.com")
+				+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"javascript:;\" onclick='userlogin(this)' url=\"" + item.replace(/\s+/g, "")
 				+ "\">跳转线上</a></td><td>" + getUrlParam(item, "time") + "</td></tr>");
 	}
 	jQuery(function($) {
@@ -53,8 +70,8 @@ table td {
 						$(date).each(function(index, item) {
 							var userUrl = item.replace("&total=" + getUrlParam(item, "total"),"");
 							$("#date_id2").append("<tr><td>" + getUrlParam(item, "password") 
-									+ "</td><td><a target=\"_blank\" href=\"" + userUrl.replace("https://www.import-express.com", "http://beta.importx.com") 
-									+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"" + userUrl 
+									+ "</td><td><a target=\"_blank\" href=\"javascript:;\" onclick='userlogin(this)' url=\"" + userUrl.replace("https://www.import-express.com", "http://beta.importx.com")
+									+ "\">跳转镜像服</a></td><td><a target=\"_blank\" href=\"javascript:;\" onclick='userlogin(this)' url=\"" + userUrl
 									+ "\">跳转线上</a></td><td>" + parseInt(getUrlParam(item, "total")).toFixed(0) + "$</td></tr>");
                         });
 					} else {

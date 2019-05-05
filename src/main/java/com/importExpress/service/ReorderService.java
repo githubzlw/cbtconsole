@@ -13,7 +13,8 @@ public interface ReorderService {
      * @Return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      */
     List<Map<String, Object>> getGoodsInfoByOrderNo(String orderNo, String goodsId);
+    List<Map<String, Object>> getGoodsInfoByUserId(String goodsId);
 
     String reorder(String orderNo, String userId);
-
+    String returnGoodsCarByUserId(String userId);
 }

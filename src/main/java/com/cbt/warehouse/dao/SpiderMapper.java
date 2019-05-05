@@ -252,11 +252,13 @@ public interface SpiderMapper {
 	public List<TypeAvgWeightBean> getCatid_Filter_AvgWeight();
 
 	public List<Map<String, Object>> getGoodsInfoByOrderNo(@Param("orderNo") String orderNo, @Param("goods_id") String[] goods_id);
-
 	/**
 	 * 搜索页面记录日志 qiqing 2018/04/11
 	 */
 	public int saveTheSearchLogOnSearchPage(SearchLog seaLog);
 	public int updateTheSearchLogOnSearchPage(@Param("rowid") int rowid, @Param("productShowIdList") String productShowIdList);
 	public int saveTheClickCountOnSearchPage(@Param("goods_id") String goodsPid, @Param("searchmd5") String searchMD5, @Param("searchusermd5") String searchUserMD5);
+
+	public List<Map<String, Object>> getGoodsInfoByUserid(@Param("orderNo") String orderNo);
+
 }

@@ -1217,4 +1217,20 @@
         where pid = #{pid}
     </update>
 
+    <update id="updateSkuInfo">
+        update custom_benchmark_ready
+        set  sku = #{sku},is_add_car_flag = 1
+        where pid = #{pid}
+    </update>
+
+    <insert id="insertIntoSkuLog">
+        insert into custom_goods_sku_log(pid,old_sku,new_sku,admin_id)
+        values(#{pid},#{oldSku} ,#{newSku} ,#{adminId})
+    </insert>
+
+    <insert id="remarkSoftGoodsValid">
+        insert into needoffshelf_goods(pid, reason)
+        values(#{pid}, #{reason})
+    </insert>
+
 </mapper>

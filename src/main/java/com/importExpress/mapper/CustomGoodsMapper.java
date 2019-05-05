@@ -388,4 +388,32 @@ public interface CustomGoodsMapper {
      * @return
      */
     int updateWeightFlag(@Param("pid") String pid, @Param("flag") int flag);
+
+    /**
+     * 更新sku数据
+     * @param pid
+     * @param sku
+     * @return
+     */
+    int updateSkuInfo(@Param("pid") String pid, @Param("sku") String sku);
+
+    /**
+     * 插入sku更新日志
+     * @param pid
+     * @param oldSku
+     * @param newSku
+     * @param adminId
+     * @return
+     */
+    int insertIntoSkuLog(@Param("pid") String pid, @Param("oldSku") String oldSku, @Param("newSku") String newSku,
+                         @Param("adminId") int adminId);
+
+
+    /**
+     * 标记商品软下架
+     * @param pid
+     * @param reason
+     * @return
+     */
+    int remarkSoftGoodsValid(@Param("pid") String pid, @Param("reason") int reason);
 }

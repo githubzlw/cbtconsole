@@ -72,6 +72,9 @@
         .payLog_div {
             float: right;width: 49%;height: 90%;
         }
+        .addtoorder_div {
+            float: right;width: 49%;height: 90%;
+        }
 
         #single_query_form {
             margin-left: 40px;
@@ -94,6 +97,9 @@
             var optsDay = $("#statistics_every_day").datagrid("options");
             optsDay.url = "/cbtconsole/behaviorStatistics/getStatisticsByEveryDay";
             doChooseData(7);
+            var optsAddToOrder = $("#statistics_easyui-datagrid4").datagrid("options");
+            optsAddToOrder.url = "/cbtconsole/behaviorStatistics/getStatisticsDatails";
+
         });
 
         function getFormatDate(subDayNum, isBegin) {
@@ -178,6 +184,36 @@
                     }
                 }
             });
+
+            $('#statistics_easyui-datagrid4').datagrid({
+                width: "100%",
+                //fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                url: '',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rowNumbers: true,
+                pageSize: 25,//默认选择的分页是每页50行数据
+                pageList: [25],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.messager.progress('close');
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (data.success) {
+                        $("#statistics_easyui-datagrid").datagrid("resize");
+                    } else {
+                        $.message.alert("提示信息", data.message);
+                    }
+                }
+            });
         }
 
         function doQuery() {
@@ -185,6 +221,7 @@
             $(".every_day_div").hide();
             $(".recent_view_div").hide();
             $(".payLog_div").hide();
+            $(".addtoorder_div").hide();
             var beginDate = $("#beginDate").val();
             if (beginDate == null) {
                 beginDate = "";
@@ -318,6 +355,7 @@
                 }else if (typeFlag == 11) {
                     addTrBk(obj);
                     $(".payLog_div").show();
+                    $(".addtoorder_div").hide();
                     $(".data_div").hide();
                     $(".every_day_div").hide();
                     $(".recent_view_div").hide();
@@ -328,7 +366,21 @@
                         "typeFlag": typeFlag,
                         "ipFlag": ipFlag
                     });
-                } else {
+                }else if (typeFlag == 12) {
+                    addTrBk(obj);
+                    $(".addtoorder_div").show();
+                    $(".data_div").hide();
+                    $(".every_day_div").hide();
+                    $(".recent_view_div").hide();
+                    $(".payLog_div").hide();
+                    $("#statistics_easyui-datagrid4").datagrid("load", {
+                        "beginDate": beginDate,
+                        "endDate": endDate,
+                        "total": total,
+                        "typeFlag": typeFlag
+                    });
+                }
+                else {
                     addTrBk(obj);
                     $(".data_div").show();
                     $(".every_day_div").hide();
@@ -465,7 +517,7 @@
             <span>至:<input
                     id="endDate" style="width: 85px; height: 24px" name="endDate"
                     readonly="readonly" onfocus="WdatePicker({isShowWeek:true,dateFmt:'yyyy-MM-dd'})"/></span>
-            <span>过滤国内IP<input type="checkbox" id="ip_flag"/></span>
+            <span>过滤国内IP<input type="checkbox" id="ip_flag" checked="checked"/></span>
             <input
                     type="button" class="but_color_qy" onclick="doQuery()" value="查询">
             <input type="button" class="but_color" onclick="doChooseData(7)"
@@ -564,15 +616,15 @@
         </tbody>
     </table>
 </div>
-<div class="payLog_div">
+<div class="addtoorder_div">
     <h2>Add to order 按钮点击次数</h2>
     <table id="statistics_easyui-datagrid4" style="width: 99%; height: 750px;" class="easyui-datagrid">
         <thead>
         <tr>
-            <th data-options="field:'createTime',align:'center',width:'180px'">日期</th>
-            <th data-options="field:'email',align:'center',width:'300px'">邮箱</th>
-            <th data-options="field:'pid',align:'center',width:'180px'">订单号</th>
-            <th data-options="field:'orderAmount',align:'center',width:'100px'">金额($)</th>
+            <th data-options="field:'userId',align:'center',width:'180px'">客户ID</th>
+            <th data-options="field:'email',align:'center',width:'180px'">sessionId</th>
+            <th data-options="field:'pid',align:'center',width:'180px'">PID</th>
+            <th data-options="field:'createTime',align:'center',width:'180px'">加入时间</th>
         </tr>
         </thead>
         <tbody>

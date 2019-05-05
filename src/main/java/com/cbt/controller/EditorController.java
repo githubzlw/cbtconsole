@@ -304,10 +304,10 @@ public class EditorController {
         }
 
         // 判断是精准对标的
-        if(goods.getBmFlag() == 1 &&  goods.getIsBenchmark() == 1){
+        if (goods.getBmFlag() == 1 && goods.getIsBenchmark() == 1) {
             // 获取实时对标信息
             Map<String, String> priceMap = customGoodsService.queryNewAliPriceByAliPid(goods.getAliGoodsPid());
-            if(priceMap.size() > 1){
+            if (priceMap.size() > 1) {
                 goods.setCrawlAliDate(priceMap.get("new_time"));
                 goods.setCrawlAliPrice(priceMap.get("new_price"));
             }
@@ -457,6 +457,124 @@ public class EditorController {
         }
     }
 
+
+    @RequestMapping("/querySkuByPid")
+    public ModelAndView querySkuByPid(HttpServletRequest request, HttpServletResponse response) {
+        ModelAndView mv = new ModelAndView("custom_sku_details");
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("success", 0);
+            mv.addObject("message", "请登录后操作");
+            return mv;
+        } else {
+            mv.addObject("uid", user.getId());
+        }
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            mv.addObject("success", 0);
+            mv.addObject("message", "获取PID失败");
+            return mv;
+        } else {
+            mv.addObject("pid", pid);
+        }
+
+        try {
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+
+            // 将goods的entype属性值取出来,即规格图
+            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+            if (StringUtils.isNotBlank(goods.getSku())) {
+                JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+                List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+                List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
+                Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
+                    @Override
+                    public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
+                        return o1.getPpIds().compareTo(o2.getPpIds());
+                    }
+                });
+                mv.addObject("showSku", JSONArray.fromObject(cbSkus));
+
+                Map<String, Object> typeNames = new HashMap<String, Object>();
+                for (TypeBean tyb : typeList) {
+                    if (!typeNames.containsKey(tyb.getTypeId())) {
+                        typeNames.put(tyb.getTypeId(), tyb.getType());
+                    }
+                }
+                mv.addObject("typeNames", typeNames);
+                skuList.clear();
+            }
+            typeList.clear();
+            mv.addObject("success", 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            mv.addObject("success", 0);
+            mv.addObject("message", "查询失败，原因：" + e.getMessage());
+        }
+        return mv;
+    }
+
+    @RequestMapping("/saveSkuInfo")
+    @ResponseBody
+    public JsonResult saveSkuInfo(HttpServletRequest request, HttpServletResponse response) {
+
+        JsonResult json = new JsonResult();
+        String userJson = Redis.hget(request.getSession().getId(), "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            json.setOk(false);
+            json.setMessage("请登录后操作");
+            return json;
+        }
+
+
+        String skuStr = request.getParameter("sku");
+        if (StringUtils.isBlank(skuStr)) {
+            json.setOk(false);
+            json.setMessage("获取sku失败");
+            return json;
+        }
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+        try {
+            CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
+            List<TypeBean> typeList = GoodsInfoUtils.deal1688GoodsType(goods, true);
+            JSONArray sku_json = JSONArray.fromObject(goods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            String[] skuStrList = skuStr.split(";");
+            double finalWeight = 0;
+            for (String singleSku : skuStrList) {
+                String[] slSkuList = singleSku.split("@");
+                String ppid = slSkuList[0].replace("_", ",");
+                String pWeight = slSkuList[1];
+                for (ImportExSku exSku : skuList) {
+                    if (ppid.equals(exSku.getSkuPropIds())) {
+                        finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(pWeight), 3);
+                        exSku.setFianlWeight(finalWeight);
+                        break;
+                    }
+                }
+            }
+            customGoodsService.updateGoodsSku(pid, goods.getSku(), skuList.toString(), user.getId(), finalWeight);
+            json.setOk(true);
+            json.setMessage("执行成功");
+            skuList.clear();
+            typeList.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            json.setOk(false);
+            json.setMessage("执行失败，原因：" + e.getMessage());
+        }
+        return json;
+    }
 
     /**
      * 处理阿里详情数据
@@ -753,9 +871,9 @@ public class EditorController {
                 String[] tpList = typeDeleteIds.split(",");
 
                 if (!(tpList.length == 0 || typeList.isEmpty())) {
-                    boolean notPt = true;
                     //剔除选中的规格
                     for (TypeBean tpBean : typeList) {
+                        boolean notPt = true;
                         for (String tpId : tpList) {
                             if (tpId.equals(tpBean.getId())) {
                                 notPt = false;
@@ -765,7 +883,6 @@ public class EditorController {
                         if (notPt) {
                             newTypeList.add(tpBean);
                         }
-                        notPt = true;
                     }
                     //cgp.setType(newTypeList.toString());
                 }
@@ -840,7 +957,6 @@ public class EditorController {
             }
 
 
-
             String type = request.getParameter("type");
             // type 0 保存 1 保存并发布
             int tempId = user.getId();
@@ -854,16 +970,15 @@ public class EditorController {
             int success = customGoodsService.saveEditDetalis(cgp, tempName, tempId, Integer.valueOf(type));
             if (success > 0) {
 
-                if(editBean.getPriceShowFlag() > 0){
+                if (editBean.getPriceShowFlag() > 0) {
                     customGoodsService.insertIntoGoodsPriceOrWeight(editBean);
-                } else{
+                } else {
                     customGoodsService.insertIntoGoodsEditBean(editBean);
                 }
                 //更新编辑标识
                 editBean.setIs_edited(1);
                 editBean.setPublish_flag(0);
                 customGoodsService.updatePidIsEdited(editBean);
-
 
 
                 json.setOk(true);
@@ -920,13 +1035,13 @@ public class EditorController {
         if (StringUtils.isNotBlank(cgp.getWprice()) && StringUtils.isNotBlank(orGoods.getWprice())) {
             if (cgp.getWprice().equals(orGoods.getWprice())) {
                 count++;
-            } else{
+            } else {
                 editBean.setWprice_old(orGoods.getWprice());
                 editBean.setWprice_new(cgp.getWprice());
             }
         } else if (StringUtils.isBlank(cgp.getWprice()) && StringUtils.isBlank(orGoods.getWprice())) {
             count++;
-        } else{
+        } else {
             editBean.setWprice_old(orGoods.getWprice());
             editBean.setWprice_new(cgp.getWprice());
         }
@@ -934,13 +1049,13 @@ public class EditorController {
         if (StringUtils.isNotBlank(cgp.getRangePrice()) && StringUtils.isNotBlank(orGoods.getRangePrice())) {
             if (cgp.getRangePrice().equals(orGoods.getRangePrice())) {
                 count++;
-            } else{
+            } else {
                 editBean.setRange_price_old(orGoods.getRangePrice());
                 editBean.setRange_price_new(cgp.getRangePrice());
             }
         } else if (StringUtils.isBlank(cgp.getRangePrice()) && StringUtils.isBlank(orGoods.getRangePrice())) {
             count++;
-        } else{
+        } else {
             editBean.setRange_price_old(orGoods.getRangePrice());
             editBean.setRange_price_new(cgp.getRangePrice());
         }
@@ -948,13 +1063,13 @@ public class EditorController {
         if (StringUtils.isNotBlank(cgp.getFeeprice()) && StringUtils.isNotBlank(orGoods.getFeeprice())) {
             if (cgp.getFeeprice().equals(orGoods.getFeeprice())) {
                 count++;
-            } else{
+            } else {
                 editBean.setFeeprice_old(orGoods.getFeeprice());
                 editBean.setFeeprice_new(cgp.getFeeprice());
             }
         } else if (StringUtils.isBlank(cgp.getFeeprice()) && StringUtils.isBlank(orGoods.getFeeprice())) {
             count++;
-        } else{
+        } else {
             editBean.setFeeprice_old(orGoods.getFeeprice());
             editBean.setFeeprice_new(cgp.getFeeprice());
         }
@@ -962,13 +1077,13 @@ public class EditorController {
         if (StringUtils.isNotBlank(cgp.getPrice()) && StringUtils.isNotBlank(orGoods.getPrice())) {
             if (cgp.getPrice().equals(orGoods.getPrice())) {
                 count++;
-            } else{
+            } else {
                 editBean.setPrice_old(orGoods.getPrice());
                 editBean.setPrice_new(cgp.getPrice());
             }
         } else if (StringUtils.isBlank(cgp.getPrice()) && StringUtils.isBlank(orGoods.getPrice())) {
             count++;
-        } else{
+        } else {
             editBean.setPrice_old(orGoods.getPrice());
             editBean.setPrice_new(cgp.getPrice());
         }
@@ -976,13 +1091,13 @@ public class EditorController {
         if (StringUtils.isNotBlank(cgp.getFpriceStr()) && StringUtils.isNotBlank(orGoods.getFpriceStr())) {
             if (cgp.getFpriceStr().equals(orGoods.getFpriceStr())) {
                 count++;
-            } else{
+            } else {
                 editBean.setFprice_str_old(orGoods.getFpriceStr());
                 editBean.setFprice_str_new(cgp.getFpriceStr());
             }
         } else if (StringUtils.isBlank(cgp.getFpriceStr()) && StringUtils.isBlank(orGoods.getFpriceStr())) {
             count++;
-        } else{
+        } else {
             editBean.setFprice_str_old(orGoods.getFpriceStr());
             editBean.setFprice_str_new(cgp.getFpriceStr());
         }
@@ -2021,59 +2136,65 @@ public class EditorController {
             if (json.isOk()) {
                 String localDiskPath = ftpConfig.getLocalDiskPath();
                 for (Element imgEl : imgEls) {
-                    System.out.println("src:" + imgEl.attr("src"));
-
                     String imgUrl = imgEl.attr("src");
-                    // 得到文件保存的名称
-                    if (imgUrl.indexOf("?") > -1) {
-                        imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
-                    }
-                    // 兼容没有http头部的src
-                    if (imgUrl.indexOf("//") == 0) {
-                        imgUrl = "http:" + imgUrl;
-                    }
-                    // 文件的后缀取出来
-                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
-                    // 生成唯一文件名称
-                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
-                    // 本地服务器磁盘全路径
-                    String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
+                    System.out.println("src:" + imgUrl);
+                    // 判断异常的图片直接过滤
+                    if (StringUtils.isNotBlank(imgUrl) && imgUrl.lastIndexOf(".") > -1) {
+                        // 得到文件保存的名称
+                        if (imgUrl.indexOf("?") > -1) {
+                            imgUrl = imgUrl.substring(0, imgUrl.indexOf("?"));
+                        }
+                        // 兼容没有http头部的src
+                        if (imgUrl.indexOf("//") == 0) {
+                            imgUrl = "http:" + imgUrl;
+                        }
+                        // 文件的后缀取出来
+                        String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                        // 生成唯一文件名称
+                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        // 本地服务器磁盘全路径
+                        String localFilePath = "importimg/" + pid + "/" + saveFilename + fileSuffix;
 
-                    // 下载网络图片到本地
-                    boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
-                    if (is) {
-                        // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
-                        boolean checked = false;
-                        checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
-                        if (checked) {
-                            checked = false;
-                            String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
-                            checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
-                                    localDiskPath + newLocalPath);
+                        // 下载网络图片到本地
+                        boolean is = ImgDownload.execute(imgUrl, localDiskPath + localFilePath);
+                        if (is) {
+                            // 判断图片的分辨率是否大于700*400，如果大于则进行图片压缩
+                            boolean checked = false;
+                            checked = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
                             if (checked) {
-                                imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                checked = false;
+                                String newLocalPath = "importimg/" + pid + "/" + saveFilename + "_700" + fileSuffix;
+                                checked = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                        localDiskPath + newLocalPath);
+                                if (checked) {
+                                    imgEl.attr("src", ftpConfig.getLocalShowPath() + newLocalPath);
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                    break;
+                                }
                             } else {
-                                json.setOk(false);
-                                json.setMessage("压缩图片到700*700失败，终止执行");
-                                break;
+                                json.setOk(true);
+                                json.setMessage("图片上传本地成功");
+                                imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
                             }
                         } else {
-                            json.setOk(true);
-                            json.setMessage("图片上传本地成功");
-                            imgEl.attr("src", ftpConfig.getLocalShowPath() + localFilePath);
+                            json.setOk(false);
+                            json.setMessage("下载图片失败，请重试！");
+                            break;
                         }
                     } else {
-                        json.setOk(false);
-                        json.setMessage("下载图片失败，请重试！");
-                        break;
+                        imgEl.remove();
                     }
+
+
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
-            json.setMessage("执行错误：" + e.getMessage());
-            LOG.error("执行错误：" + e.getMessage());
+            json.setMessage("pid:" + pid + ",执行错误：" + e.getMessage());
+            LOG.error("pid:" + pid + ",执行错误：" + e.getMessage());
         }
 
         if (nwDoc == null) {
@@ -2674,7 +2795,7 @@ public class EditorController {
                 json.setMessage("执行错误，请重试");
             }*/
             // 修改重量非直接显示价格数据更新
-            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,1, user.getId());
+            customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight, 1, user.getId());
             json.setOk(true);
             json.setMessage("执行成功");
         } catch (Exception e) {
@@ -2689,7 +2810,7 @@ public class EditorController {
 
     @RequestMapping(value = "/setGoodsWeightByWeigher")
     @ResponseBody
-    public JsonResult setGoodsWeightByWeigher(HttpServletRequest request,String pid, String newWeight) {
+    public JsonResult setGoodsWeightByWeigher(HttpServletRequest request, String pid, String newWeight) {
         JsonResult json = new JsonResult();
 
         String sessionId = request.getSession().getId();
@@ -2711,7 +2832,7 @@ public class EditorController {
             json.setMessage("获取商品重量失败");
             return json;
         }
-        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight,2, user.getId());
+        return customGoodsService.setGoodsWeightByWeigherNew(pid, newWeight, 2, user.getId());
     }
 
 
@@ -2914,10 +3035,10 @@ public class EditorController {
         }
         try {
             String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
-            int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath,shopId);
+            int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath, shopId);
             List<GoodsMd5Bean> md5BeanList;
             if (total > 1) {
-                md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
+                md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath, shopId);
                 json.setRows(md5BeanList);
             }
             json.setOk(true);
@@ -2970,7 +3091,7 @@ public class EditorController {
         try {
 
             String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
-            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath,shopId);
+            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath, shopId);
             List<String> pidList = new ArrayList(md5BeanList.size());
             Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();
             List<ShopGoodsInfo> deleteGoodsInfos = new ArrayList<>();
@@ -2998,7 +3119,7 @@ public class EditorController {
                 }
             }
             // 更新回收标识
-            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath,shopId);
+            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath, shopId);
             // 插入公共图片表中
             shopUrlService.insertShopGoodsDeleteImgs(deleteGoodsInfos, user.getId());
             md5BeanList.clear();
@@ -3052,7 +3173,7 @@ public class EditorController {
             return json;
         }
         try {
-            customGoodsService.setNewAliPidInfo(pid,aliPid,aliPrice);
+            customGoodsService.setNewAliPidInfo(pid, aliPid, aliPrice);
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -3075,12 +3196,12 @@ public class EditorController {
             json.setOk(true);
             json.setMessage("执行成功");
 
-            for(String pid : pidList){
+            for (String pid : pidList) {
                 PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
                 pbThread.start();
-                try{
+                try {
                     Thread.sleep(20000);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -3115,7 +3236,7 @@ public class EditorController {
             return json;
         }
         try {
-            customGoodsService.updateWeightFlag(pid,0);
+            customGoodsService.updateWeightFlag(pid, 0);
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -3123,6 +3244,129 @@ public class EditorController {
             System.err.println("pid:" + pid + ",updateWeightFlag error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("设置错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/deletePidImgByUrl")
+    @ResponseBody
+    public JsonResult deletePidImgByUrl(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取PID失败");
+            return json;
+        }
+        String imgUrl = request.getParameter("imgUrl");
+        if (StringUtils.isBlank(imgUrl)) {
+            json.setOk(false);
+            json.setMessage("获取图片路径失败");
+            return json;
+        } else if (!(imgUrl.contains("http://") || imgUrl.contains("https://"))) {
+            json.setOk(false);
+            json.setMessage("图片路径格式错误");
+            return json;
+        }
+        try {
+            String fileName = imgUrl.substring(imgUrl.lastIndexOf("/"));
+            CustomGoodsPublish gd = customGoodsService.queryGoodsDetails(pid, 0);
+            Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+            // 移除所有的页面效果 kse标签,实际div
+            Elements imgEls = nwDoc.getElementsByTag("img");
+            for (Element imgEl : imgEls) {
+                if (imgEl.attr("src").contains(fileName)) {
+                    imgEl.remove();
+                }
+            }
+            gd.setEninfo(nwDoc.html());
+            customGoodsService.updatePidEnInfo(gd);
+            System.err.println(nwDoc.html());
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",deletePidImgByUrl error:" + e.getMessage());
+            System.err.println("pid:" + pid + ",deletePidImgByUrl error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
+    @RequestMapping(value = "/deleteEnInfoImgByParam")
+    @ResponseBody
+    public JsonResult deleteEnInfoImgByParam(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+
+        // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
+        // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
+        String pidImgList = request.getParameter("pidImgList");
+        if (StringUtils.isBlank(pidImgList)) {
+            json.setOk(false);
+            json.setMessage("获取参数失败");
+            return json;
+        }
+        int pidTotal = 0;
+        int imgTotal = 0;
+        int deleteImgTotal = 0;
+        try {
+            // 解析数据
+            String[] list = pidImgList.split("@");
+            imgTotal = list.length;
+            Map<String, List<String>> pidImgMap = new HashMap<>(pidTotal);
+            for (String lStr : list) {
+                String[] tempList = lStr.split(";");
+                if (pidImgMap.containsKey(tempList[0])) {
+                    pidImgMap.get(tempList[0]).add(tempList[1]);
+                } else {
+                    List<String> imgList = new ArrayList<>();
+                    imgList.add(tempList[1]);
+                    pidImgMap.put(tempList[0], imgList);
+                }
+            }
+
+            for (String tempPid : pidImgMap.keySet()) {
+                pidTotal++;
+                // 循环删除数据
+                try {
+                    CustomGoodsPublish gd = customGoodsService.queryGoodsDetails(tempPid, 0);
+                    Document nwDoc = Jsoup.parseBodyFragment(gd.getEninfo());
+                    // 移除所有的页面效果 kse标签,实际div
+                    Elements imgEls = nwDoc.getElementsByTag("img");
+                    int thisPidImgTotal = imgEls.size();
+                    for (Element imgEl : imgEls) {
+                        for (String tempImgUrl : pidImgMap.get(tempPid)) {
+                            String tempFileName = tempImgUrl.substring(tempImgUrl.lastIndexOf("/"));
+                            if (imgEl.attr("src").contains(tempFileName)) {
+                                imgEl.remove();
+                                thisPidImgTotal--;
+                                deleteImgTotal ++;
+                                break;
+                            }
+                        }
+                    }
+                    gd.setEninfo(nwDoc.html());
+                    customGoodsService.updatePidEnInfo(gd);
+                    // 如果详情图片少于等于1张，标记软下架
+                    if (thisPidImgTotal <= 1) {
+                        customGoodsService.remarkSoftGoodsValid(tempPid, 27);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println(e.getMessage());
+                }
+            }
+            json.setOk(true);
+            json.setMessage("pidTotal:" + pidTotal + ",imgTotal:" + imgTotal + ",success delete:" + deleteImgTotal);
+            pidImgMap.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            System.err.println("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
+            json.setOk(false);
+            json.setMessage("imgTotal:" + imgTotal + ",执行错误，原因：" + e.getMessage());
         }
         return json;
     }
