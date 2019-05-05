@@ -62,13 +62,15 @@
     <if test="endTime !=null and endTime!=''">
          AND #{endTime}>=create_time
     </if>
+        order by create_time DESC
         limit #{startNum},#{endNum}
+
 </select>
     <select id="FindRecognition_delete_count"  resultType="int">
         SELECT count(1)
         FROM `custom_goods_md5`
         WHERE is_delete=1
-        AND ocr_need_delete=1
+        AND ocr_need_date=1
         <if test="pid !=null and pid!=''">
             AND pid=#{pid}
         </if>
@@ -78,15 +80,14 @@
         <if test="endTime !=null and endTime!=''">
             AND #{endTime}>=create_time
         </if>
-        order by create_time DESC
     </select>
 
     <select id="showDistinguish_Pircture_2" resultMap="UserMap">
          SELECT admName FROM admuser where roleType=4 OR roleType=5
     </select>
 
-    <select id="queryDistinguish_PirctureCount" resultMap="resultMap">
-        SELECT pid
+    <select id="queryDistinguish_PirctureCount" resultType="int">
+        SELECT count(1)
         FROM custom_goods_md5 cdm
         WHERE 1=1
         AND cdm.is_delete=0

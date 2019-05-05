@@ -132,10 +132,10 @@ function cleText(){
 				
 			</select>
 			
-			 <a href='getExpressRecord.do?pageNum=1&pageSize=50' class='className'>第一页</a>
-			 <a href='getExpressRecord.do?pageNum=${oip.previousPage }' class='className'>上一页</a>
-			 <a href='getExpressRecord.do?pageNum=${oip.nextPage }' class='className'>下一页</a>
-			 <a href='getExpressRecord.do?pageNum=${oip.pageCount }' class='className'>最后一页</a>
+			 <a href='recognition_date_details?pageNum=1&pageSize=50' class='className'>第一页</a>
+			 <a href='recognition_date_details?pageNum=${oip.previousPage }' class='className'>上一页</a>
+			 <a href='recognition_date_details?pageNum=${oip.nextPage }' class='className'>下一页</a>
+			 <a href='recognition_date_details?pageNum=${oip.pageCount }' class='className'>最后一页</a>
 		</div>
 		<div>
 			<h4>当前第${oip.pageNum}页 &nbsp;&nbsp; 共${oip.pageCount}页&nbsp;&nbsp; 共${oip.pageSum }记录 </h4>

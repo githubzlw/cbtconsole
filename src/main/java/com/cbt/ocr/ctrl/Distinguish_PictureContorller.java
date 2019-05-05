@@ -110,9 +110,11 @@ public class Distinguish_PictureContorller {
 			}
 
 			//提供给蒋先伟    线上下架图片的信息列
-			//request.getRequestDispatcher("editc/deleteEnInfoImgByParam?pidImgList="+imgpath.substring(0,imgpath.length()-1)).forward(request,response);
-			//editc/deleteEnInfoImgByParam?pidImgList
+			request.getRequestDispatcher("editc/deleteEnInfoImgByParam?pidImgList="+imgpath.substring(0,imgpath.length()-1)).forward(request,response);
+			//同时给下架商品打上已删除标识  这一步应该在蒋先伟的步骤写
 
+			//editc/deleteEnInfoImgByParam?pidImgList
+			ret=1;
 
 		}else if(type==1||type==3){
 			ret=distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName,type);
@@ -142,11 +144,13 @@ public class Distinguish_PictureContorller {
 			map.put("startTime", startTime);
 			map.put("endTime", endTime);
 			int count = distinguish_pictureService.FindRecognition_delete_count(map);
+
+			System.out.println(count);
 			map.put("startNum", startNum);
 			map.put("endNum", pageSize);
 			List<CustomGoods> customGoodsList=distinguish_pictureService.FindRecognition_delete_details(map);
 			request.setAttribute("customGoodsList", customGoodsList);
-			request.setAttribute("count", count);
+			request.setAttribute("pageCount", startNum);
 			request.setAttribute("startTime", startTime);
 			request.setAttribute("endTime", endTime);
 			request.setAttribute("pid", pid);
@@ -187,11 +191,4 @@ public class Distinguish_PictureContorller {
 		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
 		return  ret;
 	}
-
-	/*@RequestMapping(value = "FindRecognition_delete_details")
-	@ResponseBody
-	public String  FindRecognition_delete_details(HttpServletRequest request){
-		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
-		return  ret;
-	}*/
 }
