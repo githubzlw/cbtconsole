@@ -350,7 +350,8 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				list.get(i).setCustomerorder(cusorder);
 				list.get(i).setReturnReason(returnNO);
 				list.get(i).setApplyUser(id);
-				list.get(i).setState(0);
+				list.get(i).setState(5);
+				list.get(i).setReturnNumber(list.get(i).getItemNumber());
 				Date currentTime = new Date();
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				String dateString = formatter.format(currentTime);
