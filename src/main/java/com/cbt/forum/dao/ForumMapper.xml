@@ -64,6 +64,7 @@
 </select>
     <select id="FidForumList_one" resultMap="ForumMap">
         select
+        <include refid="ForumColumn"/>
         from  `forum_details`
         WHERE id=#{id}
     </select>

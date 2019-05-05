@@ -173,6 +173,7 @@
     //新增/修改评论 whj直接代码
     function closeRemark() {
         $(".add_forum").val('');
+        $("#add_forum_content").val('');
         $('#myModal').modal('hide');
         $('#myModal2').modal('hide');
     }
@@ -310,14 +311,14 @@
                         <td><textarea id="add_review_remark" class="add_forum" style="width: 400px; height: 150px;"></textarea>
                         </td>
                     </tr>
-                    <tr>
+                   <!-- <tr>
                         <td>配图:</td>
                         <td>
                             <div style="width: 400px; height:60px;border: 2px dashed slategrey" id="add_forum_pictrue"></div>
                             <label class="ui_button ui_button_primary" for="xFile">上传图片</label>
-                            <form><input type="file" id="xFile" style="position:absolute;clip:rect(0 0 0 0);" onchange="showPreview(this)" class="add_forum></form>
+                            <form><input type="file" id="xFile" style="position:absolute;clip:rect(0 0 0 0);" onchange="showPreview(this)" class="add_forum"></form>
                         </td>
-                    </tr>
+                    </tr>-->
                     <tr>
                         <td colspan="2">
                             <div style="text-align: center; padding: 5px 0">
