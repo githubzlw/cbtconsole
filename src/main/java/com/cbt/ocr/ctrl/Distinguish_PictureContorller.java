@@ -43,6 +43,7 @@ public class Distinguish_PictureContorller {
 	public String showDistinguish_Pircture(HttpServletRequest request,
 	    String page,String imgtype,String state,String Change_user){
 		//获取当前用户
+		try{
 		String sessionId = request.getSession().getId();
 		String authJson = Redis.hget(sessionId, "userauth");
 		String userJson = Redis.hget(sessionId, "admuser");
@@ -80,6 +81,9 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 
 
 	return "recognition_picture";
@@ -94,9 +98,10 @@ public class Distinguish_PictureContorller {
 	@ResponseBody
 	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,Object> mainMap, String userName, int type)throws Exception{
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		//更新线上下架的图片状态位为1
-		distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
 		int ret =0;
+		try{
+			//更新线上下架的图片状态位为1
+		distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
 		if(type==2){
 			StringBuffer imgpath=new StringBuffer("");
 			for (int i=0;i<bgList.size();i++){
@@ -106,11 +111,14 @@ public class Distinguish_PictureContorller {
 
 			//提供给蒋先伟    线上下架图片的信息列
 			//request.getRequestDispatcher("editc/deleteEnInfoImgByParam?pidImgList="+imgpath.substring(0,imgpath.length()-1)).forward(request,response);
-			///editc/deleteEnInfoImgByParam?pidImgList
+			//editc/deleteEnInfoImgByParam?pidImgList
 
 
 		}else if(type==1||type==3){
 			ret=distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName,type);
+		}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 
 		return  ret ;

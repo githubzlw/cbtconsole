@@ -29,6 +29,7 @@
     SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
     WHERE 1=1
         AND cdm.is_delete=0
+        AND cdm.catgrid !=0
     <if test="Change_user != null and Change_user != ''">
         AND cdm.user_operation=#{Change_user}
     </if>
@@ -68,7 +69,6 @@
         FROM `custom_goods_md5`
         WHERE is_delete=1
         AND ocr_need_delete=1
-        AND ocr_need_date=1
         <if test="pid !=null and pid!=''">
             AND pid=#{pid}
         </if>
@@ -78,16 +78,19 @@
         <if test="endTime !=null and endTime!=''">
             AND #{endTime}>=create_time
         </if>
+        order by create_time DESC
     </select>
 
     <select id="showDistinguish_Pircture_2" resultMap="UserMap">
          SELECT admName FROM admuser where roleType=4 OR roleType=5
     </select>
 
-    <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM custom_goods_md5 cdm
+    <select id="queryDistinguish_PirctureCount" resultMap="resultMap">
+        SELECT pid
+        FROM custom_goods_md5 cdm
         WHERE 1=1
         AND cdm.is_delete=0
+        AND cdm.catgrid !=0
         <if test="state == null || state == ''">
             AND cdm.ocr_need_date=0
             AND cdm.ocr_need_delete=1
@@ -114,7 +117,7 @@
         AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
         AND cdm.ocr_need_delete=1
         AND cdm.ocr_need_date=0
-        GROUP BY c.category_id
+        GROUP BY cdm.catgrid
     </select>
     <update id="updateSomePirctu_risdelete">
         update custom_goods_md5 SET

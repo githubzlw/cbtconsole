@@ -28,7 +28,7 @@ public interface Distinguish_PictureService {
 	 * @param
 	 * @return
 	 */
-	public int queryDistinguish_PirctureCount(String imgtype,String state,String Change_user);
+	public List<CustomGoods> queryDistinguish_PirctureCount(String imgtype,String state,String Change_user);
 
 	/***
 	 *批发更新线上是否删除状态

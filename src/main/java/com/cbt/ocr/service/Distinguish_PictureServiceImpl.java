@@ -21,7 +21,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	public List<CustomGoods> showDistinguish_Pircture(int page,String imgtype,String state,String Change_user) {
 		page=(page-1)*35;
 		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(page,imgtype,state,Change_user);
-		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user);
+		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user).size();
 		String len="/usr/local/goodsimg";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
@@ -39,7 +39,7 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		return distinguish_PictureDao.showDistinguish_Pircture_2();
 	}
 	@Override
-	public int queryDistinguish_PirctureCount(String imgtype,String state,String Change_user) {
+	public List<CustomGoods> queryDistinguish_PirctureCount(String imgtype,String state,String Change_user) {
 		return distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user);
 	}
 	@Override
