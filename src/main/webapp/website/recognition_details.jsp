@@ -32,6 +32,29 @@ table.altrowstable td {
 	border-style: solid;
 	border-color: #a9c6c9;
 }
+
+.div img{
+
+	width: 100%;
+
+	height: 100%;
+
+	cursor: pointer;
+
+	transition: all 0.6s;
+
+	-ms-transition: all 0.8s;
+
+}
+
+.div img:hover{
+
+	transform: scale(5);
+
+	-ms-transform: scale(5);
+
+}
+
 .oddrowcolor{
 	background-color:#F4F5FF;
 }
@@ -91,7 +114,7 @@ function cleText(){
 	<div align="center" >
 		<div><H1>详情图下架记录</H1></div>
 		<div>
-			产品编号:<input class="querycss" style="width : 160px;" id="pid" name="pid" value="${oip.express_code}" type="text"/>
+			pid:<input class="querycss" style="width : 160px;" id="pid" name="pid" value="${oip.express_code}" type="text"/>
 			开始日期:<input type="text" id="startTime" name="startTime"  value="${oip.ckStartTime}"  onfocus="WdatePicker({isShowWeek:true})"  />(0点0分0秒)
 			结束日期:<input type="text" id="endTime" name="endTime" value="${oip.ckEndTime}"  onfocus="WdatePicker({isShowWeek:true})"  />(0点0分0秒)
 			<a href='javascript:void(0);' onclick="cleText()" class='className'>清空</a>
@@ -104,13 +127,17 @@ function cleText(){
 						<tr>
 							<td>行号</td>
 							<td>产品编号</td>
+							<td>pid</td>
 							<td>下架时间</td>
+							<td>商品图片</td>
 						</tr>
 					<c:forEach items="${customGoodsList }" var="obj" varStatus="s">
 						<tr>
 							<td>${s.index+1 }</td>
+							<td>${obj.id }</td>
 							<td>${obj.pid }</td>
 							<td>${obj.createtime }</td>
+							<td class="div"><img src="${obj.remotepath }" style="width:50px; height:50px;"></td>
 						</tr>
 					</c:forEach>
 				</table>
