@@ -420,14 +420,15 @@ public class OrderCancelApprovalController {
 
                 OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
                 if (json.isOk()) {
-                    // 执行金额插入
                     OrderCancelApprovalAmount approvalAmount = new OrderCancelApprovalAmount();
                     approvalAmount.setApprovalId(approvalBean.getId());
                     approvalAmount.setOrderNo(approvalBean.getOrderNo());
                     approvalAmount.setPayAmount(approvalBean.getAgreeAmount());
                     approvalAmount.setPayType(json.getTotal().intValue());
-                    approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
-
+                    // 执行金额插入
+                    if (isBalance == 1) {
+                        approvalService.insertIntoOrderCancelApprovalAmount(approvalAmount);
+                    }
                     if (approvalOld.getDealState() == 1 || approvalOld.getDealState() == 2) {
                         approvalBean.setDealState(2);
                         approvalService.updateOrderCancelApprovalState(approvalBean);
