@@ -299,17 +299,17 @@ public class NewOrderDetailsCtr {
 					}
 					if (state == 5) {
 						c.add(Calendar.DAY_OF_MONTH, 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(采购预警" + sf.format(c.getTime()) + ")");
 						}
 					} else if (state == 1) {
 						c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime() - 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(入库预警" + sf.format(c.getTime()) + ")");
 						}
 					} else if (state == 2) {
 						c.add(Calendar.DAY_OF_MONTH, orderInfo.getDeliveryTime());
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(出运预警" + sf.format(c.getTime()) + ")");
 						}
 					}
@@ -1153,17 +1153,17 @@ public class NewOrderDetailsCtr {
 					c.setTime(sf.parse(pay_time));
 					if (state == 5) {
 						c.add(Calendar.DAY_OF_MONTH, 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(采购预警" + sf.format(c.getTime()) + ")");
 						}
 					} else if (state == 1) {
 						c.add(Calendar.DAY_OF_MONTH, order.getDeliveryTime() - 2);
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(入库预警" + sf.format(c.getTime()) + ")");
 						}
 					} else if (state == 2) {
 						c.add(Calendar.DAY_OF_MONTH, order.getDeliveryTime());
-						if ((new Date().getTime()) > c.getTime().getTime()) {
+						if (System.currentTimeMillis() > c.getTime().getTime()) {
 							request.setAttribute("delivery_warning", "(出运预警" + sf.format(c.getTime()) + ")");
 						}
 					}
@@ -1770,11 +1770,11 @@ public class NewOrderDetailsCtr {
 							actualPay = 0;
 							order_ac = 0;
 						}
-						UserDao dao = new UserDaoImpl();
+						/*UserDao dao = new UserDaoImpl();
 						order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 						dao.updateUserAvailable(userId,
 								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
-								" system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);
+								" system closeOrder:" + orderNo, orderNo, String.valueOf(adminId), 0, order_ac, 1);*/
 						// zlw add end
 
 						// 执行取消完成后，插入退款数据
@@ -1783,7 +1783,7 @@ public class NewOrderDetailsCtr {
 						cancelApproval.setOrderNo(orderNo);
 						cancelApproval.setPayPrice(actualPay);
 						cancelApproval.setType(2);
-						cancelApproval.setDealState(3);
+						cancelApproval.setDealState(0);
 						cancelApproval.setAgreeAmount(actualPay);
 						cancelApproval.setOrderState(Integer.valueOf(orderinfoMap.get("old_state").toString()));
 						NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
