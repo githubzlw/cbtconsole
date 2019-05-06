@@ -67,7 +67,7 @@
                     <td id="type_name_${type_name.key}">${type_name.value}</td>
                 </c:forEach>
                 <td>单价</td>
-                <td id="type_name_choose">重量</td>
+                <td id="type_name_choose">重量(KG)</td>
             </tr>
             </thead>
 
@@ -168,7 +168,7 @@
 
     function intervalWeight(flag, obj) {
         $(obj).css("background-color","#aba297");
-        $.messager.prompt('提示', '请输入重量，从小到大，用“-”分割:', function (is) {
+        $.messager.prompt('提示', '请输入重量(KG)，从小到大，用“-”分割:', function (is) {
             if (is) {
                 if (is.indexOf("-") > -1) {
                     var weightList = is.split("-");
@@ -209,7 +209,7 @@
 
     function allSamePrice(obj) {
         $(obj).css("background-color","#aba297");
-        $.messager.prompt('提示', '请输入重量:', function (is) {
+        $.messager.prompt('提示', '请输入重量(KG):', function (is) {
             if (is) {
                 var reg = /(^[-+]?[1-9]\d*(\.\d{1,3})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
                 if (!reg.test(is)) {

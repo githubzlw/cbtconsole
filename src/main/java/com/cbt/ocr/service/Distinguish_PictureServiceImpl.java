@@ -16,11 +16,12 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	@Autowired
 	public Distinguish_PictureDao distinguish_PictureDao;
 
+
 	@Override
-	public List<CustomGoods> showDistinguish_Pircture(String pid,int page,String imgtype,String state,String Change_user) {
-		page=(page-1)*30;
-		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(pid,page,imgtype,state,Change_user);
-		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(pid,imgtype,state,Change_user);
+	public List<CustomGoods> showDistinguish_Pircture(int page,String imgtype,String state,String Change_user) {
+		page=(page-1)*35;
+		List<CustomGoods> list=distinguish_PictureDao.showDistinguish_Pircture(page,imgtype,state,Change_user);
+		int count=distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user);
 		String len="/usr/local/goodsimg";
 		for (int i=0;i<list.size();i++){
 			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
@@ -33,26 +34,45 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public List<Admuser> showDistinguish_Pircture_2() {
+	public List<Admuser> showDistinguish_Pircture_operationUser() {
 
-		return distinguish_PictureDao.showDistinguish_Pircture_2();
+		return distinguish_PictureDao.showDistinguish_Pircture_operationUser();
 	}
 	@Override
-	public int queryDistinguish_PirctureCount(String pid, String imgtype,String state,String Change_user) {
-		return distinguish_PictureDao.queryDistinguish_PirctureCount(pid,imgtype,state,Change_user);
+	public int queryDistinguish_PirctureCount(String imgtype,String state,String Change_user) {
+		return distinguish_PictureDao.queryDistinguish_PirctureCount(imgtype,state,Change_user);
 	}
 	@Override
-	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName) {
+	public int updateSomePirctu_risdelete(List<Map<String, String>> bgList,String userName,int type) {
 
-		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,userName);
+		return distinguish_PictureDao.updateSomePirctu_risdelete(bgList,userName,type);
 	}
 	@Override
-	public int updateSomePirctu_risdelete_s(List<Map<String, String>> bgList_s,String userName) {
+	public int updateSomePirctu_risdelete_s(List<Map<String, String>> maList_s,String userName) {
 
-		return distinguish_PictureDao.updateSomePirctu_risdelete_s(bgList_s,userName);
+		return distinguish_PictureDao.updateSomePirctu_risdelete_s(maList_s,userName);
 	}
 	@Override
 	public List<Category1688> showCategory1688_type(){
 		return distinguish_PictureDao.showCategory1688_type();
 	};
+
+	@Override
+	public int FindRecognition_delete_count(Map<String, Object> map) {
+		return distinguish_PictureDao.FindRecognition_delete_count(map);
+	}
+
+	@Override
+	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
+		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);
+		String len="/usr/local/goodsimg";
+		for (int i=0;i<list.size();i++){
+			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
+		}
+		return list;
+	}
+	@Override
+	public int updateSomePirctu_risdelete_date(List<Map<String, String>> bgList) {
+		return distinguish_PictureDao.updateSomePirctu_risdelete_date(bgList);
+	}
 }

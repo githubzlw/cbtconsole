@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <!--
+            文件兼容性声明，表示使用最新的ie渲染模式
+        -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--
+            视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+                width=device-width：视口宽度等于设备宽度。
+                initial-scale=1   ：初始化缩放比，1:1
+        -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>论坛评论管理</title>
+
+    <!-- 这是bootStrap所需要的css文件 -->
+    <link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--
+               条件注释,专门为ie浏览器设计的。
+       -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- 这是bootstrap所必要的jquery文件。 -->
+    <script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+    <!-- 这是bootstrap的js文件 -->
+    <script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+    <!-- 日期控件 -->
+    <link href="/cbtconsole/css/bootstrap-datetimepicker.min.css"
+          rel="stylesheet"/>
+    <script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+    <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+    <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+    <!--页面加载进度条-->
+    <!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+    <!--easyui-->
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        /*去除默认样式*/
+        /*body, ul, li, h1, h2, h3, h4, h5, h6, p, form, dl, dt, dd { margin: 0px; padding: 0px; font-size: 12px; font-weight: normal; }*/
+        /*ul { list-style: none; }*/
+        /*img { border-style: none; }*/
+        /*a {color: #000;text-decoration: none;}*/
+        /*a:hover {color: #000;}*/
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 80px;
+            height: 35px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+
+        input, textarea, select, button {
+            font-size: 16px;
+            height: 28px;
+        }
+
+        .datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 16px;
+        }
+
+        .datagrid-header .datagrid-cell span, .panel-body {
+            font-size: 16px;
+        }
+
+        .datagrid-cell, .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            height: 28px;
+            line-height: 28px;
+            padding: 3px 5px;
+        }
+
+        #waring_id span {
+            color: red;
+            font-weight: bolder;
+        }
+
+        #myModal .userinfo, #myModal .userinfoother {
+            padding: 2px 30px;
+        }
+
+        #myModal .userinfo div {
+            float: left;
+            border: 1px solid #CCC;
+            width: 360px;
+            padding: 4px;
+            margin: 2px;
+        }
+
+        #myModal table {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        #myModal table tr {
+            height: 45px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            timeout: 3000,
+            async: false,
+            type: "POST",
+            url: "/cbtconsole/Forum/FindForum_Class",
+            dataType: "json",
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#type").append("<option value='"+data[i].id+"'>" + data[i].forumClassName + "</option>");
+                }
+            }
+        });
+        /*$.ajax({
+            timeout: 3000,
+            async: false,
+            type: "POST",
+            url: "/cbtconsole/Forum/FindForum_Class",
+            dataType: "json",
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#type").append("<option value='"+data[i].id+"'>" + data[i].forumClassName + "</option>");
+                }
+            }
+        });*/
+    });
+
+    //新增/修改评论 whj直接代码
+    function closeRemark() {
+        $('#myModal').modal('hide');
+    }
+
+    function addReviewRemark() {
+        var id = $("#add_id").val();
+        var oldCreateTime = $("#add_old_createTime").val();
+        var goods_pid = $("#add_goods_pid").val();
+        var review_remark = $("#add_review_remark").val();
+        var review_score = $("#add_review_score").val();
+        var review_flag = $('#add_review_flag').val();
+        var country = $('#add_country').val();
+        if (review_remark == null || review_remark == "") {
+            alert("请输入商品评论");
+            return false;
+        }
+        if (country == null || country == "" || country == "country") {
+            alert("请选择国家");
+            return false;
+        }
+        if (review_score == null || review_score == "") {
+            alert("请选择评分");
+            return false;
+        }
+        if (id == '') {
+            // 新增
+            if (goods_pid == null || goods_pid == "") {
+                alert("请输入商品pid");
+                return false;
+            }
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/addReviewRemark',
+                data: {
+                    "goods_pid": goods_pid,
+                    "review_remark": review_remark,
+                    "country": country,
+                    "review_score": review_score,
+                    "review_flag": review_flag
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if (json.ok) {
+                        $('#myModal').modal('hide');
+                        alert("添加评论成功");
+                        $('#main-datagrid').datagrid('reload');
+                    } else {
+                        alert("添加评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        } else {
+            //编辑
+            $.ajax({
+                type: 'POST',
+                dataType: 'text',
+                url: '/cbtconsole/editc/updateReviewRemark',
+                data: {
+                    "edit_remark": review_remark,
+                    "editcountry": country,
+                    "edit_score": review_score,
+                    "update_flag": review_flag,
+                    "oldCreateTime": oldCreateTime,
+                    "goods_pid": goods_pid
+                },
+                success: function (data) {
+                    var json = eval('(' + data + ')');
+                    if (json.ok) {
+                        $('#myModal').modal('hide');
+                        alert("修改评论成功");
+                        $('#main-datagrid').datagrid('reload');
+                    } else {
+                        alert("修改评论失败");
+                    }
+                },
+                error: function () {
+                    $.messager.alert("提醒", "error", "error");
+                }
+            });
+        }
+    }
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        //设置datagrid属性
+        $('#main-datagrid').datagrid({
+            width: "100%",
+            fit: true, //自动补全
+            pageSize: 20, //默认选择的分页是每页20行数据
+            pageList: [10, 20, 30, 50, 100], //可以选择的分页集合
+            nowrap: false, //设置为true，当数据长度超出列宽时将会自动截取
+            striped: true, //设置为true将交替显示行背景。
+            collapsible: true, //显示可折叠按钮
+            toolbar: "#top_toolbar", //在添加 增添、删除、修改操作的按钮要用到这个
+            loadMsg: '数据装载中......',
+            singleSelect: true, //为true时只能选择单行
+            fitColumns: true, //允许表格自动缩放，以适应父容器
+            pagination: true, //分页
+            rownumbers: true,
+            style: {
+                padding: '8 8 10 8'
+            },
+            onLoadError: function () {
+                return;
+            }
+        });
+        /*重置*/
+        /* $("#date-range-reset").click(function () {
+             //初始化
+             $("#typeCode").val(0);
+         });*/
+        /*查询*/
+        $("#date-range-search")
+            .click(
+                function () {
+                    //分页
+                    var pageSize = $("#main-datagrid").datagrid(
+                        "options").pageSize;
+                    var pageNumber = 1;
+                    //获取起止时间
+                    var startDate = $("#nowdate1").val();
+                    var endDate = $("#nowdate2").val();
+                    //判断开始时间是否早于结束时间 并提示
+                    if ((new Date(startDate)) > (new Date(endDate))) {
+                        /*开启错误提示*/
+                        $("#errMsg").text("开始时间应该不晚于结束时间。");
+                        //延时1.5s隐藏
+                        setTimeout(function () {
+                            $("#errMsg").text("");
+                        }, 1500);
+                        return;
+                    } else {
+                        $("#errMsg").text("");
+                    }
+                    var posttitle = $('#posttitle').val();
+                    if (posttitle == '输入帖子标题') {
+                        posttitle = '';
+                    }
+                    var type = $("#type").val();
+                    var reviewFlag = $("#reviewFlag").val();
+                    $("#main-datagrid").datagrid("options").url = "/cbtconsole/Forum/FindForum_speech";
+                    /**/
+                    $('#main-datagrid').datagrid("load", {
+                        rows: pageSize,
+                        page: pageNumber,
+                        posttitle: posttitle,
+                        type: type,
+                        reviewFlag: reviewFlag,
+                        startDate: startDate,
+                        endDate: endDate
+                    });
+                });
+
+        //设置日期时间控件
+        function Datetime(dateId, nowdateId) {
+            $(dateId).datetimepicker({
+                language: 'zh-CN', //显示中文
+                format: 'yyyy-mm-dd', //显示格式
+                minView: "month", //设置只显示到月份
+                initialDate: new Date(),
+                autoclose: true, //选中自动关闭
+                todayBtn: true, //显示今日按钮
+                locale: moment.locale('zh-cn')
+            });
+        }
+
+        Datetime('#datetimepicker1');
+        Datetime('#datetimepicker2');
+
+        //初始化时间
+        function iniDatetime() {
+            //时间选择框日期初始化
+            var today = new Date();
+            var nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            //对日期格式进行处理
+            var date = new Date(nowdate);
+            var mon = date.getMonth() + 1;
+            var day = date.getDate();
+            var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("nowdate2").value = mydate;
+            today = new Date();
+            today.setDate(today.getDate() - 30); //日期减30天
+            nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+            date = new Date(nowdate);
+            mon = date.getMonth() + 1;
+            day = date.getDate();
+            mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+            document.getElementById("nowdate1").value = mydate;
+        }
+
+        iniDatetime();
+        //搜索条件中输入框获取焦点事件
+        $("#posttitle").focus(function () {
+            if ($(this).val() == "输入评论内容部分数据") {
+                $(this).val('');
+                $(this).css('color', '#222');
+            }
+        });
+
+    });
+
+    /*数字格式化*/
+    function formatNum(val) {
+        return val < 10 ? "0" + val : val
+    }
+
+    /*时间格式化 完整*/
+    function formatterData(value) {
+        if (value != null) {
+            var date = new Date(value);
+            return date.getFullYear() + '-'
+                + formatNum(date.getMonth() + 1) + '-'
+                + formatNum(date.getDate()) + ' '
+                + formatNum(date.getHours()) + ':'
+                + formatNum(date.getMinutes());
+        } else {
+            return "";
+        }
+    }
+    function  reset(){
+        $(".form-control").val('');
+        $("input[type='text']").val('');
+    }
+    function formatterType(value, row, index) {
+        if (row.detailsState != null) {
+            if (row.detailsState == 0) {
+                return '未通过';
+            } else{
+                return '通过';
+            }
+        }
+        return '';
+    }
+
+    /*其它信息按钮*/
+    function formatterEdit_(value, row, index) {
+        if (row.detailsState != null) {
+            if (row.detailsState == 0) {
+                return '<button type="button"class="btn btn-default" style="height: 30px; width: 98px; text-align: center;background-color: mistyrose" onclick="details_state(\''+row.id+'\',0,2)">通过 </button>';
+            } else{
+                return '<button type="button"class="btn btn-default" style="height: 30px; width: 98px; text-align: center;background-color: red" onclick="details_state(\''+row.id+'\',1,2)">不通过 </button>';
+            }
+        }
+        return;
+    }
+/*/Forum/editForum_State*/
+  function details_state(id,state,type) {
+      $.ajax({
+          type: "POST",
+          url: "/cbtconsole/Forum/editForum_State",
+          data: {
+              id:id,
+              state:state,
+              type:type
+          },
+          dataType:"text",
+          success: function(data){
+              var json=eval('('+data+')');
+              if(json.ok){
+                alert("修改审核状态成功");
+                $("#main-datagrid").datagrid('reload');
+              }else{
+                  alert("修改审核状态失败");
+              }
+          }
+      }) ;
+  }
+
+    /*其它信息按钮*/
+    function formatterEdit(value, row, index) {
+        if (row.postOtherId != null) {
+            if (row.postOtherId == 0) {
+                return ' <button type="button"class="btn btn-default" style="height: 30px; width: 98px; text-align: center;background-color: mistyrose" id="roo_placement" onclick="roo_placement(\''+row.id+'\',0,3)">置顶</button>';
+            } else{
+                return ' <button type="button"class="btn btn-default" style="height: 30px; width: 98px; text-align: center;background-color: red" id="roo_placement" onclick="roo_placement(\''+row.id+'\',1,3)">取消置顶</button>';
+            }
+        }
+        return ;
+        return;
+    }
+    function roo_placement(id,state,type) {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/Forum/editForum_State",
+            data: {
+                id:id,
+                state:state,
+                type:type
+            },
+            dataType:"text",
+            success: function(data){
+                var json=eval( '(' + data + ')');
+                if(json.ok){
+                    if(state==0){
+                        alert("置顶成功");
+                    }else{
+                        alert("取消置顶成功");
+                    }
+                    $("#main-datagrid").datagrid('reload');
+                }else{
+                    if(state==0){
+                        alert("置顶失败");
+                    }else{
+                        alert("取消置顶失败");
+                    }
+
+                }
+            }
+        }) ;
+    }
+
+</script>
+
+<div id="top_toolbar" style="padding: 5px; height: auto">
+    <div>
+        <table>
+            <tr>
+                <td colspan="2">
+                    <h3>论坛评论管理</h3>
+                </td>
+            </tr>
+            <div style="clear: both"></div>
+            <tr height="30px">
+                <td colspan="2" align="center" style="width: 154px;">
+                    <span style="float: left;line-height: 30px;">&nbsp;&nbsp;时间&nbsp;&nbsp;</span>
+                </td>
+                <td align="center" style="width: 154px;">
+                    <span style="float: left;line-height: 30px;">&nbsp;&nbsp;帖子关键词(可模糊查询)&nbsp;&nbsp;</span>
+                </td>
+                <td align="center" style="width: 110px;"><span
+                        style="float: left; line-height: 30px;">&nbsp;分类&nbsp;&nbsp;</span>
+                </td>
+                <td align="center" style="width: 110px;"><span
+                        style="float: left; line-height: 30px;">&nbsp;审核人&nbsp;&nbsp;</span>
+                </td>
+                <td align="center" style="width: 110px;"><span
+                        style="float: left; line-height: 30px;">&nbsp;审核状态&nbsp;&nbsp;</span>
+                </td>
+                <td style="width: 100px;">
+                    <!--查询按钮-->
+                </td>
+                <td style="width: 200px;">
+                    <!--新增按钮-->
+                </td>
+                <td>
+                    <!--提示信息-->
+                </td>
+            </tr>
+            <tr>
+                <!--开始时间-->
+                <td align="center">
+                    <a class='input-group date' id='datetimepicker1' style="float: left;">
+                        <input type='text' class="form-control" id='nowdate1' style="width: 100px; height: 30px;"/>
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+			                <span class="glyphicon glyphicon-calendar"></span>
+                                </span></a>
+                </td>
+                <!--结束时间-->
+                <td align="center">
+                    <a class='input-group date' id='datetimepicker2' style="float: left;">
+                        <input type='text' class="form-control" id='nowdate2' style="width: 100px; height: 30px;"/>
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 30px;">
+				                <span class="glyphicon glyphicon-calendar"></span>
+                                </span></a>
+                </td>
+                <!--评论内容-->
+                <td align="center">
+                    <input type="text" name="" id="posttitle" placeholder="输入帖子部分数据"
+                           style="height: 28px;width: 200px;color: #C4C4C4;"/>
+                </td>
+                <!--评论类型-->
+                <td align="center"><select class="form-control" id="type"
+                                           style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+                    <option value="">全部</option>
+                </select></td>
+                <!--审核人-->
+                <td align="center"><select class="form-control" id="audit_user"
+                                           style="height: 30px; width: 220px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+                    <option value="">全部</option>
+                </select></td>
+                <!--审核状态-->
+                <td align="center"><select class="form-control" id="reviewFlag"
+                                           style="height: 30px; width: 106px; font-size: 14px; padding-top: 4px; padding-left: 4px;">
+                    <option value="">全部</option>
+                    <option value="1">通过</option>
+                    <option value="0">不通过</option>
+                </select></td>
+                <!--查询按钮-->
+                <td align="center">
+                    <button type="button" id="date-range-search"
+                            class="btn btn-default"
+                            style="height: 30px; width: 98px; text-align: center;background-color: #00baff">筛选
+                    </button>
+                </td>
+                <td align="center">
+                    <button type="reset"
+                            class="btn btn-default"
+                            style="height: 30px; width: 98px; text-align: center;" onclick="reset()">重置
+                    </button>
+                </td>
+                <!--新增按钮-->
+                <!--<td align="center">
+                    <button type="button" onclick="openReviewDiv('', '')"
+                            class="btn btn-default"
+                            style="height: 30px; width: 98px; text-align: center;">创建帖子
+                    </button>
+                </td>-->
+                <td align="center">
+                    <a href="/cbtconsole/apa/forumAddList.html"> <button type="button"
+                            class="btn btn-default"
+                            style="height: 30px; width: 98px; text-align: center; background-color: #00baff">创建帖子
+                </button></a>
+                </td>
+                <!--提示信息-->
+                <td id="errMsg" style="color: red;"></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<table id="main-datagrid" firstLoad="false"
+       style="width: 100%; height: 100%" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'forumClassName',width:'120px',align:'center'">分类</th>
+        <th data-options="field:'postTitle',width:'120px',align:'center'">帖子标题</th>
+        <th data-options="field:'postUser',width:'60px',align:'center'">发帖人</th>
+        <th data-options="field:'postDetails',width:'200px',align:'center'">发帖内容</th>
+        <th data-options="field:'auditUser',width:'120px',align:'center'">审核人</th>
+        <th data-options="field:'creatime',width:'80px',align:'center'">时间</th>
+        <th data-options="field:'detailsState',width:'50px',align:'center',formatter:formatterType">审核状态</th>
+        <th data-options="field:'id',width:'120px',align:'center',hidden: 'true'"></th>
+        <th data-options="field:'  ',width:'80px',align:'center',formatter:formatterEdit_">审核</th>
+        <th data-options="field:' ',width:'100px',align:'center',formatter:formatterEdit">其他</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -253,7 +253,7 @@ $(document).ready(function(){
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
 <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
-<title>订单详情管理</title>
+<title>订单详情</title>
 <style type="text/css">
 em {
 	font-style: normal;
