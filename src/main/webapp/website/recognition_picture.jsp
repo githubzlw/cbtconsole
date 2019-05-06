@@ -389,6 +389,7 @@ function  updateSomes(type){
                             alert("线上下架图片失败  !")
                         }else{
                             alert("线上图片正在下架中.....  ")
+                            alert("线上图片下架成功")
                             window.location.reload();
                         }1500;
                     }

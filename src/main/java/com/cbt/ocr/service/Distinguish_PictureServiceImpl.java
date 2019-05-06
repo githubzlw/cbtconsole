@@ -34,9 +34,9 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 	}
 
 	@Override
-	public List<Admuser> showDistinguish_Pircture_2() {
+	public List<Admuser> showDistinguish_Pircture_operationUser() {
 
-		return distinguish_PictureDao.showDistinguish_Pircture_2();
+		return distinguish_PictureDao.showDistinguish_Pircture_operationUser();
 	}
 	@Override
 	public int queryDistinguish_PirctureCount(String imgtype,String state,String Change_user) {
@@ -64,7 +64,12 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 
 	@Override
 	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
-		return distinguish_PictureDao.FindRecognition_delete_details(map);
+		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);
+		String len="/usr/local/goodsimg";
+		for (int i=0;i<list.size();i++){
+			list.get(i).setRemotepath("https://img.import-express.com"+list.get(i).getRemotepath().substring(len.length(),list.get(i).getRemotepath().length()));
+		}
+		return list;
 	}
 	@Override
 	public int updateSomePirctu_risdelete_date(List<Map<String, String>> bgList) {

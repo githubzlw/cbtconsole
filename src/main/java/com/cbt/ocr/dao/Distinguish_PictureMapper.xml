@@ -48,7 +48,7 @@
 </select>
 
     <select id="FindRecognition_delete_details" resultMap="resultMap">
-    SELECT pid,remote_path,create_time
+    SELECT id,pid,remote_path,create_time
     FROM `custom_goods_md5`
     WHERE is_delete=1
     AND ocr_need_delete=1
@@ -82,8 +82,8 @@
         </if>
     </select>
 
-    <select id="showDistinguish_Pircture_2" resultMap="UserMap">
-         SELECT admName FROM admuser where roleType=4 OR roleType=5
+    <select id="showDistinguish_Pircture_operationUser" resultMap="UserMap">
+         SELECT admName FROM admuser where roleType=4 OR roleType=5 OR admName='Ling'
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="int">

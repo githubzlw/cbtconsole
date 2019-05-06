@@ -17,7 +17,7 @@ public interface Distinguish_PictureDao {
 
 	public int FindRecognition_delete_count(Map<String, Object> map);
 
-	public List<Admuser> showDistinguish_Pircture_2();
+	public List<Admuser> showDistinguish_Pircture_operationUser();
 
 	public int queryDistinguish_PirctureCount( @Param("imgtype")String imgtype, @Param("state")String state, @Param("Change_user")String Change_user);
 
