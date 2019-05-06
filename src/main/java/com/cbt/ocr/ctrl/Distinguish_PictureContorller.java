@@ -7,20 +7,26 @@ import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.warehouse.util.OrderInfoPage;
 import org.apache.poi.util.SystemOutLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Controller
 @RequestMapping(value = "Distinguish_Picture")
 public class Distinguish_PictureContorller {
+	//private static  final Logger=new Logger(Distinguish_PictureContorller.class);
 
 	@Autowired
 	public Distinguish_PictureService  distinguish_pictureService;
@@ -30,14 +36,14 @@ public class Distinguish_PictureContorller {
 	 * @User  zlc
 	 * @param request
 	 * @param page
-	 * @param pid
 	 * @param
 	 * @return
 	 */
 	@RequestMapping(value = "FindCustomGoodsInfo")
 	public String showDistinguish_Pircture(HttpServletRequest request,
-	    String page,String pid,String imgtype,String state,String Change_user){
+	    String page,String imgtype,String state,String Change_user){
 		//获取当前用户
+		try{
 		String sessionId = request.getSession().getId();
 		String authJson = Redis.hget(sessionId, "userauth");
 		String userJson = Redis.hget(sessionId, "admuser");
@@ -48,7 +54,7 @@ public class Distinguish_PictureContorller {
 			page="1";
 		int pageNO=Integer.parseInt(page);
 		//查询出页面数据   custom_goods_md5 中符合条件的数据
-		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pid,pageNO,imgtype,state,Change_user);
+		List<CustomGoods> customGoodsList=distinguish_pictureService.showDistinguish_Pircture(pageNO,imgtype,state,Change_user);
 		if (StrUtils.isNullOrEmpty(state))
 			state="0";
 		//处理人员查询显示
@@ -63,10 +69,9 @@ public class Distinguish_PictureContorller {
 		int totalpage = 0;
 		if(customGoodsList!=null&&!customGoodsList.isEmpty()){
 			totalpage = (Integer)customGoodsList.get(0).getCount();
-			totalpage = totalpage%30==0?totalpage/30:totalpage/30+1;
+			totalpage = totalpage%35==0?totalpage/35:totalpage/35+1;
 		}
 		//页面动态锁定信息
-		request.setAttribute("pid",pid);
 		request.setAttribute("username",user.getAdmName());
 		request.setAttribute("imgtype",imgtype);
 		request.setAttribute("Change_user",Change_user);
@@ -76,6 +81,9 @@ public class Distinguish_PictureContorller {
 		request.setAttribute("customGoodsList",customGoodsList);
 		request.setAttribute("customGoodsList2",customGoodsList2);
 		request.setAttribute("isdate",isdate);
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 
 
 	return "recognition_picture";
@@ -88,10 +96,78 @@ public class Distinguish_PictureContorller {
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
 	@ResponseBody
-	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request,@RequestBody Map<String,Object> mainMap,String userName,Map<String,Object> myArray){
+	public int updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String,Object> mainMap, String userName, int type)throws Exception{
 		List<Map<String, String>> bgList = (List<Map<String, String>>)mainMap.get("bgList");
-		int ret = distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName);
+		int ret =0;
+		try{
+			//更新线上下架的图片状态位为1
+		distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
+		if(type==2){
+			StringBuffer imgpath=new StringBuffer("");
+			for (int i=0;i<bgList.size();i++){
+				String [] splt=bgList.get(i).get("id").split(",");
+				imgpath=imgpath.append(splt[0]+";"+splt[1]+"@");
+			}
+
+			//提供给蒋先伟    线上下架图片的信息列
+			request.getRequestDispatcher("editc/deleteEnInfoImgByParam?pidImgList="+imgpath.substring(0,imgpath.length()-1)).forward(request,response);
+			//同时给下架商品打上已删除标识  这一步应该在蒋先伟的步骤写
+
+			//editc/deleteEnInfoImgByParam?pidImgList
+			ret=1;
+
+		}else if(type==1||type==3){
+			ret=distinguish_pictureService.updateSomePirctu_risdelete(bgList,userName,type);
+		}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
 		return  ret ;
+	}
+	@RequestMapping(value = "recognition_date_details", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
+	public String recognition_date_details(HttpServletRequest request,String pid,String startTime,String endTime)throws Exception{
+		int pageNum = 1;
+		int pageSize = 50;
+		String t = request.getParameter("pageNum");
+		if (t != null && !"".equals(t)) {
+			pageNum = Integer.parseInt(t);
+		}
+		t = request.getParameter("pageSize");
+		if (t != null && !"".equals(t)) {
+			pageSize = Integer.parseInt(t);
+		}
+		try{
+			int startNum = pageNum * 50 - 50;
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("pid", pid);
+			map.put("startTime", startTime);
+			map.put("endTime", endTime);
+			int count = distinguish_pictureService.FindRecognition_delete_count(map);
+
+			System.out.println(count);
+			map.put("startNum", startNum);
+			map.put("endNum", pageSize);
+			List<CustomGoods> customGoodsList=distinguish_pictureService.FindRecognition_delete_details(map);
+			request.setAttribute("customGoodsList", customGoodsList);
+			request.setAttribute("pageCount", startNum);
+			request.setAttribute("startTime", startTime);
+			request.setAttribute("endTime", endTime);
+			request.setAttribute("pid", pid);
+			OrderInfoPage oip = new OrderInfoPage();
+			oip.setPageNum(pageNum);
+			oip.setPageSize(50);
+			oip.setPageSum(count);
+			oip.setCkEndTime(endTime);
+			oip.setCkStartTime(startTime);
+			oip.setExpress_code(pid);
+			request.setAttribute("oip", oip);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally {
+
+		}
+		return "recognition_details";
 	}
 	/****
 	 * @User  zlc

@@ -26,13 +26,16 @@
     </resultMap>
 
     <select id="showDistinguish_Pircture" resultMap="resultMap">
-    SELECT cdm.id,cdm.pid,cdm.remote_path FROM custom_goods_md5 cdm
+    SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
     WHERE 1=1
+        AND cdm.is_delete=0
+        AND cdm.catgrid !=0
     <if test="Change_user != null and Change_user != ''">
         AND cdm.user_operation=#{Change_user}
     </if>
     <if test="state == null || state == ''">
         AND cdm.ocr_need_delete=1
+        AND cdm.ocr_need_date=0
     </if>
     <if test="state != null and state != ''">
         AND cdm.ocr_need_date=#{state}
@@ -41,19 +44,54 @@
     <if test="imgtype != null and imgtype != ''">
         AND cdm.catgrid=#{imgtype}
     </if>
-    <if test="pid != null and pid != ''">
-        AND cdm.pid=#{pid}
-    </if>
-    limit #{page},30
+    limit #{page},35
 </select>
+
+    <select id="FindRecognition_delete_details" resultMap="resultMap">
+    SELECT pid,remote_path,create_time
+    FROM `custom_goods_md5`
+    WHERE is_delete=1
+    AND ocr_need_delete=1
+    AND ocr_need_date=1
+    <if test="pid !=null and pid!=''">
+        AND pid=#{pid}
+    </if>
+    <if test="startTime !=null and startTime!=''">
+         AND create_time>=#{startTime}
+    </if>
+    <if test="endTime !=null and endTime!=''">
+         AND #{endTime}>=create_time
+    </if>
+        order by create_time DESC
+        limit #{startNum},#{endNum}
+
+</select>
+    <select id="FindRecognition_delete_count"  resultType="int">
+        SELECT count(1)
+        FROM `custom_goods_md5`
+        WHERE is_delete=1
+        AND ocr_need_date=1
+        <if test="pid !=null and pid!=''">
+            AND pid=#{pid}
+        </if>
+        <if test="startTime !=null and startTime!=''">
+            AND create_time>=#{startTime}
+        </if>
+        <if test="endTime !=null and endTime!=''">
+            AND #{endTime}>=create_time
+        </if>
+    </select>
 
     <select id="showDistinguish_Pircture_2" resultMap="UserMap">
          SELECT admName FROM admuser where roleType=4 OR roleType=5
     </select>
 
-    <select id="queryDistinguish_PirctureCount" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM custom_goods_md5 cdm
+    <select id="queryDistinguish_PirctureCount" resultType="int">
+        SELECT count(1)
+        FROM custom_goods_md5 cdm
         WHERE 1=1
+        AND cdm.is_delete=0
+        AND cdm.catgrid !=0
         <if test="state == null || state == ''">
             AND cdm.ocr_need_date=0
             AND cdm.ocr_need_delete=1
@@ -68,9 +106,6 @@
         <if test="imgtype != null and imgtype != ''">
         and cdm.catgrid=#{imgtype}
         </if>
-        <if test="pid != null and pid != ''">
-        AND cdm.pid=#{pid}
-        </if>
     </select>
 
     <sql id="Category1688_List">
@@ -83,12 +118,21 @@
         AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
         AND cdm.ocr_need_delete=1
         AND cdm.ocr_need_date=0
-        GROUP BY c.category_id
+        GROUP BY cdm.catgrid
     </select>
     <update id="updateSomePirctu_risdelete">
         update custom_goods_md5 SET
+        <if test="type==1">
+            ocr_need_date=1,
+        </if>
+        <if test="type==2">
+            ocr_need_delete=2,
+            ocr_need_date=2,
+        </if>
+        <if test="type==3">
             ocr_need_delete=1,
             ocr_need_date=1,
+        </if>
         user_operation=#{userName}
         where
         <foreach collection="bgList" separator="or" item="i" index="index">
@@ -103,6 +147,15 @@
         where
         <foreach collection="bgList_s" separator="or" item="i" index="index">
             id = ${i.id}
+        </foreach>
+    </update>
+    <update id="updateSomePirctu_risdelete_date">
+        update custom_goods_md5 SET
+        is_delete=1,
+        create_time=NOW()
+        where
+        <foreach collection="bgList_s" separator="or" item="i" index="index">
+            id = SUBSTRING_INDEX("${i.id}",",",1)
         </foreach>
     </update>
 </mapper>
