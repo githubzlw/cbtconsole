@@ -1,0 +1,142 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.forum.dao.ForumDao">
+
+	<resultMap id="ForumMap" type="com.cbt.forum.pojo.ForumDetails">
+		<id column="id" property="id" javaType="INTEGER"/>
+        <result column="pid" property="pid"/>
+        <result column="post_class_id" property="postClassId" />
+        <result column="post_title" property="postTitle" />
+        <result column="post_user" property="postUser" />
+        <result column="post_details" property="postDetails" />
+        <result column="post_pictrue" property="postPictrue" />
+        <result column="audit_user" property="auditUser" />
+        <result column="creatime" property="creatime" />
+        <result column="audit_state" property="auditState" />
+        <result column="details_state" property="detailsState" />
+        <result column="post_other_id" property="postOtherId" />
+        <collection property="forumClass"  javaType="com.cbt.forum.pojo.ForumClassification">
+            <id column="id" property="id"/>
+            <result column="pid" property="pid"/>
+            <result column="forum_class_id" property="forumClassId" />
+            <result column="forum_class_name" property="forumClassName" />
+        </collection>
+	</resultMap>
+    <resultMap id="Forum_class_List" type="com.cbt.forum.pojo.ForumClassification">
+        <id column="id" property="id" javaType="INTEGER"/>
+        <result column="pid" property="pid"/>
+        <result column="forum_class_id" property="forumClassId" />
+        <result column="forum_class_name" property="forumClassName" />
+    </resultMap>
+    <resultMap id="Forum_user_List" type="com.cbt.forum.pojo.ForumUser">
+        <id column="id" property="id" javaType="INT"/>
+        <result column="users_name" property="usersName" />
+    </resultMap>
+    <sql id="ForumColumn">
+        id,post_class_id,post_title,post_user,post_details,audit_user,creatime,audit_state,details_state,post_other_id
+    </sql>
+    <sql id="Forum_class_Column">
+        id,forum_class_id,forum_class_name
+    </sql>
+    <select id="FidForumList" resultMap="ForumMap">
+    select
+    f.*,c.`forum_class_name` forum_class_name
+    from `forum_details` f,`forum_classification` c WHERE 1=1
+        AND f.`post_class_id`=c.`forum_class_id`
+    <if test="posttitle !=null and posttitle!=''">
+        AND  f.post_title=#{posttitle}
+    </if>
+    <if test="audit_user !=null and audit_user!=''">
+        AND  f.audit_user=#{audit_user}
+    </if>
+    <if test="type !=0">
+        AND  f.post_class_id=#{type}
+    </if>
+    <if test="reviewFlag !=0">
+        AND  f.audit_state=#{reviewFlag}
+    </if>
+    <if test="startDate != null">
+        AND f.creatime >= #{startDate}
+    </if>
+    <if test="endDate != null">
+        AND #{endDate} >= f.creatime
+    </if>
+    limit #{page},#{rows}
+</select>
+    <select id="FidForumList_one" resultMap="ForumMap">
+        select
+        <include refid="ForumColumn"/>
+        from  `forum_details`
+        WHERE id=#{id}
+    </select>
+    <select id="FidForumListConut" resultType="Integer">
+        select count(1)
+        from forum_details WHERE 1=1
+        <if test="posttitle !=null and posttitle!=''">
+            AND  post_title=#{posttitle}
+        </if>
+        <if test="type !=null and type!=''">
+            AND  post_class_id=#{type}
+        </if>
+        <if test="audit_user !=null and audit_user!=''">
+            AND  audit_user=#{audit_user}
+        </if>
+        <if test="reviewFlag !=null and reviewFlag!=''">
+            AND  audit_state=#{reviewFlag}
+        </if>
+        <if test="startDate != null">
+            AND creatime >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND #{endDate} >= creatime
+        </if>
+    </select>
+    <select id="FidForumClass" resultMap="Forum_class_List">
+        select
+        <include refid="Forum_class_Column"/>
+        from forum_classification
+    </select>
+    <select id="FindForumUser" resultMap="Forum_user_List">
+        select id,users_name from forum_user
+    </select>
+
+    <insert id="AddForumPost" parameterType="com.cbt.forum.pojo.ForumDetails">
+        insert into forum_details(post_class_id,post_title,post_user,post_details,creatime)
+        VALUE(#{post_class_id},#{post_title},#{post_user},#{post_details},NOW())
+    </insert>
+
+    <update id="EditForum_State">
+        UPDATE forum_details SET
+        <if test="type==1">
+            <if test="state==0">
+                audit_state=1
+            </if>
+            <if test="state==1">
+                audit_state=0
+            </if>
+        </if>
+        <if test="type==2">
+            <if test="state==0">
+                details_state=1
+            </if>
+            <if test="state==1">
+                details_state=0
+            </if>
+        </if>
+        <if test="type==3">
+            <if test="state==0">
+                post_other_id=1
+            </if>
+            <if test="state==1">
+                post_other_id=0
+            </if>
+        </if>
+        where id=#{id}
+    </update>
+
+    <delete id="EditForum_delete_State">
+        delete from forum_details where id=#{id}
+    </delete>
+    <delete id="EditForum_post_comment">
+        delete from forum_comment where comment_post_id=#{id}
+    </delete>
+</mapper>
