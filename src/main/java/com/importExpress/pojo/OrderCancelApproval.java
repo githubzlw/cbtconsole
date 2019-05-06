@@ -9,10 +9,16 @@ public class OrderCancelApproval {
     private double agreeAmount;
     private Integer type;
     private String typeDesc;
-    private Integer dealState;// 0 待审批 1销售中 2主管审批 3审批通过 4驳回
+    /**
+     * 0 待审批 1销售中 2主管审批 3审批通过 4驳回
+     */
+    private Integer dealState;
     private String dealStateDesc;
     private String createTime;
-    private String updateTime;// 更新时间
+    /**
+     * 更新时间
+     */
+    private String updateTime;
     private OrderCancelApprovalDetails approval1;
     private OrderCancelApprovalDetails approval2;
     private OrderCancelApprovalDetails approval3;
@@ -23,6 +29,19 @@ public class OrderCancelApproval {
     private String approvalRemark;
     private String cancelRemark;
     private Integer orderState;
+
+    /**
+     * 剩余金额
+     */
+    private double remainAmount;
+
+    public double getRemainAmount() {
+        return remainAmount;
+    }
+
+    public void setRemainAmount(double remainAmount) {
+        this.remainAmount = remainAmount;
+    }
 
     public OrderCancelApprovalDetails getApproval1() {
         return approval1;
