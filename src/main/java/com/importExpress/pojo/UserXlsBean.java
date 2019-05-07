@@ -31,4 +31,11 @@ public class UserXlsBean implements Serializable {
     private Integer userType;//未下单用户类型
     private Date createtime;//对应数据时间
 
+    public UserXlsBean() {
+    }
+
+    public UserXlsBean(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

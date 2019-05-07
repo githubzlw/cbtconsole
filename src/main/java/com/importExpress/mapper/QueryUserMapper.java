@@ -109,4 +109,9 @@ public interface QueryUserMapper {
                                       @Param("startDate") String startDate, @Param("endDate") String endDate);
 
     GoodsReview queryGoodsReviewById(@Param("id") Integer id);
+
+    List<String> queryAddCarList(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<String> querySearchProductList(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
 }
