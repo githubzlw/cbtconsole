@@ -357,6 +357,7 @@ function  updateSomes(type){
                         }
                     }
                 })
+                window.location.reload();
             }
         }
 	}else if(type==2){
