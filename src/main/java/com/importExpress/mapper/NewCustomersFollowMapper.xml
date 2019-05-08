@@ -1666,7 +1666,7 @@
         group by userid
         )scm on gcf.userid = scm.userid) gdf on us.id= gdf.userid
 
-        LEFT JOIN user_sale au on gdf.userid=au.userid
+        LEFT JOIN user_sale au on us.id=au.userid
         LEFT JOIN
         (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 AND senddate is not NULL ORDER BY senddate DESC)f GROUP BY cid) y
         on au.us.id=y.cid
@@ -1710,7 +1710,7 @@
             resultType="java.lang.Integer">
         select count(1) FROM
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
-        and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime) 
+        and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
         AND is_test=0) us
         LEFT JOIN
         ( SELECT gcf.follow_admin_id,gcf.updateTime,gcf.userid,gcf.follow_time,scm.total_catid,scm.total_price,scm.average_price from goods_carconfig gcf
@@ -1719,7 +1719,7 @@
         group by userid
         )scm on gcf.userid = scm.userid) gdf on us.id= gdf.userid
 
-        LEFT JOIN user_sale au on gdf.userid=au.userid
+        LEFT JOIN user_sale au on us.id=au.userid
         LEFT JOIN
         (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 AND senddate is not NULL ORDER BY senddate DESC)f GROUP BY cid) y
         on au.us.id=y.cid
