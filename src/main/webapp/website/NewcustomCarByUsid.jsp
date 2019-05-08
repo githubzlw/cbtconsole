@@ -245,7 +245,7 @@
 </head>
 <body>
     <div style="height: 85%;width: 100%;overflow-y: auto;">
-         <h1 align="center">客户商品浏览记录</h1>
+         <h1 align="center">${Message==null?"客户商品浏览记录":Message}</h1>
       <a href="http://192.168.1.27:10004/helpServlet?action=writeNewEmail&className=EmailListServlet&userEmail=${userEmail}&usname=${usname}&uspassword=${uspassword}" target="_blank" class="tag">发送邮件给客户</a>
         <table style="border-color: #0cc960;font-size: 18px;" border="1" cellpadding="1" cellspacing="0" align="center">
             <thead>

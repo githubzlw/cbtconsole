@@ -119,10 +119,15 @@ public class NewCustomersFollowController {
     }
     @RequestMapping("queryNewCustomByUserId")
     public ModelAndView queryNewCustomByUserId(@RequestParam("userEmail")String userEmail, @RequestParam("userId")int userId, @RequestParam(value = "page",defaultValue="1")int page, HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView("NewcustomCarByUsid");
         String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+        if (admuserJson == null) {
+            mv.addObject("Message", "用户未登陆");
+            return mv;
+        }
         Admuser admuser = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
 
-        ModelAndView mv = new ModelAndView("NewcustomCarByUsid");
+
         List<ShopCarUserStatistic> list=this.newCustomersFollowService.queryNewCustomByUserId(userId,page);
         int total=this.newCustomersFollowService.queryNewCustomByUserIdCount(userId,page);
 
