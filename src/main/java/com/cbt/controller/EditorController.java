@@ -3188,13 +3188,11 @@ public class EditorController {
 
     @RequestMapping(value = "/publicToOnline")
     @ResponseBody
-    public JsonResult publicToOnline(HttpServletRequest request, HttpServletResponse response) {
-        JsonResult json = new JsonResult();
-
+    public String publicToOnline(HttpServletRequest request, HttpServletResponse response) {
+        String rs = "0";
         try {
             List<String> pidList = customGoodsService.queryPidListByState(5);
-            json.setOk(true);
-            json.setMessage("执行成功");
+            rs = "1";
             List<String> allList = new ArrayList<>();
             allList.addAll(pidList);
             pidList.clear();
@@ -3206,7 +3204,7 @@ public class EditorController {
                     PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
                     pbThread.start();
                     try {
-                        Thread.sleep(50000);
+                        Thread.sleep(40000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -3217,11 +3215,9 @@ public class EditorController {
             allList.clear();
         } catch (Exception e) {
             e.printStackTrace();
-            json.setOk(false);
-            json.setMessage("publicToOnline 执行错误：" + e.getMessage());
             LOG.error("publicToOnline 执行错误：" + e.getMessage());
         }
-        return json;
+        return rs;
     }
 
 
