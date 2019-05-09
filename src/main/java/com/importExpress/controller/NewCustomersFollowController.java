@@ -87,7 +87,7 @@ public class NewCustomersFollowController {
             isOrder = Integer.parseInt(isOrderStr);
         }
 
-        double beginMoney = -1;
+        double beginMoney = 0;
         String beginMoneyStr = request.getParameter("beginMoney");
         if (StringUtils.isNotBlank(beginMoneyStr)) {
             beginMoney = Double.parseDouble(beginMoneyStr);

@@ -1689,13 +1689,17 @@
             and gdf.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and au.adminid = #{saleId}
+            and  au.saleid=#{saleId}
         </if>
-        <if test="beginMoney >= 0">
+        <if test="beginMoney > 0">
             and gdf.total_price &gt;= #{beginMoney}
         </if>
+
         <if test="endMoney > 0">
             and gdf.total_price &lt;= #{endMoney}
+        </if>
+        <if test="endMoney == 0">
+            and gdf.total_price is NULL
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
@@ -1742,13 +1746,16 @@
             and gdf.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and au.adminid = #{saleId}
+            and au.saleid=#{saleId}
         </if>
         <if test="beginMoney > 0">
             and gdf.total_price &gt;= #{beginMoney}
         </if>
         <if test="endMoney > 0">
             and gdf.total_price &lt;= #{endMoney}
+        </if>
+        <if test="endMoney == 0">
+            and gdf.total_price is NULL
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
