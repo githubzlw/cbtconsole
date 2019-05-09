@@ -235,11 +235,14 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取申请订单号失败,请重试");
                 return json;
             } else if (orderNo.contains("_")) {
-                json.setOk(false);
-                json.setMessage("拆单或者补货订单号，不可退款");
-                return json;
+                // jxw 19-05-09 判断是否是dp订单或者拆单订单,如果是则可以退款
+                String[] orderSplit = orderNo.split("_");
+                if(orderSplit[1].length() > 2){
+                    json.setOk(false);
+                    json.setMessage("拆单或者补货订单号，不可退款");
+                    return json;
+                }
             }
-
             String operatorIdStr = request.getParameter("operatorId");
             int operatorId = 0;
             if (StringUtils.isBlank(operatorIdStr) || "0".equals(operatorIdStr)) {
