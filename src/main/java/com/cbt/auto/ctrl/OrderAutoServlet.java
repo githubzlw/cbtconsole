@@ -618,7 +618,7 @@ public class OrderAutoServlet extends HttpServlet {
 //                    }
 
 
-                    String msg=jsons.split("childCategorys")[1].split("]")[0].split("\\[")[1];
+//                    String msg=jsons.split("childCategorys")[1].split("]")[0].split("\\[")[1];
                     Thread.sleep(500);
                     if(jsons.contains("\"id\":")) {
                         List<Integer> catidList = new ArrayList<Integer>();
