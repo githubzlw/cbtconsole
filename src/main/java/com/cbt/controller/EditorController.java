@@ -3195,17 +3195,26 @@ public class EditorController {
             List<String> pidList = customGoodsService.queryPidListByState(5);
             json.setOk(true);
             json.setMessage("执行成功");
+            List<String> allList = new ArrayList<>();
+            allList.addAll(pidList);
+            pidList.clear();
+            pidList = customGoodsService.queryPidListByState(3);
+            allList.addAll(pidList);
 
-            for (String pid : pidList) {
-                PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
-                pbThread.start();
-                try {
-                    Thread.sleep(20000);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            for (String pid : allList) {
+                if (StringUtils.isNotBlank(pid)) {
+                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
+                    pbThread.start();
+                    try {
+                        Thread.sleep(50000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            pidList = customGoodsService.queryPidListByState(3);
             pidList.clear();
+            allList.clear();
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
