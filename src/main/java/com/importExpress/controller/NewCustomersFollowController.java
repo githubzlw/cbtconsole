@@ -3,8 +3,10 @@ package com.importExpress.controller;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.ShopCarUserStatistic;
 import com.importExpress.service.NewCustomersFollowService;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,7 @@ public class NewCustomersFollowController {
 
     @RequestMapping("/CustomList")
     @ResponseBody
-    public EasyUiJsonResult FindCustomList(HttpServletRequest request, HttpServletResponse response) {
+    public EasyUiJsonResult FindCustomList(@RequestParam(value = "allCus",defaultValue = "1")int allCus,  HttpServletRequest request, HttpServletResponse response) {
         EasyUiJsonResult json = new EasyUiJsonResult();
         ShopCarUserStatistic statistic = new ShopCarUserStatistic();
         String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -113,6 +115,7 @@ public class NewCustomersFollowController {
         statistic.setCountryId(countryId);
         statistic.setStartNum(startNum);
         statistic.setLimitNum(limitNum);
+        statistic.setTotalPrice(allCus);
         json = this.newCustomersFollowService.FindCustomList(statistic);
 
         return json;
@@ -142,4 +145,21 @@ public class NewCustomersFollowController {
         mv.addObject("uspassword",admuser.getEmialpass());
         return mv;
     }
+    @RequestMapping("queryAllSale")
+    @ResponseBody
+    public JsonResult queryAllSale() {
+        JsonResult json = new JsonResult();
+        try {
+            List<ConfirmUserInfo> allAdms = this.newCustomersFollowService.queryAllSale();
+            json.setOk(true);
+            json.setData(allAdms);
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setOk(false);
+            json.setMessage("获取用户列表失败，原因 :" + e.getMessage());
+        }
+        return json;
+    }
+
+
 }

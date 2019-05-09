@@ -1658,7 +1658,10 @@
         DATE_FORMAT(gdf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
         from
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
-        and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime) AND is_test=0) us
+        <if test="totalPrice == 1">
+            and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
+        </if>
+          AND is_test=0) us
         LEFT JOIN
         ( SELECT gcf.follow_admin_id,gcf.updateTime,gcf.userid,gcf.follow_time,scm.total_catid,scm.total_price,scm.average_price from goods_carconfig gcf
         inner join (select userid,count(distinct catid) as total_catid,sum(googs_price * googs_number) as total_price,
@@ -1714,7 +1717,9 @@
             resultType="java.lang.Integer">
         select count(1) FROM
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
-        and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
+        <if test="totalPrice == 1">
+            and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
+        </if>
         AND is_test=0) us
         LEFT JOIN
         ( SELECT gcf.follow_admin_id,gcf.updateTime,gcf.userid,gcf.follow_time,scm.total_catid,scm.total_price,scm.average_price from goods_carconfig gcf
