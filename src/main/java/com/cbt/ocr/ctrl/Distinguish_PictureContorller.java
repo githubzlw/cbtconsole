@@ -101,9 +101,9 @@ public class Distinguish_PictureContorller {
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		int ret = 0;
 		try {
-			//更新线上下架的图片状态位为1
-			distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
 			if (type == 2) {
+				//更新线上下架的图片状态位为1
+				distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
 				StringBuffer imgpath = new StringBuffer("");
 				for (int i = 0; i < bgList.size(); i++) {
 					String[] splt = bgList.get(i).get("id").split(",");

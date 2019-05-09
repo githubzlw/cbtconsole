@@ -500,6 +500,33 @@
             </where>
             order by tmp_a.createtime desc
         </if>
+
+        <if test="userType == 5">
+            SELECT a.name, a.id, a.createtime FROM (
+                SELECT pid as 'name',COUNT(1) as 'id',MAX(createtime) 'createtime' FROM searchclickproductlog
+                WHERE pid NOT IN(
+                    SELECT DISTINCT itemId FROM goods_car
+                    <where>
+                        <if test="startDate != null">
+                            datatime >= #{startDate}
+                        </if>
+                        <if test="endDate != null">
+                            and datatime &lt;= #{endDate}
+                        </if>
+                    </where>
+                )
+                <if test="startDate != null">
+                    and createtime >= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and createtime &lt;= #{endDate}
+                </if>
+                GROUP BY name
+                ORDER BY id DESC
+                LIMIT 500
+            ) a
+        </if>
+
         <if test="startBars != null">
             LIMIT #{startBars}, #{rows};
         </if>
@@ -631,6 +658,11 @@
                 </if>
             </where>
         </if>
+
+        <if test="userType == 5">
+            SELECT 500
+        </if>
+
     </select>
 
     <!--List<String> queryUserAddressById(@Param("id") Integer id);-->
@@ -762,6 +794,34 @@
         FROM goods_review
         WHERE id = #{id}
         LIMIT 1
+    </select>
+
+    <!--List<String> queryAddCarList(@Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="queryAddCarList" resultType="String">
+        SELECT DISTINCT itemId
+        FROM goods_car
+        <where>
+            <if test="startDate != null">
+                datatime >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and datatime &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!--List<String> querySearchProductList(@Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="querySearchProductList" resultType="String">
+        SELECT allProductList FROM searchproductlog
+        <where>
+            <if test="startDate != null">
+                showPageTime >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and showPageTime &lt;= #{endDate}
+            </if>
+            AND LENGTH(allProductList) > 0
+        </where>
     </select>
 
 </mapper>

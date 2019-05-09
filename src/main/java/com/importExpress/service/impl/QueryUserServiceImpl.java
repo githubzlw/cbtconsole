@@ -396,26 +396,70 @@ public class QueryUserServiceImpl implements QueryUserService {
         return queryUserMapper.queryGoodsReviewById(id);
     }
 
+    /**
+     * 使用 Map按value进行倒序排序
+     * @param oriMap
+     * @return
+     */
+    public static Map<String, Integer> sortMapByValue(Map<String, Integer> oriMap) {
+        if (oriMap == null || oriMap.isEmpty()) {
+            return null;
+        }
+        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        List<Map.Entry<String, Integer>> entryList = new ArrayList<Map.Entry<String, Integer>>(
+                oriMap.entrySet());
+        Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        Iterator<Map.Entry<String, Integer>> iter = entryList.iterator();
+        Map.Entry<String, Integer> tmpEntry = null;
+        while (iter.hasNext()) {
+            tmpEntry = iter.next();
+            sortedMap.put(tmpEntry.getKey(), tmpEntry.getValue());
+        }
+        return sortedMap;
+    }
+
     @Override
     public EasyUiJsonResult queryUserList(Integer page, Integer rows, Integer userType, String startDate, String endDate) {
+        EasyUiJsonResult json = new EasyUiJsonResult();
+
+        if (userType == 6){
+            List<UserXlsBean> res = getSearchProduct((page - 1) * rows, rows, startDate, endDate);
+            if (res == null){
+                json.setSuccess(false);
+                json.setRows("");
+                json.setTotal(0);
+            } else {
+                json.setSuccess(true);
+                json.setRows(res);
+                json.setTotal(500);
+            }
+            return json;
+        }
+
         List<UserXlsBean> list = queryUserMapper.queryUserList((page - 1) * rows, rows, userType, startDate, endDate);
         Integer totalCount = queryUserMapper.queryUserListCount(userType, startDate, endDate);
 
-        EasyUiJsonResult json = new EasyUiJsonResult();
         if (list != null && list.size() > 0) {
-            //查询购物车商品数量
-            List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
-            Map<String, String> newMap = new HashMap<String, String>();
-            if (resMap != null || resMap.size() > 0){
-                for (HashMap<String, String> bean : resMap) {
-                    newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
+            if (userType <= 4) {
+                //查询购物车商品数量
+                List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
+                Map<String, String> newMap = new HashMap<String, String>();
+                if (resMap != null || resMap.size() > 0) {
+                    for (HashMap<String, String> bean : resMap) {
+                        newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
+                    }
                 }
-            }
-            for (UserXlsBean bean : list) {
-                bean.setUserType(userType);
-                String carNum = newMap.get(String.valueOf(bean.getId()));
-                if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
-                    bean.setCarNum(carNum.toString());
+                for (UserXlsBean bean : list) {
+                    bean.setUserType(userType);
+                    String carNum = newMap.get(String.valueOf(bean.getId()));
+                    if (carNum != null && StringUtils.isNotBlank(carNum.toString())) {
+                        bean.setCarNum(carNum.toString());
+                    }
                 }
             }
             json.setSuccess(true);
@@ -430,60 +474,125 @@ public class QueryUserServiceImpl implements QueryUserService {
         return json;
     }
 
+    public List<UserXlsBean> getSearchProduct(Integer startBars, Integer rows, String startDate, String endDate) {
+        if (startDate == null || endDate == null){ //完整查数据量太大 不允许
+            return null;
+        }
+        //展现率商品
+        List<String> seaProList = queryUserMapper.querySearchProductList(startDate, endDate);
+        if (seaProList == null || seaProList.size() == 0){
+            return null;
+        }
+        //加购物车数据
+        List<String> addCarList = queryUserMapper.queryAddCarList(startDate, endDate);
+        Set<String> addCarSet = new HashSet<String>(addCarList);
+        // key pid; value 展现次数
+        Map<String, Integer> seaMap = new HashMap<String, Integer>();
+        for (String allProduct : seaProList) {
+            for (String pid : allProduct.split(",")) {
+                if (!addCarSet.contains(pid)){
+                    if (seaMap.containsKey(pid)){
+                        seaMap.put(pid, seaMap.get(pid) + 1);
+                    } else {
+                        seaMap.put(pid, 1);
+                    }
+                }
+            }
+        }
+        //排序
+        seaMap = sortMapByValue(seaMap);
+        List<UserXlsBean> list = new ArrayList<UserXlsBean>();
+        int i = 0;
+        for (String pid : seaMap.keySet()) {
+            i++;
+            if (null != startBars && null != rows){
+                if (i <= startBars || i > startBars + rows) {
+                    continue;
+                }
+            }
+            if (i > 500){
+                break;
+            }
+            list.add(new UserXlsBean(seaMap.get(pid), pid));
+        }
+        return list;
+    }
+
     @Override
     public Map<String, String> queryUserListCsv(Integer userType, String startDate, String endDate) {
         Map<String, String> result = new HashMap<>();
+
+        if (userType == 6){
+            List<UserXlsBean> res = getSearchProduct(null, null, startDate, endDate);
+            if (res == null){
+                result.put("state", "false");
+                result.put("message", "未找到对应数据");
+            } else {
+                //拼接对应数据
+                StringBuffer sb = new StringBuffer();
+                sb.append("商品pid,展示次数,\r\n");
+                for (UserXlsBean bean : res) {
+                    sb.append("'")
+                            .append(bean.getName()).append(",")
+                            .append(bean.getId())
+                            .append(",\r\n");
+                }
+                result.put("csv", sb.toString());
+                result.put("state", "success");
+            }
+            return result;
+        }
+
         List<UserXlsBean> list = queryUserMapper.queryUserList(null, null, userType, startDate, endDate);
         if (list != null && list.size() > 0) {
-            //查询购物车商品数量
-            List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
-            Map<String, String> newMap = new HashMap<String, String>();
-            if (resMap != null || resMap.size() > 0){
-                for (HashMap<String, String> bean : resMap) {
-                    newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
+            if (userType <= 4) {
+                //查询购物车商品数量
+                List<HashMap<String, String>> resMap = queryUserMapper.queryCarGoodsCount(list);
+                Map<String, String> newMap = new HashMap<String, String>();
+                if (resMap != null || resMap.size() > 0){
+                    for (HashMap<String, String> bean : resMap) {
+                        newMap.put(String.valueOf(bean.get("userid")), String.valueOf(bean.get("total")));
+                    }
                 }
-            }
-            for (UserXlsBean bean : list) {
-                String carNum = newMap.get(String.valueOf(bean.getId()));
-                if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
-                    bean.setCarNum(carNum.toString());
-                }
-                if(bean.getAdmName() == null){
-                    bean.setAdmName("");
+                for (UserXlsBean bean : list) {
+                    String carNum = newMap.get(String.valueOf(bean.getId()));
+                    if (carNum != null && StringUtils.isNotBlank(carNum.toString())){
+                        bean.setCarNum(carNum.toString());
+                    }
+                    if(bean.getAdmName() == null){
+                        bean.setAdmName("");
+                    }
                 }
             }
             //拼接对应数据
             StringBuffer sb = new StringBuffer();
             if (userType == 1){
-                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,最后录入收货地址时间,\r\n");
+                sb.append("用户ID,用户名称,用户邮箱,销售,购物车商品数量,最后录入收货地址时间,\r\n");
                 for (UserXlsBean bean : list) {
                     sb.append(bean.getId()).append(",")
                         .append(bean.getName()).append(",")
                         .append(bean.getEmail()).append(",")
-                        .append(bean.getCurrency()).append(",")
                         .append(bean.getAdmName()).append(",")
                         .append(bean.getCarNum()).append(",")
                         .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
                 }
             } else if (userType == 2){
-                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,whatsApp,用户创建时间,\r\n");
+                sb.append("用户ID,用户名称,用户邮箱,销售,购物车商品数量,whatsApp,用户创建时间,\r\n");
                 for (UserXlsBean bean : list) {
                     sb.append(bean.getId()).append(",")
                         .append(bean.getName()).append(",")
                         .append(bean.getEmail()).append(",")
-                        .append(bean.getCurrency()).append(",")
                         .append(bean.getAdmName()).append(",")
                         .append(bean.getCarNum()).append(",")
                         .append(bean.getWhatsapp()).append(",")
                         .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
                 }
             } else if (userType == 3){
-                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,订单号,订单状态,支付日志,订单价格,支付状态,支付操作时间,\r\n");
+                sb.append("用户ID,用户名称,用户邮箱,销售,购物车商品数量,订单号,订单状态,支付日志,订单价格,支付状态,支付操作时间,\r\n");
                 for (UserXlsBean bean : list) {
                     sb.append(bean.getId()).append(",")
                         .append(bean.getName()).append(",")
                         .append(bean.getEmail()).append(",")
-                        .append(bean.getCurrency()).append(",")
                         .append(bean.getAdmName()).append(",")
                         .append(bean.getCarNum()).append(",")
                         .append(bean.getOrderid()).append(",")
@@ -494,15 +603,22 @@ public class QueryUserServiceImpl implements QueryUserService {
                         .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
                 }
             } else if (userType == 4){
-                sb.append("用户ID,用户名称,用户邮箱,国家,销售,购物车商品数量,用户创建时间,\r\n");
+                sb.append("用户ID,用户名称,用户邮箱,销售,购物车商品数量,用户创建时间,\r\n");
                 for (UserXlsBean bean : list) {
                     sb.append(bean.getId()).append(",")
                         .append(bean.getName()).append(",")
                         .append(bean.getEmail()).append(",")
-                        .append(bean.getCurrency()).append(",")
                         .append(bean.getAdmName()).append(",")
                         .append(bean.getCarNum()).append(",")
                         .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
+                }
+            } else if (userType == 5){
+                sb.append("商品pid,点击次数,最后一次加购物车时间,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append("'")
+                            .append(bean.getName()).append(",")
+                            .append(bean.getId()).append(",")
+                            .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
                 }
             }
             result.put("csv", sb.toString());
