@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>购物车营销</title>
+    <title>新注册用户跟进</title>
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
@@ -106,6 +106,11 @@
         }
 
         function doQuery() {
+            var allCus=1
+            var cal=document.getElementById("newCus").checked
+            if(cal==true){
+                allCus=0;
+            }
             var isOrder = $("#query_is_order").val();
             var userId = $("#query_user_id").val();
             var userEmail = $("#query_user_email").val();
@@ -123,7 +128,8 @@
                 "adminId": adminId,
                 "countryId": countryId,
                 "beginMoney": beginMoney,
-                "endMoney": endMoney
+                "endMoney": endMoney,
+                "allCus": allCus
             });
         }
 
@@ -134,7 +140,7 @@
         function getAdminList() {
             $.ajax({
                 type: "POST",
-                url: "/cbtconsole/singleGoods/getAdminList",
+                url: "/cbtconsole/NewCustomersFollow/queryAllSale",
                 data: {},
                 success: function (data) {
                     if (data.ok) {
@@ -204,10 +210,10 @@
                                                            style="font-size: 16px; height: 26px; width: 90px;">
                         <option value="-1" selected="selected">全部</option>
 			</select></span>&nbsp;&nbsp;
+        <input id="newCus" type="checkbox">所有新客户
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
-        <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <span><a href="/cbtconsole/apa/shoppingCartTracking.html" target="_blank">营销追踪</a></span>-->
+       默认最近三天的新注册客户不显示
     </form>
 </div>
 

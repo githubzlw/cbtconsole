@@ -1,5 +1,6 @@
 package com.importExpress.mapper;
 
+import com.cbt.website.bean.ConfirmUserInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -17,5 +18,7 @@ public interface NewCustomersFollowMapper {
     int queryNewCustomByUserIdCount(@Param("userId") int userId);
     @Select("select valid from custom_benchmark_ready where pid=#{shippingName}")
     int FindValidByPid(@Param("shippingName") String shippingName);
+    @Select("SELECT id,admName as confirmusername,roleType as role FROM admuser  WHERE roleType in(3,4) and status = 1")
+    List<ConfirmUserInfo> queryAllSale();
 
 }

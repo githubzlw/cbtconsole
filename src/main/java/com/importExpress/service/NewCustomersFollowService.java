@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.ShopCarUserStatistic;
 
@@ -11,5 +12,7 @@ public interface NewCustomersFollowService {
     List<ShopCarUserStatistic> queryNewCustomByUserId(int userId,int page);
 
     int queryNewCustomByUserIdCount(int userId, int page);
+
+    List<ConfirmUserInfo> queryAllSale();
 
 }

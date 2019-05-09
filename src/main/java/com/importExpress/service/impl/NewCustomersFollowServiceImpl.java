@@ -1,5 +1,6 @@
 package com.importExpress.service.impl;
 
+import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.controller.NewCustomersFollowController;
 import com.importExpress.mapper.NewCustomersFollowMapper;
@@ -65,5 +66,16 @@ public class NewCustomersFollowServiceImpl implements NewCustomersFollowService 
             return 0;
         }
 
+    }
+
+    @Override
+    public List<ConfirmUserInfo> queryAllSale() {
+        try {
+            List<ConfirmUserInfo> total=this.newCustomersFollowMapper.queryAllSale();
+            return total;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
