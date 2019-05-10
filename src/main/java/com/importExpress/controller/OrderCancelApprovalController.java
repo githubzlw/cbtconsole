@@ -390,7 +390,7 @@ public class OrderCancelApprovalController {
                     json.setMessage("拆单或者补货订单号，不可退款");
                     return json;
                 } else {
-                    refundOrderNo = orderSplit[1].trim();
+                    refundOrderNo = orderSplit[0].trim();
                 }
             }
 
@@ -433,6 +433,7 @@ public class OrderCancelApprovalController {
                     // 余额退款的，放在后面一起执行
                     json.setOk(true);
                     json.setTotal(0L);
+                    approvalBean.setRemainAmount(approvalBean.getAgreeAmount());
                 }
                 OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
                 if (json.isOk()) {

@@ -2410,7 +2410,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				} else {
 					conn2.setAutoCommit(false);
 					stmt = conn2.createStatement();
-					stmt.addBatch(sqlRcRd);
+					// stmt.addBatch(sqlRcRd);
 					stmt.addBatch(sqlOdIf);
 					stmt.addBatch(sqlOdDs);
 					int[] res = stmt.executeBatch();

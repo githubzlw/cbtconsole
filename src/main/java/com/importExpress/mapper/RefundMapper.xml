@@ -269,7 +269,7 @@
             and user_id = #{userId}
         </if>
         <if test=" orderNo != null and orderNo != '' ">
-            and order_no = #{orderNo}
+            and order_no = like concat(#{orderNo},'%')
         </if>
         order by create_time desc
     </select>
