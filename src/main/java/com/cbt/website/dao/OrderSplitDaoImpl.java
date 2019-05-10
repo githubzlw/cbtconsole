@@ -2410,7 +2410,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				} else {
 					conn2.setAutoCommit(false);
 					stmt = conn2.createStatement();
-					stmt.addBatch(sqlRcRd);
+					// stmt.addBatch(sqlRcRd);
 					stmt.addBatch(sqlOdIf);
 					stmt.addBatch(sqlOdDs);
 					int[] res = stmt.executeBatch();
@@ -3027,7 +3027,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "' as orderno_new,paymentid,'" + odbeanNew.getPay_price()
 				+ "' as payprice_new,payment_cc,'order split' as orderdesc,username,"
 				+ "paystatus,NOW(),paySID,payflag,3 as paytype,3 as payment_other,paymentno,"
-				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "'";
+				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' limit 1";
 		sqlList.add(insertPaymentSql);
 		insertPaymentSql = null;
 
