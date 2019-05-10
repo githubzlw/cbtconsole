@@ -235,11 +235,14 @@ public class OrderCancelApprovalController {
                 json.setMessage("获取申请订单号失败,请重试");
                 return json;
             } else if (orderNo.contains("_")) {
-                json.setOk(false);
-                json.setMessage("拆单或者补货订单号，不可退款");
-                return json;
+                // jxw 19-05-09 判断是否是dp订单或者拆单订单,如果是则可以退款
+                String[] orderSplit = orderNo.split("_");
+                if(orderSplit[1].length() > 2){
+                    json.setOk(false);
+                    json.setMessage("拆单或者补货订单号，不可退款");
+                    return json;
+                }
             }
-
             String operatorIdStr = request.getParameter("operatorId");
             int operatorId = 0;
             if (StringUtils.isBlank(operatorIdStr) || "0".equals(operatorIdStr)) {
@@ -379,9 +382,20 @@ public class OrderCancelApprovalController {
 
         JsonResult json = new JsonResult();
         try {
+            String refundOrderNo = approvalBean.getOrderNo();
+            if (refundOrderNo.contains("_")) {
+                String[] orderSplit = refundOrderNo.split("_");
+                if (orderSplit[1].trim().length() > 2) {
+                    json.setOk(false);
+                    json.setMessage("拆单或者补货订单号，不可退款");
+                    return json;
+                } else {
+                    refundOrderNo = orderSplit[0].trim();
+                }
+            }
 
             // 判断此订单没有PayPal或stripe的付款，如果PayPal或stripe的付款小于申请金额并且余额付款并且大于等于申请金额，则直接退给客户余额
-            List<PaymentDetails> list = paymentServiceNew.queryPaymentDetails(approvalBean.getOrderNo());
+            List<PaymentDetails> list = paymentServiceNew.queryPaymentDetails(refundOrderNo);
 
             double totalAmount = 0;
             double orderBalance = 0;
@@ -403,22 +417,23 @@ public class OrderCancelApprovalController {
             if (totalAmount - approvalBean.getAgreeAmount() < -0.01) {
                 // 获取数据异常
                 json.setOk(false);
-                json.setMessage("退款失败,[订单号：" + approvalBean.getOrderNo() + ",支付总额："
+                json.setMessage("退款失败,[订单号：" + refundOrderNo + ",支付总额："
                         + BigDecimalUtil.truncateDouble(totalAmount, 2)
                         + "，小于退款总额：" + BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + "]");
             } else {
                 // 优先PayPal TT stripe支付值退款
                 if (orderPay > 0) {
                     if (orderPay - approvalBean.getAgreeAmount() >= -0.01) {
-                        json = ppApiService.reFundNew(approvalBean.getOrderNo(), decimalFormat.format(approvalBean.getAgreeAmount()));
+                        json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(approvalBean.getAgreeAmount()));
                     } else {
-                        json = ppApiService.reFundNew(approvalBean.getOrderNo(), decimalFormat.format(orderPay));
+                        json = ppApiService.reFundNew(refundOrderNo, decimalFormat.format(orderPay));
                         approvalBean.setRemainAmount(approvalBean.getAgreeAmount() - orderPay);
                     }
                 } else {
                     // 余额退款的，放在后面一起执行
                     json.setOk(true);
                     json.setTotal(0L);
+                    approvalBean.setRemainAmount(approvalBean.getAgreeAmount());
                 }
                 OrderCancelApproval approvalOld = approvalService.queryForSingle(approvalBean.getId());
                 if (json.isOk()) {
@@ -460,8 +475,8 @@ public class OrderCancelApprovalController {
                                     + ")<br>" + json.getMessage());
                         }
                     } else {
-                        approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“余额退款”成功！(余额退款："+
-                                BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) +")");
+                        approvalDetails.setRemark(approvalDetails.getRemark() + ",执行“余额退款”成功！(余额退款：" +
+                                BigDecimalUtil.truncateDouble(approvalBean.getAgreeAmount(), 2) + ")");
                     }
                     approvalService.updateOrderCancelApprovalState(approvalBean);
                     approvalService.insertIntoApprovalDetails(approvalDetails);

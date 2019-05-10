@@ -6,11 +6,16 @@ import com.cbt.pojo.Admuser;
 import com.cbt.util.*;
 import com.cbt.website.dao.*;
 import com.cbt.website.service.IOrderSplitServer;
+import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderSplitServer;
+import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.util.JsonResult;
 
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -520,9 +525,20 @@ public class NewOrderSplitCtr {
                 // 拆单取消后取消的商品如果有使用库存则还原库存
                 splitDao.cancelInventory(odidLst);
                 // 5.如果是取消商品进余额，则调用统一接口进行客户余额变更
-                ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
+                /*ChangUserBalanceDao balanceDao = new ChangUserBalanceDaoImpl();
                 balanceDao.changeBalance(orderBeanTemp.getUserid(), genFloatWidthTwoDecimalPlaces(totalPayPriceNew), 1,
-                        1, nwOrderNo, "", admuser.getId());
+                        1, nwOrderNo, "", admuser.getId());*/
+
+                IOrderwsServer orderwsServer = new OrderwsServer();
+                int oiState=orderwsServer.checkOrderState(orderNo,"0");
+                OrderCancelApproval cancelApproval = new OrderCancelApproval();
+                cancelApproval.setUserId(orderBeanTemp.getUserid());
+                cancelApproval.setOrderNo(nwOrderNo);
+                cancelApproval.setPayPrice(totalPayPriceNew);
+                cancelApproval.setType(2);
+                cancelApproval.setDealState(0);
+                cancelApproval.setOrderState(oiState);
+                NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
             }
             // 6.执行完成后，给出执行的结果并保存数据库
             splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);

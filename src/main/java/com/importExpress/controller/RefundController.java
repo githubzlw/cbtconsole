@@ -849,6 +849,10 @@ public class RefundController {
             mv.addObject("success", 0);
             mv.addObject("message", "获取订单号失败");
             return mv;
+        }else{
+            if(orderNo.contains("_")){
+                orderNo = orderNo.split("_")[0].trim();
+            }
         }
         try {
             List<OrderBean> orderList = refundNewService.queryOrderInfoByOrderNoOrUserId(userId, orderNo);
