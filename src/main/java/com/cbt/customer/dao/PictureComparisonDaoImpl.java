@@ -2372,8 +2372,87 @@ public class PictureComparisonDaoImpl implements IPictureComparisonDao{
 		}
 		return gsfList;
 	}
-	
-	
+
+	@Override
+	public List<GoodsCheckBean> findImgDb(int selled, String cid, String pId, int start, int end, int flag){
+
+		Connection conn = DBHelper.getInstance().getConnection();
+		List<GoodsCheckBean> gsfList = new ArrayList<GoodsCheckBean>();
+		String sql = "select sor_pid,res_pid1,res_pid2,res_pid3,res_pid4,res_pid5,res_pid6,img_path ";
+
+		sql= sql+" from  lire_img_custom_db ";
+		sql= sql+" where 1=1 ";
+		if(StringUtil.isNotBlank(pId)){
+			sql= sql+" and sor_pid=? ";
+		}
+		sql= sql+"  limit ?, ?";
+
+		String path ="";
+		if(flag>0){
+			path = "http://192.168.1.28:83";
+		}else{
+			path = "http://117.144.21.74:83";
+		}
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = conn.prepareStatement(sql);
+			if(StringUtil.isNotBlank(pId)){
+				stmt.setString(1,pId);
+				stmt.setInt(2, start);
+				stmt.setInt(3, end);
+			}else{
+				stmt.setInt(1, start);
+				stmt.setInt(2, end);
+			}
+
+
+			rs = stmt.executeQuery();
+			while (rs.next()) {
+				GoodsCheckBean gfb = new GoodsCheckBean();
+				//pid
+				gfb.setGoodsName0(rs.getString("sor_pid"));
+				gfb.setGoodsName1(rs.getString("res_pid1"));
+				gfb.setGoodsName2(rs.getString("res_pid2"));
+				gfb.setGoodsName3(rs.getString("res_pid3"));
+				gfb.setGoodsName4(rs.getString("res_pid4"));
+				gfb.setGoodsName5(rs.getString("res_pid5"));
+				gfb.setGoodsName6(rs.getString("res_pid6"));
+				String imgurl="\\OnlineGoodsMain\\OnlineGoodsMain1";
+				String sourceImg = path+imgurl.replace("\\","/")+"/"+rs.getString("sor_pid")+".jpg";
+				gfb.setSourceImg(sourceImg);
+				gfb.setTbImg1(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid1")+".jpg");
+				gfb.setTbImg2(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid2")+".jpg");
+				gfb.setTbImg3(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid3")+".jpg");
+				gfb.setTbImg4(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid4")+".jpg");
+				gfb.setTbImg5(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid5")+".jpg");
+				gfb.setTbImg6(path+rs.getString("img_path").replace("\\","/")+"/"+rs.getString("res_pid6")+".jpg");
+
+				gsfList.add(gfb);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return gsfList;
+	}
+
 
 	public int upPidValid() {
 		
