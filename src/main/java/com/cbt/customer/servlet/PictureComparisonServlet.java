@@ -1020,6 +1020,88 @@ public class PictureComparisonServlet extends HttpServlet {
 
 	}
 
+	/**
+	 * 方法描述:1688产品在百万速卖通找对标产品
+	 */
+	public void findImgDb(HttpServletRequest request, HttpServletResponse response) {
+
+		//无对标标识
+		String noBenchFlag = request.getParameter("noBenchFlag");
+		//alipid
+		String aliPid = request.getParameter("aliPid");
+		//1688pid
+		String ylbbPid = request.getParameter("ylbbPid");
+//		//销量
+//		String su = request.getParameter("selled");
+//		int selled = 0;
+//		if(su != null && !"".equals(su)) {
+//			request.setAttribute("selled", su);
+//			selled = Integer.parseInt(su);
+//		}
+//		String cid = request.getParameter("cid");
+//		//大分类
+//		String categoryId = request.getParameter("categoryId");
+//		//小分类
+//		String categoryId1 = request.getParameter("categoryId1");
+
+		String str = request.getParameter("page");
+		int page = 1;
+		if(str != null) {
+			page = Integer.parseInt(str);
+		}
+		int start = (page-1) * PAGESIZE;
+
+		IPictureComparisonService ips = new PictureComparisonServiceImpl();
+//		//取得分类
+//		List<CategoryBean> categoryList=ips.getCategoryInfo();
+//		request.setAttribute("categoryList", categoryList);
+//
+//		//取得二级分类
+//		if("".equals(cid)||cid==null){
+//			cid=categoryId;
+//		}
+//		List<CategoryBean> categoryList1=new ArrayList<CategoryBean>();
+//		if(!"".equals(cid) && cid!=null){
+//			categoryList1=ips.getCategoryInfo1(cid);
+//		}
+//		request.setAttribute("categoryList1", categoryList1);
+
+		//取得登录的用户名字
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		noBenchFlag = adm.getAdmName();
+		String getSourceTbl = "";
+		String serveIp = request.getServerName();
+		int flag=0;
+		if(serveIp.indexOf("192.")>-1){
+			flag=1;
+		}
+		//根据分类查结果
+		List<GoodsCheckBean> goodsCheckBeans = ips.findImgDb(0,noBenchFlag,ylbbPid,start, PAGESIZE,flag);
+
+
+		request.setAttribute("gbbs", goodsCheckBeans);
+
+		//总条数 批量筛选用
+//		int goodsCheckCount = ips.getLireImgCount(noBenchFlag,selled);
+//		int goodsCheckCount = 10;
+//		SplitPage.buildPager(request, goodsCheckCount, PAGESIZE, page);
+//		request.setAttribute("cid", cid);
+////		request.setAttribute("categoryId", categoryId);
+////		request.setAttribute("categoryId1", categoryId1);
+////		request.setAttribute("similarityId", aliPid);
+		request.setAttribute("ylbbPid", ylbbPid);
+//		request.setAttribute("selled", selled);
+
+		try {
+			request.getRequestDispatcher("/website/lire_db_img.jsp").forward(request, response);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 
 
