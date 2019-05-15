@@ -118,7 +118,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
 
         if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {
-            sql += " and a.updatetime >='" + timeFrom + "' and a.updatetime<='" + timeTo + "'";
+            sql += " and a.createtime >='" + timeFrom + "' and a.createtime<='" + timeTo + "'";
         }
         if (date != null && !"".equals(date)) {
             sql += " and a.updatetime = '" + date + "'";
@@ -370,7 +370,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         }
 
         if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {
-            sql += " and updatetime >='" + timeFrom + "' and updatetime<='" + timeTo + "'";
+            sql += " and createtime >='" + timeFrom + "' and createtime<='" + timeTo + "'";
         }
         if (date != null && !"".equals(date)) {
             sql += " and updatetime = '" + date + "'";
