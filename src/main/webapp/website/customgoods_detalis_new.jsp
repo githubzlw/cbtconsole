@@ -35,6 +35,7 @@
         var imgJson = {};
         var tempJson = {};
         var typeJson = {};
+        var editorObj = {};
 
         $(document).ready(function () {
             initDialog();
@@ -64,7 +65,7 @@
 
         //初始化xheditor
         function initXheditor() {
-            $('#goods_content').xheditor({
+            editorObj = $('#goods_content').xheditor({
                 tools: "full",
                 html5Upload: false,
                 upBtnText: "上传",
@@ -1404,10 +1405,26 @@
             });
         }
 
+
+        function initOnLoad() {
+            querySimilarGoodsByMainPid();
+            $('#review_dlg').dialog('close');
+            $('#update_review_dlg').dialog('close');
+            setTimeout("flashImg()",3000);
+            setInterval("flashImg()", 30000);
+        }
+
+        function flashImg() {
+            $(".editMode").find("img")
+        }
+        $(".editMode").find("img").on("click", function () {
+            $(this).addClass("img_choose");
+            $(this).siblings().removeClass("img_choose");
+        });
     </script>
 </head>
 
-<body onload="querySimilarGoodsByMainPid();$('#review_dlg').dialog('close');$('#update_review_dlg').dialog('close');">
+<body onload="initOnLoad()">
 
 <c:if test="${uid ==0}">
     {"status":false,"message":"请重新登录进行操作"}
@@ -2133,10 +2150,7 @@
                               onclick="beforeSetAliInfo('${goods.pid}',${goods.isBenchmark},${goods.bmFlag},'${goods.aliGoodsPid}')">重新录入对标</span>
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
                     <br>
-                    <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>&nbsp;&nbsp;&nbsp;
-                    <button class="s_btn" style="width: 180px;"
-                            onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片
-                    </button>
+                    <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
 
                 </div>
                 <br>
@@ -2224,6 +2238,10 @@
 
         <div class="s_bot">
             <h1 style="text-align: center; color: red;">请不要全盘copy，请去掉所有有“品牌”、“店名”的图，请去掉所有有“aliexpress”字样的图</h1>
+
+            <button class="s_btn" style="width: 180px;"
+                    onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片
+            </button>&nbsp;&nbsp;&nbsp;
             <span id="use_ali_goods" class="s_btn"
                   onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
             <div class="bot_l">
@@ -2250,36 +2268,36 @@
 </body>
 <script type="text/javascript">
 
-    function beforeDeleteMd5(goodsPid,shopId) {
-        $.messager.prompt('提示', '请输入详情图片链接(详情图片选中->鼠标右击->选择“复制图片地址”->粘贴)', function (url) {
-            if (url) {
-                if (url.indexOf("http") == -1) {
-                    $.messager.alert("提醒", "输入链接地址错误", "info");
-                } else {
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'json',
-                        url: '/cbtconsole/editc/queryMd5ByImgUrl',
-                        data: {
-                            "pid": goodsPid,
-                            "shopId": shopId,
-                            "url": url
-                        },
-                        success: function (json) {
-                            if (json.ok) {
-                                confirmAndDelete(json, goodsPid, url,shopId)
-                            } else {
-                                $.messager.alert("提醒", json.message, "error");
-                            }
-                        },
-                        error: function () {
-                            $.messager.alert("提醒", "执行失败，请重试", "error");
+    function beforeDeleteMd5(goodsPid, shopId) {
+        var img = editorObj.getSelect();
+        var imgObj = $(img);
+        var url = imgObj[0].src;
+        if (url) {
+            if (url.indexOf("http") == -1 && url.indexOf("https") == -1) {
+                $.messager.alert("提醒", "获取链接地址错误", "info");
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/queryMd5ByImgUrl',
+                    data: {
+                        "pid": goodsPid,
+                        "shopId": shopId,
+                        "url": url
+                    },
+                    success: function (json) {
+                        if (json.ok) {
+                            confirmAndDelete(json, goodsPid, url, shopId)
+                        } else {
+                            $.messager.alert("提醒", json.message, "error");
                         }
-                    });
-                }
-
+                    },
+                    error: function () {
+                        $.messager.alert("提醒", "执行失败，请重试", "error");
+                    }
+                });
             }
-        });
+        }
     }
 
     function confirmAndDelete(json, goodsPid, url,shopId) {
