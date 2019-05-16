@@ -517,7 +517,7 @@ public class GoodsInfoUpdateOnlineUtil {
      * @param isSolr                     : 是否更新solr
      * @return
      */
-    public static boolean batchSetoodsShopScoreLocal(String shopName, List<String> pidList, int flag, Object objVal, int isSolr) {
+    public static boolean batchSetGoodsShopScoreLocal(String shopName, List<String> pidList, int flag, Object objVal, int isSolr) {
         boolean isSuccess = false;
         File file = null;
         List<String> upList = new ArrayList<>();
@@ -568,7 +568,7 @@ public class GoodsInfoUpdateOnlineUtil {
             }
         }
         if (isSuccess) {
-            isSuccess = batchSetoodsShopScoreOnline(shopName, upList, objVal, isSolr);
+            isSuccess = batchSetGoodsShopScoreOnline(shopName, upList, objVal, isSolr);
             upList.clear();
         }
         pidList.clear();
@@ -585,7 +585,7 @@ public class GoodsInfoUpdateOnlineUtil {
      * @param isSolr   : 是否更新solr
      * @return
      */
-    public static boolean batchSetoodsShopScoreOnline(String shopName, List<String> upList, Object objVal, int isSolr) {
+    public static boolean batchSetGoodsShopScoreOnline(String shopName, List<String> upList, Object objVal, int isSolr) {
         boolean isSuccess = false;
         File file = null;
         try {

@@ -355,7 +355,7 @@ public class SupplierScoringController {
 				// 批量更新店铺商品的打分数据
 				List<String> pidList = customGoodsService.queryPidByShopId(shopId);
 				if (pidList != null && pidList.size() > 0) {
-					GoodsInfoUpdateOnlineUtil.batchSetoodsShopScoreLocal(shopId, pidList, 1,
+					GoodsInfoUpdateOnlineUtil.batchSetGoodsShopScoreLocal(shopId, pidList, 1,
 							BigDecimalUtil.truncateDouble(qua, 2), 1);
 					pidList.clear();
 				}
