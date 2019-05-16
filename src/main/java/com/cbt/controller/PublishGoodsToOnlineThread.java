@@ -258,12 +258,12 @@ public class PublishGoodsToOnlineThread extends Thread {
                     LOG.error("this pid:" + pid + " update goodsstate error!");
                 }
             } else {
-                LOG.warn("UploadImgToOnline pid:" + pid + " is uploading!");
+                LOG.warn("PublishGoodsToOnlineThread pid:" + pid + " is uploading!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("UploadImgToOnline error:" + e.getMessage());
-            System.err.println("UploadImgToOnline error:" + e.getMessage());
+            LOG.error("PublishGoodsToOnlineThread pid:" + pid + " error:",e);
+            System.err.println("PublishGoodsToOnlineThread pid:" + pid + " error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");

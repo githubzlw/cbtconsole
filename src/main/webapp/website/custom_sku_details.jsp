@@ -47,7 +47,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="genTypeNum()">
 
 <c:if test="${success == 0}">
     <b style="font-size: 18px;text-align: center;">${message}</b>
@@ -71,7 +71,7 @@
             </tr>
             </thead>
 
-
+            <tbody id="sku_body">
             <c:forEach var="sku_bean" items="${showSku}" varStatus="skuIndex">
                 <tr>
                     <c:forEach var="tp_ar" items="${fn:split(sku_bean.skuAttrs,';')}">
@@ -84,7 +84,7 @@
                                id="${sku_bean.ppIds}" value="${sku_bean.fianlWeight}"/></td>
                 </tr>
             </c:forEach>
-
+            </tbody>
 
         </table>
 
@@ -93,10 +93,13 @@
         <table border="1" cellspacing="0" cellpadding="0" bgcolor="#94f1dc">
             <caption>操作</caption>
             <tr style="text-align: center;">
-                <td style="width: 140px;"><input class="btn" type="button" value="全部相同" onclick="updateWeight(1,this)"/></td>
-                <td style="width: 140px;"><input class="btn" type="button" value="区间(从小到大)" onclick="updateWeight(2,this)"/>
+                <td style="width: 140px;"><input class="btn" type="button" value="全部相同" onclick="updateWeight(1,this)"/>
                 </td>
-                <td style="width: 140px;"><input class="btn" type="button" value="区间(从大到小)" onclick="updateWeight(3,this)"/>
+                <td style="width: 140px;"><input class="btn" type="button" value="区间(从小到大)"
+                                                 onclick="updateWeight(2,this)"/>
+                </td>
+                <td style="width: 140px;"><input class="btn" type="button" value="区间(从大到小)"
+                                                 onclick="updateWeight(3,this)"/>
                 </td>
             </tr>
 
@@ -112,6 +115,30 @@
 
 </body>
 <script type="text/javascript">
+
+    var typeObj ={};
+    var maxVal = 1;
+
+    function genTypeNum() {
+        // 循环遍历table,判断最大规格数据
+        $("#sku_body").find("tr").each(function () {
+            var tdVal = $(this).find("td").eq(0).text();
+            if(typeObj.hasOwnProperty(tdVal)){
+                typeObj[tdVal] = typeObj[tdVal] + 1;
+            }else{
+                typeObj[tdVal] = 1;
+            }
+            $(this).find("td:last").find("input").addClass("cls_" + tdVal);
+        });
+        // 取最大值
+
+        for(var keyV in typeObj){
+            if(maxVal < typeObj[keyV]){
+                maxVal = typeObj[keyV];
+            }
+        }
+    }
+
 
     function updateWeight(flag, obj) {
         if (flag == 1) {
@@ -155,7 +182,7 @@
                 success: function (data) {
                     $('.mask').hide();
                     showMessage(data.message);
-                    if(data.ok){
+                    if (data.ok) {
                         window.location.reload();
                     }
                 },
@@ -167,7 +194,8 @@
     }
 
     function intervalWeight(flag, obj) {
-        $(obj).css("background-color","#aba297");
+        $(obj).css("background-color", "#aba297");
+
         $.messager.prompt('提示', '请输入重量(KG)，从小到大，用“-”分割:', function (is) {
             if (is) {
                 if (is.indexOf("-") > -1) {
@@ -199,16 +227,16 @@
                 } else {
                     showMessage('重量输入不合法');
                 }
-                $(obj).css("background-color","darkorange");
+                $(obj).css("background-color", "darkorange");
             } else {
                 showMessage('未输入重量或取消输入！');
-                $(obj).css("background-color","darkorange");
+                $(obj).css("background-color", "darkorange");
             }
         });
     }
 
     function allSamePrice(obj) {
-        $(obj).css("background-color","#aba297");
+        $(obj).css("background-color", "#aba297");
         $.messager.prompt('提示', '请输入重量(KG):', function (is) {
             if (is) {
                 var reg = /(^[-+]?[1-9]\d*(\.\d{1,3})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
@@ -217,10 +245,10 @@
                 } else {
                     $(".inp_price").val(is);
                 }
-                $(obj).css("background-color","darkorange");
+                $(obj).css("background-color", "darkorange");
             } else {
                 showMessage('未输入重量或取消输入！');
-                $(obj).css("background-color","darkorange");
+                $(obj).css("background-color", "darkorange");
             }
         });
     }
