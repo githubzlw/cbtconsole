@@ -691,5 +691,10 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.remarkSoftGoodsValid(pid, reason);
     }
 
+    @Override
+    public List<String> queryPidByShopId(String shopId) {
+        return customGoodsMapper.queryPidByShopId(shopId);
+    }
+
 
 }

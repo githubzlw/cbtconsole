@@ -1,6 +1,8 @@
 package com.cbt.warehouse.ctrl;
 
 import com.cbt.pojo.page.Page;
+import com.cbt.service.CustomGoodsService;
+import com.cbt.util.BigDecimalUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.Utility;
@@ -10,6 +12,7 @@ import com.cbt.warehouse.service.SupplierScoringService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.QueAns;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -35,6 +38,8 @@ import java.util.*;
 public class SupplierScoringController {
 	@Autowired
 	private SupplierScoringService supplierScoringService;
+	@Autowired
+	private CustomGoodsService customGoodsService;
 	private Logger LOG = Logger.getLogger(SupplierScoringController.class);
 
 	/**
@@ -345,6 +350,14 @@ public class SupplierScoringController {
 					maps.put("level",getLevel(qua));
 					//首次不需要算店铺平均分直接插入信息
 					supplierScoringService.saveSupplierScoring(maps);
+				}
+
+				// 批量更新店铺商品的打分数据
+				List<String> pidList = customGoodsService.queryPidByShopId(shopId);
+				if (pidList != null && pidList.size() > 0) {
+					GoodsInfoUpdateOnlineUtil.batchSetoodsShopScoreLocal(shopId, pidList, 1,
+							BigDecimalUtil.truncateDouble(qua, 2), 1);
+					pidList.clear();
 				}
 			}
 			maps.put("flag","success");

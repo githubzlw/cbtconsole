@@ -15,6 +15,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -3544,6 +3545,17 @@ public class ShopUrlController {
             shopUrlService.setShopType(shopId, Integer.valueOf(type));
             LOG.info("shopId:" + shopId + "，更新店铺类型:" + type + ",操作人：" + user.getId() + "@" + user.getAdmName());
             json.setOk(true);
+
+            if ("1".equals(type)) {
+                // 批量更新店铺商品的打分数据
+                List<String> pidList = customGoodsService.queryPidByShopId(shopId);
+                if (pidList != null && pidList.size() > 0) {
+                    GoodsInfoUpdateOnlineUtil.batchSetoodsShopScoreLocal(shopId, pidList, 2,
+                            1, 1);
+                    pidList.clear();
+                }
+            }
+
         } catch (Exception e) {
             e.getStackTrace();
             json.setOk(false);

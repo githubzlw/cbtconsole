@@ -1233,4 +1233,9 @@
         values(#{pid}, #{reason})
     </insert>
 
+    <select id="queryPidByShopId" resultType="java.lang.String">
+        select pid from custom_benchmark_ready
+        where shop_id = #{shopId}
+    </select>
+
 </mapper>

@@ -761,4 +761,11 @@ public interface CustomGoodsService {
      * @return
      */
     int remarkSoftGoodsValid(String pid, int reason);
+
+    /**
+     * 根据店铺ID查询PID数据
+     * @param shopId : 店铺ID
+     * @return
+     */
+    List<String> queryPidByShopId(String shopId);
 }
