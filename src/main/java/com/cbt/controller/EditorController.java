@@ -492,7 +492,7 @@ public class EditorController {
                 Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
                     @Override
                     public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
-                        return o1.getPpIds().compareTo(o2.getPpIds());
+                        return o1.getEnType().compareTo(o2.getEnType());
                     }
                 });
                 mv.addObject("showSku", JSONArray.fromObject(cbSkus));

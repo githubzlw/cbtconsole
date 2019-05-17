@@ -416,4 +416,11 @@ public interface CustomGoodsMapper {
      * @return
      */
     int remarkSoftGoodsValid(@Param("pid") String pid, @Param("reason") int reason);
+
+    /**
+     * 根据店铺ID查询PID数据
+     * @param shopId : 店铺ID
+     * @return
+     */
+    List<String> queryPidByShopId(@Param("shopId") String shopId);
 }

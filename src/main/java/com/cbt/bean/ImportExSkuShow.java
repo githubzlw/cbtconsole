@@ -5,6 +5,7 @@ public class ImportExSkuShow {
     private String skuAttrs;
     private float price;
     private double fianlWeight;
+    private String enType;
 
     public double getFianlWeight() {
         return fianlWeight;
@@ -36,6 +37,14 @@ public class ImportExSkuShow {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public String getEnType() {
+        return enType;
+    }
+
+    public void setEnType(String enType) {
+        this.enType = enType;
     }
 
     @Override
