@@ -350,6 +350,16 @@
 		.imagetable tr td:last-child {
 			border-right: 1px solid #ddd;
 		}
+		.model{
+			position: absolute;
+			width: 500px;
+			height: 400px;
+			margin-top: 10%;
+			left: 50%;
+			margin-left: -200px;
+			background: #fff;
+			border:1px solid #ddd;
+		}
 	</style>
 </head>
 <script type="text/javascript">
@@ -2286,11 +2296,26 @@
         return check_val;
     }
     //发起退货
-    function returnNum(odid,cusorder,num) {
+    function returnNum(odid,cusorder,pid,num) {
+
     	document.getElementById('cusorder').value=cusorder;
     	document.getElementById('num').value=num;
     	document.getElementById('odid').value=odid;
-    	     $('#user_remark').window('open');
+        document.getElementById('pid').value=pid;
+        $.post("/cbtconsole/Look/getpid", {
+            cusorder:cusorder,pid:pid
+        }, function(res) {
+            if(res.rows == 0){
+                alert('该订单已全部发起退货');
+                return;
+            }else if(res.rows == 1){
+                alert('该商品还未采购可直接取消采购');
+                return;
+            }else {
+                $('#user_remark').window('open');
+			}
+        });
+
     	        
     	   
     }
@@ -2300,12 +2325,13 @@
         var returnNO =$(" #returnNO ").val()
         var num =$(" #num ").val()
         var odid =$(" #odid ").val()
+        var pid =$(" #pid ").val()
         if(number>num){
         	alert('退货数量不能大于总数量');
         	return;
         }
 		  $.post("/cbtconsole/Look/AddOrderByOdid", {
-				number:number,cusorder:cusorder,returnNO:returnNO,odid:odid,num:num
+				number:number,cusorder:cusorder,returnNO:returnNO,odid:odid,num:num,pid:pid
 			}, function(res) {
 				if(res.rows == 0){
 					alert('修改成功');
@@ -2335,7 +2361,8 @@
          style="width:400px;height:auto;display: none;font-size: 16px;">
             <div id="sediv" style="margin-left:20px;">
              <div>客户订单号：<input id="cusorder" value='' ></div>
-            <div>购物车Id：&nbsp;&nbsp;&nbsp;<input id="odid" value='' ></div>  
+            <div>购物车Id：&nbsp;&nbsp;&nbsp;<input id="odid" value='' ></div>
+				<div>商品pid：&nbsp;&nbsp;&nbsp;&nbsp;<input id="pid" value='' ></div>
               <div>总数量：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="num" value='' ></div>
             <div>退货数量：&nbsp;&nbsp;&nbsp;<input id="number" value='' ></div>
              <div>退货理由：&nbsp;&nbsp;&nbsp;<input id="returnNO" value='' ></div>      
@@ -2345,7 +2372,7 @@
                    onclick="returnNu()" style="width:80px" >提交申请</a>
             </div>
     </div>
-<div align="center">
+<div >
 
 </div>
 <br />
@@ -3176,7 +3203,8 @@
 							</div>
 							<div class="w-margin-top">
 								<input type="button" value="备注或回复" onclick="doReplay1('${pb.orderNo}','${pb.goodsid}','${pb.od_id}');" class="repalyBtn" />
-								<input type="button" id="${pb.od_id}" stype="display:none" value="发起退货" onclick="returnNum('${pb.od_id}','${pb.orderNo}','${pb.googs_number}');" class="repalyBtn" />
+								<input type="button" id="${pb.od_id}" stype="display:none" value="发起退货" onclick="returnNum('${pb.od_id}','${pb.orderNo}','${pb.goods_pid}','${pb.googs_number}');" class="repalyBtn" />
+								<P>${pb.returnTime}</P>
 							</div>
 						</td>
 					</tr>

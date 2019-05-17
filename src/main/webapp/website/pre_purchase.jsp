@@ -325,6 +325,19 @@
                     }
                 }
             });
+            //未处理退货
+            $.ajax({
+                type:"post",
+                url:"/cbtconsole/Look/getReturnCount",
+                data:{admuserid:admuserid},
+                dataType:"text",
+                async:true,
+                success : function(data){
+                    if(data != '0'){
+                        $("#tb_info_8").html("<a target='_blank' href='/cbtconsole/website/ReturnDisplay.jsp' title='查看未处理退货(订单)'>"+data+"</a>");
+                    }
+                }
+            });
             //当月分配种类
             $.ajax({
                 type:'post',
@@ -483,6 +496,8 @@
 		<span style="font-size:20px;font-weight:bold">平均花费时间:</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tj_info_5" style="font-size:20px;width:130px;margin-right:50px">0</span>
 		<span style="font-size:20px;font-weight:bold">超过1天未发货(订单):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tb_info_6" style="font-size:20px;;margin-right:50px">0</span>
 		<span style="font-size:20px;font-weight:bold">发货3天未入库(订单):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tb_info_7" style="font-size:20px;">0</span>
+		<br>
+		<span style="font-size:20px;font-weight:bold">未处理退货(订单):</span><span class="easyui-label" data-options="iconCls:'icon-font',plain:true" id="tb_info_8" style="font-size:20px;">0</span>
 	</div><br>
 	<div style="font-size:15px;">
 		超过交期项目(订单):<span onclick="doQuery(1,1);" class="easyui-linkbutton" data-options="iconCls:'icon-font',plain:true" id="info_1" style="color:red;width:38px;text-decoration:underline;margin-right:80px;">0</span>
