@@ -44,7 +44,33 @@ public class GoodsInfoUtils {
      */
     public static final String UPLOAD_PRODUCT = "D";
 
-    // 处理1688商品的规格图片数据
+    /**
+     * 文字尺码表转换纯数据
+     */
+    private static final Map<String,String> closeSizeMap = new HashMap<>();
+
+    static {
+        closeSizeMap.put("XS", "01");
+        closeSizeMap.put("S", "02");
+        closeSizeMap.put("M", "03");
+        closeSizeMap.put("L", "04");
+        closeSizeMap.put("XL", "05");
+        closeSizeMap.put("2L", "06");
+        closeSizeMap.put("XXL", "06");
+        closeSizeMap.put("3L", "07");
+        closeSizeMap.put("XXXL", "07");
+        closeSizeMap.put("4L", "08");
+        closeSizeMap.put("XXXXL", "08");
+    }
+
+
+    /**
+     * 处理1688商品的规格图片数据
+     *
+     * @param cgbean
+     * @param isRemote
+     * @return
+     */
     public static List<TypeBean> deal1688GoodsType(CustomGoodsPublish cgbean, boolean isRemote) {// 规格
         List<TypeBean> typeList = new ArrayList<TypeBean>();
         if (!(cgbean.getEntype() == null || "".equals(cgbean.getEntype()))) {
@@ -173,6 +199,7 @@ public class GoodsInfoUtils {
 
         for (ImportExSku ites : skuList) {
             String skuAttrs = "";
+            String enType = "";
             ImportExSkuShow ipes = new ImportExSkuShow();
             // PropIds分组循环
             String[] ppidLst = ites.getSkuPropIds().split(",");
@@ -183,6 +210,11 @@ public class GoodsInfoUtils {
                 for (TypeBean tyb : typeList) {
                     if (ppid.equals(tyb.getId())) {
                         skuAttrs += ";" + tyb.getId() + "@" + tyb.getType() + "@" + tyb.getValue();
+                        if(closeSizeMap.containsKey(tyb.getValue().toUpperCase())){
+                            enType += closeSizeMap.get(tyb.getValue().toUpperCase()) + ",";
+                        }else{
+                            enType += tyb.getValue() + ",";
+                        }
                         totalCount++;
                         break;
                     }
@@ -209,6 +241,9 @@ public class GoodsInfoUtils {
             if (skuAttrs == null || "".equals(skuAttrs)) {
                 ipes = null;
             } else {
+                if(StringUtils.isNotBlank(enType)){
+                    ipes.setEnType(enType);
+                }
                 ipes.setSkuAttrs(skuAttrs.substring(1));
                 // skuAttrs获取失败，则不显示sku数据，并且在更新后覆盖原数据
                 // type多规格生成的数据中sku只有单规格的数据也剔除掉
