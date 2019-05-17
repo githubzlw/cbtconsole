@@ -116,24 +116,24 @@
 </body>
 <script type="text/javascript">
 
-    var typeObj ={};
+    var typeObj = {};
     var maxVal = 1;
 
     function genTypeNum() {
         // 循环遍历table,判断最大规格数据
         $("#sku_body").find("tr").each(function () {
             var tdVal = $(this).find("td").eq(0).text();
-            if(typeObj.hasOwnProperty(tdVal)){
+            if (typeObj.hasOwnProperty(tdVal)) {
                 typeObj[tdVal] = typeObj[tdVal] + 1;
-            }else{
+            } else {
                 typeObj[tdVal] = 1;
             }
             $(this).find("td:last").find("input").addClass("cls_" + tdVal);
         });
         // 取最大值
 
-        for(var keyV in typeObj){
-            if(maxVal < typeObj[keyV]){
+        for (var keyV in typeObj) {
+            if (maxVal < typeObj[keyV]) {
                 maxVal = typeObj[keyV];
             }
         }
@@ -207,21 +207,24 @@
                     } else {
                         var smallW = parseFloat(weightList[0]);
                         var bigW = parseFloat(weightList[1]);
-                        var count = $(".inp_price").length;
-                        var avgW = parseFloat((bigW - smallW) / (count - 1));
+                        var avgW = parseFloat((bigW - smallW) / (maxVal - 1));
                         var totalW = 0;
                         if (flag == 2) {
-                            totalW = parseFloat(smallW);
-                            $(".inp_price").each(function () {
-                                $(this).val(totalW.toFixed(3));
-                                totalW = totalW + avgW;
-                            });
+                            for (var keyV in typeObj) {
+                                totalW = parseFloat(smallW);
+                                $(".cls_" + keyV).each(function () {
+                                    $(this).val(totalW.toFixed(3));
+                                    totalW = totalW + avgW;
+                                });
+                            }
                         } else {
-                            totalW = bigW;
-                            $(".inp_price").each(function () {
-                                $(this).val(totalW.toFixed(3));
-                                totalW = totalW - avgW;
-                            });
+                            for (var keyV in typeObj) {
+                                totalW = bigW;
+                                $(".cls_" + keyV).each(function () {
+                                    $(this).val(totalW.toFixed(3));
+                                    totalW = totalW - avgW;
+                                });
+                            }
                         }
                     }
                 } else {
