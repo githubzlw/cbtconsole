@@ -89,6 +89,16 @@ public class PurchasesBean {
 	private String quality;
 	private String noChnageRemark;
 	private String shopInventory;
+	private String returnTime;//退货时间
+
+	public String getReturnTime() {
+		return returnTime;
+	}
+
+	public void setReturnTime(String returnTime) {
+		this.returnTime = returnTime;
+	}
+
 	public String getShopInventory() {
 		return shopInventory;
 	}

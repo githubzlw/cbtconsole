@@ -5,13 +5,11 @@ import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.OrderProductSource;
 import com.cbt.pojo.StraightHairPojo;
 import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
-import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
-import com.cbt.warehouse.pojo.OrderInfoCountPojo;
-import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchasesBean;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -530,4 +528,8 @@ public interface IPurchaseMapper {
 	public int updateSizeChartUpload(@Param("rowidArray")List<Integer> rowidArray);
 	public int updateSizeChartById(@Param("rowidArray")List<Integer> rowidArray,@Param("userid")int userid);
 	public int updateSizeChartById_add(@Param("rowidArray")List<Integer> rowidArray,@Param("userid")int userid);
+
+    @Select("SELECT apply_time as applyTime,apply_user as applyUser FROM return_display WHERE customer_info=#{orderNo} AND item=#{goods_pid} ORDER BY apply_time DESC LIMIT 1")
+	returndisplay getApplyTime(@Param("orderNo") String orderNo, @Param("goods_pid") String goods_pid);
+
 }

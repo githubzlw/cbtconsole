@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.cbt.warehouse.pojo.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,6 @@ import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
-import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
-import com.cbt.warehouse.pojo.OrderInfoCountPojo;
-import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -1219,6 +1216,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					purchaseBean.setShopFlag("1");
 				}else{
 					purchaseBean.setShopFlag("0");
+				}
+				returndisplay re=this.pruchaseMapper.getApplyTime(purchaseBean.getOrderNo(),purchaseBean.getGoods_pid());
+				if (re !=null) {
+					String StDate = re.getApplyUser() + "于" + re.getApplyTime() + "退货";
+					purchaseBean.setReturnTime(StDate);
 				}
 				pbList.add(purchaseBean);
 				total = Integer.parseInt(map.get("totalCount")==null?"0": String.valueOf(map.get("totalCount")));

@@ -5721,7 +5721,13 @@ public class WarehouseCtrl {
 					info.setAmount(String.valueOf(amounts));
 					info.setAcounts(String.valueOf(acountss));
 				}
-				info.setOperation("<button onclick=\"resetLocation('"+info.getBarcode()+"','"+info.getShort_term()+"')\">清空库位</button>/<button onclick=\"returnOr('"+info.getOrderids()+"')\">发起退货</button>");
+				String StDate="";
+				returndisplay re=this.iWarehouseService.FindReturnTime(orderids);
+				if (re !=null) {
+					 StDate = re.getApplyUser() + "于" + re.getApplyTime() + "退货";
+				}
+
+				info.setOperation("<button  onclick=\"resetLocation('"+info.getBarcode()+"','"+info.getShort_term()+"')\">清空库位</button>/<button onclick=\"returnOr('"+info.getOrderids()+"')\">发起退货</button><div id='th"+info.getOrderids()+"'>"+StDate+"</div>");
 				order_nos.append("'").append(orderids).append("'").append(",");
 				//获取该库位最后一次入库时间、最后一次出库时间、最后一次强制清空时间
 				String createtime=iWarehouseService.getCreateTime(info.getBarcode());
@@ -5780,14 +5786,14 @@ public class WarehouseCtrl {
 									+ "<a target='_blank' style='color:green;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
 									+ nos[j] + "&barcode=" + info.getBarcode()
 									+ "'>" + nos[j]
-									+ "</a>");
+									+ "</a>(包裹已验货)");
 						} else if (noCheckedList.size() > 0
 								&& noCheckedList.contains(nos[j])) {
 							bf.append(","
 									+ "<a target='_blank' style='color:red;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
 									+ nos[j] + "&barcode=" + info.getBarcode()
 									+ "'>" + nos[j]
-									+ "</a>");
+									+ "</a>(包裹未验货)");
 						} else {
 							bf.append(","
 									+ "<a target='_blank' style='color:black;text-decoration:underline' title='"+nos[j]+"' href='/cbtconsole/website/newtrack.jsp?shipno="
@@ -5807,14 +5813,14 @@ public class WarehouseCtrl {
 								+ "&barcode="
 								+ info.getBarcode()
 								+ "'>"
-								+ info.getShipnos() + "</a>");
+								+ info.getShipnos() + "</a>(包裹已验货)");
 					} else if (noCheckedList.size() > 0 && noCheckedList.contains(info.getShipnos())) {
 						bf.append("<a target='_blank' style='color:red;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/newtrack.jsp?shipno="
 								+ info.getShipnos()
 								+ "&barcode="
 								+ info.getBarcode()
 								+ "'>"
-								+ info.getShipnos() + "</a>");
+								+ info.getShipnos() + "</a>(包裹未验货)");
 					} else {
 						bf.append("<a target='_blank' style='color:black;text-decoration:underline' title='"+info.getShipnos()+"' href='/cbtconsole/website/newtrack.jsp?shipno="
 								+ info.getShipnos()
