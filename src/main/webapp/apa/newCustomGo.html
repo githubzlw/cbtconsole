@@ -116,7 +116,7 @@
             var userEmail = $("#query_user_email").val();
             var followId = $("#query_follow_id").val();
             var adminId = $("#query_admin_id").val();
-            //var countryId = $("#query_country_id").val();
+            var follow  = $("#query_is_order").val();
             var countryId = $('#query_country_id').combobox('getValue');
             var beginMoney = $("#query_begin_money").val();
             var endMoney = $("#query_end_money").val();
@@ -129,7 +129,8 @@
                 "countryId": countryId,
                 "beginMoney": beginMoney,
                 "endMoney": endMoney,
-                "allCus": allCus
+                "allCus": allCus,
+                "follow": follow
             });
         }
 
@@ -178,13 +179,14 @@
         }
 
         function formatOperation(val, row, index) {
-            var content = '<a class="but_color" href="/cbtconsole/shopCarMarketingCtr/queryShoppingCarByUserId?userId=' +
-                row.userId + '" target="_blank">跟进</a>';
-            if (row.totalPrice==0){
-                content=   '<a target="_blank" href="/cbtconsole/NewCustomersFollow/queryNewCustomByUserId?userEmail='+row.userEmail+'&userId=' +
-                    row.userId + '" target="_blank" >跟进</a>';
-            }
+
+               var content=   '<a href="http://192.168.1.27:10004/helpServlet?action=writeNewEmail&className=EmailListServlet&userEmail='+row.userEmail+'&usname='+row.admname+'&uspassword='+row.password+'" target="_blank" >跟进</a>';
+
             return content;
+        }
+        function formatCount(val, row, index) {
+            return '<a target="_blank" href="/cbtconsole/NewCustomersFollow/queryNewCustomByUserId?userEmail='+row.userEmail+'&userId=' +
+                row.userId + '" target="_blank" >'+val+'</a>';
         }
 
     </script>
@@ -199,17 +201,17 @@
         &nbsp;&nbsp;<span>国家: <select id="query_country_id" style="font-size: 16px; height: 26px; width: 200px;">
 			</select></span>&nbsp;&nbsp;<span>金额: <input id="query_begin_money" type="number" style="width: 80px;height: 22px;"/>
             -<input id="query_end_money"  type="number" style="width: 80px;height: 22px;"/></span>
-        <!--&nbsp;&nbsp;<span>是否下单: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 90px;">-->
-					<!--<option value="-1" selected="selected">全部</option>-->
-                    <!--<option value="0">未下单</option>-->
-                    <!--<option value="1">已下单</option>-->
+        <span>是否跟进: <select id="query_is_order" style="font-size: 16px; height: 26px; width: 90px;">-->
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">已跟进</option>
+                   <option value="1">未跟进</option>
 			</select></span>&nbsp;&nbsp;<span>销售: <select id="query_admin_id"
                                                           style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
-            </select></span>&nbsp;&nbsp;<span>跟进人: <select id="query_follow_id"
-                                                           style="font-size: 16px; height: 26px; width: 90px;">
-                        <option value="-1" selected="selected">全部</option>
-			</select></span>&nbsp;&nbsp;
+            <!--</select></span>&nbsp;&nbsp;<span>跟进人: <select id="query_follow_id"-->
+                                                           <!--style="font-size: 16px; height: 26px; width: 90px;">-->
+                        <!--<option value="-1" selected="selected">全部</option>-->
+			<!--</select></span>&nbsp;&nbsp;-->
         <input id="newCus" type="checkbox">所有新客户
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
@@ -222,15 +224,15 @@
     <tr>
         <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
         <th data-options="field:'userEmail',width:'150px'">用户Email</th>
-        <th data-options="field:'currency',align:'center',width:'100px'">货币</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
         <th data-options="field:'totalCatid',align:'center',width:'80px'">购物车商品种类</th>
         <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">购物车总金额</th>
+        <th data-options="field:'num',align:'center',width:'100px',formatter:formatCount">用户浏览商品次数</th>
         <th data-options="field:'averagePrice',align:'center',width:'100px'">均价</th>
         <th data-options="field:'lastAddCartTime',align:'center',width:'130px'">注册时间</th>
         <th data-options="field:'saleName',align:'center',width:'100px'">销售</th>
         <th data-options="field:'lastLoginTime',align:'center',width:'130px'">销售跟进时间</th>
-        <th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>
+        <!--<th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>-->
         <th data-options="field:'followTime',align:'center',width:'130px'">购物车营销跟进时间</th>
         <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
     </tr>

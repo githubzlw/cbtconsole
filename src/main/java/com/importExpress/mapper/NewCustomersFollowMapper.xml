@@ -1655,7 +1655,7 @@
         convert(gdf.total_price,decimal(10,2)) as total_price,convert(gdf.average_price,decimal(10,2)) as average_price,
         us.countryId,zone.country,us.currency,au.saleid,au.salename,
         '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
-        DATE_FORMAT(gdf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
+        DATE_FORMAT(gdf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time,rv.ck as num
         from
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
         <if test="totalPrice == 1">
@@ -1675,18 +1675,13 @@
         on au.us.id=y.cid
         left join zone on us.countryId = zone.id
         left join admuser adm on gdf.follow_admin_id = adm.id
+        LEFT JOIN (SELECT pid,COUNT(pid) as ck,uid from recent_view WHERE uid !=0 GROUP BY uid) rv on us.id=rv.uid
         where 1=1
         <if test="userId > 0">
             and us.id = #{userId}
         </if>
         <if test="userEmail != null">
             and us.email = #{userEmail}
-        </if>
-        <if test="isOrder == 0">
-            and us.id not in(select DISTINCT user_id from orderinfo)
-        </if>
-        <if test="isOrder == 1">
-            and us.id in(select DISTINCT user_id from orderinfo)
         </if>
         <if test="followAdminId > 0">
             and gdf.follow_admin_id = #{followAdminId}
@@ -1706,6 +1701,12 @@
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
+        </if>
+        <if test="isOrder == 0">
+            and y.senddate IS NOT NULL
+        </if>
+        <if test="isOrder == 1">
+            and y.senddate IS NULL
         </if>
         order by us.createtime desc
         <if test="limitNum > 0">
@@ -1741,12 +1742,6 @@
         <if test="userEmail != null">
             and us.email = #{userEmail}
         </if>
-        <if test="isOrder == 0">
-            and us.id not in(select DISTINCT user_id from orderinfo)
-        </if>
-        <if test="isOrder == 1">
-            and us.id in(select DISTINCT user_id from orderinfo)
-        </if>
         <if test="followAdminId > 0">
             and gdf.follow_admin_id = #{followAdminId}
         </if>
@@ -1764,6 +1759,12 @@
         </if>
         <if test="countryId > 0">
             and us.countryId = #{countryId}
+        </if>
+        <if test="isOrder == 0">
+            and y.senddate IS NOT NULL
+        </if>
+        <if test="isOrder == 1">
+            and y.senddate IS NULL
         </if>
     </select>
 
