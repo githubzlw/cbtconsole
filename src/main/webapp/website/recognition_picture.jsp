@@ -355,9 +355,10 @@ function  updateSomes(type){
                             }
                             window.location.reload();
                         }
+                        window.location.reload();
                     }
                 })
-                window.location.reload();
+
             }
         }
 	}else if(type==2){
