@@ -116,7 +116,6 @@ public class HeadInterceptor implements Filter {
 						chain.doFilter(request, response);
 					}
 				}
-
 			}
 
 		} catch (Exception e) {
