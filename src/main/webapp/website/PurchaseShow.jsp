@@ -350,6 +350,11 @@
 		.imagetable tr td:last-child {
 			border-right: 1px solid #ddd;
 		}
+		.easyui-window{
+			width: 100px;
+			height: 300px;
+			overflow:auto;
+		}
 		.model{
 			position: absolute;
 			width: 500px;
@@ -360,6 +365,8 @@
 			background: #fff;
 			border:1px solid #ddd;
 		}
+		.window, .window-shadow {
+			position: fixed;}
 	</style>
 </head>
 <script type="text/javascript">
@@ -2365,7 +2372,7 @@
 				<div>商品pid：&nbsp;&nbsp;&nbsp;&nbsp;<input id="pid" value='' ></div>
               <div>总数量：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="num" value='' ></div>
             <div>退货数量：&nbsp;&nbsp;&nbsp;<input id="number" value='' ></div>
-             <div>退货理由：&nbsp;&nbsp;&nbsp;<input id="returnNO" value='' ></div>      
+             <div>退货理由：&nbsp;&nbsp;&nbsp;<input id="returnNO" value='' ></div>
             </div>
             <div style="margin:20px 0 20px 40px;">
                 <a href="javascript:void(0)" class="easyui-linkbutton"

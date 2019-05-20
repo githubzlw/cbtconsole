@@ -72,6 +72,11 @@ table.imagetable td {
 	border: 1px #aaa solid;
 	color: #fff;
 }
+.easyui-window{
+	width: 100px;
+	height: 350px;
+	overflow:auto;
+}
 
 .window, .window-shadow {
     position: fixed;}
@@ -308,7 +313,7 @@ function checkboxOnclick(checkbox){
 </script>
 </head>
 <body text="#000000" onload="doQuery(1);">
-<div id="user_remark" class="easyui-window" title="退货申请"
+<div id="user_remark" class="easyui-window"  title="退货申请"
          data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
          style="width:800px;height:auto;display: none;font-size: 16px;">
             <div id="sediv" style="margin-left:20px;">
