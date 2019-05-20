@@ -97,6 +97,7 @@ public class Distinguish_PictureContorller {
 	 * @param mainMap
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
+	@ResponseBody
 	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> mainMap, String userName, int type) throws Exception {
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		int ret = 0;
@@ -128,7 +129,7 @@ public class Distinguish_PictureContorller {
 			e.printStackTrace();
 		}
 
-		return "";
+		return String.valueOf(ret);
 	}
 
 	@RequestMapping(value = "recognition_date_details", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")

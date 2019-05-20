@@ -307,6 +307,7 @@ function  updateSomes(type){
                     success:function(res){
                         if(res==0){
                             alert("删除失败  !")
+							return;
                         }else{
                             alert("删除成功 !");
                             window.location.reload();
@@ -314,7 +315,9 @@ function  updateSomes(type){
                     }
                 })
             }
+
         }
+        return
 	}else if(type==3){
         if(confirm("确定要进行此操作？")){
             var  mainMap ={};
@@ -342,9 +345,11 @@ function  updateSomes(type){
                         if(res==0){
                             if(type==2){
                                 alert("添加到无中文失败  !")
+								return
 							}
                             if(type==3){
                                 alert("添加到有中文失败  !")
+								return
                             }
                         }else{
                             if(type==2){
@@ -355,11 +360,14 @@ function  updateSomes(type){
                             }
                             window.location.reload();
                         }
+                        window.location.reload();
                     }
                 })
-                window.location.reload();
+
             }
+
         }
+        return
 	}else if(type==2){
         if(confirm("确定要进行此操作？")){
             var  mainMap ={};
@@ -393,10 +401,13 @@ function  updateSomes(type){
                             alert("线上图片下架成功")
                             window.location.reload();
                         }1500;
+                        window.location.reload();
                     }
+
                 })
             }
         }
+        return
 	}
     $("#Tips").css("display","block");
     $(".mengceng").css("display","block");
