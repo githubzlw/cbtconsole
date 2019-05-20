@@ -29,21 +29,24 @@
     SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
     WHERE 1=1
         AND cdm.is_delete=0
-        AND cdm.catgrid !=0
+        <if test="state == null || state == ''">
+            AND cdm.ocr_need_delete=1
+            AND cdm.ocr_need_date=0
+        </if>
     <if test="Change_user != null and Change_user != ''">
         AND cdm.user_operation=#{Change_user}
     </if>
-    <if test="state == null || state == ''">
-        AND cdm.ocr_need_delete=1
-        AND cdm.ocr_need_date=0
-    </if>
+
     <if test="state != null and state != ''">
-        AND cdm.ocr_need_date=#{state}
         AND cdm.ocr_need_delete=#{state}
+        AND cdm.ocr_need_date=#{state}
     </if>
     <if test="imgtype != null and imgtype != ''">
         AND cdm.catgrid=#{imgtype}
     </if>
+        <if test="imgtype == null || imgtype == ''">
+            AND cdm.catgrid !=0
+        </if>
     limit #{page},35
 </select>
 
@@ -90,11 +93,9 @@
         SELECT count(1)
         FROM custom_goods_md5 cdm
         WHERE 1=1
-        AND cdm.is_delete=0
-        AND cdm.catgrid !=0
         <if test="state == null || state == ''">
-            AND cdm.ocr_need_date=0
             AND cdm.ocr_need_delete=1
+            AND cdm.ocr_need_date=0
         </if>
         <if test="state != null and state != ''">
             AND cdm.ocr_need_date=#{state}
@@ -106,6 +107,10 @@
         <if test="imgtype != null and imgtype != ''">
         and cdm.catgrid=#{imgtype}
         </if>
+        <if test="imgtype == null || imgtype == ''">
+            AND cdm.catgrid !=0
+        </if>
+        AND cdm.is_delete=0
     </select>
 
     <sql id="Category1688_List">

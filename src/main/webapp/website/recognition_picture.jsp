@@ -406,6 +406,14 @@ function  updateSomes(type){
         $("input[type='text']").val('');
         search();
     }
+    function  checked(id){
+        if ($("#"+id).is(':checked')==true ) {
+            $("#"+id).prop("checked",false);
+        }else {
+
+            $("#"+id).prop("checked","checked");
+		}
+    }
 
 
 </script>
@@ -491,15 +499,15 @@ function  updateSomes(type){
 				</c:if>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }">
+						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }" onclick="checked('ck${customGoodsList.id }')">
 						<br/>
 							<%--md5:<input type="text"  value="${customGoodsList.goodsmd5}"/>--%>
 
 						<c:if test="${state!=1}">
-							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
+							<input type="checkbox"   class="cbox"  class="id" id="ck${customGoodsList.id }"  value="${customGoodsList.id }" style="width: 30px; height: 30px;" />
 						</c:if>
 						<c:if test="${state==1}">
-							<input type="checkbox"   class="cbox"  class="id"  value="${customGoodsList.id },${customGoodsList.pid},${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
+							<input type="checkbox"   class="cbox"  class="id" id="ck${customGoodsList.id }"  value="${customGoodsList.id },${customGoodsList.pid},${customGoodsList.remotepath }" style="width: 30px; height: 30px;" />
 						</c:if>
 						</div>
 				</c:forEach>
