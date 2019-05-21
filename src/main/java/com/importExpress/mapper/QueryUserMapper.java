@@ -95,6 +95,8 @@ public interface QueryUserMapper {
 
     void updateNeedoffshellEditFlag(@Param("list") List<String> list);
 
+    void updateNeedoffshelfByPid(@Param("pid") String pid, @Param("noShelfInfo") String noShelfInfo);
+
     List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);
 
     String querySearchKeywords(@Param("id") Integer id);

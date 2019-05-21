@@ -21,6 +21,15 @@ public class NeedOffShelfBean {
     private int soldFlag2;
     private int soldFlag3;
     private Integer sourceFlag;
+    private String noShelfInfo;
+
+    public String getNoShelfInfo() {
+        return noShelfInfo;
+    }
+
+    public void setNoShelfInfo(String noShelfInfo) {
+        this.noShelfInfo = noShelfInfo;
+    }
 
     public Integer getSourceFlag() {
         return sourceFlag;

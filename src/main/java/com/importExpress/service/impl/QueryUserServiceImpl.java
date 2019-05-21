@@ -675,4 +675,11 @@ public class QueryUserServiceImpl implements QueryUserService {
         result.put("message", "更新成功!");
         return result;
     }
+
+    @Override
+    public void updateNeedoffshelfByPid(String pid, String noShelfInfo) {
+        DataSourceSelector.set("dataSource28hop");
+        queryUserMapper.updateNeedoffshelfByPid(pid, noShelfInfo);
+        DataSourceSelector.restore();
+    }
 }

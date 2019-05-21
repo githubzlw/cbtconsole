@@ -53,4 +53,6 @@ public interface QueryUserService {
                                      Integer reviewFlag, String startDate, String endDate);
 
     GoodsReview queryGoodsReviewById(Integer id);
+
+    void updateNeedoffshelfByPid(String pid, String noShelfInfo);
 }

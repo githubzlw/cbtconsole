@@ -60,6 +60,10 @@
             font-weight: normal;
             font-style: normal;
         }
+
+        #no_shelf table tr {
+            height:40px;
+        }
     </style>
     <script type="text/javascript">
         $(document).ready(function () {
@@ -96,7 +100,7 @@
                 striped: true,//设置为true将交替显示行背景。
                 collapsible: true,//显示可折叠按钮
                 toolbar: "#neef_off_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
-                url: '/cbtconsole/singleGoods/queryOffShelfList',//url调用Action方法
+//                url: '/cbtconsole/singleGoods/queryOffShelfList',//url调用Action方法
                 loadMsg: '数据装载中......',
 //                singleSelect: true,//为true时只能选择单行
                 fitColumns: true,//允许表格自动缩放，以适应父容器
@@ -172,6 +176,8 @@
             var soldFlag2 = $("#query_sold_flag2").val();
             var soldFlag3 = $("#query_sold_flag3").val();
             var source = $("#query_source").val();
+
+            $("#neef_off_easyui-datagrid").datagrid("options").url = "/cbtconsole/singleGoods/queryOffShelfList";
             $("#neef_off_easyui-datagrid").datagrid("load", {
                 "pid": pid,
                 "catid":catid,
@@ -196,11 +202,11 @@
         function formatIsOffShelf(val, row, index) {
             //是否需要下架
             if (val == 0) {
-                return '硬下架';
+                return '硬下架(或者当前商品硬下架)';
             } else if (val == 1) {
-                return '下架后上架';
+                return '下架后上架(或者当前商品在线)';
             } else if (val == 2) {
-                return '软下架';
+                return '软下架(原1688下架等但同款>0)';
             } else {
                 return '';
             }
@@ -228,7 +234,7 @@
                 return '';
             }
         }
-        
+
         function formatneverOffFlag(val, row, index) {
             if(val >0){
                 return '是';
@@ -237,6 +243,56 @@
             }
         }
         
+        function showShelf(pid) {
+            $.messager.confirm('提示','确定下架该商品?',function(r){
+                if(r){
+                    $.ajax({
+                        type: "GET",
+                        url: "/cbtconsole/queryuser/updateNeedoffshelfByPid.do",
+                        data: {
+                            pid : pid,
+                            noShelfInfo :  "4@@"
+                        },
+                        dataType:"json",
+                        success: function(msg){
+                            if(msg.message == '已修改') {
+                                msg.message += " 隔天会定时下架.";
+                            }
+                            $.messager.alert('提示', msg.message);
+                        }
+                    });
+                }
+            });
+        }
+
+        function showNoShelf(pid) {
+            $('#no_shelf input[name=pid]').val(pid);
+            $('#no_shelf input[name=reason][value=1]').prop('checked', 'checked');
+            $('#no_shelf input[name=reason_other]').val('');
+            $('#no_shelf input[name=reason_goods]').val('');
+            $('#no_shelf').window('open');
+        }
+
+        function noShelf() {
+            var pid = $('#no_shelf input[name=pid]').val();
+            var check = $('#no_shelf input[name=reason]:checked').val();
+            var reason_other = $('#no_shelf input[name=reason_other]').val();
+            var reason_goods = $('#no_shelf input[name=reason_goods]').val();
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/queryuser/updateNeedoffshelfByPid.do",
+                data: {
+                    pid : pid,
+                    noShelfInfo : check + "@" + reason_other + "@" + reason_goods
+                },
+                dataType:"json",
+                success: function(msg){
+                    $.messager.alert('提示', msg.message);
+                    $('#no_shelf').window('close');
+                }
+            });
+        }
+
         function formatReason(val, row, index) {
             //商品下架原因
             if (val == 1) {
@@ -246,7 +302,7 @@
             } else if (val == 3) {
                 return '3-销量无变化(低库存)';
             } else if (val == 4) {
-                return '4-页面404';
+                return '4-页面404或者下架';
             } else if (val == 5) {
                 return '5-重复验证合格';
             } else if (val == 6) {
@@ -278,11 +334,23 @@
             } else if (val == 19) {
                 return '19-店铺小于5件商品软下架';
             } else if (val == 20) {
-                return '20-一手数据下架';
+                return '20-按手起批';
             } else if (val == 21) {
                 return '21-大于400美元商品下架';
             } else if (val == 22) {
                 return '22-原因老数据没有展示详情图片';
+            } else if (val == 23) {
+                return '23-对应1688商品成交量小于4';
+            } else if (val == 24) {
+                return '24-同款下架';
+            } else if (val == 27) {
+                return '27-商品无详情图(批量删除中文图)';
+            } else if (val == 28) {
+                return '28-定制商品';
+            } else if (val == 29) {
+                return '29-清洗中判断的商品异常下架(比如去除一手等规格后剩余规格不可卖)';
+            } else if (val == 30) {
+                return '30-大于40美元商品软下架(不包含婚纱礼服)';
             } else {
                 return '';
             }
@@ -290,6 +358,25 @@
 
         function formatOperation(val, row, index) {
             var content = '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid='+ row.pid +'">编辑商品</a>';
+            if (row.sourceFlag == 5) {
+                content += '<br /><br /><span><a href="#" onclick="showShelf(' + row.pid + ')">确认下架</a></span>'
+                content += '&nbsp;&nbsp;<span><a href="#" onclick="showNoShelf(' + row.pid + ')">不下架</a></span>'
+                if (row.noShelfInfo != undefined) {
+                    var info = '';
+                    if (row.noShelfInfo.startsWith("4@")) {
+                        info = '人为确认需要下架(隔天定时处理下架)';
+                    } else if (row.noShelfInfo.startsWith("5@")) {
+                        info = '人为确认需要下架且已经下架';
+                    } else if (row.noShelfInfo.startsWith("3@")) {
+                        info = '不下架 其他原因:' + row.noShelfInfo.split("@")[1];
+                    } else if (row.noShelfInfo.startsWith("2@")) {
+                        info = '不下架 有替换货源:' + row.noShelfInfo.split("@")[2];
+                    } else if (row.noShelfInfo.startsWith("1@")) {
+                        info = '不下架 库存验证不准确';
+                    }
+                    content += '<br /><br /><span>' + info + '</span>'
+                }
+            }
             return content;
         }
 
@@ -303,6 +390,44 @@
 </c:if>
 <c:if test="${uid > 0}"></c:if>
 
+<div id="no_shelf" class="easyui-window" title="不下架相关信息"
+     data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+     style="width:800px;height:auto;display: none;font-size: 16px;">
+    <div style="margin-left:20px;">
+        <input type="hidden" name="pid">
+        <div style="margin-top:20px;">
+            <table>
+                <tr>
+                    <td>商品pid:</td>
+                    <td><input type="text" readonly name="pid" style="color: #4c4c4c; width: 600px;"></td>
+                </tr>
+                <tr>
+                    <td>不下架原因:</td>
+                    <td>
+                        <input type="radio" name="reason" checked="checked" value="1">
+                        <span onclick="$('#no_shelf input[name=reason][value=1]').prop('checked', 'checked');">库存验证不准(不下架后续继续验证)</span>
+                        <br />
+                        <input type="radio" name="reason" value="2">
+                        <span onclick="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');">有替换货源(不下架后续不再验证)</span>
+                        <br />
+                        <input type="radio" name="reason" value="3">
+                        <span onclick="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">其他原因(不下架后续不再验证):</span>
+                        <input type="text" name="reason_other" style="width: 347px" onfocus="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">
+                    </td>
+                </tr>
+                <tr>
+                    <td>替换货源链接:</td>
+                    <td><input type="text" name="reason_goods" style="width: 600px" onfocus="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="margin:20px 0 20px 40px;">
+        <a href="javascript:void(0)" class="easyui-linkbutton"
+           onclick="noShelf()" style="width:80px">确认</a>
+    </div>
+</div>
+
 
 <div id="neef_off_top_toolbar" style="padding: 5px; height: auto">
     <form id="neef_off_query_form" action="#" onsubmit="return false;">
@@ -310,14 +435,14 @@
         <span> 类别: <input type="text" id="catid_id" style="width: 120px; height: 24px" value=""/></span>
         <span>更新时间: <input id="query_beginTime" class="Wdate" style="width: 110px; height: 24px" type="text" value=""
                          onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
-		    <span>&nbsp;-&nbsp;</span>
+		    <span>-</span>
             <input id="query_endTime" class="Wdate" style="width: 110px; height: 24px;" type="text" value=""
                    onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
         </span>
         <span> 在线状态: <select id="query_isOffShelf" style="font-size: 14px; height: 24px; width: 120px;">
                         <option value="-1" selected="selected">全部</option>
-                        <option value="0">硬下架</option>
-                        <option value="1">下架后上架</option>
+                        <option value="0">硬下架(或者当前商品硬下架)</option>
+                        <option value="1">下架后上架(或者当前商品在线)</option>
                         <option value="2">软下架(原1688下架等但同款>0)</option>
                     </select>
         </span>
@@ -326,7 +451,7 @@
                                 <option value="1">1-1688货源下架</option>
                                 <option value="2">2-不满足库存条件</option>
                                 <option value="3">3-销量无变化(低库存)</option>
-                                <option value="4">4-页面404</option>
+                                <option value="4">4-页面404或者下架</option>
                                 <option value="5">5-重复验证合格(原本1688异常下架后重复验证合格上线的商品)</option>
                                 <option value="6">6-IP问题或运营直接下架</option>
                                 <option value="7">7-店铺整体禁掉</option>
@@ -342,23 +467,22 @@
                                 <option value="17">17-低价商品下架</option>
                                 <option value="18">18-类别隐藏数据下架</option>
                                 <option value="19">19-店铺小于5件商品软下架</option>
-                                <option value="20">20-一手数据下架</option>
+                                <option value="20">20-按手起批</option>
                                 <option value="21">21-大于400美元商品下架</option>
                                 <option value="22">22-原因老数据没有展示详情图片</option>
+                                <option value="23">23-对应1688商品成交量小于4</option>
+                                <option value="24">24-同款下架</option>
+                                <option value="27">27-商品无详情图(批量删除中文图)</option>
+                                <option value="28">28-定制商品</option>
+                                <option value="29">29-清洗中判断的商品异常下架(比如去除一手等规格后剩余规格不可卖)</option>
+                                <option value="30">30-大于40美元商品软下架(不包含婚纱礼服)</option>
                         </select>
-        </span>
-        <%--<span> 更新标识: <select id="query_updateFlag" style="font-size: 14px; height: 24px; width: 100px;">
-                                <option value="-1" selected="selected">全部</option>
-                                <option value="0">未更新</option>
-                                <option value="1">更新失败</option>
-                                <option value="2">更新成功</option>
-                                <option value="3">重新验证过</option>
-                        </select>--%>
         </span>
         <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
                                 <option value="0" selected="selected">全部</option>
                                 <option value="1">永不下架</option>
                         </select>
+        </span>
             <span> 有销量等筛选(<a href="#" id="refreshData">刷新临时数据</a>): <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="3">我们公司卖过的 或者 购物车中商品</option>
@@ -368,21 +492,28 @@
                                 <option value="5">有库存的</option>
                                 <option value="6">有人为对标的</option>
                         </select>
+            </span>
             <span> 有跨境图片包: <select id="query_sold_flag2" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="1">有跨境图片包</option>
                         </select>
+            </span>
             <span> 数据源筛选
                 <a href="https://img.import-express.com/importcsvimg/stock_picture/researchimg/1554172194483.70268.zip">原始文档</a>:
                 <select id="query_source" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="-1" selected="selected">不进行筛选</option>
-                                <option value="2">商品拯救行动V4中F点要拯救的商品</option>
+                                <option value="1">1-库存验证中校验的上下架</option>
+                                <option value="2">2-商品拯救行动V4中F点要拯救的商品</option>
+                                <option value="3">3-后台标注的定时上下架的</option>
+                                <option value="5">5-需要下架但在购物车或卖过的人为确认后下架</option>
                         </select>
+            </span>
             <span> 是否处理过: <select id="query_sold_flag3" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="1">处理过的</option>
                                 <option value="2">未处理过</option>
                         </select>
+                </span>
         </span>
         <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
                 <br />
@@ -401,7 +532,6 @@
         <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品图片</th>
         <th data-options="field:'catidName',align:'center',width:'150px'">所属类别</th>
         <th data-options="field:'isOffShelf',align:'center',width:'150px',formatter:formatIsOffShelf">上下架标识</th>
-        <%--<th data-options="field:'updateFlag',align:'center',width:'150px',formatter:formatUpdateFlag">更新标识</th>--%>
         <th data-options="field:'competitiveFlag',align:'center',width:'150px',formatter:formatCompetitiveFlag">精品标识</th>
         <th data-options="field:'neverOffFlag',align:'center',width:'150px',formatter:formatneverOffFlag">永不下架</th>
         <th data-options="field:'reason',align:'center',width:'150px',formatter:formatReason">下架原因</th>
@@ -423,6 +553,13 @@
                 alert(msg.message);
             }
         });
+    });
+
+    jQuery(function($){
+        // 页面加载完成 初始加载 5-需要下架但在购物车或卖过的人为确认后下架 未处理过的
+        $("#query_source").val('5');
+//        $("#query_sold_flag3").val('2');
+        doQuery();
     });
 </script>
 

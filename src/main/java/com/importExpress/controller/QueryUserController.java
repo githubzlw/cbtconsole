@@ -567,5 +567,23 @@ public class QueryUserController {
         return queryUserService.queryGoodsReviewById(id);
     }
 
+    /**
+     * 后台 商品下架审核中 需要下架但在购物车 或 已买过的 人为确认是否下架更新
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/updateNeedoffshelfByPid.do?pid=&noShelfInfo=
+     *
+     */
+    @RequestMapping(value = "/updateNeedoffshelfByPid.do")
+    @ResponseBody
+    public Map<String, String> updateNeedoffshelfByPid(String pid, String noShelfInfo) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            queryUserService.updateNeedoffshelfByPid(pid, noShelfInfo);
+            result.put("message", "已修改!");
+        } catch (Exception e) {
+            result.put("message", "内部异常, 修改失败!");
+        }
+        return result;
+    }
+
 
 }
