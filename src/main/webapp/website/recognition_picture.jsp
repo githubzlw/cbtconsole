@@ -293,7 +293,7 @@ function search2(){
 	}
 function  updateSomes(type){
     if(type==1){
-        if(confirm("确定要删除选择的图片？")){
+        if(confirm("确定要标记为含中文的图片？")){
             var  mainMap ={};
             var erList= new Array();
             var sbi = 0;
@@ -513,13 +513,14 @@ function  updateSomes(type){
 						</select>
 
 						<%--${state==0?"":"处理人员:"}--%>
-						<select  id="Change_user" class="selectText"  onchange="search2()">
+
+						<select  ${Change_user==""&& (state==1|| state==2)?"":"style='display:none'"} id="Change_user" class="selectText"  onchange="search2()">
 							<option value="">全部</option>
 							<c:forEach items="${customGoodsList2}" var="ret">
 								<option value="${ret.admname}" <c:if test="${ret.admname==Change_user}"> selected </c:if>>${ret.admname}</option>
 							</c:forEach>
 						</select>
-						<input ${Change_user==""||state==0||state==2?"style='display:none'":""} type="button" value="删除该管理员标记的所有图片" onclick="delPrice('${Change_user}')">
+						<input ${Change_user==""||state==0||state==2?"style='display:none'":""} type="button" value="一键下架标记的所有图片" onclick="delPrice('${Change_user}')">
 					</div>
 				</div>
 				<div class="main-top margin2">
@@ -546,7 +547,7 @@ function  updateSomes(type){
 						<c:if test="${state==1}">
 							<div style="border: 2px solid red">
 							<span class="wenzi"  onclick="updateSomes(2)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">线上下架</font></a></span>
-							<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架)</span>
+							<span style="color: red">(请谨慎操作，删除的图片为你已处理含中文的图片，线上下架，只会下架你选中的图片 )</span>
 
 							</div>
 						</c:if>
