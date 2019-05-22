@@ -62,7 +62,18 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		return distinguish_PictureDao.FindRecognition_delete_count(map);
 	}
 
-	@Override
+    @Override
+    public List<CustomGoods> deleteAllPriceByAdmname(String admName) {
+		try {
+			List<CustomGoods> list=this.distinguish_PictureDao.deleteAllPriceByAdmname(admName);
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+    @Override
 	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
 		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);
 		String len="/usr/local/goodsimg";
