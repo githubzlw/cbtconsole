@@ -4,6 +4,7 @@ import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Category1688;
 import com.cbt.pojo.CustomGoods;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -28,5 +29,6 @@ public interface Distinguish_PictureDao {
 
 	public int updateSomePirctu_risdelete_date(@Param("bgList_s")List<Map<String, String>> bgList);
 
-
+    @Select("SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path as remotepath FROM custom_goods_md5 cdm where cdm.ocr_need_delete=1 and cdm.ocr_need_date=1 AND is_delete !=1 AND cdm.user_operation=#{admName}")
+    List<CustomGoods> deleteAllPriceByAdmname(@Param("admName") String admName);
 }

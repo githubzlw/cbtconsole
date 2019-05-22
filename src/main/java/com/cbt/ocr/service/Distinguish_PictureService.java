@@ -73,4 +73,7 @@ public interface Distinguish_PictureService {
 	 * @return
 	 */
 	public int FindRecognition_delete_count(Map<String, Object> map);
+
+	List<CustomGoods> deleteAllPriceByAdmname(String admName);
+
 }
