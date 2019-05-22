@@ -675,6 +675,126 @@ public class GoodsCarconfigExample {
             return (Criteria) this;
         }
 
+        public Criteria andUpdatetimeIsNull() {
+            addCriterion("updateTime is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeIsNotNull() {
+            addCriterion("updateTime is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeEqualTo(Date value) {
+            addCriterion("updateTime =", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeNotEqualTo(Date value) {
+            addCriterion("updateTime <>", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeGreaterThan(Date value) {
+            addCriterion("updateTime >", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("updateTime >=", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeLessThan(Date value) {
+            addCriterion("updateTime <", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeLessThanOrEqualTo(Date value) {
+            addCriterion("updateTime <=", value, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeIn(List<Date> values) {
+            addCriterion("updateTime in", values, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeNotIn(List<Date> values) {
+            addCriterion("updateTime not in", values, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeBetween(Date value1, Date value2) {
+            addCriterion("updateTime between", value1, value2, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdatetimeNotBetween(Date value1, Date value2) {
+            addCriterion("updateTime not between", value1, value2, "updatetime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightIsNull() {
+            addCriterion("total_freight is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightIsNotNull() {
+            addCriterion("total_freight is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightEqualTo(Double value) {
+            addCriterion("total_freight =", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightNotEqualTo(Double value) {
+            addCriterion("total_freight <>", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightGreaterThan(Double value) {
+            addCriterion("total_freight >", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightGreaterThanOrEqualTo(Double value) {
+            addCriterion("total_freight >=", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightLessThan(Double value) {
+            addCriterion("total_freight <", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightLessThanOrEqualTo(Double value) {
+            addCriterion("total_freight <=", value, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightIn(List<Double> values) {
+            addCriterion("total_freight in", values, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightNotIn(List<Double> values) {
+            addCriterion("total_freight not in", values, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightBetween(Double value1, Double value2) {
+            addCriterion("total_freight between", value1, value2, "totalFreight");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalFreightNotBetween(Double value1, Double value2) {
+            addCriterion("total_freight not between", value1, value2, "totalFreight");
+            return (Criteria) this;
+        }
+
         public Criteria andSumTypePriceIsNull() {
             addCriterion("sum_type_price is null");
             return (Criteria) this;
@@ -745,126 +865,6 @@ public class GoodsCarconfigExample {
             return (Criteria) this;
         }
 
-        public Criteria andTotalFreightIsNull() {
-            addCriterion("total_freight is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightIsNotNull() {
-            addCriterion("total_freight is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightEqualTo(Double value) {
-            addCriterion("total_freight =", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightNotEqualTo(Double value) {
-            addCriterion("total_freight <>", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightGreaterThan(Double value) {
-            addCriterion("total_freight >", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightGreaterThanOrEqualTo(Double value) {
-            addCriterion("total_freight >=", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightLessThan(Double value) {
-            addCriterion("total_freight <", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightLessThanOrEqualTo(Double value) {
-            addCriterion("total_freight <=", value, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightIn(List<Double> values) {
-            addCriterion("total_freight in", values, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightNotIn(List<Double> values) {
-            addCriterion("total_freight not in", values, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightBetween(Double value1, Double value2) {
-            addCriterion("total_freight between", value1, value2, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andTotalFreightNotBetween(Double value1, Double value2) {
-            addCriterion("total_freight not between", value1, value2, "totalFreight");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeIsNull() {
-            addCriterion("updateTime is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeIsNotNull() {
-            addCriterion("updateTime is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeEqualTo(Date value) {
-            addCriterion("updateTime =", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeNotEqualTo(Date value) {
-            addCriterion("updateTime <>", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeGreaterThan(Date value) {
-            addCriterion("updateTime >", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("updateTime >=", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeLessThan(Date value) {
-            addCriterion("updateTime <", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeLessThanOrEqualTo(Date value) {
-            addCriterion("updateTime <=", value, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeIn(List<Date> values) {
-            addCriterion("updateTime in", values, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeNotIn(List<Date> values) {
-            addCriterion("updateTime not in", values, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeBetween(Date value1, Date value2) {
-            addCriterion("updateTime between", value1, value2, "updatetime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUpdatetimeNotBetween(Date value1, Date value2) {
-            addCriterion("updateTime not between", value1, value2, "updatetime");
-            return (Criteria) this;
-        }
-
         public Criteria andFastshipbalanceIsNull() {
             addCriterion("fastShipBalance is null");
             return (Criteria) this;
@@ -925,6 +925,66 @@ public class GoodsCarconfigExample {
             return (Criteria) this;
         }
 
+        public Criteria andFlagIsNull() {
+            addCriterion("flag is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagIsNotNull() {
+            addCriterion("flag is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagEqualTo(Integer value) {
+            addCriterion("flag =", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagNotEqualTo(Integer value) {
+            addCriterion("flag <>", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagGreaterThan(Integer value) {
+            addCriterion("flag >", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagGreaterThanOrEqualTo(Integer value) {
+            addCriterion("flag >=", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagLessThan(Integer value) {
+            addCriterion("flag <", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagLessThanOrEqualTo(Integer value) {
+            addCriterion("flag <=", value, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagIn(List<Integer> values) {
+            addCriterion("flag in", values, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagNotIn(List<Integer> values) {
+            addCriterion("flag not in", values, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagBetween(Integer value1, Integer value2) {
+            addCriterion("flag between", value1, value2, "flag");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlagNotBetween(Integer value1, Integer value2) {
+            addCriterion("flag not between", value1, value2, "flag");
+            return (Criteria) this;
+        }
+
         public Criteria andUsermarkIsNull() {
             addCriterion("usermark is null");
             return (Criteria) this;
@@ -935,62 +995,52 @@ public class GoodsCarconfigExample {
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkEqualTo(String value) {
+        public Criteria andUsermarkEqualTo(Integer value) {
             addCriterion("usermark =", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkNotEqualTo(String value) {
+        public Criteria andUsermarkNotEqualTo(Integer value) {
             addCriterion("usermark <>", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkGreaterThan(String value) {
+        public Criteria andUsermarkGreaterThan(Integer value) {
             addCriterion("usermark >", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkGreaterThanOrEqualTo(String value) {
+        public Criteria andUsermarkGreaterThanOrEqualTo(Integer value) {
             addCriterion("usermark >=", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkLessThan(String value) {
+        public Criteria andUsermarkLessThan(Integer value) {
             addCriterion("usermark <", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkLessThanOrEqualTo(String value) {
+        public Criteria andUsermarkLessThanOrEqualTo(Integer value) {
             addCriterion("usermark <=", value, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkLike(String value) {
-            addCriterion("usermark like", value, "usermark");
-            return (Criteria) this;
-        }
-
-        public Criteria andUsermarkNotLike(String value) {
-            addCriterion("usermark not like", value, "usermark");
-            return (Criteria) this;
-        }
-
-        public Criteria andUsermarkIn(List<String> values) {
+        public Criteria andUsermarkIn(List<Integer> values) {
             addCriterion("usermark in", values, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkNotIn(List<String> values) {
+        public Criteria andUsermarkNotIn(List<Integer> values) {
             addCriterion("usermark not in", values, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkBetween(String value1, String value2) {
+        public Criteria andUsermarkBetween(Integer value1, Integer value2) {
             addCriterion("usermark between", value1, value2, "usermark");
             return (Criteria) this;
         }
 
-        public Criteria andUsermarkNotBetween(String value1, String value2) {
+        public Criteria andUsermarkNotBetween(Integer value1, Integer value2) {
             addCriterion("usermark not between", value1, value2, "usermark");
             return (Criteria) this;
         }
