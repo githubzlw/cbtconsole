@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.UserOtherInfoMapper">
+    <resultMap id="userOtherInfoBeanResultMap" type="com.importExpress.pojo.UserOtherInfoBean">
+        <id column="id" property="id"/>
+        <result column="userid" property="userId"/>
+        <result column="username" property="userName"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="web_facebook_url" property="webFacebookUrl"/>
+        <result column="usertype" property="userType"/>
+        <result column="remarks" property="remarks"/>
+        <result column="creatime" property="createTime"/>
+        <result column="follow_time" property="followTime"/>
+    </resultMap>
+
+    <select id="queryForList" resultMap="userOtherInfoBeanResultMap"
+            parameterType="com.importExpress.pojo.UserOtherInfoBean">
+        select a.id,a.userid,a.username,b.email as user_email,a.web_facebook_url,a.usertype,a.remarks,
+        DATE_FORMAT(a.creatime,'%Y-%m-%d %H:%i:%S') as creatime,DATE_FORMAT(a.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time
+        from user_other_info a, user b
+        <if test="adminId != null">
+            inner join (select d.userid from admuser c,admin_r_user d where c.id = d.adminid and c.id = #{adminId}) us
+            on a.userid = us.userid
+        </if>
+        where a.userid = b.id and b.is_test = 0
+        <if test="userId != null">
+            and a.userid = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and b.email = #{userEmail}
+        </if>
+        <if test="userType != null">
+            and a.usertype = #{userType}
+        </if>
+        <if test="beginTime != null">
+            and DATE(a.creatime) &gt;= DATE(#{beginTime})
+        </if>
+        <if test="endTime != null">
+            and DATE(a.creatime) &lt;= DATE(#{endTime})
+        </if>
+        order by a.creatime desc
+        <if test="limitNum > 0">
+            limit #{startNum},#{limitNum}
+        </if>
+
+    </select>
+
+
+    <select id="queryForListCount" resultType="java.lang.Integer"
+            parameterType="com.importExpress.pojo.UserOtherInfoBean">
+        select count(0)
+        from user_other_info a, user b
+        <if test="adminId != null">
+            inner join (select d.userid from admuser c,admin_r_user d where c.id = d.adminid and c.id = #{adminId}) us
+            on a.userid = us.userid
+        </if>
+        where a.userid = b.id and b.is_test = 0
+        <if test="userId != null">
+            and a.userid = #{userId}
+        </if>
+        <if test="userEmail != null">
+            and b.email = #{userEmail}
+        </if>
+        <if test="userType != null">
+            and a.usertype = #{userType}
+        </if>
+        <if test="beginTime != null">
+            and DATE(a.creatime) &gt;= DATE(#{beginTime})
+        </if>
+        <if test="endTime != null">
+            and DATE(a.creatime) &lt;= DATE(#{endTime})
+        </if>
+    </select>
+
+    <update id="updateFollowInfo" parameterType="com.importExpress.pojo.UserOtherInfoBean">
+        update user_other_info set follow_id = #{adminId},follow_remark = #{remarks} ,follow_time = now()
+        where id = #{id}
+    </update>
+
+    <insert id="insertFollowInfoByAdminId" parameterType="com.importExpress.pojo.UserOtherInfoBean">
+        insert into user_other_info_follow_log(info_id,user_id,admin_id,remark)
+        values(#{id},#{userId} ,#{adminId},#{remarks})
+    </insert>
+
+</mapper>
