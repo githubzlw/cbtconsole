@@ -68,7 +68,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			list.get(i).setOrderInfo("订单号：<a >"+list.get(i).getA1688Order()+"</a><br>运单号：<a href='/cbtconsole/website/newtrack.jsp?shipno="+list.get(i).getA1688Shipno()+"&barcode="+list.get(i).getBarcode()+"' target='_blank'>"+list.get(i).getA1688Shipno()+"</a>"
 					+ "<br>下单："+list.get(i).getPlaceDate()+"<br>签收："+list.get(i).getSigntime());
 			list.get(i).setCustomerorder("<a href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+list.get(i).getCustomerorder()+"' target='_blank'>"+list.get(i).getCustomerorder()+"</a>");
-            list.get(i).setItem("产品名：<a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItemname()+"</a><br>pid:"+list.get(i).getItem()+"<br>规格："+list.get(i).getSku()+"<br>数量："+list.get(i).getItemNumber());
+            list.get(i).setItem("产品名：<a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItemname()+"</a><br>pid:<a href='https://detail.1688.com/offer/"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItem()+"</a><br>规格："+list.get(i).getSku()+"<br>采购数量："+list.get(i).getItemNumber());
 			if (list.get(i).getReturntime()==null) {
             if (list.get(i).getChangeShipno()==null||"".equals(list.get(i).getChangeShipno())) {
 				list.get(i).setChangeShipno("<input class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");

@@ -234,10 +234,7 @@ function focus(){
 	}
 }
 function returnOr(cusorder){
-	//if(cusorder==""||cusorder==null){
-//		alert("该订单不存在");
-//		return;
-//	}
+
 	window.location.href ="/cbtconsole/AddReturnOrder/FindReturnOrder/"+cusorder;
 
 }
@@ -251,7 +248,7 @@ function Agreed(ship){
 }
 function returnApply(ship){
      var ch=$("input[name='radioname']:checked").val();
-     alert(ch)
+
     var ship= $('#field＿name').val();
     var url ="/cbtconsole/Look/UpdaeReturnOrder";
     var data = {
@@ -287,13 +284,13 @@ function rejected(ship) {
 function rejectedok() {
     var ship= $('#fieldName').val();
     var cusorder= $('#cusorder').val();
-    //alert(cusorder)
+
     $.ajax({
         type: "post",
         url: "/cbtconsole/Look/RemReturnOrder",
         data: {ship: ship,cusorder:cusorder},
         success: function (res) {
-          // alert(res.message)
+
             if (res.message == 0) {
                // $.messager.alert('提示', '操作成功');
             } else {
@@ -351,7 +348,7 @@ function rejectedok() {
 				<input class="easyui-textbox" name="shipno" id="shipno" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'运单号:'">
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">--%>
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">--%>
-				<input id="optTimeStart" class="Wdate"
+				时间：<input id="optTimeStart" class="Wdate"
 					   style="width: 110px; height: 24px" type="text" value=""
 					   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				<span>&nbsp;-&nbsp;</span><input id="optTimeEnd" class="Wdate"
@@ -379,12 +376,13 @@ function rejectedok() {
 				<th data-options="field:'optTime',width:40,align:'center'">退货时间</th>
 				<th data-options="field:'optUser',width:20,align:'center'">执行人员</th>
 				<th data-options="field:'shipno',width:30,align:'center'">退单运单号</th>
-				<th data-options="field:'changeShipno',width:30,align:'center'">换产品运单号</th>
+				<%--<th data-options="field:'changeShipno',width:30,align:'center'">换产品运单号</th>--%>
 				<th data-options="field:'stateShow',width:30,align:'center'">操作</th>
 				
 				
 			</tr>
 		</thead>
 	</table>
+</div>
 </body>
 </html>
