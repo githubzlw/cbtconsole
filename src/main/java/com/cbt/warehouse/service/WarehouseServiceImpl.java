@@ -2912,5 +2912,18 @@ public class WarehouseServiceImpl implements IWarehouseService {
         return 0;
     }
 
+    @Override
+    public returndisplay FindReturnTime(String orderid) {
+        try {
+            returndisplay re=new returndisplay();
+            re=this.warehouseMapper.FindReturnTime(orderid);
+            return re;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 
 }

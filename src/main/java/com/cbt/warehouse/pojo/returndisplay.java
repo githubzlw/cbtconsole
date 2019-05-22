@@ -29,7 +29,44 @@ private String pepoInfo;//获取申请人和申请数量
 private String stateShow;//获取状态展示
 private String tbId;//獲取淘寶id
 private String sku;
-public String getSku() {
+private String itemname;//获取产品名称
+private String imgurl;//获取产品图片链接
+private String returntime;//同意退货时间
+private String reason;//驳回退货理由
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getReturntime() {
+		return returntime;
+	}
+
+	public void setReturntime(String returntime) {
+		this.returntime = returntime;
+	}
+
+	public String getItemname() {
+		return itemname;
+	}
+
+	public void setItemname(String itemname) {
+		this.itemname = itemname;
+	}
+
+	public String getImgurl() {
+		return imgurl;
+	}
+
+	public void setImgurl(String imgurl) {
+		this.imgurl = imgurl;
+	}
+
+	public String getSku() {
 	return sku;
 }
 public void setSku(String sku) {

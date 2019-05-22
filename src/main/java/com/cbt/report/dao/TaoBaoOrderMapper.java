@@ -8,7 +8,9 @@ import com.cbt.bean.Orderinfo;
 import com.cbt.pojo.*;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
+import com.cbt.warehouse.pojo.returndisplay;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -717,4 +719,4 @@ public interface TaoBaoOrderMapper {
 	    */
 	public int updateInventory(Map<Object, Object> map);
 
- }
+}

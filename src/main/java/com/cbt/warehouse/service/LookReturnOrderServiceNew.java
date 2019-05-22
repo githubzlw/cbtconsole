@@ -12,9 +12,9 @@ public interface LookReturnOrderServiceNew {
 	EasyUiJsonResult FindReturndisplay(String applyUser, String state,
 			String a1688Shipno, String optTimeStart, String optTimeEnd,int page,int mid);
 
-	EasyUiJsonResult UpdaeReturnOrder(String ship);
+	EasyUiJsonResult UpdaeReturnOrder(String ship,String ch);
 
-	EasyUiJsonResult RemReturnOrder(String ship);
+	EasyUiJsonResult RemReturnOrder(String ship,String cusorder);
 
 	EasyUiJsonResult SetReturnOrder(String ship,Double number);
 
@@ -37,18 +37,15 @@ public interface LookReturnOrderServiceNew {
 	orderJson getAllOrderByitem(String cusOrder, String orid);
 
 	EasyUiJsonResult AddOrderByOdid(int number, String odid, String cusorder,
-			String returnNO, String admName, int num,String goodsid);
+			String returnNO, String admName, int num,String goodsid,String pid);
 
 	EasyUiJsonResult FindOdid(String cusorder);
 
 	EasyUiJsonResult getAllOrderByOrid(String orid);
 
-	
 
-	
+	EasyUiJsonResult getpid(String cusOrder, String tbOrder);
 
-	
-
-	
+    String getAllOrderCount();
 
 }

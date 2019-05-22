@@ -72,6 +72,11 @@ table.imagetable td {
 	border: 1px #aaa solid;
 	color: #fff;
 }
+.easyui-window{
+	width: 100px;
+	height: 350px;
+	overflow:auto;
+}
 
 .window, .window-shadow {
     position: fixed;}
@@ -204,8 +209,7 @@ function getItem() {
         data: {cusOrder:cusOrder,tbOrder:tbOrder,mid:0},
         dataType:"json",
         success: function(msg){
-        	
-            if(msg.rows[0] != undefined){
+            if(msg.rows !=null&&msg.rows[0] != undefined ){
                 var temHtml = '';
                 document.getElementById("tabl").innerHTML='';
                 $("#tabl").append("<tr ><td style='width:20px'>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
@@ -216,7 +220,8 @@ function getItem() {
                 });
             }else{
             	alert("订单已全部退货")
-            	$('#user_remark').window('close');	
+            	$('#user_remark').window('close');
+
             }
         }
     });
@@ -234,17 +239,16 @@ function returnOr(uid) {
         success: function(msg){
         	var opts = $("#easyui-datagrid").datagrid("options");
         	opts.url = "/cbtconsole/Look/LookReturnOrder?mid=1";
-        	
-            if(msg.rows[0] != undefined){
+            if(msg.rows !=null&&msg.rows[0] != undefined){
                 var temHtml = '';
                 document.getElementById("select_id").innerHTML='';
                 $("#cuso").html("");
                 $("#cuso").append(msg.rows1[0].customerorder);
                 document.getElementById("tabl").innerHTML='';
-                $("#tabl").append("<tr ><td>选择</td><td>产品名</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                $("#tabl").append("<tr ><td>选择</td><td>产品pid</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
                 $(msg.rows).each(function (index, item) {
                 	
-                 	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td>"+item.item+"</td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
+                 	$("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='"+item.item+"' id='c1' /></td><td><a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+item.item+".html' target='_blank' >"+item.item+"</a></td><td>"+item.sku+"</td><td>"+item.itemNumber+"</td><td>"+item.returnReason+"</td><td>"+item.changeShipno+"</td></tr>");
                   
                 	/* $("table").append("<tr ><td >1</td><td>"+item.item+"</td><td>产品规格</td><td>"+item.itemNumber+"</td><td></td><td></td></tr>"); */
 
@@ -254,13 +258,17 @@ function returnOr(uid) {
            		
            		 $("#select_id").append("<option id='' value='"+item.a1688Order+"'>"+item.a1688Order+"</option>");
            		 $('#user_remark').window('open');
+
            	 })
             }else{
             	alert("订单已全部退货")
-            	$('#user_remark').window('close');	
+            	//$('#user_remark').window('close');
+               // location.reload()
+                opts.url = "/cbtconsole/warehouse/getLocationManagementInfo";
             }
-           
+            opts.url = "/cbtconsole/warehouse/getLocationManagementInfo";
         }
+
     });
 }
 function AddOll() {
@@ -279,7 +287,9 @@ function AddOll() {
 			cusorder:cusorder,tbOrder:tbOrder,returnNO:returnNO
 		}, function(res) {
 			if(res.rows == 1){
-				alert('修改成功');
+				alert('退货成功');
+                $("#th"+cusorder).html("");
+                $("#th"+cusorder).append("最后退货时间"+res.footer);
 			}else{
 				alert('不可重复退单');
 			}
@@ -303,17 +313,17 @@ function checkboxOnclick(checkbox){
 </script>
 </head>
 <body text="#000000" onload="doQuery(1);">
-<div id="user_remark" class="easyui-window" title="退货申请"
+<div id="user_remark" class="easyui-window"  title="退货申请"
          data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
          style="width:800px;height:auto;display: none;font-size: 16px;">
             <div id="sediv" style="margin-left:20px;">
-              选择订单号： <select id="select_id" onchange="getItem()"></select>
-              <div id="cuso"></div>
+              选择1688订单号： <select id="select_id" onchange="getItem()"></select>
+              <div>公司订单：<span id="cuso"></span></div>
                 <table id="tabl" border="1" cellspacing="0">
                 
                <tr >
                <td style='width:20px'>选择</td>
-               <td>产品名</td>
+               <td>产品pid</td>
                <td>产品规格</td>
                <td>可退数量</td>
                <td>退货原因</td>
@@ -326,7 +336,7 @@ function checkboxOnclick(checkbox){
                    onclick="addUserRemark()" style="width:80px" >提交申请</a>部分退单选择此按钮，全单退可以使用下方按钮
             </div>
              <div style="margin:20px 0 20px 40px;">
-                <input class="but_color" type="button" value="整单提交" onclick="AddOll()">
+				 1688订单：<input class="but_color" type="button" value="整单提交" onclick="AddOll()">
                 <input type='radio' size='5' name='radioname' value='客户退单' id='c' />客户退单
                 <input type='radio' size='5' name='radioname' value='质量问题' id='c' />质量问题
                 <input type='radio' size='5' name='radioname' value='客户要求' id='c' />客户要求
@@ -356,7 +366,8 @@ function checkboxOnclick(checkbox){
 				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)"> 
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
-		</div>
+           <p style="text-align: right"><a  href="/cbtconsole/website/ReturnDisplay.jsp" target='_blank' style=" color:green; font-size:20px;" >退货管理页面</a></p>
+        </div>
 		中期库[<span id="zhongqi">${sessionScope.mid_barcode}</span>]个空位  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;今明库[<span id="duanqi">${sessionScope.shortTerm}</span>]个空位
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;已验货-待出库:<a target="_blank" href="/cbtconsole/website/order_library.jsp" target="blank"><span id="noInspection">${sessionScope.noInspection}</span></a>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;已全到库-待验货:<a target="_blank" href="/cbtconsole/website/all_library.jsp" target="blank"><span id="allLibrary">${sessionScope.allLibrary}</span></a>
@@ -404,8 +415,9 @@ function addUserRemark() {
     	 cusOrder:g
 		}, function(res) {
 			if(res.rows == 1){
-				alert('修改成功');
-				
+				alert('退货成功');
+                $("#th"+cusOrder).html("");
+                $("#th"+cusOrder).append("最后退货时间"+res.footer);
 			}else if(res.rows==0){
 				alert('不可重复退单');
 			}else if(res.rows==2){
