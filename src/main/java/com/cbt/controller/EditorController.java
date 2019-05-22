@@ -3376,6 +3376,37 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping(value = "/updateVolumeWeight")
+    @ResponseBody
+    public JsonResult updateVolumeWeight(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+
+        String newWeight = request.getParameter("newWeight");
+        if (StringUtils.isBlank(newWeight)) {
+            json.setOk(false);
+            json.setMessage("获取新的体积重量失败");
+            return json;
+        }
+
+        try {
+            customGoodsService.updateVolumeWeight(pid, newWeight);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",newWeight:" + newWeight + ",updateVolumeWeight error:", e);
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {

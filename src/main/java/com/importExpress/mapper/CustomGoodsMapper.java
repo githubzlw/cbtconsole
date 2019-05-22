@@ -423,4 +423,12 @@ public interface CustomGoodsMapper {
      * @return
      */
     List<String> queryPidByShopId(@Param("shopId") String shopId);
+
+    /**
+     * 更新体积重量
+     * @param pid : pID
+     * @param newWeight : 新的重量
+     * @return
+     */
+    int updateVolumeWeight(@Param("pid") String pid, @Param("newWeight") String newWeight);
 }

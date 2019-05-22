@@ -1963,7 +1963,13 @@
                                     <c:if test="${goods.weightFlag > 0}">
                                         <b style="font-size: 16px;color: red;">*重量超过类别上下限</b>
                                     </c:if>
-
+                                </p>
+                            </div>
+                            <div class="goods_p">
+                                <p class="goods_color">体积重量:</p>
+                                <p class="ul_size">
+                                    <span class="goods_cur">${goods.volumeWeight}<em>KG</em></span>
+                                    <input type="button" value="修改体积重量" class="s_btn" onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -2164,7 +2170,7 @@
                     <c:if test="${not empty shopId}">
                         &nbsp;&nbsp;&nbsp;
                         <a target="_blank"
-                           href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=${shopId}">产品店铺链接</a>
+                           href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${shopId}">产品店铺链接</a>
                     </c:if>
                 </div>
                 <br>
@@ -2443,6 +2449,45 @@
             },
             error: function () {
                 $.messager.alert("提醒", "执行失败，请重试", "error");
+            }
+        });
+    }
+
+    function updateVolumeWeight(pid, oldVolumeWeight) {
+        $.messager.prompt('提示信息', '请输入新的体积重量:', function (newWeight) {
+            if (newWeight) {
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                if (reg.test(newWeight)) {
+                    if (newWeight == oldVolumeWeight) {
+                        showMessage('新输入的体积重量和原来的一致！');
+                        return false;
+                    } else {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: '/cbtconsole/editc/updateVolumeWeight',
+                            data: {
+                                "pid": pid,
+                                "newWeight": newWeight
+                            },
+                            success: function (json) {
+                                if (json.ok) {
+                                    showMessage('更新体积重量执行成功');
+                                } else {
+                                    $.messager.alert("提醒", json.message, "error");
+                                }
+                            },
+                            error: function () {
+                                $.messager.alert("提醒", "执行失败，请重试", "error");
+                            }
+                        });
+                    }
+
+                } else {
+                    showMessage('新的利润率必须为正数，最多两位小数！');
+                }
+            } else {
+                showMessage('未输入新的体积重量或取消输入！');
             }
         });
     }
