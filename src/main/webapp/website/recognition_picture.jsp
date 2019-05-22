@@ -13,7 +13,8 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
-
+    <link href="../css/magnify.css" rel="stylesheet">
+    <script src="../js/jquery.magnify.js"></script>
 <!-- <link rel="stylesheet" href="/cbtconsole/js/bootstrap/bootstrap.min.css"> -->
 <style type="text/css">
 .table {
@@ -61,13 +62,13 @@
 
 }
 
-.div img:hover{
+/*.div img:hover{*/
 
-	transform: scale(2.2);
+	/*transform: scale(2.2);*/
 
-	-ms-transform: scale(2.2);
+	/*-ms-transform: scale(2.2);*/
 
-}
+/*}*/
 
 .mengceng{
 	width: 100%;
@@ -186,6 +187,17 @@ div.margin2 {
 	margin: 0 10px;
 	color: #0000ff;
 }
+
+.img2 {
+    transform: scale(1);          /*图片原始大小1倍*/
+    transition: all ease 0.5s; }  /*图片放大所用时间*/
+
+
+.img3 {
+    transform: scale(3);          /*图片需要放大3倍*/
+    position: absolute;           /*是相对于前面的容器定位的，此处要放大的图片，不能使用position：relative；以及float，否则会导致z-index无效*/
+    z-index: 100; }
+
 </style>
 <script type="text/javascript">
 	$(function () {
@@ -239,8 +251,10 @@ function fnjump(obj){
 function search(){
     $("#Tips").css("display","block");
     $(".mengceng").css("display","block");
+    var state = $("#state").val();
 	var imgtype = $("#imgtype").val();
-	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?imgtype="+imgtype;
+    var Change_user = $("#Change_user").val();
+	window.location.href="/cbtconsole/Distinguish_Picture/FindCustomGoodsInfo?imgtype="+imgtype+"&state="+state+"&Change_user="+Change_user;
 }
 function search2(){
        $("#Tips").css("display","block");
@@ -262,6 +276,21 @@ function search2(){
             $("input[class='cbox']").prop('checked',false);//反选
         }
     }
+    function Theselected(){
+       $("input[class='cbox']").each(function (i,k) {
+           // alert(k)
+           // alert($(this).prop("checked"))
+           // alert($(this).find("input[class='cbox']").prop(k))
+           if($(this).prop("checked")==true){
+
+               $(this).prop("checked",false)
+           }else {
+
+               $(this).prop("checked",true)
+           }
+       })
+
+	}
 function  updateSomes(type){
     if(type==1){
         if(confirm("确定要删除选择的图片？")){
@@ -425,6 +454,33 @@ function  updateSomes(type){
             $("#"+id).prop("checked","checked");
 		}
     }
+    function  goprice(id){
+
+        var name =document.getElementById(id).className
+		if (name=="img2"){
+
+            document.getElementById(id).className="img3"
+		}else {
+
+            document.getElementById(id).className="img2"
+        }
+    }
+    function  delPrice(admName){
+        $.ajax({
+            type:"post",
+            url:"${ctx}/Distinguish_Picture/deleteAllPriceByAdmname",
+            dataType:"text",
+            data:{admName:admName},
+            success:function(res){
+                if(res==0){
+                }else{
+
+                    window.location.reload();
+                }1500;
+                window.location.reload();
+            }
+        })
+    }
 
 
 </script>
@@ -434,6 +490,7 @@ function  updateSomes(type){
 	<h1 align="center" >数据正在装载中...</h1>
 </div>
 <body>
+<div class="vueBox">
 <h1 align="center"><b>删除有中文的图片</b></h1>
 <h3 align="center" ><font color="red" id="tip"></font></h3>
 	<div class="main">
@@ -454,12 +511,15 @@ function  updateSomes(type){
 							<option value="1" <c:if test="${state==1}"> selected </c:if>>含中文</option>
 							<option value="2" <c:if test="${state==2}"> selected </c:if>>无中文</option>
 						</select>
-						处理人员:<select   id="Change_user" class="selectText"  onchange="search2()">
+
+						<%--${state==0?"":"处理人员:"}--%>
+						<select  id="Change_user" class="selectText"  onchange="search2()">
 							<option value="">全部</option>
 							<c:forEach items="${customGoodsList2}" var="ret">
 								<option value="${ret.admname}" <c:if test="${ret.admname==Change_user}"> selected </c:if>>${ret.admname}</option>
 							</c:forEach>
 						</select>
+						<input ${Change_user==""||state==0||state==2?"style='display:none'":""} type="button" value="删除该管理员标记的所有图片" onclick="delPrice('${Change_user}')">
 					</div>
 				</div>
 				<div class="main-top margin2">
@@ -480,7 +540,7 @@ function  updateSomes(type){
 					<div class="left left-margin">
 						<input type="hidden" value="${username}" id="user_">
 						<c:if test="${state==0}">
-						<span class="wenzi"  onclick="updateSomes(1)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">删除</font></a></span>
+						<span class="wenzi"  onclick="updateSomes(1)" style="background-color: red"><a href="#" style="text-decoration:none"><font color="white">标记为有中文</font></a></span>
 							<span style="color: blue">(勾选添加到（含中文），未勾选添加到（无中文）)</span>
 						</c:if>
 						<c:if test="${state==1}">
@@ -499,6 +559,7 @@ function  updateSomes(type){
 		<br/>
 		<div class="left left-margin">
 			<label><input type="checkbox" class="checkbox-all"   id="checked" onclick="fnselect()" style="width: 30px; height: 30px;">全选</label>
+			<label><input type="button" class="checkbox-all"   id="checked2" onclick="Theselected()" style="width: 30px; height: 30px;">反选</label>
 		</div>
 		</div>
 		<div class="main-table">
@@ -510,7 +571,7 @@ function  updateSomes(type){
 				</c:if>
 				<c:forEach  var="customGoodsList"  items="${customGoodsList }"  varStatus="status">
 					<div class="div">
-						<img src="${customGoodsList.remotepath }" style="width:170px; height:170px;" alt="${customGoodsList.id }" onclick="checked('ck${customGoodsList.id }')">
+						<img class="img2" src="${customGoodsList.remotepath }" id="pr${customGoodsList.id }" style="width:170px; height:170px;" alt="${customGoodsList.id }" onclick="goprice('pr${customGoodsList.id }')">
 						<br/>
 							<%--md5:<input type="text"  value="${customGoodsList.goodsmd5}"/>--%>
 
@@ -523,6 +584,7 @@ function  updateSomes(type){
 						</div>
 				</c:forEach>
 			</table>
+		</div>
 		</div>
 		
 		<br>
@@ -537,5 +599,24 @@ function  updateSomes(type){
 		第<input id="page" type="text" value="${currentPage}" onchange="fnjump(0)" style="height: 26px;">页
 		</div>
 	</div>
+<%--<script type="text/javascript" src="../js/vue.js"></script>--%>
+<%--<script type="text/javascript">--%>
+    <%--const vm = new Vue({--%>
+        <%--el: ".vueBox",--%>
+        <%--data: {--%>
+            <%--isChoose:false--%>
+        <%--},--%>
+        <%--methods:{--%>
+            <%--imgScc:function (ret) {--%>
+                <%--alert(ret)--%>
+               <%--this.isChoose = !this.isChoose--%>
+                <%--this.$refs.openText.style.display = 'none';--%>
+
+
+            <%--}--%>
+        <%--}--%>
+
+    <%--});--%>
+<%--</script>--%>
 </body>
 </html>
