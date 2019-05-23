@@ -99,6 +99,16 @@ public class InputData {
      */
     private String describe_good_flag;
 
+    private String volume_weight;
+
+    public String getVolume_weight() {
+        return volume_weight;
+    }
+
+    public void setVolume_weight(String volume_weight) {
+        this.volume_weight = volume_weight;
+    }
+
     public String getDescribe_good_flag() {
         return describe_good_flag;
     }

@@ -641,9 +641,22 @@ public class GoodsInfoUpdateOnlineUtil {
      * @param gd
      */
     public static boolean updatePidEnInfo(CustomGoodsPublish gd) {
-        InputData inputData = new InputData('u'); //u表示更新；c表示创建，d表示删除
+        InputData inputData = new InputData('u');
         inputData.setEninfo(gd.getEninfo());
         inputData.setPid(gd.getPid());
+        return updateLocalAndSolr(inputData, 0);
+    }
+
+    /**
+     * 更新mongodb的体积重量数据
+     * @param pid
+     * @param newWeight
+     * @return
+     */
+    public static boolean updateVolumeWeight(String pid, String newWeight){
+        InputData inputData = new InputData('u');
+        inputData.setVolume_weight(newWeight);
+        inputData.setPid(pid);
         return updateLocalAndSolr(inputData, 0);
     }
 

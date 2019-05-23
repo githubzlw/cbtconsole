@@ -123,8 +123,9 @@
         <result column="weight" property="weight1688"/>
         <result column="add_price_lv" property="addPriceLv"/>
         <result column="weight_flag" property="weightFlag"/>
-         <result column="category_name" property="categoryName"/>
+        <result column="category_name" property="categoryName"/>
         <result column="describe_good_flag" property="describeGoodFlag"/>
+        <result column="volume_weight" property="volumeWeight"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -570,6 +571,16 @@
             and cbu.weight_flag = 1
         </if>
 
+        <if test="qrCatid !=null">
+            and cbu.catid1 = #{qrCatid}
+        </if>
+        <if test="shopId !=null">
+            and cbu.shop_id = #{shopId}
+        </if>
+        <if test="chKeyWord !=null">
+            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+        </if>
+
         <if test="isSort == 1">
             order by cge.search_num desc
         </if>
@@ -723,6 +734,15 @@
         <if test="isWeigthCatid == 1">
             and cbu.weight_flag = 1
         </if>
+        <if test="qrCatid !=null">
+            and cbu.catid1 = #{qrCatid}
+        </if>
+        <if test="shopId !=null">
+            and cbu.shop_id = #{shopId}
+        </if>
+        <if test="chKeyWord !=null">
+            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+        </if>
     </select>
 
     <select id="queryCategoryByParam" resultMap="categoryResultMap" parameterType="com.cbt.bean.CustomGoodsQuery">
@@ -858,6 +878,15 @@
         <if test="isWeigthCatid == 1">
             and cbu.weight_flag = 1
         </if>
+        <if test="qrCatid !=null">
+            and cbu.catid1 = #{qrCatid}
+        </if>
+        <if test="shopId !=null">
+            and cbu.shop_id = #{shopId}
+        </if>
+        <if test="chKeyWord !=null">
+            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+        </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
@@ -866,7 +895,7 @@
     <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
         select cbu.pid,cbu.enname,cbu.category_name,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
         cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,
-        cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,
+        cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.volume_weight,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,
         ifnull(adu.id,0) as admin_id,cbu.shop_id,cbu.catid1,cbu.sellunit,cbu.promotion_flag,cbu.fprice_str,
@@ -1237,5 +1266,10 @@
         select pid from custom_benchmark_ready
         where shop_id = #{shopId}
     </select>
+
+    <update id="updateVolumeWeight">
+        update custom_benchmark_ready set volume_weight = #{newWeight}
+        where pid = #{pid}
+    </update>
 
 </mapper>

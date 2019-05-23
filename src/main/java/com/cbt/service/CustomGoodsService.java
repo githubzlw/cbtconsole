@@ -768,4 +768,12 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryPidByShopId(String shopId);
+
+    /**
+     * 更新体积重量
+     * @param pid : pID
+     * @param newWeight : 新的重量
+     * @return
+     */
+    int updateVolumeWeight(String pid, String newWeight);
 }
