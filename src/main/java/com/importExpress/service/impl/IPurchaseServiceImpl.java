@@ -1036,6 +1036,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				String address="";
 				//获取商品供应商直发地址
 				getStraightAddress(shop_id_1688,map,address,straight_flag);
+				//获取供应商名字和供应商评级
+				getShopInfo(map);
 				//将值填入bean中
 				getBeanValue(map, purchaseBean);
 //				purchaseBean.setStraight_flag(straight_flag);
@@ -1458,8 +1460,26 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("quality",quality);
 		map.put("straight_flag",String.valueOf(straight_flag));
 	}
-	
-	
+
+	/**
+	 * 获取供应商名字和供应商评级
+	 * @param map
+	 */
+	public void getShopInfo(Map<String,String> map){
+		String shopName="";
+		String supplyGrade="";
+
+		Map<String, String> shopMap=pruchaseMapper.getShopInfo(String.valueOf(map.get("goodsShop")));
+		if(shopMap != null){
+            shopName=shopMap.get("shop_name");
+            supplyGrade=shopMap.get("supply_grade");
+		}
+		map.put("shopName",shopName);
+		map.put("supplyGrade",supplyGrade);
+
+	}
+
+
 	private void setInvoiceVaue(PurchasesBean purchaseBean, String fileByOrderid) {
 		if (fileByOrderid == null || fileByOrderid.length() < 10) {
 			purchaseBean.setInvoice(0);
@@ -1897,6 +1917,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if (!"  ".equals(child_order_no1) && child_order_no1 != null && child_order_no1.length() > 0) {
 			purchaseBean.setChild_order_no(child_order_no1);
 		}
+        purchaseBean.setShopName(map.get("shopName"));
+        purchaseBean.setShopGrade(map.get("supplyGrade"));
 	}
 
 	@Override

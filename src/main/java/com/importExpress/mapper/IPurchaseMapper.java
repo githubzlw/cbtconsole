@@ -17,6 +17,7 @@ import java.util.Map;
 public interface IPurchaseMapper {
 	/**
 	 * 订单采购详情页面数据查询
+	 *
 	 * @param pagesize
 	 * @param admin
 	 * @param user
@@ -279,6 +280,13 @@ public interface IPurchaseMapper {
 	 * @return
 	 */
 	public Map<String,String> getShopIdByGoodsPid(@Param("shop_id") String shop_id);
+
+	/**
+	 * 根据产品ID查询店铺信息
+	 * @param shop_id
+	 * @return
+	 */
+	public Map<String,String> getShopInfo(@Param("shop_id") String shop_id);
 
 	/**
 	 * 判断订单是否被取消

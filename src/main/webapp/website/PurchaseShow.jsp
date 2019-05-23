@@ -3037,6 +3037,17 @@
 								<%--预估单品利润金额RMB（预估单品利润率%):${pb.profit}--%>
 								<%--【预估单品利润金额RMB（预估单品利润率%）=客户实际支付单品金额-实际预估采购单品金额-预估国际单品运费--%>
 								<%--</div>--%>
+
+							<div style="width: 100%; word-wrap: break-word;">
+								供应商名字： <span>${pb.shopName}</span> <br>
+							</div>
+							<div style="width: 100%; word-wrap: break-word;">
+								供应商评级： <span>${pb.shopGrade}</span> <br>
+							</div>
+							<div style="width: 100%; word-wrap: break-word;">
+								同款链接： <a href="https://s.1688.com/collaboration/collaboration_search.htm?fromOfferId=${pb.goods_pid}&tab=sameDesign" target="_blank">链接</a>
+							</div>
+
 							<div style="width: 100%; word-wrap: break-word;">
 								原始货源重量(kg):<font color="green"><span id="cbrWeight_${pb.orderNo}${pb.od_id}">${pb.cbrWeight}</span></font>
 							</div>
