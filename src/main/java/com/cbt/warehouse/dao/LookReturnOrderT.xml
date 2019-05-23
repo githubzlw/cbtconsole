@@ -42,10 +42,14 @@ rd.barcode,
 rd.return_number as returnNumber,
 rd.tb_id as tbId,
 rd.sku,
+rd.returntime,
+rd.reason,
 th.delivery_date as signtime,
 th.orderdate as placeDate,
 th.seller as sellerpeo,
-th.itemqty
+th.itemqty,
+th.imgurl,
+th.itemname
 FROM
 return_display as rd LEFT JOIN
 taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1 
@@ -66,10 +70,10 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 	<if test="optTimeEnd != null">
 			 AND (rd.opt_time&lt;#{optTimeEnd} or rd.apply_time&lt;#{optTimeEnd}) 
 	</if>
-	<if test="state == null">
-			 AND rd.state !=5 
-	</if>
-		order by rd.State ASC limit #{page},50
+	<!--<if test="state == null">-->
+			 <!--AND rd.state !=5 -->
+	<!--</if>-->
+		order by rd.State ASC, apply_time DESC  limit #{page},20
 	</select>
 	<select id="selectCount" resultType="java.lang.Integer" >
 		SELECT count(*) 

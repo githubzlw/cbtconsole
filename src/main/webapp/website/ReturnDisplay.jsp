@@ -234,17 +234,109 @@ function focus(){
 	}
 }
 function returnOr(cusorder){
-	//if(cusorder==""||cusorder==null){
-//		alert("该订单不存在");
-//		return;
-//	}
+
 	window.location.href ="/cbtconsole/AddReturnOrder/FindReturnOrder/"+cusorder;
 
 }
+function formatImgurl(val, row, index) {
+        return '<a  href="'+val+'"><img src="'+val+'" class="img_sty"/></a>'
 
+}
+function Agreed(ship){
+    document.getElementById('field＿name').value=ship;
+    $('#user_remark').window('open');
+}
+function returnApply(ship){
+     var ch=$("input[name='radioname']:checked").val();
+
+    var ship= $('#field＿name').val();
+    var url ="/cbtconsole/Look/UpdaeReturnOrder";
+    var data = {
+        "ship":ship,"ch":ch
+    }
+    $.ajax(
+        {
+            type:"get",
+            url:url,
+            data:data,
+            async:false,
+            cache:false,
+            success : function(res){
+                //window.location.reload();
+                if(res.rows == 0){
+                   // $.messager.alert('提示','操作成功');
+                }else{
+                    $.messager.alert('提示','操作失败');
+                }
+                $('#user_remark').window('close');
+                doQuery(1);
+            }
+
+        }
+
+    );
+}
+function rejected(ship) {
+    document.getElementById('fieldName').value=ship;
+    $('#order_remark').window('open');
+
+}
+function rejectedok() {
+    var ship= $('#fieldName').val();
+    var cusorder= $('#cusorder').val();
+
+    $.ajax({
+        type: "post",
+        url: "/cbtconsole/Look/RemReturnOrder",
+        data: {ship: ship,cusorder:cusorder},
+        success: function (res) {
+
+            if (res.message == 0) {
+               // $.messager.alert('提示', '操作成功');
+            } else {
+                $.messager.alert('提示', '操作失败');
+                //window.location.reload();
+            }
+            $('#order_remark').window('close');
+            doQuery(1);
+        }
+    });
+}
 </script>
 </head>
 <body text="#000000" onload="doQuery(1);">
+<div id="user_remark" class="easyui-window" title="退货申请"
+	 data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+	 style="width:400px;height:auto;display: none;font-size: 16px;">
+	<div id="sediv" style="margin-left:20px;">
+		<div>
+			<input type="hidden" name="field＿name" id="field＿name" value="value">
+			是否退钱：
+			<input type='radio' size='5' name='radioname' value='0' id='c' />是
+			<input type='radio' size='5' name='radioname' value='1' id='c' />否
+		</div>
+	<div style="margin:20px 0 20px 40px;">
+		<a href="javascript:void(0)" class="easyui-linkbutton"
+		   onclick="returnApply()" style="width:80px" >确认</a>
+	</div>
+	</div>
+</div>
+<div id="order_remark" class="easyui-window" title="退货申请"
+	 data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+	 style="width:400px;height:auto;display: none;font-size: 16px;">
+	<div id="sediv_123" style="margin-left:20px;">
+		<div>
+			<input type="hidden" name="field＿name" id="fieldName" value="value">
+			<div>驳回原因：<input id="cusorder" value='' ></div>
+		</div>
+		<div style="margin:20px 0 20px 40px;">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+			   onclick="rejectedok()" style="width:80px" >确认</a>
+		</div>
+	</div>
+</div>
+<div align="center">
+
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<form id="query_form" action="#" onsubmit="return false;">
@@ -254,9 +346,16 @@ function returnOr(cusorder){
                     method:'get'">
 				</select>
 				<input class="easyui-textbox" name="shipno" id="shipno" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'运单号:'">
-				<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">
-				<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">
-				 <input class="but_color" type="button" value="查询" onclick="doQuery(1)"> 
+				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">--%>
+				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">--%>
+				时间：<input id="optTimeStart" class="Wdate"
+					   style="width: 110px; height: 24px" type="text" value=""
+					   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span><input id="optTimeEnd" class="Wdate"
+												 style="width: 110px; height: 24px;" type="text" value=""
+												 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				</span>&nbsp;&nbsp;&nbsp;&nbsp;
+				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
 		</div>
@@ -266,21 +365,24 @@ function returnOr(cusorder){
 		<thead>	
 			<tr>
 				<th data-options="field:'customerorder',width:25,align:'center'">客户订单</th>
-				<th data-options="field:'sellerpeo',width:50,align:'center'">1688卖家信息</th>
+				<th data-options="field:'sellerpeo',width:30,align:'center'">1688卖家信息</th>
 				<th data-options="field:'orderInfo',width:50,align:'center'">1688订单信息</th>
-				<th data-options="field:'item',width:30,align:'center'">商品ID</th>
+				<th data-options="field:'imgurl',width:50,align:'center',formatter:formatImgurl">1688订单信息</th>
+
+				<th data-options="field:'item',width:50,align:'center'">商品详情</th>
 				<th data-options="field:'returnReason',width:40,halign:'center'">退货原因</th>
 				<th data-options="field:'applyTime',width:40,halign:'center'">申请时间</th>
 				<th data-options="field:'pepoInfo',width:20,align:'center'">申请人员</th>
-				<th data-options="field:'optTime',width:40,align:'center'">执行时间</th>
+				<th data-options="field:'optTime',width:40,align:'center'">退货时间</th>
 				<th data-options="field:'optUser',width:20,align:'center'">执行人员</th>
 				<th data-options="field:'shipno',width:30,align:'center'">退单运单号</th>
-				<th data-options="field:'changeShipno',width:30,align:'center'">换产品运单号</th>
+				<%--<th data-options="field:'changeShipno',width:30,align:'center'">换产品运单号</th>--%>
 				<th data-options="field:'stateShow',width:30,align:'center'">操作</th>
 				
 				
 			</tr>
 		</thead>
 	</table>
+</div>
 </body>
 </html>

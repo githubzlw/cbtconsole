@@ -89,6 +89,34 @@ public class PurchasesBean {
 	private String quality;
 	private String noChnageRemark;
 	private String shopInventory;
+	private String returnTime;//退货时间
+	private String shopName; //供应商名字
+	private String shopGrade; //供应商评级
+
+	public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
+	}
+
+	public String getShopGrade() {
+		return shopGrade;
+	}
+
+	public void setShopGrade(String shopGrade) {
+		this.shopGrade = shopGrade;
+	}
+
+	public String getReturnTime() {
+		return returnTime;
+	}
+
+	public void setReturnTime(String returnTime) {
+		this.returnTime = returnTime;
+	}
+
 	public String getShopInventory() {
 		return shopInventory;
 	}
