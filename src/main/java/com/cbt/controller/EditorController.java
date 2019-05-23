@@ -40,6 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -3304,10 +3305,17 @@ public class EditorController {
     @ResponseBody
     public JsonResult deleteEnInfoImgByParam(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
-
+        HttpSession session = request.getSession();
         // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
         // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
         String pidImgList = request.getParameter("pidImgList");
+        if (StringUtils.isBlank(pidImgList)){
+            try {
+                pidImgList=(String)session.getAttribute("pidImgList");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (StringUtils.isBlank(pidImgList)) {
             json.setOk(false);
             json.setMessage("获取参数失败");
