@@ -32,7 +32,7 @@ public class NewCustomersFollowController {
 
     @RequestMapping("/CustomList")
     @ResponseBody
-    public EasyUiJsonResult FindCustomList(@RequestParam(value = "allCus",defaultValue = "1")int allCus,  HttpServletRequest request, HttpServletResponse response) {
+    public EasyUiJsonResult FindCustomList(@RequestParam(value = "allCus",defaultValue = "1")int allCus,@RequestParam(value = "follow",defaultValue = "-1")int follow,  HttpServletRequest request, HttpServletResponse response) {
         EasyUiJsonResult json = new EasyUiJsonResult();
         ShopCarUserStatistic statistic = new ShopCarUserStatistic();
         String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
@@ -116,7 +116,8 @@ public class NewCustomersFollowController {
         statistic.setStartNum(startNum);
         statistic.setLimitNum(limitNum);
         statistic.setTotalPrice(allCus);
-        json = this.newCustomersFollowService.FindCustomList(statistic);
+        statistic.setIsOrder(follow);
+        json = this.newCustomersFollowService.FindCustomList(statistic,admuser);
 
         return json;
     }

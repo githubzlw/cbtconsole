@@ -328,6 +328,34 @@
                 }
             });
         }
+
+        function saveShowDealShopGoods(shopId, noSave) {
+            if (noSave > 0) {
+                $.messager.alert("提醒", "请保存保存类别平均重量数据", "info");
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/ShopUrlC/checkShowDealShopGoodsAndClear',
+                    data: {
+                        shopId: shopId
+                    },
+                    success: function (data) {
+                        if (data.ok) {
+                            $.messager.alert("提醒", "执行成功,数据正在清洗，即将刷新页面", "info");
+                            setTimeout(function() {
+                                    window.location.reload();
+                                }, 1500);
+                        } else {
+                            $.messager.alert("提醒", data.message, "error");
+                        }
+                    },
+                    error: function (XMLResponse) {
+                        $.messager.alert("提醒", "保存错误，请联系管理员", "error");
+                    }
+                });
+            }
+        }
     </script>
 </head>
 <body>
@@ -345,7 +373,9 @@
                 <span>整理利润率参考(第1区间):[${wholeRate}]</span>
                 <!-- <input type="button" class="s_btn" value="一键原始" title="点击按钮，“重量选择”全部选中原始" onclick="chooseOrWeight()"/>
                 &nbsp;&nbsp;&nbsp;&nbsp; -->
-                <input type="button" class="s_btn_ot" style="margin-left: 100px;" value="解决重量超差" onclick="showCatidErrorWeightGoods('${shopId}')"/>
+                <%--<input type="button" class="s_btn_ot" style="margin-left: 100px;" value="解决重量超差" onclick="showCatidErrorWeightGoods('${shopId}')"/>--%>
+
+                <input type="button" class="s_btn" style="margin-left: 100px;" value="重量清洗" onclick="saveShowDealShopGoods('${shopId}',${noSave})"/>
                 <c:if test="${noSave > 0}">
                     <b style="color: red;font-size: 18px;">(未保存类别平均重量数据)</b>
                 </c:if>

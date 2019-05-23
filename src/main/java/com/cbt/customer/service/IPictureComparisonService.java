@@ -141,6 +141,9 @@ public interface IPictureComparisonService {
 	public List<GoodsCheckBean> findSamplInfo(int selled, String cid, String categoryId1, int start, int end);
 
 	public List<GoodsCheckBean> findLireImgInfo(int selled, String cid, String categoryId1, int start, int end, int flag);
+
+	public List<GoodsCheckBean> findImgDb(int selled, String cid, String categoryId1, int start, int end, int flag);
+
 	/**
 	 * 根据工厂ID查询核心商品
 	 * @Title fingGoodsByShopId

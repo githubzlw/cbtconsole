@@ -117,8 +117,11 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and a.admuser='" + shopUserName + "'";
         }
 
-        if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {
-            sql += " and a.updatetime >='" + timeFrom + "' and a.updatetime<='" + timeTo + "'";
+        if (StringUtils.isNotBlank(timeFrom)) {
+            sql += " and a.createtime >='" + timeFrom + "'";
+        }
+        if(StringUtils.isNotBlank(timeTo)){
+            sql += " and a.createtime<='" + timeTo + "'";
         }
         if (date != null && !"".equals(date)) {
             sql += " and a.updatetime = '" + date + "'";
@@ -369,8 +372,11 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and admuser='" + shopUserName + "'";
         }
 
-        if (timeFrom != null && !"".equals(timeFrom) && timeTo != null && !"".equals(timeTo)) {
-            sql += " and updatetime >='" + timeFrom + "' and updatetime<='" + timeTo + "'";
+        if (StringUtils.isNotBlank(timeFrom)) {
+            sql += " and createtime >='" + timeFrom + "'";
+        }
+        if(StringUtils.isNotBlank(timeTo)){
+            sql += " and createtime<='" + timeTo + "'";
         }
         if (date != null && !"".equals(date)) {
             sql += " and updatetime = '" + date + "'";
@@ -3248,8 +3254,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         Connection conn = DBHelper.getInstance().getConnection5();
         Statement stmt = null;
         String upShopSql = "update shop_url_bak set flag=0,is_valid=0,online_status=0,is_auto = 0," +
-                "spider_goods_flag = 0,service_ip='',admin_id = " + adminId
-                + ",sales_volume_threshold = 0,download_num = 1000  where shop_id = '" + shopId + "' ";
+                "spider_goods_flag = 0,service_ip='',admin_id = " + adminId + ",createtime = now(),is_shop_flag =1,"
+                + "sales_volume_threshold = 0,download_num = 1000  where shop_id = '" + shopId + "' ";
         String clearSql = "update shop_clear_state set online_state = 0,shop_state = 0 where shop_id = '" + shopId + "'";
         int count = 0;
         try {

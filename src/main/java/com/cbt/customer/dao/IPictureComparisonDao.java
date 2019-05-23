@@ -158,6 +158,8 @@ public interface IPictureComparisonDao {
 
 	public List<GoodsCheckBean> findLireImgInfo(int selled, String cid, String categoryId1, int start, int end, int flag);
 
+	public List<GoodsCheckBean> findImgDb(int selled, String cid, String categoryId1, int start, int end, int flag);
+
 	public List<GoodsCheckBean> findWinPic(String goodsPid);
 
 	public String getSourceTbl(String aliPid);

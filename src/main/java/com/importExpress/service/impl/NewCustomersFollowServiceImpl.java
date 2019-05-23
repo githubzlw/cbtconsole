@@ -1,6 +1,7 @@
 package com.importExpress.service.impl;
 
 import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.controller.NewCustomersFollowController;
 import com.importExpress.mapper.NewCustomersFollowMapper;
@@ -18,10 +19,14 @@ public class NewCustomersFollowServiceImpl implements NewCustomersFollowService 
    @Autowired
     private NewCustomersFollowMapper newCustomersFollowMapper;
     @Override
-    public EasyUiJsonResult FindCustomList(ShopCarUserStatistic statistic) {
+    public EasyUiJsonResult FindCustomList(ShopCarUserStatistic statistic, Admuser admuser) {
         EasyUiJsonResult json=new EasyUiJsonResult();
         try {
             List<ShopCarUserStatistic> list=this.newCustomersFollowMapper.FindCustomList(statistic);
+            for (ShopCarUserStatistic shopCarUserStatistic:list){
+                shopCarUserStatistic.setAdmname(admuser.getAdmName());
+                shopCarUserStatistic.setPassword(admuser.getPassword());
+            }
             int count =this.newCustomersFollowMapper.FindCustomCount(statistic);
             json.setRows(list);
             json.setTotal(count);

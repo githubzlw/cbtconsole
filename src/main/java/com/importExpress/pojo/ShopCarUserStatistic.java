@@ -29,6 +29,33 @@ public class ShopCarUserStatistic {
     private int saleId;//跟进人ID
     private String saleName;//销售
     private double offFreight;// 线下预估运费
+    private int num;// 客户浏览商品数
+    private String password;// 客户浏览商品数
+    private String admname;// 客户浏览商品数
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getAdmname() {
+        return admname;
+    }
+
+    public void setAdmname(String admname) {
+        this.admname = admname;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
 
     public int getUserId() {
         return userId;

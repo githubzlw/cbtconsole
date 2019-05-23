@@ -320,9 +320,12 @@ public class PictureComparisonServiceImpl implements IPictureComparisonService {
 	public List<GoodsCheckBean> findLireImgInfo(int selled, String cid, String categoryId1, int start, int end, int flag) {
 		return dao.findLireImgInfo(selled,cid,categoryId1,start,end,flag);
 	}
-	
-	
-	
+
+	@Override
+	public List<GoodsCheckBean> findImgDb(int selled, String cid, String categoryId1, int start, int end, int flag) {
+		return dao.findImgDb(selled,cid,categoryId1,start,end,flag);
+	}
+
 	
 	/**
 	 * 根据工厂ID查询核心商品
