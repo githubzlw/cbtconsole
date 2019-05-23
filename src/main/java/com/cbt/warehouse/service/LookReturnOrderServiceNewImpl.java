@@ -69,7 +69,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 					+ "<br>下单："+list.get(i).getPlaceDate()+"<br>签收："+list.get(i).getSigntime());
 			list.get(i).setCustomerorder("<a href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+list.get(i).getCustomerorder()+"' target='_blank'>"+list.get(i).getCustomerorder()+"</a>");
             list.get(i).setItem("产品名：<a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItemname()+"</a><br>pid:<a href='https://detail.1688.com/offer/"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItem()+"</a><br>规格："+list.get(i).getSku()+"<br>采购数量："+list.get(i).getItemNumber());
-			if (list.get(i).getReturntime()==null) {
+			if (list.get(i).getReason()==null) {
             if (list.get(i).getChangeShipno()==null||"".equals(list.get(i).getChangeShipno())) {
 				list.get(i).setChangeShipno("<input class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");
 			} else {
@@ -100,11 +100,11 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
             if (list.get(i).getState()==4) {
 				stat="完结";
 			}
-			if (list.get(i).getReturntime()!=null){
+			if (list.get(i).getReturntime()!=null &&list.get(i).getReason()!=null ){
             	if (list.get(i).getState()==4){
 					stat += "<br>驳回理由："+list.get(i).getReason()+"<br>驳回退货时间：" + list.get(i).getReturntime();
 				}else {
-					stat += "<br>同意退货时间：" + list.get(i).getReturntime();
+					stat += "<br>退货方式："+list.get(i).getReason()+"<br>同意退货时间：" + list.get(i).getReturntime();
 				}
 			}
 			if (list.get(i).getState()==-1) {
