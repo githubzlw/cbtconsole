@@ -53,6 +53,12 @@ public class Distinguish_PictureContorller {
 			//初始的判断以及赋值
 			if (StrUtils.isNullOrEmpty(page)) page = "1";
 			int pageNO = Integer.parseInt(page);
+
+			if ( user.getRoletype()!=0&&"1".equals(state)){
+                Change_user=user.getAdmName();
+            }else {
+                Change_user="";
+            }
 			//查询出页面数据   custom_goods_md5 中符合条件的数据
 			List<CustomGoods> customGoodsList = distinguish_pictureService.showDistinguish_Pircture(pageNO, imgtype, state, Change_user);
 			if (StrUtils.isNullOrEmpty(state)) state = "0";

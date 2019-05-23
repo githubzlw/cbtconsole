@@ -29,6 +29,8 @@ public interface Distinguish_PictureDao {
 
 	public int updateSomePirctu_risdelete_date(@Param("bgList_s")List<Map<String, String>> bgList);
 
-    @Select("SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path as remotepath FROM custom_goods_md5 cdm where cdm.ocr_need_delete=1 and cdm.ocr_need_date=1 AND is_delete !=1 AND cdm.user_operation=#{admName}")
+    @Select("SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path as remotepath FROM " +
+            "   custom_goods_md5 cdm where goods_md5  in (SELECT DISTINCT goods_md5 FROM custom_goods_md5 where " +
+            " ocr_need_delete=1 and ocr_need_date=1 AND is_delete !=1 AND user_operation=#{admName})")
     List<CustomGoods> deleteAllPriceByAdmname(@Param("admName") String admName);
 }
