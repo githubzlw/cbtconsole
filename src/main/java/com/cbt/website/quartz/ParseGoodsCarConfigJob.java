@@ -234,7 +234,7 @@ public class ParseGoodsCarConfigJob extends QuartzJobBean {
             }else{
                 marketing.setGoogsPrice("0");
             }
-            marketing.setPrice1(activeBean.getPrice1());
+            marketing.setPrice1(Double.parseDouble(activeBean.getPrice1()));
             marketing.setPrice2(activeBean.getPrice2());
             marketing.setPrice3(activeBean.getPrice3());
             //marketing.setStartBizFactoryPrice(activeBean.getStartBizFactoryPrice());
@@ -246,7 +246,7 @@ public class ParseGoodsCarConfigJob extends QuartzJobBean {
             marketing.setItemid(activeBean.getItemId());
             marketing.setIsbattery(activeBean.getIsBattery());
             marketing.setGoodsClass(activeBean.getGoods_class());
-            marketing.setGoodsurlmd5(activeBean.getUrlMD5());
+            marketing.setGoodsurlmd5(activeBean.getGoodsUrlMD5());
             marketing.setBizpricediscount(activeBean.getBizPriceDiscount());
             marketing.setSpiderprice(Double.valueOf(StringUtils.isBlank(activeBean.getSpider_Price()) ? "0" : activeBean.getSpider_Price()));
             //marketing.setPricelistsize(activeBean.getPriceListSize());
