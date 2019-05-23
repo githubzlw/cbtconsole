@@ -26,7 +26,7 @@
     </resultMap>
 
     <select id="showDistinguish_Pircture" resultMap="resultMap">
-    SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
+    SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path,COUNT(cdm.goods_md5) as  cu FROM custom_goods_md5 cdm
     WHERE 1=1
         AND cdm.is_delete=0
         <if test="state == null || state == ''">
@@ -47,6 +47,7 @@
         <if test="imgtype == null || imgtype == ''">
             AND cdm.catgrid !=0
         </if>
+        group by cdm.goods_md5 HAVING cu > 1
     limit #{page},35
 </select>
 
@@ -83,6 +84,7 @@
         <if test="endTime !=null and endTime!=''">
             AND #{endTime}>=create_time
         </if>
+
     </select>
 
     <select id="showDistinguish_Pircture_operationUser" resultMap="UserMap">
@@ -90,7 +92,8 @@
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="int">
-        SELECT count(1)
+        SELECT count(1) FROM
+        (SELECT count(cdm.goods_md5)
         FROM custom_goods_md5 cdm
         WHERE 1=1
         <if test="state == null || state == ''">
@@ -111,19 +114,26 @@
             AND cdm.catgrid !=0
         </if>
         AND cdm.is_delete=0
+        group by cdm.goods_md5 HAVING COUNT(cdm.goods_md5)>1) a
     </select>
 
     <sql id="Category1688_List">
         id,lv,category_id,name
     </sql>
     <select id="showCategory1688_type" resultMap="Category1688Map">
-       SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
-        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
-        WHERE cbr.`pid`=cdm.`pid`
-        AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
-        AND cdm.ocr_need_delete=1
-        AND cdm.ocr_need_date=0
-        GROUP BY cdm.catgrid
+--        SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
+--         custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
+--         WHERE cbr.`pid`=cdm.`pid`
+--         AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
+--         AND cdm.ocr_need_delete=1
+--         AND cdm.ocr_need_date=0
+--         GROUP BY cdm.catgrid
+SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
+ 1688_category c INNER JOIN
+custom_benchmark_ready  cbr on c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1) INNER JOIN
+(SELECT COUNT(goods_md5) as  cu,catgrid,pid FROM custom_goods_md5 WHERE ocr_need_delete=1 AND ocr_need_date=0
+    group by goods_md5 HAVING cu>1  ) cdm  on cdm.pid=cbr.pid
+ GROUP BY cdm.catgrid
     </select>
     <update id="updateSomePirctu_risdelete">
         update custom_goods_md5 SET
