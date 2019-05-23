@@ -7,8 +7,10 @@ import com.cbt.common.StringUtils;
 import com.cbt.pojo.StraightHairPojo;
 import com.cbt.refund.bean.AdminUserBean;
 import com.cbt.report.dao.TaoBaoOrderMapper;
+import com.cbt.warehouse.dao.LookReturnOrderServiceNewMapper;
 import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
 import com.cbt.warehouse.pojo.PreferentialPrice;
+import com.cbt.warehouse.pojo.returndisplay;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.*;
 import com.cbt.website.dao2.Page;
@@ -22,6 +24,8 @@ import java.util.*;
 @Service
 public class PurchaseServerImpl implements PurchaseServer {
 
+	@Autowired
+	private LookReturnOrderServiceNewMapper lookReturnOrderServiceNewMapper;
 	private PurchaseDao phDao = new PurchaseDaoImpl();
 	@Autowired
 	private TaoBaoOrderMapper taoBaoOrderMapper;

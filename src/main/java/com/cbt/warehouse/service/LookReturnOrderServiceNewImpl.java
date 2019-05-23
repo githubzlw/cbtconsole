@@ -24,7 +24,7 @@ import com.cbt.website.util.EasyUiJsonResult;
 public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew {
     @Autowired
     private LookReturnOrderServiceNewMapper lookReturnOrderServiceNewMapper;
-
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 	@Override
 	public EasyUiJsonResult FindReturndisplay(String applyUser, String state,
 			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid) {
@@ -65,19 +65,22 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page);
 		
 		for (int i = 0; i < list.size(); i++) {
-			list.get(i).setOrderInfo("订单号：<a>"+list.get(i).getA1688Order()+"</a><br>运单号：<a href='/cbtconsole/website/newtrack.jsp?shipno="+list.get(i).getA1688Shipno()+"&barcode="+list.get(i).getBarcode()+"' target='_blank'>"+list.get(i).getA1688Shipno()+"</a>"
+			list.get(i).setOrderInfo("订单号：<a >"+list.get(i).getA1688Order()+"</a><br>运单号：<a href='/cbtconsole/website/newtrack.jsp?shipno="+list.get(i).getA1688Shipno()+"&barcode="+list.get(i).getBarcode()+"' target='_blank'>"+list.get(i).getA1688Shipno()+"</a>"
 					+ "<br>下单："+list.get(i).getPlaceDate()+"<br>签收："+list.get(i).getSigntime());
 			list.get(i).setCustomerorder("<a href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+list.get(i).getCustomerorder()+"' target='_blank'>"+list.get(i).getCustomerorder()+"</a>");
-            list.get(i).setItem(list.get(i).getItem()+"<br>数量："+list.get(i).getItemNumber());
+            list.get(i).setItem("产品名：<a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItemname()+"</a><br>pid:<a href='https://detail.1688.com/offer/"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItem()+"</a><br>规格："+list.get(i).getSku()+"<br>采购数量："+list.get(i).getItemNumber());
+			if (list.get(i).getReason()==null) {
             if (list.get(i).getChangeShipno()==null||"".equals(list.get(i).getChangeShipno())) {
 				list.get(i).setChangeShipno("<input class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");
 			} else {
 				list.get(i).setChangeShipno(list.get(i).getChangeShipno()+"<input type='button' value='修改' onclick='UpShip("+list.get(i).getId()+")'>");	
 			}
-            if (list.get(i).getShipno()==null||"".equals(list.get(i).getShipno())) {
-				list.get(i).setShipno("<input class='but_color' type='button' value='输入退货运单号' onclick='UpShipH("+list.get(i).getId()+")'>");
-			} else {
-				list.get(i).setShipno(list.get(i).getShipno()+"<input  type='button' value='修改' onclick='UpShipH("+list.get(i).getId()+")'>");	
+
+				if (list.get(i).getShipno() == null || "".equals(list.get(i).getShipno())) {
+					list.get(i).setShipno("<input class='but_color' type='button' value='输入退货运单号' onclick='UpShipH(" + list.get(i).getId() + ")'>");
+				} else {
+					list.get(i).setShipno(list.get(i).getShipno() + "<input  type='button' value='修改' onclick='UpShipH(" + list.get(i).getId() + ")'>");
+				}
 			}
 //            list.get(i).setChangeShipno("<input class='but_color' type='button' value='"+list.get(i).getChangeShipno()==null?"输入换货运单号":"修改"+"' onclick='"+list.get(i).getChangeShipno()==null?"UpShip("+list.get(i).getId()+")":"onclick='UpShip("+list.get(i).getId()+")'>");
 //            list.get(i).setShipno("<input class='but_color' type='button' value='"+list.get(i).getShipno()==null?"输入退货运单号":"修改"+"' onclick='"+list.get(i).getShipno()==null?"UpShipH("+list.get(i).getId()+")":"onclick='UpShipH("+list.get(i).getId()+")'>");
@@ -96,13 +99,20 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			}
             if (list.get(i).getState()==4) {
 				stat="完结";
-				
 			}
+			if (list.get(i).getReturntime()!=null &&list.get(i).getReason()!=null ){
+            	if (list.get(i).getState()==4){
+					stat += "<br>驳回理由："+list.get(i).getReason()+"<br>驳回退货时间：" + list.get(i).getReturntime();
+				}else {
+					stat += "<br>退货方式："+list.get(i).getReason()+"<br>同意退货时间：" + list.get(i).getReturntime();
+				}
+			}
+			if (list.get(i).getState()==-1) {
+				stat="<input class='but_color' type='button' value='同意退货' onclick='Agreed("+list.get(i).getId()+")'><br> / <br><input class='but_color' type='button' value='驳回' onclick='rejected("+list.get(i).getId()+")'/>";
+			}
+
             list.get(i).setStateShow(stat);
             list.get(i).setPepoInfo("申请人："+list.get(i).getApplyUser()+"<br>退货数量："+list.get(i).getReturnNumber());
-            if (mid==1) {
-            	 list.get(i).setPepoInfo("<input class='but_color' type='button' value='同意退货' onclick='Agreed("+list.get(i).getId()+")'>/<input class='but_color' type='button' value='驳回' onclick='rejected("+list.get(i).getId()+")'");	
-			}
 		}
 		
 		json.setRows(list);
@@ -111,11 +121,16 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult UpdaeReturnOrder(String ship) {
+	public EasyUiJsonResult UpdaeReturnOrder(String ship,String ch) {
 		// TODO Auto-generated method stub
 		EasyUiJsonResult json=new EasyUiJsonResult();
-		Boolean bo;	
-		bo=this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship);	
+		Boolean bo;
+		if ("1".equals(ch)){
+			ch="线下补发";
+			bo=this.lookReturnOrderServiceNewMapper.UpdaeReturnOrderCh(ship,ch);
+		}else {
+			bo = this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship);
+		}
 		if(bo){
 			json.setRows(0);
 		}else {
@@ -125,13 +140,13 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult RemReturnOrder(String ship) {
+	public EasyUiJsonResult RemReturnOrder(String ship,String cusorder) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
-		Boolean bo=this.lookReturnOrderServiceNewMapper.RemReturnOrder(ship);
+		Boolean bo=this.lookReturnOrderServiceNewMapper.RemReturnOrder(ship,cusorder);
 		if(bo){
-			json.setRows(0);
+			json.setMessage("0");
 		}else {
-			json.setRows(1);	
+			json.setMessage("0");
 		}
 		return json;
 	}
@@ -213,7 +228,15 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		orderJson json=new orderJson();
 		List<returndisplay> listOr = new ArrayList<returndisplay>();
 		List<returndisplay> listItem = new ArrayList<returndisplay>();
-		listOr=this.lookReturnOrderServiceNewMapper.getAllOrder(cusOrder);		
+		returndisplay listItemCount = new returndisplay();
+		listOr=this.lookReturnOrderServiceNewMapper.getAllOrder(cusOrder);
+		for (int i = 0; i < listOr.size(); i++) {
+			listItemCount=this.lookReturnOrderServiceNewMapper.FindItemCount(listOr.get(i).getA1688Order());
+			if (listItemCount !=null&&listItemCount.getItemNumber()-listItemCount.getReturnNumber()<=0){
+				listOr.remove(i);
+				i--;
+			}
+		}
 		json.setRows1(listOr);
 		for (int i = 0; i < listOr.size(); i++) {
 			if (tbOrder !=null&&tbOrder.equals(listOr.get(i).getA1688Order())) {
@@ -321,18 +344,17 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				}
 				list.get(j).setReturnNumber(re.get(i).getReturnNumber());
 				list.get(j).setReturnReason(re.get(i).getReturnReason());
-				list.get(j).setState(5);
+				list.get(j).setState(-1);
 				Date currentTime = new Date();
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String dateString = formatter.format(currentTime);
-				
-				list.get(j).setApplyTime(dateString);
+				list.get(j).setApplyTime(df.format(new Date()));
 				bo=this.lookReturnOrderServiceNewMapper.AddOrder(list.get(j));
 				}
 			}	
 		}
 		if (bo) {
 			json.setRows(1);
+			json.setFooter(df.format(new Date()));
+
 		}else {
 			json.setRows(0);	
 		}
@@ -350,12 +372,10 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				list.get(i).setCustomerorder(cusorder);
 				list.get(i).setReturnReason(returnNO);
 				list.get(i).setApplyUser(id);
-				list.get(i).setState(5);
+				list.get(i).setState(-1);
 				list.get(i).setReturnNumber(list.get(i).getItemNumber());
 				Date currentTime = new Date();
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String dateString = formatter.format(currentTime);
-				list.get(i).setApplyTime(dateString);
+				list.get(i).setApplyTime(df.format(new Date()));
 				bo=this.lookReturnOrderServiceNewMapper.AddOrder(list.get(i));
 			}
 		} catch (Exception e) {
@@ -364,7 +384,8 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		}
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		if (bo) {
-		json.setRows(1);	
+		json.setRows(1);
+		json.setFooter(df.format(new Date()));
 		}else {
 			json.setRows(0);		
 		}
@@ -386,12 +407,13 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult AddOrderByOdid(int number, String odid,
-			String cusorder, String returnNO, String admName, int num,String goodsid) {
+	public EasyUiJsonResult AddOrderByOdid(int number, String tbId,
+			String cusorder, String returnNO, String admName, int num,String goodsid,String pid) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		returndisplay re=new returndisplay();
-		int orid=Integer.parseInt(odid);
-		returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(odid);
+		int orid=Integer.parseInt(tbId);
+        returndisplay itnum=new returndisplay();
+		 itnum=this.lookReturnOrderServiceNewMapper.FinditnumByPid(cusorder,pid);
 		if (itnum !=null) {
 			int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
 			if (itemNum ==0) {
@@ -404,26 +426,18 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			}
 		}
 		
-		re=this.lookReturnOrderServiceNewMapper.FindReturndisplayByOrid(orid);
-		
-		if (re==null) {
-			re=this.lookReturnOrderServiceNewMapper.FindOrderdetailsByOrid(orid);
-		}
-		
+		re=this.lookReturnOrderServiceNewMapper.FindReturndisplayBypid(cusorder,pid);
 		if (re==null) {
 		json.setRows("3");
 		return json;
 		}
 		if (re.getTbId()==null) {
-			re.setTbId(odid);
+			re.setTbId(tbId);
 		}
 		
 		re.setCustomerorder(cusorder);
 		re.setApplyUser(admName);
-		Date currentTime = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String dateString = formatter.format(currentTime);
-		re.setApplyTime(dateString);
+		re.setApplyTime(df.format(new Date()));
 		re.setReturnNumber(num);
 		re.setReturnReason(returnNO);
 		Boolean bo=false;
@@ -477,6 +491,37 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		jsonResult.setRows(re);
 		return jsonResult;
 	}
-	
-	
+
+	@Override
+	public EasyUiJsonResult getpid(String cusorder, String pid) {
+		EasyUiJsonResult json = new EasyUiJsonResult();
+		List<returndisplay> re = new ArrayList<returndisplay>();
+		returndisplay itnum = new returndisplay();
+		itnum = this.lookReturnOrderServiceNewMapper.FinditnumByPid(cusorder, pid);
+		if (itnum != null) {
+			int itemNum = itnum.getItemNumber() - itnum.getReturnNumber();
+			if (itemNum <= 0) {
+				json.setRows(0);
+				return json;
+			}
+		}
+		re=this.lookReturnOrderServiceNewMapper.FindReturndisplayByCusorder(cusorder,pid);
+		if (re.size()==0) {
+			json.setRows("1");
+			return json;
+		}
+			return null;
+		}
+
+	@Override
+	public String getAllOrderCount() {
+		try {
+			int count=this.lookReturnOrderServiceNewMapper.getAllOrderCount();
+			return String.valueOf(count);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }
