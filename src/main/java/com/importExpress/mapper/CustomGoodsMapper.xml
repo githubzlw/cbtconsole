@@ -431,14 +431,15 @@
         ifnull(cbc.complain_id,'') as complain_id,
         ifnull(cbc.complain_id,0) as reviewCount
         from custom_benchmark_ready cbu
+        <if test="catid !=null">
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+        </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join custom_benchmark_complain cbc on cbc.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         left join (select count(0) as reviewCount,goods_pid from goods_review group by goods_pid) gr on gr.goods_pid=cbu.pid
         where 1=1
-        <if test="catid !=null">
-            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
-        </if>
+
         <if test="unsellableReason !=null">
             and cbu.unsellableReason=${unsellableReason}
         </if>
@@ -578,7 +579,7 @@
             and cbu.shop_id = #{shopId}
         </if>
         <if test="chKeyWord !=null">
-            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+            and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
 
         <if test="isSort == 1">
@@ -599,12 +600,12 @@
 
     <select id="queryForListByParamCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
         select count(0) from custom_benchmark_ready cbu
+        <if test="catid !=null">
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+        </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         where 1=1
-        <if test="catid !=null">
-            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
-        </if>
         <if test="sttime !=null">
             and cge.publish_time &gt;= #{sttime}
         </if>
@@ -741,7 +742,7 @@
             and cbu.shop_id = #{shopId}
         </if>
         <if test="chKeyWord !=null">
-            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+            and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
     </select>
 
@@ -749,12 +750,12 @@
         select cat1688.*,ifnull(cbm.total,0) as total from (select category_id as cid,name as category_name,
         path,lv from 1688_category where lv > 0) cat1688 left join
         (select catid1,count(0) as total from custom_benchmark_ready cbu
+        <if test="catid !=null">
+            inner join (select category_id from 1688_category where find_in_set(#{catid},path)) ct on cbu.catid1 = ct.category_id
+        </if>
         left join custom_goods_edit cge on cbu.pid = cge.pid
         left join (select id,admName from admuser where status =1) adu on cge.admin_id = adu.id
         where 1=1
-        <if test="catid !=null">
-            and cbu.catid1 in (select category_id from 1688_category where find_in_set(#{catid},path))
-        </if>
         <if test="sttime !=null">
             and cge.publish_time &gt;= #{sttime}
         </if>
@@ -885,7 +886,7 @@
             and cbu.shop_id = #{shopId}
         </if>
         <if test="chKeyWord !=null">
-            and MATCH(cbu.name) AGAINST(#{chKeyWord})
+            and MATCH(cbu.name) AGAINST(concat('*',#{chKeyWord},'*') IN BOOLEAN MODE)
         </if>
         group by catid1
         ) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
