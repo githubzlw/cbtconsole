@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户询盘</title>
+    <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        .datagrid-htable {
+            text-align: center;
+            height: 22px;
+            font-size: 18px;
+        }
+
+        #user_other_info_query_form {
+            font-size: 18px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 22px;
+            font-size: 18px;
+        }
+
+        #user_other_info_toolbar {
+            padding: 18px 22px !important;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 15px;
+        }
+
+        .datagrid-row {
+            height: 22px;
+        }
+
+        .but_color {
+            background: #44a823;
+            width: 77px;
+            height: 26px;
+            border: 1px #aaa solid;
+            color: #fff;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setDatagrid();
+            // getAdminList();
+            closeDialog();
+        });
+
+        function setDatagrid() {
+            $('#user_other_info_easyui-datagrid').datagrid({
+                title: '客户询盘',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#user_other_info_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/userOtherInfo/queryForList',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: true,//允许表格自动缩放，以适应父容器
+                rownumbers: true,
+                nowrap: false,
+                pageSize: 25,//默认选择的分页是每页50行数据
+                pageList: [25, 40],//可以选择的分页集合
+                pagination: true,//分页
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadError: function () {
+                    $.message.alert("提示信息", "获取数据信息失败");
+                    return;
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        $.messager.alert(data.message);
+                    }
+                }
+            });
+        }
+
+
+        function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#query_admin_id").empty();
+                        var content = '<option value="0" selected="selected">全部</option>';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#query_admin_id").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
+
+        function doQuery() {
+            //var adminId = $("#query_admin_id").val();
+            var userId = $("#query_user_id").val();
+            var userEmail = $("#query_email").val();
+            var beginTime = $("#query_pay_begin_time").val();
+            var endTime = $("#query_pay_end_time").val();
+            $("#user_other_info_easyui-datagrid").datagrid("load", {
+                "userId": userId,
+                "userEmail": userEmail,
+                "beginTime": beginTime,
+                "endTime": endTime
+            });
+        }
+
+
+        function formatOperation(val, row, index) {
+            var content = '<button class="but_color" onclick="beforUpdateFollowInfo(' + row.id + ',' + row.userId + ')" >跟进日志</button>';
+            return content;
+        }
+
+        function beforUpdateFollowInfo(id, userId) {
+            $("#edit_remark").val("");
+            $("#edit_id").val(id);
+            $("#edit_user_id").val(userId);
+            $('#enter_div_sty').dialog('open');
+        }
+
+
+        function saveFollowInfo() {
+            var remark = $("#edit_remark").val();
+            if (!remark) {
+                $.messager.alert("提醒", "请输入备注信息", "info");
+            } else {
+                var id = $("#edit_id").val();
+                var userId = $("#edit_user_id").val();
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'text',
+                    url: '/cbtconsole/userOtherInfo/saveFollowInfo',
+                    data: {
+                        "id": id,
+                        "userId": userId,
+                        "remark": remark
+                    },
+                    success: function (data) {
+                        var json = JSON.parse(data);
+                        if (json.ok) {
+                            closeDialog();
+                            $('#user_other_info_easyui-datagrid').datagrid('reload');
+                        } else {
+                            $.messager.alert("提醒", json.message, "error");
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert("提醒", "error", "error");
+                    }
+                });
+            }
+        }
+
+        function closeDialog() {
+            $('#enter_div_sty').dialog('close');
+            $("#edit_remark").val("");
+            $("#edit_id").val("0");
+            $("#edit_user_id").val("0");
+        }
+    </script>
+</head>
+<body>
+
+<div id="enter_div_sty" class="easyui-dialog" title="添加跟进备注"
+     data-options="modal:true"
+     style="width: 411px; height: 260px;">
+    <form id="form_enter" action="#" onsubmit="return false" style="margin-left: 30px;">
+        <br>
+        <div>
+            <input type="hidden" id="edit_id" value="0"/>
+            <input type="hidden" id="edit_user_id" value="0"/>
+            <textarea id="edit_remark" style="width: 340px; height: 140px;"></textarea>
+        </div>
+        <br>
+        <div style="text-align: center;">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton" onclick="saveFollowInfo()" style="width: 80px">保存</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialog()"
+               style="width: 80px">取消</a>
+        </div>
+
+    </form>
+</div>
+
+<div id="user_other_info_toolbar" style="padding: 5px; height: auto">
+    <form id="user_other_info_query_form" action="#" onsubmit="return false;">
+
+        <span>客户ID:<input id="query_user_id" type="text" value="" style="width: 118px;height: 18px;"/></span>
+        &nbsp;&nbsp;<span>邮箱:<input id="query_email" type="text" value=""
+                                    style="width: 180px;height: 18px;"/></span>
+        &nbsp;&nbsp;<span>创建时间:<input id="query_pay_begin_time" type="text" class="Wdate"
+                                      onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"
+                                      value="" style="width: 118px;height: 18px;"/></span>
+        &nbsp;&nbsp;<span>至:<input id="query_pay_end_time" type="text" class="Wdate"
+                                   onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"
+                                   value="" style="width: 118px;height: 18px;"/></span>
+        <!--&nbsp;&nbsp;<span>销售: <select id="query_admin_id" style="font-size: 16px; height: 22px; width: 118px;">
+					<option value="-1" selected="selected">全部</option>
+			</select></span>-->
+        &nbsp;&nbsp;
+        <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
+    </form>
+</div>
+
+<table id="user_other_info_easyui-datagrid" class="easyui-datagrid">
+    <thead>
+    <tr>
+        <th data-options="field:'userId',width:'60px'">用户ID</th>
+        <th data-options="field:'userName',width:'110px'">用户名称</th>
+        <th data-options="field:'userEmail',width:'160px'">用户邮箱</th>
+        <th data-options="field:'webFacebookUrl',align:'center',width:'170px'">WebFacebook</th>
+        <th data-options="field:'userTypeDesc',align:'center',width:'170px'">Business Services</th>
+        <th data-options="field:'remarks',align:'center',width:'240px'">备注</th>
+        <th data-options="field:'createTime',align:'center',width:'120px'">创建时间</th>
+        <th data-options="field:'followTime',align:'center',width:'120px'">跟进时间</th>
+        <th data-options="field:'opFlag',align:'center',width:'60px',formatter:formatOperation">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>

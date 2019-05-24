@@ -217,7 +217,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                             minTime = delivery_time.split("-")[0];
                             maxTime = delivery_time.split("-")[1];
                         }
-                        goodsActiveInfo.setUrlMD5(goodsUuid);
+                        goodsActiveInfo.setGoodsUrlMD5(goodsUuid);
                         goodsActiveInfo.setItemId((String)goodMap.get("itemId"));//商品id
                         if(upDateFlag){
                             goodsActiveInfo.setPrice(originalPrice);
@@ -370,10 +370,10 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             spdBean.setNorm_least(activeBean.getNorm_least());
             spdBean.setNotfreeprice(activeBean.getNotfreeprice());
             spdBean.setNumber(activeBean.getNumber());
-            spdBean.setoNum(activeBean.getoNum());
+            spdBean.setoNum(activeBean.getONum());
             spdBean.setPerWeight(activeBean.getPerWeight());
             spdBean.setPrice(activeBean.getPrice());
-            spdBean.setPrice1(activeBean.getPrice1());
+            spdBean.setPrice1(Double.parseDouble(activeBean.getPrice1()));
             spdBean.setPrice2(activeBean.getPrice2());
             spdBean.setPrice3(activeBean.getPrice3());
             spdBean.setStartBizFactoryPrice(activeBean.getStartBizFactoryPrice());
@@ -385,7 +385,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             spdBean.setItemId(activeBean.getItemId());
             spdBean.setIsBattery(activeBean.getIsBattery());
             spdBean.setGoods_class(activeBean.getGoods_class());
-            spdBean.setUrlMD5(activeBean.getUrlMD5());
+            spdBean.setUrlMD5(activeBean.getGoodsUrlMD5());
             spdBean.setBizPriceDiscount(activeBean.getBizPriceDiscount());
             spdBean.setSpider_Price("0.00");
             spdBean.setPriceListSize(activeBean.getPriceListSize());
@@ -583,7 +583,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             redisGoods.setSkuid_1688(showBean.getSkuid_1688());
             redisGoods.setSpec_id(showBean.getSkuid_1688());
             redisGoods.setTypes(showBean.getTypes());
-            redisGoods.setUrlMD5(activeBean.getUrlMD5());
+            redisGoods.setUrlMD5(activeBean.getGoodsUrlMD5());
             //redisGoods.setImg_url(showBean.getImg_url());
             if(StringUtils.isNotBlank(redisGoods.getComparePrices())) {
                 if(Double.parseDouble(redisGoods.getComparePrices()) <= Double.parseDouble(redisGoods.getPrice())) {
@@ -736,7 +736,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
                                 minTime = delivery_time.split("-")[0];
                                 maxTime = delivery_time.split("-")[1];
                             }
-                            goodsActiveInfo.setUrlMD5(goodsUuid);
+                            goodsActiveInfo.setGoodsUrlMD5(goodsUuid);
                             goodsActiveInfo.setItemId((String)goodMap.get("itemId"));//商品id
                             if(upDateFlag){
                                 goodsActiveInfo.setPrice(originalPrice);

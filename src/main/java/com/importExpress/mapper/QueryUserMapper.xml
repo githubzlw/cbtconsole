@@ -717,6 +717,13 @@
         </foreach>
     </update>
 
+    <!--void updateNeedoffshelfByPid(@Param("pid") String pid, @Param("noShelfInfo") String noShelfInfo);-->
+    <update id="updateNeedoffshelfByPid">
+        UPDATE alidata.needoffshelf_all_log
+        SET edit_flag = 1, no_shelf_info = #{noShelfInfo}
+        WHERE pid = #{pid}
+    </update>
+
     <!--List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);-->
     <select id="queryCarGoodsCount" resultType="map">
         SELECT userid, LENGTH(shopCarShowinfo) - LENGTH(REPLACE(shopCarShowinfo,'"guId"','"guI"'))  'total'
@@ -807,6 +814,14 @@
             <if test="endDate != null">
                 and datatime &lt;= #{endDate}
             </if>
+            AND userid IN (
+                SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+                email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+                email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+                email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+                email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+                email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
         </where>
     </select>
 
@@ -821,6 +836,14 @@
                 and showPageTime &lt;= #{endDate}
             </if>
             AND LENGTH(allProductList) > 0
+            AND userid IN (
+                SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+                email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+                email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+                email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+                email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+                email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
         </where>
     </select>
 

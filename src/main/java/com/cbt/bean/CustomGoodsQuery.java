@@ -1,11 +1,14 @@
 package com.cbt.bean;
 
+import lombok.Data;
+
 /**
  * 1688商品查询条件信息
  * 
  * @author JXW
  *
  */
+@Data
 public class CustomGoodsQuery {
 
 	private String catid;// 类别id
@@ -40,7 +43,8 @@ public class CustomGoodsQuery {
 	 */
 	private int weightCheck = -1;
 
-	private int infringingFlag = -1;//侵权标识 0未侵权 1侵权
+	//侵权标识 0未侵权 1侵权
+	private int infringingFlag = -1;
 
 
 	private double aliWeightBegin;
@@ -55,342 +59,23 @@ public class CustomGoodsQuery {
 	private double price1688End;
 	private int isSort;
 	private String unsellableReason;
-	private int isComplain = -1;//是否被投诉 0-为投诉  1-投诉
-	private int fromFlag;// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
+	//是否被投诉 0-为投诉  1-投诉
+	private int isComplain = -1;
+	// 产品上线来源：1店铺上线，2单个商品上线录入，3速卖通对标上线，4跨境上线，5爆款开发上线
+	private int fromFlag;
 
 	private double finalWeightBegin;
 	private double finalWeightEnd;
 	private double minPrice;
 	private double maxPrice;
-	private int isSoldFlag = -1; // 是否免邮 flag:1老客户免邮价,2：新的免邮价
+	// 是否免邮 flag:1老客户免邮价,2：新的免邮价
+	private int isSoldFlag = -1;
 	private int isWeigthZero;
 	private int isWeigthCatid;
 
-	public int getIsWeigthCatid() {
-		return isWeigthCatid;
-	}
+	private int currPage;
+	private String qrCatid;
+	private String shopId;
+	private String chKeyWord;
 
-	public void setIsWeigthCatid(int isWeigthCatid) {
-		this.isWeigthCatid = isWeigthCatid;
-	}
-
-	public int getIsWeigthZero() {
-		return isWeigthZero;
-	}
-
-	public void setIsWeigthZero(int isWeigthZero) {
-		this.isWeigthZero = isWeigthZero;
-	}
-
-	public int getIsSoldFlag() {
-		return isSoldFlag;
-	}
-
-	public void setIsSoldFlag(int isSoldFlag) {
-		this.isSoldFlag = isSoldFlag;
-	}
-
-	public int getFromFlag() {
-		return fromFlag;
-	}
-
-	public void setFromFlag(int fromFlag) {
-		this.fromFlag = fromFlag;
-	}
-
-	public String getUnsellableReason() {
-		return unsellableReason;
-	}
-
-	public void setUnsellableReason(String unsellableReason) {
-		this.unsellableReason = unsellableReason;
-	}
-
-	public int getIsComplain() {
-		return isComplain;
-	}
-
-	public void setIsComplain(int isComplain) {
-		this.isComplain = isComplain;
-	}
-
-	public String getCatid() {
-		return catid;
-	}
-
-	public void setCatid(String catid) {
-		this.catid = catid;
-	}
-
-	public int getPage() {
-		return page;
-	}
-
-	public void setPage(int page) {
-		this.page = page;
-	}
-
-	public String getSttime() {
-		return sttime;
-	}
-
-	public void setSttime(String sttime) {
-		this.sttime = sttime;
-	}
-
-	public String getEdtime() {
-		return edtime;
-	}
-
-	public void setEdtime(String edtime) {
-		this.edtime = edtime;
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setState(int state) {
-		this.state = state;
-	}
-
-	public int getAdminId() {
-		return adminId;
-	}
-
-	public void setAdminId(int adminId) {
-		this.adminId = adminId;
-	}
-
-	public int getIsEdited() {
-		return isEdited;
-	}
-
-	public void setIsEdited(int isEdited) {
-		this.isEdited = isEdited;
-	}
-
-	public int getIsAbnormal() {
-		return isAbnormal;
-	}
-
-	public void setIsAbnormal(int isAbnormal) {
-		this.isAbnormal = isAbnormal;
-	}
-
-	public int getIsBenchmark() {
-		return isBenchmark;
-	}
-
-	public void setIsBenchmark(int isBenchmark) {
-		this.isBenchmark = isBenchmark;
-	}
-
-	public int getBmFlag() {
-		return bmFlag;
-	}
-
-	public void setBmFlag(int bmFlag) {
-		this.bmFlag = bmFlag;
-	}
-
-	public int getSourceProFlag() {
-		return sourceProFlag;
-	}
-
-	public void setSourceProFlag(int sourceProFlag) {
-		this.sourceProFlag = sourceProFlag;
-	}
-
-	public int getSoldFlag() {
-		return soldFlag;
-	}
-
-	public void setSoldFlag(int soldFlag) {
-		this.soldFlag = soldFlag;
-	}
-
-	public int getPriorityFlag() {
-		return priorityFlag;
-	}
-
-	public void setPriorityFlag(int priorityFlag) {
-		this.priorityFlag = priorityFlag;
-	}
-
-	public int getAddCarFlag() {
-		return addCarFlag;
-	}
-
-	public void setAddCarFlag(int addCarFlag) {
-		this.addCarFlag = addCarFlag;
-	}
-
-	public int getSourceUsedFlag() {
-		return sourceUsedFlag;
-	}
-
-	public void setSourceUsedFlag(int sourceUsedFlag) {
-		this.sourceUsedFlag = sourceUsedFlag;
-	}
-
-	public int getOcrMatchFlag() {
-		return ocrMatchFlag;
-	}
-
-	public void setOcrMatchFlag(int ocrMatchFlag) {
-		this.ocrMatchFlag = ocrMatchFlag;
-	}
-
-	public int getRebidFlag() {
-		return rebidFlag;
-	}
-
-	public void setRebidFlag(int rebidFlag) {
-		this.rebidFlag = rebidFlag;
-	}
-
-	public int getValid() {
-		return valid;
-	}
-
-	public void setValid(int valid) {
-		this.valid = valid;
-	}
-
-	public int getWeightCheck() {
-		return weightCheck;
-	}
-
-	public void setWeightCheck(int weightCheck) {
-		this.weightCheck = weightCheck;
-	}
-
-	public int getInfringingFlag() {
-		return infringingFlag;
-	}
-
-	public void setInfringingFlag(int infringingFlag) {
-		this.infringingFlag = infringingFlag;
-	}
-
-	public double getAliWeightBegin() {
-		return aliWeightBegin;
-	}
-
-	public void setAliWeightBegin(double aliWeightBegin) {
-		this.aliWeightBegin = aliWeightBegin;
-	}
-
-	public double getAliWeightEnd() {
-		return aliWeightEnd;
-	}
-
-	public void setAliWeightEnd(double aliWeightEnd) {
-		this.aliWeightEnd = aliWeightEnd;
-	}
-
-	public String getOnlineTime() {
-		return onlineTime;
-	}
-
-	public void setOnlineTime(String onlineTime) {
-		this.onlineTime = onlineTime;
-	}
-
-	public String getOfflineTime() {
-		return offlineTime;
-	}
-
-	public void setOfflineTime(String offlineTime) {
-		this.offlineTime = offlineTime;
-	}
-
-	public String getEditBeginTime() {
-		return editBeginTime;
-	}
-
-	public void setEditBeginTime(String editBeginTime) {
-		this.editBeginTime = editBeginTime;
-	}
-
-	public String getEditEndTime() {
-		return editEndTime;
-	}
-
-	public void setEditEndTime(String editEndTime) {
-		this.editEndTime = editEndTime;
-	}
-
-	public double getWeight1688Begin() {
-		return weight1688Begin;
-	}
-
-	public void setWeight1688Begin(double weight1688Begin) {
-		this.weight1688Begin = weight1688Begin;
-	}
-
-	public double getWeight1688End() {
-		return weight1688End;
-	}
-
-	public void setWeight1688End(double weight1688End) {
-		this.weight1688End = weight1688End;
-	}
-
-	public double getPrice1688Begin() {
-		return price1688Begin;
-	}
-
-	public void setPrice1688Begin(double price1688Begin) {
-		this.price1688Begin = price1688Begin;
-	}
-
-	public double getPrice1688End() {
-		return price1688End;
-	}
-
-	public void setPrice1688End(double price1688End) {
-		this.price1688End = price1688End;
-	}
-
-	public int getIsSort() {
-		return isSort;
-	}
-
-	public void setIsSort(int isSort) {
-		this.isSort = isSort;
-	}
-
-	public double getFinalWeightBegin() {
-		return finalWeightBegin;
-	}
-
-	public void setFinalWeightBegin(double finalWeightBegin) {
-		this.finalWeightBegin = finalWeightBegin;
-	}
-
-	public double getFinalWeightEnd() {
-		return finalWeightEnd;
-	}
-
-	public void setFinalWeightEnd(double finalWeightEnd) {
-		this.finalWeightEnd = finalWeightEnd;
-	}
-
-	public double getMinPrice() {
-		return minPrice;
-	}
-
-	public void setMinPrice(double minPrice) {
-		this.minPrice = minPrice;
-	}
-
-	public double getMaxPrice() {
-		return maxPrice;
-	}
-
-	public void setMaxPrice(double maxPrice) {
-		this.maxPrice = maxPrice;
-	}
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,7 +102,7 @@ public class Distinguish_PictureContorller {
 	 * @param mainMap
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
-	@ResponseBody
+
 	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> mainMap, String userName, int type) throws Exception {
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		int ret = 0;
@@ -206,15 +207,15 @@ public class Distinguish_PictureContorller {
 		return ret;
 	}
 	@RequestMapping(value = "deleteAllPriceByAdmname")
-	@ResponseBody
-	public String deleteAllPriceByAdmname(@RequestParam("admName")String admName) {
+
+	public String deleteAllPriceByAdmname(@RequestParam("admName")String admName,HttpServletRequest request) {
 		List<CustomGoods> customGoodsList = distinguish_pictureService.deleteAllPriceByAdmname(admName);
 		List<Map<String, String>> bgList=new ArrayList<>();
-		Map<String,String> map=new HashMap<>();
-		for (CustomGoods customGoods:customGoodsList){
+		for (int i=0;i<customGoodsList.size();i++ ){
+			Map<String,String> map=new HashMap<>();
 			String len="/usr/local/goodsimg";
-			customGoods.setRemotepath("https://img.import-express.com"+customGoods.getRemotepath().substring(len.length(),customGoods.getRemotepath().length()));
-			String value=customGoods.getId()+","+customGoods.getPid()+","+customGoods.getRemotepath();
+			customGoodsList.get(i).setRemotepath("https://img.import-express.com"+customGoodsList.get(i).getRemotepath().substring(len.length(),customGoodsList.get(i).getRemotepath().length()));
+			String value=customGoodsList.get(i).getId()+","+customGoodsList.get(i).getPid()+","+customGoodsList.get(i).getRemotepath();
 			map.put("id",value);
 			bgList.add(map);
 		}
@@ -224,10 +225,12 @@ public class Distinguish_PictureContorller {
 			imgpath = imgpath.append(splt[1] + ";" + splt[2] + "@");
 		}
 		int ret=1;
+		HttpSession session = request.getSession();
 		try {
 			 distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
+			session.setAttribute("pidImgList",imgpath.substring(0, imgpath.length() - 1));
 			//提供给蒋先伟    线上下架图片的信息列
-			return "redirect:/editc/deleteEnInfoImgByParam?pidImgList=" + imgpath.substring(0, imgpath.length() - 1);
+			return "redirect:/editc/deleteEnInfoImgByParam";
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -115,7 +115,8 @@ b {
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
 			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"",
-			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0"
+			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0",
+			"shopId":"","chKeyWord":""
 	};
 	var isQuery =0;
 
@@ -132,6 +133,7 @@ b {
 		var catid = sessionStorage.getItem("catid");
 		if(!(catid == null || catid == "" || catid == "0")){
 			queryParams.catid = catid;
+			$("#query_catid").val(catid);
 		}
 		var sttime = sessionStorage.getItem("sttime");
 		if(!(sttime == null || sttime == "")){
@@ -323,6 +325,17 @@ b {
                 $("#is_weight_catid").attr("checked",'true');
 			}
         }
+        var shopId = sessionStorage.getItem("shopId");
+        if(!(shopId == null || shopId == "")){
+            queryParams.shopId = shopId;
+            $("#query_shop_id").val(shopId);
+        }
+        var chKeyWord = sessionStorage.getItem("chKeyWord");
+        if(!(chKeyWord == null || chKeyWord == "")){
+            queryParams.chKeyWord = chKeyWord;
+            $("#query_china_keyword").val(chKeyWord);
+        }
+
 		createCateroryTree(queryParams.catid);
 		doQueryList();
         doStatistic();
@@ -409,9 +422,13 @@ b {
 		var isWeigthZero = $("#is_weight_zero").is(":checked")?"1":"0";
 		var isWeigthCatid = $("#is_weight_catid").is(":checked")?"1":"0";
 
+		var catid = $("#query_catid").val();
+		var shopId = $("#query_shop_id").val();
+		var chKeyWord = $("#query_china_keyword").val();
 
+		sessionStorage.setItem("catid",catid);
 
-		queryParams.catid = "0";
+		queryParams.catid = catid;
 		queryParams.page = "1";
 		queryParams.adminid = adminid;
 		queryParams.state = state;
@@ -450,9 +467,14 @@ b {
         queryParams.finalWeightEnd = finalWeightEnd;
 		queryParams.minPrice = minPrice;
 		queryParams.maxPrice = maxPrice;
+
 		queryParams.isSoldFlag = isSoldFlag;
 		queryParams.isWeigthZero = isWeigthZero;
 		queryParams.isWeigthCatid = isWeigthCatid;
+
+		queryParams.shopId = shopId;
+		queryParams.chKeyWord = chKeyWord;
+
 
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
@@ -467,7 +489,7 @@ b {
 	function doQueryList(){
 
 		if(isQuery ==0){
-			sessionStorage.setItem("catid", queryParams.catid);
+			// sessionStorage.setItem("catid", queryParams.catid);
 			sessionStorage.setItem("page", queryParams.page);
 			sessionStorage.setItem("state", queryParams.state);
 			sessionStorage.setItem("sttime", queryParams.sttime);
@@ -508,6 +530,9 @@ b {
 			sessionStorage.setItem("isWeigthZero", queryParams.isWeigthZero);
 			sessionStorage.setItem("isWeigthCatid", queryParams.isWeigthCatid);
 
+			sessionStorage.setItem("shopId", queryParams.shopId);
+			sessionStorage.setItem("chKeyWord", queryParams.chKeyWord);
+
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
 			+ "&state=" + queryParams.state + "&sttime=" + queryParams.sttime + "&edtime="
@@ -522,9 +547,10 @@ b {
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
 			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice
-				+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid;
+			+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid
+			+ "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord;
 
-			$('#goods_list').attr('src',url);
+			$('#goods_list').attr('src',encodeURI(url));
 		}
 	}
 
@@ -835,14 +861,17 @@ b {
 						value="查询" style="height: 30px; width: 60px;" class="btn" /></td>
 
 				</tr>
-				<%--<tr>--%>
-						<%----%>
-				<%--</tr>--%>
+				<tr>
+					<td><span>中文关键词:</span><input id="query_china_keyword" style="width: 160px;height: 22px;"/></td>
+					<td><span>类别ID:</span><input id="query_catid" style="width: 100px;height: 22px;"/></td>
+					<td><span>店铺ID:</span><input id="query_shop_id" style="width: 110px;height: 22px;"/></td>
+
+				</tr>
 			</table>
 
 
 			<div class="div_left">
-				<div class="easyui-panel" style="padding: 5px; height: 96%">
+				<div class="easyui-panel" style="padding: 5px; height: 93%">
 					<ul class="easyui-tree">
 					</ul>
 				</div>
@@ -850,7 +879,7 @@ b {
 
 
 			<div class="div_right">
-				<iframe id="goods_list" src="/cbtconsole/cutom/clist" height="96%"
+				<iframe id="goods_list" src="/cbtconsole/cutom/clist" height="93%"
 					width="100%"> </iframe>
 
 			</div>

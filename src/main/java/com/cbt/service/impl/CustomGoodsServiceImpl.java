@@ -271,6 +271,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         GoodsInfoUpdateOnlineUtil.setGoodsValidByMongoDb(pid, type);
         return customGoodsDao.setGoodsValid(pid, adminName, adminId, type, 6, remark);
     }
+
     @Override
     public int setGoodsValid2(String pid, String adminName, int adminId, int type, String remark) {
         // AWS更新
@@ -505,7 +506,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             // 插入日志记录
             GoodsEditBean editBean = new GoodsEditBean();
             editBean.setAdmin_id(adminId);
-            if(StringUtils.isBlank(orGoods.getWeight()) || "0".equals(orGoods.getWeight()) || "0.00".equals(orGoods.getWeight())){
+            if (StringUtils.isBlank(orGoods.getWeight()) || "0".equals(orGoods.getWeight()) || "0.00".equals(orGoods.getWeight())) {
                 editBean.setWeight_old(orGoods.getWeight());
                 editBean.setWeight_new(newWeight);
             }
@@ -516,7 +517,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
             editBean.setPid(pid);
             customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
 
-            boolean isSuccess = refreshPriceRelatedData(orGoods,newWeight);
+            boolean isSuccess = refreshPriceRelatedData(orGoods, newWeight);
             if (isSuccess) {
                 json.setOk(true);
                 json.setMessage("更新数据成功");
@@ -679,7 +680,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int updateGoodsSku(String pid, String oldSku, String newSku, int adminId, double finalWeight) {
         // 1.更新产品表sku数据和标识
-        customGoodsMapper.updateSkuInfo(pid,newSku);
+        customGoodsMapper.updateSkuInfo(pid, newSku);
         // 2.插入sku日志
         customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
@@ -694,6 +695,17 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public List<String> queryPidByShopId(String shopId) {
         return customGoodsMapper.queryPidByShopId(shopId);
+    }
+
+    @Override
+    public int updateVolumeWeight(String pid, String newWeight) {
+        // 更新27
+        customGoodsMapper.updateVolumeWeight(pid, newWeight);
+        // 更新28
+        customGoodsDao.updateVolumeWeight(pid, newWeight);
+        // 更新mongodb
+        GoodsInfoUpdateOnlineUtil.updateVolumeWeight(pid, newWeight);
+        return 1;
     }
 
 
