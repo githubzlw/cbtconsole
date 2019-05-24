@@ -403,10 +403,10 @@ public class CustomGoodsController {
 			queryBean.setIsWeigthCatid(Integer.valueOf(isWeigthCatid));
 		}
 
-		String qrCatid = request.getParameter("qrCatid");
+		/*String qrCatid = request.getParameter("qrCatid");
 		if(StringUtils.isNotBlank(qrCatid)){
 			queryBean.setQrCatid(qrCatid);
-		}
+		}*/
 		String shopId = request.getParameter("shopId");
 		if(StringUtils.isNotBlank(shopId)){
 			queryBean.setQrCatid(shopId);

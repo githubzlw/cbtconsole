@@ -116,7 +116,7 @@ b {
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
 			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"",
 			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0",
-			"qrCatid":"","shopId":"","chKeyWord":""
+			"shopId":"","chKeyWord":""
 	};
 	var isQuery =0;
 
@@ -133,6 +133,7 @@ b {
 		var catid = sessionStorage.getItem("catid");
 		if(!(catid == null || catid == "" || catid == "0")){
 			queryParams.catid = catid;
+			$("#query_catid").val(catid);
 		}
 		var sttime = sessionStorage.getItem("sttime");
 		if(!(sttime == null || sttime == "")){
@@ -324,12 +325,6 @@ b {
                 $("#is_weight_catid").attr("checked",'true');
 			}
         }
-
-        var qrCatid = sessionStorage.getItem("qrCatid");
-        if(!(qrCatid == null || qrCatid == "")){
-            queryParams.qrCatid = qrCatid;
-            $("#query_catid").val(qrCatid);
-        }
         var shopId = sessionStorage.getItem("shopId");
         if(!(shopId == null || shopId == "")){
             queryParams.shopId = shopId;
@@ -427,13 +422,13 @@ b {
 		var isWeigthZero = $("#is_weight_zero").is(":checked")?"1":"0";
 		var isWeigthCatid = $("#is_weight_catid").is(":checked")?"1":"0";
 
-		var qrCatid = $("#query_catid").val();
+		var catid = $("#query_catid").val();
 		var shopId = $("#query_shop_id").val();
 		var chKeyWord = $("#query_china_keyword").val();
 
+		sessionStorage.setItem("catid",catid);
 
-
-		queryParams.catid = "0";
+		queryParams.catid = catid;
 		queryParams.page = "1";
 		queryParams.adminid = adminid;
 		queryParams.state = state;
@@ -477,7 +472,6 @@ b {
 		queryParams.isWeigthZero = isWeigthZero;
 		queryParams.isWeigthCatid = isWeigthCatid;
 
-		queryParams.qrCatid = qrCatid;
 		queryParams.shopId = shopId;
 		queryParams.chKeyWord = chKeyWord;
 
@@ -495,7 +489,7 @@ b {
 	function doQueryList(){
 
 		if(isQuery ==0){
-			sessionStorage.setItem("catid", queryParams.catid);
+			// sessionStorage.setItem("catid", queryParams.catid);
 			sessionStorage.setItem("page", queryParams.page);
 			sessionStorage.setItem("state", queryParams.state);
 			sessionStorage.setItem("sttime", queryParams.sttime);
@@ -536,7 +530,6 @@ b {
 			sessionStorage.setItem("isWeigthZero", queryParams.isWeigthZero);
 			sessionStorage.setItem("isWeigthCatid", queryParams.isWeigthCatid);
 
-			sessionStorage.setItem("qrCatid", queryParams.qrCatid);
 			sessionStorage.setItem("shopId", queryParams.shopId);
 			sessionStorage.setItem("chKeyWord", queryParams.chKeyWord);
 
@@ -555,7 +548,7 @@ b {
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
 			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice
 			+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid
-			+ "&qrCatid=" + queryParams.qrCatid + "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord;
+			+ "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord;
 
 			$('#goods_list').attr('src',encodeURI(url));
 		}
