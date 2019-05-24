@@ -299,10 +299,8 @@
                 return '1-1688货源下架';
             } else if (val == 2) {
                 return '2-不满足库存条件';
-            } else if (val == 3) {
-                return '3-销量无变化(低库存)';
             } else if (val == 4) {
-                return '4-页面404或者下架';
+                return '4-1688页面404或者货源下架';
             } else if (val == 5) {
                 return '5-重复验证合格';
             } else if (val == 6) {
@@ -351,6 +349,10 @@
                 return '29-清洗中判断的商品异常下架(比如去除一手等规格后剩余规格不可卖)';
             } else if (val == 30) {
                 return '30-大于40美元商品软下架(不包含婚纱礼服)';
+            } else if (val == 31) {
+                return '31-整店下架';
+            } else if (val == 32) {
+                return '32-因为中文或者画质下架';
             } else {
                 return '';
             }
@@ -378,6 +380,10 @@
                 }
             }
             return content;
+        }
+
+        function formatPid(val, row, index) {
+            return '<a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">' + row.pid + '</a>';
         }
 
     </script>
@@ -448,10 +454,8 @@
         </span>
         <span> 下架原因: <select id="query_reason" style="font-size: 14px; height: 24px; width: 160px;">
                                 <option value="0" selected="selected">全部</option>
-                                <option value="1">1-1688货源下架</option>
                                 <option value="2">2-不满足库存条件</option>
-                                <option value="3">3-销量无变化(低库存)</option>
-                                <option value="4">4-页面404或者下架</option>
+                                <option value="4">4-1688页面404或者货源下架</option>
                                 <option value="5">5-重复验证合格(原本1688异常下架后重复验证合格上线的商品)</option>
                                 <option value="6">6-IP问题或运营直接下架</option>
                                 <option value="7">7-店铺整体禁掉</option>
@@ -476,6 +480,8 @@
                                 <option value="28">28-定制商品</option>
                                 <option value="29">29-清洗中判断的商品异常下架(比如去除一手等规格后剩余规格不可卖)</option>
                                 <option value="30">30-大于40美元商品软下架(不包含婚纱礼服)</option>
+                                <option value="31">31-整店下架</option>
+                                <option value="32">32-因为中文或者画质下架</option>
                         </select>
         </span>
         <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
@@ -528,13 +534,14 @@
     <thead>
     <tr>
         <th field="ck" checkbox="true"></th>
-        <th data-options="field:'pid',align:'center',width:'110px'">PID</th>
+        <th data-options="field:'pid',align:'center',width:'110px',formatter:formatPid">PID</th>
         <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品图片</th>
         <th data-options="field:'catidName',align:'center',width:'150px'">所属类别</th>
         <th data-options="field:'isOffShelf',align:'center',width:'150px',formatter:formatIsOffShelf">上下架标识</th>
         <th data-options="field:'competitiveFlag',align:'center',width:'150px',formatter:formatCompetitiveFlag">精品标识</th>
         <th data-options="field:'neverOffFlag',align:'center',width:'150px',formatter:formatneverOffFlag">永不下架</th>
         <th data-options="field:'reason',align:'center',width:'150px',formatter:formatReason">下架原因</th>
+        <th data-options="field:'createtime',align:'center',width:'200px'">上架时间</th>
         <th data-options="field:'updateTime',align:'center',width:'200px'">更新时间</th>
         <th data-options="field:'opFlag',align:'center',width:'200px',formatter:formatOperation">操作</th>
     </tr>
