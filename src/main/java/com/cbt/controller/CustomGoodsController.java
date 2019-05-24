@@ -158,14 +158,14 @@ public class CustomGoodsController {
 		CustomGoodsQuery queryBean = genQueryBean(request);
 
 		String chKeyWord = request.getParameter("chKeyWord");
-		if(StringUtils.isNotBlank(chKeyWord)){
+		/*if(StringUtils.isNotBlank(chKeyWord)){
 			try{
 				chKeyWord  = new String(chKeyWord.getBytes("ISO-8859-1"),"UTF-8");
 				queryBean.setChKeyWord(chKeyWord);
 			}catch (Exception e){
 				e.printStackTrace();
 			}
-		}
+		}*/
 
 		List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsInfos(queryBean);
 		goodsList.stream().forEach(c -> {

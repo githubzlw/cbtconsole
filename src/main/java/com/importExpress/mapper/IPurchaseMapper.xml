@@ -728,8 +728,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         AND o.state>0 AND o.state<![CDATA[<]]>6 AND od.checked=1
     </select>
     <update id="updateReplenishmentState">
-        update order_product_source set last_tb_1688_itemid = #{tb_1688_itemid},is_replenishment=1
-        where od_id=#{odid} and orderid=#{orderid}
+        update order_product_source a,order_details b set
+        a.last_tb_1688_itemid = #{tb_1688_itemid},a.is_replenishment=1,
+        a.purchase_state = case when b.state= 1 then 6 else 3 end
+        where a.od_id=#{odid} and a.orderid=#{orderid} and a.od_id=b.id and a.orderid=b.orderid
     </update>
     <select id="getIsOfflinepurchase" resultType="com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo">
         select a.shipno,a.createtime,b.admName as admuserid,a.goods_p_url,a.tb_orderid from offline_purchase_records a inner join admuser b on a.admuserid=b.id where a.orderid=#{orderid} and a.goodsid=#{goodsid}
