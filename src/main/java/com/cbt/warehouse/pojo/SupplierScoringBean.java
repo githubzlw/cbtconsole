@@ -26,7 +26,17 @@ public class SupplierScoringBean implements Serializable{
 	private Date updateTime;
 	private String category;
 	private int noSupplier;
-	public int getNoSupplier() {
+	private int sell;  // 店铺内销量
+
+    public int getSell() {
+        return sell;
+    }
+
+    public void setSell(int sell) {
+        this.sell = sell;
+    }
+
+    public int getNoSupplier() {
 		return noSupplier;
 	}
 

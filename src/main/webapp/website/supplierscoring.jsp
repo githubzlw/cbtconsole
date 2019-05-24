@@ -46,7 +46,7 @@
 			<tr>
 			<td>供应商</td>
 			<td>供应商类别ID(类别名称)</td>
-			<td>店铺商品总数|在线产品数量</td>
+			<td>店铺商品总数|在线产品数量|店铺产品销量</td>
 			<td>是否精品店铺</td>
 			<td>是否授权</td>
 			<td>质量</td>
@@ -63,7 +63,7 @@
 			<td><a target='_blank' href='https://www.import-express.com/shop?sid=${supplierScoringBean.shopId }'>${supplierScoringBean.shopId }</a>
 			</td>
 			<td>${supplierScoringBean.category}</td>
-			<td>${supplierScoringBean.allcounts }|${supplierScoringBean.counts }</td>
+			<td>${supplierScoringBean.allcounts }|${supplierScoringBean.counts }|${supplierScoringBean.sell }</td>
 			<td>${supplierScoringBean.type}</td>
 			<td>${supplierScoringBean.authorizedFlag}</td>
 			<td>

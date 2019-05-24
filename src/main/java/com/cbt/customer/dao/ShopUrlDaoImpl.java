@@ -2932,7 +2932,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     public List<NeedOffShelfBean> queryNeedOffShelfByParam(NeedOffShelfBean offShelf) {
         List<NeedOffShelfBean> list = new ArrayList<NeedOffShelfBean>();
         //,cbr.is_edited
-        String sql = "select ns.id,ns.source AS 'sourceFlag', ns.no_shelf_info, ns.pid,ns.update_time," +
+        String sql = "select cbr.createtime, ns.id,ns.source AS 'sourceFlag', ns.no_shelf_info, ns.pid,ns.update_time," +
                 " concat(cbr.remotpath,cbr.custom_main_image) as img_url,cbr.unsellableReason as reason," +
                 " cbr.catid1,ct18.name as catid_name,cbr.valid as isOffShelf,cbr.is_edited  " +
                 " from needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
@@ -3032,6 +3032,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
                 offShelfBean.setCatidName(rs28.getString("catid_name"));
                 offShelfBean.setSourceFlag(rs28.getInt("sourceFlag"));
                 offShelfBean.setNoShelfInfo(rs28.getString("no_shelf_info"));
+                offShelfBean.setCreatetime(rs28.getString("createtime"));
                 if("3".equals(rs28.getString("is_edited"))){
                     offShelfBean.setNeverOffFlag(1);
                 }
