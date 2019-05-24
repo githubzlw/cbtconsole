@@ -2019,7 +2019,7 @@
                             <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>
+                                    <span class="goods_cur">${goods.finalWeight}</span><em>KG</em>
                                     <input type="button" value="修改重量" class="s_btn"
                                            onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
                                     <c:if test="${goods.isWeigthZero > 0}">
@@ -2035,7 +2035,7 @@
                             <div class="goods_p">
                                 <p class="goods_color">体积重量:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur">${goods.volumeWeight}<em>KG</em></span>
+                                    <span id="goods_volum_weight" class="goods_cur">${goods.volumeWeight}</span><em>KG</em>
                                     <input type="button" value="修改体积重量" class="s_btn"
                                            onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
                                 </p>
@@ -2545,6 +2545,7 @@
                             },
                             success: function (json) {
                                 if (json.ok) {
+                                    $("#goods_volum_weight").val(newWeight);
                                     showMessage('更新体积重量执行成功');
                                 } else {
                                     $.messager.alert("提醒", json.message, "error");
@@ -2557,10 +2558,10 @@
                     }
 
                 } else {
-                    showMessage('新的利润率必须为正数，最多两位小数！');
+                    showMessage('新的体积重量必须为正数，最多两位小数！');
                 }
             } else {
-                showMessage('未输入新的体积重量或取消输入！');
+                // showMessage('未输入新的体积重量或取消输入！');
             }
         });
     }
