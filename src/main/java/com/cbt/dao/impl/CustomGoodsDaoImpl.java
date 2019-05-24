@@ -4267,4 +4267,27 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         return map;
     }
 
+    @Override
+    public int updateVolumeWeight(String pid, String newWeight) {
+        Connection conn28 = DBHelper.getInstance().getConnection8();
+        PreparedStatement stmt28 = null;
+
+        String updateSql = "update custom_benchmark_ready_newest set volume_weight = ? where pid = ?";
+        int count = 0;
+        try {
+            stmt28 = conn28.prepareStatement(updateSql);
+            stmt28.setString(1, newWeight);
+            stmt28.setString(2, pid);
+            count = stmt28.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("pid:" + pid + ",updateVolumeWeight error :" + e.getMessage());
+            LOG.error("pid:" + pid + ",updateVolumeWeight error",e);
+        } finally {
+            DBHelper.getInstance().closePreparedStatement(stmt28);
+            DBHelper.getInstance().closeConnection(conn28);
+        }
+        return count;
+    }
+
 }

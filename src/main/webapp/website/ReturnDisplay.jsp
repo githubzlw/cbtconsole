@@ -171,14 +171,13 @@ function upState(ship ) {
 				  $.post("/cbtconsole/Look/SetReturnOrder", {
 						ship:ship,number:number
 					}, function(res) {
-						window.location.reload();
 						if(res.rows == 0){
 							$.messager.alert('提示','修改成功');
 						}else{
 							$.messager.alert('提示','修改失败');
-							//window.location.reload();
+
 						}
-						
+                      doQuery(1)
 					});			  
 		});
 }

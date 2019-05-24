@@ -115,7 +115,8 @@ b {
 			"aliWeightBegin":"","aliWeightEnd":"","onlineTime":"","offlineTime":"","editBeginTime":"","editEndTime":"",
 			"weight1688Begin":"","weight1688End":"","price1688Begin":"","price1688End":"","isSort":"0",
 			"unsellableReason":"-1","fromFlag":"-1","finalWeightBegin":"","finalWeightEnd":"",
-			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0"
+			"minPrice":"","maxPrice":"","isSoldFlag":"-1","isWeigthZero":"0","isWeigthCatid":"0",
+			"qrCatid":"","shopId":"","chKeyWord":""
 	};
 	var isQuery =0;
 
@@ -323,6 +324,23 @@ b {
                 $("#is_weight_catid").attr("checked",'true');
 			}
         }
+
+        var qrCatid = sessionStorage.getItem("qrCatid");
+        if(!(qrCatid == null || qrCatid == "")){
+            queryParams.qrCatid = qrCatid;
+            $("#query_catid").val(qrCatid);
+        }
+        var shopId = sessionStorage.getItem("shopId");
+        if(!(shopId == null || shopId == "")){
+            queryParams.shopId = shopId;
+            $("#query_shop_id").val(shopId);
+        }
+        var chKeyWord = sessionStorage.getItem("chKeyWord");
+        if(!(chKeyWord == null || chKeyWord == "")){
+            queryParams.chKeyWord = chKeyWord;
+            $("#query_china_keyword").val(chKeyWord);
+        }
+
 		createCateroryTree(queryParams.catid);
 		doQueryList();
         doStatistic();
@@ -409,6 +427,10 @@ b {
 		var isWeigthZero = $("#is_weight_zero").is(":checked")?"1":"0";
 		var isWeigthCatid = $("#is_weight_catid").is(":checked")?"1":"0";
 
+		var qrCatid = $("#query_catid").val();
+		var shopId = $("#query_shop_id").val();
+		var chKeyWord = $("#query_china_keyword").val();
+
 
 
 		queryParams.catid = "0";
@@ -450,9 +472,15 @@ b {
         queryParams.finalWeightEnd = finalWeightEnd;
 		queryParams.minPrice = minPrice;
 		queryParams.maxPrice = maxPrice;
+
 		queryParams.isSoldFlag = isSoldFlag;
 		queryParams.isWeigthZero = isWeigthZero;
 		queryParams.isWeigthCatid = isWeigthCatid;
+
+		queryParams.qrCatid = qrCatid;
+		queryParams.shopId = shopId;
+		queryParams.chKeyWord = chKeyWord;
+
 
 		$(".easyui-tree").hide();
 		createCateroryTree(queryParams.catid);
@@ -508,6 +536,10 @@ b {
 			sessionStorage.setItem("isWeigthZero", queryParams.isWeigthZero);
 			sessionStorage.setItem("isWeigthCatid", queryParams.isWeigthCatid);
 
+			sessionStorage.setItem("qrCatid", queryParams.qrCatid);
+			sessionStorage.setItem("shopId", queryParams.shopId);
+			sessionStorage.setItem("chKeyWord", queryParams.chKeyWord);
+
 			$('#goods_list').empty();
 			var url = "/cbtconsole/cutom/clist?page=" + queryParams.page + "&catid=" + queryParams.catid
 			+ "&state=" + queryParams.state + "&sttime=" + queryParams.sttime + "&edtime="
@@ -522,9 +554,10 @@ b {
 			+ "&price1688End=" + queryParams.price1688End + "&isSort=" + queryParams.isSort+"&isComplain="+queryParams.isComplain
 			+"&unsellableReason="+queryParams.unsellableReason+"&fromFlag="+queryParams.fromFlag+"&finalWeightBegin="+queryParams.finalWeightBegin
 			+"&finalWeightEnd="+queryParams.finalWeightEnd+"&minPrice="+queryParams.minPrice+"&maxPrice="+queryParams.maxPrice
-				+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid;
+			+"&isSoldFlag="+queryParams.isSoldFlag + "&isWeigthZero=" + queryParams.isWeigthZero + "&isWeigthCatid=" + queryParams.isWeigthCatid
+			+ "&qrCatid=" + queryParams.qrCatid + "&shopId=" + queryParams.shopId + "&chKeyWord=" + queryParams.chKeyWord;
 
-			$('#goods_list').attr('src',url);
+			$('#goods_list').attr('src',encodeURI(url));
 		}
 	}
 
@@ -835,14 +868,17 @@ b {
 						value="查询" style="height: 30px; width: 60px;" class="btn" /></td>
 
 				</tr>
-				<%--<tr>--%>
-						<%----%>
-				<%--</tr>--%>
+				<tr>
+					<td><span>中文关键词:</span><input id="query_china_keyword" style="width: 160px;height: 22px;"/></td>
+					<td><span>类别ID:</span><input id="query_catid" style="width: 100px;height: 22px;"/></td>
+					<td><span>店铺ID:</span><input id="query_shop_id" style="width: 110px;height: 22px;"/></td>
+
+				</tr>
 			</table>
 
 
 			<div class="div_left">
-				<div class="easyui-panel" style="padding: 5px; height: 96%">
+				<div class="easyui-panel" style="padding: 5px; height: 93%">
 					<ul class="easyui-tree">
 					</ul>
 				</div>
@@ -850,7 +886,7 @@ b {
 
 
 			<div class="div_right">
-				<iframe id="goods_list" src="/cbtconsole/cutom/clist" height="96%"
+				<iframe id="goods_list" src="/cbtconsole/cutom/clist" height="93%"
 					width="100%"> </iframe>
 
 			</div>

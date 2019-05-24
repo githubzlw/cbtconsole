@@ -30,7 +30,7 @@ public interface LookReturnOrderServiceNewMapper {
 	Boolean SetReturnOrder(@Param("ship")String ship);
     @Select("SELECT id AS appyId,opt_user AS optUser,opt_time as optTime FROM return_display where id=#{ship}")
 	returnbill FindOrdetByship(@Param("ship")String ship);
-    @Insert("INSERT INTO `back_crossshop`.`return_bill` (`appy_id`, `chang_amount`, `opt_user`, `opt_time`, `end_time`) VALUES (#{re.appyId}, #{re.changAmount}, #{re.optUser}, #{re.optTime}, #{re.endTime});")
+    @Insert("INSERT INTO `return_bill` (`appy_id`, `chang_amount`, `opt_user`, `opt_time`, `end_time`) VALUES (#{re.appyId}, #{re.changAmount}, #{re.optUser}, #{re.optTime}, #{re.endTime});")
 	Boolean AddMoney(@Param("re")returnbill re);
    
     @Update("UPDATE return_display SET shipno=#{number},opt_user=#{name},opt_time=curtime() where id=#{ship}")
@@ -87,7 +87,7 @@ public interface LookReturnOrderServiceNewMapper {
     int getAllOrderCount();
     @Select("SELECT COUNT(return_number)as returnNumber ,item_number as itemNumber from return_display WHERE 1688_order=#{a1688Order} GROUP BY 1688_order")
 	returndisplay FindItemCount(@Param("a1688Order") String a1688Order);
-	@Update("UPDATE return_display SET State=0,returntime=NOW(),reason=#{ch} WHERE id=#{ship} ")
+	@Update("UPDATE return_display SET State=3,returntime=NOW(),reason=#{ch} WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrderCh(@Param("ship") String ship,@Param("ch") String ch);
 
 }

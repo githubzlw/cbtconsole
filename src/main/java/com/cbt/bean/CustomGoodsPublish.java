@@ -124,6 +124,16 @@ public class CustomGoodsPublish extends CustomGoodsBean {
      */
     private int describeGoodFlag = -1;
 
+    private String volumeWeight;
+
+    public String getVolumeWeight() {
+        return volumeWeight;
+    }
+
+    public void setVolumeWeight(String volumeWeight) {
+        this.volumeWeight = volumeWeight;
+    }
+
     public int getDescribeGoodFlag() {
         return describeGoodFlag;
     }

@@ -36,10 +36,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -1497,6 +1499,7 @@ public class EditorController {
         return "redirect:/editc/edit?pid=" + pid;
     }
 
+
     /**
      * 接受上传文件
      *
@@ -1506,9 +1509,9 @@ public class EditorController {
      * @date 2016年12月16日
      * @author abc
      */
-    @RequestMapping(value = "/uploads", method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(value = "/xheditorUploads", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
-    public Map<String, Object> getLoads(HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> xheditorUploads(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> map = new HashMap<String, Object>();
         String msg = "";
         String err = "";
@@ -1587,6 +1590,84 @@ public class EditorController {
         map.put("err", err);
         map.put("msg", msg);
         return map;
+    }
+
+    /**
+     * 接受上传文件
+     *
+     * @param files
+     * @param request
+     * @return
+     * @date 2016年12月16日
+     * @author abc
+     */
+    @RequestMapping(value = "/uploadMultiFile", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    public JsonResult uploadMultiFile(@RequestParam(value = "file", required = false) CommonsMultipartFile[] files,
+                                      HttpServletRequest request, @RequestParam(value = "pid", required = true) String pid) {
+        JsonResult json = new JsonResult();
+
+        System.out.println("pid:" + pid);
+        try {
+            Random random = new Random();
+            // 获取配置文件信息
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            checkFtpConfig(ftpConfig, json);
+            String localDiskPath = ftpConfig.getLocalDiskPath();
+            List<String> imgList = new ArrayList<>();
+            if (json.isOk()) {
+                for (CommonsMultipartFile mf : files) {
+                    if (!mf.isEmpty()) {
+                        // 得到文件保存的名称mf.getOriginalFilename()
+                        String originalName = mf.getOriginalFilename();
+                        // 文件的后缀取出来
+                        String fileSuffix = originalName.substring(originalName.lastIndexOf("."));
+                        String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                        // 本地服务器磁盘全路径
+                        String localFilePath = "importimg/" + pid + "/desc/" + saveFilename + fileSuffix;
+                        // 文件流输出到本地服务器指定路径
+                        ImgDownload.writeImageToDisk(mf.getBytes(), localDiskPath + localFilePath);
+                        // 检查图片分辨率
+                        boolean is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 100, 100);
+                        if (is) {
+                            is = ImageCompression.checkImgResolution(localDiskPath + localFilePath, 700, 400);
+                            if (is) {
+                                String newLocalPath = "importimg/" + pid + "/desc/" + saveFilename + "_700" + fileSuffix;
+                                is = ImageCompression.reduceImgByWidth(700.00, localDiskPath + localFilePath,
+                                        localDiskPath + newLocalPath);
+                                if (is) {
+                                    imgList.add(ftpConfig.getLocalShowPath() + newLocalPath);
+                                } else {
+                                    json.setOk(false);
+                                    json.setMessage("压缩图片到700*700失败，终止执行");
+                                }
+                            } else {
+                                imgList.add(ftpConfig.getLocalShowPath() + localFilePath);
+                            }
+                        } else {
+                            // 判断分辨率不通过删除图片
+                            File file = new File(localFilePath);
+                            if (file.exists()) {
+                                file.delete();
+                            }
+                            json.setOk(false);
+                            json.setMessage("图片分辨率小于100");
+                        }
+                    }
+                }
+                if(imgList.size() > 0){
+                    json.setData(imgList);
+                }
+            }
+        } catch (Exception e) {
+            json.setOk(false);
+            json.setMessage("上传错误:" + e.getMessage());
+            e.printStackTrace();
+            LOG.error("上传错误：", e);
+        }
+        return json;
     }
 
     /**
@@ -3304,10 +3385,17 @@ public class EditorController {
     @ResponseBody
     public JsonResult deleteEnInfoImgByParam(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
-
+        HttpSession session = request.getSession();
         // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
         // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
         String pidImgList = request.getParameter("pidImgList");
+        if (StringUtils.isBlank(pidImgList)){
+            try {
+                pidImgList=(String)session.getAttribute("pidImgList");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         if (StringUtils.isBlank(pidImgList)) {
             json.setOk(false);
             json.setMessage("获取参数失败");
@@ -3347,7 +3435,7 @@ public class EditorController {
                             if (imgEl.attr("src").contains(tempFileName)) {
                                 imgEl.remove();
                                 thisPidImgTotal--;
-                                deleteImgTotal ++;
+                                deleteImgTotal++;
                                 break;
                             }
                         }
@@ -3372,6 +3460,36 @@ public class EditorController {
             System.err.println("imgTotal:" + imgTotal + ",deleteEnInfoImgByParam error:" + e.getMessage());
             json.setOk(false);
             json.setMessage("imgTotal:" + imgTotal + ",执行错误，原因：" + e.getMessage());
+        }
+        return json;
+    }
+
+    @RequestMapping(value = "/updateVolumeWeight")
+    @ResponseBody
+    public JsonResult updateVolumeWeight(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String pid = request.getParameter("pid");
+        if (StringUtils.isBlank(pid)) {
+            json.setOk(false);
+            json.setMessage("获取pid失败");
+            return json;
+        }
+
+        String newWeight = request.getParameter("newWeight");
+        if (StringUtils.isBlank(newWeight)) {
+            json.setOk(false);
+            json.setMessage("获取新的体积重量失败");
+            return json;
+        }
+
+        try {
+            customGoodsService.updateVolumeWeight(pid, newWeight);
+            json.setOk(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("pid:" + pid + ",newWeight:" + newWeight + ",updateVolumeWeight error:", e);
+            json.setOk(false);
+            json.setMessage("执行错误，原因：" + e.getMessage());
         }
         return json;
     }

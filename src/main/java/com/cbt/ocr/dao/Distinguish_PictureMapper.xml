@@ -47,7 +47,12 @@
         <if test="imgtype == null || imgtype == ''">
             AND cdm.catgrid !=0
         </if>
+     <if test="state != 1 and state != 2">
         group by cdm.goods_md5 HAVING cu > 1
+     </if>
+        <if test="state != null and state != ''">
+        group by cdm.goods_md5 HAVING cu > 0
+        </if>
     limit #{page},35
 </select>
 
@@ -114,7 +119,12 @@
             AND cdm.catgrid !=0
         </if>
         AND cdm.is_delete=0
+        <if test="state != 1 and state != 2">
         group by cdm.goods_md5 HAVING COUNT(cdm.goods_md5)>1) a
+        </if>
+        <if test="state != null and state != ''">
+            group by cdm.goods_md5 HAVING COUNT(cdm.goods_md5)>0) a
+        </if>
     </select>
 
     <sql id="Category1688_List">
