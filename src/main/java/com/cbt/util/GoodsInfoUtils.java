@@ -49,6 +49,11 @@ public class GoodsInfoUtils {
      */
     private static final Map<String,String> closeSizeMap = new HashMap<>();
 
+    /**
+     * 替换包含转换数据
+     */
+    private static final Map<String,String> replaceSizeMap = new HashMap<>();
+
     static {
         closeSizeMap.put("XS", "01");
         closeSizeMap.put("S", "02");
@@ -61,6 +66,16 @@ public class GoodsInfoUtils {
         closeSizeMap.put("XXXL", "07");
         closeSizeMap.put("4L", "08");
         closeSizeMap.put("XXXXL", "08");
+        closeSizeMap.put("800 or more", "ZZZZ");
+        replaceSizeMap.put("10cm", "010cm");
+        replaceSizeMap.put("20cm", "020cm");
+        replaceSizeMap.put("30cm", "030cm");
+        replaceSizeMap.put("40cm", "040cm");
+        replaceSizeMap.put("50cm", "050cm");
+        replaceSizeMap.put("60cm", "060cm");
+        replaceSizeMap.put("70cm", "070cm");
+        replaceSizeMap.put("80cm", "080cm");
+        replaceSizeMap.put("90cm", "090cm");
     }
 
 
@@ -213,7 +228,7 @@ public class GoodsInfoUtils {
                         if(closeSizeMap.containsKey(tyb.getValue().toUpperCase())){
                             enType += closeSizeMap.get(tyb.getValue().toUpperCase()) + ",";
                         }else{
-                            enType += tyb.getValue() + ",";
+                            enType += genNewTypeVal(tyb.getValue()) + ",";
                         }
                         totalCount++;
                         break;
@@ -238,6 +253,11 @@ public class GoodsInfoUtils {
             ipes.setPpIds(ites.getSkuPropIds().replace(",", "_"));
             ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
             ipes.setFianlWeight(ites.getFianlWeight());
+            if(ites.getVolumeWeight() > 0){
+                ipes.setVolumeWeight(ites.getVolumeWeight());
+            }else{
+                ipes.setVolumeWeight(ites.getFianlWeight());
+            }
             if (skuAttrs == null || "".equals(skuAttrs)) {
                 ipes = null;
             } else {
@@ -258,6 +278,16 @@ public class GoodsInfoUtils {
         return cbSkuLst;
     }
 
+
+    private static String genNewTypeVal(String typeVal){
+        String tempVal = typeVal;
+        for(String mapKey : replaceSizeMap.keySet()){
+            if(tempVal.contains(mapKey)){
+                tempVal = tempVal.replace(mapKey,replaceSizeMap.get(mapKey));
+            }
+        }
+        return tempVal;
+    }
 
     public static String changeRemotePathToLocal(String remotepath) {
 

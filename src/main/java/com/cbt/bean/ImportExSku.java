@@ -13,6 +13,19 @@ public class ImportExSku {
     private double fianlWeight;
     private ImportExSkuVal skuVal;
 
+    /**
+     * 体积重量
+     */
+    private double volumeWeight;
+
+    public double getVolumeWeight() {
+        return volumeWeight;
+    }
+
+    public void setVolumeWeight(double volumeWeight) {
+        this.volumeWeight = volumeWeight;
+    }
+
     public double getFianlWeight() {
         return fianlWeight;
     }

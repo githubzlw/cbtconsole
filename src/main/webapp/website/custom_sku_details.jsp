@@ -67,7 +67,8 @@
                     <td id="type_name_${type_name.key}">${type_name.value}</td>
                 </c:forEach>
                 <td>单价</td>
-                <td id="type_name_choose">重量(KG)</td>
+                <td>重量(KG)</td>
+                <td>体积重量(KG)</td>
             </tr>
             </thead>
 
@@ -80,8 +81,11 @@
                     </c:forEach>
                     <td style="width: 100px;text-align: center;"><span>${sku_bean.price}</span></td>
                     <td style="width: 100px;">
-                        <input class="inp_style inp_price" title="单击可进行编辑"
-                               id="${sku_bean.ppIds}" value="${sku_bean.fianlWeight}"/></td>
+                        <input class="inp_style inp_cmn_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.fianlWeight}"/></td>
+                    <td style="width: 100px;">
+                        <input class="inp_style inp_vlm_price" title="单击可进行编辑" data-id="${sku_bean.ppIds}"
+                               value="${sku_bean.volumeWeight}"/></td>
                 </tr>
             </c:forEach>
             </tbody>
@@ -92,19 +96,35 @@
         <br>
         <table border="1" cellspacing="0" cellpadding="0" bgcolor="#94f1dc">
             <caption>操作</caption>
-            <tr style="text-align: center;">
-                <td style="width: 140px;"><input class="btn" type="button" value="全部相同" onclick="updateWeight(1,this)"/>
+            <tr>
+                <td>重量修改</td>
+                <td style="width: 140px;"><input class="btn" type="button" value="全部相同"
+                                                 onclick="updatePidWeight(1, 1,this)"/>
                 </td>
                 <td style="width: 140px;"><input class="btn" type="button" value="区间(从小到大)"
-                                                 onclick="updateWeight(2,this)"/>
+                                                 onclick="updatePidWeight(1, 2,this)"/>
                 </td>
                 <td style="width: 140px;"><input class="btn" type="button" value="区间(从大到小)"
-                                                 onclick="updateWeight(3,this)"/>
+                                                 onclick="updatePidWeight(1, 3,this)"/>
+                </td>
+
+            </tr>
+
+            <tr>
+                <td>体积重量修改</td>
+                <td style="width: 140px;"><input class="btn" type="button" value="全部相同"
+                                                 onclick="updatePidWeight(2, 1,this)"/>
+                </td>
+                <td style="width: 140px;"><input class="btn" type="button" value="区间(从小到大)"
+                                                 onclick="updatePidWeight(2, 2,this)"/>
+                </td>
+                <td style="width: 140px;"><input class="btn" type="button" value="区间(从大到小)"
+                                                 onclick="updatePidWeight(2, 3,this)"/>
                 </td>
             </tr>
 
             <tr style="text-align: center;">
-                <td colspan="3"><input class="btn" type="button" value="保存" onclick="doSaveSkuWeight('${pid}')"/></td>
+                <td colspan="4"><input class="btn" type="button" value="保存" onclick="doSaveSkuWeight('${pid}')"/></td>
             </tr>
 
         </table>
@@ -128,7 +148,8 @@
             } else {
                 typeObj[tdVal] = 1;
             }
-            $(this).find("td:last").find("input").addClass("cls_" + tdVal);
+            $(this).find("td").eq(3).find("input").addClass("com_" + tdVal);
+            $(this).find("td:last").find("input").addClass("vlm_" + tdVal);
         });
         // 取最大值
 
@@ -140,22 +161,23 @@
     }
 
 
-    function updateWeight(flag, obj) {
+    function updatePidWeight(type, flag, obj) {
         if (flag == 1) {
-            allSamePrice(obj);
+            allSamePrice(type, obj);
         } else if (flag == 2) {
-            intervalWeight(flag, obj);
+            intervalPidWeight(type, flag, obj);
         } else if (flag == 3) {
-            intervalWeight(flag, obj);
+            intervalPidWeight(type, flag, obj);
         }
     }
 
     function doSaveSkuWeight(pid) {
         var reg = /(^[-+]?[1-9]\d*(\.\d{1,3})?$)|(^[-+]?[0]{1}(\.\d{1,3})?$)/;
         var singSkus = "";
+        var singVlmSkus = "";
         var isNotErr = true;
-        $(".inp_price").each(function () {
-            var ppid = $(this).attr("id");
+        $(".inp_cmn_price").each(function () {
+            var ppid = $(this).attr("data-id");
             var pweight = $(this).val();
             if (ppid == null || ppid == "") {
                 showMessage("单规格ID获取失败");
@@ -169,15 +191,33 @@
                 singSkus += ";" + ppid + "@" + pweight;
             }
         });
+        $(".inp_vlm_price").each(function () {
+            var ppid = $(this).attr("data-id");
+            var pweight = $(this).val();
+            if (ppid == null || ppid == "") {
+                showMessage("单规格ID获取失败");
+                isNotErr = false;
+                return false;
+            } else if (!reg.test(pweight)) {
+                showMessage("单规格重量异常");
+                isNotErr = false;
+                return false;
+            } else {
+                singVlmSkus += ";" + ppid + "@" + pweight;
+            }
+        });
         if (isNotErr) {
-            showMessage("正在执行，请等待...");
+            alert(singSkus);
+            alert(singVlmSkus);
+            /*showMessage("正在执行，请等待...");
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
                 url: '/cbtconsole/editc/saveSkuInfo',
                 data: {
                     "pid": pid,
-                    "sku": singSkus.substring(1)
+                    "sku": singSkus.substring(1),
+                    "volumeSku": singVlmSkus.substring(1)
                 },
                 success: function (data) {
                     $('.mask').hide();
@@ -189,11 +229,11 @@
                 error: function (XMLResponse) {
                     $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                 }
-            });
+            });*/
         }
     }
 
-    function intervalWeight(flag, obj) {
+    function intervalPidWeight(type, flag, obj) {
         $(obj).css("background-color", "#aba297");
 
         $.messager.prompt('提示', '请输入重量(KG)，从小到大，用“-”分割:', function (is) {
@@ -212,18 +252,37 @@
                         if (flag == 2) {
                             for (var keyV in typeObj) {
                                 totalW = parseFloat(smallW);
-                                $(".cls_" + keyV).each(function () {
-                                    $(this).val(totalW.toFixed(3));
-                                    totalW = totalW + avgW;
-                                });
+                                var tempVal = totalW;
+                                if (type == 1) {
+                                    $(".com_" + keyV).each(function () {
+                                        $(this).val(tempVal.toFixed(3));
+                                        tempVal = tempVal + avgW;
+                                    });
+                                } else {
+                                    $(".vlm_" + keyV).each(function () {
+                                        $(this).val(tempVal.toFixed(3));
+                                        tempVal = tempVal + avgW;
+                                    });
+                                }
+                                totalW = tempVal;
+
                             }
                         } else {
                             for (var keyV in typeObj) {
                                 totalW = bigW;
-                                $(".cls_" + keyV).each(function () {
-                                    $(this).val(totalW.toFixed(3));
-                                    totalW = totalW - avgW;
-                                });
+                                var tempVal = totalW;
+                                if (type == 1) {
+                                    $(".com_" + keyV).each(function () {
+                                        $(this).val(tempVal.toFixed(3));
+
+                                    });
+                                } else {
+                                    $(".vlm_" + keyV).each(function () {
+                                        $(this).val(tempVal.toFixed(3));
+                                        tempVal = tempVal - avgW;
+                                    });
+                                }
+                                totalW = tempVal;
                             }
                         }
                     }
@@ -238,7 +297,7 @@
         });
     }
 
-    function allSamePrice(obj) {
+    function allSamePrice(type, obj) {
         $(obj).css("background-color", "#aba297");
         $.messager.prompt('提示', '请输入重量(KG):', function (is) {
             if (is) {
@@ -246,11 +305,14 @@
                 if (!reg.test(is)) {
                     showMessage('重量必须为正数，最多两位小数！');
                 } else {
-                    $(".inp_price").val(is);
+                    if (type == 1) {
+                        $(".inp_cmn_price").val(is);
+                    } else {
+                        $(".inp_vlm_price").val(is);
+                    }
                 }
                 $(obj).css("background-color", "darkorange");
             } else {
-                showMessage('未输入重量或取消输入！');
                 $(obj).css("background-color", "darkorange");
             }
         });
