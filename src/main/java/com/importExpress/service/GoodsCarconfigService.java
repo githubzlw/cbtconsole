@@ -22,7 +22,7 @@ public interface GoodsCarconfigService {
 
     List<GoodsCarconfig> selectByExample(GoodsCarconfigExample example);
 
-    GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer id);
+    GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer userId);
 
     int updateByExampleSelective(@Param("record") GoodsCarconfigWithBLOBs record, @Param("example") GoodsCarconfigExample example);
 
