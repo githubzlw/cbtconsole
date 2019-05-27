@@ -146,23 +146,27 @@ custom_benchmark_ready  cbr on c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",
  GROUP BY cdm.catgrid
     </select>
     <update id="updateSomePirctu_risdelete">
-        update custom_goods_md5 SET
-        <if test="type==1">
-            ocr_need_date=1,
-        </if>
-        <if test="type==2">
-            ocr_need_delete=2,
-            ocr_need_date=2,
-        </if>
-        <if test="type==3">
-            ocr_need_delete=1,
-            ocr_need_date=1,
-        </if>
-        user_operation=#{userName}
-        where
+        update custom_goods_md5 a,(SELECT goods_md5,id FROM custom_goods_md5 WHERE
+
         <foreach collection="bgList" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
+          ) b  SET
+        <if test="type==1">
+            a.ocr_need_date=1,
+        </if>
+        <if test="type==2">
+            a.ocr_need_delete=2,
+            a.ocr_need_date=2,
+        </if>
+        <if test="type==3">
+            a.ocr_need_delete=1,
+            a.ocr_need_date=1,
+        </if>
+        a.user_operation=#{userName}
+
+        WHERE a.goods_md5=b.goods_md5
+
     </update>
     <update id="updateSomePirctu_risdelete_s">
         update custom_goods_md5 SET
