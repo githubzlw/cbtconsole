@@ -835,13 +835,16 @@ function search() {
                 if (res == "[]") {
                     $("#ydid").html("查询的运单号为:"+expresstrackid);
                     $("#div").html("当前订单已出库或已完结！或者当前扫描的快递号是原链接购买商品，请从下面列表中查找入库,谢谢！！");
+                    $("#ship").html(expresstrackid)
                 } else {
                     flag="0";
                     //清空订单id文本框
                     if(checked=="1"){
                         $("#ydid").html("查询的运单号为:"+expresstrackid+"");
+                        $("#ship").html(expresstrackid)
                     }else{
                         $("#ydid").html("查询的运单号为:"+expresstrackid);
+                        $("#ship").html(expresstrackid)
                     }
                     $("#search").val('');
                     $('#startv').show();

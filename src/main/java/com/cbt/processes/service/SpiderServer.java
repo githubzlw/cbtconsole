@@ -84,7 +84,34 @@ public class SpiderServer implements ISpiderServer {
 	public int saveTheClickCountOnSearchPage(String goodsPid,String searchMD5,String searchUserMD5){
 		return spiderMapper.saveTheClickCountOnSearchPage(goodsPid,searchMD5,searchUserMD5);
 	}
-	
+
+	@Override
+	public List<String> FindOdidByShipno(String shipno) {
+		List<String> list=new ArrayList<>();
+		try {
+			list = this.spiderMapper.FindOdidByShipno(shipno);
+			return list;
+		}catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	@Override
+	public int updataCheckedById(String id) {
+
+		int ret=0;
+		try {
+			ret = this.spiderMapper.updataCheckedById(id);
+			return ret;
+		}catch (Exception e){
+			e.printStackTrace();
+			return 0;
+		}
+
+	}
+
 	@Override
 	public int addURL(String userName, String url, int fruit) {
 		int res = dao.addURL(userName, url,fruit);

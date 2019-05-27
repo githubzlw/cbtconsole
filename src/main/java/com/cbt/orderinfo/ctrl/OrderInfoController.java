@@ -1324,4 +1324,20 @@ public class OrderInfoController{
 		}
 		return json;
 	}
+    @RequestMapping("/getOdid")
+    @ResponseBody
+    public List<String> getOdid(HttpServletRequest request) {
+        List<String> list=new ArrayList<>();
+        String shipno = request.getParameter("shipno");
+        list=this.spiderService.FindOdidByShipno(shipno);
+        return list;
+    }
+    @RequestMapping("/updataChecked")//取消验货
+    @ResponseBody
+    public int updataChecked(HttpServletRequest request) {
+        int ret=0;
+        String id = request.getParameter("id");
+        ret=this.spiderService.updataCheckedById(id);
+        return ret;
+    }
 }
