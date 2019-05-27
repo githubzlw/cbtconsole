@@ -334,6 +334,7 @@ function  updateSomes(type){
                     contentType : 'application/json;charset=utf-8',
                     data:JSON.stringify(mainMap),
                     success:function(res){
+                        alert(res)
                         if(res==0){
                             alert("删除失败  !")
 							return;
@@ -342,7 +343,9 @@ function  updateSomes(type){
                             window.location.reload();
                         }
                     }
+
                 })
+                window.location.reload();
             }
 
         }
@@ -480,6 +483,7 @@ function  updateSomes(type){
                 window.location.reload();
             }
         })
+        window.location.reload();
     }
 
 
