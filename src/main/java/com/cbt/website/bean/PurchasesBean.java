@@ -92,6 +92,15 @@ public class PurchasesBean {
 	private String returnTime;//退货时间
 	private String shopName; //供应商名字
 	private String shopGrade; //供应商评级
+	private String morder; //最小moq
+
+	public String getMorder() {
+		return morder;
+	}
+
+	public void setMorder(String morder) {
+		this.morder = morder;
+	}
 
 	public String getShopName() {
 		return shopName;
