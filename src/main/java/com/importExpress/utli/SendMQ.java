@@ -154,6 +154,17 @@ public class SendMQ {
         System.err.println(" [x] Sent '" + jsonObject.toString() + "'");
     }
 
+    /**
+     * 更新redis数据
+     * @param model type=4
+     * @throws Exception
+     */
+    public void sendMsg(JSONObject model) throws Exception {
+        channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
+        channel.basicPublish("", QUEUE_REDIS_NAME, null, model.toString().getBytes("UTF-8"));
+        System.err.println(" [x] Sent '" + model.toString() + "'");
+    }
+
 
     public static void main(String[] argv) throws Exception {
         SendMQ sendMQ = new SendMQ();

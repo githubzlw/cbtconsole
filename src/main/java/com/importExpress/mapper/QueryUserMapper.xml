@@ -527,6 +527,61 @@
             ) a
         </if>
 
+        <if test="userType == 7">
+            SELECT tem.goods_pid AS 'name', tem.name AS 'admName', tem.cnt AS 'id' FROM (
+                SELECT a.goods_pid, b.name, COUNT(1) AS 'cnt'
+                FROM(
+                SELECT oi.order_no, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH -- 最近6个月
+                AND u.is_test = 0 AND ( -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%'
+                and
+                u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not
+                like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.order_no, od.goods_pid -- 同一个订单中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid
+                ORDER BY COUNT(1) DESC
+                LIMIT 10
+            ) tem
+        </if>
+
+        <if test="userType == 8">
+            SELECT tem.goods_pid AS 'name', tem.name AS 'admName', tem.cnt AS 'id' FROM (
+                SELECT a.goods_pid, b.name, COUNT(1) AS 'cnt'
+                FROM(
+                SELECT oi.user_id, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1)  -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH  -- 最近6个月
+                AND u.is_test = 0 AND (  -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%'   and  u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and  u.email not like '%csmfg.com%'  and  u.email not like '%@sourcing-cn.com%'  and
+                u.email not like '%@china-synergy%'  and u.email&lt;>'sb33@gmail.com'  and u.email&lt;>'sbtest@gmail.com'  and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.user_id, od.goods_pid  -- 同一个用户中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid HAVING COUNT(1) > 4
+                ORDER BY COUNT(1) DESC
+            ) tem
+        </if>
+
         <if test="startBars != null">
             LIMIT #{startBars}, #{rows};
         </if>
@@ -662,6 +717,39 @@
         <if test="userType == 5">
             SELECT 500
         </if>
+
+        <if test="userType == 7">
+            SELECT 10
+        </if>
+
+        <if test="userType == 8">
+            SELECT COUNT(tem.goods_pid) FROM (
+                SELECT a.goods_pid
+                FROM(
+                SELECT oi.user_id, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH -- 最近6个月
+                AND u.is_test = 0 AND ( -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%'
+                and
+                u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not
+                like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.user_id, od.goods_pid -- 同一个用户中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid HAVING COUNT(1) > 4
+                ORDER BY COUNT(1) DESC
+            ) tem
+        </if>
+
 
     </select>
 

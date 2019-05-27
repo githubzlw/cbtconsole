@@ -383,7 +383,8 @@
         }
 
         function formatPid(val, row, index) {
-            return '<a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">' + row.pid + '</a>';
+            return row.pid + '<br /><br /><a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">原1688链接</a>' +
+                '<br /><br /><a target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1'+ row.pid +'.html">线上链接</a>';
         }
 
     </script>
@@ -411,19 +412,16 @@
                     <td>不下架原因:</td>
                     <td>
                         <input type="radio" name="reason" checked="checked" value="1">
-                        <span onclick="$('#no_shelf input[name=reason][value=1]').prop('checked', 'checked');">库存验证不准(不下架后续继续验证)</span>
+                        <span onclick="$('#no_shelf input[name=reason][value=1]').prop('checked', 'checked');">不考虑库存</span>
                         <br />
                         <input type="radio" name="reason" value="2">
-                        <span onclick="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');">有替换货源(不下架后续不再验证)</span>
+                        <span onclick="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');">有替换货源</span>
+                        <input type="text" name="reason_goods" style="width: 490px" onfocus="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');">
                         <br />
                         <input type="radio" name="reason" value="3">
-                        <span onclick="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">其他原因(不下架后续不再验证):</span>
-                        <input type="text" name="reason_other" style="width: 347px" onfocus="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">
+                        <span onclick="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">其他原因</span>
+                        <input type="text" name="reason_other" style="width: 506px" onfocus="$('#no_shelf input[name=reason][value=3]').prop('checked', 'checked');">
                     </td>
-                </tr>
-                <tr>
-                    <td>替换货源链接:</td>
-                    <td><input type="text" name="reason_goods" style="width: 600px" onfocus="$('#no_shelf input[name=reason][value=2]').prop('checked', 'checked');"></td>
                 </tr>
             </table>
         </div>
