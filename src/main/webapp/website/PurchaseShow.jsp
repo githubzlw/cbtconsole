@@ -3047,7 +3047,9 @@
 							<div style="width: 100%; word-wrap: break-word;">
 								同款链接： <a href="https://s.1688.com/collaboration/collaboration_search.htm?fromOfferId=${pb.goods_pid}&tab=sameDesign" target="_blank">链接</a>
 							</div>
-
+							<div style="width: 100%; word-wrap: break-word;">
+								起订量:<span>${pb.morder}</span>
+							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								原始货源重量(kg):<font color="green"><span id="cbrWeight_${pb.orderNo}${pb.od_id}">${pb.cbrWeight}</span></font>
 							</div>
