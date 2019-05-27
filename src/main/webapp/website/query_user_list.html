@@ -14,7 +14,7 @@
         -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>未下单或未加购物车用户查询</title>
+    <title>未下单或未加购物车用户等数据查询</title>
 
     <!-- 这是bootStrap所需要的css文件 -->
     <link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
@@ -329,6 +329,24 @@
                         {field:'id',title:'展示次数',width:'14%',align:'center'}
                     ]]
                 });
+            } else if(userType == 7){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'name',title:'商品pid',width:'10%',align:'center',formatter:formatterPid},
+                        {field:'admName',title:'商品名',width:'8%',align:'center'},
+                        {field:'id',title:'销量(销售次数)',width:'14%',align:'center'}
+                    ]]
+                });
+            } else if(userType == 8){
+                $('#main-datagrid').datagrid({
+                    width: "100%",
+                    columns:[[
+                        {field:'name',title:'商品pid',width:'10%',align:'center',formatter:formatterPid},
+                        {field:'admName',title:'商品名',width:'8%',align:'center'},
+                        {field:'id',title:'购买过的用户数量',width:'14%',align:'center'}
+                    ]]
+                });
             }
             // 清空
             $('#main-datagrid').datagrid('loadData',{total:0,rows:[]});
@@ -514,7 +532,7 @@
         <table>
             <tr>
                 <td colspan="2">
-                    <h3>未下单或未加购物车用户查询</h3>
+                    <h3>未下单或未加购物车用户等数据查询</h3>
                 </td>
             </tr>
             <div style="clear: both"></div>
@@ -523,7 +541,7 @@
                     <span style="float: left;line-height: 30px;">&nbsp;&nbsp;时间范围&nbsp;&nbsp;</span>
                 </td>
                 <td align="center" style="width: 274px;"><span
-                        style="float: left; line-height: 30px;">&nbsp;未下单或未加购物车用户类型&nbsp;&nbsp;</span>
+                        style="float: left; line-height: 30px;">&nbsp;查询数据类型&nbsp;&nbsp;</span>
                 </td>
                 <td style="width: 100px;">
                     <!--查询按钮-->
@@ -562,6 +580,8 @@
                     <option value="4">4-完成注册但未下单客户(时间条件是用户创建时间)</option>
                     <option value="5">5-点击率高没加购物车的商品(只查询点击率高的前500个)</option>
                     <option value="6">6-展现率高但没加购物车的商品(只查询展现率高的前500个)</option>
+                    <option value="7">7-我们卖的产品里面 最近6个月 销量最高 的(前10个产品 不进行时间筛选)</option>
+                    <option value="8">8-有超过4个不同的用户购买过的商品(不进行时间筛选)</option>
                 </select></td>
                 <!--查询按钮-->
                 <td align="center">
