@@ -16,6 +16,7 @@ import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
 import com.importExpress.utli.*;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -365,8 +366,11 @@ public class ShopCarMarketingController {
                     // 2.更新redis数据
                     try{
                         SendMQ sendMQ = new SendMQ();
-                        RedisUpModel redisModel = new RedisUpModel(userIdStr,"4");
-                        sendMQ.sendMsg(redisModel);
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("type","4");
+                        jsonObject.put("userid",userIdStr);
+                        jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(listActive));
+                        sendMQ.sendMsg(jsonObject);
                         sendMQ.closeConn();
                     }catch (Exception e){
                         e.printStackTrace();

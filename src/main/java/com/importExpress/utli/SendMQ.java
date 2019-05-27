@@ -159,11 +159,10 @@ public class SendMQ {
      * @param model type=4
      * @throws Exception
      */
-    public void sendMsg(RedisUpModel model) throws Exception {
+    public void sendMsg(JSONObject model) throws Exception {
         channel.queueDeclare(QUEUE_REDIS_NAME, false, false, false, null);
-        JSONObject jsonObject = JSONObject.fromObject(model);
-        channel.basicPublish("", QUEUE_REDIS_NAME, null, jsonObject.toString().getBytes("UTF-8"));
-        System.err.println(" [x] Sent '" + jsonObject.toString() + "'");
+        channel.basicPublish("", QUEUE_REDIS_NAME, null, model.toString().getBytes("UTF-8"));
+        System.err.println(" [x] Sent '" + model.toString() + "'");
     }
 
 

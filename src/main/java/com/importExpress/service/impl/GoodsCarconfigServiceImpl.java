@@ -72,8 +72,8 @@ public class GoodsCarconfigServiceImpl implements GoodsCarconfigService {
     }
 
     @Override
-    public GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer id) {
-        return goodsCarconfigMapper.selectByPrimaryKey(id);
+    public GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer userId) {
+        return goodsCarconfigMapper.selectByPrimaryKey(userId);
     }
 
     @Override
