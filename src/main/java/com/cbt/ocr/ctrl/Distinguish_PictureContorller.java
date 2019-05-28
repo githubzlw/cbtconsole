@@ -134,7 +134,7 @@ public class Distinguish_PictureContorller {
 			e.printStackTrace();
 		}
 
-		return String.valueOf(ret);
+		return "";
 	}
 
 	@RequestMapping(value = "recognition_date_details", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
@@ -240,6 +240,6 @@ public class Distinguish_PictureContorller {
 		}
 		//更新线上下架的图片状态位为1
 
-     return String.valueOf(ret);
+     return "";
 	}
 }
