@@ -6,6 +6,18 @@ public class ImportExSkuShow {
     private float price;
     private double fianlWeight;
     private String enType;
+    /**
+     * 体积重量
+     */
+    private double volumeWeight;
+
+    public double getVolumeWeight() {
+        return volumeWeight;
+    }
+
+    public void setVolumeWeight(double volumeWeight) {
+        this.volumeWeight = volumeWeight;
+    }
 
     public double getFianlWeight() {
         return fianlWeight;
