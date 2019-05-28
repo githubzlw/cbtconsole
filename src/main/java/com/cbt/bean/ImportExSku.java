@@ -87,6 +87,8 @@ public class ImportExSku {
                 .append(skuId).append('\"');
         sb.append(",\"fianlWeight\":")
                 .append(fianlWeight);
+        sb.append(",\"volumeWeight\":")
+                .append(volumeWeight);
         sb.append(",\"skuVal\":")
                 .append(skuVal);
         sb.append('}');

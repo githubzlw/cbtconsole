@@ -57,7 +57,7 @@
     <div class="mask"></div>
     <div style="margin-left: 120px;">
 
-        <h1>产品SKU重量修改</h1>
+        <h1>产品SKU重量修改(体积重量默认显示重量数据)</h1>
         <table border="1" cellspacing="0" cellpadding="0" bgcolor="#f5e9cf">
                 <%--<caption><span>PID:${pid}</span></caption>--%>
             <thead style="text-align: center;">
@@ -143,13 +143,14 @@
         // 循环遍历table,判断最大规格数据
         $("#sku_body").find("tr").each(function () {
             var tdVal = $(this).find("td").eq(0).text();
-            if (typeObj.hasOwnProperty(tdVal)) {
-                typeObj[tdVal] = typeObj[tdVal] + 1;
+            var noBlankVal = tdVal.replace(/\s+/g,"");
+            if (typeObj.hasOwnProperty(noBlankVal)) {
+                typeObj[noBlankVal] = typeObj[noBlankVal] + 1;
             } else {
-                typeObj[tdVal] = 1;
+                typeObj[noBlankVal] = 1;
             }
-            $(this).find("td").eq(3).find("input").addClass("com_" + tdVal);
-            $(this).find("td:last").find("input").addClass("vlm_" + tdVal);
+            $(this).find("td").eq(3).find("input").addClass("com_" + noBlankVal);
+            $(this).find("td:last").find("input").addClass("vlm_" + noBlankVal);
         });
         // 取最大值
 
@@ -207,9 +208,7 @@
             }
         });
         if (isNotErr) {
-            alert(singSkus);
-            alert(singVlmSkus);
-            /*showMessage("正在执行，请等待...");
+            showMessage("正在执行，请等待...");
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -229,7 +228,7 @@
                 error: function (XMLResponse) {
                     $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                 }
-            });*/
+            });
         }
     }
 

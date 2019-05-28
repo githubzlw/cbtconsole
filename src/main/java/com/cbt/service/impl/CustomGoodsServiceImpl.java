@@ -682,9 +682,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 1.更新产品表sku数据和标识
         customGoodsMapper.updateSkuInfo(pid, newSku);
         // 2.插入sku日志
-        customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
+        return customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
-        return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        // return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
     @Override
