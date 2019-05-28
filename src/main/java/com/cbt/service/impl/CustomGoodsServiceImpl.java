@@ -5,6 +5,8 @@ import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.service.CustomGoodsService;
+import com.cbt.util.BigDecimalUtil;
+import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
@@ -682,9 +684,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 1.更新产品表sku数据和标识
         customGoodsMapper.updateSkuInfo(pid, newSku);
         // 2.插入sku日志
-        customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
+        return customGoodsMapper.insertIntoSkuLog(pid, oldSku, newSku, adminId);
         // 3.走child表进行线上更新
-        return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
+        //return customGoodsDao.insertIntoSingleOffersChild(pid, finalWeight);
     }
 
     @Override
@@ -706,6 +708,71 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         // 更新mongodb
         GoodsInfoUpdateOnlineUtil.updateVolumeWeight(pid, newWeight);
         return 1;
+    }
+
+    @Override
+    public JsonResult setGoodsWeightByWeigherInfo(String pid, SearchResultInfo weightAndSyn, int adminId) {
+        JsonResult json = new JsonResult();
+        // 获取商品信息
+        CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
+        JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+        List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+        // 查找匹配的type数据
+        String typeStr = weightAndSyn.getGoods_type();
+        // Colour:black@32161,Size:S@4501,
+        String[] typeStrList = typeStr.split(",");
+        String ppId = "";
+        for (String childType : typeStrList) {
+            if (StringUtils.isNotBlank(childType)) {
+                String[] childList = childType.split("@");
+                if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
+                    ppId += "," + childList[1];
+                }
+            }
+        }
+        double finalWeight = 0;
+        for (ImportExSku exSku : skuList) {
+            if (checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+                finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
+                exSku.setFianlWeight(finalWeight);
+                if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
+                    double volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getVolume_weight()), 3);
+                    exSku.setVolumeWeight(volumeWeight);
+                }
+                break;
+            }
+        }
+        // 进行sku更新
+        updateGoodsSku(pid, orGoods.getSku(), skuList.toString(), adminId, finalWeight);
+        // 插入日志记录
+        GoodsEditBean editBean = new GoodsEditBean();
+        editBean.setNew_title(weightAndSyn.getGoodsType() + ",sku 更新");
+        editBean.setAdmin_id(adminId);
+        if (StringUtils.isBlank(orGoods.getWeight()) || "0".equals(orGoods.getWeight()) || "0.00".equals(orGoods.getWeight())) {
+            editBean.setWeight_old(orGoods.getWeight());
+            editBean.setWeight_new(weightAndSyn.getWeight());
+        }
+        editBean.setRevise_weight_old(orGoods.getReviseWeight());
+        editBean.setFinal_weight_old(orGoods.getFinalWeight());
+        editBean.setRevise_weight_new(weightAndSyn.getWeight());
+        editBean.setFinal_weight_new(weightAndSyn.getWeight());
+        editBean.setPid(pid);
+        customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
+        json.setOk(true);
+        skuList.clear();
+        return json;
+    }
+
+    private boolean checkIsEqualPpid(String ppId, String skuId) {
+        String parentSku = "," + skuId + ",";
+        String[] ppIdList = ppId.split(",");
+        int count = 0;
+        for (String child : ppIdList) {
+            if (parentSku.contains(child)) {
+                count++;
+            }
+        }
+        return ppIdList.length == count;
     }
 
 
