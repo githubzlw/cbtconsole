@@ -166,7 +166,38 @@
 			font-size: 14px;
 			font-weight: 700
 		}
-
+        #login
+        {
+            display:none;
+            border:1em solid purple;
+            height:300px;
+            width:500px;
+            position:absolute;/*让节点脱离文档流,我的理解就是,从页面上浮出来,不再按照文档其它内容布局*/
+            top:24%;/*节点脱离了文档流,如果设置位置需要用top和left,right,bottom定位*/
+            left:24%;
+            z-index:2;/*个人理解为层级关系,由于这个节点要在顶部显示,所以这个值比其余节点的都大*/
+            background: white;
+        }
+		#login a
+        {
+			float:right
+        }
+        #over
+        {
+            width: 100%;
+            height: 100%;
+            opacity:0.8;/*设置背景色透明度,1为完全不透明,IE需要使用filter:alpha(opacity=80);*/
+            filter:alpha(opacity=80);
+            display: none;
+            position:absolute;
+            top:0;
+            left:0;
+            z-index:1;
+            background: silver;
+        }
+		.aright{
+			text-align:right;
+		}
 		.strcarype{color: black;font-size: 16px;font-weight:bold;}
 
 		.loading { position: fixed; top: 0px; left: 0px;
@@ -290,12 +321,74 @@
                 $(objImg).height(objimgheight);
             }
         }
+        function show(){
+
+            var shipno = $("#ship").html();
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/order/getOdid",
+                data: {shipno: shipno},
+                dataType: "json",
+                success: function (msg) {
+                    document.getElementById("TheInspection").innerHTML='';
+                    var i=0;
+                    if(msg.length==0){
+                     alert("没有需要取消的")
+                        return;
+                    }else {
+                        $(msg).each(function (index, item) {
+                            $("#TheInspection").append("<br/>odid："+item + "&nbsp;&nbsp;<button id='msg'" + index + " onclick='retuOdid(" + item + ")'>取消验货</button>&nbsp;&nbsp;")
+                            i++;
+                            if (i == 3) {
+                                $("#TheInspection").append("<br/>")
+                                i = 0;
+                            }
+                        });
+                        var login = document.getElementById('login');
+                        var over = document.getElementById('over');
+                        login.style.display = "block";
+                        over.style.display = "block";
+                    }
+                }
+            });
+         // $("#TheInspection").css("display","")  ;
+        }
+
+        function hide()
+        {
+            var login = document.getElementById('login');
+            var over = document.getElementById('over');
+            login.style.display = "none";
+            over.style.display = "none";
+        }
+        function retuOdid(id)
+        {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/order/updataChecked",
+                data: {id: id},
+                dataType: "json",
+                success: function (msg) {
+                    if(msg==0){
+                        alert("取消验货失败")
+                        return;
+                    }else {
+                        alert("取消验货成功")
+                        window.location.reload();
+                    }
+                }
+            });
+
+                }
+
 	</script>
 </head>
 <body onload="focus();">
 
 
 <div id="operatediv" class="loading" style="display: none;"></div>
+<div id="ship" class="ship" style="display: none;"></div>
+
 <div class="m-feedback" id="divTip">
 	<div class="tb-side">
 		<ul>
@@ -348,6 +441,14 @@
 		<input type="text" id="kwhid" onFocus="celkwhid()" readonly="readonly" onkeypress="if (event.keyCode == 13) getPosition()"/>
 
 		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
+
+        <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
+        <div id="login" >
+            <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
+            <div id="TheInspection" ></div>
+        </div>
+        <div id="over"></div>
+
 		<h2 id="ydid"  style="clear:both;"></h2>
 		<h2 id="positionid"></h2>
 		<input type="hidden" id="tborderid" value=""/>

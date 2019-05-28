@@ -491,12 +491,8 @@ public class EditorController {
                 JSONArray sku_json = JSONArray.fromObject(goods.getSku());
                 List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
-                Collections.sort(cbSkus, new Comparator<ImportExSkuShow>() {
-                    @Override
-                    public int compare(ImportExSkuShow o1, ImportExSkuShow o2) {
-                        return o1.getEnType().compareTo(o2.getEnType());
-                    }
-                });
+
+                Collections.sort(cbSkus,Comparator.comparing(ImportExSkuShow::getEnType));
                 mv.addObject("showSku", JSONArray.fromObject(cbSkus));
 
                 Map<String, Object> typeNames = new HashMap<String, Object>();
@@ -531,12 +527,16 @@ public class EditorController {
             json.setMessage("请登录后操作");
             return json;
         }
-
-
         String skuStr = request.getParameter("sku");
         if (StringUtils.isBlank(skuStr)) {
             json.setOk(false);
             json.setMessage("获取sku失败");
+            return json;
+        }
+        String volumeSkuStr = request.getParameter("volumeSku");
+        if (StringUtils.isBlank(volumeSkuStr)) {
+            json.setOk(false);
+            json.setMessage("获取体积重量失败");
             return json;
         }
         String pid = request.getParameter("pid");
@@ -551,6 +551,7 @@ public class EditorController {
             JSONArray sku_json = JSONArray.fromObject(goods.getSku());
             List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
             String[] skuStrList = skuStr.split(";");
+            String[] volumeSkuList = volumeSkuStr.split(";");
             double finalWeight = 0;
             for (String singleSku : skuStrList) {
                 String[] slSkuList = singleSku.split("@");
@@ -560,6 +561,19 @@ public class EditorController {
                     if (ppid.equals(exSku.getSkuPropIds())) {
                         finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(pWeight), 3);
                         exSku.setFianlWeight(finalWeight);
+                        break;
+                    }
+                }
+            }
+            double volumeWeight = 0;
+            for (String volumeSku : volumeSkuList) {
+                String[] vlSkuList = volumeSku.split("@");
+                String ppid = vlSkuList[0].replace("_", ",");
+                String pWeight = vlSkuList[1];
+                for (ImportExSku exSku : skuList) {
+                    if (ppid.equals(exSku.getSkuPropIds())) {
+                        volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(pWeight), 3);
+                        exSku.setVolumeWeight(volumeWeight);
                         break;
                     }
                 }

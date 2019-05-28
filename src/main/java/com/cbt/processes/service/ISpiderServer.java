@@ -165,5 +165,9 @@ public interface ISpiderServer {
 	public int saveTheSearchLogOnSearchPage(SearchLog seaLog);
 
 	public int saveTheClickCountOnSearchPage(String goodsPid, String searchMD5, String searchUserMD5);
-	
+
+	List<String> FindOdidByShipno(String shipno);
+
+	int updataCheckedById(String id);
+
 }

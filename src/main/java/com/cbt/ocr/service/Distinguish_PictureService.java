@@ -76,4 +76,6 @@ public interface Distinguish_PictureService {
 
 	List<CustomGoods> deleteAllPriceByAdmname(String admName);
 
+	int updateSomePirctu_risdelete_dateById(List<CustomGoods> customGoodsList);
+
 }
