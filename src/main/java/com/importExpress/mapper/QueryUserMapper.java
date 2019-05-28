@@ -49,6 +49,8 @@ public interface QueryUserMapper {
 
 	void insertStaticizeData(List<ItemStaticFile> list);
 
+    void insertOrderShare(@Param("list") List<OrderShare> list,@Param("shopType") String shopType,@Param("orderNo") String orderNo);
+
 	String queryStaticizeTime();
 
 	AuthInfo queryAuthInfo(@Param("authId") Integer authId);
@@ -109,6 +111,13 @@ public interface QueryUserMapper {
                                       @Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
                                       @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
                                       @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<OrderShare> queryOrderShareList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
+                                           @Param("shopType") String shopType, @Param("orderNo") String orderNo);
+
+    Integer queryOrderShareListCount(@Param("shopType") String shopType, @Param("orderNo") String orderNo);
+
+    void insertOrderShare(List<OrderShare> list);
 
     GoodsReview queryGoodsReviewById(@Param("id") Integer id);
 
