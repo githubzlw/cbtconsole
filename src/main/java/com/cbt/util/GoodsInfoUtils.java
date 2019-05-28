@@ -47,20 +47,35 @@ public class GoodsInfoUtils {
     /**
      * 文字尺码表转换纯数据
      */
-    private static final Map<String,String> closeSizeMap = new HashMap<>();
+    private static final Map<String, String> CLOSE_SIZE_MAP = new HashMap<>();
+
+    /**
+     * 替换包含转换数据
+     */
+    private static final Map<String, String> REPLACE_SIZE_MAP = new HashMap<>();
 
     static {
-        closeSizeMap.put("XS", "01");
-        closeSizeMap.put("S", "02");
-        closeSizeMap.put("M", "03");
-        closeSizeMap.put("L", "04");
-        closeSizeMap.put("XL", "05");
-        closeSizeMap.put("2L", "06");
-        closeSizeMap.put("XXL", "06");
-        closeSizeMap.put("3L", "07");
-        closeSizeMap.put("XXXL", "07");
-        closeSizeMap.put("4L", "08");
-        closeSizeMap.put("XXXXL", "08");
+        CLOSE_SIZE_MAP.put("XS", "01");
+        CLOSE_SIZE_MAP.put("S", "02");
+        CLOSE_SIZE_MAP.put("M", "03");
+        CLOSE_SIZE_MAP.put("L", "04");
+        CLOSE_SIZE_MAP.put("XL", "05");
+        CLOSE_SIZE_MAP.put("2L", "06");
+        CLOSE_SIZE_MAP.put("XXL", "06");
+        CLOSE_SIZE_MAP.put("3L", "07");
+        CLOSE_SIZE_MAP.put("XXXL", "07");
+        CLOSE_SIZE_MAP.put("4L", "08");
+        CLOSE_SIZE_MAP.put("XXXXL", "08");
+        CLOSE_SIZE_MAP.put("800 or more", "ZZZZ");
+        REPLACE_SIZE_MAP.put("10cm", "010cm");
+        REPLACE_SIZE_MAP.put("20cm", "020cm");
+        REPLACE_SIZE_MAP.put("30cm", "030cm");
+        REPLACE_SIZE_MAP.put("40cm", "040cm");
+        REPLACE_SIZE_MAP.put("50cm", "050cm");
+        REPLACE_SIZE_MAP.put("60cm", "060cm");
+        REPLACE_SIZE_MAP.put("70cm", "070cm");
+        REPLACE_SIZE_MAP.put("80cm", "080cm");
+        REPLACE_SIZE_MAP.put("90cm", "090cm");
     }
 
 
@@ -210,10 +225,10 @@ public class GoodsInfoUtils {
                 for (TypeBean tyb : typeList) {
                     if (ppid.equals(tyb.getId())) {
                         skuAttrs += ";" + tyb.getId() + "@" + tyb.getType() + "@" + tyb.getValue();
-                        if(closeSizeMap.containsKey(tyb.getValue().toUpperCase())){
-                            enType += closeSizeMap.get(tyb.getValue().toUpperCase()) + ",";
-                        }else{
-                            enType += tyb.getValue() + ",";
+                        if (CLOSE_SIZE_MAP.containsKey(tyb.getValue().toUpperCase())) {
+                            enType += CLOSE_SIZE_MAP.get(tyb.getValue().toUpperCase()) + ",";
+                        } else {
+                            enType += genNewTypeVal(tyb.getValue()) + ",";
                         }
                         totalCount++;
                         break;
@@ -238,10 +253,15 @@ public class GoodsInfoUtils {
             ipes.setPpIds(ites.getSkuPropIds().replace(",", "_"));
             ipes.setPrice(ites.getSkuVal().getActSkuCalPrice());
             ipes.setFianlWeight(ites.getFianlWeight());
+            if (ites.getVolumeWeight() > 0) {
+                ipes.setVolumeWeight(ites.getVolumeWeight());
+            } else {
+                ipes.setVolumeWeight(ites.getFianlWeight());
+            }
             if (skuAttrs == null || "".equals(skuAttrs)) {
                 ipes = null;
             } else {
-                if(StringUtils.isNotBlank(enType)){
+                if (StringUtils.isNotBlank(enType)) {
                     ipes.setEnType(enType);
                 }
                 ipes.setSkuAttrs(skuAttrs.substring(1));
@@ -258,6 +278,17 @@ public class GoodsInfoUtils {
         return cbSkuLst;
     }
 
+
+    private static String genNewTypeVal(String typeVal) {
+        String tempVal = typeVal;
+        for (String mapKey : REPLACE_SIZE_MAP.keySet()) {
+            if (tempVal.contains(mapKey)) {
+                tempVal = tempVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
+                break;
+            }
+        }
+        return tempVal;
+    }
 
     public static String changeRemotePathToLocal(String remotepath) {
 
