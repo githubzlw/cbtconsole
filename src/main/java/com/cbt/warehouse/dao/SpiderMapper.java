@@ -264,6 +264,9 @@ public interface SpiderMapper {
 	public List<Map<String, Object>> getGoodsInfoByUserid(@Param("orderNo") String orderNo);
     @Select("SELECT id FROM order_details WHERE shipno=#{shipno} AND checked=1")
     List<String> FindOdidByShipno(@Param("shipno") String shipno);
-    @Update("UPDATE order_details SET checked=0 WHERE id=#{id}")
+    @Update("UPDATE order_details SET checked=0,yourorder=0 WHERE id=#{id}")
 	int updataCheckedById(@Param("id") String id);
+    @Update("update id_relationtable SET itemqty=0 WHERE odid=#{id}")
+    int updataIqById(@Param("id") String id);
+
 }

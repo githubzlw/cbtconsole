@@ -104,6 +104,7 @@ public class SpiderServer implements ISpiderServer {
 		int ret=0;
 		try {
 			ret = this.spiderMapper.updataCheckedById(id);
+			ret=this.spiderMapper.updataIqById(id);
 			return ret;
 		}catch (Exception e){
 			e.printStackTrace();

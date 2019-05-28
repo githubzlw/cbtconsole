@@ -178,6 +178,10 @@
             z-index:2;/*个人理解为层级关系,由于这个节点要在顶部显示,所以这个值比其余节点的都大*/
             background: white;
         }
+		#login a
+        {
+			float:right
+        }
         #over
         {
             width: 100%;
@@ -191,6 +195,9 @@
             z-index:1;
             background: silver;
         }
+		.aright{
+			text-align:right;
+		}
 		.strcarype{color: black;font-size: 16px;font-weight:bold;}
 
 		.loading { position: fixed; top: 0px; left: 0px;
@@ -330,7 +337,7 @@
                         return;
                     }else {
                         $(msg).each(function (index, item) {
-                            $("#TheInspection").append("odid："+item + "&nbsp;&nbsp;<button id='msg'" + index + " onclick='retuOdid(" + item + ")'>取消验货</button>&nbsp;&nbsp;")
+                            $("#TheInspection").append("<br/>odid："+item + "&nbsp;&nbsp;<button id='msg'" + index + " onclick='retuOdid(" + item + ")'>取消验货</button>&nbsp;&nbsp;")
                             i++;
                             if (i == 3) {
                                 $("#TheInspection").append("<br/>")
@@ -436,8 +443,8 @@
 		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
 
         <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
-        <div id="login">
-            <a href="javascript:hide()">关闭</a>
+        <div id="login" >
+            <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
             <div id="TheInspection" ></div>
         </div>
         <div id="over"></div>
