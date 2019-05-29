@@ -5652,6 +5652,10 @@ public class WarehouseCtrl {
 			String orderid = request.getParameter("orderid");
 			String barcode = request.getParameter("barcode");
 			String shipno=request.getParameter("shipno");
+			String pid=request.getParameter("pid");
+			if(StringUtil.isBlank(pid)){
+				pid = null;
+			}
 			int page = Integer.parseInt(request.getParameter("page"));
 			if (page > 0) {
 				page = (page - 1) * 20;
@@ -5681,6 +5685,7 @@ public class WarehouseCtrl {
 			map.put("orderid", orderid);
 			map.put("barcode", barcode);
 			map.put("page", page);
+			map.put("pid", pid);
 			int acount = 0;
 			int mid = iWarehouseService.getMid();// 中期库位剩余
 			int shortTerm = iWarehouseService.getShortTerm();// 短期库位剩余
