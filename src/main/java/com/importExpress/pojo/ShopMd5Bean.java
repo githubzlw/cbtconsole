@@ -17,6 +17,15 @@ public class ShopMd5Bean {
     private int isDelete;
     private int startNum;
 	private int limitNum;
+	private String catid;
+
+    public String getCatid() {
+        return catid;
+    }
+
+    public void setCatid(String catid) {
+        this.catid = catid;
+    }
 
     public String getShopId() {
         return shopId;
