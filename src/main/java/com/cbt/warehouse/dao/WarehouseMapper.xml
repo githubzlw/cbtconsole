@@ -1657,7 +1657,19 @@
 
 	<select id="getLocationManagementInfo" resultType="com.cbt.bean.LocationManagementInfo">
 		SELECT sl.barcode AS barcode, CASE WHEN sl.short_term=1 THEN '中期库' ELSE '今明库' END AS short_term,CASE WHEN sl.acount=1 THEN '否' ELSE '是' END AS acount,
-		CASE WHEN sl.is_company=2 THEN '仓库库位' WHEN sl.is_company=1 THEN '公司库位' ELSE '原仓库库位' END AS is_company FROM  storage_location sl WHERE 1=1 and is_company in (1,2)
+		CASE WHEN sl.is_company=2 THEN '仓库库位' WHEN sl.is_company=1 THEN '公司库位' ELSE '原仓库库位' END AS is_company
+		FROM  storage_location sl
+		<if test="pid != null || orderid != null">
+			inner join id_relationtable id on
+			sl.barcode=id.barcode
+			<if test="orderid != null">
+				and id.orderid=#{orderid}
+			</if>
+			<if test="pid != null">
+				and id.itemid = #{pid}
+			</if>
+		</if>
+		WHERE 1=1 and sl.is_company in (1,2)
 		<if test="location_type!=-1">
 			and sl.short_term=#{location_type}
 		</if>
@@ -1696,7 +1708,18 @@
 		SELECT COALESCE(SUM(checked),0) as acount FROM order_details WHERE orderid=#{orderid}
 	</select>
 	<select id="searchCount" resultType="INTEGER">
-		SELECT count(sl.id) FROM  storage_location sl WHERE 1=1 and is_company in (1,2)
+		SELECT count(sl.id) FROM  storage_location sl
+		<if test="pid != null || orderid != null">
+			inner join id_relationtable id on
+			sl.barcode=id.barcode
+			<if test="orderid != null">
+				and id.orderid=#{orderid}
+			</if>
+			<if test="pid != null">
+				and id.itemid = #{pid}
+			</if>
+		</if>
+		WHERE 1=1 and sl.is_company in (1,2)
 		<if test="location_type!=-1">
 			and sl.short_term=#{location_type}
 		</if>
