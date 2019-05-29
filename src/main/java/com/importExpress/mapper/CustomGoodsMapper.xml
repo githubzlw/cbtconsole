@@ -1162,6 +1162,9 @@
         <if test="shopId != null">
             and shop_id = #{shopId}
         </if>
+        <if test="catid != null">
+            and catid = #{catid}
+        </if>
         <if test="md5Num == 1">
             and md5_num &lt;= 5
         </if>
@@ -1179,6 +1182,9 @@
         where 1=1
         <if test="shopId != null">
             and shop_id = #{shopId}
+        </if>
+        <if test="catid != null">
+            and catid = #{catid}
         </if>
         <if test="md5Num == 1">
             and md5_num &lt;= 5
