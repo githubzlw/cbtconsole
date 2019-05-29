@@ -145,6 +145,16 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 	private String pidInventory;
 	private int isBenchmark;
 	private String noChnageRemark;
+	private String locationNum;
+
+	public String getLocationNum() {
+		return locationNum;
+	}
+
+	public void setLocationNum(String locationNum) {
+		this.locationNum = locationNum;
+	}
+
 	public String getNoChnageRemark() {
 		return noChnageRemark;
 	}

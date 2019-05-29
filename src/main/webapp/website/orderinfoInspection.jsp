@@ -651,7 +651,7 @@
 											</c:if>
 											<c:if test="${storageLocation.mergestate =='0'}">
 												<td id="rowspanid${strOrder }"><span style="color:red;">客户默认不合并</span></td>
-												<%--<td id="rowspanid${strOrder }"><input id="inputid${strOrder }" type="button" onclick="mergeOrders()" class='classSh' value="合并" disabled="disabled"/></td>--%>
+												<td id="rowspanid${strOrder }"><input id="inputid${strOrder }" type="button" onclick="mergeOrders()" class='classSh' value="合并" disabled="disabled"/></td>
 												<c:set var="setTi2" value="1"></c:set>
 											</c:if>
 											<c:if test="${storageLocation.mergestate !='0' && storageLocation.mergestate !='1'}">
