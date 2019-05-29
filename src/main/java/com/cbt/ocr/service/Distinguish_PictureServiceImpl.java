@@ -73,7 +73,23 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		}
 	}
 
-    @Override
+	@Override
+	public int updateSomePirctu_risdelete_dateById(List<CustomGoods> customGoodsList) {
+		int ret=0;
+		try {
+		for (int i=0;i<customGoodsList.size();i++){
+		ret+=this.distinguish_PictureDao.updateSomePirctu_risdelete_dateById(customGoodsList.get(i).getId());
+
+		}
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+	}
+
+	@Override
 	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
 		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);
 		String len="/usr/local/goodsimg";

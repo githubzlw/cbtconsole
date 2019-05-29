@@ -227,7 +227,7 @@ public class Distinguish_PictureContorller {
 		int ret=1;
 		HttpSession session = request.getSession();
 		try {
-			 distinguish_pictureService.updateSomePirctu_risdelete_date(bgList);
+			 distinguish_pictureService.updateSomePirctu_risdelete_dateById(customGoodsList);
 			session.setAttribute("pidImgList",imgpath.substring(0, imgpath.length() - 1));
 			//提供给蒋先伟    线上下架图片的信息列
 			return "redirect:/editc/deleteEnInfoImgByParam";

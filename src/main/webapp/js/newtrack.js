@@ -835,13 +835,16 @@ function search() {
                 if (res == "[]") {
                     $("#ydid").html("查询的运单号为:"+expresstrackid);
                     $("#div").html("当前订单已出库或已完结！或者当前扫描的快递号是原链接购买商品，请从下面列表中查找入库,谢谢！！");
+                    $("#ship").html(expresstrackid)
                 } else {
                     flag="0";
                     //清空订单id文本框
                     if(checked=="1"){
                         $("#ydid").html("查询的运单号为:"+expresstrackid+"");
+                        $("#ship").html(expresstrackid)
                     }else{
                         $("#ydid").html("查询的运单号为:"+expresstrackid);
+                        $("#ship").html(expresstrackid)
                     }
                     $("#search").val('');
                     $('#startv').show();
@@ -1052,14 +1055,17 @@ function search() {
                         }
                         if(checked=="1"){
                             queryRecord(json[i].odid);
-                            str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:#ff0000;">'
+                            str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h4>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:#ff0000;">'
                                 +id_qty
-                                + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h3>';
+                                + '</span></h4><h4>单件重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'weight'+json[i].odid+'"></h4>'
+                                + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'volumeWeight'+json[i].odid+'"></h4>';
                             /*'<input type="button" value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">' +*/
                             if (json[i].weight == undefined) {
                                 str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                             } else {
-                                str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
+                                    +'<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
+                                    +'<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                             }
                             str += '<br />';
                             if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1441,14 +1447,17 @@ function search() {
                             if(checked=="1"){
                                 console.log(1);
                                 queryRecord(json[i].odid);
-                                str += '<p style="font-size:16px;font-weight:bold;"><h3>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:red;">'
+                                str += '<p style="font-size:16px;font-weight:bold;"><h4>已验货数量:<span id="'+json[i].orderid+'record_'+json[i].odid+'" style="font-size:30px;color:red;">'
                                     +id_qty
-                                    + '</span></h3><h3>单件商品重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h3>';
+                                    + '</span></h4><h4>单件重量(kg):<input type="text" style="width: 70px;" id="\'+json[i].orderid+\'weight\'+json[i].odid+\'"></h4>'
+                                    + '<h4>体积重量(kg):<input type="text" style="width: 70px;" id="'+json[i].orderid+'volumeWeight'+json[i].odid+'"></h4>';
                                 /*+ '<input type="button"  value="获取商品重量" onclick="getWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\')">'*/
                                 if (json[i].weight == undefined) {
                                     str += '<span name="save_weight">未保存过重量!</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                                 } else {
-                                    str += '<span name="save_weight">已保存的重量:' + json[i].weight + 'Kg&nbsp;</span><input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
+                                    str += '<span name="save_weight">已保存的重量:' + json[i].weight + '<em>Kg</em></span>'
+                                        +'<br><span name="save_volume_weight">已保存的体积重量:' + json[i].volume_weight + '<em>Kg</em></span>'
+                                        +'<input type="button" value="将商品重量同步到产品库" style="margin-left:5px" onclick="saveWeight(\''+json[i].orderid+'\',\''+json[i].odid+'\',\''+json[i].goods_pid+'\')">';
                                 }
                                 str += '<br />';
                                 if (json[i].syn == undefined || json[i].syn == '0') {
@@ -1712,6 +1721,10 @@ function getWeight(orderid,odid){
 //保存验货商品重量
 function saveWeight(orderid,odid,pid){
     var weight=$("#"+orderid+"weight"+odid+"").val();
+    var volumeWeight = $("#"+orderid+"volumeWeight"+odid+"").val();
+    if(!volumeWeight){
+        volumeWeight = 0;
+    }
     //数据校验
     if(weight == undefined || weight == ''){
         document.getElementById("tip_"+orderid+odid).innerHTML = "未录入单件商品重量!";
@@ -1727,12 +1740,13 @@ function saveWeight(orderid,odid,pid){
         type: "POST",//方法类型
         dataType:'json',
         url:'/cbtconsole/warehouse/saveWeight',
-        data:{orderid:orderid,odid:odid,weight:weight,pid:pid},
+        data:{orderid:orderid,odid:odid,weight:weight,pid:pid,volumeWeight:volumeWeight},
         dataType:"json",
         success:function(data){
             if(Number(data) == 1){
                 document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量成功";
-                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html("已保存的重量:" + weight + "Kg&nbsp;")
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html("已保存的重量:" + weight + "<em>Kg</em>");
+                $("#tip_"+orderid+odid).parent().parent().find("span[name=save_volume_weight]").html("已保存的体积重量:" + volumeWeight + "<em>Kg</em>")
                 $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight_flag]").html("未同步到产品库");
             }else if(Number(data) == 1){
                 document.getElementById("tip_"+orderid+odid).innerHTML = "保存商品重量失败";
@@ -1747,6 +1761,7 @@ function saveWeight(orderid,odid,pid){
 function saveWeightFlag(orderid,odid,pid){
     //网页中获取之前保存记录
     var his_weight = $("#tip_"+orderid+odid).parent().parent().find("span[name=save_weight]").html();
+    var volume_weight = $("#tip_"+orderid+odid).parent().parent().find("span[name=save_volume_weight]").html();
     //数据校验
     if(his_weight.indexOf("已保存") == -1){
         document.getElementById("tip_"+orderid+odid).innerHTML = "未保存单件商品重量,请先保存重量!";
@@ -1757,8 +1772,7 @@ function saveWeightFlag(orderid,odid,pid){
         type: "POST",//方法类型
         dataType:'json',
         url:'/cbtconsole/warehouse/saveWeightFlag',
-        data:{pid:pid},
-        dataType:"json",
+        data:{pid:pid,odId:odid},
         success:function(data){
             //result 0-处理异常;2-pid数据问题;1-同步到产品库成功;3-未找到重量数据;4-已经同步到产品库过;
             if(Number(data) == 1){

@@ -76,6 +76,15 @@ public class GoodsInfoUtils {
         REPLACE_SIZE_MAP.put("70cm", "070cm");
         REPLACE_SIZE_MAP.put("80cm", "080cm");
         REPLACE_SIZE_MAP.put("90cm", "090cm");
+        REPLACE_SIZE_MAP.put("10 yards", "010 yards");
+        REPLACE_SIZE_MAP.put("20 yards", "020 yards");
+        REPLACE_SIZE_MAP.put("30 yards", "030 yards");
+        REPLACE_SIZE_MAP.put("40 yards", "040 yards");
+        REPLACE_SIZE_MAP.put("50 yards", "050 yards");
+        REPLACE_SIZE_MAP.put("60 yards", "060 yards");
+        REPLACE_SIZE_MAP.put("70 yards", "070 yards");
+        REPLACE_SIZE_MAP.put("80 yards", "080 yards");
+        REPLACE_SIZE_MAP.put("90 yards", "090 yards");
     }
 
 

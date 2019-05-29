@@ -1,12 +1,18 @@
 package com.importExpress.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
+import com.cbt.util.StrUtils;
+import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsReview;
+import com.importExpress.pojo.OrderShare;
 import com.importExpress.service.QueryUserService;
+import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -417,7 +424,7 @@ public class QueryUserController {
             }
             //调用蒋接口同步
             for (String pid : pidList) {
-                iWarehouseService.saveWeightFlag(pid, user.getId());
+                // iWarehouseService.saveWeightFlag(pid, user.getId());
             }
             result.put("message", "success");
             return result;
@@ -552,6 +559,70 @@ public class QueryUserController {
         // 查询
         return queryUserService.queryGoodsReviewList(page, rows, goodsPid, reviewRemark, type, reviewFlag, startDate, endDate);
     }
+
+
+    /**
+     * 查询要分享的订单数据
+     *
+     *
+     * @return 返回的是easyui数据(json)格式
+     */
+    @RequestMapping(value = "/queryOrderShareList.do")
+    @ResponseBody
+    public EasyUiJsonResult queryOrderShareList(@RequestParam(value = "rows", defaultValue = "20", required = false) Integer rows,
+                                                 @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+                                                 @RequestParam(value = "shopType", defaultValue = "", required = false) String shopType,
+                                                 @RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo) {
+        if (StringUtils.isBlank(orderNo)) {
+            orderNo = null;
+        }
+        // 查询
+        return queryUserService.queryOrderShareList(page, rows, shopType,orderNo);
+    }
+
+    /**
+     * 查询要分享的订单数据
+     *
+     *
+     * @return 返回的是easyui数据(json)格式
+     */
+    @RequestMapping(value = "/queryOrderShareSave.do")
+    @ResponseBody
+    public String queryOrderShareSave(HttpServletRequest request, HttpServletResponse response) {
+
+        String msg = "成功";
+        //店铺类型
+        String shopType = request.getParameter("shopType");
+        String orderNo = request.getParameter("orderNo");
+        //get the detail data
+        String ens = request.getParameter("equations");
+
+
+        List<OrderShare> deviceReturns= StrUtils.getPersons(ens, OrderShare.class);
+        try {
+            //本地27插入
+//            queryUserService.insertOrderShare(deviceReturns,shopType,orderNo);
+            //线上表插入
+            this.insertOrderShare(deviceReturns,shopType,orderNo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg="操作失败";
+            return msg;
+        }
+        return msg;
+    }
+
+    private void insertOrderShare(List<OrderShare> pList,String shopType,String orderNo) {
+        shopType = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(shopType);
+        for(int i=0;i<pList.size();i++ ){
+            String sql = "INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,goods_pid)" +
+                    " values('" + shopType + "','" + orderNo + "','" + pList.get(i).getGoodsPrice() + "','"+pList.get(i).getGoodsImg()+ "','" + pList.get(i).getGoodsPid() + "')";
+            NotifyToCustomerUtil.sendSqlByMq(sql);
+        }
+
+    }
+
+
 
     /**
      * 根据id查询对应评论数据

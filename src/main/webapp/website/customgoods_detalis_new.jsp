@@ -2227,15 +2227,20 @@
                     &nbsp;&nbsp;<span class="s_btn" onclick="setGoodsRepairedByPid('${goods.pid}')">产品已修复</span>
                     <br>
                     <button class="s_btn" onclick="openReviewDiv()">添加产品评价</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <a target="_blank"
+                       href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
+                       style="color: #ff0000;">重新对标</a>
 
                 </div>
                 <br>
                 <div>
-                    <a target="_blank"
-                       href="http://192.168.1.29:8280/cbtconsole/customerServlet?action=findAllTaoBaoInfo&className=PictureComparisonServlet&aliPid=${goods.aliGoodsPid}&ylbbPid=${goods.pid}"
-                       style="color: #ff0000;">重新对标</a> &nbsp;&nbsp;&nbsp;
+
                     <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
-                    &nbsp;&nbsp;&nbsp; <a target="_blank"
+                    &nbsp;&nbsp;&nbsp;
+                    <a target="_blank"
+                                          href="https://www.import-express.com/goodsinfo/cbtconsole-1${goods.pid}.html">线上预览</a>
+                    &nbsp;&nbsp;&nbsp;<a target="_blank"
                                           href="${goods.aliGoodsUrl}">速卖通原链接</a>
                     <c:if test="${not empty shopId}">
                         &nbsp;&nbsp;&nbsp;

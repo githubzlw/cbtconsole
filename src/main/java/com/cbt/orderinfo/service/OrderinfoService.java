@@ -473,10 +473,15 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库
-                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(map.get("goods_pid"));
+                SearchResultInfo weightAndSyn = warehouseMapper.getGoodsWeight(map.get("goods_pid"), Integer.valueOf(String.valueOf(map.get("odid"))));
                 if (null != weightAndSyn){
                     searchresultinfo.setWeight(weightAndSyn.getWeight());
                     searchresultinfo.setSyn(weightAndSyn.getSyn());
+                    if(org.apache.commons.lang3.StringUtils.isNotBlank(weightAndSyn.getVolume_weight())){
+                    	searchresultinfo.setVolume_weight(weightAndSyn.getVolume_weight());
+					}else{
+                    	searchresultinfo.setVolume_weight("");
+					}
                 }
 				//获取验货商品的最大类别ID 王宏杰
 				String catid="";
