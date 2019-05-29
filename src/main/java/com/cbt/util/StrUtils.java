@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 
 public class StrUtils {
@@ -360,7 +361,15 @@ public class StrUtils {
 		}
 		return result;//\\.
 	}
-	
+
+	public static <T> List<T> getPersons(String jsonString, Class cls) {
+		List<T> list = new ArrayList<T>();
+		try {
+			list = JSON.parseArray(jsonString, cls);
+		} catch (Exception e) {
+		}
+		return list;
+	}
 	public static void main(String[] args) {
 		
 		System.out.println(removeSpecialCodeForWprice("[1-2 $ 4.00,3-10 $ 3.80,≥11 $ 3.00]"));

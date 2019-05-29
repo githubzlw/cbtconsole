@@ -224,6 +224,17 @@ public class QueryUserServiceImpl implements QueryUserService {
 		return queryUserMapper.queryStaticizeTime();
 	}
 
+    @Override
+    public void insertOrderShare(List<OrderShare> list,String shopType,String OrderNo) {
+
+        if (null != list && list.size() > 0) {
+            queryUserMapper.insertOrderShare(list,shopType,OrderNo);
+        }
+
+    }
+
+
+
 	@Override
 	public Map<String, Object> queryStandardGoodsFormCreatetime() {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -390,6 +401,25 @@ public class QueryUserServiceImpl implements QueryUserService {
         }
         return json;
     }
+
+    @Override
+    public EasyUiJsonResult queryOrderShareList(Integer page, Integer rows, String shopType, String orderNo) {
+        List<OrderShare> list = queryUserMapper.queryOrderShareList((page - 1) * rows, rows, shopType, orderNo);
+        Integer totalCount = queryUserMapper.queryOrderShareListCount(shopType, orderNo);
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        if (list != null && list.size() > 0) {
+            json.setSuccess(true);
+            json.setRows(list);
+            json.setTotal(totalCount);
+        } else {
+            json.setSuccess(false);
+            json.setRows("");
+            json.setTotal(0);
+        }
+        return json;
+    }
+
 
     @Override
     public GoodsReview queryGoodsReviewById(Integer id) {
