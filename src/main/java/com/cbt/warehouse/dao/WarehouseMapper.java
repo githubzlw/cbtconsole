@@ -221,8 +221,8 @@ public interface WarehouseMapper {
 	 * @return
 	 */
 	public SearchResultInfo getWeight();
-	public SearchResultInfo getGoodsWeight(@Param("pid") String pid);
-	public SearchResultInfo updateGoodsWeightFlag(@Param("pid") String pid);
+	public SearchResultInfo getGoodsWeight(@Param("pid") String pid, @Param("odId") int odId);
+	public SearchResultInfo updateGoodsWeightFlag(@Param("pid") String pid, @Param("odId") int odId);
 
 	/**
 	 * 获取该商品上一次发货的订单国家

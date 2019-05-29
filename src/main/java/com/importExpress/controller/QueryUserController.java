@@ -424,7 +424,7 @@ public class QueryUserController {
             }
             //调用蒋接口同步
             for (String pid : pidList) {
-                iWarehouseService.saveWeightFlag(pid, user.getId());
+                // iWarehouseService.saveWeightFlag(pid, user.getId());
             }
             result.put("message", "success");
             return result;

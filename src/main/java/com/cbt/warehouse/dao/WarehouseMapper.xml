@@ -2979,18 +2979,19 @@
 		select weight,createtime from package_weight order by id desc limit 1
 	</select>
     <select id="getGoodsWeight" resultType="com.cbt.website.bean.SearchResultInfo">
-		SELECT weight,syn FROM package_goods_weight WHERE pid=#{pid} AND del = 0 LIMIT 1
+		SELECT weight,syn,volume_weight,goods_type FROM package_goods_weight
+		WHERE pid=#{pid} and odid = #{odId} AND  del = 0 LIMIT 1
 	</select>
     <select id="updateGoodsWeightFlag">
         UPDATE package_goods_weight
         SET syn = 1
-        WHERE pid=#{pid} AND del = 0
+        WHERE pid=#{pid} and odid = #{odId} AND del = 0
 	</select>
 	<insert id="saveWeight">
 		<!-- UPDATE id_relationtable SET weight=weight+${weight} WHERE orderid=#{orderid} and odid=#{odid} -->
 		UPDATE package_goods_weight SET del=1 WHERE pid=#{pid} AND del=0;
-		INSERT INTO package_goods_weight (pid, weight, flag, odid, orderid, createtime, updatetime) 
-		VALUES (#{pid}, #{weight}, 1, #{odid}, #{orderid}, NOW(), NOW())
+		INSERT INTO package_goods_weight (pid, weight, flag, odid, orderid, createtime, updatetime,volume_weight,goods_type)
+		VALUES (#{pid}, #{weight}, 1, #{odid}, #{orderid}, NOW(), NOW(), #{volumeWeight}, #{goodsType})
 	</insert>
 	<insert id="saveClothingData">
 		insert into quality_result (orderid,goodsid,goodscatid,createtime,admName,result) values(#{orderid},#{goodsid},#{catid},now(),#{admName},#{result})
