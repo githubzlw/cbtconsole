@@ -1841,7 +1841,8 @@
                                         <li
                                                 class="${typeBean.img=='null'||typeBean.img==''?'li_size':'li_color'}">
                                             <c:if test="${typeBean.img!='null' && typeBean.img !=''}">
-                                                <img id="${typeBean.id}" <%--onclick="addDeleteTypeId('${typeBean.id}')"--%>
+                                                <input type="hidden" id="${typeBean.id}"/>
+                                                <img <%--onclick="addDeleteTypeId('${typeBean.id}')"--%>
                                                      class="img_limit"
                                                      src="${typeBean.img}" alt="${typeBean.value}"
                                                      title="${typeBean.value}"/>
