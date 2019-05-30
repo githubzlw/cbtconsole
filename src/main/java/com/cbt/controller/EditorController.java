@@ -1883,7 +1883,11 @@ public class EditorController {
                         }
                     }
                     tempEninfo = nwDoc.toString();
+                } else{
+                    tempEninfo = eninfo;
                 }
+            } else{
+                tempEninfo = "";
             }
         } catch (Exception e) {
             e.printStackTrace();

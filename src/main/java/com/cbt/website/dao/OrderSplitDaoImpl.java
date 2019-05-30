@@ -3221,4 +3221,29 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		return count > 0;
 	}
 
+	@Override
+	public int updateGoodsCommunicationInfo(String oldOrder, String newOrder, List<Integer> odIds) {
+
+		Connection conn = DBHelper.getInstance().getConnection();
+		int rs = 0;
+		String sql = "update goods_communication_info set orderid =? where orderid = ? and odid = ?";
+		PreparedStatement pStmt = null;
+		try {
+			pStmt = conn.prepareStatement(sql);
+			for (int i = 0; i < odIds.size(); i++) {
+				pStmt.setString(1, newOrder);
+				pStmt.setString(2, oldOrder);
+				pStmt.setInt(3, odIds.get(i));
+				pStmt.addBatch();
+			}
+			rs = pStmt.executeBatch().length;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBHelper.getInstance().closePreparedStatement(pStmt);
+			DBHelper.getInstance().closeConnection(conn);
+		}
+		return rs;
+	}
+
 }

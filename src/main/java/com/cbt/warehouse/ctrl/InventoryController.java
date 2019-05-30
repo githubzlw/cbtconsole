@@ -471,12 +471,12 @@ public class InventoryController {
 		TaoBaoInfoList list = new TaoBaoInfoList();
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		int row = 0;
-		// String orderid=request.getParameter("orderid");
+		String orderNo=request.getParameter("orderNo");
 		String goodsid = request.getParameter("goodsid");
 		String count = request.getParameter("count");
 		String remark = request.getParameter("remark");
 		String in_barcode = request.getParameter("in_barcode");
-		// map.put("orderid", orderid);
+		map.put("orderid", orderNo);
 		map.put("goodsid", goodsid);
 		map.put("count", count);
 		map.put("remark", remark);
