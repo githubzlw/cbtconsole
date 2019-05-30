@@ -167,8 +167,7 @@ public class Purchase extends HttpServlet {
 		AdmUserDao admDao = new AdmUserDaoImpl();
 		String sessionId = request.getSession().getId();
 		String admuserw = Redis.hget(sessionId, "admuser");
-		SerializeUtil su = new SerializeUtil();
-		Admuser admuser = (Admuser) su.JsonToObj(admuserw, Admuser.class);
+		Admuser admuser = (Admuser) SerializeUtil.JsonToObj(admuserw, Admuser.class);
 		Date date=new Date();
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		String time=sdf.format(date);

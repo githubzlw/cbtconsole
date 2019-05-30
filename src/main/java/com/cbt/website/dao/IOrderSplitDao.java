@@ -347,5 +347,13 @@ public interface IOrderSplitDao {
 	 */
 	boolean updateDropShipDate(String oldDropShopId, String newDropShopId, String parentOrderNo, float orderAc, float extraFreight);
 
+	/**
+	 * 更新商品备注信息
+	 * @param oldOrder
+	 * @param newOrder
+	 * @param odIds
+	 * @return
+	 */
+	int updateGoodsCommunicationInfo(String oldOrder, String newOrder, List<Integer> odIds);
 
 }

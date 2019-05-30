@@ -394,6 +394,7 @@ function openYmxInventoryEntryView(){
 }
 
 function inventoryEntry(){
+    var orderNo = $("#order_no_id").val();
 	var goodsid=$("#goodsid").val();
 	var count=$("#count_").val();
 	var in_barcode = $('#new_barcode2').combobox('getValue');
@@ -401,6 +402,7 @@ function inventoryEntry(){
 	jQuery.ajax({
 	       url:"/cbtconsole/inventory/inventoryEntry",
 	       data:{
+	           "orderNo" : orderNo,
 	       	  "goodsid":goodsid,
 	       	  "count":count,
 	       	  "in_barcode":in_barcode,
@@ -471,6 +473,7 @@ function inventoryYmxEntry(){
 
 function cance1(){
 	$('#dlg1').dialog('close');
+	$("#order_no_id").textbox('setValue','');
 	$("#goodsid").textbox('setValue','');
 	$("#count_").textbox('setValue','');
 	$("#remark_").textbox('setValue','');
@@ -665,6 +668,9 @@ function delete_inventory(id,goods_pid,barcode,amount){
 	</div>
 	<div id="dlg1" class="easyui-dialog" title="手动录入库存" data-options="modal:true" style="width:400px;height:400px;padding:10px;autoOpen:false;;closed:true;display: none;">
 	<form  method="post" style="height:100%;">
+			<div style="margin-bottom:20px;margin-left:35px;">
+				<input class="easyui-textbox" name="orderNo" id="order_no_id"  style="width:70%;"  data-options="label:'订单号:',required:true">
+			</div>
 			<div style="margin-bottom:20px;margin-left:35px;">
 				<input class="easyui-numberbox" name="goodsid" id="goodsid"  style="width:70%;"  data-options="label:'商品号:',required:true">
 			</div>

@@ -293,7 +293,8 @@
         update custom_benchmark_ready set is_stock_flag=0 where pid=#{goods_pid};
     </update>
     <select id="findOrderDetails" resultType="com.cbt.bean.OrderDetailsBean">
-        select od.*,ops.goods_p_price from order_details od inner join order_product_source ops ON od.goodsid=ops.goodsid where od.goodsid=#{goodsid} limit 1
+        select od.*,ops.goods_p_price from order_details od inner join order_product_source ops ON od.goodsid=ops.goodsid
+        where od.orderid=#{orderid} and od.goodsid=#{goodsid} limit 1
     </select>
     <insert id="inventoryEntry">
         insert into inventory (goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_amount,car_img,goods_pid,car_urlMD5,createtime,goods_p_price,remark,flag,updatetime,new_inventory_amount,new_remaining)
