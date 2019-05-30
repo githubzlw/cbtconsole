@@ -85,6 +85,15 @@ public class GoodsInfoUtils {
         REPLACE_SIZE_MAP.put("70 yards", "070 yards");
         REPLACE_SIZE_MAP.put("80 yards", "080 yards");
         REPLACE_SIZE_MAP.put("90 yards", "090 yards");
+        REPLACE_SIZE_MAP.put("1Month", "01Month");
+        REPLACE_SIZE_MAP.put("2Month", "02Month");
+        REPLACE_SIZE_MAP.put("3Month", "03Month");
+        REPLACE_SIZE_MAP.put("4Month", "04Month");
+        REPLACE_SIZE_MAP.put("5Month", "05Month");
+        REPLACE_SIZE_MAP.put("6Month", "06Month");
+        REPLACE_SIZE_MAP.put("7Month", "07Month");
+        REPLACE_SIZE_MAP.put("8Month", "08Month");
+        REPLACE_SIZE_MAP.put("9Month", "09Month");
     }
 
 
@@ -291,8 +300,11 @@ public class GoodsInfoUtils {
     private static String genNewTypeVal(String typeVal) {
         String tempVal = typeVal;
         for (String mapKey : REPLACE_SIZE_MAP.keySet()) {
-            if (tempVal.contains(mapKey)) {
-                tempVal = tempVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
+            if (typeVal.contains(mapKey)) {
+                tempVal = typeVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
+                break;
+            }else if(typeVal.contains(mapKey.toUpperCase())){
+                tempVal = typeVal.replace(mapKey.toUpperCase(), REPLACE_SIZE_MAP.get(mapKey).toUpperCase());
                 break;
             }
         }

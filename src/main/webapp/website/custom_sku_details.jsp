@@ -137,6 +137,7 @@
 <script type="text/javascript">
 
     var typeObj = {};
+    var typeMap = {};
     var maxVal = 1;
 
     function genTypeNum() {
@@ -148,9 +149,17 @@
                 typeObj[noBlankVal] = typeObj[noBlankVal] + 1;
             } else {
                 typeObj[noBlankVal] = 1;
+                var tVal = "tp_00";
+                var ln = getLeng(typeObj);
+                if(ln < 9){
+                    tVal = "tp_0" + ln;
+                }else{
+                    tVal = "tp_" + ln;
+                }
+                typeMap[noBlankVal] = tVal;
             }
-            $(this).find("td").eq(3).find("input").addClass("com_" + noBlankVal);
-            $(this).find("td:last").find("input").addClass("vlm_" + noBlankVal);
+            $(this).find("td").eq(3).find("input").addClass("com_" + typeMap[noBlankVal]);
+            $(this).find("td:last").find("input").addClass("vlm_" + typeMap[noBlankVal]);
         });
         // 取最大值
 
@@ -161,6 +170,14 @@
         }
     }
 
+
+    function getLeng(obj) {
+        var ln = 0;
+        for(var key in typeObj){
+            ln ++;
+        }
+        return ln;
+    }
 
     function updatePidWeight(type, flag, obj) {
         if (flag == 1) {
@@ -253,12 +270,12 @@
                                 totalW = parseFloat(smallW);
                                 var tempVal = totalW;
                                 if (type == 1) {
-                                    $(".com_" + keyV).each(function () {
+                                    $(".com_" + typeMap[keyV]).each(function () {
                                         $(this).val(tempVal.toFixed(3));
                                         tempVal = tempVal + avgW;
                                     });
                                 } else {
-                                    $(".vlm_" + keyV).each(function () {
+                                    $(".vlm_" + typeMap[keyV]).each(function () {
                                         $(this).val(tempVal.toFixed(3));
                                         tempVal = tempVal + avgW;
                                     });
@@ -271,12 +288,12 @@
                                 totalW = bigW;
                                 var tempVal = totalW;
                                 if (type == 1) {
-                                    $(".com_" + keyV).each(function () {
+                                    $(".com_" + typeMap[keyV]).each(function () {
                                         $(this).val(tempVal.toFixed(3));
 
                                     });
                                 } else {
-                                    $(".vlm_" + keyV).each(function () {
+                                    $(".vlm_" + typeMap[keyV]).each(function () {
                                         $(this).val(tempVal.toFixed(3));
                                         tempVal = tempVal - avgW;
                                     });
