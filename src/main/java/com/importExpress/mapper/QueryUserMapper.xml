@@ -44,7 +44,19 @@
 		SET a.catid1 = b.catid1
 		WHERE a.pid = b.pid;
     </insert>
-    
+
+    <insert id="insertOrderShare" >
+
+        INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,create_time)
+        VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{shopType},#{orderNo},#{item.goodsPrice}, #{item.goodsImg}, NOW())
+        </foreach>
+
+    </insert>
+
+
+
 	<!-- String queryStaticizeTime(); -->
     <select id="queryStaticizeTime" resultType="String">
         SELECT createdate
@@ -825,6 +837,12 @@
     <!--Integer queryGoodsReviewListCount(@Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
                                  @Param("type") Integer type, @Param("reviewFlag") Integer reviewFlag,
                                  @Param("startDate") String startDate, @Param("endDate") String endDate);-->
+    <select id="queryOrderShareListCount" resultType="Integer">
+        SELECT COUNT(1)
+        FROM order_details
+        where  orderid = #{orderNo}
+    </select>
+
     <select id="queryGoodsReviewListCount" resultType="Integer">
         SELECT COUNT(1)
         FROM goods_review
@@ -849,6 +867,7 @@
             </if>
         </where>
     </select>
+
 
     <!--List<GoodsReview> queryGoodsReviewList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
                                       @Param("goodsPid") String goodsPid, @Param("reviewRemark") String reviewRemark,
@@ -879,6 +898,14 @@
             </if>
         </where>
         ORDER BY createtime DESC
+        LIMIT #{startBars},#{rows}
+    </select>
+
+    <select id="queryOrderShareList" resultType="com.importExpress.pojo.OrderShare">
+        SELECT car_img as goodsImg,goodsprice as goodsPrice,goods_pid as goodsPid
+        FROM order_details
+        where  orderid = #{orderNo}
+        ORDER BY goods_pid
         LIMIT #{startBars},#{rows}
     </select>
 

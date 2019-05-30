@@ -265,6 +265,7 @@ public class NewOrderSplitCtr {
                 List<OrderDetailsBean> orderDetails = splitDao.getOrdersDetails_split(orderNo);
                 List<OrderDetailsBean> nwOrderDetails = new ArrayList<OrderDetailsBean>();
                 List<Integer> goodsIds = new ArrayList<Integer>();
+                List<Integer> odIds = new ArrayList<>();
                 // 判断是否获取到要拆分的商品ids
                 if (odidLst.length > 0) {
                     double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
@@ -274,6 +275,7 @@ public class NewOrderSplitCtr {
                             if (odds.getId() == Integer.valueOf(odid)) {
                                 nwOrderDetails.add(odds);
                                 goodsIds.add(odds.getGoodsid());
+                                odIds.add(Integer.valueOf(odid));
                                 break;
                             }
                         }
@@ -283,7 +285,7 @@ public class NewOrderSplitCtr {
                     if (nwOrderDetails.size() == odidLst.length && !(totalPayPriceOld <= 0 || totalGoodsCostOld <= 0)) {
                         // 3.计算预期结果并保存和拆单操作
                         calculateExpectedResult(json, nwOrderDetails, orderNo, nwOrderNo, orderBean, totalGoodsCostOld,
-                                totalPayPriceOld, orderBeanTemp, admuser, state, odidLst, goodsIds);
+                                totalPayPriceOld, orderBeanTemp, admuser, state, odidLst, goodsIds, odIds);
                         //取消订单后商品进入库存中
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
@@ -349,7 +351,8 @@ public class NewOrderSplitCtr {
      */
     private void calculateExpectedResult(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
                                          String nwOrderNo, OrderBean orderBean, double totalGoodsCostOld, double totalPayPriceOld,
-                                         OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst, List<Integer> goodsIds) {
+                                         OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst,
+                                         List<Integer> goodsIds, List<Integer> odIds) {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
         double totalGoodsCostNew = 0;// 新的订单商品总价
@@ -483,7 +486,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) totalPayPriceNew);
+                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -499,7 +502,7 @@ public class NewOrderSplitCtr {
      */
     private void doSplitOrderAction(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
                                     String nwOrderNo, OrderBean orderBeanTemp, OrderBean odbeanNew, Admuser admuser, String state,
-                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew) {
+                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew, List<Integer> odIds) {
 
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
@@ -515,6 +518,8 @@ public class NewOrderSplitCtr {
             // 更新新订单商品的入库信息,本地
             if (goodsIds.size() > 0) {
                 splitDao.updateWarehouseInfo(orderNo, nwOrderNo, goodsIds);
+                splitDao.updateGoodsCommunicationInfo(orderNo, nwOrderNo, odIds);
+                odIds.clear();
             }
 
             // 判断是否是取消状态,是取消,则更新新订单的状态
@@ -543,6 +548,8 @@ public class NewOrderSplitCtr {
             // 6.执行完成后，给出执行的结果并保存数据库
             splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);
 
+            goodsIds.clear();
+            nwOrderDetails.clear();
             json.setOk(true);
             json.setMessage("拆分成功");
             json.setData(nwOrderNo);

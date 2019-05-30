@@ -1,6 +1,7 @@
 package com.cbt.service;
 
 import com.cbt.bean.*;
+import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
@@ -776,4 +777,14 @@ public interface CustomGoodsService {
      * @return
      */
     int updateVolumeWeight(String pid, String newWeight);
+
+
+    /**
+     * 根据规格更新 称重重量和体积重量
+     * @param pid
+     * @param weightAndSyn
+     * @param adminId
+     * @return
+     */
+    JsonResult setGoodsWeightByWeigherInfo(String pid, SearchResultInfo weightAndSyn, int adminId);
 }

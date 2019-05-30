@@ -4,6 +4,7 @@ import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsReview;
+import com.importExpress.pojo.OrderShare;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ public interface QueryUserService {
 	List<String> queryUserByPrice(Integer price);
 
 	String createStaticizeForm(Integer flag);
+
+    void insertOrderShare(List<OrderShare> list,String shopType,String OrderNo);
 
 	AuthInfo queryAuthInfo(Integer authId);
 
@@ -51,6 +54,8 @@ public interface QueryUserService {
 
     EasyUiJsonResult queryGoodsReviewList(Integer page, Integer rows, String goodsPid, String reviewRemark, Integer type,
                                      Integer reviewFlag, String startDate, String endDate);
+
+    EasyUiJsonResult queryOrderShareList(Integer page, Integer rows, String shopType, String orderNo);
 
     GoodsReview queryGoodsReviewById(Integer id);
 

@@ -471,6 +471,7 @@ public class WarehouseCtrl {
 			String orderid=request.getParameter("orderid");
 			String odid=request.getParameter("odid");
 			String weight=request.getParameter("weight");
+			String volumeWeight=request.getParameter("volumeWeight");
 			String pid=request.getParameter("pid");
 			//数据校验
 			if (StringUtil.isBlank(pid) || pid.length() < 3 || StringUtil.isBlank(weight) || !Pattern.compile("(\\d+([.]{1}\\d+)?)").matcher(weight).matches()) {
@@ -478,10 +479,24 @@ public class WarehouseCtrl {
 				out.close();
 				return;
 			}
+			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderid);
+			String goods_type = "";
+			for(OrderDetailsBean orderDetails : odb){
+				if(orderDetails.getId() == Integer.valueOf(odid)){
+					goods_type = orderDetails.getCar_type();
+					break;
+				}
+			}
 			map.put("orderid",orderid);
 			map.put("odid",odid);
 			map.put("weight",weight);
 			map.put("pid",pid);
+			map.put("goodsType",goods_type);
+			if(org.apache.commons.lang3.StringUtils.isBlank(volumeWeight) || "0".equals(volumeWeight)){
+				map.put("volumeWeight","");
+			}else{
+				map.put("volumeWeight",volumeWeight);
+			}
 			iWarehouseService.saveWeight(map);
 			out.print(1);
 		}catch(Exception e){
@@ -506,13 +521,14 @@ public class WarehouseCtrl {
 			String userJson = Redis.hget(sessionId, "admuser");
 			com.cbt.website.userAuth.bean.Admuser user = (com.cbt.website.userAuth.bean.Admuser) SerializeUtil.JsonToObj(userJson, com.cbt.website.userAuth.bean.Admuser.class);
             String pid=request.getParameter("pid");
+            String odId=request.getParameter("odId");
             //数据校验
             if (StringUtil.isBlank(pid) || pid.length() < 3) {
                 out.print(2);
                 out.close();
                 return;
             }
-            int result = iWarehouseService.saveWeightFlag(pid, user.getId());
+            int result = iWarehouseService.saveWeightFlag(pid, user.getId(), Integer.valueOf(odId));
             out.print(result);
         }catch(Exception e){
             out.print(0);
@@ -5636,6 +5652,10 @@ public class WarehouseCtrl {
 			String orderid = request.getParameter("orderid");
 			String barcode = request.getParameter("barcode");
 			String shipno=request.getParameter("shipno");
+			String pid=request.getParameter("pid");
+			if(StringUtil.isBlank(pid)){
+				pid = null;
+			}
 			int page = Integer.parseInt(request.getParameter("page"));
 			if (page > 0) {
 				page = (page - 1) * 20;
@@ -5665,6 +5685,7 @@ public class WarehouseCtrl {
 			map.put("orderid", orderid);
 			map.put("barcode", barcode);
 			map.put("page", page);
+			map.put("pid", pid);
 			int acount = 0;
 			int mid = iWarehouseService.getMid();// 中期库位剩余
 			int shortTerm = iWarehouseService.getShortTerm();// 短期库位剩余

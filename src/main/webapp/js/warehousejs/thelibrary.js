@@ -598,7 +598,7 @@ function mergeOrders(){
 //	return;
 	$.ajax({
 		type:'post',
-		url:'selectOrderidAddress.do',
+		url:'/cbtconsole/warehouse/selectOrderidAddress.do',
 		data:{'ordersArr':ordersArr,'userid':userid},
 		traditional :true,
 		success:function(data){

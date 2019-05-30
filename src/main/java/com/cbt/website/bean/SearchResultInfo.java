@@ -66,6 +66,30 @@ public class SearchResultInfo {
 	private String isExitPhone;
 	private String source1688_img;
 
+	/**
+	 * 称秤体积重量
+	 */
+	private String volume_weight;
+	/**
+	 * 产品规格
+	 */
+	private String goods_type;
+
+	public String getGoods_type() {
+		return goods_type;
+	}
+
+	public void setGoods_type(String goods_type) {
+		this.goods_type = goods_type;
+	}
+
+	public String getVolume_weight() {
+		return volume_weight;
+	}
+
+	public void setVolume_weight(String volume_weight) {
+		this.volume_weight = volume_weight;
+	}
 
 	public String getValid() {
 		return valid;
