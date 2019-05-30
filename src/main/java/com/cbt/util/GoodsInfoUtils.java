@@ -291,8 +291,11 @@ public class GoodsInfoUtils {
     private static String genNewTypeVal(String typeVal) {
         String tempVal = typeVal;
         for (String mapKey : REPLACE_SIZE_MAP.keySet()) {
-            if (tempVal.contains(mapKey)) {
-                tempVal = tempVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
+            if (typeVal.contains(mapKey)) {
+                tempVal = typeVal.replace(mapKey, REPLACE_SIZE_MAP.get(mapKey));
+                break;
+            }else if(typeVal.contains(mapKey.toUpperCase())){
+                tempVal = typeVal.replace(mapKey.toUpperCase(), REPLACE_SIZE_MAP.get(mapKey).toUpperCase());
                 break;
             }
         }
