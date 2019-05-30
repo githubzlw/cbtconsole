@@ -620,7 +620,24 @@ public class QueryUserServiceImpl implements QueryUserService {
                             .append(bean.getId()).append(",")
                             .append(DateFormatUtil.getWithSeconds(bean.getCreatetime())).append(",\r\n");
                 }
+            } else if (userType == 7){
+                sb.append("商品pid,商品名,销量(销售次数),\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append("'")
+                            .append(bean.getName()).append(",")
+                            .append(bean.getAdmName()).append(",")
+                            .append(bean.getId()).append(",\r\n");
+                }
+            } else if (userType == 8){
+                sb.append("商品pid,商品名,购买过的用户数量,\r\n");
+                for (UserXlsBean bean : list) {
+                    sb.append("'")
+                            .append(bean.getName()).append(",")
+                            .append(bean.getAdmName()).append(",")
+                            .append(bean.getId()).append(",\r\n");
+                }
             }
+
             result.put("csv", sb.toString());
             result.put("state", "success");
         } else {
@@ -674,5 +691,12 @@ public class QueryUserServiceImpl implements QueryUserService {
         DataSourceSelector.restore();
         result.put("message", "更新成功!");
         return result;
+    }
+
+    @Override
+    public void updateNeedoffshelfByPid(String pid, String noShelfInfo) {
+        DataSourceSelector.set("dataSource28hop");
+        queryUserMapper.updateNeedoffshelfByPid(pid, noShelfInfo);
+        DataSourceSelector.restore();
     }
 }

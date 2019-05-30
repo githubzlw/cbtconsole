@@ -21,6 +21,24 @@ public class NeedOffShelfBean {
     private int soldFlag2;
     private int soldFlag3;
     private Integer sourceFlag;
+    private String noShelfInfo;
+    private String createtime;
+
+    public String getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
+    }
+
+    public String getNoShelfInfo() {
+        return noShelfInfo;
+    }
+
+    public void setNoShelfInfo(String noShelfInfo) {
+        this.noShelfInfo = noShelfInfo;
+    }
 
     public Integer getSourceFlag() {
         return sourceFlag;

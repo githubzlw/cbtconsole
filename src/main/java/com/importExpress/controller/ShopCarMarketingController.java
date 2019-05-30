@@ -15,10 +15,8 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
-import com.importExpress.utli.GoodsPriceUpdateUtil;
-import com.importExpress.utli.RedisModel;
-import com.importExpress.utli.SendEmailNew;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -362,14 +360,29 @@ public class ShopCarMarketingController {
                     }
                 }
 
-                //判断是否有改价的情况，有改价更新并清空购物车
+                //判断是否有改价的情况，有改价更新并清空购物车--jxw05-27弃用，改成更新redis数据
                 if (isUpdatePrice > 0) {
+
+                    // 2.更新redis数据
+                    try{
+                        SendMQ sendMQ = new SendMQ();
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("type","4");
+                        jsonObject.put("userid",userIdStr);
+                        jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(listActive));
+                        sendMQ.sendMsg(jsonObject);
+                        sendMQ.closeConn();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        logger.error("userId:" + userIdStr + ",confirmAndSendEmail SendMQ error:",e);
+                    }
+
+
+                    /*--jxw05-27弃用弃用，改成更新redis数据
                     boolean isSuccess = updateGoodsCarConfig(listActive, Integer.valueOf(userIdStr));
                     //更新成功后，发布邮件的时候全部更新线上
                     if (isSuccess) {
-                        //2.清空redis数据
-                        //使用MQ清空购物车数据
-                        //redis示例
+                        // 2.清空redis数据 使用MQ清空购物车数据 redis示例
                         try {
                             SendMQ sendMQ = new SendMQ();
                             RedisModel redisModel = new RedisModel(new String[]{userIdStr});
@@ -384,7 +397,7 @@ public class ShopCarMarketingController {
                         json.setOk(false);
                         json.setMessage("更新失败,请重试");
                         return json;
-                    }
+                    }*/
                 }
                 listActive.clear();
                 showList.clear();

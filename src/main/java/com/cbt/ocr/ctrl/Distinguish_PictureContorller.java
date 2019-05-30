@@ -14,13 +14,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.poi.util.SystemOutLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +54,12 @@ public class Distinguish_PictureContorller {
 			//初始的判断以及赋值
 			if (StrUtils.isNullOrEmpty(page)) page = "1";
 			int pageNO = Integer.parseInt(page);
+
+			if ( user.getRoletype()!=0&&"1".equals(state)){
+                Change_user=user.getAdmName();
+            }else {
+                Change_user="";
+            }
 			//查询出页面数据   custom_goods_md5 中符合条件的数据
 			List<CustomGoods> customGoodsList = distinguish_pictureService.showDistinguish_Pircture(pageNO, imgtype, state, Change_user);
 			if (StrUtils.isNullOrEmpty(state)) state = "0";
@@ -97,6 +102,7 @@ public class Distinguish_PictureContorller {
 	 * @param mainMap
 	 */
 	@RequestMapping(value = "updateSomeis_delete")
+
 	public String updateSomeDistinguish_Pircture_is_delete(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> mainMap, String userName, int type) throws Exception {
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		int ret = 0;
@@ -199,5 +205,41 @@ public class Distinguish_PictureContorller {
 	public List<Category1688> FindCategory(HttpServletRequest request) {
 		List<Category1688> ret = distinguish_pictureService.showCategory1688_type();
 		return ret;
+	}
+	@RequestMapping(value = "deleteAllPriceByAdmname")
+
+	public String deleteAllPriceByAdmname(@RequestParam("admName")String admName,HttpServletRequest request) {
+		List<CustomGoods> customGoodsList = distinguish_pictureService.deleteAllPriceByAdmname(admName);
+		List<Map<String, String>> bgList=new ArrayList<>();
+		for (int i=0;i<customGoodsList.size();i++ ){
+			Map<String,String> map=new HashMap<>();
+			String len="/usr/local/goodsimg";
+			customGoodsList.get(i).setRemotepath("https://img.import-express.com"+customGoodsList.get(i).getRemotepath().substring(len.length(),customGoodsList.get(i).getRemotepath().length()));
+			String value=customGoodsList.get(i).getId()+","+customGoodsList.get(i).getPid()+","+customGoodsList.get(i).getRemotepath();
+			map.put("id",value);
+			bgList.add(map);
+		}
+		StringBuffer imgpath = new StringBuffer("");
+		for (int i = 0; i < bgList.size(); i++) {
+			String[] splt = bgList.get(i).get("id").split(",");
+			imgpath = imgpath.append(splt[1] + ";" + splt[2] + "@");
+		}
+		int ret=1;
+		HttpSession session = request.getSession();
+		try {
+			 distinguish_pictureService.updateSomePirctu_risdelete_dateById(customGoodsList);
+			session.setAttribute("pidImgList",imgpath.substring(0, imgpath.length() - 1));
+			//提供给蒋先伟    线上下架图片的信息列
+			return "redirect:/editc/deleteEnInfoImgByParam";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error("pidImgList:" + imgpath.substring(0, imgpath.length() - 1) + ",updateSomeis_delete error:" + e.getMessage());
+			System.err.println("pidImgList:" + imgpath.substring(0, imgpath.length() - 1) + ",updateSomeis_delete error:" + e.getMessage());
+			ret=0;
+		}
+		//更新线上下架的图片状态位为1
+
+     return "";
 	}
 }

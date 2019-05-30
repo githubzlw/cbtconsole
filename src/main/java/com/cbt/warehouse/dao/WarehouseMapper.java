@@ -1427,4 +1427,7 @@ public interface WarehouseMapper {
     //@Insert("INSERT INTO `crossshop`.`low_price_Bad_goods` ( `pid`, `catid1`, `name`, `max_price`, `shelves_because`) VALUES ( #{pid}, #{catid1}, #{name}, #{maxPrice}, '价格过低下架');")
     @Insert("INSERT INTO needoffshelf_goods (pid, reason) VALUES (#{pid}, '17')")
 	int AddReviewGoods(@Param("pid") String pid,@Param("catid1") String catid1, @Param("name") String name, @Param("maxPrice") String maxPrice);
+
+	@Select("SELECT apply_time as applyTime,apply_user as applyUser FROM return_display WHERE customer_info=#{orderid} ORDER BY apply_time DESC LIMIT 1")
+	returndisplay FindReturnTime(@Param("orderid")String orderid);
 }

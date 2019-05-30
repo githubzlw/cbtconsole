@@ -527,6 +527,61 @@
             ) a
         </if>
 
+        <if test="userType == 7">
+            SELECT tem.goods_pid AS 'name', tem.name AS 'admName', tem.cnt AS 'id' FROM (
+                SELECT a.goods_pid, b.name, COUNT(1) AS 'cnt'
+                FROM(
+                SELECT oi.order_no, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH -- 最近6个月
+                AND u.is_test = 0 AND ( -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%'
+                and
+                u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not
+                like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.order_no, od.goods_pid -- 同一个订单中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid
+                ORDER BY COUNT(1) DESC
+                LIMIT 10
+            ) tem
+        </if>
+
+        <if test="userType == 8">
+            SELECT tem.goods_pid AS 'name', tem.name AS 'admName', tem.cnt AS 'id' FROM (
+                SELECT a.goods_pid, b.name, COUNT(1) AS 'cnt'
+                FROM(
+                SELECT oi.user_id, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1)  -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH  -- 最近6个月
+                AND u.is_test = 0 AND (  -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%'   and  u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and  u.email not like '%csmfg.com%'  and  u.email not like '%@sourcing-cn.com%'  and
+                u.email not like '%@china-synergy%'  and u.email&lt;>'sb33@gmail.com'  and u.email&lt;>'sbtest@gmail.com'  and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.user_id, od.goods_pid  -- 同一个用户中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid HAVING COUNT(1) > 4
+                ORDER BY COUNT(1) DESC
+            ) tem
+        </if>
+
         <if test="startBars != null">
             LIMIT #{startBars}, #{rows};
         </if>
@@ -663,6 +718,39 @@
             SELECT 500
         </if>
 
+        <if test="userType == 7">
+            SELECT 10
+        </if>
+
+        <if test="userType == 8">
+            SELECT COUNT(tem.goods_pid) FROM (
+                SELECT a.goods_pid
+                FROM(
+                SELECT oi.user_id, od.goods_pid FROM orderinfo oi
+                INNER JOIN order_details od ON oi.order_no=od.orderid
+                INNER JOIN `user` u ON oi.user_id = u.id
+                WHERE LENGTH(od.goods_pid) > 0
+                AND oi.state BETWEEN 1 AND 5 AND od.state IN (0,1) -- 成功的订单
+                AND oi.create_time >= NOW() - INTERVAL 6 MONTH -- 最近6个月
+                AND u.is_test = 0 AND ( -- 排除测试账号
+                u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+                u.email not like 'test%' and u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+                u.email not like '%qqsss.com' and u.email not like '%csmfg.com%' and u.email not like '%@sourcing-cn.com%'
+                and
+                u.email not like '%@china-synergy%' and u.email&lt;>'sb33@gmail.com' and u.email&lt;>'sbtest@gmail.com' and
+                u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not
+                like '%@163.com' and
+                u.email not like 'xielulu%'
+                )
+                GROUP BY oi.user_id, od.goods_pid -- 同一个用户中同一个商品只算一次
+                ) a
+                LEFT JOIN custom_benchmark_ready b ON a.goods_pid = b.pid
+                GROUP BY a.goods_pid HAVING COUNT(1) > 4
+                ORDER BY COUNT(1) DESC
+            ) tem
+        </if>
+
+
     </select>
 
     <!--List<String> queryUserAddressById(@Param("id") Integer id);-->
@@ -715,6 +803,13 @@
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+    </update>
+
+    <!--void updateNeedoffshelfByPid(@Param("pid") String pid, @Param("noShelfInfo") String noShelfInfo);-->
+    <update id="updateNeedoffshelfByPid">
+        UPDATE alidata.needoffshelf_all_log
+        SET edit_flag = 1, no_shelf_info = #{noShelfInfo}
+        WHERE pid = #{pid}
     </update>
 
     <!--List<HashMap<String,String>> queryCarGoodsCount(@Param("list") List<UserXlsBean> list);-->
@@ -807,6 +902,14 @@
             <if test="endDate != null">
                 and datatime &lt;= #{endDate}
             </if>
+            AND userid IN (
+                SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+                email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+                email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+                email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+                email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+                email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
         </where>
     </select>
 
@@ -821,6 +924,14 @@
                 and showPageTime &lt;= #{endDate}
             </if>
             AND LENGTH(allProductList) > 0
+            AND userid IN (
+                SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
+                email NOT LIKE 'test%' AND email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+                email NOT LIKE '%qqsss.com' AND email NOT LIKE '%csmfg.com%' AND email NOT LIKE '%@sourcing-cn.com%' AND
+                email NOT LIKE '%@china-synergy%' AND email&lt;>'sb33@gmail.com' AND email&lt;>'sbtest@gmail.com' AND
+                email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com' AND
+                email NOT LIKE 'zhouxueyun%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'wanghongjie%' AND email NOT LIKE 'lifang%' AND email NOT LIKE 'w_kun%'
+            )
         </where>
     </select>
 

@@ -39,9 +39,6 @@ public class ReturnsManagement {
 		if (page > 0) {
 			page = (page - 1) * 20;
 		}
-		if (mid==1) {
-		State="5";	
-		}
 		json=this.lookReturnOrderServiceNew.FindReturndisplay(applyUser,State,a1688Shipno,optTimeStart,optTimeEnd,page,mid);
 		 
 		return json;
@@ -51,17 +48,19 @@ public class ReturnsManagement {
 	public EasyUiJsonResult UpdaeReturnOrder(HttpServletRequest request,HttpServletResponse response){
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
-		System.err.println("运单号"+ship);
-		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship);
+		String ch= request.getParameter("ch");
+		//System.err.println("运单号"+ship);
+		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship,ch);
 		 return json;
 	}
-	@RequestMapping(value = "/RemReturnOrder")
+	@RequestMapping(value = "/RemReturnOrder")//驳回订单操作
 	@ResponseBody
 	public EasyUiJsonResult RemReturnOrder(HttpServletRequest request,HttpServletResponse response){
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
-		System.err.println("运单号"+ship);
-		json=this.lookReturnOrderServiceNew.RemReturnOrder(ship);
+		String cusorder= request.getParameter("cusorder");
+		//System.err.println("运单号"+ship);
+		json=this.lookReturnOrderServiceNew.RemReturnOrder(ship,cusorder);
 		 return json;
 	}
 	@RequestMapping(value = "/SetReturnOrder")
@@ -70,7 +69,7 @@ public class ReturnsManagement {
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
 		Double number= Double.parseDouble(request.getParameter("number"));
-		System.err.println("运单号"+ship);
+		//System.err.println("运单号"+ship);
 		json=this.lookReturnOrderServiceNew.SetReturnOrder(ship,number);
 		 return json;
 	}
@@ -83,7 +82,7 @@ public class ReturnsManagement {
 		int ship=Integer.parseInt( request.getParameter("ship"));
 		String number= request.getParameter("number");
 		int mid=Integer.parseInt(request.getParameter("mid"));
-		System.err.println("运单号"+number);
+		//System.err.println("运单号"+number);
 		json=this.lookReturnOrderServiceNew.UpdateReturnOrder(ship,number,mid,adm.getAdmName());
 		 return json;
 	}
@@ -104,14 +103,14 @@ public class ReturnsManagement {
 			orString="0";
 		}
 		int orid=Integer.parseInt(orString);
-		System.err.println("订单号："+orid);
+		//System.err.println("订单号："+orid);
 		String cusorder=request.getParameter("cusorder");
 		String returnNO=request.getParameter("returnNO");
 		if (returnNO==null||"".equals(returnNO)||number==0) {
 			json.setRows(3);
 			return json;
 		}
-		System.err.println("运单号"+number);
+		//System.err.println("运单号"+number);
 		json=this.lookReturnOrderServiceNew.AddOrder(number,orid,cusorder,returnNO,adm.getAdmName());
 		 return json;
 	}
@@ -128,6 +127,7 @@ public class ReturnsManagement {
 			json.setRows(2);
 			return json;
 		}
+		String pid=request.getParameter("pid");
 		String goodsid=request.getParameter("goodsid");
 		String cusorder=request.getParameter("cusorder");
 		String odid=request.getParameter("odid");
@@ -137,7 +137,7 @@ public class ReturnsManagement {
 			json.setRows(2);
 			return json;
 		}
-		json=this.lookReturnOrderServiceNew.AddOrderByOdid(number,odid,cusorder,returnNO,adm.getAdmName(),num,goodsid);
+		json=this.lookReturnOrderServiceNew.AddOrderByOdid(number,odid,cusorder,returnNO,adm.getAdmName(),num,goodsid,pid);
 		 return json;
 	}
 	@RequestMapping(value = "/LookOrder")
@@ -145,7 +145,7 @@ public class ReturnsManagement {
 	public EasyUiJsonResult LookOrder(HttpServletRequest request,HttpServletResponse response){
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String tborid=request.getParameter("orderid");
-		System.err.println("客户订单号——"+tborid);
+		//System.err.println("客户订单号——"+tborid);
 		json=this.lookReturnOrderServiceNew.LookOrder(tborid);
 		 return json;
 	}
@@ -156,9 +156,18 @@ public class ReturnsManagement {
 		String cusOrder=request.getParameter("cusOrder");
 		String tbOrder=request.getParameter("tbOrder");
 		int mid=Integer.parseInt(request.getParameter("mid"));
-		System.err.println("客户订单号——"+cusOrder);
+		//System.err.println("客户订单号——"+cusOrder);
 		List<returndisplay> result = new ArrayList<returndisplay>();
 		json=this.lookReturnOrderServiceNew.getAllOrder(cusOrder,tbOrder,mid);		
+		 return json;
+	}
+	@RequestMapping(value = "/getpid")
+	@ResponseBody
+	public EasyUiJsonResult getpid(HttpServletRequest request,HttpServletResponse response){
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		String cusOrder=request.getParameter("cusorder");
+		String tbOrder=request.getParameter("pid");
+		json=this.lookReturnOrderServiceNew.getpid(cusOrder,tbOrder);
 		 return json;
 	}
 	@RequestMapping(value = "/getAllOrderByCu")
@@ -166,7 +175,7 @@ public class ReturnsManagement {
 	public orderJson getAllOrderByCu(HttpServletRequest request,HttpServletResponse response){
 		orderJson json=new orderJson();
 		String cusOrder=request.getParameter("cusOrder");
-		System.err.println("单号："+cusOrder);
+		//System.err.println("单号："+cusOrder);
 		json=this.lookReturnOrderServiceNew.getAllOrderByCu(cusOrder);		
 		 return json;
 	}
@@ -232,5 +241,12 @@ public class ReturnsManagement {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		json=this.lookReturnOrderServiceNew.getAllOrderByOrid(orid);		
 		 return json;
-	}	
+	}
+	@RequestMapping(value = "/getReturnCount")
+	@ResponseBody
+	public String getReturnCount(){
+
+		String json=this.lookReturnOrderServiceNew.getAllOrderCount();
+		 return json;
+	}
 }

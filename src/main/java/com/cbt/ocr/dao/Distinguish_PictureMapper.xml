@@ -26,24 +26,33 @@
     </resultMap>
 
     <select id="showDistinguish_Pircture" resultMap="resultMap">
-    SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path FROM custom_goods_md5 cdm
+    SELECT cdm.id,cdm.pid,cdm.goods_md5,cdm.remote_path,COUNT(cdm.goods_md5) as  cu FROM custom_goods_md5 cdm
     WHERE 1=1
         AND cdm.is_delete=0
-        AND cdm.catgrid !=0
+        <if test="state == null || state == ''">
+            AND cdm.ocr_need_delete=1
+            AND cdm.ocr_need_date=0
+        </if>
     <if test="Change_user != null and Change_user != ''">
         AND cdm.user_operation=#{Change_user}
     </if>
-    <if test="state == null || state == ''">
-        AND cdm.ocr_need_delete=1
-        AND cdm.ocr_need_date=0
-    </if>
+
     <if test="state != null and state != ''">
-        AND cdm.ocr_need_date=#{state}
         AND cdm.ocr_need_delete=#{state}
+        AND cdm.ocr_need_date=#{state}
     </if>
     <if test="imgtype != null and imgtype != ''">
         AND cdm.catgrid=#{imgtype}
     </if>
+        <if test="imgtype == null || imgtype == ''">
+            AND cdm.catgrid !=0
+        </if>
+     <if test="state != 1 and state != 2">
+        group by cdm.goods_md5 HAVING cu > 1
+     </if>
+        <if test="state != null and state != ''">
+        group by cdm.goods_md5 HAVING cu > 0
+        </if>
     limit #{page},35
 </select>
 
@@ -80,6 +89,7 @@
         <if test="endTime !=null and endTime!=''">
             AND #{endTime}>=create_time
         </if>
+
     </select>
 
     <select id="showDistinguish_Pircture_operationUser" resultMap="UserMap">
@@ -87,14 +97,13 @@
     </select>
 
     <select id="queryDistinguish_PirctureCount" resultType="int">
-        SELECT count(1)
+        SELECT count(1) FROM
+        (SELECT count(cdm.goods_md5)
         FROM custom_goods_md5 cdm
         WHERE 1=1
-        AND cdm.is_delete=0
-        AND cdm.catgrid !=0
         <if test="state == null || state == ''">
-            AND cdm.ocr_need_date=0
             AND cdm.ocr_need_delete=1
+            AND cdm.ocr_need_date=0
         </if>
         <if test="state != null and state != ''">
             AND cdm.ocr_need_date=#{state}
@@ -106,38 +115,58 @@
         <if test="imgtype != null and imgtype != ''">
         and cdm.catgrid=#{imgtype}
         </if>
+        <if test="imgtype == null || imgtype == ''">
+            AND cdm.catgrid !=0
+        </if>
+        AND cdm.is_delete=0
+        <if test="state != 1 and state != 2">
+        group by cdm.goods_md5 HAVING COUNT(cdm.goods_md5)>1) a
+        </if>
+        <if test="state != null and state != ''">
+            group by cdm.goods_md5 HAVING COUNT(cdm.goods_md5)>0) a
+        </if>
     </select>
 
     <sql id="Category1688_List">
         id,lv,category_id,name
     </sql>
     <select id="showCategory1688_type" resultMap="Category1688Map">
-       SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
-        custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
-        WHERE cbr.`pid`=cdm.`pid`
-        AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
-        AND cdm.ocr_need_delete=1
-        AND cdm.ocr_need_date=0
-        GROUP BY cdm.catgrid
+--        SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
+--         custom_benchmark_ready cbr,custom_goods_md5 cdm,1688_category c
+--         WHERE cbr.`pid`=cdm.`pid`
+--         AND c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1)
+--         AND cdm.ocr_need_delete=1
+--         AND cdm.ocr_need_date=0
+--         GROUP BY cdm.catgrid
+SELECT c.category_id category_id,c.name name,COUNT(1) id FROM
+ 1688_category c INNER JOIN
+custom_benchmark_ready  cbr on c.category_id=SUBSTRING_INDEX(cbr.`path_catid`,",",1) INNER JOIN
+(SELECT COUNT(goods_md5) as  cu,catgrid,pid FROM custom_goods_md5 WHERE ocr_need_delete=1 AND ocr_need_date=0
+    group by goods_md5 HAVING cu>1  ) cdm  on cdm.pid=cbr.pid
+ GROUP BY cdm.catgrid
     </select>
     <update id="updateSomePirctu_risdelete">
-        update custom_goods_md5 SET
-        <if test="type==1">
-            ocr_need_date=1,
-        </if>
-        <if test="type==2">
-            ocr_need_delete=2,
-            ocr_need_date=2,
-        </if>
-        <if test="type==3">
-            ocr_need_delete=1,
-            ocr_need_date=1,
-        </if>
-        user_operation=#{userName}
-        where
+        update custom_goods_md5 a,(SELECT goods_md5,id FROM custom_goods_md5 WHERE
+
         <foreach collection="bgList" separator="or" item="i" index="index">
             id = ${i.id}
         </foreach>
+          ) b  SET
+        <if test="type==1">
+            a.ocr_need_date=1,
+        </if>
+        <if test="type==2">
+            a.ocr_need_delete=2,
+            a.ocr_need_date=2,
+        </if>
+        <if test="type==3">
+            a.ocr_need_delete=1,
+            a.ocr_need_date=1,
+        </if>
+        a.user_operation=#{userName}
+
+        WHERE a.goods_md5=b.goods_md5
+
     </update>
     <update id="updateSomePirctu_risdelete_s">
         update custom_goods_md5 SET

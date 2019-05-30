@@ -1,5 +1,7 @@
 package com.cbt.website.bean;
 
+import lombok.Data;
+
 import java.io.Serializable;
 /**
  * Created by qiqing
@@ -9,7 +11,8 @@ import java.io.Serializable;
 /**
  * 购物车商品信息实体：添加购物车时，需要变更或者购物车价格计算用到的商品信息
  * */
-public class GoodsCarActiveBean implements Serializable, Cloneable {
+@Data
+public class GoodsCarActiveBean implements Serializable{
     /**
      *
      */
@@ -31,7 +34,7 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
     private int oNum;//记录购物车本次添加的数量product number 下一次计算购物车使用  Use 默认0
     private String perWeight;//每个商品的重量(number=1时的重量) Use
     private String price;//购物车最新价格
-    private double price1;//根据数量变化的非免邮价格，平摊非免邮价格
+    private String price1;//根据数量变化的非免邮价格，平摊非免邮价格
     private double price2;//原始一件商品的邮费
     private double price3;//原始工厂价-用来后台修改工厂价，保留原始值的
     private String startBizFactoryPrice;//产品起始工厂价
@@ -49,11 +52,11 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
     private String priceListSize;//判断该商品是否有区间价格的9-13 >0 有  Use
     private String spider_Price;//产品单页中添加购物车的价格
     private int spider_changenum;//当前商品改变的数量 2017年11月22日
-    private double ts1;//购物车的总运费
-    private double old_price;//记录当前商品上次的价格，给下一次价格计算比较使用 Use 默认0
+    private double  ts1;//购物车的总运费
+    private double Old_price;//记录当前商品上次的价格，给下一次价格计算比较使用 Use 默认0
     private String method_day;//记录当前产品的价格的交期时间
     private int old_CountryId;//记录当前商品上次计算的时候的国家id
-    private double JTS1;//购物车 短交期或者免邮国家的TS1
+    private double  JTS1;//购物车 短交期或者免邮国家的TS1
     private String priceList;//该商品的价格区间  Use
     private int groupBuyId;//团购编号，也是团购标识，团购商品不执行降价逻辑:0非团购商品;>0团购商品
     private double gbPrice;//加入购物车时团购价格
@@ -64,30 +67,14 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
      * 店铺商品数量
      */
     private int shopCount;
-
-    public int getIsStockFlag() {
-        return isStockFlag;
-    }
-
-    public void setIsStockFlag(int isStockFlag) {
-        this.isStockFlag = isStockFlag;
-    }
-
-    public int getShopCount() {
-        return shopCount;
-    }
-
-    public void setShopCount(int shopCount) {
-        this.shopCount = shopCount;
-    }
-
-    public int getIsFreeShipProduct() {
-        return isFreeShipProduct;
-    }
-
-    public void setIsFreeShipProduct(int isFreeShipProduct) {
-        this.isFreeShipProduct = isFreeShipProduct;
-    }
+    /**
+     * businessPrice
+     */
+    private double businessPrice;
+    /**
+     * 1688的价格 为了产品单页计算利润使用
+     */
+    private String spiderWholePrice;
 
     /**
      * 该商品的最大交期
@@ -115,496 +102,14 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
      * 拿样最小moq
      */
     private int sampleMoq;
-
-    public double getSampleFee() {
-        return sampleFee;
-    }
-
-    public void setSampleFee(double sampleFee) {
-        this.sampleFee = sampleFee;
-    }
-
-    public int getSampleMoq() {
-        return sampleMoq;
-    }
-
-    public void setSampleMoq(int sampleMoq) {
-        this.sampleMoq = sampleMoq;
-    }
-
-    public String getShopId() {
-        return shopId;
-    }
-
-    public void setShopId(String shopId) {
-        this.shopId = shopId;
-    }
-
-    public String getComparePrices() {
-        return comparePrices;
-    }
-
-    public void setComparePrices(String comparePrices) {
-        this.comparePrices = comparePrices;
-    }
-
-    public String getProcessingTimeMin() {
-        return processingTimeMin;
-    }
-
-    public void setProcessingTimeMin(String processingTimeMin) {
-        this.processingTimeMin = processingTimeMin;
-    }
-
-    public String getProcessingTime() {
-        return processingTime;
-    }
-
-    public void setProcessingTime(String processingTime) {
-        this.processingTime = processingTime;
-    }
-
-    public String getPriceList() {
-        return priceList;
-    }
-
-    public void setPriceList(String priceList) {
-        this.priceList = priceList;
-    }
-
-    public double getJTS1() {
-        return JTS1;
-    }
-
-    public void setJTS1(double jTS1) {
-        JTS1 = jTS1;
-    }
-
-    public double getOld_price() {
-        return old_price;
-    }
-
-    public int getOld_CountryId() {
-        return old_CountryId;
-    }
-
-    public void setOld_CountryId(int old_CountryId) {
-        this.old_CountryId = old_CountryId;
-    }
-
-    public String getMethod_day() {
-        return method_day;
-    }
-
-    public void setMethod_day(String method_day) {
-        this.method_day = method_day;
-    }
-
-    public void setOld_price(double old_price) {
-        this.old_price = old_price;
-    }
-
-    public double getJes1() {
-        return jes1;
-    }
-
-    public void setJes1(double jes1) {
-        this.jes1 = jes1;
-    }
-
-    public double getTs1() {
-        return ts1;
-    }
-
-    public void setTs1(double ts1) {
-        this.ts1 = ts1;
-    }
-
-    public int getSpider_changenum() {
-        return spider_changenum;
-    }
-
-    public void setSpider_changenum(int changeNumber) {
-        this.spider_changenum = changeNumber;
-    }
-
-    public String getSpider_Price() {
-        return spider_Price;
-    }
-
-    public void setSpider_Price(String spider_Price) {
-        this.spider_Price = spider_Price;
-    }
-
-    public String getPriceListSize() {
-        return priceListSize;
-    }
-
-    public void setPriceListSize(String priceListSize) {
-        this.priceListSize = priceListSize;
-    }
-
-    public String getBizPriceDiscount() {
-        return bizPriceDiscount;
-    }
-
-    public void setBizPriceDiscount(String bizPriceDiscount) {
-        this.bizPriceDiscount = bizPriceDiscount;
-    }
-
-    public String getUrlMD5() {
-        return goodsUrlMD5;
-    }
-
-    public void setUrlMD5(String goodsUrlMD5) {
-        this.goodsUrlMD5 = goodsUrlMD5;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
-
-    public String getSeilUnit() {
-        return seilUnit;
-    }
-
-    public void setSeilUnit(String seilUnit) {
-        this.seilUnit = seilUnit;
-    }
-
-    public int getGoods_class() {
-        return goods_class;
-    }
-
-    public void setGoods_class(int goods_class) {
-        this.goods_class = goods_class;
-    }
-
-    public double getFreightByWeight() {
-        return freightByWeight;
-    }
-
-    public void setFreightByWeight(double freightByWeight) {
-        this.freightByWeight = freightByWeight;
-    }
-
-    public int getIsBattery() {
-        return isBattery;
-    }
-
-    public void setIsBattery(int isBattery) {
-        this.isBattery = isBattery;
-    }
-
-    public String getBulk_volume() {
-        return bulk_volume;
-    }
-
-    public void setBulk_volume(String bulk_volume) {
-        this.bulk_volume = bulk_volume;
-    }
-
-    public double getCategoryDiscountRate() {
-        return categoryDiscountRate;
-    }
-
-    public void setCategoryDiscountRate(double categoryDiscountRate) {
-        this.categoryDiscountRate = categoryDiscountRate;
-    }
-
-    public double getEs1() {
-        return es1;
-    }
-
-    public void setEs1(double es1) {
-        this.es1 = es1;
-    }
-
-    public int getFirstnumber() {
-        return firstnumber;
-    }
-
-    public void setFirstnumber(int firstnumber) {
-        this.firstnumber = firstnumber;
-    }
-
-    public double getFirstprice() {
-        return firstprice;
-    }
-
-    public void setFirstprice(double firstprice) {
-        this.firstprice = firstprice;
-    }
-
-    public double getFreeprice() {
-        return freeprice;
-    }
-
-    public void setFreeprice(double freeprice) {
-        this.freeprice = freeprice;
-    }
-
-    public double getFreight() {
-        return freight;
-    }
-
-    public void setFreight(double freight) {
-        this.freight = freight;
-    }
-
-    public double getFreight_es1() {
-        return freight_es1;
-    }
-
-    public void setFreight_es1(double freight_es1) {
-        this.freight_es1 = freight_es1;
-    }
-
-    public String getGuId() {
-        return guId;
-    }
-
-    public void setGuId(String guId) {
-        this.guId = guId;
-    }
-
-    public double getMethod_feight() {
-        return method_feight;
-    }
-
-    public void setMethod_feight(double method_feight) {
-        this.method_feight = method_feight;
-    }
-
-    public String getNorm_least() {
-        return norm_least;
-    }
-
-    public void setNorm_least(String norm_least) {
-        this.norm_least = norm_least;
-    }
-
-    public double getNotfreeprice() {
-        return notfreeprice;
-    }
-
-    public void setNotfreeprice(double notfreeprice) {
-        this.notfreeprice = notfreeprice;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
-    public int getoNum() {
-        return oNum;
-    }
-
-    public void setoNum(int oNum) {
-        this.oNum = oNum;
-    }
-
-    public String getPerWeight() {
-        return perWeight;
-    }
-
-    public void setPerWeight(String perWeight) {
-        this.perWeight = perWeight;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-    public double getPrice1() {
-        return price1;
-    }
-
-    public void setPrice1(double price1) {
-        this.price1 = price1;
-    }
-
-    public double getPrice2() {
-        return price2;
-    }
-
-    public void setPrice2(double price2) {
-        this.price2 = price2;
-    }
-
-    public double getPrice3() {
-        return price3;
-    }
-
-    public void setPrice3(double price3) {
-        this.price3 = price3;
-    }
-
-    public String getStartBizFactoryPrice() {
-        return startBizFactoryPrice;
-    }
-
-    public void setStartBizFactoryPrice(String startBizFactoryPrice) {
-        this.startBizFactoryPrice = startBizFactoryPrice;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public double getTotal_price() {
-        return total_price;
-    }
-
-    public void setTotal_price(double total_price) {
-        this.total_price = total_price;
-    }
-
-    public String getTotal_weight() {
-        return total_weight;
-    }
-
-    public void setTotal_weight(String total_weight) {
-        this.total_weight = total_weight;
-    }
-
-    public int getGroupBuyId() {
-        return groupBuyId;
-    }
-
-    public void setGroupBuyId(int groupBuyId) {
-        this.groupBuyId = groupBuyId;
-    }
-
-    public double getGbPrice() {
-        return gbPrice;
-    }
-
-    public void setGbPrice(double gbPrice) {
-        this.gbPrice = gbPrice;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{\"JTS1\":\"");
-        builder.append(JTS1);
-        builder.append("\", \"bizPriceDiscount\":\"");
-        builder.append(bizPriceDiscount);
-        builder.append("\", \"bulk_volume\":\"");
-        builder.append(bulk_volume);
-        builder.append("\", \"categoryDiscountRate\":\"");
-        builder.append(categoryDiscountRate);
-        builder.append("\", \"comparePrices\":\"");
-        builder.append(comparePrices == null ? "" : comparePrices);
-        builder.append("\", \"es1\":\"");
-        builder.append(es1);
-        builder.append("\", \"firstnumber\":\"");
-        builder.append(firstnumber);
-        builder.append("\", \"firstprice\":\"");
-        builder.append(firstprice);
-        builder.append("\", \"freeprice\":\"");
-        builder.append(freeprice);
-        builder.append("\", \"freight\":\"");
-        builder.append(freight);
-        builder.append("\", \"freightByWeight\":\"");
-        builder.append(freightByWeight);
-        builder.append("\", \"freight_es1\":\"");
-        builder.append(freight_es1);
-        builder.append("\", \"gbPrice\":\"");
-        builder.append(gbPrice);
-        builder.append("\", \"goods_class\":\"");
-        builder.append(goods_class);
-        builder.append("\", \"groupBuyId\":\"");
-        builder.append(groupBuyId);
-        builder.append("\", \"guId\":\"");
-        builder.append(guId);
-        builder.append("\", \"isBattery\":\"");
-        builder.append(isBattery);
-        builder.append("\", \"isFreeShipProduct\":\"");
-        builder.append(isFreeShipProduct);
-        builder.append("\", \"itemId\":\"");
-        builder.append(itemId);
-        builder.append("\", \"jes1\":\"");
-        builder.append(jes1);
-        builder.append("\", \"method_day\":\"");
-        builder.append(method_day);
-        builder.append("\", \"method_feight\":\"");
-        builder.append(method_feight);
-        builder.append("\", \"norm_least\":\"");
-        builder.append(norm_least);
-        builder.append("\", \"notfreeprice\":\"");
-        builder.append(notfreeprice);
-        builder.append("\", \"number\":\"");
-        builder.append(number);
-        builder.append("\", \"oNum\":\"");
-        builder.append(oNum);
-        builder.append("\", \"old_CountryId\":\"");
-        builder.append(old_CountryId);
-        builder.append("\", \"old_price\":\"");
-        builder.append(old_price);
-        builder.append("\", \"perWeight\":\"");
-        builder.append(perWeight);
-        builder.append("\", \"price\":\"");
-        builder.append(price);
-        builder.append("\", \"price1\":\"");
-        builder.append(price1);
-        builder.append("\", \"price2\":\"");
-        builder.append(price2);
-        builder.append("\", \"price3\":\"");
-        builder.append(price3);
-        builder.append("\", \"priceList\":\"");
-        builder.append(priceList == null ? "" : priceList);
-        builder.append("\", \"priceListSize\":\"");
-        builder.append(priceListSize);
-        builder.append("\", \"processingTime\":\"");
-        builder.append(processingTime);
-        builder.append("\", \"processingTimeMin\":\"");
-        builder.append(processingTimeMin == null ? "" : processingTimeMin);
-        builder.append("\", \"sampleFee\":\"");
-        builder.append(sampleFee);
-        builder.append("\", \"sampleMoq\":\"");
-        builder.append(sampleMoq);
-        builder.append("\", \"seilUnit\":\"");
-        builder.append(seilUnit);
-        builder.append("\", \"shopId\":\"");
-        builder.append(shopId == null ? "" : shopId);
-        builder.append("\", \"spider_Price\":\"");
-        builder.append(spider_Price);
-        builder.append("\", \"spider_changenum\":\"");
-        builder.append(spider_changenum);
-        builder.append("\", \"startBizFactoryPrice\":\"");
-        builder.append(startBizFactoryPrice == null ? "" : startBizFactoryPrice);
-        builder.append("\", \"state\":\"");
-        builder.append(state);
-        builder.append("\", \"total_price\":\"");
-        builder.append(total_price);
-        builder.append("\", \"total_weight\":\"");
-        builder.append(total_weight);
-        builder.append("\", \"ts1\":\"");
-        builder.append(ts1);
-        builder.append("\", \"urlMD5\":\"");
-        builder.append(goodsUrlMD5);
-        builder.append("\"}");
-        return builder.toString();
-    }
-
+    /**
+     * 1688区间价格
+     */
+    private String wholePrice;
+    /**
+     * step v1. @author: cjc @date：  16:45:46  TODO 产品表【promotion_flag=1】 是促销商品，不参加购物车降价。
+     */
+    private String promotionFlag;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -624,7 +129,6 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
         if (Double.compare(that.notfreeprice, notfreeprice) != 0) return false;
         if (number != that.number) return false;
         if (oNum != that.oNum) return false;
-        if (Double.compare(that.price1, price1) != 0) return false;
         if (Double.compare(that.price2, price2) != 0) return false;
         if (Double.compare(that.price3, price3) != 0) return false;
         if (state != that.state) return false;
@@ -634,7 +138,7 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
         if (goods_class != that.goods_class) return false;
         if (spider_changenum != that.spider_changenum) return false;
         if (Double.compare(that.ts1, ts1) != 0) return false;
-        if (Double.compare(that.old_price, old_price) != 0) return false;
+        if (Double.compare(that.Old_price, Old_price) != 0) return false;
         if (old_CountryId != that.old_CountryId) return false;
         if (Double.compare(that.JTS1, JTS1) != 0) return false;
         if (guId != null ? !guId.equals(that.guId) : that.guId != null) return false;
@@ -687,8 +191,6 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
         result = 31 * result + oNum;
         result = 31 * result + (perWeight != null ? perWeight.hashCode() : 0);
         result = 31 * result + (price != null ? price.hashCode() : 0);
-        temp = Double.doubleToLongBits(price1);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(price2);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(price3);
@@ -712,7 +214,7 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
         result = 31 * result + spider_changenum;
         temp = Double.doubleToLongBits(ts1);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(old_price);
+        temp = Double.doubleToLongBits(Old_price);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (method_day != null ? method_day.hashCode() : 0);
         result = 31 * result + old_CountryId;
@@ -721,60 +223,5 @@ public class GoodsCarActiveBean implements Serializable, Cloneable {
         result = 31 * result + (priceList != null ? priceList.hashCode() : 0);
         result = 31 * result + (processingTime != null ? processingTime.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        GoodsCarActiveBean goodsCarActiveBean = new GoodsCarActiveBean();
-        goodsCarActiveBean.setIsFreeShipProduct(this.isFreeShipProduct);
-        goodsCarActiveBean.setSampleFee(this.sampleFee);
-        goodsCarActiveBean.setSampleMoq(this.sampleMoq);
-        goodsCarActiveBean.setShopId(this.shopId);
-        goodsCarActiveBean.setComparePrices(this.comparePrices);
-        goodsCarActiveBean.setProcessingTimeMin(this.processingTimeMin);
-        goodsCarActiveBean.setProcessingTime(this.processingTime);
-        goodsCarActiveBean.setPriceList(this.priceList);
-        goodsCarActiveBean.setJTS1(JTS1);
-        goodsCarActiveBean.setOld_CountryId(this.old_CountryId);
-        goodsCarActiveBean.setMethod_day(this.method_day);
-        goodsCarActiveBean.setOld_price(old_price);
-        goodsCarActiveBean.setJes1(this.jes1);
-        goodsCarActiveBean.setTs1(this.ts1);
-        goodsCarActiveBean.setSpider_changenum(this.spider_changenum);
-        goodsCarActiveBean.setSpider_Price(this.spider_Price);
-        goodsCarActiveBean.setPriceListSize(this.priceListSize);
-        goodsCarActiveBean.setBizPriceDiscount(this.bizPriceDiscount);
-        goodsCarActiveBean.setUrlMD5(this.goodsUrlMD5);
-        goodsCarActiveBean.setItemId(this.itemId);
-        goodsCarActiveBean.setSeilUnit(this.seilUnit);
-        goodsCarActiveBean.setGoods_class(this.goods_class);
-        goodsCarActiveBean.setFreightByWeight(this.freightByWeight);
-        goodsCarActiveBean.setIsBattery(this.isBattery);
-        goodsCarActiveBean.setBulk_volume(this.bulk_volume);
-        goodsCarActiveBean.setCategoryDiscountRate(this.categoryDiscountRate);
-        goodsCarActiveBean.setEs1(this.es1);
-        goodsCarActiveBean.setFirstnumber(this.firstnumber);
-        goodsCarActiveBean.setFirstprice(this.firstprice);
-        goodsCarActiveBean.setFreeprice(this.freeprice);
-        goodsCarActiveBean.setFreight(this.freight);
-        goodsCarActiveBean.setFreight_es1(this.freight_es1);
-        goodsCarActiveBean.setGuId(this.guId);
-        goodsCarActiveBean.setMethod_feight(this.method_feight);
-        goodsCarActiveBean.setNorm_least(this.norm_least);
-        goodsCarActiveBean.setNotfreeprice(this.notfreeprice);
-        goodsCarActiveBean.setNumber(this.number);
-        goodsCarActiveBean.setoNum(this.oNum);
-        goodsCarActiveBean.setPerWeight(this.perWeight);
-        goodsCarActiveBean.setPrice(this.price);
-        goodsCarActiveBean.setPrice1(this.price1);
-        goodsCarActiveBean.setPrice2(this.price2);
-        goodsCarActiveBean.setPrice3(this.price3);
-        goodsCarActiveBean.setStartBizFactoryPrice(this.startBizFactoryPrice);
-        goodsCarActiveBean.setState(this.state);
-        goodsCarActiveBean.setTotal_price(this.total_price);
-        goodsCarActiveBean.setTotal_weight(this.total_weight);
-        goodsCarActiveBean.setGroupBuyId(this.groupBuyId);
-        goodsCarActiveBean.setGbPrice(this.gbPrice);
-        return goodsCarActiveBean;
     }
 }

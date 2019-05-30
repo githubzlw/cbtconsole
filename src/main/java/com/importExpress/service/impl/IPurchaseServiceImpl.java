@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.cbt.warehouse.pojo.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,6 @@ import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
-import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
-import com.cbt.warehouse.pojo.OrderInfoCountPojo;
-import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -1039,6 +1036,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				String address="";
 				//获取商品供应商直发地址
 				getStraightAddress(shop_id_1688,map,address,straight_flag);
+				//获取供应商名字和供应商评级
+				getShopInfo(map);
 				//将值填入bean中
 				getBeanValue(map, purchaseBean);
 //				purchaseBean.setStraight_flag(straight_flag);
@@ -1219,6 +1218,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 					purchaseBean.setShopFlag("1");
 				}else{
 					purchaseBean.setShopFlag("0");
+				}
+				returndisplay re=this.pruchaseMapper.getApplyTime(purchaseBean.getOrderNo(),purchaseBean.getGoods_pid());
+				if (re !=null) {
+					String StDate = re.getApplyUser() + "于" + re.getApplyTime() + "退货";
+					purchaseBean.setReturnTime(StDate);
 				}
 				pbList.add(purchaseBean);
 				total = Integer.parseInt(map.get("totalCount")==null?"0": String.valueOf(map.get("totalCount")));
@@ -1456,8 +1460,26 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("quality",quality);
 		map.put("straight_flag",String.valueOf(straight_flag));
 	}
-	
-	
+
+	/**
+	 * 获取供应商名字和供应商评级
+	 * @param map
+	 */
+	public void getShopInfo(Map<String,String> map){
+		String shopName="";
+		String supplyGrade="";
+
+		Map<String, String> shopMap=pruchaseMapper.getShopInfo(String.valueOf(map.get("goodsShop")));
+		if(shopMap != null){
+            shopName=shopMap.get("shop_name");
+            supplyGrade=shopMap.get("supply_grade");
+		}
+		map.put("shopName",shopName);
+		map.put("supplyGrade",supplyGrade);
+
+	}
+
+
 	private void setInvoiceVaue(PurchasesBean purchaseBean, String fileByOrderid) {
 		if (fileByOrderid == null || fileByOrderid.length() < 10) {
 			purchaseBean.setInvoice(0);
@@ -1895,6 +1917,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		if (!"  ".equals(child_order_no1) && child_order_no1 != null && child_order_no1.length() > 0) {
 			purchaseBean.setChild_order_no(child_order_no1);
 		}
+        purchaseBean.setShopName(map.get("shopName"));
+        purchaseBean.setShopGrade(map.get("supplyGrade"));
+		purchaseBean.setMorder(String.valueOf(map.get("morder")));
 	}
 
 	@Override

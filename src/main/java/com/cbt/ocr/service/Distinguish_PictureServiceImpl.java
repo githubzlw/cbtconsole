@@ -62,6 +62,33 @@ public class Distinguish_PictureServiceImpl implements Distinguish_PictureServic
 		return distinguish_PictureDao.FindRecognition_delete_count(map);
 	}
 
+    @Override
+    public List<CustomGoods> deleteAllPriceByAdmname(String admName) {
+		try {
+			List<CustomGoods> list=this.distinguish_PictureDao.deleteAllPriceByAdmname(admName);
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public int updateSomePirctu_risdelete_dateById(List<CustomGoods> customGoodsList) {
+		int ret=0;
+		try {
+		for (int i=0;i<customGoodsList.size();i++){
+		ret+=this.distinguish_PictureDao.updateSomePirctu_risdelete_dateById(customGoodsList.get(i).getId());
+
+		}
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+	}
+
 	@Override
 	public List<CustomGoods> FindRecognition_delete_details(Map<String, Object> map) {
 		List<CustomGoods> list=distinguish_PictureDao.FindRecognition_delete_details(map);

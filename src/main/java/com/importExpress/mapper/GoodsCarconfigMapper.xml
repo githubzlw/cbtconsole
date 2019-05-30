@@ -11,17 +11,17 @@
     <result column="save_freight" property="saveFreight" jdbcType="DOUBLE" />
     <result column="addFlag" property="addflag" jdbcType="INTEGER" />
     <result column="userCookieId" property="usercookieid" jdbcType="VARCHAR" />
-    <result column="sum_type_price" property="sumTypePrice" jdbcType="VARCHAR" />
-    <result column="total_freight" property="totalFreight" jdbcType="DOUBLE" />
     <result column="updateTime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="total_freight" property="totalFreight" jdbcType="DOUBLE" />
+    <result column="sum_type_price" property="sumTypePrice" jdbcType="VARCHAR" />
     <result column="fastShipBalance" property="fastshipbalance" jdbcType="DOUBLE" />
-    <result column="usermark" property="usermark" jdbcType="VARCHAR" />
+    <result column="flag" property="flag" jdbcType="INTEGER" />
+    <result column="usermark" property="usermark" jdbcType="INTEGER" />
     <result column="needCheck" property="needcheck" jdbcType="INTEGER" />
-    <result column="is_new" property="isNew" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.importExpress.pojo.GoodsCarconfigWithBLOBs" extends="BaseResultMap" >
-    <result column="shopCarShowinfo" property="shopcarshowinfo" jdbcType="LONGVARCHAR" />
     <result column="shopCarinfo" property="shopcarinfo" jdbcType="LONGVARCHAR" />
+    <result column="shopCarShowinfo" property="shopcarshowinfo" jdbcType="LONGVARCHAR" />
     <result column="saveForLaterShowinfo" property="saveforlatershowinfo" jdbcType="LONGVARCHAR" />
     <result column="saveForLaterinfo" property="saveforlaterinfo" jdbcType="LONGVARCHAR" />
     <result column="buyForMeCarConfig" property="buyformecarconfig" jdbcType="LONGVARCHAR" />
@@ -86,20 +86,20 @@
   </sql>
   <sql id="Base_Column_List" >
     id, userid, shippingname, shippingcost, shippingdays, changeexpress, save_freight, 
-    addFlag, userCookieId, sum_type_price, total_freight, updateTime, fastShipBalance, 
-    usermark, needCheck
+    addFlag, userCookieId, updateTime, total_freight, sum_type_price, fastShipBalance, 
+    flag, usermark, needCheck
   </sql>
   <sql id="Blob_Column_List" >
-    shopCarShowinfo, shopCarinfo, saveForLaterShowinfo, saveForLaterinfo, buyForMeCarConfig
+    shopCarinfo, shopCarShowinfo, saveForLaterShowinfo, saveForLaterinfo, buyForMeCarConfig
   </sql>
   <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.importExpress.pojo.GoodsCarconfigExample" >
     select
     <if test="distinct" >
       distinct
     </if>
-    <include refid="Base_Column_List" />
+    userid,userCookieId
     ,
-    <include refid="Blob_Column_List" />
+    buyForMeCarConfig
     from goods_carconfig
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -128,24 +128,8 @@
     ,
     <include refid="Blob_Column_List" />
     from goods_carconfig
-    where userid = #{id,jdbcType=INTEGER}
+    where userid = #{userId,jdbcType=INTEGER}
   </select>
-
-  <select id="queryByIsNew" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from goods_carconfig
-    where is_new = 1
-    <if test=" userId > 0 ">
-      and userid = #{userId,jdbcType=INTEGER}
-    </if>
-    <if test=" userId == 0 ">
-      and userid > 0
-    </if>
-  </select>
-
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from goods_carconfig
     where id = #{id,jdbcType=INTEGER}
@@ -160,19 +144,19 @@
     insert into goods_carconfig (id, userid, shippingname, 
       shippingcost, shippingdays, changeexpress, 
       save_freight, addFlag, userCookieId, 
-      sum_type_price, total_freight, updateTime, 
-      fastShipBalance, usermark, needCheck, 
-      shopCarShowinfo, shopCarinfo, saveForLaterShowinfo, 
-      saveForLaterinfo, buyForMeCarConfig
-      )
+      updateTime, total_freight, sum_type_price, 
+      fastShipBalance, flag, usermark, 
+      needCheck, shopCarinfo, shopCarShowinfo, 
+      saveForLaterShowinfo, saveForLaterinfo, 
+      buyForMeCarConfig)
     values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{shippingname,jdbcType=VARCHAR}, 
       #{shippingcost,jdbcType=DOUBLE}, #{shippingdays,jdbcType=VARCHAR}, #{changeexpress,jdbcType=INTEGER}, 
       #{saveFreight,jdbcType=DOUBLE}, #{addflag,jdbcType=INTEGER}, #{usercookieid,jdbcType=VARCHAR}, 
-      #{sumTypePrice,jdbcType=VARCHAR}, #{totalFreight,jdbcType=DOUBLE}, #{updatetime,jdbcType=TIMESTAMP}, 
-      #{fastshipbalance,jdbcType=DOUBLE}, #{usermark,jdbcType=VARCHAR}, #{needcheck,jdbcType=INTEGER}, 
-      #{shopcarshowinfo,jdbcType=LONGVARCHAR}, #{shopcarinfo,jdbcType=LONGVARCHAR}, #{saveforlatershowinfo,jdbcType=LONGVARCHAR}, 
-      #{saveforlaterinfo,jdbcType=LONGVARCHAR}, #{buyformecarconfig,jdbcType=LONGVARCHAR}
-      )
+      #{updatetime,jdbcType=TIMESTAMP}, #{totalFreight,jdbcType=DOUBLE}, #{sumTypePrice,jdbcType=VARCHAR}, 
+      #{fastshipbalance,jdbcType=DOUBLE}, #{flag,jdbcType=INTEGER}, #{usermark,jdbcType=INTEGER}, 
+      #{needcheck,jdbcType=INTEGER}, #{shopcarinfo,jdbcType=LONGVARCHAR}, #{shopcarshowinfo,jdbcType=LONGVARCHAR}, 
+      #{saveforlatershowinfo,jdbcType=LONGVARCHAR}, #{saveforlaterinfo,jdbcType=LONGVARCHAR}, 
+      #{buyformecarconfig,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.importExpress.pojo.GoodsCarconfigWithBLOBs" >
     insert into goods_carconfig
@@ -204,17 +188,20 @@
       <if test="usercookieid != null" >
         userCookieId,
       </if>
-      <if test="sumTypePrice != null" >
-        sum_type_price,
+      <if test="updatetime != null" >
+        updateTime,
       </if>
       <if test="totalFreight != null" >
         total_freight,
       </if>
-      <if test="updatetime != null" >
-        updateTime,
+      <if test="sumTypePrice != null" >
+        sum_type_price,
       </if>
       <if test="fastshipbalance != null" >
         fastShipBalance,
+      </if>
+      <if test="flag != null" >
+        flag,
       </if>
       <if test="usermark != null" >
         usermark,
@@ -222,11 +209,11 @@
       <if test="needcheck != null" >
         needCheck,
       </if>
-      <if test="shopcarshowinfo != null" >
-        shopCarShowinfo,
-      </if>
       <if test="shopcarinfo != null" >
         shopCarinfo,
+      </if>
+      <if test="shopcarshowinfo != null" >
+        shopCarShowinfo,
       </if>
       <if test="saveforlatershowinfo != null" >
         saveForLaterShowinfo,
@@ -266,29 +253,32 @@
       <if test="usercookieid != null" >
         #{usercookieid,jdbcType=VARCHAR},
       </if>
-      <if test="sumTypePrice != null" >
-        #{sumTypePrice,jdbcType=VARCHAR},
+      <if test="updatetime != null" >
+        #{updatetime,jdbcType=TIMESTAMP},
       </if>
       <if test="totalFreight != null" >
         #{totalFreight,jdbcType=DOUBLE},
       </if>
-      <if test="updatetime != null" >
-        #{updatetime,jdbcType=TIMESTAMP},
+      <if test="sumTypePrice != null" >
+        #{sumTypePrice,jdbcType=VARCHAR},
       </if>
       <if test="fastshipbalance != null" >
         #{fastshipbalance,jdbcType=DOUBLE},
       </if>
+      <if test="flag != null" >
+        #{flag,jdbcType=INTEGER},
+      </if>
       <if test="usermark != null" >
-        #{usermark,jdbcType=VARCHAR},
+        #{usermark,jdbcType=INTEGER},
       </if>
       <if test="needcheck != null" >
         #{needcheck,jdbcType=INTEGER},
       </if>
-      <if test="shopcarshowinfo != null" >
-        #{shopcarshowinfo,jdbcType=LONGVARCHAR},
-      </if>
       <if test="shopcarinfo != null" >
         #{shopcarinfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="shopcarshowinfo != null" >
+        #{shopcarshowinfo,jdbcType=LONGVARCHAR},
       </if>
       <if test="saveforlatershowinfo != null" >
         #{saveforlatershowinfo,jdbcType=LONGVARCHAR},
@@ -337,29 +327,32 @@
       <if test="record.usercookieid != null" >
         userCookieId = #{record.usercookieid,jdbcType=VARCHAR},
       </if>
-      <if test="record.sumTypePrice != null" >
-        sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
+      <if test="record.updatetime != null" >
+        updateTime = #{record.updatetime,jdbcType=TIMESTAMP},
       </if>
       <if test="record.totalFreight != null" >
         total_freight = #{record.totalFreight,jdbcType=DOUBLE},
       </if>
-      <if test="record.updatetime != null" >
-        updateTime = #{record.updatetime,jdbcType=TIMESTAMP},
+      <if test="record.sumTypePrice != null" >
+        sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
       </if>
       <if test="record.fastshipbalance != null" >
         fastShipBalance = #{record.fastshipbalance,jdbcType=DOUBLE},
       </if>
+      <if test="record.flag != null" >
+        flag = #{record.flag,jdbcType=INTEGER},
+      </if>
       <if test="record.usermark != null" >
-        usermark = #{record.usermark,jdbcType=VARCHAR},
+        usermark = #{record.usermark,jdbcType=INTEGER},
       </if>
       <if test="record.needcheck != null" >
         needCheck = #{record.needcheck,jdbcType=INTEGER},
       </if>
-      <if test="record.shopcarshowinfo != null" >
-        shopCarShowinfo = #{record.shopcarshowinfo,jdbcType=LONGVARCHAR},
-      </if>
       <if test="record.shopcarinfo != null" >
         shopCarinfo = #{record.shopcarinfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.shopcarshowinfo != null" >
+        shopCarShowinfo = #{record.shopcarshowinfo,jdbcType=LONGVARCHAR},
       </if>
       <if test="record.saveforlatershowinfo != null" >
         saveForLaterShowinfo = #{record.saveforlatershowinfo,jdbcType=LONGVARCHAR},
@@ -386,14 +379,15 @@
       save_freight = #{record.saveFreight,jdbcType=DOUBLE},
       addFlag = #{record.addflag,jdbcType=INTEGER},
       userCookieId = #{record.usercookieid,jdbcType=VARCHAR},
-      sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
-      total_freight = #{record.totalFreight,jdbcType=DOUBLE},
       updateTime = #{record.updatetime,jdbcType=TIMESTAMP},
+      total_freight = #{record.totalFreight,jdbcType=DOUBLE},
+      sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
       fastShipBalance = #{record.fastshipbalance,jdbcType=DOUBLE},
-      usermark = #{record.usermark,jdbcType=VARCHAR},
+      flag = #{record.flag,jdbcType=INTEGER},
+      usermark = #{record.usermark,jdbcType=INTEGER},
       needCheck = #{record.needcheck,jdbcType=INTEGER},
-      shopCarShowinfo = #{record.shopcarshowinfo,jdbcType=LONGVARCHAR},
       shopCarinfo = #{record.shopcarinfo,jdbcType=LONGVARCHAR},
+      shopCarShowinfo = #{record.shopcarshowinfo,jdbcType=LONGVARCHAR},
       saveForLaterShowinfo = #{record.saveforlatershowinfo,jdbcType=LONGVARCHAR},
       saveForLaterinfo = #{record.saveforlaterinfo,jdbcType=LONGVARCHAR},
       buyForMeCarConfig = #{record.buyformecarconfig,jdbcType=LONGVARCHAR}
@@ -412,11 +406,12 @@
       save_freight = #{record.saveFreight,jdbcType=DOUBLE},
       addFlag = #{record.addflag,jdbcType=INTEGER},
       userCookieId = #{record.usercookieid,jdbcType=VARCHAR},
-      sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
-      total_freight = #{record.totalFreight,jdbcType=DOUBLE},
       updateTime = #{record.updatetime,jdbcType=TIMESTAMP},
+      total_freight = #{record.totalFreight,jdbcType=DOUBLE},
+      sum_type_price = #{record.sumTypePrice,jdbcType=VARCHAR},
       fastShipBalance = #{record.fastshipbalance,jdbcType=DOUBLE},
-      usermark = #{record.usermark,jdbcType=VARCHAR},
+      flag = #{record.flag,jdbcType=INTEGER},
+      usermark = #{record.usermark,jdbcType=INTEGER},
       needCheck = #{record.needcheck,jdbcType=INTEGER}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
@@ -449,29 +444,32 @@
       <if test="usercookieid != null" >
         userCookieId = #{usercookieid,jdbcType=VARCHAR},
       </if>
-      <if test="sumTypePrice != null" >
-        sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
+      <if test="updatetime != null" >
+        updateTime = #{updatetime,jdbcType=TIMESTAMP},
       </if>
       <if test="totalFreight != null" >
         total_freight = #{totalFreight,jdbcType=DOUBLE},
       </if>
-      <if test="updatetime != null" >
-        updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      <if test="sumTypePrice != null" >
+        sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
       </if>
       <if test="fastshipbalance != null" >
         fastShipBalance = #{fastshipbalance,jdbcType=DOUBLE},
       </if>
+      <if test="flag != null" >
+        flag = #{flag,jdbcType=INTEGER},
+      </if>
       <if test="usermark != null" >
-        usermark = #{usermark,jdbcType=VARCHAR},
+        usermark = #{usermark,jdbcType=INTEGER},
       </if>
       <if test="needcheck != null" >
         needCheck = #{needcheck,jdbcType=INTEGER},
       </if>
-      <if test="shopcarshowinfo != null" >
-        shopCarShowinfo = #{shopcarshowinfo,jdbcType=LONGVARCHAR},
-      </if>
       <if test="shopcarinfo != null" >
         shopCarinfo = #{shopcarinfo,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="shopcarshowinfo != null" >
+        shopCarShowinfo = #{shopcarshowinfo,jdbcType=LONGVARCHAR},
       </if>
       <if test="saveforlatershowinfo != null" >
         saveForLaterShowinfo = #{saveforlatershowinfo,jdbcType=LONGVARCHAR},
@@ -495,14 +493,15 @@
       save_freight = #{saveFreight,jdbcType=DOUBLE},
       addFlag = #{addflag,jdbcType=INTEGER},
       userCookieId = #{usercookieid,jdbcType=VARCHAR},
-      sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
-      total_freight = #{totalFreight,jdbcType=DOUBLE},
       updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      total_freight = #{totalFreight,jdbcType=DOUBLE},
+      sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
       fastShipBalance = #{fastshipbalance,jdbcType=DOUBLE},
-      usermark = #{usermark,jdbcType=VARCHAR},
+      flag = #{flag,jdbcType=INTEGER},
+      usermark = #{usermark,jdbcType=INTEGER},
       needCheck = #{needcheck,jdbcType=INTEGER},
-      shopCarShowinfo = #{shopcarshowinfo,jdbcType=LONGVARCHAR},
       shopCarinfo = #{shopcarinfo,jdbcType=LONGVARCHAR},
+      shopCarShowinfo = #{shopcarshowinfo,jdbcType=LONGVARCHAR},
       saveForLaterShowinfo = #{saveforlatershowinfo,jdbcType=LONGVARCHAR},
       saveForLaterinfo = #{saveforlaterinfo,jdbcType=LONGVARCHAR},
       buyForMeCarConfig = #{buyformecarconfig,jdbcType=LONGVARCHAR}
@@ -518,19 +517,32 @@
       save_freight = #{saveFreight,jdbcType=DOUBLE},
       addFlag = #{addflag,jdbcType=INTEGER},
       userCookieId = #{usercookieid,jdbcType=VARCHAR},
-      sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
-      total_freight = #{totalFreight,jdbcType=DOUBLE},
       updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      total_freight = #{totalFreight,jdbcType=DOUBLE},
+      sum_type_price = #{sumTypePrice,jdbcType=VARCHAR},
       fastShipBalance = #{fastshipbalance,jdbcType=DOUBLE},
-      usermark = #{usermark,jdbcType=VARCHAR},
+      flag = #{flag,jdbcType=INTEGER},
+      usermark = #{usermark,jdbcType=INTEGER},
       needCheck = #{needcheck,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
+  <select id="queryByIsNew" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods_carconfig
+    where is_new = 1
+    <if test=" userId > 0 ">
+      and userid = #{userId,jdbcType=INTEGER}
+    </if>
+    <if test=" userId == 0 ">
+      and userid > 0
+    </if>
+  </select>
   <update id="updateByIdAndUserId">
-    update goods_carconfig
-    set is_new = 0,updateTime = now()
-    where id = #{id,jdbcType=INTEGER} and userid = #{userId,jdbcType=INTEGER}
+  update goods_carconfig
+  set is_new = 0,updateTime = now()
+  where id = #{id,jdbcType=INTEGER} and userid = #{userId,jdbcType=INTEGER}
   </update>
-
 </mapper>

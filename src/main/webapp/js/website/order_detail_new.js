@@ -1302,7 +1302,7 @@ function openorderaddress() {
 // 				}
 // 				$("#ordercountry").val($("#ordercountry_value").val());
 // 			});
-    $("#ordercountry").val($("#ordercountry_value").val());
+   // $("#ordercountry").val($("#ordercountry_value").val());
 }
 // 直接抵扣赠送运费操作
 function refreight() {

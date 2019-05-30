@@ -36,6 +36,9 @@
     <select id="getShopIdByGoodsPid" resultType="java.util.Map">
         SELECT a.addr AS address,IFNULL(b.level,'') AS level,IFNULL(b.quality_avg,'') AS quality_avg FROM shop_addr_spider a LEFT JOIN supplier_scoring b ON a.shop_id=b.shop_id WHERE a.shop_id=#{shop_id} limit 1
     </select>
+    <select id="getShopInfo" resultType="java.util.Map">
+        SELECT shop_name,supply_grade FROM  shop_qualifications where shop_id=#{shop_id} limit 1
+    </select>
     <select id="getLevelBySid" resultType="java.util.Map">
         select distinct a.address,s.level from ali_info_data a left join supplier_scoring s on a.shop_id=s.shop_id
         where a.shop_id=#{sid} AND a.address IS NOT NULL AND a.address&lt;>'' limit 1
@@ -728,8 +731,10 @@ where od.purchase_state = 1 and ops.purchase_state =1 and oi.state in (1,2,3,4,5
         AND o.state>0 AND o.state<![CDATA[<]]>6 AND od.checked=1
     </select>
     <update id="updateReplenishmentState">
-        update order_product_source set last_tb_1688_itemid = #{tb_1688_itemid},is_replenishment=1
-        where od_id=#{odid} and orderid=#{orderid}
+        update order_product_source a,order_details b set
+        a.last_tb_1688_itemid = #{tb_1688_itemid},a.is_replenishment=1,
+        a.purchase_state = case when b.state= 1 then 6 else 3 end
+        where a.od_id=#{odid} and a.orderid=#{orderid} and a.od_id=b.id and a.orderid=b.orderid
     </update>
     <select id="getIsOfflinepurchase" resultType="com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo">
         select a.shipno,a.createtime,b.admName as admuserid,a.goods_p_url,a.tb_orderid from offline_purchase_records a inner join admuser b on a.admuserid=b.id where a.orderid=#{orderid} and a.goodsid=#{goodsid}

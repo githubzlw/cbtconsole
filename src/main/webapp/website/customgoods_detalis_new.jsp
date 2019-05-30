@@ -51,6 +51,7 @@
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
             closeNewAliPidDlg('close');
+            closeMultiFileDialog();
         });
 
         function relieveDisabled(obj) {
@@ -70,7 +71,7 @@
                 html5Upload: false,
                 upBtnText: "上传",
                 upMultiple: 1,
-                upImgUrl: "/cbtconsole/editc/uploads?pid=${goods.pid}",
+                upImgUrl: "/cbtconsole/editc/xheditorUploads?pid=${goods.pid}",
                 upImgExt: "jpg,jpeg,gif,png"
             });
         }
@@ -276,7 +277,7 @@
                             if (tempJson[key] != "") {
                                 imgJson[key] = tempJson[key];
                                 //imgs += ";" + tempJson[key];
-                                img_tag += '<img style="width:78%;" src="'+tempJson[key]+'" />';
+                                img_tag += '<img style="width:78%;" src="' + tempJson[key] + '" />';
 
                             }
                         }
@@ -382,7 +383,7 @@
             if (mainImg == "" || mainImg == null) {
                 showMessage("设置封面图失败,请重新设置");
                 return;
-            }else if(mainImg == "99"){
+            } else if (mainImg == "99") {
                 mainImg = "";
             }
 
@@ -394,7 +395,7 @@
                 return;
             }
             var bizPrice = $("#biz_price").val();
-            if(bizPrice == null || bizPrice == "" || bizPrice == 0){
+            if (bizPrice == null || bizPrice == "" || bizPrice == 0) {
                 bizPrice = "";
             }
             var wprice = "";
@@ -496,15 +497,15 @@
                         "content": content,
                         "sku": singSkus.substring(1),
                         "wprice": wprice.substring(1),
-                        "feePrice":feePrice.substring(1),
+                        "feePrice": feePrice.substring(1),
                         "rangePrice": range_price,
                         "bizPrice": bizPrice,
                         "goodsPrice": goodsPriceVal,
                         "sellUtil": sellUtil,
                         "typeRepalceIds": typeRepalceIds.substring(1),
                         "typeDeleteIds": typeDeleteIds.substring(1),
-                        "wordSizeInfo":wordSizeInfo,
-                        "mainImg":mainImg
+                        "wordSizeInfo": wordSizeInfo,
+                        "mainImg": mainImg
                     },
                     success: function (data) {
                         $('.mask').hide();
@@ -572,12 +573,12 @@
             return info.substring(1);
         }
 
-        function setGoodsValid(pid,type) {
+        function setGoodsValid(pid, type) {
             if (pid == "" || pid == "0" || pid == 0) {
                 showMessage("pid为空");
                 return;
             }
-            if(type > 0 ){
+            if (type > 0) {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -588,9 +589,9 @@
                     success: function (data) {
                         if (data.ok) {
                             showMessage("执行成功，即将刷新页面");
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 1500);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1500);
                         } else {
                             $.messager.alert("提醒", data.message, "error");
                         }
@@ -599,7 +600,7 @@
                         $.messager.alert("提醒", "保存错误，请联系管理员", "error");
                     }
                 });
-            }else{
+            } else {
                 $.messager.prompt('提示', '请输入下架原因:', function (rs) {
                     if (rs) {
                         $.ajax({
@@ -613,12 +614,12 @@
                                 if (data.ok) {
                                     $.messager.confirm('提示', '此商品为热销有库存商品，确定要下架此商品吗？', function (rs) {
                                         if (rs) {
-                                            doGoodsUnValid(pid, 1,rs);
+                                            doGoodsUnValid(pid, 1, rs);
                                         }
                                     });
                                 } else {
                                     if (data.total == 1) {
-                                        doGoodsUnValid(pid,0,rs);
+                                        doGoodsUnValid(pid, 0, rs);
                                     } else {
                                         $.messager.alert("提醒", data.message, "error");
                                     }
@@ -634,7 +635,7 @@
             }
         }
 
-        function doGoodsUnValid(pid,tip,rs) {
+        function doGoodsUnValid(pid, tip, rs) {
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -860,55 +861,55 @@
             $("#similar_pids").val("");
         }
 
-        function closeRemark(){
+        function closeRemark() {
             $('#review_dlg').dialog('close');
             $("#review_remark").val("");
         }
 
-        function openEditReview(country,review_remark,review_score,review_flag,createtime,pid){
+        function openEditReview(country, review_remark, review_score, review_flag, createtime, pid) {
             $("#oldCreateTime").val(createtime);
             $("#goods_pid").val(pid);
 
-            $('#edit_score').combobox('setValue',review_score);
-            $('#editcountry').combobox('setValue',country);
+            $('#edit_score').combobox('setValue', review_score);
+            $('#editcountry').combobox('setValue', country);
             $("#edit_remark").val(review_remark);
-            if(review_flag == "不显示"){
-                review_flag="1";
-            }else if(review_flag == "显示"){
-                review_flag="0";
+            if (review_flag == "不显示") {
+                review_flag = "1";
+            } else if (review_flag == "显示") {
+                review_flag = "0";
             }
-            $('#update_flag').combobox('setValue',review_flag);
+            $('#update_flag').combobox('setValue', review_flag);
             $('#update_review_dlg').dialog('open');
         }
 
-        function closeUpdateRemark(){
+        function closeUpdateRemark() {
             $("#oldCreateTime").val("");
             $("#goods_pid").val("");
 
-            $('#edit_score').combobox('setValue',"1");
-            $('#editcountry').combobox('setValue',"country");
+            $('#edit_score').combobox('setValue', "1");
+            $('#editcountry').combobox('setValue', "country");
             $("#edit_remark").val("");
-            $('#update_flag').combobox('setValue',"0");
+            $('#update_flag').combobox('setValue', "0");
             $('#update_review_dlg').dialog('close');
         }
 
-        function updateReviewRemark(){
-           var oldCreateTime=$("#oldCreateTime").val();
-            var goods_pid=$("#goods_pid").val();
+        function updateReviewRemark() {
+            var oldCreateTime = $("#oldCreateTime").val();
+            var goods_pid = $("#goods_pid").val();
 
-            var edit_remark=$("#edit_remark").val();
-            var editcountry=$('#editcountry').combobox('getValue');
-            var edit_score=$("#edit_score").val();
-            var update_flag=$('#update_flag').combobox('getValue');
-            if(edit_remark ==null ||edit_remark ==""){
+            var edit_remark = $("#edit_remark").val();
+            var editcountry = $('#editcountry').combobox('getValue');
+            var edit_score = $("#edit_score").val();
+            var update_flag = $('#update_flag').combobox('getValue');
+            if (edit_remark == null || edit_remark == "") {
                 showMessage("请输入商品评论");
                 return false;
             }
-            if(editcountry ==null ||editcountry =="" || editcountry=="country"){
+            if (editcountry == null || editcountry == "" || editcountry == "country") {
                 showMessage("请选择国家");
                 return false;
             }
-            if(edit_score ==null ||edit_score ==""){
+            if (edit_score == null || edit_score == "") {
                 showMessage("请选择评分");
                 return false;
             }
@@ -918,20 +919,20 @@
                 url: '/cbtconsole/editc/updateReviewRemark',
                 data: {
                     "edit_remark": edit_remark,
-                    "editcountry":editcountry,
-                    "edit_score":edit_score,
-                    "update_flag":update_flag,
-                    "oldCreateTime":oldCreateTime,
-                    "goods_pid":goods_pid
+                    "editcountry": editcountry,
+                    "edit_score": edit_score,
+                    "update_flag": update_flag,
+                    "oldCreateTime": oldCreateTime,
+                    "goods_pid": goods_pid
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
-                    if(json.ok){
+                    if (json.ok) {
                         showMessage("修改评论成功；2秒后刷新页面");
                         setTimeout(function () {
                             window.location.reload();
                         }, 2000);
-                    }else{
+                    } else {
                         showMessage("修改评论失败");
                     }
                 },
@@ -941,19 +942,19 @@
             });
         }
 
-        function addReviewRemark(goods_pid){
-            var review_remark=$("#review_remark").val();
-            var country=$('#country').combobox('getValue');
-            var review_score=$("#review_score").val();
-            if(review_remark ==null ||review_remark ==""){
+        function addReviewRemark(goods_pid) {
+            var review_remark = $("#review_remark").val();
+            var country = $('#country').combobox('getValue');
+            var review_score = $("#review_score").val();
+            if (review_remark == null || review_remark == "") {
                 showMessage("请输入商品评论");
                 return false;
             }
-            if(country ==null ||country =="" || country=="country"){
+            if (country == null || country == "" || country == "country") {
                 showMessage("请选择国家");
                 return false;
             }
-            if(review_score ==null ||review_score ==""){
+            if (review_score == null || review_score == "") {
                 showMessage("请选择评分");
                 return false;
             }
@@ -964,17 +965,17 @@
                 data: {
                     "goods_pid": goods_pid,
                     "review_remark": review_remark,
-                    "country":country,
-                    "review_score":review_score
+                    "country": country,
+                    "review_score": review_score
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
-                    if(json.ok){
+                    if (json.ok) {
                         showMessage("添加评论成功；1秒后刷新页面");
                         setTimeout(function () {
                             window.location.reload();
                         }, 800);
-                    }else{
+                    } else {
                         showMessage("添加评论失败");
                     }
                 },
@@ -1060,7 +1061,7 @@
             });
         }
 
-        function setGoodsFlagByPid(pid,weight_flag,ugly_flag,benchmarking_flag,describe_good_flag,never_off_flag,uniqueness_flag,promotion_flag) {
+        function setGoodsFlagByPid(pid, weight_flag, ugly_flag, benchmarking_flag, describe_good_flag, never_off_flag, uniqueness_flag, promotion_flag) {
             $.messager.confirm('提示', '是否确认设置此标识？', function (rs) {
                 if (rs) {
                     $.ajax({
@@ -1069,13 +1070,13 @@
                         url: '/cbtconsole/editc/setGoodsFlagByPid',
                         data: {
                             "pid": pid,
-                            "weight_flag":weight_flag,
-                            "ugly_flag":ugly_flag,
-                            "benchmarking_flag":benchmarking_flag,
-                            "describe_good_flag":describe_good_flag,
-                            "never_off_flag":never_off_flag,
-                            "uniqueness_flag":uniqueness_flag,
-                            "promotion_flag":promotion_flag
+                            "weight_flag": weight_flag,
+                            "ugly_flag": ugly_flag,
+                            "benchmarking_flag": benchmarking_flag,
+                            "describe_good_flag": describe_good_flag,
+                            "never_off_flag": never_off_flag,
+                            "uniqueness_flag": uniqueness_flag,
+                            "promotion_flag": promotion_flag
                         },
                         success: function (data) {
                             var json = eval('(' + data + ')');
@@ -1095,17 +1096,17 @@
                 }
             });
         }
-        
-        
+
+
         function beforeSetAliInfo(pid, isBenchmark, bmFlag, aliPid) {
-            if((isBenchmark == 1 && bmFlag == 1) || isBenchmark == 2){
-                $.messager.confirm('提示', '已经存在对标(AliPid:'+aliPid+'),是否重新对标？', function (rs) {
-                if (rs) {
-                    $("#new_ali_pid").val(aliPid);
-                    $('#set_new_aliPid_dlg').dialog('open');
-                }
-            });
-            }else{
+            if ((isBenchmark == 1 && bmFlag == 1) || isBenchmark == 2) {
+                $.messager.confirm('提示', '已经存在对标(AliPid:' + aliPid + '),是否重新对标？', function (rs) {
+                    if (rs) {
+                        $("#new_ali_pid").val(aliPid);
+                        $('#set_new_aliPid_dlg').dialog('open');
+                    }
+                });
+            } else {
                 $('#set_new_aliPid_dlg').dialog('open');
             }
         }
@@ -1256,7 +1257,7 @@
         }
 
         function updateWordSizeInfo(type) {
-            if(type == 0){
+            if (type == 0) {
                 $("#size_info_en_text").val("");
             }
             $('#size_info_en_dlg').dialog('open');
@@ -1410,17 +1411,55 @@
             querySimilarGoodsByMainPid();
             $('#review_dlg').dialog('close');
             $('#update_review_dlg').dialog('close');
-            setTimeout("flashImg()",3000);
+            setTimeout("flashImg()", 3000);
             setInterval("flashImg()", 30000);
         }
 
         function flashImg() {
             $(".editMode").find("img")
         }
+
         $(".editMode").find("img").on("click", function () {
             $(this).addClass("img_choose");
             $(this).siblings().removeClass("img_choose");
         });
+
+        function closeMultiFileDialog() {
+            $('#multi_file_dlg').dialog('close');
+            $("#multiFileForm")[0].reset();
+        }
+
+        function uploadMultiFile() {
+            $.messager.progress({
+                title: '上传本地图片',
+                msg: '请等待...'
+            });
+            $("#multiFileForm").form('submit', {
+                type: "post",  //提交方式
+                url: "/cbtconsole/editc/uploadMultiFile", //请求url
+                success: function (data) {
+                    $.messager.progress('close');
+                    var data = eval('(' + data + ')');
+                    if (data.ok) {
+                        closeMultiFileDialog();
+                        var json = data.data;
+                        var content = '';
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<br><img src="' + json[i] + '"/>'
+                        }
+                        if (content.length > 10) {
+                            editorObj.appendHTML(content)
+                        }
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function () {
+                    $.messager.progress('close');
+                    $.messager.alert("提醒", "上传错误，请联系管理员", "error");
+                }
+            });
+        }
     </script>
 </head>
 
@@ -1439,6 +1478,27 @@
 <c:if test="${uid > 0}">
 
     <div class="mask"></div>
+
+
+    <div id="multi_file_dlg" class="easyui-dialog" title="详情多文件上传"
+         data-options="modal:true"
+         style="width: 300px; height: 180px; padding: 10px;">
+        <form style="margin-left: 44px;" id="multiFileForm" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="pid" value="${goods.pid}"/>
+            <input id="file" type="file" name="file" multiple="true">
+        </form>
+
+        <br><br>
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="uploadMultiFile()" style="width: 80px">确认上传</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeMultiFileDialog()"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
 
     <div id="enter_div_sty" class="easyui-dialog" title="添加类别关键词重量"
          data-options="modal:true"
@@ -1565,21 +1625,22 @@
          data-options="modal:true"
          style="width: 460px; height: 320px; padding: 10px;">
         <br>
-         评论:<textarea id="review_remark" style="width: 300px; height: 88px;"></textarea><br>
+        评论:<textarea id="review_remark" style="width: 300px; height: 88px;"></textarea><br>
         <br>
-        <select class="easyui-combobox" name="review_score" id="review_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+        <select class="easyui-combobox" name="review_score" id="review_score" style="width:300px;"
+                data-options="label:'分数:',panelHeight:'auto'">
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
         </select>
-       <br><br>
+        <br><br>
         <select class="easyui-combobox" name="country" id="country" style="width:300px;" data-options="label:'国家:',Height:'2000px',valueField: 'country',
                     textField: 'country', value:'country',selected:true,
                     url: '/cbtconsole/warehouse/getAllZone',
                     method:'get'">
-         </select>
+        </select>
         <br><br>
 
         <div style="text-align: center; padding: 5px 0">
@@ -1600,7 +1661,8 @@
         <input id="goods_pid" type="hidden">
         评论:<textarea id="edit_remark" style="width: 300px; height: 88px;"></textarea><br>
         <br>
-        <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;" data-options="label:'分数:',panelHeight:'auto'">
+        <select class="easyui-combobox" name="edit_score" id="edit_score" style="width:300px;"
+                data-options="label:'分数:',panelHeight:'auto'">
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -1608,7 +1670,8 @@
             <option value="5">5</option>
         </select>
         <br><br>
-        <select class="easyui-combobox" name="update_flag" id="update_flag" style="width:300px;" data-options="label:'是否显示:',panelHeight:'auto'">
+        <select class="easyui-combobox" name="update_flag" id="update_flag" style="width:300px;"
+                data-options="label:'是否显示:',panelHeight:'auto'">
             <option value="0">显示</option>
             <option value="1">不显示</option>
         </select>
@@ -1690,13 +1753,13 @@
             <span class="s_btn" title="无需修改时点击检查通过" onclick="setGoodsValid('${goods.pid}',1)">检查通过</span>
 
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <%--<span class="s_btn" >保存并发布</span>
-            <span class="s_btn" >下架该商品</span>
-            <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
+                <%--<span class="s_btn" >保存并发布</span>
+                <span class="s_btn" >下架该商品</span>
+                <span class="s_btn" title="无需修改时点击检查通过" >检查通过</span>--%>
             <c:if test="${goods.describeGoodFlag == 0}">
                 <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,1,0,0,0)">设置描述很精彩</span>
             </c:if>
-            <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
+                <%--<span class="s_last">*点击后数据直接更新线上</span>--%>
             <span class="s_btn" onclick="setNoBenchmarking('${goods.pid}',${goods.finalWeight})">标识非对标商品</span>
             <span class="s_btn" onclick="setGoodsFlagByPid('${goods.pid}',0,0,0,0,1,0,0)">标识永不下架</span>
             <c:if test="${goods.promotionFlag == 0}">
@@ -1751,7 +1814,7 @@
 
                             <div class="goods_top">
                                 <input class="s_btn" type="button" value="移除选中规格" onclick="removeTypeId()"
-                                   title="请选中规格，点击删除按钮"/>
+                                       title="请选中规格，点击删除按钮"/>
                                 <span style="color: red;">*请选中规格，点击删除按钮，删除完成后请点击保存</span>
                                 <c:set value="" var="typeName"></c:set>
                                 <c:set value="${fn:length(showtypes)}" var="typeLength"></c:set>
@@ -1941,29 +2004,40 @@
 
                             <div class="goods_p">
                                 <p class="ul_size">
-                                    <%--<a href="/cbtconsole/editc/querySkuByPid?pid=${goods.pid}" target="_blank">编辑sku重量</a>--%>
-                                    <input type="button" class="s_btn" value="编辑sku重量" onclick="openSkuEdit('${goods.pid}')" />
+                                        <%--<a href="/cbtconsole/editc/querySkuByPid?pid=${goods.pid}" target="_blank">编辑sku重量</a>--%>
+                                    <input type="button" class="s_btn" value="编辑sku重量"
+                                           onclick="openSkuEdit('${goods.pid}')"/>
                                 </p>
                             </div>
                             <div class="goods_p">
                                 <p class="goods_color">bizPrice:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur"><input class="pr_txt" id="biz_price" value="${goods.fpriceStr}"/></span>
+                                    <span class="goods_cur"><input class="pr_txt" id="biz_price"
+                                                                   value="${goods.fpriceStr}"/></span>
                                 </p>
                             </div>
                             <div class="goods_p">
                                 <p class="goods_color">重量:</p>
                                 <p class="ul_size">
-                                    <span class="goods_cur">${goods.finalWeight}<em>KG</em></span>
-                                    <input type="button" value="修改重量" class="s_btn" onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
+                                    <span class="goods_cur">${goods.finalWeight}</span><em>KG</em>
+                                    <input type="button" value="修改重量" class="s_btn"
+                                           onclick="beginUpdateWeight('${goods.pid}',${goods.finalWeight})"/>
                                     <c:if test="${goods.isWeigthZero > 0}">
                                         <b style="color: red;font-size: 18px;">*抓取1688重量为空</b>
                                     </c:if>
-                                    &nbsp;&nbsp;&nbsp;<input type="button" value="确认重量没有问题" class="s_btn" onclick="updateWeightFlag('${goods.pid}',this)"/>
+                                    &nbsp;&nbsp;&nbsp;<input type="button" value="确认重量没有问题" class="s_btn"
+                                                             onclick="updateWeightFlag('${goods.pid}',this)"/>
                                     <c:if test="${goods.weightFlag > 0}">
                                         <b style="font-size: 16px;color: red;">*重量超过类别上下限</b>
                                     </c:if>
-
+                                </p>
+                            </div>
+                            <div class="goods_p">
+                                <p class="goods_color">体积重量:</p>
+                                <p class="ul_size">
+                                    <span id="goods_volum_weight" class="goods_cur">${goods.volumeWeight}</span><em>KG</em>
+                                    <input type="button" value="修改体积重量" class="s_btn"
+                                           onclick="updateVolumeWeight('${goods.pid}',${goods.volumeWeight})"/>
                                 </p>
                             </div>
                             <div class="goods_p">
@@ -1973,14 +2047,16 @@
                                         原始[${goods.addPriceLv}]
                                     </span>
                                     <c:if test="${goods.editProfit > 0}">
-                                            修改[${goods.editProfit}]
+                                        修改[${goods.editProfit}]
                                     </c:if>
                                     <c:if test="${goods.lockProfit > 0}">
                                         <b style="color:red;">(已锁定)</b>
                                     </c:if>
                                     <c:if test="${goods.lockProfit == 0}">
-                                        <input type="button" value="修改利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',0,${goods.addPriceLv})"/>
-                                        <input type="button" value="锁定利润率" class="s_btn" onclick="beforeProfit('${goods.pid}',1,${goods.addPriceLv})"/>
+                                        <input type="button" value="修改利润率" class="s_btn"
+                                               onclick="beforeProfit('${goods.pid}',0,${goods.addPriceLv})"/>
+                                        <input type="button" value="锁定利润率" class="s_btn"
+                                               onclick="beforeProfit('${goods.pid}',1,${goods.addPriceLv})"/>
                                     </c:if>
                                 </p>
                             </div>
@@ -2081,9 +2157,9 @@
                                 <br>
                                 <b style="font-size: 16px;">OCR判断:${goods.ocrMatchValue}</b>
                             </c:if> --%>
-                        <c:if test="${goods.rebidFlag >0}">
-                    <br>
-                    <b style="font-size: 16px;">是否重新对标:是</b>
+                    <c:if test="${goods.rebidFlag >0}">
+                        <br>
+                        <b style="font-size: 16px;">是否重新对标:是</b>
                     </c:if> <c:if test="${goods.goodsState >0}">
                     <br>
                     <b style="font-size: 16px;">发布状态:${goods.goodsStateValue}</b>
@@ -2160,11 +2236,11 @@
                        style="color: #ff0000;">重新对标</a> &nbsp;&nbsp;&nbsp;
                     <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
                     &nbsp;&nbsp;&nbsp; <a target="_blank"
-                            href="${goods.aliGoodsUrl}">速卖通原链接</a>
+                                          href="${goods.aliGoodsUrl}">速卖通原链接</a>
                     <c:if test="${not empty shopId}">
                         &nbsp;&nbsp;&nbsp;
                         <a target="_blank"
-                           href="/cbtconsole/supplierscoring/supplierproducts?flag=1&shop_id=${shopId}">产品店铺链接</a>
+                           href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${shopId}">产品店铺链接</a>
                     </c:if>
                 </div>
                 <br>
@@ -2192,7 +2268,10 @@
                 <span style="font-size: 22px; color: red; margin-top: 15px;">商品评论:</span><br>
                 <c:forEach items="${reviewList}" var="review">
                     <span style="font-size: 15px;  margin-top: 15px;">评论人:${review.review_name};评论时间:${review.createtime};国家:${review.country};评论内容:${review.review_remark};评分:${review.review_score};${review.review_flag};编辑时间:${review.updatetime}</span>
-                    <button onclick="openEditReview('${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">编辑</button><br>
+                    <button onclick="openEditReview('${review.country}','${review.review_remark}','${review.review_score}','${review.review_flag}','${review.createtime}','${review.goods_pid}');">
+                        编辑
+                    </button>
+                    <br>
                 </c:forEach>
 
             </div>
@@ -2234,15 +2313,15 @@
         </div>
 
 
-
-
         <div class="s_bot">
             <h1 style="text-align: center; color: red;">请不要全盘copy，请去掉所有有“品牌”、“店名”的图，请去掉所有有“aliexpress”字样的图</h1>
 
             <button class="s_btn" style="width: 180px;"
                     onclick="beforeDeleteMd5('${goods.pid}','${goods.shopId}')">删除同店铺相同MD5图片
             </button>&nbsp;&nbsp;&nbsp;
-            <span id="use_ali_goods" class="s_btn"
+            <span class="s_btn"
+                  onclick="$('#multi_file_dlg').dialog('open');">详情多文件上传</span>
+            &nbsp;&nbsp;&nbsp;<span id="use_ali_goods" class="s_btn"
                   onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
             <div class="bot_l">
                 <div class="b_left">
@@ -2300,7 +2379,7 @@
         }
     }
 
-    function confirmAndDelete(json, goodsPid, url,shopId) {
+    function confirmAndDelete(json, goodsPid, url, shopId) {
         $.messager.confirm('提醒', '当前商品的店铺下存在相同的MD5图片数为' + json.total + ',是否删除?', function (r) {
             if (r) {
                 if (json.total > 0) {
@@ -2377,14 +2456,14 @@
         });
     }
 
-    function beginUpdateWeight(pid,weight) {
-        $.messager.prompt('提示信息', '请输入新的重量:', function(newWeight){
-            if (newWeight){
+    function beginUpdateWeight(pid, weight) {
+        $.messager.prompt('提示信息', '请输入新的重量:', function (newWeight) {
+            if (newWeight) {
                 var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
                 if (reg.test(newWeight)) {
-                    if(weight == newWeight){
+                    if (weight == newWeight) {
                         $.messager.alert("提醒", "新的重量和原重量相同", "info");
-                    }else{
+                    } else {
                         $.messager.progress({
                             title: '正在更新',
                             msg: '请等待...'
@@ -2419,7 +2498,7 @@
                 } else {
                     showMessage('新的重量必须为正数，最多两位小数！');
                 }
-            }else{
+            } else {
                 showMessage('未输入新的重量或取消输入！');
             }
         });
@@ -2447,33 +2526,73 @@
         });
     }
 
-    function beforeProfit(pid,type,profit) {
-        if(type == 0){
-            $.messager.prompt('提示信息', '请输入新的利润率:', function(newProfit){
-                        if (newProfit){
-                            var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
-                            if (reg.test(newProfit)) {
-                                editAndLockProfit(pid,type,newProfit);
-                            } else {
-                                showMessage('新的利润率必须为正数，最多两位小数！');
+    function updateVolumeWeight(pid, oldVolumeWeight) {
+        $.messager.prompt('提示信息', '请输入新的体积重量:', function (newWeight) {
+            if (newWeight) {
+                var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                if (reg.test(newWeight)) {
+                    if (newWeight == oldVolumeWeight) {
+                        showMessage('新输入的体积重量和原来的一致！');
+                        return false;
+                    } else {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: '/cbtconsole/editc/updateVolumeWeight',
+                            data: {
+                                "pid": pid,
+                                "newWeight": newWeight
+                            },
+                            success: function (json) {
+                                if (json.ok) {
+                                    $("#goods_volum_weight").val(newWeight);
+                                    showMessage('更新体积重量执行成功');
+                                } else {
+                                    $.messager.alert("提醒", json.message, "error");
+                                }
+                            },
+                            error: function () {
+                                $.messager.alert("提醒", "执行失败，请重试", "error");
                             }
-                        }else{
-                            showMessage('未输入新的利润率或取消输入！');
-                        }
-                    });
-        }else if(type == 1){
-            if(profit == 0){
+                        });
+                    }
+
+                } else {
+                    showMessage('新的体积重量必须为正数，最多两位小数！');
+                }
+            } else {
+                // showMessage('未输入新的体积重量或取消输入！');
+            }
+        });
+    }
+
+    function beforeProfit(pid, type, profit) {
+        if (type == 0) {
+            $.messager.prompt('提示信息', '请输入新的利润率:', function (newProfit) {
+                if (newProfit) {
+                    var reg = /(^[-+]?[1-9]\d*(\.\d{1,2})?$)|(^[-+]?[0]{1}(\.\d{1,2})?$)/;
+                    if (reg.test(newProfit)) {
+                        editAndLockProfit(pid, type, newProfit);
+                    } else {
+                        showMessage('新的利润率必须为正数，最多两位小数！');
+                    }
+                } else {
+                    showMessage('未输入新的利润率或取消输入！');
+                }
+            });
+        } else if (type == 1) {
+            if (profit == 0) {
                 showMessage('未设置新的利润率，拒绝执行锁定');
-            }else{
-                $.messager.confirm('提示信息', '是否锁定利润率？', function(rs){
-                if (rs){
-                        editAndLockProfit(pid,type,0);
+            } else {
+                $.messager.confirm('提示信息', '是否锁定利润率？', function (rs) {
+                    if (rs) {
+                        editAndLockProfit(pid, type, 0);
                     }
                 });
             }
         }
 
-        function editAndLockProfit(pid,type,newProfit) {
+        function editAndLockProfit(pid, type, newProfit) {
             $.ajax({
                 type: 'POST',
                 dataType: 'json',

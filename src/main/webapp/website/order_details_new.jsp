@@ -17,8 +17,6 @@
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.8.2.min.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
-<script type="text/javascript"
-	src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/main.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/website/order_detail_new.js"></script>
@@ -243,7 +241,7 @@ $(document).ready(function(){
         $("#saler_but").attr("disabled",true);
     }
     $("#ordercountry_value").val("${order.address.country}");
-    $("#ordercountry").val($("#ordercountry_value").val());
+    $("#ordercountry").val("${order.address.country}");
 });
 </script>
 
@@ -744,12 +742,13 @@ em {
 						<tr>
 							<td>Country:</td>
 							<td>
-								<select id="ordercountry" style="width: 180px" disabled="disabled" >
+								<input type="text" id="ordercountry" style="width: 180px" disabled="disabled" value="">
+								<%--<select id="ordercountry" style="width: 180px" disabled="disabled" >
 									<c:forEach items="${countryList }" var="zone">
 										<option value="${zone.country}">${zone.country}</option>
 									</c:forEach>
 
-								</select>
+								</select>--%>
 							</td>
 						</tr>
 						<tr>

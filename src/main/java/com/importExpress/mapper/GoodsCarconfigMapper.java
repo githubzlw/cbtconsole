@@ -4,10 +4,9 @@ import com.importExpress.pojo.GoodsCarconfig;
 import com.importExpress.pojo.GoodsCarconfigExample;
 import com.importExpress.pojo.GoodsCarconfigWithBLOBs;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
-@Repository
+
 public interface GoodsCarconfigMapper {
     int countByExample(GoodsCarconfigExample example);
 
@@ -23,7 +22,7 @@ public interface GoodsCarconfigMapper {
 
     List<GoodsCarconfig> selectByExample(GoodsCarconfigExample example);
 
-    GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer id);
+    GoodsCarconfigWithBLOBs selectByPrimaryKey(Integer userId);
 
     int updateByExampleSelective(@Param("record") GoodsCarconfigWithBLOBs record, @Param("example") GoodsCarconfigExample example);
 
@@ -39,5 +38,5 @@ public interface GoodsCarconfigMapper {
 
     List<GoodsCarconfigWithBLOBs> queryByIsNew(@Param("userId") int userId);
 
-    int updateByIdAndUserId(@Param("id") int id,@Param("userId") int userId);
+    int updateByIdAndUserId(@Param("id") int id, @Param("userId") int userId);
 }
