@@ -1651,16 +1651,16 @@
 
     <select id="FindCustomList" parameterType="com.importExpress.pojo.ShopCarUserStatistic"
             resultMap="shopCarUserStatisticResultMap">
-        select y.senddate as lastLoginTime,us.id as userid,us.email,gdf.total_catid,DATE_FORMAT(us.createtime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
+        select DISTINCT(uo.userid) AS usco ,y.senddate as lastLoginTime,us.id as userid,us.email,gdf.total_catid,DATE_FORMAT(us.createtime,'%Y-%m-%d %H:%i:%s') as last_add_cart_time,
         convert(gdf.total_price,decimal(10,2)) as total_price,convert(gdf.average_price,decimal(10,2)) as average_price,
-        us.countryId,zone.country,us.currency,au.saleid,au.salename,
+        us.countryId,zone.country,au.adminid,au.admName,
         '' as last_login_time,ifnull(adm.id,0) as follow_admin_id,ifnull(adm.admName,'') as follow_admin_name,
         DATE_FORMAT(gdf.follow_time,'%Y-%m-%d %H:%i:%s') as follow_time,rv.ck as num
         from
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
-        <if test="totalPrice == 1">
-            and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
-        </if>
+        <!--<if test="totalPrice == 1">-->
+            <!--and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)-->
+        <!--</if>-->
           AND is_test=0) us
         LEFT JOIN
         ( SELECT gcf.follow_admin_id,gcf.updateTime,gcf.userid,gcf.follow_time,scm.total_catid,scm.total_price,scm.average_price from goods_carconfig gcf
@@ -1669,13 +1669,14 @@
         group by userid
         )scm on gcf.userid = scm.userid) gdf on us.id= gdf.userid
 
-        LEFT JOIN user_sale au on us.id=au.userid
+        LEFT JOIN admin_r_user au on us.id=au.userid
         LEFT JOIN
-        (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 AND senddate is not NULL ORDER BY senddate DESC)f GROUP BY cid) y
+        (SELECT cid,senddate FROM(SELECT userid as cid,receipt_date as senddate FROM mail.emailinfo WHERE userid !=0 AND receipt_date is not NULL ORDER BY receipt_date DESC)f GROUP BY cid) y
         on au.us.id=y.cid
         left join zone on us.countryId = zone.id
         left join admuser adm on gdf.follow_admin_id = adm.id
         LEFT JOIN (SELECT pid,COUNT(pid) as ck,uid from recent_view WHERE uid !=0 GROUP BY uid) rv on us.id=rv.uid
+        LEFT JOIN user_other_info uo on us.id=uo.userid
         where 1=1
         <if test="userId > 0">
             and us.id = #{userId}
@@ -1687,7 +1688,7 @@
             and gdf.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and  au.saleid=#{saleId}
+            and  au.adminid=#{saleId}
         </if>
         <if test="beginMoney > 0">
             and gdf.total_price &gt;= #{beginMoney}
@@ -1707,6 +1708,9 @@
         </if>
         <if test="isOrder == 1">
             and y.senddate IS NULL
+        </if>
+        <if test="totalPrice == 0">
+       and  uo.userid is NOT NULL
         </if>
         order by us.createtime desc
         <if test="limitNum > 0">
@@ -1718,9 +1722,9 @@
             resultType="java.lang.Integer">
         select count(1) FROM
         (SELECT id,email,countryId,createtime,currency from `user` WHERE firstdiscount=3 and  DATE_SUB(CURDATE(), INTERVAL 180 DAY) &lt;= date(createtime)
-        <if test="totalPrice == 1">
-            and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)
-        </if>
+        <!--<if test="totalPrice == 1">-->
+            <!--and  DATE_SUB(CURDATE(), INTERVAL 3 DAY) >= date(createtime)-->
+        <!--</if>-->
         AND is_test=0) us
         LEFT JOIN
         ( SELECT gcf.follow_admin_id,gcf.updateTime,gcf.userid,gcf.follow_time,scm.total_catid,scm.total_price,scm.average_price from goods_carconfig gcf
@@ -1729,12 +1733,14 @@
         group by userid
         )scm on gcf.userid = scm.userid) gdf on us.id= gdf.userid
 
-        LEFT JOIN user_sale au on us.id=au.userid
+        LEFT JOIN admin_r_user au on us.id=au.userid
         LEFT JOIN
-        (SELECT cid,senddate FROM(SELECT cid,senddate FROM nemail.email_info WHERE cid !=0 AND senddate is not NULL ORDER BY senddate DESC)f GROUP BY cid) y
+        (SELECT cid,senddate FROM(SELECT userid as cid,receipt_date as senddate FROM mail.emailinfo WHERE userid !=0 AND receipt_date is not NULL ORDER BY receipt_date DESC)f GROUP BY cid) y
         on au.us.id=y.cid
         left join zone on us.countryId = zone.id
         left join admuser adm on gdf.follow_admin_id = adm.id
+        LEFT JOIN (SELECT pid,COUNT(pid) as ck,uid from recent_view WHERE uid !=0 GROUP BY uid) rv on us.id=rv.uid
+        LEFT JOIN (SELECT DISTINCT(userid) AS userid from user_other_info) uo on us.id=uo.userid
         where 1=1
         <if test="userId > 0">
             and us.id = #{userId}
@@ -1746,7 +1752,7 @@
             and gdf.follow_admin_id = #{followAdminId}
         </if>
         <if test="saleId > 0">
-            and au.saleid=#{saleId}
+            and au.adminid=#{saleId}
         </if>
         <if test="beginMoney > 0">
             and gdf.total_price &gt;= #{beginMoney}
@@ -1765,6 +1771,9 @@
         </if>
         <if test="isOrder == 1">
             and y.senddate IS NULL
+        </if>
+        <if test="totalPrice == 0">
+            and  uo.userid is NOT NULL
         </if>
     </select>
 

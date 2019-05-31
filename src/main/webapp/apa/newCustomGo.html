@@ -167,6 +167,26 @@
         function formatUserId(val, row, index) {
             return '<a target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=' + val + '">' + val + '</a>';
         }
+        function lookuso(userid,usermail) {
+
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/NewCustomersFollow/queryCustomByUserId",
+                data: {userid:userid},
+                dataType:"json",
+                success: function(msg) {
+                if (msg.data!=1){
+                 $("#cusid").val(msg.data.userId)
+                    $("#cusname").val(msg.data.userName)
+                    $("#cusemail").val(usermail)
+                    $("#custime").val(msg.data.createTime)
+                    $("#reworkmesB").val(msg.data.userTypeDesc)
+                    $("#reworkmesY").val(msg.data.remarks)
+                }
+                }
+                })
+            $('#user_remark').window('open');
+        }
 
         function formatMoney(val, row, index) {
             if(val > 0){
@@ -175,6 +195,14 @@
             }else{
                 return '<a target="_blank" href="/cbtconsole/NewCustomersFollow/queryNewCustomByUserId?userEmail='+row.userEmail+'&userId=' +
                     row.userId + '" target="_blank" >'+val+'</a>';
+            }
+        }
+        function formatuso(val, row, index) {
+            if(val > 0){
+                return '<a  href="javascript:void(0);"  onclick="lookuso(\''+row.userId+'\',\''+row.userEmail+'\')" >查看问卷</a>';
+            }else{
+                return val;
+
             }
         }
 
@@ -192,7 +220,37 @@
     </script>
 </head>
 <body>
+<div id="user_remark" class="easyui-window"  title="问卷调查"
+     data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+     style="width:800px;height:auto;display: none;font-size: 16px;">
+    <div id="sediv" style="margin-left:20px;text-align:center">
 
+         <div >
+             <div style="display:inline">用户id：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusid" type="text"></div>
+         </div>
+        <div>
+            <div style="display:inline">用户email：</div><div style="display:inline"><input id="cusemail" type="text"></div>
+        </div>
+        <div>
+            <div style="display:inline">用户名：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div><div style="display:inline"><input id="cusname" type="text"></div>
+        </div>
+        <div>
+            <div style="display:inline">创建时间：&nbsp;&nbsp;</div><div style="display:inline"><input id="custime" type="text"></div>
+        </div>
+        <br/>
+        <div>
+            <div style="display:inline">用户选择的感兴趣Business Services：</div>
+            <div ><textarea name="reworkmesB"  id="reworkmesB"  cols="40"   rows="5"   style="OVERFLOW:   hidden"></textarea></div>
+        </div>
+
+        <br/>
+        <div>
+            <div style="display:inline">用户其它的留言要求：</div>
+            <div ><textarea name="reworkmesY"  id="reworkmesY"  cols="40"   rows="8"   style="OVERFLOW:   hidden"></textarea></div>
+        </div>
+
+    </div>
+</div>
 <div id="shop_marketing_toolbar" style="padding: 5px; height: auto">
     <form id="shop_marketing_query_form" action="#" onsubmit="return false;">
 
@@ -208,15 +266,17 @@
 			</select></span>&nbsp;&nbsp;<span>销售: <select id="query_admin_id"
                                                           style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
-            <!--</select></span>&nbsp;&nbsp;<span>跟进人: <select id="query_follow_id"-->
+            </select></span>&nbsp;&nbsp;
+        <!--<span>跟进人: <select id="query_follow_id"-->
                                                            <!--style="font-size: 16px; height: 26px; width: 90px;">-->
                         <!--<option value="-1" selected="selected">全部</option>-->
-			<!--</select></span>&nbsp;&nbsp;-->
-        <input id="newCus" type="checkbox">所有新客户
+			<!--</select>-->
+    <!--</span>&nbsp;&nbsp;-->
+        <input id="newCus" type="checkbox" style="">是否填写问卷  是勾选/否不勾选
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
-       默认最近三天的新注册客户不显示
     </form>
+
 </div>
 
 <table id="shop_marketing_easyui-datagrid" class="easyui-datagrid">
@@ -225,6 +285,7 @@
         <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
         <th data-options="field:'userEmail',width:'150px'">用户Email</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
+        <th data-options="field:'usco',align:'center',width:'100px',formatter:formatuso">问卷</th>
         <th data-options="field:'totalCatid',align:'center',width:'80px'">购物车商品种类</th>
         <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">购物车总金额</th>
         <th data-options="field:'num',align:'center',width:'100px',formatter:formatCount">用户浏览商品次数</th>
@@ -234,7 +295,7 @@
         <th data-options="field:'lastLoginTime',align:'center',width:'130px'">销售跟进时间</th>
         <!--<th data-options="field:'followAdminName',align:'center',width:'100px'">跟进人员</th>-->
         <th data-options="field:'followTime',align:'center',width:'130px'">购物车营销跟进时间</th>
-        <th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>
+        <!--<th data-options="field:'opFlag',align:'center',width:'100px',formatter:formatOperation">操作</th>-->
     </tr>
     </thead>
     <tbody>
