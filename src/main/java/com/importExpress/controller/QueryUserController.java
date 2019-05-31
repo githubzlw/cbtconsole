@@ -1,11 +1,9 @@
 package com.importExpress.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
-import com.cbt.warehouse.pojo.HotCategory;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsReview;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -652,6 +649,25 @@ public class QueryUserController {
             result.put("message", "已修改!");
         } catch (Exception e) {
             result.put("message", "内部异常, 修改失败!");
+        }
+        return result;
+    }
+
+
+    /**
+     * 后台 商品下架审核中 根据pid查询同款信息
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/querySameGoodsInfoByPid.do?pid=
+     *
+     */
+    @RequestMapping(value = "/querySameGoodsInfoByPid.do")
+    @ResponseBody
+    public Map<String, Object> querySameGoodsInfoByPid(String pid) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            return queryUserService.querySameGoodsInfoByPid(pid);
+        } catch (Exception e) {
+            result.put("state", false);
+            result.put("message", "内部异常!");
         }
         return result;
     }
