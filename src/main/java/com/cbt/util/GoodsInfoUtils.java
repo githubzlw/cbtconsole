@@ -35,9 +35,9 @@ public class GoodsInfoUtils {
             + "|([hH]igh\\s*[qQ]uality,*!*\\:*)|(20\\d+,*!*\\:*)|([pP][aA][nN][dD][oO][rR][aA])";
 
     /**
-     * 产品单页静态化文件中的名字，
-     */
-    private static final String[] goodsNameWords = {"hotsale", "aliexpress", "free-shipping", "new", "shipping", "HOT", "fashion", "Hot sale", "Hot Worldwide"};
+	 * 产品单页静态化文件中的名字，
+	 */
+	private static final String[] goodsNameWords={"hotsale","aliexpress","free-shipping","new","shipping","HOT","fashion","Hot sale","Hot Worldwide"};
 
     /**
      * 产品类型:自定义上传商品
@@ -522,15 +522,52 @@ public class GoodsInfoUtils {
                 String newName = "(?i)" + name;
                 goodsName = goodsName.replaceAll(newName, "");
             }
-
-//			int nowYear = Integer.parseInt(new SimpleDateFormat("yyyy").format(new Date()));
-			/*delete by lhao 2018.06.29
-			for(int year=1949;year<=9999;year++){
-				goodsName = goodsName.replace(String.valueOf(year), "");
-			}*/
             return goodsName;
         }
         return goodsName;
+    }
+
+    public static String genOnlineUrl(CustomGoodsPublish bean) {
+
+        String itemid = bean.getPid();
+        String dataType = "1";
+        String type = "D";
+        String catid1 = "0";
+        String catid2 = "0";
+        String pathCatid = bean.getPathCatid();
+
+        if (StringUtils.isNotBlank(pathCatid) && pathCatid.indexOf(",") > -1) {
+            String[] catidList = pathCatid.split(",");
+            catid1 = catidList[0];
+            catid2 = catidList[1];
+        }
+
+        String enName = bean.getEnname().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ").trim();
+
+        //去除静态页名字中一些不需要的词
+        enName = removeGoodsNameWords(enName);
+        String[] nameArr = enName.split("\\s+");
+        StringBuffer goodNameNew = new StringBuffer();
+        if (nameArr.length > 10) {
+            for (int i = 0; i < 10; i++) {
+                if (StringUtils.isNotBlank(nameArr[i])) {
+                    goodNameNew.append(nameArr[i] + "-");
+                }
+            }
+        } else {
+            goodNameNew.append(enName.replaceAll("(\\s+)", "-"));
+        }
+        String url = "";
+        if (StringUtils.isNotBlank(goodNameNew.toString())) {
+            if (StringUtils.isBlank(catid1) || StringUtils.isBlank(catid2)) {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + dataType + itemid + ".html";
+            } else {
+                url = "https://www.import-express.com/goodsinfo/" + goodNameNew.deleteCharAt(goodNameNew.length() - 1) + "-" + catid1 + "-" + catid2 + "-" + dataType + itemid + ".html";
+            }
+        } else {
+            url = "https://www.import-express.com/spider/getSpider?item=" + itemid + "&source=" + itemIDToUUID(itemid, type);
+        }
+        return url;
     }
 
 

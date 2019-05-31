@@ -2240,7 +2240,7 @@
                     <a target="_blank" href="https://detail.1688.com/offer/${goods.pid}.html">1688原链接</a>
                     &nbsp;&nbsp;&nbsp;
                     <a target="_blank"
-                                          href="https://www.import-express.com/goodsinfo/cbtconsole-1${goods.pid}.html">线上预览</a>
+                                          href="${goods.onlineUrl}">线上链接</a>
                     &nbsp;&nbsp;&nbsp;<a target="_blank"
                                           href="${goods.aliGoodsUrl}">速卖通原链接</a>
                     <c:if test="${not empty shopId}">
