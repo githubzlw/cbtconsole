@@ -110,9 +110,10 @@
         sales_name,
         admuser.id as sales_id from `user`,admin_r_user,admuser
         where `user`.id = admin_r_user.userid and admin_r_user.adminid = admuser.id) u on r.userid=u.id
-        left join payment pm on r.userid = pm.userid and r.orderid = pm.orderid and pm.paystatus = 1 and pm.paytype in(0,1)
+        left join ( select userid,orderid,sum(payment_amount) as payment_amount,paymentid from payment
+        where paystatus = 1 and paytype in(0,1) and payment_amount > 0 group by orderid
+        ) pm on r.userid = pm.userid and r.orderid = pm.orderid
         where r.valid = 1
-
         <if test="userId > 0">
             and r.userid = #{userId}
         </if>
