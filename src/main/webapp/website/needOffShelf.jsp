@@ -556,7 +556,7 @@
                     <td>
                         <br />
                         <h3 style="line-height: 0px">以图搜货</h3>
-                        <span>&nbsp;&nbsp;&nbsp;&nbsp;(下面图片是原1688商品在线时候保存的橱窗图, 点击对应图片可以跳转到对应1688对应图片的亿图搜货页面)</span>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;(下面图片是原1688商品在线时候保存的橱窗图, 点击对应图片可以跳转到1688对应图片的以图搜货页面)</span>
                         <div name="img_goods" style="margin-left: 44px">
                         </div>
                     </td>

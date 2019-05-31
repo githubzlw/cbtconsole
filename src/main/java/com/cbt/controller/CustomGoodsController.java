@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping(value = "/cutom")
@@ -203,6 +206,13 @@ public class CustomGoodsController {
         String sttime = request.getParameter("sttime");
         if (StringUtils.isNotBlank(sttime)) {
             queryBean.setSttime(sttime);
+        }
+
+        String valid = request.getParameter("valid");
+        if (StringUtils.isNotBlank(valid)) {
+            queryBean.setValid(Integer.parseInt(valid));
+        } else {
+            queryBean.setValid(-1);
         }
 
         String unsellableReason = request.getParameter("unsellableReason");
@@ -1289,4 +1299,116 @@ public class CustomGoodsController {
         }
         return list;
     }
+
+
+    /**
+     * 批量产品删图和下架
+     *
+     */
+    @RequestMapping(value = "/showProductPageShow")
+    public ModelAndView showProductPageShow(HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView("customManageShow");
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            mv.addObject("uid", 0);
+            return mv;
+        } else {
+            mv.addObject("admName", user.getAdmName());
+//            mv.addObject("roletype", user.getRoletype());
+            mv.addObject("uid", user.getId());
+        }
+        return mv;
+    }
+
+    /**
+     * 批量产品删图和下架列出产品
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/cmslist")
+    public ModelAndView getCustomsShowList(HttpServletRequest request,
+                                           @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+                                           @RequestParam(value = "catid", defaultValue = "0", required = false) String catid,
+                                           @RequestParam(value = "shopId", defaultValue = "", required = false) String shopId,
+                                           @RequestParam(value = "isBenchmark", defaultValue = "-1", required = false) Integer isBenchmark,
+                                           @RequestParam(value = "isEdited", defaultValue = "-1", required = false) Integer isEdited,
+                                           @RequestParam(value = "valid", defaultValue = "-1", required = false) Integer valid
+    ) {
+        CustomGoodsQuery queryBean = new CustomGoodsQuery();
+        queryBean.setCurrPage(50);
+        queryBean.setPage((page -1) * 50);
+        queryBean.setCatid(catid);
+        queryBean.setIsBenchmark(isBenchmark);
+        queryBean.setIsEdited(isEdited);
+        queryBean.setValid(valid);
+
+        ModelAndView mv = new ModelAndView("customGoodsShowList");
+        if (StringUtils.isNotBlank(shopId)) {
+            queryBean.setShopId(shopId);
+            mv.addObject("shopId", shopId);
+        }
+
+        if (valid == -2) {
+            return mv;  // 首次不加载数据
+        }
+
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            return mv;
+        } else {
+            int uid = user.getId();
+            String admName = user.getAdmName();
+            mv.addObject("admName", admName);
+//            mv.addObject("roletype", roletype);
+            mv.addObject("uid", uid);
+        }
+
+        List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsShowInfos(queryBean);
+        goodsList.stream().forEach(c -> {
+            List<String> showImagesList = new ArrayList<String>();
+            String img = c.getImg();
+            for (String imgBea : img.replace("[", "").replace("]", "").split(",")) {
+                String imgTem = imgBea.trim();
+                if (imgTem.startsWith("http")) {
+                    showImagesList.add(imgTem.replace("60x60.", "400x400."));
+                } else {
+                    showImagesList.add(c.getRemotpath() + imgTem.replace("60x60.", "400x400."));
+                }
+                if (showImagesList.size() >= 2) {
+                    break;
+                }
+            }
+            Pattern pattern = Pattern.compile("<img src=\"(.*?)\"");
+            Matcher m = pattern.matcher(c.getName());
+            while (m.find()) {
+                String imgTem = m.group(1).trim();
+                if (imgTem.startsWith("http")) {
+                    showImagesList.add(imgTem);
+                } else {
+                    showImagesList.add(c.getRemotpath() + imgTem);
+                }
+                if (showImagesList.size() >= 5) {
+                    break;
+                }
+            }
+            c.setShowImages(showImagesList);
+        });
+
+        int count = customGoodsService.queryGoodsShowInfosCount(queryBean);
+        int amount = (count % 50 == 0 ? count / 50 : count / 50 + 1);
+        mv.addObject("catid", queryBean.getCatid());
+        mv.addObject("goodsList", goodsList);
+        mv.addObject("totalpage", amount);
+        mv.addObject("totalNum", count);
+        mv.addObject("currentpage", page);
+        mv.addObject("pagingNum", 50);
+        return mv;
+    }
+
+
 }
