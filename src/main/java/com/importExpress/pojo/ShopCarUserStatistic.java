@@ -32,6 +32,15 @@ public class ShopCarUserStatistic {
     private int num;// 客户浏览商品数
     private String password;// 客户浏览商品数
     private String admname;// 客户浏览商品数
+    private int usco;//问卷调查专用
+
+    public int getUsco() {
+        return usco;
+    }
+
+    public void setUsco(int usco) {
+        this.usco = usco;
+    }
 
     public String getPassword() {
         return password;

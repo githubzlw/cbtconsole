@@ -3,9 +3,11 @@ package com.importExpress.service.impl;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.JsonResult;
 import com.importExpress.controller.NewCustomersFollowController;
 import com.importExpress.mapper.NewCustomersFollowMapper;
 import com.importExpress.pojo.ShopCarUserStatistic;
+import com.importExpress.pojo.UserOtherInfoBean;
 import com.importExpress.service.NewCustomersFollowService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,5 +84,37 @@ public class NewCustomersFollowServiceImpl implements NewCustomersFollowService 
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public JsonResult queryCustomByUserId(String userid) {
+        JsonResult jsonResult=new JsonResult();
+        try {
+            UserOtherInfoBean userOtherInfoBean= this.newCustomersFollowMapper.queryCustomByUserId(userid);
+            if (userOtherInfoBean!=null && userOtherInfoBean.getUserType()!=null ){
+                String body="";
+                char arr[]=userOtherInfoBean.getUserType().toCharArray();
+                for (int i=0;i<arr.length;i++){
+                    if ('1'==arr[i]) {
+                        body+="Combine Shipping (ocean freight, cheapest shipping rate);  ";
+                    } else if ('2'==arr[i]) {
+                        body+="Combine Shipping (air freight, better price than shipping individually);  ";
+                    } else if ('3'==arr[i]) {
+                        body+="Quality Control;  ";
+                    } else if ('4'==arr[i]) {
+                        body+="Custom Packaging  ";
+                    }
+
+                }
+                userOtherInfoBean.setUserTypeDesc(body);
+
+            }
+            jsonResult.setData(userOtherInfoBean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setData(1);
+        }
+
+        return jsonResult;
     }
 }

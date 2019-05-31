@@ -2,6 +2,7 @@ package com.importExpress.mapper;
 
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
+import com.importExpress.pojo.UserOtherInfoBean;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -20,5 +21,6 @@ public interface NewCustomersFollowMapper {
     int FindValidByPid(@Param("shippingName") String shippingName);
     @Select("SELECT id,admName as confirmusername,roleType as role FROM admuser  WHERE roleType in(3,4) and status = 1")
     List<ConfirmUserInfo> queryAllSale();
-
+    @Select("SELECT userid,username,usertype as userType,remarks as remarks,creaTime as createTime FROM user_other_info WHERE userid=#{userid} ORDER BY creatime DESC LIMIT 1")
+    UserOtherInfoBean queryCustomByUserId(@Param("userid") String userid);
 }

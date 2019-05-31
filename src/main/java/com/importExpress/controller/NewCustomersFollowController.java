@@ -162,5 +162,14 @@ public class NewCustomersFollowController {
         return json;
     }
 
+ @RequestMapping("queryCustomByUserId")
+    @ResponseBody
+    public JsonResult queryCustomByUserId(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String userid=request.getParameter("userid");
+            json = this.newCustomersFollowService.queryCustomByUserId(userid);
+        return json;
+    }
+
 
 }
