@@ -1,5 +1,6 @@
 package com.importExpress.mapper;
 
+import com.cbt.bean.SameGoodsDetails;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
@@ -125,4 +126,7 @@ public interface QueryUserMapper {
 
     List<String> querySearchProductList(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
+    String queryProductsStockverification1688data(@Param("pid") String pid);
+
+    List<SameGoodsDetails> querySameGoodsDetails(@Param("pid") String pid);
 }

@@ -2933,10 +2933,10 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         List<NeedOffShelfBean> list = new ArrayList<NeedOffShelfBean>();
         //,cbr.is_edited
         String sql = "select cbr.createtime, ns.id,ns.source AS 'sourceFlag', ns.no_shelf_info, ns.pid,ns.update_time," +
-                " concat(cbr.remotpath,cbr.custom_main_image) as img_url,cbr.unsellableReason as reason," +
+                " concat(cbr.remotpath,cbr.custom_main_image) as img_url,ns.unsellableReason as reason," +
                 " cbr.catid1,ct18.name as catid_name,cbr.valid as isOffShelf,cbr.is_edited  " +
-                " from needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
-                " left join 1688_category ct18 on cbr.catid1 = ct18.category_id" +
+                " from alidata.needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
+                " left join cross_border.1688_category ct18 on cbr.catid1 = ct18.category_id" +
                 " where ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
@@ -2976,7 +2976,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and date(ns.update_time) <= ?";
         }
         if(StringUtils.isNotBlank(offShelf.getCatid())){
-            sql += " and cbr.catid1 = ?";
+//            sql += " and cbr.catid1 = ?";
+            sql += " and cbr.catid1 in ( SELECT category_id FROM cross_border.1688_category WHERE find_in_set(?,path) )";
         }
         if(offShelf.getNeverOffFlag() > 0){
             sql += " and cbr.is_edited = ?";
@@ -3051,7 +3052,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
     @Override
     public int queryNeedOffShelfByParamCount(NeedOffShelfBean offShelf) {
 
-        String sql = "select count(0) from needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
+        String sql = "select count(0) from alidata.needoffshelf_all_log ns,cross_border.custom_benchmark_ready_newest cbr " +
                 " where ns.pid = cbr.pid ";
 
         if(StringUtils.isNotBlank(offShelf.getPid())){
@@ -3091,7 +3092,8 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and date(ns.update_time) <= ?";
         }
         if(StringUtils.isNotBlank(offShelf.getCatid())){
-            sql += " and cbr.catid1 = ?";
+//            sql += " and cbr.catid1 = ?";
+            sql += " and cbr.catid1 in ( SELECT category_id FROM cross_border.1688_category WHERE find_in_set(?,path) )";
         }
         if(offShelf.getNeverOffFlag() > 0){
             sql += " and cbr.is_edited = ?";

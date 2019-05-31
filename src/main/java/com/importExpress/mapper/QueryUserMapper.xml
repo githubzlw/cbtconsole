@@ -962,4 +962,20 @@
         </where>
     </select>
 
+    <!--String queryProductsStockverification1688data(@Param("pid") String pid);-->
+    <select id="queryProductsStockverification1688data" resultType="String">
+        SELECT pics
+        FROM alidata.products_stockverification_1688data
+        WHERE goods_pid = #{pid}
+        LIMIT 1
+    </select>
+
+    <!--List<SameGoodsDetails> querySameGoodsDetails(@Param("pid") String pid);-->
+    <select id="querySameGoodsDetails" resultType="com.cbt.bean.SameGoodsDetails">
+        SELECT s_pid pid, shop_id shopId, shop_name shopName, json_content jsonContent
+        FROM alidata.1688_same_goods_detail
+        WHERE origin_pid = #{pid}
+        LIMIT 4
+    </select>
+
 </mapper>

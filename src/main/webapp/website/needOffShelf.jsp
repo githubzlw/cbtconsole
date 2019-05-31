@@ -64,6 +64,12 @@
         #no_shelf table tr {
             height:40px;
         }
+
+        #same_goods table,#same_goods table tr th, #same_goods table tr td {
+            /*border:1px solid #CCC;*/
+            margin: 0px;
+            padding: 0px;
+        }
     </style>
     <script type="text/javascript">
         $(document).ready(function () {
@@ -94,7 +100,7 @@
 
         function setDatagrid() {
             $('#neef_off_easyui-datagrid').datagrid({
-                title: '商品下架审核',
+//                title: '商品下架审核',
                 width: "100%",
                 fit: true,//自动补全
                 striped: true,//设置为true将交替显示行背景。
@@ -202,14 +208,18 @@
         function formatIsOffShelf(val, row, index) {
             //是否需要下架
             if (val == 0) {
-                return '硬下架(或者当前商品硬下架)';
+                return '硬下架';
             } else if (val == 1) {
-                return '下架后上架(或者当前商品在线)';
+                return '在线';
             } else if (val == 2) {
-                return '软下架(原1688下架等但同款>0)';
+                return '软下架';
             } else {
                 return '';
             }
+        }
+
+        function formatCatid(val, row, index) {
+            return row.catid + "<br />" + row.catidName;
         }
 
         function formatUpdateFlag(val, row, index) {
@@ -273,6 +283,77 @@
             $('#no_shelf').window('open');
         }
 
+
+        /* 同款数据弹窗 */
+        function showSameGoods(pid, imgUrl) {
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/queryuser/querySameGoodsInfoByPid.do",
+                data: {
+                    pid: pid
+                },
+                dataType:"json",
+                success: function(data){
+                    console.log(data);
+                    if (data.state == false) {
+                        alert(data.message);
+                        return;
+                    }
+                    $("#same_goods input[name=pid]").val(pid);
+                    $("#same_goods img[name=main_img]").attr('src', imgUrl);
+
+                    var same_url = "https://s.1688.com/collaboration/collaboration_search.htm?fromOfferId="
+                        + pid + "&tab=sameDesign";
+                    $("#same_goods a[name=same_url]").attr('href', same_url);
+
+                    // 之前抓取同款详情
+                    if (data.sameGoods == '') {
+                        $("#same_goods tr[name=same_url_detail]").css('display', 'none');
+                    } else {
+                        $("#same_goods tr[name=same_url_detail]").css('display', 'table-row');
+                        var same_url_datail = $("#same_goods tr[name=same_url_detail] div");
+                        same_url_datail.empty();
+                        $(data.sameGoods).each(function (index, item) {
+                            var htm = "<div style=\"float:left;margin: 4px;width: 46%\"><div style=\"\">\n" +
+                                "同款pid: <a href=\"https://detail.1688.com/offer/" + item.pid +
+                                ".html\" target=\"_blank\">" + item.pid +
+                                "</a><br />同款店铺: <a href=\"https://" + item.shopId +
+                                ".1688.com\" target=\"_blank\">" + item.shopId +
+                                "</a><br />同款店铺名:" + item.shopName + "<br /></div>\n" +
+                                "<div><img class=\"search_for_goods\" style=\"height: 160px;\" \n" +
+                                "src=\"" + item.jsonContent + "\" alt=\"无图\"></div></div>";
+                            same_url_datail.append(htm);
+                        });
+                    }
+
+                    // 以图找货
+                    if (data.pics == '') {
+                        $("#same_goods tr[name=same_img_goods]").css('display', 'none');
+                    } else {
+                        $("#same_goods tr[name=same_img_goods]").css('display', 'table-row');
+                        var same_img = $("#same_goods tr[name=same_img_goods] div[name=img_goods]");
+                        same_img.empty();
+                        $(data.pics.split(";")).each(function (index, item) {
+                            same_img.append("<div style=\"float:left; margin: 2px;\">" +
+                                "<img class=\"search_for_goods\" style=\"height: 160px;\" src=\"" +
+                                item + "\" alt=\"无图\"></div>");
+                        });
+                    }
+
+                    // 以图找货 图片点击找货
+                    $("img[class=search_for_goods]").click(function () {
+                        var src_url = new URL($(this).attr('src'));
+                        var tar_url = "https://s.1688.com/youyuan/index.htm?tab=imageSearch&from=plugin&imageType=" +
+                            src_url.origin + "&imageAddress=" + src_url.pathname;
+                        $("#search_for_goods_id").attr('href', tar_url)
+                        document.getElementById("search_for_goods_id").click();
+                    });
+
+                    $('#same_goods').window('open');
+                }
+            });
+        }
+
         function noShelf() {
             var pid = $('#no_shelf input[name=pid]').val();
             var check = $('#no_shelf input[name=reason]:checked').val();
@@ -299,6 +380,8 @@
                 return '1-1688货源下架';
             } else if (val == 2) {
                 return '2-不满足库存条件';
+            } else if (val == 3) {
+                return '3-销量不合格';
             } else if (val == 4) {
                 return '4-1688页面404或者货源下架';
             } else if (val == 5) {
@@ -360,6 +443,7 @@
 
         function formatOperation(val, row, index) {
             var content = '<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid='+ row.pid +'">编辑商品</a>';
+            content += '<br /><br /><span><a href="#" onclick="showSameGoods(\'' + row.pid + '\', \'' + row.imgUrl + '\')">同款数据</a></span>'
             if (row.sourceFlag == 5) {
                 content += '<br /><br /><span><a href="#" onclick="showShelf(' + row.pid + ')">确认下架</a></span>'
                 content += '&nbsp;&nbsp;<span><a href="#" onclick="showNoShelf(' + row.pid + ')">不下架</a></span>'
@@ -374,7 +458,7 @@
                     } else if (row.noShelfInfo.startsWith("2@")) {
                         info = '不下架 有替换货源:' + row.noShelfInfo.split("@")[2];
                     } else if (row.noShelfInfo.startsWith("1@")) {
-                        info = '不下架 库存验证不准确';
+                        info = '不下架 不考虑库存';
                     }
                     content += '<br /><br /><span>' + info + '</span>'
                 }
@@ -396,6 +480,7 @@
     <h1 align="center">请登录后操作</h1>
 </c:if>
 <c:if test="${uid > 0}"></c:if>
+
 
 <div id="no_shelf" class="easyui-window" title="不下架相关信息"
      data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
@@ -433,26 +518,79 @@
 </div>
 
 
+<%-- 同款数据弹窗 --%>
+<div id="same_goods" class="easyui-window" title="同款数据"
+     data-options="collapsible:false,minimizable:false,maximizable:false,closed:true,overflow:true"
+     style="width:1000px;height:700px;display: none;font-size: 16px;">
+    <div style="margin-left:20px;margin-right: 20px">
+        <input type="hidden" name="pid">
+        <div style="margin-top:20px;">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <h3 style="line-height: 0px">当前商品信息</h3>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        商品pid:
+                        <input type="text" readonly name="pid" style="color: #4c4c4c; width: 200px;">
+                        &nbsp;&nbsp;&nbsp;商品主图:
+                        <div style="position: relative; top: -80px; left: 400px; height: 90px;width: 90px;">
+                            <img name="main_img" style="height: 150px;" src="" alt="无图">
+                        </div>
+                    </td>
+                </tr>
+                <tr name="same_url_flag">
+                    <td>
+                        <h3 style="line-height: 0px">同款货源</h3>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;如果当前1688商品还在线 可以点击查询最新的同款数据: </span>
+                        <span><a href="#" target="_blank" name="same_url">同款链接</a></span>
+                    </td>
+                </tr>
+                <tr name="same_url_detail">
+                    <td>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;原1688商品在线时候通过链接抓取的同款数据(前4个)</span>
+                        <div style="margin-left: 44px">
+                        </div>
+                    </td>
+                </tr>
+                <tr name="same_img_goods">
+                    <td>
+                        <br />
+                        <h3 style="line-height: 0px">以图搜货</h3>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;(下面图片是原1688商品在线时候保存的橱窗图, 点击对应图片可以跳转到对应1688对应图片的亿图搜货页面)</span>
+                        <div name="img_goods" style="margin-left: 44px">
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="margin:20px 0 20px 40px;">
+        <a id="search_for_goods_id" href="#" target="_blank"></a>
+    </div>
+</div>
+
+
 <div id="neef_off_top_toolbar" style="padding: 5px; height: auto">
     <form id="neef_off_query_form" action="#" onsubmit="return false;">
         <span> PID: <input type="text" id="pid_id" style="width: 180px; height: 24px" value=""/></span>
-        <span> 类别: <input type="text" id="catid_id" style="width: 120px; height: 24px" value=""/></span>
-        <span>更新时间: <input id="query_beginTime" class="Wdate" style="width: 110px; height: 24px" type="text" value=""
+        <span> 类别ID: <input type="text" id="catid_id" style="width: 120px; height: 24px" value=""/></span>
+        <span>上下架时间: <input id="query_beginTime" class="Wdate" style="width: 110px; height: 24px" type="text" value=""
                          onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 		    <span>-</span>
             <input id="query_endTime" class="Wdate" style="width: 110px; height: 24px;" type="text" value=""
                    onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
         </span>
-        <span> 在线状态: <select id="query_isOffShelf" style="font-size: 14px; height: 24px; width: 120px;">
+        <span> 当前在线状态: <select id="query_isOffShelf" style="font-size: 14px; height: 24px; width: 120px;">
                         <option value="-1" selected="selected">全部</option>
-                        <option value="0">硬下架(或者当前商品硬下架)</option>
-                        <option value="1">下架后上架(或者当前商品在线)</option>
-                        <option value="2">软下架(原1688下架等但同款>0)</option>
+                        <option value="1">在线</option>
+                        <option value="2">软下架</option>
+                        <option value="0">硬下架</option>
                     </select>
         </span>
         <span> 下架原因: <select id="query_reason" style="font-size: 14px; height: 24px; width: 160px;">
                                 <option value="0" selected="selected">全部</option>
                                 <option value="2">2-不满足库存条件</option>
+                                <option value="3">3-销量不合格</option>
                                 <option value="4">4-1688页面404或者货源下架</option>
                                 <option value="5">5-重复验证合格(原本1688异常下架后重复验证合格上线的商品)</option>
                                 <option value="6">6-IP问题或运营直接下架</option>
@@ -482,12 +620,13 @@
                                 <option value="32">32-因为中文或者画质下架</option>
                         </select>
         </span>
-        <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
+       <%-- <span> 永不下架标识: <select id="query_never_off" style="font-size: 14px; height: 24px; width: 90px;">
                                 <option value="0" selected="selected">全部</option>
                                 <option value="1">永不下架</option>
                         </select>
-        </span>
-            <span> 有销量等筛选(<a href="#" id="refreshData">刷新临时数据</a>): <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
+        </span>--%>
+            <br />
+        <span> 其他筛选: <select id="query_sold_flag" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="0" selected="selected">不进行筛选</option>
                                 <option value="3">我们公司卖过的 或者 购物车中商品</option>
                                 <option value="1">我们公司卖过的</option>
@@ -503,13 +642,13 @@
                         </select>
             </span>
             <span> 数据源筛选
-                <a href="https://img.import-express.com/importcsvimg/stock_picture/researchimg/1554172194483.70268.zip">原始文档</a>:
+                <%--<a href="https://img.import-express.com/importcsvimg/stock_picture/researchimg/1554172194483.70268.zip">原始文档</a>--%>:
                 <select id="query_source" style="font-size: 14px; height: 24px; width: 120px;">
                                 <option value="-1" selected="selected">不进行筛选</option>
-                                <option value="1">1-库存验证中校验的上下架</option>
+                                <%--<option value="1">1-库存验证中校验的上下架</option>
                                 <option value="2">2-商品拯救行动V4中F点要拯救的商品</option>
-                                <option value="3">3-后台标注的定时上下架的</option>
-                                <option value="5">5-需要下架但在购物车或卖过的人为确认后下架</option>
+                                <option value="3">3-后台标注的定时上下架的</option>--%>
+                                <option value="5">5-需要人为确认后下架(在购物车、卖过的、Favorite、描述很精彩)</option>
                         </select>
             </span>
             <span> 是否处理过: <select id="query_sold_flag3" style="font-size: 14px; height: 24px; width: 120px;">
@@ -523,6 +662,8 @@
                 <br />
                 <span>
                     <a href="#" onclick="updateFlag3()" style="text-decoration: none;position: relative;top: 12px;line-height: 14px;">将选择的标记为处理过</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a target="_blank" href="/cbtconsole/website/singleGoods.jsp" style="text-decoration: none;position: relative;top: 12px;line-height: 14px;">链接:单个商品上线</a>
                 </span>
     </form>
 </div>
@@ -533,14 +674,14 @@
     <tr>
         <th field="ck" checkbox="true"></th>
         <th data-options="field:'pid',align:'center',width:'110px',formatter:formatPid">PID</th>
-        <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品图片</th>
-        <th data-options="field:'catidName',align:'center',width:'150px'">所属类别</th>
-        <th data-options="field:'isOffShelf',align:'center',width:'150px',formatter:formatIsOffShelf">上下架标识</th>
-        <th data-options="field:'competitiveFlag',align:'center',width:'150px',formatter:formatCompetitiveFlag">精品标识</th>
-        <th data-options="field:'neverOffFlag',align:'center',width:'150px',formatter:formatneverOffFlag">永不下架</th>
+        <th data-options="field:'imgUrl',align:'center',width:'180px',formatter:formatImg">商品主图</th>
+        <th data-options="field:'catidName',align:'center',width:'150px',formatter:formatCatid">类别</th>
+        <th data-options="field:'isOffShelf',align:'center',width:'150px',formatter:formatIsOffShelf">当前在线状态</th>
+        <%--<th data-options="field:'competitiveFlag',align:'center',width:'150px',formatter:formatCompetitiveFlag">精品标识</th>--%>
+        <%--<th data-options="field:'neverOffFlag',align:'center',width:'150px',formatter:formatneverOffFlag">永不下架</th>--%>
         <th data-options="field:'reason',align:'center',width:'150px',formatter:formatReason">下架原因</th>
-        <th data-options="field:'createtime',align:'center',width:'200px'">上架时间</th>
-        <th data-options="field:'updateTime',align:'center',width:'200px'">更新时间</th>
+        <th data-options="field:'createtime',align:'center',width:'200px'">首次上架时间</th>
+        <th data-options="field:'updateTime',align:'center',width:'200px'">上下架时间</th>
         <th data-options="field:'opFlag',align:'center',width:'200px',formatter:formatOperation">操作</th>
     </tr>
     </thead>
@@ -563,7 +704,7 @@
     jQuery(function($){
         // 页面加载完成 初始加载 5-需要下架但在购物车或卖过的人为确认后下架 未处理过的
         $("#query_source").val('5');
-//        $("#query_sold_flag3").val('2');
+        $("#query_sold_flag3").val('2');
         doQuery();
     });
 </script>
