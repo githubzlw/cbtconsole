@@ -126,6 +126,7 @@
         <result column="category_name" property="categoryName"/>
         <result column="describe_good_flag" property="describeGoodFlag"/>
         <result column="volume_weight" property="volumeWeight"/>
+        <result column="path_catid" property="pathCatid"/>
     </resultMap>
 
     <resultMap id="categoryResultMap" type="com.cbt.bean.CategoryBean">
@@ -895,7 +896,7 @@
 
     <select id="queryGoodsDetailsByPid" resultMap="editGoodsResultMap">
         select cbu.pid,cbu.enname,cbu.category_name,cbu.endetail,cbu.eninfo,cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.add_price_lv,
-        cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,
+        cbu.keyword,cbu.custom_main_image,cbu.price,cbu.final_weight,cbu.wprice,cbu.entype,cbu.sku,cbu.weight_flag,cbu.path_catid,
         cbu.goodsstate,cbu.bm_flag,cbu.valid,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.volume_weight,
         cbu.ocr_match_flag,cbu.priority_flag,cbu.img,cbu.range_price,cbu.revise_weight,cbu.localpath,cbu.remotpath,
         cbu.is_sold_flag,cbu.is_add_car_flag,cbu.ali_pid,cbu.unsellableReason,cbu.size_info_en,cbu.from_flag,cbu.weight,

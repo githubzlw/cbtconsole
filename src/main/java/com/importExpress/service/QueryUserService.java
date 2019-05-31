@@ -60,4 +60,6 @@ public interface QueryUserService {
     GoodsReview queryGoodsReviewById(Integer id);
 
     void updateNeedoffshelfByPid(String pid, String noShelfInfo);
+
+    Map<String,Object> querySameGoodsInfoByPid(String pid);
 }

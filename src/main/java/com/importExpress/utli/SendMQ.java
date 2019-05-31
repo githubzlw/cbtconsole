@@ -56,11 +56,8 @@ public class SendMQ {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(config.get("host"));
         factory.setPort(Integer.parseInt(config.get("port")));
-        //更新线上数据库 连接的mq是192.168.1.27 需要设置用户名和密码
-        if ("192.168.1.27".equals(config.get("host"))) {
-            factory.setUsername(config.get("username"));
-            factory.setPassword(config.get("password"));
-        }
+        factory.setUsername(config.get("username"));
+        factory.setPassword(config.get("password"));
         connection= factory.newConnection();
         channel = connection.createChannel();
         ++totalConnect;

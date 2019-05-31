@@ -6,6 +6,7 @@ import com.cbt.dao.CustomGoodsDao;
 import com.cbt.dao.impl.CustomGoodsDaoImpl;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.BigDecimalUtil;
+import com.cbt.util.GoodsInfoUtils;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.ShopManagerPojo;
 import com.cbt.website.userAuth.bean.Admuser;
@@ -243,7 +244,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
         //return customGoodsDao.queryGoodsDetails(pid, type);
         DataSourceSelector.restore();
-        return customGoodsMapper.queryGoodsDetailsByPid(pid);
+        CustomGoodsPublish bean = customGoodsMapper.queryGoodsDetailsByPid(pid);
+        if(bean != null){
+            bean.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(bean));
+        }
+        return bean;
     }
 
     @Override

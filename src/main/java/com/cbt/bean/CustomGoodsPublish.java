@@ -126,6 +126,25 @@ public class CustomGoodsPublish extends CustomGoodsBean {
 
     private String volumeWeight;
 
+    private String onlineUrl;
+    private String pathCatid;
+
+    public String getPathCatid() {
+        return pathCatid;
+    }
+
+    public void setPathCatid(String pathCatid) {
+        this.pathCatid = pathCatid;
+    }
+
+    public String getOnlineUrl() {
+        return onlineUrl;
+    }
+
+    public void setOnlineUrl(String onlineUrl) {
+        this.onlineUrl = onlineUrl;
+    }
+
     public String getVolumeWeight() {
         return volumeWeight;
     }
