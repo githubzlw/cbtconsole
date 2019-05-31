@@ -462,9 +462,6 @@
         <if test="state == 6">
             and cbu.valid = 2
         </if>
-        <if test="valid != -1">
-            and cbu.valid = #{valid}
-        </if>
         <if test="adminId > 0">
             and cge.admin_id = #{adminId}
         </if>
@@ -780,6 +777,9 @@
         </if>
         <if test="state == 6">
             and cbu.valid = 2
+        </if>
+        <if test="valid != -1">
+            and cbu.valid = #{valid}
         </if>
         <if test="adminId > 0">
             and cge.admin_id = #{adminId}
