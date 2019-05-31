@@ -1,6 +1,7 @@
 package com.importExpress.service.impl;
 
 import com.cbt.bean.EasyUiJsonResult;
+import com.cbt.bean.SameGoodsDetails;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.util.DateFormatUtil;
 import com.cbt.website.userAuth.bean.AuthInfo;
@@ -8,6 +9,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.QueryUserService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -728,5 +730,37 @@ public class QueryUserServiceImpl implements QueryUserService {
         DataSourceSelector.set("dataSource28hop");
         queryUserMapper.updateNeedoffshelfByPid(pid, noShelfInfo);
         DataSourceSelector.restore();
+    }
+
+    @Override
+    public Map<String, Object> querySameGoodsInfoByPid(String pid) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        // 查询主图 以图搜图使用
+        DataSourceSelector.set("dataSource28hop");
+        String pics = queryUserMapper.queryProductsStockverification1688data(pid);
+        result.put("pics", StringUtils.isBlank(pics)?"":pics);
+
+        // 查询同款货源
+        List<SameGoodsDetails> sameGoodsList = queryUserMapper.querySameGoodsDetails(pid);
+        DataSourceSelector.restore();
+
+        if (CollectionUtils.isEmpty(sameGoodsList)) {
+            result.put("sameGoods", "");
+        } else {
+            for (SameGoodsDetails bean : sameGoodsList) {
+                String jsonContent = bean.getJsonContent();
+                if (jsonContent != null && jsonContent.contains("\"imgUrl\": \"")) {
+                    jsonContent = jsonContent.substring(jsonContent.indexOf("\"imgUrl\": \"") + 11);
+                    jsonContent = jsonContent.substring(0, jsonContent.indexOf("\""));
+                } else {
+                    jsonContent = "#";
+                }
+                bean.setJsonContent(jsonContent);
+            }
+            result.put("sameGoods", sameGoodsList);
+        }
+
+        result.put("state", true);
+        return result;
     }
 }

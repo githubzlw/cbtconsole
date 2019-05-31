@@ -132,7 +132,7 @@
     </insert>
     <update id="updateOrderProductSource">
         update order_product_source set  userid=#{userid},adminid=${admid},addtime=now(),goods_p_url=#{resource},last_goods_p_url=#{resource},goods_p_price=#{price},
-        buycount=#{buycount},bargainRemark=#{bargainRemark},usecount=#{googs_number},
+        buycount=#{buycount},bargainRemark=#{bargainRemark},usecount=#{googs_number},goodsid=#{goodid},
         deliveryRemark=#{deliveryRemark},colorReplaceRemark=#{colorReplaceRemark},sizeReplaceRemark=#{sizeReplaceRemark},orderNumRemarks=#{orderNumRemarks},
         questionsRemarks=#{questionsRemarks},unquestionsRemarks=#{unquestionsRemarks},purchase_state=${purchase_state},tb_1688_itemid=#{itemid},last_tb_1688_itemid=#{itemid}
         where orderid=#{orderNo} and od_id=#{od_id}
@@ -183,7 +183,9 @@
         )
     </select>
     <update id="updateSourceState">
-        update order_product_source set offline_purchase=1 where orderid=#{TbOrderid} and od_id=#{odid}
+        update order_product_source ops,order_details od
+        set ops.offline_purchase=1,od.re_shipnos = #{shipno} ,ops.purchase_state = case when od.state= 1 then 6 else 3 end
+        where ops.orderid = od.orderid and ops.od_id = od.id and ops.orderid=#{TbOrderid} and ops.od_id=#{odid}
     </update>
     <select id="getNoMatchOrderByTbShipno" resultType="com.cbt.warehouse.pojo.OrderInfoCountPojo">
         SELECT COUNT(a.orderid) ordernonum, GROUP_CONCAT("'",CONCAT(a.orderid,"'")) ordernoarray FROM (

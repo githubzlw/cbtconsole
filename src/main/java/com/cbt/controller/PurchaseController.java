@@ -251,8 +251,7 @@ public class PurchaseController {
 		Map<String, String> map = new HashMap<String, String>();
 		String sessionId = request.getSession().getId();
 		String admuserw = Redis.hget(sessionId, "admuser");
-		SerializeUtil su = new SerializeUtil();
-		Admuser admuser = (Admuser) su.JsonToObj(admuserw, Admuser.class);
+		Admuser admuser = (Admuser) SerializeUtil.JsonToObj(admuserw, Admuser.class);
 		int adminid = admuser.getId();
 		String shipno = request.getParameter("shipno");
 		String odid = request.getParameter("odid");
