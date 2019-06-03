@@ -147,7 +147,7 @@
         function formatOperation(val, row, index) {
             var content = '<button style="width: 160px;" class="but_color" onclick="markAndDeleteImg(\'' + row.shopId + '\',\''
                 + row.pid + '\',\''  + row.imgShow +'\',this)">标记公共图片并删除</button>'
-                +'<br><span style=\'color: red;display: none \'>已标记和删除</span>';
+                +'<br><span style=\'color: red;display: none \'>正在处理,请等待</span>';
             return content;
         }
 
@@ -172,7 +172,7 @@
                             }
                         },
                         error: function () {
-                            $.messager.alert("提醒", "执行失败，请重试", "error");
+                            $.messager.alert("提醒", "链接超时，请重试", "error");
                         }
                     });
             }
@@ -206,6 +206,7 @@
 
         <span><input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>
         <span><input type="button" class="but_color" value="重置" onclick="doResetForm()"/></span>
+        <span style="color: red;">(*点击图片放大)</span>
     </form>
 </div>
 
