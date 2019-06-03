@@ -89,7 +89,7 @@
                 padding: 3px 5px;
             }
             
-            #waring_id span {
+            #waring_id span a {
 				color: red;
 				font-weight: bolder;
 			}
@@ -187,6 +187,16 @@
             function formatNum(val) {
                 return val < 10 ? "0" + val : val
             }
+
+
+            //获取url中的参数
+            function getUrlParam(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+                var r = window.location.search.substr(1).match(reg); //匹配目标参数
+                if(r != null) return unescape(r[2]);
+                return null; //返回参数值
+            }
+
             
             $(function() {
                 //单选框radio事件
@@ -306,13 +316,6 @@
                 }
                 iniDatetime();
 
-                //获取url中的参数
-                //              function getUrlParam(name) {
-                //                  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-                //                  var r = window.location.search.substr(1).match(reg); //匹配目标参数
-                //                  if(r != null) return unescape(r[2]);
-                //                  return null; //返回参数值
-                //              }
 
                 /*查询条件重置按钮*/
                 $("#date-range-reset").click(function() {
@@ -833,16 +836,22 @@
     		   url: "/cbtconsole/tabtrackinfo/querywaringnum.do?startDate=" + $("#nowdate1").val() + "&endDate=" + $("#nowdate2").val(),
     		   dataType:"json",
     		   success: function(msg){
-    		     var waringtext = "最近<strong>90</strong>天预警信息 (0-总预警条数:<span>" + msg.waring0
-    		    		 + "</span>条; 1-物流问题:<span>" + msg.waring1
-    		    		 + "</span>条; 2-交期超时:<span>" + msg.waring2
-    		    		 + "</span>条; 4-退回:<span>" + msg.waring4
-    		    		 + "</span>条; 5-异常:<span>" + msg.waring5
-    		    		 + "</span>条; 6-内部异常:<span>" + msg.waring6
-    		    		 + "</span>条;)"
+    		     var waringtext = "最近<strong>90</strong>天预警信息 (0-总预警条数:<span><a href='/cbtconsole/website/tab_track_info_list.html'>" + msg.waring0
+    		    		 + "</a></span>条; 1-物流问题:<span><a href='/cbtconsole/website/tab_track_info_list.html?warning=1'>" + msg.waring1
+    		    		 + "</a></span>条; 2-交期超时:<span><a href='/cbtconsole/website/tab_track_info_list.html?warning=2'>" + msg.waring2
+    		    		 + "</a></span>条; 4-退回:<span><a href='/cbtconsole/website/tab_track_info_list.html?warning=4'>" + msg.waring4
+    		    		 + "</a></span>条; 5-异常:<span><a href='/cbtconsole/website/tab_track_info_list.html?warning=5'>" + msg.waring5
+    		    		 + "</a></span>条; 6-内部异常:<span><a href='/cbtconsole/website/tab_track_info_list.html?warning=6'>" + msg.waring6
+    		    		 + "</a></span>条;)"
     		     $("#waring_id").html(waringtext);
     		   }
     		});
+	    	// 页面打开默认加载
+            var warning = getUrlParam("warning");
+            if (warning != undefined) {
+                $("#warning").val(warning);
+            }
+            $("#date-range-search").click();
 	    });
     </script>
 

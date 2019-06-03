@@ -781,4 +781,14 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     }
 
 
+    @Override
+    public List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsShowInfos(queryBean);
+    }
+
+    @Override
+    public int queryGoodsShowInfosCount(CustomGoodsQuery queryBean) {
+        return customGoodsMapper.queryGoodsShowInfosCount(queryBean);
+    }
+
 }
