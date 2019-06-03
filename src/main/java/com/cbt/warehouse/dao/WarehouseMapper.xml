@@ -3659,4 +3659,46 @@
 	<select id="getAllZone" resultType="com.cbt.bean.ZoneBean">
 		SELECT REPLACE(country,' ','') AS country FROM zone
 	</select>
+	<select id="getShippingPack" resultType="com.cbt.warehouse.pojo.ShippingPackage">
+	select id,orderid,remarks,sweight,transportcompany, transportcountry,expressno,track_package_number   
+	from shipping_package 
+	<if test="order_no != null and order_no != ''">
+	where orderid=#{order_no}
+	</if>
+	order by id desc 
+ 	limit #{start},#{limit} ;
+	
+	</select>
+	<select id="getShippingPackCount" resultType="java.lang.Integer">
+	select count(*)  from shipping_package  ;
+	
+	</select>
+	
+	<select id="getOrder" resultType="java.util.HashMap">
+	select a.user_id,a.address_id,a.order_no,a.product_cost,a.pay_price ,
+	b.phoneNumber,b.Country,b.statename,b.address,b.recipients
+	from orderinfo a  left join  order_address b on a.order_no=b.orderNo  
+	where a.state>0 and a.state&lt;6  and a.order_no in 
+	<foreach collection="orderids" item="item" index="index"  open="(" close=")" separator="," >
+	#{item}
+	</foreach>
+	</select>
+	<select id="getOrderDetailsForExport" resultType="java.util.HashMap">
+	select a.orderid,a.yourorder,a.goodsprice,a.goods_pid,a.goodscatid,a.actual_weight ,
+	b.weight,c.name 
+	from order_details a left join  package_goods_weight b on a.goods_pid=b.pid  and a.orderid=b.orderid
+	left join 1688_category c on a.goodscatid=c.category_id
+	where a.state>0 and a.state &lt; 2 and a.orderid in  
+	<foreach collection="orderids" item="item" index="index"  open="(" close=")" separator="," >
+	#{item}
+	</foreach>
+	</select>
+	<select id="getOrderPay" resultType="java.util.HashMap">
+	select paymentid,orderid,payment_cc,payment_amount,paymentno,createtime    
+	from payment  where paystatus=1 and paytype in (0,1,2,5) and  orderid in
+	<foreach collection="orderids" item="item" index="index"  open="(" close=")" separator="," >
+	#{item}
+	</foreach>
+	</select>
+	
 </mapper>
