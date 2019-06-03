@@ -653,7 +653,7 @@ $(document).ready(function(){
 									<%--<td style="width: 124px;">货源问题</td>--%>
 									<!-- <td style="width: 124px;">货物到齐</td> -->
 									<td style="width: 124px;">出货审核问题</td>
-									<td style="width: 124px;">出运中/<br />物流问题</td>
+									<td style="width: 124px;">物流问题</td>
 									<%--<td style="width: 124px;">出运运费预警</td>--%>
 									<td style="width: 124px;">质检服务订单</td>
 								</tr>
@@ -669,7 +669,7 @@ $(document).ready(function(){
 									<%--<td id="errorbuy">0</td>--%>
 									<!-- <td id="allgoods">0</td> -->
 									<td id="errorgoods">0</td>
-									<td><span id="onshipping">0</span>/<span id="onshippingw">0</span></td>
+									<td><%--<span id="onshipping">0</span>/--%><span id="onshippingw">0</span></td>
 									<%--<td id="freightWaraing">0</td>--%>
 									<td><span id="checkOrder">0</span></td>
 								</tr>
