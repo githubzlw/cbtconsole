@@ -763,4 +763,10 @@ public class QueryUserServiceImpl implements QueryUserService {
         result.put("state", true);
         return result;
     }
+
+    @Override
+    public void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid) {
+        queryUserMapper.insertNeedoffDownAll(pidList, reason, adminid);
+    }
+
 }

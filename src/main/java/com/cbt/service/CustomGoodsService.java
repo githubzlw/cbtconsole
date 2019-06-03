@@ -787,4 +787,9 @@ public interface CustomGoodsService {
      * @return
      */
     JsonResult setGoodsWeightByWeigherInfo(String pid, SearchResultInfo weightAndSyn, int adminId);
+
+    public List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery queryBean);
+
+    public int queryGoodsShowInfosCount(CustomGoodsQuery queryBean);
+
 }
