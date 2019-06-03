@@ -3002,7 +3002,7 @@
 		select weight,createtime from package_weight order by id desc limit 1
 	</select>
     <select id="getGoodsWeight" resultType="com.cbt.website.bean.SearchResultInfo">
-		SELECT weight,syn,volume_weight,goods_type FROM package_goods_weight
+		SELECT weight,syn,volume_weight,goods_type, odid FROM package_goods_weight
 		WHERE pid=#{pid} and odid = #{odId} AND  del = 0 LIMIT 1
 	</select>
     <select id="updateGoodsWeightFlag">
