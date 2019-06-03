@@ -1345,6 +1345,7 @@
         select
         COUNT(1)
         from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
             <if test="shopId == null">
                 <if test="isEdited > -1">  -- 商品已编辑
@@ -1359,7 +1360,7 @@
                 <if test="isBenchmark > -1 and isBenchmark != 1">
                     and cbu.isBenchmark = #{isBenchmark}
                 </if>
-                <if test="catid != -1">
+                <if test="catid != -1 and catid != 0">
                     and cbu.catid1 in(
                     select category_id from 1688_category where find_in_set(#{catid},path)
                     )
