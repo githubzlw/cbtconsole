@@ -135,18 +135,21 @@
         /* 批量下架 */
         function fndownall(reason, shopId) {
             var checked = "";
+            var title = "";
             if (reason == '32') {
                 $(".checkpid:checked").each(function () {
                     checked += this.value + ',';
                 });
+                title = "是否确认批量下架(下架下面勾选的商品 因为中文或者画质下架)?";
             } else if (reason == '31') {
                 checked = shopId;
+                title = "是否确认批量下架(全店铺商品下架)?";
             }
             if (checked == '') {
                 showMessage("请选择需要批量下架的数据");
                 return;
             }
-            $.messager.confirm('提示', '是否确认批量下架?', function(rs) {
+            $.messager.confirm('提示', title, function(rs) {
                 if (rs) {
                     $.ajax({
                         type : 'POST',
@@ -190,7 +193,7 @@
 
 
         function showMessage(msgStr) {
-            $.messager.show({
+            $.messager.alert({
                 title : '提醒',
                 msg : msgStr,
                 timeout : 1500,
@@ -232,7 +235,7 @@
 <div>
     <input type="button" onclick="fndownall('32', '')" value="批量下架(下架下面勾选的商品 因为中文或者画质下架)" style="height: 30px; margin-right: 40px;" class="btn">
     <c:if test="${not empty shopId}">
-        <input type="button" onclick="fndownall('31', '${shopId}')" value="批量下架(整个店铺商品下架)" style="height: 30px; margin-right: 40px;" class="btn">
+        <input type="button" onclick="fndownall('31', '${shopId}')" value="批量下架(全店铺商品下架)" style="height: 30px; margin-right: 40px;" class="btn">
         &nbsp;&nbsp;当前店铺:<span>${shopId}</span>&nbsp;&nbsp;条数:<span>${totalNum}</span>条
     </c:if>
 </div>
@@ -314,7 +317,7 @@
                     <a target="_blank" href="/cbtconsole/cutom/cmslist?valid=1&shopId=${list.shopId}">店铺所有商品</a>
                     <br><br>
                 </c:if>
-                <a href="#" onclick="fndown('${list.pid}','32')">产品下架(因为中文或者画质下架)</a>
+                <a href="javascript:;" onclick="fndown('${list.pid}','32')">产品下架(因为中文或者画质下架)</a>
             </td>
         </tr>
     </c:forEach>
