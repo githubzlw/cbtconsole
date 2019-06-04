@@ -51,6 +51,23 @@
 						</tr>
 					</table>
 
+                 <br><br><font style="text-align: center; padding-left: 200px">入库备注</font>
+                 <table border="1px  #0094ff ; border-collapse: collapse" style="width: 50%;height: 50%">
+                     <tr>
+                         <td>时间</td>
+                         <td>备注</td>
+                     </tr>
+                     <c:forEach items="${warehouseRemarkList }" var="supplierBean">
+                         <tr>
+                             <td>
+                                     ${supplierBean.createtime }
+                             <td>
+                                     ${supplierBean.remarks}
+                             </td>
+                         </tr>
+                     </c:forEach>
+                 </table>
+
 	 			<br><br><font style="text-align: center; padding-left: 200px">产品打分信息展示 </font>
 	 			</br></br>
 					 	<font color="red">[质量]</font>:1:差 &nbsp;&nbsp;2:较差&nbsp;&nbsp;3: 一般&nbsp;&nbsp;4:无投诉&nbsp;&nbsp;5: 优质</br> 

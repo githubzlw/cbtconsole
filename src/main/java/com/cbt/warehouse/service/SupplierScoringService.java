@@ -224,4 +224,5 @@ public interface SupplierScoringService {
 	 */
 	public void saveOrUpdateInven(SupplierScoringBean bean);
 
+    List<SupplierProductsBean> queryWarehouseRemarkByShopId(String shopId);
 }

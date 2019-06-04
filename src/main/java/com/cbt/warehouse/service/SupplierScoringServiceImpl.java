@@ -203,4 +203,9 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 		//修改ali_info_data下供应商的天数
 		supplierScoringMapper.updateAliInfoDataDays(bean.getReturnDays(),bean.getShopId());
 	}
+
+    @Override
+    public List<SupplierProductsBean> queryWarehouseRemarkByShopId(String shopId) {
+        return supplierScoringMapper.queryWarehouseRemarkByShopId(shopId);
+    }
 }

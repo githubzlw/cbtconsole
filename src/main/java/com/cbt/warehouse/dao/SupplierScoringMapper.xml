@@ -287,4 +287,14 @@
 	<update id="updateRemark">
 		update supplier_product set remark=#{remark},quality=#{newQuality} where id=${id}
 	</update>
+
+    <!--List<SupplierProductsBean> queryWarehouseRemarkByShopId(@Param("shopId") String shopId);-->
+    <select id="queryWarehouseRemarkByShopId" resultType="com.cbt.warehouse.pojo.SupplierProductsBean">
+        SELECT a.warehouse_remark AS 'remarks', a.createtime
+        FROM id_relationtable a
+        LEFT JOIN custom_benchmark_ready b ON a.itemid = b.pid
+        WHERE a.goodstatus = 4 AND LENGTH(a.warehouse_remark) > 0 AND LENGTH(a.itemid) > 0
+        AND b.shop_id = #{shopId}
+    </select>
+
 </mapper>
