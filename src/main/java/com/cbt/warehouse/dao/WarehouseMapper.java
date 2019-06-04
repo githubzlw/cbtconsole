@@ -1430,4 +1430,37 @@ public interface WarehouseMapper {
 
 	@Select("SELECT apply_time as applyTime,apply_user as applyUser FROM return_display WHERE customer_info=#{orderid} ORDER BY apply_time DESC LIMIT 1")
 	returndisplay FindReturnTime(@Param("orderid")String orderid);
+	
+	/**获取出库订单列表
+	 * @param start
+	 * @param limit
+	 * @return
+	 */
+	List<ShippingPackage> getShippingPack(@Param("start")int start,@Param("limit")int limit,@Param("order_no")String order_no);
+	
+	/**数量
+	 * @return
+	 */
+	int getShippingPackCount();
+	
+	/**订单
+	 * @param orderids
+	 * @return
+	 */
+	List<Map<String,Object>> getOrder(@Param("orderids")List<String> orderids);
+	
+	/**订单商品
+	 * @param orderids
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderDetailsForExport(@Param("orderids")List<String> orderids);
+	/**订单商品
+	 * @param orderids
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderPay(@Param("orderids")List<String> orderids);
+	
+	
+	
+	
 }
