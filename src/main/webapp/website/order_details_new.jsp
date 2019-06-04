@@ -1343,12 +1343,16 @@
 											%</p>
 								</span>
                                 <a href="/cbtconsole/editc/detalisEdit?pid=${orderd.goods_pid}" target="_blank">编辑链接</a>
-
-                                <span id="spanurl${sd.index}" style="color:red;">
-									<p>1688原始货源价格(RMB): ${orderd.price1688}</p>
+									<br>
+                                <span id="spanurl${sd.index}">
+									<p > 1688原始货源价格(RMB):<em style="color:red;">${orderd.price1688}</em> </p>
 								</span>
-                                <span id="spanurl${sd.index}" style="color:red;">
-									<p style="width:200px;">单件原始货源重量(kg): ${orderd.final_weight}</p>
+                                <span id="spanurl${sd.index}">
+
+									<p >  1688起订量:<em style="color:red;">${orderd.morder}</em> </p>
+								</span>
+								<span id="spanurl${sd.index}">
+									<p> 单件原始货源重量(kg):<em style="color:red;">${orderd.final_weight}</em> </p>
 								</span>
                                 <span id="spanurl${sd.index}">
 									<p style="width:200px;">采购货源标题: ${orderd.goodsPName}</p>

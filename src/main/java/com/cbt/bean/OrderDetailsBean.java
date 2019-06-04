@@ -155,6 +155,17 @@ public class OrderDetailsBean implements Cloneable,Serializable {
 		this.locationNum = locationNum;
 	}
 
+
+	private String morder;
+
+	public String getMorder() {
+		return morder;
+	}
+
+	public void setMorder(String morder) {
+		this.morder = morder;
+	}
+
 	public String getNoChnageRemark() {
 		return noChnageRemark;
 	}
