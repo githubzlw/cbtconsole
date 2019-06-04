@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>出口审批</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style>
+        .datagrid-htable {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .panel-title {
+            text-align: center;
+            height: 30px;
+            font-size: 24px;
+        }
+
+        .datagrid-header .datagrid-cell span, .datagrid-cell,
+        .datagrid-cell-group, .datagrid-header-rownumber,
+        .datagrid-cell-rownumber {
+            font-size: 14px;
+        }
+
+        #groupbuy_query_form {
+            font-size: 18px;
+        }
+
+        .enter_btn {
+            margin-bottom: 10px;
+            width: 130px;
+            height: 26px;
+            color: #ffffff;
+            background-color: #009688;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .delete_btn {
+            width: 130px;
+            height: 26px;
+            margin-bottom: 10px;
+            color: #ffffff;
+            background-color: red;
+            transform: rotate(0deg);
+            font-size: 16px;
+            border-radius: 4px;
+            border-width: 1px;
+            border-style: solid;
+            text-align: center;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .inp_sty {
+            width: 240px;
+            height: 24px;
+        }
+
+        .img_sty {
+            max-height: 180px;
+            max-width: 180px;
+        }
+
+        #form_enter {
+            font-size: 16px;
+            background-color: #afefe6;
+        }
+
+        .img_little {
+            max-width: 180px;
+            max-height: 180px;
+        }
+
+        .td_sty {
+            width: 130px;
+        }
+        .datagrid-btable{
+        table-layout:fixed;}
+        .datagrid-btable td{
+        word-wrap:break-word;}
+    </style>
+    <script>
+        $(document).ready(function () {
+            setDatagrid();
+        });
+        
+        function fnexport(){
+        	
+        	 var order_no = $("#order_no").val();
+        	 var page=$(".pagination-num").val();
+        	 var rows=$(".pagination-page-list").val();
+            window.location.href ="/cbtconsole/cexport/export?order_no="+order_no+"&rows="+rows+"&page="+page;
+        }
+          
+        /**
+         * 初始化datagrid数据
+         */
+        function setDatagrid() {
+            $('#groupbuy_easyui-datagrid').datagrid({
+                title: '出口审批',
+                width: "100%",
+                fit: true,//自动补全
+                striped: true,//设置为true将交替显示行背景。
+                collapsible: true,//显示可折叠按钮
+                toolbar: "#groupbuy_top_toolbar",//在添加 增添、删除、修改操作的按钮要用到这个
+                url: '/cbtconsole/cexport/ship',//url调用Action方法
+                loadMsg: '数据装载中......',
+                singleSelect: true,//为true时只能选择单行
+                fitColumns: false,//允许表格自动缩放，以适应父容器
+                nowrap: false,//超出换行
+                rownumbers: true,
+                pageSize: 10,//默认选择的分页是每页50行数据
+                pageList: [10, 15, 20],//可以选择的分页集合
+                pagination: true,//分页
+                showFooter : false,//底部统计显示
+                style: {
+                    padding: '8 8 10 8'
+                },
+                onLoadSuccess: function (data) {
+                    if (!data.success) {
+                        showMessage(data.message);
+                    }
+                }
+            });
+        }
+        /**
+         * 页面首次查询
+         */
+       function doQuery() {
+             var order_no = $("#order_no").val();
+            $("#groupbuy_easyui-datagrid").datagrid("load", {
+                 "order_no": order_no
+            });
+        }
+    
+        </script>
+
+</head>
+<body>
+
+<div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
+    <form id="groupbuy_query_form" action="#" onsubmit="return false;">
+				<!-- 时间: 
+				<input id="query_sttime" class="Wdate"
+                             style="width: 110px; height: 24px" type="text" value=""
+                             onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
+				<span>&nbsp;-&nbsp;</span>
+				<input id="query_edtime" class="Wdate"
+                                                 style="width: 110px; height: 24px;" type="text" value=""
+                                                 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/> -->
+        订单号:<input value="" id="order_no">    
+        <span><input type="button" class="enter_btn" value="查询" onclick="doQuery()"/></span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                    
+        <span><input type="button" class="enter_btn export_btn" id ="export_btn" value="导出" onclick="fnexport()"/></span>
+      
+    </form>
+</div>
+
+<table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
+       class="easyui-datagrid">
+    <thead>
+    <tr>
+        <!-- <th data-options="field:'id',width:'150px'">ID</th> -->
+        <th data-options="field:'companyCode',width:140">电商企业代码</th>
+       <th data-options="field:'logisticscode',width:140">物流企业代码</th>
+        <th data-options="field:'number',width:140">电商订单号</th>
+        <th data-options="field:'shipmentNumber',width:140">总运单号</th>
+        <th data-options="field:'subShipmentNumber',width:140">分运单号</th>
+        <th data-options="field:'weight',width:140">订单总重量</th>
+       <th data-options="field:'netWeight',width:140">订单总净重</th>
+        <th data-options="field:'currency',width:140">币种</th>
+        <th data-options="field:'cost',width:140">商品总价值</th>
+        <th data-options="field:'otherCost',width:140">运杂费</th>
+        <th data-options="field:'premium',width:140">保费</th>
+        <th data-options="field:'packageCode',width:140">集包号</th>
+        <th data-options="field:'packageNumber',width:140">小包件数</th>
+        <th data-options="field:'postName',width:140">发货人名称</th>
+        <th data-options="field:'postAddress',width:140">发货人地址</th>
+        <th data-options="field:'postContry',width:140">发货人国家</th>
+        <th data-options="field:'postNumber',width:140">发货人电话</th>
+        <th data-options="field:'receivingName',width:140">收件人名称</th>
+        <th data-options="field:'receivingAddress',width:140">收件人地址</th>
+        <th data-options="field:'receivingContry',width:140">收件人国家</th>
+        <th data-options="field:'receivingNumber',width:140">收件人电话</th>
+        <th data-options="field:'transactionNumber',width:140">支付交易流水号</th>
+        <th data-options="field:'totalAmount',width:140">支付总金额</th>
+        <th data-options="field:'enterpriseCode',width:140">支付企业代码</th>
+        <th data-options="field:'enterpriseName',width:140">支付企业名称</th>
+        <th data-options="field:'receivingTime',width:140">到帐时间</th>
+        <th data-options="field:'pid',width:140">电商商品编号</th>
+        <th data-options="field:'goodsName',width:140">商品名称 </th>
+        <th data-options="field:'goodsWeight',width:140">单件重量</th>
+        <th data-options="field:'quality',width:140">商品数量</th>
+        <th data-options="field:'goodsPrice',width:140">商品单价</th>
+        <th data-options="field:'goodsCost',width:140">商品总价 </th>
+        <th data-options="field:'customsRecordNumber',width:140">海关备案编号</th>
+        <th data-options="field:'hsNumber',width:140">HS编码 </th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+</body>
+</html>
