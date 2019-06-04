@@ -28,6 +28,7 @@ import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/order")
+@Slf4j
 public class OrderInfoController{
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderInfoController.class);
 	@Autowired
@@ -692,6 +694,12 @@ public class OrderInfoController{
 		}
 		startdate_req=StringUtil.isNotBlank(startdate_req)?startdate_req + " 00:00:00":"0";
 		enddate_req=StringUtil.isNotBlank(enddate_req)?enddate_req + " 23:59:59":"0";
+		//Added <V1.0.1> Start： cjc 2019/6/4 10:57:52 Description : 添加付款失败订单筛选
+		if(9 == state){
+			type = "order_pending";
+		}
+		//End：
+
 		paramMap.put("userID",String.valueOf(userID));
 		paramMap.put("state",String.valueOf(state));
 		paramMap.put("trackState",String.valueOf(trackState));
@@ -1340,4 +1348,16 @@ public class OrderInfoController{
         ret=this.spiderService.updataCheckedById(id);
         return ret;
     }
+
+	@RequestMapping("/delOrderinfo")
+	@ResponseBody
+    public int delOrderinfo(String orderno){
+    	int ret = 0;
+    	try {
+			ret=spiderService.delOrderinfo(orderno);
+		}catch (Exception e){
+    		log.error("更新失败",e);
+		}
+		return ret;
+	}
 }

@@ -619,3 +619,18 @@ function reFreshoDate() {
             }
         });
 	}
+	function delOrderinfo(orderno,that){
+		$.ajax({
+			type:"POST",
+			url:'/cbtconsole/order/delOrderinfo',
+			data:{orderno:orderno},
+			success:function(data) {
+				if(data == 1){
+					alert("删除成功!");
+					$('#tr_'+orderno).hide();
+				}else{
+					alert("删除失败");
+				}
+			}
+		});
+	}
