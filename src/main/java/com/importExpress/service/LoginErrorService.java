@@ -1,8 +1,6 @@
 package com.importExpress.service;
 
-import java.util.List;
-
-import com.importExpress.pojo.LoginErrorInfo;
+import java.util.Map;
 
 public interface LoginErrorService {
 	
@@ -11,6 +9,6 @@ public interface LoginErrorService {
 	 * @param limitNum
 	 * @return
 	 */
-	List<LoginErrorInfo> getList(int startNum, int limitNum);
+	Map<String,Object> getList(int startNum, int limitNum);
 
 }

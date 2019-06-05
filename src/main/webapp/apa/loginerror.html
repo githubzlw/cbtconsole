@@ -169,9 +169,9 @@
 <body>
 
 <div id="groupbuy_top_toolbar" style="padding: 5px; height: auto">
-    <form id="groupbuy_query_form" action="#" onsubmit="return false;">
-			<!-- <span> 事件号: <input type="text" id="pid_id"
-                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span> -->
+    <!-- <form id="groupbuy_query_form" action="#" onsubmit="return false;">
+			<span> 事件号: <input type="text" id="pid_id"
+                                style="width: 200px; height: 24px" value=""/></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
 				时间: <input id="query_sttime" class="Wdate"
                              style="width: 110px; height: 24px" type="text" value=""
                              onfocus="WdatePicker({skin:'whyGreen',minDate:'2019-06-12',maxDate:'2050-12-20'})"/>
@@ -184,16 +184,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <span><input type="button" class="enter_btn export_btn" id ="export_btn" value="导出" onclick="fnexport()"/></span>
       
-    </form>
+    </form> -->
 </div>
 
 <table id="groupbuy_easyui-datagrid" style="width: 100%; height: 100%;"
        class="easyui-datagrid">
     <thead>
     <tr>
-        <th data-options="field:'loginTime',width:'80px'">登录时间</th>
-        <th data-options="field:'email',align:'left',width:'80px'">登录用户名</th>
-        <th data-options="field:'pass',align:'left',width:'150px'">密码</th>
+        <th data-options="field:'loginTime',width:'33%'">登录时间</th>
+        <th data-options="field:'email',width:'33%'">登录用户名</th>
+        <th data-options="field:'pass',width:'33%'">密码</th>
     </tr>
     </thead>
     <tbody>

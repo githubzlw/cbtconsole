@@ -23,4 +23,6 @@ public class LoginErrorInfo {
              *登陆时间 
      */
     private String loginTime;
+    
+    private long time;
 }

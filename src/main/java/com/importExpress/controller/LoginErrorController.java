@@ -1,7 +1,7 @@
 package com.importExpress.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.cbt.website.util.EasyUiJsonResult;
-import com.importExpress.pojo.LoginErrorInfo;
 import com.importExpress.service.LoginErrorService;
 
 @Controller
@@ -56,10 +55,10 @@ public class LoginErrorController {
             edtime += " 23:59:59";
         }
 		try {
-			List<LoginErrorInfo> result = loginErrorService.getList(startNum, limitNum);
+			Map<String, Object> result = loginErrorService.getList(startNum, limitNum);
             json.setSuccess(true);
-            json.setRows(result);
-            json.setTotal(result.size());
+            json.setRows(result.get("data"));
+            json.setTotal((int)result.get("count"));
         } catch (Exception e) {
             e.printStackTrace();
             json.setSuccess(false);
