@@ -65,9 +65,12 @@
 		<if test="level != null and level != ''">
 			and s.level =#{level}
 		</if>
-		<if test="quality != null and quality != ''">
+		<if test="quality != null and quality != '' and quality != -1">
 			and s.quality_avg>=#{quality} and s.quality_avg&lt;#{qualitys}
 		</if>
+        <if test="quality == -1">
+            and s.quality_avg is null
+        </if>
 		<if test="services != null and services != ''">
 			and s.service_avg >=#{services} and s.service_avg&lt;#{servicess}
 		</if>
@@ -100,10 +103,13 @@
 		<if test="level != null and level != ''">
 			and s.level =#{level}
 		</if>
-		<if test="quality != null and quality != ''">
+        <if test="quality != null and quality != '' and quality != -1">
 			and s.quality_avg>=#{quality} and s.quality_avg&lt;#{qualitys}
 		</if>
-		<if test="services != null and services != ''">
+        <if test="quality == -1">
+            and s.quality_avg is null
+        </if>
+        <if test="services != null and services != ''">
 			and s.service_avg >=#{services} and s.service_avg&lt;#{servicess}
 		</if>
 		<if test="authorized != null">
