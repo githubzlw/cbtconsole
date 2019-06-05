@@ -662,6 +662,13 @@
                            href="/cbtconsole/complain/searchComplainByParam?userid=${order.userid}&creatTime=&complainState=-1&username=&toPage=1&currentPage=1">有申诉</a>&nbsp;&nbsp;
                     </c:if>
 
+                    <c:if test="${sampleschoice }">
+                        <br /><br />
+                        <span style="color: red; font-size: 16px;">
+                            支付成功页面用户勾选的是否先发送样品: 是(先发送样品)
+                        </span>
+                    </c:if>
+
                 </td>
                 <td style="margin-left:100px">
                     <c:if test="${evaluate.evaluate != null && evaluate.evaluate !=''}">

@@ -514,4 +514,6 @@ public interface IOrderinfoService {
 	Boolean UpdateGoodsState(String goods_pid);
 
 	Boolean UpdateAllGoodsState(String tbOrderId);
+
+    boolean getSampleschoice(String orderNo);
 }
