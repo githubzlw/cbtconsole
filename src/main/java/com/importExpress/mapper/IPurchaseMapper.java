@@ -539,5 +539,6 @@ public interface IPurchaseMapper {
 
     @Select("SELECT apply_time as applyTime,apply_user as applyUser FROM return_display WHERE customer_info=#{orderNo} AND item=#{goods_pid} ORDER BY apply_time DESC LIMIT 1")
 	returndisplay getApplyTime(@Param("orderNo") String orderNo, @Param("goods_pid") String goods_pid);
-
+    @Select("SELECT COUNT(1) FROM mail.emailinfo WHERE useremail=#{email}")
+    int FindCountByEmial(@Param("email") String email);
 }

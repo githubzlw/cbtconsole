@@ -1,6 +1,7 @@
 package com.importExpress.mapper;
 
 import com.cbt.website.bean.ConfirmUserInfo;
+import com.importExpress.pojo.EmailInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
 import com.importExpress.pojo.UserOtherInfoBean;
 import org.apache.ibatis.annotations.Param;
@@ -23,4 +24,6 @@ public interface NewCustomersFollowMapper {
     List<ConfirmUserInfo> queryAllSale();
     @Select("SELECT userid,username,usertype as userType,remarks as remarks,creaTime as createTime FROM user_other_info WHERE userid=#{userid} ORDER BY creatime DESC LIMIT 1")
     UserOtherInfoBean queryCustomByUserId(@Param("userid") String userid);
+    @Select("SELECT * FROM mail.emailinfo WHERE useremail=#{email} or adm_email=#{email}")
+    List<EmailInfo> LookUseremail(@Param("email") String email);
 }

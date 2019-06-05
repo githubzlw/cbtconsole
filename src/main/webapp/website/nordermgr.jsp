@@ -177,7 +177,8 @@ function fn(va) {
 		//订单量
 		$("#table tr:eq(" + row + ") td:eq(4)").after("<td style='text-align:center;vertical-align:middle;'>" + json[i].order_count + "</td>");
 		//邮件
-		$("#table tr:eq(" + row + ") td:eq(5)").after("<td><a target='_blank'  href='/cbtconsole/website/user.jsp?userid="+ json[i].user_id + "'>"+ json[i].email + "</a></td>");
+		$("#table tr:eq(" + row + ") td:eq(5)").after("<td><a target='_blank'  href='/cbtconsole/website/user.jsp?userid="+ json[i].user_id + "'>"+ json[i].email +"</a>" +
+			"<a  target='_blank' href='http://192.168.1.27:8089/LookUseremail?email="+json[i].email+"' style='color: red'>("+json[i].emailcount+")</a></td>");
 		//支付时间
 		var paytime_ = (createtime.split(':')[0]).substring(5, 17);
 		$("#table tr:eq(" + row + ") td:eq(6)").after("<td>"+ paytime_+ ":"+ createtime.split(':')[1]+ "</td>");

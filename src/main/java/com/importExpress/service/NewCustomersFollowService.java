@@ -4,6 +4,7 @@ import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.EmailInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
 
 import java.util.List;
@@ -19,4 +20,5 @@ public interface NewCustomersFollowService {
 
     JsonResult queryCustomByUserId(String userid);
 
+    List<EmailInfo> LookUseremail(String email);
 }

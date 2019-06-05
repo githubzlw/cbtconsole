@@ -6,6 +6,7 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.controller.NewCustomersFollowController;
 import com.importExpress.mapper.NewCustomersFollowMapper;
+import com.importExpress.pojo.EmailInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
 import com.importExpress.pojo.UserOtherInfoBean;
 import com.importExpress.service.NewCustomersFollowService;
@@ -116,5 +117,17 @@ public class NewCustomersFollowServiceImpl implements NewCustomersFollowService 
         }
 
         return jsonResult;
+    }
+
+    @Override
+    public List<EmailInfo> LookUseremail(String email) {
+        try {
+        List<EmailInfo> list=this.newCustomersFollowMapper.LookUseremail(email);
+        return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }
