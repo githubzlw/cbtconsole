@@ -1920,6 +1920,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
         purchaseBean.setShopName(map.get("shopName"));
         purchaseBean.setShopGrade(map.get("supplyGrade"));
 		purchaseBean.setMorder(String.valueOf(map.get("morder")));
+		purchaseBean.setReplacementProduct(map.get("replacement_product"));
 	}
 
 	@Override
