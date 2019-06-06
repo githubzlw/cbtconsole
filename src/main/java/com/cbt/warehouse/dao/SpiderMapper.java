@@ -269,4 +269,7 @@ public interface SpiderMapper {
     @Update("update id_relationtable SET itemqty=0 WHERE odid=#{id}")
     int updataIqById(@Param("id") String id);
 
+    @Update("update orderinfo set del = 1 where order_no=#{orderno}")
+    int delOrderinfo(@Param("orderno") String orderno);
+
 }

@@ -3038,6 +3038,11 @@
 								<%--【预估单品利润金额RMB（预估单品利润率%）=客户实际支付单品金额-实际预估采购单品金额-预估国际单品运费--%>
 								<%--</div>--%>
 
+							<c:if test="${pb.replacementProduct!=null}">
+								<div style="width: 100%; word-wrap: break-word;">
+									<font color="red">客户录入替换商品： <span>${pb.replacementProduct}</span> </font><br>
+								</div>
+							</c:if>
 							<div style="width: 100%; word-wrap: break-word;">
 								供应商名字： <span>${pb.shopName}</span> <br>
 							</div>

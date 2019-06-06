@@ -652,4 +652,7 @@ public interface OrderinfoMapper {
 	int InserGoodsState(@Param("goods_pid")String goods_pid);
     @Select("SELECT itemid as goods_pid from taobao_1688_order_history WHERE orderid=#{tbOrderId}")
 	List<String> FindAllGoodsPid(@Param("tbOrderId") String tbOrderId);
+
+    String getSampleschoice(@Param("orderNo") String orderNo);
+
 }

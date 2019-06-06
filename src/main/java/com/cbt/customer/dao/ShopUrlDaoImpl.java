@@ -98,7 +98,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
         List<ShopUrl> suList = new ArrayList<ShopUrl>();
         ShopUrl su = null;
         String sql = "select a.*,(select count(b.id) from cross_border.custom_benchmark_ready_newest b " +
-                "where b.shop_id =a.shop_id and b.valid=1) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, " +
+                "where b.shop_id =a.shop_id) as on_line_num, au.file_name au_file_name, au.file_url au_file_url, " +
                 "au.admuser au_admuser, au.start_time au_start_time, au.end_time au_end_time, au.remark au_remark, au.valid au_valid," +
                 "ifnull(scs.shop_state,0) as shop_state,ifnull(scs.online_state,0) as online_state " +
                 "from shop_url_bak a LEFT JOIN shop_url_authorized_info au ON a.shop_id = au.shop_id AND au.valid != 3 " +

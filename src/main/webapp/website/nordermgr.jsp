@@ -72,7 +72,7 @@ function fn(va) {
 			orderColor = "";
 		}
 		$("#table tr:eq(" + (row - 1) + ")").after(
-				"<tr></tr>");
+				"<tr id='tr_"+json[i].order_no+"'></tr>");
 		//项目标识
 		var paytype = json[i].paytype;
         //订单是否有申诉
@@ -164,12 +164,23 @@ function fn(va) {
 	    if(json[i].message_read>0){
 			showImg += "<span class='spiconbl'>客户有新回复</span>";
 		}
+		//Added <V1.0.1> Start： cjc 2019/6/4 11:56:48 Description : 添加删除订单
+		var checkType='${param.type}';
+		var requestType = '<%=request.getAttribute("type")%>';
+		var thisOrderNo = json[i].order_no;
+		var delectImg = "<span class='spiconbl' onclick='delOrderinfo("+thisOrderNo+",this)'>删除</span>"
+		if("order_pending" != checkType && "order_pending" != requestType){
+			delectImg = "";
+		}
+		//End：
 		$("#table tr:eq(" + row + ")").append("<td>" + (i + 1) + "</td>");
 		$("#table tr:eq(" + row + ") td:eq(0)").after("<td id='"+json[i].order_no+"'>" + showImg + "</td>");
 		//订单号
-		$("#table tr:eq(" + row + ") td:eq(1)").after("<td style='background-color:"+orderColor+";'><a target='_blank' href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="
-			+ json[i].order_no+ "&state="+ json[i].state+ "&username="+ json[i].username
-			+ "&paytime="+ json[i].createtime.split(':')[0]+ "&allFreight="+Number(json[i].allFreights).toFixed(2)+"'>"+ json[i].order_no+ "</a></td>");
+		$("#table tr:eq(" + row + ") td:eq(1)").after("<td   style='background-color:" + orderColor + ";'><a target='_blank' href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="
+				+ thisOrderNo + "&state=" + json[i].state + "&username=" + json[i].username
+				+ "&paytime=" + json[i].createtime.split(':')[0] + "&allFreight=" + Number(json[i].allFreights).toFixed(2) + "'>" + json[i].order_no + "</a>" +
+				delectImg +
+				"</td>");
 		//支付类型
         $("#table tr:eq(" + row + ") td:eq(2)").after("<td style='text-align:center;vertical-align:middle;'>"+json[i].paytypes+"</td>");
 		//用户id
@@ -177,7 +188,8 @@ function fn(va) {
 		//订单量
 		$("#table tr:eq(" + row + ") td:eq(4)").after("<td style='text-align:center;vertical-align:middle;'>" + json[i].order_count + "</td>");
 		//邮件
-		$("#table tr:eq(" + row + ") td:eq(5)").after("<td><a target='_blank'  href='/cbtconsole/website/user.jsp?userid="+ json[i].user_id + "'>"+ json[i].email + "</a></td>");
+		$("#table tr:eq(" + row + ") td:eq(5)").after("<td><a target='_blank'  href='/cbtconsole/website/user.jsp?userid="+ json[i].user_id + "'>"+ json[i].email +"</a>" +
+			"<a  target='_blank' href='http://192.168.1.27:8089/LookUseremail?email="+json[i].email+"' style='color: red'>("+json[i].emailcount+")</a></td>");
 		//支付时间
 		var paytime_ = (createtime.split(':')[0]).substring(5, 17);
 		$("#table tr:eq(" + row + ") td:eq(6)").after("<td>"+ paytime_+ ":"+ createtime.split(':')[1]+ "</td>");
@@ -321,7 +333,6 @@ function fn(va) {
 		uname = user.username;
 		uemail = user.email;
         var emailFlag = json[i].emailFlag;
-        var checkType='${param.type}';
 		if(adminName=="Ling"){
 		    var html_="<td style='"+show_changeState+"'><a target='_blank' href='javascript:void(0)' "
                 +"onclick='window.open(\"/cbtconsole/website/updateorderstate.jsp?orderNo="
@@ -710,6 +721,7 @@ $(document).ready(function(){
 								<option value="5" ${param.state==5?'selected="selected"':''}>确认价格中</option>
 								<option value="7" ${param.state==7?'selected="selected"':''}>非正常出库</option>
 								<option value="8" ${param.state==8?'selected="selected"':''}>采样订单</option>
+								<option value="9" ${param.state==9?'selected="selected"':''}>支付失败</option>
 						</select>
 						</td>
 						<td style="width: 80px;">运单状态<select id="trackState"

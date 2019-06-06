@@ -142,6 +142,7 @@ public class SupplierScoringController {
 		List<SupplierProductsBean> supplierproducts = new ArrayList<SupplierProductsBean>();
 		List<SupplierProductsBean> supplierProductsBeans = new ArrayList<SupplierProductsBean>();
 		List<SupplierProductsBean> supplierProductsBeansList = new ArrayList<SupplierProductsBean>();
+		List<SupplierProductsBean> warehouseRemarkList = new ArrayList<SupplierProductsBean>();
 		Map<String,String> map=new HashMap<String,String>();
 		try{
 			String shop_id=request.getParameter("shop_id");
@@ -156,9 +157,12 @@ public class SupplierScoringController {
 				supplierProductsBeans=supplierScoringService.getAllShopGoodsInfo(map);
 			}
 			supplierProductsBeansList=supplierScoringService.getAllShopGoodsInfoList(map);
+			// 2019-6-4 增加显示 入库备注
+            warehouseRemarkList = supplierScoringService.queryWarehouseRemarkByShopId(shop_id);
 			request.setAttribute("supplierproducts", supplierproducts);
 			request.setAttribute("supplierProductsBeans",supplierProductsBeans);
 			request.setAttribute("supplierProductsBeansList",supplierProductsBeansList);
+			request.setAttribute("warehouseRemarkList",warehouseRemarkList);
 			request.setAttribute("map",map);
 		}catch (Exception e){
 			e.printStackTrace();

@@ -711,7 +711,7 @@
         ifnull(re.orderremark,'-') as orderremarks
         FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
         left join order_remark re on re.orderid=o.order_no
-        where o.order_no in (${orderIds})
+        where o.order_no in (${orderIds}) and del = 0 ORDER BY paytime desc
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
         SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
@@ -1379,4 +1379,12 @@
         UPDATE order_details SET state=1 WHERE orderid=#{orderid} AND id=#{odid};
         UPDATE id_relationtable SET is_delete = 1 WHERE orderid=#{orderid} AND odid=#{odid};
     </update>
+
+    <!--String getSampleschoice(@Param("orderNo") String orderNo);-->
+    <select id="getSampleschoice" resultType="String">
+        SELECT sampleschoice FROM paysuccessinfo WHERE orderno = #{orderNo}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
 </mapper>
