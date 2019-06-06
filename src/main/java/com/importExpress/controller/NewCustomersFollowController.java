@@ -7,6 +7,7 @@ import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.EmailInfo;
 import com.importExpress.pojo.ShopCarUserStatistic;
 import com.importExpress.service.NewCustomersFollowService;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 @Controller
@@ -169,6 +171,38 @@ public class NewCustomersFollowController {
         String userid=request.getParameter("userid");
             json = this.newCustomersFollowService.queryCustomByUserId(userid);
         return json;
+    }
+
+@RequestMapping("LookUseremail")
+    public String LookUseremail(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String email=request.getParameter("useremail");
+            List<EmailInfo>list = this.newCustomersFollowService.LookUseremail(email);
+            request.setAttribute("email",list);
+        return "mailShow";
+    }
+
+@RequestMapping("lookEmail")
+@ResponseBody
+    public String lookEmail(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult json = new JsonResult();
+        String body=request.getParameter("body");
+    StringBuilder result = new StringBuilder();
+    try{
+        BufferedReader br = new BufferedReader(new FileReader(body));//构造一个BufferedReader类来读取文件
+        String s = null;
+        while((s = br.readLine())!=null){//使用readLine方法，一次读一行
+            result.append(System.lineSeparator()+s);
+        }
+        br.close();
+    }catch(Exception e){
+        e.printStackTrace();
+        return "";
+    }
+
+    String html=result.toString();
+
+        return html;
     }
 
 
