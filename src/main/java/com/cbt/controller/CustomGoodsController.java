@@ -417,7 +417,7 @@ public class CustomGoodsController {
 		}*/
         String shopId = request.getParameter("shopId");
         if (StringUtils.isNotBlank(shopId)) {
-            queryBean.setQrCatid(shopId);
+            queryBean.setShopId(shopId);
         }
         String chKeyWord = request.getParameter("chKeyWord");
         if (StringUtils.isNotBlank(chKeyWord)) {
