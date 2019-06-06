@@ -16,6 +16,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
+import com.importExpress.thread.DeleteImgByMd5Thread;
 import com.importExpress.utli.ImageCompressionByNoteJs;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -3188,44 +3189,9 @@ public class EditorController {
             return json;
         }
         try {
-
-            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
-            List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath, shopId);
-            List<String> pidList = new ArrayList(md5BeanList.size());
-            Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();
-            List<ShopGoodsInfo> deleteGoodsInfos = new ArrayList<>();
-            for (GoodsMd5Bean md5Bean : md5BeanList) {
-                pidList.add(md5Bean.getPid());
-                if (pidMap.containsKey(md5Bean.getPid())) {
-                    pidMap.get(md5Bean.getPid()).add(md5Bean);
-                } else {
-                    List<GoodsMd5Bean> childList = new ArrayList<>();
-                    childList.add(md5Bean);
-                    pidMap.put(md5Bean.getPid(), childList);
-                }
-                ShopGoodsInfo delGd = new ShopGoodsInfo();
-                delGd.setShopId(shopId);
-                delGd.setPid(md5Bean.getPid());
-                delGd.setImgUrl(md5Bean.getRemotePath().substring(md5Bean.getRemotePath().indexOf(md5Bean.getPid()) + 1));
-                delGd.setLocalPath(md5Bean.getLocalPath());
-                delGd.setRemotePath(GoodsInfoUtils.changeLocalPathToRemotePath(md5Bean.getRemotePath()));
-                deleteGoodsInfos.add(delGd);
-            }
-            List<CustomGoodsPublish> goodsList = customGoodsService.queryGoodsByPidList(pidList);
-            for (CustomGoodsPublish gd : goodsList) {
-                if (pidMap.containsKey(gd.getPid())) {
-                    deleteAndUpdateGoodsImg(gd, pidMap.get(gd.getPid()));
-                }
-            }
-            // 更新回收标识
-            customGoodsService.updateMd5ImgDeleteFlag(pid, remotePath, shopId);
-            // 插入公共图片表中
-            shopUrlService.insertShopGoodsDeleteImgs(deleteGoodsInfos, user.getId());
-            md5BeanList.clear();
-            pidList.clear();
-            pidMap.clear();
-            goodsList.clear();
-            deleteGoodsInfos.clear();
+            DeleteImgByMd5Thread deleteImgByMd5Thread = new DeleteImgByMd5Thread(pid, user.getId(), shopId, url,
+                    customGoodsService, shopUrlService);
+            deleteImgByMd5Thread.start();
             json.setOk(true);
         } catch (Exception e) {
             e.printStackTrace();

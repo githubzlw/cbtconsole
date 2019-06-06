@@ -254,6 +254,6 @@ public interface SupplierScoringMapper {
 	 * @return void
 	 */
 	void updateAliInfoDataDays(@Param("returnDays") int returnDays, @Param("shopId") String shopId);
-	
 
+    List<SupplierProductsBean> queryWarehouseRemarkByShopId(@Param("shopId") String shopId);
 }

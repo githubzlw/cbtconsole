@@ -5,12 +5,14 @@ import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
 import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsReview;
 import com.importExpress.pojo.OrderShare;
 import com.importExpress.service.QueryUserService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -671,6 +674,40 @@ public class QueryUserController {
         }
         return result;
     }
+
+
+    /**
+     * 后台 商品下架(添加到指定表 隔天定时下架)
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/insertNeedoffDownAll.do?pids=&reason=
+     *
+     */
+    @RequestMapping(value = "/insertNeedoffDownAll.do")
+    @ResponseBody
+    public Map<String, String> insertNeedoffDownAll(HttpServletRequest request, String pids, Integer reason) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            String sessionId = request.getSession().getId();
+            String userJson = Redis.hget(sessionId, "admuser");
+            Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+            if (user == null || user.getId() == 0) {
+                result.put("message", "请登陆后再操作!");
+                return result;
+            }
+
+            List<String> pidList = Arrays.asList(pids.split(","));
+            if (CollectionUtils.isEmpty(pidList)) {
+                result.put("message", "未找到下架的pid!");
+                return result;
+            }
+            queryUserService.insertNeedoffDownAll(pidList, reason, user.getId());
+            result.put("state", "true");
+            result.put("message", "已修改!");
+        } catch (Exception e) {
+            result.put("message", "内部异常, 修改失败!");
+        }
+        return result;
+    }
+
 
 
 }

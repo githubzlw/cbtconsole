@@ -711,7 +711,7 @@
         ifnull(re.orderremark,'-') as orderremarks
         FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
         left join order_remark re on re.orderid=o.order_no
-        where o.order_no in (${orderIds})
+        where o.order_no in (${orderIds}) and del = 0 ORDER BY paytime desc
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
         SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
@@ -736,10 +736,11 @@
         (SELECT CASE WHEN flag=1 THEN new_remaining ELSE remaining END FROM inventory WHERE goods_pid=od.goods_pid AND IFNULL(sku,'---')!=od.car_type AND can_remaining>0 limit 1) AS pidInventory,
         ( SELECT COUNT(DISTINCT ifnull(ods.goods_pid,''))*5 FROM order_details ods  WHERE ods.orderid=od.orderid AND ods.state in (0,1)) as pid_amount,
         date_format(od.createtime,'%Y-%m-%d') as createtime,od.car_img img_type, ors.bargainRemark,ors.deliveryRemark,ors.colorReplaceRemark,ors.sizeReplaceRemark,ors.orderNumRemarks,ors.questionsRemarks,ors.unquestionsRemarks,ors.againRemarks, od.remark,0.00 as sprice,dropshipid,checked,
-        id.goodstatus,ifnull(id.barcode,'') as locationNum,
+        id.goodstatus,ifnull(id.position,'') as locationNum,
         od.seilUnit,gci.context as goods_info,dso.state as dropshipstate,ifnull(ors.shop_id,'') as shop_id,ors.is_replenishment,
         ifnull(od.goods_pid,'') as goods_pid,od.car_urlMD5,ors.offline_purchase,od.isFreeShipProduct as is_sold_flag,od.seilUnit as ali_sellunit,
         cbr.bm_flag,cbr.isBenchmark,cbr.weight cbrWeight,cbr.final_weight,cbr.wholesale_price cbrPrice,0 as cbrdPrice,0 as dfinal_weight,cbr.ali_price,cbr.ali_pid alipid,cbr.shop_id as cbrShopid,"" as cbrdShop_id
+        ,REPLACE(REPLACE(func_get_split_string(func_get_split_string(cbr.wholesale_price,'$',1),'-',1),'[',''),'≥','') as morder
         from order_details od
         left join order_address adr on od.orderid=adr.orderNo
         left join cancel_replacement_record cr on cr.orderid=od.orderid and cr.goodsid=od.goodsid
@@ -1378,4 +1379,12 @@
         UPDATE order_details SET state=1 WHERE orderid=#{orderid} AND id=#{odid};
         UPDATE id_relationtable SET is_delete = 1 WHERE orderid=#{orderid} AND odid=#{odid};
     </update>
+
+    <!--String getSampleschoice(@Param("orderNo") String orderNo);-->
+    <select id="getSampleschoice" resultType="String">
+        SELECT sampleschoice FROM paysuccessinfo WHERE orderno = #{orderNo}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
 </mapper>

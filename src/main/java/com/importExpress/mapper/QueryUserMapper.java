@@ -129,4 +129,7 @@ public interface QueryUserMapper {
     String queryProductsStockverification1688data(@Param("pid") String pid);
 
     List<SameGoodsDetails> querySameGoodsDetails(@Param("pid") String pid);
+
+    void insertNeedoffDownAll(@Param("list") List<String> list, @Param("reason") Integer reason, @Param("adminid") Integer adminid);
+
 }

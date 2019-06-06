@@ -972,6 +972,8 @@ public class OrderinfoService implements IOrderinfoService {
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
 			String tp="支付类型错误";
+			int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
+			map.put("emailcount",String.valueOf(count));
 			if(StringUtil.isNotBlank(paytype) && paytype.indexOf(",")>-1){
 				StringBuilder types=new StringBuilder();
 				String [] t=paytype.split(",");
@@ -1880,6 +1882,15 @@ public class OrderinfoService implements IOrderinfoService {
 			return false;
 		}
 	}
+
+    @Override
+    public boolean getSampleschoice(String orderNo) {
+	    String sampleschoice = this.dao.getSampleschoice(orderNo);
+	    if ("1".equals(sampleschoice)) {
+	        return true;
+        }
+        return false;
+    }
 }
 
 

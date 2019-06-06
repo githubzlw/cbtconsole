@@ -93,6 +93,15 @@ public class PurchasesBean {
 	private String shopName; //供应商名字
 	private String shopGrade; //供应商评级
 	private String morder; //最小moq
+	private String replacementProduct; //客户录入替换产品
+
+	public String getReplacementProduct() {
+		return replacementProduct;
+	}
+
+	public void setReplacementProduct(String replacementProduct) {
+		this.replacementProduct = replacementProduct;
+	}
 
 	public String getMorder() {
 		return morder;

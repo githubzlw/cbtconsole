@@ -978,4 +978,11 @@
         LIMIT 4
     </select>
 
+    <!--void insertNeedoffDownAll(@Param("list") List<String> list, @Param("reason") Integer reason, @Param("adminid") Integer adminid);-->
+    <insert id="insertNeedoffDownAll">
+        <foreach collection="list" item="item" separator=";">
+            INSERT INTO needoffshelf_goods (pid, reason, adminid) VALUES (#{item}, #{reason}, #{adminid})
+        </foreach>
+    </insert>
+
 </mapper>

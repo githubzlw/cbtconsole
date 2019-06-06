@@ -62,4 +62,6 @@ public interface QueryUserService {
     void updateNeedoffshelfByPid(String pid, String noShelfInfo);
 
     Map<String,Object> querySameGoodsInfoByPid(String pid);
+
+    void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid);
 }

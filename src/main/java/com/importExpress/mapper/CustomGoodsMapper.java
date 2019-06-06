@@ -431,4 +431,8 @@ public interface CustomGoodsMapper {
      * @return
      */
     int updateVolumeWeight(@Param("pid") String pid, @Param("newWeight") String newWeight);
+
+    List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery goodsQuery);
+
+    int queryGoodsShowInfosCount(CustomGoodsQuery goodsQuery);
 }

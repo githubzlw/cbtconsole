@@ -628,6 +628,9 @@
         <if test="state == 6">
             and cbu.valid = 2
         </if>
+        <if test="valid != -1">
+            and cbu.valid = #{valid}
+        </if>
         <if test="adminId > 0">
             and cge.admin_id = #{adminId}
         </if>
@@ -774,6 +777,9 @@
         </if>
         <if test="state == 6">
             and cbu.valid = 2
+        </if>
+        <if test="valid != -1">
+            and cbu.valid = #{valid}
         </if>
         <if test="adminId > 0">
             and cge.admin_id = #{adminId}
@@ -1279,5 +1285,94 @@
         update custom_benchmark_ready set volume_weight = #{newWeight}
         where pid = #{pid}
     </update>
+
+    <select id="queryGoodsShowInfos" parameterType="com.cbt.bean.CustomGoodsQuery" resultMap="queryGoodsResultMap">
+        select
+        cbu.pid, cbu.custom_main_image, cbu.isBenchmark, cbu.remotpath, cbu.img, cbu.shop_id,
+        cbu.eninfo AS 'name', cbu.valid, cge.is_edited, ifnull(cge.update_time,'') as update_time,
+        (
+        SELECT COUNT(1) FROM orderinfo oi
+        INNER JOIN order_details od ON oi.order_no=od.orderid
+        INNER JOIN `user` u ON oi.user_id = u.id
+        WHERE oi.state BETWEEN 1 AND 5 AND od.state IN (0,1)
+        AND u.is_test=0
+        AND (
+        u.email not like '%qq.com%' and u.email not like '%ww.com%' and
+        u.email not like 'test%'   and  u.email not like '%qq.ss' and u.email not like '%@q.ocm' and
+        u.email not like '%qqsss.com' and  u.email not like '%csmfg.com%'  and  u.email not like '%@sourcing-cn.com%'  and
+        u.email not like '%@china-synergy%'  and u.email&lt;>'sb33@gmail.com'  and u.email&lt;>'sbtest@gmail.com'  and
+        u.email not like '%@qq.co%' and u.email not like '%11.com' and u.email not like '%@qq.ocm' and u.email not like '%@163.com'
+        )
+        AND od.goods_pid IN (
+        cbu.pid
+        )
+        ) AS 'is_sold_flag'  -- 商品销售次数
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        <where>
+            <if test="shopId == null">
+                <if test="isEdited > -1">  -- 商品已编辑
+                    cge.is_edited = #{isEdited}
+                </if>
+                <if test="valid != -1">
+                    and cbu.valid = #{valid}
+                </if>
+                <if test="isBenchmark == 1">
+                    and cbu.isBenchmark = 1 and cbu.bm_flag=1
+                </if>
+                <if test="isBenchmark > -1 and isBenchmark != 1">
+                    and cbu.isBenchmark = #{isBenchmark}
+                </if>
+                <if test="catid != -1 and catid != 0">
+                    and cbu.catid1 in(
+                    select category_id from 1688_category where find_in_set(#{catid},path)
+                    )
+                </if>
+            </if>
+            <if test="shopId != null">
+                cbu.shop_id = #{shopId}
+                <if test="valid != -1">
+                    and cbu.valid = #{valid}
+                </if>
+            </if>
+        </where>
+        <if test="shopId == null">
+            limit #{page}, #{currPage}
+        </if>
+    </select>
+
+    <select id="queryGoodsShowInfosCount" parameterType="com.cbt.bean.CustomGoodsQuery" resultType="java.lang.Integer">
+        select
+        COUNT(1)
+        from custom_benchmark_ready cbu
+        left join custom_goods_edit cge on cbu.pid = cge.pid
+        <where>
+            <if test="shopId == null">
+                <if test="isEdited > -1">  -- 商品已编辑
+                    cge.is_edited = #{isEdited}
+                </if>
+                <if test="valid != -1">
+                    and cbu.valid = #{valid}
+                </if>
+                <if test="isBenchmark == 1">
+                    and cbu.isBenchmark = 1 and cbu.bm_flag=1
+                </if>
+                <if test="isBenchmark > -1 and isBenchmark != 1">
+                    and cbu.isBenchmark = #{isBenchmark}
+                </if>
+                <if test="catid != -1 and catid != 0">
+                    and cbu.catid1 in(
+                    select category_id from 1688_category where find_in_set(#{catid},path)
+                    )
+                </if>
+            </if>
+            <if test="shopId != null">
+                cbu.shop_id = #{shopId}
+                <if test="valid != -1">
+                    and cbu.valid = #{valid}
+                </if>
+            </if>
+        </where>
+    </select>
 
 </mapper>

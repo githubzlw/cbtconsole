@@ -258,5 +258,8 @@ public class SpiderServer implements ISpiderServer {
 		int res = dao.upGoogs_car(spider);
 		return res;
 	}
-
+	@Override
+	public  int delOrderinfo(String orderno){
+		return spiderMapper.delOrderinfo(orderno);
+	}
 }

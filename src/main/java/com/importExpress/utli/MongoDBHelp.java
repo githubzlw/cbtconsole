@@ -33,8 +33,10 @@ public enum MongoDBHelp {
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(MongoDBHelp.class);
 
     private static final String MONGODB_HOST = SysParamUtil.getParam("mongodb.host");
+    private static final String MONGODB_HOST2 = SysParamUtil.getParam("mongodb.host2");
     private static final String MONGODB_PORT = SysParamUtil.getParam("mongodb.port");
     private static final String MONGODB_DB = SysParamUtil.getParam("mongodb.db");
+    private static final String MONGODB_DB2 = SysParamUtil.getParam("mongodb.db2");
     private static final String MONGODB_USERNAME = SysParamUtil.getParam("mongodb.username");
     private static final String MONGODB_POSSWORD = SysParamUtil.getParam("mongodb.password");
     private static final String MONGODB_MAX_WAIT_TIME = SysParamUtil.getParam("mongodb.maxWaitTime");
@@ -43,6 +45,8 @@ public enum MongoDBHelp {
     private static final String MONGODB_CONNECTION_TIMEOUT = SysParamUtil.getParam("mongodb.connectTimeout");
     private MongoClient mongoClient = null;
     private MongoDatabase mongoDatabase = null;
+    private MongoClient mongoClient2 = null;
+    private MongoDatabase mongoDatabase2 = null;
 
     private void getConnection(){
     	List<ServerAddress> seeds = new ArrayList<>();
@@ -56,6 +60,12 @@ public enum MongoDBHelp {
     	MongoCredential credential = MongoCredential.createCredential(MONGODB_USERNAME, MONGODB_DB, MONGODB_POSSWORD.toCharArray());
         this.mongoClient = new MongoClient(seeds,credential,options);
         this.mongoDatabase = mongoClient.getDatabase(MONGODB_DB);
+       
+        List<ServerAddress> seeds2 = new ArrayList<>();
+        ServerAddress addr2 = new ServerAddress(MONGODB_HOST2, Integer.valueOf(MONGODB_PORT));
+        seeds2.add(addr2);
+        this.mongoClient2 = new MongoClient(MONGODB_HOST2, Integer.valueOf(MONGODB_PORT));
+        this.mongoDatabase2 = mongoClient2.getDatabase(MONGODB_DB2);
     }
 
     private void closeConnection(){
@@ -63,6 +73,10 @@ public enum MongoDBHelp {
         if(this.mongoClient!=null){
             this.mongoClient.close();
             this.mongoDatabase=null;
+        }
+        if(this.mongoClient2!=null){
+        	this.mongoClient2.close();
+        	this.mongoDatabase2=null;
         }
 
     }
@@ -170,5 +184,28 @@ public enum MongoDBHelp {
 
         this.closeConnection();
         return result;
+    }
+    public  long countFromMongo2(String collectionName,BasicDBObject q){
+    	this.getConnection();
+    	long count = mongoDatabase2.getCollection(collectionName).countDocuments(q);
+    	this.closeConnection();
+    	return count;
+    }
+    public  List<String> findAnyFromMongo2(String collectionName,BasicDBObject find,BasicDBObject sort,int startNum,int limitNum){
+    	this.getConnection();
+    	List<String> result = new ArrayList<>();
+    	FindIterable<Document> documents = mongoDatabase2.getCollection(collectionName).find(find);
+    	if(sort != null) {
+    		documents = documents.sort(sort);
+    	}
+    	
+    	documents = documents.skip(startNum).limit(limitNum);
+    	
+    	MongoCursor<Document> iterator = documents.iterator();
+    	while (iterator.hasNext()){
+    		result.add(iterator.next().toJson());
+    	}
+    	this.closeConnection();
+    	return result;
     }
 }
