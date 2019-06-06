@@ -32,6 +32,7 @@
 						<option value="3" >3</option>
 						<option value="4">4</option>
 						<option value="5" >5</option>
+						<option value="-1">暂未评分</option>
 						</select>
 			是否授权:<select id="authorizedFlag"  name="authorizedFlag">
 						<option value="" >---全部---</option>
