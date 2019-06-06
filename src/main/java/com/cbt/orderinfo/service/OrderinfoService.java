@@ -1752,6 +1752,8 @@ public class OrderinfoService implements IOrderinfoService {
 		if(StringUtil.isNotBlank(orderIds)){
 			list=dao.getorderPending(orderIds);
 			for(Map<String, String> map:list){
+				int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
+				map.put("emailcount",String.valueOf(count));
 				String tp="支付错误";
 				String paystatus="";
 				String orderNo=map.get("order_no");
