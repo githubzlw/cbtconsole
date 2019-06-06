@@ -1882,6 +1882,15 @@ public class OrderinfoService implements IOrderinfoService {
 			return false;
 		}
 	}
+
+    @Override
+    public boolean getSampleschoice(String orderNo) {
+	    String sampleschoice = this.dao.getSampleschoice(orderNo);
+	    if ("1".equals(sampleschoice)) {
+	        return true;
+        }
+        return false;
+    }
 }
 
 
