@@ -711,7 +711,7 @@
         ifnull(re.orderremark,'-') as orderremarks
         FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
         left join order_remark re on re.orderid=o.order_no
-        where o.order_no in (${orderIds})
+        where o.order_no in (${orderIds}) and del = 0 ORDER BY paytime desc
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
         SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no

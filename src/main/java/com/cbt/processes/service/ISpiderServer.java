@@ -170,4 +170,5 @@ public interface ISpiderServer {
 
 	int updataCheckedById(String id);
 
+    int delOrderinfo(String orderno);
 }
