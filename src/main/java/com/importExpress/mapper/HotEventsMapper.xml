@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.HotEventsMapper">
+
+
+    <resultMap id="eventsInfoResultMap" type="com.importExpress.pojo.HotEventsInfo">
+        <id column="id" property="id"/>
+        <result column="link" property="link"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="child_name1" property="childName1"/>
+        <result column="child_link1" property="childLink1"/>
+        <result column="child_name2" property="childName2"/>
+        <result column="child_link2" property="childLink2"/>
+        <result column="child_name3" property="childName3"/>
+        <result column="child_link3" property="childLink3"/>
+        <result column="is_on" property="isOn"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="eventsGoodsResultMap" type="com.importExpress.pojo.HotEventsGoods">
+        <id column="id" property="id"/>
+        <result column="events_id" property="eventsId"/>
+        <result column="pid" property="pid"/>
+        <result column="is_on" property="isOn"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="queryForInfoList" parameterType="com.importExpress.pojo.HotEventsInfo" resultMap="eventsInfoResultMap">
+        select id,link,img_url,child_name1,child_link1,child_name2,child_link2,child_name3,child_link3,is_on,admin_id,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as
+        update_time
+        from hot_events_info
+        where 1 = 1
+        <if test="isOn > -1">
+            and is_on = #{isOn}
+        </if>
+        order by is_on desc,create_time desc
+    </select>
+
+    <select id="queryForGoodsList" parameterType="com.importExpress.pojo.HotEventsGoods"
+            resultMap="eventsGoodsResultMap">
+        select id,events_id,pid,is_on,admin_id,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as
+        update_time
+        from hot_events_goods
+        where 1= 1
+        <if test="isOn > -1">
+            and is_on = #{isOn}
+        </if>
+    </select>
+
+    <insert id="insertIntoHotEventsInfo" parameterType="com.importExpress.pojo.HotEventsInfo">
+        insert into hot_events_info(link,img_url,child_name1,child_link1,child_name2,child_link2,child_name3,child_link3,is_on,admin_id)
+        values(#{link},#{imgUrl},#{childName1},#{childLink1},#{childName2},#{childLink2},#{childName3},#{childLink3},#{isOn},#{adminId})
+    </insert>
+
+    <insert id="insertIntoHotEventsGoods" parameterType="com.importExpress.pojo.HotEventsGoods">
+        insert into hot_events_goods(events_id,pid,is_on,admin_id)
+        values(#{eventsId},#{pid},#{isOn},#{adminId})
+    </insert>
+
+    <update id="updateIntoHotEventsInfo" parameterType="com.importExpress.pojo.HotEventsInfo">
+        update hot_events_info set
+        <if test="img_url != null">
+            img_url = #{imgUrl},
+        </if>
+        <if test="child_name1 != null">
+            child_name1 = #{childName1},
+        </if>
+        <if test="child_link1 != null">
+            child_link1 = #{childLink1},
+        </if>
+        <if test="child_name2 != null">
+            child_name2 = #{childName2},
+        </if>
+        <if test="child_link2 != null">
+            child_link2 = #{childLink2},
+        </if>
+        <if test="child_name3 != null">
+            child_name3 = #{childName3},
+        </if>
+        <if test="is_on > -1">
+            is_on = #{isOn} ,
+        </if>
+        admin_id = #{adminId}
+        where id = #{id}
+    </update>
+
+    <update id="updateIntoHotEventsGoods" parameterType="com.importExpress.pojo.HotEventsGoods">
+        update hot_events_goods
+        set pid = #{pid} ,is_on = #{isOn} ,admin_id = #{adminId}
+        where id = #{id} and events_id = #{eventsId}
+    </update>
+
+    <delete id="deleteIntoHotEventsInfo" parameterType="com.importExpress.pojo.HotEventsInfo">
+        delete from hot_events_info where id = #{id}
+    </delete>
+
+    <delete id="deleteIntoHotEventsGoods" parameterType="com.importExpress.pojo.HotEventsGoods">
+        delete from hot_events_goods where id = #{id} and events_id = #{eventsId}
+    </delete>
+
+</mapper>
