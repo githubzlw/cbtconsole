@@ -70,10 +70,16 @@ taobao_1688_order_history  as th on rd.tb_id=th.id where 1=1
 	<if test="optTimeEnd != null">
 			 AND (rd.opt_time&lt;#{optTimeEnd} or rd.apply_time&lt;#{optTimeEnd}) 
 	</if>
-	<!--<if test="state == null">-->
-			 <!--AND rd.state !=5 -->
-	<!--</if>-->
-		order by rd.State ASC, apply_time DESC  limit #{page},20
+	<if test="state !=null">
+			 AND rd.state =#{state}
+	</if>
+		<if test="userOther !=null">
+			 AND (rd.opt_user =#{userOther} OR rd.opt_user =#{user})
+	</if>
+		<if test="a1688order !=null">
+			 AND rd.customer_info =#{a1688order}
+	</if>
+		order by  rd.apply_time DESC  limit #{page},20
 	</select>
 	<select id="selectCount" resultType="java.lang.Integer" >
 		SELECT count(*) 
@@ -88,8 +94,14 @@ from return_display as rd where 1=1
 	 <if test="a1688Shipno != null">
 			 AND rd.1688_shipno=#{a1688Shipno} 
 	</if>
-	<if test="state == null">
-			 AND rd.state !=5 
-	</if>
+		<if test="state !=null">
+			AND rd.state =#{state}
+		</if>
+		<if test="userOther !=null">
+			AND (rd.opt_user =#{userOther} OR rd.opt_user =#{user})
+		</if>
+		<if test="a1688order !=null">
+			AND rd.customer_info =#{a1688order}
+		</if>
 	</select>
 </mapper>
