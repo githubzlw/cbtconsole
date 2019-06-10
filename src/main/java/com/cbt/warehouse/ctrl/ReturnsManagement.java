@@ -28,10 +28,14 @@ public class ReturnsManagement {
 	@RequestMapping(value = "/LookReturnOrder")
 	@ResponseBody
 	public EasyUiJsonResult LookReturnOrder(HttpServletRequest request,HttpServletResponse response){
+		String admJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser user = (Admuser)SerializeUtil.JsonToObj(admJson, Admuser.class);
+		String users = user.getAdmName();
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String applyUser=request.getParameter("location_type");
-		String State=request.getParameter("State");
+		String State=request.getParameter("state");
 		String a1688Shipno=request.getParameter("shipno");
+		String a1688order=request.getParameter("order");
 		String optTimeStart=request.getParameter("optTimeStart");
 		String optTimeEnd=request.getParameter("optTimeEnd");
 		int mid=Integer.parseInt(request.getParameter("mid"));
@@ -39,7 +43,7 @@ public class ReturnsManagement {
 		if (page > 0) {
 			page = (page - 1) * 20;
 		}
-		json=this.lookReturnOrderServiceNew.FindReturndisplay(applyUser,State,a1688Shipno,optTimeStart,optTimeEnd,page,mid);
+		json=this.lookReturnOrderServiceNew.FindReturndisplay(applyUser,State,a1688Shipno,optTimeStart,optTimeEnd,page,mid,users,a1688order);
 		 
 		return json;
 }

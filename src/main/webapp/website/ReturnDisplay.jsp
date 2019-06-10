@@ -124,12 +124,16 @@ function doQuery(page) {
 	var optTimeStart = $("#optTimeStart").val();
 	var optTimeEnd = $("#optTimeEnd").val();
     var shipno = $("#shipno").val();
+    var order = $("#order").val();
+     var state = $('#state option:selected') .val();
 	$("#easyui-datagrid").datagrid("load", {
 		location_type : location_type,
 		optTimeStart:optTimeStart,
 		page:page,
 		optTimeEnd:optTimeEnd,
-		shipno:shipno
+		shipno:shipno,
+        order:order,
+		state:state
 	});
 }
 
@@ -137,7 +141,9 @@ function doReset(){
 	$('#location_type').combobox('setValue','-1');
 	$("#optTimeStart").textbox('setValue','');
     $("#shipno").textbox('setValue','');
+    $("#order").textbox('setValue','');
 	$("#optTimeEnd").textbox('setValue','');
+	$("#state").textbox('setValue','-2');
 }
 
 function resetLocation(barcode,short_term){
@@ -345,6 +351,7 @@ function rejectedok() {
                     method:'get'">
 				</select>
 				<input class="easyui-textbox" name="shipno" id="shipno" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'运单号:'">
+				<input class="easyui-textbox" name="order" id="order" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'客户订单号:'">
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeStart" id="optTimeStart" style="width:15%;" onkeypress="if (event.keyCode == 13) doQuery(1)"  data-options="label:'发起时间:'">--%>
 				<%--<input class="easyui-textbox" value="列:2019-01-17" name="optTimeEnd" id="optTimeEnd" style="width:15%;"  data-options="label:'结束时间:',events:{blur:blurs,focus:focus},">--%>
 				时间：<input id="optTimeStart" class="Wdate"
@@ -354,6 +361,15 @@ function rejectedok() {
 												 style="width: 110px; height: 24px;" type="text" value=""
 												 onfocus="WdatePicker({skin:'whyGreen',minDate:'2015-10-12',maxDate:'2050-12-20'})"/>
 				</span>&nbsp;&nbsp;&nbsp;&nbsp;
+				退货状态：<select class="easyui-combobox" id="state" >
+					<option value ="-2">全部</option>
+					<option value ="-1">同意/驳回</option>
+					<option value ="0">未处理</option>
+					<option value="1">已处理</option>
+					<option value="2">待确定</option>
+					<option value="3">到账完结</option>
+					<option value="4">驳回完结</option>
+				</select>&nbsp;&nbsp;&nbsp;&nbsp;
 				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
 			</form>
