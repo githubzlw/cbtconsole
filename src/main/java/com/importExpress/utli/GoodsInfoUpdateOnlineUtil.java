@@ -53,8 +53,8 @@ public class GoodsInfoUpdateOnlineUtil {
     /**
      * 前台上传文件路径
      */
-    // public static final String ONLINE_EVENTS_URL = "https://www.import-express.com/popProducts/postEventsFile";
-    public static final String ONLINE_EVENTS_URL = "http://127.0.0.1:8087/popProducts/postEventsFile";
+    public static final String ONLINE_EVENTS_URL = "https://www.import-express.com/popProducts/postEventsFile";
+    // public static final String ONLINE_EVENTS_URL = "http://127.0.0.1:8087/popProducts/postEventsFile";
 
     // test
 //    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
