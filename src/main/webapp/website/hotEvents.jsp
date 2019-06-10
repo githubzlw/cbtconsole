@@ -19,9 +19,20 @@
 
         .btn_sty {
             margin: 5px 0 0 0;
-            width: 140px;
+            width: 96px;
             color: #fff;
             background-color: #5db5dc;
+            border-color: #2e6da4;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid transparent;
+        }
+
+        .btn_del {
+            margin: 5px 0 0 0;
+            width: 96px;
+            color: #fff;
+            background-color: red;
             border-color: #2e6da4;
             font-size: 16px;
             border-radius: 5px;
@@ -60,7 +71,7 @@
 
         .theme_bottom {
             width: 100%;
-            height: 210px;
+            height: 190px;
             overflow: hidden;
             position: relative;
         }
@@ -119,7 +130,7 @@
         }
 
         .inp_wd {
-            width: 400px;
+            width: 480px;
             height: 30px;
         }
 
@@ -144,12 +155,9 @@
             text-align: center;
         }
 
-        .edit_style td {
-            min-width: 120px;
-        }
-
         table td {
-            max-width: 425px;
+            min-width: 120px;
+            max-width: 580px;
             border: 2px solid #ada8a8;
         }
     </style>
@@ -160,7 +168,28 @@
             closeAddGoodsDialog();
         });
 
+        function beforeAddInfo(id, isOn) {
+            if (id > 0) {
+                $("#edit_id").val(id);
+                $("#edit_is_on").prop("checked", isOn > 0);
+                $("#add_title").text("编辑events");
+                $("#info_img").val($("#edit_info_img_" + id).attr("src"));
+                $("#info_link").val($("#edit_info_link_" + id).attr("href"));
+                $("#child_name1").val($("#edit_child_link1_" + id).text());
+                $("#child_link1").val($("#edit_child_link1_" + id).attr("href"));
+                $("#child_name2").val($("#edit_child_link2_" + id).text());
+                $("#child_link2").val($("#edit_child_link2_" + id).attr("href"));
+                $("#child_name3").val($("#edit_child_link3_" + id).text());
+                $("#child_link3").val($("#edit_child_link3_" + id).attr("href"));
+            } else {
+                $("#add_title").text("新增events");
+            }
+            $('#add_info').dialog('open');
+        }
+
         function addInfoFun() {
+            var eventsId = $("#edit_id").val();
+            var isOn = $("#edit_is_on").is(':checked') ? 1 : 0;
             var info_img = $("#info_img").val();
             var info_link = $("#info_link").val();
             var child_name1 = $("#child_name1").val();
@@ -175,6 +204,7 @@
                     dataType: 'text',
                     url: '/cbtconsole/hotEvents/insertIntoHotEventsInfo',
                     data: {
+                        "eventsId": eventsId,
                         "infoImg": info_img,
                         "infoLink": info_link,
                         "childName1": child_name1,
@@ -182,7 +212,8 @@
                         "childName2": child_name2,
                         "childLink2": child_link2,
                         "childName3": child_name3,
-                        "childLink3": child_link3
+                        "childLink3": child_link3,
+                        "isOn": isOn
                     },
                     success: function (data) {
                         var json = eval('(' + data + ')');
@@ -243,8 +274,7 @@
                         $("#new_goods_pid").text(json.pid);
                         $("#new_goods_show_name").text(json.enname);
                         $("#new_goods_url").text(json.url);
-                        $("#new_goods_img").attr("src",
-                            json.remotpath + json.img);
+                        $("#new_goods_img").attr("src", json.remotpath + json.img);
                         $("#new_goods_price").text(json.price);
                     } else {
                         $.messager.alert("提醒", data.message, "error");
@@ -284,6 +314,52 @@
                 $.messager.alert("提醒", "获取events Id失败", "error");
             }
         }
+
+        function deleteAddGoods(eventsId, pid) {
+            $.messager.confirm('系统提醒', '是否删除，删除后数据不可恢复', function (r) {
+                if (r) {
+                    $.ajax({
+                        type: "post",
+                        url: "/cbtconsole/hotEvents/deleteIntoHotEventsGoods",
+                        data: {
+                            eventsId: eventsId,
+                            pid: pid
+                        },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.ok) {
+                                window.location.reload();
+                            } else {
+                                $.messager.alert("提醒", data.message, "error");
+                            }
+                        },
+                        error: function (res) {
+                            $.messager.alert("提醒", "获取失败，请重试", "error");
+                        }
+                    });
+                }
+            });
+        }
+
+        function syncToOnline() {
+            $("#show_message").text("正在执行...").show();
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/hotEvents/genOnlineData",
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    if (data.ok) {
+                        $("#show_message").text("刷新成功").show();
+                    } else {
+                        $("#show_message").text(data.message).show();
+                    }
+                },
+                error: function (res) {
+                    $("#show_message").text("网路链接失败").show();
+                }
+            });
+        }
     </script>
 </head>
 <body>
@@ -296,12 +372,12 @@
 <c:if test="${isShow > 0}">
 
 
-    <div id="add_info" class="easyui-dialog" title="新增events"
+    <div id="add_info" class="easyui-dialog" title="Events"
          data-options="modal:true"
-         style="width: 580px; height: 400px; padding: 10px;">
+         style="width: 660px; height: 420px; padding: 10px;">
         <form id="addInfoForm" method="post" onsubmit="false">
             <table>
-
+                <caption id="add_title">新增events</caption>
                 <tr>
                     <td>图片Url:</td>
                     <td><input id="info_img" class="inp_wd"/></td>
@@ -337,11 +413,14 @@
                     <td>子跳转链接3:</td>
                     <td><input id="child_link3" class="inp_wd"/></td>
                 </tr>
+                <tr>
+                    <span style="font-size: 14px;"><input type="checkbox" id="edit_is_on" checked="checked"/>启用</span>
+                </tr>
             </table>
-
         </form>
 
         <div style="text-align: center; padding: 5px 0">
+            <input id="edit_id" type="hidden" value="0"/>
             <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
                class="easyui-linkbutton"
                onclick="addInfoFun()" style="width: 80px">保存</a>
@@ -356,7 +435,7 @@
          style="width: 580px; height: 420px; padding: 10px;">
         <input type="hidden" id="events_id" value="0"/>
         <form id="addGoodsForm" method="post" onsubmit="false">
-            <table class="edit_style">
+            <table>
                 <tr>
                     <td>PID</td>
                     <td><input id="idOrUrl" type="text" style="width: 250px;"/><input
@@ -398,7 +477,9 @@
 
     <div>
         <h3 style="text-align: center"> Hot Events 管理</h3>
-        <button class="btn_sty" onclick="$('#add_info').dialog('open');">新增Events数据</button>
+        <button class="btn_sty" onclick="beforeAddInfo(0)">新增Events</button>
+        <button class="btn_sty" style="margin-left: 60px;" onclick="syncToOnline()">刷新到线上</button>
+        <span id="show_message" style="color: red;display: none;">正在执行...</span>
     </div>
 
     <c:forEach items="${list}" var="info">
@@ -406,13 +487,18 @@
         <div id="show_div">
         <ul class="theme_ul">
             <li class="theme_li">
-                <div class="theme_top"><a href="${info.link}"
-                                          class="theme_top_link"><img class="theme_top_img"
+                <div class="theme_top"><a id="edit_info_link_${info.id}" href="${info.link}"
+                                          class="theme_top_link"><img id="edit_info_img_${info.id}"
+                                                                      class="theme_top_img"
                                                                       src="${info.imgUrl}"></a>
                     <p class="theme_top_keyword">
-                        <a href="${info.childLink1}" class="theme_keyword_link">${info.childName1}</a>
-                        <a href="${info.childLink2}" class="theme_keyword_link">${info.childName2}</a>
-                        <a href="${info.childLink3}" class="theme_keyword_link">${info.childName3}</a>
+                        <a id="edit_child_link1_${info.id}" href="${info.childLink1}"
+                           class="theme_keyword_link">${info.childName1}</a>
+                        <a id="edit_child_link2_${info.id}" href="${info.childLink2}"
+                           class="theme_keyword_link">${info.childName2}</a>
+                        <a id="edit_child_link3_${info.id}" href="${info.childLink3}"
+                           class="theme_keyword_link">${info.childName3}</a>
+                        <button class="btn_sty" onclick="beforeAddInfo(${info.id},${info.isOn})">编辑Events</button>
                     </p>
                 </div>
                 <div class="theme_bottom">
@@ -421,7 +507,7 @@
                             <div class="theme_bottom_list">
                                 <c:forEach items="${info.goodsList}" var="goods">
                                 <div class="theme_li_01">
-                                    <a href="${goods.onlineUrl}" class="theme_a_01">
+                                    <a target="_blank" href="${goods.onlineUrl}" class="theme_a_01">
                                         <span class="theme_img_span"> <img src="${goods.mainImg}"
                                                                            class="img_min"></span>
                                             <%--<span class="theme_span_01">${goods.enName}</span>
@@ -431,6 +517,9 @@
                                                 <i class="theme_now">${goods.price}</i>
                                             </span>--%>
                                     </a>
+                                    <a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${goods.pid}">产品编辑</a>
+                                    <button class="btn_del" onclick="deleteAddGoods(${info.id},'${goods.pid}')">删除产品
+                                    </button>
                                 </div>
                                 </c:forEach>
                         </li>

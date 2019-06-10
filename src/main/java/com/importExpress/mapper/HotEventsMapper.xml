@@ -65,25 +65,28 @@
 
     <update id="updateIntoHotEventsInfo" parameterType="com.importExpress.pojo.HotEventsInfo">
         update hot_events_info set
-        <if test="img_url != null">
+        <if test="link != null">
+            link = #{link},
+        </if>
+        <if test="imgUrl != null">
             img_url = #{imgUrl},
         </if>
-        <if test="child_name1 != null">
+        <if test="childName1 != null">
             child_name1 = #{childName1},
         </if>
-        <if test="child_link1 != null">
+        <if test="childLink1 != null">
             child_link1 = #{childLink1},
         </if>
-        <if test="child_name2 != null">
+        <if test="childName2 != null">
             child_name2 = #{childName2},
         </if>
-        <if test="child_link2 != null">
+        <if test="childLink2 != null">
             child_link2 = #{childLink2},
         </if>
-        <if test="child_name3 != null">
+        <if test="childName3 != null">
             child_name3 = #{childName3},
         </if>
-        <if test="is_on > -1">
+        <if test="isOn > -1">
             is_on = #{isOn} ,
         </if>
         admin_id = #{adminId}
@@ -101,7 +104,7 @@
     </delete>
 
     <delete id="deleteIntoHotEventsGoods" parameterType="com.importExpress.pojo.HotEventsGoods">
-        delete from hot_events_goods where id = #{id} and events_id = #{eventsId}
+        delete from hot_events_goods where pid = #{pid} and events_id = #{eventsId}
     </delete>
 
 </mapper>

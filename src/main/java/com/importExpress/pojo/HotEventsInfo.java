@@ -21,4 +21,31 @@ public class HotEventsInfo {
     private String updateTime;
 
     private List<HotEventsGoods> goodsList;
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("{");
+        sb.append("\"id\":")
+                .append(id);
+        sb.append(",\"link\":\"")
+                .append(link).append('\"');
+        sb.append(",\"imgUrl\":\"")
+                .append(imgUrl).append('\"');
+        sb.append(",\"childName1\":\"")
+                .append(childName1).append('\"');
+        sb.append(",\"childLink1\":\"")
+                .append(childLink1).append('\"');
+        sb.append(",\"childName2\":\"")
+                .append(childName2).append('\"');
+        sb.append(",\"childLink2\":\"")
+                .append(childLink2).append('\"');
+        sb.append(",\"childName3\":\"")
+                .append(childName3).append('\"');
+        sb.append(",\"childLink3\":\"")
+                .append(childLink3).append('\"');
+        sb.append(",\"goodsList\":")
+                .append(goodsList.toString());
+        sb.append('}');
+        return sb.toString();
+    }
 }
