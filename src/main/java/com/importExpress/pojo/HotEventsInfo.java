@@ -43,8 +43,12 @@ public class HotEventsInfo {
                 .append(childName3).append('\"');
         sb.append(",\"childLink3\":\"")
                 .append(childLink3).append('\"');
-        sb.append(",\"goodsList\":")
-                .append(goodsList.toString());
+        sb.append(",\"goodsList\":");
+        if(goodsList == null || goodsList.size() == 0){
+            sb.append("[]");
+        }else{
+             sb.append(goodsList.toString());
+        }
         sb.append('}');
         return sb.toString();
     }
