@@ -1342,12 +1342,21 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				if("2".equals(t.getTbOr1688()) && !"等待买家确认收货".equals(shipstatus)){
 					String msg=t.getShipstatus().split("\n")[1];
 					purchaseBean.setShipstatus(shipstatus+"\n "+msg);
+					if (StringUtil.isNotBlank(t.getOrderid())){
+						purchaseBean.setShipno(t.getOrderid());
+					}
 				}else{
 					purchaseBean.setShipstatus(shipstatus);
+					if (StringUtil.isNotBlank(t.getOrderid())){
+						purchaseBean.setShipno(t.getOrderid());
+					}
 				}
 			}else if(t!=null && !StringUtils.isStrNull(t.getShipno()) && StringUtils.isStrNull(t.getShipstatus())){
 				//点了采购确认 有了1688订单但是没有发货
 				purchaseBean.setShipstatus("已发货系统未抓到物流信息");
+				if (StringUtil.isNotBlank(t.getOrderid())){
+					purchaseBean.setShipno(t.getOrderid());
+				}
 			}else{
 				purchaseBean.setShipstatus("没有匹配到采购订单或者还未发货");
 			}
