@@ -11,7 +11,6 @@ import com.importExpress.service.HotEventsService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.OKHttpUtils;
 import com.importExpress.utli.UserInfoUtils;
-import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -364,37 +363,43 @@ public class HotEventsController {
                     goods = customGoodsService.queryGoodsDetails(childGoods.getPid(), 0);
                     childGoods.setEnName(goods.getEnname());
                     if (goods.getShowMainImage().contains("http:") || goods.getShowMainImage().contains("https:")) {
-                        childGoods.setMainImg(goods.getShowMainImage().replace("http:","https:"));
+                        childGoods.setMainImg(goods.getShowMainImage().replace("http:", "https:"));
                     } else {
-                        childGoods.setMainImg(goods.getRemotpath().replace("http:","https:") + goods.getShowMainImage());
+                        childGoods.setMainImg(goods.getRemotpath().replace("http:", "https:") + goods.getShowMainImage());
                     }
                     childGoods.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(goods));
                     if (goods.getRangePrice() == null || "".equals(goods.getRangePrice()) || "[]".equals(goods.getRangePrice().trim())) {
                         if (Integer.valueOf(goods.getIsSoldFlag()) > 0) {
                             if (StringUtils.isBlank(goods.getFeeprice()) || "[]".equals(goods.getFeeprice().trim())) {
                                 childGoods.setPrice(goods.getPrice().trim());
-                            }else{
-                                if (goods.getFeeprice().indexOf(",") > -1) {
+                            } else {
+                                if (goods.getFeeprice().contains(",")) {
                                     String[] prices = goods.getFeeprice().split(",");
-									String[] price2 = prices[0].replace(" ", "").split("\\$");
-									childGoods.setPrice(price2[1].replace("[", "").trim());
+                                    String[] price2 = prices[0].replace(" ", "").split("\\$");
+                                    childGoods.setPrice(price2[1].replace("[","").replace("]", "").trim());
+                                } else {
+                                    String[] price2 = goods.getFeeprice().replace(" ", "").split("\\$");
+                                    childGoods.setPrice(price2[1].replace("[","").replace("]", "").trim());
                                 }
                             }
-                        }else{
+                        } else {
                             if (StringUtils.isBlank(goods.getWprice()) || "[]".equals(goods.getWprice().trim())) {
                                 childGoods.setPrice(goods.getPrice().trim());
-                            }else{
-                                if (goods.getWprice().indexOf(",") > -1) {
+                            } else {
+                                if (goods.getWprice().contains(",")) {
                                     String[] prices = goods.getWprice().split(",");
-									String[] price2 = prices[0].replace(" ", "").split("\\$");
-									childGoods.setPrice(price2[1].replace("[", "").trim());
+                                    String[] price2 = prices[0].replace(" ", "").split("\\$");
+                                    childGoods.setPrice(price2[1].replace("[","").replace("]", "").trim());
+                                } else {
+                                    String[] price2 = goods.getWprice().replace(" ", "").split("\\$");
+                                    childGoods.setPrice(price2[1].replace("[","").replace("]", "").trim());
                                 }
                             }
                         }
-                    }else{
-                        if(goods.getRangePrice().contains("-")){
+                    } else {
+                        if (goods.getRangePrice().contains("-")) {
                             childGoods.setPrice(goods.getRangePrice().split("-")[1].trim());
-                        }else{
+                        } else {
                             childGoods.setPrice(goods.getRangePrice().trim());
                         }
                     }
