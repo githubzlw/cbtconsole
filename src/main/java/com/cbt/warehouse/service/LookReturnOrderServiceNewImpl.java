@@ -249,6 +249,33 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		List<returndisplay> listItem = new ArrayList<returndisplay>();
 		returndisplay listItemCount = new returndisplay();
 		listOr=this.lookReturnOrderServiceNewMapper.getAllOrder(cusOrder);
+		if (listOr.size()==0&&StringUtil.isNotBlank(tbOrder)){
+			listItem=this.lookReturnOrderServiceNewMapper.getAllItem(tbOrder);
+			for (int j = 0; j < listItem.size(); j++) {
+				returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(listItem.get(j).getTbId());
+				if (itnum !=null) {
+					int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
+					if (itemNum<=0) {
+						listItem.remove(j);
+						j--;
+					}else {
+						listItem.get(j).setItemNumber(itemNum);
+						listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+						listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+					}
+				}else {
+					listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+					listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+				}
+			}
+			returndisplay display=new returndisplay();
+			display.setA1688Order(tbOrder);
+			display.setCustomerorder(cusOrder);
+			listOr.add(display);
+			json.setRows1(listOr);
+			json.setRows(listItem);
+			return json;
+		}
 		for (int i = 0; i < listOr.size(); i++) {
 			listItemCount=this.lookReturnOrderServiceNewMapper.FindItemCount(listOr.get(i).getA1688Order());
 			if (listItemCount !=null&&listItemCount.getItemNumber()-listItemCount.getReturnNumber()<=0){
