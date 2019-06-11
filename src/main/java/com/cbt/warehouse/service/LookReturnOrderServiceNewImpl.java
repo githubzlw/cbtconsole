@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.cbt.warehouse.util.StringUtil;
 import org.apache.tools.ant.taskdefs.condition.And;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
     private SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 	@Override
 	public EasyUiJsonResult FindReturndisplay(String applyUser, String state,
-			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid) {
+			String a1688Shipno, String optTimeStart, String optTimeEnd, int page,int mid,String user,String a1688order) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
 		String nameString=null;
 		if ("".equals(applyUser)||"全部".equals(applyUser)||"-1".equals(applyUser)) {
@@ -53,17 +54,34 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			optTimeEnd=optTimeEnd.replaceAll("列:", "");
 			optTimeEnd+=" 23:59:59";
 		}
-		
-		
+		if ("".equals(a1688order)){
+			a1688order=null;
+		}
+		String userOther=null;
+
+			if ("mindy".equalsIgnoreCase(user)){
+				userOther="策融BY1";
+			}
+			if ("helen".equalsIgnoreCase(user)){
+				userOther="策融BY2";
+			}
+			if ("camille".equalsIgnoreCase(user)){
+				userOther="策融BY3";
+			}
+
+		if ("-2".equals(state)){
+			state=null;
+		}
 		List<returndisplay> list = new ArrayList<returndisplay>();
 		
-		list=this.lookReturnOrderServiceNewMapper.FindReturndisplay(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page);
+		list=this.lookReturnOrderServiceNewMapper.FindReturndisplay(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order);
 		if (list.size()==0) {
-			json.setTotal(0);
+            json.setRows("");
+            json.setTotal(0);
 		return json;	
 		}
-		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page);
-		
+		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order);
+
 		for (int i = 0; i < list.size(); i++) {
 			list.get(i).setOrderInfo("订单号：<a >"+list.get(i).getA1688Order()+"</a><br>运单号：<a href='/cbtconsole/website/newtrack.jsp?shipno="+list.get(i).getA1688Shipno()+"&barcode="+list.get(i).getBarcode()+"' target='_blank'>"+list.get(i).getA1688Shipno()+"</a>"
 					+ "<br>下单："+list.get(i).getPlaceDate()+"<br>签收："+list.get(i).getSigntime());
@@ -73,7 +91,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
             if (list.get(i).getChangeShipno()==null||"".equals(list.get(i).getChangeShipno())) {
 				list.get(i).setChangeShipno("<input class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");
 			} else {
-				list.get(i).setChangeShipno(list.get(i).getChangeShipno()+"<input type='button' value='修改' onclick='UpShip("+list.get(i).getId()+")'>");	
+				list.get(i).setChangeShipno(list.get(i).getChangeShipno()+"<input type='button' value='修改' onclick='UpShip("+list.get(i).getId()+")'>");
 			}
 
 				if (list.get(i).getShipno() == null || "".equals(list.get(i).getShipno())) {
@@ -108,13 +126,14 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				}
 			}
 			if (list.get(i).getState()==-1) {
+				list.get(i).setShipno("");
 				stat="<input class='but_color' type='button' value='同意退货' onclick='Agreed("+list.get(i).getId()+")'><br> / <br><input class='but_color' type='button' value='驳回' onclick='rejected("+list.get(i).getId()+")'/>";
 			}
 
             list.get(i).setStateShow(stat);
             list.get(i).setPepoInfo("申请人："+list.get(i).getApplyUser()+"<br>退货数量："+list.get(i).getReturnNumber());
 		}
-		
+
 		json.setRows(list);
 		json.setTotal(total);
 		return json;
@@ -230,6 +249,33 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		List<returndisplay> listItem = new ArrayList<returndisplay>();
 		returndisplay listItemCount = new returndisplay();
 		listOr=this.lookReturnOrderServiceNewMapper.getAllOrder(cusOrder);
+		if (listOr.size()==0&&StringUtil.isNotBlank(tbOrder)){
+			listItem=this.lookReturnOrderServiceNewMapper.getAllItem(tbOrder);
+			for (int j = 0; j < listItem.size(); j++) {
+				returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(listItem.get(j).getTbId());
+				if (itnum !=null) {
+					int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
+					if (itemNum<=0) {
+						listItem.remove(j);
+						j--;
+					}else {
+						listItem.get(j).setItemNumber(itemNum);
+						listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+						listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+					}
+				}else {
+					listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+					listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+				}
+			}
+			returndisplay display=new returndisplay();
+			display.setA1688Order(tbOrder);
+			display.setCustomerorder(cusOrder);
+			listOr.add(display);
+			json.setRows1(listOr);
+			json.setRows(listItem);
+			return json;
+		}
 		for (int i = 0; i < listOr.size(); i++) {
 			listItemCount=this.lookReturnOrderServiceNewMapper.FindItemCount(listOr.get(i).getA1688Order());
 			if (listItemCount !=null&&listItemCount.getItemNumber()-listItemCount.getReturnNumber()<=0){
@@ -523,5 +569,37 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		}
 		return null;
 	}
+
+    @Override
+    public orderJson getOrderByship(String shipno) {
+        try {
+        orderJson json=new orderJson();
+        List<returndisplay> listItem = new ArrayList<returndisplay>();
+        listItem=this.lookReturnOrderServiceNewMapper.getOrderByship(shipno);
+        for (int j = 0; j < listItem.size(); j++) {
+            returndisplay itnum=this.lookReturnOrderServiceNewMapper.Finditnum(listItem.get(j).getTbId());
+            if (itnum !=null) {
+                int itemNum=itnum.getItemNumber()-itnum.getReturnNumber();
+                if (itemNum<=0) {
+                    listItem.remove(j);
+                    j--;
+                }else {
+                    listItem.get(j).setItemNumber(itemNum);
+                    listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+                    listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+                }
+                System.out.println(listItem.size());
+            }else {
+                listItem.get(j).setReturnReason("<input type='text' id='retu"+j+"' value='' >");
+                listItem.get(j).setChangeShipno("<input type='text' id='num"+j+"' value='' >");
+            }
+        }
+        json.setRows(listItem);
+        return json;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

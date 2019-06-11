@@ -15,10 +15,10 @@ import com.cbt.warehouse.pojo.returndisplay;
 public interface LookReturnOrderServiceNewMapper {
 
 	int selectCount(@Param("nameString")String nameString, @Param("state")String state,
-			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page);
+			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order);
 
 	List<returndisplay> FindReturndisplay(@Param("nameString")String nameString, @Param("state")String state,
-			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page);
+			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order);
 
 	@Update("UPDATE return_display SET State=0,returntime=NOW() WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrder(@Param("ship")String ship);
@@ -89,5 +89,7 @@ public interface LookReturnOrderServiceNewMapper {
 	returndisplay FindItemCount(@Param("a1688Order") String a1688Order);
 	@Update("UPDATE return_display SET State=3,returntime=NOW(),reason=#{ch} WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrderCh(@Param("ship") String ship,@Param("ch") String ch);
-
+	@Select("SELECT b.orderid as customerorder,a.orderid as a1688Order ,a.orderdate as placeDate,a.seller as sellerpeo,a.itemid as item,a.itemqty as itemNumber,a.shipno as a1688Shipno,a.username as optUser," +
+			"a.delivery_date as signtime,a.sku,a.id AS tbId from taobao_1688_order_history a,id_relationtable b WHERE a.orderid=b.tborderid AND  a.shipno=#{shipno};")
+    List<returndisplay> getOrderByship(@Param("shipno") String shipno);
 }

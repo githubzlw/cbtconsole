@@ -10,7 +10,7 @@ import com.cbt.website.util.EasyUiJsonResult;
 
 public interface LookReturnOrderServiceNew {
 	EasyUiJsonResult FindReturndisplay(String applyUser, String state,
-			String a1688Shipno, String optTimeStart, String optTimeEnd,int page,int mid);
+			String a1688Shipno, String optTimeStart, String optTimeEnd,int page,int mid,String user,String a1688order);
 
 	EasyUiJsonResult UpdaeReturnOrder(String ship,String ch);
 
@@ -48,4 +48,5 @@ public interface LookReturnOrderServiceNew {
 
     String getAllOrderCount();
 
+	orderJson getOrderByship(String shipno);
 }

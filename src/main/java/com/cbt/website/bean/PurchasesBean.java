@@ -94,6 +94,15 @@ public class PurchasesBean {
 	private String shopGrade; //供应商评级
 	private String morder; //最小moq
 	private String replacementProduct; //客户录入替换产品
+	private String shipno; //运单号
+
+	public String getShipno() {
+		return shipno;
+	}
+
+	public void setShipno(String shipno) {
+		this.shipno = shipno;
+	}
 
 	public String getReplacementProduct() {
 		return replacementProduct;
