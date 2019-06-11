@@ -356,13 +356,22 @@ public class SupplierScoringController {
 					supplierScoringService.saveSupplierScoring(maps);
 				}
 
+				// 原代码 影响了运行速度 直接调整到异步的
+                final double qual = qua;
+                new Thread(new Runnable(){
+                    @Override
+                    public void run() {
+
 				// 批量更新店铺商品的打分数据
 				List<String> pidList = customGoodsService.queryPidByShopId(shopId);
 				if (pidList != null && pidList.size() > 0) {
 					GoodsInfoUpdateOnlineUtil.batchSetGoodsShopScoreLocal(shopId, pidList, 1,
-							BigDecimalUtil.truncateDouble(qua, 2), 1);
+							BigDecimalUtil.truncateDouble(qual, 2), 1);
 					pidList.clear();
 				}
+
+                    }
+                }).start();
 			}
 			maps.put("flag","success");
 		}catch (Exception e){

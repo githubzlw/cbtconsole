@@ -82,7 +82,7 @@
 	   		SELECT p.id,u.id as userid,u.name as userName,u.email as userEmail,ad.email AS sale_email,p.problem AS qustion,p.createtime,IFNULL(p.reply_content,'') AS reply_content FROM problem_report p
 			INNER JOIN admin_r_user a ON p.email=a.useremail
 			INNER JOIN USER u ON a.userid=u.id
-			INNER JOIN admuser ad ON a.adminid=ad.id
+			LEFT JOIN admuser ad ON a.adminid=ad.id
 			WHERE p.id=${report_id}
 	</select>
 
