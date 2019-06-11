@@ -127,7 +127,7 @@ public class HotEventsController {
             info.setChildName3(childName3);
             info.setIsOn(1);
 
-            if (StringUtils.isNotBlank(eventsId)) {
+            if (StringUtils.isNotBlank(eventsId) && Integer.valueOf(eventsId) > 0) {
                 info.setId(Integer.valueOf(eventsId));
                 if (StringUtils.isNotBlank(isOn)) {
                     info.setIsOn(Integer.valueOf(isOn));
