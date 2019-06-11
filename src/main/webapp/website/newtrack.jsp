@@ -182,6 +182,20 @@
         {
 			float:right
         }
+		.qod_pay3 {
+			width: 720px;
+			height: 500px;
+			top: 250px;
+			left: 15%;
+			overflow: auto;
+			position: absolute;
+			z-index: 1011;
+			background: gray;
+			padding: 5px;
+			padding-bottom: 20px;
+			z-index: 1011;
+			border: 15px ;
+		}
         #over
         {
             width: 100%;
@@ -353,7 +367,37 @@
             });
          // $("#TheInspection").css("display","")  ;
         }
+        function Returngoods() {
+            var shipno = $("#ship").html();
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/Look/getOrderByship",
+                data: {shipno: shipno},
+                dataType: "json",
+                success: function (msg) {
+                    if (msg.rows != null && msg.rows[0] != undefined) {
+                        var temHtml = '';
+                        $("#cuso").html("");
+                        $("#cuso").append(msg.rows[0].customerorder);
+                        $("#tbso").html("");
+                        $("#tbso").append(msg.rows[0].a1688Order);
+                        document.getElementById("tabl").innerHTML = '';
+                        $("#tabl").append("<tr ><td>选择</td><td>产品pid</td><td>产品规格</td><td>可退数量</td><td>退货原因</td><td>退货数量</td></tr>");
+                        $(msg.rows).each(function (index, item) {
 
+                            $("#tabl").append("<tr ><td ><input type='checkbox' onclick='this.value=this.checked?1:0' name='" + item.item + "' id='c1' /></td><td><a href='https://www.importx.com/goodsinfo/122916001-121814002-1" + item.item + ".html' target='_blank' >" + item.item + "</a></td><td>" + item.sku + "</td><td>" + item.itemNumber + "</td><td>" + item.returnReason + "</td><td>" + item.changeShipno + "</td></tr>");
+                        });
+                        $('#user_remark .remark_list').html(temHtml);
+                        document.getElementById("user_remark").style.display = "";
+                    } else {
+                        alert("订单已全部退货")
+                        document.getElementById("user_remark").style.display = "none";
+                    }
+
+                }
+
+            });
+        }
         function hide()
         {
             var login = document.getElementById('login');
@@ -380,11 +424,87 @@
             });
 
                 }
+        function FncloseOut(){
+            document.getElementById("user_remark").style.display = "none";
+            var or = document.all("otherReason");
+            for(var i=0;i<or.length;i++){
+                or[i].value="";
+            }
+        }
+        function addUserRemark() {
+            var cusOrder = $('#cuso').text();
+            var tbOrder = $('#tbso').text();
+            var der = $("#retu").val();
+            var g = "";
+            $("#tabl tr").each(function () {
+
+                $(this).find('input').each(function () {
+                    var value = $(this).val();
+                    g += value + ",";
+
+                });
+            });
+            g += tbOrder + ",";
+            g += cusOrder;
+
+            $.post("/cbtconsole/Look/AddAllOrder", {
+                cusOrder: g
+            }, function (res) {
+                if (res.rows == 1) {
+                    alert('退货成功');
+                    $("#th" + cusOrder).html("");
+                    $("#th" + cusOrder).append("最后退货时间" + res.footer);
+                } else if (res.rows == 0) {
+                    alert('不可重复退单');
+                } else if (res.rows == 2) {
+                    alert('请勾选要退的商品');
+                } else if (res.rows == 3) {
+                    alert('请填写数据');
+                }
+                else if (res.rows == 4) {
+                    alert('退货数量不能大于可退数量');
+                } else if (res.rows == 5) {
+                    alert('该商品已全部退货');
+                    getItem();
+                }
+                Returngoods();
+            });
+        }
+
 
 	</script>
 </head>
 <body onload="focus();">
-
+<div id="user_remark" class="qod_pay3" title="退货申请"
+	 style="width:800px;height:auto;display: none;font-size: 16px;">
+	<div>
+		<a href="javascript:void(0)" class="show_x" onclick="FncloseOut()">╳</a>
+	</div>
+	<div id="sediv" style="margin-left:20px;">
+		<div>公司订单：<span id="cuso"></span></div>
+		<div>1688订单：<span id="tbso"></span></div>
+		<table id="tabl" border="1" cellspacing="0">
+			<tr>
+				<td style='width:20px'>选择</td>
+				<td>产品pid</td>
+				<td>产品规格</td>
+				<td>可退数量</td>
+				<td>退货原因</td>
+				<td>退货数量</td>
+			</tr>
+		</table>
+	</div>
+	<div style="margin:20px 0 20px 40px;">
+		<input class="but_color" type="button" value="提交申请" onclick="addUserRemark()">
+		   部分退单选择此按钮，全单退可以使用下方按钮
+	</div>
+	<div style="margin:20px 0 20px 40px;">
+		1688订单：<input class="but_color" type="button" value="整单提交" onclick="AddOll()">
+		<input type='radio' size='5' name='radioname' value='客户退单' id='c'/>客户退单
+		<input type='radio' size='5' name='radioname' value='质量问题' id='c'/>质量问题
+		<input type='radio' size='5' name='radioname' value='客户要求' id='c'/>客户要求
+	</div>
+</div>
 
 <div id="operatediv" class="loading" style="display: none;"></div>
 <div id="ship" class="ship" style="display: none;"></div>
@@ -443,6 +563,7 @@
 		<a href="../website/purchase_order_details.jsp"  target="_Blank">未按时入库订单列表</a>
 
         <a href="javascript:show()" style="color: red; font-size:30px;">验货取消</a>
+        <a href="javascript:Returngoods()" style="color: red; font-size:30px;">发起退货</a>
         <div id="login" >
             <a class="aright" href="javascript:hide()" style="color: red; font-size:30px;" >关闭</a>
             <div id="TheInspection" ></div>

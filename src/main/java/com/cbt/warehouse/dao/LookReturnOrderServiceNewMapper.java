@@ -89,5 +89,7 @@ public interface LookReturnOrderServiceNewMapper {
 	returndisplay FindItemCount(@Param("a1688Order") String a1688Order);
 	@Update("UPDATE return_display SET State=3,returntime=NOW(),reason=#{ch} WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrderCh(@Param("ship") String ship,@Param("ch") String ch);
-
+	@Select("SELECT b.orderid as customerorder,a.orderid as a1688Order ,a.orderdate as placeDate,a.seller as sellerpeo,a.itemid as item,a.itemqty as itemNumber,a.shipno as a1688Shipno,a.username as optUser," +
+			"a.delivery_date as signtime,a.sku,a.id AS tbId from taobao_1688_order_history a,id_relationtable b WHERE a.orderid=b.tborderid AND  a.shipno=#{shipno};")
+    List<returndisplay> getOrderByship(@Param("shipno") String shipno);
 }
