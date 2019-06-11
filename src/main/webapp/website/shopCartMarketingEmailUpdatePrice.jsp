@@ -236,6 +236,7 @@
             } else {
                 //var emailContent = $("#email_content").html();
                 //var model = $("#modeStr").html();
+                $("#show_notice").text("正在执行...").show();
                 $.ajax({
                     type: 'POST',
                     dataType: 'text',
