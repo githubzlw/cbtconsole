@@ -45,6 +45,17 @@ public class GoodsInfoUpdateOnlineUtil {
      */
     private static final String MONGODB_UPDATE_SOLR_URL_ONLINE = "http://35.166.131.70:18001/invokejob/b006";
 
+    /**
+     * 生成events文件路径
+     */
+    private static final String LOCAL_EVENTS_PATH = "/data/cbtconsole/events";
+
+    /**
+     * 前台上传文件路径
+     */
+    public static final String ONLINE_EVENTS_URL = "https://www.import-express.com/popProducts/postEventsFile";
+    // public static final String ONLINE_EVENTS_URL = "http://127.0.0.1:8087/popProducts/postEventsFile";
+
     // test
 //    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";
 //    private static final String MONGODB_UPDATE_GOODS_URL_ONLINE = "http://192.168.1.153:8001/invokejob/b004";// 刷新产品表数据
@@ -661,6 +672,13 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
+    /**
+     * 写入mongodb数据大本地
+     * @param fileName
+     * @param json
+     * @return
+     * @throws Exception
+     */
     private static File writeToLocal(String fileName, String json) throws Exception {
         String tempJson = json;
         if (tempJson.contains("\\\\\\")) {
@@ -681,6 +699,35 @@ public class GoodsInfoUpdateOnlineUtil {
     }
 
 
+    /**
+     * 写入数据到本地
+     * @param fileName
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public static File writeDataToLocal(String fileName, String json) throws Exception {
+        String timeStr = String.valueOf(System.currentTimeMillis()) + "_" ;
+        File parentfile = new File(LOCAL_EVENTS_PATH);
+        if(!(parentfile.exists() && parentfile.isDirectory())){
+            parentfile.mkdirs();
+        }
+        FileUtils.write(new File(LOCAL_EVENTS_PATH + "/" + timeStr + fileName), json, "utf-8");
+        File file = new File(LOCAL_EVENTS_PATH + "/" + timeStr + fileName);
+        if (file.exists()) {
+            return file;
+        } else {
+            throw new Exception("生成文件异常");
+        }
+    }
+
+    /**
+     * 写入List集合数据到本地
+     * @param fileName
+     * @param list
+     * @return
+     * @throws Exception
+     */
     private static File writeLinesToLocal(String fileName, List<String> list) throws Exception {
         File file = new File(fileName);
         FileUtils.writeLines(file, list, true);
