@@ -876,19 +876,19 @@
         select account from tb_1688_accounts where adminid=${admuserId} and del=1
     </select>
     <select id="getShipStatusInfoFor" resultType="com.cbt.pojo.TaoBaoOrderInfo">
-        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t where t.importorderid=#{orderId} and t.importgoodsid=${goodsId} order by id desc limit 1
+        SELECT DISTINCT t.tbOr1688,t.orderid,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t where t.importorderid=#{orderId} and t.importgoodsid=${goodsId} order by id desc limit 1
     </select>
     <select id="getOrderReplenishment" resultType="com.cbt.pojo.TaoBaoOrderInfo">
         select tb_1688_itemid,createtime from order_replenishment where orderid=#{orderId} and goodsid=#{goodsId} and tb_1688_itemid is not null order by id desc limit 1
     </select>
     <select id="getShipStatusInfo" resultType="com.cbt.pojo.TaoBaoOrderInfo">
-        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t
+        SELECT DISTINCT t.tbOr1688,t.orderid,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t
         WHERE t.itemid=#{itmeid}  AND t.username=#{admName}
         and t.delivery_date>=#{createtime}
         order by t.delivery_date asc limit 1
     </select>
     <select id="getShipStatusInfos" resultType="com.cbt.pojo.TaoBaoOrderInfo">
-        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.shipno,t.support_info FROM taobao_1688_order_history t INNER JOIN order_product_source os ON
+        SELECT DISTINCT t.tbOr1688,t.shipstatus,t.orderid,t.shipno,t.support_info FROM taobao_1688_order_history t INNER JOIN order_product_source os ON
         t.itemid = os.tb_1688_itemid OR t.itemid = os.last_tb_1688_itemid WHERE (os.tb_1688_itemid=#{itemid} OR last_tb_1688_itemid=#{itemids})
         AND t.username=#{admName} and t.delivery_date>=#{createtime}
         and os.confirm_userid=(select adminid from tb_1688_accounts where account=#{admName}

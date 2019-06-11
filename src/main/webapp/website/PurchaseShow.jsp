@@ -2432,7 +2432,7 @@
             }
         });
     }
-    function returnOr(uid) {
+    function returnOr(uid,tbor) {
         $('#user_remark .remark_list').html('');
         $("#user_remark input[name='userid']").val(uid);
         $('#new_user_remark').val('');
@@ -2440,7 +2440,7 @@
         $.ajax({
             type: "POST",
             url: "/cbtconsole/Look/getAllOrder",
-            data: {cusOrder: uid, mid: 1},
+            data: {cusOrder: uid, mid: 1,tbOrder:tbor},
             dataType: "json",
             success: function (msg) {
                 if (msg.rows != null && msg.rows[0] != undefined) {
@@ -2466,7 +2466,7 @@
 
                     })
                 } else {
-                    alert("订单已全部退货")
+                    alert("订单已全部退货或者还未发货")
 
                 }
 
@@ -3305,6 +3305,9 @@
 							<div style="width: 100%; word-wrap: break-word;">
 								物流信息： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipstatus}</span></font> <br>
 							</div>
+                            <div style="width: 100%; word-wrap: break-word;">
+								淘宝订单号： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipno}</span></font> <br>
+							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								产品编辑页面打分：<a target="_blank" href="/cbtconsole/editc/detalisEdit?pid=${pb.goods_pid}">产品编辑</a> <br>
 							</div>
@@ -3422,7 +3425,7 @@
 							</div>
 							<div class="w-margin-top">
 								<input type="button" value="备注或回复" onclick="doReplay1('${pb.orderNo}','${pb.goodsid}','${pb.od_id}');" class="repalyBtn" />
-								<input type="button" id="${pb.od_id}" stype="display:none" value="发起退货" onclick="returnOr('${pb.orderNo}');" class="repalyBtn" />
+								<input type="button" id="${pb.od_id}" stype="display:none" value="发起退货" onclick="returnOr('${pb.orderNo}','${pb.shipno}');" class="repalyBtn" />
 								<P>${pb.returnTime}</P>
 							</div>
 						</td>
