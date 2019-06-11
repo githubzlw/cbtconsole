@@ -277,18 +277,28 @@
 			border: 15px solid #33CCFF;
 		}
 		.qod_pay3 {
+			/*width: 720px;*/
+			/*height: 500px;*/
+			/*top: 250px;*/
+			/*left: 15%;*/
+			/*overflow: auto;*/
+			/*position: absolute;*/
+			/*z-index: 1011;*/
+			/*background: gray;*/
+			/*padding: 5px;*/
+			/*padding-bottom: 20px;*/
+			/*z-index: 1011;*/
+			/*border: 15px ;*/
 			width: 720px;
-			height: 500px;
+			position: fixed;
 			top: 250px;
 			left: 15%;
-			overflow: auto;
-			position: absolute;
 			z-index: 1011;
 			background: gray;
 			padding: 5px;
 			padding-bottom: 20px;
 			z-index: 1011;
-			border: 15px ;
+			border: 15px solid #33CCFF;
 
 		}
 
