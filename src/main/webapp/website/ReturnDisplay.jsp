@@ -139,10 +139,10 @@ function doQuery(page) {
 
 function doReset(){
 	$('#location_type').combobox('setValue','-1');
-	$("#optTimeStart").textbox('setValue','');
+	$("#optTimeStart").val('');
     $("#shipno").textbox('setValue','');
     $("#order").textbox('setValue','');
-	$("#optTimeEnd").textbox('setValue','');
+	$("#optTimeEnd").val('');
 	$("#state").textbox('setValue','-2');
 }
 

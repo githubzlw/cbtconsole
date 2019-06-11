@@ -48,4 +48,5 @@ public interface LookReturnOrderServiceNew {
 
     String getAllOrderCount();
 
+	orderJson getOrderByship(String shipno);
 }

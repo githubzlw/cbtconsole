@@ -165,6 +165,15 @@ public class ReturnsManagement {
 		json=this.lookReturnOrderServiceNew.getAllOrder(cusOrder,tbOrder,mid);		
 		 return json;
 	}
+	@RequestMapping(value = "/getOrderByship")
+	@ResponseBody
+	public orderJson getOrderByship(HttpServletRequest request,HttpServletResponse response){
+		orderJson json=new orderJson();
+		String shipno=request.getParameter("shipno");
+		List<returndisplay> result = new ArrayList<returndisplay>();
+		json=this.lookReturnOrderServiceNew.getOrderByship(shipno);
+		 return json;
+	}
 	@RequestMapping(value = "/getpid")
 	@ResponseBody
 	public EasyUiJsonResult getpid(HttpServletRequest request,HttpServletResponse response){
