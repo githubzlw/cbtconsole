@@ -244,7 +244,7 @@
                         <div class="order_first">
                           <div class="rece_shop">
                             <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
-                            <p>Recently you have added some items to your <a href="">shopping cart</a>. We greatly value
+                            <p>Recently you have added some items to your <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar">shopping cart</a>. We greatly value
                               your trust and confidence. To express our sincere appreciation for your loyalty to our business,
                               <b>we have made an adjustment on your chosen shipping rate:</b> </p>
                           </div>
@@ -253,7 +253,8 @@
                             </em><em> 18.80</em></strong></i><em> (Shipping time: XXX)</em></p>
                             <p class="order_off"><strong>The discounted shipping price:<em>USD
                             </em><em> 18.80</em></strong><em> (Shipping time: XXX)</em></p>
-                            <p class="estima_time estima_time_color">You have saved :USD <span>7.2</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span>7.2</span>
+                              <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">We'll keep this deal valid <b>for the next 48 hours</b></p>
                           <p class="order_rem_p">Hurry in to make sure you snag your most-coveted ImportExpress merch  -  don't let this be the one that got away!</p>
@@ -271,7 +272,7 @@
                             <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
                             <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
-                            <span style="display:none;"><img th:src="${followCode}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
+                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>

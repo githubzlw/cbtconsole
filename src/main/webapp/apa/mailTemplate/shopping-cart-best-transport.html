@@ -249,7 +249,7 @@
                         <div class="order_first">
                           <div class="rece_shop">
                             <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
-                            <p>Recently you have added some items to your <a target="_blank" href="https://www.import-express.com/Goods/getShopCar">shopping cart</a>, and ticked
+                            <p>Recently you have added some items to your <a th:href="${carUrl}" target="_blank" href="https://www.import-express.com/Goods/getShopCar">shopping cart</a>, and ticked
                               A  as your shipping method, however there is a faster and cheaper shipping method you have probably missed:</p>
                           </div>
                           <div class="way_box">
@@ -280,7 +280,8 @@
 
                           <div class="order_usd order_usd_due">
                             <p class="order_off">We have updated your shopping cart with this better shipping method</p>
-                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${savePrice}">100</span> <a href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${savePrice}">100</span>
+                              <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
                           </div>
                           <p class="order_rem_p">But If there were actually any other reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email,  our team will absolutely try every effort to meet your satisfaction!</p>
                           <p class="order_rem_p"><strong>Import Express CHINA</strong><br/>
@@ -296,7 +297,7 @@
                             <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
                             <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
-                            <span style="display:none;"><img th:src="${followCode}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
+                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>
