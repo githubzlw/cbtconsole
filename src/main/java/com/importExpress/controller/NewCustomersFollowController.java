@@ -118,7 +118,7 @@ public class NewCustomersFollowController {
         statistic.setStartNum(startNum);
         statistic.setLimitNum(limitNum);
         statistic.setTotalPrice(allCus);
-        statistic.setIsOrder(follow);
+        statistic.setFirstdiscount(follow);
         json = this.newCustomersFollowService.FindCustomList(statistic,admuser);
 
         return json;
