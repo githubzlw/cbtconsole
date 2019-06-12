@@ -49,8 +49,8 @@ public class ShopCarMarketingController {
     private static final String EMAIL_FOLLOW_URL = "https://www.import-express.com/followMe/index.do?fmc=";
 //  private static final String EMAIL_FOLLOW_URL = "http://127.0.0.1:8087/followMe/index.do?fmc=";
 
-    private static final String AUTO_LOGIN_URL = "https://www.import-express.com/simulateLogin/shopCarLogin";
-//    private static final String AUTO_LOGIN_URL = "http://127.0.0.1:8087/simulateLogin/shopCarLogin";
+    private static final String AUTO_LOGIN_URL = "https://www.import-express.com/user/autoLogin";
+//    private static final String AUTO_LOGIN_URL = "http://127.0.0.1:8087/user/autoLogin";
 
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
     @Autowired
@@ -458,7 +458,7 @@ public class ShopCarMarketingController {
             modelM.put("emailFollowUrl", EMAIL_FOLLOW_URL + followCode);
             modelM.put("followCode", followCode);
             modelM.put("userId",userId);
-            modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&imf=" + followCode);
+            modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode);
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
