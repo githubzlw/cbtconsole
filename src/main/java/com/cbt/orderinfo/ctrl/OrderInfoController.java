@@ -738,7 +738,7 @@ public class OrderInfoController{
 			}
 			getQueryParam(request,paramMap,user,response);
 			if(StringUtil.isNotBlank(paramMap.get("type").toString()) && "order_pending".equals(paramMap.get("type").toString())){
-				list=iOrderinfoService.getorderPending();
+				list=iOrderinfoService.getorderPending(Integer.valueOf(paramMap.get("admuserid")));
 			}else{
 				list=iOrderinfoService.getOrderManagementQuery(paramMap);
 //				for(int i=0;i<list.size();i++){

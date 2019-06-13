@@ -33,6 +33,15 @@ public class ShopCarUserStatistic {
     private String password;// 客户浏览商品数
     private String admname;// 客户浏览商品数
     private int usco;//问卷调查专用
+    private int firstdiscount;//是否下单
+
+    public int getFirstdiscount() {
+        return firstdiscount;
+    }
+
+    public void setFirstdiscount(int firstdiscount) {
+        this.firstdiscount = firstdiscount;
+    }
 
     public int getUsco() {
         return usco;

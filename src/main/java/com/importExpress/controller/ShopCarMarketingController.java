@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +47,10 @@ public class ShopCarMarketingController {
     private static final Log logger = LogFactory.getLog(ShopCarMarketingController.class);
 
     private static final String EMAIL_FOLLOW_URL = "https://www.import-express.com/followMe/index.do?fmc=";
-//    private static final String EMAIL_FOLLOW_URL = "http://127.0.0.1:8087/followMe/index.do?fmc=";
+//  private static final String EMAIL_FOLLOW_URL = "http://127.0.0.1:8087/followMe/index.do?fmc=";
+
+    private static final String AUTO_LOGIN_URL = "https://www.import-express.com/user/autoLogin";
+//    private static final String AUTO_LOGIN_URL = "http://127.0.0.1:8087/user/autoLogin";
 
     private static final String GET_MIN_FREIGHT_URL = GetConfigureInfo.getValueByCbt("getMinFreightUrl");
     @Autowired
@@ -450,7 +455,10 @@ public class ShopCarMarketingController {
                 return isSuccess;
             }
 
-            modelM.put("followCode", EMAIL_FOLLOW_URL + followCode);
+            modelM.put("emailFollowUrl", EMAIL_FOLLOW_URL + followCode);
+            modelM.put("followCode", followCode);
+            modelM.put("userId",userId);
+            modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode);
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
@@ -549,6 +557,25 @@ public class ShopCarMarketingController {
                 modelM.put("savePrice", paramMap.get("savePrice"));
                 sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_BEST_TRANSPORT);
             }
+            // 发送成功后，更新redis的跟踪码信息
+            try {
+                LocalDateTime dateTime = LocalDateTime.now();
+                dateTime = dateTime.minusHours(8);
+                String deadline = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                SendMQ sendMQ = new SendMQ();
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("type", "5");
+                jsonObject.put("userid", userId);
+                jsonObject.put("uuid", followCode);
+                jsonObject.put("timeout", 8 * 60 * 60);
+                sendMQ.sendMsg(jsonObject);
+                sendMQ.closeConn();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("userId:" + userId + ",更新redis的跟踪码信息 SendMQ error:", e);
+            }
+
             isSuccess = true;
         } catch (Exception e) {
             isSuccess = false;

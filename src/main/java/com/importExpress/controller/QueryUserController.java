@@ -708,6 +708,22 @@ public class QueryUserController {
         return result;
     }
 
-
+    /**
+     * 后台 商品下架审核中 使用的所有商品下架原因及对应中文
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/queryUnsellablereasonMaster.do
+     *
+     */
+    @RequestMapping(value = "/queryUnsellablereasonMaster.do")
+    @ResponseBody
+    public Map<String, Object> queryUnsellablereasonMaster() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        try {
+            return queryUserService.queryUnsellablereasonMaster();
+        } catch (Exception e) {
+            result.put("state", false);
+            result.put("message", "内部异常!");
+        }
+        return result;
+    }
 
 }

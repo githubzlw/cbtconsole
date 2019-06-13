@@ -76,13 +76,10 @@ public class CheckGoodsCarDataServiceImpl implements com.importExpress.service.C
     public void checkData(GoodsCarconfigWithBLOBs goodsCarBean){
         int userid = 0;
         String userCookieId="";
-        try{
+        if(null != goodsCarBean.getUserid()){
             userid = goodsCarBean.getUserid();
-        }catch(Exception e){
-            log.error("error,",e);
-            log.error("当前购物车id 为:[{}]",userid);
+        }else {
             userCookieId = goodsCarBean.getUsercookieid();
-
         }
         log.info("当前购物车id 为:[{}],userCookieId:[{}]",userid,userCookieId);
         String buyformecarconfig = goodsCarBean.getBuyformecarconfig();
