@@ -1746,9 +1746,9 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 
 	@Override
-	public List<Map<String, String>> getorderPending() {
+	public List<Map<String, String>> getorderPending(int admuserid) {
 		List<Map<String, String>> list=new ArrayList<Map<String, String>>();
-		String orderIds=dao.getOrderIds();
+		String orderIds=dao.getOrderIds(admuserid);
 		if(StringUtil.isNotBlank(orderIds)){
 			list=dao.getorderPending(orderIds);
 			for(Map<String, String> map:list){
@@ -1810,6 +1810,13 @@ public class OrderinfoService implements IOrderinfoService {
 		cywMap.put("state", 1);
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
+		// 支付失败的订单
+        List<Map<String, String>> list = dao.getorderPending(dao.getOrderIds(admuserid));
+        for (Map<String, Integer> bean : result) {
+            if ("order_pending".equals(bean.get("state"))) {
+                bean.put("counts", list==null?0:list.size());
+            }
+        }
 		return result;
 	}
 	

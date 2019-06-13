@@ -985,4 +985,10 @@
         </foreach>
     </insert>
 
+    <!--List<Map<String,String>> queryUnsellablereasonMaster();-->
+    <select id="queryUnsellablereasonMaster" resultType="HashMap">
+        SELECT unsellablereason_id 'id', unsellablereason_name 'name'
+        FROM unsellablereason_master
+    </select>
+
 </mapper>
