@@ -765,6 +765,15 @@ public class QueryUserServiceImpl implements QueryUserService {
     }
 
     @Override
+    public Map<String, Object> queryUnsellablereasonMaster() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        List<Map<String, String>> reasonList = queryUserMapper.queryUnsellablereasonMaster();
+        result.put("reason", reasonList);
+        result.put("state", true);
+        return result;
+    }
+
+    @Override
     public void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid) {
         queryUserMapper.insertNeedoffDownAll(pidList, reason, adminid);
     }

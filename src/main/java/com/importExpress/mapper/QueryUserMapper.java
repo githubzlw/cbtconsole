@@ -132,4 +132,5 @@ public interface QueryUserMapper {
 
     void insertNeedoffDownAll(@Param("list") List<String> list, @Param("reason") Integer reason, @Param("adminid") Integer adminid);
 
+    List<Map<String,String>> queryUnsellablereasonMaster();
 }
