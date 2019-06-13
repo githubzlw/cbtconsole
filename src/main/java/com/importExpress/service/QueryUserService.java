@@ -63,5 +63,7 @@ public interface QueryUserService {
 
     Map<String,Object> querySameGoodsInfoByPid(String pid);
 
+    Map<String,Object> queryUnsellablereasonMaster();
+
     void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid);
 }
