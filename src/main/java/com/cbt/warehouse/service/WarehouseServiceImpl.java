@@ -998,22 +998,23 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getAdminname()
                     + "')\">");
             userInfo.setAdmuser(admuser.toString());
-            double goods_price=0.00;
+            // 直接使用的jxw购物车营销中计算购物车价格的方式
+            /*double goods_price=0.00;
             if(!StringUtils.isStrNull(userInfo.getCar_info()) && userInfo.getCar_info().length()>10){
                 List<GoodsCarActiveBean> list_active  =  (List<GoodsCarActiveBean>) net.sf.json.JSONArray.toCollection(JSONArray.fromObject(userInfo.getCar_info()),GoodsCarActiveBean.class);
                 System.out.println("list_active=="+list_active.toString());
                 for (GoodsCarActiveBean g : list_active) {
                     goods_price+=g.getNumber()*Double.valueOf(g.getPrice());
                 }
-            }
-            userInfo.setGoodsPriceUrl("<a href=javascript:toShopCar("
+            }*/
+            userInfo.setGoodsPriceUrl("<a href=javascript:userlogin("
                     + userInfo.getUserid()
                     + ",\'"
                     + userInfo.getUserName()
                     + "\',\'"
                     + userInfo.getCurrency()
                     + "\')>"
-                    + String.format("%.2f", goods_price) + "</a>");
+                    + String.format("%.2f", userInfo.getGoodsPrice()) + "</a>");
             String gname = warehouseMapper.getGname(userInfo.getGid());
             userInfo.setGrade(gname);
             if (StringUtils.isStrNull(userInfo.getBusinessName())) {
