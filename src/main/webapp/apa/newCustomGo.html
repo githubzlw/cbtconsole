@@ -116,7 +116,7 @@
             var userEmail = $("#query_user_email").val();
             var followId = $("#query_follow_id").val();
             var adminId = $("#query_admin_id").val();
-            var follow  = $("#query_is_order").val();
+            var follow  = $("#oporder").val();
             var countryId = $('#query_country_id').combobox('getValue');
             var beginMoney = $("#query_begin_money").val();
             var endMoney = $("#query_end_money").val();
@@ -197,6 +197,13 @@
                     row.userId + '" target="_blank" >'+val+'</a>';
             }
         }
+        function formatFirstdiscount(val, row, index) {
+            if(val > 0){
+                return "否";
+            }else{
+                return '<a target="_blank" href="/cbtconsole/order/getOrderInfo.do?page=1&userid=&orderno=&email=' + row.userEmail + '&state=-2&trackState=0&buyuser=0&admuserid=0&startdate=&enddate=&showUnpaid=0&type=&paymentid=">是</a>';
+            }
+        }
         function formatuso(val, row, index) {
             if(val > 0){
                 return '<a  href="javascript:void(0);"  onclick="lookuso(\''+row.userId+'\',\''+row.userEmail+'\')" >查看问卷</a>';
@@ -263,7 +270,13 @@
 					<option value="-1" selected="selected">全部</option>
                     <option value="0">已跟进</option>
                    <option value="1">未跟进</option>
-			</select></span>&nbsp;&nbsp;<span>销售: <select id="query_admin_id"
+			</select></span>&nbsp;&nbsp;
+        <span>是否下单: <select id="oporder" style="font-size: 16px; height: 26px; width: 90px;">-->
+					<option value="-1" selected="selected">全部</option>
+                    <option value="0">未下单</option>
+                   <option value="1">已下单</option>
+			</select></span>&nbsp;&nbsp;
+        <span>销售: <select id="query_admin_id"
                                                           style="font-size: 16px; height: 26px; width: 90px;">
 					<option value="-1" selected="selected">全部</option>
             </select></span>&nbsp;&nbsp;
@@ -285,6 +298,7 @@
         <th data-options="field:'userId',align:'center',width:'100px',formatter:formatUserId">用户ID</th>
         <th data-options="field:'userEmail',width:'150px'">用户Email</th>
         <th data-options="field:'countryName',align:'center',width:'100px'">国家</th>
+        <th data-options="field:'firstdiscount',align:'center',width:'100px',formatter:formatFirstdiscount">是否下单</th>
         <th data-options="field:'usco',align:'center',width:'100px',formatter:formatuso">问卷</th>
         <th data-options="field:'totalCatid',align:'center',width:'80px'">购物车商品种类</th>
         <th data-options="field:'totalPrice',align:'center',width:'100px',formatter:formatMoney">购物车总金额</th>
