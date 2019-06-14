@@ -1459,8 +1459,8 @@ public interface WarehouseMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderPay(@Param("orderids")List<String> orderids);
-	
-	
-	
-	
+
+
+	@Select("SELECT remotpath from custom_benchmark_ready WHERE pid=#{pid}")
+	String getRepathByPid(@Param("pid") String pid);
 }
