@@ -9064,10 +9064,10 @@ public class WarehouseCtrl {
 				MultipartFile file = fileList.get(i);
 				String filename1 = file.getOriginalFilename();
 				String pid = filename1.replaceAll(".mp4", "").replaceAll("[^0-9]","");
-				String VidoPath=this.iWarehouseService.getRepathByPid(pid);
-				String Vpath=VidoPath.split("/")[4];
-				System.out.println(filename1);
 				try {
+					String VidoPath=this.iWarehouseService.getRepathByPid(pid);
+					String Vpath=VidoPath.split("/")[4];
+					System.out.println(filename1);
 				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
 				String time = df.format(new Date());// new Date()为获取当前系统时间
 				String filename = pid + "_" + time;
@@ -9076,8 +9076,8 @@ public class WarehouseCtrl {
 				}
 				// 检查配置文件信息是否正常读取
 				String imgUploadPath = ftpConfig.getLocalDiskPath();
-//				filePath = imgUploadPath  + file.getOriginalFilename();
-				filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
+				filePath = imgUploadPath  + file.getOriginalFilename();
+				//filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 				FileOutputStream fs = new FileOutputStream(filePath);
 				byte[] buffer = new byte[1024 * 1024];
 				int bytesum = 0;
