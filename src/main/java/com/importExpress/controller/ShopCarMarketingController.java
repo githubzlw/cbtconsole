@@ -568,7 +568,8 @@ public class ShopCarMarketingController {
                 jsonObject.put("type", "5");
                 jsonObject.put("userid", userId);
                 jsonObject.put("uuid", followCode);
-                jsonObject.put("timeout", 8 * 60 * 60);
+                // 失效时间3周
+                jsonObject.put("timeout", 3 * 7 * 24 * 60 * 60);
                 sendMQ.sendMsg(jsonObject);
                 sendMQ.closeConn();
             } catch (Exception e) {
