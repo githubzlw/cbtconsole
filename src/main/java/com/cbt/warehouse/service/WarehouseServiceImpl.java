@@ -2929,5 +2929,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
 
     }
 
+    @Override
+    public String getRepathByPid(String pid) {
+        String path=this.warehouseMapper.getRepathByPid(pid);
+        return path;
+    }
+
 
 }

@@ -320,4 +320,5 @@ public interface PurchaseServer {
 	 * @return
 	 */
 	public UserOrderDetails getUserAddr(String orderid) throws Exception;
+
 }

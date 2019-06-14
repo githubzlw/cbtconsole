@@ -1156,5 +1156,6 @@ public interface IWarehouseService {
 
     returndisplay FindReturnTime(String orderids);
 
+	String getRepathByPid(String pid);
 }
  
