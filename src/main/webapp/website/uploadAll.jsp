@@ -43,12 +43,15 @@
                         $.messager.progress('close');
                         alert("上传成功");
                         // closeUploadDialog();
+                        window.location.reload()
                     }else if (returndata[0] =="0"){
                         alert("上传失败");
                         $.messager.progress('close');
+                        window.location.reload()
                     }else {
                         alert(returndata+"上传失败")
                         $.messager.progress('close');
+                        window.location.reload()
                     }
                 },
                 error: function (returndata) {
