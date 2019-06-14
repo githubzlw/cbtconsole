@@ -251,7 +251,7 @@ public interface IOrderinfoService {
 	 * 查询订单状态为支付失败或者order_pending的订单
 	 * @return
 	 */
-	public List<Map<String, String>> getorderPending();
+	public List<Map<String, String>> getorderPending(int admuserid);
 
 	/**
 	 * 根据客户订单获取邮箱地址

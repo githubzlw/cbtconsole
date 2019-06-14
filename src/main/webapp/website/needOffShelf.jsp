@@ -375,6 +375,9 @@
         }
 
         function formatReason(val, row, index) {
+            if (window.UNSELLABLEREASON != {}) {
+                return window.UNSELLABLEREASON[val];
+            }
             //商品下架原因
             if (val == 1) {
                 return '1-1688货源下架';
@@ -689,6 +692,34 @@
     </tbody>
 </table>
 <script type="text/javascript">
+    // 商品下架原因
+    $.ajax({
+        type: "GET",
+        url: "/cbtconsole/queryuser/queryUnsellablereasonMaster.do",
+        async: false,
+        dataType:"json",
+        success: function(msg){
+            if(msg.state == true) {
+                window.UNSELLABLEREASON = {};
+                var query_reason = $("#query_reason");
+                query_reason.empty();
+                $("<option>", {
+                    value: "0",
+                    selected: "selected",
+                    text: "全部"
+                }).appendTo(query_reason);
+                $(msg.reason).each(function (key, val) {
+                    window.UNSELLABLEREASON[val.id] = val.name;
+                    $("<option>", {
+                        value: val.id,
+                        text: val.id + "-" + val.name
+                    }).appendTo(query_reason);
+                });
+            }
+        }
+    });
+
+
     $("#refreshData").click(function () {
         alert("临时查询数据刷新中 预计30s!");
         $.ajax({

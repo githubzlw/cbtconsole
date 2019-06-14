@@ -672,7 +672,8 @@
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND o.user_id !='26018' AND o.user_id!='25913'
         union all
-        SELECT 'order_pending' AS state,COUNT(orderid) counts FROM (SELECT p.orderid FROM payment p
+        SELECT 'order_pending' AS state,0 counts
+        <!--SELECT 'order_pending' AS state,COUNT(orderid) counts FROM (SELECT p.orderid FROM payment p
         INNER JOIN orderinfo oi ON p.orderid=oi.order_no
         <if test="admuserid != 0">
             inner JOIN admin_r_user a ON oi.user_id=a.userid and  a.adminid=#{admuserid}
@@ -684,7 +685,7 @@
         email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
         email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
         email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913'
-        GROUP BY p.orderid) a
+        GROUP BY p.orderid) a-->
         union ALL
         SELECT 'checkOrder' AS state,COUNT(b.order_no) counts FROM (
         SELECT oi.* FROM orderinfo oi
@@ -715,6 +716,10 @@
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
         SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
+        <if test="admuserid != 0">
+            INNER JOIN admin_r_user a ON oi.user_id = a.userid
+            AND a.adminid = #{admuserid}
+        </if>
         WHERE p.id IN(SELECT MAX(id) FROM payment GROUP BY orderid) AND p.paystatus=0 and oi.state=0   ORDER BY p.id DESC
     </select>
     <select id="getPayTypeForOrderNo" resultType="com.cbt.bean.Payment">

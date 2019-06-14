@@ -594,7 +594,7 @@ public interface OrderinfoMapper {
 	 * 获取支付时间或到账订单的订单号
 	 * @return
 	 */
-	public String getOrderIds();
+	public String getOrderIds(@Param("admuserid") int admuserid);
 	/**
 	 * 根据客户订单获取邮箱地址
 	 * @param orderNo
