@@ -118,6 +118,7 @@
             });
 
             var formData = new FormData($("#upload_video")[0]);
+            alert(formData)
             $.ajax({
                 url: '/cbtconsole/warehouse/vimeoUpload',
                 type: 'POST',

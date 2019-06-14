@@ -393,6 +393,9 @@ tr .td_class{width:230px;}
             }
         });
 	}
+    function uploadAll(){
+        $('#upload').dialog('open');
+    }
 	</script>
 </head>
 <body onload="doQuery(1);$('#pic_dlg').dialog('close');$('#pic_dlg1').dialog('close');;$('#dlg2').dialog('close');">
@@ -480,6 +483,7 @@ tr .td_class{width:230px;}
 		<input class="but_color" type="button" value="查询" onclick="doQuery(1,0)"> 
 		<input class="but_color" type="button" value="重置" onclick="doReset()">
 		<%--<br><a href="/cbtconsole/website/upload_video.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">产品单页视频展示操作</a>--%>
+		<a target="_blank" href="/cbtconsole/website/uploadAll.jsp">视频批量上传</a>
 	</div>
 	<table class="easyui-datagrid" id="easyui-datagrid"
 		style="width: 1800px; height: 900px">
