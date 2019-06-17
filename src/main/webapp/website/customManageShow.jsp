@@ -167,10 +167,17 @@
         }
 
         function doQueryWidthJump(){
-            queryParams.page = "1";
-            queryParams.catid = "0";
-            $(".easyui-tree").hide();
-            createCateroryTree(queryParams.catid);
+            if ($("#query_source").val() == '1') {
+                queryParams.page = "1";
+                queryParams.catid = "0";
+                $(".easyui-tree").hide();
+                createCateroryTree(queryParams.catid);
+            } else if ($("#query_source").val() != '1') {
+                var url = "/cbtconsole/cutom/cmslist?page=" + queryParams.page
+                    + "&source=" + $("#query_source").val();
+                console.log(url);
+                $('#goods_list').attr('src',encodeURI(url));
+            }
         }
 
         function parentDoQuery(page){
@@ -217,28 +224,38 @@
             当前操作人:
             <span id="admName">${admName}</span>
 
-            &nbsp;&nbsp;编辑状态:
-            <select id="query_is_edited">
-                <option value="-1" selected="selected">全部</option>
-                <option value="0">未编辑</option>
-                <option value="1">已编辑</option>
+            &nbsp;&nbsp;数据源:
+            <select id="query_source">
+                <option value="1" selected="selected">1-按照类别树</option>
+                <option value="2">2-指定商品</option>
+                <option value="3">3-指定商品</option>
+                <option value="4">4-指定商品</option>
             </select>
 
-            &nbsp;&nbsp;货源对标情况:
-            <select id="query_is_benchmark">
-                <option value="-1" selected="selected">全部</option>
-                <option value="0">没找到对标</option>
-                <option value="1">精确对标</option>
-                <option value="2">近似对标</option>
-            </select>
+            <div style="display: inline-block;">
+                &nbsp;&nbsp;编辑状态:
+                <select id="query_is_edited">
+                    <option value="-1" selected="selected">全部</option>
+                    <option value="0">未编辑</option>
+                    <option value="1">已编辑</option>
+                </select>
 
-            &nbsp;&nbsp;在线状态:
-            <select id="query_valid">
-                <option value="-1" selected="selected">全部</option>
-                <option value="0">硬下架</option>
-                <option value="1">在线</option>
-                <option value="2">软下架</option>
-            </select>
+                &nbsp;&nbsp;货源对标情况:
+                <select id="query_is_benchmark">
+                    <option value="-1" selected="selected">全部</option>
+                    <option value="0">没找到对标</option>
+                    <option value="1">精确对标</option>
+                    <option value="2">近似对标</option>
+                </select>
+
+                &nbsp;&nbsp;在线状态:
+                <select id="query_valid">
+                    <option value="-1" selected="selected">全部</option>
+                    <option value="0">硬下架</option>
+                    <option value="1">在线</option>
+                    <option value="2">软下架</option>
+                </select>
+            </div>
 
             &nbsp;&nbsp;
             <input type="button" value="查询" onclick="doQueryWidthJump()">
@@ -259,5 +276,19 @@
 <c:if test="${uid ==0}">
     {"status":false,"message":"请重新登录进行操作"}
 </c:if>
+<script type="text/javascript">
+    jQuery(function($){
+        // 数据源切换
+        $("#query_source").change(function(){
+            if ($("#query_source").val() == '1') {
+                $("#query_is_edited").parent().css('display', 'inline-block')
+            } else if ($("#query_source").val() != '1') {
+                $("#query_is_edited").parent().css('display', 'none');
+                $(".easyui-tree").hide();
+                $('#goods_list').attr('src','/cbtconsole/cutom/cmslist?valid=-2');
+            }
+        });
+    });
+</script>
 </body>
 </html>
