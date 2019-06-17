@@ -1,22 +1,21 @@
 package com.cbt.warehouse.ctrl;
 
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.pojo.Admuser;
-import com.cbt.util.*;
-import com.cbt.website.dao.*;
-import com.cbt.website.service.IOrderSplitServer;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderSplitServer;
-import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.util.JsonResult;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
-import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.service.IPurchaseService;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import net.sf.json.JSONObject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +23,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.pojo.Admuser;
+import com.cbt.util.BigDecimalUtil;
+import com.cbt.util.GetConfigureInfo;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.UUIDUtil;
+import com.cbt.util.Utility;
+import com.cbt.website.dao.IOrderSplitDao;
+import com.cbt.website.dao.OrderInfoDao;
+import com.cbt.website.dao.OrderInfoImpl;
+import com.cbt.website.dao.OrderSplitDaoImpl;
+import com.cbt.website.service.IOrderSplitServer;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderSplitServer;
+import com.cbt.website.service.OrderwsServer;
+import com.cbt.website.util.JsonResult;
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.OrderSplitMain;
+import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.utli.NotifyToCustomerUtil;
 
 @Controller
 @RequestMapping("/orderSplit")
@@ -41,6 +55,8 @@ public class NewOrderSplitCtr {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
     @Autowired
     private SendMailFactory sendMailFactory;
+    @Autowired
+    private OrderSplitRecordService orderSplitRecordService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -270,6 +286,7 @@ public class NewOrderSplitCtr {
                 if (odidLst.length > 0) {
                     double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
                     double totalGoodsCostOld = 0;// 原订单商品总价
+                    double totalGoodsWeightOld = 0;// 原订单商品总重量
                     for (OrderDetailsBean odds : orderDetails) {
                         for (String odid : odidLst) {
                             if (odds.getId() == Integer.valueOf(odid)) {
@@ -280,7 +297,18 @@ public class NewOrderSplitCtr {
                             }
                         }
                         totalGoodsCostOld += Double.valueOf(odds.getGoodsprice()) * odds.getYourorder();
+                        totalGoodsWeightOld += Double.valueOf(odds.getActual_weight()) * odds.getYourorder();
                     }
+                    //插入主单信息
+                    if(orderNo.indexOf("_") == -1) {
+                		OrderSplitMain orderMain = new OrderSplitMain();
+                		orderMain.setCost(totalGoodsCostOld);
+                		orderMain.setFeight(orderBean.getActual_weight_estimate());
+                		orderMain.setOrderid(orderNo);
+                		orderMain.setWeight(totalGoodsWeightOld);
+                		orderSplitRecordService.insertMainOrder(orderMain);
+                	}
+                    
                     // 判断传递的odids有效
                     if (nwOrderDetails.size() == odidLst.length && !(totalPayPriceOld <= 0 || totalGoodsCostOld <= 0)) {
                         // 3.计算预期结果并保存和拆单操作
@@ -296,6 +324,8 @@ public class NewOrderSplitCtr {
                             }
                         }
 //						}
+                        
+                        
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
@@ -544,6 +574,8 @@ public class NewOrderSplitCtr {
                 cancelApproval.setDealState(0);
                 cancelApproval.setOrderState(oiState);
                 NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+            }else {
+            	orderSplitRecordService.insertChildOrder(nwOrderNo);
             }
             // 6.执行完成后，给出执行的结果并保存数据库
             splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);

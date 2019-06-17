@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.OrderSplitRecordMapper">
+
+  <insert id="insertMainOrder" useGeneratedKeys="true" parameterType="com.importExpress.pojo.OrderSplitMain">
+  <selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+  insert into order_split_main_record(order_id,weight,feight,cost)values(#{orderid},#{weight},#{feight},#{cost})
+  </insert>
+  
+  <select id="countMainOrder" resultType="Integer">
+  select  count(*) from order_split_main_record where order_id=#{orderid}
+  </select>
+  <select id="getMainOrder" resultType="com.importExpress.pojo.OrderSplitMain">
+  select  id,order_id,weight,feight,cost from order_split_main_record where order_id=#{orderid}
+  </select>
+  <select id="getChildOrder" resultType="com.importExpress.pojo.OrderSplitChild">
+  select  main_id,order_id,weight,feight,cost from order_split_child_record where order_id=#{orderid}
+  </select>
+  
+   <insert id="insertChildOrder"  parameterType="com.importExpress.pojo.OrderSplitChild">
+  insert into order_split_child_record(main_id,order_id,weight,feight,cost,recommend)values(#{mainid},#{orderid},#{weight},#{feight},#{cost},#{recommend})
+  </insert>
+   <insert id="updateChildOrder"  >
+  update order_split_child_record set recommend=0,child_order_id=CONCAT_WS(',',child_order_id,#{orderChild2}) where order_id=#{orderChild1}
+  </insert>
+  
+  <select id="getOrder" resultType="Integer">
+  select  recommend from  order_split_child_record where order_id=#{orderid}
+  
+  </select>
+  
+  
+</mapper>

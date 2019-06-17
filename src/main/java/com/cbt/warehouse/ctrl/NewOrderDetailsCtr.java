@@ -1,9 +1,45 @@
 package com.cbt.warehouse.ctrl;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.auto.service.IOrderAutoService;
 import com.cbt.auto.service.PreOrderAutoService;
-import com.cbt.bean.*;
+import com.cbt.bean.CodeMaster;
+import com.cbt.bean.Evaluate;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.Payment;
+import com.cbt.bean.RechargeRecord;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.TabTransitFreightinfoUniteNew;
+import com.cbt.bean.TransitPricecost;
+import com.cbt.bean.UserBean;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -23,40 +59,41 @@ import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.service.UserServer;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
-import com.cbt.util.*;
+import com.cbt.util.AppConfig;
+import com.cbt.util.BigDecimalUtil;
+import com.cbt.util.DoubleUtil;
+import com.cbt.util.OrderInfoConstantUtil;
+import com.cbt.util.Redis;
+import com.cbt.util.SerializeUtil;
+import com.cbt.util.UUIDUtil;
+import com.cbt.util.Util;
+import com.cbt.util.Utility;
 import com.cbt.warehouse.service.GoodsCommentsService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.PaymentDetails;
 import com.cbt.website.bean.QualityResult;
-import com.cbt.website.dao.*;
-import com.cbt.website.service.*;
+import com.cbt.website.dao.IOrderwsDao;
+import com.cbt.website.dao.OrderwsDao;
+import com.cbt.website.dao.PaymentDao;
+import com.cbt.website.dao.PaymentDaoImp;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
+import com.cbt.website.service.GoodsPriceHistoryserviceImpl;
+import com.cbt.website.service.IOrderSplitServer;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderSplitServer;
+import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Controller
 @RequestMapping("/orderDetails")
@@ -79,6 +116,8 @@ public class NewOrderDetailsCtr {
 
 	@Autowired
 	private PaymentServiceNew paymentServiceNew;
+	@Autowired
+	private OrderSplitRecordService orderSplitRecordService;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -497,6 +536,8 @@ public class NewOrderDetailsCtr {
 			}
 			request.setAttribute("lists", lists);
 			request.setAttribute("isDropFlag",0);
+			int recommend = orderSplitRecordService.getOrder(orderNo);
+			request.setAttribute("recommend",recommend);
 		//} catch (Exception e) {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/

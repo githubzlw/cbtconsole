@@ -997,6 +997,9 @@
         <br/>
     </div>
     <br>
+    <c:if test="${recommend > 0}">
+    <span>${recommend==1?'推荐分批出货':'不推荐分批出货'}</span>
+    </c:if>
     <c:if test="${isDropshipOrder == 0 || isDropshipOrder == 2 || isDropshipOrder == 3}">
         <!-- 不是dropship订单 -->
         <div style="width:1440px;">
