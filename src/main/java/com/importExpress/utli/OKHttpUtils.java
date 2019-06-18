@@ -213,6 +213,11 @@ public class OKHttpUtils {
 		}
 	}
 
+	public synchronized OkHttpClient getClientInstance(){
+		checkAndInitOkHttp();
+		return client;
+	}
+
 	public static void main(String[] args) throws Exception{
 		OKHttpUtils okHttpUtils = new OKHttpUtils();
 		File file = new File("E:/hotJson/1000190129.json");

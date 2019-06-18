@@ -30,9 +30,9 @@ public class ImgDownload {
 		FileOutputStream fileOutputStream = null;
 		ByteArrayOutputStream output = null;
 		try {
-			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS)
-					.readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).build();
-			Request request = new Request.Builder().addHeader("Accept", "*/*")
+			OkHttpClient client = new OkHttpClient.Builder().connectTimeout(180, TimeUnit.SECONDS)
+					.readTimeout(90, TimeUnit.SECONDS).writeTimeout(90, TimeUnit.SECONDS).build();
+			Request request = new Request.Builder().addHeader("Connection", "close").addHeader("Accept", "*/*")
 					.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)").get().url(imgUrl).build();
 			Response response = client.newCall(request).execute();
 
@@ -83,16 +83,7 @@ public class ImgDownload {
 				}
 			}
 		}
-		File downFlie = new File(fileName);
-
-		if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 1) {
-			isDown = true;
-		} else {
-			if (downFlie.exists()) {
-				downFlie.delete();
-			}
-			isDown = false;
-		}
+		isDown = checkDownFileByName(fileName);
 		System.err.println("down img [" + fileName + "],result:" + isDown);
 		return isDown;
 	}
@@ -215,5 +206,20 @@ public class ImgDownload {
 		inStream.close();
 		return outStream.toByteArray();
 	}
+
+	public static boolean checkDownFileByName(String fileName){
+        boolean isDown = false;
+        File downFlie = new File(fileName);
+
+        if (downFlie.exists() && 1.0 * downFlie.length() / 1024 > 1) {
+            isDown = true;
+        } else {
+            if (downFlie.exists()) {
+                downFlie.delete();
+            }
+            isDown = false;
+        }
+        return isDown;
+    }
 
 }
