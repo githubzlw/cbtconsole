@@ -1386,4 +1386,8 @@
         where shop_id = #{shopId}
     </select>
 
+    <insert id="insertIntoGoodsImgUpLog">
+        insert into custom_goods_img_up_log(pid,img_url,admin_id,remark)
+        values(#{pid}, #{imgUrl}, #{adminId}, #{remark})
+    </insert>
 </mapper>

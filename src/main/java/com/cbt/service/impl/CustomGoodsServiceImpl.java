@@ -140,6 +140,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
+        }else{
+            customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
         }
         return res;
     }
@@ -799,6 +801,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public ShopGoodsSalesAmount queryShopGoodsSalesAmountByShopId(String shopId) {
         return customGoodsMapper.queryShopGoodsSalesAmountByShopId(shopId);
+    }
+
+    @Override
+    public int insertIntoGoodsImgUpLog(String pid, String imgUrl, int adminId, String remark) {
+        return customGoodsMapper.insertIntoGoodsImgUpLog(pid, imgUrl, adminId, remark);
     }
 
 }
