@@ -435,4 +435,18 @@ public interface CustomGoodsMapper {
     List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery goodsQuery);
 
     int queryGoodsShowInfosCount(CustomGoodsQuery goodsQuery);
+
+
+    /**
+     * 查询全部店铺售卖金额
+     * @return
+     */
+    List<ShopGoodsSalesAmount> queryShopGoodsSalesAmountAll();
+
+    /**
+     * 查询单个店铺售卖金额
+     * @param shopId
+     * @return
+     */
+    ShopGoodsSalesAmount queryShopGoodsSalesAmountByShopId(String shopId);
 }

@@ -27,6 +27,18 @@ public class SupplierScoringBean implements Serializable{
 	private String category;
 	private int noSupplier;
 	private int sell;  // 店铺内销量
+	/**
+	 * 店铺售卖金额
+	 */
+	private double shopPrice;
+
+	public double getShopPrice() {
+		return shopPrice;
+	}
+
+	public void setShopPrice(double shopPrice) {
+		this.shopPrice = shopPrice;
+	}
 
     public int getSell() {
         return sell;
