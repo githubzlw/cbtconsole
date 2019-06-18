@@ -50,7 +50,7 @@ public class OrderSplitRecordServiceImpl implements OrderSplitRecordService {
         double orderChildWeight = 0;// 订单商品总重量
 		for(OrderDetailsBean d : orderDetails) {
 			orderChildCost += Double.valueOf(d.getGoodsprice()) * d.getYourorder();
-			orderChildWeight += Double.valueOf(d.getActual_weight()) * d.getYourorder();
+			orderChildWeight += Double.valueOf(d.getActual_weight());
 		}
 		
 		OrderSplitChild orderChild = new OrderSplitChild();
@@ -79,7 +79,7 @@ public class OrderSplitRecordServiceImpl implements OrderSplitRecordService {
 	}
 
 	@Override
-	public int getOrder(String splitOrerId) {
+	public OrderSplitChild getOrder(String splitOrerId) {
 		// TODO Auto-generated method stub
 		return orderSplitRecordMapper.getOrder(splitOrerId);
 	}

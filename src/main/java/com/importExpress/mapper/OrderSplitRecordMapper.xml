@@ -27,8 +27,8 @@
   update order_split_child_record set recommend=0,child_order_id=CONCAT_WS(',',child_order_id,#{orderChild2}) where order_id=#{orderChild1}
   </insert>
   
-  <select id="getOrder" resultType="Integer">
-  select  recommend from  order_split_child_record where order_id=#{orderid}
+  <select id="getOrder" resultType="com.importExpress.pojo.OrderSplitChild">
+  select  main_id,order_id,weight,feight,cost,recommend from  order_split_child_record where order_id=#{orderid}
   
   </select>
   

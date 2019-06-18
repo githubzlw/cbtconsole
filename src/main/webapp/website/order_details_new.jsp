@@ -997,8 +997,26 @@
         <br/>
     </div>
     <br>
-    <c:if test="${recommend > 0}">
-    <span>${recommend==1?'推荐分批出货':'不推荐分批出货'}</span>
+    <c:if test="${orderRecord.recommend > 0}">
+    <table border="1" style="margin-left:160px;">
+    <tr>
+    <td style="width: 320px;">订单销售价($)</td>
+    <td style="width: 320px;">${orderRecord.cost}</td>
+    </tr>
+    <tr>
+    <td style="width: 320px;">订单重量(kg)</td>
+    <td style="width: 320px;">${orderRecord.weight }</td>
+    </tr>
+    <tr>
+    <td style="width: 320px;">订单预估运费(￥)</td>
+    <td style="width: 320px;">${orderRecord.feight }</td>
+    </tr>
+    <tr>
+    <td style="width: 320px;">是否推荐分批出货</td>
+    <td style="color: red;font-size: 24px;width: 320px;">${orderRecord.recommend==1?'推荐':'不推荐'}</td>
+    </tr>
+    </table>
+    <br>
     </c:if>
     <c:if test="${isDropshipOrder == 0 || isDropshipOrder == 2 || isDropshipOrder == 3}">
         <!-- 不是dropship订单 -->

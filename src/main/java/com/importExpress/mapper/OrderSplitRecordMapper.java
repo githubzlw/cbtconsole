@@ -45,6 +45,6 @@ public interface OrderSplitRecordMapper {
      * @param orderid
      * @return
      */
-    int getOrder(String orderid);
+    OrderSplitChild getOrder(String orderid);
     
 }

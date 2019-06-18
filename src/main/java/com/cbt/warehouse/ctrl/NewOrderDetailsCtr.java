@@ -88,6 +88,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
@@ -536,8 +537,8 @@ public class NewOrderDetailsCtr {
 			}
 			request.setAttribute("lists", lists);
 			request.setAttribute("isDropFlag",0);
-			int recommend = orderSplitRecordService.getOrder(orderNo);
-			request.setAttribute("recommend",recommend);
+			OrderSplitChild orderSplitChild = orderSplitRecordService.getOrder(orderNo);
+			request.setAttribute("orderRecord",orderSplitChild);
 		//} catch (Exception e) {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/

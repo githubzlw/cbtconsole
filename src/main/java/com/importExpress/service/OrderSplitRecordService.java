@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.pojo.OrderSplitMain;
 
 public interface OrderSplitRecordService {
@@ -20,7 +21,7 @@ public interface OrderSplitRecordService {
      * @param orderid
      * @return
      */
-    int getOrder(String orderid);
+    OrderSplitChild getOrder(String orderid);
     
     
 }
