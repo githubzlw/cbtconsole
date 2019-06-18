@@ -435,4 +435,29 @@ public interface CustomGoodsMapper {
     List<CustomGoodsPublish> queryGoodsShowInfos(CustomGoodsQuery goodsQuery);
 
     int queryGoodsShowInfosCount(CustomGoodsQuery goodsQuery);
+
+
+    /**
+     * 查询全部店铺售卖金额
+     * @return
+     */
+    List<ShopGoodsSalesAmount> queryShopGoodsSalesAmountAll();
+
+    /**
+     * 查询单个店铺售卖金额
+     * @param shopId
+     * @return
+     */
+    ShopGoodsSalesAmount queryShopGoodsSalesAmountByShopId(String shopId);
+
+
+    /**
+     * 插入商品压缩和上传图片失败日志
+     * @param pid
+     * @param imgUrl
+     * @param adminId
+     * @param remark
+     * @return
+     */
+    int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
 }

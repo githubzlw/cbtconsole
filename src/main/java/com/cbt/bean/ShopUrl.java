@@ -52,6 +52,19 @@ public class ShopUrl {
 	 */
 	private int isShopFlag;
 
+	/**
+	 * 店铺售卖金额
+	 */
+	private double shopPrice;
+
+	public double getShopPrice() {
+		return shopPrice;
+	}
+
+	public void setShopPrice(double shopPrice) {
+		this.shopPrice = shopPrice;
+	}
+
 	public int getIsShopFlag() {
 		return isShopFlag;
 	}

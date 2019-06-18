@@ -1391,4 +1391,19 @@
         </where>
     </select>
 
+    <select id="queryShopGoodsSalesAmountAll" resultType="com.importExpress.pojo.ShopGoodsSalesAmount">
+        select shop_id as shopId,goods_num as goodsNum,total_price as totalPrice
+        from shop_goods_sales_amount
+    </select>
+
+    <select id="queryShopGoodsSalesAmountByShopId" resultType="com.importExpress.pojo.ShopGoodsSalesAmount">
+        select shop_id as shopId,goods_num as goodsNum,total_price as totalPrice
+        from shop_goods_sales_amount
+        where shop_id = #{shopId}
+    </select>
+
+    <insert id="insertIntoGoodsImgUpLog">
+        insert into custom_goods_img_up_log(pid,img_url,admin_id,remark)
+        values(#{pid}, #{imgUrl}, #{adminId}, #{remark})
+    </insert>
 </mapper>

@@ -95,6 +95,15 @@ public class PurchasesBean {
 	private String morder; //最小moq
 	private String replacementProduct; //客户录入替换产品
 	private String shipno; //运单号
+	private double goodsShopPrice;// 商品店铺总销售额
+
+	public double getGoodsShopPrice() {
+		return goodsShopPrice;
+	}
+
+	public void setGoodsShopPrice(double goodsShopPrice) {
+		this.goodsShopPrice = goodsShopPrice;
+	}
 
 	public String getShipno() {
 		return shipno;

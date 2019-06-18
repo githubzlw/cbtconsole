@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.cbt.warehouse.pojo.*;
+import com.importExpress.mapper.CustomGoodsMapper;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	private IOrderinfoService iOrderinfoService;
 	@Autowired
 	private WarehouseMapper dao;
+	@Autowired
+    private CustomGoodsMapper customGoodsMapper;
 	int total;
 	int goodsnum = 0;
 
@@ -1227,10 +1231,14 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				pbList.add(purchaseBean);
 				total = Integer.parseInt(map.get("totalCount")==null?"0": String.valueOf(map.get("totalCount")));
 			}
+			// 获取数据
+			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsMapper.queryShopGoodsSalesAmountAll();
 			Set<String> pid_list=new HashSet<String>();
 			for(int i=0;i<pbList.size();i++){
 				pid_list.add(pbList.get(i).getGoods_pid());
+				genShopPrice(pbList.get(i),shopGoodsSalesAmountList);
 			}
+			shopGoodsSalesAmountList.clear();
 			double pid_amount=0;
 			if(list.size()>0){
 				pid_amount=pid_list.size()*5;
@@ -1258,6 +1266,15 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 
 		return page;
+	}
+
+	private void genShopPrice(PurchasesBean purchasesBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(purchasesBean.getGoodsShop())){
+				purchasesBean.setGoodsShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
 	}
 
 	/**

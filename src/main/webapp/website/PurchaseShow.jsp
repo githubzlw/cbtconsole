@@ -3299,7 +3299,10 @@
 									供应商ID： <a target="_blank" style="color:red;" title="查看该供应商采购历史记录" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${pb.goodsShop}">${pb.goodsShop}</a><br>
 								</div>
 								<div style="width: 100%; word-wrap: break-word;">
-									供应商库存：${pb.shopInventory}<br>
+									供应商库存：${pb.shopInventory}
+								</div>
+								<div style="width: 170px; word-wrap: break-word;color: #59f775;background-color: black;">
+									<b>店铺售卖金额($):${pb.goodsShopPrice}</b>
 								</div>
 							</c:if>
 							<c:if test="${pb.inventory>0}">

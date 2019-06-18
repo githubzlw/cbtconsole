@@ -54,6 +54,7 @@
 			<td>级别</td>
 			<td>供应商地址</td>
 			<td>产品打分</td>
+			<td>售卖金额($)</td>
 			<td>支持退换货天数</td>
 			<td colspan="3">库存协议</td>
 			</tr>
@@ -92,6 +93,7 @@
 				</c:if>
 			</td>
 			<td><a target="_blank" href="/cbtconsole/supplierscoring/supplierproducts?shop_id=${supplierScoringBean.shopId }&flag=1">进入店铺、商品评分</a></td>
+			<td>${supplierScoringBean.shopPrice}</td>
 			<td>
 				<c:if test="${supplierScoringBean.returnDays!=0 }">${supplierScoringBean.returnDays }</c:if>
 			</td>
