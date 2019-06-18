@@ -581,21 +581,7 @@
 		from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		not in(select id from `user` where email like
-		'test%' or
-		email like
-		'%qq.com' or email like '%163.com' or email like
-		'%126.com'
-		or email
-		like '%ww.com' or name like 'rlef%' or email like
-		't@%' or
-		email like
-		't_@%' or email like '%sina.com'
-		or
-		email like '%test%hotmail.com%' or
-		email =
-		'yangyanyan4228@yahoo.com' or
-		id=1128)
+		in(select id from `user` where is_test = 0)
 		group by userid
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -611,20 +597,7 @@
 		count(*) from (select userid from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		not in(select id from `user` where email like
-		'test%' or
-		email like
-		'%qq.com' or email like '%163.com' or email like
-		'%126.com'
-		or email
-		like '%ww.com' or name like 'rlef%' or email like
-		't@%' or
-		email like
-		't_@%' or email like '%sina.com' or
-		email like '%test%hotmail.com%' or
-		email =
-		'yangyanyan4228@yahoo.com' or
-		id=1128)
+		in(select id from `user` where is_test = 0)
 		group by userid) tbc
 	</select>
 
