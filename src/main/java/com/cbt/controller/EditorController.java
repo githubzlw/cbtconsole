@@ -1019,12 +1019,12 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
+                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
                             pbThread.start();
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     } else {
-                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
+                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
                         pbThread.start();
                         json.setMessage("更新成功,异步上传图片中，请等待");
                     }
@@ -3266,7 +3266,7 @@ public class EditorController {
 
             for (String pid : allList) {
                 if (StringUtils.isNotBlank(pid)) {
-                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
+                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
                     pbThread.start();
                     try {
                         Thread.sleep(40000);

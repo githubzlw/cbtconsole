@@ -54,6 +54,7 @@ public class PublishGoodsToOnlineThread extends Thread {
         List<String> imgList = new ArrayList<String>();
 
         try {
+            customGoodsService.insertIntoGoodsImgUpLog(pid,"",adminId,"test");
 
             LOG.info("Pid : " + pid + " Execute Start");
 
