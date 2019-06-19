@@ -739,7 +739,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         }
         double finalWeight = 0;
         for (ImportExSku exSku : skuList) {
-            if (checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+            if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
                 finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
                 exSku.setFianlWeight(finalWeight);
                 if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
