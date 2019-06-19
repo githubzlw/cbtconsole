@@ -547,7 +547,7 @@
 		where 1=1 and oi.state in(1,2,3,4,5)
 		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by oi.create_time
 		<if test="rows != 0">
@@ -563,7 +563,7 @@
 		where 1=1 and oi.state in(1,2,3,4,5)
 		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -574,7 +574,7 @@
 		where 1=1 and paystatus=1 and paytype =0 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -589,7 +589,7 @@
 		where 1=1 and paystatus=1 and paytype =0 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -601,7 +601,7 @@
 		where 1=1 and paystatus=1 and paytype =1 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -616,7 +616,7 @@
 		where 1=1 and paystatus=1 and paytype =1 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -628,7 +628,7 @@
 		where 1=1 and paystatus=1 and paytype =2 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -643,7 +643,7 @@
 		where 1=1 and paystatus=1 and paytype =2 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -794,7 +794,7 @@
 		from recharge_record where type in(1,5) and usesign=0 and
 		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -810,7 +810,7 @@
 		usesign=0 and
 		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))) bcs
 	</select>
 
@@ -920,7 +920,7 @@
 		where 1=1 and paystatus=1 and paytype = 5 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(select id from user where is_test = 0) and payment.paystatus=1
-		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -935,7 +935,7 @@
 		where 1=1 and paystatus=1 and paytype = 5 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
 		where userid in(select id from user where is_test = 0) and payment.paystatus=1
-		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
