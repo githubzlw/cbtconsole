@@ -83,6 +83,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		int total=this.lookReturnOrderServiceNewMapper.selectCount(nameString,state,a1688Shipno,optTimeStart,optTimeEnd,page,userOther,user,a1688order);
 
 		for (int i = 0; i < list.size(); i++) {
+			String ship=list.get(i).getShipno();
 			list.get(i).setOrderInfo("订单号：<a >"+list.get(i).getA1688Order()+"</a><br>运单号：<a href='/cbtconsole/website/newtrack.jsp?shipno="+list.get(i).getA1688Shipno()+"&barcode="+list.get(i).getBarcode()+"' target='_blank'>"+list.get(i).getA1688Shipno()+"</a>"
 					+ "<br>下单："+list.get(i).getPlaceDate()+"<br>签收："+list.get(i).getSigntime());
 			list.get(i).setCustomerorder("<a href='/cbtconsole/orderDetails/queryByOrderNo.do?orderNo="+list.get(i).getCustomerorder()+"' target='_blank'>"+list.get(i).getCustomerorder()+"</a>");
@@ -102,28 +103,53 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			}
 //            list.get(i).setChangeShipno("<input class='but_color' type='button' value='"+list.get(i).getChangeShipno()==null?"输入换货运单号":"修改"+"' onclick='"+list.get(i).getChangeShipno()==null?"UpShip("+list.get(i).getId()+")":"onclick='UpShip("+list.get(i).getId()+")'>");
 //            list.get(i).setShipno("<input class='but_color' type='button' value='"+list.get(i).getShipno()==null?"输入退货运单号":"修改"+"' onclick='"+list.get(i).getShipno()==null?"UpShipH("+list.get(i).getId()+")":"onclick='UpShipH("+list.get(i).getId()+")'>");
+
             String stat="";
+			if (list.get(i).getRefund_time()==null){
+				list.get(i).setRefund_time("");
+			}
+
             if (list.get(i).getState()==0) {
-				stat="待处理";
+				stat="待处理<br><a style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'>";
 			}
             if (list.get(i).getState()==1) {
-				stat="已处理";
+				stat="已处理<br><a style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'>";
 			}
+
             if (list.get(i).getState()==2) {
-				stat="已到账<br><input class='but_color' type='button' value='确认完结' onclick='upState("+list.get(i).getId()+")'>";
+				if (!"".equals(list.get(i).getActual_money()) && !"".equals(list.get(i).getRefund_money())) {
+						if (list.get(i).getActual_money() == list.get(i).getRefund_money() && list.get(i).getRefund_money()!=0 &&list.get(i).getActual_money() !=0) {
+							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() +"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+						} else if (StringUtil.isNotBlank(list.get(i).getDifferences()) ){
+							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><br/>差异原因:"+list.get(i).getDifferences();
+
+						}else {
+							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><input class='but_color' type='button' value='差异原因' onclick='upState(" + ship + ")'>";
+
+						}
+					}else {
+						stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+					}
+
 			}
             if (list.get(i).getState()==3) {
-				stat="换货签收<br><input class='but_color' type='button' value='确认完结' onclick='upState("+list.get(i).getId()+")'>";
+				stat="换货签收<br><input class='but_color' type='button' value='确认完结' onclick='upState("+ship+")'>";
 			}
             if (list.get(i).getState()==4) {
-				stat="完结";
-			}
-			if (list.get(i).getReturntime()!=null &&list.get(i).getReason()!=null ){
-            	if (list.get(i).getState()==4){
-					stat += "<br>驳回理由："+list.get(i).getReason()+"<br>驳回退货时间：" + list.get(i).getReturntime();
-				}else {
+				stat = "完结<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+				if (StringUtil.isNotBlank(list.get(i).getDifferences())&&list.get(i).getActual_money()!=list.get(i).getRefund_money()){
+					stat+="<br/>差异原因："+list.get(i).getDifferences();
+				}
+				if (list.get(i).getReason()!=null ){
 					stat += "<br>退货方式："+list.get(i).getReason()+"<br>同意退货时间：" + list.get(i).getReturntime();
 				}
+			}
+				if (list.get(i).getReturntime()!=null  ){
+					stat += "<br>同意退货时间：" + list.get(i).getReturntime();
+			}
+
+			if (list.get(i).getState()==5 ){
+					stat = "完结<br>驳回理由："+list.get(i).getReason()+"<br>驳回退货时间：" + list.get(i).getReturntime();
 			}
 			if (list.get(i).getState()==-1) {
 				list.get(i).setShipno("");
@@ -140,15 +166,16 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult UpdaeReturnOrder(String ship,String ch) {
+	public EasyUiJsonResult UpdaeReturnOrder(String ship,String ch,String money) {
 		// TODO Auto-generated method stub
 		EasyUiJsonResult json=new EasyUiJsonResult();
+		double moneyd=Double.parseDouble(money.replaceAll(" ",""));
 		Boolean bo;
 		if ("1".equals(ch)){
 			ch="线下补发";
 			bo=this.lookReturnOrderServiceNewMapper.UpdaeReturnOrderCh(ship,ch);
 		}else {
-			bo = this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship);
+			bo = this.lookReturnOrderServiceNewMapper.UpdaeReturnOrder(ship,moneyd);
 		}
 		if(bo){
 			json.setRows(0);
@@ -171,13 +198,9 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	}
 
 	@Override
-	public EasyUiJsonResult SetReturnOrder(String ship,Double number) {
+	public EasyUiJsonResult SetReturnOrder(String ship,String number) {
 		EasyUiJsonResult json=new EasyUiJsonResult();
-		Boolean bo=this.lookReturnOrderServiceNewMapper.SetReturnOrder(ship);
-		returnbill re=this.lookReturnOrderServiceNewMapper.FindOrdetByship(ship);
-		re.setEndTime(new Date());
-		re.setChangAmount(number);
-		bo=this.lookReturnOrderServiceNewMapper.AddMoney(re);
+		Boolean bo=this.lookReturnOrderServiceNewMapper.SetReturnOrder(ship,number);
 		if(bo){
 			json.setRows(0);
 		}else {
@@ -601,5 +624,18 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
         }
         return null;
     }
+
+	@Override
+	public EasyUiJsonResult SetUpMoney(String ship, String number) {
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		double moneyd=Double.parseDouble(number.replaceAll(" ",""));
+		Boolean bo=this.lookReturnOrderServiceNewMapper.SetUpMoney(ship,moneyd);
+		if(bo){
+			json.setRows(0);
+		}else {
+			json.setRows(1);
+		}
+		return json;
+	}
 
 }

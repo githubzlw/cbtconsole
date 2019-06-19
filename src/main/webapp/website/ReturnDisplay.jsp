@@ -168,25 +168,67 @@ function confirm(ship){
 			}
 		});
 }
-function upState(ship ) {
-	 $.messager.prompt('退款金额换货输入0','请输入金额',function(number){
-				  if(number==null || number==""){
-					 $.messager.alert('提示','退货金额不为空换货输入0');
-					 return;
-				  }
-				  $.post("/cbtconsole/Look/SetReturnOrder", {
-						ship:ship,number:number
-					}, function(res) {
-						if(res.rows == 0){
-							$.messager.alert('提示','修改成功');
-						}else{
-							$.messager.alert('提示','修改失败');
+// function upState(ship ) {
+// 	 $.messager.prompt('退款金额换货输入0','请输入金额',function(number){
+// 				  if(number==null || number==""){
+// 					 $.messager.alert('提示','退货金额不为空换货输入0');
+// 					 return;
+// 				  }
+// 				  $.post("/cbtconsole/Look/SetReturnOrder", {
+// 						ship:ship,number:number
+// 					}, function(res) {
+// 						if(res.rows == 0){
+// 							$.messager.alert('提示','修改成功');
+// 						}else{
+// 							$.messager.alert('提示','修改失败');
+//
+// 						}
+//                       doQuery(1)
+// 					});
+// 		});
+// }
 
-						}
-                      doQuery(1)
-					});			  
-		});
+function upState(ship ) {
+    $.messager.prompt('退货金额差异原因','请输入原因',function(number){
+        if(number==null || number==""){
+            $.messager.alert('提示','请输入原因');
+            return;
+        }
+        $.post("/cbtconsole/Look/SetReturnOrder", {
+            ship:ship,number:number
+        }, function(res) {
+            if(res.rows == 0){
+                $.messager.alert('提示','修改成功');
+                doQuery(this.page)
+            }else{
+                $.messager.alert('提示','修改失败');
+
+            }
+
+        });
+    });
 }
+function UpMoney(ship ) {
+    $.messager.prompt('采购价格','请输入修改后价格',function(number){
+        if(number==null || number==""){
+            $.messager.alert('提示','请输入修改后价格');
+            return;
+        }
+        $.post("/cbtconsole/Look/SetUpMoney", {
+            ship:ship,number:number
+        }, function(res) {
+            if(res.rows == 0){
+                $.messager.alert('提示','修改成功');
+                doQuery(this.page)
+            }else{
+                $.messager.alert('提示','修改失败');
+
+            }
+
+        });
+    });
+}
+
 function UpShipH(ship ) {
 	 $.messager.prompt('退货运单号','请输入退货运单号',function(number){
 				  if(number==null || number==""){
@@ -255,9 +297,10 @@ function returnApply(ship){
      var ch=$("input[name='radioname']:checked").val();
 
     var ship= $('#field＿name').val();
+    var money=$('#money').val();
     var url ="/cbtconsole/Look/UpdaeReturnOrder";
     var data = {
-        "ship":ship,"ch":ch
+        "ship":ship,"ch":ch,money:money
     }
     $.ajax(
         {
@@ -309,7 +352,23 @@ function rejectedok() {
 }
 </script>
 </head>
-<body text="#000000" onload="doQuery(1);">
+<body text="#000000" onload="doQuery(this.page);">
+<div id="user_remark2" class="easyui-window" title="信息修改"
+	 data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+	 style="width:400px;height:auto;display: none;font-size: 16px;">
+	<div id="sediv3" style="margin-left:20px;">
+		<div>
+			订单状态：
+			运单号：<input id="SetShipno" type="text">
+			<br/>采购录入金额：<input id="money4" type="text">
+		</div>
+		<div style="margin:20px 0 20px 40px;">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+			   onclick="returnApply()" style="width:80px" >确认</a>
+		</div>
+	</div>
+</div>
+
 <div id="user_remark" class="easyui-window" title="退货申请"
 	 data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
 	 style="width:400px;height:auto;display: none;font-size: 16px;">
@@ -319,6 +378,7 @@ function rejectedok() {
 			是否退钱：
 			<input type='radio' size='5' name='radioname' value='0' id='c' />是
 			<input type='radio' size='5' name='radioname' value='1' id='c' />否
+			<br/>退款金额：<input id="money" type="text">
 		</div>
 	<div style="margin:20px 0 20px 40px;">
 		<a href="javascript:void(0)" class="easyui-linkbutton"
@@ -367,8 +427,9 @@ function rejectedok() {
 					<option value ="0">未处理</option>
 					<option value="1">已处理</option>
 					<option value="2">待确定</option>
-					<option value="3">到账完结</option>
-					<option value="4">驳回完结</option>
+					<option value="3">换货/线下补发</option>
+					<option value="4">到账完结</option>
+					<option value="5">驳回完结</option>
 				</select>&nbsp;&nbsp;&nbsp;&nbsp;
 				<input class="but_color" type="button" value="查询" onclick="doQuery(1)">
 				 <input class="but_color" type="button" value="重置" onclick="doReset()">
@@ -386,13 +447,13 @@ function rejectedok() {
 
 				<th data-options="field:'item',width:50,align:'center'">商品详情</th>
 				<th data-options="field:'returnReason',width:40,halign:'center'">退货原因</th>
-				<th data-options="field:'applyTime',width:40,halign:'center'">申请时间</th>
+				<th data-options="field:'applyTime',width:30,halign:'center'">申请时间</th>
 				<th data-options="field:'pepoInfo',width:20,align:'center'">申请人员</th>
-				<th data-options="field:'optTime',width:40,align:'center'">退货时间</th>
+				<th data-options="field:'optTime',width:30,align:'center'">退货时间</th>
 				<th data-options="field:'optUser',width:20,align:'center'">执行人员</th>
 				<th data-options="field:'shipno',width:30,align:'center'">退单运单号</th>
 				<%--<th data-options="field:'changeShipno',width:30,align:'center'">换产品运单号</th>--%>
-				<th data-options="field:'stateShow',width:30,align:'center'">操作</th>
+				<th data-options="field:'stateShow',width:50,align:'center'">操作</th>
 				
 				
 			</tr>
