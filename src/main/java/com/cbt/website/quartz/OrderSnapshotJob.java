@@ -27,7 +27,7 @@ public class OrderSnapshotJob implements Job {
 
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderSnapshotJob.class);
 //	private static final String SHOWURL = "http://192.168.1.29:8765/editimg/snapshot/";
-	private static final String SHOWURL ="http://img1.import-express.com/importcsvimg/snapshot/";
+	private static final String SHOWURL ="https://img.import-express.com/importcsvimg/snapshot/";
 
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
