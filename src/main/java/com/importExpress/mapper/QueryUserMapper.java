@@ -1,9 +1,12 @@
 package com.importExpress.mapper;
 
 import com.cbt.bean.SameGoodsDetails;
+import com.cbt.pojo.ShareableOrder;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.HashMap;
 import java.util.List;
@@ -133,4 +136,18 @@ public interface QueryUserMapper {
     void insertNeedoffDownAll(@Param("list") List<String> list, @Param("reason") Integer reason, @Param("adminid") Integer adminid);
 
     List<Map<String,String>> queryUnsellablereasonMaster();
+    @Select({"<script> SELECT a.share, a.orderNo,a.userid,a.paymentamount,a.creatime,b.name FROM paysuccessinfo a LEFT JOIN `user` b ON a.userid=b.id where a.sharechoice=1 <when test='orderNo != null'> and a.orderNo = #{orderNo} </when> " +
+            "<when test='name != null'> and b.name = #{name} </when>" +
+            "<when test='userid != 0'> and a.userid = #{userid} </when>" +
+            "<when test='share != -1'> and a.share = #{share} </when>" +
+            " LIMIT #{startBars},#{rows}</script>"})
+    List<ShareableOrder> lookShareableOrder(@Param("startBars") int startBars, @Param("rows") Integer rows, @Param("orderNo") String orderNo,@Param("name")String name,@Param("userid")int userid,@Param("share")int share);
+    @Select({"<script> SELECT COUNT(1) FROM paysuccessinfo a LEFT JOIN `user` b ON a.userid=b.id where a.sharechoice=1 <when test='orderNo != null'> and a.orderNo = #{orderNo} </when> " +
+            "<when test='name != null'> and b.name = #{name} </when>" +
+            "<when test='userid != 0'> and a.userid = #{userid} </when>" +
+            "<when test='share != -1'> and a.share = #{share} </when>" +
+            " </script>"})
+    Integer lookShareableOrderCount(@Param("orderNo") String orderNo,@Param("name")String name,@Param("userid")int userid,@Param("share")int share);
+    @Update("UPDATE paysuccessinfo SET share=1 WHERE orderno=#{orderNo}")
+    void SetShareByOrderno(@Param("orderNo") String orderNo);
 }
