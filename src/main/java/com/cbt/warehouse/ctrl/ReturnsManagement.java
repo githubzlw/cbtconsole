@@ -53,8 +53,9 @@ public class ReturnsManagement {
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
 		String ch= request.getParameter("ch");
+		String money= request.getParameter("money");
 		//System.err.println("运单号"+ship);
-		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship,ch);
+		json=this.lookReturnOrderServiceNew.UpdaeReturnOrder(ship,ch,money);
 		 return json;
 	}
 	@RequestMapping(value = "/RemReturnOrder")//驳回订单操作
@@ -72,9 +73,19 @@ public class ReturnsManagement {
 	public EasyUiJsonResult SetReturnOrder(HttpServletRequest request,HttpServletResponse response){
 		 EasyUiJsonResult json=new EasyUiJsonResult();
 		String ship= request.getParameter("ship");
-		Double number= Double.parseDouble(request.getParameter("number"));
+		String number= request.getParameter("number");
 		//System.err.println("运单号"+ship);
 		json=this.lookReturnOrderServiceNew.SetReturnOrder(ship,number);
+		 return json;
+	}
+	@RequestMapping(value = "/SetUpMoney")
+	@ResponseBody
+	public EasyUiJsonResult SetUpMoney(HttpServletRequest request,HttpServletResponse response){
+		 EasyUiJsonResult json=new EasyUiJsonResult();
+		String ship= request.getParameter("ship");
+		String number= request.getParameter("number");
+		//System.err.println("运单号"+ship);
+		json=this.lookReturnOrderServiceNew.SetUpMoney(ship,number);
 		 return json;
 	}
 	@RequestMapping(value = "/UpdateReturnOrder")
