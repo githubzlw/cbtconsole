@@ -18,10 +18,7 @@ import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.thread.DeleteImgByMd5Thread;
-import com.importExpress.utli.ImageCompressionByNoteJs;
-import com.importExpress.utli.ImgDownByOkHttpUtils;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -3482,6 +3479,8 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping("/changeChineseImgToEnglishImg")
+    @ResponseBody
     public JsonResult changeChineseImgToEnglishImg(HttpServletRequest request) {
         JsonResult json = new JsonResult();
         try {
@@ -3510,8 +3509,7 @@ public class EditorController {
             File imgFile = new File(pidEnInfoFile);
             if (isDown && imgFile.exists() && imgFile.isFile()) {
                 // 调用替换中文图片到英文图片的接口
-                OkHttpClient client = new OkHttpClient.Builder().connectTimeout(400, TimeUnit.SECONDS)
-                        .readTimeout(200, TimeUnit.SECONDS).writeTimeout(200, TimeUnit.SECONDS).build();
+                OkHttpClient client = OKHttpUtils.getClientInstence();
 
                 String imageType = "image/jpg";
                 RequestBody fileBody = RequestBody.create(MediaType.parse(imageType), imgFile);
