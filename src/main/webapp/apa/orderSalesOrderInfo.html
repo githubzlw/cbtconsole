@@ -66,9 +66,22 @@
 <script type="text/javascript">
 	$(function() {
 		setDatagrid();
+		genYearSelect();
 		var opts = $("#oso_easyui-datagrid").datagrid("options");
 		opts.url = "/cbtconsole/basicStatistical/orderSalesOrderInfo";
 	});
+
+	function genYearSelect() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        $(".oso_rYear").empty();
+        var content = "";
+        for (var yr = 2016; yr <= rYear; yr++) {
+            content += "<option value='" + yr + "'>" + yr + "</option>";
+        }
+        $(".oso_rYear").append(content);
+    }
+
 	function setDatagrid() {
 		$('#oso_easyui-datagrid').datagrid({
 			title : '实际销售订单详情',
@@ -249,12 +262,12 @@
 <body>
 	<div id="oso_top_toolbar" style="padding: 5px; height: auto">
 		<form id="oso_query_form" action="#" onsubmit="return false;">
-			<label for="oso_rYear">年份选择<font color="red">*</font>：
+			<label>年份选择<font color="red">*</font>：
 			</label> <select name="year" class="oso_rYear" onchange="doOfsSelectChange()">
 				<option value='2016'>2016</option>
 				<option value='2017'>2017</option>
 				<option value='2018'>2018</option>
-			</select><label for="oso_rMonth">月份选择<font color="red">*</font>：
+			</select><label>月份选择<font color="red">*</font>：
 			</label> <select name="month" class="oso_rMonth">
 				<option value="1">1</option>
 				<option value="2">2</option>

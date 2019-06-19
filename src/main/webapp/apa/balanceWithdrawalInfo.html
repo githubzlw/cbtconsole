@@ -62,9 +62,22 @@
 <script type="text/javascript">
 	$(function() {
 		setDatagrid();
+		genYearSelect();
 		var opts = $("#bwi_easyui-datagrid").datagrid("options");
 		opts.url = "/cbtconsole/basicStatistical/queryBalanceWithdrawalInfo";
 	});
+
+	function genYearSelect() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        $(".bwd_rYear").empty();
+        var content = "";
+        for (var yr = 2016; yr <= rYear; yr++) {
+            content += "<option value='" + yr + "'>" + yr + "</option>";
+        }
+        $(".bwd_rYear").append(content);
+    }
+
 	function setDatagrid() {
 		$('#bwi_easyui-datagrid').datagrid({
 			title : '余额提现详情',
