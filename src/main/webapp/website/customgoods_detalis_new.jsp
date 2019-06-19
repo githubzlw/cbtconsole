@@ -2370,7 +2370,7 @@
                             dataType: 'json',
                             url: '/cbtconsole/editc/changeChineseImgToEnglishImg',
                             data: {
-                                "pid": goodsPid,
+                                "pid": pid,
                                 "imgUrl": url
                             },
                             success: function (json) {

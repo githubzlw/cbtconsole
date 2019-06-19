@@ -17,7 +17,7 @@ public class ImgDownload {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String url = "http://img1.import-express.com/importcsvimg/shopimg/1001616913/4426630628_1406535455.400x400.jpg";
+		String url = "https://img.import-express.com/importcsvimg/shopimg/1001616913/4426630628_1406535455.400x400.jpg";
 		String fileName = "E:/cbtimg/editimg/importimg/777.jpg";
 		System.err.println("downFromImgService:" + downFromImgService(url, fileName));
 	}

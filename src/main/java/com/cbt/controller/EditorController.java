@@ -40,12 +40,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -63,7 +65,8 @@ public class EditorController {
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
-    private static final String OCR_URL = "http://192.168.1.84:5000/photo";
+    // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
+    private static final String OCR_URL = "http://192.168.1.28:11880/photo";
 
     @Autowired
     private CustomGoodsService customGoodsService;
@@ -3497,9 +3500,9 @@ public class EditorController {
                 ftpConfig = GetConfigureInfo.getFtpConfig();
             }
             String suffixName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
-            String imgPrePath = imgUrl.substring(0, imgUrl.lastIndexOf("/"));
-            String prePath = ftpConfig.getLocalDiskPath() + pid + "/desc/";
-            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(imgPrePath);
+            // String imgPrePath = imgUrl.substring(0, imgUrl.lastIndexOf("/"));
+            // String remotePath = GoodsInfoUtils.changeRemotePathToLocal(imgPrePath);
+            String prePath = ftpConfig.getLocalDiskPath() + "importimg/" + pid + "/desc/";
             String pidEnInfoFile = prePath + suffixName;
             boolean isDown = ImgDownByOkHttpUtils.downFromImgServiceWithApache(imgUrl, pidEnInfoFile);
             // 重试一次
@@ -3530,21 +3533,27 @@ public class EditorController {
                     String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
                     String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
                     String changeLocalFilePath = prePath + saveFilename + fileSuffix;
-                    FileUtils.copyInputStreamToFile(okHttpResponse.body().byteStream(), new File(changeLocalFilePath));
+
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    FileUtils.writeByteArrayToFile(new File(changeLocalFilePath), decoder.decodeBuffer(okHttpResponse.body().byteStream()));
+
                     File checkFile = new File(changeLocalFilePath);
                     if (checkFile.exists() && checkFile.isFile()) {
-                        boolean isSuccess = UploadByOkHttp.uploadFile(checkFile, remotePath);
+                        /*boolean isSuccess = UploadByOkHttp.uploadFile(checkFile, remotePath);
                         if (!isSuccess) {
                             isSuccess = UploadByOkHttp.uploadFile(checkFile, remotePath);
                         }
                         if (isSuccess) {
                             //返回新的链接
-                            json.setData(imgPrePath + saveFilename + fileSuffix);
+                            json.setData(imgPrePath + "/" + saveFilename + fileSuffix);
                             json.setOk(true);
                         } else {
                             json.setOk(false);
                             json.setMessage("上传新的文件失败");
-                        }
+                        }*/
+
+                        json.setData(ftpConfig.getLocalShowPath() + "importimg/" + pid + "/desc/" + saveFilename + fileSuffix);
+                        json.setOk(true);
                     } else {
                         json.setOk(false);
                         json.setMessage("获取新文件失败");
