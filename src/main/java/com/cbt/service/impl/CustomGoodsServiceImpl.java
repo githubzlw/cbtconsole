@@ -604,7 +604,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public List<CustomGoodsPublish> queryGoodsByPidList(List<String> pidList) {
-        return customGoodsMapper.queryGoodsByPidList(pidList);
+        if(pidList != null && pidList.size() > 0){
+            return customGoodsMapper.queryGoodsByPidList(pidList);
+        }else{
+            return new ArrayList<>();
+        }
     }
 
     @Override

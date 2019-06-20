@@ -1244,7 +1244,7 @@
 
     <update id="setNewAliPidInfo">
         update custom_benchmark_ready
-        set ali_pid = #{aliPid},ali_price = #{aliPrice}
+        set ali_pid = #{aliPid},ali_price = #{aliPrice},bm_flag = 1 ,isBenchmark = 1
         where pid = #{pid}
     </update>
 
