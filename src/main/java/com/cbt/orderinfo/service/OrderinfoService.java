@@ -1403,13 +1403,13 @@ public class OrderinfoService implements IOrderinfoService {
 			double grade=Double.parseDouble(String.format("%.2f", ob.getGradeDiscount()/Double.parseDouble(ob.getProduct_cost())))*100;
 			if(grade==3){
 				gradeName="BizClub Member";
-			}else if(grade==7){
+			}else if(grade==5){
 				gradeName="Silver VIP";
-			}else if(grade==10){
+			}else if(grade==7){
 				gradeName="Gold VIP";
-			}else if(grade==14){
+			}else if(grade==9){
 				gradeName="Platinum VIP";
-			}else if(grade==18){
+			}else if(grade==12){
 				gradeName="Diamond VIP";
 			}
 			ob.setGradeName(gradeName);
