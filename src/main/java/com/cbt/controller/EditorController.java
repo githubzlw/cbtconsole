@@ -66,7 +66,7 @@ public class EditorController {
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
 
     // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
-    private static final String OCR_URL = "http://192.168.1.28:11880/photo";
+    private static final String OCR_URL = "http://192.168.1.251:5000/photo";
 
     @Autowired
     private CustomGoodsService customGoodsService;
