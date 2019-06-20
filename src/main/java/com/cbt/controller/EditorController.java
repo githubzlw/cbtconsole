@@ -779,12 +779,18 @@ public class EditorController {
                 // 不校检商品属性
                 cgp.setEndetail("[]");
             }
-            if (!(contentStr == null || "".equals(contentStr))) {
-                // 产品详情
-                String eninfo = contentStr.replaceAll(remotepath, "");
-                //解析和上传阿里商品的图片
-                eninfo = uploadAliImgToLocal(pidStr, eninfo);
-                cgp.setEninfo(eninfo);
+            if (StringUtils.isNotBlank(contentStr)) {
+                if(contentStr.contains("data:image/png;base64")){
+                    json.setOk(false);
+                    json.setMessage("详情存在截屏图片，不能保存！");
+                    return json;
+                } else{
+                    // 产品详情
+                    String eninfo = contentStr.replaceAll(remotepath, "");
+                    //解析和上传阿里商品的图片
+                    eninfo = uploadAliImgToLocal(pidStr, eninfo);
+                    cgp.setEninfo(eninfo);
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("获取商品详情失败");
