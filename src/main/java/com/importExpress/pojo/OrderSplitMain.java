@@ -9,5 +9,7 @@ public class OrderSplitMain {
 	private double weight;
 	private double cost;
 	private double feight;
-
+	private int country;
+	private String modeTransport;
+	private String countryName;
 }

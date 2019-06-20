@@ -47,4 +47,9 @@ public interface OrderSplitRecordMapper {
      */
     OrderSplitChild getOrder(String orderid);
     
+    /**订单国家
+     * @param orderid
+     * @return
+     */
+    int getOrderCountry(String orderid);
 }

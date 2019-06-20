@@ -4,12 +4,14 @@ import lombok.Data;
 
 @Data
 public class OrderSplitChild {
-	private String mainid;
+	private int mainid;
 	private String orderid;
 	private double weight;
 	private double cost;
 	private double feight;
 	private String childOrderid;
 	private int recommend;
+	private int country;
+	private String modeTransport;
 
 }

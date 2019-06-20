@@ -14,7 +14,7 @@ public interface OrderSplitRecordService {
     /**插入子单
      * @return
      */
-    int insertChildOrder(String orderId);
+    int insertChildOrder(OrderSplitMain orderMain,String orderId);
     
     
     /**
