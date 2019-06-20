@@ -80,7 +80,9 @@ public class OrderSplitRecordServiceImpl implements OrderSplitRecordService {
 		
 		orderChild.setRecommend(recommend);
 		orderChild.setFeight(orderChildFeigth);
-		
+		if(orderid.indexOf("_")>-1 && orderid.lastIndexOf("_") > orderid.indexOf("_")) {
+			orderSplitRecordMapper.updateChildOrder(orderid.substring(0, orderid.lastIndexOf("_")), orderid);
+		}
 		int insertChildOrder = orderSplitRecordMapper.insertChildOrder(orderChild );
 		return insertChildOrder;
 	}

@@ -998,6 +998,7 @@
     </div>
     <br>
     <c:if test="${orderRecord.recommend > 0}">
+    <span style="margin-left:160px;">分批发货推荐</span>
     <table border="1" style="margin-left:160px;">
     <tr>
     <td style="width: 320px;">订单销售价($)</td>
