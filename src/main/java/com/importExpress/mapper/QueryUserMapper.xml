@@ -47,10 +47,10 @@
 
     <insert id="insertOrderShare" >
 
-        INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,create_time)
+        INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,create_time,goods_pid,yourorder)
         VALUES
         <foreach collection="list" separator="," item="item">
-            (#{shopType},#{orderNo},#{item.goodsPrice}, #{item.goodsImg}, NOW())
+            (#{shopType},#{orderNo},#{item.goodsPrice}, #{item.goodsImg}, NOW(),#{item.goodsPid},#{item.yourorder})
         </foreach>
 
     </insert>
@@ -902,7 +902,7 @@
     </select>
 
     <select id="queryOrderShareList" resultType="com.importExpress.pojo.OrderShare">
-        SELECT car_img as goodsImg,goodsprice as goodsPrice,goods_pid as goodsPid
+        SELECT car_img as goodsImg,goodsprice as goodsPrice,goods_pid as goodsPid,yourorder
         FROM order_details
         where  orderid = #{orderNo}
         ORDER BY goods_pid

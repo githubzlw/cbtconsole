@@ -33,6 +33,45 @@ private String itemname;//获取产品名称
 private String imgurl;//获取产品图片链接
 private String returntime;//同意退货时间
 private String reason;//驳回退货理由
+private double actual_money;//采购输入价格
+private String refund_time;//退款时间
+private double refund_money;//1688抓取退货金额
+private String differences;//金额差异原因
+
+	public double getActual_money() {
+		return actual_money;
+	}
+
+	public void setActual_money(double actual_money) {
+		this.actual_money = actual_money;
+	}
+
+	public double getRefund_money() {
+		return refund_money;
+	}
+
+	public void setRefund_money(double refund_money) {
+		this.refund_money = refund_money;
+	}
+
+	public String getDifferences() {
+		return differences;
+	}
+
+	public void setDifferences(String differences) {
+		this.differences = differences;
+	}
+
+
+
+	public String getRefund_time() {
+		return refund_time;
+	}
+
+	public void setRefund_time(String refund_time) {
+		this.refund_time = refund_time;
+	}
+
 
 	public String getReason() {
 		return reason;

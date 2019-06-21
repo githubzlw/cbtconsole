@@ -3,8 +3,8 @@ package com.cbt.track.ctrl;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.TabTrackInfo;
 import com.cbt.track.service.TabTrackInfoService;
-import com.cbt.util.DateFormatUtil;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +14,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/tabtrackinfo")
 public class TabTrackInfoController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TabTrackInfoController.class);
 
     @Autowired
     private TabTrackInfoService tabTrackInfoService;
@@ -61,182 +62,92 @@ public class TabTrackInfoController {
      *
      * rows 每页行数			   为空则默认20
      * page 当前页			   为空则默认1
-     * trackState 运行状态      0-查询所有；1-备货中；2-已发货；3-已签收；4-退回；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）
-     * warning 预警查询         0-查询所有；1-物流问题；2-交期超时；3-未签收；4-退回；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）
-     * funChange 查询信息       0-运单状态;1-运单预警;2-单个订单号或运单号的查询
+     *
+     * orderUserid 用户id或邮箱 默认空
+     * orderNo 订单编号 默认空
+     * orderTrackNo 运单号 转单号 默认空
+     *
+     * payStartDate 默认空
+     * payEndDate 支付起始时间 默认空
+     *
+     * startDate 默认空
+     * endDate 出货起始时间 默认空
+     * userid 负责人 默认0是全部 不进行筛选
+     *
+     * trackState 运行状态      默认0-查询所有；1-备货中；2-已发货；3-已签收；4-退回；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）
+     * warning 预警查询         默认0-查询所有；-1-不进行预警筛选；1-物流问题；2-交期超时；3-未签收；4-退回；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）
+     *
+     * export 是否导出 1是导出      默认0 不导出
      *
      * @return 返回的是easyui数据(json)格式
      */
     @RequestMapping(value = "/list.do")
     @ResponseBody
-    public EasyUiJsonResult queryByRepeatList(HttpServletRequest request) {
-        //返回数据
+    public EasyUiJsonResult getTrackInfoList(@RequestParam(value = "rows", defaultValue = "20", required = false) Integer rows,
+                                              @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+                                              @RequestParam(value = "orderUserid", defaultValue = "", required = false) String orderUserid,
+                                              @RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo,
+                                              @RequestParam(value = "orderTrackNo", defaultValue = "", required = false) String orderTrackNo,
+                                              @RequestParam(value = "payStartDate", defaultValue = "", required = false) String payStartDate,
+                                              @RequestParam(value = "payEndDate", defaultValue = "", required = false) String payEndDate,
+                                              @RequestParam(value = "startDate", defaultValue = "", required = false) String startDate,
+                                              @RequestParam(value = "endDate", defaultValue = "", required = false) String endDate,
+                                              @RequestParam(value = "userid", defaultValue = "0", required = false) Integer userid,
+                                              @RequestParam(value = "trackState", defaultValue = "0", required = false) Integer trackState,
+                                              @RequestParam(value = "warning", defaultValue = "0", required = false) Integer warning,
+                                              @RequestParam(value = "export", defaultValue = "0", required = false) Integer export) {
         EasyUiJsonResult json = new EasyUiJsonResult();
-        //导出标志
-        Boolean export = "true".equals(request.getParameter("export"))?true:false;
-        //需要查询的信息
-        String funChangeStr = request.getParameter("funChange");
-        int funChange;
-        if (funChangeStr == null || "".equals(funChangeStr) || !funChangeStr.matches("\\d+")) {
-            //参数错误
-            json.setRows("");
-            json.setSuccess(false);
-            return json;
-        } else {
-            funChange = Integer.parseInt(funChangeStr);
+        Map<String, Object> param = new HashMap<String, Object>(){{
+            put("rows", rows);
+            put("page", page);
+            put("orderUserid", orderUserid);
+            put("orderNo", orderNo);
+            put("orderTrackNo", orderTrackNo);
+            put("userid", userid);
+            put("trackState", trackState);
+            put("warning", warning);
+            put("export", export);
+        }};
+        if (!"".equals(payStartDate)) {
+            payStartDate += " 00:00";
+            param.put("payStartDate", payStartDate);
         }
-        //搜索条件 负责人 userid
-        String useridStr = request.getParameter("userid");
-        Integer userid = null;
-        if (StringUtils.isNotBlank(useridStr) && !"0".equals(useridStr)) {
-            userid = Integer.valueOf(useridStr);
+        if (!"".equals(payEndDate)) {
+            payEndDate += " 23:59";
+            param.put("payEndDate", payEndDate);
         }
-        //查询时间范围参数接收
-        String startDate = request.getParameter("startDate");
-        String endDate = request.getParameter("endDate");
         if (!"".equals(startDate)) {
             startDate += " 00:00";
+            param.put("startDate", startDate);
         }
         if (!"".equals(endDate)) {
             endDate += " 23:59";
+            param.put("endDate", endDate);
         }
 
-        //查询结果
-        Map<String, Object> map = null;
-        // 2-单个订单号或运单号的查询
-        if (funChange == 2) {
-            // 获取参数
-            String orderOrTrackNo = request.getParameter("orderOrTrackNo");
-            if (orderOrTrackNo == null || "".equals(orderOrTrackNo) || orderOrTrackNo.length() < 3) {
-                //参数错误
-                json.setRows("");
-                json.setSuccess(false);
-                return json;
-            }
-            map = tabTrackInfoService.getRecordListByOrderOrTrackNo(orderOrTrackNo, userid, startDate, endDate);
-        } else if (funChange == 3) {
-            // 3-根据用户id查询
-            // 获取参数
-            String orderUserid = request.getParameter("orderUserid");
-            if (StringUtils.isBlank(orderUserid)) {
-                //参数错误
-                json.setRows("");
-                json.setSuccess(false);
-                return json;
-            }
-            map = tabTrackInfoService.getRecordListByUserid(orderUserid, userid, startDate, endDate);
-        } else {
-            //如果导出 则不分页
-            Integer rows = null;
-            Integer page = null;
-            if(!export){
-                //分页参数接收并处理
-                String rowsStr = request.getParameter("rows");
-                if (!(rowsStr == null || "".equals(rowsStr) || "0".equals(rowsStr))) {
-                    rows = Integer.valueOf(rowsStr);//无该参数时查询默认值20
-                } else {
-                    rows = 20;
-                }
-                String pageStr = request.getParameter("page");
-                if (!(pageStr == null || "".equals(pageStr) || "0".equals(pageStr))) {
-                    page = Integer.valueOf(pageStr);//无该参数时查询默认值1
-                } else {
-                    page = 1;
-                }
-            }
-            if (funChange == 0) {
-                // 查询运单状态
-                // 获取参数
-                String trackStateStr = request.getParameter("trackState");
-                int trackState;
-                if (trackStateStr == null || "".equals(trackStateStr) || !trackStateStr.matches("\\d+")) {
-                    //参数错误
-                    json.setRows("");
-                    json.setSuccess(false);
-                    return json;
-                } else {
-                    trackState = Integer.parseInt(trackStateStr);
-                }
-                map = tabTrackInfoService.getRecordListByTrackState(page, rows, startDate, endDate, trackState, userid);
-            } else if (funChange ==1 ) {
-                // 查询运单预警
-                // 获取参数
-                String warningStr = request.getParameter("warning");
-                int warning;
-                if (warningStr == null || "".equals(warningStr) || !warningStr.matches("\\d+")) {
-                    //参数错误
-                    json.setRows("");
-                    json.setSuccess(false);
-                    return json;
-                } else {
-                    warning = Integer.parseInt(warningStr);
-                }
-                map = tabTrackInfoService.getWarningRecordList(page, rows, startDate, endDate, warning, userid);
-            }
+        if (!"".equals(orderUserid))
+            param.put("orderUseridLike", "%" + orderUserid + "%");
+        if (!"".equals(orderNo))
+            param.put("orderNoLike", "%" + orderNo + "%");
+        if (!"".equals(orderTrackNo))
+            param.put("orderTrackNoLike", "%" + orderTrackNo + "%");
+
+        if (export == 0) {
+            // page==null?null:(page-1)*rows, rows
+            param.put("startBars", (page - 1) * rows);
         }
-        // 查询结果处理 并返回
-        if (export){
-            if (map != null && map.size() > 0) {
-                List<TabTrackInfo> res = (List<TabTrackInfo>) map.get("recordList");
-                if (res != null && res.size() > 0) {
-                    StringBuffer sb = new StringBuffer();
-                    sb.append("用户ID,用户邮箱,主单号,负责人,运单号,物流公司,转单号,转单物流公司,运单状态,订单支付时间,出货时间,运单完成时间,\r\n");
-                    for (TabTrackInfo bean : res) {
-                        sb.append(bean.getId()).append(",")
-                                .append(bean.getEmail()).append(",")
-                                .append(bean.getOrderNo()).append(",")
-                                .append(bean.getAdmName()).append(",")
-                                .append(bean.getTrackNo()).append(",")
-                                .append(bean.getTrackCompany()).append(",")
-                                .append(bean.getForwardNo()==null?"":"'" + bean.getForwardNo()).append(",")
-                                .append(bean.getForwardCompany()==null?"":bean.getForwardCompany().replaceAll(",", " ")).append(",")
-                                .append(formatterTrackState(bean.getTrackState())).append(",") //运单状态
-                                .append(DateFormatUtil.getWithSeconds(bean.getOrderPaytime())).append(",")
-                                .append(DateFormatUtil.getWithSeconds(bean.getSenttime())).append(",")
-                                .append(DateFormatUtil.getWithSeconds(bean.getDeliveredTime())).append(",\r\n");
-                    }
-                    json.setSuccess(true);
-                    String message = sb.toString().replaceAll(",null,", ",,");
-                    message = message.replaceAll(",null,", ",,");
-                    json.setMessage(message);
-                    return json;
-                }
-            }
+
+        try {
+            tabTrackInfoService.getTrackInfoList(json, param);
+        } catch (Exception e) {
+            LOGGER.error("getTrackInfoList error ", e);
+            json.setRows(new ArrayList<TabTrackInfo>());
+            json.setTotal(0);
             json.setSuccess(false);
-            json.setMessage("该条件下查询不到数据");
-        } else {
-            if (map != null && map.size() > 0) {
-                json.setSuccess(true);
-                json.setRows(map.get("recordList"));
-                json.setTotal(Integer.parseInt(map.get("totalCount").toString()));
-            } else {
-                json.setRows(new ArrayList<TabTrackInfo>());
-                json.setTotal(0);
-                json.setSuccess(false);
-            }
         }
         return json;
     }
 
-    public static String formatterTrackState(Integer trackState){
-        if (trackState == null){
-            return "";
-        }
-        switch(trackState) {
-            case 3:
-                return "已签收";
-            case 4:
-                return "退回";
-            case 5:
-                return "异常";
-            case 6:
-                return "内部异常";
-            case 7:
-                return "手动标记正常";
-            default:
-                return "已发货";
-        }
-    }
 
     /**
      * 操作运单状态
@@ -305,18 +216,20 @@ public class TabTrackInfoController {
      * @return
      */
     @RequestMapping(value = "/querywaringnum.do", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, Integer>> querywaringnum(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Integer>> querywaringnum(@RequestParam(value = "payStartDate", defaultValue = "", required = false) String payStartDate,
+                                                                @RequestParam(value = "payEndDate", defaultValue = "", required = false) String payEndDate,
+                                                                @RequestParam(value = "export", defaultValue = "0", required = false) Integer export) {
         try {
-        	//查询时间范围参数接收
-            String startDate = request.getParameter("startDate");
-            String endDate = request.getParameter("endDate");
-            if (!"".equals(startDate)) {
-                startDate += " 00:00";
+            Map<String, Object> param = new HashMap<String, Object>();
+            if (!"".equals(payStartDate)) {
+                payStartDate += " 00:00";
+                param.put("payStartDate", payStartDate);
             }
-            if (!"".equals(endDate)) {
-                endDate += " 23:59";
+            if (!"".equals(payEndDate)) {
+                payEndDate += " 23:59";
+                param.put("payEndDate", payEndDate);
             }
-        	Map<String, Integer> result = tabTrackInfoService.queryWaringNum(startDate, endDate);
+        	Map<String, Integer> result = tabTrackInfoService.queryWaringNum(param);
             if (result == null) {
                 // 未查询到 响应404(调整为返回空对象)
                 return new ResponseEntity<Map<String, Integer>>(HttpStatus.NOT_FOUND);

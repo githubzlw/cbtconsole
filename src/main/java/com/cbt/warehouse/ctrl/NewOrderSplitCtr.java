@@ -897,7 +897,7 @@ public class NewOrderSplitCtr {
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("genOrderSplitEmail",e);
             LOG.error("genOrderSplitEmail:" + e.getMessage());
         }
         LOG.info("getOrderSplit sendEmailInfo end");

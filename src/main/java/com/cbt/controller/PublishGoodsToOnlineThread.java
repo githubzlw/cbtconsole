@@ -36,14 +36,16 @@ public class PublishGoodsToOnlineThread extends Thread {
     private CustomGoodsService customGoodsService;
     private FtpConfig ftpConfig;
     private int isUpdateImg;
+    private int adminId;
     // private CustomGoodsDao customGoodsDao = new CustomGoodsDaoImpl();
 
-    public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg) {
+    public PublishGoodsToOnlineThread(String pid, CustomGoodsService customGoodsService, FtpConfig ftpConfig, int isUpdateImg, int adminId) {
         super();
         this.pid = pid;
         this.customGoodsService = customGoodsService;
         this.ftpConfig = ftpConfig;
         this.isUpdateImg = isUpdateImg;
+        this.adminId = adminId;
     }
 
     @Override
@@ -52,6 +54,7 @@ public class PublishGoodsToOnlineThread extends Thread {
         List<String> imgList = new ArrayList<String>();
 
         try {
+            customGoodsService.insertIntoGoodsImgUpLog(pid,"",adminId,"test");
 
             LOG.info("Pid : " + pid + " Execute Start");
 
@@ -161,6 +164,8 @@ public class PublishGoodsToOnlineThread extends Thread {
                             } else {
                                 System.err.println("this pid:" + pid + ",file:" + localImgPath + " is not exists");
                                 LOG.error("this pid:" + pid + ",file:" + localImgPath + " is not exists");
+                                // 记录上传失败日志
+                                customGoodsService.insertIntoGoodsImgUpLog(pid,localImgPath,adminId,",file:" + localImgPath + " is not exists");
                                 isSuccess = false;
                                 break;
                             }
@@ -221,21 +226,28 @@ public class PublishGoodsToOnlineThread extends Thread {
                                                 System.err.println("this pid:" + pid + ",上传产品主图成功");
                                             } else {
                                                 System.err.println("this pid:" + pid + ",上传产品主图失败");
+                                                // 记录上传失败日志
+                                                customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"to " + destPath + "error");
                                                 isSuccess = false;
                                             }
                                         }
                                     } else {
                                         System.err.println("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
                                         LOG.error("this pid:" + pid + ",下载图片文件夹[" + localDownImgPre + "] 不存在----");
+                                        // 记录上传失败日志
+                                        customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"下载图片文件夹[" + localDownImgPre + "] 不存在----");
                                         isSuccess = false;
                                     }
                                 } else {
                                     System.err.println("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
                                     LOG.error("this pid:" + pid + ",压缩img [" + localDownImg + "] error----");
+                                    // 记录上传失败日志
+                                    customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"压缩img[" + localDownImgPre + "] error----");
                                     isSuccess = false;
                                 }
                             } else {
                                 LOG.error("this pid:" + pid + ",下载图片失败,无法设置主图");
+                                customGoodsService.insertIntoGoodsImgUpLog(pid,localDownImgPre,adminId,"下载图片失败,无法设置主图");
                             }
                             if (isSuccess) {
                                 String nwMainImg = goods.getShowMainImage().replace(".400x400.",".220x220.")
@@ -252,9 +264,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                             customGoodsService.updateGoodsState(pid, 4);
                         }
                     } else {
+                        // 记录上传失败日志
+                        customGoodsService.insertIntoGoodsImgUpLog(pid,"批量上传失败,size:" + imgList.size(),adminId,imgList.toString());
                         customGoodsService.updateGoodsState(pid, 3);
                     }
                 } else {
+                    // 记录上传失败日志
+                    customGoodsService.insertIntoGoodsImgUpLog(pid,"" + imgList.size(),adminId,"update goodsState error");
                     LOG.error("this pid:" + pid + " update goodsstate error!");
                 }
             } else {
@@ -264,6 +280,7 @@ public class PublishGoodsToOnlineThread extends Thread {
             e.printStackTrace();
             LOG.error("PublishGoodsToOnlineThread pid:" + pid + " error:",e);
             System.err.println("PublishGoodsToOnlineThread pid:" + pid + " error:" + e.getMessage());
+            customGoodsService.insertIntoGoodsImgUpLog(pid,"" + imgList.size(),adminId,"PublishGoodsToOnlineThread error:" + e.getMessage());
             customGoodsService.updateGoodsState(pid, 3);
         }
         LOG.info("Pid : " + pid + " Execute End");

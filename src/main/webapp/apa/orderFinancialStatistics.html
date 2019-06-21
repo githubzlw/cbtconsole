@@ -66,10 +66,23 @@
 </style>
 <script type="text/javascript">
 	$(function() {
+	    genYearSelect();
 		setDatagrid();
 		var opts = $("#ofs_easyui-datagrid").datagrid("options");
 		opts.url = "/cbtconsole/basicStatistical/orderFinancial";
 	});
+
+    function genYearSelect() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        $("#ofs_rYear").empty();
+        var content = "<option value='-1'>请选择</option>";
+        for (var yr = 2016; yr <= rYear; yr++) {
+            content += "<option value='" + yr + "'>" + yr + "</option>";
+        }
+        $("#ofs_rYear").append(content);
+    }
+
 	function setDatagrid() {
 		$('#ofs_easyui-datagrid').datagrid({
 			title : '订单及销售额对账报表(金额单位：USD，时间：电商网站系统时间)',
@@ -211,6 +224,7 @@
 
 	//重新生成本月对账报表
 	function onloadOrderFinancialDate(){
+        $("#gen_notice").text("正在执行...").show();
         var year = $("#ofs_rYear").val();
         var month = $("#ofs_rMonth").val();
         if (year == null || year == "" || year == "-1") {
@@ -228,10 +242,12 @@
             dataType:"json",
             success:function(data) {
                 if(data>0){
-                    showMessage("生成成功");
+                    $("#gen_notice").text("生成成功").show();
+                    // showMessage("生成成功");
                     $('#ofs_easyui-datagrid').datagrid('reload');
                 }else{
-                    showMessage("生成失败");
+                    // showMessage("生成失败");
+                    $("#gen_notice").text("生成失败").show();
                 }
             }
         });
@@ -257,6 +273,7 @@
 					onclick="exportOfsExcel()"><input
 					class="but_color" type="button"style="width:130px;" value="重新生成本月数据"
 					onclick="onloadOrderFinancialDate()">
+				<span id="gen_notice" style="display: none;color: red;"></span>
 			</form>
 			<br>
 			<div class="top_div_style">

@@ -65,10 +65,23 @@
 </style>
 <script type="text/javascript">
     $(function() {
+        genYearSelect();
         setDatagrid();
         var opts = $("#prp_easyui-datagrid").datagrid("options");
         opts.url = "/cbtconsole/basicStatistical/queryWireRevenuePayPalInfo";
     });
+
+    function genYearSelect() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        $(".prp_rYear").empty();
+        var content = "";
+        for (var yr = 2016; yr <= rYear; yr++) {
+            content += "<option value='" + yr + "'>" + yr + "</option>";
+        }
+        $(".prp_rYear").append(content);
+    }
+
     function setDatagrid() {
         $('#prp_easyui-datagrid').datagrid({
             title : '电汇总收入详情',

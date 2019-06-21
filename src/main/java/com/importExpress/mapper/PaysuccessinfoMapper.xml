@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.importExpress.mapper.PaysuccessinfoMapper" >
+  <resultMap id="BaseResultMap" type="com.importExpress.pojo.Paysuccessinfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="orderno" property="orderno" jdbcType="VARCHAR" />
+    <result column="paymentamount" property="paymentamount" jdbcType="VARCHAR" />
+    <result column="sampleschoice" property="sampleschoice" jdbcType="INTEGER" />
+    <result column="sharechoice" property="sharechoice" jdbcType="INTEGER" />
+    <result column="info" property="info" jdbcType="VARCHAR" />
+    <result column="creatime" property="creatime" jdbcType="TIMESTAMP" />
+    <result column="del" property="del" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, userid, orderno, paymentamount, sampleschoice, sharechoice, info, creatime, del
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.importExpress.pojo.PaysuccessinfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from paysuccessinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    and
+    userid in (SELECT id FROM USER WHERE email NOT LIKE '%qq.com' AND email NOT LIKE '%ww.com' AND
+    email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
+    email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com'  AND  email NOT LIKE '%@sourcing-cn.com'  AND
+    email NOT LIKE '%@china-synergy'  AND email != 'sb33@gmail.com'  AND email != 'sbtest@gmail.com'  AND
+    email NOT LIKE '%@qq.com' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
+    email NOT LIKE 'zhouxueyun%' and email not like 'xielulu%')
+    order by creatime desc
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from paysuccessinfo
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from paysuccessinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.importExpress.pojo.PaysuccessinfoExample" >
+    delete from paysuccessinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.importExpress.pojo.Paysuccessinfo" >
+    insert into paysuccessinfo (id, userid, orderno, 
+      paymentamount, sampleschoice, sharechoice, 
+      info, creatime, del
+      )
+    values (#{id,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{orderno,jdbcType=VARCHAR}, 
+      #{paymentamount,jdbcType=VARCHAR}, #{sampleschoice,jdbcType=INTEGER}, #{sharechoice,jdbcType=INTEGER}, 
+      #{info,jdbcType=VARCHAR}, #{creatime,jdbcType=TIMESTAMP}, #{del,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.importExpress.pojo.Paysuccessinfo" >
+    insert into paysuccessinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="orderno != null" >
+        orderno,
+      </if>
+      <if test="paymentamount != null" >
+        paymentamount,
+      </if>
+      <if test="sampleschoice != null" >
+        sampleschoice,
+      </if>
+      <if test="sharechoice != null" >
+        sharechoice,
+      </if>
+      <if test="info != null" >
+        info,
+      </if>
+      <if test="creatime != null" >
+        creatime,
+      </if>
+      <if test="del != null" >
+        del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentamount != null" >
+        #{paymentamount,jdbcType=VARCHAR},
+      </if>
+      <if test="sampleschoice != null" >
+        #{sampleschoice,jdbcType=INTEGER},
+      </if>
+      <if test="sharechoice != null" >
+        #{sharechoice,jdbcType=INTEGER},
+      </if>
+      <if test="info != null" >
+        #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="creatime != null" >
+        #{creatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null" >
+        #{del,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.importExpress.pojo.PaysuccessinfoExample" resultType="java.lang.Integer" >
+    select count(*) from paysuccessinfo
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update paysuccessinfo
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null" >
+        userid = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.orderno != null" >
+        orderno = #{record.orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paymentamount != null" >
+        paymentamount = #{record.paymentamount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sampleschoice != null" >
+        sampleschoice = #{record.sampleschoice,jdbcType=INTEGER},
+      </if>
+      <if test="record.sharechoice != null" >
+        sharechoice = #{record.sharechoice,jdbcType=INTEGER},
+      </if>
+      <if test="record.info != null" >
+        info = #{record.info,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creatime != null" >
+        creatime = #{record.creatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.del != null" >
+        del = #{record.del,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update paysuccessinfo
+    set id = #{record.id,jdbcType=INTEGER},
+      userid = #{record.userid,jdbcType=INTEGER},
+      orderno = #{record.orderno,jdbcType=VARCHAR},
+      paymentamount = #{record.paymentamount,jdbcType=VARCHAR},
+      sampleschoice = #{record.sampleschoice,jdbcType=INTEGER},
+      sharechoice = #{record.sharechoice,jdbcType=INTEGER},
+      info = #{record.info,jdbcType=VARCHAR},
+      creatime = #{record.creatime,jdbcType=TIMESTAMP},
+      del = #{record.del,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.importExpress.pojo.Paysuccessinfo" >
+    update paysuccessinfo
+    <set >
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="orderno != null" >
+        orderno = #{orderno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentamount != null" >
+        paymentamount = #{paymentamount,jdbcType=VARCHAR},
+      </if>
+      <if test="sampleschoice != null" >
+        sampleschoice = #{sampleschoice,jdbcType=INTEGER},
+      </if>
+      <if test="sharechoice != null" >
+        sharechoice = #{sharechoice,jdbcType=INTEGER},
+      </if>
+      <if test="info != null" >
+        info = #{info,jdbcType=VARCHAR},
+      </if>
+      <if test="creatime != null" >
+        creatime = #{creatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="del != null" >
+        del = #{del,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.importExpress.pojo.Paysuccessinfo" >
+    update paysuccessinfo
+    set userid = #{userid,jdbcType=INTEGER},
+      orderno = #{orderno,jdbcType=VARCHAR},
+      paymentamount = #{paymentamount,jdbcType=VARCHAR},
+      sampleschoice = #{sampleschoice,jdbcType=INTEGER},
+      sharechoice = #{sharechoice,jdbcType=INTEGER},
+      info = #{info,jdbcType=VARCHAR},
+      creatime = #{creatime,jdbcType=TIMESTAMP},
+      del = #{del,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--<select id="queryUserListByAdminId" >
+    select d.userid from admuser c,admin_r_user d where c.id = d.adminid and c.id = #{adminId}
+  </select>-->
+</mapper>
