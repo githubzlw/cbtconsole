@@ -188,7 +188,8 @@ function confirm(ship){
 // 		});
 // }
 
-function upState(ship ) {
+function upState(ship, that) {
+    // var that = this;
     $.messager.prompt('退货金额差异原因','请输入原因',function(number){
         if(number==null || number==""){
             $.messager.alert('提示','请输入原因');
@@ -199,7 +200,9 @@ function upState(ship ) {
         }, function(res) {
             if(res.rows == 0){
                 $.messager.alert('提示','修改成功');
-                doQuery(this.page)
+                $(that).after('<br>差异原因：'+ number);
+                // $("#gid"+page).prop('lastChild').nodeValue ="差异原因:"+ number;
+                $($(that)).css('display', 'none');
             }else{
                 $.messager.alert('提示','修改失败');
 
@@ -208,7 +211,7 @@ function upState(ship ) {
         });
     });
 }
-function UpMoney(ship ) {
+function UpMoney(ship,page) {
     $.messager.prompt('采购价格','请输入修改后价格',function(number){
         if(number==null || number==""){
             $.messager.alert('提示','请输入修改后价格');
@@ -219,7 +222,7 @@ function UpMoney(ship ) {
         }, function(res) {
             if(res.rows == 0){
                 $.messager.alert('提示','修改成功');
-                doQuery(this.page)
+                $("#pid"+page).prop('lastChild').nodeValue ="采购录入金额:"+ number;
             }else{
                 $.messager.alert('提示','修改失败');
 
@@ -241,11 +244,11 @@ function UpShipH(ship ) {
 						//window.location.reload();
 						 if(res.rows == 0){
 							$.messager.alert('提示','修改成功');
+                             doQuery(1);
 						}else{
 							$.messager.alert('提示','修改失败');
 							
-						} 
-						 doQuery(1)
+						}
 					});
 		});
 }
@@ -261,10 +264,10 @@ function UpShip(ship ) {
 						//window.location.reload();
 						 if(res.rows == 0){
 							$.messager.alert('提示','修改成功');
+                             doQuery(1);
 						}else{
 							$.messager.alert('提示','修改失败');
-						} 
-						 doQuery(1)
+						}
 					});
 		});
 }
@@ -293,7 +296,7 @@ function Agreed(ship){
     document.getElementById('field＿name').value=ship;
     $('#user_remark').window('open');
 }
-function returnApply(ship){
+function returnApply(page){
      var ch=$("input[name='radioname']:checked").val();
 
     var ship= $('#field＿name').val();
@@ -329,7 +332,7 @@ function rejected(ship) {
     $('#order_remark').window('open');
 
 }
-function rejectedok() {
+function rejectedok(page) {
     var ship= $('#fieldName').val();
     var cusorder= $('#cusorder').val();
 
@@ -346,7 +349,7 @@ function rejectedok() {
                 //window.location.reload();
             }
             $('#order_remark').window('close');
-            doQuery(1);
+            doQuery(page);
         }
     });
 }
@@ -364,7 +367,7 @@ function rejectedok() {
 		</div>
 		<div style="margin:20px 0 20px 40px;">
 			<a href="javascript:void(0)" class="easyui-linkbutton"
-			   onclick="returnApply()" style="width:80px" >确认</a>
+			   onclick="returnApply(this.page)" style="width:80px" >确认</a>
 		</div>
 	</div>
 </div>
@@ -382,7 +385,7 @@ function rejectedok() {
 		</div>
 	<div style="margin:20px 0 20px 40px;">
 		<a href="javascript:void(0)" class="easyui-linkbutton"
-		   onclick="returnApply()" style="width:80px" >确认</a>
+		   onclick="returnApply(this.page)" style="width:80px" >确认</a>
 	</div>
 	</div>
 </div>
@@ -396,7 +399,7 @@ function rejectedok() {
 		</div>
 		<div style="margin:20px 0 20px 40px;">
 			<a href="javascript:void(0)" class="easyui-linkbutton"
-			   onclick="rejectedok()" style="width:80px" >确认</a>
+			   onclick="rejectedok(this.page)" style="width:80px" >确认</a>
 		</div>
 	</div>
 </div>

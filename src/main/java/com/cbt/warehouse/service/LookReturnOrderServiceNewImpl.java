@@ -90,15 +90,15 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
             list.get(i).setItem("产品名：<a href='https://www.importx.com/goodsinfo/122916001-121814002-1"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItemname()+"</a><br>pid:<a href='https://detail.1688.com/offer/"+list.get(i).getItem()+".html' target='_blank'>"+list.get(i).getItem()+"</a><br>规格："+list.get(i).getSku()+"<br>采购数量："+list.get(i).getItemNumber());
 			if (list.get(i).getReason()==null) {
             if (list.get(i).getChangeShipno()==null||"".equals(list.get(i).getChangeShipno())) {
-				list.get(i).setChangeShipno("<input class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");
+				list.get(i).setChangeShipno("<input id=\"cid"+list.get(i).getId()+"\" class='but_color' type='button' value='输入换货运单号' onclick='UpShip("+list.get(i).getId()+")'>");
 			} else {
-				list.get(i).setChangeShipno(list.get(i).getChangeShipno()+"<input type='button' value='修改' onclick='UpShip("+list.get(i).getId()+")'>");
+				list.get(i).setChangeShipno(list.get(i).getChangeShipno()+"<input id=\"cid"+list.get(i).getId()+"\" type='button' value='修改' onclick='UpShip("+list.get(i).getId()+")'>");
 			}
 
 				if (list.get(i).getShipno() == null || "".equals(list.get(i).getShipno())) {
-					list.get(i).setShipno("<input class='but_color' type='button' value='输入退货运单号' onclick='UpShipH(" + list.get(i).getId() + ")'>");
+					list.get(i).setShipno("<input id=\"did"+list.get(i).getId()+"\" class='but_color' type='button' value='输入退货运单号' onclick='UpShipH(" + list.get(i).getId() + ")'>");
 				} else {
-					list.get(i).setShipno(list.get(i).getShipno() + "<input  type='button' value='修改' onclick='UpShipH(" + list.get(i).getId() + ")'>");
+					list.get(i).setShipno(list.get(i).getShipno() + "<input id=\"did"+list.get(i).getId()+"\" type='button' value='修改' onclick='UpShipH(" + list.get(i).getId() + ")'>");
 				}
 			}
 //            list.get(i).setChangeShipno("<input class='but_color' type='button' value='"+list.get(i).getChangeShipno()==null?"输入换货运单号":"修改"+"' onclick='"+list.get(i).getChangeShipno()==null?"UpShip("+list.get(i).getId()+")":"onclick='UpShip("+list.get(i).getId()+")'>");
@@ -110,25 +110,26 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 			}
 
             if (list.get(i).getState()==0) {
-				stat="待处理<br><a style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'>";
+				stat="待处理<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'>";
 			}
             if (list.get(i).getState()==1) {
-				stat="已处理<br><a style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'>";
+				stat="已处理<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额："+list.get(i).getActual_money()+"</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'>";
 			}
 
             if (list.get(i).getState()==2) {
 				if (!"".equals(list.get(i).getActual_money()) && !"".equals(list.get(i).getRefund_money())) {
 						if (list.get(i).getActual_money() == list.get(i).getRefund_money() && list.get(i).getRefund_money()!=0 &&list.get(i).getActual_money() !=0) {
-							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() +"</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+							stat = "已到账<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() +"</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
 						} else if (StringUtil.isNotBlank(list.get(i).getDifferences()) ){
-							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><br/>差异原因:"+list.get(i).getDifferences();
+							stat = "已到账<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><br/>差异原因:"+list.get(i).getDifferences();
 
 						}else {
-							stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><input class='but_color' type='button' value='差异原因' onclick='upState(" + ship + ")'>";
+							stat = "已到账<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money() + "</a><input class='but_color' id=\"oid"+list.get(i).getId()+"\" type='button' value='差异原因' onclick='upState(\"" + ship + "\",this)'>" ;
+
 
 						}
 					}else {
-						stat = "已到账<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+						stat = "已到账<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
 					}
 
 			}
@@ -136,7 +137,7 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 				stat="换货签收<br><input class='but_color' type='button' value='确认完结' onclick='upState("+ship+")'>";
 			}
             if (list.get(i).getState()==4) {
-				stat = "完结<br><a style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(" + ship + ")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
+				stat = "完结<br><a id=\"pid"+list.get(i).getId()+"\" style=\"color: red\">采购录入金额：" + list.get(i).getActual_money() + "</a><input  type='button' value='修改' onclick='UpMoney(\"" + ship + "\",\""+list.get(i).getId()+"\")'> <br/>退款时间：" + list.get(i).getRefund_time() + "<br><a style=\"color: red\">1688退款金额：" + list.get(i).getRefund_money()+"</a>";
 				if (StringUtil.isNotBlank(list.get(i).getDifferences())&&list.get(i).getActual_money()!=list.get(i).getRefund_money()){
 					stat+="<br/>差异原因："+list.get(i).getDifferences();
 				}
