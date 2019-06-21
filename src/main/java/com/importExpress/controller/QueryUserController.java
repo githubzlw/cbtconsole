@@ -586,6 +586,30 @@ public class QueryUserController {
      *
      * @return 返回的是easyui数据(json)格式
      */
+    @RequestMapping(value = "/lookShareableOrder")
+    @ResponseBody
+    public EasyUiJsonResult lookShareableOrder(@RequestParam(value = "rows", defaultValue = "20", required = false) Integer rows,
+                                                 @RequestParam(value = "page", defaultValue = "1", required = false) Integer page,
+                                                 @RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo,
+                                                 @RequestParam(value = "userId", defaultValue = "0", required = false) int userId,
+                                                 @RequestParam(value = "share", defaultValue = "-1", required = false) int share,
+                                                 @RequestParam(value = "name", defaultValue = "", required = false) String name) {
+        if (StringUtils.isBlank(orderNo)) {
+            orderNo = null;
+        }
+        if (StringUtils.isBlank(name)) {
+            name = null;
+        }
+        // 查询
+        return queryUserService.lookShareableOrder(page, rows,orderNo,name,userId,share);
+    }
+
+    /**
+     * 查询要分享的订单数据
+     *
+     *
+     * @return 返回的是easyui数据(json)格式
+     */
     @RequestMapping(value = "/queryOrderShareSave.do")
     @ResponseBody
     public String queryOrderShareSave(HttpServletRequest request, HttpServletResponse response) {
@@ -600,6 +624,7 @@ public class QueryUserController {
 
         List<OrderShare> deviceReturns= StrUtils.getPersons(ens, OrderShare.class);
         try {
+            this.queryUserService.SetShareByOrderno(orderNo);
             //本地27插入
 //            queryUserService.insertOrderShare(deviceReturns,shopType,orderNo);
             //线上表插入
@@ -615,8 +640,8 @@ public class QueryUserController {
     private void insertOrderShare(List<OrderShare> pList,String shopType,String orderNo) {
         shopType = GoodsInfoUpdateOnlineUtil.checkAndReplaceQuotes(shopType);
         for(int i=0;i<pList.size();i++ ){
-            String sql = "INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,goods_pid)" +
-                    " values('" + shopType + "','" + orderNo + "','" + pList.get(i).getGoodsPrice() + "','"+pList.get(i).getGoodsImg()+ "','" + pList.get(i).getGoodsPid() + "')";
+            String sql = "INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,goods_pid,yourorder)" +
+                    " values('" + shopType + "','" + orderNo + "','" + pList.get(i).getGoodsPrice() + "','"+pList.get(i).getGoodsImg()+ "','" + pList.get(i).getGoodsPid() + "','" + pList.get(i).getYourorder() + "')";
             NotifyToCustomerUtil.sendSqlByMq(sql);
         }
 

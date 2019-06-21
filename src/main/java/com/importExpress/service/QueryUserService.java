@@ -66,4 +66,8 @@ public interface QueryUserService {
     Map<String,Object> queryUnsellablereasonMaster();
 
     void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid);
+
+    EasyUiJsonResult lookShareableOrder(Integer page, Integer rows, String orderNo,String name,int userid,int share);
+
+    void SetShareByOrderno(String orderNo);
 }

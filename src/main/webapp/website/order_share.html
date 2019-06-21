@@ -129,6 +129,12 @@
 <script type="text/javascript">
 
     $(function () {
+        var reg = new RegExp("(^|[&?])orderNo=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg); //匹配目标参数
+        unescape(r[2]);
+        if (r[2]!=null){
+            $("#orderNo").val(r[2])
+        }
         //设置datagrid属性
         $('#main-datagrid').datagrid({
             width: "100%",
@@ -139,6 +145,7 @@
             striped: true, //设置为true将交替显示行背景。
             collapsible: true, //显示可折叠按钮
             toolbar: "#top_toolbar", //在添加 增添、删除、修改操作的按钮要用到这个
+            url: '/cbtconsole/queryuser/queryOrderShareList.do?orderNo='+r[2],//url调用Action方法
             loadMsg: '数据装载中......',
             singleSelect: true, //为true时只能选择单行
             fitColumns: true, //允许表格自动缩放，以适应父容器
@@ -151,38 +158,38 @@
                 return;
             }
         });
+
         /*重置*/
         $("#date-range-reset").click(function () {
             //初始化
             $("#typeCode").val(0);
         });
         /*查询*/
-        $("#date-range-search")
-            .click(
-                function () {
-                    //分页
-                    var pageSize = $("#main-datagrid").datagrid(
-                        "options").pageSize;
-                    var pageNumber = 1;
-                    var shopType = $('#shopType').val();
-                    if(shopType == null ||shopType == ""){
-                        alert("请输入店铺类型");
-                        return false;
-                    }
-                    var orderNo = $('#orderNo').val();
-                    if(orderNo == null ||orderNo == ""){
-                        alert("请输入订单号");
-                        return false;
-                    }
-
-                    $("#main-datagrid").datagrid("options").url = "/cbtconsole/queryuser/queryOrderShareList.do";
-                    $('#main-datagrid').datagrid("load", {
-                        rows: pageSize,
-                        page: pageNumber,
-                        shopType: shopType,
-                        orderNo: orderNo
-                    });
-                });
+        // $("#date-range-search")
+        //     .click(
+        //         function () {
+        //             //分页
+        //             var pageSize = $("#main-datagrid").datagrid(
+        //                 "options").pageSize;
+        //             var pageNumber = 1;
+        //             var shopType = $('#shopType').val();
+        //             if(shopType == null ||shopType == ""){
+        //                 alert("请输入店铺类型");
+        //                 return false;
+        //             }
+        //             var orderNo = $('#orderNo').val();
+        //             if(orderNo == null ||orderNo == ""){
+        //                 alert("请输入订单号");
+        //                 return false;
+        //             }
+        //             $("#main-datagrid").datagrid("options").url = "/cbtconsole/queryuser/queryOrderShareList.do";
+        //             $('#main-datagrid').datagrid("load", {
+        //                 rows: pageSize,
+        //                 page: pageNumber,
+        //                 shopType: shopType,
+        //                 orderNo: orderNo
+        //             });
+        //         });
 
     });
 
@@ -234,6 +241,7 @@ function  fnAddDatagrid(){
         arr.goodsPid = addrows[i].goodsPid;
         arr.goodsImg = addrows[i].goodsImg;
         arr.goodsPrice = addrows[i].goodsPrice;
+        arr.yourorder = addrows[i].yourorder;
         arr.shopType = shopType;
         arr.orderNo = orderNo;
         str[i] = arr;   //
@@ -275,13 +283,13 @@ function  fnAddDatagrid(){
                 <td align="center">
                     订单号:<input type="text" name="" id="orderNo" value="" style="height: 28px;width: 200px;color: #C4C4C4;" />
                 </td>
-                <!--查询按钮-->
-                <td align="center">
-                    <button type="button" id="date-range-search"
-                            class="btn btn-default"
-                            style="height: 30px; width: 98px; text-align: center;">查询
-                    </button>
-                </td>
+                <!--&lt;!&ndash;查询按钮&ndash;&gt;-->
+                <!--<td align="center">-->
+                    <!--<button type="button" id="date-range-search"-->
+                            <!--class="btn btn-default"-->
+                            <!--style="height: 30px; width: 98px; text-align: center;">查询-->
+                    <!--</button>-->
+                <!--</td>-->
                 <!--新增按钮-->
                <td align="center">
                     <button type="button" onclick="fnAddDatagrid();"
@@ -303,6 +311,7 @@ function  fnAddDatagrid(){
         <th data-options="field:'goodsPid',width:'120px',align:'center',formatter:formatterGoodsPid">商品</th>
         <th data-options="field:'goodsImg',width:'120px',align:'center',formatter:showImg">商品图片</th>
         <th data-options="field:'goodsPrice',width:'220px',align:'center'">价格</th>
+        <th data-options="field:'yourorder',width:'220px',align:'center'">数量</th>
         <th data-options="field:'opFlag',align:'center',width:'60px',formatter:formatOperation">操作</th>
     </tr>
     </thead>
