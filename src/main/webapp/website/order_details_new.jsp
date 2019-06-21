@@ -547,7 +547,7 @@
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">VIP级别：</span><span
-                        style="color:red;">${order.gradeName} ${order.grade}</span>
+                        style="color:red;">${order.gradeName} (${order.grade})</span>
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">订单重量(kg)：</span><span><span
