@@ -3,10 +3,12 @@ package com.cbt.track.dao;
 import com.cbt.bean.TabTrackForward;
 import com.cbt.bean.TabTrackInfo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface TabTrackInfoMapping {
 
     TabTrackInfo queryByTrackNo(@Param("trackNo") String trackNo);
