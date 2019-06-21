@@ -1,10 +1,14 @@
 package com.cbt.track.service.impl;
 
+import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.TabTrackDetails;
+import com.cbt.bean.TabTrackForward;
 import com.cbt.bean.TabTrackInfo;
 import com.cbt.track.dao.TabTrackDetailsMapping;
 import com.cbt.track.dao.TabTrackInfoMapping;
 import com.cbt.track.service.TabTrackInfoService;
+import com.cbt.util.DateFormatUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,8 +30,12 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         TabTrackInfo tabTrackInfo = tabTrackInfoMapping.queryByTrackNo(trackNo);
         if (tabTrackInfo != null){
             List<TabTrackDetails> tabTrackDetailsList = tabTrackDetailsMapping.queryByTrackNo(tabTrackInfo.getTrackNo());
-            if (tabTrackDetailsList != null && tabTrackDetailsList.size() > 0){
+            if (CollectionUtils.isNotEmpty(tabTrackDetailsList)){
                 tabTrackInfo.setTabTrackDetailsList(tabTrackDetailsList);
+            }
+            List<TabTrackForward> forwardList = tabTrackInfoMapping.queryTrackForward(tabTrackInfo.getTrackNo());
+            if (CollectionUtils.isNotEmpty(forwardList)){
+                tabTrackInfo.setForwardList(forwardList);
             }
         }
         return tabTrackInfo;
@@ -42,6 +50,64 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         map.put("recordList", list);
         map.put("totalCount", totalCount);
         return map;
+    }
+
+    @Override
+    public void getTrackInfoList(EasyUiJsonResult json, Map<String, Object> param) {
+        List<TabTrackInfo> list = tabTrackInfoMapping.getTrackInfoList(param);
+        json.setRows(list);
+        json.setSuccess(true);
+        if ((int)param.get("export") == 0) {
+            // 查询 按钮
+            Integer totalCount = tabTrackInfoMapping.getTrackInfoListCount(param);
+            json.setTotal(totalCount);
+            return;
+        }
+
+        // 导出 按钮
+        if (CollectionUtils.isEmpty(list)) {
+            json.setMessage("该条件下查询不到数据");
+            json.setSuccess(false);
+        } else {
+            StringBuffer sb = new StringBuffer();
+            sb.append("用户ID,用户邮箱,主单号,负责人,运单号,物流公司,转单号,转单物流公司,运单状态,订单支付时间,出货时间,\r\n");
+            for (TabTrackInfo bean : list) {
+                sb.append(bean.getId()).append(",")
+                        .append(bean.getEmail()).append(",")
+                        .append(bean.getOrderNo()).append(",")
+                        .append(bean.getAdmName()).append(",")
+                        .append(bean.getTrackNo()).append(",")
+                        .append(bean.getTrackCompany()).append(",")
+                        .append(bean.getForwardNo()==null?"":"'" + bean.getForwardNo()).append(",")
+                        .append(bean.getForwardCompany()==null?"":bean.getForwardCompany().replaceAll(",", " ")).append(",")
+                        .append(formatterTrackState(bean.getTrackState())).append(",") //运单状态
+                        .append(DateFormatUtil.getWithSeconds(bean.getOrderPaytime())).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getSenttime())).append(",\r\n");
+            }
+            String message = sb.toString().replaceAll(",null,", ",,");
+            message = message.replaceAll(",null,", ",,");
+            json.setMessage(message);
+        }
+    }
+
+    public static String formatterTrackState(Integer trackState){
+        if (trackState == null){
+            return "";
+        }
+        switch(trackState) {
+            case 3:
+                return "已签收";
+            case 4:
+                return "退回";
+            case 5:
+                return "异常";
+            case 6:
+                return "内部异常";
+            case 7:
+                return "手动标记正常";
+            default:
+                return "已发货";
+        }
     }
 
     @Override
@@ -132,22 +198,20 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
 	}
 
 	@Override
-	public Map<String, Integer> queryWaringNum(String startDate, String endDate) {
+	public Map<String, Integer> queryWaringNum(Map<String, Object> param) {
 		Map<String, Integer> result = new HashMap<String, Integer>();
-        Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 0, null);
-        Integer waring1 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 1, null);
-        Integer waring2 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 2, null);
-//        Integer waring3 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 3);
-        Integer waring4 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 4, null);
-        Integer waring5 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 5, null);
-        Integer waring6 = tabTrackInfoMapping.getWarningRecordCount(startDate, endDate, 6, null);
-        result.put("waring0", waring0);
-        result.put("waring1", waring1);
-        result.put("waring2", waring2);
-//        result.put("waring3", waring3);
-        result.put("waring4", waring4);
-        result.put("waring5", waring5);
-        result.put("waring6", waring6);
+        param.put("warning", 0);
+        result.put("waring0", tabTrackInfoMapping.getTrackInfoListCount(param));
+        param.put("warning", 1);
+        result.put("waring1", tabTrackInfoMapping.getTrackInfoListCount(param));
+        param.put("warning", 2);
+        result.put("waring2", tabTrackInfoMapping.getTrackInfoListCount(param));
+        param.put("warning", 4);
+        result.put("waring4", tabTrackInfoMapping.getTrackInfoListCount(param));
+        param.put("warning", 5);
+        result.put("waring5", tabTrackInfoMapping.getTrackInfoListCount(param));
+        param.put("warning", 6);
+        result.put("waring6", tabTrackInfoMapping.getTrackInfoListCount(param));
 		return result;
 	}
 

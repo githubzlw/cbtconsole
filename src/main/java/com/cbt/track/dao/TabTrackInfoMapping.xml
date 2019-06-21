@@ -378,4 +378,140 @@
         LIMIT 1
     </select>
 
+    <!--List<TabTrackForward> queryTrackForward(@Param("trackNo") String trackNo);-->
+    <select id="queryTrackForward" resultType="com.cbt.bean.TabTrackForward">
+        SELECT track_no_forward 'trackNoForward', track_company_forward 'trackCompanyForward', source_type 'sourceType'
+        FROM cross_border_shop.tab_track_forward
+        WHERE track_no = #{trackNo}
+    </select>
+
+    <sql id="getTrackInfo">
+        FROM shipping_package sp
+        INNER JOIN orderinfo of ON sp.orderid = of.order_no
+        LEFT JOIN cross_border_shop.tab_track_info ti ON sp.transportcompany = ti.track_company AND sp.expressno = ti.track_no
+
+        <if test="export != null and export == 1">
+            LEFT JOIN (
+              SELECT track_no, track_company, GROUP_CONCAT(track_no_forward SEPARATOR ';') AS 'track_no_forward',
+              GROUP_CONCAT(track_company_forward SEPARATOR ';') AS 'track_company_forward'
+              FROM cross_border_shop.tab_track_forward GROUP BY track_no,track_company
+            ) tf ON sp.expressno = tf.track_no AND sp.transportcompany = tf.track_company
+        </if>
+
+        LEFT JOIN admin_r_user ar ON of.user_id = ar.userid
+        LEFT JOIN admuser au ON au.id = ar.adminid
+        WHERE sp.sflag = 3  -- 已出货
+
+        /*用户id或者用户邮箱*/
+        <if test="orderUserid != null and orderUserid != ''">
+            AND of.user_id IN (
+              SELECT id FROM `user` WHERE id = #{orderUserid} OR `name` LIKE #{orderUseridLike} OR email LIKE #{orderUseridLike}
+            )
+        </if>
+
+        /*订单编号*/
+        <if test="orderNo != null and orderNo != ''">
+            AND (sp.orderid = #{orderUserid} OR sp.orderid LIKE #{orderNoLike})
+        </if>
+
+        /*运单号 转单号*/
+        <if test="orderTrackNo != null and orderTrackNo != ''">
+            AND sp.expressno IN (
+                SELECT expressno FROM shipping_package WHERE expressno LIKE #{orderTrackNoLike}
+                UNION
+                SELECT track_no FROM cross_border_shop.tab_track_forward WHERE track_no_forward LIKE #{orderTrackNoLike}
+            )
+        </if>
+
+        /*负责人*/
+        <if test="userid != null and userid != 0">
+            AND ar.adminid = #{userid}
+        </if>
+
+        /*运单状态*/
+        <if test="trackState != null">
+            <if test="trackState != 0 and trackState != 2 and trackState != 7">
+                AND ti.track_state = #{trackState} /*1-备货中；2-已发货；3-已签收；4-退回；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）; 7-手动标记正常*/
+            </if>
+            <if test="trackState == 2">
+                AND (ti.track_state IS NULL OR ti.track_state = 2)
+            </if>
+            <if test="trackState == 7">
+                AND ti.track_note IS NOT NULL AND ti.track_note != ""
+            </if>
+        </if>
+
+        /*订单支付时间*/
+        <if test="payStartDate != null">
+            AND (of.orderpaytime >= #{payStartDate})
+        </if>
+        <if test="payEndDate != null">
+            AND (#{payEndDate} >= of.orderpaytime)
+        </if>
+
+        /*订单出货时间*/
+        <if test="startDate != null">
+            AND (sp.createtime >= #{startDate} OR sp.createtime IS NULL)
+        </if>
+        <if test="endDate != null">
+            AND (#{endDate} >= sp.createtime OR sp.createtime IS NULL)
+        </if>
+
+        /*物流预警*/
+        <if test="warning != null">
+            <if test="warning == 0">
+                AND ((ti.track_state != 3 AND ti.track_state != 7 AND datediff(NOW(), sp.createtime) >= 3 AND
+                ((datediff(ti.updat_date,ti.track_update) IS null
+                OR datediff(ti.updat_date,ti.track_update) > 3
+                OR now() > ti.order_deliverDate))
+                OR ti.track_state IN (4,5,6)))
+            </if>
+            <if test="warning == 1"> /*0-查询所有异常运单；1-物流问题；2-交期超时；5-异常(海关扣押等)；6-内部异常（抓取方式没有，单号问题等）*/
+                AND ti.track_state != 3 AND ti.track_state != 7
+                AND datediff(NOW(), sp.createtime) >= 3
+                AND (datediff(ti.updat_date,ti.track_update) IS null OR datediff(ti.updat_date,ti.track_update) > 3)
+            </if>
+            <if test="warning == 2">
+                AND ti.track_state != 3 AND ti.track_state != 7
+                AND now() > ti.order_deliverDate
+            </if>
+            <if test="warning == 4">
+                AND ti.track_state = 4
+            </if>
+            <if test="warning == 5">
+                AND ti.track_state = 5
+            </if>
+            <if test="warning == 6">
+                AND ti.track_state = 6
+            </if>
+        </if>
+    </sql>
+
+    <!--List<TabTrackInfo> getTrackInfoList(Map<String, Object> param);-->
+    <select id="getTrackInfoList" resultType="com.cbt.bean.TabTrackInfo" parameterType="java.util.Map">
+        SELECT
+            ar.useremail 'email',au.admName, of.user_id id, sp.orderid orderNo, sp.remarks orderList,
+            sp.transportcompany trackCompany, sp.expressno trackNo,
+            ti.track_state trackState, of.orderpaytime orderPaytime, ti.order_deliverDate orderDeliverDate, ti.updat_date updatDate,
+            ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
+            sp.createtime senttime
+        <if test="export != null and export == 1">
+            , tf.track_no_forward forwardNo, tf.track_company_forward forwardCompany
+        </if>
+
+        <include refid="getTrackInfo" />
+
+        ORDER BY of.orderpaytime DESC
+        <if test="export != null and export == 0">
+            LIMIT #{startBars},#{rows}
+        </if>
+    </select>
+
+    <!--Integer getTrackInfoListCount(Map<String, Object> param);-->
+    <select id="getTrackInfoListCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT COUNT(1)
+        <include refid="getTrackInfo" />
+    </select>
+
+
 </mapper>

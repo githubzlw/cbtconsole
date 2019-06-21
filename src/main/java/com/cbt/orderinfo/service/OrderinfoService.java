@@ -1804,8 +1804,12 @@ public class OrderinfoService implements IOrderinfoService {
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
 		ca.add(Calendar.DATE, - 90);
-		String startDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
-		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0, null);
+		String payStartDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
+        Map<String, Object> param = new HashMap<String, Object>(){{
+            put("payStartDate", payStartDate);
+            put("warning", 0);
+        }};
+		Integer waring0 = tabTrackInfoMapping.getTrackInfoListCount(param);
 		Map<String, Integer> cywMap = new HashMap<String, Integer>();
 		cywMap.put("state", 1);
 		cywMap.put("counts", waring0);

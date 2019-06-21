@@ -1,9 +1,11 @@
 package com.cbt.track.dao;
 
+import com.cbt.bean.TabTrackForward;
 import com.cbt.bean.TabTrackInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TabTrackInfoMapping {
 
@@ -35,5 +37,11 @@ public interface TabTrackInfoMapping {
 
 	List<TabTrackInfo> getForwardListByTrackNo(@Param("trackNo") String trackNo, @Param("userid") Integer userid,
                                                @Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    List<TabTrackForward> queryTrackForward(@Param("trackNo") String trackNo);
+
+    List<TabTrackInfo> getTrackInfoList(Map<String, Object> param);
+
+    Integer getTrackInfoListCount(Map<String, Object> param);
 
 }
