@@ -92,7 +92,8 @@
     email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com'  AND  email NOT LIKE '%@sourcing-cn.com'  AND
     email NOT LIKE '%@china-synergy'  AND email != 'sb33@gmail.com'  AND email != 'sbtest@gmail.com'  AND
     email NOT LIKE '%@qq.com' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-    email NOT LIKE 'zhouxueyun%' and email not like 'xielulu%');
+    email NOT LIKE 'zhouxueyun%' and email not like 'xielulu%')
+    order by creatime desc
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
