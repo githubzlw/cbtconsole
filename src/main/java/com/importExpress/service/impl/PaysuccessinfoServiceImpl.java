@@ -10,8 +10,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -95,6 +97,8 @@ public class PaysuccessinfoServiceImpl implements PaysuccessinfoService {
     }
     @Override
     public List<Paysuccessinfo> queryPaySuccessInfoList(String pageStr,String limitNumStr,String sttime,String edtime,String userIdStr,String orderNo,Integer userId){
+        //格式化 日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int startNum = 0;
         int limitNum = 50;
 
@@ -116,6 +120,7 @@ public class PaysuccessinfoServiceImpl implements PaysuccessinfoService {
         }
         PaysuccessinfoExample example = new PaysuccessinfoExample();
         PaysuccessinfoExample.Criteria criteria = example.createCriteria();
+        String orderByClause = example.getOrderByClause();
         criteria.andDelEqualTo(0);
         List<Integer> userIdList = new ArrayList<>();
         if (StringUtils.isNotBlank(userIdStr)) {
@@ -131,9 +136,25 @@ public class PaysuccessinfoServiceImpl implements PaysuccessinfoService {
         if(userIdList.size() > 0){
             criteria.andUseridIn(userIdList);
         }
+        if(StringUtils.isNotBlank(orderNo)){
+            orderNo = orderNo.replaceAll("\\s*","");
+            criteria.andOrdernoEqualTo(orderNo);
+        }
+        Date sTime = null;
+        Date eTime = null;
+        try {
+            sTime = sdf.parse(sttime);
+            eTime = sdf.parse(edtime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        criteria.andCreatimeGreaterThan(sTime);
+        criteria.andCreatimeLessThan(eTime);
+        if(StringUtils.isNotBlank(userIdStr)){
+            userIdStr = userIdStr.replaceAll("\\s*","");
+            criteria.andUseridEqualTo(Integer.parseInt(userIdStr));
+        }
         List<Paysuccessinfo> paysuccessinfoList = paysuccessinfoMapper.selectByExample(example);
-        //格式化 日期
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         paysuccessinfoList.stream().forEach(e ->{
             e.setCreatimeStr(sdf.format(e.getCreatime()));
             switch (e.getSampleschoice()){
