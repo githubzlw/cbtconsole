@@ -620,17 +620,33 @@ function reFreshoDate() {
         });
 	}
 	function delOrderinfo(orderno,that){
-		$.ajax({
-			type:"POST",
-			url:'/cbtconsole/order/delOrderinfo',
-			data:{orderno:orderno},
-			success:function(data) {
-				if(data == 1){
-					alert("删除成功!");
-					$('#tr_'+orderno).hide();
-				}else{
-					alert("删除失败");
-				}
+		//搞一个确认弹窗
+		$.dialog({
+			title : '删除订单',
+			content : "是否标记该订单在该页面不在显示",
+			max : false,
+			min : false,
+			lock : true,
+			drag : false,
+			fixed : true,
+			ok : function() {
+				$.ajax({
+					type:"POST",
+					url:'/cbtconsole/order/delOrderinfo',
+					data:{orderno:orderno},
+					success:function(data) {
+						if(data == 1){
+							$.dialog.alert("Message",orderno + ' 删除成功 ! ');
+							$('#tr_'+orderno).hide();
+						}else{
+							$.dialog.alert("Message",orderno + ' 删除失败 ! ');
+						}
+					}
+				});
+			},
+			cancel : function() {
+				return;
 			}
 		});
+
 	}
