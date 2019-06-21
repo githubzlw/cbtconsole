@@ -547,7 +547,7 @@
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">VIP级别：</span><span
-                        style="color:red;">${order.grade}</span>
+                        style="color:red;">${order.gradeName} ${order.grade}</span>
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">订单重量(kg)：</span><span><span
@@ -615,7 +615,7 @@
                             -${order.gradeName}<span class="ormtittdred">（${order.gradeDiscount}） </span>
                         </c:if>
                         <c:if test="${firstdiscount>0}">
-                            -首单优惠<span class="ormtittdred">（${firstdiscount}） </span>
+                            -首单运费抵扣<span class="ormtittdred">（${firstdiscount}） </span>
                         </c:if>
                         =<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
                             value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount-order.couponAmount) >0 ?
