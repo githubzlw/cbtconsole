@@ -196,7 +196,7 @@ function fnGetStatistic() {
             if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest'>" + json[i].counts + "</a>");//建议替换
             if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
             // if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy'>" + json[i].counts + "</a>");//出运
-            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
+            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html?warning=0'>" + json[i].counts + "</a>");//出运中但物流预警数据
             // if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
             if (json[i].state == "purchasewarning") $("#purchasewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchasewarning'>" + json[i].counts + "</a>");//采购预警项目
             if (json[i].state == "storagewarning") $("#storagewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=storagewarning'>" + json[i].counts + "</a>");//入库预警项目
@@ -228,7 +228,7 @@ function fnGetStatistic() {
 						if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//建议替换
                         if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
 						// if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//出运
-			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
+			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html?warning=0'>" + json[i].counts + "</a>");//出运中但物流预警数据
 						// if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
 						if (json[i].state == "purchasewarning") $("#purchasewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchasewarning&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//采购预警项目
 						if (json[i].state == "storagewarning") $("#storagewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=storagewarning&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//入库预警项目

@@ -14,14 +14,15 @@ import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
+import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.thread.DeleteImgByMd5Thread;
-import com.importExpress.utli.ImageCompressionByNoteJs;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import okhttp3.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,16 +40,19 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import sun.misc.BASE64Decoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/editc")
@@ -60,9 +64,9 @@ public class EditorController {
     private DecimalFormat format = new DecimalFormat("#0.00");
 
     private FtpConfig ftpConfig = GetConfigureInfo.getFtpConfig();
-    // 重量清洗的访问路径
-//	public static final String SHOPGOODSWEIGHTCLEARURL = "http://127.0.0.1:8080/checkimage/clear/shopGoodsWeight?";
-    public static final String SHOPGOODSWEIGHTCLEARURL = "http://192.168.1.31:8080/checkimage/clear/shopGoodsWeight?";
+
+    // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
+    private static final String OCR_URL = "http://192.168.1.251:5000/photo";
 
     @Autowired
     private CustomGoodsService customGoodsService;
@@ -493,7 +497,7 @@ public class EditorController {
                 List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
                 List<ImportExSkuShow> cbSkus = GoodsInfoUtils.combineSkuList(typeList, skuList);
 
-                Collections.sort(cbSkus,Comparator.comparing(ImportExSkuShow::getEnType));
+                Collections.sort(cbSkus, Comparator.comparing(ImportExSkuShow::getEnType));
                 mv.addObject("showSku", JSONArray.fromObject(cbSkus));
 
                 Map<String, Object> typeNames = new HashMap<String, Object>();
@@ -775,12 +779,18 @@ public class EditorController {
                 // 不校检商品属性
                 cgp.setEndetail("[]");
             }
-            if (!(contentStr == null || "".equals(contentStr))) {
-                // 产品详情
-                String eninfo = contentStr.replaceAll(remotepath, "");
-                //解析和上传阿里商品的图片
-                eninfo = uploadAliImgToLocal(pidStr, eninfo);
-                cgp.setEninfo(eninfo);
+            if (StringUtils.isNotBlank(contentStr)) {
+                if(contentStr.contains("data:image/png;base64")){
+                    json.setOk(false);
+                    json.setMessage("详情存在截屏图片，不能保存！");
+                    return json;
+                } else{
+                    // 产品详情
+                    String eninfo = contentStr.replaceAll(remotepath, "");
+                    //解析和上传阿里商品的图片
+                    eninfo = uploadAliImgToLocal(pidStr, eninfo);
+                    cgp.setEninfo(eninfo);
+                }
             } else {
                 json.setOk(false);
                 json.setMessage("获取商品详情失败");
@@ -1019,12 +1029,12 @@ public class EditorController {
                             json.setOk(false);
                             json.setMessage("数据已经保存成功，离上次发布小于15分钟，不能发布");
                         } else {
-                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
+                            PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
                             pbThread.start();
                             json.setMessage("更新成功,异步上传图片中，请等待");
                         }
                     } else {
-                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg());
+                        PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pidStr, customGoodsService, ftpConfig, cgp.getIsUpdateImg(), editBean.getAdmin_id());
                         pbThread.start();
                         json.setMessage("更新成功,异步上传图片中，请等待");
                     }
@@ -1672,7 +1682,7 @@ public class EditorController {
                         }
                     }
                 }
-                if(imgList.size() > 0){
+                if (imgList.size() > 0) {
                     json.setData(imgList);
                 }
             }
@@ -1884,10 +1894,10 @@ public class EditorController {
                         }
                     }
                     tempEninfo = nwDoc.toString();
-                } else{
+                } else {
                     tempEninfo = eninfo;
                 }
-            } else{
+            } else {
                 tempEninfo = "";
             }
         } catch (Exception e) {
@@ -3266,7 +3276,7 @@ public class EditorController {
 
             for (String pid : allList) {
                 if (StringUtils.isNotBlank(pid)) {
-                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1);
+                    PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
                     pbThread.start();
                     try {
                         Thread.sleep(40000);
@@ -3373,9 +3383,9 @@ public class EditorController {
         // 格式  (pid:)xx;(imgUrl:)xx@(pid:)xx;(imgUrl:)xx 例如
         // 123;https://img.import-express.com/123.jpg@456;https://img.import-express.com/456.jpg
         String pidImgList = request.getParameter("pidImgList");
-        if (StringUtils.isBlank(pidImgList)){
+        if (StringUtils.isBlank(pidImgList)) {
             try {
-                pidImgList=(String)session.getAttribute("pidImgList");
+                pidImgList = (String) session.getAttribute("pidImgList");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -3478,6 +3488,101 @@ public class EditorController {
         return json;
     }
 
+    @RequestMapping("/changeChineseImgToEnglishImg")
+    @ResponseBody
+    public JsonResult changeChineseImgToEnglishImg(HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+        try {
+            String pid = request.getParameter("pid");
+            String imgUrl = request.getParameter("imgUrl");
+            if (StringUtils.isBlank(pid) || StringUtils.isBlank(imgUrl)) {
+                json.setOk(false);
+                json.setMessage("获取参数异常！");
+                return json;
+            }
+
+            // 下载图片到本地
+            if (ftpConfig == null) {
+                ftpConfig = GetConfigureInfo.getFtpConfig();
+            }
+            String suffixName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
+            // String imgPrePath = imgUrl.substring(0, imgUrl.lastIndexOf("/"));
+            // String remotePath = GoodsInfoUtils.changeRemotePathToLocal(imgPrePath);
+            String prePath = ftpConfig.getLocalDiskPath() + "importimg/" + pid + "/desc/";
+            String pidEnInfoFile = prePath + suffixName;
+            boolean isDown = ImgDownByOkHttpUtils.downFromImgServiceWithApache(imgUrl, pidEnInfoFile);
+            // 重试一次
+            if (!isDown) {
+                isDown = ImgDownByOkHttpUtils.downFromImgServiceWithApache(imgUrl, pidEnInfoFile);
+            }
+            File imgFile = new File(pidEnInfoFile);
+            if (isDown && imgFile.exists() && imgFile.isFile()) {
+                // 调用替换中文图片到英文图片的接口
+                OkHttpClient client = OKHttpUtils.getClientInstence();
+
+                String imageType = "image/jpg";
+                RequestBody fileBody = RequestBody.create(MediaType.parse(imageType), imgFile);
+                MultipartBody body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", imgFile.getName(), fileBody)
+                        .build();
+                Request okHttpRequest = new Request.Builder().addHeader("Accept", "*/*").addHeader("Connection", "close")
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                        .post(body)
+                        .url(OCR_URL)
+                        .build();
+
+                Response okHttpResponse = client.newCall(okHttpRequest).execute();
+                if (okHttpResponse.isSuccessful()) {
+                    // 本地生成新的文件
+                    Random random = new Random();
+                    String fileSuffix = imgUrl.substring(imgUrl.lastIndexOf("."));
+                    String saveFilename = makeFileName(String.valueOf(random.nextInt(1000)));
+                    String changeLocalFilePath = prePath + saveFilename + fileSuffix;
+
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    FileUtils.writeByteArrayToFile(new File(changeLocalFilePath), decoder.decodeBuffer(okHttpResponse.body().byteStream()));
+
+                    File checkFile = new File(changeLocalFilePath);
+                    if (checkFile.exists() && checkFile.isFile()) {
+                        /*boolean isSuccess = UploadByOkHttp.uploadFile(checkFile, remotePath);
+                        if (!isSuccess) {
+                            isSuccess = UploadByOkHttp.uploadFile(checkFile, remotePath);
+                        }
+                        if (isSuccess) {
+                            //返回新的链接
+                            json.setData(imgPrePath + "/" + saveFilename + fileSuffix);
+                            json.setOk(true);
+                        } else {
+                            json.setOk(false);
+                            json.setMessage("上传新的文件失败");
+                        }*/
+
+                        json.setData(ftpConfig.getLocalShowPath() + "importimg/" + pid + "/desc/" + saveFilename + fileSuffix);
+                        json.setOk(true);
+                    } else {
+                        json.setOk(false);
+                        json.setMessage("获取新文件失败");
+                    }
+                } else {
+                    json.setOk(false);
+                    json.setMessage("调用转换接口失败");
+                }
+            } else {
+                json.setOk(false);
+                json.setMessage("下载图片失败,请重试");
+                return json;
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("changeChineseImgToEnglishImg", e);
+            json.setOk(false);
+            json.setMessage("changeChineseImgToEnglishImg error:" + e.getMessage());
+        }
+        return json;
+    }
 
     private void deleteAndUpdateGoodsImg(CustomGoodsPublish gd, List<GoodsMd5Bean> md5BeanList) {
         try {

@@ -55,10 +55,21 @@
 </style>
 <script type="text/javascript">
 	$(function() {
+	    genYearSelect();
 		setDatagrid();
 		var opts = $("#ocb_main-datagrid").datagrid("options");
 		opts.url = "/cbtconsole/basicStatistical/orderCancel";
 	});
+	function genYearSelect() {
+        var mydate = new Date();
+        var rYear = mydate.getFullYear();
+        $("#ocb_rYear").empty();
+        var content = "";
+        for (var yr = 2016; yr <= rYear; yr++) {
+            content += "<option value='" + yr + "'>" + yr + "</option>";
+        }
+        $("#ocb_rYear").append(content);
+    }
 	function setDatagrid() {
 		$('#ocb_main-datagrid').datagrid({
 			title : '订单取消(全部或部分)详情',

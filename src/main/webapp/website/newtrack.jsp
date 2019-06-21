@@ -470,7 +470,32 @@
                 Returngoods();
             });
         }
+        function AddOll() {
+            var tbOrder = this.$("#select_id option:selected").val();
+            var cusorder = $('#cuso').text();
+            //alert(cusorder)
+            var returnNO = $("input[name='radioname']checked").val();
+            var isAutoSend = document.getElementsByName('radioname');
+            for (var i = 0; i < isAutoSend.length; i++) {
+                if (isAutoSend[i].checked == true) {
+                    returnNO = isAutoSend[i].value;
+                }
+            }
+            //alert(returnNO)
+            $.post("/cbtconsole/Look/AddRetAllOrder", {
+                cusorder: cusorder, tbOrder: tbOrder, returnNO: returnNO
+            }, function (res) {
+                if (res.rows == 1) {
+                    alert('退货成功');
+                    $("#th" + cusorder).html("");
+                    $("#th" + cusorder).append("最后退货时间" + res.footer);
+                } else {
+                    alert('不可重复退单');
+                }
 
+                getItem();
+            });
+        }
 
 	</script>
 </head>
@@ -496,15 +521,16 @@
 	</div>
 	<div style="margin:20px 0 20px 40px;">
 		<input class="but_color" type="button" value="提交申请" onclick="addUserRemark()">
-		   部分退单选择此按钮，全单退可以使用下方按钮
+		   <%--部分退单选择此按钮，全单退可以使用下方按钮--%>
 	</div>
-	<div style="margin:20px 0 20px 40px;">
-		1688订单：<input class="but_color" type="button" value="整单提交" onclick="AddOll()">
-		<input type='radio' size='5' name='radioname' value='客户退单' id='c'/>客户退单
-		<input type='radio' size='5' name='radioname' value='质量问题' id='c'/>质量问题
-		<input type='radio' size='5' name='radioname' value='客户要求' id='c'/>客户要求
-	</div>
+	<%--<div style="margin:20px 0 20px 40px;">--%>
+		<%--1688订单：<input class="but_color" type="button" value="整单提交" onclick="AddOll()">--%>
+		<%--<input type='radio' size='5' name='radioname' value='客户退单' id='c'/>客户退单--%>
+		<%--<input type='radio' size='5' name='radioname' value='质量问题' id='c'/>质量问题--%>
+		<%--<input type='radio' size='5' name='radioname' value='客户要求' id='c'/>客户要求--%>
+	<%--</div>--%>
 </div>
+
 
 <div id="operatediv" class="loading" style="display: none;"></div>
 <div id="ship" class="ship" style="display: none;"></div>

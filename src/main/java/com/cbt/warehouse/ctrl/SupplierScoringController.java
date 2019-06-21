@@ -12,6 +12,7 @@ import com.cbt.warehouse.service.SupplierScoringService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.QueAns;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -106,6 +107,11 @@ public class SupplierScoringController {
 			if (scoringlist == null) {
 				LOG.warn("工厂列表查询为空");
 			}
+			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
+			for(SupplierScoringBean supplierScoringBean :  scoringlist){
+				genShopPrice(supplierScoringBean,shopGoodsSalesAmountList);
+			}
+			shopGoodsSalesAmountList.clear();
 			request.setAttribute("pageInfo", pageInfo);
 			request.setAttribute("shop_id", StringUtil.isBlank(shop_id)?"":shop_id);
 			//合作过的供应商
@@ -125,6 +131,16 @@ public class SupplierScoringController {
 		}
 		return "supplierscoring";
 	}
+
+	private void genShopPrice(SupplierScoringBean supplierScoringBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(supplierScoringBean.getShopId())){
+				supplierScoringBean.setShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
+	}
+
 
 	/**
 	 * 查询供应商下的样品
@@ -159,6 +175,14 @@ public class SupplierScoringController {
 			supplierProductsBeansList=supplierScoringService.getAllShopGoodsInfoList(map);
 			// 2019-6-4 增加显示 入库备注
             warehouseRemarkList = supplierScoringService.queryWarehouseRemarkByShopId(shop_id);
+
+            ShopGoodsSalesAmount salesAmount = customGoodsService.queryShopGoodsSalesAmountByShopId(shop_id);
+            if(salesAmount == null){
+            	request.setAttribute("totalPrice", 0);
+			}else{
+            	request.setAttribute("totalPrice", salesAmount.getTotalPrice());
+			}
+
 			request.setAttribute("supplierproducts", supplierproducts);
 			request.setAttribute("supplierProductsBeans",supplierProductsBeans);
 			request.setAttribute("supplierProductsBeansList",supplierProductsBeansList);

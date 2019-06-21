@@ -15,6 +15,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -201,12 +202,26 @@ public class ShopUrlController {
         List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, rows, timeFrom,
                 timeTo, isOn,state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids,
                 translateDescription, isShopFlag, catid);
+        List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
+        for(ShopUrl shopUrlBean :  findAll){
+            genShopPrice(shopUrlBean,shopGoodsSalesAmountList);
+        }
+        shopGoodsSalesAmountList.clear();
         int total = shopUrlService.total(shopId,shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
                 authorizedFileFlag,ennameBrandFlag,shopids,translateDescription, isShopFlag, catid);
         json.setRows(findAll);
         json.setTotal(total);
         return json;
     }
+
+    private void genShopPrice(ShopUrl shopUrlBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(shopUrlBean.getShopId())){
+				shopUrlBean.setShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
+	}
     
     /**
      * 方法描述:查询授权

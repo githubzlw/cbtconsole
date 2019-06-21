@@ -78,4 +78,6 @@ public class CustomGoodsQuery {
 	private String shopId;
 	private String chKeyWord;
 
+	private Integer source;
+
 }

@@ -29,7 +29,7 @@ public class ShopGoodsToOnline {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(ShopGoodsToOnline.class);
 	//private static final String SHOWURL = "http://192.168.1.100:8765/editimg/shopimg/";
 	//private static final String SHOWURL = "http://192.168.1.219:8765/editimg/shopimg/";
-	private static final String SHOWURL = "http://img1.import-express.com/importcsvimg/shopimg/";
+	private static final String SHOWURL = "https://img.import-express.com/importcsvimg/shopimg/";
 	private String chineseChar = "([\\一-\\龥]+)";
 
 	/**
