@@ -32,7 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,7 +45,7 @@ public class NewOrderSplitCtr {
     @Autowired
     private SendMailFactory sendMailFactory;
     @Autowired
-	private IOrderinfoService iOrderinfoService;
+    private IOrderinfoService iOrderinfoService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -263,7 +262,7 @@ public class NewOrderSplitCtr {
             // 查询订单和订单详情
             OrderBean orderBean = splitDao.getOrders(orderNo);
             // 获取新的订单号
-            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo,orderBean, 0);
+            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
             // 需要取消的商品order_details的id
             String[] odidLst = odids.split("@");
             // 1.拆单之前保存订单原始信息 log
@@ -376,8 +375,8 @@ public class NewOrderSplitCtr {
 
             // 拆分比例
             double splitRatio = totalGoodsCostNew / totalGoodsCostOld;
-            OrderBean odbeanNew = OrderInfoUtil.genNewOrderInfo(orderBean ,orderBeanTemp,splitRatio,nwOrderNo,
-                                  totalGoodsCostOld,  nwOrderDetails);
+            OrderBean odbeanNew = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, nwOrderNo,
+                    totalGoodsCostOld, nwOrderDetails);
 
             // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
             List<OrderBean> orderBeans = new ArrayList<OrderBean>();
@@ -408,7 +407,7 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
         // 开始执行拆单
-        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state);
+        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state, 0);
         if (!isOk) {
             json.setOk(false);
             json.setMessage("拆分失败请重试");
@@ -462,12 +461,18 @@ public class NewOrderSplitCtr {
     @ResponseBody
     public JsonResult splitGoodsByNum(HttpServletRequest request) {
         JsonResult json = new JsonResult();
+        String orderNo = request.getParameter("orderNo");
+        String odIds = request.getParameter("odIds");
         try {
-            String orderNo = request.getParameter("orderNo");
-            String odIds = request.getParameter("odIds");
+
             if (StringUtils.isNotBlank(orderNo) || StringUtils.isNotBlank(odIds)) {
                 json.setOk(false);
                 json.setMessage("获取拆单数据失败");
+                return json;
+            } else if (orderNo.contains("SN")) {
+                json.setOk(false);
+                json.setMessage("数量拆单数据，不允许再次拆单");
+                return json;
             }
 
             Admuser admuser = UserInfoUtils.getUserInfo(request);
@@ -478,8 +483,8 @@ public class NewOrderSplitCtr {
             }
 
             // 判断是否是Drop Ship订单，根据订单号获取订单信息
-            OrderInfoDao orderInfoDao = new OrderInfoImpl();
-            OrderBean orderBean = orderInfoDao.getOrderInfo(orderNo, null);
+            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+            OrderBean orderBean = splitDao.getOrders(orderNo);
             if (orderBean.getIsDropshipOrder() == 1) {
                 // Drop Ship 拆单，不可数量拆单
                 json.setOk(false);
@@ -489,26 +494,27 @@ public class NewOrderSplitCtr {
 
             JSONArray jsonArray = JSONArray.fromObject(odIds);
             List<SplitGoodsNumBean> splitIdList = (List<SplitGoodsNumBean>) JSONArray.toCollection(jsonArray, SplitGoodsNumBean.class);
-            if(splitIdList == null || splitIdList.isEmpty()){
+            if (splitIdList == null || splitIdList.isEmpty()) {
                 json.setOk(false);
                 json.setMessage("转换拆单数据失败");
                 return json;
             }
             OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
-            if(orderInfo.getState() != 5){
+            if (orderInfo.getState() != 5) {
                 json.setOk(false);
                 json.setMessage("订单状态非审核状态，不能拆单");
                 return json;
             }
             // 1.获取原来数据,并进行数据处理
             List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
+            List<OrderDetailsBean> nwOrderDetails = new ArrayList<>(splitIdList.size());
             // 生成新的OrderDetailsBean数据
-            Map<Integer,OrderDetailsBean> oldOrderDeatisMap = new HashMap<>(odbList.size());
+            Map<Integer, OrderDetailsBean> oldOrderDeatisMap = new HashMap<>(odbList.size());
             double oldTotalGoodsCost = 0;
             double newTotalGoodsCost = 0;
-            for(SplitGoodsNumBean goodsNumBean :  splitIdList){
-                for(OrderDetailsBean orderDetail :  odbList){
-                    if(orderDetail.getId() == goodsNumBean.getOdId()){
+            for (SplitGoodsNumBean goodsNumBean : splitIdList) {
+                for (OrderDetailsBean orderDetail : odbList) {
+                    if (orderDetail.getId() == goodsNumBean.getOdId()) {
                         // 保存商品价格和数量信息，放入日志
                         goodsNumBean.setGoodsPrice(Double.valueOf(orderDetail.getGoodsprice()));
                         goodsNumBean.setOldNum(orderDetail.getYourorder());
@@ -516,13 +522,17 @@ public class NewOrderSplitCtr {
                         newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
                         // 执行修改产品数量操作
                         orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
-                        oldOrderDeatisMap.put(orderDetail.getId(),orderDetail);
+                        oldOrderDeatisMap.put(orderDetail.getId(), orderDetail);
+                        //
+                        OrderDetailsBean orderDetailTemp = (OrderDetailsBean) orderDetail.clone();
+                        orderDetailTemp.setYourorder(goodsNumBean.getNum());
+                        nwOrderDetails.add(orderDetailTemp);
                         break;
                     }
                 }
             }
             // 计算拆分产品总价占原总价的百分比
-            if(oldTotalGoodsCost == 0  || newTotalGoodsCost == 0){
+            if (oldTotalGoodsCost == 0 || newTotalGoodsCost == 0) {
                 json.setOk(false);
                 json.setMessage("订单商品计算总价失败");
                 return json;
@@ -530,25 +540,31 @@ public class NewOrderSplitCtr {
             double splitRatio = newTotalGoodsCost / oldTotalGoodsCost;
             // 2.新的订单数据
             // 复制订单信息充当临时订单
-                OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
-            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo,orderBean,1);
-//            OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo( orderBean, orderBeanTemp, splitRatio,  newOrderNo,
-//                    oldTotalGoodsCost,  nwOrderDetails);
+            OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
+            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 1);
+            OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, newOrderNo,
+                    oldTotalGoodsCost, nwOrderDetails);
 
-
+            // 3.开始执行拆单
+            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
+            if (!isOk) {
+                json.setOk(false);
+                json.setMessage("拆分失败请重试");
+            } else {
+                // 更新订单的状态
+                // splitDao.checkAndUpdateOrderState(orderNo, newOrderNo);
+            }
+            json.setOk(true);
 
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("splitGoodsByNum error:", e);
             json.setOk(false);
-            json.setMessage("splitGoodsByNum error:" + e.getMessage());
+            json.setMessage("orderNo:" + orderNo + ",splitGoodsByNum error:" + e.getMessage());
         }
         return json;
     }
 
-
-
-    
 
     /**
      * 获取订单拆分后的邮件信息
@@ -599,12 +615,12 @@ public class NewOrderSplitCtr {
                     // 获取运输方式和对应的运输时间
                     String mode_transport = oldOrderBean.getMode_transport();
                     int mode_transport_day = 0;
-                    if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+                    if (mode_transport != null && mode_transport.contains("@")) {
                         String[] mode_transports = mode_transport.split("@");
                         if (mode_transports.length > 3) {
                             mode_transport = mode_transport.split("@")[1];
                             if (Utility.getStringIsNull(mode_transport)) {
-                                if (mode_transport.indexOf("-") > -1) {
+                                if (mode_transport.contains("-")) {
                                     mode_transport = mode_transport.split("-")[1];
                                 }
                                 mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
@@ -720,12 +736,12 @@ public class NewOrderSplitCtr {
                         // 获取运输方式和对应的运输时间
                         String mode_transport = orderBeans.get(i).getMode_transport();
                         int mode_transport_day = 0;
-                        if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+                        if (mode_transport != null && mode_transport.contains("@")) {
                             String[] mode_transports = mode_transport.split("@");
                             if (mode_transports.length > 3) {
                                 mode_transport = mode_transport.split("@")[1];
                                 if (Utility.getStringIsNull(mode_transport)) {
-                                    if (mode_transport.indexOf("-") > -1) {
+                                    if (mode_transport.contains("-")) {
                                         mode_transport = mode_transport.split("-")[1];
                                     }
                                     mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
@@ -868,7 +884,7 @@ public class NewOrderSplitCtr {
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {
-            LOG.error("genOrderSplitEmail",e);
+            LOG.error("genOrderSplitEmail", e);
             LOG.error("genOrderSplitEmail:" + e.getMessage());
         }
         LOG.info("getOrderSplit sendEmailInfo end");

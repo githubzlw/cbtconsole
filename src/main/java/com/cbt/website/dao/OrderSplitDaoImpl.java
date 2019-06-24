@@ -2952,7 +2952,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 	@SuppressWarnings("resource")
 	@Override
 	public boolean newOrderSplitFun(OrderBean orderBeanTemp, OrderBean odbeanNew,
-	                                List<OrderDetailsBean> nwOrderDetails,String state) {
+	                                List<OrderDetailsBean> nwOrderDetails,String state, int isSplitNum) {
 
 		String orderNoOld = orderBeanTemp.getOrderNo();
 		Connection remoteConn = DBHelper.getInstance().getConnection2();
@@ -2961,7 +2961,8 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		Statement wStamt = null;
 		Statement localStamt = null;
 		boolean isSuccess = false;
-		List<String> sqlList = new ArrayList<String>();// 执行SQL队列
+		// 远程执行SQL队列
+		List<String> remoteSqlList = new ArrayList<String>();
 		StringBuffer insertOrderSql = new StringBuffer();
 		// 插入新的订单信息SQL
 		insertOrderSql.append("insert into orderinfo")
@@ -2989,7 +2990,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				.append(" as coupon_discount," + odbeanNew.getGradeDiscount() + " as grade_discount,"+odbeanNew.getExchange_rate()+","+odbeanNew.getProcessingfee()+" as processingfee")
 				.append(" from orderinfo where order_no = '" + orderNoOld + "'");
 
-		sqlList.add(insertOrderSql.toString());
+		remoteSqlList.add(insertOrderSql.toString());
 		insertOrderSql = null;
 		// 更新原订单的商品总价，支付金额和折扣金额
 		String updateOrSql = "update orderinfo set product_cost='" + orderBeanTemp.getProduct_cost() + "',pay_price="
@@ -3002,11 +3003,11 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ ",processingfee=" + orderBeanTemp.getProcessingfee()
 				+ " where order_no = '"
 				+ orderBeanTemp.getOrderNo() + "'";
-		sqlList.add(updateOrSql);
+		remoteSqlList.add(updateOrSql);
 		updateOrSql = null;
 		// 删除订单地址SQL
 		String deleteAddressSql = "delete from order_address  where orderNo= '" + odbeanNew.getOrderNo() + "'";
-		sqlList.add(deleteAddressSql);
+		remoteSqlList.add(deleteAddressSql);
 		deleteAddressSql = null;
 		// 复制原订单地址信息并更新订单号到新订单
 		String insertAddressSql = "insert into  order_address"
@@ -3014,12 +3015,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "admUserID, street, recipients) select  AddressID, '" + odbeanNew.getOrderNo()
 				+ "' as orderNo, Country, statename, address, address2, phoneNumber, zipcode, Adstatus, Updatetimr, "
 				+ "admUserID, street, recipients from order_address where orderNo='" + orderNoOld + "'";
-		sqlList.add(insertAddressSql);
+		remoteSqlList.add(insertAddressSql);
 		insertAddressSql = null;
 
 		// 补充新的支付信息
 		String deletePaymentSql = "delete from payment where payment.orderid='" + odbeanNew.getOrderNo() + "'";
-		sqlList.add(deletePaymentSql);
+		remoteSqlList.add(deletePaymentSql);
 		deletePaymentSql = null;
 		String insertPaymentSql = "insert into payment(userid,orderid,paymentid,payment_amount,"
 				+ "payment_cc,orderdesc,username,paystatus,createtime,paySID,payflag,paytype,"
@@ -3028,10 +3029,12 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 				+ "' as payprice_new,payment_cc,'order split' as orderdesc,username,"
 				+ "paystatus,NOW(),paySID,payflag,3 as paytype,3 as payment_other,paymentno,"
 				+ "0 as transaction_fee from payment where orderid='" + orderNoOld + "' limit 1";
-		sqlList.add(insertPaymentSql);
+		remoteSqlList.add(insertPaymentSql);
 		insertPaymentSql = null;
 
-		List<String> localSqlList = new ArrayList<String>();// 本地执行SQL队列
+		// 本地执行SQL队列
+		List<String> localSqlList = new ArrayList<String>();
+
 		String localSql ="update id_relationtable set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
 				+ orderNoOld + "' and goodid in(" ;
 		String localSql1 ="update goods_distribution set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
@@ -3044,13 +3047,40 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 		for (OrderDetailsBean oddsb : nwOrderDetails) {
 			insert_split_details +="(";
-			// 更新order_details表原订单号到新的订单号
-			String updateChange = "update order_details set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
-					+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
-			sqlList.add(updateChange);
+
+			if(isSplitNum == 0){
+				// 正常普通订单商品
+				// 更新order_details表原订单号到新的订单号
+				String orderDetails = "update order_details set orderid='" + odbeanNew.getOrderNo() + "' where orderid='"
+						+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				remoteSqlList.add(orderDetails);
+			}else{
+				// 数量拆单商品
+				// 插入新的订单详情
+				String orderDetails = "insert into order_details(userid, goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
+						"delivery_time, yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, checkprice_fee, checkproduct_fee, " +
+						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
+						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
+						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio, " +
+						"flag, goodscatid, isAuto,buy_for_me, isFeight, checked, " +
+						"seilUnit, picturepath, car_urlMD5,goods_pid, guid, startPrice," +
+						"bizPriceDiscount, group_buy_id, isFreeShipProduct,is_stock_flag, shopCount)" +
+						" select userid, goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
+						"delivery_time, "+oddsb.getYourorder()+" as yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, " +
+						"checkprice_fee, checkproduct_fee," +
+						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
+						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
+						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio," +
+						"flag, goodscatid, isAuto,buy_for_me, isFeight, checked,seilUnit, picturepath, " +
+						"car_urlMD5,goods_pid, guid, startPrice,bizPriceDiscount, group_buy_id, isFreeShipProduct,is_stock_flag, shopCount " +
+						" where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				remoteSqlList.add(orderDetails);
+			}
+
 			// 更新order_change表信息
-			updateChange = "update order_change set orderNo='" + odbeanNew.getOrderNo() + "' where orderNo='"
+			String updateChange = "update order_change set orderNo='" + odbeanNew.getOrderNo() + "' where orderNo='"
 					+ orderNoOld + "' and goodid=" + oddsb.getGoodsid();
+			remoteSqlList.add(updateChange);
 			//采购补货的订单号更新
 			String orderReplenishment = "update order_replenishment set orderid = '"+ odbeanNew.getOrderNo() +"' where orderid = '"
 					+ orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
@@ -3060,16 +3090,17 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 			String order_product_source_sql = "update order_product_source set orderid='" + odbeanNew.getOrderNo() + "' where orderid = '" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 			localSqlList.add(order_product_source_sql);
 
-			sqlList.add(updateChange);
+
 			// 替换拆单的入库商品单号
 			tempSql += "," + oddsb.getGoodsid();
 			insert_split_details += "'"+oddsb.getGoodsid()+"','"+odbeanNew.getOrderNo()+"'),";
 //			insert_split_details += ")";
-			sqlList.add(updateChange);
 			updateChange = null;
 			String inspection_pictureSql = "update inspection_picture set orderid = '"+ odbeanNew.getOrderNo()
 					+"' where orderid = '"+ orderNoOld  +"' and goods_id="+oddsb.getGoodsid()+"";
-			sqlList.add(inspection_pictureSql);
+			if(isSplitNum > 0){
+				remoteSqlList.add(inspection_pictureSql);
+			}
 			localSqlList.add(inspection_pictureSql);
 		}
 		insert_split_details=insert_split_details.substring(0,insert_split_details.length()-1)+";";
@@ -3086,7 +3117,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 			remoteConn.setAutoCommit(false);
 			ppStamt = remoteConn.createStatement();
 			System.err.println("exSql begin");
-			for (String exSql : sqlList) {
+			for (String exSql : remoteSqlList) {
 				System.err.println(exSql + ";");
 				ppStamt.addBatch(exSql);
 			}

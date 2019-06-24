@@ -172,14 +172,14 @@ public class OrderInfoUtil {
                 String[] n = orderNo.split("_");
                 orderNo1 = n[0];
                 if (isSplitNum > 0) {
-                    nwOrderNo = orderNo1 + "N_" + (splitIndex + 1);
+                    nwOrderNo = orderNo1 + "_" + (splitIndex + 1) + "_SN";
                 } else {
                     nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
                 }
             }
         } else {
             if (isSplitNum > 0) {
-                nwOrderNo = orderNo + "N_1";
+                nwOrderNo = orderNo + "_1_SN";
             } else {
                 nwOrderNo = orderNo + "_1";
             }
@@ -187,7 +187,7 @@ public class OrderInfoUtil {
             if (maxSplitOrderNo.contains("_")) {
                 int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
                 if (isSplitNum > 0) {
-                    nwOrderNo = orderNo + "N_" + (splitIndex + 1);
+                    nwOrderNo = orderNo + "_" + (splitIndex + 1) + "_SN";
                 } else {
                     nwOrderNo = orderNo + "_" + (splitIndex + 1);
                 }
