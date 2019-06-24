@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.cbt.warehouse.pojo.*;
+import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1977,6 +1978,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public int updateSizeChartById_add(List<Integer> rowidArray,int userid) {
 		return pruchaseMapper.updateSizeChartById_add(rowidArray,userid);
 	}
+
+	@Override
+	public List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo) {
+		return pruchaseMapper.queryOrderProductSourceByOrderNo(orderNo);
+	}
+
 	@Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);
