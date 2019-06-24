@@ -13,6 +13,8 @@
 <body>
  <a href="/cbtconsole/supplierscoring/querySupplierScoringList?flag=1">返回供应商列表页</a>
  <a target="_blank" href="/cbtconsole/website/shopBuyLog.jsp?shopId=${param.shop_id}">查看该供应商采购历史</a>
+ <br> <br>
+ <b style="color: #E91E63;">店铺售卖金额($):${totalPrice}</b>
  				<br /><br />
  				<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>
 	    		<input type="radio" name="flag" value="0">所有的</input>

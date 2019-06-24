@@ -140,6 +140,8 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
                 //否则插入或者更新SingleOffersChild信息
                 customGoodsDao.insertIntoSingleOffersChild(bean.getPid(), Double.valueOf(bean.getFinalWeight()));
             }*/
+        }else{
+            customGoodsMapper.insertIntoGoodsImgUpLog(bean.getPid(),"",bean.getAdminId(),"publish error");
         }
         return res;
     }
@@ -602,7 +604,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public List<CustomGoodsPublish> queryGoodsByPidList(List<String> pidList) {
-        return customGoodsMapper.queryGoodsByPidList(pidList);
+        if(pidList != null && pidList.size() > 0){
+            return customGoodsMapper.queryGoodsByPidList(pidList);
+        }else{
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -737,7 +743,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         }
         double finalWeight = 0;
         for (ImportExSku exSku : skuList) {
-            if (checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+            if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
                 finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
                 exSku.setFianlWeight(finalWeight);
                 if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
@@ -789,6 +795,21 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int queryGoodsShowInfosCount(CustomGoodsQuery queryBean) {
         return customGoodsMapper.queryGoodsShowInfosCount(queryBean);
+    }
+
+    @Override
+    public List<ShopGoodsSalesAmount> queryShopGoodsSalesAmountAll() {
+        return customGoodsMapper.queryShopGoodsSalesAmountAll();
+    }
+
+    @Override
+    public ShopGoodsSalesAmount queryShopGoodsSalesAmountByShopId(String shopId) {
+        return customGoodsMapper.queryShopGoodsSalesAmountByShopId(shopId);
+    }
+
+    @Override
+    public int insertIntoGoodsImgUpLog(String pid, String imgUrl, int adminId, String remark) {
+        return customGoodsMapper.insertIntoGoodsImgUpLog(pid, imgUrl, adminId, remark);
     }
 
 }

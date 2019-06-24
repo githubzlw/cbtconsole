@@ -4220,7 +4220,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         Connection conn28 = DBHelper.getInstance().getConnection8();
         PreparedStatement stmt28 = null;
 
-        String updateSql = "update custom_benchmark_ready_newest set ali_pid = ?, ali_price = ? where pid = ?";
+        String updateSql = "update custom_benchmark_ready_newest set ali_pid = ?, ali_price = ?,bm_flag = 1 ,isBenchmark = 1 where pid = ?";
         int count = 0;
         try {
             stmt28 = conn28.prepareStatement(updateSql);

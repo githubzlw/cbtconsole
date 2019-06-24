@@ -196,7 +196,7 @@ function fnGetStatistic() {
             if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest'>" + json[i].counts + "</a>");//建议替换
             if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
             // if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy'>" + json[i].counts + "</a>");//出运
-            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
+            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html?warning=0'>" + json[i].counts + "</a>");//出运中但物流预警数据
             // if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
             if (json[i].state == "purchasewarning") $("#purchasewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchasewarning'>" + json[i].counts + "</a>");//采购预警项目
             if (json[i].state == "storagewarning") $("#storagewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=storagewarning'>" + json[i].counts + "</a>");//入库预警项目
@@ -228,7 +228,7 @@ function fnGetStatistic() {
 						if (json[i].state == "suggest") $("#changes").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=suggest&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//建议替换
                         if (json[i].state == "noChange") $("#noChange").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=noChange'>" + json[i].counts + "</a>");//取消替换
 						// if (json[i].state == "cy") $("#onshipping").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=cy&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//出运
-			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html'>" + json[i].counts + "</a>");//出运中但物流预警数据
+			            if (json[i].state == "1") $("#onshippingw").html("<a target=\"_blank\" href='/cbtconsole/website/tab_track_info_list.html?warning=0'>" + json[i].counts + "</a>");//出运中但物流预警数据
 						// if(json[i].state == "ck")$("#allgoods").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&state=2'>" + json[i].counts + "</a>");//到达仓库
 						if (json[i].state == "purchasewarning") $("#purchasewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=purchasewarning&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//采购预警项目
 						if (json[i].state == "storagewarning") $("#storagewarning").html("<a href='/cbtconsole/order/getOrderInfo.do?showUnpaid=0&type=storagewarning&admuserid="+admuserid+"'>" + json[i].counts + "</a>");//入库预警项目
@@ -620,17 +620,33 @@ function reFreshoDate() {
         });
 	}
 	function delOrderinfo(orderno,that){
-		$.ajax({
-			type:"POST",
-			url:'/cbtconsole/order/delOrderinfo',
-			data:{orderno:orderno},
-			success:function(data) {
-				if(data == 1){
-					alert("删除成功!");
-					$('#tr_'+orderno).hide();
-				}else{
-					alert("删除失败");
-				}
+		//搞一个确认弹窗
+		$.dialog({
+			title : '删除订单',
+			content : "是否标记该订单在该页面不在显示",
+			max : false,
+			min : false,
+			lock : true,
+			drag : false,
+			fixed : true,
+			ok : function() {
+				$.ajax({
+					type:"POST",
+					url:'/cbtconsole/order/delOrderinfo',
+					data:{orderno:orderno},
+					success:function(data) {
+						if(data == 1){
+							$.dialog.alert("Message",orderno + ' 删除成功 ! ');
+							$('#tr_'+orderno).hide();
+						}else{
+							$.dialog.alert("Message",orderno + ' 删除失败 ! ');
+						}
+					}
+				});
+			},
+			cancel : function() {
+				return;
 			}
 		});
+
 	}

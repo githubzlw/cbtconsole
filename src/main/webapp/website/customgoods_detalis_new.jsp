@@ -2327,6 +2327,8 @@
             </button>&nbsp;&nbsp;&nbsp;
             <span class="s_btn"
                   onclick="$('#multi_file_dlg').dialog('open');">详情多文件上传</span>
+            &nbsp;&nbsp;&nbsp;<span id="change_img_english" class="s_btn"
+                  onclick="changeChineseImgToEnglishImg(${goods.pid})">替换图片文字为英文</span>
             &nbsp;&nbsp;&nbsp;<span id="use_ali_goods" class="s_btn"
                   onclick="useAliGoodsDetails(${goods.pid})">使用速卖通详情</span>
             <div class="bot_l">
@@ -2352,6 +2354,44 @@
 </c:if>
 </body>
 <script type="text/javascript">
+
+    function changeChineseImgToEnglishImg(pid) {
+        var img = editorObj.getSelect();
+        var imgObj = $(img);
+        var url = imgObj[0].src;
+        if (url) {
+            if (url.indexOf("http") == -1 && url.indexOf("https") == -1) {
+                $.messager.alert("提醒", "获取链接地址错误", "info");
+            } else {
+                $.messager.confirm('提醒', '替换后不可恢复,是否替换?', function (r) {
+                    if (r) {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: '/cbtconsole/editc/changeChineseImgToEnglishImg',
+                            data: {
+                                "pid": pid,
+                                "imgUrl": url
+                            },
+                            success: function (json) {
+                                if (json.ok) {
+                                    var imgNw = '<img src="'+json.data+'"/>';
+                                    editorObj.pasteHTML(imgNw);
+                                } else {
+                                    $.messager.alert("提醒", json.message, "error");
+                                }
+                            },
+                            error: function () {
+                                $.messager.alert("提醒", "连接服务器失败", "error");
+                            }
+                        });
+                    }
+                });
+            }
+        } else {
+            $.messager.alert("提醒", "请选中一张图片", "error");
+        }
+    }
 
     function beforeDeleteMd5(goodsPid, shopId) {
         var img = editorObj.getSelect();
@@ -2382,6 +2422,8 @@
                     }
                 });
             }
+        } else {
+            $.messager.alert("提醒", "请选中一张图片", "error");
         }
     }
 

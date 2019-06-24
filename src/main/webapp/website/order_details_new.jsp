@@ -547,7 +547,7 @@
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">VIP级别：</span><span
-                        style="color:red;">${order.grade}</span>
+                        style="color:red;">${order.gradeName} (${order.grade})</span>
                 </td>
                 <td class="ormtittd">
                     <span class="ormtittd" style="margin-left:100px">订单重量(kg)：</span><span><span
@@ -615,7 +615,7 @@
                             -${order.gradeName}<span class="ormtittdred">（${order.gradeDiscount}） </span>
                         </c:if>
                         <c:if test="${firstdiscount>0}">
-                            -首单优惠<span class="ormtittdred">（${firstdiscount}） </span>
+                            -首单运费抵扣<span class="ormtittdred">（${firstdiscount}） </span>
                         </c:if>
                         =<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
                             value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount-order.couponAmount) >0 ?
@@ -905,15 +905,21 @@
                 <td>客户实际支付金额(￥):</td>
                 <td style="text-align:center;vertical-align:middle;"><span id="pay_price" style="color:red;">-</span>
                 </td>
-                <td rowspan="10">
-                    运输公司:<span style="color:red;" id="transportcompany">-</span>;运输方式:<span style="color:red;"
-                                                                                            id="shippingtype">-</span><br>
+                <%--<td rowspan="10">
+                    运输公司:
+                    <span style="color:red;" id="transportcompany">-</span>;
+                    运输方式:<span style="color:red;" id="shippingtype">-</span><br>
                     预估国际运费=（商品重量和-首重）/续重*续重价格+首重价格<br>
                     录入采购金额=SUM(录入采购额)+产品国内运费<br>
                     实际采购金额=暂无（待上线）<br>
                     根据预估重量预估运费计算预估利润金额RMB（预估利润率%）=客户实际支付金额-实际预估采购金额-预估国际运费<br>
                     根据实际重量预估的运费实际利润金额RMB（实际利润率%）= 客户实际支付金额-录入采购金额-实际重量预估运费<br>
                     根据物流公司运费计算最终利润金额RMB（最终利润率%）= 客户实际支付金额-录入采购金额-最终录入的运费
+                </td>--%>
+                <td>
+                    运输公司:
+                    <span style="color:red;" id="transportcompany">-</span>;
+                    运输方式:<span style="color:red;" id="shippingtype">-</span><br>
                 </td>
             </tr>
             <tr>
@@ -934,6 +940,7 @@
                 <td>实际采购金额(￥):</td>
                 <td style="text-align:center;vertical-align:middle;"><span id="acBuyAmount" style="color:red;">-</span>
                 </td>
+                <td>实际采购金额=暂无（待上线)</td>
             </tr>
             <tr>
                 <td>预计重量(购物车重量)(kg):</td>
@@ -952,6 +959,8 @@
                         ${fn:indexOf(order.mode_transport, "@") > 1 ? fn:split(order.mode_transport,'@')[0]:""}
                     </c:if>)
                 </td>
+                <td>预估国际运费=（商品重量和-首重）/续重*续重价格+首重价格
+                    录入采购金额=SUM(录入采购额)+产品国内运费</td>
             </tr>
             <tr>
                 <td>实际重量预估运费(￥):</td>
@@ -965,23 +974,24 @@
             </tr>
             <tr>
                 <td>根据预估重量预估运费计算预估利润金额(￥)（预估利润率）:</td>
-                <td style="text-align:center;vertical-align:middle;"><span id="es_profit"
-                                                                           style="color:red;">-</span>(<span id="es_p"
-                                                                                                             style="color:red;">-</span>)
+                <td style="text-align:center;vertical-align:middle;"><span id="es_profit" style="color:red;">-</span>(<span id="es_p" style="color:red;">-</span>)
                 </td>
+                <td>根据预估重量预估运费计算预估利润金额RMB（预估利润率%）=客户实际支付金额-实际预估采购金额-预估国际运费</td>
             </tr>
             <tr>
                 <td>根据实际重量预估的运费实际利润金额(￥)（实际利润率）:</td>
                 <td style="text-align:center;vertical-align:middle;width:300px"><span id="ac_profit" style="color:red;">-</span>(<span
                         id="ac_p" style="color:red;">-</span>)
                 </td>
+                <td>根据实际重量预估的运费实际利润金额RMB（实际利润率%）= 客户实际支付金额-录入采购金额-实际重量预估运费</td>
             </tr>
             <tr>
                 <td>根据物流公司运费计算最终利润金额(￥)（最终利润率）:</td>
                 <td style="text-align:center;vertical-align:middle;width:300px"><span id="end_profit"
                                                                                       style="color:red;">-</span>(<span
-                        id="end_p" style="color:red;">-</span>)
+                id="end_p" style="color:red;">-</span>)
                 </td>
+                <td>根据物流公司运费计算最终利润金额RMB（最终利润率%）= 客户实际支付金额-录入采购金额-最终录入的运费</td>
             </tr>
         </table>
     </div>

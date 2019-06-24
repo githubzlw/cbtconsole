@@ -33,7 +33,7 @@ public class SameTypeGoodsJob implements Job {
 	
 	//private static final String SHOWURL = "http://192.168.1.100:8765/editimg/sametype/";
 	//private static final String SHOWURL = "http://192.168.1.29:8765/editimg/sametype/";
-	private static final String SHOWURL = "http://img1.import-express.com/importcsvimg/sametype/";
+	private static final String SHOWURL = "https://img.import-express.com/importcsvimg/sametype/";
 	
 	//private static final String CLEARURL = "http://192.168.1.100:8080/checkimage/clear/sameGoods";
 	private static final String CLEARURL = "http://192.168.1.27:9115/checkimage/clear/sameGoods";

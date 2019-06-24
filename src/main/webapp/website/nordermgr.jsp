@@ -23,6 +23,10 @@
 <script type="text/javascript" src="/cbtconsole/js/website/ordermgr.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript"
+		src="/cbtconsole/js/lhgdialog/lhgdialog.min.js?self=true&skin=discuz"></script>
+<script type="text/javascript"
+		src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 <title>订单管理</title>
 <script type="text/javascript">
 var page = parseInt(<%=request.getAttribute("page")%>, 0);

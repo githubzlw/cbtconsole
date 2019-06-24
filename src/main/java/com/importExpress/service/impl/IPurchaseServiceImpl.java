@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.cbt.warehouse.pojo.*;
+import com.importExpress.mapper.CustomGoodsMapper;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
