@@ -40,6 +40,7 @@ import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -1407,6 +1408,7 @@ public class NewOrderDetailsCtr {
 			json.setMessage("请登录后操作");
 			return json;
 		} else {
+
 			String orderNo = request.getParameter("orderNo");
 			if (orderNo == null || "".equalsIgnoreCase(orderNo)) {
 				json.setOk(false);
@@ -1503,6 +1505,8 @@ public class NewOrderDetailsCtr {
 		JsonResult json = new JsonResult();
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
+		String websiteType= request.getParameter("websiteType");
+		boolean isKidFlag =  "2".equals(websiteType);
 		if (mainOrderNo.equals(orderNo)) {
 			int res = orderwsServer.iscloseOrder(orderNo);
 			if (res > 0) {
@@ -1549,15 +1553,20 @@ public class NewOrderDetailsCtr {
 							"<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
 					sbBuffer.append(
 							"<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-					sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+					sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
 					sbBuffer.append("<br>Thank you for shopping with us.");
 					sbBuffer.append("<br>To review your order status, click ");
 					sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
 					sbBuffer.append("<br><br>Sincerely,");
-					sbBuffer.append("<br>Import-Express Team");
-
-					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
+					if(isKidFlag){
+						sbBuffer.append("<br>Kids-Product-Wholesale Team");
+						SendEmail.send(confirmEmail, null, toEmail, SwitchDomainNameUtil.checkNullAndReplace(sbBuffer.toString()),
+							"Your KidsProductWholesale Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+					} else{
+						sbBuffer.append("<br>Import-Express Team");
+						SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+					}
 
 					// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 					insertChangeRecords(orderNo, -1, adminId);
@@ -1638,12 +1647,17 @@ public class NewOrderDetailsCtr {
 								"<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
 						sbBuffer.append(
 								"<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-						sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+						sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
 						sbBuffer.append("<br>Thank you for shopping with us.");
 						sbBuffer.append("<br>To review your order status, click ");
 						sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
 						sbBuffer.append("<br><br>Sincerely,");
-						sbBuffer.append("<br>Import-Express Team");
+						if(isKidFlag){
+							sbBuffer.append("<br>Import-Express Team");
+						} else{
+							sbBuffer.append("<br>Kids-Product-Wholesale Team");
+						}
+
 
 						//					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
@@ -1653,8 +1667,14 @@ public class NewOrderDetailsCtr {
 						model.put("orderNo",orderNo);
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
+						if(isKidFlag){
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_KID);
+						} else{
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_IMPORT);
+						}
 
-						sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 						// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 						insertChangeRecords(orderNo, -1, adminId);
 						json.setOk(true);
@@ -1797,6 +1817,8 @@ public class NewOrderDetailsCtr {
 
 				}
                 if (json.isOk()) {
+                	String websiteType= request.getParameter("websiteType");
+					boolean isKidFlag =  "2".equals(websiteType);
                     // ssd add start
                     // 发送取消订单的提醒邮件
                     StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
@@ -1809,7 +1831,7 @@ public class NewOrderDetailsCtr {
                             "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
                     sbBuffer.append(
                             "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
                     sbBuffer.append("<br>Thank you for shopping with us.");
                     sbBuffer.append("<br>To review your order status, click ");
                     sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
@@ -1819,12 +1841,22 @@ public class NewOrderDetailsCtr {
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
-                    model.put("accountLink", AppConfig.center_path);
+                    if(isKidFlag){
+                    	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
+					} else{
+                    	model.put("accountLink", AppConfig.center_path);
+					}
                     model.put("orderNo", orderNo);
                     net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
                     String modeStr = jsonObject.toString();
                     try {
-                        sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+						if (isKidFlag) {
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_KID);
+						} else {
+							sendMailFactory.sendMail(toEmail, null, "Your kidsProductWholesale Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_IMPORT);
+						}
                     } catch (Exception e) {
                         e.printStackTrace();
                         LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());
