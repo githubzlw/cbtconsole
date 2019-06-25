@@ -940,7 +940,7 @@ public class UserBehaviorStatisticsController {
         cell.setCellValue("下单的新客户数量");
         cell.setCellStyle(style);
         cell = row.createCell(7);
-        cell.setCellValue("本日有添加购物车的客户数量");
+        cell.setCellValue("本日有添加购物车的客户数量（老客户）");
         cell.setCellStyle(style);
         cell = row.createCell(8);
         cell.setCellValue("当日付款按钮的用户数量 ");
