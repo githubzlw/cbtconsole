@@ -6902,7 +6902,12 @@ public class OrderwsDao implements IOrderwsDao {
                 //u.setPid(rs.getString("view_url"));
                 String view_url = rs.getString("view_url");
                 if (org.apache.commons.lang3.StringUtils.isNotBlank(view_url)) {
-                    u.setPid(view_url.substring(view_url.lastIndexOf("-") + 2, view_url.lastIndexOf(".html")));
+
+                    try {
+                        u.setPid(view_url.substring(view_url.lastIndexOf("-") + 2, view_url.lastIndexOf(".html")));
+                    } catch (Exception e) {
+
+                    }
                 }
                 u.setCarNum(rs.getInt("view_url_count"));
                 list.add(u);
