@@ -645,8 +645,8 @@ function innerOuterNetUrl(btnUrl) {
 		url: "/cbtconsole/messages/findCustomerMessages",
 		dataType:"json",
 		success: function(msg){
-			if (msg != undefined && msg.length > 0) {
-				$(msg).each(function(index,item){
+			if (msg != undefined && msg.state == true) {
+				$(msg.data).each(function(index,item){
 					var $obj = $($("button:contains('" + item.authName + "')").get(0));
 					$obj.html($obj.html() + "<span style=\"color:red;\">(" + item.count + "条)</span>");
 				});

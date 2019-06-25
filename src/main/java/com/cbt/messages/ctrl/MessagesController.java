@@ -33,10 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/messages")
@@ -311,10 +308,10 @@ public class MessagesController {
 	 */
 	@RequestMapping(value = "/findCustomerMessages")
     @ResponseBody
-	public String findCustomerMessages(HttpServletRequest request) {
-		List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-		
-		String admJson = Redis.hget(request.getSession().getId(), "admuser");
+	public Map<String, Object> findCustomerMessages(HttpServletRequest request) {
+        Map<String, Object> res = new HashMap<String, Object>();
+
+        String admJson = Redis.hget(request.getSession().getId(), "admuser");
 		if (admJson == null) {
 			return null;
 		}
@@ -327,12 +324,14 @@ public class MessagesController {
 		}
 		
 		try {
-			list = messagesService.findCustomerMessages(admuserid);
-            return SerializeUtil.ListToJson(list);
+            List<HashMap<String, String>> list = messagesService.findCustomerMessages(admuserid);
+            res.put("state" , true);
+            res.put("data" , list);
         } catch (Exception e) {
             System.out.println(e);
+            res.put("state" , false);
         }
-        return null;
+        return res;
 	}
 
 	/**
