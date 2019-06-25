@@ -465,7 +465,7 @@ public class NewOrderSplitCtr {
         String odIds = request.getParameter("odIds");
         try {
 
-            if (StringUtils.isNotBlank(orderNo) || StringUtils.isNotBlank(odIds)) {
+            if (StringUtils.isBlank(orderNo) || StringUtils.isBlank(odIds)) {
                 json.setOk(false);
                 json.setMessage("获取拆单数据失败");
                 return json;
@@ -547,14 +547,15 @@ public class NewOrderSplitCtr {
 
             // 3.开始执行拆单
             boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
-            if (!isOk) {
-                json.setOk(false);
-                json.setMessage("拆分失败请重试");
-            } else {
+            if (isOk) {
                 // 更新订单的状态
                 // splitDao.checkAndUpdateOrderState(orderNo, newOrderNo);
+                json.setOk(true);
+            } else {
+                json.setOk(false);
+                json.setMessage("拆分失败请重试");
+
             }
-            json.setOk(true);
 
         } catch (Exception e) {
             e.printStackTrace();

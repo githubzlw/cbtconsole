@@ -3045,7 +3045,13 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		String insert_split_details="insert into split_details(new_orderid,goodsid) values";
 		String tempSql ="";
 
+		String goodsDistributionSqlBegin = "insert into goods_distribution(orderid,odid,goodsid,admuserid,goodscatid,goods_pid) " +
+                "select '"+odbeanNew.getOrderNo()+"' as orderid,odid,goodsid,admuserid,goodscatid,goods_pid " +
+                "from goods_distribution where orderid = '"+orderNoOld +"' and odid in(";
+        String goodsDistributionSqlEnd="";
 		for (OrderDetailsBean oddsb : nwOrderDetails) {
+		    goodsDistributionSqlEnd += "," + oddsb.getId();
+
 			insert_split_details +="(";
 
 			if(isSplitNum == 0){
@@ -3057,24 +3063,27 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 			}else{
 				// 数量拆单商品
 				// 插入新的订单详情
-				String orderDetails = "insert into order_details(userid, goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
+				String orderDetails = "insert into order_details(userid,goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
 						"delivery_time, yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, checkprice_fee, checkproduct_fee, " +
 						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
 						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
 						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio, " +
-						"flag, goodscatid, isAuto,buy_for_me, isFeight, checked, " +
-						"seilUnit, picturepath, car_urlMD5,goods_pid, guid, startPrice," +
-						"bizPriceDiscount, group_buy_id, isFreeShipProduct,is_stock_flag, shopCount)" +
-						" select userid, goodsid,goodsdata_id, goodsname, orderid,dropshipid, " +
+						"flag, goodscatid, isAuto,buy_for_me, checked, " +
+						"seilUnit, picturepath, car_urlMD5,goods_pid," +
+						"bizPriceDiscount, isFreeShipProduct, shopCount)" +
+						" select userid,goodsid,goodsdata_id, goodsname, '"+odbeanNew.getOrderNo()+"' as orderid,dropshipid, " +
 						"delivery_time, "+oddsb.getYourorder()+" as yourorder,car_url, car_type, car_img,goodsprice, goodsfreight, " +
 						"checkprice_fee, checkproduct_fee," +
 						"actual_price,actual_freight,actual_weight, actual_volume, state,fileupload, od_state, paytime," +
 						"createtime, freight_free, purchase_state, purchase_time, purchase_confirmation, remark," +
 						"sprice, goods_class, extra_freight, od_bulk_volume, od_total_weight, discount_ratio," +
-						"flag, goodscatid, isAuto,buy_for_me, isFeight, checked,seilUnit, picturepath, " +
-						"car_urlMD5,goods_pid, guid, startPrice,bizPriceDiscount, group_buy_id, isFreeShipProduct,is_stock_flag, shopCount " +
-						" where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+						"flag, goodscatid, isAuto,buy_for_me, checked,seilUnit, picturepath, " +
+						"car_urlMD5,goods_pid,bizPriceDiscount, isFreeShipProduct, shopCount " +
+						" from order_details where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
+				String oldOdSql = "update order_details set yourorder = yourorder - "+ oddsb.getYourorder()
+                        +" where orderid='" + orderNoOld + "' and goodsid=" + oddsb.getGoodsid();
 				remoteSqlList.add(orderDetails);
+				remoteSqlList.add(oldOdSql);
 			}
 
 			// 更新order_change表信息
@@ -3098,7 +3107,7 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 			updateChange = null;
 			String inspection_pictureSql = "update inspection_picture set orderid = '"+ odbeanNew.getOrderNo()
 					+"' where orderid = '"+ orderNoOld  +"' and goods_id="+oddsb.getGoodsid()+"";
-			if(isSplitNum > 0){
+			if(isSplitNum == 0){
 				remoteSqlList.add(inspection_pictureSql);
 			}
 			localSqlList.add(inspection_pictureSql);
@@ -3112,9 +3121,14 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		localSqlList.add(localSql2);
 		//localSqlList.add(insert_split_details);
 
+        if(isSplitNum > 0){
+            // 采购分配的
+            localSqlList.add(goodsDistributionSqlBegin + goodsDistributionSqlEnd.substring(1) + ")");
+        }
 
 		try {
 			remoteConn.setAutoCommit(false);
+			localConn.setAutoCommit(false);
 			ppStamt = remoteConn.createStatement();
 			System.err.println("exSql begin");
 			for (String exSql : remoteSqlList) {
@@ -3124,15 +3138,22 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 
 			isSuccess = ppStamt.executeBatch().length > 0;
 			if(isSuccess){
-				remoteConn.commit();
-				ppStamt = localConn.createStatement();
+				wStamt = localConn.createStatement();
 				for(String loSql : localSqlList){
-					ppStamt.addBatch(loSql);
+					wStamt.addBatch(loSql);
 				}
 				//ppStamt.executeUpdate(localSql);
-				ppStamt.executeBatch();
+				isSuccess = wStamt.executeBatch().length > 0;
+				if(isSuccess){
+				    remoteConn.commit();
+				    localConn.commit();
+                }else{
+				    remoteConn.rollback();
+				    localConn.rollback();
+                }
 				//拆单取消时记录拆单的商品
 				if("0".equals(state)){
+				    wStamt.clearBatch();
 					wStamt = localConn.createStatement();
 					wStamt.executeUpdate(insert_split_details);
 				}

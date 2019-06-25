@@ -55,7 +55,7 @@
                     }
                 }
             });
-            alert(json);
+            $("#show_notice").show().text("正在执行中...");
             $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -65,11 +65,9 @@
                         odIds: JSON.stringify(json)
                     },
                     success: function (data) {
+                        $("#show_notice").hide();
                         if (data.ok) {
-                            $.messager.alert("提醒", "执行成功,页面即将刷新", "info");
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 500);
+                            $("#show_notice").show().text("执行成功，请关闭当前页面.");
                         } else {
                             $.messager.alert("提醒", data.message, "error");
                         }
