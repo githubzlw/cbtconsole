@@ -141,7 +141,7 @@ public class UserBehaviorStatisticsController {
             UserBehaviorBean payOrderUser = new UserBehaviorBean();
             payOrderUser.setTypeDesc("付款按钮的用户数量");
             payOrderUser.setTypeFlag(9);
-            int payOrderUserNum = dao.statisticsPayOrderUser(beginDate, endDate, ipFlag);
+            int payOrderUserNum = dao.statisticsPayOrderUser(beginDate.substring(0,10), endDate, ipFlag);
             payOrderUser.setStatisticsNum(payOrderUserNum);
             list.add(payOrderUser);
 
@@ -493,6 +493,11 @@ public class UserBehaviorStatisticsController {
 	                typeDesc = "Pay按钮点击独特人数";
 	                typeEnDesc = "Pay_log";
 	                list = dao.queryUserPayLogDetails(beginDate, endDate, 0, 0, ipFlag);
+                }else if ("12".equals(typeStr)) {
+                    typeDesc = "Add to order 按钮点击次数";
+                    typeEnDesc = "Add to order";
+                    //Pay按钮点击独特人数
+                    list = dao.queryUserAddToOrderDetails(beginDate, endDate, 0, 0,ipFlag);
                 }
 
                 if (StringUtils.isNotBlank(endDate)) {
@@ -831,19 +836,20 @@ public class UserBehaviorStatisticsController {
                         behaviorTotal.setFirstAddAdressNum(statisticsNum);
 
                         //3.1本日有添加购物车的客户数量 （未注册的客户）
-                        statisticsNum = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
-                        behaviorTotal.setAddCarNoRegisterNum(statisticsNum);
-                        totalUser += statisticsNum;
+                       int statisticsNumNull = dao.statisticsAddCarWithNoRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setAddCarNoRegisterNum(statisticsNumNull);
+                        totalUser += statisticsNumNull;
 
                         //3.2本日有添加购物车的客户数量 （有注册过的客户）
-                        statisticsNum = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
-                        totalUser += statisticsNum;
+                       int statisticsNumUs = dao.statisticsAddCarWithHasRegisterUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setAddCarAllUserNum(statisticsNumUs);
+                        totalUser += statisticsNumUs;
 
                         //3.3本日有添加购物车的客户数量 （老客户 （以前购买过））
                         statisticsNum = dao.statisticsAddCarWithOldUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
                         totalUser += statisticsNum;
-
                         behaviorTotal.setAddCarAllUserNum(totalUser);
+                        behaviorTotal.setAddCarWithOldUserNum(statisticsNum);
 
                         //4当日下单的 总客户数量 （点击数字后 显示 每人的用户ID 和邮箱）（过滤掉被取消的订单）（如果有拆单的情况，只
                         // count 母订单）（过滤掉付款金额为0的订单，过滤掉 未付款已取消，过滤掉 等待付款）
@@ -852,9 +858,28 @@ public class UserBehaviorStatisticsController {
 
 
                         // 5当日下单的 新客户数量
-                        statisticsNum = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
-                        behaviorTotal.setMarkOrderNewNum(statisticsNum);
+                       int statisticsNumNew = dao.statisticsMakeOrderNewUser(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setMarkOrderNewNum(statisticsNumNew);
 
+                        // 6当日付款按钮的用户数量 （同一用户只算一次， 注意过滤掉测试账号）
+                        int payOrderUserNum = dao.statisticsPayOrderUser(dateList.get((i - 1) * 2).substring(0,10), dateList.get((i - 1) * 2 + 1).substring(0,10), ipFlag);
+                        behaviorTotal.setPayOrderUserNum(payOrderUserNum);
+
+                        // 7当日产品单页浏览总次数
+                        int recentViewNum = dao.statisticsRecentView(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setRecentViewNum(recentViewNum);
+
+                        // 8Pay按钮点击独特人数
+                        int payLogNum = dao.queryUserPayLog(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setPayLogNum(payLogNum);
+                        //9 点击添加购物车按钮数量
+                        int payLogCat = dao.queryBehaviorRecord(dateList.get((i - 1) * 2), dateList.get((i - 1) * 2 + 1), ipFlag);
+                        behaviorTotal.setPayLogCat(payLogCat);
+
+
+                        // 3.4本日有添加购物车的客户数量 （所有客户）
+                        int AllCatCount= statisticsNumNull + statisticsNumNew + statisticsNumUs;
+                        behaviorTotal.setAllCatCount(AllCatCount);
                         list.add(behaviorTotal);
                     }
                     HSSFWorkbook wb = genTotalStatisticsExcel(list, typeEnDesc);
@@ -914,6 +939,24 @@ public class UserBehaviorStatisticsController {
         cell = row.createCell(6);
         cell.setCellValue("下单的新客户数量");
         cell.setCellStyle(style);
+        cell = row.createCell(7);
+        cell.setCellValue("本日有添加购物车的客户数量");
+        cell.setCellStyle(style);
+        cell = row.createCell(8);
+        cell.setCellValue("当日付款按钮的用户数量 ");
+        cell.setCellStyle(style);
+        cell = row.createCell(9);
+        cell.setCellValue("当日产品单页浏览总次数");
+        cell.setCellStyle(style);
+        cell = row.createCell(10);
+        cell.setCellValue("Pay按钮单独点击人数");
+        cell.setCellStyle(style);
+        cell = row.createCell(11);
+        cell.setCellValue("点击添加购物车按钮数量");
+        cell.setCellStyle(style);
+        cell = row.createCell(12);
+        cell.setCellValue("本日有添加购物车的客户数量 （所有客户）");
+        cell.setCellStyle(style);
 
         for (int i = 0; i < list.size(); i++) {
             row = sheet.createRow(i + 1);
@@ -925,6 +968,12 @@ public class UserBehaviorStatisticsController {
             row.createCell(4).setCellValue(list.get(i).getFirstAddAdressNum());
             row.createCell(5).setCellValue(list.get(i).getMarkOrderTotalNum());
             row.createCell(6).setCellValue(list.get(i).getMarkOrderNewNum());
+            row.createCell(7).setCellValue(list.get(i).getAddCarWithOldUserNum());
+            row.createCell(8).setCellValue(list.get(i).getPayOrderUserNum());
+            row.createCell(9).setCellValue(list.get(i).getRecentViewNum());
+            row.createCell(10).setCellValue(list.get(i).getPayLogNum());
+            row.createCell(11).setCellValue(list.get(i).getPayLogCat());
+            row.createCell(12).setCellValue(list.get(i).getAllCatCount());
         }
         return wb;
     }
