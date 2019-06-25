@@ -86,6 +86,9 @@
         <if test="childName3 != null">
             child_name3 = #{childName3},
         </if>
+        <if test="childLink3 != null">
+            child_link3 = #{childLink3},
+        </if>
         <if test="isOn > -1">
             is_on = #{isOn} ,
         </if>
