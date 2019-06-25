@@ -6690,7 +6690,7 @@ public class OrderwsDao implements IOrderwsDao {
                 "on r.pid=c.pid WHERE r.createtime>='" + beginDate + "' " +
                 "AND r.createtime<='" + endDate + "' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL\n";
         if (ipFlag > 0) {
-            sql += " and r.sessionid not in(select sessionid from ip_record where sessionid is not null and is_china =1 and user_id = 0))";
+            sql += " and r.sessionid not in(select sessionid from ip_record where sessionid is not null and is_china =1 and user_id = 0) ";
         }
         sql += "GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid\n" +
                 "UNION\n" +
