@@ -897,7 +897,11 @@ public class NewOrderSplitCtr {
                             + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "Your Import Express order was partially cancelled");
+                    if(isKidFlag){
+                        model.put("title", "Your Kids Product Wholesale order was partially cancelled");
+                    } else{
+                        model.put("title", "Your Import Express order was partially cancelled");
+                    }
                     model.put("message", obBean_.getOrderNo());
                 }
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
