@@ -557,22 +557,15 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         return ;
 	}
 	//var isCf = confirm("是否确定取消订单?");
-
-    $("#dialog_cancel").dialog('close');
-    var websiteType = $("#website_type").val();
-
-    // $.dialog({
-    //     title : '是否确定取消订单?',
-    //     content : website_type_html + "是否确定取消订单?",
-    //     max : false,
-    //     min : false,
-    //     lock : true,
-    //     drag : false,
-    //     fixed : true,
-    //     height: 400,
-    //     width: 350,
-    //     modal: true,
-    //     ok : function() {
+    $.dialog({
+        title : '是否确定取消订单?',
+        content : "是否确定取消订单?",
+        max : false,
+        min : false,
+        lock : true,
+        drag : false,
+        fixed : true,
+        ok : function() {
                 // 按钮不可用
                 $("#closeOrder").attr("disabled", true);
                 $("#closeOrder").hide();
@@ -590,8 +583,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                         "confirmEmail" : confirmEmail,
                         "totalPrice" : totalPrice,
                         "weight" : weight,
-                        "isDropshipOrder" : isDropshipOrder,
-                        "websiteType": websiteType
+                        "isDropshipOrder" : isDropshipOrder
                     };
                     $.ajax({
                         url : '/cbtconsole/orderDetails/closeOrder.do',
@@ -645,8 +637,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                             "weight" : weight,
                             "freight" : freight,
                             "isDropshipOrder" : isDropshipOrder,
-                            'isDropshipOrder1':isDropshipOrder1,
-                            "websiteType": websiteType
+                            'isDropshipOrder1':isDropshipOrder1
                         };
 
                         $.ajax({
@@ -675,10 +666,10 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                         });
                     }
                 }
-        // },
-        // cancel : function() {
-        // }
-    // });
+        },
+        cancel : function() {
+        }
+    });
 }
 
 function showMessage(msg) {

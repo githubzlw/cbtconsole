@@ -703,7 +703,10 @@
                         <input type="button"
                                style="position: fixed; bottom: 520px; right: 50px; width: 150px; height: 30px;"
                                id="closeOrder"
-                               onclick="$('#dialog_cancel').dialog('open');" value="取消订单">&nbsp;&nbsp;
+                               onclick="fnCloseOrder('${order.orderNo}',${order.userid},${order.pay_price},
+                                       '${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
+                                   ${order.product_cost+preferential_price},${actual_ffreight_+foreign_freight},
+                                   ${order.actual_weight_estimate},${isDropshipOrder })" value="取消订单">&nbsp;&nbsp;
                     </c:if>
                     <c:if test="${count==1 }">
                         <input type="button"
@@ -1777,25 +1780,6 @@
     </c:if>
     <div id="prinum"></div>
     <div class="peimask"></div>
-</div>
-<div id="dialog_cancel" class="easyui-dialog" title="是否确定取消订单?" style="width:420px;height:240px;"
-     data-options="iconCls:'icon-save',resizable:true,modal:true,closed:true">
-    <div style="font-size: 16px; margin: 20px;">
-        是否确定取消订单?
-        <br /><br />
-        选择网站名:
-        <select id="website_type" style="height: 28px;width: 160px;">
-            <option value="1" selected="selected">import-express</option>
-            <option value="2">kidsproductwholesale</option>
-        </select>
-        <br /><br /><br />
-        <a href="javascript:;" onclick="fnCloseOrder('${order.orderNo}',${order.userid},${order.pay_price},
-                '${order.currency}',${order.order_ac},'${order.userEmail}','${order.email}',
-                ${order.product_cost+preferential_price},${actual_ffreight_+foreign_freight},
-                ${order.actual_weight_estimate},${isDropshipOrder })"
-           class="easyui-linkbutton" style="margin-left: 200px;">确定取消</a>
-        <a href="javascript:;" onclick="$('#dialog_cancel').dialog('close');" class="easyui-linkbutton">不操作</a>
-    </div>
 </div>
 </body>
 <script type="text/javascript">
