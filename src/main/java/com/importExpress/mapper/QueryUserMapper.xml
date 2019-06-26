@@ -972,9 +972,10 @@
 
     <!--List<SameGoodsDetails> querySameGoodsDetails(@Param("pid") String pid);-->
     <select id="querySameGoodsDetails" resultType="com.cbt.bean.SameGoodsDetails">
-        SELECT s_pid pid, shop_id shopId, shop_name shopName, json_content jsonContent
+        SELECT s_pid pid, shop_id shopId, shop_name shopName, json_content jsonContent, booked_cnt bookedCnt
         FROM alidata.1688_same_goods_detail
         WHERE origin_pid = #{pid}
+        ORDER BY booked_cnt DESC
         LIMIT 4
     </select>
 
@@ -989,6 +990,14 @@
     <select id="queryUnsellablereasonMaster" resultType="HashMap">
         SELECT unsellablereason_id 'id', unsellablereason_name 'name'
         FROM unsellablereason_master
+    </select>
+
+    <!--List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);-->
+    <select id="querySalesShop" resultType="String">
+        SELECT shop_id FROM sales_shop WHERE shop_id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item.shopId}
+        </foreach>
     </select>
 
 </mapper>

@@ -150,4 +150,6 @@ public interface QueryUserMapper {
     Integer lookShareableOrderCount(@Param("orderNo") String orderNo,@Param("name")String name,@Param("userid")int userid,@Param("share")int share);
     @Update("UPDATE paysuccessinfo SET share=1 WHERE orderno=#{orderNo}")
     void SetShareByOrderno(@Param("orderNo") String orderNo);
+
+    List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);
 }
