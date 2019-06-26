@@ -1434,6 +1434,8 @@ public class NewOrderDetailsCtr {
 			String isDropshipOrder1 = request.getParameter("isDropshipOrder1");
 			//End：
 
+            Integer websiteType = StringUtils.isBlank(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
+
 			try {
 				IOrderwsServer orderwsServer = new OrderwsServer();
 				//如果线上订单已经被取消则不做操作 王宏杰 2018-09-29
@@ -1466,11 +1468,11 @@ public class NewOrderDetailsCtr {
 						return json;
 					} else {
 						json = closeDropShipOrder(request, response, orderwsServer, adm.getId(), mainOrderNo, orderNo,
-								toEmail, confirmEmail);
+								toEmail, confirmEmail, websiteType);
 					}
 				} else {
 					json = closeGeneralOrder(request, response, orderwsServer, adm.getId(), orderNo, toEmail,
-							confirmEmail);
+							confirmEmail, websiteType);
 				}
 
 			} catch (Exception e) {
@@ -1497,7 +1499,7 @@ public class NewOrderDetailsCtr {
 	 */
 	private JsonResult closeDropShipOrder(HttpServletRequest request, HttpServletResponse response,
                                           IOrderwsServer orderwsServer, int adminId, String mainOrderNo, String orderNo, String toEmail,
-                                          String confirmEmail) throws Exception {
+                                          String confirmEmail, Integer websiteType) throws Exception {
 		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeDropShipOrder start");
 		JsonResult json = new JsonResult();
@@ -1697,7 +1699,7 @@ public class NewOrderDetailsCtr {
 	 * @throws Exception
 	 */
 	private JsonResult closeGeneralOrder(HttpServletRequest request, HttpServletResponse response,
-                                         IOrderwsServer orderwsServer, int adminId, String orderNo, String toEmail, String confirmEmail)
+                                         IOrderwsServer orderwsServer, int adminId, String orderNo, String toEmail, String confirmEmail, Integer websiteType)
 			throws Exception {
 		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeGeneralOrder start,orderNo : " + orderNo);
