@@ -8,4 +8,5 @@ public class SplitGoodsNumBean {
     private int num;
     private int oldNum;
     private double goodsPrice;
+    private int adminId;
 }

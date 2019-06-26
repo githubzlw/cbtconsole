@@ -165,10 +165,13 @@
             if (num > inputVal) {
                 $(obj).parent().find("input:checkbox").prop("checked", true);
             } else {
-                alert("拆单数量必须小于客户购买数量!");
+                $.messager.alert("提醒", "拆单数量必须小于客户购买数量!", "info");
+                return;
             }
         }else{
             //alert("拆单数量必须大于0");
+            $.messager.alert("提醒", "拆单数量必须大于0", "info");
+            return;
         }
     }
 

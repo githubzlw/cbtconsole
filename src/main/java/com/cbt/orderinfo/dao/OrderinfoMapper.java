@@ -9,6 +9,7 @@ import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -656,4 +657,10 @@ public interface OrderinfoMapper {
 
     String getSampleschoice(@Param("orderNo") String orderNo);
 
+    /**
+	 * 插入数量拆单日志
+	 * @param splitGoodsNumBeanList
+	 * @return
+	 */
+	int insertIntoOrderSplitNumLog(@Param("list") List<SplitGoodsNumBean> splitGoodsNumBeanList);
 }

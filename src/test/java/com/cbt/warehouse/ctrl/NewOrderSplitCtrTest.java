@@ -50,7 +50,7 @@ public class NewOrderSplitCtrTest {
 		String closeOrder="{\"orderNo\":\"QC13519415298019_6\",\"name\":\"saycjc@outlook.com\",\"accountLink\":\"https://www.import-express.com/individual/getCenter\",\"email\":\"Sale1\"}";*/
         model = SerializeUtil.JsonToMapStr(modelStr);
         model.put("email", "saycjc@outlook.com");
-        sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+        sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER_IMPORT);
 		/*// 购物车营销
 		model = SerializeUtil.JsonToMapStr(shopcar);
 		sendMailFactory.sendMail("saycjc@outlook.com", null,
