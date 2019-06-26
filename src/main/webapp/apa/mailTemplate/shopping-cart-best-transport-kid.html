@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title th:text="${title}">ImportExpress ShopCart Show</title>
+  <title th:text="${title}">KidsProductWholesale ShopCart Show</title>
   <style type="text/css">
 
     *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -68,7 +68,7 @@
     .estima_time_color{ font-weight: bold; font-size: 18px;}
     .estima_time_color a{ padding: 4px 8px; text-align: center; background-color: #3e9eea; color: #fff;
       border-radius: 4px; font-size: 16px; font-weight: 400; text-transform: uppercase; margin-left: 10px;}
-    .order_off i{ text-decoration: line-through; margin-left: 5px; color: #999;}
+    .order_off{color: #999; font-size: 14px;}
     .dismantling_box{ width: 100%; text-align: left; margin: 0px auto 0; }
     .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
     .order_first{ width: 100%; margin: 0 auto 15px; }
@@ -85,7 +85,7 @@
     .order_pr{ margin: 0; text-align: left; }
     .order_usd{ text-align: left; color: #333; margin-bottom: 5px; }
     .order_usd strong{ font-size: 14px; }
-    .order_usd_due{ margin: 0px 0 10px; border-top: 2px solid #ffc167; padding-top: 5px;}
+    .order_usd_due{ margin: 0px 0 10px;padding-top: 5px;}
     .order_usd_due p{ margin-bottom: 0px;}
     .order_remark{ width: 100%; margin-top: 5px; }
     .order_rem_p{ text-align: left; margin: 10px 0 0; color:#333;  }
@@ -93,6 +93,17 @@
     .refund_amount h3{ font-size: 16px; font-weight: bold; margin: 8px 0;}
     .order_pr strong{ color: red;}
     .order_pr span{ text-decoration: line-through; color: #999;}
+    .order_click{ text-align: left; color:#333;}
+    .order_click a{ color:#01a4ef;}
+    .way_box{ width: 100%; margin: 0px auto;}
+    .way_box table{width: 96%; margin: 0 auto; border: 1px solid #e2e2e2;text-align: center;
+      color: #333;font-size: 14px; border-right: none; border-bottom: none;}
+    .way_box table th{ background-color: #01A4EF; color:#fff;}
+    .way_box td, .way_box th {  border-right: 1px #e2e2e2 solid;  border-bottom: 1px #e2e2e2 solid; padding:10px 5px; }
+    .way_box table p{ margin-bottom: 0;}
+    .way_faa{ color: red;}
+    .way_box table .way_check{ background-color: #F4F4F4;}
+    .way_box table p b{ color: #f5a72c;}
 
 
     .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
@@ -206,8 +217,8 @@
       <td class="header container" align="center">
         <div class="content">
             <span class="brand">
-              <a href="https://www.import-express.com/">
-                <img src="https://www.import-express.com/newindex/img/logo.png">
+              <a href="https://www.kidsproductwholesale.com/">
+                <img src="https://www.kidsproductwholesale.com/newindex/img/logo.png">
               </a>
             </span>
         </div>
@@ -225,7 +236,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                    <td class="soapbox-title">You Have Made Some Wonderful Selections!</td>
+                    <td class="soapbox-title">Faster And Cheaper Shipping Method For Your Consideration!</td>
                   </tr>
                 </table>
 
@@ -237,31 +248,43 @@
                       <div class="dismantling_box" >
                         <div class="order_first">
                           <div class="rece_shop">
-                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
-                            <p>I noticed that you were about to buy some products from our website but haven't completed your order yet.</p>
-                            <p>Is there anything I could help you with?</p>
-                            <p>Here's your shopping cart list.</p>
+                            <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Kids Product Wholesale.</p>
+                            <p>Recently you have added some items to your <a th:href="${carUrl}" target="_blank" href="https://www.kidsproductwholesale.com/Goods/getShopCar">shopping cart</a>, and ticked
+                              A  as your shipping method, however there is a faster and cheaper shipping method you have probably missed:</p>
                           </div>
-                          <ul class="clearfix">
+                          <div class="way_box">
+                            <table width="100%" cellspacing="0" cellpadding="0">
+                              <thead>
+                              <tr>
+                                <th width="30%">Shipping Method</th>
+                                <th width="35">Shipping Time</th>
+                                <th width="35%">Shipping Cost</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                <td><span th:text="${oldMethod}">A</span></td>
+                                <td><em th:text="${oldTransport}">30</em> days</td>
+                                <td>USD&nbsp;<em th:text="${oldPrice}">1,000</em></td>
+                              </tr>
+                              <tr class="way_check">
+                                <td><span th:text="${newMethod}">B</span></td>
+                                <td><p><em th:text="${newTransport}">10</em> days<b>(Faster)</b></p>
+                                </td>
+                                <td><p>USD&nbsp;<em th:text="${newPrice}">100</em><b>(Cheaper)</b></p>
+                                </td>
+                              </tr>
+                              </tbody>
+                            </table>
+                          </div>
 
-                            <li class="order_li" th:each="carInfo:${sourceList}">
-
-                              <img th:src="${carInfo.googsImg}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                               <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
-
-                              <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
-                                <div class="order_size">
-                                  <span th:title="${typeStr}" th:text="${typeStr}">Size:S</span>
-                                </div>
-                              </div>
-
-                               <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
-                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong>
-                                <!--<span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span>--></p>
-                             </li>
-                           </ul>
-                          <p class="order_rem_p">If there were any reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email, our team will absolutely try every effort to meet your satisfaction!</p>
-                          <p class="order_rem_p"><strong>Import Express CHINA</strong><br/>
+                          <div class="order_usd order_usd_due">
+                            <p class="order_off">We have updated your shopping cart with this better shipping method</p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span th:text="${savePrice}">100</span>
+                              <a th:href="${carUrl}" href="https://www.kidsproductwholesale.com/Goods/getShopCar" target="_blank">Buy now</a></p>
+                          </div>
+                          <p class="order_rem_p">But If there were actually any other reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email,  our team will absolutely try every effort to meet your satisfaction!</p>
+                          <p class="order_rem_p"><strong>Kids Product Wholesale CHINA</strong><br/>
                             Best product source for small business!</p>
                         </div>
                       </div>
@@ -271,10 +294,10 @@
                             <p class="thanks_so">Yours Sincerely,</p>
                               <p class="thanks_so"> <strong th:text="${adminName}">Lena</strong> | Marketing Manager</p>
                             <p class="thanks_so"> Marketing Department</p>
-                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@import-express.com</strong></p>
+                            <p class="thanks_so"> Email: <strong th:text="${adminEmail}">lenawu@kidsproductwholesale.com</strong></p>
                             <p class="thanks_so">WhatsApp: <strong th:text="${whatsApp}">+86 18717701974</strong></p>
-                            <p class="thanks_so"><a href="https://www.import-express.com" target="_blank">www.import-express.com</a></p>
-                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.import-express.com/followMe/index.do?fmc=110119911"/></span>
+                            <p class="thanks_so"><a href="https://www.kidsproductwholesale.com" target="_blank">www.kidsproductwholesale.com</a></p>
+                            <span style="display:none;"><img th:src="${emailFollowUrl}" src="https://www.kidsproductwholesale.com/followMe/index.do?fmc=110119911"/></span>
                           </td>
                         </tr>
                       </table>
