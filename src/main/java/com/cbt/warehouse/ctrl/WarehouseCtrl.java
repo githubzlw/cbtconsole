@@ -6555,6 +6555,7 @@ public class WarehouseCtrl {
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
 				}
 				if ("1".equals(WebSite)){
+
 					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
 				}
 
