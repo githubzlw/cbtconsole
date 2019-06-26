@@ -1668,7 +1668,7 @@ public class NewOrderDetailsCtr {
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
-							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+							sendMailFactory.sendMail(toEmail, null, "Your KidsProductWholesale Order " + orderNo + " transaction is closed!",
 									model, TemplateType.CANCEL_ORDER_KID);
 						} else{
 							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
