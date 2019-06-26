@@ -21,6 +21,8 @@ import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
+import com.importExpress.utli.SwitchDomainNameUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,8 +47,6 @@ public class NewOrderSplitCtr {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
     @Autowired
     private SendMailFactory sendMailFactory;
-    @Autowired
-    private IOrderinfoService iOrderinfoService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -160,13 +161,13 @@ public class NewOrderSplitCtr {
                     String orderNo1 = null;
                     if (orderNo.length() > 17) {
                         OrderBean orderBean1 = null;
-                        if (orderNo.contains("_")) {
+                        if (orderNo.indexOf("_") > -1) {
                             String[] n = orderNo.split("_");
                             String orderNo_ = n[0];
                             orderBean1 = dao.getOrders(orderNo_);
                         }
                         String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
-                        if (maxSplitOrderNo.contains("_")) {
+                        if (maxSplitOrderNo.indexOf("_") > -1) {
                             int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
                             String[] n = orderNo.split("_");
                             orderNo1 = n[0];
@@ -175,7 +176,7 @@ public class NewOrderSplitCtr {
                     } else {
                         nwOrderNo = orderNo + "_1";
                         String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-                        if (maxSplitOrderNo.contains("_")) {
+                        if (maxSplitOrderNo.indexOf("_") > -1) {
                             int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
                             nwOrderNo = orderNo + "_" + (splitIndex + 1);
                         }
@@ -258,13 +259,9 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         String nwOrderNo = "";
         try {
-
             // 查询订单和订单详情
             OrderBean orderBean = splitDao.getOrders(orderNo);
-            // 获取新的订单号
-            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
-            // 需要取消的商品order_details的id
-            String[] odidLst = odids.split("@");
+            String[] odidLst = odids.split("@");// 需要取消的商品order_details的id
             // 1.拆单之前保存订单原始信息 log
             boolean isSuccess = saveOrderInfoBeforeSplitOrder(orderBean, orderNo, odids, admuser);
             if (isSuccess) {
@@ -277,10 +274,8 @@ public class NewOrderSplitCtr {
                 List<Integer> odIds = new ArrayList<>();
                 // 判断是否获取到要拆分的商品ids
                 if (odidLst.length > 0) {
-                    // 原订单支付金额
-                    double totalPayPriceOld = orderBean.getPay_price();
-                    // 原订单商品总价
-                    double totalGoodsCostOld = 0;
+                    double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
+                    double totalGoodsCostOld = 0;// 原订单商品总价
                     for (OrderDetailsBean odds : orderDetails) {
                         for (String odid : odidLst) {
                             if (odds.getId() == Integer.valueOf(odid)) {
@@ -300,12 +295,13 @@ public class NewOrderSplitCtr {
                         //取消订单后商品进入库存中
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
-//						if(flag){}
+//						if(flag){
                         if ("0".equals(state)) {
                             for (String odid : odidLst) {
                                 splitDao.addInventory(odid, "拆单取消库存");
                             }
                         }
+//						}
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
@@ -363,20 +359,130 @@ public class NewOrderSplitCtr {
                                          String nwOrderNo, OrderBean orderBean, double totalGoodsCostOld, double totalPayPriceOld,
                                          OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst,
                                          List<Integer> goodsIds, List<Integer> odIds) {
-
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
-        // 新的订单商品总价
-        double totalGoodsCostNew = 0;
+        double totalGoodsCostNew = 0;// 新的订单商品总价
         for (OrderDetailsBean nwOdDt : nwOrderDetails) {
             totalGoodsCostNew += Double.valueOf(nwOdDt.getGoodsprice()) * nwOdDt.getYourorder();
         }
         if (totalGoodsCostNew > 0) {
+            // 拆单新生成的订单号
+            String orderNo1 = null;
+            if (orderNo.length() > 17) {
+                OrderBean orderBean1 = null;
+                if (orderNo.indexOf("_") > -1) {
+                    String[] n = orderNo.split("_");
+                    String orderNo_ = n[0];
+                    orderBean1 = splitDao.getOrders(orderNo_);
+                }
+                String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
+                if (maxSplitOrderNo.indexOf("_") > -1) {
+                    int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+                    String[] n = orderNo.split("_");
+                    orderNo1 = n[0];
+                    nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
+                }
+            } else {
+                nwOrderNo = orderNo + "_1";
+                String maxSplitOrderNo = orderBean.getMaxSplitOrder();
+                if (maxSplitOrderNo.indexOf("_") > -1) {
+                    int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
+                    nwOrderNo = orderNo + "_" + (splitIndex + 1);
+                }
+            }
+            // 支付金额拆分逻辑：拆分比例=拆单商品的总价/原订单所有商品的总价
+            // 所有的折扣金额都按照计算的拆分比例计算，新生成的订单支付金额也是按照比例分割
+            double splitRatio = totalGoodsCostNew / totalGoodsCostOld;// 拆分比例
+            double totalPayPriceNew = totalPayPriceOld * splitRatio;// 新的订单支付金额
+            double coupon_discount_old = orderBean.getCoupon_discount();// coupon优惠
+            double coupon_discount_new = coupon_discount_old * splitRatio;// 新订单coupon优惠
+            double extra_discount_old = orderBean.getExtra_discount();// 其他优惠
+            double extra_discount_new = extra_discount_old * splitRatio;// 新订单其他优惠
+            double grade_discount_old = orderBean.getGradeDiscount();// 等级优惠
+            double grade_discount_new = grade_discount_old * splitRatio;// 新订单等级优惠
+            double share_discount_old = orderBean.getShare_discount();// 分享优惠
+            double share_discount_new = share_discount_old * splitRatio;// 新订单分享优惠
+            double discount_amount_old = orderBean.getDiscount_amount();// 优惠金额（之前BIz等）
+            double discount_amount_new = discount_amount_old * splitRatio;// 新订单优惠金额（之前BIz等）
+            double cash_back_old = orderBean.getCashback();// cash_back折扣
+            double cash_back_new = cash_back_old * splitRatio;// 新订单cash_back折扣
+            double extra_freight_old = orderBean.getExtra_freight();// 额外运费
+            double extra_freight_new = extra_freight_old * splitRatio;//新订单额外运费
 
-            // 拆分比例
-            double splitRatio = totalGoodsCostNew / totalGoodsCostOld;
-            OrderBean odbeanNew = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, nwOrderNo,
-                    totalGoodsCostOld, nwOrderDetails);
+            double vatBalanceOld = orderBean.getVatBalance();//双清包税价格
+            double vatBalanceNew = vatBalanceOld * splitRatio;//新双清包税价格
+
+            double proces_singfee_old = orderBean.getProcessingfee();// 店铺处理费
+            double proces_singfee_new = proces_singfee_old * splitRatio;
+
+            double actual_lwh_old = genDoubleWidthTwoDecimalPlaces(Double.parseDouble(orderBean.getActual_lwh() == null ? "0.00" : orderBean.getActual_lwh()));// 质检费
+            double actual_lwh_new = actual_lwh_old * splitRatio;
+
+            // 新生成订单信息
+            OrderBean odbeanNew = new OrderBean();
+            odbeanNew.setVatBalance(vatBalanceNew);
+            odbeanNew.setUserid(orderBean.getUserid());
+            odbeanNew.setOrderNo(nwOrderNo);
+            odbeanNew.setExchange_rate(orderBean.getExchange_rate());
+            odbeanNew.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_new));
+            odbeanNew.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_new));
+            odbeanNew.setGradeDiscount(
+                    Float.valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_new))));
+            odbeanNew.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_new));
+            odbeanNew.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_new));
+            odbeanNew.setProduct_cost(String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostNew)));
+            odbeanNew.setCashback(cash_back_new);
+            odbeanNew.setExtra_freight(extra_freight_new);
+            odbeanNew.setOrderDetail(nwOrderDetails);
+
+            odbeanNew.setProcessingfee(proces_singfee_new);
+            odbeanNew.setActual_lwh(new BigDecimal(actual_lwh_new).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+            // 计算新订单支付金额
+            totalPayPriceNew = new BigDecimal(odbeanNew.getProduct_cost())
+                    .subtract(new BigDecimal(odbeanNew.getCoupon_discount()))
+                    .subtract(new BigDecimal(odbeanNew.getShare_discount()))
+                    .subtract(new BigDecimal(odbeanNew.getDiscount_amount()))
+                    .subtract(new BigDecimal(odbeanNew.getGradeDiscount()))
+                    .subtract(new BigDecimal(odbeanNew.getCashback()))
+                    .subtract(new BigDecimal(odbeanNew.getExtra_discount()))
+                    .add(new BigDecimal(odbeanNew.getExtra_freight()))
+                    .add(new BigDecimal(odbeanNew.getProcessingfee()))
+                    .add(new BigDecimal(odbeanNew.getActual_lwh())).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            odbeanNew.setPay_price(totalPayPriceNew);
+
+            // 原始订单减去拆分比例后的值
+            orderBeanTemp.setVatBalance(vatBalanceOld - vatBalanceNew);
+            orderBeanTemp.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_old - coupon_discount_new));
+            orderBeanTemp.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_old - extra_discount_new));
+            orderBeanTemp.setGradeDiscount(Float
+                    .valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_old - grade_discount_new))));
+            orderBeanTemp.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_old - share_discount_new));
+            orderBeanTemp.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_old - discount_amount_new));
+            orderBeanTemp.setProduct_cost(
+                    String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostOld - totalGoodsCostNew)));
+            orderBeanTemp.setCashback(genDoubleWidthTwoDecimalPlaces(cash_back_old - cash_back_new));
+            orderBeanTemp.setExtra_freight(genDoubleWidthTwoDecimalPlaces(extra_freight_old - extra_freight_new));
+
+            orderBeanTemp.setProcessingfee(genDoubleWidthTwoDecimalPlaces(proces_singfee_old - proces_singfee_new));
+            orderBeanTemp.setActual_lwh(String.valueOf(genDoubleWidthTwoDecimalPlaces(actual_lwh_old - actual_lwh_new)));
+
+            //拆单前订单payprice = 订单1payprice + 订单2 payprice
+            orderBeanTemp.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceOld - totalPayPriceNew));
+            //理论上payprice
+            BigDecimal needPay = new BigDecimal(orderBeanTemp.getProduct_cost())
+                    .subtract(new BigDecimal(orderBeanTemp.getCoupon_discount()))
+                    .subtract(new BigDecimal(orderBeanTemp.getShare_discount()))
+                    .subtract(new BigDecimal(orderBeanTemp.getDiscount_amount()))
+                    .subtract(new BigDecimal(orderBeanTemp.getGradeDiscount()))
+                    .subtract(new BigDecimal(orderBeanTemp.getCashback()))
+                    .subtract(new BigDecimal(orderBeanTemp.getExtra_discount()))
+                    .add(new BigDecimal(orderBeanTemp.getExtra_freight()))
+                    .add(new BigDecimal(orderBeanTemp.getProcessingfee()))
+                    .add(new BigDecimal(orderBeanTemp.getActual_lwh()));
+            // 排除计算误差
+            orderBeanTemp.setExtra_freight(new BigDecimal(orderBeanTemp.getExtra_freight())
+                    .add(new BigDecimal(orderBeanTemp.getPay_price()).subtract(needPay))
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
 
             // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
             List<OrderBean> orderBeans = new ArrayList<OrderBean>();
@@ -386,7 +492,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) odbeanNew.getPay_price(), odIds);
+                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -407,7 +513,7 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
         // 开始执行拆单
-        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state, 0);
+        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state);
         if (!isOk) {
             json.setOk(false);
             json.setMessage("拆分失败请重试");
@@ -435,7 +541,7 @@ public class NewOrderSplitCtr {
                         1, nwOrderNo, "", admuser.getId());*/
 
                 IOrderwsServer orderwsServer = new OrderwsServer();
-                int oiState = orderwsServer.checkOrderState(orderNo, "0");
+                int oiState=orderwsServer.checkOrderState(orderNo,"0");
                 OrderCancelApproval cancelApproval = new OrderCancelApproval();
                 cancelApproval.setUserId(orderBeanTemp.getUserid());
                 cancelApproval.setOrderNo(nwOrderNo);
@@ -454,118 +560,30 @@ public class NewOrderSplitCtr {
             json.setMessage("拆分成功");
             json.setData(nwOrderNo);
         }
+
     }
 
-
-    @RequestMapping(value = "/splitGoodsByNum")
-    @ResponseBody
-    public JsonResult splitGoodsByNum(HttpServletRequest request) {
-        JsonResult json = new JsonResult();
-        String orderNo = request.getParameter("orderNo");
-        String odIds = request.getParameter("odIds");
-        try {
-
-            if (StringUtils.isBlank(orderNo) || StringUtils.isBlank(odIds)) {
-                json.setOk(false);
-                json.setMessage("获取拆单数据失败");
-                return json;
-            } else if (orderNo.contains("SN")) {
-                json.setOk(false);
-                json.setMessage("数量拆单数据，不允许再次拆单");
-                return json;
-            }
-
-            Admuser admuser = UserInfoUtils.getUserInfo(request);
-            if (admuser == null || admuser.getId() == 0) {
-                json.setOk(false);
-                json.setMessage("请登录后操作");
-                return json;
-            }
-
-            // 判断是否是Drop Ship订单，根据订单号获取订单信息
-            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
-            OrderBean orderBean = splitDao.getOrders(orderNo);
-            if (orderBean.getIsDropshipOrder() == 1) {
-                // Drop Ship 拆单，不可数量拆单
-                json.setOk(false);
-                json.setMessage("DropShip订单，不能数量拆单");
-                return json;
-            }
-
-            JSONArray jsonArray = JSONArray.fromObject(odIds);
-            List<SplitGoodsNumBean> splitIdList = (List<SplitGoodsNumBean>) JSONArray.toCollection(jsonArray, SplitGoodsNumBean.class);
-            if (splitIdList == null || splitIdList.isEmpty()) {
-                json.setOk(false);
-                json.setMessage("转换拆单数据失败");
-                return json;
-            }
-            OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
-            if (orderInfo.getState() != 5) {
-                json.setOk(false);
-                json.setMessage("订单状态非审核状态，不能拆单");
-                return json;
-            }
-            // 1.获取原来数据,并进行数据处理
-            List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
-            List<OrderDetailsBean> nwOrderDetails = new ArrayList<>(splitIdList.size());
-            // 生成新的OrderDetailsBean数据
-            Map<Integer, OrderDetailsBean> oldOrderDeatisMap = new HashMap<>(odbList.size());
-            double oldTotalGoodsCost = 0;
-            double newTotalGoodsCost = 0;
-            for (SplitGoodsNumBean goodsNumBean : splitIdList) {
-                for (OrderDetailsBean orderDetail : odbList) {
-                    if (orderDetail.getId() == goodsNumBean.getOdId()) {
-                        // 保存商品价格和数量信息，放入日志
-                        goodsNumBean.setGoodsPrice(Double.valueOf(orderDetail.getGoodsprice()));
-                        goodsNumBean.setOldNum(orderDetail.getYourorder());
-                        oldTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getOldNum();
-                        newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
-                        // 执行修改产品数量操作
-                        orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
-                        oldOrderDeatisMap.put(orderDetail.getId(), orderDetail);
-                        //
-                        OrderDetailsBean orderDetailTemp = (OrderDetailsBean) orderDetail.clone();
-                        orderDetailTemp.setYourorder(goodsNumBean.getNum());
-                        nwOrderDetails.add(orderDetailTemp);
-                        break;
-                    }
-                }
-            }
-            // 计算拆分产品总价占原总价的百分比
-            if (oldTotalGoodsCost == 0 || newTotalGoodsCost == 0) {
-                json.setOk(false);
-                json.setMessage("订单商品计算总价失败");
-                return json;
-            }
-            double splitRatio = newTotalGoodsCost / oldTotalGoodsCost;
-            // 2.新的订单数据
-            // 复制订单信息充当临时订单
-            OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
-            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 1);
-            OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, newOrderNo,
-                    oldTotalGoodsCost, nwOrderDetails);
-
-            // 3.开始执行拆单
-            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
-            if (isOk) {
-                // 更新订单的状态
-                // splitDao.checkAndUpdateOrderState(orderNo, newOrderNo);
-                json.setOk(true);
-            } else {
-                json.setOk(false);
-                json.setMessage("拆分失败请重试");
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error("splitGoodsByNum error:", e);
-            json.setOk(false);
-            json.setMessage("orderNo:" + orderNo + ",splitGoodsByNum error:" + e.getMessage());
-        }
-        return json;
+    /**
+     * 生成两位小数的double类型数据
+     *
+     * @param numVal
+     * @return
+     */
+    private double genDoubleWidthTwoDecimalPlaces(double numVal) {
+        BigDecimal bd = new BigDecimal(numVal);
+        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
+    /**
+     * 生成两位小数的float类型数据
+     *
+     * @param numVal
+     * @return
+     */
+    private float genFloatWidthTwoDecimalPlaces(float numVal) {
+        BigDecimal bd = new BigDecimal(numVal);
+        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+    }
 
     /**
      * 获取订单拆分后的邮件信息
@@ -588,6 +606,8 @@ public class NewOrderSplitCtr {
                 email = m.group();
             }
         }
+        String websiteType = request.getParameter("websiteType");
+        boolean isKidFlag = "2".equals(websiteType);
         try {
             String remark = StringUtils.isNotBlank(request.getParameter("remark ")) ? request.getParameter("remark") : "";
             model.put("remark", remark);
@@ -616,19 +636,19 @@ public class NewOrderSplitCtr {
                     // 获取运输方式和对应的运输时间
                     String mode_transport = oldOrderBean.getMode_transport();
                     int mode_transport_day = 0;
-                    if (mode_transport != null && mode_transport.contains("@")) {
+                    if (mode_transport != null && mode_transport.indexOf("@") > -1) {
                         String[] mode_transports = mode_transport.split("@");
                         if (mode_transports.length > 3) {
                             mode_transport = mode_transport.split("@")[1];
                             if (Utility.getStringIsNull(mode_transport)) {
-                                if (mode_transport.contains("-")) {
+                                if (mode_transport.indexOf("-") > -1) {
                                     mode_transport = mode_transport.split("-")[1];
                                 }
                                 mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
                             }
                         }
                     }
-                    if (oldOrderBean.getOrderNo().contains("_")) {
+                    if (oldOrderBean.getOrderNo().indexOf("_") > -1) {
                         if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
                             calendar.setTime(sdf.parse(time_));
                             calendar.set(Calendar.DAY_OF_MONTH,
@@ -650,7 +670,11 @@ public class NewOrderSplitCtr {
                 String url = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
                 request.setAttribute("autoUrl", url);
                 String autoUrl = "http://www.import-express.com" + url;
-                model.put("autoUrl", autoUrl);
+                if(isKidFlag){
+                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(autoUrl));
+                } else{
+                    model.put("autoUrl", autoUrl);
+                }
                 // 获取用户email
                 IOrderSplitServer splitServer = new OrderSplitServer();
                 request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
@@ -689,6 +713,10 @@ public class NewOrderSplitCtr {
                 // 发送邮件开始
                 request.setAttribute("details", oldOrderDetails);
                 request.setAttribute("details_", nwOrderDetails);
+                if(isKidFlag){
+                    SwitchDomainNameUtil.changeObjectList(oldOrderDetails);
+                    SwitchDomainNameUtil.changeObjectList(nwOrderDetails);
+                }
                 model.put("details", oldOrderDetails);
                 model.put("details_", nwOrderDetails);
                 if (state == 1) {
@@ -737,19 +765,19 @@ public class NewOrderSplitCtr {
                         // 获取运输方式和对应的运输时间
                         String mode_transport = orderBeans.get(i).getMode_transport();
                         int mode_transport_day = 0;
-                        if (mode_transport != null && mode_transport.contains("@")) {
+                        if (mode_transport != null && mode_transport.indexOf("@") > -1) {
                             String[] mode_transports = mode_transport.split("@");
                             if (mode_transports.length > 3) {
                                 mode_transport = mode_transport.split("@")[1];
                                 if (Utility.getStringIsNull(mode_transport)) {
-                                    if (mode_transport.contains("-")) {
+                                    if (mode_transport.indexOf("-") > -1) {
                                         mode_transport = mode_transport.split("-")[1];
                                     }
                                     mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
                                 }
                             }
                         }
-                        if (orderBeans.get(i).getOrderNo().contains("_")) {
+                        if (orderBeans.get(i).getOrderNo().indexOf("_") > -1) {
                             if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
                                 calendar.setTime(sdf.parse(time_));
                                 calendar.set(Calendar.DAY_OF_MONTH,
@@ -781,7 +809,11 @@ public class NewOrderSplitCtr {
                 request.setAttribute("autoUrl", url);
                 // 获取用户email
                 request.setAttribute("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
-                model.put("autoUrl", url);
+                if(isKidFlag){
+                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(url));
+                } else{
+                    model.put("autoUrl", url);
+                }
                 model.put("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
                 List<Object[]> orderDetails = new ArrayList<Object[]>();
                 if (state == 1) {
@@ -793,7 +825,7 @@ public class NewOrderSplitCtr {
                 List<Object[]> details = new ArrayList<Object[]>();// 剩余的订单
                 // 发送邮件开始
                 for (int i = 0; i < orderDetails.size(); i++) {
-                    if ((orderDetails.get(i)[0].toString().contains("_"))) {
+                    if ((orderDetails.get(i)[0].toString().indexOf("_") > -1)) {
                         if (orderNo.length() > 17) {
                             if (!orderDetails.get(i)[0].equals(ordernoNew)) {
                                 details.add(orderDetails.get(i));
@@ -810,6 +842,10 @@ public class NewOrderSplitCtr {
 
                 request.setAttribute("details", details);
                 request.setAttribute("details_", details_);
+                if(isKidFlag){
+                    SwitchDomainNameUtil.changeObjectList(details);
+                    SwitchDomainNameUtil.changeObjectList(details_);
+                }
                 model.put("details", details);
                 model.put("details_", details_);
                 if (state == 1) {
@@ -862,7 +898,7 @@ public class NewOrderSplitCtr {
                         model.put("totalExtraFree", "--");
                     }
                     System.err.println(orderBeans.get(0).getPay_price() + "(payPrice)="
-                            + orderBeans.get(0).getProduct_cost() + "(productCost)+ "
+                            +  orderBeans.get(0).getProduct_cost() + "(productCost)+ "
                             + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
@@ -872,13 +908,23 @@ public class NewOrderSplitCtr {
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
                 model.put("currency", orderBeans.get(0).getCurrency());
                 String liveChatLink = "http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service";
-                model.put("here", liveChatLink);
+                if(isKidFlag){
+                    model.put("here", SwitchDomainNameUtil.checkNullAndReplace(liveChatLink));
+                }else {
+                    model.put("here", liveChatLink);
+                }
             }
             net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
             String modeStr = jsonObject.toString();
             try {
-                sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
-                        "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING);
+                if(isKidFlag){
+                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
+                        "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING_KID);
+                } else{
+                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
+                        "Due to supply reasons, we can only send your order partially at first.",
+                            model, TemplateType.DISMANTLING_IMPORT);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());
