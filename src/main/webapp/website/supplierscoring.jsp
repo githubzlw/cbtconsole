@@ -175,6 +175,10 @@
 		  }
 	}
 	function topageInfo(topage,currpage){
+            var salesShop = $("#salesShop").val();
+            var nowdate1 = $("#nowdate1").val();
+            var nowdate2 = $("#nowdate2").val();
+
 			var countpage = "${pageInfo.countPage }";
 			var level =	$("#select_level").val();
 			var shop_id = $("#select_ship_id").val();
@@ -193,7 +197,10 @@
 			if(topage==-1){
 				topage = $("#jump1").val()
 			}
-		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage+"&shop_id="+shop_id+"&level="+level+"&quality="+quality+"&flag="+flag+"&categoryName="+categoryName;
+		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage
+                +"&shop_id="+shop_id+"&level="+level+"&quality="+quality
+                +"&salesShop="+salesShop+"&nowdate1="+nowdate1+"&nowdate2="+nowdate2
+                +"&flag="+flag+"&categoryName="+categoryName;
 
 		}
 
