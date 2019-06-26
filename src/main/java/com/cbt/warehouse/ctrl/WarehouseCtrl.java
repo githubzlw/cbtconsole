@@ -6437,131 +6437,140 @@ public class WarehouseCtrl {
 		JcgjSoapHttpPost jc = new JcgjSoapHttpPost();
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		List<Map<String, Object>> sbxxList = (List<Map<String, Object>>) mainMap.get("sbxxList");
+		String WebSite= request.getParameter("WebSite");
 		int cont = sbxxList.size();
 		List<String> removeId = new ArrayList<String>();
-		try{
-			for (int i = 0; i < cont; i++) {
-				Map<String, Object> declares = sbxxList.get(i);
-				String orderid = (String) declares.get("orderid");
-				// 封装包裹信息
-				List<ProductBean> lpb=getProductBean(declares);
-				String expressNo = "";
-				String pdfUrl="";
-				int j = i;
-				Map<String, String> bgMap = bgList.get(j);
-				if (StringUtil.isNotBlank(orderid) && orderid.equals((String) bgMap.get("orderid"))) {
-					// 运输公司
-					String tStr = getGsType((String) bgMap.get("transportcompany"));
-					// 获取数据
-					PurchaseServer purchaseServer = new PurchaseServerImpl();
-					UserOrderDetails uod = purchaseServer.getUserDetails(orderid + ",");
-					//将数据保存到UserOrderDetails中
-					saveUod(lpb, bgMap, uod);
-					String number = "";
-					if ("3".equals(tStr)) {
-						number = jc.callGetNumber(uod.getUserzone(), "887799");
-						LOG.info("佳成运单号================" + number);
-						//校验运单数据是否合法
-						int ri = Integer.parseInt(outJc(uod, number));
-						expressNo = number;
-						if (ri != 10000){
-							removeId.add(bgList.get(j).get("shipmentno"));
-							continue;
-						}
-					}else if("7".equals(tStr)){
-						Map<String,String> map=getFTData(orderid,declares,uod);
-						String  strs=outFte(map);
-						expressNo=strs;
-					}else if("5".equals(tStr)){
-						Map<String,Object> map=getZtoData(orderid,declares,uod);
-						String [] strs=outZto(map);
-						expressNo=strs[0];
-						pdfUrl=strs[1];
-					}else if ("4".equals(tStr)) {
-						List<RecList> lr = new ArrayList<RecList>();
-						List<GoodsPojo> list = new ArrayList<GoodsPojo>();
-						// 申报信息
-						List<ProductBean> proBeanList = new ArrayList<ProductBean>();
-						proBeanList = uod.getProductBean();
-						int ppp = proBeanList.size();
-						StringBuilder en_name=new StringBuilder();
-						StringBuilder cn_name=new StringBuilder();
-						getGoodsPojoInfo(list, proBeanList, ppp, en_name, cn_name);
-						RecList r = new RecList();
-						r.setiID("0");
-						r.setnItemType("1");
-						String orderidTemp = uod.getOrderno();
-						if (orderid.indexOf("-1") != -1) {
-							orderidTemp = orderidTemp.substring(0,orderidTemp.indexOf("-1"));
-						}
-						lr=getRecList(bgMap, uod, lr, list, en_name, cn_name, r, orderidTemp);
-						Map<String, Object> mapR = new HashMap<String, Object>();
-						mapR.put("RequestName", "PreInputSet");
-						mapR.put("icID", 14972);
-						String nowTime = null;
-						nowTime = getNowTime(jc, nowTime);
-						String md5 =JcgjSoapHttpPost.string2MD5("14972" + nowTime+ "Yb70MrMh9Q4Odl5");
-						mapR.put("TimeStamp", nowTime);
-						mapR.put("MD5", md5);
-						mapR.put("RecList", lr);
-						String t2 = jc.objToGson(mapR);
-						LOG.info("==============t2==================="+t2);
-						//调用CNE的API
-						String ret = jc.preInputSet(t2);
-						JSONObject json = JSONObject.fromObject(ret);
-						if(!json.toString().contains("请及时付款")){
-							List<Map<String, Object>> edit = (List<Map<String, Object>>) json.getJSONArray("ErrList");
-							int iID = (Integer) edit.get(0).get("iID");
-							if (iID == 0) {
-								LOG.info("【订单号:" + orderid+ "】 对接CNE获取运单号有误  -----"+ edit.get(0).get("cMess").toString());
-								removeId.add(bgList.get(j).get("shipmentno"));
-								continue;
-							}
-							//CNE包裹号
-							String cNum = (String) edit.get(0).get("cNum");
-							expressNo = cNum;
-						}
-					}
-					bgMap.put("expressno", expressNo); // 添加包裹号
-					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
-				}
-			}
-			//发送邮件给客户提示发货
-			for (int i = 0; i < cont; i++) {
-				Map<String, Object> declares = sbxxList.get(i);
-				String orderid = (String) declares.get("orderid");
-				//发送邮件给客户告知已经发货
-				IGuestBookService ibs = new GuestBookServiceImpl();
-				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
-				Map<String,Object> modelM = new HashedMap();
-				modelM.put("name",ob.getEmail());
-				modelM.put("orderid",orderid);
-				modelM.put("recipients",ob.getRecipients());
-				if(org.apache.commons.lang3.StringUtils.isNotBlank(ob.getAddresss())){
-					modelM.put("street",ob.getAddresss() + " " + ob.getStreet());
-				}else{
-					modelM.put("street",ob.getStreet());
-				}
-				modelM.put("street1","");
-				modelM.put("city",ob.getAddress2());
-				modelM.put("state",ob.getStatename());
-				modelM.put("country",ob.getCountry());
-				modelM.put("zipCode",ob.getZipcode());
-				modelM.put("phone",ob.getPhonenumber());
-				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
-				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
-			}
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		// 更新订单状态
-		updateOrderState(bgList, sbxxList, cont);
-		// 存申报信息
-		saveDeclareInfo(sbxxList);
-		// 修改包裹信息
-		int ret = 0;
-		ret = updateBgState(bgList, ret);
-		return String.valueOf(ret);
+//		try{
+//			for (int i = 0; i < cont; i++) {
+//				Map<String, Object> declares = sbxxList.get(i);
+//				String orderid = (String) declares.get("orderid");
+//				// 封装包裹信息
+//				List<ProductBean> lpb=getProductBean(declares);
+//				String expressNo = "";
+//				String pdfUrl="";
+//				int j = i;
+//				Map<String, String> bgMap = bgList.get(j);
+//				if (StringUtil.isNotBlank(orderid) && orderid.equals((String) bgMap.get("orderid"))) {
+//					// 运输公司
+//					String tStr = getGsType((String) bgMap.get("transportcompany"));
+//					// 获取数据
+//					PurchaseServer purchaseServer = new PurchaseServerImpl();
+//					UserOrderDetails uod = purchaseServer.getUserDetails(orderid + ",");
+//					//将数据保存到UserOrderDetails中
+//					saveUod(lpb, bgMap, uod);
+//					String number = "";
+//					if ("3".equals(tStr)) {
+//						number = jc.callGetNumber(uod.getUserzone(), "887799");
+//						LOG.info("佳成运单号================" + number);
+//						//校验运单数据是否合法
+//						int ri = Integer.parseInt(outJc(uod, number));
+//						expressNo = number;
+//						if (ri != 10000){
+//							removeId.add(bgList.get(j).get("shipmentno"));
+//							continue;
+//						}
+//					}else if("7".equals(tStr)){
+//						Map<String,String> map=getFTData(orderid,declares,uod);
+//						String  strs=outFte(map);
+//						expressNo=strs;
+//					}else if("5".equals(tStr)){
+//						Map<String,Object> map=getZtoData(orderid,declares,uod);
+//						String [] strs=outZto(map);
+//						expressNo=strs[0];
+//						pdfUrl=strs[1];
+//					}else if ("4".equals(tStr)) {
+//						List<RecList> lr = new ArrayList<RecList>();
+//						List<GoodsPojo> list = new ArrayList<GoodsPojo>();
+//						// 申报信息
+//						List<ProductBean> proBeanList = new ArrayList<ProductBean>();
+//						proBeanList = uod.getProductBean();
+//						int ppp = proBeanList.size();
+//						StringBuilder en_name=new StringBuilder();
+//						StringBuilder cn_name=new StringBuilder();
+//						getGoodsPojoInfo(list, proBeanList, ppp, en_name, cn_name);
+//						RecList r = new RecList();
+//						r.setiID("0");
+//						r.setnItemType("1");
+//						String orderidTemp = uod.getOrderno();
+//						if (orderid.indexOf("-1") != -1) {
+//							orderidTemp = orderidTemp.substring(0,orderidTemp.indexOf("-1"));
+//						}
+//						lr=getRecList(bgMap, uod, lr, list, en_name, cn_name, r, orderidTemp);
+//						Map<String, Object> mapR = new HashMap<String, Object>();
+//						mapR.put("RequestName", "PreInputSet");
+//						mapR.put("icID", 14972);
+//						String nowTime = null;
+//						nowTime = getNowTime(jc, nowTime);
+//						String md5 =JcgjSoapHttpPost.string2MD5("14972" + nowTime+ "Yb70MrMh9Q4Odl5");
+//						mapR.put("TimeStamp", nowTime);
+//						mapR.put("MD5", md5);
+//						mapR.put("RecList", lr);
+//						String t2 = jc.objToGson(mapR);
+//						LOG.info("==============t2==================="+t2);
+//						//调用CNE的API
+//						String ret = jc.preInputSet(t2);
+//						JSONObject json = JSONObject.fromObject(ret);
+//						if(!json.toString().contains("请及时付款")){
+//							List<Map<String, Object>> edit = (List<Map<String, Object>>) json.getJSONArray("ErrList");
+//							int iID = (Integer) edit.get(0).get("iID");
+//							if (iID == 0) {
+//								LOG.info("【订单号:" + orderid+ "】 对接CNE获取运单号有误  -----"+ edit.get(0).get("cMess").toString());
+//								removeId.add(bgList.get(j).get("shipmentno"));
+//								continue;
+//							}
+//							//CNE包裹号
+//							String cNum = (String) edit.get(0).get("cNum");
+//							expressNo = cNum;
+//						}
+//					}
+//					bgMap.put("expressno", expressNo); // 添加包裹号
+//					bgMap.put("pdfUrl", pdfUrl); // 添加包裹号
+//				}
+//			}
+//			//发送邮件给客户提示发货
+//			for (int i = 0; i < cont; i++) {
+//				Map<String, Object> declares = sbxxList.get(i);
+//				String orderid = (String) declares.get("orderid");
+//				//发送邮件给客户告知已经发货
+//				IGuestBookService ibs = new GuestBookServiceImpl();
+//				OrderBean ob=iWarehouseService.getUserOrderInfoByOrderNo(orderid);
+//				Map<String,Object> modelM = new HashedMap();
+//				modelM.put("name",ob.getEmail());
+//				modelM.put("orderid",orderid);
+//				modelM.put("recipients",ob.getRecipients());
+//				if(org.apache.commons.lang3.StringUtils.isNotBlank(ob.getAddresss())){
+//					modelM.put("street",ob.getAddresss() + " " + ob.getStreet());
+//				}else{
+//					modelM.put("street",ob.getStreet());
+//				}
+//				modelM.put("street1","");
+//				modelM.put("city",ob.getAddress2());
+//				modelM.put("state",ob.getStatename());
+//				modelM.put("country",ob.getCountry());
+//				modelM.put("zipCode",ob.getZipcode());
+//				modelM.put("phone",ob.getPhonenumber());
+//				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+//				String temp="";
+//				if ("0".equals(WebSite)){
+//					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+//				}
+//				if ("1".equals(WebSite)){
+//					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
+//				}
+//
+//			}
+//		}catch (Exception e){
+//			e.printStackTrace();
+//		}
+//		// 更新订单状态
+//		updateOrderState(bgList, sbxxList, cont);
+//		// 存申报信息
+//		saveDeclareInfo(sbxxList);
+//		// 修改包裹信息
+//		int ret = 0;
+//		ret = updateBgState(bgList, ret);
+//		return String.valueOf(ret);
+		return "";
 	}
 
 
