@@ -142,6 +142,7 @@ public class TabCouponController {
                                          @RequestParam(value = "valueRight", defaultValue = "0", required = false) Integer valueRight, //满减卷优惠金额
                                          String describe, //卷描述
                                          @RequestParam(value = "count", defaultValue = "0", required = false) Integer count, //卷数量
+                                         @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType, //网站名
                                          String fromTime,//领取开始时间
                                          String toTime//领取截止时间
     		) {
@@ -213,7 +214,7 @@ public class TabCouponController {
         		type.toString(), "1");
         //String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to, int type, int valid, Integer userid
         TabCouponNew tabCouponNew = new TabCouponNew(couponCode, count, count, describe,
-        		value, fromDate, toDate, type, 1, userId, shareFlag);
+        		value, fromDate, toDate, type, 1, userId, shareFlag, websiteType);
         try {
             resultMap = tabCouponService.addCoupon(couponRedis, tabCouponNew, useridList);
         	if (shareFlag == 1) {
@@ -313,7 +314,9 @@ public class TabCouponController {
      **/
     @RequestMapping(value = "/addCouponUser.do", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, String> addCouponUser(String couponCode, String userids) {
+    public Map<String, String> addCouponUser(String couponCode, String userids,
+                                             @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType  //网站名
+                                            ) {
         Map<String, String> result = new HashMap<String, String>();
         try {
             if (userids == null){
@@ -331,7 +334,7 @@ public class TabCouponController {
                 result.put("message", "未录入用户id");
                 return result;
             }
-            result = tabCouponService.addCouponUser(couponCode, useridList);
+            result = tabCouponService.addCouponUser(couponCode, useridList, websiteType);
         } catch (Exception e) {
             result.put("state", "false");
             result.put("message", "录入异常");
