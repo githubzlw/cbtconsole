@@ -1,7 +1,6 @@
 package com.importExpress.service.impl;
 
 import com.cbt.customer.service.IPictureComparisonService;
-import com.cbt.processes.dao.IUserDao;
 import com.cbt.util.Utility;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.TemplateType;
@@ -13,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -40,7 +37,7 @@ public class SendChaPsendEmailServiceImple implements SendChaPsendEmailService {
     @Autowired
     private IPictureComparisonService ips;
     @Override
-    public JsonResult sendChaPsendEmail(String emailInfo, String email, String copyEmail, String orderNo, String userId, String title , String reason3){
+    public JsonResult sendChaPsendEmail(String emailInfo, String email, String copyEmail, String orderNo, String userId, String title, String reason3, Integer websiteType){
         JsonResult result = new JsonResult();
         try {
             //step v1. @author: cjc @date：2018/12/29 10:25:45  TODO 获取参数
@@ -62,7 +59,11 @@ public class SendChaPsendEmailServiceImple implements SendChaPsendEmailService {
                 Map<String,Object> map = new HashedMap();
                 //href="http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo=QC26660789904597_1"
                 String href = "";
-                map.put("clickHereForDetails","http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo="+orderNo);
+                if (websiteType == 1) {
+                    map.put("clickHereForDetails", "http://www.import-express.com/orderInfo/getChangeProduct?flag=1&orderNo=" + orderNo);
+                } else if (websiteType == 2) {
+                    map.put("clickHereForDetails", "http://www.kidsproductwholesale.com/orderInfo/getChangeProduct?flag=1&orderNo=" + orderNo);
+                }
                 //标题
                 map.put("title",title);
                 //客户邮件
@@ -77,6 +78,8 @@ public class SendChaPsendEmailServiceImple implements SendChaPsendEmailService {
                 map.put("orderNo",orderNo);
                 //备注
                 map.put("reason3",reason3);
+
+                map.put("websiteType", websiteType);
 
                 freightUtlity.sendMailNew(email, copyEmail, title, map, TemplateType.REPLACEGOODS);
                 result.setOk(true);

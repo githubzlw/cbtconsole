@@ -72,6 +72,7 @@ function fnSendEmail(){
 	var copyEmail = $("#copyEmail").val();
 	var orderNo = $("#orderNo").val();
 	var userId = $("#userId").val();
+    var websiteType = $("#website_type").val();  // 网站名
 	$.ajax({
         type : 'POST',
 		url:"../customerRelationshipManagement/sendChaPsendEmail",
@@ -82,7 +83,8 @@ function fnSendEmail(){
 			orderNo:orderNo,
 			userId:userId,
 			title:titleinfo,
-			reason3:reason3
+			reason3:reason3,
+            websiteType:websiteType
 		},
         success:function(data){
 		    if(data.ok){
@@ -154,12 +156,20 @@ String uuid = UUIDUtil.getEffectiveUUID(Integer.parseInt(userId), "");
 String url = UUIDUtil.getAutoLoginPath("/orderInfo/getChangeProduct?flag=1&orderNo=", uuid);
 %>
 <body>
+    <div>
 	收件人:<input type="text" id="emailaddress" value="<%=email%>">&nbsp;&nbsp;&nbsp;
 	发件人:<input type="text" id="copyEmail" value="${param.sendEmail}">&nbsp;&nbsp;&nbsp;
+    网站名:
+    <select id="website_type" style="width: 160px;">
+        <option value="1" selected="selected">import-express</option>
+        <option value="2">kidsproductwholesale</option>
+    </select>
+    </div>
+
 	<input type="hidden" id="orderNo" value="${param.orderno}">
 	<input type="hidden" id="userId" value="${param.userId}">
 	<%--<br>标题:<input style="width: 260px;" type="text" lang="100" value="Your ImportExpress order has substitutes need your confirm before purchase!" id="titleinfo">--%>
-	<br>标题:<input style="width: 260px;" type="text" lang="100" value="Alternatives for Unavailable Item(s) in Your Current Order!" id="titleinfo">
+	<br>标题:<input style="width: 620px;" type="text" lang="100" value="Alternatives for Unavailable Item(s) in Your Current Order!" id="titleinfo">
 	<input type="button" id="send_bt" value="确认并发送邮件" style="font-size: 14px;font-weight: bold;" onclick="fnSendEmail();"><br>
 	邮件显示内容：
 	<br>

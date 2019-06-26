@@ -2,9 +2,6 @@ package com.importExpress.service;
 
 import com.cbt.website.util.JsonResult;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 public interface SendChaPsendEmailService {
     /**
      * @Title: sendChaPsendEmail
@@ -14,5 +11,5 @@ public interface SendChaPsendEmailService {
      * @Param: [request, response]
      * @Return: com.cbt.website.util.JsonResult
      */
-    JsonResult sendChaPsendEmail(String emailInfo, String email, String copyEmail, String orderNo, String userId, String title , String reason3);
+    JsonResult sendChaPsendEmail(String emailInfo, String email, String copyEmail, String orderNo, String userId, String title, String reason3, Integer websiteType);
 }
