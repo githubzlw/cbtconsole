@@ -75,7 +75,15 @@ public class SupplierScoringController {
 			categoryName=StringUtil.isBlank(categoryName)?null:categoryName;
 			shop_id = StringUtils.isNotBlank(shop_id) ? new String(shop_id.getBytes("iso8859-1"), "utf-8"): null;
 			String level = request.getParameter("level");
-			request.setAttribute("flag",flag);
+			// 是否是核心供应商 店铺上线时间
+            Integer salesShop = StringUtils.isBlank(request.getParameter("salesShop"))?0:Integer.parseInt(request.getParameter("salesShop"));
+            String nowdate1 = StringUtils.isBlank(request.getParameter("nowdate1"))?"":request.getParameter("nowdate1");
+            String nowdate2 = StringUtils.isBlank(request.getParameter("nowdate2"))?"":request.getParameter("nowdate2");
+            request.setAttribute("salesShop", salesShop);
+            request.setAttribute("nowdate1", nowdate1);
+            request.setAttribute("nowdate2", nowdate2);
+
+            request.setAttribute("flag",flag);
 			request.setAttribute("level",StringUtil.isBlank(level)?"":level);
 			request.setAttribute("quality",StringUtil.isBlank(quality)?"":quality);
 			request.setAttribute("services",StringUtil.isBlank(services)?"":services);
@@ -102,7 +110,7 @@ public class SupplierScoringController {
 			int start = Utility.getStringIsNull(request.getParameter("currpage")) ? Integer.parseInt(request.getParameter("currpage")) : 1;
 			int pagesize = 20;
 			Page<SupplierScoringBean> pageInfo = supplierScoringService.queryList(start, pagesize, shop_id, level,quality,services,
-					authorizedFlag,flag,userid,categoryName);
+					authorizedFlag,flag,userid,categoryName, salesShop, nowdate1, nowdate2);
 			List<SupplierScoringBean> scoringlist = pageInfo.getList();
 			if (scoringlist == null) {
 				LOG.warn("工厂列表查询为空");
