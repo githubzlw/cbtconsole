@@ -6437,6 +6437,7 @@ public class WarehouseCtrl {
 		JcgjSoapHttpPost jc = new JcgjSoapHttpPost();
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		List<Map<String, Object>> sbxxList = (List<Map<String, Object>>) mainMap.get("sbxxList");
+		String WebSite= request.getParameter("WebSite");
 		int cont = sbxxList.size();
 		List<String> removeId = new ArrayList<String>();
 		try{
@@ -6549,7 +6550,15 @@ public class WarehouseCtrl {
 				modelM.put("zipCode",ob.getZipcode());
 				modelM.put("phone",ob.getPhonenumber());
 				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
-				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+				String temp="";
+				if ("0".equals(WebSite)){
+					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+				}
+				if ("1".equals(WebSite)){
+
+					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
+				}
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();

@@ -260,6 +260,7 @@ function getType(t){
 }
 //批量出库                                      
 function batchCk(){
+    var Web_site=$("#Web_site").val()
 	$.jBox.tip("正在操作，清稍候", 'loading');                                             
 	var tempOrderid;
 	var tempFpxCountryCode;
@@ -374,7 +375,7 @@ function batchCk(){
 	$('#plckid').attr('disabled',"true");
 	$.ajax({
 		type:"post", 
-		url:"batchCk",
+		url:"batchCk?WebSite="+Web_site,
 		dataType:"json",  
 	    contentType : 'application/json;charset=utf-8', 
 	    data:JSON.stringify(mainMap),
