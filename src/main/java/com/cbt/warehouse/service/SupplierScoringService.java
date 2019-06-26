@@ -21,7 +21,8 @@ public interface SupplierScoringService {
 	 * @return List<SupplierScoring>
 	 */
 	public Page<SupplierScoringBean> queryList(int start, int pagesize, String shop_id, String level, String quality,
-                                               String services, String authorizedFlag, boolean flag, String userid,String categoryName);
+                                               String services, String authorizedFlag, boolean flag, String userid,
+                                               String categoryName, Integer salesShop, String nowdate1, String nowdate2);
 
 	/**
 	 * 合作过的供应商
