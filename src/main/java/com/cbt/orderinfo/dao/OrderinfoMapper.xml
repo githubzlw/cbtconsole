@@ -1394,10 +1394,10 @@
 
     <insert id="insertIntoOrderSplitNumLog" parameterType="java.util.ArrayList">
         insert into order_split_num_log(od_id,num,old_num,goods_price,admin_id)
-        values(#{odId},#{num},#{oldNum},#{goodsPrice},#{adminId})
+         values
         <foreach collection="list" item="splitGood" separator=",">
-          values(#{splitGood.odId},#{splitGood.num},#{splitGood.oldNum},#{splitGood.goodsPrice},#{splitGood.adminId})
-          </foreach>
+           (#{splitGood.odId},#{splitGood.num},#{splitGood.oldNum},#{splitGood.goodsPrice},#{splitGood.adminId})
+        </foreach>
     </insert>
 
 </mapper>
