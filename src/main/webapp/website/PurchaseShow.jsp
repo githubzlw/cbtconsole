@@ -3304,6 +3304,11 @@
 								<div style="width: 170px; word-wrap: break-word;color: #59f775;background-color: black;">
 									<b>店铺售卖金额($):${pb.goodsShopPrice}</b>
 								</div>
+								<c:if test="${pb.goodsShopPrice>1000}">
+									<div style="width: 100%; word-wrap: break-word;">
+										建议多买些：多买的变成库存
+									</div>
+								</c:if>
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
