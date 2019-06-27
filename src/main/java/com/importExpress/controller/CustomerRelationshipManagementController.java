@@ -4,50 +4,30 @@ package com.importExpress.controller;
 import com.cbt.admuser.service.AdmuserService;
 import com.cbt.bean.Orderinfo;
 import com.cbt.bean.TabTransitFreightinfoUniteNew;
-import com.cbt.common.dynamics.DataSourceSelector;
-import com.cbt.customer.service.IPictureComparisonService;
-import com.cbt.customer.service.PictureComparisonServiceImpl;
 import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
-import com.cbt.processes.dao.IUserDao;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
-import com.cbt.util.Utility;
-import com.cbt.website.util.JsonResult;
-import com.importExpress.mail.TemplateType;
 import com.cbt.website.util.EasyUiJsonResult;
-import com.importExpress.pojo.*;
-import com.importExpress.service.AdminRUserServiece;
-import com.importExpress.service.OrderSplitService;
-import com.importExpress.service.OutofstockdemandService;
-import com.importExpress.service.ReorderService;
-import com.importExpress.service.SendChaPsendEmailService;
-import com.importExpress.utli.FreightUtlity;
+import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.AdminRUser;
+import com.importExpress.pojo.AdminRUserExample;
+import com.importExpress.pojo.Outofstockdemandtable;
+import com.importExpress.service.*;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.opencv.ml.EM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
-import javax.jws.Oneway;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Result;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 
 /**
@@ -198,7 +178,8 @@ public class CustomerRelationshipManagementController {
         String userId=request.getParameter("userId");
         String title = request.getParameter("title");
         String reason3 = request.getParameter("reason3");
-        JsonResult result = sendChaPsendEmailService.sendChaPsendEmail( emailInfo,  email,  copyEmail,  orderNo,  userId,  title ,  reason3);
+        Integer websiteType = StringUtils.isBlank(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
+        JsonResult result = sendChaPsendEmailService.sendChaPsendEmail(emailInfo,  email,  copyEmail,  orderNo,  userId,  title ,  reason3, websiteType);
         return result;
     }
     @RequestMapping(value = "/getOutofstockdemandList")

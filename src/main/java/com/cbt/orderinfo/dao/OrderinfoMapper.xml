@@ -699,7 +699,7 @@
         email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913' AND oi.actual_lwh>0
         GROUP BY oi.order_no HAVING COUNT(od.id)=SUM(od.checked)) b
     </select>
-    <select id="getorderPending" resultType="java.util.Map">
+    <select id="getorderPending" resultType="java.util.Map" parameterType="java.util.ArrayList">
         SELECT  o.order_no,o.mode_transport,o.orderid AS id,o.delivery_time ,o.currency,o.user_id,IFNULL(aru.admName,'') adminname,
         IFNULL(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email,
         ''AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
@@ -712,10 +712,14 @@
         ifnull(re.orderremark,'-') as orderremarks
         FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
         left join order_remark re on re.orderid=o.order_no
-        where o.order_no in (${orderIds}) and del = 0 ORDER BY paytime desc
+        where 1=1 and  o.order_no in
+        <foreach collection="orderIds" item="onVal" open="("  close=")">
+            #{onVal}
+        </foreach>
+        and del = 0 ORDER BY paytime desc
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
-        SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
+        SELECT p.orderid as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
         <if test="admuserid != 0">
             INNER JOIN admin_r_user a ON oi.user_id = a.userid
             AND a.adminid = #{admuserid}

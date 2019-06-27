@@ -6690,7 +6690,7 @@ public class OrderwsDao implements IOrderwsDao {
                 "on r.pid=c.pid WHERE r.createtime>='" + beginDate + "' " +
                 "AND r.createtime<='" + endDate + "' and c.valid=1 AND r.uid=0 AND r.sessionid IS NOT NULL\n";
         if (ipFlag > 0) {
-            sql += " and r.sessionid not in(select sessionid from ip_record where sessionid is not null and is_china =1 and user_id = 0))";
+            sql += " and r.sessionid not in(select sessionid from ip_record where sessionid is not null and is_china =1 and user_id = 0) ";
         }
         sql += "GROUP BY r.sessionid,r.pid,LEFT(r.createtime,10)) a GROUP BY a.pid\n" +
                 "UNION\n" +
@@ -6902,7 +6902,12 @@ public class OrderwsDao implements IOrderwsDao {
                 //u.setPid(rs.getString("view_url"));
                 String view_url = rs.getString("view_url");
                 if (org.apache.commons.lang3.StringUtils.isNotBlank(view_url)) {
-                    u.setPid(view_url.substring(view_url.lastIndexOf("-") + 2, view_url.lastIndexOf(".html")));
+
+                    try {
+                        u.setPid(view_url.substring(view_url.lastIndexOf("-") + 2, view_url.lastIndexOf(".html")));
+                    } catch (Exception e) {
+
+                    }
                 }
                 u.setCarNum(rs.getInt("view_url_count"));
                 list.add(u);

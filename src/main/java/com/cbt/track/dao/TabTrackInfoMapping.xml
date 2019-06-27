@@ -496,7 +496,7 @@
             ti.track_update trackUpdate, ti.delivered_time deliveredTime, ti.source_type sourceType,
             sp.createtime senttime
         <if test="export != null and export == 1">
-            , tf.track_no_forward forwardNo, tf.track_company_forward forwardCompany
+            , tf.track_no_forward forwardNo, tf.track_company_forward forwardCompany, ti.delivered_time deliveredTime
         </if>
 
         <include refid="getTrackInfo" />

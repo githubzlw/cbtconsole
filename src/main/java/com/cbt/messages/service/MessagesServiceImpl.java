@@ -9,10 +9,8 @@ import com.cbt.messages.vo.MessagesCountVo;
 import com.cbt.pojo.Admuser;
 import com.cbt.pojo.Messages;
 import com.cbt.pojo.page.Page;
-import com.importExpress.mapper.CustomerDisputeMapper;
 import com.importExpress.utli.MongoDBHelp;
 import com.mongodb.BasicDBObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -191,7 +188,7 @@ public class MessagesServiceImpl implements MessagesService{
 		Integer count1027 = customerInfoCollectionNum.getNoDeleteCount();
 		
 		//客户评论管理：如果 没删除 或者 让他 前台显示  就属于 未处理 (请限制为最近1个月)	1078
-		Integer count1078 = messagesDao.selectReviewManagementNum();
+//		Integer count1078 = messagesDao.selectReviewManagementNum();
 		
 		//投诉管理 ， 如果 没回复 就属于未处理	29
 		//http://192.168.1.34:8086/cbtconsole/complain/searchComplainByParam?userid=&creatTime=&complainState=0&username=&toPage=1&currentPage=1
@@ -230,7 +227,7 @@ public class MessagesServiceImpl implements MessagesService{
 		
 		
 		//查询需要加待处理消息数量入口的名称，用于入口页面中搜索入口按钮及拼接对应数量
-		List<HashMap<String, String>> result = messagesDao.queryAuthNameByIds(Arrays.asList(new String[]{"19","29","1073","1078","1027","1114"}));
+		List<HashMap<String, String>> result = messagesDao.queryAuthNameByIds(Arrays.asList(new String[]{"19","29","1073","1027","1114"}));
 		for (HashMap<String, String> bean : result) {
 			String id = String.valueOf(bean.get("authId"));
 			switch (id) {
@@ -243,9 +240,9 @@ public class MessagesServiceImpl implements MessagesService{
 			case "1073":
 				bean.put("count", String.valueOf(count1073));
 				break;
-			case "1078":
-				bean.put("count", String.valueOf(count1078));
-				break;
+//			case "1078":
+////				bean.put("count", String.valueOf(count1078));
+////				break;
 			case "1027":
 				bean.put("count", String.valueOf(count1027));
 				break;
