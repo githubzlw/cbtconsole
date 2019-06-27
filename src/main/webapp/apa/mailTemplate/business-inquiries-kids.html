@@ -4,7 +4,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>kidsproductwholesale Mail Complaint</title>
+    <title>ImportExpress Mail Business Inquiries</title>
+    <link rel="stylesheet" href="css/xiazai.css">
     <style type="text/css">
 
         *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -22,6 +23,7 @@
         h6{font-weight:900;font-size: 14px;text-transform: uppercase;}
         .collapse{margin:0!important;}
         i,em{ font-style: normal;}
+
         td, div{font-family: Helvetica, Arial, sans-serif;text-align: center;}
         p, ul{margin-bottom: 10px;font-weight: normal;font-size:14px;line-height:1.6;}
         p.lead{font-size:17px;}
@@ -29,23 +31,17 @@
         ul, ol { list-style:none; }
         a{color: #747474;text-decoration: none;}
         a img{border: none;}
-
-
         .clearfix:before,.clearfix:after{content:"";display:table;}
         .clearfix:after{clear:both;}
         .clearfix{zoom:1;}
         .head-wrap{width: 100%;margin: 0 auto;background-color: #f9f8f8;border-bottom: 1px solid #d8d8d8;}
         .head-wrap *{margin: 0;padding: 0;}
-        .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 78px;}
+        .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 60px;}
         .header{height: 42px;}
         .header .content{padding: 0;}
         .header .brand{font-size: 16px;line-height: 42px;font-weight: bold;}
         .header .brand a{color: #464646;}
-        .header .brand a img{ padding:2% 0 1%; }
-        .order_batck{ margin-bottom: 5px; text-align: left; color: #333;}
-        .order_batck1{ margin: 8px 0;}
-        .order_batck a{ color: #01a4ef;}
-        .order_batck a:hover{ text-decoration: underline;}
+        .header .brand a img{ padding:3% 0; }
         .body-wrap{width: 505px;margin: 0 auto;background-color: #ffffff;}
         .soapbox .soapbox-title{font-size: 30px;color: #464646;padding-top: 25px; text-align: left; }
         .content .status-container.single .status-padding{width: 80px;}
@@ -64,15 +60,21 @@
         .body-padded, .body-title{text-align: left;}
         .body .body-title{font-weight: bold;font-size: 16px;color: #464646;}
         .body .body-text .body-text-cell{text-align: left;font-size: 14px;line-height: 1.6;padding: 10px 0 10px;}
-        /* Complaint */
+        /* business-inquiries */
         .business_test{ margin: 8px 0 5px; color: #333; }
-        .business_question545{margin: 8px 0 0; color: #333; }
+        .business_question{margin: 8px 0; color: #333; }
+        .business_question a{color:#01a4ef;}
+        .business_question a:hover{ text-decoration: underline;}
 
 
         .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
         .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
         .footer-wrap{width: 100%;margin: 0 auto;clear: both !important;background-color: #e5e5e5;border-top: 1px solid #b3b3b3;font-size: 12px;color: #656565;line-height: 30px;}
         .thanks_so{ margin-bottom: 5px; }
+        .please_note{ width: 96%; padding: 1%; border: 1px solid #dfdfdf; background-color: #f6f6f6; text-align:left; color: #555;}
+        .please_note h3{ font-size: 14px; font-weight:bold; margin-bottom: 5px;}
+        .please_note p{ color: #666; font-size: 13px; margin-bottom:0;}
+        .please_note p a{color:#01a4ef; text-decoration: underline; }
         .footer-wrap .container{padding: 14px 0;}
         .footer-wrap .container .content{padding: 0;}
         .footer-wrap .container .footer-lead{font-size: 14px;}
@@ -185,7 +187,7 @@
                             <td>
                                 <table class="soapbox">
                                     <tr>
-                                        <td class="soapbox-title">Shipping Notification - kidsproductwholesale</td>
+                                        <td class="soapbox-title">Inquiry Reply From kidsproductwholesale</td>
                                     </tr>
                                 </table>
 
@@ -193,24 +195,16 @@
                                     <tr>
                                         <td class="body-padding"></td>
                                         <td class="body-padded">
-                                            <div class="body-title">Dear Sir/Madam, </div>
-                                            <p class="order_batck order_batck1">Your Order <i th:text="${orderid}"></i> has been shipped
-                                                out today and
-                                                it is on the way to you.</p>
-                                            <p class="order_batck">Recipients:<i th:text="${recipients}"></i></p>
-                                            <p class="order_batck">Street:<i th:text="${street}"></i><br><i th:text="${street1}"></i></p>
-                                            <p class="order_batck">City:<i th:text="${city}"></i></p>
-                                            <p class="order_batck">State:<i th:text="${state}"></i></p>
-                                            <p class="order_batck">Country:<i th:text="${country}"></i></p>
-                                            <p class="order_batck">Zip Code:<i th:text="${zipCode}"></i></p>
-                                            <p class="order_batck">Phone:<i th:text="${phone}"></i></p>
-                                            <p class="order_batck">And you can find the tracking information through<a target="_blank" href="" th:href="${toHref}">To Track</a></p>
-                                            <p class="order_batck">Any further question please fill our online Customer Contact<br> Form: <a target="_blank" href="https://www.kidsproductwholesale.com/cbt/servicerequest.jsp">https://www.kidsproductwholesale.com/cbt/servicerequest.jsp</a></p>
+                                            <div class="body-title">Hey <i th:text="${email}"></i>,</div>
+                                            <p class="business_test" th:text="${replyContent}">test_拆单</p>
+                                            <p class="business_question"><strong>Your Question:</strong>
+                                                [<i th:text="${id}">5500</i>]<i th:text="${qustion}">orderQuantity: Business inquiries_2018年10月18日13:43:49——Quantity; targetPrice: Business inquiries_2018年10月18日13:43:49——Your Target Price</i></p>
+                                            <p class="business_question"><strong>Item:</strong><a th:href= "${itemUrl}" href="https://www.kidsproductwholesale.com/goodsinfo/sex-woman-s-mark-west-club-red-bandage-dresses-1566738346383.html#%23%23" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://www.kidsproductwholesale.com/goodsinfo/sex-woman-s-mark-west-club-red-bandage-dresses-1566738346383.html%23%2523%2523&amp;source=gmail&amp;ust=1540358500042000&amp;usg=AFQjCNGVxQyRjYBY-PoG82L8RdSqPkxf_A" th:text="${itemUrl}"> Sex Woman 's Mark West Club Red Bandage Dresses</a></p>
                                             <table class="body-signature-block">
                                                 <tr>
                                                     <td class="body-signature-cell">
-                                                        <p class="thanks_so">Warm Regards,</p>
-                                                        <p class="thanks_so">kidsproductwholesale</p>
+                                                        <p class="thanks_so">Thanks so much,</p>
+                                                        <p>kidsproductwholesale</p>
                                                     </td>
                                                 </tr>
                                             </table>
