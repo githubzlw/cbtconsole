@@ -388,7 +388,7 @@ public interface OrderinfoMapper {
 	 * 查询订单状态为支付失败或者order_pending的订单
 	 * @return
 	 */
-	public List<Map<String, String>> getorderPending(@Param("orderIds") String orderIds);
+	public List<Map<String, String>> getorderPending(@Param("orderIds") List<String> orderIds);
 
 	/**
 	 * 根据订单号获取订单的支付状态
@@ -595,7 +595,7 @@ public interface OrderinfoMapper {
 	 * 获取支付时间或到账订单的订单号
 	 * @return
 	 */
-	public String getOrderIds(@Param("admuserid") int admuserid);
+	public List<String> getOrderIds(@Param("admuserid") int admuserid);
 	/**
 	 * 根据客户订单获取邮箱地址
 	 * @param orderNo
