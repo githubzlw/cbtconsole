@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
+import com.cbt.bean.*;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -36,15 +37,15 @@ import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.*;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.service.MabangshipmentService;
 import com.cbt.warehouse.service.SkuinfoService;
 import com.cbt.warehouse.service.ZoneShippingService;
 import com.cbt.warehouse.thread.warehouseThread;
-import com.cbt.warehouse.util.*;
 import com.cbt.warehouse.util.Utility;
+import com.cbt.warehouse.util.*;
 import com.cbt.website.bean.*;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
@@ -56,8 +57,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
-import com.cbt.website.util.*;
 import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.*;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -108,7 +109,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
@@ -7268,7 +7268,9 @@ public class WarehouseCtrl {
 	// 采购确认
 	@RequestMapping(value = "/purchaseConfirm", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
-	public String purchaseConfirm(HttpServletRequest request) {
+	public String purchaseConfirm(HttpServletRequest request,
+                                  @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType //网站名
+                                  ) {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 		// 判断是否登录失效，失效则不能执行
@@ -7324,8 +7326,13 @@ public class WarehouseCtrl {
 						modelM.put("country",ob.getCountry());
 						modelM.put("zipCode",ob.getZipcode());
 						modelM.put("phone",ob.getPhonenumber());
-						modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
-						sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
+						modelM.put("websiteType", websiteType);
+						if (websiteType == 1) {
+                            modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                        } else if (websiteType == 2) {
+                            modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                        }
+                        sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 						//插入发送邮件记录
 						pruchaseMapper.insertPurchaseEmail(orderid);
 					}

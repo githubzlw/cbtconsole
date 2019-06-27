@@ -1,7 +1,10 @@
 package com.importExpress.pojo;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class TabCouponNew {
 
 	// 折扣卷码
@@ -42,146 +45,20 @@ public class TabCouponNew {
     private Integer shareFlag;//是否用于社交分享：0-默认值 用于关联客户；1-用于社交分享；
     private String shareUrl;
 
-    public String getShareUrl() {
-        return shareUrl;
-    }
-
-    public void setShareUrl(String shareUrl) {
-        this.shareUrl = shareUrl;
-    }
-
-    public Integer getShareFlag() {
-        return shareFlag;
-    }
-
-    public void setShareFlag(Integer shareFlag) {
-        this.shareFlag = shareFlag;
-    }
-
-    public String getUserids() {
-        return userids;
-    }
-
-    public void setUserids(String userids) {
-        this.userids = userids;
-    }
-
-    public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	// 创建时间
 	private Date createtime;
 
 	//
 	private String mqlog;
+
+	private Integer websiteType;  // 网站名
 	
-	public String getMqlog() {
-		return mqlog;
-	}
-
-	public void setMqlog(String mqlog) {
-		this.mqlog = mqlog;
-	}
-
-	public String getId() {
-		return this.id;
-	};
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Integer getCount() {
-		return this.count;
-	};
-
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-
-	public Integer getLeftCount() {
-		return this.leftCount;
-	};
-
-	public void setLeftCount(Integer leftCount) {
-		this.leftCount = leftCount;
-	}
-
-	public String getDescribe() {
-		return this.describe;
-	};
-
-	public void setDescribe(String describe) {
-		this.describe = describe;
-	}
-
-	public String getValue() {
-		return this.value;
-	};
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public Date getFrom() {
-		return this.from;
-	};
-
-	public void setFrom(Date from) {
-		this.from = from;
-	}
-
-	public Date getTo() {
-		return this.to;
-	};
-
-	public void setTo(Date to) {
-		this.to = to;
-	}
-
-	public int getType() {
-		return this.type;
-	};
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getValid() {
-		return this.valid;
-	};
-
-	public void setValid(int valid) {
-		this.valid = valid;
-	}
-
-	public Integer getUserid() {
-		return this.userid;
-	};
-
-	public void setUserid(Integer userid) {
-		this.userid = userid;
-	}
-
-	public Date getCreatetime() {
-		return this.createtime;
-	};
-
-	public void setCreatetime(Date createtime) {
-		this.createtime = createtime;
-	}
-
 	public TabCouponNew() {
 		super();
 	}
 
 	public TabCouponNew(String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to,
-			int type, int valid, Integer userid, Integer shareFlag) {
+			int type, int valid, Integer userid, Integer shareFlag, Integer websiteType) {
 		super();
 		this.id = id;
 		this.count = count;
@@ -194,6 +71,7 @@ public class TabCouponNew {
 		this.valid = valid;
 		this.userid = userid;
 		this.shareFlag = shareFlag;
+		this.websiteType = websiteType;
 	}
 	
 }

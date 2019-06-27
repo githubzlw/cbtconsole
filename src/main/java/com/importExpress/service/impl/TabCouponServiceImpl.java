@@ -3,8 +3,6 @@ package com.importExpress.service.impl;
 import com.cbt.bean.UserBean;
 import com.cbt.jcys.util.HttpUtil;
 import com.cbt.util.DateFormatUtil;
-import com.cbt.warehouse.service.WarehouseServiceImpl;
-import com.ctc.wstx.util.DataUtil;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.TabCouponMapper;
@@ -116,7 +114,7 @@ public class TabCouponServiceImpl implements TabCouponService {
     }
 
     @Override
-    public Map<String, String> addCouponUser(String couponCode, List<String> useridList) {
+    public Map<String, String> addCouponUser(String couponCode, List<String> useridList, Integer websiteType) {
         Map<String, String> result = new HashMap<String, String>();
         //查询优惠卷信息
         TabCouponNew tabCouponNew = queryTabCouponOne(couponCode);
@@ -156,6 +154,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             result.put("message", "卷数量不足(已关联用户数+待关联用户数>卷总数量)");
             return result;
         }
+        tabCouponNew.setWebsiteType(websiteType);
         insertCouponUsersAndSendMail(tabCouponNew, userList);
         result.put("state", "true");
         result.put("message", "关联用户id成功, 正在发送邮件通知客户。");
@@ -211,6 +210,7 @@ public class TabCouponServiceImpl implements TabCouponService {
 
                     model.put("email", userBean.getEmail());
                     model.put("title", "A coupon was sent to your individual center!");
+                    model.put("websiteType", tabCouponNew.getWebsiteType());
 
                     sendMailFactory.sendMail(model.get("email").toString(), null, model.get("title").toString(), model, TemplateType.COUPON);
                 } catch (Exception e) {

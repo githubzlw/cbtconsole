@@ -1,31 +1,5 @@
 package com.importExpress.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.cbt.warehouse.pojo.*;
-import com.importExpress.mapper.CustomGoodsMapper;
-import com.importExpress.pojo.ShopGoodsSalesAmount;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.alibaba.ocean.rawsdk.ApiExecutor;
 import com.alibaba.trade.param.AlibabaTradeFastAddress;
 import com.alibaba.trade.param.AlibabaTradeFastCargo;
@@ -48,6 +22,7 @@ import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -63,12 +38,29 @@ import com.cbt.website.service.OrderwsServer;
 import com.ibm.icu.math.BigDecimal;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class IPurchaseServiceImpl implements IPurchaseService {
@@ -425,7 +417,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	}
 
 	@Override
-	public String allcgqrQrNew(String orderid, int adminid) {
+	public String allcgqrQrNew(String orderid, int adminid, Integer websiteType) {
 		String datas = "";
 		StringBuffer bf = new StringBuffer();
 		Date date = new Date();
@@ -496,7 +488,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				modelM.put("country",ob.getCountry());
 				modelM.put("zipCode",ob.getZipcode());
 				modelM.put("phone",ob.getPhonenumber());
-				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+                modelM.put("websiteType", websiteType);
+                if (websiteType == 1) {
+                    modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                } else if (websiteType == 2) {
+                    modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                }
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 				//插入发送邮件记录
 				pruchaseMapper.insertPurchaseEmail(orderid);
