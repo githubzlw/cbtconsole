@@ -379,7 +379,6 @@ function sendEmail(qid,shop_id,url){
         url:'/cbtconsole/question/sendEmail?Website='+Website,
         data:{qid:qid,rcontent:content,url:url},
         success:function(res){
-            alert(res)
             if(res>0){
                 alert("邮件发送成功");
             }else{
