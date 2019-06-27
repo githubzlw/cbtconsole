@@ -602,6 +602,7 @@ public class OrderInfoController{
 		PrintWriter out = response.getWriter();
 		String orderNo = null;
 		String orderNo1 = request.getParameter("orderNo");
+		String Website = request.getParameter("Website");
 		int whichOne = Integer.parseInt(request.getParameter("whichOne"));
 		// 获取到是否是isDropship订单
 		int isDropship = Integer.parseInt(request.getParameter("isDropship"));
@@ -619,7 +620,14 @@ public class OrderInfoController{
 			modelM.put("orderNo",orderNo);
 			modelM.put("name",email);
 			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
-			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
+			if ("0".equals(Website)){
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
+			}
+			if ("1".equals(Website)){
+				modelM.put("accountLink","https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo="+orderNo+"");
+				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
+			}
+//			sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
 			SendMQ sendMQ=new SendMQ();
 			iOrderinfoService.updateOrderinfoUpdateState(orderNo);
 			sendMQ.sendMsg(new RunSqlModel("update orderinfo set server_update=1 where order_no='"+orderNo+"'"));

@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>kidsproductwholesale Mail Complaint</title>
+    <title>ImportExpress Mail Change Order</title>
     <style type="text/css">
 
         *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -29,23 +29,17 @@
         ul, ol { list-style:none; }
         a{color: #747474;text-decoration: none;}
         a img{border: none;}
-
-
         .clearfix:before,.clearfix:after{content:"";display:table;}
         .clearfix:after{clear:both;}
         .clearfix{zoom:1;}
         .head-wrap{width: 100%;margin: 0 auto;background-color: #f9f8f8;border-bottom: 1px solid #d8d8d8;}
         .head-wrap *{margin: 0;padding: 0;}
-        .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 78px;}
+        .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 60px;}
         .header{height: 42px;}
         .header .content{padding: 0;}
         .header .brand{font-size: 16px;line-height: 42px;font-weight: bold;}
         .header .brand a{color: #464646;}
-        .header .brand a img{ padding:2% 0 1%; }
-        .order_batck{ margin-bottom: 5px; text-align: left; color: #333;}
-        .order_batck1{ margin: 8px 0;}
-        .order_batck a{ color: #01a4ef;}
-        .order_batck a:hover{ text-decoration: underline;}
+        .header .brand a img{ padding:3% 0; }
         .body-wrap{width: 505px;margin: 0 auto;background-color: #ffffff;}
         .soapbox .soapbox-title{font-size: 30px;color: #464646;padding-top: 25px; text-align: left; }
         .content .status-container.single .status-padding{width: 80px;}
@@ -64,15 +58,25 @@
         .body-padded, .body-title{text-align: left;}
         .body .body-title{font-weight: bold;font-size: 16px;color: #464646;}
         .body .body-text .body-text-cell{text-align: left;font-size: 14px;line-height: 1.6;padding: 10px 0 10px;}
-        /* Complaint */
-        .business_test{ margin: 8px 0 5px; color: #333; }
-        .business_question545{margin: 8px 0 0; color: #333; }
-
+        .user_id_ple span{ color:red; font-weight: bold; font-size: 18px; }
+        .user_id_ple{ color:#333; }
+        .activate_account{background-color:#41CC00;background-image:url(https://www.filepicker.io/api/file/N8GiNGsmT6mK6ORk00S7);border:1px solid #407429;border-radius:4px;color:#ffffff;display:inline-block;font-family:sans-serif;font-size:17px;font-weight:bold;text-shadow: -1px -1px #47A54B;line-height:38px;text-align:center;text-decoration:none;width:190px;-webkit-text-size-adjust:none;mso-hide:all;}
+        .email_button{width: 98%; margin: 0 auto; text-align: left;}
+        .account_if{ margin-top: 15px; }
+        .account_email{ color:#01a4ef; font-size: 14px; line-height:20px;word-wrap: break-word;word-break: break-all; }
+        .account_email:hover{text-decoration: underline; }
+        /* cancel order */
+        .cancel_p{border: 1px solid #d8d8d8; padding: 8px; font-size: 13px; margin: 10px 0; color: #333;}
+        .cancel_p a{ color:#01a4ef; }
+        .cancel_p a:hover{text-decoration: underline; }
 
         .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
         .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
         .footer-wrap{width: 100%;margin: 0 auto;clear: both !important;background-color: #e5e5e5;border-top: 1px solid #b3b3b3;font-size: 12px;color: #656565;line-height: 30px;}
         .thanks_so{ margin-bottom: 5px; }
+        .please_note{ width: 96%; padding: 1%; border: 1px solid #dfdfdf; background-color: #f6f6f6; text-align:left; color: #555;box-sizing:border-box;}
+        .please_note h3{ font-size: 14px; font-weight:bold; margin-bottom: 5px;}
+        .please_note p{ color: #666; font-size: 13px; margin-bottom:0;}
         .footer-wrap .container{padding: 14px 0;}
         .footer-wrap .container .content{padding: 0;}
         .footer-wrap .container .footer-lead{font-size: 14px;}
@@ -185,7 +189,7 @@
                             <td>
                                 <table class="soapbox">
                                     <tr>
-                                        <td class="soapbox-title">Shipping Notification - kidsproductwholesale</td>
+                                        <td class="soapbox-title">Your kidsproductwholesale order <i th:text="${orderNo}"></i> need your action now!</td>
                                     </tr>
                                 </table>
 
@@ -193,24 +197,25 @@
                                     <tr>
                                         <td class="body-padding"></td>
                                         <td class="body-padded">
-                                            <div class="body-title">Dear Sir/Madam, </div>
-                                            <p class="order_batck order_batck1">Your Order <i th:text="${orderid}"></i> has been shipped
-                                                out today and
-                                                it is on the way to you.</p>
-                                            <p class="order_batck">Recipients:<i th:text="${recipients}"></i></p>
-                                            <p class="order_batck">Street:<i th:text="${street}"></i><br><i th:text="${street1}"></i></p>
-                                            <p class="order_batck">City:<i th:text="${city}"></i></p>
-                                            <p class="order_batck">State:<i th:text="${state}"></i></p>
-                                            <p class="order_batck">Country:<i th:text="${country}"></i></p>
-                                            <p class="order_batck">Zip Code:<i th:text="${zipCode}"></i></p>
-                                            <p class="order_batck">Phone:<i th:text="${phone}"></i></p>
-                                            <p class="order_batck">And you can find the tracking information through<a target="_blank" href="" th:href="${toHref}">To Track</a></p>
-                                            <p class="order_batck">Any further question please fill our online Customer Contact<br> Form: <a target="_blank" href="https://www.kidsproductwholesale.com/cbt/servicerequest.jsp">https://www.kidsproductwholesale.com/cbt/servicerequest.jsp</a></p>
+                                            <div class="body-title">Dear Sir/Madam,</div>
+                                            <table class="body-text">
+                                                <tr>
+                                                    <td class="body-text-cell">
+                                                        <p class="user_id_ple">Order #:<i th:text="${orderNo}"></i></p>
+                                                        <p class="cancel_p">Due to the supply reasons, please go to your order in <a href="" th:href="${accountLink}">your account</a> to check your item status by click <strong>Need Your Action</strong> and we will continue purchasing for you after your confirmation, or go to your order to <strong>Cancel Item</strong> and refund will be done automatically.</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
                                             <table class="body-signature-block">
                                                 <tr>
                                                     <td class="body-signature-cell">
-                                                        <p class="thanks_so">Warm Regards,</p>
-                                                        <p class="thanks_so">kidsproductwholesale</p>
+                                                        <p class="thanks_so">Thanks so much,</p>
+                                                        <p>kidsproductwholesale</p>
+                                                        <div class="please_note">
+                                                            <h3>PLEASE NOTE:</h3>
+                                                            <p>This email message was sent from a notification-only address that cannot accept incoming email. PLEASE DO NOT REPLY to this message. If you have any question or concern, access your account <a href="https://www.kidsproductwholesale.com/user/loginNew" th:href="${accountLink}">here</a>.</p>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </table>
