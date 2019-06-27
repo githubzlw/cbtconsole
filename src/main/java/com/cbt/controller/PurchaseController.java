@@ -696,7 +696,8 @@ public class PurchaseController {
 			throws ServletException, IOException, ParseException {
 		String orderNo=request.getParameter("orderNo");
 		String admid=request.getParameter("admid");
-		String datas=iPurchaseService.allcgqrQrNew(orderNo,Integer.valueOf(admid));
+        Integer websiteType = org.apache.commons.lang3.StringUtils.isBlank(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
+		String datas=iPurchaseService.allcgqrQrNew(orderNo,Integer.valueOf(admid),websiteType);
 		PrintWriter out = response.getWriter();
 		out.print(datas);
 		out.flush();

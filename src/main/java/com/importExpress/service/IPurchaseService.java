@@ -183,7 +183,7 @@ public interface IPurchaseService {
 	 * @param adminid
 	 * @return
 	 */
-	public String allcgqrQrNew(String orderid, int adminid);
+	public String allcgqrQrNew(String orderid, int adminid, Integer websiteType);
 	/**
 	 public String allcgqrQrNew();
 
