@@ -9,4 +9,5 @@ public class SplitGoodsNumBean {
     private int oldNum;
     private double goodsPrice;
     private int adminId;
+    private String orderNo;
 }

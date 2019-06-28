@@ -494,6 +494,7 @@ public class NewOrderSplitCtr {
             double newTotalGoodsCost = 0;
             for (SplitGoodsNumBean goodsNumBean : splitIdList) {
                 goodsNumBean.setAdminId(admuser.getId());
+                goodsNumBean.setOrderNo(orderNo);
                 for (OrderDetailsBean orderDetail : odbList) {
                     if (orderDetail.getId() == goodsNumBean.getOdId()) {
                         // 保存商品价格和数量信息，放入日志
@@ -528,6 +529,12 @@ public class NewOrderSplitCtr {
             OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, newOrderNo,
                     oldTotalGoodsCost, nwOrderDetails);
 
+            // 拆单日志
+            List<OrderBean> orderBeans = new ArrayList<>(2);
+            orderBeans.add(orderBean);
+            orderBeans.add(newOrderBean);
+            orderBeans.add(orderBeanTemp);
+            splitDao.saveOrderInfoLogByList(orderBeans, admuser);
             // 3.开始执行拆单
             boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
             if (isOk) {
