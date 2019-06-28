@@ -1420,13 +1420,14 @@
 
 
     //一键确认采购
-    function allcgQr(orderNo){
+    function allcgQr(orderNo, that){
         var admid = '${admid}';
+        var websiteType = $(that).parent().find("select[name=websiteType]").val();
         $.ajax({
             type:"post",
             url:'/cbtconsole/purchase/allcgqrQrNew',
             dataType:"text",
-            data:{"orderNo":orderNo,"admid":admid},
+            data:{"orderNo":orderNo,"admid":admid,"websiteType":websiteType},
             success : function(data){
                 if(data.length>0 && data.indexOf("&")>-1){
                     $.jBox.tip('操作成功', 'success');
@@ -1461,7 +1462,7 @@
     }
 
     //****************采购确认****************
-    function FnComfirm(userid,orderno,od_id,goodsid,goodsdata_id,goods_url,googs_img,goods_price,googs_number,purchaseCount,child_order_no,isDropshipOrder){
+    function FnComfirm(userid,orderno,od_id,goodsid,goodsdata_id,goods_url,googs_img,goods_price,googs_number,purchaseCount,child_order_no,isDropshipOrder, that){
         $.jBox.tip("正在操作，請稍候", 'loading');
         var purchaseComfirmm = document.getElementById(orderno+od_id);
         var admid = '${admid}';
@@ -1470,6 +1471,8 @@
         var newValue= document.getElementById("chk1_"+orderno+od_id).value;
         var oldValue = document.getElementById("chk2_"+orderno+od_id).value;
         var goods_p_url=document.getElementById("chk_"+orderno+od_id+"").innerHTML;
+        var websiteType = $(that).parent().find("select[name=websiteType]").val();
+
         if(admid==0){
             alert("请选择采购人员");
         } else if(purchaseComfirmm.value=='采购确认'){
@@ -1484,7 +1487,8 @@
                         odid:od_id,
                         purchase_state:'3',
                         child_order_no:child_order_no,
-                        isDropshipOrder:isDropshipOrder
+                        isDropshipOrder:isDropshipOrder,
+                        websiteType:websiteType
                     },
                     success:function(st){
                         if(st>0) {
@@ -2982,8 +2986,15 @@
 						<td width="25%" colspan="2">商品信息</td>
 						<td width="8%">下单信息</td>
 						<td width="22%">实际采购信息</td>
-						<td width="5%">操作/状态
-							<br><input type="button" id="allQr1" style="color: green;" onclick="allQr('${pb.orderNo}')" value="一键确认货源" /><input type="button" id="allcgQr1" style="color: green;" onclick="allcgQr('${pb.orderNo}')" value="一键确认采购" /><br/><br/><input type="button" id="allQr2" style="color: red;" onclick="allQxQr('${pb.orderNo}')" value="一键取消货源" /><input type="button" id="allcgQr2" style="color: red;" onclick="allQxcgQr('${pb.orderNo}')" value="一键取消采购" /></td>
+						<td width="5%">
+                            一键确认采购发送邮件网站名:
+                            <select name="websiteType" style="height: 28px;width: 160px;">
+                                <option value="1" selected="selected">import-express</option>
+                                <option value="2">kidsproductwholesale</option>
+                            </select>
+                            <br /><br />
+                            操作/状态
+							<br><input type="button" id="allQr1" style="color: green;" onclick="allQr('${pb.orderNo}')" value="一键确认货源" /><input type="button" id="allcgQr1" style="color: green;" onclick="allcgQr('${pb.orderNo}', this)" value="一键确认采购" /><br/><br/><input type="button" id="allQr2" style="color: red;" onclick="allQxQr('${pb.orderNo}')" value="一键取消货源" /><input type="button" id="allcgQr2" style="color: red;" onclick="allQxcgQr('${pb.orderNo}')" value="一键取消采购" /></td>
 						<td width="6%">时间记录</td>
 						<td width="4%">操作</td>
 						<td width="4%">消息备注</td>
@@ -3304,6 +3315,11 @@
 								<div style="width: 170px; word-wrap: break-word;color: #59f775;background-color: black;">
 									<b>店铺售卖金额($):${pb.goodsShopPrice}</b>
 								</div>
+								<c:if test="${pb.goodsShopPrice>1000}">
+									<div style="width: 100%; word-wrap: break-word;">
+										建议多买些：多买的变成库存
+									</div>
+								</c:if>
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
@@ -3353,9 +3369,17 @@
 								<span id="puechase_comfirm_hyqr${pb.orderNo}${pb.od_id}"></span>
 							</div>
 							<div>
-								<br />
+								<br /><br />
 							</div>
-							<div id="clickdiv_${pb.orderNo}" onclick="FnComfirm('${pb.userid}','${pb.orderNo}','${pb.od_id}','${pb.goodsid}','${pb.goodsdata_id}','${pb.goods_url}','','${pb.goods_price}','${pb.googs_number}','${pb.purchaseCount}','${pb.child_order_no}','${pb.isDropshipOrder}');" style="width: 100%;">
+                            <div>
+                                采购确认发送邮件网站名:
+                                <select name="websiteType" style="height: 28px;width: 160px;">
+                                    <option value="1" selected="selected">import-express</option>
+                                    <option value="2">kidsproductwholesale</option>
+                                </select>
+                                <br /><br />
+                            </div>
+							<div id="clickdiv_${pb.orderNo}" onclick="FnComfirm('${pb.userid}','${pb.orderNo}','${pb.od_id}','${pb.goodsid}','${pb.goodsdata_id}','${pb.goods_url}','','${pb.goods_price}','${pb.googs_number}','${pb.purchaseCount}','${pb.child_order_no}','${pb.isDropshipOrder}', this);" style="width: 100%;">
 								<input type="hidden" value="${pb.od_state}" />${pb.purchaseSure}
 							</div>
 							<div>

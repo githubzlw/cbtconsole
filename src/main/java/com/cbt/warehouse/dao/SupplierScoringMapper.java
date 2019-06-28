@@ -23,7 +23,8 @@ public interface SupplierScoringMapper {
 	List<SupplierScoringBean> querySupplierScoringByPage(@Param("startindex") int startindex,
                                                          @Param("pagesize") int pagesize, @Param("shop_id") String shop_id, @Param("level") String level, @Param("quality") String quality, @Param("qualitys") String qualitys,
                                                          @Param("services") String services, @Param("servicess") String servicess, @Param("authorized") String authorized,
-                                                         @Param("flag") boolean flag, @Param("userid") String userid,@Param("categoryName") String categoryName);
+                                                         @Param("flag") boolean flag, @Param("userid") String userid,@Param("categoryName") String categoryName,
+                                                         @Param("salesShop") Integer salesShop, @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2);
 
 	/**
 	 * 判断该店铺是否为精品店铺
@@ -40,9 +41,11 @@ public interface SupplierScoringMapper {
 	 * @return
 	 * @return int
 	 */
-	int querySupplierRecord(@Param("shop_id") String shop_id, @Param("level") String level, @Param("quality") String quality
-            , @Param("qualitys") String qualitys, @Param("services") String services, @Param("servicess") String servicess,
-                            @Param("authorized") String authorized, @Param("flag") boolean flag, @Param("userid") String userid,@Param("categoryName") String categoryName);
+	int querySupplierRecord(@Param("shop_id") String shop_id, @Param("level") String level, @Param("quality") String quality,
+                            @Param("qualitys") String qualitys, @Param("services") String services, @Param("servicess") String servicess,
+                            @Param("authorized") String authorized, @Param("flag") boolean flag, @Param("userid") String userid,
+                            @Param("categoryName") String categoryName, @Param("salesShop") Integer salesShop,
+                            @Param("nowdate1") String nowdate1, @Param("nowdate2") String nowdate2);
 	/**
 	 * 合作过的供应商
 	 * @return

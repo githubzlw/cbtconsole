@@ -70,7 +70,7 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
             json.setSuccess(false);
         } else {
             StringBuffer sb = new StringBuffer();
-            sb.append("用户ID,用户邮箱,主单号,负责人,运单号,物流公司,转单号,转单物流公司,运单状态,订单支付时间,出货时间,\r\n");
+            sb.append("用户ID,用户邮箱,主单号,负责人,运单号,物流公司,转单号,转单物流公司,运单状态,订单支付时间,出货时间,运单完成时间,\r\n");
             for (TabTrackInfo bean : list) {
                 sb.append(bean.getId()).append(",")
                         .append(bean.getEmail()).append(",")
@@ -82,7 +82,8 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
                         .append(bean.getForwardCompany()==null?"":bean.getForwardCompany().replaceAll(",", " ")).append(",")
                         .append(formatterTrackState(bean.getTrackState())).append(",") //运单状态
                         .append(DateFormatUtil.getWithSeconds(bean.getOrderPaytime())).append(",")
-                        .append(DateFormatUtil.getWithSeconds(bean.getSenttime())).append(",\r\n");
+                        .append(DateFormatUtil.getWithSeconds(bean.getSenttime())).append(",")
+                        .append(DateFormatUtil.getWithSeconds(bean.getDeliveredTime())).append(",\r\n");
             }
             String message = sb.toString().replaceAll(",null,", ",,");
             message = message.replaceAll(",null,", ",,");
