@@ -281,7 +281,13 @@ function fnSplitOrder(orderno, email, paytime) {
 						},
 						success : function(data) {
 							if (data.ok) {
-                                var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  /></div>";
+                                var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  " +
+									"onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" " +
+									"onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  />" +
+									"<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
+									"<option value=\"1\" selected=\"selected\">import-express</option>" +
+									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
+									"</div>";
                                 $.dialog({
                                     title : '拆单成功是否要发送邮件！',
                                     content : text,
@@ -293,7 +299,8 @@ function fnSplitOrder(orderno, email, paytime) {
                                     ok : function() {
                                         var orderNew = data.data;
                                         var email = $('#email').val();
-                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email);
+                                        var websiteType = $('#website_type').val();
+                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email,websiteType);
                                     },
                                     cancel : function() {
                                         window.location.reload();
@@ -557,9 +564,13 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         return ;
 	}
 	//var isCf = confirm("是否确定取消订单?");
+	var text = "<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
+									"<option value=\"1\" selected=\"selected\">import-express</option>" +
+									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
+									"</div>";
     $.dialog({
         title : '是否确定取消订单?',
-        content : "是否确定取消订单?",
+        content : text,
         max : false,
         min : false,
         lock : true,
@@ -570,6 +581,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                 $("#closeOrder").attr("disabled", true);
                 $("#closeOrder").hide();
                 $(".mask").show().text("正在执行，请等待...");
+                var websiteType = $('#website_type').val();
                 // ==2 是补货订单能进行退款操作
                 if (isDropshipOrder == 2) {
 
@@ -583,7 +595,8 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                         "confirmEmail" : confirmEmail,
                         "totalPrice" : totalPrice,
                         "weight" : weight,
-                        "isDropshipOrder" : isDropshipOrder
+                        "isDropshipOrder" : isDropshipOrder,
+						"websiteType" : websiteType
                     };
                     $.ajax({
                         url : '/cbtconsole/orderDetails/closeOrder.do',
@@ -637,7 +650,8 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
                             "weight" : weight,
                             "freight" : freight,
                             "isDropshipOrder" : isDropshipOrder,
-                            'isDropshipOrder1':isDropshipOrder1
+                            'isDropshipOrder1':isDropshipOrder1,
+							"websiteType" : websiteType
                         };
 
                         $.ajax({
@@ -1242,8 +1256,9 @@ function fnChangeProduct(orderNo) {
 function sendCutomers(orderNo, whichOne, isDropship) {
 	// $("#notifycustomer").attr("disabled", "disabled");
 	// $("#msg").css("display", "none");
+	 var Website=$("#Web_site").val();
 	$.ajax({
-		url : '/cbtconsole/order/sendCutomers',
+		url : '/cbtconsole/order/sendCutomers?Website='+Website,
 		type : "post",
 		data : {"orderNo" : orderNo, "whichOne" : whichOne, "isDropship" : isDropship},
 		success : function(data) {
@@ -1966,7 +1981,7 @@ function resetClothingDiv(){
     document.getElementById('clothing_orderid').innerHTML= "";
     document.getElementById('clothing_goodsid').innerHTML= "";
 }
-function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
+function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email,websiteType) {
     var s = orderno;
     $.ajax({
         type : 'POST',
@@ -1977,7 +1992,8 @@ function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
             "ordernoNew" : ordernoNew,
             "time_" : time_,
             "state" : state,
-            "email" : email
+            "email" : email,
+            "websiteType" : websiteType
         },
         success : function(data) {
             if(data != null){

@@ -35,12 +35,12 @@
     .clearfix{zoom:1;}
     .head-wrap{width: 100%;margin: 0 auto;background-color: #f9f8f8;border-bottom: 1px solid #d8d8d8;}
     .head-wrap *{margin: 0;padding: 0;}
-    .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 60px;}
+    .header-background{background: repeat-x url(https://www.filepicker.io/api/file/wUGKTIOZTDqV2oJx5NCh) left bottom; height: 78px;}
     .header{height: 42px;}
     .header .content{padding: 0;}
     .header .brand{font-size: 16px;line-height: 42px;font-weight: bold;}
     .header .brand a{color: #464646;}
-    .header .brand a img{ padding:3% 0; }
+    .header .brand a img{ padding:2% 0 1%; }
     .body-wrap{width: 505px;margin: 0 auto;background-color: #ffffff;}
     .soapbox .soapbox-title{font-size: 30px;color: #464646;padding-top: 25px; text-align: left; }
     .content .status-container.single .status-padding{width: 80px;}
@@ -64,10 +64,7 @@
     .rece_shop a{ color: #00B1FF; }
     .rece_shop a:hover{ text-decoration: underline;}
     .rece_shop p{ margin-bottom: 0;}
-    .estima_time{ margin-bottom: 0px; text-align: left;color: #333;}
-    .estima_time_color{ font-weight: bold; font-size: 18px;}
-    .estima_time_color a{ padding: 4px 8px; text-align: center; background-color: #3e9eea; color: #fff;
-      border-radius: 4px; font-size: 16px; font-weight: 400; text-transform: uppercase; margin-left: 10px;}
+
     .order_off i{ text-decoration: line-through; margin-left: 5px; color: #999;}
     .dismantling_box{ width: 100%; text-align: left; margin: 0px auto 0; }
     .order_number{ background-color: #e7e7e7; color: #333; font-weight: bold; padding-left: 5px; text-align: left; font-size: 16px;}
@@ -76,23 +73,32 @@
     .order_first ul{ width: 100%; margin: 0 auto; overflow: hidden;box-sizing:border-box;}
     .order_li{ float: left; width:225px;border:1px solid #e5e5e5; margin: 2% 2% 2% 0; color: #333; padding: 5px;
         list-style:none; height: 338px; overflow:hidden;text-align: center;box-sizing:border-box;}
-    .order_img{ max-width:213px; max-height: 213px; overflow: hidden; cursor: pointer; }
+    .order_img{max-width:213px; max-height: 213px; overflow: hidden; cursor: pointer;  }
     .a6S{opacity: 0.01; left: 163px; top: 380.406px; position: absolute; font-weight: normal;}
     .order_title{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; margin: 0 auto; text-align:left;}
     .order_size{ text-align: left; width: 98%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       word-break: break-all; }
     .order_size span{border:1px solid #e1e1e1;}
     .order_pr{ margin: 0; text-align: left; }
-    .order_usd{ text-align: left; color: #333; margin-bottom: 5px; }
+    .order_usd{ text-align: left; color: #333; margin-bottom: 5px; border: 1px solid #01a4ef; padding: 10px; }
     .order_usd strong{ font-size: 14px; }
     .order_usd_due{ margin: 0px 0 10px; border-top: 2px solid #ffc167; padding-top: 5px;}
-    .order_usd_due p{ margin-bottom: 0px;}
+    .order_usd_due p{ margin-bottom: 5px;}
     .order_remark{ width: 100%; margin-top: 5px; }
     .order_rem_p{ text-align: left; margin: 10px 0 0; color:#333;  }
     .refund_amount{font-weight: bold;border-top: 1px  dashed #AAABAF;margin-top: 5px; text-align: left;}
     .refund_amount h3{ font-size: 16px; font-weight: bold; margin: 8px 0;}
     .order_pr strong{ color: red;}
     .order_pr span{ text-decoration: line-through; color: #999;}
+    .order_click{ text-align: left; color:#333;}
+    .order_click a{ color:#01a4ef;}
+    .order_off_dis{ color: #999;}
+    .estima_time{ margin-bottom: 0px; text-align: left;color: #333; border-top: 1px dashed #01a4ef; padding-top: 8px;}
+    .estima_time_color{ font-weight: bold; font-size: 18px;}
+    .estima_time_color a{ padding: 4px 8px; text-align: center; background-color: #3e9eea; color: #fff;
+      border-radius: 4px; font-size: 16px; font-weight: 400; text-transform: uppercase; margin-left: 10px;}
+
+
 
 
     .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
@@ -225,7 +231,7 @@
               <td>
                 <table class="soapbox">
                   <tr>
-                    <td class="soapbox-title">You Have Made Some Wonderful Selections!</td>
+                    <td class="soapbox-title">Your Ultimate Shipping Rate Discount</td>
                   </tr>
                 </table>
 
@@ -238,29 +244,21 @@
                         <div class="order_first">
                           <div class="rece_shop">
                             <p>I'm <strong th:text="${adminNameFirst}">Lena Wu</strong>, Marketing Manager of Import Express.</p>
-                            <p>I noticed that you were about to buy some products from our website but haven't completed your order yet.</p>
-                            <p>Is there anything I could help you with?</p>
-                            <p>Here's your shopping cart list.</p>
+                            <p>Recently you have added some items to your <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar">shopping cart</a>. We greatly value
+                              your trust and confidence. To express our sincere appreciation for your loyalty to our business,
+                              <b>we have made an adjustment on your chosen shipping rate:</b> </p>
                           </div>
-                          <ul class="clearfix">
-
-                            <li class="order_li" th:each="carInfo:${sourceList}">
-
-                              <img th:src="${carInfo.googsImg}" src="https://img1.import-express.com/importcsvimg/img/527048933132/2760309121_1271534044.220x220.jpg" class="order_img CToWUd" tabindex="0">
-                               <p class="order_title" th:title="${carInfo.goodsTitle}" th:text="${carInfo.goodsTitle}" title="Sex Woman 's Mark West Club Red Bandage Dresses">Sex Woman 's Mark West Club Red Bandage Dresses</p>
-
-                              <div th:if="${not #lists.isEmpty(carInfo.typeList)}" th:each="typeStr:${carInfo.typeList}">
-                                <div class="order_size">
-                                  <span th:title="${typeStr}" th:text="${typeStr}">Size:S</span>
-                                </div>
-                              </div>
-
-                               <p class="order_pr"><em th:text="${carInfo.googsNumber}">1</em>&nbsp;&nbsp;<i th:text="${carInfo.goodsunit}">pc</i></p>
-                              <p class="order_pr"><strong><em>USD</em> <em th:text="${carInfo.googsPrice}">5.58</em></strong>
-                                <!--<span><em>USD</em> <em th:text="${carInfo.price1}">6.58</em></span>--></p>
-                             </li>
-                           </ul>
-                          <p class="order_rem_p">If there were any reasons why you didn't complete your purchase, please don't hesitate to let me know by responding to this Email, our team will absolutely try every effort to meet your satisfaction!</p>
+                          <div class="order_usd">
+                            <p class="order_off order_off_dis"><strong>The original shipping price:</strong><i><strong><em>USD
+                            </em><em> 18.80</em></strong></i><em> (Shipping time: XXX)</em></p>
+                            <p class="order_off"><strong>The discounted shipping price:<em>USD
+                            </em><em> 18.80</em></strong><em> (Shipping time: XXX)</em></p>
+                            <p class="estima_time estima_time_color">You have saved :USD <span>7.2</span>
+                              <a th:href="${carUrl}" href="https://www.import-express.com/Goods/getShopCar" target="_blank">Buy now</a></p>
+                          </div>
+                          <p class="order_rem_p">We'll keep this deal valid <b>for the next 48 hours</b></p>
+                          <p class="order_rem_p">Hurry in to make sure you snag your most-coveted ImportExpress merch  -  don't let this be the one that got away!</p>
+                          <p class="order_rem_p">If you have any further concerns or questions please feel free to shoot me an email, I'll get back to you in 24h!</p>
                           <p class="order_rem_p"><strong>Import Express CHINA</strong><br/>
                             Best product source for small business!</p>
                         </div>

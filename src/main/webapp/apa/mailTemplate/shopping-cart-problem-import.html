@@ -1,11 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width" />
-  <title>ImportExpress Mail Business Inquiries</title>
-  <link rel="stylesheet" href="css/xiazai.css">
+  <title>ImportExpress Mail Shopping Cart Problem</title>
   <style type="text/css">
 
   *{margin:0;padding:0;font-family: Helvetica, Arial, sans-serif;}
@@ -23,6 +21,7 @@
   h6{font-weight:900;font-size: 14px;text-transform: uppercase;}
   .collapse{margin:0!important;}
   i,em{ font-style: normal;}
+
 
   td, div{font-family: Helvetica, Arial, sans-serif;text-align: center;}
   p, ul{margin-bottom: 10px;font-weight: normal;font-size:14px;line-height:1.6;}
@@ -60,21 +59,14 @@
   .body-padded, .body-title{text-align: left;}
   .body .body-title{font-weight: bold;font-size: 16px;color: #464646;}
   .body .body-text .body-text-cell{text-align: left;font-size: 14px;line-height: 1.6;padding: 10px 0 10px;}
-  /* business-inquiries */
+  /* shopping-cart-problem */
   .business_test{ margin: 8px 0 5px; color: #333; }
-  .business_question{margin: 8px 0; color: #333; }
-  .business_question a{color:#01a4ef;}
-  .business_question a:hover{ text-decoration: underline;}
-
+  .business_question545{margin: 8px 0 0; color: #333; }
 
   .body .body-signature-block .body-signature-cell{padding: 15px 0;text-align: left;}
   .body .body-signature{font-family: "Comic Sans MS", Textile, cursive;font-weight: bold;}
   .footer-wrap{width: 100%;margin: 0 auto;clear: both !important;background-color: #e5e5e5;border-top: 1px solid #b3b3b3;font-size: 12px;color: #656565;line-height: 30px;}
   .thanks_so{ margin-bottom: 5px; }
-  .please_note{ width: 96%; padding: 1%; border: 1px solid #dfdfdf; background-color: #f6f6f6; text-align:left; color: #555;}
-  .please_note h3{ font-size: 14px; font-weight:bold; margin-bottom: 5px;}
-  .please_note p{ color: #666; font-size: 13px; margin-bottom:0;}
-  .please_note p a{color:#01a4ef; text-decoration: underline; }
   .footer-wrap .container{padding: 14px 0;}
   .footer-wrap .container .content{padding: 0;}
   .footer-wrap .container .footer-lead{font-size: 14px;}
@@ -195,11 +187,10 @@
                     <tr>
                       <td class="body-padding"></td>
                       <td class="body-padded">
-                        <div class="body-title">Hey <i th:text="${email}"></i>,</div>
-                        <p class="business_test" th:text="${replyContent}">test_拆单</p>
-                        <p class="business_question"><strong>Your Question:</strong>
-                          [<i th:text="${id}">5500</i>]<i th:text="${qustion}">orderQuantity: Business inquiries_2018年10月18日13:43:49——Quantity; targetPrice: Business inquiries_2018年10月18日13:43:49——Your Target Price</i></p>
-                        <p class="business_question"><strong>Item:</strong><a th:href= "${itemUrl}" href="https://www.import-express.com/goodsinfo/sex-woman-s-mark-west-club-red-bandage-dresses-1566738346383.html#%23%23" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://www.import-express.com/goodsinfo/sex-woman-s-mark-west-club-red-bandage-dresses-1566738346383.html%23%2523%2523&amp;source=gmail&amp;ust=1540358500042000&amp;usg=AFQjCNGVxQyRjYBY-PoG82L8RdSqPkxf_A" th:text="${itemUrl}"> Sex Woman 's Mark West Club Red Bandage Dresses</a></p>
+                        <div class="body-title">Hey {{ first_name }},</div>
+                        <p class="business_test">ask_answer-test</p>
+                        <p class="business_question545"><strong>Your Question:</strong>[545]ask here-2018-10-18 13:46:13</p>
+                        
                         <table class="body-signature-block">
                           <tr>
                             <td class="body-signature-cell">                              

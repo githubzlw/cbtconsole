@@ -226,8 +226,15 @@ input, textarea, select, button {
                                 <input type="radio" name="shareFlag" value="0" checked="checked" style="float: left;height: 20px;" />
                                 <span style="float: left;line-height: 30px;">&nbsp;用于关联客户(多个用户用逗号隔开, 可不录入)&nbsp;&nbsp;</span>
                                 <br /><br />
-                                <textarea rows="30" cols="52" name="userids" style="height: 100px;margin-left: 60px;"></textarea>
-                                <br />
+                                <div style="margin-left: 60px;">
+                                    网站名:
+                                    <select id="website_type" name="websiteType" style="height: 28px;width: 392px;margin: 2px 0;">
+                                        <option value="1" selected="selected">import-express</option>
+                                        <option value="2">kidsproductwholesale</option>
+                                    </select>
+                                    <br />
+                                    <textarea rows="30" cols="52" name="userids" style="height: 100px;"></textarea>
+                                </div>
                                 <input type="radio" name="shareFlag" value="1" style="float: left;height: 20px;" />
                                 <span style="float: left;line-height: 30px;">&nbsp;用于社交分享</span>
                             </td>
@@ -314,8 +321,14 @@ input, textarea, select, button {
                         </tr>
                         <tr>
                             <td></td>
-                            <td>关联用户(多个用户用逗号隔开)</td>
+                            <td>关联客户(多个用户用逗号隔开)</td>
                             <td>
+                                网站名:
+                                <select id="add_website_type" style="height: 28px;width: 457px;margin: 2px 0;">
+                                    <option value="1" selected="selected">import-express</option>
+                                    <option value="2">kidsproductwholesale</option>
+                                </select>
+                                <br />
                                 <textarea rows="30" cols="60" id="add_user" style="height: 100px;"></textarea>
                             </td>
                         </tr>
@@ -462,12 +475,14 @@ input, textarea, select, button {
                 $.messager.alert('提示', "请输入关联的用户");
                 return;
             }
+            var websiteType = $("#add_website_type").val();
             $.ajax({
                 type: "POST",
                 url: "/cbtconsole/coupon/addCouponUser.do",
                 data: {
                     'couponCode':couponCode,
-                    'userids':userids
+                    'userids':userids,
+                    'websiteType':websiteType
                 },
                 dataType:"json",
                 success: function(msg){

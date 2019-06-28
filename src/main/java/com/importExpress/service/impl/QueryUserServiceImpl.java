@@ -748,6 +748,9 @@ public class QueryUserServiceImpl implements QueryUserService {
         if (CollectionUtils.isEmpty(sameGoodsList)) {
             result.put("sameGoods", "");
         } else {
+            // 查询 核心供应商
+            List<String> salesList = queryUserMapper.querySalesShop(sameGoodsList);
+
             for (SameGoodsDetails bean : sameGoodsList) {
                 String jsonContent = bean.getJsonContent();
                 if (jsonContent != null && jsonContent.contains("\"imgUrl\": \"")) {
@@ -757,6 +760,10 @@ public class QueryUserServiceImpl implements QueryUserService {
                     jsonContent = "#";
                 }
                 bean.setJsonContent(jsonContent);
+
+                if (salesList.contains(bean.getShopId())) {
+                    bean.setSalesShop(true);
+                }
             }
             result.put("sameGoods", sameGoodsList);
         }

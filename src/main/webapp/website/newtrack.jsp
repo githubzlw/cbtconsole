@@ -1,14 +1,11 @@
 <!DOCTYPE html>
-<%@ page language="java" contentType="text/html; charset=utf-8"
-		 import="com.cbt.website.bean.SearchTaobaoInfo" pageEncoding="utf-8"%>
+<%@ page language="java" contentType="text/html; charset=utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <%@ page import="com.cbt.util.Redis" %>
-<%@page import="com.cbt.util.AppConfig"%>
 <%@ page import="com.cbt.website.userAuth.bean.Admuser" %>
 <%@ page import="com.cbt.util.SerializeUtil" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html>
 <head>
@@ -226,7 +223,7 @@
 		.w { position:absolute; left:10px; top:150px; width:280px; height:284px; overflow:hidden; border:2px groove #281; cursor:default; -moz-user-select:none; }
 		.t { line-height:20px; height:20px; width:280px; overflow:hidden; background-color:#27C; color:white; font-weight:bold; border-bottom:1px outset blue; text-align:center; }
 		.winBody { height:236px; width:600px; overflow-x:hidden; overflow-y:auto; border-top:0px inset blue; padding:10px; text-indent:10px; background-color:white; }
-		#paizhao{position: fixed;right:0;top:0;}
+		#take_photo{position: fixed;right:0;top:0;}
 
 	</style>
 	<%
@@ -499,7 +496,7 @@
 
 	</script>
 </head>
-<body onload="focus();">
+<body onload="initPhoto();">
 <div id="user_remark" class="qod_pay3" title="退货申请"
 	 style="width:800px;height:auto;display: none;font-size: 16px;">
 	<div>
@@ -572,9 +569,9 @@
 	<jsp:include page="message_notification.jsp"></jsp:include>
 	<%}  %>
 
-	<div id="paizhao" style="display: ;">
-		<video id="video" width="400" height="400" autoplay></video><br>
-		<canvas id="canvas" width="400"  height="400"></canvas>
+	<div id="take_photo" >
+		<video id="video" width="400px" height="400px" autoplay="autoplay"></video><br>
+		<canvas id="canvas" width="400px" height="400px"></canvas>
 	</div>
 	<br>
 	<!-- 扫描框开始 -->

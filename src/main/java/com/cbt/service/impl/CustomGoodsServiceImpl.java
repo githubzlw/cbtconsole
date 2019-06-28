@@ -726,35 +726,39 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         JsonResult json = new JsonResult();
         // 获取商品信息
         CustomGoodsPublish orGoods = queryGoodsDetails(pid, 0);
-        JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
-        List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
-        // 查找匹配的type数据
-        String typeStr = weightAndSyn.getGoods_type();
-        // Colour:black@32161,Size:S@4501,
-        String[] typeStrList = typeStr.split(",");
-        String ppId = "";
-        for (String childType : typeStrList) {
-            if (StringUtils.isNotBlank(childType)) {
-                String[] childList = childType.split("@");
-                if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
-                    ppId += "," + childList[1];
+        if (StringUtils.isNotBlank(orGoods.getSku())) {
+            JSONArray sku_json = JSONArray.fromObject(orGoods.getSku());
+            List<ImportExSku> skuList = (List<ImportExSku>) JSONArray.toCollection(sku_json, ImportExSku.class);
+            // 查找匹配的type数据
+            String typeStr = weightAndSyn.getGoods_type();
+            // Colour:black@32161,Size:S@4501,
+            String[] typeStrList = typeStr.split(",");
+            String ppId = "";
+            for (String childType : typeStrList) {
+                if (StringUtils.isNotBlank(childType)) {
+                    String[] childList = childType.split("@");
+                    if (childList.length == 2 && StringUtils.isNotBlank(childList[1])) {
+                        ppId += "," + childList[1];
+                    }
                 }
             }
-        }
-        double finalWeight = 0;
-        for (ImportExSku exSku : skuList) {
-            if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
-                finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
-                exSku.setFianlWeight(finalWeight);
-                if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
-                    double volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getVolume_weight()), 3);
-                    exSku.setVolumeWeight(volumeWeight);
+            double finalWeight = 0;
+            for (ImportExSku exSku : skuList) {
+                if (StringUtils.isNotBlank(ppId) && checkIsEqualPpid(ppId.substring(1), exSku.getSkuPropIds())) {
+                    finalWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getWeight()), 3);
+                    exSku.setFianlWeight(finalWeight);
+                    if (StringUtils.isNotBlank(weightAndSyn.getVolume_weight())) {
+                        double volumeWeight = BigDecimalUtil.truncateDouble(Float.valueOf(weightAndSyn.getVolume_weight()), 3);
+                        exSku.setVolumeWeight(volumeWeight);
+                    }
+                    break;
                 }
-                break;
             }
+            // 进行sku更新
+            updateGoodsSku(pid, orGoods.getSku(), skuList.toString(), adminId, finalWeight);
+            skuList.clear();
         }
-        // 进行sku更新
-        updateGoodsSku(pid, orGoods.getSku(), skuList.toString(), adminId, finalWeight);
+
         // 插入日志记录
         GoodsEditBean editBean = new GoodsEditBean();
         editBean.setNew_title(weightAndSyn.getGoodsType() + ",sku 更新");
@@ -770,7 +774,7 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         editBean.setPid(pid);
         customGoodsMapper.insertIntoGoodsPriceOrWeight(editBean);
         json.setOk(true);
-        skuList.clear();
+
         return json;
     }
 

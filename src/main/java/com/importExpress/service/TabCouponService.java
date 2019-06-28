@@ -22,7 +22,7 @@ public interface TabCouponService {
 
     TabCouponNew queryTabCouponOne(String couponCode);
 
-    Map<String, String> addCouponUser(String couponCode, List<String> useridList);
+    Map<String, String> addCouponUser(String couponCode, List<String> useridList, Integer websiteType);
 
     Map<String, String> delCoupon(String couponCode);
 
