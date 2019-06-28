@@ -67,5 +67,9 @@
 	<input type="hidden" value="<%=request.getParameter("isDropshipOrder1")%>" name="isDropshipOrder1" id="isDropshipOrder1">
 	天数：<input id="newDeliver" name="newDeliver" type="text" />
 	<button id="deliverButton" onclick="updatedeliver()">交期变更</button>
+	公司网站：<select id="Web_site" style="font-size: 16px; height: 24px; width: 150px;">
+		<option value="0" selected="selected">import-express</option>
+		<option value="1">kidsproductwholesale</option>
+	</select>
 	</body>
 </html>

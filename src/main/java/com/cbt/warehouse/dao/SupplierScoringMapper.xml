@@ -80,6 +80,27 @@
 		<if test="categoryName != null">
 			and b.en_name like CONCAT('%','${categoryName}','%' )
 		</if>
+		<if test="salesShop == 1">
+            and smi.shop_id in (SELECT shop_id FROM sales_shop)
+        </if>
+        <if test="salesShop == 2">
+            and smi.shop_id not in (SELECT shop_id FROM sales_shop)
+        </if>
+        <if test="nowdate1 != '' and nowdate2 != ''">
+            and smi.shop_id in (
+                SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE createtime >= #{nowdate1} AND #{nowdate2} >= createtime
+            )
+        </if>
+        <if test="nowdate1 != '' and nowdate2 == ''">
+            and smi.shop_id in (
+            SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE createtime >= #{nowdate1}
+            )
+        </if>
+        <if test="nowdate1 == '' and nowdate2 != ''">
+            and smi.shop_id in (
+            SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE #{nowdate2} >= createtime
+            )
+        </if>
 		/*GROUP BY smi.shop_id*/
         ORDER BY smi.sell DESC
 		limit #{startindex},#{pagesize}
@@ -118,6 +139,27 @@
 		<if test="categoryName != null">
 			and b.en_name like CONCAT('%','${categoryName}','%' )
 		</if>
+        <if test="salesShop == 1">
+            and c.shop_id in (SELECT shop_id FROM sales_shop)
+        </if>
+        <if test="salesShop == 2">
+            and c.shop_id not in (SELECT shop_id FROM sales_shop)
+        </if>
+        <if test="nowdate1 != '' and nowdate2 != ''">
+            and c.shop_id in (
+            SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE createtime >= #{nowdate1} AND #{nowdate2} >= createtime
+            )
+        </if>
+        <if test="nowdate1 != '' and nowdate2 == ''">
+            and c.shop_id in (
+            SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE createtime >= #{nowdate1}
+            )
+        </if>
+        <if test="nowdate1 == '' and nowdate2 != ''">
+            and c.shop_id in (
+            SELECT DISTINCT shop_id FROM custom_benchmark_ready WHERE #{nowdate2} >= createtime
+            )
+        </if>
 		GROUP BY c.shop_id
 		) a
 	</select>

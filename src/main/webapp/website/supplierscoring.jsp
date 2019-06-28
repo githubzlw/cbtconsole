@@ -9,23 +9,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>供应商列表</title>
 </head>
-<script type="text/javascript" src="/cbtconsole/js/jquery-1.8.0.min.js"></script>
-<body>
-<table border="1px  #0094ff" style="border-collapse: collapse;width: 90%; height: 90%">
+<script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+<link href="/cbtconsole/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+<script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+<script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+
+
+<body style="width: 98%; margin: 0 1%;">
  		<form action="/cbtconsole/supplierscoring/querySupplierScoringList" method="get">
  			<%--<input type="radio" name="flag" value="1" checked="checked">最近7天已经验货的,本人采购的,未评价的</input>--%>
-    		<input type="radio" name="flag" value="0" checked="checked">所有的</input>
+    		<input type="hidden" name="flag" value="0" checked="checked"><%--所有的--%></input>
     		<div style="float: right;">【合作过的供应商（<span>${cooperatedCount}</span>）】【优质供应商（<span>${highCount}</span>）】【普通供应商（<span>${ordinaryCount}</span>）】【黑名单供应商（<span>${blacklistCount}</span>）】
  			</div><br />
- 			供应商ID:<input id="select_ship_id" type="text" name="shop_id">
-			供应商类别名称:<input id="categoryName" type="text" name="categoryName">
- 			供应商级别:<select id="select_level"  name="level">
+
+                <div>
+ 			供应商ID:<input id="select_ship_id" type="text" name="shop_id" style="height: 20px;">
+			供应商类别名称:<input id="categoryName" type="text" name="categoryName" style="height: 20px;">
+ 			供应商级别:<select id="select_level"  name="level" style="height: 20px;">
  							<option value=""  >---请选择---</option>
  							<option value="1">合作过的供应商</option>
  							<option value="2">优选供应商</option>
  							<option value="3" >黑名单</option>
  					  </select>
-			质量评分:<select id="quality"  name="quality">
+			质量评分:<select id="quality"  name="quality" style="height: 20px;">
 						<option value=""  >---全部---</option>
 						<option value="1">1</option>
 						<option value="2">2</option>
@@ -34,20 +43,46 @@
 						<option value="5" >5</option>
 						<option value="-1">暂未评分</option>
 						</select>
-			是否授权:<select id="authorizedFlag"  name="authorizedFlag">
+			是否授权:<select id="authorizedFlag"  name="authorizedFlag" style="height: 20px;">
 						<option value="" >---全部---</option>
 						<option value="0">未授权</option>
 						<option value="1">已授权</option>
 		 			 </select>
-		<input type="submit" style="margin-left:20px;" value="查询">
-		<input type="reset"  style="margin-left:20px;" value="重置">
- 		</form>
+                <br />
+                </div>
 
+                <div style="margin: 4px 0;">
+                    <span style="float: left;">是否核心供应商:</span>
+                    <select id="salesShop"  name="salesShop" style="float: left;">
+                        <option value="0">---全部---</option>
+                        <option value="1">是核心供应商</option>
+                        <option value="2">不是核心供应商</option>
+                    </select>
+                    <span style="float: left;">店铺上线时间:</span>
+                    <a class='input-group date' id='datetimepicker1' style="float: left;">
+                        <input type='text' class="form-control" name="nowdate1" id='nowdate1' style="width: 100px; height: 20px;"/>
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 20px;">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                    </a>
+                    <span style="float: left; margin: 0 6px">到</span>
+                    <a class='input-group date' id='datetimepicker2' style="float: left;">
+                        <input type='text' class="form-control" name="nowdate2" id='nowdate2' style="width: 100px; height: 20px;" />
+                        <span class="input-group-addon" style="float: left; width: 50px; height: 20px;">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                    </a>
+                    <input type="submit" style="margin-left:20px;height: 20px;line-height: 16px;" value="查询">
+                    <input type="reset"  style="margin-left:20px;height: 20px;line-height: 16px;" value="重置">
+                </div>
+        </form>
+
+    <table border="1px  #0094ff" style="border-collapse: collapse; width: 100%;">
  		<thead>
 			<tr>
 			<td>供应商</td>
 			<td>供应商类别ID(类别名称)</td>
-			<td>店铺商品总数|在线产品数量|店铺产品在订单中出现次数</td>
+			<td>店铺商品总数|在线产品数量<br />|店铺产品在订单中出现次数</td>
 			<td>是否精品店铺</td>
 			<td>是否授权</td>
 			<td>质量</td>
@@ -117,7 +152,7 @@
 			</tr>
 		</c:forEach>
 		</tbody>
-</table>
+    </table>
 		 <div class="pageInfoInfo" id="pageInfoInfo">
 				<span>&nbsp;&nbsp;总条数：<font>${pageInfo.countRecord }</font>&nbsp;&nbsp;总页数：<font>${pageInfo.countPage }</font></span>&nbsp;&nbsp;当前页:<font >${pageInfo.currentPage }</font>&nbsp;&nbsp;
 				<button onclick="topageInfo('${pageInfo.currentPage-1}','${pageInfo.currentPage }')">上一页</button>
@@ -140,6 +175,10 @@
 		  }
 	}
 	function topageInfo(topage,currpage){
+            var salesShop = $("#salesShop").val();
+            var nowdate1 = $("#nowdate1").val();
+            var nowdate2 = $("#nowdate2").val();
+
 			var countpage = "${pageInfo.countPage }";
 			var level =	$("#select_level").val();
 			var shop_id = $("#select_ship_id").val();
@@ -158,7 +197,10 @@
 			if(topage==-1){
 				topage = $("#jump1").val()
 			}
-		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage+"&shop_id="+shop_id+"&level="+level+"&quality="+quality+"&flag="+flag+"&categoryName="+categoryName;
+		    window.location.href="/cbtconsole/supplierscoring/querySupplierScoringList?currpage="+topage
+                +"&shop_id="+shop_id+"&level="+level+"&quality="+quality
+                +"&salesShop="+salesShop+"&nowdate1="+nowdate1+"&nowdate2="+nowdate2
+                +"&flag="+flag+"&categoryName="+categoryName;
 
 		}
 
@@ -219,18 +261,24 @@
 		var level = '${level}';
 		var quality = '${quality}';
         var authorizedFlag='${authorizedFlag}';
-        var flag='${flag}';
+        <%--var flag='${flag}';--%>
         var categoryName='${categoryName}';
+        var salesShop='${salesShop}';
+        var nowdate1 = '${nowdate1}';
+        var nowdate2 = '${nowdate2}';
         $("#quality").val(quality);
         /* $("#services").val(services); */
 		$("#select_ship_id").val(shop_id);
 		$("#categoryName").val(categoryName);
 		$("#authorizedFlag").val(authorizedFlag);
-		if("true" == flag){
-			$('input[type=radio][name=flag][value=1]').get(0).checked = "checked";
-		} else{
-			$('input[type=radio][name=flag][value=0]').get(0).checked = "checked";
-		}
+		$("#salesShop").val(salesShop);
+		$("#nowdate1").val(nowdate1);
+		$("#nowdate2").val(nowdate2);
+		// if("true" == flag){
+		// 	$('input[type=radio][name=flag][value=1]').get(0).checked = "checked";
+		// } else{
+		// 	$('input[type=radio][name=flag][value=0]').get(0).checked = "checked";
+		// }
 		if(level != ""){
 			if(level==1){
 				$("#select_level").val("1");
@@ -245,6 +293,41 @@
 		}
 
 	})
+
+    //设置日期时间控件
+    function Datetime(dateId) {
+        $(dateId).datetimepicker({
+            language: 'zh-CN', //显示中文
+            format: 'yyyy-mm-dd', //显示格式
+            minView: "month", //设置只显示到月份
+            initialDate: new Date(),
+            autoclose: true, //选中自动关闭
+            todayBtn: true, //显示今日按钮
+            locale: moment.locale('zh-cn')
+        });
+    }
+    Datetime('#datetimepicker1');
+    Datetime('#datetimepicker2');
+    function iniDatetime() {
+        var today = new Date();
+        var nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+        var date = new Date(nowdate);
+        var mon = date.getMonth() + 1;
+        var day = date.getDate();
+        var mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+        document.getElementById("nowdate2").value = '';
+        today = new Date();
+        today.setDate(today.getDate() - 90); //日期减90天
+        nowdate = (today.getFullYear()) + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+        date = new Date(nowdate);
+        mon = date.getMonth() + 1;
+        day = date.getDate();
+        mydate = date.getFullYear() + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
+        document.getElementById("nowdate1").value = '';
+    }
+    iniDatetime();
+
+
 </script>
 
 </html>

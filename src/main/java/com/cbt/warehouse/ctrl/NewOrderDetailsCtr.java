@@ -1639,7 +1639,7 @@ public class NewOrderDetailsCtr {
 							ErrorLogDao.insertErrorInfo("orderinfo", sqlStr, adminId, 2, remark);
 						}
 
-						// ssd add start
+						/*// ssd add start
 						// 发送取消订单的提醒邮件
 						StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
 						sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
@@ -1660,7 +1660,7 @@ public class NewOrderDetailsCtr {
 							sbBuffer.append("<br>Import-Express Team");
 						} else{
 							sbBuffer.append("<br>Kids-Product-Wholesale Team");
-						}
+						}*/
 
 
 						//					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
@@ -1672,7 +1672,7 @@ public class NewOrderDetailsCtr {
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
-							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+							sendMailFactory.sendMail(toEmail, null, "Your KidsProductWholesale Order " + orderNo + " transaction is closed!",
 									model, TemplateType.CANCEL_ORDER_KID);
 						} else{
 							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
@@ -1825,22 +1825,22 @@ public class NewOrderDetailsCtr {
 					boolean isKidFlag =  "2".equals(websiteType);
                     // ssd add start
                     // 发送取消订单的提醒邮件
-                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
-                    sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
-                            + AppConfig.ip_email + "/img/logo.png' ></img></a>");
-                    sbBuffer.append(
-                            "<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
-                    sbBuffer.append("<br><br>Order#: " + orderNo);
-                    sbBuffer.append(
-                            "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
-                    sbBuffer.append(
-                            "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
-                    sbBuffer.append("<br>Thank you for shopping with us.");
-                    sbBuffer.append("<br>To review your order status, click ");
-                    sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
-                    sbBuffer.append("<br><br>Sincerely,");
-                    sbBuffer.append("<br>Import-Express Team");
+//                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
+//                    sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
+//                            + AppConfig.ip_email + "/img/logo.png' ></img></a>");
+//                    sbBuffer.append(
+//                            "<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
+//                    sbBuffer.append("<br><br>Order#: " + orderNo);
+//                    sbBuffer.append(
+//                            "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
+//                    sbBuffer.append(
+//                            "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
+//                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
+//                    sbBuffer.append("<br>Thank you for shopping with us.");
+//                    sbBuffer.append("<br>To review your order status, click ");
+//                    sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
+//                    sbBuffer.append("<br><br>Sincerely,");
+//                    sbBuffer.append("<br>Import-Express Team");
                     //SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
@@ -1855,10 +1855,10 @@ public class NewOrderDetailsCtr {
                     String modeStr = jsonObject.toString();
                     try {
 						if (isKidFlag) {
-							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+							sendMailFactory.sendMail(toEmail, null, "Your kidsProductWholesale Order " + orderNo + " transaction is closed!",
 									model, TemplateType.CANCEL_ORDER_KID);
 						} else {
-							sendMailFactory.sendMail(toEmail, null, "Your kidsProductWholesale Order " + orderNo + " transaction is closed!",
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
 									model, TemplateType.CANCEL_ORDER_IMPORT);
 						}
                     } catch (Exception e) {

@@ -822,7 +822,11 @@ public class NewOrderSplitCtr {
                     model.put("expect_arrive_time", expect_arrive_time);
                     model.put("orderbean", obBean);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "Import Express Split Order Reminder");
+                    if(isKidFlag){
+                        model.put("title", "Kids Product Wholesale Split Order Reminder");
+                    }else{
+                        model.put("title", "Import Express Split Order Reminder");
+                    }
                     model.put("message", "");
                 } else {
                     //针对取消的订单计算折扣金额
@@ -867,7 +871,11 @@ public class NewOrderSplitCtr {
                             + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "Your Import Express order was partially cancelled");
+                    if(isKidFlag){
+                        model.put("title", "Your Kids Product Wholesale order was partially cancelled");
+                    } else{
+                        model.put("title", "Your Import Express order was partially cancelled");
+                    }
                     model.put("message", obBean_.getOrderNo());
                 }
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
