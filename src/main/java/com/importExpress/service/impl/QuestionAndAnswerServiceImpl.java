@@ -122,7 +122,7 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
                 if ("1".equals(Website)){
 					 urlTem = "https://www.kidsproductwholesale.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
-					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From ImportExpress", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
+					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From kidsproductwholesale", model, TemplateType.BUSINESS_INQUIRIES_KIDS);
 				}
 
             };
