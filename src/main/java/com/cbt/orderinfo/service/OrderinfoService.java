@@ -1749,9 +1749,10 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public List<Map<String, String>> getorderPending(int admuserid) {
 		List<Map<String, String>> list=new ArrayList<Map<String, String>>();
-		String orderIds=dao.getOrderIds(admuserid);
-		if(StringUtil.isNotBlank(orderIds)){
+		List<String> orderIds=dao.getOrderIds(admuserid);
+		if(orderIds != null && !orderIds.isEmpty()){
 			list=dao.getorderPending(orderIds);
+			orderIds.clear();
 			for(Map<String, String> map:list){
 				int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
 				map.put("emailcount",String.valueOf(count));
@@ -1816,7 +1817,9 @@ public class OrderinfoService implements IOrderinfoService {
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
 		// 支付失败的订单
-        List<Map<String, String>> list = dao.getorderPending(dao.getOrderIds(admuserid));
+		List<String> orderNoList = dao.getOrderIds(admuserid);
+        List<Map<String, String>> list = dao.getorderPending(orderNoList);
+        orderNoList.clear();
         for (Map<String, Integer> bean : result) {
             if ("order_pending".equals(bean.get("state"))) {
                 bean.put("counts", list==null?0:list.size());
