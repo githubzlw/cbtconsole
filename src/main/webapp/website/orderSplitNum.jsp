@@ -145,7 +145,7 @@
                         </span>
                     <br><br>
                     <span>
-                        <input id="${odBean.id}" type="checkbox" class="split_check_bok"/>
+                        <input id="${odBean.id}" type="checkbox" class="split_check_bok" onclick="checkIsTrue(this, ${odBean.yourorder})"/>
                         拆单数量:<input class="ipu_num" type="number" onblur="chooseCheckBox(this,${odBean.yourorder})"
                                     style="height: 24px;width: 70px;"/>
                     </span>
@@ -159,6 +159,23 @@
 </body>
 
 <script type="text/javascript">
+    function checkIsTrue(obj, num) {
+        if ($(obj).is(":checked")) {
+            var inputVal = $(obj).find(".ipu_num").val();
+            if (inputVal &&　inputVal > 0) {
+                if (inputVal >= num) {
+                    $(obj).prop("checked", false);
+                    $.messager.alert("提醒", "拆单数量必须小于客户购买数量!", "info");
+                    return false;
+                }
+            } else {
+                $(obj).prop("checked", false);
+                $.messager.alert("提醒", "请输入拆单数量", "info");
+                return false;
+            }
+        }
+    }
+
     function chooseCheckBox(obj, num) {
         var inputVal = $(obj).val();
         if (inputVal > 0) {
