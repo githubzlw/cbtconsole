@@ -737,6 +737,11 @@
                            style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="open"
                            onclick="afterReplenishment()" value="售后补货">
                 </td>
+                <td>
+                    <input type="button"
+                           style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
+                           onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
+                </td>
                 <td colspan="3" style="display: none;" id="td_buyuser">
                     <span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
                     <select id="saler" name="saler" style="width: 110px;"></select>

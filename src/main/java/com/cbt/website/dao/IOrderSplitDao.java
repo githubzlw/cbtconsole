@@ -329,7 +329,8 @@ public interface IOrderSplitDao {
 	 * @param nwOrderDetails
 	 * @return
 	 */
-	public boolean newOrderSplitFun(OrderBean orderBeanTemp, OrderBean odbeanNew, List<OrderDetailsBean> nwOrderDetails, String state);
+	public boolean newOrderSplitFun(OrderBean orderBeanTemp, OrderBean odbeanNew, List<OrderDetailsBean> nwOrderDetails,
+									String state, int isSplitNum);
 
 	/**
 	 * 根据订单哈查询线上存在通知消息

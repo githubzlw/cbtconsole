@@ -20,6 +20,7 @@ import com.cbt.website.bean.*;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -1907,6 +1908,11 @@ public class OrderinfoService implements IOrderinfoService {
         }
         return false;
     }
+
+	@Override
+	public int insertIntoOrderSplitNumLog(List<SplitGoodsNumBean> splitGoodsNumBeanList) {
+		return dao.insertIntoOrderSplitNumLog(splitGoodsNumBeanList);
+	}
 }
 
 
