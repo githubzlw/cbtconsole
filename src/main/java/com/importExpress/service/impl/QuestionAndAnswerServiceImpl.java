@@ -127,7 +127,8 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
 
             };
         }.start();
-        return Utility.getStringIsNull(sale_email)?dao.replyReport(id, replyContent,date):1;
+//        return Utility.getStringIsNull(sale_email)?dao.replyReport(id, replyContent,date):0;
+        return 1;
     }
 	
 
