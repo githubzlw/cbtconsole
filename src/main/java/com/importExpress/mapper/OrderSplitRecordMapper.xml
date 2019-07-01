@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.OrderSplitRecordMapper">
+<resultMap type="com.importExpress.pojo.OrderSplitMain" id="orderMainMap">
+ 		<id column="id" property="id"/>
+        <result column="order_id" property="orderid"/>
+        <result column="weight" property="weight"/>
+        <result column="cost" property="cost"/>
+        <result column="feight" property="feight"/>
+        <result column="country" property="country"/>
+        <result column="mode_transport" property="modeTransport"/>
+
+</resultMap>
+<resultMap type="com.importExpress.pojo.OrderSplitChild" id="orderChildMap">
+ 		<id column="id" property="id"/>
+        <result column="main_id" property="mainid"/>
+        <result column="order_id" property="orderid"/>
+        <result column="weight" property="weight"/>
+        <result column="cost" property="cost"/>
+        <result column="feight" property="feight"/>
+        <result column="country" property="country"/>
+        <result column="recommend" property="recommend"/>
+        <result column="child_orderid" property="childOrderid"/>
+        <result column="mode_transport" property="modeTransport"/>
+
+</resultMap>
+
+  <insert id="insertMainOrder" useGeneratedKeys="true" parameterType="com.importExpress.pojo.OrderSplitMain">
+  <selectKey resultType="int" keyProperty="id" order="AFTER">  
+        SELECT 
+        LAST_INSERT_ID() 
+    </selectKey>
+  insert into order_split_main_record(order_id,weight,feight,cost,country,mode_transport)
+  values(#{orderid},#{weight},#{feight},#{cost},
+  (select  b.id from  order_address a left join zone b on a.country=b.country where a.orderNo=#{orderid}),
+  ( select  SUBSTRING_INDEX(mode_transport, '@',1) from orderinfo where order_no=#{orderid}))
+  </insert>
+  
+  <select id="countMainOrder" resultType="Integer">
+  select  count(*) from order_split_main_record where order_id=#{orderid}
+  </select>
+  <select id="getMainOrder" resultMap="orderMainMap">
+  select  id,order_id,weight,feight,cost,country,mode_transport from order_split_main_record where order_id=#{orderid}
+  </select>
+  <select id="getChildOrder" resultMap="orderChildMap">
+  select  main_id,order_id,weight,feight,cost,country,mode_transport from order_split_child_record where order_id=#{orderid}
+  </select>
+  
+   <insert id="insertChildOrder"  parameterType="com.importExpress.pojo.OrderSplitChild">
+  insert into order_split_child_record(main_id,order_id,weight,feight,cost,recommend,country,mode_transport)
+  values(#{mainid},#{orderid},#{weight},#{feight},#{cost},#{recommend},#{country},#{modeTransport})
+  </insert>
+   <insert id="updateChildOrder"  >
+  update order_split_child_record set recommend=0,child_order_id=CONCAT_WS(',',child_order_id,#{orderChild2}) where order_id=#{orderChild1}
+  </insert>
+  
+  <select id="getOrder" resultMap="orderChildMap">
+  select  main_id,order_id,weight,feight,cost,recommend,country,mode_transport from  order_split_child_record where order_id=#{orderid}
+  
+  </select>
+  <select id="getOrderCountry" resultType="Integer">
+  select  b.id from  order_address a left join zone b on a.country=b.country where a.orderNo=#{orderid}
+  
+  </select>
+  
+  
+</mapper>
