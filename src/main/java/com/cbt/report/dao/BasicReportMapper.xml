@@ -372,16 +372,7 @@
 		1=1 and date(datatime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(datatime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not
-		in(select id from user where email like 'test%' or email like
-		'%qq.com' or email like '%163.com' or email like '%126.com'
-		or email
-		like '%ww.com' or name like 'rlef%' or email like 't@%' or
-		email like
-		't_@%' or email like '%sina.com'
-		 or
-		email like '%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com'
-		or id=1128))
+		in(select id from user where is_test = 0))
 		AS new_add_balance,
 		<!-- 余额补偿 -->
 		(select cast(ifnull(sum(money),0) AS DECIMAL(11, 2)) from
@@ -390,14 +381,7 @@
 		&lt;=date(#{endDate,jdbcType=VARCHAR}) and date(createtime)
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not in(select id
-		from user where email like 'test%' or email like '%qq.com' or email
-		like '%163.com' or email like '%126.com'
-		or email like '%ww.com' or
-		name like 'rlef%' or email like 't@%' or
-		email like 't_@%' or email
-		like '%sina.com'  or email like
-		'%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		from user where is_test = 0))
 		AS balance_compensation,
 		<!-- 客户充值 pay_for_balance -->
 		(select cast(sum(payment_amount) AS DECIMAL(11, 2)) from payment where
@@ -410,16 +394,7 @@
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not
 		in(select id
-		from user where email like 'test%' or email like '%qq.com'
-		or email
-		like '%163.com' or email like '%126.com'
-		or email like
-		'%ww.com' or name like 'rlef%' or email like 't@%' or
-		email like 't_@%'
-		or email like '%sina.com'  or email
-		like '%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or
-		id=1128))
+		from user where is_test = 0))
 		AS pay_for_balance,
 		<!-- 多支付 -->
 		(select cast(ifnull(sum(price),0) as decimal(11,2)) as extra_pay from
@@ -430,20 +405,7 @@
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not
 		in(select id
-		from user where email like 'test%' or email
-		like '%qq.com'
-		or email like
-		'%163.com' or email like '%126.com'
-		or email like
-		'%ww.com' or name like
-		'rlef%' or email like 't@%' or
-		email like 't_@%'
-		or email like
-		'%sina.com'  or email
-		like
-		'%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or
-		id=1128))
+		from user where is_test = 0))
 		AS over_payment_balance,
 		<!-- 订单取消(全部或部分) -->
 		(select cast(ifnull(sum(price),0) as decimal(11,2)) as extra_pay from
@@ -454,20 +416,7 @@
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not
 		in(select id
-		from user where email like 'test%' or email
-		like '%qq.com'
-		or email like
-		'%163.com' or email like '%126.com'
-		or email like
-		'%ww.com' or name like
-		'rlef%' or email like 't@%' or
-		email like 't_@%'
-		or email like
-		'%sina.com' or email
-		like
-		'%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or
-		id=1128)
+		from user where is_test = 0)
 		and remark_id not in(select order_no from orderinfo where
 		date(create_time) &lt;=date(#{endDate,jdbcType=VARCHAR})
 		and
@@ -481,14 +430,7 @@
 		date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and date(endtime)
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid not in(select id
-		from user where email like 'test%' or email like '%qq.com' or email
-		like '%163.com' or email like '%126.com'
-		or email like '%ww.com' or
-		name like 'rlef%' or email like 't@%' or
-		email like 't_@%' or email
-		like '%sina.com' or email like
-		'%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or id=1128))
+		from user where is_test = 0))
 		AS balance_withdrawal
 
 		from dual
@@ -522,16 +464,7 @@
 		from orderinfo where orderinfo.order_no =
 		rf.orderid)
 		and rf.userid not
-		in(select id from user where email like 'test%' or
-		email like '%qq.com'
-		or email like '%163.com' or email like '%126.com'
-		or email like
-		'%ww.com' or name like 'rlef%' or email like 't@%' or
-		email like 't_@%'
-		or email like '%sina.com' or email
-		like '%test%hotmail.com%' or
-		email = 'yangyanyan4228@yahoo.com' or
-		id=1128)
+		in(select id from user where is_test = 0)
 		order by rf.endtime
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -549,15 +482,7 @@
 		and
 		exists(select order_no from orderinfo where orderinfo.order_no =
 		refund.orderid)
-		and userid not in(select id from user where email like
-		'test%' or email
-		like '%qq.com' or email like '%163.com' or email like
-		'%126.com'
-		or email like '%ww.com' or name like 'rlef%' or email like
-		't@%' or
-		email like 't_@%' or email like '%sina.com' or email like '%test%hotmail.com%' or
-		email =
-		'yangyanyan4228@yahoo.com' or id=1128)
+		and userid not in(select id from user where is_test = 0)
 	</select>
 
 
@@ -581,21 +506,7 @@
 		from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		not in(select id from `user` where email like
-		'test%' or
-		email like
-		'%qq.com' or email like '%163.com' or email like
-		'%126.com'
-		or email
-		like '%ww.com' or name like 'rlef%' or email like
-		't@%' or
-		email like
-		't_@%' or email like '%sina.com'
-		or
-		email like '%test%hotmail.com%' or
-		email =
-		'yangyanyan4228@yahoo.com' or
-		id=1128)
+		in(select id from `user` where is_test = 0)
 		group by userid
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -611,20 +522,7 @@
 		count(*) from (select userid from tab_blancechangelog where
 		date(changetime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(changetime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		not in(select id from `user` where email like
-		'test%' or
-		email like
-		'%qq.com' or email like '%163.com' or email like
-		'%126.com'
-		or email
-		like '%ww.com' or name like 'rlef%' or email like
-		't@%' or
-		email like
-		't_@%' or email like '%sina.com' or
-		email like '%test%hotmail.com%' or
-		email =
-		'yangyanyan4228@yahoo.com' or
-		id=1128)
+		in(select id from `user` where is_test = 0)
 		group by userid) tbc
 	</select>
 
@@ -648,13 +546,8 @@
 		orderinfo oi inner join user u on oi.user_id=u.id
 		where 1=1 and oi.state in(1,2,3,4,5)
 		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by oi.create_time
 		<if test="rows != 0">
@@ -669,13 +562,8 @@
 		LEFT JOIN shipping_package sp ON (oi.order_no=sp.orderid OR (LOCATE(oi.order_no,sp.remarks)>0 AND LOCATE(oi.order_no,sp.orderid)&lt;=0))
 		where 1=1 and oi.state in(1,2,3,4,5)
 		and left(oi.order_no,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -685,13 +573,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype =0 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -705,13 +588,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype =0 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -722,13 +600,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype =1 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -742,13 +615,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype =1 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -759,13 +627,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype =2 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -779,13 +642,8 @@
 		count(id) from payment
 		where 1=1 and paystatus=1 and paytype =2 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 
@@ -809,12 +667,7 @@
 		status =2 and type in(0,1) and refund.orderid
 		=orderinfo.order_no ) and
 		state in(-1,6)
-		and user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%'))) rf
+		and user_id  in(SELECT id FROM USER WHERE is_test = 0))) rf
 		on rf.orderid =
 		odif.order_no
 		where odif.state in(-1,6)
@@ -824,12 +677,7 @@
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and valid=1 and status =2 and
 		type in(0,1))
-		and odif.user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		and odif.user_id  in(SELECT id FROM USER WHERE is_test = 0)
 		and not exists(select id from
 		order_change where
 		order_change.orderNo=odif.order_no)
@@ -849,12 +697,7 @@
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and valid=1 and status =2 and
 		type in(0,1))
-		and odif.user_id  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		and odif.user_id  in(SELECT id FROM USER WHERE is_test = 0)
 		and not exists(select id from
 		order_change where
 		order_change.orderNo=odif.order_no)
@@ -871,12 +714,7 @@
 		&lt;=#{endDate,jdbcType=VARCHAR} and
 		date_sub(endtime,interval 8 HOUR)
 		&gt;=#{beginDate,jdbcType=VARCHAR}
-		and userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		and userid  in(SELECT id FROM USER WHERE is_test = 0)
 		order by endtime
 		limit
 		#{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -889,12 +727,7 @@
 		and
 		date_sub(endtime,interval 8 HOUR) &lt;=#{endDate,jdbcType=VARCHAR} and
 		date_sub(endtime,interval 8 HOUR) &gt;=#{beginDate,jdbcType=VARCHAR}
-		and userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		and userid  in(SELECT id FROM USER WHERE is_test = 0)
 	</select>
 
 
@@ -934,12 +767,7 @@
 		from additional_balance where valid=1 and state=1 and
 		date(createtime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(createtime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		 in(SELECT id FROM USER WHERE is_test = 0)
 		group by userid
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -955,12 +783,7 @@
 		state=1 and
 		date(createtime)&lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(createtime)&gt;=date(#{beginDate,jdbcType=VARCHAR}) and userid
-		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		 in(SELECT id FROM USER WHERE is_test = 0)
 		group by userid) bcs
 	</select>
 
@@ -970,13 +793,8 @@
 		select userid ,ifnull(price,0) as amount,remark_id,remark
 		from recharge_record where type in(1,5) and usesign=0 and
 		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -991,13 +809,8 @@
 		from (select userid from recharge_record where type in(1,5) and
 		usesign=0 and
 		left(remark_id,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid  in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%') and payment.paystatus=1
-		and LENGTH(orderid)=16 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid  in(SELECT id FROM USER WHERE is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))) bcs
 	</select>
 
@@ -1010,12 +823,7 @@
 		and date(endtime) &lt;=date(#{endDate,jdbcType=VARCHAR}) and
 		date(endtime) &gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid
-		in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		in(SELECT id FROM USER WHERE is_test = 0)
 		group by userid
 		<if test="rows != 0">
 			limit #{start,jdbcType=INTEGER},#{rows,jdbcType=INTEGER}
@@ -1032,12 +840,7 @@
 		date(endtime)
 		&gt;=date(#{beginDate,jdbcType=VARCHAR})
 		and userid
-		in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		in(SELECT id FROM USER WHERE is_test = 0)
 		group by userid) rf
 	</select>
 
@@ -1065,12 +868,7 @@
 		where 1=1 and (oi.create_time BETWEEN #{beginDate,jdbcType=VARCHAR}
 		and #{endDate,jdbcType=VARCHAR}) and oi.state in (1,2,3,4,5) and od.state in(0,1)
 		and oi.user_id
-		 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+		 in(SELECT id FROM USER WHERE is_test = 0)
 		) gd
 		on gdad.pid = gd.goods_pid
 		where 1=1
@@ -1104,12 +902,7 @@
 		where 1=1 and (oi.create_time BETWEEN #{beginDate,jdbcType=VARCHAR} 
 		and #{endDate,jdbcType=VARCHAR}) and oi.state in (1,2,3,4,5) and od.state in(0,1)
 		and oi.user_id
-				 in(SELECT id FROM USER WHERE email NOT LIKE '%qq.com%' AND email NOT LIKE '%ww.com%' AND
-		email NOT LIKE 'test%'   AND  email NOT LIKE '%qq.ss' AND email NOT LIKE '%@q.ocm' AND
-		email NOT LIKE '%qqsss.com' AND  email NOT LIKE '%csmfg.com%'  AND  email NOT LIKE '%@sourcing-cn.com%'  AND
-		email NOT LIKE '%@china-synergy%'  AND email&lt;>'sb33@gmail.com'  AND email&lt;>'sbtest@gmail.com'  AND
-		email NOT LIKE '%@qq.co%' AND email NOT LIKE '%11.com' AND email NOT LIKE '%@qq.ocm' AND email NOT LIKE '%@163.com'   AND
-		email NOT LIKE 'zhouxueyun%')
+				 in(SELECT id FROM USER WHERE is_test = 0)
 		) gd
 		on gdad.pid = gd.goods_pid
 		where 1=1 
@@ -1126,12 +919,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype = 5 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid not in(select id from user where email  like 'test%' or   email  like '%ww.com' or  email  like '%qq.com%'
-		or  email  like '%163.com%' or
-		email  like '%126.com%'  or email  LIKE '%test%hotmail.com%' or email = 'yangyanyan4228@yahoo.com' or id=1128
-		or email  LIKE '%import-express.com%' or id=66  or email  LIKE '%test.com%'  or email  LIKE '%china-synergy.org%'
-		or email  LIKE '%asdf.com%' or email  LIKE '%11.com%'  or email  LIKE '%ww.ppp.com%' ) and payment.paystatus=1
-		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid in(select id from user where is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 		order by createtime
 		<if test="rows != 0">
@@ -1145,12 +934,8 @@
 		from payment
 		where 1=1 and paystatus=1 and paytype = 5 and
 		left(orderid,16) in(select orderid from (select orderid,min(payment.createtime) as createtime from payment
-		where userid not in(select id from user where email  like 'test%' or   email  like '%ww.com' or  email  like '%qq.com%'
-		or  email  like '%163.com%' or
-		email  like '%126.com%'  or email  LIKE '%test%hotmail.com%' or email = 'yangyanyan4228@yahoo.com' or id=1128
-		or email  LIKE '%import-express.com%' or id=66  or email  LIKE '%test.com%'  or email  LIKE '%china-synergy.org%'
-		or email  LIKE '%asdf.com%' or email  LIKE '%11.com%'  or email  LIKE '%ww.ppp.com%' ) and payment.paystatus=1
-		and (LENGTH(orderid)=16 or LENGTH(orderid)=8) group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
+		where userid in(select id from user where is_test = 0) and payment.paystatus=1
+		and paytype in(0,1,2,5) and payment_amount > 0 group by orderid) cur_payment where date(createtime) &gt;= date(#{beginDate,jdbcType=VARCHAR})
 		and date(createtime) &lt;= date(#{endDate,jdbcType=VARCHAR}))
 	</select>
 

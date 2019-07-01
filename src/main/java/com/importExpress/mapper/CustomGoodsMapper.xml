@@ -1244,7 +1244,7 @@
 
     <update id="setNewAliPidInfo">
         update custom_benchmark_ready
-        set ali_pid = #{aliPid},ali_price = #{aliPrice}
+        set ali_pid = #{aliPid},ali_price = #{aliPrice},bm_flag = 1 ,isBenchmark = 1
         where pid = #{pid}
     </update>
 
@@ -1310,7 +1310,7 @@
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
-            <if test="shopId == null">
+            <if test="shopId == null and source == 1">
                 <if test="isEdited > -1">  -- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
@@ -1329,11 +1329,19 @@
                     )
                 </if>
             </if>
-            <if test="shopId != null">
+            <if test="shopId != null and source == 1">
                 cbu.shop_id = #{shopId}
                 <if test="valid != -1">
                     and cbu.valid = #{valid}
                 </if>
+            </if>
+            <if test="shopId == null and source != 1">
+                <if test="valid != -1">
+                    cbu.valid = #{valid} and
+                </if>
+                cbu.pid in(
+                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                )
             </if>
         </where>
         <if test="shopId == null">
@@ -1347,7 +1355,7 @@
         from custom_benchmark_ready cbu
         left join custom_goods_edit cge on cbu.pid = cge.pid
         <where>
-            <if test="shopId == null">
+            <if test="shopId == null and source == 1">
                 <if test="isEdited > -1">  -- 商品已编辑
                     cge.is_edited = #{isEdited}
                 </if>
@@ -1366,13 +1374,36 @@
                     )
                 </if>
             </if>
-            <if test="shopId != null">
+            <if test="shopId != null and source == 1">
                 cbu.shop_id = #{shopId}
                 <if test="valid != -1">
                     and cbu.valid = #{valid}
                 </if>
             </if>
+            <if test="shopId == null and source != 1">
+                <if test="valid != -1">
+                    cbu.valid = #{valid} and
+                </if>
+                cbu.pid in(
+                    SELECT pid FROM custom_benchmark_show WHERE source = #{source}
+                )
+            </if>
         </where>
     </select>
 
+    <select id="queryShopGoodsSalesAmountAll" resultType="com.importExpress.pojo.ShopGoodsSalesAmount">
+        select shop_id as shopId,goods_num as goodsNum,total_price as totalPrice
+        from shop_goods_sales_amount
+    </select>
+
+    <select id="queryShopGoodsSalesAmountByShopId" resultType="com.importExpress.pojo.ShopGoodsSalesAmount">
+        select shop_id as shopId,goods_num as goodsNum,total_price as totalPrice
+        from shop_goods_sales_amount
+        where shop_id = #{shopId}
+    </select>
+
+    <insert id="insertIntoGoodsImgUpLog">
+        insert into custom_goods_img_up_log(pid,img_url,admin_id,remark)
+        values(#{pid}, #{imgUrl}, #{adminId}, #{remark})
+    </insert>
 </mapper>

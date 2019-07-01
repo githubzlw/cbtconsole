@@ -15,8 +15,10 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.*;
 import com.importExpress.service.GoodsCarconfigService;
 import com.importExpress.service.ShopCarMarketingService;
-import com.importExpress.utli.*;
-import net.sf.json.JSON;
+import com.importExpress.utli.GoodsPriceUpdateUtil;
+import com.importExpress.utli.SendEmailNew;
+import com.importExpress.utli.SendMQ;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import okhttp3.*;
@@ -211,6 +213,10 @@ public class ShopCarMarketingController {
             return json;
         }else{
             paramMap.put("type",type);
+        }
+        String websiteType = request.getParameter("websiteType");
+        if(StringUtils.isBlank(websiteType)){
+            websiteType = "1";
         }
 
         if("4".equals(type)) {
@@ -418,6 +424,7 @@ public class ShopCarMarketingController {
             paramMap.put("adminEmail", adminEmail);
             paramMap.put("whatsApp", whatsApp);
             paramMap.put("type", type);
+            paramMap.put("websiteType", websiteType);
             if (genHtmlEamil(userId, paramMap)) {
                 //4.更新跟进信息
                 shopCarMarketingService.updateAndInsertUserFollowInfo(userId, user.getId(), paramMap.toString());
@@ -441,6 +448,7 @@ public class ShopCarMarketingController {
 
     private boolean genHtmlEamil(int userId,Map<String,String> paramMap) {
         boolean isSuccess = false;
+        boolean isKidFlag =  "2".equals(paramMap.get("websiteType"));
         try {
             Map<String, Object> modelM = new HashMap<String, Object>();
 
@@ -455,10 +463,18 @@ public class ShopCarMarketingController {
                 return isSuccess;
             }
 
-            modelM.put("emailFollowUrl", EMAIL_FOLLOW_URL + followCode);
+            if (isKidFlag) {
+                modelM.put("emailFollowUrl", SwitchDomainNameUtil.checkNullAndReplace(EMAIL_FOLLOW_URL + followCode));
+                modelM.put("carUrl", SwitchDomainNameUtil.checkNullAndReplace(AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode));
+            } else {
+                modelM.put("emailFollowUrl", EMAIL_FOLLOW_URL + followCode);
+                modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode);
+            }
+
             modelM.put("followCode", followCode);
             modelM.put("userId",userId);
-            modelM.put("carUrl", AUTO_LOGIN_URL + "?userId=" + userId + "&uuid=" + followCode);
+
+
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
@@ -531,6 +547,11 @@ public class ShopCarMarketingController {
                     modelM.put("offRate", BigDecimalUtil.truncateDouble((offCost) / productCost * 100, 2));
                 }
                 modelM.put("offCost", BigDecimalUtil.truncateDouble(offCost, 2));
+                // 域名转换
+                if(isKidFlag){
+                    SwitchDomainNameUtil.changeShopCarMarketingList(resultList);
+                    SwitchDomainNameUtil.changeShopCarMarketingList(sourceList);
+                }
                 modelM.put("updateList", resultList);
                 modelM.put("sourceList", sourceList);
             }
@@ -542,11 +563,32 @@ public class ShopCarMarketingController {
             modelM.put("adminEmail", paramMap.get("adminEmail"));
             modelM.put("whatsApp", paramMap.get("whatsApp"));
             if ("1".equals(paramMap.get("type"))) {
-                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_NO_CHANGE);
+                if (isKidFlag) {
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_NO_CHANGE_KID);
+
+                } else {
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_NO_CHANGE_IMPORT);
+                }
             } else if ("2".equals(paramMap.get("type"))) {
-                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_UPDATE_PRICE);
+                if (isKidFlag) {
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_UPDATE_PRICE_KID);
+                } else {
+
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_UPDATE_PRICE_IMPORT);
+                }
             } else if ("3".equals(paramMap.get("type"))) {
-                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_FREIGHT_COUPON);
+                if (isKidFlag) {
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_FREIGHT_COUPON_KID);
+                } else {
+
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_FREIGHT_COUPON_IMPORT);
+                }
             } else if ("4".equals(paramMap.get("type"))) {
                 modelM.put("oldMethod", paramMap.get("oldMethod"));
                 modelM.put("oldTransport", paramMap.get("oldTransport"));
@@ -555,7 +597,14 @@ public class ShopCarMarketingController {
                 modelM.put("newTransport", paramMap.get("newTransport"));
                 modelM.put("newPrice", paramMap.get("newPrice"));
                 modelM.put("savePrice", paramMap.get("savePrice"));
-                sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM, TemplateType.SHOPPING_CART_BEST_TRANSPORT);
+                if (isKidFlag) {
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_BEST_TRANSPORT_KID);
+                } else {
+
+                    sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
+                            TemplateType.SHOPPING_CART_BEST_TRANSPORT_IMPORT);
+                }
             }
             // 发送成功后，更新redis的跟踪码信息
             try {
@@ -568,7 +617,8 @@ public class ShopCarMarketingController {
                 jsonObject.put("type", "5");
                 jsonObject.put("userid", userId);
                 jsonObject.put("uuid", followCode);
-                jsonObject.put("timeout", 8 * 60 * 60);
+                // 失效时间3周
+                jsonObject.put("timeout", 3 * 7 * 24 * 60 * 60);
                 sendMQ.sendMsg(jsonObject);
                 sendMQ.closeConn();
             } catch (Exception e) {

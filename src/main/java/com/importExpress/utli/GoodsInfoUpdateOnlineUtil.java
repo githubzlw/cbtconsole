@@ -400,6 +400,7 @@ public class GoodsInfoUpdateOnlineUtil {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage(e.getMessage());
+            logger.error("pid:" + inputData.getPid() + ",updateOnlineAndSolr error:", e);
         } finally {
             if (file != null && file.exists()) {
                 file.delete();
@@ -472,6 +473,7 @@ public class GoodsInfoUpdateOnlineUtil {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage(e.getMessage());
+            logger.error("pid:" + inputData.getPid() + ",updateOnlineAndSolr error:", e);
         } finally {
             if (file != null && file.exists()) {
                 file.delete();

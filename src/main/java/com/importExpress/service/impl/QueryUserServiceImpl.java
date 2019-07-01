@@ -3,6 +3,7 @@ package com.importExpress.service.impl;
 import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.SameGoodsDetails;
 import com.cbt.common.dynamics.DataSourceSelector;
+import com.cbt.pojo.ShareableOrder;
 import com.cbt.util.DateFormatUtil;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
@@ -747,6 +748,9 @@ public class QueryUserServiceImpl implements QueryUserService {
         if (CollectionUtils.isEmpty(sameGoodsList)) {
             result.put("sameGoods", "");
         } else {
+            // 查询 核心供应商
+            List<String> salesList = queryUserMapper.querySalesShop(sameGoodsList);
+
             for (SameGoodsDetails bean : sameGoodsList) {
                 String jsonContent = bean.getJsonContent();
                 if (jsonContent != null && jsonContent.contains("\"imgUrl\": \"")) {
@@ -756,6 +760,10 @@ public class QueryUserServiceImpl implements QueryUserService {
                     jsonContent = "#";
                 }
                 bean.setJsonContent(jsonContent);
+
+                if (salesList.contains(bean.getShopId())) {
+                    bean.setSalesShop(true);
+                }
             }
             result.put("sameGoods", sameGoodsList);
         }
@@ -776,6 +784,29 @@ public class QueryUserServiceImpl implements QueryUserService {
     @Override
     public void insertNeedoffDownAll(List<String> pidList, Integer reason, Integer adminid) {
         queryUserMapper.insertNeedoffDownAll(pidList, reason, adminid);
+    }
+
+    @Override
+    public EasyUiJsonResult lookShareableOrder(Integer page, Integer rows, String orderNo,String name,int userid,int share) {
+        List<ShareableOrder> list = queryUserMapper.lookShareableOrder((page - 1) * rows, rows, orderNo,name,userid,share);
+        Integer totalCount = queryUserMapper.lookShareableOrderCount(orderNo,name,userid,share);
+
+        EasyUiJsonResult json = new EasyUiJsonResult();
+        if (list != null && list.size() > 0) {
+            json.setSuccess(true);
+            json.setRows(list);
+            json.setTotal(totalCount);
+        } else {
+            json.setSuccess(false);
+            json.setRows("");
+            json.setTotal(0);
+        }
+        return json;
+    }
+
+    @Override
+    public void SetShareByOrderno(String orderNo) {
+        this.queryUserMapper.SetShareByOrderno(orderNo);
     }
 
 }

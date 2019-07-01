@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+<head>
+    <title>凯融科技 ~ Wonderful Network Service.</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="https://touhou.io/assets/css/main.css" />
+    <!--[if lte IE 9]><link rel="stylesheet" href="https://touhou.io/assets/css/ie9.css" /><![endif]-->
+    <noscript><link rel="stylesheet" href="https://touhou.io/assets/css/noscript.css" /></noscript>
+</head>
+<body>
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Music -->
+    <div id="music">
+        <iframe id="musicFrame" style="display: none;" frameborder="no" border="0" marginwidth="0" marginheight="0" width=298 height=52 src=""></iframe>
+    </div>
+
+    <!-- Header -->
+    <header id="header">
+        <div class="logo">
+            <img src="https://www.import-express.com/img/logo.png" alt="" />
+        </div>
+        <div class="content">
+            <div class="inner">
+                <h1>凯融科技</h1>
+                <h3 style="text-transform: none;">~ Wonderful Network Service ~</h3>
+                <p>穿越结界 进入幻想</p>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#intro">简介</a></li>
+                <li><a href="#tos">TOS</a></li>
+                <!--<li><a href="/user">用户中心</a></li>-->
+                <li class="is-middle"><a href="/auth/login">登录</a></li>
+                <li><a href="/auth/register">注册</a></li>
+                <!--<li><a href="/user/logout">退出</a></li>-->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <div id="main">
+
+        <!-- Intro -->
+        <article id="intro">
+            <h2 class="major">简介</h2>
+            <p>今天也是好天气☆</p>
+        </article>
+
+        <!-- TOS -->
+        <article id="tos">
+            <h2 class="major">用户协议 Terms of Service</h2>
+            <p>凯融科技，以下简称本站。</p>
+
+            <h3>隐私</h3>
+            <ul>
+                <li>用户注册时候需要提供邮箱以及密码，并自行保管。邮箱为用户的唯一凭证。</li>
+                <li>本站会加密存储用户密码，尽量保证数据安全，但并不保证这些信息的绝对安全。</li>
+            </ul>
+
+            <h3>使用条款</h3>
+            <ul>
+                <li>禁止使用本站服务进行任何违法恶意活动。</li>
+                <li>使用任何节点，需遵循节点所属国家的相关法律以及中国法律。</li>
+                <li>禁止滥用本站提供的服务。</li>
+                <li>对于免费用户，我们有权在不通知的情况下删除账户。</li>
+                <li>任何违反使用条款的用户，我们将会删除违规账户并没收使用本站服务的权利。</li>
+            </ul>
+
+            <h3>其它</h3>
+            <ul>
+                <li>本站仅限人类、猫及**注册使用。</li>
+                <li>TOS更新时用户需要遵守最新TOS。</li>
+            </ul>
+        </article>
+
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <p class="copyright">&copy;2017-2019 凯融科技
+            <!-- Global site tag (gtag.js) - Google Analytics -->
+            <!--<script async src="https://www.googletagmanager.com/gtag/js?id=UA-119239684-1"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'UA-119239684-1');
+            </script>-->
+        </p>
+    </footer>
+
+</div>
+
+<!-- BG -->
+<div id="bg">
+    <div class="cloud1"><img src="https://touhou.io/images/cloud1.png" /></div>
+    <div class="cloud2"><img src="https://touhou.io/images/cloud2.png" /></div>
+    <div class="cloud3"><img src="https://touhou.io/images/cloud1.png" /></div>
+    <div class="cloud4"><img src="https://touhou.io/images/cloud2.png" /></div>
+</div>
+
+<!-- Scripts -->
+<script src="https://touhou.io/assets/js/jquery.min.js"></script>
+<script src="https://touhou.io/assets/js/skel.min.js"></script>
+<script src="https://touhou.io/assets/js/util.js"></script>
+<script src="https://touhou.io/assets/js/main.js"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        $("#musicFrame").attr("src", "//music.163.com/outchain/player?type=2&id=34229702&auto=2&height=1000");
+        $("#musicFrame").show();
+    }
+</script>
+
+<script>
+
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(decodeURI(pair[0]) == variable){
+                return decodeURI(pair[1]);
+            }
+        }
+        return "";
+    }
+
+    function setCookie(cname,cvalue,exdays)
+    {
+        var d = new Date();
+        d.setTime(d.getTime()+(exdays*24*60*60*1000));
+        var expires = "expires="+d.toGMTString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+    function getCookie(cname)
+    {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++)
+        {
+            var c = ca[i].trim();
+            if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+
+    if (getQueryVariable('code')!=''){
+        setCookie('code',getQueryVariable('code'),30);
+        window.location.href='/';
+    }
+
+    //if ((getCookie('code'))!=''){
+    //$("#code").val(getCookie('code'));
+    //}
+</script>
+
+</body>
+</html>

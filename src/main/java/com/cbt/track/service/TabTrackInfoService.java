@@ -1,5 +1,6 @@
 package com.cbt.track.service;
 
+import com.cbt.bean.EasyUiJsonResult;
 import com.cbt.bean.TabTrackInfo;
 
 import java.util.Map;
@@ -24,7 +25,9 @@ public interface TabTrackInfoService {
 
 	TabTrackInfo queryStateByTrackNo(String trackNo);
 
-	Map<String, Integer> queryWaringNum(String startDate, String endDate);
+	Map<String, Integer> queryWaringNum(Map<String, Object> param);
+
+    void getTrackInfoList(EasyUiJsonResult json, Map<String, Object> param);
 
 //    List<String> getAllTrackNo();
 }

@@ -11,10 +11,11 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
-
+@Repository
 public interface WarehouseMapper {
 	public outIdBean findOutId(@Param("uid") Integer uid);
 	public OrderAddress getAddressByOrderID(@Param("orderNo") String orderNo);
@@ -1459,8 +1460,8 @@ public interface WarehouseMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderPay(@Param("orderids")List<String> orderids);
-	
-	
-	
-	
+
+
+	@Select("SELECT remotpath from custom_benchmark_ready WHERE pid=#{pid}")
+	String getRepathByPid(@Param("pid") String pid);
 }

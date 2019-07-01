@@ -1335,7 +1335,8 @@ public class CustomGoodsController {
                                            @RequestParam(value = "shopId", defaultValue = "", required = false) String shopId,
                                            @RequestParam(value = "isBenchmark", defaultValue = "-1", required = false) Integer isBenchmark,
                                            @RequestParam(value = "isEdited", defaultValue = "-1", required = false) Integer isEdited,
-                                           @RequestParam(value = "valid", defaultValue = "-1", required = false) Integer valid
+                                           @RequestParam(value = "valid", defaultValue = "-1", required = false) Integer valid,
+                                           @RequestParam(value = "source", defaultValue = "1", required = false) Integer source
     ) {
         CustomGoodsQuery queryBean = new CustomGoodsQuery();
         queryBean.setCurrPage(50);
@@ -1344,6 +1345,7 @@ public class CustomGoodsController {
         queryBean.setIsBenchmark(isBenchmark);
         queryBean.setIsEdited(isEdited);
         queryBean.setValid(valid);
+        queryBean.setSource(source);
 
         ModelAndView mv = new ModelAndView("customGoodsShowList");
         if (StringUtils.isNotBlank(shopId)) {

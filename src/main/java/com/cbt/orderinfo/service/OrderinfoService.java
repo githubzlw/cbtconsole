@@ -1403,13 +1403,13 @@ public class OrderinfoService implements IOrderinfoService {
 			double grade=Double.parseDouble(String.format("%.2f", ob.getGradeDiscount()/Double.parseDouble(ob.getProduct_cost())))*100;
 			if(grade==3){
 				gradeName="BizClub Member";
-			}else if(grade==7){
+			}else if(grade==5){
 				gradeName="Silver VIP";
-			}else if(grade==10){
+			}else if(grade==7){
 				gradeName="Gold VIP";
-			}else if(grade==14){
+			}else if(grade==9){
 				gradeName="Platinum VIP";
-			}else if(grade==18){
+			}else if(grade==12){
 				gradeName="Diamond VIP";
 			}
 			ob.setGradeName(gradeName);
@@ -1748,9 +1748,10 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public List<Map<String, String>> getorderPending(int admuserid) {
 		List<Map<String, String>> list=new ArrayList<Map<String, String>>();
-		String orderIds=dao.getOrderIds(admuserid);
-		if(StringUtil.isNotBlank(orderIds)){
+		List<String> orderIds=dao.getOrderIds(admuserid);
+		if(orderIds != null && !orderIds.isEmpty()){
 			list=dao.getorderPending(orderIds);
+			orderIds.clear();
 			for(Map<String, String> map:list){
 				int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
 				map.put("emailcount",String.valueOf(count));
@@ -1804,14 +1805,20 @@ public class OrderinfoService implements IOrderinfoService {
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
 		ca.add(Calendar.DATE, - 90);
-		String startDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
-		Integer waring0 = tabTrackInfoMapping.getWarningRecordCount(startDate, "", 0, null);
+		String payStartDate = DATEFORMAT.format(ca.getTime()) + " 00:00";
+        Map<String, Object> param = new HashMap<String, Object>(){{
+            put("payStartDate", payStartDate);
+            put("warning", 0);
+        }};
+		Integer waring0 = tabTrackInfoMapping.getTrackInfoListCount(param);
 		Map<String, Integer> cywMap = new HashMap<String, Integer>();
 		cywMap.put("state", 1);
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
 		// 支付失败的订单
-        List<Map<String, String>> list = dao.getorderPending(dao.getOrderIds(admuserid));
+		List<String> orderNoList = dao.getOrderIds(admuserid);
+        List<Map<String, String>> list = dao.getorderPending(orderNoList);
+        orderNoList.clear();
         for (Map<String, Integer> bean : result) {
             if ("order_pending".equals(bean.get("state"))) {
                 bean.put("counts", list==null?0:list.size());

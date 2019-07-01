@@ -16,6 +16,12 @@
 </c:if>
 <c:if test="${success > 0}">
     <div>
+        <span>网站名:
+            <select id="website_type" style="height: 28px;width: 160px;">
+                <option value="1" selected="selected">import-express</option>
+                <option value="2">kidsproductwholesale</option>
+            </select>
+        </span>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}')"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
@@ -202,6 +208,7 @@
     function confirmAndSendEmail(userId, userEmail) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
+            var websiteType = $("#website_type").val();
             var ischeck = 0;
             var adminNameFirst = $("#admin_name_first").val();
             if (adminNameFirst == null || adminNameFirst == "") {
@@ -239,7 +246,8 @@
                         "adminNameFirst": adminNameFirst,
                         "adminName": adminName,
                         "adminEmail": adminEmail,
-                        "whatsApp": whatsApp
+                        "whatsApp": whatsApp,
+                        "websiteType": websiteType
                         //"emailContent": emailContent,
                         //"model": model,
                     },

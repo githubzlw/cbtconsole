@@ -21,6 +21,16 @@ public class OrderShare {
 
     //订单号
     private String orderNo;
+    //商品数量
+    private String yourorder;
+
+    public String getYourorder() {
+        return yourorder;
+    }
+
+    public void setYourorder(String yourorder) {
+        this.yourorder = yourorder;
+    }
 
     public Long getId() {
         return id;

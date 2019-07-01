@@ -47,10 +47,10 @@
 
     <insert id="insertOrderShare" >
 
-        INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,create_time)
+        INSERT INTO order_share (shop_type , order_no, goods_price,goods_img,create_time,goods_pid,yourorder)
         VALUES
         <foreach collection="list" separator="," item="item">
-            (#{shopType},#{orderNo},#{item.goodsPrice}, #{item.goodsImg}, NOW())
+            (#{shopType},#{orderNo},#{item.goodsPrice}, #{item.goodsImg}, NOW(),#{item.goodsPid},#{item.yourorder})
         </foreach>
 
     </insert>
@@ -902,7 +902,7 @@
     </select>
 
     <select id="queryOrderShareList" resultType="com.importExpress.pojo.OrderShare">
-        SELECT car_img as goodsImg,goodsprice as goodsPrice,goods_pid as goodsPid
+        SELECT car_img as goodsImg,goodsprice as goodsPrice,goods_pid as goodsPid,yourorder
         FROM order_details
         where  orderid = #{orderNo}
         ORDER BY goods_pid
@@ -972,9 +972,10 @@
 
     <!--List<SameGoodsDetails> querySameGoodsDetails(@Param("pid") String pid);-->
     <select id="querySameGoodsDetails" resultType="com.cbt.bean.SameGoodsDetails">
-        SELECT s_pid pid, shop_id shopId, shop_name shopName, json_content jsonContent
+        SELECT s_pid pid, shop_id shopId, shop_name shopName, json_content jsonContent, booked_cnt bookedCnt
         FROM alidata.1688_same_goods_detail
         WHERE origin_pid = #{pid}
+        ORDER BY booked_cnt DESC
         LIMIT 4
     </select>
 
@@ -989,6 +990,14 @@
     <select id="queryUnsellablereasonMaster" resultType="HashMap">
         SELECT unsellablereason_id 'id', unsellablereason_name 'name'
         FROM unsellablereason_master
+    </select>
+
+    <!--List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);-->
+    <select id="querySalesShop" resultType="String">
+        SELECT shop_id FROM sales_shop WHERE shop_id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item.shopId}
+        </foreach>
     </select>
 
 </mapper>

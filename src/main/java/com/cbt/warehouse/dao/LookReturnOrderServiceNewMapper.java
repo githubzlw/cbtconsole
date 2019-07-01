@@ -20,18 +20,18 @@ public interface LookReturnOrderServiceNewMapper {
 	List<returndisplay> FindReturndisplay(@Param("nameString")String nameString, @Param("state")String state,
 			@Param("a1688Shipno")String a1688Shipno, @Param("optTimeStart")String optTimeStart, @Param("optTimeEnd")String optTimeEnd,@Param("page")int page,@Param("userOther")String userOther,@Param("user")String user,@Param("a1688order")String a1688order);
 
-	@Update("UPDATE return_display SET State=0,returntime=NOW() WHERE id=#{ship} ")
-	Boolean UpdaeReturnOrder(@Param("ship")String ship);
+	@Update("UPDATE return_display SET State=0,returntime=NOW(),actual_money=#{money} WHERE id=#{ship} ")
+	Boolean UpdaeReturnOrder(@Param("ship")String ship,@Param("money") double money);
 
-	@Delete("UPDATE return_display set reason=#{cusorder}, State=4,returntime=NOW() where id=#{ship}")
+	@Delete("UPDATE return_display set reason=#{cusorder},return_number=0,State=5,returntime=NOW() where id=#{ship}")
 	Boolean RemReturnOrder(@Param("ship")String ship,@Param("cusorder") String cusorder);
 
-	@Update("UPDATE return_display set State=4,end_time=curtime() where id=#{ship}")
-	Boolean SetReturnOrder(@Param("ship")String ship);
+	@Update("UPDATE return_display set end_time=curtime(),State=4,differences=#{number} where shipno=#{ship}")
+	Boolean SetReturnOrder(@Param("ship")String ship,@Param("number")String number);
     @Select("SELECT id AS appyId,opt_user AS optUser,opt_time as optTime FROM return_display where id=#{ship}")
 	returnbill FindOrdetByship(@Param("ship")String ship);
-    @Insert("INSERT INTO `return_bill` (`appy_id`, `chang_amount`, `opt_user`, `opt_time`, `end_time`) VALUES (#{re.appyId}, #{re.changAmount}, #{re.optUser}, #{re.optTime}, #{re.endTime});")
-	Boolean AddMoney(@Param("re")returnbill re);
+//    @Insert("INSERT INTO `return_bill` (`appy_id`, `chang_amount`, `opt_user`, `opt_time`, `end_time`) VALUES (#{re.appyId}, #{re.changAmount}, #{re.optUser}, #{re.optTime}, #{re.endTime});")
+//	Boolean AddMoney(@Param("re")returnbill re);
    
     @Update("UPDATE return_display SET shipno=#{number},opt_user=#{name},opt_time=curtime() where id=#{ship}")
 	Boolean UpdateReturnOrder(@Param("ship")int ship,@Param("number")String number,@Param("name")String name);
@@ -85,11 +85,13 @@ public interface LookReturnOrderServiceNewMapper {
 	List<returndisplay> FindReturndisplayByCusorder(@Param("cusorder")String orid,@Param("pid")String pid);
    @Select("SELECT COUNT(1) FROM return_display WHERE state=-1")
     int getAllOrderCount();
-    @Select("SELECT COUNT(return_number)as returnNumber ,item_number as itemNumber from return_display WHERE 1688_order=#{a1688Order} GROUP BY 1688_order")
+    @Select("SELECT sum(return_number)as returnNumber ,item_number as itemNumber from return_display WHERE 1688_order=#{a1688Order} GROUP BY 1688_order")
 	returndisplay FindItemCount(@Param("a1688Order") String a1688Order);
 	@Update("UPDATE return_display SET State=3,returntime=NOW(),reason=#{ch} WHERE id=#{ship} ")
 	Boolean UpdaeReturnOrderCh(@Param("ship") String ship,@Param("ch") String ch);
 	@Select("SELECT b.orderid as customerorder,a.orderid as a1688Order ,a.orderdate as placeDate,a.seller as sellerpeo,a.itemid as item,a.itemqty as itemNumber,a.shipno as a1688Shipno,a.username as optUser," +
-			"a.delivery_date as signtime,a.sku,a.id AS tbId from taobao_1688_order_history a,id_relationtable b WHERE a.orderid=b.tborderid AND  a.shipno=#{shipno};")
+			"a.delivery_date as signtime,a.sku,a.id AS tbId from taobao_1688_order_history a,id_relationtable b WHERE a.orderid=b.tborderid AND  a.shipno=#{shipno} GROUP BY a.id;")
     List<returndisplay> getOrderByship(@Param("shipno") String shipno);
+   @Update("UPDATE return_display set actual_money=#{number} where shipno=#{ship}")
+	Boolean SetUpMoney(@Param("ship") String ship, @Param("number") double number);
 }

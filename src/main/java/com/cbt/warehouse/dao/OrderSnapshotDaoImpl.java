@@ -107,10 +107,10 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 					} else {
 						if(eninfo.contains("192.168.1.28")){
 							eninfo = eninfo.replace("http://192.168.1.28:81/editimg/",
-									"http://img1.import-express.com/importcsvimg/");
+									"https://img.import-express.com/importcsvimg/");
 						}if(eninfo.contains("192.168.1.34")){
 							eninfo = eninfo.replace("http://192.168.1.34:81/editimg/",
-									"http://img1.import-express.com/importcsvimg/");
+									"https://img.import-express.com/importcsvimg/");
 						}
 					}
 					remoteStmt.setString(k++, eninfo);

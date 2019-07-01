@@ -12,6 +12,7 @@ import com.cbt.warehouse.service.SupplierScoringService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.importExpress.pojo.QueAns;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -74,7 +75,15 @@ public class SupplierScoringController {
 			categoryName=StringUtil.isBlank(categoryName)?null:categoryName;
 			shop_id = StringUtils.isNotBlank(shop_id) ? new String(shop_id.getBytes("iso8859-1"), "utf-8"): null;
 			String level = request.getParameter("level");
-			request.setAttribute("flag",flag);
+			// 是否是核心供应商 店铺上线时间
+            Integer salesShop = StringUtils.isBlank(request.getParameter("salesShop"))?0:Integer.parseInt(request.getParameter("salesShop"));
+            String nowdate1 = StringUtils.isBlank(request.getParameter("nowdate1"))?"":request.getParameter("nowdate1");
+            String nowdate2 = StringUtils.isBlank(request.getParameter("nowdate2"))?"":request.getParameter("nowdate2");
+            request.setAttribute("salesShop", salesShop);
+            request.setAttribute("nowdate1", nowdate1);
+            request.setAttribute("nowdate2", nowdate2);
+
+            request.setAttribute("flag",flag);
 			request.setAttribute("level",StringUtil.isBlank(level)?"":level);
 			request.setAttribute("quality",StringUtil.isBlank(quality)?"":quality);
 			request.setAttribute("services",StringUtil.isBlank(services)?"":services);
@@ -101,11 +110,16 @@ public class SupplierScoringController {
 			int start = Utility.getStringIsNull(request.getParameter("currpage")) ? Integer.parseInt(request.getParameter("currpage")) : 1;
 			int pagesize = 20;
 			Page<SupplierScoringBean> pageInfo = supplierScoringService.queryList(start, pagesize, shop_id, level,quality,services,
-					authorizedFlag,flag,userid,categoryName);
+					authorizedFlag,flag,userid,categoryName, salesShop, nowdate1, nowdate2);
 			List<SupplierScoringBean> scoringlist = pageInfo.getList();
 			if (scoringlist == null) {
 				LOG.warn("工厂列表查询为空");
 			}
+			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
+			for(SupplierScoringBean supplierScoringBean :  scoringlist){
+				genShopPrice(supplierScoringBean,shopGoodsSalesAmountList);
+			}
+			shopGoodsSalesAmountList.clear();
 			request.setAttribute("pageInfo", pageInfo);
 			request.setAttribute("shop_id", StringUtil.isBlank(shop_id)?"":shop_id);
 			//合作过的供应商
@@ -125,6 +139,16 @@ public class SupplierScoringController {
 		}
 		return "supplierscoring";
 	}
+
+	private void genShopPrice(SupplierScoringBean supplierScoringBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(supplierScoringBean.getShopId())){
+				supplierScoringBean.setShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
+	}
+
 
 	/**
 	 * 查询供应商下的样品
@@ -159,6 +183,14 @@ public class SupplierScoringController {
 			supplierProductsBeansList=supplierScoringService.getAllShopGoodsInfoList(map);
 			// 2019-6-4 增加显示 入库备注
             warehouseRemarkList = supplierScoringService.queryWarehouseRemarkByShopId(shop_id);
+
+            ShopGoodsSalesAmount salesAmount = customGoodsService.queryShopGoodsSalesAmountByShopId(shop_id);
+            if(salesAmount == null){
+            	request.setAttribute("totalPrice", 0);
+			}else{
+            	request.setAttribute("totalPrice", salesAmount.getTotalPrice());
+			}
+
 			request.setAttribute("supplierproducts", supplierproducts);
 			request.setAttribute("supplierProductsBeans",supplierProductsBeans);
 			request.setAttribute("supplierProductsBeansList",supplierProductsBeansList);

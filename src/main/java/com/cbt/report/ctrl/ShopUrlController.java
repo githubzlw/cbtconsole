@@ -15,6 +15,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.cbt.website.util.MD5Util;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -50,6 +51,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/ShopUrlC")
@@ -201,12 +203,26 @@ public class ShopUrlController {
         List<ShopUrl> findAll = shopUrlService.findAll(shopId,shopBrand, shopUserName, date, start, rows, timeFrom,
                 timeTo, isOn,state, isAuto, readyDel,shopType,authorizedFlag,authorizedFileFlag,ennameBrandFlag,shopids,
                 translateDescription, isShopFlag, catid);
+        List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsService.queryShopGoodsSalesAmountAll();
+        for(ShopUrl shopUrlBean :  findAll){
+            genShopPrice(shopUrlBean,shopGoodsSalesAmountList);
+        }
+        shopGoodsSalesAmountList.clear();
         int total = shopUrlService.total(shopId,shopBrand, shopUserName, date, timeFrom, timeTo, isOn, state, isAuto, readyDel,shopType,authorizedFlag,
                 authorizedFileFlag,ennameBrandFlag,shopids,translateDescription, isShopFlag, catid);
         json.setRows(findAll);
         json.setTotal(total);
         return json;
     }
+
+    private void genShopPrice(ShopUrl shopUrlBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(shopUrlBean.getShopId())){
+				shopUrlBean.setShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
+	}
     
     /**
      * 方法描述:查询授权
@@ -783,13 +799,14 @@ public class ShopUrlController {
             Map<String, CatidStatisticalResult> catidResultMap = new HashMap<String, CatidStatisticalResult>();
             List<GoodsOfferBean> goodsErrInfos = new ArrayList<GoodsOfferBean>();
             // 计算需要的数据
+            Set<String> catidSet = goodsInfos.stream().map( GoodsOfferBean :: getCatid).collect(Collectors.toSet());
             for (GoodsOfferBean gdOf : goodsInfos) {
                 // “类别的平均重量” * 运费
-                gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));
                 // “该产品重量” * 运费
                 if (!(catidWeightMap.get(gdOf.getCatid()) == null || catidWeightMap.get(gdOf.getCatid()) == 0)) {
                     gdOf.setGoodsWeightfreight(
                             FeightUtils.getCarFeightNew(gdOf.getWeight(), Integer.valueOf(gdOf.getCatid())));
+                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));
                 }
                 // 如果平均运费为0，则说明是第一次的数据，存在空值，不做判断
                 if (gdOf.getAvgWeightfreight() == 0) {

@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.cbt.FreightFee.service.FreightFeeSerive;
 import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.Specification.util.DateFormatUtil;
-import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
+import com.cbt.bean.TypeBean;
 import com.cbt.bean.ZoneBean;
+import com.cbt.bean.*;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -36,15 +37,15 @@ import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.GeneralReportService;
 import com.cbt.util.*;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.service.IWarehouseService;
 import com.cbt.warehouse.service.MabangshipmentService;
 import com.cbt.warehouse.service.SkuinfoService;
 import com.cbt.warehouse.service.ZoneShippingService;
 import com.cbt.warehouse.thread.warehouseThread;
-import com.cbt.warehouse.util.*;
 import com.cbt.warehouse.util.Utility;
+import com.cbt.warehouse.util.*;
 import com.cbt.website.bean.*;
 import com.cbt.website.dao.ExpressTrackDaoImpl;
 import com.cbt.website.dao.IExpressTrackDao;
@@ -56,8 +57,8 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.servlet.Purchase;
 import com.cbt.website.thread.AddInventoryThread;
 import com.cbt.website.util.ContentConfig;
-import com.cbt.website.util.*;
 import com.cbt.website.util.EasyUiJsonResult;
+import com.cbt.website.util.*;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -108,7 +109,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
@@ -2978,6 +2978,7 @@ public class WarehouseCtrl {
 			String imgUploadPath = ftpConfig.getLocalDiskPath();
 			filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
 			FileOutputStream fs=new FileOutputStream(filePath);
+			int i=1/0;
 			byte[] buffer =new byte[1024*1024];
 			int bytesum = 0;
 			int byteread = 0;
@@ -6436,6 +6437,7 @@ public class WarehouseCtrl {
 		JcgjSoapHttpPost jc = new JcgjSoapHttpPost();
 		List<Map<String, String>> bgList = (List<Map<String, String>>) mainMap.get("bgList");
 		List<Map<String, Object>> sbxxList = (List<Map<String, Object>>) mainMap.get("sbxxList");
+		String WebSite= request.getParameter("WebSite");
 		int cont = sbxxList.size();
 		List<String> removeId = new ArrayList<String>();
 		try{
@@ -6548,7 +6550,15 @@ public class WarehouseCtrl {
 				modelM.put("zipCode",ob.getZipcode());
 				modelM.put("phone",ob.getPhonenumber());
 				modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
-				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+				String temp="";
+				if ("0".equals(WebSite)){
+					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK);
+				}
+				if ("1".equals(WebSite)){
+					modelM.put("toHref","https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
+					sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order delivery notice", modelM, TemplateType.BATCK_KIDS);
+				}
+
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -7258,7 +7268,9 @@ public class WarehouseCtrl {
 	// 采购确认
 	@RequestMapping(value = "/purchaseConfirm", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	@ResponseBody
-	public String purchaseConfirm(HttpServletRequest request) {
+	public String purchaseConfirm(HttpServletRequest request,
+                                  @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType //网站名
+                                  ) {
 		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
 		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson,Admuser.class);
 		// 判断是否登录失效，失效则不能执行
@@ -7314,8 +7326,13 @@ public class WarehouseCtrl {
 						modelM.put("country",ob.getCountry());
 						modelM.put("zipCode",ob.getZipcode());
 						modelM.put("phone",ob.getPhonenumber());
-						modelM.put("toHref","https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo="+orderid+"");
-						sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
+						modelM.put("websiteType", websiteType);
+						if (websiteType == 1) {
+                            modelM.put("toHref", "https://www.import-express.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                        } else if (websiteType == 2) {
+                            modelM.put("toHref", "https://www.kidsproductwholesale.com/apa/tracking.html?loginflag=false&orderNo=" + orderid + "");
+                        }
+                        sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order purchase notice", modelM, TemplateType.PURCHASE);
 						//插入发送邮件记录
 						pruchaseMapper.insertPurchaseEmail(orderid);
 					}
@@ -9040,4 +9057,191 @@ public class WarehouseCtrl {
 		}
 		return encodeStr;
 	}
+	/**
+	 * 产品单页视频图片编辑上传
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value ="/UploadAll4",method = RequestMethod.POST)
+	@ResponseBody
+	public List<String>  UploadAll4(HttpServletRequest request) {
+		Map<String,String> map = new HashMap<String,String>();
+		List<String> list=new ArrayList<>();
+		try {
+			SendMQ sendMQ = new SendMQ();
+			String filePath="";
+			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			List<MultipartFile> fileList = multipartRequest.getFiles("file");
+			if(fileList == null || fileList.size() == 0){
+				System.out.println("请上传文件,注意文件的name属性为file");
+			}
+			for (int i=0;i<fileList.size();i++) {
+
+				MultipartFile file = fileList.get(i);
+				String filename1 = file.getOriginalFilename();
+				String pid = filename1.replaceAll(".mp4", "").replaceAll("[^0-9]","");
+				try {
+					String VidoPath=this.iWarehouseService.getRepathByPid(pid);
+					String Vpath=VidoPath.split("/")[4];
+					System.out.println(filename1);
+				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
+				String time = df.format(new Date());// new Date()为获取当前系统时间
+				String filename = pid + "_" + time;
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				// 检查配置文件信息是否正常读取
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				filePath = imgUploadPath  + file.getOriginalFilename();
+				//filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
+				FileOutputStream fs = new FileOutputStream(filePath);
+				byte[] buffer = new byte[1024 * 1024];
+				int bytesum = 0;
+				int byteread = 0;
+				InputStream stream = file.getInputStream();
+				while ((byteread = stream.read(buffer)) != -1) {
+					bytesum += byteread;
+					fs.write(buffer, 0, byteread);
+					fs.flush();
+				}
+				fs.close();
+				stream.close();
+				File video = new File(filePath);
+				if (video.exists()) {
+//					UploadByOkHttp.uploadFile(video,filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/"+Vpath+pid+"/", filename + "_" + file.getOriginalFilename(), filePath);
+					if (flag) {
+						map.put("msg", "1");
+						map.put("goods_pid", pid);
+						String path = "https://img.import-express.com/importcsvimg/"+Vpath+pid+"/" + (filename + "_" + file.getOriginalFilename()) + "";
+						map.put("path", path);
+						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
+						iWarehouseService.updateCustomVideoUrl(map);
+					}
+				} else {
+					list.add(pid);
+				}
+			} catch (Exception e) {
+					list.add(pid);
+			}
+
+			}
+			sendMQ.closeConn();
+			if (list.size()==fileList.size()){
+				list.clear();
+				list.add("0");
+			}
+			if (list.size()==0){
+				list.add("1");
+			}
+		} catch (Exception e) {
+			list.add("0");
+			return list;
+		}
+		return list;
+	}
+	public String  UploadAll2(MultipartFile file) {
+		String list="1";
+		String filePath = "";
+		String filename1 = file.getOriginalFilename();
+		String pid = filename1.replaceAll(".mp4", "").replaceAll("[^0-9]", "");
+		try {
+		SendMQ sendMQ = new SendMQ();
+		Map<String, String> map = new HashMap<String, String>();
+
+				String VidoPath = this.iWarehouseService.getRepathByPid(pid);
+				String Vpath = VidoPath.split("/")[4];
+				System.out.println(filename1);
+				SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");//设置日期格式
+				String time = df.format(new Date());// new Date()为获取当前系统时间
+				String filename = pid + "_" + time;
+				if (ftpConfig == null) {
+					ftpConfig = GetConfigureInfo.getFtpConfig();
+				}
+				// 检查配置文件信息是否正常读取
+				String imgUploadPath = ftpConfig.getLocalDiskPath();
+				filePath = imgUploadPath + file.getOriginalFilename();
+				//filePath=imgUploadPath+"_"+filename+"_"+file.getOriginalFilename();
+				FileOutputStream fs = new FileOutputStream(filePath);
+				byte[] buffer = new byte[1024 * 1024];
+				int bytesum = 0;
+				int byteread = 0;
+				InputStream stream = file.getInputStream();
+				while ((byteread = stream.read(buffer)) != -1) {
+					bytesum += byteread;
+					fs.write(buffer, 0, byteread);
+					fs.flush();
+				}
+				fs.close();
+				stream.close();
+				File video = new File(filePath);
+				if (video.exists()) {
+//					UploadByOkHttp.uploadFile(video,filePath);
+					boolean flag = NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/" + Vpath + pid + "/", filename + "_" + file.getOriginalFilename(), filePath);
+					if (flag) {
+						map.put("msg", "1");
+						map.put("goods_pid", pid);
+						String path = "https://img.import-express.com/importcsvimg/" + Vpath + pid + "/" + (filename + "_" + file.getOriginalFilename()) + "";
+						map.put("path", path);
+						GoodsInfoUpdateOnlineUtil.videoUrlToOnlineByMongoDB(pid, path);
+						iWarehouseService.updateCustomVideoUrl(map);
+					}
+				} else {
+					list="0";
+				}
+			sendMQ.closeConn();
+			} catch (Exception e) {
+				list=pid;
+			}
+
+		return list;
+	}
+	@RequestMapping(value ="/UploadAll",method = RequestMethod.POST)
+	@ResponseBody
+	public  List<String> UploadAll(HttpServletRequest request) {
+		List<String> list=new ArrayList<>();
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		List<MultipartFile> fileList = multipartRequest.getFiles("file");
+		if(fileList == null || fileList.size() == 0){
+			System.out.println("请上传文件,注意文件的name属性为file");
+		}
+		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+		for (int i = 0; i < fileList.size(); i++) {
+			final int index = i;
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			cachedThreadPool.execute(new Runnable() {
+				public void run() {
+					String pid=UploadAll2(fileList.get(index));
+					list.add(pid);
+				}
+			});
+		}
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (list.size()>0) {
+			for (int i = list.size() - 1; i >= 0; i--) {
+				if ("1".equals(list.get(i))) {
+					list.remove(i);
+				}
+			}
+			list.remove("1");
+			if (list.size() == fileList.size()) {
+				list.clear();
+				list.add("0");
+			}
+			if (list.size() == 0) {
+				list.add("1");
+			}
+		}
+		System.out.println(list);
+		return list;
+	}
+
 }
