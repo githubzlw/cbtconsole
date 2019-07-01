@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.importExpress.mapper.ShopRecommendMapper">
+
+   <resultMap id="shopRecommendInfoResultMap" type="com.importExpress.pojo.ShopRecommendInfo">
+       <id column="id" property="id" />
+       <result column="shop_id" property="shopId" />
+       <result column="cover_pid" property="coverPid" />
+       <result column="cover_img" property="coverImg" />
+       <result column="sort" property="sort" />
+       <result column="is_on" property="isOn" />
+       <result column="create_time" property="createTime" />
+       <result column="create_admin_id" property="createAdminId" />
+       <result column="update_time" property="updateTime" />
+       <result column="update_admin_id" property="updateTime" />
+   </resultMap>
+
+    <resultMap id="shopRecommendGoodsResultMap" type="com.importExpress.pojo.ShopRecommendGoods">
+        <id column="id" property="id" />
+       <result column="shop_id" property="shopId" />
+       <result column="reco_id" property="recoId" />
+       <result column="pid" property="pid" />
+       <result column="is_on" property="isOn" />
+       <result column="create_time" property="createTime" />
+       <result column="create_admin_id" property="createAdminId" />
+       <result column="update_time" property="updateTime" />
+       <result column="update_admin_id" property="updateTime" />
+   </resultMap>
+
+    <select id="queryShopRecommendInfoList" resultMap="shopRecommendInfoResultMap">
+        select id,shop_id,cover_pid,cover_img,sort,is_on,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
+        from shop_recommend_info
+        where 1 = 1
+        order by is_on desc;
+    </select>
+
+    <insert id="insertShopRecommendInfo" parameterType="com.importExpress.pojo.ShopRecommendInfo">
+        insert into shop_recommend_info(shop_id,cover_pid,cover_img,sort,is_on,create_admin_id)
+        values(#{shopId},#{coverPid},#{coverImg},#{sort},#{isOn},#{createAdminId})
+    </insert>
+
+    <update id="updateShopRecommendInfo" parameterType="com.importExpress.pojo.ShopRecommendInfo">
+        update shop_recommend_info set cover_pid = #{coverPid},cover_img = #{coverImg},sort = #{sort},
+        is_on = #{isOn},create_admin_id = #{createAdminId}
+        where shop_id = #{shopId}
+    </update>
+
+</mapper>
