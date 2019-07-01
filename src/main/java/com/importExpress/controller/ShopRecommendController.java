@@ -1,5 +1,6 @@
 package com.importExpress.controller;
 
+import com.cbt.pojo.Admuser;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.ShopRecommendInfo;
 import com.importExpress.service.ShopRecommendService;
@@ -53,6 +54,13 @@ public class ShopRecommendController {
         JsonResult json = new JsonResult();
         ShopRecommendInfo shopRecommendInfo = new ShopRecommendInfo();
         try {
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+            shopRecommendInfo.setCreateAdminId(admuser.getId());
             json = getBeanByParam(request, shopRecommendInfo);
             if (json.isOk()) {
                 if (StringUtils.isBlank(shopRecommendInfo.getShopId()) || shopRecommendInfo.getIsOn() == null ||
@@ -86,10 +94,18 @@ public class ShopRecommendController {
         JsonResult json = new JsonResult();
         ShopRecommendInfo shopRecommendInfo = new ShopRecommendInfo();
         try {
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+            shopRecommendInfo.setUpdateAdminId(admuser.getId());
             json = getBeanByParam(request, shopRecommendInfo);
             if (json.isOk()) {
                 if (StringUtils.isBlank(shopRecommendInfo.getShopId()) || shopRecommendInfo.getIsOn() == null ||
-                        shopRecommendInfo.getSort() == null) {
+                        shopRecommendInfo.getSort() == null || StringUtils.isBlank(shopRecommendInfo.getCoverPid())
+                        || StringUtils.isBlank(shopRecommendInfo.getCoverImg())) {
                     json.setOk(false);
                     json.setMessage("获取参数失败");
                 } else {
@@ -133,7 +149,7 @@ public class ShopRecommendController {
     }
 
 
-    @RequestMapping("/")
+    @RequestMapping("/11")
     @ResponseBody
     public JsonResult insertShopRecommendInfo1() {
         JsonResult json = new JsonResult();
