@@ -1,45 +1,9 @@
 package com.cbt.warehouse.ctrl;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.alibaba.fastjson.JSONObject;
 import com.cbt.auto.service.IOrderAutoService;
 import com.cbt.auto.service.PreOrderAutoService;
-import com.cbt.bean.CodeMaster;
-import com.cbt.bean.Evaluate;
-import com.cbt.bean.Forwarder;
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.bean.Orderinfo;
-import com.cbt.bean.Payment;
-import com.cbt.bean.RechargeRecord;
-import com.cbt.bean.ShippingBean;
-import com.cbt.bean.TabTransitFreightinfoUniteNew;
-import com.cbt.bean.TransitPricecost;
-import com.cbt.bean.UserBean;
+import com.cbt.bean.*;
 import com.cbt.change.util.ChangeRecordsDao;
 import com.cbt.change.util.CheckCanUpdateUtil;
 import com.cbt.change.util.ErrorLogDao;
@@ -59,42 +23,41 @@ import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.SendEmail;
 import com.cbt.processes.service.UserServer;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
-import com.cbt.util.AppConfig;
-import com.cbt.util.BigDecimalUtil;
-import com.cbt.util.DoubleUtil;
-import com.cbt.util.OrderInfoConstantUtil;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.UUIDUtil;
-import com.cbt.util.Util;
-import com.cbt.util.Utility;
+import com.cbt.util.*;
 import com.cbt.warehouse.service.GoodsCommentsService;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PaymentConfirm;
 import com.cbt.website.bean.PaymentDetails;
 import com.cbt.website.bean.QualityResult;
-import com.cbt.website.dao.IOrderwsDao;
-import com.cbt.website.dao.OrderwsDao;
-import com.cbt.website.dao.PaymentDao;
-import com.cbt.website.dao.PaymentDaoImp;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.cbt.website.service.GoodsPriceHistoryserviceImpl;
-import com.cbt.website.service.IOrderSplitServer;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderSplitServer;
-import com.cbt.website.service.OrderwsServer;
+import com.cbt.website.dao.*;
+import com.cbt.website.service.*;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
-import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping("/orderDetails")
@@ -1449,6 +1412,7 @@ public class NewOrderDetailsCtr {
 			json.setMessage("请登录后操作");
 			return json;
 		} else {
+
 			String orderNo = request.getParameter("orderNo");
 			if (orderNo == null || "".equalsIgnoreCase(orderNo)) {
 				json.setOk(false);
@@ -1545,6 +1509,8 @@ public class NewOrderDetailsCtr {
 		JsonResult json = new JsonResult();
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
+		String websiteType= request.getParameter("websiteType");
+		boolean isKidFlag =  "2".equals(websiteType);
 		if (mainOrderNo.equals(orderNo)) {
 			int res = orderwsServer.iscloseOrder(orderNo);
 			if (res > 0) {
@@ -1591,15 +1557,20 @@ public class NewOrderDetailsCtr {
 							"<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
 					sbBuffer.append(
 							"<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-					sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+					sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
 					sbBuffer.append("<br>Thank you for shopping with us.");
 					sbBuffer.append("<br>To review your order status, click ");
 					sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
 					sbBuffer.append("<br><br>Sincerely,");
-					sbBuffer.append("<br>Import-Express Team");
-
-					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
+					if(isKidFlag){
+						sbBuffer.append("<br>Kids-Product-Wholesale Team");
+						SendEmail.send(confirmEmail, null, toEmail, SwitchDomainNameUtil.checkNullAndReplace(sbBuffer.toString()),
+							"Your KidsProductWholesale Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+					} else{
+						sbBuffer.append("<br>Import-Express Team");
+						SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
+					}
 
 					// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 					insertChangeRecords(orderNo, -1, adminId);
@@ -1668,7 +1639,7 @@ public class NewOrderDetailsCtr {
 							ErrorLogDao.insertErrorInfo("orderinfo", sqlStr, adminId, 2, remark);
 						}
 
-						// ssd add start
+						/*// ssd add start
 						// 发送取消订单的提醒邮件
 						StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
 						sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
@@ -1680,12 +1651,17 @@ public class NewOrderDetailsCtr {
 								"<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
 						sbBuffer.append(
 								"<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-						sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
+						sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
 						sbBuffer.append("<br>Thank you for shopping with us.");
 						sbBuffer.append("<br>To review your order status, click ");
 						sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
 						sbBuffer.append("<br><br>Sincerely,");
-						sbBuffer.append("<br>Import-Express Team");
+						if(isKidFlag){
+							sbBuffer.append("<br>Import-Express Team");
+						} else{
+							sbBuffer.append("<br>Kids-Product-Wholesale Team");
+						}*/
+
 
 						//					SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
@@ -1695,8 +1671,14 @@ public class NewOrderDetailsCtr {
 						model.put("orderNo",orderNo);
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
+						if(isKidFlag){
+							sendMailFactory.sendMail(toEmail, null, "Your KidsProductWholesale Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_KID);
+						} else{
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_IMPORT);
+						}
 
-						sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
 						// jxw 2017-4-25 插入成功，插入信息放入更改记录表中
 						insertChangeRecords(orderNo, -1, adminId);
 						json.setOk(true);
@@ -1839,34 +1821,46 @@ public class NewOrderDetailsCtr {
 
 				}
                 if (json.isOk()) {
+                	String websiteType= request.getParameter("websiteType");
+					boolean isKidFlag =  "2".equals(websiteType);
                     // ssd add start
                     // 发送取消订单的提醒邮件
-                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
-                    sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
-                            + AppConfig.ip_email + "/img/logo.png' ></img></a>");
-                    sbBuffer.append(
-                            "<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
-                    sbBuffer.append("<br><br>Order#: " + orderNo);
-                    sbBuffer.append(
-                            "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
-                    sbBuffer.append(
-                            "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
-                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.importx.com</a>.");
-                    sbBuffer.append("<br>Thank you for shopping with us.");
-                    sbBuffer.append("<br>To review your order status, click ");
-                    sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
-                    sbBuffer.append("<br><br>Sincerely,");
-                    sbBuffer.append("<br>Import-Express Team");
+//                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
+//                    sbBuffer.append("<a href='" + AppConfig.ip_email + "'><img style='cursor: pointer' src='"
+//                            + AppConfig.ip_email + "/img/logo.png' ></img></a>");
+//                    sbBuffer.append(
+//                            "<div style='font-size: 14px;'><div style='font-weight: bolder;'>Dear " + toEmail + "</div>");
+//                    sbBuffer.append("<br><br>Order#: " + orderNo);
+//                    sbBuffer.append(
+//                            "<br><br>We apologize, but despite our efforts, we weren’t able to fulfill some or all of the items in your order.");
+//                    sbBuffer.append(
+//                            "<br>We apologize for any inconvenience this has caused and look forward to your next visit to ");
+//                    sbBuffer.append("<a href='" + AppConfig.server_path + "'>www.import-express.com</a>.");
+//                    sbBuffer.append("<br>Thank you for shopping with us.");
+//                    sbBuffer.append("<br>To review your order status, click ");
+//                    sbBuffer.append("<a href='" + AppConfig.center_path + "'>" + AppConfig.center_path + "</a>.");
+//                    sbBuffer.append("<br><br>Sincerely,");
+//                    sbBuffer.append("<br>Import-Express Team");
                     //SendEmail.send(confirmEmail, null, toEmail, sbBuffer.toString(),
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
-                    model.put("accountLink", AppConfig.center_path);
+                    if(isKidFlag){
+                    	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
+					} else{
+                    	model.put("accountLink", AppConfig.center_path);
+					}
                     model.put("orderNo", orderNo);
                     net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
                     String modeStr = jsonObject.toString();
                     try {
-                        sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+						if (isKidFlag) {
+							sendMailFactory.sendMail(toEmail, null, "Your kidsProductWholesale Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_KID);
+						} else {
+							sendMailFactory.sendMail(toEmail, null, "Your ImportExpress Order " + orderNo + " transaction is closed!",
+									model, TemplateType.CANCEL_ORDER_IMPORT);
+						}
                     } catch (Exception e) {
                         e.printStackTrace();
                         LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());

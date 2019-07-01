@@ -1,21 +1,23 @@
 package com.cbt.warehouse.ctrl;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.pojo.Admuser;
+import com.cbt.util.*;
+import com.cbt.website.dao.*;
+import com.cbt.website.service.IOrderSplitServer;
+import com.cbt.website.service.IOrderwsServer;
+import com.cbt.website.service.OrderSplitServer;
+import com.cbt.website.service.OrderwsServer;
+import com.cbt.website.util.JsonResult;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.importExpress.mail.SendMailFactory;
+import com.importExpress.mail.TemplateType;
+import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,31 +25,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.cbt.bean.OrderBean;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.pojo.Admuser;
-import com.cbt.util.BigDecimalUtil;
-import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.UUIDUtil;
-import com.cbt.util.Utility;
-import com.cbt.website.dao.IOrderSplitDao;
-import com.cbt.website.dao.OrderInfoDao;
-import com.cbt.website.dao.OrderInfoImpl;
-import com.cbt.website.dao.OrderSplitDaoImpl;
-import com.cbt.website.service.IOrderSplitServer;
-import com.cbt.website.service.IOrderwsServer;
-import com.cbt.website.service.OrderSplitServer;
-import com.cbt.website.service.OrderwsServer;
-import com.cbt.website.util.JsonResult;
-import com.importExpress.mail.SendMailFactory;
-import com.importExpress.mail.TemplateType;
-import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.pojo.OrderSplitChild;
-import com.importExpress.pojo.OrderSplitMain;
-import com.importExpress.service.OrderSplitRecordService;
-import com.importExpress.utli.NotifyToCustomerUtil;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/orderSplit")
@@ -328,8 +315,6 @@ public class NewOrderSplitCtr {
                             }
                         }
 //						}
-                        
-                        
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
@@ -636,6 +621,8 @@ public class NewOrderSplitCtr {
                 email = m.group();
             }
         }
+        String websiteType = request.getParameter("websiteType");
+        boolean isKidFlag = "2".equals(websiteType);
         try {
             String remark = StringUtils.isNotBlank(request.getParameter("remark ")) ? request.getParameter("remark") : "";
             model.put("remark", remark);
@@ -698,7 +685,11 @@ public class NewOrderSplitCtr {
                 String url = UUIDUtil.getAutoLoginPath("/individual/getCenter", uuid);
                 request.setAttribute("autoUrl", url);
                 String autoUrl = "http://www.import-express.com" + url;
-                model.put("autoUrl", autoUrl);
+                if(isKidFlag){
+                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(autoUrl));
+                } else{
+                    model.put("autoUrl", autoUrl);
+                }
                 // 获取用户email
                 IOrderSplitServer splitServer = new OrderSplitServer();
                 request.setAttribute("email", splitServer.getUserEmailByUserName(oldOrderBean.getUserid()));
@@ -737,6 +728,10 @@ public class NewOrderSplitCtr {
                 // 发送邮件开始
                 request.setAttribute("details", oldOrderDetails);
                 request.setAttribute("details_", nwOrderDetails);
+                if(isKidFlag){
+                    SwitchDomainNameUtil.changeObjectList(oldOrderDetails);
+                    SwitchDomainNameUtil.changeObjectList(nwOrderDetails);
+                }
                 model.put("details", oldOrderDetails);
                 model.put("details_", nwOrderDetails);
                 if (state == 1) {
@@ -829,7 +824,11 @@ public class NewOrderSplitCtr {
                 request.setAttribute("autoUrl", url);
                 // 获取用户email
                 request.setAttribute("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
-                model.put("autoUrl", url);
+                if(isKidFlag){
+                    model.put("autoUrl", SwitchDomainNameUtil.checkNullAndReplace(url));
+                } else{
+                    model.put("autoUrl", url);
+                }
                 model.put("email", splitServer.getUserEmailByUserName(orderBeans.get(0).getUserid()));
                 List<Object[]> orderDetails = new ArrayList<Object[]>();
                 if (state == 1) {
@@ -858,6 +857,10 @@ public class NewOrderSplitCtr {
 
                 request.setAttribute("details", details);
                 request.setAttribute("details_", details_);
+                if(isKidFlag){
+                    SwitchDomainNameUtil.changeObjectList(details);
+                    SwitchDomainNameUtil.changeObjectList(details_);
+                }
                 model.put("details", details);
                 model.put("details_", details_);
                 if (state == 1) {
@@ -869,7 +872,11 @@ public class NewOrderSplitCtr {
                     model.put("expect_arrive_time", expect_arrive_time);
                     model.put("orderbean", obBean);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "Import Express Split Order Reminder");
+                    if(isKidFlag){
+                        model.put("title", "Kids Product Wholesale Split Order Reminder");
+                    }else{
+                        model.put("title", "Import Express Split Order Reminder");
+                    }
                     model.put("message", "");
                 } else {
                     //针对取消的订单计算折扣金额
@@ -914,26 +921,40 @@ public class NewOrderSplitCtr {
                             + totalExtraFree + "(totalExtraFree)" + "-" + totalDisCount + "(totalDisCount)");
                     request.setAttribute("orderbean_", obBean_);
                     model.put("orderbean_", obBean_);
-                    model.put("title", "Your Import Express order was partially cancelled");
+                    if(isKidFlag){
+                        model.put("title", "Your Kids Product Wholesale order was partially cancelled");
+                    } else{
+                        model.put("title", "Your Import Express order was partially cancelled");
+                    }
                     model.put("message", obBean_.getOrderNo());
                 }
                 request.setAttribute("currency", orderBeans.get(0).getCurrency());
                 model.put("currency", orderBeans.get(0).getCurrency());
                 String liveChatLink = "http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service";
-                model.put("here", liveChatLink);
+                if(isKidFlag){
+                    model.put("here", SwitchDomainNameUtil.checkNullAndReplace(liveChatLink));
+                }else {
+                    model.put("here", liveChatLink);
+                }
             }
             net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
             String modeStr = jsonObject.toString();
             try {
-                sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
-                        "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING);
+                if(isKidFlag){
+                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
+                        "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING_KID);
+                } else{
+                    sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
+                        "Due to supply reasons, we can only send your order partially at first.",
+                            model, TemplateType.DISMANTLING_IMPORT);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("genOrderSplitEmail",e);
             LOG.error("genOrderSplitEmail:" + e.getMessage());
         }
         LOG.info("getOrderSplit sendEmailInfo end");
@@ -960,7 +981,7 @@ public class NewOrderSplitCtr {
 		String closeOrder="{\"orderNo\":\"QC13519415298019_6\",\"name\":\"saycjc@outlook.com\",\"accountLink\":\"https://www.import-express.com/individual/getCenter\",\"email\":\"Sale1\"}";*/
         model = SerializeUtil.JsonToMapStr(modelStr);
         model.put("email", "saycjc@outlook.com");
-        sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER);
+        sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER_IMPORT);
 		/*// 购物车营销
 		model = SerializeUtil.JsonToMapStr(shopcar);
 		sendMailFactory.sendMail("saycjc@outlook.com", null,
