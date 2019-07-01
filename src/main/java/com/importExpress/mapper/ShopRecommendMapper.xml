@@ -2,38 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.importExpress.mapper.ShopRecommendMapper">
 
-   <resultMap id="shopRecommendInfoResultMap" type="com.importExpress.pojo.ShopRecommendInfo">
-       <id column="id" property="id" />
-       <result column="shop_id" property="shopId" />
-       <result column="cover_pid" property="coverPid" />
-       <result column="cover_img" property="coverImg" />
-       <result column="sort" property="sort" />
-       <result column="is_on" property="isOn" />
-       <result column="create_time" property="createTime" />
-       <result column="create_admin_id" property="createAdminId" />
-       <result column="update_time" property="updateTime" />
-       <result column="update_admin_id" property="updateTime" />
-   </resultMap>
+    <resultMap id="shopRecommendInfoResultMap" type="com.importExpress.pojo.ShopRecommendInfo">
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="cover_pid" property="coverPid"/>
+        <result column="cover_img" property="coverImg"/>
+        <result column="sort" property="sort"/>
+        <result column="is_on" property="isOn"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_admin_id" property="createAdminId"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_admin_id" property="updateTime"/>
+    </resultMap>
 
     <resultMap id="shopRecommendGoodsResultMap" type="com.importExpress.pojo.ShopRecommendGoods">
-        <id column="id" property="id" />
-       <result column="shop_id" property="shopId" />
-       <result column="reco_id" property="recoId" />
-       <result column="pid" property="pid" />
-       <result column="is_on" property="isOn" />
-       <result column="create_time" property="createTime" />
-       <result column="create_admin_id" property="createAdminId" />
-       <result column="update_time" property="updateTime" />
-       <result column="update_admin_id" property="updateTime" />
-   </resultMap>
+        <id column="id" property="id"/>
+        <result column="shop_id" property="shopId"/>
+        <result column="reco_id" property="recoId"/>
+        <result column="pid" property="pid"/>
+        <result column="is_on" property="isOn"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_admin_id" property="createAdminId"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_admin_id" property="updateTime"/>
+    </resultMap>
 
-    <select id="queryShopRecommendInfoList" resultMap="shopRecommendInfoResultMap">
+    <select id="queryShopRecommendInfoList" resultMap="shopRecommendInfoResultMap"
+            parameterType="com.importExpress.pojo.ShopRecommendInfo">
         select id,shop_id,cover_pid,cover_img,sort,is_on,
         DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
         DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
         from shop_recommend_info
         where 1 = 1
-        order by is_on desc;
+        order by is_on desc
+    </select>
+
+    <select id="queryRecommendInfoByShopId" resultMap="shopRecommendInfoResultMap">
+        select id,shop_id,cover_pid,cover_img,sort,is_on,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
+        from shop_recommend_info
+        where shop_id = #{shopId}
+    </select>
+
+    <select id="checkRecommendInfoByShopId" resultType="java.lang.Integer">
+        select count(0)
+        from shop_recommend_info
+        where shop_id = #{shopId}
     </select>
 
     <insert id="insertShopRecommendInfo" parameterType="com.importExpress.pojo.ShopRecommendInfo">
@@ -43,8 +58,43 @@
 
     <update id="updateShopRecommendInfo" parameterType="com.importExpress.pojo.ShopRecommendInfo">
         update shop_recommend_info set cover_pid = #{coverPid},cover_img = #{coverImg},sort = #{sort},
-        is_on = #{isOn},create_admin_id = #{createAdminId}
+        is_on = #{isOn},update_admin_id = #{updateAdminId}
         where shop_id = #{shopId}
     </update>
+
+    <delete id="deleteShopRecommendInfoByShopId">
+        delete from shop_recommend_info where shop_id = #{shopId}
+    </delete>
+
+    <select id="queryShopRecommendGoodsList" resultMap="shopRecommendGoodsResultMap">
+        select id,shop_id,reco_id,pid,is_on,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
+        from shop_recommend_goods
+        order by is_on desc
+    </select>
+
+    <select id="queryShopRecommendGoodsByShopId" resultMap="shopRecommendGoodsResultMap">
+        select id,shop_id,reco_id,pid,is_on,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
+        from shop_recommend_goods
+        where shop_id = #{shopId}
+        order by is_on desc
+    </select>
+
+    <insert id="insertShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
+        insert into shop_recommend_goods(shop_id,reco_id,pid,is_on,create_admin_id)
+        values(#{shopId},#{recoId},#{pid},#{isOn},#{createAdminId})
+    </insert>
+
+    <update id="updateShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
+        update shop_recommend_goods set is_on = #{isOn},update_admin_id = #{updateAdminId}
+        where shop_id = #{shopId} and pid = #{pid}
+    </update>
+
+    <delete id="deleteShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
+        delete from shop_recommend_goods where shop_id = #{shopId} and pid = #{pid}
+    </delete>
 
 </mapper>
