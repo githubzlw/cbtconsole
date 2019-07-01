@@ -3,6 +3,7 @@ package com.cbt.website.service;
 import com.cbt.bean.*;
 import com.cbt.pay.dao.IOrderDao;
 import com.cbt.pay.dao.OrderDao;
+import com.cbt.util.OrderInfoUtil;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
 import com.cbt.website.dao.*;
@@ -294,31 +295,8 @@ public class OrderSplitServer implements IOrderSplitServer{
 		//生成另一个采购中订单
 		//修改已有货源订单详情的订单号
 		String orderNew = null ;
-		String orderNo1 = null ;
-		if (orderNo.length()>17) {
-			OrderBean orderBean1 = null;
-			if(orderNo.indexOf("_") > -1){
-				String [] n = orderNo.split("_");
-				String orderNo_ = n[0];
-				orderBean1 = dao.getOrders(orderNo_);
-		}
-			
-			String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
-			if(maxSplitOrderNo.indexOf("_") > -1){
-				int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-				String [] n = orderNo.split("_");
-				orderNo1 = n[0];
-				orderNew = orderNo1 + "_" + (splitIndex+1);
-		}
-		} else {
-			orderNew = orderNo + "_1";
-			String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-			if(maxSplitOrderNo.indexOf("_") > -1){
-				int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]); 
-				orderNew = orderNo + "_" + (splitIndex+1);
-		}
-		
-		}
+		orderNew = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
+
 		int isPurchase = 0;
 		//拆完后原订单数量和入库数量相等，则将原订单信息改为入库，
 		if (odIds_.length + splitMap.size() == odstate && orderBean.getState() == 2) {

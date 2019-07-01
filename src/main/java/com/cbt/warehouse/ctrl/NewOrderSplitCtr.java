@@ -2,20 +2,25 @@ package com.cbt.warehouse.ctrl;
 
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
+import com.cbt.orderinfo.service.IOrderinfoService;
 import com.cbt.pojo.Admuser;
 import com.cbt.util.*;
-import com.cbt.website.dao.*;
+import com.cbt.website.dao.IOrderSplitDao;
+import com.cbt.website.dao.OrderInfoDao;
+import com.cbt.website.dao.OrderInfoImpl;
+import com.cbt.website.dao.OrderSplitDaoImpl;
 import com.cbt.website.service.IOrderSplitServer;
 import com.cbt.website.service.IOrderwsServer;
 import com.cbt.website.service.OrderSplitServer;
 import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.util.JsonResult;
-
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
-import com.importExpress.service.IPurchaseService;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.UserInfoUtils;
+import net.sf.json.JSONArray;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +47,8 @@ public class NewOrderSplitCtr {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
     @Autowired
     private SendMailFactory sendMailFactory;
+    @Autowired
+    private IOrderinfoService iOrderinfoService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -153,30 +160,7 @@ public class NewOrderSplitCtr {
                 if (nwOrderDetails.size() > 0) {
                     // 生成另一个采购中订单
                     // 修改已有货源订单详情的订单号
-                    String orderNo1 = null;
-                    if (orderNo.length() > 17) {
-                        OrderBean orderBean1 = null;
-                        if (orderNo.indexOf("_") > -1) {
-                            String[] n = orderNo.split("_");
-                            String orderNo_ = n[0];
-                            orderBean1 = dao.getOrders(orderNo_);
-                        }
-                        String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
-                        if (maxSplitOrderNo.indexOf("_") > -1) {
-                            int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-                            String[] n = orderNo.split("_");
-                            orderNo1 = n[0];
-                            nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
-                        }
-                    } else {
-                        nwOrderNo = orderNo + "_1";
-                        String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-                        if (maxSplitOrderNo.indexOf("_") > -1) {
-                            int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-                            nwOrderNo = orderNo + "_" + (splitIndex + 1);
-                        }
-
-                    }
+                    nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
 
                     // 开始执行拆单
                     boolean isOk = true;
@@ -254,9 +238,13 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         String nwOrderNo = "";
         try {
+
             // 查询订单和订单详情
             OrderBean orderBean = splitDao.getOrders(orderNo);
-            String[] odidLst = odids.split("@");// 需要取消的商品order_details的id
+            // 获取新的订单号
+            nwOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 0);
+            // 需要取消的商品order_details的id
+            String[] odidLst = odids.split("@");
             // 1.拆单之前保存订单原始信息 log
             boolean isSuccess = saveOrderInfoBeforeSplitOrder(orderBean, orderNo, odids, admuser);
             if (isSuccess) {
@@ -269,8 +257,10 @@ public class NewOrderSplitCtr {
                 List<Integer> odIds = new ArrayList<>();
                 // 判断是否获取到要拆分的商品ids
                 if (odidLst.length > 0) {
-                    double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
-                    double totalGoodsCostOld = 0;// 原订单商品总价
+                    // 原订单支付金额
+                    double totalPayPriceOld = orderBean.getPay_price();
+                    // 原订单商品总价
+                    double totalGoodsCostOld = 0;
                     for (OrderDetailsBean odds : orderDetails) {
                         for (String odid : odidLst) {
                             if (odds.getId() == Integer.valueOf(odid)) {
@@ -290,13 +280,12 @@ public class NewOrderSplitCtr {
                         //取消订单后商品进入库存中
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
-//						if(flag){
+//						if(flag){}
                         if ("0".equals(state)) {
                             for (String odid : odidLst) {
                                 splitDao.addInventory(odid, "拆单取消库存");
                             }
                         }
-//						}
                     } else {
                         json.setOk(false);
                         if (nwOrderDetails.size() == 0 || nwOrderDetails.size() != odidLst.length) {
@@ -354,130 +343,20 @@ public class NewOrderSplitCtr {
                                          String nwOrderNo, OrderBean orderBean, double totalGoodsCostOld, double totalPayPriceOld,
                                          OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst,
                                          List<Integer> goodsIds, List<Integer> odIds) {
+
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
-        double totalGoodsCostNew = 0;// 新的订单商品总价
+        // 新的订单商品总价
+        double totalGoodsCostNew = 0;
         for (OrderDetailsBean nwOdDt : nwOrderDetails) {
             totalGoodsCostNew += Double.valueOf(nwOdDt.getGoodsprice()) * nwOdDt.getYourorder();
         }
         if (totalGoodsCostNew > 0) {
-            // 拆单新生成的订单号
-            String orderNo1 = null;
-            if (orderNo.length() > 17) {
-                OrderBean orderBean1 = null;
-                if (orderNo.indexOf("_") > -1) {
-                    String[] n = orderNo.split("_");
-                    String orderNo_ = n[0];
-                    orderBean1 = splitDao.getOrders(orderNo_);
-                }
-                String maxSplitOrderNo = orderBean1.getMaxSplitOrder();
-                if (maxSplitOrderNo.indexOf("_") > -1) {
-                    int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-                    String[] n = orderNo.split("_");
-                    orderNo1 = n[0];
-                    nwOrderNo = orderNo1 + "_" + (splitIndex + 1);
-                }
-            } else {
-                nwOrderNo = orderNo + "_1";
-                String maxSplitOrderNo = orderBean.getMaxSplitOrder();
-                if (maxSplitOrderNo.indexOf("_") > -1) {
-                    int splitIndex = Integer.parseInt(maxSplitOrderNo.split("_")[1]);
-                    nwOrderNo = orderNo + "_" + (splitIndex + 1);
-                }
-            }
-            // 支付金额拆分逻辑：拆分比例=拆单商品的总价/原订单所有商品的总价
-            // 所有的折扣金额都按照计算的拆分比例计算，新生成的订单支付金额也是按照比例分割
-            double splitRatio = totalGoodsCostNew / totalGoodsCostOld;// 拆分比例
-            double totalPayPriceNew = totalPayPriceOld * splitRatio;// 新的订单支付金额
-            double coupon_discount_old = orderBean.getCoupon_discount();// coupon优惠
-            double coupon_discount_new = coupon_discount_old * splitRatio;// 新订单coupon优惠
-            double extra_discount_old = orderBean.getExtra_discount();// 其他优惠
-            double extra_discount_new = extra_discount_old * splitRatio;// 新订单其他优惠
-            double grade_discount_old = orderBean.getGradeDiscount();// 等级优惠
-            double grade_discount_new = grade_discount_old * splitRatio;// 新订单等级优惠
-            double share_discount_old = orderBean.getShare_discount();// 分享优惠
-            double share_discount_new = share_discount_old * splitRatio;// 新订单分享优惠
-            double discount_amount_old = orderBean.getDiscount_amount();// 优惠金额（之前BIz等）
-            double discount_amount_new = discount_amount_old * splitRatio;// 新订单优惠金额（之前BIz等）
-            double cash_back_old = orderBean.getCashback();// cash_back折扣
-            double cash_back_new = cash_back_old * splitRatio;// 新订单cash_back折扣
-            double extra_freight_old = orderBean.getExtra_freight();// 额外运费
-            double extra_freight_new = extra_freight_old * splitRatio;//新订单额外运费
 
-            double vatBalanceOld = orderBean.getVatBalance();//双清包税价格
-            double vatBalanceNew = vatBalanceOld * splitRatio;//新双清包税价格
-
-            double proces_singfee_old = orderBean.getProcessingfee();// 店铺处理费
-            double proces_singfee_new = proces_singfee_old * splitRatio;
-
-            double actual_lwh_old = genDoubleWidthTwoDecimalPlaces(Double.parseDouble(orderBean.getActual_lwh() == null ? "0.00" : orderBean.getActual_lwh()));// 质检费
-            double actual_lwh_new = actual_lwh_old * splitRatio;
-
-            // 新生成订单信息
-            OrderBean odbeanNew = new OrderBean();
-            odbeanNew.setVatBalance(vatBalanceNew);
-            odbeanNew.setUserid(orderBean.getUserid());
-            odbeanNew.setOrderNo(nwOrderNo);
-            odbeanNew.setExchange_rate(orderBean.getExchange_rate());
-            odbeanNew.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_new));
-            odbeanNew.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_new));
-            odbeanNew.setGradeDiscount(
-                    Float.valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_new))));
-            odbeanNew.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_new));
-            odbeanNew.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_new));
-            odbeanNew.setProduct_cost(String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostNew)));
-            odbeanNew.setCashback(cash_back_new);
-            odbeanNew.setExtra_freight(extra_freight_new);
-            odbeanNew.setOrderDetail(nwOrderDetails);
-
-            odbeanNew.setProcessingfee(proces_singfee_new);
-            odbeanNew.setActual_lwh(new BigDecimal(actual_lwh_new).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-            // 计算新订单支付金额
-            totalPayPriceNew = new BigDecimal(odbeanNew.getProduct_cost())
-                    .subtract(new BigDecimal(odbeanNew.getCoupon_discount()))
-                    .subtract(new BigDecimal(odbeanNew.getShare_discount()))
-                    .subtract(new BigDecimal(odbeanNew.getDiscount_amount()))
-                    .subtract(new BigDecimal(odbeanNew.getGradeDiscount()))
-                    .subtract(new BigDecimal(odbeanNew.getCashback()))
-                    .subtract(new BigDecimal(odbeanNew.getExtra_discount()))
-                    .add(new BigDecimal(odbeanNew.getExtra_freight()))
-                    .add(new BigDecimal(odbeanNew.getProcessingfee()))
-                    .add(new BigDecimal(odbeanNew.getActual_lwh())).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            odbeanNew.setPay_price(totalPayPriceNew);
-
-            // 原始订单减去拆分比例后的值
-            orderBeanTemp.setVatBalance(vatBalanceOld - vatBalanceNew);
-            orderBeanTemp.setCoupon_discount(genDoubleWidthTwoDecimalPlaces(coupon_discount_old - coupon_discount_new));
-            orderBeanTemp.setExtra_discount(genDoubleWidthTwoDecimalPlaces(extra_discount_old - extra_discount_new));
-            orderBeanTemp.setGradeDiscount(Float
-                    .valueOf(String.valueOf(genDoubleWidthTwoDecimalPlaces(grade_discount_old - grade_discount_new))));
-            orderBeanTemp.setShare_discount(genDoubleWidthTwoDecimalPlaces(share_discount_old - share_discount_new));
-            orderBeanTemp.setDiscount_amount(genDoubleWidthTwoDecimalPlaces(discount_amount_old - discount_amount_new));
-            orderBeanTemp.setProduct_cost(
-                    String.valueOf(genDoubleWidthTwoDecimalPlaces(totalGoodsCostOld - totalGoodsCostNew)));
-            orderBeanTemp.setCashback(genDoubleWidthTwoDecimalPlaces(cash_back_old - cash_back_new));
-            orderBeanTemp.setExtra_freight(genDoubleWidthTwoDecimalPlaces(extra_freight_old - extra_freight_new));
-
-            orderBeanTemp.setProcessingfee(genDoubleWidthTwoDecimalPlaces(proces_singfee_old - proces_singfee_new));
-            orderBeanTemp.setActual_lwh(String.valueOf(genDoubleWidthTwoDecimalPlaces(actual_lwh_old - actual_lwh_new)));
-
-            //拆单前订单payprice = 订单1payprice + 订单2 payprice
-            orderBeanTemp.setPay_price(genDoubleWidthTwoDecimalPlaces(totalPayPriceOld - totalPayPriceNew));
-            //理论上payprice
-            BigDecimal needPay = new BigDecimal(orderBeanTemp.getProduct_cost())
-                    .subtract(new BigDecimal(orderBeanTemp.getCoupon_discount()))
-                    .subtract(new BigDecimal(orderBeanTemp.getShare_discount()))
-                    .subtract(new BigDecimal(orderBeanTemp.getDiscount_amount()))
-                    .subtract(new BigDecimal(orderBeanTemp.getGradeDiscount()))
-                    .subtract(new BigDecimal(orderBeanTemp.getCashback()))
-                    .subtract(new BigDecimal(orderBeanTemp.getExtra_discount()))
-                    .add(new BigDecimal(orderBeanTemp.getExtra_freight()))
-                    .add(new BigDecimal(orderBeanTemp.getProcessingfee()))
-                    .add(new BigDecimal(orderBeanTemp.getActual_lwh()));
-            // 排除计算误差
-            orderBeanTemp.setExtra_freight(new BigDecimal(orderBeanTemp.getExtra_freight())
-                    .add(new BigDecimal(orderBeanTemp.getPay_price()).subtract(needPay))
-                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            // 拆分比例
+            double splitRatio = totalGoodsCostNew / totalGoodsCostOld;
+            OrderBean odbeanNew = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, nwOrderNo,
+                    totalGoodsCostOld, nwOrderDetails);
 
             // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
             List<OrderBean> orderBeans = new ArrayList<OrderBean>();
@@ -487,7 +366,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
+                        odidLst, goodsIds, (float) odbeanNew.getPay_price(), odIds);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -508,7 +387,7 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
         // 开始执行拆单
-        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state);
+        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state, 0);
         if (!isOk) {
             json.setOk(false);
             json.setMessage("拆分失败请重试");
@@ -536,7 +415,7 @@ public class NewOrderSplitCtr {
                         1, nwOrderNo, "", admuser.getId());*/
 
                 IOrderwsServer orderwsServer = new OrderwsServer();
-                int oiState=orderwsServer.checkOrderState(orderNo,"0");
+                int oiState = orderwsServer.checkOrderState(orderNo, "0");
                 OrderCancelApproval cancelApproval = new OrderCancelApproval();
                 cancelApproval.setUserId(orderBeanTemp.getUserid());
                 cancelApproval.setOrderNo(nwOrderNo);
@@ -555,30 +434,128 @@ public class NewOrderSplitCtr {
             json.setMessage("拆分成功");
             json.setData(nwOrderNo);
         }
-
     }
 
-    /**
-     * 生成两位小数的double类型数据
-     *
-     * @param numVal
-     * @return
-     */
-    private double genDoubleWidthTwoDecimalPlaces(double numVal) {
-        BigDecimal bd = new BigDecimal(numVal);
-        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+    @RequestMapping(value = "/splitGoodsByNum")
+    @ResponseBody
+    public JsonResult splitGoodsByNum(HttpServletRequest request) {
+        JsonResult json = new JsonResult();
+        String orderNo = request.getParameter("orderNo");
+        String odIds = request.getParameter("odIds");
+        try {
+
+            if (StringUtils.isBlank(orderNo) || StringUtils.isBlank(odIds)) {
+                json.setOk(false);
+                json.setMessage("获取拆单数据失败");
+                return json;
+            } else if (orderNo.contains("SN")) {
+                json.setOk(false);
+                json.setMessage("数量拆单数据，不允许再次拆单");
+                return json;
+            }
+
+            Admuser admuser = UserInfoUtils.getUserInfo(request);
+            if (admuser == null || admuser.getId() == 0) {
+                json.setOk(false);
+                json.setMessage("请登录后操作");
+                return json;
+            }
+
+            // 判断是否是Drop Ship订单，根据订单号获取订单信息
+            IOrderSplitDao splitDao = new OrderSplitDaoImpl();
+            OrderBean orderBean = splitDao.getOrders(orderNo);
+            if (orderBean.getIsDropshipOrder() == 1) {
+                // Drop Ship 拆单，不可数量拆单
+                json.setOk(false);
+                json.setMessage("DropShip订单，不能数量拆单");
+                return json;
+            }
+
+            JSONArray jsonArray = JSONArray.fromObject(odIds);
+            List<SplitGoodsNumBean> splitIdList = (List<SplitGoodsNumBean>) JSONArray.toCollection(jsonArray, SplitGoodsNumBean.class);
+            if (splitIdList == null || splitIdList.isEmpty()) {
+                json.setOk(false);
+                json.setMessage("转换拆单数据失败");
+                return json;
+            }
+            OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
+            if (orderInfo.getState() != 5) {
+                json.setOk(false);
+                json.setMessage("订单状态非审核状态，不能拆单");
+                return json;
+            }
+            // 1.获取原来数据,并进行数据处理
+            List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
+            List<OrderDetailsBean> nwOrderDetails = new ArrayList<>(splitIdList.size());
+            // 生成新的OrderDetailsBean数据
+            Map<Integer, OrderDetailsBean> oldOrderDeatisMap = new HashMap<>(odbList.size());
+            double oldTotalGoodsCost = 0;
+            double newTotalGoodsCost = 0;
+            for (SplitGoodsNumBean goodsNumBean : splitIdList) {
+                goodsNumBean.setAdminId(admuser.getId());
+                goodsNumBean.setOrderNo(orderNo);
+                for (OrderDetailsBean orderDetail : odbList) {
+                    if (orderDetail.getId() == goodsNumBean.getOdId()) {
+                        // 保存商品价格和数量信息，放入日志
+                        goodsNumBean.setGoodsPrice(Double.valueOf(orderDetail.getGoodsprice()));
+                        goodsNumBean.setOldNum(orderDetail.getYourorder());
+                        oldTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getOldNum();
+                        newTotalGoodsCost += goodsNumBean.getGoodsPrice() * goodsNumBean.getNum();
+                        // 执行修改产品数量操作
+                        orderDetail.setYourorder(goodsNumBean.getOldNum() - goodsNumBean.getNum());
+                        oldOrderDeatisMap.put(orderDetail.getId(), orderDetail);
+                        //
+                        OrderDetailsBean orderDetailTemp = (OrderDetailsBean) orderDetail.clone();
+                        orderDetailTemp.setYourorder(goodsNumBean.getNum());
+                        nwOrderDetails.add(orderDetailTemp);
+                        break;
+                    }
+                }
+            }
+            // 记录日志
+            iOrderinfoService.insertIntoOrderSplitNumLog(splitIdList);
+            // 计算拆分产品总价占原总价的百分比
+            if (oldTotalGoodsCost == 0 || newTotalGoodsCost == 0) {
+                json.setOk(false);
+                json.setMessage("订单商品计算总价失败");
+                return json;
+            }
+            double splitRatio = newTotalGoodsCost / oldTotalGoodsCost;
+            // 2.新的订单数据
+            // 复制订单信息充当临时订单
+            OrderBean orderBeanTemp = (OrderBean) orderBean.clone();
+            String newOrderNo = OrderInfoUtil.getNewOrderNo(orderNo, orderBean, 1);
+            OrderBean newOrderBean = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, newOrderNo,
+                    oldTotalGoodsCost, nwOrderDetails);
+
+            // 拆单日志
+            List<OrderBean> orderBeans = new ArrayList<>(2);
+            orderBeans.add(orderBean);
+            orderBeans.add(newOrderBean);
+            orderBeans.add(orderBeanTemp);
+            splitDao.saveOrderInfoLogByList(orderBeans, admuser);
+            // 3.开始执行拆单
+            boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, newOrderBean, nwOrderDetails, OrderInfoConstantUtil.REVIEW, 1);
+            if (isOk) {
+                json.setOk(true);
+            } else {
+                json.setOk(false);
+                json.setMessage("拆分失败请重试");
+            }
+            odbList.clear();
+            nwOrderDetails.clear();
+            oldOrderDeatisMap.clear();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("splitGoodsByNum error:", e);
+            json.setOk(false);
+            json.setMessage("orderNo:" + orderNo + ",splitGoodsByNum error:" + e.getMessage());
+        }
+        return json;
     }
 
-    /**
-     * 生成两位小数的float类型数据
-     *
-     * @param numVal
-     * @return
-     */
-    private float genFloatWidthTwoDecimalPlaces(float numVal) {
-        BigDecimal bd = new BigDecimal(numVal);
-        return bd.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
-    }
 
     /**
      * 获取订单拆分后的邮件信息
@@ -631,19 +608,19 @@ public class NewOrderSplitCtr {
                     // 获取运输方式和对应的运输时间
                     String mode_transport = oldOrderBean.getMode_transport();
                     int mode_transport_day = 0;
-                    if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+                    if (mode_transport != null && mode_transport.contains("@")) {
                         String[] mode_transports = mode_transport.split("@");
                         if (mode_transports.length > 3) {
                             mode_transport = mode_transport.split("@")[1];
                             if (Utility.getStringIsNull(mode_transport)) {
-                                if (mode_transport.indexOf("-") > -1) {
+                                if (mode_transport.contains("-")) {
                                     mode_transport = mode_transport.split("-")[1];
                                 }
                                 mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
                             }
                         }
                     }
-                    if (oldOrderBean.getOrderNo().indexOf("_") > -1) {
+                    if (oldOrderBean.getOrderNo().contains("_")) {
                         if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
                             calendar.setTime(sdf.parse(time_));
                             calendar.set(Calendar.DAY_OF_MONTH,
@@ -760,19 +737,19 @@ public class NewOrderSplitCtr {
                         // 获取运输方式和对应的运输时间
                         String mode_transport = orderBeans.get(i).getMode_transport();
                         int mode_transport_day = 0;
-                        if (mode_transport != null && mode_transport.indexOf("@") > -1) {
+                        if (mode_transport != null && mode_transport.contains("@")) {
                             String[] mode_transports = mode_transport.split("@");
                             if (mode_transports.length > 3) {
                                 mode_transport = mode_transport.split("@")[1];
                                 if (Utility.getStringIsNull(mode_transport)) {
-                                    if (mode_transport.indexOf("-") > -1) {
+                                    if (mode_transport.contains("-")) {
                                         mode_transport = mode_transport.split("-")[1];
                                     }
                                     mode_transport_day = Integer.parseInt(mode_transport.replace("Days", "").trim());
                                 }
                             }
                         }
-                        if (orderBeans.get(i).getOrderNo().indexOf("_") > -1) {
+                        if (orderBeans.get(i).getOrderNo().contains("_")) {
                             if (mode_transport_day != 0 && Utility.getStringIsNull(time_)) {
                                 calendar.setTime(sdf.parse(time_));
                                 calendar.set(Calendar.DAY_OF_MONTH,
@@ -820,7 +797,7 @@ public class NewOrderSplitCtr {
                 List<Object[]> details = new ArrayList<Object[]>();// 剩余的订单
                 // 发送邮件开始
                 for (int i = 0; i < orderDetails.size(); i++) {
-                    if ((orderDetails.get(i)[0].toString().indexOf("_") > -1)) {
+                    if ((orderDetails.get(i)[0].toString().contains("_"))) {
                         if (orderNo.length() > 17) {
                             if (!orderDetails.get(i)[0].equals(ordernoNew)) {
                                 details.add(orderDetails.get(i));
@@ -934,39 +911,12 @@ public class NewOrderSplitCtr {
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {
-            LOG.error("genOrderSplitEmail",e);
+            LOG.error("genOrderSplitEmail", e);
             LOG.error("genOrderSplitEmail:" + e.getMessage());
         }
         LOG.info("getOrderSplit sendEmailInfo end");
         return message;
     }
 
-    @RequestMapping("/sendEmailTest")
-    @ResponseBody
-    public String sendEmailTest() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("email", "saycjc@outlook.com");
-        model.put("name", "saycjc");
-        model.put("pass", "111");
-        model.put("activeLink", "111");
-        model.put("here", "111");
-        //sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.WELCOME);
-        //发送拆单
-        String modelStr = "{\"here\":\"http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service\",\"orderno\":\"QC13519415298019\",\"time_\":\"2018-12-13\",\"remark\":\"\",\"title\":\"ImportExpress Mail Dismantling\",\"message\":\"\",\"orderbean\":{\"actualPay\":0,\"actual_allincost\":0,\"actual_ffreight\":\"0\",\"actual_freight_c\":0,\"actual_lwh\":\"\",\"actual_volume\":\"\",\"actual_weight\":\"\",\"actual_weight_estimate\":0,\"address\":null,\"address2\":\"\",\"addressid\":0,\"addresss\":\"\",\"adminemail\":\"\",\"adminid\":0,\"adminname\":\"\",\"applicable_credit\":0,\"arrive_time\":\"\",\"backFlag\":\"\",\"businessName\":\"\",\"buyAmount\":\"\",\"buycount\":\"\",\"buyid\":0,\"buyuser\":\"\",\"cancelFlag\":0,\"cancel_obj\":0,\"cashback\":0,\"cg\":0,\"chaOrderNo\":\"\",\"changenum\":0,\"checked\":\"\",\"checkeds\":0,\"client_update\":0,\"comformFlag\":0,\"complain\":0,\"count\":0,\"countOd\":\"\",\"country\":\"\",\"countryName\":\"\",\"countryNameCN\":\"\",\"coupon_discount\":0,\"createtime\":\"2018-12-13 17:42:40.0\",\"currency\":\"USD\",\"custom_discuss_other\":\"\",\"del_state\":0,\"deliver\":0,\"deliveryTime\":3,\"details_number\":8,\"details_pay\":\"\",\"discount_amount\":0,\"domestic_freight\":\"\",\"dropShipList\":\"\",\"dropShipState\":\"\",\"dzConfirmname\":\"\",\"dzConfirmtime\":\"\",\"dzId\":0,\"dzOrderno\":\"\",\"email\":\"\",\"esBuyPrice\":\"\",\"exchange_rate\":\"\",\"expect_arrive_time\":\"\",\"expressNo\":\"\",\"extra_discount\":0,\"extra_freight\":0.12,\"firstdiscount\":\"\",\"foreign_freight\":\"0\",\"free_shipping\":0,\"freightFee\":0,\"grade\":\"\",\"gradeDiscount\":0,\"gradeName\":\"\",\"id\":0,\"ip\":\"192.168.1.249\",\"isDropshipOrder\":0,\"maxSplitOrder\":\"\",\"memberFee\":0,\"mode_transport\":\"EPACKET (USPS)@9-15@USA@all\",\"new_zid\":\"\",\"no_checked\":\"\",\"odcount\":0,\"oldValue\":\"\",\"orderDetail\":[],\"orderFlag\":0,\"orderNo\":\"QC13519415298019\",\"orderNumber\":false,\"orderRemark\":\"\",\"order_ac\":0,\"order_count\":0,\"ordernum\":0,\"packag_number\":0,\"package_style\":0,\"payFlag\":0,\"payUserName\":\"\",\"pay_price\":32.74,\"pay_price_three\":\"0.0\",\"pay_price_tow\":\"0\",\"pay_type\":\"\",\"paystatus\":\"\",\"paytypes\":\"\",\"phonenumber\":\"\",\"problem\":\"\",\"processingfee\":0,\"product_cost\":\"32.49\",\"purchase\":0,\"purchase_number\":0,\"recipients\":\"\",\"remaining_price\":0,\"reminded\":[],\"rk\":0,\"ropType\":0,\"server_update\":0,\"service_fee\":\"0.0\",\"share_discount\":0,\"spider\":[],\"state\":5,\"stateDesc\":\"确认价格中\",\"statename\":\"\",\"storagetime\":\"\",\"street\":\"\",\"svolume\":\"\",\"total\":0,\"transport_time\":\"\",\"userEmail\":\"\",\"userName\":\"\",\"userid\":1019075,\"vatBalance\":0,\"volumeweight\":\"\",\"yhCount\":0,\"yourorder\":\"\",\"zipcode\":\"\"},\"expect_arrive_time\":\"\",\"ordernoNew\":\"QC13519415298019_6\",\"details_\":[[\"QC13519415298019_6\",259121,1,\"22.43\",\"Spring Long Sleeve Miss KTV Dress Night Club Sexy Buttock Cover Skirt With Slim Button And Fishtail Skirt\",\"https://img1.import-express.com/importcsvimg/img/546718222139/3954913382_1799662277.400x400.jpg\",\"Color:Black@32162,Size:M@4502\",null]],\"orderbean_\":{\"actualPay\":0,\"actual_allincost\":0,\"actual_ffreight\":\"0\",\"actual_freight_c\":0,\"actual_lwh\":\"\",\"actual_volume\":\"\",\"actual_weight\":\"\",\"actual_weight_estimate\":0,\"address\":null,\"address2\":\"\",\"addressid\":0,\"addresss\":\"\",\"adminemail\":\"\",\"adminid\":0,\"adminname\":\"\",\"applicable_credit\":0,\"arrive_time\":\"\",\"backFlag\":\"\",\"businessName\":\"\",\"buyAmount\":\"\",\"buycount\":\"\",\"buyid\":0,\"buyuser\":\"\",\"cancelFlag\":0,\"cancel_obj\":0,\"cashback\":0,\"cg\":0,\"chaOrderNo\":\"\",\"changenum\":0,\"checked\":\"\",\"checkeds\":0,\"client_update\":0,\"comformFlag\":0,\"complain\":0,\"count\":0,\"countOd\":\"\",\"country\":\"\",\"countryName\":\"\",\"countryNameCN\":\"\",\"coupon_discount\":0,\"createtime\":\"2018-12-13 17:42:40.0\",\"currency\":\"USD\",\"custom_discuss_other\":\"\",\"del_state\":0,\"deliver\":0,\"deliveryTime\":3,\"details_number\":1,\"details_pay\":\"\",\"discount_amount\":0,\"domestic_freight\":\"\",\"dropShipList\":\"\",\"dropShipState\":\"\",\"dzConfirmname\":\"\",\"dzConfirmtime\":\"\",\"dzId\":0,\"dzOrderno\":\"\",\"email\":\"\",\"esBuyPrice\":\"\",\"exchange_rate\":\"\",\"expect_arrive_time\":\"\",\"expressNo\":\"\",\"extra_discount\":0,\"extra_freight\":0.09,\"firstdiscount\":\"\",\"foreign_freight\":\"0\",\"free_shipping\":0,\"freightFee\":0,\"grade\":\"\",\"gradeDiscount\":0,\"gradeName\":\"\",\"id\":0,\"ip\":\"192.168.1.249\",\"isDropshipOrder\":0,\"maxSplitOrder\":\"\",\"memberFee\":0,\"mode_transport\":\"EPACKET (USPS)@9-15@USA@all\",\"new_zid\":\"\",\"no_checked\":\"\",\"odcount\":0,\"oldValue\":\"\",\"orderDetail\":[],\"orderFlag\":0,\"orderNo\":\"QC13519415298019_6\",\"orderNumber\":false,\"orderRemark\":\"\",\"order_ac\":0,\"order_count\":0,\"ordernum\":0,\"packag_number\":0,\"package_style\":0,\"payFlag\":0,\"payUserName\":\"\",\"pay_price\":22.52,\"pay_price_three\":\"0\",\"pay_price_tow\":\"0\",\"pay_type\":\"\",\"paystatus\":\"\",\"paytypes\":\"\",\"phonenumber\":\"\",\"problem\":\"\",\"processingfee\":0,\"product_cost\":\"22.43\",\"purchase\":0,\"purchase_number\":0,\"recipients\":\"\",\"remaining_price\":0,\"reminded\":[],\"rk\":0,\"ropType\":0,\"server_update\":0,\"service_fee\":\"0\",\"share_discount\":0,\"spider\":[],\"state\":5,\"stateDesc\":\"确认价格中\",\"statename\":\"\",\"storagetime\":\"\",\"street\":\"\",\"svolume\":\"\",\"total\":0,\"transport_time\":\"\",\"userEmail\":\"\",\"userName\":\"\",\"userid\":1019075,\"vatBalance\":0,\"volumeweight\":\"\",\"yhCount\":0,\"yourorder\":\"\",\"zipcode\":\"\"},\"autoUrl\":\"/user/toEmailPage?uid=c9ff91b2-8309-4620-b19b-be756ae4edcc&url=%2Findividual%2FgetCenter\",\"details\":[[\"QC13519415298019\",259117,1,\"10.06\",\"Standard Code Sexy Super-popular Digital Printing Dress\",\"https://img.import-express.com/importcsvimg/singleimg/549046313792/4103293319_891407924.400x400.jpg\",\"Color:D1121@32161,Size:S@4501\",\"https://img.import-express.com/importcsvimg/singleimg/549046313792/4103293319_891407924.60x60.jpg@\"],[\"QC13519415298019\",259122,1,\"22.43\",\"Spring Long Sleeve Miss KTV Dress Night Club Sexy Buttock Cover Skirt With Slim Button And Fishtail Skirt\",\"https://img1.import-express.com/importcsvimg/img/546718222139/3954913382_1799662277.400x400.jpg\",\"Color:Black@32162,Size:L@4503\",null]],\"currency\":\"USD\",\"time\":null,\"state\":1,\"email\":\"saycjc@outlook.com\",\"expect_arrive_time_\":\"2018-12-28\"}";
-        //发送拆单取消
-        modelStr = "{\"here\":\"http://chat32.live800.com/live800/chatClient/chatbox.jsp?companyID=496777&configID=70901&lan=en&jid=4818862369&enterurl=http%3A%2F%2Fwww.import-express.com%2Fcbtconsole%2Fapa%2Fcontact.html&amp;timestamp=1441622560799&amp;pagereferrer=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2F&amp;firstEnterUrl=http%3A%2F%2Fwww%2Eimport-express%2Ecom%2Fcbtconsole%2Fapa%2Fcontact%2Ehtml&amp;pagetitle=Customer+Service\",\"orderno\":\"QC13519415298019\",\"time_\":\"2018-12-13\",\"remark\":\"\",\"title\":\"Your Import Express order was partially cancelled\",\"message\":\"QC13519415298019_7\",\"ordernoNew\":\"QC13519415298019_7\",\"details_\":[[\"QC13519415298019_7\",259122,1,\"22.43\",\"Spring Long Sleeve Miss KTV Dress Night Club Sexy Buttock Cover Skirt With Slim Button And Fishtail Skirt\",\"https://img1.import-express.com/importcsvimg/img/546718222139/3954913382_1799662277.400x400.jpg\",\"Color:Black@32162,Size:L@4503\",null]],\"orderbean_\":{\"actualPay\":0,\"actual_allincost\":0,\"actual_ffreight\":\"0\",\"actual_freight_c\":0,\"actual_lwh\":\"\",\"actual_volume\":\"\",\"actual_weight\":\"\",\"actual_weight_estimate\":0,\"address\":null,\"address2\":\"\",\"addressid\":0,\"addresss\":\"\",\"adminemail\":\"\",\"adminid\":0,\"adminname\":\"\",\"applicable_credit\":0,\"arrive_time\":\"\",\"backFlag\":\"\",\"businessName\":\"\",\"buyAmount\":\"\",\"buycount\":\"\",\"buyid\":0,\"buyuser\":\"\",\"cancelFlag\":0,\"cancel_obj\":0,\"cashback\":0,\"cg\":0,\"chaOrderNo\":\"\",\"changenum\":0,\"checked\":\"\",\"checkeds\":0,\"client_update\":0,\"comformFlag\":0,\"complain\":0,\"count\":0,\"countOd\":\"\",\"country\":\"\",\"countryName\":\"\",\"countryNameCN\":\"\",\"coupon_discount\":0,\"createtime\":\"2018-12-13 17:42:40.0\",\"currency\":\"USD\",\"custom_discuss_other\":\"\",\"del_state\":0,\"deliver\":0,\"deliveryTime\":3,\"details_number\":1,\"details_pay\":\"\",\"discount_amount\":0,\"domestic_freight\":\"\",\"dropShipList\":\"\",\"dropShipState\":\"\",\"dzConfirmname\":\"\",\"dzConfirmtime\":\"\",\"dzId\":0,\"dzOrderno\":\"\",\"email\":\"\",\"esBuyPrice\":\"\",\"exchange_rate\":\"\",\"expect_arrive_time\":\"\",\"expressNo\":\"\",\"extra_discount\":0,\"extra_freight\":0.08,\"firstdiscount\":\"\",\"foreign_freight\":\"0\",\"free_shipping\":0,\"freightFee\":0,\"grade\":\"\",\"gradeDiscount\":0,\"gradeName\":\"\",\"id\":0,\"ip\":\"192.168.1.249\",\"isDropshipOrder\":0,\"maxSplitOrder\":\"\",\"memberFee\":0,\"mode_transport\":\"EPACKET (USPS)@9-15@USA@all\",\"new_zid\":\"\",\"no_checked\":\"\",\"odcount\":0,\"oldValue\":\"\",\"orderDetail\":[],\"orderFlag\":0,\"orderNo\":\"QC13519415298019_7\",\"orderNumber\":false,\"orderRemark\":\"\",\"order_ac\":0,\"order_count\":0,\"ordernum\":0,\"packag_number\":0,\"package_style\":0,\"payFlag\":0,\"payUserName\":\"\",\"pay_price\":22.51,\"pay_price_three\":\"0\",\"pay_price_tow\":\"0\",\"pay_type\":\"\",\"paystatus\":\"\",\"paytypes\":\"\",\"phonenumber\":\"\",\"problem\":\"\",\"processingfee\":0,\"product_cost\":\"22.43\",\"purchase\":0,\"purchase_number\":0,\"recipients\":\"\",\"remaining_price\":0,\"reminded\":[],\"rk\":0,\"ropType\":0,\"server_update\":0,\"service_fee\":\"0\",\"share_discount\":0,\"spider\":[],\"state\":-1,\"stateDesc\":\"订单取消\",\"statename\":\"\",\"storagetime\":\"\",\"street\":\"\",\"svolume\":\"\",\"total\":0,\"transport_time\":\"\",\"userEmail\":\"\",\"userName\":\"\",\"userid\":1019075,\"vatBalance\":0,\"volumeweight\":\"\",\"yhCount\":0,\"yourorder\":\"\",\"zipcode\":\"\"},\"autoUrl\":\"/user/toEmailPage?uid=c9ff91b2-8309-4620-b19b-be756ae4edcc&url=%2Findividual%2FgetCenter\",\"details\":[],\"currency\":\"USD\",\"time\":null,\"state\":0,\"totalDisCount\":\"--\",\"totalExtraFree\":\"USD 0.08\",\"email\":\"saycjc@outlook.com\"}";
-        String shopcar = "{\"updateList\":[{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"11.0\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1174,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":6.09,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":11,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"11.0\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1175,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":6.09,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":11,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"}],\"userEmail\":\"137365374@qq.com\",\"sourceList\":[{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1177,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1178,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1182,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1183,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1196,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1197,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1218,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1219,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1264,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1265,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1339,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1340,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1415,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":6.41,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1416,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@1$6.41,2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1428,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1429,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1456,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1457,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:White;Size:34;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3785797301_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"711196137f465530974817c7b7ce59de\",\"id\":1463,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053595\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"},{\"addprice\":0,\"aliposttime\":\"9-15\",\"bizpricediscount\":\"1038378,125372002,1034340\",\"bulkVolume\":\"0\",\"catid\":\"1034340\",\"comparealiprice\":\"0.00\",\"currency\":\"USD\",\"datatime\":null,\"deliveryTime\":\"6\",\"depositRate\":0,\"extraFreight\":0,\"feeprice\":\"\",\"firstnumber\":1,\"firstprice\":5.91,\"flag\":0,\"freeScDays\":\"9-15\",\"freeShoppingCompany\":\"\",\"freeprice\":6.41,\"freight\":0,\"freightFree\":0,\"goodsClass\":0,\"goodsEmail\":\"\",\"goodsTitle\":\"Classic Fashionable Sexy One Word Button Band Open Toe High Heel Sandal Open Toe High Heels Shoes\",\"goodsType\":\"Color:Gold;Size:35;\",\"goodsUrl\":\"/goodsinfo/classic-able-sexy-one-word-button-band-open-toe-high-1544182264149.html\",\"goodsdataId\":0,\"goodsunit\":\"pair\",\"goodsurlmd5\":\"DC40D807D2F2EE21F3080F9321832C2E1\",\"googsColor\":\"\",\"googsImg\":\"https://img1.import-express.com/importcsvimg/img/544182264149/3788124439_1057423199.60x60.jpg\",\"googsNumber\":1,\"googsPrice\":\"6.09\",\"googsSeller\":\"dd\",\"googsSize\":\"\",\"groupBuyId\":0,\"guid\":\"4be89b42fb7b1f21e618e3ce70a401db\",\"id\":1464,\"isbattery\":0,\"isfeight\":1,\"isfreeshipproduct\":0,\"isshippingPromote\":0,\"isvolume\":0,\"itemid\":\"544182264149\",\"methodFeight\":0,\"normLeast\":\"1\",\"normMost\":\"\",\"notfreeprice\":4.56,\"perWeight\":\"0.237\",\"preferential\":\"0\",\"price1\":0,\"price2\":0,\"price3\":4.56,\"price4\":6.41,\"pricelistsize\":\"3@@@@@2$6.09,10$5.91\",\"pwprice\":\"\",\"remark\":\"\",\"samplefee\":0,\"samplemoq\":0,\"seilunit\":\"pair\",\"sessionid\":\"\",\"shopid\":\"shop1463417989898\",\"skuid1688\":\"3278242053608\",\"sourceUrl\":0,\"spiderprice\":0,\"state\":0,\"theproductfrieght\":0,\"totalPrice\":6.09,\"totalWeight\":\"0.237\",\"trueShipping\":\"\",\"updatetime\":null,\"userid\":46261,\"width\":\"\"}],\"offRate\":-80.62,\"success\":1,\"offCost\":-9.82,\"productCost\":12.18,\"actualCost\":22}";
-		/*model = SerializeUtil.JsonToMapStr(modelStr);
-		sendMailFactory.sendMail(  String.valueOf(model.get("email")),null,"Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING);
-		String closeOrder="{\"orderNo\":\"QC13519415298019_6\",\"name\":\"saycjc@outlook.com\",\"accountLink\":\"https://www.import-express.com/individual/getCenter\",\"email\":\"Sale1\"}";*/
-        model = SerializeUtil.JsonToMapStr(modelStr);
-        model.put("email", "saycjc@outlook.com");
-        sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!", model, TemplateType.CANCEL_ORDER_IMPORT);
-		/*// 购物车营销
-		model = SerializeUtil.JsonToMapStr(shopcar);
-		sendMailFactory.sendMail("saycjc@outlook.com", null,
-				"Your ImportExpress Order " + String.valueOf(model.get("orderNo")) + " transaction is closed!",
-				model, TemplateType.SHOPPING_CART_MARKETING);*/
-        return "success!";
-    }
+
 }

@@ -702,7 +702,7 @@
     <select id="getorderPending" resultType="java.util.Map" parameterType="java.util.ArrayList">
         SELECT  o.order_no,o.mode_transport,o.orderid AS id,o.delivery_time ,o.currency,o.user_id,IFNULL(aru.admName,'') adminname,
         IFNULL(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email,
-        ''AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
+        '' AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
         o.packag_style AS changenum ,(select createtime from payment where orderid=o.order_no limit 1) as paytime,
         (CASE WHEN pay_price_three='-999' THEN 3 WHEN IFNULL(pay_price_three,0)>0 THEN 2 ELSE 0 END ) paytype,
         (CASE (IFNULL(pay_price,0)-IFNULL(pay_price_three,0))>0 WHEN TRUE THEN (IFNULL(pay_price,0)-IFNULL(pay_price_three,0)) ELSE 0 END ) service_fee ,
@@ -1395,5 +1395,13 @@
         ORDER BY id DESC
         LIMIT 1
     </select>
+
+    <insert id="insertIntoOrderSplitNumLog" parameterType="java.util.ArrayList">
+        insert into order_split_num_log(od_id,num,old_num,goods_price,admin_id,order_no)
+         values
+        <foreach collection="list" item="splitGood" separator=",">
+           (#{splitGood.odId},#{splitGood.num},#{splitGood.oldNum},#{splitGood.goodsPrice},#{splitGood.adminId},#{splitGood.orderNo})
+        </foreach>
+    </insert>
 
 </mapper>

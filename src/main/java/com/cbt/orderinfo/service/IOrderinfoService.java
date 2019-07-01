@@ -9,6 +9,7 @@ import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.SearchResultInfo;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.importExpress.pojo.SplitGoodsNumBean;
 
 import java.util.Date;
 import java.util.List;
@@ -516,4 +517,11 @@ public interface IOrderinfoService {
 	Boolean UpdateAllGoodsState(String tbOrderId);
 
     boolean getSampleschoice(String orderNo);
+
+    /**
+	 * 插入数量拆单日志
+	 * @param splitGoodsNumBeanList
+	 * @return
+	 */
+	int insertIntoOrderSplitNumLog(List<SplitGoodsNumBean> splitGoodsNumBeanList);
 }
