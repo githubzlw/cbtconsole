@@ -181,7 +181,7 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateGoodsCarMessage(orderNo);
 			// 订单商品详情
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
-			List<GoodsDistribution> distributionList = null;
+			List<GoodsDistribution> distributionList = new ArrayList<>();
 			List<GoodsDistribution> updistributionList = new ArrayList<>();
 			if(orderNo.contains("_SN")){
 				// 对数量拆单的订单分配采购数据的更新
