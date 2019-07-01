@@ -3,6 +3,7 @@ package com.cbt.orderinfo.service;
 import com.cbt.bean.*;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
@@ -524,4 +525,18 @@ public interface IOrderinfoService {
 	 * @return
 	 */
 	int insertIntoOrderSplitNumLog(List<SplitGoodsNumBean> splitGoodsNumBeanList);
+
+	/**
+	 * 根据订单号查询分配采购信息
+	 * @param orderNo
+	 * @return
+	 */
+	List<GoodsDistribution> queryGoodsDistributionByOrderNo(String orderNo);
+
+	/**
+	 * 批量更新采购分配
+	 * @param goodsDistributionList
+	 * @return
+	 */
+	int batchUpdateDistribution(List<GoodsDistribution> goodsDistributionList);
 }

@@ -18,6 +18,7 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.pay.service.IPayServer;
 import com.cbt.pay.service.PayServer;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.SendEmail;
@@ -101,6 +102,7 @@ public class NewOrderDetailsCtr {
 			if(StringUtils.isNotBlank(orderNo)){
 				orderNo = orderNo.replaceAll("'","");
 			}
+
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
@@ -178,6 +180,12 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateGoodsCarMessage(orderNo);
 			// 订单商品详情
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+			List<GoodsDistribution> distributionList = null;
+			List<GoodsDistribution> updistributionList = new ArrayList<>();
+			if(orderNo.contains("_SN")){
+				// 对数量拆单的订单分配采购数据的更新
+				distributionList = iOrderinfoService.queryGoodsDistributionByOrderNo(orderNo);
+			}
 			Double es_prices=0.00;
 			double feeWeight=0.00;
 			Map<String,Double> shopShippingCostMap= new HashedMap();
@@ -185,6 +193,17 @@ public class NewOrderDetailsCtr {
 			shopShippingCostMap.put("shopShippingCost",0d);
 			for (int i = 0; i < odb.size(); i++) {
 				OrderDetailsBean o = odb.get(i);
+				if(orderNo.contains("_SN") && distributionList != null && !distributionList.isEmpty()){
+					for (GoodsDistribution distribution : distributionList) {
+						if(distribution.getGoodsid().equals(String.valueOf(o.getGoodsid()))){
+							if(distribution.getOdid() != o.getOid()){
+								distribution.setOdid(o.getOid());
+								updistributionList.add(distribution);
+							}
+						}
+					}
+				}
+
 				if(!shopShippingCostMap.containsKey(o.getCbrShopid())){
 					Double shopShippingCost = shopShippingCostMap.get("shopShippingCost");
 					shopShippingCostMap.put("shopShippingCost",shopShippingCost+=5d);
@@ -198,6 +217,11 @@ public class NewOrderDetailsCtr {
 				if(o.getIs_sold_flag() != 0){
 					feeWeight+=o.getOd_total_weight();
 				}
+			}
+			distributionList.clear();
+			if(updistributionList.size() > 0){
+				iOrderinfoService.batchUpdateDistribution(updistributionList);
+				updistributionList.clear();
 			}
 			request.setAttribute("feeWeight",df.format(feeWeight));
 			Forwarder forw = null;
