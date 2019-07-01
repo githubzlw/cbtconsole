@@ -2292,4 +2292,48 @@ public class NewOrderDetailsCtr {
 		return json;
 	}
 
+
+	@RequestMapping(value = "/splitByNumPage")
+	public String splitByNumPage(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			String orderNo = request.getParameter("orderNo");
+			if (StringUtils.isBlank(orderNo)) {
+				request.setAttribute("isShow", 0);
+				request.setAttribute("message", "获取订单号失败");
+			} else {
+				request.setAttribute("orderNo", orderNo);
+			}
+			// 订单信息
+			DataSourceSelector.restore();
+			OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
+			// 订单商品详情
+			List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
+			List<PurchaseInfoBean> purchaseInfoList = iPurchaseService.queryOrderProductSourceByOrderNo(orderNo);
+
+			List<OrderDetailsBean> nwOdbList;
+			if (purchaseInfoList != null && purchaseInfoList.size() > 0) {
+				Set<Integer> hasPurchaseSet = purchaseInfoList.stream()
+						.filter(e -> e.getConfirmUserId() != null && e.getConfirmUserId() > 0)
+						.map(PurchaseInfoBean::getOdId).collect(toSet());
+				nwOdbList = odbList.stream().filter(e -> hasPurchaseSet.contains(e.getId())).collect(Collectors.toList());
+				request.setAttribute("odList", nwOdbList);
+				purchaseInfoList.clear();
+				hasPurchaseSet.clear();
+				odbList.clear();
+			} else {
+				request.setAttribute("odList", odbList);
+			}
+			request.setAttribute("orderInfo", orderInfo);
+			request.setAttribute("isShow", 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("isShow", 0);
+			request.setAttribute("message", e.getMessage());
+			LOG.error("splitByNumPage error:", e);
+		}
+
+		return "orderSplitNum";
+	}
+
 }
