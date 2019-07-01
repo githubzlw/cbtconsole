@@ -1255,6 +1255,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}
 			Set<String> pid_list=new HashSet<String>();
 			for(int i=0;i<pbList.size();i++){
+				PurchasesBean shipBean=this.customGoodsMapper.FindShipnoByOdid(pbList.get(i));
+				pbList.get(i).setShipnoid(shipBean.getShipnoid());
+				pbList.get(i).setTborderid(shipBean.getTborderid());
 				pid_list.add(pbList.get(i).getGoods_pid());
 			}
 			double pid_amount=0;
