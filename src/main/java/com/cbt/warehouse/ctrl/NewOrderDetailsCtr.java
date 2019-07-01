@@ -35,8 +35,10 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
@@ -80,6 +82,8 @@ public class NewOrderDetailsCtr {
 
 	@Autowired
 	private PaymentServiceNew paymentServiceNew;
+	@Autowired
+	private OrderSplitRecordService orderSplitRecordService;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -498,6 +502,8 @@ public class NewOrderDetailsCtr {
 			}
 			request.setAttribute("lists", lists);
 			request.setAttribute("isDropFlag",0);
+			OrderSplitChild orderSplitChild = orderSplitRecordService.getOrder(orderNo);
+			request.setAttribute("orderRecord",orderSplitChild);
 		//} catch (Exception e) {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/

@@ -14,7 +14,9 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.OrderSplitMain;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONObject;
@@ -42,6 +44,8 @@ public class NewOrderSplitCtr {
     private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(NewOrderSplitCtr.class);
     @Autowired
     private SendMailFactory sendMailFactory;
+    @Autowired
+    private OrderSplitRecordService orderSplitRecordService;
 
     /**
      * 订单拆分(正常订单和Drop Ship订单)
@@ -271,6 +275,7 @@ public class NewOrderSplitCtr {
                 if (odidLst.length > 0) {
                     double totalPayPriceOld = orderBean.getPay_price();// 原订单支付金额
                     double totalGoodsCostOld = 0;// 原订单商品总价
+                    double totalGoodsWeightOld = 0;// 原订单商品总重量
                     for (OrderDetailsBean odds : orderDetails) {
                         for (String odid : odidLst) {
                             if (odds.getId() == Integer.valueOf(odid)) {
@@ -281,12 +286,27 @@ public class NewOrderSplitCtr {
                             }
                         }
                         totalGoodsCostOld += Double.valueOf(odds.getGoodsprice()) * odds.getYourorder();
+                        totalGoodsWeightOld += Double.valueOf(odds.getActual_weight());
                     }
+                    //插入主单信息
+                    OrderSplitMain orderMain = new OrderSplitMain();
+                    orderMain.setCost(totalGoodsCostOld);
+                    orderMain.setFeight(orderBean.getActual_weight_estimate());
+                    orderMain.setOrderid(orderNo);
+                    orderMain.setWeight(totalGoodsWeightOld);
+                    String mode_transport = orderBean.getMode_transport();
+                    String modeTransport = mode_transport.split("@")[0];
+                    orderMain.setModeTransport(modeTransport);
+                    if(orderNo.indexOf("_") == -1) {
+                    	orderMain.setCountryName(mode_transport.split("@")[2]);
+                		orderSplitRecordService.insertMainOrder(orderMain);
+                	}
+                    
                     // 判断传递的odids有效
                     if (nwOrderDetails.size() == odidLst.length && !(totalPayPriceOld <= 0 || totalGoodsCostOld <= 0)) {
                         // 3.计算预期结果并保存和拆单操作
                         calculateExpectedResult(json, nwOrderDetails, orderNo, nwOrderNo, orderBean, totalGoodsCostOld,
-                                totalPayPriceOld, orderBeanTemp, admuser, state, odidLst, goodsIds, odIds);
+                                totalPayPriceOld, orderBeanTemp, admuser, state, odidLst, goodsIds, odIds,orderMain);
                         //取消订单后商品进入库存中
                         //判断该订单是否为测试订单如果是则不入库存
 //						boolean flag=splitDao.checkTestOrder(odidLst[0]);
@@ -353,7 +373,7 @@ public class NewOrderSplitCtr {
     private void calculateExpectedResult(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
                                          String nwOrderNo, OrderBean orderBean, double totalGoodsCostOld, double totalPayPriceOld,
                                          OrderBean orderBeanTemp, Admuser admuser, String state, String[] odidLst,
-                                         List<Integer> goodsIds, List<Integer> odIds) {
+                                         List<Integer> goodsIds, List<Integer> odIds,OrderSplitMain orderMain) {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库
         double totalGoodsCostNew = 0;// 新的订单商品总价
@@ -487,7 +507,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
+                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds,orderMain);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -503,7 +523,7 @@ public class NewOrderSplitCtr {
      */
     private void doSplitOrderAction(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
                                     String nwOrderNo, OrderBean orderBeanTemp, OrderBean odbeanNew, Admuser admuser, String state,
-                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew, List<Integer> odIds) {
+                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew, List<Integer> odIds,OrderSplitMain orderMain) {
 
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
@@ -545,6 +565,8 @@ public class NewOrderSplitCtr {
                 cancelApproval.setDealState(0);
                 cancelApproval.setOrderState(oiState);
                 NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+            }else {
+            	orderSplitRecordService.insertChildOrder(orderMain,nwOrderNo);
             }
             // 6.执行完成后，给出执行的结果并保存数据库
             splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);
