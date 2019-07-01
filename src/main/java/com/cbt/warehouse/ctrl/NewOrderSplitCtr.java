@@ -378,6 +378,8 @@ public class NewOrderSplitCtr {
             OrderBean odbeanNew = OrderInfoUtil.genNewOrderInfo(orderBean, orderBeanTemp, splitRatio, nwOrderNo,
                     totalGoodsCostOld, nwOrderDetails);
 
+            // 新的订单支付金额
+            double totalPayPriceNew = totalPayPriceOld * splitRatio;
             // 3.统计拆单商品所有的原始价格，支付价格之和，给出预期结果，保存数据库(保存预期结果)
             List<OrderBean> orderBeans = new ArrayList<OrderBean>();
             orderBeans.add(odbeanNew);
@@ -386,7 +388,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds,orderMain);
+                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -407,7 +409,7 @@ public class NewOrderSplitCtr {
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
         // 开始执行拆单
-        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state);
+        boolean isOk = splitDao.newOrderSplitFun(orderBeanTemp, odbeanNew, nwOrderDetails, state, 0);
         if (!isOk) {
             json.setOk(false);
             json.setMessage("拆分失败请重试");
