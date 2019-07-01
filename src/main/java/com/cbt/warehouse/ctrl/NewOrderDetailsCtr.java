@@ -199,6 +199,7 @@ public class NewOrderDetailsCtr {
 							if(distribution.getOdid() != o.getOid()){
 								distribution.setOdid(o.getOid());
 								updistributionList.add(distribution);
+								break;
 							}
 						}
 					}
