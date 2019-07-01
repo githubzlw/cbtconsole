@@ -1237,6 +1237,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				pbList.get(i).setTborderid(shipBean.getTborderid());
 				pid_list.add(pbList.get(i).getGoods_pid());
 				genShopPrice(pbList.get(i),shopGoodsSalesAmountList);
+
+
 			}
 			shopGoodsSalesAmountList.clear();
 			double pid_amount=0;
