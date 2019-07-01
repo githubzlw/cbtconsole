@@ -34,7 +34,9 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		// String sql="select
 		// od.id,od.yourorder,od.goodsprice,od_total_weight,od_bulk_volume,purchase_state,goodsid,discount_ratio,state
 		// from order_details od where od.state != 2 and od.orderid=? ";
-		String sql = "select od.id,od.userid,od.yourorder,od.goodsname,od.orderid,od.delivery_time,od.car_img,od.car_type,od.car_url,od.goodsprice,od_total_weight,od_bulk_volume,purchase_state,goodsid,discount_ratio,state,od.fileupload from order_details od where od.state != 2 and od.orderid=? ";
+		String sql = "select od.id,od.userid,od.yourorder,od.goodsname,od.orderid,od.delivery_time,"
+				+ "od.car_img,od.car_type,od.car_url,od.goodsprice,od_total_weight,od_bulk_volume,"
+				+ "purchase_state,goodsid,discount_ratio,state,od.fileupload from order_details od where od.state != 2 and od.orderid=? ";
 		//查询线上订单商品信息拆单时 王宏杰 2018-09-29
 		Connection conn = DBHelper.getInstance().getConnection2();
 //		Connection conn = DBHelper.getInstance().getConnection();

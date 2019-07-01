@@ -114,7 +114,7 @@ public interface ZoneMapper {
 	 */
 	public List<Map<String, Object>> spidertFreight(@Param("countryid") int countryid, @Param("weight") double weight);
 
-	public List<Integer> getIdFormCountry(@Param("country") String country);
+	int getIdFormCountry(@Param("country") String country);
 
 	public List<CountryEpacketjcexBean> getCountryEpacket();
 
