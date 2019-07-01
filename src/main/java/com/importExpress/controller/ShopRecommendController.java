@@ -32,6 +32,9 @@ public class ShopRecommendController {
         try {
             if (UserInfoUtils.checkIsLogin(request)) {
                 List<ShopRecommendInfo> list = shopRecommendService.queryShopRecommendInfoList();
+                for(ShopRecommendInfo shopRecommendInfo : list){
+                    shopRecommendInfo.setGoodsList(shopRecommendService.queryShopRecommendGoodsByShopId(shopRecommendInfo.getShopId()));
+                }
                 mv.addObject("list", list);
                 mv.addObject("isShow", 1);
             } else {

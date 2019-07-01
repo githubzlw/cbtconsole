@@ -2,6 +2,8 @@ package com.importExpress.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ShopRecommendInfo {
     private Integer id;
@@ -14,4 +16,5 @@ public class ShopRecommendInfo {
 	private int createAdminId;
 	private String updateTime;
 	private int updateAdminId;
+	private List<ShopRecommendGoods> goodsList;
 }
