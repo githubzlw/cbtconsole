@@ -8,8 +8,8 @@ public class ShopRecommendInfo {
     private String shopId;
     private String coverImg;
     private String coverPid;
-    private int sort;
-    private int isOn;
+    private Integer sort;
+    private Integer isOn;
     private String createTime;
 	private int createAdminId;
 	private String updateTime;

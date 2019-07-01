@@ -3,6 +3,7 @@ package com.importExpress.controller;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.pojo.ShopRecommendInfo;
 import com.importExpress.service.ShopRecommendService;
+import com.importExpress.utli.UserInfoUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,14 @@ public class ShopRecommendController {
     public ModelAndView queryForList(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView("shopRecommendList");
         try {
-            List<ShopRecommendInfo> list = shopRecommendService.queryShopRecommendInfoList();
-            mv.addObject("list", list);
-            mv.addObject("isShow", 1);
+            if (UserInfoUtils.checkIsLogin(request)) {
+                List<ShopRecommendInfo> list = shopRecommendService.queryShopRecommendInfoList();
+                mv.addObject("list", list);
+                mv.addObject("isShow", 1);
+            } else {
+                mv.addObject("isShow", 0);
+                mv.addObject("message", "请登录后操作");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             mv.addObject("isShow", 0);
@@ -49,13 +55,19 @@ public class ShopRecommendController {
         try {
             json = getBeanByParam(request, shopRecommendInfo);
             if (json.isOk()) {
-                json.setOk(false);
-                if (shopRecommendService.checkRecommendInfoByShopId(shopRecommendInfo.getShopId()) > 0) {
+                if (StringUtils.isBlank(shopRecommendInfo.getShopId()) || shopRecommendInfo.getIsOn() == null ||
+                        shopRecommendInfo.getSort() == null) {
                     json.setOk(false);
-                    json.setMessage("店铺:" + shopRecommendInfo.getShopId() + " 已经录入");
+                    json.setMessage("获取参数失败");
                 } else {
-                    shopRecommendService.insertShopRecommendInfo(shopRecommendInfo);
-                    json.setOk(true);
+                    json.setOk(false);
+                    if (shopRecommendService.checkRecommendInfoByShopId(shopRecommendInfo.getShopId()) > 0) {
+                        json.setOk(false);
+                        json.setMessage("店铺:" + shopRecommendInfo.getShopId() + " 已经录入");
+                    } else {
+                        shopRecommendService.insertShopRecommendInfo(shopRecommendInfo);
+                        json.setOk(true);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -76,15 +88,21 @@ public class ShopRecommendController {
         try {
             json = getBeanByParam(request, shopRecommendInfo);
             if (json.isOk()) {
-                json.setOk(false);
-                shopRecommendService.updateShopRecommendInfo(shopRecommendInfo);
-                json.setOk(true);
+                if (StringUtils.isBlank(shopRecommendInfo.getShopId()) || shopRecommendInfo.getIsOn() == null ||
+                        shopRecommendInfo.getSort() == null) {
+                    json.setOk(false);
+                    json.setMessage("获取参数失败");
+                } else {
+                    json.setOk(false);
+                    shopRecommendService.updateShopRecommendInfo(shopRecommendInfo);
+                    json.setOk(true);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
             json.setOk(false);
             json.setMessage(e.getMessage());
-            logger.error("insertShopRecommendInfo shopId:" + shopRecommendInfo.getShopId() + " error", e);
+            logger.error("updateShopRecommendInfo shopId:" + shopRecommendInfo.getShopId() + " error", e);
         }
         return json;
     }
