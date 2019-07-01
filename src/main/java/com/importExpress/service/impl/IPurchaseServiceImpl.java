@@ -103,6 +103,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	@Autowired
+	private CustomGoodsMapper customGoodsMapper;
+	@Autowired
 	private WarehouseMapper dao;
 	int total;
 	int goodsnum = 0;
