@@ -20,10 +20,12 @@ import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.warehouse.pojo.Tb1688Account;
 import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.warehouse.util.ExcelUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.AliPayInfo;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -49,6 +51,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -4613,10 +4616,34 @@ public class StatisticalReportController {
 		JsonResult json = new JsonResult();
 		try{
 			String uploadPath = SysParamUtil.getParam("uploadPath");
+			LocalDate today = LocalDate.now();
+			int year = today.getYear();
+			int month = today.getMonthValue();
+			String fileSplit ;
+			if(month < 10){
+				fileSplit = String.valueOf(year) + "0" + String.valueOf(month);
+			}else{
+				fileSplit = String.valueOf(year) + String.valueOf(month);
+			}
 			Long time = System.currentTimeMillis();
-			String path = uploadPath + "/aliPay/" + time + "/";
-			FileCopyUtils.copy(file.getBytes(), new FileOutputStream(path + file.getOriginalFilename()));
+			String path = uploadPath + "aliPay/" + fileSplit + "/";
+			File pathFile = new File(path);
+			if(!pathFile.exists()){
+				pathFile.mkdirs();
+			}
+			String orFileName = file.getOriginalFilename();
+			String fileAllPath = path + time + orFileName.substring(orFileName.lastIndexOf("."));
+			FileCopyUtils.copy(file.getBytes(), new FileOutputStream(fileAllPath));
+            List<AliPayInfo> infoList = ExcelUtil.getAliPayInfoByExcel(fileAllPath);
+            if(infoList == null || infoList.isEmpty()){
 
+            	json.setOk(false);
+				json.setMessage("获取数据失败");
+			}else{
+            	reportInfoService.insertAliPayInfo(infoList);
+				infoList.clear();
+				json.setOk(true);
+			}
 		}catch (Exception e){
 			e.printStackTrace();
 			json.setOk(false);

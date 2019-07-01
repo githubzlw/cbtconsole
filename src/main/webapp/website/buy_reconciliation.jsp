@@ -282,6 +282,10 @@ function doReset(){
             });
  }
 
+ function uploadBuyingData() {
+     $('#excel_dlg').dialog('open');
+ }
+ 
  function closeAllDialog() {
      closeDialogById('#ali_dlg');
 	 closeDialogById('#excel_dlg');
@@ -294,7 +298,7 @@ function doReset(){
 </head>
 <body text="#000000" onload="closeAllDialog()">
 
-<div id="excel_dlg" class="easyui-dialog" title="上传Excel文件" data-options="modal:true" style="width: 460px; height: 330px; padding: 10px;">
+<div id="excel_dlg" class="easyui-dialog" title="上传Excel文件" data-options="modal:true" style="width: 380px; height: 220px; padding: 10px;">
         <form style="margin-left: 44px;" id="multiFileForm" method="post" enctype="multipart/form-data">
             <input id="file" type="file" name="file" multiple="false">
         </form>
