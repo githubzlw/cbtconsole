@@ -3117,8 +3117,10 @@ public class OrderSplitDaoImpl implements IOrderSplitDao {
 		insert_split_details=insert_split_details.substring(0,insert_split_details.length()-1)+";";
 		localSql += tempSql.substring(1) + ")";
 		localSqlList.add(localSql);
-		localSql1 += tempSql.substring(1) + ")";
-		localSqlList.add(localSql1);
+		if(isSplitNum == 0){
+			localSql1 += tempSql.substring(1) + ")";
+			localSqlList.add(localSql1);
+		}
 		localSql2 += tempSql.substring(1) + ")";
 		localSqlList.add(localSql2);
 		//localSqlList.add(insert_split_details);
