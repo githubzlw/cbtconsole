@@ -92,19 +92,11 @@ public class ShopRecommendController {
     private JsonResult getBeanByParam(HttpServletRequest request, ShopRecommendInfo shopRecommendInfo) {
         JsonResult json = new JsonResult();
         String shopId = request.getParameter("shopId");
-        if (StringUtils.isBlank(shopId)) {
-            json.setOk(false);
-            json.setMessage("获取店铺ID失败");
-            return json;
-        } else {
+        if (StringUtils.isNotBlank(shopId)) {
             shopRecommendInfo.setShopId(shopId);
         }
         String sort = request.getParameter("sort");
-        if (StringUtils.isBlank(sort)) {
-            json.setOk(false);
-            json.setMessage("获取店铺排序失败");
-            return json;
-        } else {
+        if (StringUtils.isNotBlank(sort)) {
             shopRecommendInfo.setSort(Integer.valueOf(sort));
         }
         String isOn = request.getParameter("isOn");
