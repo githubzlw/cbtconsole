@@ -1232,6 +1232,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsMapper.queryShopGoodsSalesAmountAll();
 			Set<String> pid_list=new HashSet<String>();
 			for(int i=0;i<pbList.size();i++){
+				PurchasesBean shipBean=this.customGoodsMapper.FindShipnoByOdid(pbList.get(i));
+				pbList.get(i).setShipnoid(shipBean.getShipnoid());
+				pbList.get(i).setTborderid(shipBean.getTborderid());
 				pid_list.add(pbList.get(i).getGoods_pid());
 				genShopPrice(pbList.get(i),shopGoodsSalesAmountList);
 			}
