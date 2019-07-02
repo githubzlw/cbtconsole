@@ -62,7 +62,7 @@ public class ShopUrlController {
     private String chineseChar = "([\\一-\\龥]+)";
     private List<Category1688Bean> category1688List = new ArrayList<Category1688Bean>();
     private static final String SHOP_GOODS_WEIGHT_CLEARURL = "http://192.168.1.31:8080/checkimage/clear/shopGoodsWeight?";
-    //private static final String SHOP_GOODS_SHOW_URL = "http://117.144.21.74:8000";
+    // private static final String SHOP_GOODS_SHOW_URL = "http://117.144.21.74:8000";
     private static final String SHOP_GOODS_SHOW_URL_K = "http://192.168.1.28:8499";
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
