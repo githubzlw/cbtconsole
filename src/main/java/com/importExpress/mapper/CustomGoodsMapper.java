@@ -460,4 +460,13 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
+
+    /**
+     * 根据shopId查询数据信息
+     *
+     * @param shopId
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
+
 }

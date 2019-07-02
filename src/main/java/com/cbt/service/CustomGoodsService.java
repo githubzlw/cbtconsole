@@ -815,4 +815,13 @@ public interface CustomGoodsService {
      */
     int insertIntoGoodsImgUpLog(String pid, String imgUrl, int adminId, String remark);
 
+
+    /**
+     * 根据shopId查询数据信息
+     *
+     * @param shopId
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
+
 }

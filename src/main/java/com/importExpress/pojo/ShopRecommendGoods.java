@@ -17,6 +17,8 @@ public class ShopRecommendGoods {
     private String rangePrice;
     private String price1688;
     private String moq;
+    private String remotePath;
+    private String mainImg;
 
     private int isOn;
     private String createTime;

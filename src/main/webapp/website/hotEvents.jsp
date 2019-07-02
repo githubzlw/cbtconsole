@@ -414,7 +414,9 @@
                     <td><input id="child_link3" class="inp_wd"/></td>
                 </tr>
                 <tr>
-                    <span style="font-size: 14px;"><input type="checkbox" id="edit_is_on" checked="checked"/>启用</span>
+                    <td colspan="2">
+                        <span style="font-size: 14px;"><input type="checkbox" id="edit_is_on" checked="checked"/>启用</span>
+                    </td>
                 </tr>
             </table>
         </form>

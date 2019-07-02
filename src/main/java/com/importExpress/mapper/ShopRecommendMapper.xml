@@ -20,6 +20,14 @@
         <result column="shop_id" property="shopId"/>
         <result column="reco_id" property="recoId"/>
         <result column="pid" property="pid"/>
+
+		<result column="goods_img" property="goodsImg" />
+		<result column="is_on" property="isOn" />
+	    <result column="range_price" property="rangePrice" />
+	    <result column="sellunit" property="goodsUnit" />
+        <result column="remotpath" property="remotePath" />
+        <result column="custom_main_image" property="mainImg" />
+
         <result column="is_on" property="isOn"/>
         <result column="create_time" property="createTime"/>
         <result column="create_admin_id" property="createAdminId"/>
@@ -38,11 +46,12 @@
     </select>
 
     <select id="queryRecommendInfoByShopId" resultMap="shopRecommendInfoResultMap">
-        select id,shop_id,cover_pid,cover_img,sort,is_on,
-        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
-        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
-        from shop_recommend_info
-        where shop_id = #{shopId}
+        select a.id,a.shop_id,a.cover_pid,a.cover_img,a.sort,a.is_on,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.create_admin_id,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.update_admin_id,
+        b.remotpath,b.custom_main_image,b.sellunit
+        from shop_recommend_info a,custom_benchmark_ready b
+        where a.shop_id = #{shopId} and a.goods_pid = b.pid and b.valid =1
     </select>
 
     <select id="checkRecommendInfoByShopId" resultType="java.lang.Integer">

@@ -816,4 +816,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.insertIntoGoodsImgUpLog(pid, imgUrl, adminId, remark);
     }
 
+    @Override
+    public List<CustomGoodsPublish> queryGoodsByShopId(String shopId) {
+        return customGoodsMapper.queryGoodsByShopId(shopId);
+    }
+
 }
