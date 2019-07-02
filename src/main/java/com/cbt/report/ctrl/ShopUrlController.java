@@ -799,10 +799,11 @@ public class ShopUrlController {
             List<GoodsOfferBean> goodsErrInfos = new ArrayList<GoodsOfferBean>();
             // 计算需要的数据
             for (GoodsOfferBean gdOf : goodsInfos) {
-                // “类别的平均重量” * 运费
-                gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));
+
                 // “该产品重量” * 运费
                 if (!(catidWeightMap.get(gdOf.getCatid()) == null || catidWeightMap.get(gdOf.getCatid()) == 0)) {
+                    // “类别的平均重量” * 运费
+                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()), Integer.valueOf(gdOf.getCatid())));
                     gdOf.setGoodsWeightfreight(
                             FeightUtils.getCarFeightNew(gdOf.getWeight(), Integer.valueOf(gdOf.getCatid())));
                 }
