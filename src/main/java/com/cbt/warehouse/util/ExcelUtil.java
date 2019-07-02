@@ -4,6 +4,7 @@ import com.cbt.util.WebTool;
 import com.cbt.warehouse.pojo.Mabangshipment;
 import com.cbt.warehouse.pojo.Shipment;
 import com.cbt.warehouse.pojo.Skuinfo;
+import com.importExpress.pojo.AliBillingDetails;
 import com.importExpress.pojo.AliPayInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.EncryptedDocumentException;
@@ -1923,6 +1924,9 @@ public class ExcelUtil {
 			Row currentRow = sheet.getRow(rowIndex);
 			AliPayInfo payInfo = new AliPayInfo();
 			payInfo.setOrderCreateTime(getCellValue(currentRow.getCell(1), true));
+			if(StringUtils.isBlank(currentRow.getCell(2).getStringCellValue())){
+				continue;
+			}
 			payInfo.setOrderNo(getCellValue(currentRow.getCell(2), true));
 			payInfo.setGoodsName(getCellValue(currentRow.getCell(3), true));
 			if(StringUtils.isNotBlank(currentRow.getCell(4).getStringCellValue())){
@@ -1944,6 +1948,68 @@ public class ExcelUtil {
 			}
 			payInfo.setPaymentChannel(getCellValue(currentRow.getCell(14), true));
 			infoList.add(payInfo);
+		}
+		return infoList;
+	}
+
+
+
+	/**
+	 * 根据Excel获取支付宝对账明细
+	 * @param filePath
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<AliBillingDetails> getAliBillingDetailsByExcel(String filePath) throws Exception {
+		List<AliBillingDetails> infoList = new ArrayList<>();
+		// 检查
+		fileCheck(filePath);
+		Workbook workbook = null;
+		workbook = getWorkbook(filePath);
+
+		Sheet sheet = workbook.getSheetAt(0);
+		if (sheet == null) {
+			throw new Exception("获取Excel文件失败");
+		}
+		// 首行索引
+		int firstRowIndex = sheet.getFirstRowNum();
+		// 最后一行
+		int lastRowIndex = sheet.getLastRowNum();
+
+		// 读取数据行
+		for (int rowIndex = 3; rowIndex <= lastRowIndex - 1; rowIndex++) {
+			// 当前行
+			Row currentRow = sheet.getRow(rowIndex);
+			AliBillingDetails billingDt = new AliBillingDetails();
+			billingDt.setBillTime(getCellValue(currentRow.getCell(1), true));
+			if(StringUtils.isBlank(currentRow.getCell(2).getStringCellValue())){
+				continue;
+			}
+			billingDt.setTransactionNo(getCellValue(currentRow.getCell(2), true));
+			billingDt.setSerialNo(getCellValue(currentRow.getCell(3), true));
+			billingDt.setOrderNo(getCellValue(currentRow.getCell(4), true));
+			billingDt.setPayType(getCellValue(currentRow.getCell(5), true));
+			if (StringUtils.isNotBlank(currentRow.getCell(6).getStringCellValue())) {
+				billingDt.setIncome(Double.valueOf(getCellValue(currentRow.getCell(6), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(7).getStringCellValue())) {
+				billingDt.setExpend(Double.valueOf(getCellValue(currentRow.getCell(7), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(8).getStringCellValue())) {
+				billingDt.setBalance(Double.valueOf(getCellValue(currentRow.getCell(8), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(9).getStringCellValue())) {
+				billingDt.setServiceFee(Double.valueOf(getCellValue(currentRow.getCell(9), true)));
+			}
+			billingDt.setPaymentChannel(getCellValue(currentRow.getCell(10), true));
+
+			billingDt.setMerchantAccount(getCellValue(currentRow.getCell(12), true));
+			billingDt.setMerchantName(getCellValue(currentRow.getCell(13), true));
+
+			billingDt.setGoodsName(getCellValue(currentRow.getCell(15), true));
+			billingDt.setRemark(getCellValue(currentRow.getCell(16), true));
+
+			infoList.add(billingDt);
 		}
 		return infoList;
 	}
