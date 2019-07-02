@@ -51,6 +51,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(value = "/ShopUrlC")
@@ -798,14 +799,16 @@ public class ShopUrlController {
             Map<String, CatidStatisticalResult> catidResultMap = new HashMap<String, CatidStatisticalResult>();
             List<GoodsOfferBean> goodsErrInfos = new ArrayList<GoodsOfferBean>();
             // 计算需要的数据
+            Set<String> catidSet = goodsInfos.stream().map( GoodsOfferBean :: getCatid).collect(Collectors.toSet());
             for (GoodsOfferBean gdOf : goodsInfos) {
-
+                // “类别的平均重量” * 运费
                 // “该产品重量” * 运费
                 if (!(catidWeightMap.get(gdOf.getCatid()) == null || catidWeightMap.get(gdOf.getCatid()) == 0)) {
                     // “类别的平均重量” * 运费
                     gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()), Integer.valueOf(gdOf.getCatid())));
                     gdOf.setGoodsWeightfreight(
                             FeightUtils.getCarFeightNew(gdOf.getWeight(), Integer.valueOf(gdOf.getCatid())));
+                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));
                 }
                 // 如果平均运费为0，则说明是第一次的数据，存在空值，不做判断
                 if (gdOf.getAvgWeightfreight() == 0) {

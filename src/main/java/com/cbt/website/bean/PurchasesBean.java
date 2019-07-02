@@ -94,8 +94,26 @@ public class PurchasesBean {
 	private String shopGrade; //供应商评级
 	private String morder; //最小moq
 	private String replacementProduct; //客户录入替换产品
-	private String shipno; //运单号
+	private String shipno;
 	private double goodsShopPrice;// 商品店铺总销售额
+	private String tborderid;// 1688订单号
+	private String shipnoid;// 运单号
+
+	public String getShipnoid() {
+		return shipnoid;
+	}
+
+	public void setShipnoid(String shipnoid) {
+		this.shipnoid = shipnoid;
+	}
+
+	public String getTborderid() {
+		return tborderid;
+	}
+
+	public void setTborderid(String tborderid) {
+		this.tborderid = tborderid;
+	}
 
 	public double getGoodsShopPrice() {
 		return goodsShopPrice;

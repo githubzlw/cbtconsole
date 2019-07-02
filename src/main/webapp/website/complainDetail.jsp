@@ -252,6 +252,7 @@ function fn(){
 		var userEmail = $("#userEmail").html(); 
 		var orderNo = $("#orders").html(); 
 		var urls =$("#urls").val();
+		var websiteType =$("#website_type").val();
 		if(chatText.trim()!=""){
 			
 			$.post(
@@ -266,7 +267,8 @@ function fn(){
 					dealAdminId:presentAdminId,
 					userEmail:userEmail,
 					orderNo:orderNo,
-					urls:urls
+					urls:urls,
+                    websiteType:websiteType
 				}, function(res) {
 					alert(res.message);
 					$("#chatText").val("");
@@ -418,7 +420,12 @@ function fn(){
 			    </div>
 			  </div>
 			  <div class="form-group">
-			    <div class="col-sm-offset-5 col-sm-8">
+			    <div class="col-sm-offset-3 col-sm-10">
+                  邮件回复客户网站名:
+                  <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
+                    <option value="1" selected="selected">import-express</option>
+                    <option value="2">kidsproductwholesale</option>
+                  </select>
 			      <button type="button" id="submitForm1" onclick="submitForm();" class="btn btn-success">回复客户</button>
 			      <button type="button" class="btn btn-success" onclick="closeCase()">关闭case</button>
 			      <button type="button" class="btn btn-success" onclick="changeavailable()">余额补偿</button>

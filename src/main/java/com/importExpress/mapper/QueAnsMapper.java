@@ -2,6 +2,7 @@ package com.importExpress.mapper;
 
 import com.importExpress.pojo.QueAns;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -87,8 +88,11 @@ public interface QueAnsMapper {
 	 * @return
 	 */
 	public int updateRemark(@Param("qid") int qid, @Param("adminId") int adminId, @Param("isReview") int isReview, @Param("reviewRemark") String reviewRemark);
-	
-	
+    @Select("select reply_content from problem_report where id=?")
+    int replyReport(@Param("id") int id, String replyContent, String date);
+
+
+
 //    int deleteByPrimaryKey(Integer questionid);
 //
 //    int insert(QueAns record);

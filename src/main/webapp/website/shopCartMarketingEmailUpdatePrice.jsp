@@ -19,6 +19,12 @@
         <h2 style="text-align: center">产品改价邮件预览</h2>
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
+        <span>网站名:
+            <select id="website_type" style="height: 28px;width: 160px;">
+                <option value="1" selected="selected">import-express</option>
+                <option value="2">kidsproductwholesale</option>
+            </select>
+        </span>
         <input type="button" style="border-color: orangered;background-color: aquamarine;"
                value="确认并发送邮件给客户" onclick="confirmAndSendEmail(${userId},'${userEmail}',${type})"/>
         <span id="show_notice" style="display: none;color: red;">*正在执行，请等待...</span>
@@ -210,6 +216,7 @@
     function confirmAndSendEmail(userId, userEmail,type) {
         var r = confirm("是否确认发送邮件?");
         if (r) {
+            var websiteType = $("#website_type").val();
             var ischeck = 0;
             var adminNameFirst = $("#admin_name_first").val();
             if (adminNameFirst == null || adminNameFirst == "") {
@@ -249,7 +256,8 @@
                         "adminEmail": adminEmail,
                         "whatsApp": whatsApp,
                         "type":type,
-                        "emailTitle":"Limited Time Offer JUST for you!"
+                        "emailTitle":"Limited Time Offer JUST for you!",
+                        "websiteType": websiteType
                         //"emailContent": emailContent,
                         //"model": model,
                     },

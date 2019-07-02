@@ -3,12 +3,14 @@ package com.cbt.orderinfo.dao;
 import com.cbt.bean.*;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -388,7 +390,7 @@ public interface OrderinfoMapper {
 	 * 查询订单状态为支付失败或者order_pending的订单
 	 * @return
 	 */
-	public List<Map<String, String>> getorderPending(@Param("orderIds") String orderIds);
+	public List<Map<String, String>> getorderPending(@Param("orderIds") List<String> orderIds);
 
 	/**
 	 * 根据订单号获取订单的支付状态
@@ -595,7 +597,7 @@ public interface OrderinfoMapper {
 	 * 获取支付时间或到账订单的订单号
 	 * @return
 	 */
-	public String getOrderIds(@Param("admuserid") int admuserid);
+	public List<String> getOrderIds(@Param("admuserid") int admuserid);
 	/**
 	 * 根据客户订单获取邮箱地址
 	 * @param orderNo
@@ -656,4 +658,24 @@ public interface OrderinfoMapper {
 
     String getSampleschoice(@Param("orderNo") String orderNo);
 
+    /**
+	 * 插入数量拆单日志
+	 * @param splitGoodsNumBeanList
+	 * @return
+	 */
+	int insertIntoOrderSplitNumLog(@Param("list") List<SplitGoodsNumBean> splitGoodsNumBeanList);
+
+	/**
+	 * 根据订单号查询分配采购信息
+	 * @param orderNo
+	 * @return
+	 */
+	List<GoodsDistribution> queryGoodsDistributionByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 批量更新采购分配
+	 * @param goodsDistributionList
+	 * @return
+	 */
+	int batchUpdateDistribution(@Param("list") List<GoodsDistribution> goodsDistributionList);
 }

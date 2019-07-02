@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -52,7 +53,9 @@ public class ComplainChatController {
 	private SendMailFactory sendMailFactory;
 	@RequestMapping(value = "/responseCustomer", method = RequestMethod.POST)
 	@ResponseBody
-	public JsonResult responseCustomer(ComplainChat t, String dealAdmin, Integer dealAdminId, String userEmail, String orderNo, String urls){
+	public JsonResult responseCustomer(ComplainChat t, String dealAdmin, Integer dealAdminId, String userEmail, String orderNo, String urls,
+                                       @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType //网站名
+                                       ){
 		JsonResult js = new JsonResult();
 		if(t.getComplainid()!=0 && dealAdminId!=0 &&t.getChatText().trim()!=null){
 			int complainChatid=complainChatService.addChat(t);
@@ -76,6 +79,7 @@ public class ComplainChatController {
 				model.put("email",userEmail);
 				model.put("chatText",chatText);
 				model.put("chatText",chatText);
+				model.put("websiteType",websiteType);
 				sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "Reply to your support request", model, TemplateType.COMPLAINT);
 				js.setOk(true);
 				js.setMessage("回复成功");
