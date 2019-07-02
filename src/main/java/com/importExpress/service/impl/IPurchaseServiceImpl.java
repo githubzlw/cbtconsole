@@ -1261,6 +1261,10 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				if (shipBean !=null) {
 					pbList.get(i).setShipnoid(shipBean.getShipnoid());
 					pbList.get(i).setTborderid(shipBean.getTborderid());
+					if ("undefined".equals(shipBean.getShipnoid())&&shipBean.getTborderid()!=null){
+						String shipnum=this.customGoodsMapper.FindShipnoByTbor(shipBean.getTborderid());
+						pbList.get(i).setShipnoid(shipnum);
+					}
 				}
 				pid_list.add(pbList.get(i).getGoods_pid());
 			}
@@ -1371,6 +1375,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				//1.点了采购确认但没有1688订单
 				purchaseBean.setShipstatus("没有匹配到采购订单或者还未发货");
 			}else if (t != null && t.getShipstatus() != null && t.getShipstatus().length() > 0) {
+                purchaseBean.setTborderid(t.getOrderid());
+                purchaseBean.setShipnoid(t.getShipno());
 				String shipstatus = t.getShipstatus().split("\n")["2".equals(t.getTbOr1688())?0:t.getShipstatus().split("\n").length - 1];
 				if("2".equals(t.getTbOr1688()) && !"等待买家确认收货".equals(shipstatus)){
 					String msg=t.getShipstatus().split("\n")[1];
