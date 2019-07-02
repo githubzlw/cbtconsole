@@ -388,7 +388,7 @@ public class NewOrderSplitCtr {
             if (success) {
                 // 开始拆单操作
                 doSplitOrderAction(json, nwOrderDetails, orderNo, nwOrderNo, orderBeanTemp, odbeanNew, admuser, state,
-                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds);
+                        odidLst, goodsIds, (float) totalPayPriceNew,  odIds, orderMain);
             } else {
                 json.setOk(false);
                 json.setMessage("保存拆单信息失败，程序终止执行");
@@ -404,7 +404,7 @@ public class NewOrderSplitCtr {
      */
     private void doSplitOrderAction(JsonResult json, List<OrderDetailsBean> nwOrderDetails, String orderNo,
                                     String nwOrderNo, OrderBean orderBeanTemp, OrderBean odbeanNew, Admuser admuser, String state,
-                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew, List<Integer> odIds) {
+                                    String[] odidLst, List<Integer> goodsIds, float totalPayPriceNew, List<Integer> odIds,OrderSplitMain orderMain) {
 
         IOrderSplitDao splitDao = new OrderSplitDaoImpl();
         // 4.执行拆单操作
@@ -446,6 +446,8 @@ public class NewOrderSplitCtr {
                 cancelApproval.setDealState(0);
                 cancelApproval.setOrderState(oiState);
                 NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+            }else {
+            	orderSplitRecordService.insertChildOrder(orderMain,nwOrderNo);
             }
             // 6.执行完成后，给出执行的结果并保存数据库
             splitDao.addOrderInfoAndPaymentLog(nwOrderNo, admuser, 1);
