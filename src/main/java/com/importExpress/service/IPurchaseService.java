@@ -12,6 +12,7 @@ import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
 import com.cbt.website.bean.PurchasesBean;
 import com.cbt.website.dao2.Page;
+import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -183,7 +184,7 @@ public interface IPurchaseService {
 	 * @param adminid
 	 * @return
 	 */
-	public String allcgqrQrNew(String orderid, int adminid);
+	public String allcgqrQrNew(String orderid, int adminid, Integer websiteType);
 	/**
 	 public String allcgqrQrNew();
 
@@ -290,4 +291,11 @@ public interface IPurchaseService {
 	public int updateSizeChartUpload(List<Integer> rowidArray);
 	public int updateSizeChartById(List<Integer> rowidArray,int userid);
 	public int updateSizeChartById_add(List<Integer> rowidArray,int userid);
+
+	/**
+	 * 根据订单号查询采购商品信息
+	 * @param orderNo
+	 * @return
+	 */
+	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
 }

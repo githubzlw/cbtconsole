@@ -19,7 +19,8 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 	//供应商列表
 	@Override
 	public Page<SupplierScoringBean> queryList(int start , int pagesize, String shop_id, String level, String quality,
-                                               String services, String authorized, boolean flag, String userid,String categoryName) {
+                                               String services, String authorized, boolean flag, String userid,
+                                               String categoryName, Integer salesShop, String nowdate1, String nowdate2) {
 		Page<SupplierScoringBean> page = new Page<SupplierScoringBean>(start, pagesize);
 		int startindex = (start-1)*pagesize;//起始位置
 		String qualitys="";
@@ -30,10 +31,16 @@ public class SupplierScoringServiceImpl implements SupplierScoringService {
 		if(StringUtil.isNotBlank(services)){
 			servicess=String.valueOf(Integer.valueOf(services)+1);
 		}
+		if (!"".equals(nowdate1)) {
+		    nowdate1 += " 00:00";
+        }
+		if (!"".equals(nowdate2)) {
+		    nowdate2 += " 23:59";
+        }
 		//查询总数
-		int total = supplierScoringMapper.querySupplierRecord(shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName);
+		int total = supplierScoringMapper.querySupplierRecord(shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName, salesShop, nowdate1, nowdate2);
 		List<SupplierScoringBean> supplierScoringlist = supplierScoringMapper.querySupplierScoringByPage(startindex,pagesize,
-				shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName);
+				shop_id,level,quality,qualitys,services,servicess,authorized,flag,userid,categoryName, salesShop, nowdate1, nowdate2);
 		for(SupplierScoringBean s:supplierScoringlist){
 			String type="非精品店铺";
 			String authorizedFlag="未授权";

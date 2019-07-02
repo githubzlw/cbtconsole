@@ -83,9 +83,9 @@ public interface QuestionAndAnswerService {
 	 * @return
 	 */
 	public int updateRemark(int qid, int adminId, int isReview, String reviewRemark);
-	
-	
-	
+
+
+	public int replyReportQes(int id, String replyContent, String date, String name, String qustion, String email, int userId, String sale_email, String url,String Website);
 	
 
 //	 @SuppressWarnings("rawtypes")

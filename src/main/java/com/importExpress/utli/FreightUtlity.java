@@ -3,6 +3,7 @@ package com.importExpress.utli;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -71,6 +72,36 @@ public class FreightUtlity {
             logger.warn("getFreightByOrderno error,orderNo:[{}],e:[{}]" + orderNo + e.getMessage());
         }
         return freight;
+    }
+    public static double getFreightByWeight(int countryId,String weight,String modeTransport) {
+    	double freight = 0;
+    	OkHttpClient okHttpClient = new OkHttpClient();
+    	
+    	RequestBody formBody = new FormBody.Builder().add("countryId", String.valueOf(countryId)).add("weight", weight).build();
+    	/*Request request = new Request.Builder().url(getFreightCostUrl).post(formBody).build();*/
+    	String url = getFreightCostUrl.replace("getMinFreightByUserId","getFreightByWeight");
+    	Request request = new Request.Builder().addHeader("Accept","*/*")
+    			.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+    			.url(url).post(formBody).build();
+    	try {
+    		Response response = okHttpClient.newCall(request).execute();
+    		String resultStr = response.body().string();
+    		JSONObject json = JSONObject.fromObject(resultStr);
+    		if (json.getBoolean("ok")) {
+    			JSONArray jsonObject = json.getJSONArray("data");
+    			for(int i=0;i<jsonObject.size();i++) {
+    				JSONObject fromObject = JSONObject.fromObject(jsonObject.get(i));
+    				if(modeTransport.equals(fromObject.get("shippingmethod"))) {
+    					freight = (Double) fromObject.get("freightCost");
+    				}
+    			}
+    		} else {
+    			logger.warn("getFreightByWeight error :<:<:<");
+    		}
+    	} catch (Exception e) {
+    		logger.warn("getFreightByOrderno error,countryId:[{}],e:[{}]" + countryId + e.getMessage());
+    	}
+    	return freight;
     }
     public void sendMailNew(String email, String copyEmail, String title, Map<String, Object> map,Enum<TemplateType> templateType) {
         try {
@@ -288,5 +319,10 @@ public class FreightUtlity {
 		double newFeight = 0.08 * weight * 1000;
 			
 		return new BigDecimal(newFeight).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+	}
+	public static void main(String[] args) {
+		double freightByWeight = getFreightByWeight(36, "0.23", "EPACKET (USPS)");
+		System.out.println(freightByWeight);
+		
 	}
 }

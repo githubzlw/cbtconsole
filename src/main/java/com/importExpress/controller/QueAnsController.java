@@ -214,6 +214,7 @@ public class QueAnsController {
 		int qid = StrUtils.isNum(strqid) ? Integer.valueOf(strqid) : 0;
 		String replyContent = request.getParameter("rcontent");
 		String url=request.getParameter("url");
+		String Website=request.getParameter("Website");
 		if(StringUtils.isBlank(replyContent) || qid == 0){
 			return -1;
 		}
@@ -224,7 +225,7 @@ public class QueAnsController {
 		String date = dateFormat.format(now);
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
-		int updateReplyContent=ibs.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url);
+		int updateReplyContent=questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url,Website);
 		return updateReplyContent;
 	}
 	/**回复提问
@@ -245,6 +246,7 @@ public class QueAnsController {
 		int adminid = user.getId();
 		String strqid = request.getParameter("qid");
 		String isShow = request.getParameter("isShow");
+		String Website=request.getParameter("Website");
 		//影响同店铺标识 1影响
 		String shop_flag=request.getParameter("shop_flag");
 		String shop_id=request.getParameter("shop_id");
@@ -274,7 +276,7 @@ public class QueAnsController {
 		sendMQ.closeConn();
 		//给客户发送邮件
 		QueAns q=questionAndAnswerService.getQueAnsinfo(qid);
-		ibs.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url);
+		questionAndAnswerService.replyReportQes(q.getQuestionid(),replyContent, date, q.getEmail(), q.getQuestion_content(), q.getEmail(), Integer.valueOf(q.getUserid()), q.getSale_email(),url,Website);
 //		}
 		return updateReplyContent;
 	}

@@ -314,12 +314,15 @@
                         var same_url_datail = $("#same_goods tr[name=same_url_detail] div");
                         same_url_datail.empty();
                         $(data.sameGoods).each(function (index, item) {
-                            var htm = "<div style=\"float:left;margin: 4px;width: 46%\"><div style=\"\">\n" +
+                            var htm = "<div style=\"float:left;margin: 4px;width: 46%;border: 1px groove;padding: 2px;\"><div style=\"\">\n" +
                                 "同款pid: <a href=\"https://detail.1688.com/offer/" + item.pid +
                                 ".html\" target=\"_blank\">" + item.pid +
                                 "</a><br />同款店铺: <a href=\"https://" + item.shopId +
                                 ".1688.com\" target=\"_blank\">" + item.shopId +
-                                "</a><br />同款店铺名:" + item.shopName + "<br /></div>\n" +
+                                "</a><br />同款店铺名: " + item.shopName + "<br />" +
+                                "同款销量: " + item.bookedCnt + "<br />" +
+                                "核心供应商: " + (item.salesShop?"是":"不是") + "<br />" +
+                                "</div>\n" +
                                 "<div><img class=\"search_for_goods\" style=\"height: 160px;\" \n" +
                                 "src=\"" + item.jsonContent + "\" alt=\"无图\"></div></div>";
                             same_url_datail.append(htm);

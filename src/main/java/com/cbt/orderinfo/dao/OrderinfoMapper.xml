@@ -699,10 +699,10 @@
         email NOT LIKE 'zhouxueyun%') AND oi.user_id !='26018' AND oi.user_id!='25913' AND oi.actual_lwh>0
         GROUP BY oi.order_no HAVING COUNT(od.id)=SUM(od.checked)) b
     </select>
-    <select id="getorderPending" resultType="java.util.Map">
+    <select id="getorderPending" resultType="java.util.Map" parameterType="java.util.ArrayList">
         SELECT  o.order_no,o.mode_transport,o.orderid AS id,o.delivery_time ,o.currency,o.user_id,IFNULL(aru.admName,'') adminname,
         IFNULL(aru.adminid,-1) adminid,cancel_obj,o.actual_ffreight,o.product_cost,o.state,user.name username,user.email email,
-        ''AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
+        '' AS buyer, SPACE(2000) AS countrys, '' address, '' address2,'' statename,'' phoneNumber,'' street,'' zipcode, 1 paystatus,
         o.packag_style AS changenum ,(select createtime from payment where orderid=o.order_no limit 1) as paytime,
         (CASE WHEN pay_price_three='-999' THEN 3 WHEN IFNULL(pay_price_three,0)>0 THEN 2 ELSE 0 END ) paytype,
         (CASE (IFNULL(pay_price,0)-IFNULL(pay_price_three,0))>0 WHEN TRUE THEN (IFNULL(pay_price,0)-IFNULL(pay_price_three,0)) ELSE 0 END ) service_fee ,
@@ -712,10 +712,14 @@
         ifnull(re.orderremark,'-') as orderremarks
         FROM orderinfo o INNER JOIN USER ON o.user_id=user.id LEFT JOIN admin_r_user aru ON aru.userid=o.user_id
         left join order_remark re on re.orderid=o.order_no
-        where o.order_no in (${orderIds}) and del = 0 ORDER BY paytime desc
+        where 1=1 and  o.order_no in
+        <foreach collection="orderIds" item="onVal" open="("  close=")">
+            #{onVal}
+        </foreach>
+        and del = 0 ORDER BY paytime desc
     </select>
     <select id="getOrderIds" resultType="java.lang.String">
-        SELECT GROUP_CONCAT("'",p.orderid,"'") as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
+        SELECT p.orderid as orderids FROM payment p inner join orderinfo oi on p.orderid=oi.order_no
         <if test="admuserid != 0">
             INNER JOIN admin_r_user a ON oi.user_id = a.userid
             AND a.adminid = #{admuserid}
@@ -1391,5 +1395,29 @@
         ORDER BY id DESC
         LIMIT 1
     </select>
+
+    <insert id="insertIntoOrderSplitNumLog" parameterType="java.util.ArrayList">
+        insert into order_split_num_log(od_id,num,old_num,goods_price,admin_id,order_no)
+         values
+        <foreach collection="list" item="splitGood" separator=",">
+           (#{splitGood.odId},#{splitGood.num},#{splitGood.oldNum},#{splitGood.goodsPrice},#{splitGood.adminId},#{splitGood.orderNo})
+        </foreach>
+    </insert>
+
+    <select id="queryGoodsDistributionByOrderNo" resultType="com.cbt.pojo.GoodsDistribution">
+        select id,orderid, odid, goodsid, admuserid
+        from goods_distribution
+        where orderid = #{orderNo} and iscomplete in(0,1)
+    </select>
+
+    <update id="batchUpdateDistribution" parameterType="java.util.ArrayList">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update goods_distribution
+            <set>
+                odid = #{item.odid}
+            </set>
+            where id = ${item.id}
+        </foreach>
+    </update>
 
 </mapper>

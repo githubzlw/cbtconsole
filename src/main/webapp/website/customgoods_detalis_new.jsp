@@ -2363,28 +2363,24 @@
             if (url.indexOf("http") == -1 && url.indexOf("https") == -1) {
                 $.messager.alert("提醒", "获取链接地址错误", "info");
             } else {
-                $.messager.confirm('提醒', '替换后不可恢复,是否替换?', function (r) {
-                    if (r) {
-                        $.ajax({
-                            type: 'POST',
-                            dataType: 'json',
-                            url: '/cbtconsole/editc/changeChineseImgToEnglishImg',
-                            data: {
-                                "pid": pid,
-                                "imgUrl": url
-                            },
-                            success: function (json) {
-                                if (json.ok) {
-                                    var imgNw = '<img src="'+json.data+'"/>';
-                                    editorObj.pasteHTML(imgNw);
-                                } else {
-                                    $.messager.alert("提醒", json.message, "error");
-                                }
-                            },
-                            error: function () {
-                                $.messager.alert("提醒", "连接服务器失败", "error");
-                            }
-                        });
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: '/cbtconsole/editc/changeChineseImgToEnglishImg',
+                    data: {
+                        "pid": pid,
+                        "imgUrl": url
+                    },
+                    success: function (json) {
+                        if (json.ok) {
+                            var imgNw = '<img src="'+json.data+'"/>';
+                            editorObj.pasteHTML(imgNw);
+                        } else {
+                            $.messager.alert("提醒", json.message, "error");
+                        }
+                    },
+                    error: function () {
+                        $.messager.alert("提醒", "连接服务器失败", "error");
                     }
                 });
             }
