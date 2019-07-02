@@ -79,7 +79,7 @@
         function updateFlag3() {
             //选择的商品
             var checkArr = new Array();
-            $("input[name='ck']:checked").parent().parent().parent().find("td[field='pid'] div")
+            $("input[name='ck']:checked").parent().parent().parent().find("td[field='pid'] span[name='pid']")
                 .each(function(index,item){
                     checkArr.push(item.innerHTML);
                 });
@@ -473,7 +473,7 @@
         }
 
         function formatPid(val, row, index) {
-            return row.pid + '<br /><br /><a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">原1688链接</a>' +
+            return '<span name="pid">' + row.pid + '</span><br /><br /><a target="_blank" href="https://detail.1688.com/offer/'+ row.pid +'.html">原1688链接</a>' +
                 '<br /><br /><a target="_blank" href="https://www.import-express.com/goodsinfo/cbtconsole-1'+ row.pid +'.html">线上链接</a>';
         }
 
