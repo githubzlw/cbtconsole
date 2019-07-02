@@ -24,6 +24,7 @@ public class OrderSplitRecordServiceImpl implements OrderSplitRecordService {
 	
 	private IOrderSplitDao splitDao = new OrderSplitDaoImpl();
 	private DecimalFormat format = new DecimalFormat("#0.000");
+	private DecimalFormat formatPrice = new DecimalFormat("#0.00");
 
 	@Override
 	public int insertMainOrder(OrderSplitMain order) {
@@ -89,8 +90,11 @@ public class OrderSplitRecordServiceImpl implements OrderSplitRecordService {
 
 	@Override
 	public OrderSplitChild getOrder(String splitOrerId) {
-		// TODO Auto-generated method stub
-		return orderSplitRecordMapper.getOrder(splitOrerId);
+		OrderSplitChild orderSplitChild = orderSplitRecordMapper.getOrder(splitOrerId);
+		if(orderSplitChild != null) {
+			orderSplitChild.setFeight(Double.valueOf(formatPrice.format(orderSplitChild.getFeight() * 6.6)));
+		}
+		return orderSplitChild;
 	}
 
 	
