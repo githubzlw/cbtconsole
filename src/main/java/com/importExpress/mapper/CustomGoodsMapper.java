@@ -3,8 +3,10 @@ package com.importExpress.mapper;
 import com.cbt.bean.CategoryBean;
 import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.bean.CustomGoodsQuery;
+import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.*;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -460,4 +462,8 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
+    @Select("SELECT shipno as shipnoid,tborderid from id_relationtable WHERE orderid=#{purchasesBean.orderNo} AND odid=#{purchasesBean.od_id} AND goodid=#{purchasesBean.goodsid}")
+    PurchasesBean FindShipnoByOdid(@Param("purchasesBean") PurchasesBean purchasesBean);
+    @Select("SELECT shipno from taobao_1688_order_history WHERE orderid=#{tborderid} LIMIT 1")
+    String FindShipnoByTbor(@Param("tborderid") String tborderid);
 }

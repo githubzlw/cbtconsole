@@ -63,8 +63,8 @@ public class ShopUrlController {
     private String chineseChar = "([\\一-\\龥]+)";
     private List<Category1688Bean> category1688List = new ArrayList<Category1688Bean>();
     private static final String SHOP_GOODS_WEIGHT_CLEARURL = "http://192.168.1.31:8080/checkimage/clear/shopGoodsWeight?";
-    //private static final String SHOP_GOODS_SHOW_URL = "http://117.144.21.74:8000";
-    private static final String SHOP_GOODS_SHOW_URL_K = "http://192.168.1.28:8000";
+    // private static final String SHOP_GOODS_SHOW_URL = "http://117.144.21.74:8000";
+    private static final String SHOP_GOODS_SHOW_URL_K = "http://192.168.1.28:8499";
     private static final String SHOP_GOODS_LOCAL_PATH_K = "K:/shopimages";
     private static final String SHOP_GOODS_SHOW_URL_J = "http://192.168.1.28:8399";
     private static final String SHOP_GOODS_LOCAL_PATH_J = "J:/shopimages";//J:/shopimages
@@ -804,6 +804,8 @@ public class ShopUrlController {
                 // “类别的平均重量” * 运费
                 // “该产品重量” * 运费
                 if (!(catidWeightMap.get(gdOf.getCatid()) == null || catidWeightMap.get(gdOf.getCatid()) == 0)) {
+                    // “类别的平均重量” * 运费
+                    gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()), Integer.valueOf(gdOf.getCatid())));
                     gdOf.setGoodsWeightfreight(
                             FeightUtils.getCarFeightNew(gdOf.getWeight(), Integer.valueOf(gdOf.getCatid())));
                     gdOf.setAvgWeightfreight(FeightUtils.getCarFeightNew(catidWeightMap.get(gdOf.getCatid()),Integer.valueOf(gdOf.getCatid())));

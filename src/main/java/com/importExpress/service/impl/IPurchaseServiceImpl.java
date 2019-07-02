@@ -1,5 +1,32 @@
 package com.importExpress.service.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import com.cbt.warehouse.pojo.*;
+import com.importExpress.mapper.CustomGoodsMapper;
+import com.importExpress.pojo.ShopGoodsSalesAmount;
+import com.importExpress.pojo.PurchaseInfoBean;
+import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.ocean.rawsdk.ApiExecutor;
 import com.alibaba.trade.param.AlibabaTradeFastAddress;
 import com.alibaba.trade.param.AlibabaTradeFastCargo;
@@ -76,9 +103,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	@Autowired
 	private IOrderinfoService iOrderinfoService;
 	@Autowired
-	private WarehouseMapper dao;
+	private CustomGoodsMapper customGoodsMapper;
 	@Autowired
-    private CustomGoodsMapper customGoodsMapper;
+	private WarehouseMapper dao;
 	int total;
 	int goodsnum = 0;
 
@@ -1228,14 +1255,19 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				pbList.add(purchaseBean);
 				total = Integer.parseInt(map.get("totalCount")==null?"0": String.valueOf(map.get("totalCount")));
 			}
-			// 获取数据
-			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsMapper.queryShopGoodsSalesAmountAll();
 			Set<String> pid_list=new HashSet<String>();
 			for(int i=0;i<pbList.size();i++){
+				PurchasesBean shipBean=this.customGoodsMapper.FindShipnoByOdid(pbList.get(i));
+				if (shipBean !=null) {
+					pbList.get(i).setShipnoid(shipBean.getShipnoid());
+					pbList.get(i).setTborderid(shipBean.getTborderid());
+					if ("undefined".equals(shipBean.getShipnoid())&&shipBean.getTborderid()!=null){
+						String shipnum=this.customGoodsMapper.FindShipnoByTbor(shipBean.getTborderid());
+						pbList.get(i).setShipnoid(shipnum);
+					}
+				}
 				pid_list.add(pbList.get(i).getGoods_pid());
-				genShopPrice(pbList.get(i),shopGoodsSalesAmountList);
 			}
-			shopGoodsSalesAmountList.clear();
 			double pid_amount=0;
 			if(list.size()>0){
 				pid_amount=pid_list.size()*5;
@@ -1263,15 +1295,6 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 
 		return page;
-	}
-
-	private void genShopPrice(PurchasesBean purchasesBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
-		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
-			if(salesAmount.getShopId().equals(purchasesBean.getGoodsShop())){
-				purchasesBean.setGoodsShopPrice(salesAmount.getTotalPrice());
-				break;
-			}
-		}
 	}
 
 	/**
@@ -1352,6 +1375,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				//1.点了采购确认但没有1688订单
 				purchaseBean.setShipstatus("没有匹配到采购订单或者还未发货");
 			}else if (t != null && t.getShipstatus() != null && t.getShipstatus().length() > 0) {
+                purchaseBean.setTborderid(t.getOrderid());
+                purchaseBean.setShipnoid(t.getShipno());
 				String shipstatus = t.getShipstatus().split("\n")["2".equals(t.getTbOr1688())?0:t.getShipstatus().split("\n").length - 1];
 				if("2".equals(t.getTbOr1688()) && !"等待买家确认收货".equals(shipstatus)){
 					String msg=t.getShipstatus().split("\n")[1];
@@ -1991,6 +2016,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	public int updateSizeChartById_add(List<Integer> rowidArray,int userid) {
 		return pruchaseMapper.updateSizeChartById_add(rowidArray,userid);
 	}
+
+	@Override
+	public List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo) {
+		return pruchaseMapper.queryOrderProductSourceByOrderNo(orderNo);
+	}
+
 	@Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);

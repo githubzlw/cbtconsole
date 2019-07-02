@@ -6,6 +6,7 @@ import com.cbt.email.entity.EmailReceive1;
 import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
@@ -20,6 +21,7 @@ import com.cbt.website.bean.*;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
@@ -43,7 +45,7 @@ import java.util.*;
 public class OrderinfoService implements IOrderinfoService {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
-	private OrderinfoMapper dao;
+	private OrderinfoMapper orderinfoMapper;
 	@Autowired
 	private WarehouseMapper warehouseMapper;
 
@@ -59,7 +61,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public List<Map<String, String>> getOrders(int userID, int state,
 	                                           Date startdate, Date enddate, String email, String orderno,
 	                                           int startpage, int page, int admuserid, int buyid, int showUnpaid,String type,int status) {
-		return dao.getOrders(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
+		return orderinfoMapper.getOrders(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
 	}
 
 
@@ -67,7 +69,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public String getProblem(String orderid) {
-		return dao.getProblem(orderid);
+		return orderinfoMapper.getProblem(orderid);
 	}
 
 	@Override
@@ -77,48 +79,48 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public List<OrderBean> getFlushOrderFreightOrder() {
-		return dao.getFlushOrderFreightOrder();
+		return orderinfoMapper.getFlushOrderFreightOrder();
 	}
 
 	@Override
 	public List<OrderBean> getAllOrderInfo() {
-		return dao.getAllOrderInfo();
+		return orderinfoMapper.getAllOrderInfo();
 	}
 
 
 	@Override
 	public int deleteFlagByOrder(String orderNo) {
-		return dao.deleteFlagByOrder(orderNo);
+		return orderinfoMapper.deleteFlagByOrder(orderNo);
 	}
 
 	@Override
 	public int insertFlagByOrderid(String orderNo) {
-		return dao.insertFlagByOrderid(orderNo);
+		return orderinfoMapper.insertFlagByOrderid(orderNo);
 	}
 
 	@Override
 	public List<OrderBean> getFlushOrderFreightOrderCancel() {
-		return dao.getFlushOrderFreightOrderCancel();
+		return orderinfoMapper.getFlushOrderFreightOrderCancel();
 	}
 
 	@Override
 	public int getAllOrderinfoFreight() {
-		return dao.getAllOrderinfoFreight();
+		return orderinfoMapper.getAllOrderinfoFreight();
 	}
 
 	@Override
 	public List<OrderBean> getAllNoFreight() {
-		return dao.getAllNoFreight();
+		return orderinfoMapper.getAllNoFreight();
 	}
 
 	@Override
 	public String getOrderNo() {
-		return dao.getOrderNo();
+		return orderinfoMapper.getOrderNo();
 	}
 
 	@Override
 	public String getExchangeRate() {
-		String rate=dao.getExchangeRate();
+		String rate=orderinfoMapper.getExchangeRate();
 		if(StringUtil.isBlank(rate)){
 			rate="6.3";
 		}
@@ -127,40 +129,40 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public String getCountryById(String country, String userid) {
-		String coun=dao.getCountryById(country);
+		String coun=orderinfoMapper.getCountryById(country);
 		if(StringUtil.isBlank(coun)){
-			coun=dao.getOtherCountry(userid);
+			coun=orderinfoMapper.getOtherCountry(userid);
 		}
 		return coun;
 	}
 
 	@Override
 	public int addOrderInfo(List<OrderBean> OrderBean, int address) {
-		return dao.addOrderInfo(OrderBean,address);
+		return orderinfoMapper.addOrderInfo(OrderBean,address);
 	}
 
 	@Override
 	public int addOrderDetail(List<OrderDetailsBean> orderdetails) {
-		return dao.addOrderDetail(orderdetails);
+		return orderinfoMapper.addOrderDetail(orderdetails);
 	}
 
 	@Override
 	public int addOrderAddress(Map<String, String> addressMap) {
-		return dao.addOrderAddress(addressMap);
+		return orderinfoMapper.addOrderAddress(addressMap);
 	}
 
 	@Override
 	public UserBean getUserFromIdForCheck(int userId) {
-		return dao.getUserFromIdForCheck(userId);
+		return orderinfoMapper.getUserFromIdForCheck(userId);
 	}
 
 	@Override
 	public int addPayment(PaymentBean payment) {
-		int row=dao.getPayMentCount(payment);
+		int row=orderinfoMapper.getPayMentCount(payment);
 		if(row>0){
-			row=dao.updatePayMent(payment);
+			row=orderinfoMapper.updatePayMent(payment);
 		}else{
-			row=dao.insertPayMent(payment);
+			row=orderinfoMapper.insertPayMent(payment);
 		}
 		return row;
 	}
@@ -168,7 +170,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public List<Address> getUserAddr(int userId) {
 		List<Address> address = new ArrayList<Address>();
-		List<Address> list=dao.getUserAddr(userId);
+		List<Address> list=orderinfoMapper.getUserAddr(userId);
 		Address defAddress = new Address();
 		int flag=0;
 		for(Address a:list){
@@ -211,39 +213,39 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public int addPaymentNote(String userid, String orderno, String dealMan,String upfile) {
-		return dao.addPaymentNote(userid,orderno,dealMan,upfile);
+		return orderinfoMapper.addPaymentNote(userid,orderno,dealMan,upfile);
 	}
 
 	@Override
 	public int countPaymentInvoiceByorderuser(String userid, String orderno) {
-		return dao.countPaymentInvoiceByorderuser(userid,orderno);
+		return orderinfoMapper.countPaymentInvoiceByorderuser(userid,orderno);
 	}
 
 	@Override
 	public int updatePaymentNote(String userid, String orderno, String dealMan,String upfile) {
-		return dao.updatePaymentNote(userid,orderno,dealMan,upfile);
+		return orderinfoMapper.updatePaymentNote(userid,orderno,dealMan,upfile);
 	}
 
 	@Override
 	public List<OrderDetailsBean> getCatidDetails(String orderid) {
-		return dao.getCatidDetails(orderid);
+		return orderinfoMapper.getCatidDetails(orderid);
 	}
 
 	@Override
 	public List<TabTransitFreightinfoUniteNew> selectByExample(TabTransitFreightinfoUniteNewExample example) {
-		return dao.selectByExample(example);
+		return orderinfoMapper.selectByExample(example);
 	}
 
 	@Override
 	public List<Map<String,String>> allTrack(Map<String, String> map) {
-		int adminid=dao.getAdmNameByShipno(map);
-		List<Map<String,String>> list=dao.getOrderData(map.get("shipno"),adminid);
+		int adminid=orderinfoMapper.getAdmNameByShipno(map);
+		List<Map<String,String>> list=orderinfoMapper.getOrderData(map.get("shipno"),adminid);
 		return list;
 	}
 
 	@Override
 	public List<OrderDetailsBean> getAllCancelDetails(Map<String, String> map) {
-		return dao.getAllCancelDetails(map);
+		return orderinfoMapper.getAllCancelDetails(map);
 	}
 
 	@Override
@@ -255,7 +257,7 @@ public class OrderinfoService implements IOrderinfoService {
 		try{
 			SendMQ sendMQ = new SendMQ();
 			//查询入库备注
-			Map<String,String> reMap=dao.getRemarkInspetion(map);
+			Map<String,String> reMap=orderinfoMapper.getRemarkInspetion(map);
 			if(reMap !=null){
 				remark = reMap.get("warehouse_remark") + map.get("warehouseRemark");
 				old_itemqty=Integer.valueOf(reMap.get("itemqty"));
@@ -265,30 +267,30 @@ public class OrderinfoService implements IOrderinfoService {
 			old_itemqty= Integer.parseInt(map.get("count"))+old_itemqty;
 			map.put("old_itemqty",String.valueOf(old_itemqty));
 			map.put("remark",remark);
-//			row=dao.updateIdrelationtable(map);
+//			row=orderinfoMapper.updateIdrelationtable(map);
 			//入库操作
 			String username=map.get("userName");
 			String positon="";
 			if("Sherry".equals(username)){
-				positon=dao.getPositionByBarcode(map.get("barcode"),"1");
+				positon=orderinfoMapper.getPositionByBarcode(map.get("barcode"),"1");
 			}else{
-				positon=dao.getPositionByBarcode(map.get("barcode"),"2");
+				positon=orderinfoMapper.getPositionByBarcode(map.get("barcode"),"2");
 			}
-			int idd=dao.getIdRelationtable(map);
+			int idd=orderinfoMapper.getIdRelationtable(map);
 			map.put("positon",positon);
 			if("0".equals(map.get("repState"))){
 				map.put("old_itemqty","0");
-				dao.insertIdRelationtable(map);
+				orderinfoMapper.insertIdRelationtable(map);
 			}else if(idd<=0){
-				dao.insertIdRelationtable(map);
+				orderinfoMapper.insertIdRelationtable(map);
 			}else{
-				dao.updateIdRationtable(map);
+				orderinfoMapper.updateIdRationtable(map);
 			}
 			if("1".equals(map.get("status"))){
 				//点击到库时根据spec_id关联抓取订单的id
-				String typeName=dao.getTypeNameByOdid(map);
+				String typeName=orderinfoMapper.getTypeNameByOdid(map);
 				//查询入库对应的淘宝订单
-				List<TaoBaoOrderInfo> tList=dao.getTaobaoInfoByOrderid(map);
+				List<TaoBaoOrderInfo> tList=orderinfoMapper.getTaobaoInfoByOrderid(map);
 				int tbId=0;
 				if(StringUtil.isNotBlank(typeName) && typeName.contains("&gt;")){
 					String [] types=typeName.split("&gt;");
@@ -300,47 +302,47 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 				map.put("tbId",String.valueOf(tbId));
 				//更新订单详情表状态为已经到仓库
-				dao.updateState(map);
+				orderinfoMapper.updateState(map);
 				if("0".equals(map.get("repState"))){
 					//如果是补货则更新order_replenishment的状态为1已完成
-					dao.updateOrderReState(map);
+					orderinfoMapper.updateOrderReState(map);
 				}else{
 					//更新采购表状态为已到库
-					dao.updateBuyState(map);
+					orderinfoMapper.updateBuyState(map);
 				}
 			}else{
 				//更新采购表状态为问题货源
-				dao.updateOrderSourceState(map);
+				orderinfoMapper.updateOrderSourceState(map);
 			}
 			//等于1为到库操作，其余为验货有疑问
 			if(Integer.valueOf(map.get("status")) != 1){
 				//Added <V1.0.1> Start： cjc 2019/3/27 17:28:32 Description : 验货有疑问 后续操作
 				// TODO 1. 更新商品状态为采购中 2.更新入库记录为无效记录  是否需要启用待数据验证
-				//dao.updateOrderDetailsState(map.get("odid"),map.get("orderid"));
+				//orderinfoMapper.updateOrderDetailsState(map.get("odid"),map.get("orderid"));
 				//End：
 				return row;
 			}
 			sql="update storage_problem_order set flag=1 where shipno='"+map.get("shipno")+"'";
-			dao.updateStorageProblemOrder(map);
+			orderinfoMapper.updateStorageProblemOrder(map);
 			//查询是否是DP订单
-			int isDropshipOrder=dao.queyIsDropshipOrder(map);
+			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 			//查询客户ID
-			//int userId = dao.queryUserIdByOrderNo(map.get("orderid"));
+			//int userId = orderinfoMapper.queryUserIdByOrderNo(map.get("orderid"));
 			//获取未更新之前，订单状态和客户ID，比较前后状态是否一致，不一致说明订单状态已经修改
 			Map<String,Object> orderinfoMap = pruchaseMapper.queryUserIdAndStateByOrderNo(map.get("orderid"));
 			if (isDropshipOrder == 1) {
-				dao.updateOrderDetails(map);
+				orderinfoMapper.updateOrderDetails(map);
 				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
-				int counts=dao.getDtailsState(map);
+				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
-					dao.updateDropshiporder(map);
+					orderinfoMapper.updateDropshiporder(map);
 					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+map.get("orderid")+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
-				counts=dao.getAllChildOrderState(map);
+				counts=orderinfoMapper.getAllChildOrderState(map);
 				if(counts == 0){
-					dao.updateOrderInfoState(map);
+					orderinfoMapper.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
@@ -351,12 +353,12 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 			}else{
 				// 非dropshi订单
-				dao.updateOrderDetails(map);
+				orderinfoMapper.updateOrderDetails(map);
 				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+map.get("orderid")+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
-				int counts=dao.getDetailsState(map);
+				int counts=orderinfoMapper.getDetailsState(map);
 				if(counts == 0){
-					dao.updateOrderInfoState(map);
+					orderinfoMapper.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+map.get("orderid")+"'"));
 					//判断订单状态是否一致
 					if(!orderinfoMap.get("old_state").toString().equals("2")){
@@ -369,10 +371,10 @@ public class OrderinfoService implements IOrderinfoService {
 			orderinfoMap.clear();
 			//记录商品入库
 			LOG.info("--------------------开始记录商品入库--------------------");
-			Map<String,String> inMap=dao.queryData(map);
+			Map<String,String> inMap=orderinfoMapper.queryData(map);
 			if(inMap != null){
 				map.put("goods_pid",inMap.get("goods_pid"));
-				dao.insertGoodsInventory(map);
+				orderinfoMapper.insertGoodsInventory(map);
 			}
 			LOG.info("--------------------结束记录商品入库--------------------");
 			sendMQ.closeConn();
@@ -385,12 +387,12 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public int insertScanLog(String shipno, String admName) {
-		return dao.insertScanLog(shipno,admName);
+		return orderinfoMapper.insertScanLog(shipno,admName);
 	}
 
 	@Override
 	public List<Tb1688OrderHistory> getGoodsData(String shipno) {
-		List<Tb1688OrderHistory> list=dao.getGoodsData(shipno);
+		List<Tb1688OrderHistory> list=orderinfoMapper.getGoodsData(shipno);
 		for(Tb1688OrderHistory t:list){
 			t.setImgurl(t.getImgurl().replace(".80x80","").replace(".60x60",""));
 		}
@@ -415,14 +417,14 @@ public class OrderinfoService implements IOrderinfoService {
 		int adminid = 520;
 		List<Map<String,String>> resultList=new ArrayList<Map<String,String>>();
 		try{
-			String admin=dao.getAdminid(shipno);
+			String admin=orderinfoMapper.getAdminid(shipno);
 			if(StringUtil.isNotBlank(admin)){
 				adminid=Integer.valueOf(admin);
 			}
 			if ("1".equals(checked)) {
-				resultList=dao.getOrderDataOne(shipno);
+				resultList=orderinfoMapper.getOrderDataOne(shipno);
 			}else{
-				resultList=dao.getOrderData(shipno,adminid);
+				resultList=orderinfoMapper.getOrderData(shipno,adminid);
 			}
 			Set set=new HashSet();
 			for(Map<String,String> map:resultList){
@@ -448,7 +450,7 @@ public class OrderinfoService implements IOrderinfoService {
 				String goods_pid=String.valueOf(map.get("goods_pid"));
 				if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
 					//采购货源和推荐货源一致
-					shop_id=dao.getShopId(goods_pid);
+					shop_id=orderinfoMapper.getShopId(goods_pid);
 					//是否授权
 					String flag="1";
 					if(map.get("authorizedFlag") == null || StringUtil.isBlank(map.get("authorizedFlag")) || "0".equals(String.valueOf(map.get("authorizedFlag"))) || "2".equals(String.valueOf(map.get("authorizedFlag")))){
@@ -487,7 +489,7 @@ public class OrderinfoService implements IOrderinfoService {
 				String catid="";
 				if("1".equals(checked)){
 					String goodscatid=map.get("goodscatid");
-					catid=dao.getCatid(goodscatid);
+					catid=orderinfoMapper.getCatid(goodscatid);
 				}
 				searchresultinfo.setCatid(catid);
 				String orderid = String.valueOf(map.get("orderid"));
@@ -498,14 +500,14 @@ public class OrderinfoService implements IOrderinfoService {
 				//保存值到bean中
 				saveValueForBean(map, searchresultinfo);
 //				PaymentDaoImp paymentDao = new PaymentDao();
-				String fileByOrderid = dao.getFileByOrderid(orderid);
+				String fileByOrderid = orderinfoMapper.getFileByOrderid(orderid);
 				//拼接备注信息
 				StringBuffer sbf = getStringForRemark(map, searchresultinfo, orderid, fileByOrderid);
 				searchresultinfo.setRemark(sbf.toString());
 				sbf.setLength(0);
 				searchresultinfo.setImgList(taobaoinfoList);
 				List<Object[]> orderremark = new ArrayList<Object[]>();
-				List<Map<String,String>> remarkList=dao.getOrderRemark(orderid);
+				List<Map<String,String>> remarkList=orderinfoMapper.getOrderRemark(orderid);
 				for(Map<String,String> reMap:remarkList){
 					Object[] objects = {reMap.get("orderid"), reMap.get("orderremark"), reMap.get("remarkuserid"),reMap.get("createtime")};
 					orderremark.add(objects);
@@ -619,9 +621,9 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public int changeBuyer(Map<String, String> map) {
 		//判断该商品是否分配过采购
-		int row =dao.queryGoodsDis(map);
+		int row =orderinfoMapper.queryGoodsDis(map);
 		if(row>0){
-			row=dao.updateGoodsDis(map);
+			row=orderinfoMapper.updateGoodsDis(map);
 		}
 		return row;
 	}
@@ -632,17 +634,17 @@ public class OrderinfoService implements IOrderinfoService {
 		try{
 			SendMQ sendMQ = new SendMQ();
 			// 直接删除 标识记为已经删除
-			row=dao.updateIdrelationtableFlag(map);
-			int counts=dao.getInCount(map);
+			row=orderinfoMapper.updateIdrelationtableFlag(map);
+			int counts=orderinfoMapper.getInCount(map);
 			if(counts == 0){
-				row=dao.udpateStorage(map);
+				row=orderinfoMapper.udpateStorage(map);
 			}
-			row=dao.updateDetailsShipno(map);
-			row=dao.updateOrderState(map);
+			row=orderinfoMapper.updateDetailsShipno(map);
+			row=orderinfoMapper.updateOrderState(map);
 			if ("0".equals(map.get("repState"))) {
-				row=dao.updateOrderRe(map);
+				row=orderinfoMapper.updateOrderRe(map);
 			}else{
-				row=dao.updateOrderSource(map);
+				row=orderinfoMapper.updateOrderSource(map);
 			}
 			// 更新线上状态
 			sendMQ.sendMsg(new RunSqlModel("UPDATE order_details t SET t.state = 0 WHERE t.orderid = '"+map.get("orderid")+"' AND t.id = '"+map.get("odid")+"'"));
@@ -656,27 +658,27 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public int orderReturn(Map<String,String> map) {
-		return dao.orderReturn(map);
+		return orderinfoMapper.orderReturn(map);
 	}
 
 	@Override
 	public int addUser(Map<String, String> map) {
-		map.put("admName",dao.getAdmName(map));
+		map.put("admName",orderinfoMapper.getAdmName(map));
 		int row=0;
 		try{
 			SendMQ sendMQ = new SendMQ();
-			row=dao.queryAdmin(map);
+			row=orderinfoMapper.queryAdmin(map);
 			if(row>0){
                 //更新商业询盘中分配的数据
-			    dao.updateBusiess(map);
+			    orderinfoMapper.updateBusiess(map);
                 //更新销售人
-                row=dao.updateAdminUser(map);
+                row=orderinfoMapper.updateAdminUser(map);
 				if(row>0){
 					sendMQ.sendMsg(new RunSqlModel("update admin_r_user set adminid="+map.get("adminid")+",admName='"+map.get("admName")+"' where userid="+map.get("userid")+""));
 				}
 			}else{
 				//新增销售记录
-				row=dao.insertAdminUser(map);
+				row=orderinfoMapper.insertAdminUser(map);
 				if(row>0){
 					sendMQ.sendMsg(new RunSqlModel("insert into admin_r_user(userid,username,useremail,adminid,createdate,admName) " +
 							"values('"+map.get("userid")+"','"+map.get("email")+"','"+map.get("email")+"','"+map.get("adminid")+"',now(),'"+map.get("admName")+"')"));
@@ -691,7 +693,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public int checkOrderState(String orderid) {
-		return dao.checkOrderState(orderid);
+		return orderinfoMapper.checkOrderState(orderid);
 	}
 
 	@Override
@@ -701,7 +703,7 @@ public class OrderinfoService implements IOrderinfoService {
 		double weights=0.00;
 		int cancelCount=0;
 		try{
-			Map<String,String> inMap=dao.getInspetionMap(map);
+			Map<String,String> inMap=orderinfoMapper.getInspetionMap(map);
 			cancelCount=Integer.valueOf(map.get("cance_inventory_count"));
 			if(inMap != null){
 				old_itemqty=Integer.valueOf(String.valueOf(inMap.get("itemqty")));
@@ -712,11 +714,11 @@ public class OrderinfoService implements IOrderinfoService {
 				}
 				map.put("weight",String.valueOf(weights));
 				map.put("count",String.valueOf(count_));
-				dao.updateRelationTable(map);
+				orderinfoMapper.updateRelationTable(map);
 			}
-			row=dao.updateDetails(map);
+			row=orderinfoMapper.updateDetails(map);
 			//如果该商品验货是有录入库存则做想应的减少
-			Map<String,String> inventoryMap=dao.getInventoryMap(map);
+			Map<String,String> inventoryMap=orderinfoMapper.getInventoryMap(map);
 			if(inventoryMap != null){
 				String sku=String.valueOf(inventoryMap.get("car_type"));
 				String car_urlMD5=String.valueOf(inventoryMap.get("car_urlMD5"));
@@ -731,24 +733,24 @@ public class OrderinfoService implements IOrderinfoService {
 				map.put("goods_pid",goods_pid);
 				if(inventory_count>0){
 					//库存减少
-					Inventory in=dao.getInventoryInfo(map);
+					Inventory in=orderinfoMapper.getInventoryInfo(map);
 					if(in != null && in.getFlag()==1){
 						double amount=in.getNew_inventory_amount()-(inventory_count/Integer.valueOf(map.get("seiUnit")))*Double.valueOf(goods_p_price);
 						map.put("amount",String.valueOf(amount));
 						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getNew_remaining())-inventory_count<0?0:(Integer.valueOf(in.getNew_remaining())-inventory_count)));
 						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
-						dao.updateInventory(map);
+						orderinfoMapper.updateInventory(map);
 					}else if(in != null && in.getFlag()==0){
 						//未盘点
 						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getRemaining())-inventory_count<0?0:(Integer.valueOf(in.getRemaining())-inventory_count)));
 						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
 						double amount=in.getInventory_amount()-(inventory_count/Integer.valueOf(String.valueOf(map.get("seiUnit"))))*Double.valueOf(goods_p_price);
 						map.put("amount",String.valueOf(amount));
-						dao.updateInventoryFlag(map);
+						orderinfoMapper.updateInventoryFlag(map);
 					}
 				}
 				//删除验货时的记录storage_outbound_details
-				dao.updateUutboundDetails(map);
+				orderinfoMapper.updateUutboundDetails(map);
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -763,9 +765,9 @@ public class OrderinfoService implements IOrderinfoService {
 		try{
 			SendMQ sendMQ=new SendMQ();
 			Double weights=Double.parseDouble(map.get("weight"));
-			row=dao.updateChecked(map);
-			row=dao.updateSourceState(map);
-			Map<String,String> inMap=dao.getInspetionMap(map);
+			row=orderinfoMapper.updateChecked(map);
+			row=orderinfoMapper.updateSourceState(map);
+			Map<String,String> inMap=orderinfoMapper.getInspetionMap(map);
 			if(inMap != null){
 				remark = inMap.get("warehouse_remark") + map.get("warehouseRemark");
 				weights+=Double.parseDouble(String.valueOf(inMap.get("weight")));
@@ -774,35 +776,35 @@ public class OrderinfoService implements IOrderinfoService {
 			}
 			map.put("warehouseRemark",remark);
 			map.put("weight",String.valueOf(weights));
-			row=dao.updateRelationTable(map);
+			row=orderinfoMapper.updateRelationTable(map);
 			String orderid=String.valueOf(map.get("orderid"));
 			String goodsid=String.valueOf(map.get("goodid"));
 			//判断是否为dp订单
-			int isDropshipOrder=dao.queyIsDropshipOrder(map);
+			int isDropshipOrder=orderinfoMapper.queyIsDropshipOrder(map);
 			if (isDropshipOrder == 1) {
-				dao.updateOrderDetails(map);
+				orderinfoMapper.updateOrderDetails(map);
 				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
-				int counts=dao.getDtailsState(map);
+				int counts=orderinfoMapper.getDtailsState(map);
 				if(counts == 0){
-					dao.updateDropshiporder(map);
+					orderinfoMapper.updateDropshiporder(map);
 					sendMQ.sendMsg(new RunSqlModel("update dropshiporder set state=2 where child_order_no=(select dropshipid from order_details where orderid='"+orderid+"' " +
 							"and id='"+map.get("odid")+"')"));
 				}
 				//判断主单下所有的子单是否到库
-				counts=dao.getAllChildOrderState(map);
+				counts=orderinfoMapper.getAllChildOrderState(map);
 				if(counts == 0){
-					dao.updateOrderInfoState(map);
+					orderinfoMapper.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
 			}else{
 				// 非dropshi订单
-				dao.updateOrderDetails(map);
+				orderinfoMapper.updateOrderDetails(map);
 				sendMQ.sendMsg(new RunSqlModel("update order_details set state=1 where orderid='"+orderid+"' and id='"+map.get("odid")+"'"));
 				//判断订单是否全部到库
-				int counts=dao.getDetailsState(map);
+				int counts=orderinfoMapper.getDetailsState(map);
 				if(counts == 0){
 					System.err.println("orderNo:" + orderid + ",验货无误");
-					dao.updateOrderInfoState(map);
+					orderinfoMapper.updateOrderInfoState(map);
 					sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=2 where order_no='"+orderid+"'"));
 				}
 			}
@@ -815,14 +817,14 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public List<com.cbt.pojo.Admuser> getAllBuyer() {
-		return dao.getAllBuyer();
+		return orderinfoMapper.getAllBuyer();
 	}
 
 	@Override
 	public List<OrderDetailsBean> getChildrenOrdersDetails(String orderNo) {
 		Map<String, ArrayList<Object[]>> changInfo = new HashMap<String, ArrayList<Object[]>>();
-		List<OrderChange> ocList=dao.getOrderChange(orderNo);
-		List<OrderDetailsBean> list=dao.getChildrenOrdersDetails(orderNo);
+		List<OrderChange> ocList=orderinfoMapper.getOrderChange(orderNo);
+		List<OrderDetailsBean> list=orderinfoMapper.getChildrenOrdersDetails(orderNo);
 		for(OrderDetailsBean odb:list){
 			String weitht1688 = Utility.getStringIsNull(odb.getCbrWeight()) ?odb.getCbrWeight() : "0";
 			String price1688 = Utility.getStringIsNull(odb.getCbrPrice()) ? odb.getCbrPrice() : "0";
@@ -932,12 +934,12 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public String getAllFreightByOrderid(String orderNo) {
-		return dao.getAllFreightByOrderid(orderNo);
+		return orderinfoMapper.getAllFreightByOrderid(orderNo);
 	}
 
 	@Override
 	public OrderBean getChildrenOrders(String orderNo) {
-		OrderBean ob=dao.getChildrenOrders(orderNo);
+		OrderBean ob=orderinfoMapper.getChildrenOrders(orderNo);
 		if(ob != null){
 			String dzconfirmtime = ob.getDzConfirmtime();
 			ob.setDzConfirmtime(Utility.getStringIsNull(dzconfirmtime)? dzconfirmtime.substring(0, dzconfirmtime.indexOf(" ")) : "");
@@ -967,7 +969,7 @@ public class OrderinfoService implements IOrderinfoService {
 	public List<Map<String, String>> getOrderManagementQuery(Map<String,String> paramMap) {
 		long start=System.currentTimeMillis();
 		UserDao udao = new UserDaoImpl();
-		List<Map<String, String>> list=dao.getOrderManagementQuery(paramMap);
+		List<Map<String, String>> list=orderinfoMapper.getOrderManagementQuery(paramMap);
 		long start2=System.currentTimeMillis();
 		for(Map<String, String> map:list){
 			String paytype=map.get("paytypes");
@@ -1055,14 +1057,14 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public List<ShippingBean> getShipPackmentInfo(String orderNo) {
-		List<ShippingBean> sb=dao.getShipPackmentInfo(orderNo);
+		List<ShippingBean> sb=orderinfoMapper.getShipPackmentInfo(orderNo);
 		return sb;
 	}
 
 	@Override
 	public Double getEstimatefreight(String orderNo) {
 		double estimatefreight=0.00;
-		Object o=dao.getEstimatefreight(orderNo);
+		Object o=orderinfoMapper.getEstimatefreight(orderNo);
 		if(o != null){
 			estimatefreight=(Double)o;
 		}
@@ -1071,12 +1073,12 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public double getAllWeight(String orderNo) {
-		return dao.getAllWeight(orderNo);
+		return orderinfoMapper.getAllWeight(orderNo);
 	}
 
 	@Override
 	public String getFileByOrderid(String orderNo) {
-		return dao.getFileByOrderid(orderNo);
+		return orderinfoMapper.getFileByOrderid(orderNo);
 	}
 
 	@Override
@@ -1084,7 +1086,7 @@ public class OrderinfoService implements IOrderinfoService {
 		int row=0;
 		try{
 			SendMQ sendMQ=new SendMQ();
-			row=dao.cancelOrder(orderid);
+			row=orderinfoMapper.cancelOrder(orderid);
 			sendMQ.sendMsg(new RunSqlModel("update orderinfo set state=-1 where order_no='"+orderid+"'"));
 			sendMQ.closeConn();
 		}catch (Exception e){
@@ -1098,7 +1100,7 @@ public class OrderinfoService implements IOrderinfoService {
 		int row=0;
 		try{
 			SendMQ sendMQ=new SendMQ();
-			row=dao.cancelPayment(pid);
+			row=orderinfoMapper.cancelPayment(pid);
 			sendMQ.sendMsg(new RunSqlModel("update payment set paystatus=0  where id='"+pid+"'"));
 			sendMQ.closeConn();
 		}catch (Exception e){
@@ -1110,8 +1112,8 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public List<AutoOrderBean> getOrderList(String orderid, String userid, String page) {
 		List<AutoOrderBean> list = new ArrayList<AutoOrderBean>();
-		List<AutoOrderBean> dataList=dao.getOrderList(orderid,userid,page);
-		int count=dao.getCounts();
+		List<AutoOrderBean> dataList=orderinfoMapper.getOrderList(orderid,userid,page);
+		int count=orderinfoMapper.getCounts();
 		for(AutoOrderBean a:dataList){
 			AutoOrderBean bean = new AutoOrderBean();
 			bean.setCurrency(a.getCurrency());
@@ -1153,20 +1155,20 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public TabTransitFreightinfoUniteOur getFreightInfo(String countryNameCn, int isEub) {
-		TabTransitFreightinfoUniteOur tf=dao.getFreightInfo(countryNameCn,isEub);
+		TabTransitFreightinfoUniteOur tf=orderinfoMapper.getFreightInfo(countryNameCn,isEub);
 		return tf;
 	}
 
 	@Override
 	public int updateFreight(String orderNo, String freight) {
-		return dao.updateFreight(orderNo,freight);
+		return orderinfoMapper.updateFreight(orderNo,freight);
 	}
 
 	@Override
 	public double getFreightFee(String allFreight,OrderBean orderInfo) {
 		double esFreight=0.00;
 		String modeTransport =orderInfo.getMode_transport();
-		//dao.getModeTransport(orderInfo.getOrderNo());
+		//orderinfoMapper.getModeTransport(orderInfo.getOrderNo());
 		if(StringUtil.isBlank(modeTransport)){
 			return 0.00;
 		}
@@ -1181,7 +1183,7 @@ public class OrderinfoService implements IOrderinfoService {
 		double weight1=0.00;
 		//普通商品
 		double weight2=0.00;
-		List<OrderDetailsBean> odList=dao.getCatidDetails(orderInfo.getOrderNo());
+		List<OrderDetailsBean> odList=orderinfoMapper.getCatidDetails(orderInfo.getOrderNo());
 		for(OrderDetailsBean odd:odList){
 			String catid=odd.getGoodscatid();
 			double odWeight=odd.getOd_total_weight();
@@ -1207,7 +1209,7 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public int updateFreightForOrder(String orderNo, String freight,String esprice) {
-		return dao.updateFreightForOrder(orderNo,freight,esprice);
+		return orderinfoMapper.updateFreightForOrder(orderNo,freight,esprice);
 	}
 
 	public double getOrderShippingCost(double weight ,int countryid,String shippingMethod,boolean isSpecialCatid){
@@ -1231,13 +1233,13 @@ public class OrderinfoService implements IOrderinfoService {
 		TabTransitFreightinfoUniteNewExample.Criteria criteria = example.createCriteria();
 		criteria.andCountryidEqualTo(countryid);
 		criteria.andTransportModeEqualTo(shippingMethod);
-		List<TabTransitFreightinfoUniteNew> list = dao.selectByExample(example);
+		List<TabTransitFreightinfoUniteNew> list = orderinfoMapper.selectByExample(example);
 		if(list.size()<=0){
 			TabTransitFreightinfoUniteNewExample example1 = new TabTransitFreightinfoUniteNewExample();
 			TabTransitFreightinfoUniteNewExample.Criteria criteria1 = example1.createCriteria();
 			criteria1.andCountryidEqualTo(29);
 			criteria1.andTransportModeEqualTo(shippingMethod);
-			list = dao.selectByExample(example1);
+			list = orderinfoMapper.selectByExample(example1);
 		}
 		BigDecimal sumFreight = new BigDecimal(0);
 		TransitPricecost transitPricecost = new TransitPricecost();
@@ -1311,16 +1313,16 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public List<Admuser> getBuyerAndAll() {
-		return dao.getBuyerAndAll();
+		return orderinfoMapper.getBuyerAndAll();
 	}
 
 	@Override
 	public OrderBean getOrders(String orderNo) {
-		OrderBean ob=dao.getOrder(orderNo);
+		OrderBean ob=orderinfoMapper.getOrder(orderNo);
 		if(ob != null){
 			if (ob.getIsDropshipOrder() == 1) {
 				//dropship订单
-				String dropShipList = dao.getDropshipOrderNoList(orderNo);
+				String dropShipList = orderinfoMapper.getDropshipOrderNoList(orderNo);
 				ob.setDropShipList(dropShipList);
 			}
 			String couponAmount=ob.getCouponAmount();
@@ -1420,7 +1422,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public Forwarder getForwarder(String orderNo) {
 		String newOrderNo = orderNo + ",";
-		Forwarder forword=dao.getForwarder(newOrderNo);
+		Forwarder forword=orderinfoMapper.getForwarder(newOrderNo);
 		String expressno = "";
 		String logistics_name = "";
 		if(forword !=null){
@@ -1436,7 +1438,7 @@ public class OrderinfoService implements IOrderinfoService {
 			forword.setIsneed(0);
 		}
 		if (forword == null) {
-			forword=dao.getForwarder(orderNo);
+			forword=orderinfoMapper.getForwarder(orderNo);
 			if(forword !=null){
 				expressno=forword.getExpress_no();
 				logistics_name=forword.getLogistics_name();
@@ -1460,38 +1462,38 @@ public class OrderinfoService implements IOrderinfoService {
 			flag=1;
 			orderNo = orderNo.substring(0, orderNo.length() - 1);
 		}
-		return dao.getOrdersPays(orderNo,flag);
+		return orderinfoMapper.getOrdersPays(orderNo,flag);
 	}
 
 	@Override
 	public List<CodeMaster> getLogisticsInfo() {
-		return dao.getLogisticsInfo();
+		return orderinfoMapper.getLogisticsInfo();
 	}
 
 	@Override
 	public List<String> getOrderNos(int userId,String orderNo) {
-		return dao.getOrderNos(userId,orderNo);
+		return orderinfoMapper.getOrderNos(userId,orderNo);
 	}
 
 	@Override
 	public List<String> getSameAdrDifAccount(int userId, String address, String street, String zipCode,String country, String city, String recipients) {
-		return dao.getSameAdrDifAccount(userId,address,street,zipCode,country,city,recipients);
+		return orderinfoMapper.getSameAdrDifAccount(userId,address,street,zipCode,country,city,recipients);
 	}
 	
 	
 	@Override
 	public double getAcPayPrice(String orderNo) {
-		return dao.getAcPayPrice(orderNo);
+		return orderinfoMapper.getAcPayPrice(orderNo);
 	}
 
 	@Override
 	public String getModeTransport(String orderNo) {
-		return dao.getModeTransport(orderNo);
+		return orderinfoMapper.getModeTransport(orderNo);
 	}
 
 	@Override
 	public List<EmailReceive1> getall(String orderNo) {
-		List<EmailReceive1> list=dao.getall(orderNo);
+		List<EmailReceive1> list=orderinfoMapper.getall(orderNo);
 		for(EmailReceive1 email:list){
 			String content=email.getContent();
 			try{
@@ -1517,20 +1519,20 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public Evaluate getEvaluate(String orderNo) {
-		return dao.getEvaluate(orderNo);
+		return orderinfoMapper.getEvaluate(orderNo);
 	}
 
 	@Override
 	public TaoBaoOrderInfo getShipStatusInfo(String tb1688Itemid, String lastTb1688Itemid, String confirmTime, String admName, String shipno, int offlinePurchase, String orderId, int goodsId) {
 		TaoBaoOrderInfo t=new TaoBaoOrderInfo();
 		if(offlinePurchase == 1){
-			t=dao.getShipStatusInfoFor(tb1688Itemid,lastTb1688Itemid,confirmTime,admName,shipno,offlinePurchase,orderId,goodsId);
+			t=orderinfoMapper.getShipStatusInfoFor(tb1688Itemid,lastTb1688Itemid,confirmTime,admName,shipno,offlinePurchase,orderId,goodsId);
 		}else{
-			t=dao.getOrderReplenishment(tb1688Itemid,lastTb1688Itemid,confirmTime,admName,shipno,offlinePurchase,orderId,goodsId);
+			t=orderinfoMapper.getOrderReplenishment(tb1688Itemid,lastTb1688Itemid,confirmTime,admName,shipno,offlinePurchase,orderId,goodsId);
 			if(t!=null){
-				t=dao.getShipStatusInfo(t.getTb_1688_itemid(),t.getCreatetime(),admName);
+				t=orderinfoMapper.getShipStatusInfo(t.getTb_1688_itemid(),t.getCreatetime(),admName);
 			}else{
-				t=dao.getShipStatusInfos(tb1688Itemid,lastTb1688Itemid,confirmTime,admName);
+				t=orderinfoMapper.getShipStatusInfos(tb1688Itemid,lastTb1688Itemid,confirmTime,admName);
 			}
 		}
 		if(t != null){
@@ -1542,24 +1544,24 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public String queryBuyCount(int admuserId) {
-		return dao.queryBuyCount(admuserId);
+		return orderinfoMapper.queryBuyCount(admuserId);
 	}
 
 	@Override
 	public List<String> getOrderIdList() {
-		return dao.getOrderIdList();
+		return orderinfoMapper.getOrderIdList();
 	}
 
 	@Override
 	public int updateGoodsCarMessage(String orderNo) {
-		return dao.updateGoodsCarMessage(orderNo);
+		return orderinfoMapper.updateGoodsCarMessage(orderNo);
 	}
 
 	@Override
 	public List<OrderDetailsBean> getOrdersDetails(String orderNo) {
 		DecimalFormat df = new DecimalFormat("######0.00");
 		Map<String, ArrayList<Object[]>> changInfo = new HashMap<String, ArrayList<Object[]>>();
-		List<OrderChange> ocList=dao.getOrderChange(orderNo);
+		List<OrderChange> ocList=orderinfoMapper.getOrderChange(orderNo);
 		for(OrderChange oc:ocList){
 			String values =oc.getNewValue();
 			String oldValue =oc.getOldValue();
@@ -1576,7 +1578,7 @@ public class OrderinfoService implements IOrderinfoService {
 				changInfo.get("order" + oc.getGoodId()).add(new Object[]{oc.getRopType(), oc.getDel_state(), values});
 			}
 		}
-		List<OrderDetailsBean> list=dao.getOrdersDetails(orderNo);
+		List<OrderDetailsBean> list=orderinfoMapper.getOrdersDetails(orderNo);
 		for(OrderDetailsBean odb:list){
 			String aliLink = "";
 			String alipid = Utility.getStringIsNull(odb.getAlipid()) ?odb.getAlipid() : "0";
@@ -1727,30 +1729,30 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public String getUserEmailByOrderNo(String orderNo) {
-		return dao.getUserEmailByOrderNo(orderNo);
+		return orderinfoMapper.getUserEmailByOrderNo(orderNo);
 	}
 
 	@Override
 	public int updateOrderinfoUpdateState(String orderNo) {
-		return dao.updateOrderinfoUpdateState(orderNo);
+		return orderinfoMapper.updateOrderinfoUpdateState(orderNo);
 	}
 
 	@Override
 	public int checkRecord(String orderNo) {
-		return dao.checkRecord(orderNo);
+		return orderinfoMapper.checkRecord(orderNo);
 	}
 
 	@Override
 	public int insertEmailRecord(String orderNo) {
-		return dao.insertEmailRecord(orderNo);
+		return orderinfoMapper.insertEmailRecord(orderNo);
 	}
 
 	@Override
 	public List<Map<String, String>> getorderPending(int admuserid) {
 		List<Map<String, String>> list=new ArrayList<Map<String, String>>();
-		List<String> orderIds=dao.getOrderIds(admuserid);
+		List<String> orderIds=orderinfoMapper.getOrderIds(admuserid);
 		if(orderIds != null && !orderIds.isEmpty()){
-			list=dao.getorderPending(orderIds);
+			list=orderinfoMapper.getorderPending(orderIds);
 			orderIds.clear();
 			for(Map<String, String> map:list){
 				int count=this.pruchaseMapper.FindCountByEmial(map.get("email"));
@@ -1758,7 +1760,7 @@ public class OrderinfoService implements IOrderinfoService {
 				String tp="支付错误";
 				String paystatus="";
 				String orderNo=map.get("order_no");
-				Payment p=dao.getPayTypeForOrderNo(orderNo);
+				Payment p=orderinfoMapper.getPayTypeForOrderNo(orderNo);
 				if(p!=null && StringUtil.isNotBlank(p.getPaytype())){
 					String paytype=p.getPaytype();
 					if(StringUtil.isNotBlank(paytype) && paytype.indexOf(",")>-1){
@@ -1790,18 +1792,18 @@ public class OrderinfoService implements IOrderinfoService {
 	public List<Map<String, String>> getOrders1(int userID, int state,
 	                                            Date startdate, Date enddate, String email, String orderno,
 	                                            int startpage, int page, int admuserid, int buyid, int showUnpaid,String type,int status) {
-		return dao.getOrders1(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
+		return orderinfoMapper.getOrders1(userID, state, startdate, enddate, email, orderno, (startpage-1)*40, 40, admuserid, buyid, showUnpaid,type,status);
 	}
 	@Override
 	public int getOrdersCount(Map<String,String> paramMap) {
 		paramMap.put("startdate_req","0".equals(paramMap.get("startdate_req"))?null:paramMap.get("startdate_req"));
 		paramMap.put("enddate_req","0".equals(paramMap.get("enddate_req"))?null:paramMap.get("enddate_req"));
-		return dao.getOrdersCount(paramMap);
+		return orderinfoMapper.getOrdersCount(paramMap);
 	}
 
 	@Override
 	public List<Map<String, Integer>> getOrdersState(int admuserid) {
-		List<Map<String, Integer>> result = dao.getOrdersState(admuserid);
+		List<Map<String, Integer>> result = orderinfoMapper.getOrdersState(admuserid);
 		//国际物流预警中预警条数
 		Calendar ca = Calendar.getInstance();
 		ca.add(Calendar.DATE, - 90);
@@ -1816,8 +1818,8 @@ public class OrderinfoService implements IOrderinfoService {
 		cywMap.put("counts", waring0);
 		result.add(cywMap);
 		// 支付失败的订单
-		List<String> orderNoList = dao.getOrderIds(admuserid);
-        List<Map<String, String>> list = dao.getorderPending(orderNoList);
+		List<String> orderNoList = orderinfoMapper.getOrderIds(admuserid);
+        List<Map<String, String>> list = orderinfoMapper.getorderPending(orderNoList);
         orderNoList.clear();
         for (Map<String, Integer> bean : result) {
             if ("order_pending".equals(bean.get("state"))) {
@@ -1831,16 +1833,16 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Override
 	public List<ConfirmUserInfo> getAllSalesAndBuyer() {
-		return dao.getAllSalesAndBuyer();
+		return orderinfoMapper.getAllSalesAndBuyer();
 	}
 
 	@Override
 	public int queryUserIdByOrderNo(String orderNo) {
-		return dao.queryUserIdByOrderNo(orderNo);
+		return orderinfoMapper.queryUserIdByOrderNo(orderNo);
 	}
 	@Override
 	public List<Orderinfo> getAllOrderShippingMehtodIsNull() {
-		return dao.getAllOrderShippingMehtodIsNull();
+		return orderinfoMapper.getAllOrderShippingMehtodIsNull();
 	}
 
 	@Override
@@ -1864,7 +1866,7 @@ public class OrderinfoService implements IOrderinfoService {
 	}
 	@Override
 	public  int updateOrderinfomodeTransport(String modeTransport,String orderNo){
-		return dao.updateOrderinfomodeTransport(modeTransport,orderNo);
+		return orderinfoMapper.updateOrderinfomodeTransport(modeTransport,orderNo);
 	}
 
 	@Override
@@ -1872,9 +1874,9 @@ public class OrderinfoService implements IOrderinfoService {
 
 		int b= 0;
 		try {
-			b = this.dao.UpdateGoodsState(goods_pid);
+			b = this.orderinfoMapper.UpdateGoodsState(goods_pid);
 			if (b==0){
-            b=this.dao.InserGoodsState(goods_pid);
+            b=this.orderinfoMapper.InserGoodsState(goods_pid);
             }
 			return b>0?true:false;
 		} catch (Exception e) {
@@ -1887,7 +1889,7 @@ public class OrderinfoService implements IOrderinfoService {
 	@Override
 	public Boolean UpdateAllGoodsState(String tbOrderId) {
 		try {
-			List<String>list =this.dao.FindAllGoodsPid(tbOrderId);
+			List<String>list =this.orderinfoMapper.FindAllGoodsPid(tbOrderId);
 			boolean b = false;
 			for (String goods_pid:list){
                 b=this.UpdateGoodsState(goods_pid);
@@ -1901,11 +1903,26 @@ public class OrderinfoService implements IOrderinfoService {
 
     @Override
     public boolean getSampleschoice(String orderNo) {
-	    String sampleschoice = this.dao.getSampleschoice(orderNo);
+	    String sampleschoice = this.orderinfoMapper.getSampleschoice(orderNo);
 	    if ("1".equals(sampleschoice)) {
 	        return true;
         }
         return false;
+    }
+
+	@Override
+	public int insertIntoOrderSplitNumLog(List<SplitGoodsNumBean> splitGoodsNumBeanList) {
+		return orderinfoMapper.insertIntoOrderSplitNumLog(splitGoodsNumBeanList);
+	}
+
+    @Override
+    public List<GoodsDistribution> queryGoodsDistributionByOrderNo(String orderNo) {
+        return orderinfoMapper.queryGoodsDistributionByOrderNo(orderNo);
+    }
+
+    @Override
+    public int batchUpdateDistribution(List<GoodsDistribution> goodsDistributionList) {
+        return orderinfoMapper.batchUpdateDistribution(goodsDistributionList);
     }
 }
 

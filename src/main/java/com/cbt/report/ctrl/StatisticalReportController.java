@@ -15,18 +15,17 @@ import com.cbt.processes.servlet.Currency;
 import com.cbt.report.service.*;
 import com.cbt.report.vo.NoAvailableRate;
 import com.cbt.report.vo.StatisticalReportVo;
-import com.cbt.util.Redis;
-import com.cbt.util.SerializeUtil;
-import com.cbt.util.Util;
-import com.cbt.util.Utility;
+import com.cbt.util.*;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
 import com.cbt.warehouse.pojo.Tb1688Account;
 import com.cbt.warehouse.service.IWarehouseService;
+import com.cbt.warehouse.util.ExcelUtil;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.AliPayInfo;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONArray;
@@ -35,22 +34,24 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -4606,6 +4607,52 @@ public class StatisticalReportController {
 		}
 
 	}
+
+
+	@RequestMapping(value = "/uploadExcelFile")
+	@ResponseBody
+	protected JsonResult uploadExcelFile(@RequestParam(value = "file", required = false) MultipartFile file,
+                                      HttpServletRequest request){
+		JsonResult json = new JsonResult();
+		try{
+			String uploadPath = SysParamUtil.getParam("uploadPath");
+			LocalDate today = LocalDate.now();
+			int year = today.getYear();
+			int month = today.getMonthValue();
+			String fileSplit ;
+			if(month < 10){
+				fileSplit = String.valueOf(year) + "0" + String.valueOf(month);
+			}else{
+				fileSplit = String.valueOf(year) + String.valueOf(month);
+			}
+			Long time = System.currentTimeMillis();
+			String path = uploadPath + "aliPay/" + fileSplit + "/";
+			File pathFile = new File(path);
+			if(!pathFile.exists()){
+				pathFile.mkdirs();
+			}
+			String orFileName = file.getOriginalFilename();
+			String fileAllPath = path + time + orFileName.substring(orFileName.lastIndexOf("."));
+			FileCopyUtils.copy(file.getBytes(), new FileOutputStream(fileAllPath));
+            List<AliPayInfo> infoList = ExcelUtil.getAliPayInfoByExcel(fileAllPath);
+            if(infoList == null || infoList.isEmpty()){
+
+            	json.setOk(false);
+				json.setMessage("获取数据失败");
+			}else{
+            	reportInfoService.insertAliPayInfo(infoList);
+				infoList.clear();
+				json.setOk(true);
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			json.setOk(false);
+			json.setMessage("上传失败：" + e.getMessage());
+		}
+		return json;
+	}
+
+
 
 	private void genResult(List<NoAvailableRate> rsList, Date beginDate, Date endDate, int calendarType,
 	                       int queryType) {

@@ -88,8 +88,33 @@
 </head>
 <script type="text/javascript">
     $(function(){
-		$("#buyer").val(9);
+		//$("#buyer").val(9);
+		getAdminList();
     })
+	function getAdminList() {
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/singleGoods/getAdminList",
+                data: {},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#buyer").empty();
+                        //var content = '<option value="0" selected="selected">全部</option>';
+						var content = '';
+                        var json = data.data;
+                        for (var i = 0; i < json.length; i++) {
+                            content += '<option value="' + json[i].id + '" ">' + json[i].confirmusername + '</option>';
+                        }
+                        $("#buyer").append(content);
+                    } else {
+                        console.log("获取用户列表失败，原因 :" + data.message);
+                    }
+                },
+                error: function (res) {
+                    console.log("网络获取失败");
+                }
+            });
+        }
 </script>
 <body text="#000000">
 <div id="operatediv" class="loading" style="display: none;"></div>
