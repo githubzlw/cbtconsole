@@ -500,4 +500,14 @@
       #{transactionNo},#{tradeMark},#{discounts},#{refundAmount},#{serviceFee},#{paymentChannel})
   </insert>
 
+  <insert id="insertAliBillingDetails" parameterType="java.util.ArrayList">
+    insert into ali_billing_details(bill_time,transaction_no,serial_no,order_no,pay_type,income,expend,balance,
+    service_fee,payment_channel,merchant_account,merchant_name,goods_name,remark,account_type)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.billTime},#{item.transactionNo},#{item.serialNo},#{item.orderNo},#{item.payType},#{item.income},#{item.expend},#{item.balance},
+      #{item.serviceFee},#{item.paymentChannel},#{item.merchantAccount},#{item.merchantName},#{item.goodsName},#{item.remark},#{item.accountType})
+    </foreach>
+  </insert>
+
 </mapper>
