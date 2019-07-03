@@ -21,6 +21,9 @@
             max-height: 160px;
             max-width: 160px;
         }
+        .div_sty{
+            float: left;
+        }
     </style>
     <script type="text/javascript">
 

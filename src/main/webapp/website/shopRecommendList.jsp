@@ -147,7 +147,8 @@
         }
 
         function openShopGoods(shopId) {
-
+            var param = "height=688,width=1080,top=20,left=150,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            window.open("/cbtconsole/shopRecommend/queryGoodsListByShopId?shopId=" + shopId, "windows", param);
         }
     </script>
 </head>

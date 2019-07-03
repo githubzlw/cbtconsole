@@ -215,7 +215,7 @@ public class ShopRecommendController {
 
     @RequestMapping("/queryGoodsListByShopId")
     public ModelAndView queryGoodsListByShopId(HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView("shopGoodsList");
+        ModelAndView mv = new ModelAndView("shopRecommendGoods");
         try {
             if (UserInfoUtils.checkIsLogin(request)) {
                 String shopId = request.getParameter("shopId");
