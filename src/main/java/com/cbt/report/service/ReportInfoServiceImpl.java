@@ -6,6 +6,7 @@ import com.cbt.pojo.ReportInfoExample;
 import com.cbt.pojo.StatisticalReportPojo;
 import com.cbt.report.dao.ReportInfoMapper;
 import com.cbt.report.vo.StatisticalReportVo;
+import com.importExpress.pojo.AliBillingDetails;
 import com.importExpress.pojo.AliPayInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,5 +101,10 @@ public class ReportInfoServiceImpl implements ReportInfoService{
 	@Override
 	public int insertAliPayInfoSingle(AliPayInfo aliPayInfo) {
 		return reportInfoDao.insertAliPayInfoSingle(aliPayInfo);
+	}
+
+	@Override
+	public int insertAliBillingDetails(List<AliBillingDetails> detailsList) {
+		return reportInfoDao.insertAliBillingDetails(detailsList);
 	}
 }

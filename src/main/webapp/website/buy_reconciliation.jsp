@@ -272,6 +272,7 @@ function doReset(){
                     var data = eval('(' + data + ')');
                     if (data.ok) {
                         closeDialogById('#excel_dlg');
+                        $("#multiFileForm")[0].reset();
                         $.messager.alert("提醒", "执行成功，请刷新界面", "info");
                     } else {
                         $.messager.alert("提醒", data.message, "error");
@@ -303,6 +304,14 @@ function doReset(){
 <div id="excel_dlg" class="easyui-dialog" title="上传Excel文件" data-options="modal:true" style="width: 380px; height: 220px; padding: 10px;">
         <form style="margin-left: 44px;" id="multiFileForm" method="post" enctype="multipart/form-data">
             <input id="file" type="file" name="file" multiple="false">
+			<br>
+			<span>类型:<select style="height: 28px;" name="type">
+				<%--<option value="4">支付宝买入交易</option>--%>
+				<option value="0">账务明细(service@import-express.com)</option>
+				<option value="1">账务明细(cerong6@qq.com)</option>
+				<option value="2">账务明细(lingzheng@import-express.com)</option>
+			</select></span>
+
         </form>
         <br>
         <div style="text-align: center; padding: 5px 0">
