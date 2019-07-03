@@ -306,9 +306,10 @@ function doReset(){
             <input id="file" type="file" name="file" multiple="false">
 			<br>
 			<span>类型:<select style="height: 28px;" name="type">
-				<%--<option value="0">支付宝买入交易</option>--%>
-				<option value="1">账务明细(service@import-express.com)</option>
-				<option value="2">账务明细(cerong6@qq.com)</option>
+				<%--<option value="4">支付宝买入交易</option>--%>
+				<option value="0">账务明细(service@import-express.com)</option>
+				<option value="1">账务明细(cerong6@qq.com)</option>
+				<option value="2">账务明细(lingzheng@import-express.com)</option>
 			</select></span>
 
         </form>

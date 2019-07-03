@@ -4657,7 +4657,7 @@ public class StatisticalReportController {
             String orFileName = file.getOriginalFilename();
             String fileAllPath = path + time + orFileName.substring(orFileName.lastIndexOf("."));
             FileCopyUtils.copy(file.getBytes(), new FileOutputStream(fileAllPath));
-            if ("0".equals(type)) {
+            if ("4".equals(type)) {
                 List<AliPayInfo> infoList = ExcelUtil.getAliPayInfoByExcel(fileAllPath);
                 if (infoList == null || infoList.isEmpty()) {
 
@@ -4668,15 +4668,13 @@ public class StatisticalReportController {
                     infoList.clear();
                     json.setOk(true);
                 }
-            } else if ("1".equals(type) || "2".equals(type) ) {
+            } else if ("0".equals(type) || "1".equals(type) || "2".equals(type) ) {
                 List<AliBillingDetails> detailList = ExcelUtil.getAliBillingDetailsByExcel(fileAllPath);
                 if (detailList == null || detailList.isEmpty()) {
                     json.setOk(false);
                     json.setMessage("获取数据失败");
                 } else {
-                    if ("2".equals(type)) {
-                        detailList.stream().forEach(e -> e.setAccountType(1));
-                    }
+                    detailList.stream().forEach(e -> e.setAccountType(Integer.valueOf(type)));
                     reportInfoService.insertAliBillingDetails(detailList);
                     detailList.clear();
                     json.setOk(true);
