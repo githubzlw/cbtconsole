@@ -583,7 +583,7 @@
 		FROM taobao_1688_order_history t 
 		INNER JOIN id_relationtable ir ON t.orderid=ir.tborderid 
 		INNER JOIN orderinfo oi ON ir.orderid=oi.order_no 
-		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
+		WHERE t.orderstatus<![CDATA[<>]]>'交易关闭' and t.orderstatus<![CDATA[<>]]>'交易取消' and t.username !='策融by5' AND LOCATE('退款',t.orderstatus)<![CDATA[<]]>1 AND t.paydata>=#{startTime}
 		<if test="endTime!=null">
 		and t.paydata<![CDATA[<=]]>#{endTime}
 		</if>
@@ -609,8 +609,8 @@
           select distinct t.orderid,t.totalPrice,t.paydata from taobao_1688_order_history t
           left join order_product_source ops on t.itemid=ops.tb_1688_itemid
           left join order_replenishment orp on t.itemid=orp.tb_1688_itemid
-          where t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 and
-           t.tbOr1688 between 0 and 3 and ops.id is null and orp.id is null
+          where t.orderstatus&lt;>'交易关闭' and t.orderstatus&lt;>'交易取消' AND LOCATE('退款',t.orderstatus)&lt;1 and t.username !='策融by5'
+          and t.tbOr1688 between 0 and 3 and ops.id is null and orp.id is null
           and t.paydata>=#{startTime}
           <if test="endTime!=null">
               and t.paydata&lt;=#{endTime}
@@ -1592,9 +1592,9 @@
         INNER JOIN USER u ON oi.user_id=u.id
         INNER JOIN user_grade ug ON u.grade=ug.id
         left join order_warning ow on oi.order_no=ow.orderNo
-        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND LEFT(oi.order_no,16)
+        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND oi.order_no
         IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE
-        is_test = 0) AND payment.paystatus=1 AND (LENGTH(orderid)=16 or LENGTH(orderid)=10) GROUP BY orderid) cur_payment
+        is_test = 0) AND payment.paystatus=1 and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
         <if test="userId != null">
             and oi.user_id=#{userId}
@@ -1609,9 +1609,9 @@
         INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no
         INNER JOIN shipment s ON sp.expressno=s.orderNo
         WHERE oi.state IN (1,2,3,4,5)
-        AND LEFT(oi.order_no,16)
+        AND oi.order_no
         IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE 
-        is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        is_test = 0) AND payment.paystatus=1 and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE  DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
         GROUP BY  sp.expressno
         ) a  GROUP BY a.user_id
@@ -1639,9 +1639,9 @@
         FROM orderinfo oi
         INNER JOIN USER u ON oi.user_id=u.id
         INNER JOIN user_grade ug ON u.grade=ug.id
-        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND LEFT(oi.order_no,16)
+        WHERE 1=1 AND oi.state BETWEEN 1 AND 5 AND oi.order_no
         IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid 
-        IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1  and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
         <if test="userId != null">
             and oi.user_id=#{userId}
@@ -1655,8 +1655,9 @@
         INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no
         INNER JOIN shipment s ON sp.expressno=s.orderNo
         WHERE oi.state IN (1,2,3,4,5)
-        AND LEFT(oi.order_no,16)
-        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        AND oi.order_no
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid
+        IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE  DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
         GROUP BY  sp.expressno
         ) a  GROUP BY a.user_id
@@ -1669,8 +1670,9 @@
         FROM orderinfo oi
         INNER JOIN USER u ON oi.user_id=u.id
         INNER JOIN user_grade ug ON u.grade=ug.id
-        WHERE 1=1 AND oi.state between 1 and 5 AND LEFT(oi.order_no,16)
-        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        WHERE 1=1 AND oi.state between 1 and 5 AND oi.order_no
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE
+        userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE DATE(createtime) >= DATE(#{startTime}) AND DATE(createtime) &lt;= DATE(#{endTime}))
         <if test="userId != null">
             and oi.user_id=#{userId}
@@ -1679,9 +1681,10 @@
     </select>
     <select id="getAllOrderNo" resultType="java.util.Map">
         SELECT oi.order_no,oi.extra_freight,oi.product_cost,oi.mode_transport,if(oi.exchange_rate&lt;=0,6.3,oi.exchange_rate) as exchange_rate FROM orderinfo oi WHERE user_id=#{userId} AND
-        oi.state between 1 and 5 AND LEFT(oi.order_no,16)
+        oi.state between 1 and 5 AND oi.order_no
         IN(
-        SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE
+        userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 and locate('_',payment.orderid)=0   GROUP BY orderid) cur_payment
         WHERE DATE(createtime) >= DATE(#{s_time}) AND DATE(createtime) &lt;= DATE(#{e_time})
         )
     </select>
@@ -1692,8 +1695,9 @@
         INNER JOIN orderinfo oi ON  sp.orderid=oi.order_no OR (LOCATE(CONCAT(oi.order_no,','),sp.remarks)>0 AND sp.orderid!=oi.order_no)
         inner join shipment s on sp.expressno=s.orderNo
         WHERE oi.state IN (1,2,3,4,5) AND oi.user_id=#{userId}
-        AND LEFT(oi.order_no,16)
-        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1 AND LENGTH(orderid)=16 GROUP BY orderid) cur_payment
+        AND oi.order_no
+        IN(SELECT orderid FROM (SELECT orderid,MIN(payment.createtime) AS createtime FROM payment WHERE
+        userid IN(SELECT id FROM USER WHERE is_test = 0) AND payment.paystatus=1  and locate('_',payment.orderid)=0  GROUP BY orderid) cur_payment
         WHERE DATE(createtime) >= DATE(#{s_time}) AND DATE(createtime) &lt;= DATE(#{e_time}))
         GROUP BY  sp.expressno) a
     </select>
