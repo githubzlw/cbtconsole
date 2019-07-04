@@ -123,7 +123,10 @@
                     success: function (data) {
                         $("#show_message").hide();
                         if (data.ok) {
-                            window.location.reload();
+                            $.messager.alert("提醒", "执行成功，即将刷新", "info");
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1500);
                         } else {
                             $.messager.alert("提醒", data.message, "error");
                         }

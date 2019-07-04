@@ -53,6 +53,13 @@ public class ShopRecommendController {
                     shopRecommendInfo.setGoodsList(showList);
                     goodsList.clear();
                 }
+                list.sort((o1, o2) -> {
+                    if (o1.getIsOn().equals(o2.getIsOn())) {
+                        return o1.getSort() - o2.getSort();
+                    } else {
+                        return o2.getIsOn() - o1.getIsOn();
+                    }
+                });
                 mv.addObject("list", list);
                 mv.addObject("isShow", 1);
             } else {
@@ -410,7 +417,7 @@ public class ShopRecommendController {
     public JsonResult genOnlineData(HttpServletRequest request, HttpServletResponse response) {
         JsonResult json = new JsonResult();
         try {
-            if (UserInfoUtils.checkIsLogin(request)) {
+            if (!UserInfoUtils.checkIsLogin(request)) {
                 json.setOk(false);
                 json.setMessage("请登录后操作");
                 return json;

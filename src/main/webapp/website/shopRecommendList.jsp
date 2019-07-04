@@ -155,6 +155,26 @@
             var param = "height=910,width=1360,top=70,left=280,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open("/cbtconsole/shopRecommend/queryGoodsListByShopId?shopId=" + shopId, "windows", param);
         }
+
+        function syncToOnline() {
+            $("#show_message").text("正在执行...").show();
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/shopRecommend/genOnlineData",
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    if (data.ok) {
+                        $("#show_message").text("刷新成功").show();
+                    } else {
+                        $("#show_message").text(data.message).show();
+                    }
+                },
+                error: function (res) {
+                    $("#show_message").text("网路链接失败").show();
+                }
+            });
+        }
     </script>
 </head>
 <body>
@@ -213,7 +233,8 @@
                 <img title="封面图" class="img_shop" src="${info.coverImg}"/>
                 <br>
                 <span>
-                    店铺ID:<a href="https://www.import-express.com/shop?sid=${info.shopId}" target="_blank">${info.shopId}</a>
+                    店铺ID:<a href="https://www.import-express.com/shop?sid=${info.shopId}"
+                            target="_blank">${info.shopId}</a>
                 </span>
                 <ul style="height: 150px;">
                     <c:if test="${not empty info.goodsList}">

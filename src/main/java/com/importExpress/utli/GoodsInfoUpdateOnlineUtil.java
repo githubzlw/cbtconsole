@@ -59,8 +59,8 @@ public class GoodsInfoUpdateOnlineUtil {
     /**
      * 前台上传店铺推荐文件路径
      */
-    public static final String ONLINE_SHOP_RECOMMEND_URL = "https://www.import-express.com/popProducts/shopRecommendFile";
-    // public static final String ONLINE_EVENTS_URL = "http://127.0.0.1:8087/popProducts/shopRecommendFile";
+//    public static final String ONLINE_SHOP_RECOMMEND_URL = "https://www.import-express.com/popProducts/postShopRecommendFile";
+     public static final String ONLINE_SHOP_RECOMMEND_URL = "http://127.0.0.1:8087/popProducts/postShopRecommendFile";
 
     // test
 //    private static final String LOCAL_JSON_PATH = "E:/data/cbtconsole/product/";

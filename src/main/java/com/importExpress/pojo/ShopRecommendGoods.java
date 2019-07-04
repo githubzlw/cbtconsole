@@ -48,10 +48,6 @@ public class ShopRecommendGoods {
                 .append(goodsUnit).append('\"');
         sb.append(",\"rangePrice\":\"")
                 .append(rangePrice).append('\"');
-        sb.append(",\"price1688\":\"")
-                .append(price1688).append('\"');
-        sb.append(",\"moq\":\"")
-                .append(moq).append('\"');
         sb.append(",\"mainImg\":\"")
                 .append(mainImg).append('\"');
         sb.append('}');
