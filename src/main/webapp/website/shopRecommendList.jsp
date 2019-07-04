@@ -18,13 +18,13 @@
           href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
     <style type="text/css">
         .img_shop {
-            max-width: 220px;
-            max-height: 220px;
+            max-width: 180px;
+            max-height: 180px;
         }
 
         .img_goods {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 70px;
+            max-height: 70px;
         }
 
         .btn_sty {
@@ -53,13 +53,18 @@
             margin-right: 20px;
             float: left;
             background-color: antiquewhite;
-            height: 380px;
+            height: 460px;
             width: 360px;
         }
 
         .inp_wd {
             width: 220px;
             height: 30px;
+        }
+
+        .li_sty {
+            float: left;
+            list-style: none;
         }
     </style>
     <script type="text/javascript">
@@ -147,7 +152,7 @@
         }
 
         function openShopGoods(shopId) {
-            var param = "height=688,width=1080,top=20,left=150,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+            var param = "height=910,width=1360,top=70,left=280,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open("/cbtconsole/shopRecommend/queryGoodsListByShopId?shopId=" + shopId, "windows", param);
         }
     </script>
@@ -205,20 +210,20 @@
         <c:forEach items="${list}" var="info">
             <div class="div_sty">
                 <input type="hidden" value="${info.coverPid}"/>
-                <img class="img_shop" src="${info.coverImg}"/>
+                <img title="封面图" class="img_shop" src="${info.coverImg}"/>
                 <br>
-                <a href="https://www.import-express.com/shop?sid=${info.shopId}" target="_blank">${info.shopId}</a>
-                <br>
+                <span>
+                    店铺ID:<a href="https://www.import-express.com/shop?sid=${info.shopId}" target="_blank">${info.shopId}</a>
+                </span>
                 <ul style="height: 150px;">
                     <c:if test="${not empty info.goodsList}">
                         <c:forEach items="${info.goodsList}" var="gd">
-                            <li>
+                            <li class="li_sty">
                                 <img class="img_goods" src="${gd.goodsImg}">
                             </li>
                         </c:forEach>
                     </c:if>
                 </ul>
-                <br>
                 <p><span>排序:${info.sort}</span>
                     &nbsp;&nbsp;<span>状态:
                     <c:if test="${info.isOn > 0}">

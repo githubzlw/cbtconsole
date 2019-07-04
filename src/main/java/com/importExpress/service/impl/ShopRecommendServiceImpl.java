@@ -21,7 +21,7 @@ public class ShopRecommendServiceImpl implements ShopRecommendService {
     }
 
     @Override
-    public List<ShopRecommendInfo> queryRecommendInfoByShopId(String shopId) {
+    public ShopRecommendInfo queryRecommendInfoByShopId(String shopId) {
         return shopRecommendMapper.queryRecommendInfoByShopId(shopId);
     }
 
@@ -41,6 +41,11 @@ public class ShopRecommendServiceImpl implements ShopRecommendService {
     }
 
     @Override
+    public int updateShopMainImg(ShopRecommendInfo shopRecommendInfo) {
+        return shopRecommendMapper.updateShopMainImg(shopRecommendInfo);
+    }
+
+    @Override
     public int deleteShopRecommendInfoByShopId(String shopId) {
         return shopRecommendMapper.deleteShopRecommendInfoByShopId(shopId);
     }
@@ -56,17 +61,17 @@ public class ShopRecommendServiceImpl implements ShopRecommendService {
     }
 
     @Override
-    public int insertShopRecommendGoods(ShopRecommendGoods shopRecommendGoods) {
-        return shopRecommendMapper.insertShopRecommendGoods(shopRecommendGoods);
+    public int insertShopRecommendGoods(List<ShopRecommendGoods> shopRecommendGoodsList) {
+        return shopRecommendMapper.insertShopRecommendGoods(shopRecommendGoodsList);
     }
 
     @Override
-    public int updateShopRecommendGoods(ShopRecommendGoods shopRecommendGoods) {
-        return shopRecommendMapper.updateShopRecommendGoods(shopRecommendGoods);
+    public int updateShopRecommendGoods(List<ShopRecommendGoods> shopRecommendGoodsList) {
+        return shopRecommendMapper.updateShopRecommendGoods(shopRecommendGoodsList);
     }
 
     @Override
-    public int deleteShopRecommendGoods(ShopRecommendGoods shopRecommendGoods) {
-        return shopRecommendMapper.deleteShopRecommendGoods(shopRecommendGoods);
+    public int deleteShopRecommendGoods(String shopId) {
+        return shopRecommendMapper.deleteShopRecommendGoods(shopId);
     }
 }

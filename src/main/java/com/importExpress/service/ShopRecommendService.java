@@ -9,7 +9,7 @@ public interface ShopRecommendService {
 
     List<ShopRecommendInfo> queryShopRecommendInfoList();
 
-    List<ShopRecommendInfo> queryRecommendInfoByShopId(String shopId);
+    ShopRecommendInfo queryRecommendInfoByShopId(String shopId);
 
     int checkRecommendInfoByShopId(String shopId);
 
@@ -17,15 +17,17 @@ public interface ShopRecommendService {
 
     int updateShopRecommendInfo(ShopRecommendInfo shopRecommendInfo);
 
+    int updateShopMainImg(ShopRecommendInfo shopRecommendInfo);
+
     int deleteShopRecommendInfoByShopId(String shopId);
 
     List<ShopRecommendGoods> queryShopRecommendGoodsList();
 
     List<ShopRecommendGoods> queryShopRecommendGoodsByShopId(String shopId);
 
-    int insertShopRecommendGoods(ShopRecommendGoods shopRecommendGoods);
+    int insertShopRecommendGoods(List<ShopRecommendGoods> shopRecommendGoodsList);
 
-    int updateShopRecommendGoods(ShopRecommendGoods shopRecommendGoods);
+    int updateShopRecommendGoods(List<ShopRecommendGoods> shopRecommendGoodsList);
 
-    int deleteShopRecommendGoods(ShopRecommendGoods shopRecommendGoods);
+    int deleteShopRecommendGoods(String shopId);
 }

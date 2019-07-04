@@ -35,23 +35,24 @@
         <result column="update_admin_id" property="updateTime"/>
     </resultMap>
 
-    <select id="queryShopRecommendInfoList" resultMap="shopRecommendInfoResultMap"
-            parameterType="com.importExpress.pojo.ShopRecommendInfo">
+    <select id="queryShopRecommendInfoList" resultMap="shopRecommendInfoResultMap">
         select id,shop_id,cover_pid,cover_img,sort,is_on,
         DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
         DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
         from shop_recommend_info
         where 1 = 1
+        <if test="shopId != null">
+            shop_id = #{shopId}
+        </if>
         order by is_on desc
     </select>
 
     <select id="queryRecommendInfoByShopId" resultMap="shopRecommendInfoResultMap">
-        select a.id,a.shop_id,a.cover_pid,a.cover_img,a.sort,a.is_on,
-        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.create_admin_id,
-        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.update_admin_id,
-        b.remotpath,b.custom_main_image,b.sellunit
-        from shop_recommend_info a,custom_benchmark_ready b
-        where a.shop_id = #{shopId} and a.goods_pid = b.pid and b.valid =1
+        select id,shop_id,cover_pid,cover_img,sort,is_on,
+        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
+        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
+        from shop_recommend_info
+        where shop_id = #{shopId}
     </select>
 
     <select id="checkRecommendInfoByShopId" resultType="java.lang.Integer">
@@ -71,6 +72,11 @@
         where shop_id = #{shopId}
     </update>
 
+    <update id="updateShopMainImg" parameterType="com.importExpress.pojo.ShopRecommendInfo">
+        update shop_recommend_info set cover_pid = #{coverPid},cover_img = #{coverImg},update_admin_id = #{updateAdminId}
+        where shop_id = #{shopId}
+    </update>
+
     <delete id="deleteShopRecommendInfoByShopId">
         delete from shop_recommend_info where shop_id = #{shopId}
     </delete>
@@ -84,26 +90,36 @@
     </select>
 
     <select id="queryShopRecommendGoodsByShopId" resultMap="shopRecommendGoodsResultMap">
-        select id,shop_id,reco_id,pid,is_on,
-        DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%S') as create_time,create_admin_id,
-        DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%S') as update_time,update_admin_id
-        from shop_recommend_goods
-        where shop_id = #{shopId}
-        order by is_on desc
+        select a.id,a.shop_id,a.pid,
+        DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%S') as create_time,a.create_admin_id,
+        DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%S') as update_time,a.update_admin_id,
+        b.remotpath,b.custom_main_image
+        from shop_recommend_goods a,custom_benchmark_ready b
+        where a.shop_id = #{shopId} and a.pid = b.pid and b.valid =1
     </select>
 
-    <insert id="insertShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
+    <insert id="insertShopRecommendGoods" parameterType="java.util.ArrayList">
         insert into shop_recommend_goods(shop_id,reco_id,pid,is_on,create_admin_id)
-        values(#{shopId},#{recoId},#{pid},#{isOn},#{createAdminId})
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.shopId},#{item.recoId},#{item.pid},#{item.isOn},#{item.createAdminId})
+        </foreach>
     </insert>
 
-    <update id="updateShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
-        update shop_recommend_goods set is_on = #{isOn},update_admin_id = #{updateAdminId}
-        where shop_id = #{shopId} and pid = #{pid}
+    <update id="updateShopRecommendGoods" parameterType="java.util.ArrayList">
+        <foreach collection="list" item="item" separator=";">
+            update shop_recommend_goods
+            <set>
+                is_on = #{item.isOn},update_admin_id = #{item.updateAdminId}
+            </set>
+            <where>
+                shop_id = #{item.shopId} and pid = #{item.pid}
+            </where>
+        </foreach>
     </update>
 
-    <delete id="deleteShopRecommendGoods" parameterType="com.importExpress.pojo.ShopRecommendGoods">
-        delete from shop_recommend_goods where shop_id = #{shopId} and pid = #{pid}
+    <delete id="deleteShopRecommendGoods" parameterType="java.util.ArrayList">
+        delete from shop_recommend_goods where shop_id = #{shopId}
     </delete>
 
 </mapper>
