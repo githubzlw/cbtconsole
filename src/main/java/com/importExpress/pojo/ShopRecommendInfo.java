@@ -10,16 +10,18 @@ public class ShopRecommendInfo {
     private String shopId;
     private String coverImg;
     private String coverPid;
+    private String coverOnlineUrl;
+    private String coverPrice;
     private Integer sort;
     private Integer isOn;
     private String createTime;
-	private int createAdminId;
-	private String updateTime;
-	private int updateAdminId;
-	private List<ShopRecommendGoods> goodsList;
-	private String pidList;
-	private String shopUrl;
-	private String shopName;
+    private int createAdminId;
+    private String updateTime;
+    private int updateAdminId;
+    private List<ShopRecommendGoods> goodsList;
+    private String pidList;
+    private String shopUrl;
+    private String shopName;
 
     @Override
     public String toString() {
@@ -36,6 +38,10 @@ public class ShopRecommendInfo {
                 .append(coverImg).append('\"');
         sb.append(",\"coverPid\":\"")
                 .append(coverPid).append('\"');
+        sb.append(",\"coverPrice\":\"")
+                .append(coverPrice).append('\"');
+        sb.append(",\"coverOnlineUrl\":\"")
+                .append(coverOnlineUrl).append('\"');
         sb.append(",\"sort\":")
                 .append(sort);
         sb.append(",\"goodsList\":")

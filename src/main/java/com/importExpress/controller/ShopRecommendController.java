@@ -509,6 +509,10 @@ public class ShopRecommendController {
                     }
                 }
                 childGoods.setGoodsUnit(goods.getSellUnit());
+                if(Info.getCoverPid().equals(childGoods.getPid())){
+                    Info.setCoverPrice(childGoods.getPriceShow());
+                    Info.setCoverOnlineUrl(childGoods.getOnlineUrl());
+                }
             }
         }
     }
