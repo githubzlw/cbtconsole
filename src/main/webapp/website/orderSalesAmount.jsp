@@ -184,6 +184,7 @@ function doReset(){
 				<option value="0" selected>全部</option>
 				<option value="2017">2017</option>
 				<option value="2018">2018</option>
+				<option value="2019">2019</option>
 				</select>
 				<select class="easyui-combobox" name="month" id="month" style="width:15%;height: 30px;" data-options="label:'月份:',panelHeight:'auto'">
 				<option value="0" selected>全部</option>

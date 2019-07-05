@@ -482,4 +482,32 @@
     </if>
      GROUP BY od.goodscatid ) a
   </select>
+
+  <insert id="insertAliPayInfo" parameterType="java.util.ArrayList">
+    insert into ali_pay_info(order_create_time,order_no,goods_name,order_amount,pay_state,merchant_account,merchant_name,
+    transaction_no,trade_mark,discounts,refund_amount,service_fee,payment_channel)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.orderCreateTime},#{item.orderNo},#{item.goodsName},#{item.orderAmount},#{item.payState},#{item.merchantAccount},#{item.merchantName},
+      #{item.transactionNo},#{item.tradeMark},#{item.discounts},#{item.refundAmount},#{item.serviceFee},#{item.paymentChannel})
+    </foreach>
+  </insert>
+
+  <insert id="insertAliPayInfoSingle" parameterType="com.importExpress.pojo.AliPayInfo">
+    insert into ali_pay_info(order_create_time,order_no,goods_name,order_amount,pay_state,merchant_account,merchant_name,
+    transaction_no,trade_mark,discounts,refund_amount,service_fee,payment_channel)
+    values(#{orderCreateTime},#{orderNo},#{goodsName},#{orderAmount},#{payState},#{merchantAccount},#{merchantName},
+      #{transactionNo},#{tradeMark},#{discounts},#{refundAmount},#{serviceFee},#{paymentChannel})
+  </insert>
+
+  <insert id="insertAliBillingDetails" parameterType="java.util.ArrayList">
+    insert into ali_billing_details(bill_time,transaction_no,serial_no,order_no,pay_type,income,expend,balance,
+    service_fee,payment_channel,merchant_account,merchant_name,goods_name,remark,account_type)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.billTime},#{item.transactionNo},#{item.serialNo},#{item.orderNo},#{item.payType},#{item.income},#{item.expend},#{item.balance},
+      #{item.serviceFee},#{item.paymentChannel},#{item.merchantAccount},#{item.merchantName},#{item.goodsName},#{item.remark},#{item.accountType})
+    </foreach>
+  </insert>
+
 </mapper>

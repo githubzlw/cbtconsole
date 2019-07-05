@@ -3,12 +3,14 @@ package com.cbt.orderinfo.dao;
 import com.cbt.bean.*;
 import com.cbt.email.entity.EmailReceive1;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.Inventory;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.importExpress.pojo.SplitGoodsNumBean;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -656,4 +658,24 @@ public interface OrderinfoMapper {
 
     String getSampleschoice(@Param("orderNo") String orderNo);
 
+    /**
+	 * 插入数量拆单日志
+	 * @param splitGoodsNumBeanList
+	 * @return
+	 */
+	int insertIntoOrderSplitNumLog(@Param("list") List<SplitGoodsNumBean> splitGoodsNumBeanList);
+
+	/**
+	 * 根据订单号查询分配采购信息
+	 * @param orderNo
+	 * @return
+	 */
+	List<GoodsDistribution> queryGoodsDistributionByOrderNo(@Param("orderNo") String orderNo);
+
+	/**
+	 * 批量更新采购分配
+	 * @param goodsDistributionList
+	 * @return
+	 */
+	int batchUpdateDistribution(@Param("list") List<GoodsDistribution> goodsDistributionList);
 }

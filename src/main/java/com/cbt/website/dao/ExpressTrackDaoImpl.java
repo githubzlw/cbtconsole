@@ -3917,6 +3917,8 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 					+ "' AND od.state<>2 AND op.purchase_state IN (2,3,4,6,7,8)) AS noBuy"
 					+ " FROM taobao_1688_order_history t INNER JOIN id_relationtable id ON t.orderid=id.tborderid"
 					+ " WHERE id.orderid='" + orderid + "'";
+			sql += "OR id.orderid IN (SELECT order_no FROM orderinfo WHERE state IN (1, 2) AND user_id = (SELECT user_id FROM orderinfo WHERE order_no ='"
+                    + orderid + "')) LIMIT 1";  // 同用户未出库订单在同一库位
 			stmt = conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 			while (rs.next()) {

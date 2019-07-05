@@ -8,6 +8,7 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchasesBean;
+import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -541,4 +542,11 @@ public interface IPurchaseMapper {
 	returndisplay getApplyTime(@Param("orderNo") String orderNo, @Param("goods_pid") String goods_pid);
     @Select("SELECT COUNT(1) FROM mail.emailinfo WHERE useremail=#{email}")
     int FindCountByEmial(@Param("email") String email);
+
+	/**
+	 * 根据订单号查询采购商品信息
+	 * @param orderNo
+	 * @return
+	 */
+	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
 }

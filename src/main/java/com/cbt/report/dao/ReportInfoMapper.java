@@ -5,6 +5,8 @@ import com.cbt.pojo.ReportInfo;
 import com.cbt.pojo.ReportInfoExample;
 import com.cbt.pojo.StatisticalReportPojo;
 import com.cbt.report.vo.StatisticalReportVo;
+import com.importExpress.pojo.AliBillingDetails;
+import com.importExpress.pojo.AliPayInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -55,4 +57,20 @@ public interface ReportInfoMapper {
     List<ReportInfo> selectOrderByTime(StatisticalReportVo statisticalReportVo);
     
     List<ReportInfo> selectByGeneral(GeneralReport generalReport);
+
+    /**
+	 * 插入支付宝账单信息
+	 * @param infoList
+	 * @return
+	 */
+	int insertAliPayInfo(List<AliPayInfo> infoList);
+
+	int insertAliPayInfoSingle(AliPayInfo aliPayInfo);
+
+	/**
+	 * 插入支付宝对账信息
+	 * @param detailsList
+	 * @return
+	 */
+	int insertAliBillingDetails(List<AliBillingDetails> detailsList);
 }

@@ -885,4 +885,9 @@ where a.path_catid like #{catid} and cu.valid=1 and a.flag=0 group by a.catid
         insert into purchaseEmail(orderid,createtime) values(#{orderid},now())
     </insert>
 
+    <select id="queryOrderProductSourceByOrderNo" resultType="com.importExpress.pojo.PurchaseInfoBean">
+        select id,od_id as odId,orderid as orderNo,confirm_userid as confirmUserId,confirm_time as confirmTime,
+        goodsid as goodsId,usecount as useCount,buycount as buyCount,purchase_state as purchaseState
+        from order_product_source where orderid = #{orderNo} and confirm_userid > 0
+    </select>
 </mapper>

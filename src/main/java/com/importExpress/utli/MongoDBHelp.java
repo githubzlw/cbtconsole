@@ -64,7 +64,7 @@ public enum MongoDBHelp {
         List<ServerAddress> seeds2 = new ArrayList<>();
         ServerAddress addr2 = new ServerAddress(MONGODB_HOST2, Integer.valueOf(MONGODB_PORT));
         seeds2.add(addr2);
-        this.mongoClient2 = new MongoClient(MONGODB_HOST2, Integer.valueOf(MONGODB_PORT));
+        this.mongoClient2 = new MongoClient(seeds2,options);
         this.mongoDatabase2 = mongoClient2.getDatabase(MONGODB_DB2);
     }
 
@@ -198,8 +198,9 @@ public enum MongoDBHelp {
     	if(sort != null) {
     		documents = documents.sort(sort);
     	}
-    	
-    	documents = documents.skip(startNum).limit(limitNum);
+    	if(limitNum > 0) {
+    		documents = documents.skip(startNum).limit(limitNum);
+    	}
     	
     	MongoCursor<Document> iterator = documents.iterator();
     	while (iterator.hasNext()){
