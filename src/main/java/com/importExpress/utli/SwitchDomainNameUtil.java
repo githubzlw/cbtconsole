@@ -66,6 +66,7 @@ public class SwitchDomainNameUtil {
      * @param recommendInfo
      */
     public static void changeShopRecommendInfoBean(ShopRecommendInfo recommendInfo) {
+        recommendInfo.setShopUrl(checkNullAndReplace(recommendInfo.getShopUrl()));
         recommendInfo.setCoverImg(checkNullAndReplace(recommendInfo.getCoverImg()));
         changeShopRecommendGoodsList(recommendInfo.getGoodsList());
     }

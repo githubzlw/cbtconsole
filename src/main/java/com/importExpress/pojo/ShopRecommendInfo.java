@@ -18,6 +18,8 @@ public class ShopRecommendInfo {
 	private int updateAdminId;
 	private List<ShopRecommendGoods> goodsList;
 	private String pidList;
+	private String shopUrl;
+	private String shopName;
 
     @Override
     public String toString() {
@@ -26,6 +28,10 @@ public class ShopRecommendInfo {
                 .append(id);
         sb.append(",\"shopId\":\"")
                 .append(shopId).append('\"');
+        sb.append(",\"shopUrl\":\"")
+                .append(shopUrl).append('\"');
+        sb.append(",\"shopName\":\"")
+                .append(shopName).append('\"');
         sb.append(",\"coverImg\":\"")
                 .append(coverImg).append('\"');
         sb.append(",\"coverPid\":\"")
