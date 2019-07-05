@@ -259,6 +259,7 @@ public interface CustomGoodsService {
      * 根据pid查询本地的1688商品以及对于翻译和ali商品的数据
      *
      * @param pid
+     * @param type : 0是importExpress,1是kid
      * @return
      */
     public CustomGoodsPublish queryGoodsDetails(String pid, int type);

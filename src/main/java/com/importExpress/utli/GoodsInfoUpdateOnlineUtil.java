@@ -51,6 +51,11 @@ public class GoodsInfoUpdateOnlineUtil {
     private static final String LOCAL_EVENTS_PATH = "/data/cbtconsole/events";
 
     /**
+     * 生成events文件路径
+     */
+    private static final String LOCAL_SHOP_RECOMMEND_PATH = "/data/cbtconsole/shopRecommend";
+
+    /**
      * 前台上传event文件路径
      */
     public static final String ONLINE_EVENTS_URL = "https://www.import-express.com/popProducts/postEventsFile";
@@ -716,12 +721,12 @@ public class GoodsInfoUpdateOnlineUtil {
      */
     public static File writeDataToLocal(String fileName, String json) throws Exception {
         String timeStr = String.valueOf(System.currentTimeMillis()) + "_" ;
-        File parentfile = new File(LOCAL_EVENTS_PATH);
+        File parentfile = new File(LOCAL_SHOP_RECOMMEND_PATH);
         if(!(parentfile.exists() && parentfile.isDirectory())){
             parentfile.mkdirs();
         }
-        FileUtils.write(new File(LOCAL_EVENTS_PATH + "/" + timeStr + fileName), json, "utf-8");
-        File file = new File(LOCAL_EVENTS_PATH + "/" + timeStr + fileName);
+        FileUtils.write(new File(LOCAL_SHOP_RECOMMEND_PATH + "/" + timeStr + fileName), json, "utf-8");
+        File file = new File(LOCAL_SHOP_RECOMMEND_PATH + "/" + timeStr + fileName);
         if (file.exists()) {
             return file;
         } else {

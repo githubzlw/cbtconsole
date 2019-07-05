@@ -11,6 +11,7 @@ import com.importExpress.pojo.ShopRecommendInfo;
 import com.importExpress.service.ShopRecommendService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.OKHttpUtils;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -438,6 +439,8 @@ public class ShopRecommendController {
             genShopRecommendInfoData(upList);
             // 排序
             upList.sort(Comparator.comparingInt(ShopRecommendInfo::getSort));
+            // 域名转换
+            SwitchDomainNameUtil.changeShopRecommendInfoList(upList);
 
             File file = GoodsInfoUpdateOnlineUtil.writeDataToLocal("shopRecommend.json", upList.toString());
             boolean isSuccess = okHttpUtils.postFileNoParam(GoodsInfoUpdateOnlineUtil.ONLINE_SHOP_RECOMMEND_URL, file);
@@ -462,7 +465,7 @@ public class ShopRecommendController {
         CustomGoodsPublish goods;
         for (ShopRecommendInfo Info : upList) {
             for (ShopRecommendGoods childGoods : Info.getGoodsList()) {
-                goods = customGoodsService.queryGoodsDetails(childGoods.getPid(), 0);
+                goods = customGoodsService.queryGoodsDetails(childGoods.getPid(), 1);
                 childGoods.setEnName(goods.getEnname());
                 if (goods.getShowMainImage().contains("http:") || goods.getShowMainImage().contains("https:")) {
                     childGoods.setMainImg(goods.getShowMainImage().replace("http:", "https:"));
