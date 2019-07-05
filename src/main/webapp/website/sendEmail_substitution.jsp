@@ -164,6 +164,19 @@ String url = UUIDUtil.getAutoLoginPath("/orderInfo/getChangeProduct?flag=1&order
         <option value="1" selected="selected">import-express</option>
         <option value="2">kidsproductwholesale</option>
     </select>
+        <script type="text/javascript">
+            $.ajax({
+                type: "GET",
+                url: "/cbtconsole/queryuser/getSiteTypeNum.do",
+                data: {'orderNo':'${param.orderno}'},
+                dataType:"json",
+                success: function(msg){
+                    if (msg == 2) {
+                        $('#website_type').val(2);
+                    }
+                }
+            });
+        </script>
     </div>
 
 	<input type="hidden" id="orderNo" value="${param.orderno}">
