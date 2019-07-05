@@ -2401,3 +2401,9 @@ function fnmessage() {
         }
     });
 }
+
+function openSplitNumPage(orderNo) {
+    var url = "/cbtconsole/orderDetails/splitByNumPage?orderNo=" + orderNo;
+    var param = "height=860,width=1500,top=80,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+    window.open(url, "windows", param);
+}

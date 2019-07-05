@@ -4,9 +4,16 @@ import com.cbt.util.WebTool;
 import com.cbt.warehouse.pojo.Mabangshipment;
 import com.cbt.warehouse.pojo.Shipment;
 import com.cbt.warehouse.pojo.Skuinfo;
+import com.importExpress.pojo.AliBillingDetails;
+import com.importExpress.pojo.AliPayInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -1584,6 +1591,7 @@ public class ExcelUtil {
 		Workbook workbook = null;
 		if (null != filename) {
 			workbook = WorkbookFactory.create(new FileInputStream(filename));
+//			workbook = createWorkBook(new FileInputStream(filename));
 		}
 		return workbook;
 	}
@@ -1604,6 +1612,26 @@ public class ExcelUtil {
 //        }
 //        return workbook;
 //	}
+
+	/**
+    * 静态方法  解决创建Workbook 创建产生的问题
+    * @param inp
+    * @return
+    * @throws IOException
+    * @throws InvalidFormatException
+    */
+	public static Workbook createWorkBook(InputStream inp) throws IOException, InvalidFormatException {
+		if (!inp.markSupported()) {
+			inp = new PushbackInputStream(inp, 8);
+		}
+		if (POIFSFileSystem.hasPOIFSHeader(inp)) {
+			return new HSSFWorkbook(inp);
+		}
+		if (POIXMLDocument.hasOOXMLHeader(inp)) {
+			return new XSSFWorkbook(OPCPackage.open(inp));
+		}
+		throw new IllegalArgumentException("你的excel版本目前poi解析不了");
+	}
 
 
 	/**
@@ -1867,5 +1895,135 @@ public class ExcelUtil {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * 根据Excel获取支付宝账单信息
+	 * @param filePath
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<AliPayInfo> getAliPayInfoByExcel(String filePath) throws Exception {
+		List<AliPayInfo> infoList = new ArrayList<>();
+		// 检查
+		fileCheck(filePath);
+		Workbook workbook = null;
+		workbook = getWorkbook(filePath);
+
+		Sheet sheet = workbook.getSheetAt(0);
+		if (sheet == null) {
+			throw new Exception("获取Excel文件失败");
+		}
+		// 首行索引
+		int firstRowIndex = sheet.getFirstRowNum();
+		// 最后一行
+		int lastRowIndex = sheet.getLastRowNum();
+
+		// 读取数据行
+		for (int rowIndex = 3; rowIndex <= lastRowIndex - 1; rowIndex++) {
+			// 当前行
+			Row currentRow = sheet.getRow(rowIndex);
+			AliPayInfo payInfo = new AliPayInfo();
+			payInfo.setOrderCreateTime(getCellValue(currentRow.getCell(1), true));
+			if(StringUtils.isBlank(currentRow.getCell(2).getStringCellValue())){
+				continue;
+			}
+			payInfo.setOrderNo(getCellValue(currentRow.getCell(2), true));
+			payInfo.setGoodsName(getCellValue(currentRow.getCell(3), true));
+			if(StringUtils.isNotBlank(currentRow.getCell(4).getStringCellValue())){
+				payInfo.setOrderAmount(Double.valueOf(getCellValue(currentRow.getCell(4), true)));
+			}
+			payInfo.setPayState(getCellValue(currentRow.getCell(5), true));
+			payInfo.setMerchantAccount(getCellValue(currentRow.getCell(6), true));
+			payInfo.setMerchantName(getCellValue(currentRow.getCell(7), true));
+			payInfo.setTransactionNo(getCellValue(currentRow.getCell(8), true));
+			payInfo.setTradeMark(getCellValue(currentRow.getCell(9), true));
+			if(StringUtils.isNotBlank(currentRow.getCell(10).getStringCellValue())){
+				payInfo.setDiscounts(Double.valueOf(getCellValue(currentRow.getCell(10), true)));
+			}
+			if(StringUtils.isNotBlank(currentRow.getCell(11).getStringCellValue())){
+				payInfo.setRefundAmount(Double.valueOf(getCellValue(currentRow.getCell(11), true)));
+			}
+			if(StringUtils.isNotBlank(currentRow.getCell(13).getStringCellValue())){
+				payInfo.setServiceFee(Double.valueOf(getCellValue(currentRow.getCell(13), true)));
+			}
+			payInfo.setPaymentChannel(getCellValue(currentRow.getCell(14), true));
+			infoList.add(payInfo);
+		}
+		return infoList;
+	}
+
+
+
+	/**
+	 * 根据Excel获取支付宝对账明细
+	 * @param filePath
+	 * @return
+	 * @throws Exception
+	 */
+	public static List<AliBillingDetails> getAliBillingDetailsByExcel(String filePath) throws Exception {
+		List<AliBillingDetails> infoList = new ArrayList<>();
+		// 检查
+		fileCheck(filePath);
+		Workbook workbook = null;
+		workbook = getWorkbook(filePath);
+
+		Sheet sheet = workbook.getSheetAt(0);
+		if (sheet == null) {
+			throw new Exception("获取Excel文件失败");
+		}
+		// 首行索引
+		int firstRowIndex = sheet.getFirstRowNum();
+		// 最后一行
+		int lastRowIndex = sheet.getLastRowNum();
+
+		// 读取数据行
+		for (int rowIndex = 3; rowIndex <= lastRowIndex - 1; rowIndex++) {
+			// 当前行
+			Row currentRow = sheet.getRow(rowIndex);
+			AliBillingDetails billingDt = new AliBillingDetails();
+			billingDt.setBillTime(getCellValue(currentRow.getCell(1), true));
+			if(StringUtils.isBlank(currentRow.getCell(2).getStringCellValue())){
+				continue;
+			}
+			billingDt.setTransactionNo(getCellValue(currentRow.getCell(2), true));
+			billingDt.setSerialNo(getCellValue(currentRow.getCell(3), true));
+			billingDt.setOrderNo(getCellValue(currentRow.getCell(4), true));
+			billingDt.setPayType(getCellValue(currentRow.getCell(5), true));
+			if (StringUtils.isNotBlank(currentRow.getCell(6).getStringCellValue())) {
+				billingDt.setIncome(Double.valueOf(getCellValue(currentRow.getCell(6), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(7).getStringCellValue())) {
+				billingDt.setExpend(Double.valueOf(getCellValue(currentRow.getCell(7), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(8).getStringCellValue())) {
+				billingDt.setBalance(Double.valueOf(getCellValue(currentRow.getCell(8), true)));
+			}
+			if (StringUtils.isNotBlank(currentRow.getCell(9).getStringCellValue())) {
+				billingDt.setServiceFee(Double.valueOf(getCellValue(currentRow.getCell(9), true)));
+			}
+			billingDt.setPaymentChannel(getCellValue(currentRow.getCell(10), true));
+
+			billingDt.setMerchantAccount(getCellValue(currentRow.getCell(12), true));
+			billingDt.setMerchantName(getCellValue(currentRow.getCell(13), true));
+
+			billingDt.setGoodsName(getCellValue(currentRow.getCell(15), true));
+			billingDt.setRemark(getCellValue(currentRow.getCell(16), true));
+
+			infoList.add(billingDt);
+		}
+		return infoList;
+	}
+
+	public static String cutOneByte(String str) {
+        if (str != null && !str.equals("")) {
+            byte[] a = str.getBytes();// 转化为字节流处理,去掉最前面一个字节，以防止第一个字母乱码
+            byte[] b = new byte[a.length - 1];
+            for (int i = 1; i < a.length; i++) {
+                b[i - 1] = a[i];
+            }
+            str = new String(b);
+        }
+        return str;
+    }
 
 }

@@ -18,6 +18,7 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.pay.service.IPayServer;
 import com.cbt.pay.service.PayServer;
 import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
 import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.processes.dao.IUserDao;
 import com.cbt.processes.service.SendEmail;
@@ -35,8 +36,11 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.pojo.PurchaseInfoBean;
+import com.importExpress.pojo.OrderSplitChild;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
+import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
 import com.importExpress.utli.NotifyToCustomerUtil;
@@ -58,6 +62,9 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 @Controller
 @RequestMapping("/orderDetails")
@@ -80,6 +87,8 @@ public class NewOrderDetailsCtr {
 
 	@Autowired
 	private PaymentServiceNew paymentServiceNew;
+	@Autowired
+	private OrderSplitRecordService orderSplitRecordService;
 	/**
 	/**
 	 * 根据订单号获取订单详情
@@ -97,6 +106,7 @@ public class NewOrderDetailsCtr {
 			if(StringUtils.isNotBlank(orderNo)){
 				orderNo = orderNo.replaceAll("'","");
 			}
+
 			String payTime = request.getParameter("paytime");
 			request.setAttribute("payToTime", payTime);
 			// 获取所有采购人员信息
@@ -174,6 +184,12 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateGoodsCarMessage(orderNo);
 			// 订单商品详情
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+			List<GoodsDistribution> distributionList = new ArrayList<>();
+			List<GoodsDistribution> updistributionList = new ArrayList<>();
+			if(orderNo.contains("_SN")){
+				// 对数量拆单的订单分配采购数据的更新
+				distributionList = iOrderinfoService.queryGoodsDistributionByOrderNo(orderNo);
+			}
 			Double es_prices=0.00;
 			double feeWeight=0.00;
 			Map<String,Double> shopShippingCostMap= new HashedMap();
@@ -181,6 +197,18 @@ public class NewOrderDetailsCtr {
 			shopShippingCostMap.put("shopShippingCost",0d);
 			for (int i = 0; i < odb.size(); i++) {
 				OrderDetailsBean o = odb.get(i);
+				if(orderNo.contains("_SN") && distributionList != null && !distributionList.isEmpty()){
+					for (GoodsDistribution distribution : distributionList) {
+						if(distribution.getGoodsid().equals(String.valueOf(o.getGoodsid()))){
+							if(distribution.getOdid() != o.getOid()){
+								distribution.setOdid(o.getOid());
+								updistributionList.add(distribution);
+								break;
+							}
+						}
+					}
+				}
+
 				if(!shopShippingCostMap.containsKey(o.getCbrShopid())){
 					Double shopShippingCost = shopShippingCostMap.get("shopShippingCost");
 					shopShippingCostMap.put("shopShippingCost",shopShippingCost+=5d);
@@ -194,6 +222,11 @@ public class NewOrderDetailsCtr {
 				if(o.getIs_sold_flag() != 0){
 					feeWeight+=o.getOd_total_weight();
 				}
+			}
+			distributionList.clear();
+			if(updistributionList.size() > 0){
+				iOrderinfoService.batchUpdateDistribution(updistributionList);
+				updistributionList.clear();
 			}
 			request.setAttribute("feeWeight",df.format(feeWeight));
 			Forwarder forw = null;
@@ -498,6 +531,8 @@ public class NewOrderDetailsCtr {
 			}
 			request.setAttribute("lists", lists);
 			request.setAttribute("isDropFlag",0);
+			OrderSplitChild orderSplitChild = orderSplitRecordService.getOrder(orderNo);
+			request.setAttribute("orderRecord",orderSplitChild);
 		//} catch (Exception e) {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/
@@ -2258,6 +2293,50 @@ public class NewOrderDetailsCtr {
 			json.setMessage("sendEmailFright error:" + e.getMessage());
 		}
 		return json;
+	}
+
+
+	@RequestMapping(value = "/splitByNumPage")
+	public String splitByNumPage(HttpServletRequest request, HttpServletResponse response) {
+
+		try {
+			String orderNo = request.getParameter("orderNo");
+			if (StringUtils.isBlank(orderNo)) {
+				request.setAttribute("isShow", 0);
+				request.setAttribute("message", "获取订单号失败");
+			} else {
+				request.setAttribute("orderNo", orderNo);
+			}
+			// 订单信息
+			DataSourceSelector.restore();
+			OrderBean orderInfo = iOrderinfoService.getOrders(orderNo);
+			// 订单商品详情
+			List<OrderDetailsBean> odbList = iOrderinfoService.getOrdersDetails(orderNo);
+			List<PurchaseInfoBean> purchaseInfoList = iPurchaseService.queryOrderProductSourceByOrderNo(orderNo);
+
+			List<OrderDetailsBean> nwOdbList;
+			if (purchaseInfoList != null && purchaseInfoList.size() > 0) {
+				Set<Integer> hasPurchaseSet = purchaseInfoList.stream()
+						.filter(e -> e.getConfirmUserId() != null && e.getConfirmUserId() > 0)
+						.map(PurchaseInfoBean::getOdId).collect(toSet());
+				nwOdbList = odbList.stream().filter(e -> hasPurchaseSet.contains(e.getId())).collect(Collectors.toList());
+				request.setAttribute("odList", nwOdbList);
+				purchaseInfoList.clear();
+				hasPurchaseSet.clear();
+				odbList.clear();
+			} else {
+				request.setAttribute("odList", odbList);
+			}
+			request.setAttribute("orderInfo", orderInfo);
+			request.setAttribute("isShow", 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("isShow", 0);
+			request.setAttribute("message", e.getMessage());
+			LOG.error("splitByNumPage error:", e);
+		}
+
+		return "orderSplitNum";
 	}
 
 }

@@ -5,6 +5,8 @@ import com.cbt.pojo.ReportInfo;
 import com.cbt.pojo.ReportInfoExample;
 import com.cbt.pojo.StatisticalReportPojo;
 import com.cbt.report.vo.StatisticalReportVo;
+import com.importExpress.pojo.AliBillingDetails;
+import com.importExpress.pojo.AliPayInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -40,5 +42,20 @@ public interface ReportInfoService {
 	 */
 	List<StatisticalReportPojo> getCategoryReportCount(Map<String, String> map);
 
+	/**
+	 * 插入支付宝账单信息
+	 * @param infoList
+	 * @return
+	 */
+	int insertAliPayInfo(List<AliPayInfo> infoList);
+
+	int insertAliPayInfoSingle(AliPayInfo aliPayInfo);
+
+	/**
+	 * 插入支付宝对账信息
+	 * @param detailsList
+	 * @return
+	 */
+	int insertAliBillingDetails(List<AliBillingDetails> detailsList);
     
 }

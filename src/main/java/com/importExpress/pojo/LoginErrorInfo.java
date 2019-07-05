@@ -17,7 +17,22 @@ public class LoginErrorInfo {
     /**
      * 登陆失败类型
      */
-    private int errorType;
+    private String errorType;
+    
+    /**
+     * guid
+     */
+    private String guid;
+    
+    /**
+     *sessionId 
+     */
+    private String sessionId;
+    
+    /**
+     *userId 
+     */
+    private String userId;
     
     /**
              *登陆时间 
@@ -25,4 +40,9 @@ public class LoginErrorInfo {
     private String loginTime;
     
     private long time;
+    
+    /**
+     * 登录类型
+     */
+    private String loginType;
 }

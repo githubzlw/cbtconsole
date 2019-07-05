@@ -11,6 +11,7 @@ import com.importExpress.pojo.GoodsReview;
 import com.importExpress.pojo.OrderShare;
 import com.importExpress.service.QueryUserService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -749,6 +750,18 @@ public class QueryUserController {
             result.put("message", "内部异常!");
         }
         return result;
+    }
+
+    /**
+     * 根据订单号判断用户下单的网站
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/getSiteTypeNum.do?orderNo=
+     *
+     *  返回 1-非kids网站(importx网站); 2-kids网站;
+     */
+    @RequestMapping(value = "/getSiteTypeNum.do")
+    @ResponseBody
+    public Integer getSiteTypeNum(@RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo) {
+        return MultiSiteUtil.getSiteTypeNum(orderNo);
     }
 
 }

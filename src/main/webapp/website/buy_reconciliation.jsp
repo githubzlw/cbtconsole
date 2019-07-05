@@ -85,7 +85,7 @@ $(function(){
 			getZfuDate();
 		}
 	});
-	$('#dlg').dialog('close');
+	$('#ali_dlg').dialog('close');
 })
 
 function setDatagrid() {
@@ -155,7 +155,7 @@ function doReset(){
 	 window.location.href ="/cbtconsole/StatisticalReport/exportBuyReconciliation?year="+year+"&month="+month;
 }
  function openLog() {
-		$('#dlg').dialog('open');
+		$('#ali_dlg').dialog('open');
 		getZfuDate();
 }
  // 根据选择的年月获取相应的支付宝数据
@@ -247,7 +247,7 @@ function doReset(){
 	        type:"post",
 	        success:function(data){
 	        	if(data.data.allCount>0){
-	        		$('#dlg').dialog('close');
+	        		$('#ali_dlg').dialog('close');
 	        		doQuery(1);
 	        	}else{
 	        		showMessage("修改/添加当月支付宝余额失败");
@@ -258,10 +258,73 @@ function doReset(){
 	    	}
 	    });
  }
+ 
+ function uploadExcelFile() {
+      $.messager.progress({
+                title: '上传Excel',
+                msg: '请等待...'
+            });
+	 $("#multiFileForm").form('submit', {
+                type: "post",  //提交方式
+                url: "/cbtconsole/StatisticalReport/uploadExcelFile", //请求url
+                success: function (data) {
+                    $.messager.progress('close');
+                    var data = eval('(' + data + ')');
+                    if (data.ok) {
+                        closeDialogById('#excel_dlg');
+                        $("#multiFileForm")[0].reset();
+                        $.messager.alert("提醒", "执行成功，请刷新界面", "info");
+                    } else {
+                        $.messager.alert("提醒", data.message, "error");
+                    }
+                },
+                error: function () {
+                    $.messager.progress('close');
+                    $.messager.alert("提醒", "上传错误，请联系管理员", "error");
+                }
+            });
+ }
+
+ function uploadBuyingData() {
+     $('#excel_dlg').dialog('open');
+ }
+ 
+ function closeAllDialog() {
+     closeDialogById('#ali_dlg');
+	 closeDialogById('#excel_dlg');
+ }
+ 
+ function closeDialogById(id) {
+	 $(id).dialog('close');
+ }
 </script>
 </head>
-<body text="#000000" onload="$('#dlg').dialog('close');">
-		<div id="dlg" class="easyui-dialog" title="添加/修改支付宝余额" data-options="modal:true" style="width:400px;height:550px;padding:10px;">
+<body text="#000000" onload="closeAllDialog()">
+
+<div id="excel_dlg" class="easyui-dialog" title="上传Excel文件" data-options="modal:true" style="width: 380px; height: 220px; padding: 10px;">
+        <form style="margin-left: 44px;" id="multiFileForm" method="post" enctype="multipart/form-data">
+            <input id="file" type="file" name="file" multiple="false">
+			<br>
+			<span>类型:<select style="height: 28px;" name="type">
+				<%--<option value="4">支付宝买入交易</option>--%>
+				<option value="0">账务明细(service@import-express.com)</option>
+				<option value="1">账务明细(cerong6@qq.com)</option>
+				<option value="2">账务明细(lingzheng@import-express.com)</option>
+			</select></span>
+
+        </form>
+        <br>
+        <div style="text-align: center; padding: 5px 0">
+            <a href="javascript:void(0)" data-options="iconCls:'icon-add'"
+               class="easyui-linkbutton"
+               onclick="uploadExcelFile()" style="width: 80px">确认上传</a>
+            <a href="javascript:void(0)" data-options="iconCls:'icon-cancel'"
+               class="easyui-linkbutton" onclick="closeDialogById('#excel_dlg')"
+               style="width: 80px">关闭</a>
+        </div>
+    </div>
+
+		<div id="ali_dlg" class="easyui-dialog" title="添加/修改支付宝余额" data-options="modal:true" style="width:400px;height:550px;padding:10px;">
 		 <form id="ff" method="post">
 				<div style="margin-bottom:20px">
 					<select class="easyui-combobox" name="data" id="data" style="width:85%;" data-options="label:'年月:',panelHeight:'auto'">
@@ -355,6 +418,7 @@ function doReset(){
 		<a href="/cbtconsole/website/orderSalesAmount.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">订单页面的销售额</a>
 		<a href="/cbtconsole/website/orderDetailsSales.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">每天的进账退款数据</a>
 		<a href="/cbtconsole/website/sales_buy.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">采购订单/销售订单匹配查询</a>
+		<a href="javascript:uploadBuyingData();" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">上传支付宝买入交易数据(Excel)</a>
 		<%--<a href="/cbtconsole/website/data_query.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">GA数据统计</a>--%>
 		<%--<a href="/cbtconsole/website/user_profit.jsp" target="_blank" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">用户月利润统计</a>--%>
 		<br>
