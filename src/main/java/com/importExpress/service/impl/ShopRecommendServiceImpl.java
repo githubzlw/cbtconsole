@@ -27,7 +27,7 @@ public class ShopRecommendServiceImpl implements ShopRecommendService {
             for (ShopRecommendInfo info : list) {
                 Map<String, String> shopMap = pruchaseMapper.getShopInfo(info.getShopId());
                 if(StringUtils.isNotBlank(shopMap.get("shop_en_name"))){
-                    info.setShopName(shopMap.get("shop_en_name"));
+                    info.setShopName(shopMap.get("shop_en_name").toUpperCase());
                 }else{
                     info.setShopName("");
                 }
