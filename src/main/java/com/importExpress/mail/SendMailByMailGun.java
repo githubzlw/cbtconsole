@@ -22,16 +22,17 @@ public class SendMailByMailGun implements SendMail {
 
     private final static String MAILGUN_DOMAIN_NAME = "mg.import-express.com";
     private final static String MAILGUN_API_KEY = "key-5af11fc491becf8970b5c8eb45bbf6af";
-    private final static String MAIL_GUN_ADDRESS = "Import-Express.com<admin@importx.com>";
+    private final static String MAIL_GUN_ADDRESS = "Import-Express.com<service@importexpress.com>";
+    private final static String MAIL_GUN_ADDRESS2 = "China WholeSale<service@chinawholesaleinc.com>";
     private static HostnameVerifier hv = (urlHostName, session) -> {
         logger.info("Warning: URL Host: " + urlHostName + " vs. "
                 + session.getPeerHost());
         return true;
     };
 
-
-    protected SendMailByMailGun() {
-
+    private Integer siteType;
+    public SendMailByMailGun(Integer siteType) {
+        this.siteType = siteType;
     }
 
     public static void main(String[] args) {
@@ -43,7 +44,7 @@ public class SendMailByMailGun implements SendMail {
                     "<a href='https://github.com/javaee/javamail'>Javamail Package</a>",
                     " for <a href='https://www.java.com'>Java</a>."
             );
-            new SendMailByMailGun().sendMail("luohao518@163.com", "", "Mail Gun test (SMTP interface accessed using Java)", BODY);
+            new SendMailByMailGun(2).sendMail("luohao518@163.com", "", "Mail Gun test (SMTP interface accessed using Java)", BODY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,7 +58,11 @@ public class SendMailByMailGun implements SendMail {
         client.addFilter(new HTTPBasicAuthFilter("api", MAILGUN_API_KEY));
         WebResource webResource = client.resource("https://api.mailgun.net/v3/" + MAILGUN_DOMAIN_NAME + "/messages");
         FormDataMultiPart formData = new FormDataMultiPart();
-        formData.field("from", MAIL_GUN_ADDRESS);
+        if (siteType == 2) {
+            formData.field("from", MAIL_GUN_ADDRESS2);
+        } else {
+            formData.field("from", MAIL_GUN_ADDRESS);
+        }
         formData.field("to", TO);
         if (StringUtils.isNotBlank(BCC)) {
             formData.field("bcc", BCC);
