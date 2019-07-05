@@ -51,4 +51,8 @@ public interface LookReturnOrderServiceNew {
 	orderJson getOrderByship(String shipno);
 
 	EasyUiJsonResult SetUpMoney(String ship, String number);
+
+	List<returndisplay> FindAllByTborder(String tborder);
+
+    EasyUiJsonResult AddOtherOrder(List<returndisplay> list, String admName);
 }

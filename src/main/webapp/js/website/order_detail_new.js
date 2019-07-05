@@ -1022,10 +1022,14 @@ function getBuyer(oids){
                         if (document.getElementById("buyer"+json[i].odid).options[j].text == json[i].admName){
                             document.getElementById("buyer"+json[i].odid).options[j].selected=true;
                             break;
+                        } if (document.getElementById("Abuyer").options[j].text == json[i].admName){
+                            document.getElementById("Abuyer").options[j].selected=true;
+                            break;
                         }
                     }
                     if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
                         $("#buyer"+json[i].odid).attr("disabled",true);
+                        $("#Abuyer").attr("disabled",true);
                     }
                 }
             }
@@ -1230,6 +1234,26 @@ function changeBuyer(odid,buyid){
         },
         error : function(res){
             $("#info"+odid).text("执行失败,请联系管理员");
+        }
+    });
+}
+//手动调整整单采购人员
+function changeAllBuyer(orderNo,buyid){
+    $.ajax({
+        url:"/cbtconsole/orderDetails/changeAllBuyer",
+        type:"post",
+        dataType:"json",
+        data : {"orderNo":orderNo,"admuserid":buyid},
+        success:function(data){
+            if(data.ok){
+                $("#orderbuyer").text("执行成功");
+            }else{
+                $("#orderbuyer").text("执行失败");
+            }
+            window.location.reload();
+        },
+        error : function(res){
+            $("#orderbuyer").text("执行失败,请联系管理员");
         }
     });
 }

@@ -2022,7 +2022,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		return pruchaseMapper.queryOrderProductSourceByOrderNo(orderNo);
 	}
 
-	@Override
+    @Override
+    public void changeAllBuyer(String orderNo, Integer integer) {
+        this.pruchaseMapper.changeAllBuyer(orderNo,integer);
+    }
+
+    @Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);
 		AlibabaTradeFastCreateOrderParam param = new AlibabaTradeFastCreateOrderParam();

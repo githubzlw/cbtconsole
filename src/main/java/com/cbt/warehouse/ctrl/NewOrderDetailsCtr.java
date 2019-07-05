@@ -833,6 +833,39 @@ public class NewOrderDetailsCtr {
 		}
 		return json;
 	}
+/**
+	 * 手动调整采购人员
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/changeAllBuyer")
+	@ResponseBody
+	public JsonResult changeAllBuyer(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String orderNo = request.getParameter("orderNo");
+		String admuserid = request.getParameter("admuserid");
+		try {
+			if (StringUtil.isBlank(orderNo)) {
+				json.setOk(false);
+				json.setMessage("获取订单详情id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(admuserid)) {
+				json.setOk(false);
+				json.setMessage("获取采购人id失败");
+				return json;
+			}
+			this.iPurchaseService.changeAllBuyer(orderNo, Integer.valueOf(admuserid));
+			json.setOk(true);
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			json.setOk(false);
+			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
+		}
+		return json;
+	}
 
 	/**
 	 * 调整整个订单的采购人员

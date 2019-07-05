@@ -742,6 +742,12 @@
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
                 </td>
+                <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer(${order.orderNo},this.value);">
+                    <option value=""></option>
+                    <c:forEach var="aub" items="${aublist }">
+                        <option value="${aub.id }">${aub.admName}</option>
+                    </c:forEach>
+                </select><span id="orderbuyer"></span></td>
                 <td colspan="3" style="display: none;" id="td_buyuser">
                     <span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
                     <select id="saler" name="saler" style="width: 110px;"></select>
@@ -1434,6 +1440,14 @@
                         <td id="odid${orderd.id}">采购时间:${orderd.purchase_time}<br> <select
                                 id="buyer${orderd.id}"
                                 onchange="changeBuyer(${orderd.id},this.value);">
+                            <option value=""></option>
+                            <c:forEach var="aub" items="${aublist }">
+                                <option value="${aub.id }">${aub.admName}</option>
+                            </c:forEach>
+                        </select><span id="info${orderd.id}"></span>
+                           <br/> 按pid分配采购：<select
+                                id="pidbuyer${orderd.id}"
+                                onchange="changeBuyerpid(${orderd.id},this.value);">
                             <option value=""></option>
                             <c:forEach var="aub" items="${aublist }">
                                 <option value="${aub.id }">${aub.admName}</option>

@@ -639,4 +639,42 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		return json;
 	}
 
+	@Override
+	public List<returndisplay> FindAllByTborder(String tborder) {
+		try {
+			List<returndisplay> item=this.lookReturnOrderServiceNewMapper.FindAllByTborder(tborder);
+			return item;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	@Override
+	public EasyUiJsonResult AddOtherOrder(List<returndisplay> list, String admName) {
+		Boolean bo=false;
+		try {
+			for (int i = 0; i < list.size(); i++) {
+                list.get(i).setApplyUser(admName);
+                list.get(i).setState(-1);
+                list.get(i).setReturnNumber(list.get(i).getItemNumber());
+                Date currentTime = new Date();
+                list.get(i).setApplyTime(df.format(new Date()));
+                bo=this.lookReturnOrderServiceNewMapper.AddOrder(list.get(i));
+            }
+		} catch (Exception e) {
+			e.printStackTrace();
+			bo=false;
+		}
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		if (bo) {
+			json.setRows(1);
+			json.setFooter(df.format(new Date()));
+		}else {
+			json.setRows(0);
+		}
+		return json;
+	}
+
 }

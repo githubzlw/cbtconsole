@@ -11,6 +11,7 @@ import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -549,4 +550,6 @@ public interface IPurchaseMapper {
 	 * @return
 	 */
 	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
+    @Update("update goods_distribution set admuserid=#{integer}  where orderid = #{orderNo}")
+    void changeAllBuyer(@Param("orderNo") String orderNo, @Param("integer") Integer integer);
 }
