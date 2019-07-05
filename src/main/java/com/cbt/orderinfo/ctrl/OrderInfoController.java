@@ -621,9 +621,11 @@ public class OrderInfoController{
 			modelM.put("name",email);
 			modelM.put("accountLink","https://www.import-express.com/orderInfo/emailLink?orderNo="+orderNo+"");
 			if ("0".equals(Website)){
+				modelM.put("websiteType",1);
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE);
 			}
 			if ("1".equals(Website)){
+				modelM.put("websiteType",2);
 				modelM.put("accountLink","https://www.kidsproductwholesale.com/orderInfo/emailLink?orderNo="+orderNo+"");
 				sendMailFactory.sendMail(String.valueOf(modelM.get("name")), null, "Order change notice", modelM, TemplateType.GOODS_CHANGE_KIDS);
 			}
