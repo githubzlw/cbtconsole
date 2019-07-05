@@ -466,4 +466,13 @@ public interface CustomGoodsMapper {
     PurchasesBean FindShipnoByOdid(@Param("purchasesBean") PurchasesBean purchasesBean);
     @Select("SELECT shipno from taobao_1688_order_history WHERE orderid=#{tborderid} LIMIT 1")
     String FindShipnoByTbor(@Param("tborderid") String tborderid);
+
+    /**
+     * 根据shopId查询数据信息
+     *
+     * @param shopId
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
+
 }
