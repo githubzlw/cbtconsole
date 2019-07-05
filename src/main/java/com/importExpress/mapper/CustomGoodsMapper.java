@@ -462,7 +462,6 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
-
     @Select("SELECT shipno as shipnoid,tborderid from id_relationtable WHERE orderid=#{purchasesBean.orderNo} AND odid=#{purchasesBean.od_id} AND goodid=#{purchasesBean.goodsid}")
     PurchasesBean FindShipnoByOdid(@Param("purchasesBean") PurchasesBean purchasesBean);
     @Select("SELECT shipno from taobao_1688_order_history WHERE orderid=#{tborderid} LIMIT 1")
