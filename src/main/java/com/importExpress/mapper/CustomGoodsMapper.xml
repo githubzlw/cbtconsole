@@ -1406,4 +1406,14 @@
         insert into custom_goods_img_up_log(pid,img_url,admin_id,remark)
         values(#{pid}, #{imgUrl}, #{adminId}, #{remark})
     </insert>
+
+    <select id="queryGoodsByShopId" resultMap="queryGoodsResultMap">
+        select
+        cbu.keyword,cbu.catid1,cbu.pid,cbu.enname,cbu.localpath,cbu.remotpath,cbu.goodsstate,cbu.custom_main_image,cbu.is_sold_flag,
+        cbu.ali_name,cbu.ali_img,cbu.ali_pid,cbu.valid,cbu.name,cbu.from_flag,cbu.final_weight,cbu.max_price,cbu.shop_id,
+        cbu.bm_flag,cbu.isBenchmark,cbu.source_pro_flag,cbu.source_used_flag,cbu.ocr_match_flag,cbu.unsellableReason,cbu.eninfo,
+        cbu.feeprice,cbu.fprice,cbu.wholesale_price,cbu.price,cbu.wprice
+        from custom_benchmark_ready cbu
+        where cbu.shop_id = #{shopId} and valid = 1
+    </select>
 </mapper>
