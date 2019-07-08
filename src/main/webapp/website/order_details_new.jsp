@@ -266,6 +266,31 @@
             $("#ordercountry_value").val("${order.address.country}");
             $("#ordercountry").val("${order.address.country}");
         });
+        //手动调整同pid采购人员
+        function pidchec(odid,orderNo){
+            var admid=$("#buyer"+odid).val()
+            alert(admid)
+            $.ajax({
+                url: "/cbtconsole/orderDetails/changeBuyerByPid",
+                type: "post",
+                dataType: "json",
+                data: {"odid": odid, "orderNo": orderNo, "admid": admid},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#info" + odid).text("执行成功");
+                    } else {
+                        $("#info" + odid).text("执行失败");
+                    }
+                    window.location.reload();
+                },
+                error: function (res) {
+                    $("#info" + odid).text("执行失败,请联系管理员");
+                }
+            });
+
+        }
+
+
     </script>
 
     <link type="text/css" rel="stylesheet"
@@ -742,6 +767,12 @@
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
                 </td>
+                <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer(${order.orderNo},this.value);">
+                    <option value=""></option>
+                    <c:forEach var="aub" items="${aublist }">
+                        <option value="${aub.id }">${aub.admName}</option>
+                    </c:forEach>
+                </select><span id="orderbuyer"></span></td>
                 <td colspan="3" style="display: none;" id="td_buyuser">
                     <span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
                     <select id="saler" name="saler" style="width: 110px;"></select>
@@ -1439,6 +1470,7 @@
                                 <option value="${aub.id }">${aub.admName}</option>
                             </c:forEach>
                         </select><span id="info${orderd.id}"></span>
+                           <input type="checkbox" id="ch${orderd.id}" onchange="pidchec(${orderd.id},${order.orderNo})">：按pid分配采购(勾选当前订单此pid商品都分配给当前采购)
 
                             <!-- 消息备注列合并过来的-->
                             <div style="overflow-y:scroll;height:200px;width:200px;">
