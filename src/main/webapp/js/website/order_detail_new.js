@@ -283,10 +283,7 @@ function fnSplitOrder(orderno, email, paytime) {
 							if (data.ok) {
                                 var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  " +
 									"onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" " +
-									"onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  />" +
-									"<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
-									"<option value=\"1\" selected=\"selected\">import-express</option>" +
-									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
+									"onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  />"
 									"</div>";
                                 $.dialog({
                                     title : '拆单成功是否要发送邮件！',
@@ -300,7 +297,7 @@ function fnSplitOrder(orderno, email, paytime) {
                                         var orderNew = data.data;
                                         var email = $('#email').val();
                                         var websiteType = $('#website_type').val();
-                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email,websiteType);
+                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email);
                                     },
                                     cancel : function() {
                                         window.location.reload();
@@ -564,10 +561,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         return ;
 	}
 	//var isCf = confirm("是否确定取消订单?");
-	var text = "<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
-									"<option value=\"1\" selected=\"selected\">import-express</option>" +
-									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
-									"</div>";
+	var text = "";
     $.dialog({
         title : '是否确定取消订单?',
         content : text,
@@ -1981,7 +1975,7 @@ function resetClothingDiv(){
     document.getElementById('clothing_orderid').innerHTML= "";
     document.getElementById('clothing_goodsid').innerHTML= "";
 }
-function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email,websiteType) {
+function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
     var s = orderno;
     $.ajax({
         type : 'POST',
@@ -1992,8 +1986,7 @@ function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email,websit
             "ordernoNew" : ordernoNew,
             "time_" : time_,
             "state" : state,
-            "email" : email,
-            "websiteType" : websiteType
+            "email" : email
         },
         success : function(data) {
             if(data != null){

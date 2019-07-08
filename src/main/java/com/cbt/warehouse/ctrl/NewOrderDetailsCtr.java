@@ -43,6 +43,7 @@ import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.collections.map.HashedMap;
@@ -1541,7 +1542,8 @@ public class NewOrderDetailsCtr {
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
 		String websiteType= request.getParameter("websiteType");
-		boolean isKidFlag =  "2".equals(websiteType);
+		// boolean isKidFlag =  "2".equals(websiteType);
+		boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
 		if (mainOrderNo.equals(orderNo)) {
 			int res = orderwsServer.iscloseOrder(orderNo);
 			if (res > 0) {
@@ -1700,6 +1702,7 @@ public class NewOrderDetailsCtr {
 						model.put("name",toEmail);
 						model.put("accountLink",AppConfig.center_path);
 						model.put("orderNo",orderNo);
+						model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
@@ -1853,7 +1856,8 @@ public class NewOrderDetailsCtr {
 				}
                 if (json.isOk()) {
                 	String websiteType= request.getParameter("websiteType");
-					boolean isKidFlag =  "2".equals(websiteType);
+					// boolean isKidFlag =  "2".equals(websiteType);
+                	boolean isKidFlag =  MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
                     // ssd add start
                     // 发送取消订单的提醒邮件
 //                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
@@ -1876,6 +1880,7 @@ public class NewOrderDetailsCtr {
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
+                    model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                     if(isKidFlag){
                     	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
 					} else{
