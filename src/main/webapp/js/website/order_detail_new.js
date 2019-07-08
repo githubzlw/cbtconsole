@@ -1256,9 +1256,9 @@ function fnChangeProduct(orderNo) {
 function sendCutomers(orderNo, whichOne, isDropship) {
 	// $("#notifycustomer").attr("disabled", "disabled");
 	// $("#msg").css("display", "none");
-	 var Website=$("#Web_site").val();
+	//  var Website=$("#Web_site").val();
 	$.ajax({
-		url : '/cbtconsole/order/sendCutomers?Website='+Website,
+		url : '/cbtconsole/order/sendCutomers',
 		type : "post",
 		data : {"orderNo" : orderNo, "whichOne" : whichOne, "isDropship" : isDropship},
 		success : function(data) {
