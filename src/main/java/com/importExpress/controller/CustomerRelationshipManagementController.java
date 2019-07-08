@@ -13,6 +13,7 @@ import com.importExpress.pojo.AdminRUser;
 import com.importExpress.pojo.AdminRUserExample;
 import com.importExpress.pojo.Outofstockdemandtable;
 import com.importExpress.service.*;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.RedisModel;
 import com.importExpress.utli.SendMQ;
 import org.apache.commons.lang3.StringUtils;
@@ -159,7 +160,7 @@ public class CustomerRelationshipManagementController {
         RedisModel redisModel= new RedisModel();
         redisModel.setType("3");
         redisModel.setUserid(new String[]{userIdStr});
-        sendMQ.sendMsg(redisModel);
+        sendMQ.sendMsg(redisModel, MultiSiteUtil.getSiteTypeNum(orderNo) - 1);
         sendMQ.closeConn();
         return message;
     }

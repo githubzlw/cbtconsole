@@ -9,6 +9,14 @@
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
     <script type="text/javascript"
             src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var website = '${website}';
+            if(website > 0){
+                $("#website_type").val(2);
+            }
+        });
+    </script>
 </head>
 <body>
 <c:if test="${success == 0}">
@@ -20,7 +28,7 @@
         <img style="cursor: pointer"
                  src="https://img1.import-express.com/importcsvimg/webpic/newindex/img/logo.png"/>
         <span>网站名:
-            <select id="website_type" style="height: 28px;width: 160px;">
+            <select disabled="disabled" id="website_type" style="height: 28px;width: 160px;">
                 <option value="1" selected="selected">import-express</option>
                 <option value="2">kidsproductwholesale</option>
             </select>
