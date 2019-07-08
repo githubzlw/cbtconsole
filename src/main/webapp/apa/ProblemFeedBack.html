@@ -127,6 +127,7 @@ table th {
 		function saveRepalyContent() {
 		var report_id = $("#report_id").val();
 		var text = $("#remark_content_").val();
+		var websiteType = $("#website_type").val();
 		$
 				.ajax({
 					type : 'POST',
@@ -134,7 +135,8 @@ table th {
 					url : '/cbtconsole/problemFeedBack/saveRepalyContent',
 					data : {
 						'report_id' : report_id,
-						'text' : text
+						'text' : text,
+                        'websiteType' : websiteType
 					},
 					dataType : 'text',
 					success : function(data) {
@@ -282,6 +284,13 @@ table th {
 		反馈内容:
 		<textarea name="remark_content" rows="8" cols="50"
 			id="remark_content_"></textarea>
+            <br />
+            邮件回复网站名:
+            <select id="website_type" style="height: 28px;width: 160px;">
+                <option value="1" selected="selected">import-express</option>
+                <option value="2">kidsproductwholesale</option>
+            </select>
+            <br />
 		<input type="button" id="repalyBtnId" onclick="saveRepalyContent()"
 			value="提交反馈">
 	</div>
