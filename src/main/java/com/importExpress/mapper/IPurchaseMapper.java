@@ -552,4 +552,8 @@ public interface IPurchaseMapper {
 	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
     @Update("update goods_distribution set admuserid=#{integer}  where orderid = #{orderNo}")
     void changeAllBuyer(@Param("orderNo") String orderNo, @Param("integer") Integer integer);
+    @Update("UPDATE goods_distribution SET admuserid=#{admid} WHERE goods_pid=#{pid} and odid=#{odid} AND orderid=#{orderNo}")
+    void changeBuyerByPid(@Param("odid") String odid, @Param("admid") String admid, @Param("orderNo") String orderNo,@Param("pid")String pid);
+    @Select("SELECT goods_pid FROM goods_distribution WHERE odid=#{odid}")
+	String FindPidByOdid(@Param("odid") String odid);
 }

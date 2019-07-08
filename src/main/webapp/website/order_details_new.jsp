@@ -266,6 +266,31 @@
             $("#ordercountry_value").val("${order.address.country}");
             $("#ordercountry").val("${order.address.country}");
         });
+        //手动调整同pid采购人员
+        function pidchec(odid,orderNo){
+            var admid=$("#buyer"+odid).val()
+            alert(admid)
+            $.ajax({
+                url: "/cbtconsole/orderDetails/changeBuyerByPid",
+                type: "post",
+                dataType: "json",
+                data: {"odid": odid, "orderNo": orderNo, "admid": admid},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#info" + odid).text("执行成功");
+                    } else {
+                        $("#info" + odid).text("执行失败");
+                    }
+                    window.location.reload();
+                },
+                error: function (res) {
+                    $("#info" + odid).text("执行失败,请联系管理员");
+                }
+            });
+
+        }
+
+
     </script>
 
     <link type="text/css" rel="stylesheet"
@@ -1445,14 +1470,7 @@
                                 <option value="${aub.id }">${aub.admName}</option>
                             </c:forEach>
                         </select><span id="info${orderd.id}"></span>
-                           <br/> 按pid分配采购：<select
-                                id="pidbuyer${orderd.id}"
-                                onchange="changeBuyerpid(${orderd.id},this.value);">
-                            <option value=""></option>
-                            <c:forEach var="aub" items="${aublist }">
-                                <option value="${aub.id }">${aub.admName}</option>
-                            </c:forEach>
-                        </select><span id="info${orderd.id}"></span>
+                           <input type="checkbox" id="ch${orderd.id}" onchange="pidchec(${orderd.id},${order.orderNo})">：按pid分配采购(勾选当前订单此pid商品都分配给当前采购)
 
                             <!-- 消息备注列合并过来的-->
                             <div style="overflow-y:scroll;height:200px;width:200px;">
