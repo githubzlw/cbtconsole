@@ -67,6 +67,7 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -173,6 +174,8 @@ public class WarehouseCtrl {
 	private IPurchaseService iPurchaseService;
 	@Autowired
 	private FreightFeeSerive freightFeeSerive;
+	@Autowired
+	private TabCouponService tabCouponService;
 	/**
 	 *
 	 * @Title getAllBuyer
@@ -8758,7 +8761,9 @@ public class WarehouseCtrl {
 	}
 	@RequestMapping(value = "/reply", method = { RequestMethod.POST })
 	@ResponseBody
-	public JsonResult reply(@RequestParam(value = "gbookid", required = true) String gbookid, @RequestParam(value = "replyContent1", required = true) String replyContent1,
+	public JsonResult reply(@RequestParam(value = "gbookid", required = true) String gbookid,
+                            @RequestParam(value = "replyContent1", required = true) String replyContent1,
+                            @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType, //网站名
                             @RequestParam(value = "uploadfile1", required = true) MultipartFile file, HttpServletRequest request) {
 		JsonResult json = new JsonResult();
 		boolean flag=false;
@@ -8829,7 +8834,9 @@ public class WarehouseCtrl {
 				Date now = new Date();
 				dateFormat.setLenient(false);
 				String date = dateFormat.format(now);
-				count = ibs.reply(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath);
+				// 发送邮件等 原方法不能注入 邮件发送转移位置
+                tabCouponService.SendGuestbook(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath, websiteType);
+                count = ibs.reply(id, replyContent1,date,name,qustion,pname,email,Integer.parseInt(userId),purl,sale_email,picPath);
 				if(count>0){
 					json.setOk(true);
 				}

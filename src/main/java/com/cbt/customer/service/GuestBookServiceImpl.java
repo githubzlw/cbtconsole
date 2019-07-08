@@ -112,33 +112,34 @@ public class GuestBookServiceImpl implements IGuestBookService{
 	@Override
 	public int reply(final int id,final String replyContent,final String date,final String name,final String qustion,final String pname,
 	                 final String email,final int userId,final String purl,final String sale_email,final String picPath) {
-		new Thread(){
-			public void run() {
-				StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
-		        sb.append(" <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div><br><div style='font-size: 13px;'>"); 
-		        sb.append("<div >"+replyContent+" </div>"); 
-		        sb.append("<br><div style='margin-bottom: 10px;'><span style='font-weight: bold'>Your Question:</span>["+id+"]"+qustion+" </div>"); 
-		        sb.append("<div style='margin-bottom: 10px;'><span style='font-weight: bold'>Item:</span><a href='"+purl+"'> "+pname+"</a></div>");
-		        if(StringUtil.isNotBlank(picPath)){
-			        sb.append("<br><img src='"+picPath+"'></img><br>");
-		        }
-		        //sb.append("<br><div>We hope you enjoy the shopping experience on Import-Express.com!</div><br>");
-		        sb.append("<div style='style='font-weight: bold''>Best regards, </div><div style='font-weight: bold'><a href='http://www.import-express.com'>www.Import-Express.com</a></div></div>");
-		       if(Utility.getStringIsNull(email)){
-		    	   String sendemail = null;
-		    	   String pwd = null;
-		    	   if(userId != 0){
-		    		   IUserDao userDao = new UserDao();
-		    		   String[] adminEmail =  userDao.getAdminUser(0, null, userId);
-		    		   if(adminEmail != null){
-		    			   sendemail = adminEmail[0];
-		    			   pwd = adminEmail[1];
-		    		   }
-		    	   }
-				        SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,sale_email);
-		       }
-			};
-		}.start();
+        // 发送邮件等 原方法不能注入 转移到 com.importExpress.service.impl.TabCouponServiceImpl.SendGuestbook
+//		new Thread(){
+//			public void run() {
+//				StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
+//		        sb.append(" <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div><br><div style='font-size: 13px;'>");
+//		        sb.append("<div >"+replyContent+" </div>");
+//		        sb.append("<br><div style='margin-bottom: 10px;'><span style='font-weight: bold'>Your Question:</span>["+id+"]"+qustion+" </div>");
+//		        sb.append("<div style='margin-bottom: 10px;'><span style='font-weight: bold'>Item:</span><a href='"+purl+"'> "+pname+"</a></div>");
+//		        if(StringUtil.isNotBlank(picPath)){
+//			        sb.append("<br><img src='"+picPath+"'></img><br>");
+//		        }
+//		        //sb.append("<br><div>We hope you enjoy the shopping experience on Import-Express.com!</div><br>");
+//		        sb.append("<div style='style='font-weight: bold''>Best regards, </div><div style='font-weight: bold'><a href='http://www.import-express.com'>www.Import-Express.com</a></div></div>");
+//		       if(Utility.getStringIsNull(email)){
+//		    	   String sendemail = null;
+//		    	   String pwd = null;
+//		    	   if(userId != 0){
+//		    		   IUserDao userDao = new UserDao();
+//		    		   String[] adminEmail =  userDao.getAdminUser(0, null, userId);
+//		    		   if(adminEmail != null){
+//		    			   sendemail = adminEmail[0];
+//		    			   pwd = adminEmail[1];
+//		    		   }
+//		    	   }
+//				        SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,sale_email);
+//		       }
+//			};
+//		}.start();
 		return dao.reply(id, replyContent,date);
 	}
 	/**

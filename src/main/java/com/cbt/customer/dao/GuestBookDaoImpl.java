@@ -410,7 +410,7 @@ public class GuestBookDaoImpl implements IGuestBookDao {
 		ResultSet rs=null;
 		GuestBookBean g=new GuestBookBean();
 		try{
-			sql="select g.questionType,g.user_id,g.orderQuantity,g.targetPrice,g.user_name,g.pname,g.content,g.online_url,u.email,ad.email as sale_email  from guestbook g left join user u on g.user_id=u.id 	inner join admin_r_user a on u.id=a.userid inner join admuser ad on a.adminid=ad.id  where g.id='"+gid+"'";
+			sql="select g.questionType,g.user_id,g.orderQuantity,g.targetPrice,g.user_name,g.pname,g.content,g.online_url,u.email,ad.email as sale_email  from guestbook g left join user u on g.user_id=u.id 	left join admin_r_user a on u.id=a.userid left join admuser ad on a.adminid=ad.id  where g.id='"+gid+"'";
 			stmt=conn.prepareStatement(sql);
 			rs=stmt.executeQuery();
 			if(rs.next()){
