@@ -1702,6 +1702,7 @@ public class NewOrderDetailsCtr {
 						model.put("name",toEmail);
 						model.put("accountLink",AppConfig.center_path);
 						model.put("orderNo",orderNo);
+						model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
@@ -1855,7 +1856,8 @@ public class NewOrderDetailsCtr {
 				}
                 if (json.isOk()) {
                 	String websiteType= request.getParameter("websiteType");
-					boolean isKidFlag =  "2".equals(websiteType);
+					// boolean isKidFlag =  "2".equals(websiteType);
+                	boolean isKidFlag =  MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
                     // ssd add start
                     // 发送取消订单的提醒邮件
 //                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
