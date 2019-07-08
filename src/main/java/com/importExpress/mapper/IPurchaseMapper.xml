@@ -37,7 +37,7 @@
         SELECT a.addr AS address,IFNULL(b.level,'') AS level,IFNULL(b.quality_avg,'') AS quality_avg FROM shop_addr_spider a LEFT JOIN supplier_scoring b ON a.shop_id=b.shop_id WHERE a.shop_id=#{shop_id} limit 1
     </select>
     <select id="getShopInfo" resultType="java.util.Map">
-        SELECT shop_name,supply_grade FROM  shop_qualifications where shop_id=#{shop_id} limit 1
+        SELECT shop_name,supply_grade,shop_en_name FROM  shop_qualifications where shop_id=#{shop_id} limit 1
     </select>
     <select id="getLevelBySid" resultType="java.util.Map">
         select distinct a.address,s.level from ali_info_data a left join supplier_scoring s on a.shop_id=s.shop_id

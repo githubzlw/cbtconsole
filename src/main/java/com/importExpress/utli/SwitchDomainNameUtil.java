@@ -1,6 +1,9 @@
 package com.importExpress.utli;
 
+import com.cbt.bean.CustomGoodsPublish;
 import com.importExpress.pojo.ShopCarMarketing;
+import com.importExpress.pojo.ShopRecommendGoods;
+import com.importExpress.pojo.ShopRecommendInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -28,6 +31,68 @@ public class SwitchDomainNameUtil {
                 changeShopCarMarketingSingle(shopCarMarketing);
             }
         }
+    }
+
+
+    /**
+     * 产品单个bean域名切换
+     *
+     * @param goods
+     */
+    public static void changeCustomGoodsPublishBean(CustomGoodsPublish goods) {
+        goods.setRemotpath(checkNullAndReplace(goods.getRemotpath()));
+        goods.setCustomMainImage(checkNullAndReplace(goods.getCustomMainImage()));
+        goods.setShowMainImage(checkNullAndReplace(goods.getShowMainImage()));
+        goods.setImg(checkNullAndReplace(goods.getImg()));
+        goods.setEninfo(checkNullAndReplace(goods.getEninfo()));
+    }
+
+    /**
+     * 店铺推荐List域名切换
+     *
+     * @param infoList
+     */
+    public static void changeShopRecommendInfoList(List<ShopRecommendInfo> infoList) {
+        if (infoList != null && !infoList.isEmpty()) {
+            for (ShopRecommendInfo info : infoList) {
+                changeShopRecommendInfoBean(info);
+            }
+        }
+    }
+
+    /**
+     * 店铺推荐Bean域名切换
+     *
+     * @param recommendInfo
+     */
+    public static void changeShopRecommendInfoBean(ShopRecommendInfo recommendInfo) {
+        recommendInfo.setShopUrl(checkNullAndReplace(recommendInfo.getShopUrl()));
+        recommendInfo.setCoverImg(checkNullAndReplace(recommendInfo.getCoverImg()));
+        changeShopRecommendGoodsList(recommendInfo.getGoodsList());
+    }
+
+    /**
+     * 店铺推荐商品List域名切换
+     *
+     * @param goodsList
+     */
+    public static void changeShopRecommendGoodsList(List<ShopRecommendGoods> goodsList) {
+        if (goodsList != null && !goodsList.isEmpty()) {
+            for (ShopRecommendGoods gd : goodsList) {
+                changeShopRecommendGoodsBean(gd);
+            }
+        }
+    }
+
+    /**
+     * 店铺推荐商品Bean域名切换
+     *
+     * @param recommendGoods
+     */
+    public static void changeShopRecommendGoodsBean(ShopRecommendGoods recommendGoods) {
+        recommendGoods.setGoodsImg(checkNullAndReplace(recommendGoods.getGoodsImg()));
+        recommendGoods.setMainImg(checkNullAndReplace(recommendGoods.getMainImg()));
+        recommendGoods.setOnlineUrl(checkNullAndReplace(recommendGoods.getOnlineUrl()));
     }
 
     /**

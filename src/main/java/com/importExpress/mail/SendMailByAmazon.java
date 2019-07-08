@@ -22,12 +22,16 @@ public class SendMailByAmazon implements SendMail {
 
     private static final String FROM = "service@importexpress.com";
     private static final String FROMNAME = "Import-Express.com";
+    private static final String FROM2 = "service@chinawholesaleinc.com";
+    private static final String FROMNAME2 = "ChinaWholesaleInc.com";
     private static final String HOST = "email-smtp.us-west-2.amazonaws.com";
     private static final String SMTP_USERNAME = "AKIAIO7TWKGGFXB5WY2A";
     private static final String SMTP_PASSWORD = "AuYzbo9jZAUkWX35u5mwPdFeUJVdKI6K2sqTHCXZyiK6";
     private static final int PORT = 587;
-    protected SendMailByAmazon() {
 
+    private Integer siteType;
+    public SendMailByAmazon(Integer siteType) {
+        this.siteType = siteType;
     }
 
     public static void main(String[] args) {
@@ -39,7 +43,7 @@ public class SendMailByAmazon implements SendMail {
                     "<a href='https://github.com/javaee/javamail'>Javamail Package</a>",
                     " for <a href='https://www.java.com'>Java</a>."
             );
-            new SendMailByAmazon().sendMail("luohao518@163.com", "", "Amazon SES test (SMTP interface accessed using Java)", BODY);
+            new SendMailByAmazon(2).sendMail("luohao518@163.com", "", "Amazon SES test (SMTP interface accessed using Java)", BODY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,7 +61,11 @@ public class SendMailByAmazon implements SendMail {
         Session session = Session.getDefaultInstance(props);
 
         MimeMessage msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(FROM, FROMNAME));
+        if (siteType == 2) {
+            msg.setFrom(new InternetAddress(FROM2, FROMNAME2));
+        } else {
+            msg.setFrom(new InternetAddress(FROM, FROMNAME));
+        }
         msg.setRecipient(Message.RecipientType.TO, new InternetAddress(TO));
         if (StringUtils.isNotBlank(BCC)) {
             msg.setRecipient(Message.RecipientType.BCC, new InternetAddress(BCC));

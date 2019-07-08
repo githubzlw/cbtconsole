@@ -117,9 +117,11 @@ public class QuestionAndAnswerServiceImpl implements QuestionAndAnswerService {
                 model.put("qustion",qustion);
                 model.put("itemUrl",urlTem);
                 if ("0".equals(Website)){
+					model.put("websiteType",1);
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From ImportExpress", model, TemplateType.BUSINESS_INQUIRIES);
 				}
                 if ("1".equals(Website)){
+					model.put("websiteType",2);
 					 urlTem = "https://www.kidsproductwholesale.com/goodsinfo/...-1"+url+".html";
 					model.put("itemUrl",urlTem);
 					sendMailFactory.sendMail(String.valueOf(model.get("email")), null, "["+id+"]"+"Inquiry Reply From kidsproductwholesale", model, TemplateType.BUSINESS_INQUIRIES_KIDS);

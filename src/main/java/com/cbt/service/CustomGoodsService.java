@@ -259,6 +259,7 @@ public interface CustomGoodsService {
      * 根据pid查询本地的1688商品以及对于翻译和ali商品的数据
      *
      * @param pid
+     * @param type : 0是importExpress,1是kid
      * @return
      */
     public CustomGoodsPublish queryGoodsDetails(String pid, int type);
@@ -814,5 +815,14 @@ public interface CustomGoodsService {
      * @return
      */
     int insertIntoGoodsImgUpLog(String pid, String imgUrl, int adminId, String remark);
+
+
+    /**
+     * 根据shopId查询数据信息
+     *
+     * @param shopId
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
 
 }

@@ -18,14 +18,13 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.OrderSplitMain;
-import com.importExpress.service.IPurchaseService;
-import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.pojo.SplitGoodsNumBean;
+import com.importExpress.service.OrderSplitRecordService;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import com.importExpress.utli.UserInfoUtils;
 import net.sf.json.JSONArray;
-import com.importExpress.utli.SwitchDomainNameUtil;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -602,15 +600,17 @@ public class NewOrderSplitCtr {
                 email = m.group();
             }
         }
+        String orderNo = request.getParameter("orderno");
         String websiteType = request.getParameter("websiteType");
-        boolean isKidFlag = "2".equals(websiteType);
+        // boolean isKidFlag = "2".equals(websiteType);
+        boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
         try {
             String remark = StringUtils.isNotBlank(request.getParameter("remark ")) ? request.getParameter("remark") : "";
             model.put("remark", remark);
             // 判断是否开启线下同步线上配置
             if (GetConfigureInfo.openSync()) {
                 String odids = request.getParameter("odids");
-                String orderNo = request.getParameter("orderno");
+
                 String ordernoNew = request.getParameter("ordernoNew");
 
                 String time = request.getParameter("time");
@@ -732,7 +732,6 @@ public class NewOrderSplitCtr {
                 model.put("currency", oldOrderBean.getCurrency());
             } else {
 
-                String orderNo = request.getParameter("orderno");
                 String ordernoNew = request.getParameter("ordernoNew");
                 String time = request.getParameter("time");
                 String time_ = request.getParameter("time_");
@@ -921,6 +920,8 @@ public class NewOrderSplitCtr {
             net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
             String modeStr = jsonObject.toString();
             try {
+                // 邮件替换头部
+                model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                 if(isKidFlag){
                     sendMailFactory.sendMail(String.valueOf(model.get("email")), email,
                         "Due to supply reasons, we can only send your order partially at first.", model, TemplateType.DISMANTLING_KID);

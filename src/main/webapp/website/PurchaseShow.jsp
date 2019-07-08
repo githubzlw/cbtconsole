@@ -2989,8 +2989,8 @@
 						<td width="5%">
                             一键确认采购发送邮件网站名:
                             <select name="websiteType" style="height: 28px;width: 160px;">
-                                <option value="1" selected="selected">import-express</option>
-                                <option value="2">kidsproductwholesale</option>
+                                <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
+                                <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
                             </select>
                             <br /><br />
                             操作/状态
@@ -3377,8 +3377,8 @@
                             <div>
                                 采购确认发送邮件网站名:
                                 <select name="websiteType" style="height: 28px;width: 160px;">
-                                    <option value="1" selected="selected">import-express</option>
-                                    <option value="2">kidsproductwholesale</option>
+                                    <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
+                                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
                                 </select>
                                 <br /><br />
                             </div>
