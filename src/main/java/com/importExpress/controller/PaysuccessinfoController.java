@@ -61,11 +61,8 @@ public class PaysuccessinfoController {
             String edtime = request.getParameter("edtime");
             String userIdStr = request.getParameter("userId");
             String orderNo = request.getParameter("orderNo");
-            List<Paysuccessinfo> paysuccessinfoList = paysuccessinfoService.queryPaySuccessInfoList(pageStr, limitNumStr, sttime, edtime, userIdStr, orderNo, user.getId());
-            long total = paysuccessinfoList.stream().count();
-            json.setTotal((int) total);
-            json.setRows(paysuccessinfoList);
-            json.setSuccess(true);
+            json = paysuccessinfoService.queryPaySuccessInfoList(pageStr, limitNumStr, sttime, edtime, userIdStr, orderNo, user.getId());
+
         } catch (Exception e) {
             log.error("queryForList error:", e);
             json.setMessage("queryForList error:" + e.getMessage());
