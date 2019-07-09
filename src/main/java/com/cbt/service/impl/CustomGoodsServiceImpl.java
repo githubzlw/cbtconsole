@@ -14,6 +14,7 @@ import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -244,11 +245,13 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
 
     @Override
     public CustomGoodsPublish queryGoodsDetails(String pid, int type) {
-        //return customGoodsDao.queryGoodsDetails(pid, type);
         DataSourceSelector.restore();
         CustomGoodsPublish bean = customGoodsMapper.queryGoodsDetailsByPid(pid);
         if(bean != null){
             bean.setOnlineUrl(GoodsInfoUtils.genOnlineUrl(bean));
+        }
+        if(type == 1){
+            SwitchDomainNameUtil.changeCustomGoodsPublishBean(bean);
         }
         return bean;
     }
@@ -814,6 +817,11 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
     @Override
     public int insertIntoGoodsImgUpLog(String pid, String imgUrl, int adminId, String remark) {
         return customGoodsMapper.insertIntoGoodsImgUpLog(pid, imgUrl, adminId, remark);
+    }
+
+    @Override
+    public List<CustomGoodsPublish> queryGoodsByShopId(String shopId) {
+        return customGoodsMapper.queryGoodsByShopId(shopId);
     }
 
 }

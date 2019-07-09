@@ -367,7 +367,7 @@ $(function(){
 <div class="mod_pay3" style="display: none;" id="big_img">
 
 </div>
-	<div id="dlg" class="easyui-dialog" title="回复内容" data-options="modal:true" style="width:450px;height:250px;padding:10px;">
+	<div id="dlg" class="easyui-dialog" title="回复内容" data-options="modal:true" style="width:450px;height:320px;padding:10px;">
 		<form id="uploadFileForm1" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="gbookid" id="gbookid"/>
 			<div style="margin-bottom:20px">
@@ -378,6 +378,13 @@ $(function(){
 					id="local_picture1" name="uploadfile1" class="easyui-filebox"
 					data-options="prompt:'...'"
 					style="width: 360px">
+			</div>
+			<div style="margin-bottom: 20px">
+                邮件回复网站名: <br />
+                <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
+                    <option value="1" selected="selected">import-express</option>
+                    <option value="2">kidsproductwholesale</option>
+                </select>
 			</div>
 		</form>
 		<div style="text-align: center; padding: 5px 0">

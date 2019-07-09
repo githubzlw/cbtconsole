@@ -43,6 +43,7 @@ import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.collections.map.HashedMap;
@@ -833,6 +834,78 @@ public class NewOrderDetailsCtr {
 		}
 		return json;
 	}
+/**
+	 * 手动调整采购人员
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/changeAllBuyer")
+	@ResponseBody
+	public JsonResult changeAllBuyer(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String orderNo = request.getParameter("orderNo");
+		String admuserid = request.getParameter("admuserid");
+		try {
+			if (StringUtil.isBlank(orderNo)) {
+				json.setOk(false);
+				json.setMessage("获取订单详情id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(admuserid)) {
+				json.setOk(false);
+				json.setMessage("获取采购人id失败");
+				return json;
+			}
+			this.iPurchaseService.changeAllBuyer(orderNo, Integer.valueOf(admuserid));
+			json.setOk(true);
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			json.setOk(false);
+			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
+		}
+		return json;
+	}
+/**
+	 * 手动调整同pid采购人员
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/changeBuyerByPid")
+	@ResponseBody
+	public JsonResult changeBuyerByPid(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String odid = request.getParameter("odid");
+		String orderNo = request.getParameter("orderNo");
+		String admid = request.getParameter("admid");
+		try {
+			if (StringUtil.isBlank(odid)) {
+				json.setOk(false);
+				json.setMessage("获取订单详情id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(admid)) {
+				json.setOk(false);
+				json.setMessage("获取采购人id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(orderNo)) {
+				json.setOk(false);
+				json.setMessage("获取订单号失败");
+				return json;
+			}
+			this.iPurchaseService.changeBuyerByPid(odid,admid,orderNo);
+			json.setOk(true);
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			json.setOk(false);
+			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
+		}
+		return json;
+	}
 
 	/**
 	 * 调整整个订单的采购人员
@@ -1541,7 +1614,8 @@ public class NewOrderDetailsCtr {
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
 		String websiteType= request.getParameter("websiteType");
-		boolean isKidFlag =  "2".equals(websiteType);
+		// boolean isKidFlag =  "2".equals(websiteType);
+		boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
 		if (mainOrderNo.equals(orderNo)) {
 			int res = orderwsServer.iscloseOrder(orderNo);
 			if (res > 0) {
@@ -1700,6 +1774,7 @@ public class NewOrderDetailsCtr {
 						model.put("name",toEmail);
 						model.put("accountLink",AppConfig.center_path);
 						model.put("orderNo",orderNo);
+						model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
@@ -1853,7 +1928,8 @@ public class NewOrderDetailsCtr {
 				}
                 if (json.isOk()) {
                 	String websiteType= request.getParameter("websiteType");
-					boolean isKidFlag =  "2".equals(websiteType);
+					// boolean isKidFlag =  "2".equals(websiteType);
+                	boolean isKidFlag =  MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
                     // ssd add start
                     // 发送取消订单的提醒邮件
 //                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
@@ -1876,6 +1952,7 @@ public class NewOrderDetailsCtr {
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
+                    model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                     if(isKidFlag){
                     	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
 					} else{

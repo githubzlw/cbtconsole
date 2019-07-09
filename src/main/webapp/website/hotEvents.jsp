@@ -414,7 +414,9 @@
                     <td><input id="child_link3" class="inp_wd"/></td>
                 </tr>
                 <tr>
-                    <span style="font-size: 14px;"><input type="checkbox" id="edit_is_on" checked="checked"/>启用</span>
+                    <td colspan="2">
+                        <span style="font-size: 14px;"><input type="checkbox" id="edit_is_on" checked="checked"/>启用</span>
+                    </td>
                 </tr>
             </table>
         </form>
@@ -482,9 +484,8 @@
         <span id="show_message" style="color: red;display: none;">正在执行...</span>
     </div>
 
+    <div id="show_div">
     <c:forEach items="${list}" var="info">
-
-        <div id="show_div">
         <ul class="theme_ul">
             <li class="theme_li">
                 <div class="theme_top"><a id="edit_info_link_${info.id}" href="${info.link}"

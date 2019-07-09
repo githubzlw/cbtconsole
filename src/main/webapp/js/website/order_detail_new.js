@@ -216,11 +216,11 @@ function fnSplitOrder(orderno, email, paytime) {
 	for (var i = 1; i < tab; i++) {
 		var cansonl = $("#user_cancel_" + (i - 1)).html();// 是否取消
 		var od_time = $("#orderd_delivery_" + (i - 1)).html();// 交期时间
-		var check = $("#orderDetail tr").eq(i).find("input:checkbox");
+		var check = $("#orderDetail tr").eq(i).find(".choose_chk");
 		if ($(check).next().val() != 2) {
 			tab_yx++;
 		}
-		if (!$(check).prop("checked")) {
+		if (!$(check).is(":checked")) {
 			// 没有选中
 			if ($(check).next().val() != 2) {
 				check_num++;
@@ -283,10 +283,7 @@ function fnSplitOrder(orderno, email, paytime) {
 							if (data.ok) {
                                 var text = " <div id=\"split_div\">密送人:<input name=\"email\" id=\"email\" type=\"text\"  " +
 									"onfocus=\"if (value =='选填'){value =''; this.style.color='#000';}\" placeholder=\"选填\" " +
-									"onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  />" +
-									"<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
-									"<option value=\"1\" selected=\"selected\">import-express</option>" +
-									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
+									"onblur=\"if (value ==''){value='选填'; this.style.color='#999999';}\"  />"
 									"</div>";
                                 $.dialog({
                                     title : '拆单成功是否要发送邮件！',
@@ -300,7 +297,7 @@ function fnSplitOrder(orderno, email, paytime) {
                                         var orderNew = data.data;
                                         var email = $('#email').val();
                                         var websiteType = $('#website_type').val();
-                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email,websiteType);
+                                        sendSplitSuccessEmail(orderno,orderNew,odids,time_,state,email);
                                     },
                                     cancel : function() {
                                         window.location.reload();
@@ -564,10 +561,7 @@ function fnCloseOrder(orderno, userId, actualPay, currency, order_ac, email,
         return ;
 	}
 	//var isCf = confirm("是否确定取消订单?");
-	var text = "<span>网站名:<select id=\"website_type\" style=\"height: 28px;width: 160px;\">" +
-									"<option value=\"1\" selected=\"selected\">import-express</option>" +
-									"<option value=\"2\">kidsproductwholesale</option></select></span>" +
-									"</div>";
+	var text = "";
     $.dialog({
         title : '是否确定取消订单?',
         content : text,
@@ -1022,10 +1016,14 @@ function getBuyer(oids){
                         if (document.getElementById("buyer"+json[i].odid).options[j].text == json[i].admName){
                             document.getElementById("buyer"+json[i].odid).options[j].selected=true;
                             break;
+                        } if (document.getElementById("Abuyer").options[j].text == json[i].admName){
+                            document.getElementById("Abuyer").options[j].selected=true;
+                            break;
                         }
                     }
                     if(admid!=1 || adminName !="Ling" || adminName !="emmaxie"){
                         $("#buyer"+json[i].odid).attr("disabled",true);
+                        $("#Abuyer").attr("disabled",true);
                     }
                 }
             }
@@ -1233,6 +1231,26 @@ function changeBuyer(odid,buyid){
         }
     });
 }
+//手动调整整单采购人员
+function changeAllBuyer(orderNo,buyid){
+    $.ajax({
+        url:"/cbtconsole/orderDetails/changeAllBuyer",
+        type:"post",
+        dataType:"json",
+        data : {"orderNo":orderNo,"admuserid":buyid},
+        success:function(data){
+            if(data.ok){
+                $("#orderbuyer").text("执行成功");
+            }else{
+                $("#orderbuyer").text("执行失败");
+            }
+            window.location.reload();
+        },
+        error : function(res){
+            $("#orderbuyer").text("执行失败,请联系管理员");
+        }
+    });
+}
 
 //备注回复
 function doReplay1(orderid,odid){
@@ -1256,9 +1274,9 @@ function fnChangeProduct(orderNo) {
 function sendCutomers(orderNo, whichOne, isDropship) {
 	// $("#notifycustomer").attr("disabled", "disabled");
 	// $("#msg").css("display", "none");
-	 var Website=$("#Web_site").val();
+	//  var Website=$("#Web_site").val();
 	$.ajax({
-		url : '/cbtconsole/order/sendCutomers?Website='+Website,
+		url : '/cbtconsole/order/sendCutomers',
 		type : "post",
 		data : {"orderNo" : orderNo, "whichOne" : whichOne, "isDropship" : isDropship},
 		success : function(data) {
@@ -1981,7 +1999,7 @@ function resetClothingDiv(){
     document.getElementById('clothing_orderid').innerHTML= "";
     document.getElementById('clothing_goodsid').innerHTML= "";
 }
-function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email,websiteType) {
+function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email) {
     var s = orderno;
     $.ajax({
         type : 'POST',
@@ -1992,8 +2010,7 @@ function sendSplitSuccessEmail(orderno,ordernoNew,odids,time_,state,email,websit
             "ordernoNew" : ordernoNew,
             "time_" : time_,
             "state" : state,
-            "email" : email,
-            "websiteType" : websiteType
+            "email" : email
         },
         success : function(data) {
             if(data != null){

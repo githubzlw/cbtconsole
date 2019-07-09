@@ -95,4 +95,12 @@ public interface ShopCarMarketingService {
      */
     int queryFollowLogListCount(FollowLogBean logBean);
 
+
+    /**
+     * 更加userId和website 查询数据
+     * @param userId
+     * @param website
+     * @return
+     */
+    List<ShopCarMarketing> selectByUserIdAndType(int userId, int website);
 }

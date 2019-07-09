@@ -207,16 +207,32 @@
                     <tr>
                       <td class="body-padding"></td>
                       <td class="body-padded">
-                        <div class="body-title">Hey <i th:text="${first_name}"></i>,</div>
-                        <p class="business_question"><strong>Your Question:</strong><i th:text="${question}"></i>_<i th:text="${createtime}"></i></p>
-                        <p class="business_question"><strong>Reply from product manager:</strong><i th:text="${reply_content}"></i></p>
-                        <p class="business_page"><strong>On this page:</strong><a href="" target="_blank" style="text-decoration: underline" th:href="${toHref}"> To Shopping Car</a></p>
+                        <div>
+                            <div style='font-size: 14px;'>
+                                <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div>
+                                <br>
+                                <div style='font-size: 13px;'>
+                                    <div th:text="${replyContent}"></div>
+                                    <br>
+                                    <div style='margin-bottom: 10px;'>
+                                        <span style='font-weight: bold'>Your Question:</span>
+                                        <span th:text="${qustion}"></span>
+                                    </div>
+                                    <div style='margin-bottom: 10px;'>
+                                        <span style='font-weight: bold'>Item:</span>
+                                        <p th:utext="${pname}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <table class="body-signature-block">
                           <tr>
                             <td class="body-signature-cell">                              
-                              <p class="thanks_so">Thanks so much,</p>
-                              <p th:if="${websiteType} eq 1">ImportExpress</p>
-                              <p th:if="${websiteType} eq 2">kidsProductWholesale</p>
+                              <div style='font-weight: bold'>Best regards, </div>
+                                <div style='font-weight: bold'>
+                                <a th:if="${websiteType} eq 1" href='http://www.import-express.com'>www.import-express.com</a>
+                                <a th:if="${websiteType} eq 2" href='http://www.kidsproductwholesale.com'>www.kidsproductwholesale.com</a>
+                              </div>
                             </td>
                           </tr>
                         </table>

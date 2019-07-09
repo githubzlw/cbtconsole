@@ -11,6 +11,7 @@ import com.importExpress.service.TabCouponService;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,9 @@ public class TabCouponServiceImpl implements TabCouponService {
     private SendMailFactory sendMailFactory;
 	
 	@Override
-	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo) {
-		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid, timeTo);
-		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid, timeTo);
+	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo, Integer couponSite) {
+		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid, timeTo, couponSite);
+		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid, timeTo, couponSite);
 		
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
@@ -63,7 +64,7 @@ public class TabCouponServiceImpl implements TabCouponService {
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
-            sendMQ.sendCouponMsg(json);
+            sendMQ.sendCouponMsg(json, tabCouponNew.getSite());
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
         } finally {
@@ -104,9 +105,10 @@ public class TabCouponServiceImpl implements TabCouponService {
             String value = result.getValue();
             String[] valueArr = value.split("-");
             if (valueArr != null && valueArr.length > 0) {
-                String shareUrl = SearchFileUtils.importexpressPath
-                        + "/coupon/shareCoupon?couponcode=" + couponCode
-                        + "&shareid=" + valueArr[valueArr.length-1];
+                String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + valueArr[valueArr.length-1];
+                shareUrl = SearchFileUtils.importexpressPath + shareUrl
+                        + "<br /><br />" + "https://www.kidsproductwholesale.com" + shareUrl;
+
                 result.setShareUrl(shareUrl);
             }
         }
@@ -171,7 +173,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             for (UserBean userBean : userList) {
                 CouponUserRedisBean bean = new CouponUserRedisBean(tabCouponNew.getId(), new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
-                sendMQ.sendCouponMsg(json);
+                sendMQ.sendCouponMsg(json, tabCouponNew.getWebsiteType());
             }
             //异步发送邮件
             Runnable task=new sendCouponMailTask(userList, tabCouponNew);
@@ -291,6 +293,35 @@ public class TabCouponServiceImpl implements TabCouponService {
         System.out.println(String.valueOf(System.currentTimeMillis()).substring(6, 6));
         System.out.println(1);
     }
-    
-    
+
+    @Override
+    public int SendGuestbook(int id, String replyContent, String date, String name, String qustion, String pname, String email, int parseInt, String purl, String sale_email, String picPath, Integer websiteType) {
+        new Thread(){
+            public void run() {
+//                StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
+//                sb.append(" <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div><br><div style='font-size: 13px;'>");
+//                sb.append("<div >" + replyContent + " </div>");
+//                sb.append("<br><div style='margin-bottom: 10px;'><span style='font-weight: bold'>Your Question:</span>["+id+"]"+qustion+" </div>");
+//                sb.append("<div style='margin-bottom: 10px;'><span style='font-weight: bold'>Item:</span><a href='"+purl+"'> "+pname+"</a></div>");
+//                if(StringUtil.isNotBlank(picPath)){
+//                    sb.append("<br><img src='"+picPath+"'></img><br>");
+//                }
+                //sb.append("<br><div>We hope you enjoy the shopping experience on Import-Express.com!</div><br>");
+//		        sb.append("<div style='style='font-weight: bold'>Best regards, </div><div style='font-weight: bold'><a href='http://www.import-express.com'>www.Import-Express.com</a></div></div>");
+
+                String pnameHtml = "<a href='"+purl+"'> "+pname+"</a>";
+                if(StringUtils.isNotBlank(picPath)){
+                    pnameHtml += "<br><img src='"+picPath+"'></img><br>";
+                }
+
+                Map<String,Object> modelM = new HashedMap();
+                modelM.put("replyContent", replyContent);
+                modelM.put("qustion", "[" + id + "]" + qustion);
+                modelM.put("pname", pnameHtml);
+                modelM.put("websiteType", websiteType);
+                sendMailFactory.sendMail(email, null, "["+id+"]"+"Inquiry Reply From ImportExpress", modelM, TemplateType.GUESTBOOK_REPLY);
+            }
+        }.start();
+        return 0;
+    }
 }

@@ -23,6 +23,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.MultiSiteUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -1122,6 +1123,8 @@ public class PurchaseController {
 			System.out.println("========全部结束:" + sdf1.format(new Date()) + "========");
 			List<OrderProductSource> odids = purchaseServer.getAllGoodsids(adminid);
 			request.setAttribute("odids", JSONArray.fromObject(odids).toString());
+			// 根据订单号判断的客户下单的网站
+            request.setAttribute("websiteType", MultiSiteUtil.getSiteTypeNum(orderno));
 			long end = System.currentTimeMillis();
 			System.out.println("耗时:" + (end - start));
 		} catch (Exception e) {

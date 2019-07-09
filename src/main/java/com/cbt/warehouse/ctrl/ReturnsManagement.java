@@ -6,8 +6,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cbt.warehouse.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -272,5 +275,27 @@ public class ReturnsManagement {
 
 		String json=this.lookReturnOrderServiceNew.getAllOrderCount();
 		 return json;
+	}
+	@RequestMapping("/FindOtherOrder")
+	public String FindOtherOrder(HttpServletRequest request, HttpServletResponse response, Model model){
+		String Tborder=request.getParameter("Tborder");
+		List<returndisplay> orderDetail=new ArrayList<>();
+		if (StringUtil.isNotBlank(Tborder)){
+			orderDetail=this.lookReturnOrderServiceNew.FindAllByTborder(Tborder);
+		}
+		model.addAttribute("orderDetail",orderDetail);
+		model.addAttribute("Tborder",Tborder);
+		return "otherOrder";
+	}
+	@RequestMapping(value = "/AddOtherOrder")
+	@ResponseBody
+	public EasyUiJsonResult AddOtherOrder(HttpServletRequest request,HttpServletResponse response,@RequestBody List<returndisplay> list){
+		EasyUiJsonResult json=new EasyUiJsonResult();
+		String admuserJson = Redis.hget(request.getSession().getId(), "admuser");
+		Admuser adm = (Admuser) SerializeUtil.JsonToObj(admuserJson, Admuser.class);
+		if (list.size()>0) {
+			json = this.lookReturnOrderServiceNew.AddOtherOrder(list, adm.getAdmName());
+		}
+		return json;
 	}
 }
