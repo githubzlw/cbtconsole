@@ -32,6 +32,8 @@
 	src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
 <script type="text/javascript"
 	src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript"
+			src="/cbtconsole/js/lhgdialog/lhgdialog.js"></script>
 <title>用户信息管理</title>
 <style type="text/css">
 .but_color {
@@ -200,13 +202,43 @@ tr .td_class{width:230px;}
     }
 
 	function useraddress(userid, name, currency) {
-		window.open(
+		$.dialog({
+			title : '模拟登陆暂停使用',
+			content : "模拟登陆暂停使用",
+			max : false,
+			min : false,
+			lock : true,
+			drag : false,
+			fixed : true,
+			ok : function() {
+				return;
+			}/*,
+			cancel : function() {
+				return;
+			}*/
+		});
+		/*window.open(
 				"http://www.import-express.com/simulateLogin/toDeliverAddress?userName="
 						+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
-						+ currency, "_blank");
+						+ currency, "_blank");*/
 	}
 	function userlogin(userid, name, currency) {
-		//获取加密信息
+		$.dialog({
+			title : '模拟登陆暂停使用',
+			content : "模拟登陆暂停使用",
+			max : false,
+			min : false,
+			lock : true,
+			drag : false,
+			fixed : true,
+			ok : function() {
+				return;
+			}/*,
+			cancel : function() {
+				return;
+			}*/
+		});
+		/*//获取加密信息
 		$.ajax({
 			type:'post',
 			url:'../warehouse/encodeStr',
@@ -224,7 +256,7 @@ tr .td_class{width:230px;}
 					alert("加密用户名报错勒！！");
 				}
 			}
-		});
+		});*/
 
 	}
 	function toShopCar(userid, name, currency) {
