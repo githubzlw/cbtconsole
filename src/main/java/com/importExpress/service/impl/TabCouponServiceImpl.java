@@ -33,9 +33,9 @@ public class TabCouponServiceImpl implements TabCouponService {
     private SendMailFactory sendMailFactory;
 	
 	@Override
-	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo) {
-		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid, timeTo);
-		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid, timeTo);
+	public Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo, Integer couponSite) {
+		List<TabCouponNew> list = tabCouponMapper.queryTabCouponList((page - 1) * rows, rows, typeCode, valid, timeTo, couponSite);
+		Long totalCount = tabCouponMapper.queryTabCouponListCount(typeCode, valid, timeTo, couponSite);
 		
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("recordList", list);
@@ -64,7 +64,7 @@ public class TabCouponServiceImpl implements TabCouponService {
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
-            sendMQ.sendCouponMsg(json, 0);
+            sendMQ.sendCouponMsg(json, tabCouponNew.getSite());
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
         } finally {
@@ -105,9 +105,10 @@ public class TabCouponServiceImpl implements TabCouponService {
             String value = result.getValue();
             String[] valueArr = value.split("-");
             if (valueArr != null && valueArr.length > 0) {
-                String shareUrl = SearchFileUtils.importexpressPath
-                        + "/coupon/shareCoupon?couponcode=" + couponCode
-                        + "&shareid=" + valueArr[valueArr.length-1];
+                String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + valueArr[valueArr.length-1];
+                shareUrl = SearchFileUtils.importexpressPath + shareUrl
+                        + "<br /><br />" + "https://www.kidsproductwholesale.com" + shareUrl;
+
                 result.setShareUrl(shareUrl);
             }
         }
@@ -172,7 +173,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             for (UserBean userBean : userList) {
                 CouponUserRedisBean bean = new CouponUserRedisBean(tabCouponNew.getId(), new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
-                sendMQ.sendCouponMsg(json, 0);
+                sendMQ.sendCouponMsg(json, tabCouponNew.getWebsiteType());
             }
             //异步发送邮件
             Runnable task=new sendCouponMailTask(userList, tabCouponNew);

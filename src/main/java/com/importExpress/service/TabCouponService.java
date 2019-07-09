@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface TabCouponService {
 
-	Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo);
+	Map<String, Object> queryTabCouponList(Integer page, Integer rows, String typeCode, Integer valid, Integer timeTo, Integer couponSite);
 
 	List<TabCouponType> queryTabCouponTypeCodeList();
 

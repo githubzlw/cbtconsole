@@ -12,9 +12,10 @@ public interface TabCouponMapper {
 
 	List<TabCouponNew> queryTabCouponList(@Param("startBars") Integer startBars, @Param("rows") Integer rows,
                                           @Param("typeCode") String typeCode, @Param("valid") Integer valid,
-                                          @Param("timeTo") Integer timeTo);
+                                          @Param("timeTo") Integer timeTo, @Param("couponSite") Integer couponSite);
 
-	Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid, @Param("timeTo") Integer timeTo);
+	Long queryTabCouponListCount(@Param("typeCode") String typeCode, @Param("valid") Integer valid,
+                                 @Param("timeTo") Integer timeTo, @Param("couponSite") Integer couponSite);
 
 	List<TabCouponType> queryTabCouponTypeCodeList();
 
