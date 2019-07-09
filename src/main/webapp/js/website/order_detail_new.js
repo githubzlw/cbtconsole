@@ -220,7 +220,7 @@ function fnSplitOrder(orderno, email, paytime) {
 		if ($(check).next().val() != 2) {
 			tab_yx++;
 		}
-		if (!$(check).prop("checked")) {
+		if (!$(check).is(":checked")) {
 			// 没有选中
 			if ($(check).next().val() != 2) {
 				check_num++;

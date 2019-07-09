@@ -1627,8 +1627,8 @@ public class ShopUrlController {
             }
         }
         if (tempImgList.size() != resultMap.size()) {
-            resultMap.clear();
             System.err.println("tempImgList size:" + tempImgList.size() + " != resultMap size:" + resultMap.size());
+            // resultMap.clear();
         }
         return resultMap;
     }
