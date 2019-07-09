@@ -1080,7 +1080,6 @@ public class ShopCarMarketingController {
         if(website > 0){
             url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL);
         }
-        url = "http://127.0.0.1:8087/shopCartMarketingCtr/getMinFreightByUserId";
         RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
         Request request = new Request.Builder().addHeader("Accept","*/*")
 				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
