@@ -1486,7 +1486,7 @@
 
                         </td>
                         <td style="word-break: break-all; width: 30px;"><input
-                                type="checkbox" style="zoom:140%;" onchange="fnChange(${orderd.id},this);"
+                                type="checkbox" style="zoom:140%;" class="choose_chk" onchange="fnChange(${orderd.id},this);"
                             ${orderd.state == 2?'checked="checked" disabled="true"':''}
                                 value="${orderd.id}"> <span>拆单、延后发货</span><input type="hidden"
                                                                                  value="${orderd.state}">

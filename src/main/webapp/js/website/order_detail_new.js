@@ -216,7 +216,7 @@ function fnSplitOrder(orderno, email, paytime) {
 	for (var i = 1; i < tab; i++) {
 		var cansonl = $("#user_cancel_" + (i - 1)).html();// 是否取消
 		var od_time = $("#orderd_delivery_" + (i - 1)).html();// 交期时间
-		var check = $("#orderDetail tr").eq(i).find("input:checkbox");
+		var check = $("#orderDetail tr").eq(i).find(".choose_chk");
 		if ($(check).next().val() != 2) {
 			tab_yx++;
 		}

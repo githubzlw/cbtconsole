@@ -1537,11 +1537,7 @@ public class ShopUrlController {
                 }
                 if (newImgsList.size() > 0) {
                     // 选中排列第一
-                    Collections.sort(newImgsList, new Comparator<ShopGoodsPublicImg>() {
-                        public int compare(ShopGoodsPublicImg o1, ShopGoodsPublicImg o2) {
-                            return o2.getTotalNum() - o1.getTotalNum();
-                        }
-                    });
+                    newImgsList.sort(Comparator.comparingInt(ShopGoodsPublicImg :: getTotalNum).reversed());
                 }
                 imgsList.clear();
                 localPidImgs.clear();
