@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/shopCarMarketingCtr")
@@ -337,26 +338,36 @@ public class ShopCarMarketingController {
         }
         //try {
             int userId = Integer.valueOf(userIdStr);
-
             if ("1".equals(type) || "2".equals(type)) {
                 //1.重新生成goods_carconfig数据，并进行保存
 
                 //获取原来的重新生成goods_carconfig数据
                 GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(userId);
-                if(StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
-                    json.setOk(false);
-                    json.setMessage("客户购物车信息为空");
-                    return json;
+                if ("2".equals(websiteType)) {
+                    if (StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig()) || carconfigWithBLOBs.getKidscarconfig().length() < 10) {
+                        json.setOk(false);
+                        json.setMessage("客户购物车信息为空");
+                        return json;
+                    }
+                } else {
+                    if (StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10) {
+                        json.setOk(false);
+                        json.setMessage("客户购物车信息为空");
+                        return json;
+                    }
                 }
 
-                List<GoodsCarActiveSimplBean> listActive = (List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
+                List<GoodsCarActiveSimplBean> listActive;
+
+                if ("2".equals(websiteType)) {
+                    listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getKidscarconfig()), GoodsCarActiveSimplBean.class);
+                }else{
+                    listActive =(List<GoodsCarActiveSimplBean>) JSONArray.toCollection(JSONArray.fromObject(carconfigWithBLOBs.getBuyformecarconfig()), GoodsCarActiveSimplBean.class);
+                }
 
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
                 List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
-                ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-                ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-                marketingCriteria.andUseridEqualTo(userId);
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType));
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
                     for (GoodsCarActiveSimplBean simplBean : listActive) {
@@ -381,7 +392,7 @@ public class ShopCarMarketingController {
                         jsonObject.put("type","4");
                         jsonObject.put("userid",userIdStr);
                         jsonObject.put("json",com.alibaba.fastjson.JSON.toJSONString(listActive));
-                        sendMQ.sendMsg(jsonObject);
+                        sendMQ.sendMsg(jsonObject, "2".equals(websiteType) ? 1 : 0);
                         sendMQ.closeConn();
                     }catch (Exception e){
                         e.printStackTrace();
@@ -620,7 +631,7 @@ public class ShopCarMarketingController {
                 jsonObject.put("uuid", followCode);
                 // 失效时间3周
                 jsonObject.put("timeout", 3 * 7 * 24 * 60 * 60);
-                sendMQ.sendMsg(jsonObject);
+                sendMQ.sendMsg(jsonObject, isKidFlag ? 1 : 0);
                 sendMQ.closeConn();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -925,6 +936,11 @@ public class ShopCarMarketingController {
         } else {
             mv.addObject("userId", userIdStr);
         }
+        String websiteStr = request.getParameter("website");
+        int checkWebsite = 0;
+        if(StringUtils.isNotBlank(websiteStr)){
+            checkWebsite = Integer.valueOf(websiteStr);
+        }
         try {
             int userId = Integer.valueOf(userIdStr);
             ShopCarUserStatistic carUserStatistic = shopCarMarketingService.queryUserInfo(userId);
@@ -932,95 +948,18 @@ public class ShopCarMarketingController {
                 carUserStatistic.setShippingName("EPACKET (USPS)");
             }
             List<ShopCarInfo> shopCarInfoList = shopCarMarketingService.queryShopCarInfoByUserId(userId);
-            double totalFreight = 0;
-            double totalPrice = 0;
-            double totalWhosePrice = 0;
-            double estimateProfit = 0;
-            
-            for (ShopCarInfo carInfo : shopCarInfoList) {
-                if(StringUtils.isBlank(carInfo.getWholesalePrice())){
-                    continue;
-                }
-                //设置显示图片
-                carInfo.setShowImg(carInfo.getRemotePath() + carInfo.getMainImg());
-                carInfo.setCartGoodsImg(carInfo.getCartGoodsImg().replace("60x60.", "400x400."));
-                carInfo.setOnlineUrl("https://www.import-express.com/goodsinfo/cbtconsole-1" + carInfo.getPid() + ".html");
-                //格式化规格
-                String tempType = "";
-                if (StringUtils.isNotBlank(carInfo.getGoodsType())) {
-                    String[] splitFirst = carInfo.getGoodsType().split(",");
-                    for (String spCh : splitFirst) {
-                        String[] spScList = spCh.split("@");
-                        tempType += spScList[0] + ";";
-                        spScList = null;
-                    }
-                    splitFirst = null;
-                }
-                if (tempType.length() > 0) {
-                    carInfo.setGoodsType(tempType);
-                }
 
-                totalPrice += carInfo.getCartGoodsNum() * carInfo.getCartGoodsPrice();
-                // 运费计算公式
-                double freight = genFreightByPid(carUserStatistic.getShippingName(), carInfo.getCatid1(), carInfo.getCartWeight(), carUserStatistic.getCountryId());
-                totalFreight += freight;
-                double oldProfit = 0;
-                //获取1688价格(1piece)
-                double wholePrice = 0;
-                String wholePriceStr = carInfo.getWholesalePrice();
-                String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
-                firstPrice = firstPrice.replace("]", "");
-
-                if (firstPrice.contains("-")) {
-                    wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
-                } else {
-                    wholePrice = Double.valueOf(firstPrice.trim());
-                }
-
-                //计算加价率
-                if ((carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1) || carInfo.getIsBenchmark() == 2) {
-                    //对标时
-                    double priceXs = 0;
-                    if(carInfo.getAliPrice().contains("-")){
-                        priceXs = (Double.valueOf(carInfo.getAliPrice().split("-")[0]) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
-                    }else {
-                        priceXs = (Double.valueOf(carInfo.getAliPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
-                    }
-                    //加价率
-                    oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
-                    carInfo.setPriceRate(BigDecimalUtil.truncateDouble(oldProfit, 2));
-                } else {
-                    //非对标
-                    double catXs = GoodsPriceUpdateUtil.getCatxs(carInfo.getCatid1(), String.valueOf(wholePrice));
-                    //加价率= 0.55+类别调整值
-                    oldProfit = 0.55 + catXs;
-                    carInfo.setPriceRate(BigDecimalUtil.truncateDouble(oldProfit, 2));
-                }
-
-                //计算利润率
-                totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
-            }
-            // 调用线上接口，获取客户支付运费,实际我司运费
-            boolean isGetFreigthResult = getMinFreightByUserId(userId, carUserStatistic);
-
-            if(isGetFreigthResult){
-                // 利润率计算
-                if(totalWhosePrice == 0){
-                    estimateProfit = 0;
-                    carUserStatistic.setTotalPrice(0);
-                    carUserStatistic.setEstimateProfit(0);
-                    carUserStatistic.setTotalWhosePrice(0);
-                }else {
-                    estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / (totalPrice + carUserStatistic.getTotalFreight()) * 100D;
-                    carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
-                    carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
-                    carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
-                }
-            }
+            Map<Integer, List<ShopCarInfo>> resultMap = shopCarInfoList.stream().collect(Collectors.groupingBy(ShopCarInfo::getWebsite));
+            mv.addObject("website", checkWebsite);
             mv.addObject("success", 1);
-            mv.addObject("userInfo", carUserStatistic);
-            mv.addObject("goodsList", shopCarInfoList);
-            mv.addObject("isGetFreigthResult",isGetFreigthResult);
+            for (Integer website : resultMap.keySet()) {
+                if (checkWebsite == website) {
+                    dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website);
+                    break;
+                }
+            }
+            shopCarInfoList.clear();
+            resultMap.clear();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("queryShoppingCarByUserId error:" + e.getMessage());
@@ -1031,15 +970,121 @@ public class ShopCarMarketingController {
         return mv;
     }
 
-    private boolean getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic) {
+    private void dealShopCarGoodsByType(List<ShopCarInfo> shopCarInfoList, ShopCarUserStatistic carUserStatistic,
+                                        int userId, ModelAndView mv, int website) {
+        double totalFreight = 0;
+        double totalPrice = 0;
+        double totalWhosePrice = 0;
+        double estimateProfit = 0;
+
+        String onlineUrl = null;
+        for (ShopCarInfo carInfo : shopCarInfoList) {
+            if (StringUtils.isBlank(carInfo.getWholesalePrice())) {
+                continue;
+            }
+            //设置显示图片
+            carInfo.setShowImg(carInfo.getRemotePath() + carInfo.getMainImg());
+            carInfo.setCartGoodsImg(carInfo.getCartGoodsImg().replace("60x60.", "400x400."));
+            onlineUrl = "https://www.import-express.com/goodsinfo/cbtconsole-1" + carInfo.getPid() + ".html";
+            if (website > 0) {
+                carInfo.setOnlineUrl(SwitchDomainNameUtil.checkNullAndReplace(onlineUrl));
+            } else {
+                carInfo.setOnlineUrl(onlineUrl);
+            }
+
+            //格式化规格
+            String tempType = "";
+            if (StringUtils.isNotBlank(carInfo.getGoodsType())) {
+                String[] splitFirst = carInfo.getGoodsType().split(",");
+                for (String spCh : splitFirst) {
+                    String[] spScList = spCh.split("@");
+                    tempType += spScList[0] + ";";
+                    spScList = null;
+                }
+                splitFirst = null;
+            }
+            if (tempType.length() > 0) {
+                carInfo.setGoodsType(tempType);
+            }
+
+            totalPrice += carInfo.getCartGoodsNum() * carInfo.getCartGoodsPrice();
+            // 运费计算公式
+            double freight = genFreightByPid(carUserStatistic.getShippingName(), carInfo.getCatid1(), carInfo.getCartWeight(), carUserStatistic.getCountryId());
+            totalFreight += freight;
+            double oldProfit = 0;
+            //获取1688价格(1piece)
+            double wholePrice = 0;
+            String wholePriceStr = carInfo.getWholesalePrice();
+            String firstPrice = wholePriceStr.split(",")[0].split("\\$")[1].trim();
+            firstPrice = firstPrice.replace("]", "");
+
+            if (firstPrice.contains("-")) {
+                wholePrice = Double.valueOf(firstPrice.split("-")[1].trim());
+            } else {
+                wholePrice = Double.valueOf(firstPrice.trim());
+            }
+
+            //计算加价率
+            if ((carInfo.getIsBenchmark() == 1 && carInfo.getBmFlag() == 1) || carInfo.getIsBenchmark() == 2) {
+                //对标时
+                double priceXs = 0;
+                if (carInfo.getAliPrice().contains("-")) {
+                    priceXs = (Double.valueOf(carInfo.getAliPrice().split("-")[0]) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                } else {
+                    priceXs = (Double.valueOf(carInfo.getAliPrice()) * GoodsPriceUpdateUtil.EXCHANGE_RATE - freight) / wholePrice;
+                }
+                //加价率
+                oldProfit = GoodsPriceUpdateUtil.getAddPriceJz(priceXs);
+                carInfo.setPriceRate(BigDecimalUtil.truncateDouble(oldProfit, 2));
+            } else {
+                //非对标
+                double catXs = GoodsPriceUpdateUtil.getCatxs(carInfo.getCatid1(), String.valueOf(wholePrice));
+                //加价率= 0.55+类别调整值
+                oldProfit = 0.55 + catXs;
+                carInfo.setPriceRate(BigDecimalUtil.truncateDouble(oldProfit, 2));
+            }
+
+            //计算利润率
+            totalWhosePrice += wholePrice * carInfo.getCartGoodsNum();
+        }
+        // 调用线上接口，获取客户支付运费,实际我司运费
+        boolean isGetFreigthResult = getMinFreightByUserId(userId, carUserStatistic, website);
+
+        if (isGetFreigthResult) {
+            // 利润率计算
+            if (totalWhosePrice == 0) {
+                estimateProfit = 0;
+                carUserStatistic.setTotalPrice(0);
+                carUserStatistic.setEstimateProfit(0);
+                carUserStatistic.setTotalWhosePrice(0);
+            } else {
+                estimateProfit = (totalPrice + carUserStatistic.getTotalFreight() - carUserStatistic.getOffFreight() - totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE) / (totalPrice + carUserStatistic.getTotalFreight()) * 100D;
+                carUserStatistic.setTotalPrice(BigDecimalUtil.truncateDouble(totalPrice, 2));
+                carUserStatistic.setEstimateProfit(BigDecimalUtil.truncateDouble(estimateProfit, 2));
+                carUserStatistic.setTotalWhosePrice(BigDecimalUtil.truncateDouble(totalWhosePrice / GoodsPriceUpdateUtil.EXCHANGE_RATE, 2));
+            }
+        }
+        mv.addObject("website", website);
+        mv.addObject("success", 1);
+        mv.addObject("userInfo", carUserStatistic);
+        mv.addObject("goodsList", shopCarInfoList);
+        mv.addObject("isGetFreigthResult", isGetFreigthResult);
+    }
+
+    private boolean getMinFreightByUserId(int userId,ShopCarUserStatistic carUserStatistic, int website) {
         boolean resutl= false;
         double freight = 0;
         OkHttpClient okHttpClient = new OkHttpClient();
 
+        String url = GET_MIN_FREIGHT_URL;
+        if(website > 0){
+            url = SwitchDomainNameUtil.checkNullAndReplace(GET_MIN_FREIGHT_URL);
+        }
+        url = "http://127.0.0.1:8087/shopCartMarketingCtr/getMinFreightByUserId";
         RequestBody formBody = new FormBody.Builder().add("userId", String.valueOf(userId)).build();
         Request request = new Request.Builder().addHeader("Accept","*/*")
 				.addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
-                .url(GET_MIN_FREIGHT_URL).post(formBody).build();
+                .url(url).post(formBody).build();
         try {
             Response response = okHttpClient.newCall(request).execute();
             String resultStr = response.body().string();
@@ -1462,6 +1507,15 @@ public class ShopCarMarketingController {
             mv.addObject("type", typeStr);
         }
 
+        String websiteStr = request.getParameter("website");
+        if (StringUtils.isBlank(websiteStr)) {
+            mv.addObject("message", "获取网站类型失败");
+            mv.addObject("success", 0);
+            return mv;
+        } else {
+            mv.addObject("website", websiteStr);
+        }
+
         if ("1".equals(typeStr)) {
             mv.setViewName("shopCartMarketingEmailNoChange");
         } else if ("2".equals(typeStr)) {
@@ -1482,17 +1536,18 @@ public class ShopCarMarketingController {
 
             //获取原来的重新生成goods_carconfig数据
             GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(Integer.valueOf(userIdStr));
-            if(StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10){
+            boolean isImport = StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig())
+                    || carconfigWithBLOBs.getBuyformecarconfig().length() < 10;
+            boolean isKids = StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig())
+                    || carconfigWithBLOBs.getKidscarconfig().length() < 10;
+            if(isImport && isKids){
                 mv.addObject("message", "客户购物车信息为空");
                 mv.addObject("success", 0);
                 return mv;
             }
 
             //查询当前客户存在的购物车数据
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(Integer.valueOf(userIdStr),Integer.valueOf(websiteStr) );
             //格式化处理规格数据
             double productCost = 0;
             double actualCost = 0;
