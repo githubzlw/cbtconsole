@@ -63,7 +63,7 @@ public class TabCouponServiceImpl implements TabCouponService {
         SendMQ sendMQ = null;
         try {
             sendMQ = new SendMQ();
-            sendMQ.sendCouponMsg(json);
+            sendMQ.sendCouponMsg(json, 0);
         } catch (Exception e) {
             throw new RuntimeException("mq发送失败");
         } finally {
@@ -171,7 +171,7 @@ public class TabCouponServiceImpl implements TabCouponService {
             for (UserBean userBean : userList) {
                 CouponUserRedisBean bean = new CouponUserRedisBean(tabCouponNew.getId(), new Long(tabCouponNew.getTo().getTime()).toString(), String.valueOf(userBean.getId()));
                 String json = JSONObject.fromObject(bean).toString();
-                sendMQ.sendCouponMsg(json);
+                sendMQ.sendCouponMsg(json, 0);
             }
             //异步发送邮件
             Runnable task=new sendCouponMailTask(userList, tabCouponNew);

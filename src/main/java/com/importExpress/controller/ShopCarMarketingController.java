@@ -950,6 +950,8 @@ public class ShopCarMarketingController {
             List<ShopCarInfo> shopCarInfoList = shopCarMarketingService.queryShopCarInfoByUserId(userId);
 
             Map<Integer, List<ShopCarInfo>> resultMap = shopCarInfoList.stream().collect(Collectors.groupingBy(ShopCarInfo::getWebsite));
+            mv.addObject("website", checkWebsite);
+            mv.addObject("success", 1);
             for (Integer website : resultMap.keySet()) {
                 if (checkWebsite == website) {
                     dealShopCarGoodsByType(resultMap.get(website), carUserStatistic, userId, mv, website);
@@ -957,6 +959,7 @@ public class ShopCarMarketingController {
                 }
             }
             shopCarInfoList.clear();
+            resultMap.clear();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("queryShoppingCarByUserId error:" + e.getMessage());
@@ -1533,17 +1536,18 @@ public class ShopCarMarketingController {
 
             //获取原来的重新生成goods_carconfig数据
             GoodsCarconfigWithBLOBs carconfigWithBLOBs = goodsCarconfigService.selectByPrimaryKey(Integer.valueOf(userIdStr));
-            if(StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig()) || carconfigWithBLOBs.getBuyformecarconfig().length() < 10){
+            boolean isImport = StringUtils.isBlank(carconfigWithBLOBs.getBuyformecarconfig())
+                    || carconfigWithBLOBs.getBuyformecarconfig().length() < 10;
+            boolean isKids = StringUtils.isBlank(carconfigWithBLOBs.getKidscarconfig())
+                    || carconfigWithBLOBs.getKidscarconfig().length() < 10;
+            if(isImport && isKids){
                 mv.addObject("message", "客户购物车信息为空");
                 mv.addObject("success", 0);
                 return mv;
             }
 
             //查询当前客户存在的购物车数据
-            ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-            ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-            marketingCriteria.andUseridEqualTo(Integer.valueOf(userIdStr));
-            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+            List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(Integer.valueOf(userIdStr),Integer.valueOf(websiteStr) );
             //格式化处理规格数据
             double productCost = 0;
             double actualCost = 0;
