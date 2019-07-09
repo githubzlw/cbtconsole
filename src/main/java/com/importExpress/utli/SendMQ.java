@@ -116,14 +116,17 @@ public class SendMQ {
      * @throws Exception
      */
     public void sendCouponMsg(String couponJson, int website) throws Exception {
-        if(website > 0){
+        if(website == 2){
             channel.queueDeclare(COUPON_NAME_KIDS, false, false, false, null);
             channel.basicPublish("", COUPON_NAME_KIDS, null, couponJson.getBytes("UTF-8"));
-        } else{
+        } else if (website == 1){
             channel.queueDeclare(COUPON_NAME, false, false, false, null);
             channel.basicPublish("", COUPON_NAME, null, couponJson.getBytes("UTF-8"));
+        } else if (website == 0) {
+            sendCouponMsg(couponJson, 1);
+            sendCouponMsg(couponJson, 2);
         }
-    	System.err.println(" [x] Sent '" + couponJson + "'");
+    	System.err.println("Site=" + website + " [x] Sent '" + couponJson + "'");
     }
 
     /**

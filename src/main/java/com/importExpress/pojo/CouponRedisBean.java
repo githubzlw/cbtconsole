@@ -1,5 +1,8 @@
 package com.importExpress.pojo;
 
+import lombok.Data;
+
+@Data
 public class CouponRedisBean {
 
 	private String id;//卷码
@@ -19,84 +22,6 @@ public class CouponRedisBean {
 	private String type; //优惠卷类型 1-满减卷
 	
 	private String valid = "1";//是否有效 1-有效
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getCount() {
-		return count;
-	}
-
-	public void setCount(String count) {
-		this.count = count;
-	}
-
-	public String getLeftCount() {
-		return leftCount;
-	}
-
-	public void setLeftCount(String leftCount) {
-		this.leftCount = leftCount;
-	}
-
-	public String getDescribe() {
-		return describe;
-	}
-
-	public void setDescribe(String describe) {
-		this.describe = describe;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getFrom() {
-		return from;
-	}
-
-	public void setFrom(String from) {
-		this.from = from;
-	}
-
-	public String getTo() {
-		return to;
-	}
-
-	public void setTo(String to) {
-		this.to = to;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getValid() {
-		return valid;
-	}
-
-	public void setValid(String valid) {
-		this.valid = valid;
-	}
-
-	@Override
-	public String toString() {
-		return "CouponRedisBean [id=" + id + ", count=" + count + ", leftCount=" + leftCount + ", describe=" + describe
-				+ ", value=" + value + ", from=" + from + ", to=" + to + ", type=" + type + ", valid=" + valid + "]";
-	}
 
 	public CouponRedisBean() {
 		super();
