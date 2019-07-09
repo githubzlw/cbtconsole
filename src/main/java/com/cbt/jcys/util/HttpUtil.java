@@ -1,6 +1,5 @@
 package com.cbt.jcys.util;
 
-import com.importExpress.utli.SearchFileUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 
@@ -161,7 +160,7 @@ public class HttpUtil {
      * @param params 可变参数，传入的依次为 变量名 变量值；变量名 变量值；...
      * @return
      */
-    public static String postCoupon(String uri, String... params){
+    public static String postCoupon(String urlSite, String uri, String... params){
         if (StringUtils.isBlank(uri)){
             return null;
         }
@@ -170,7 +169,7 @@ public class HttpUtil {
             for (int i = 0; i < params.length; i++) {
                 map.put(params[i++], params[i]);
             }
-            return post(SearchFileUtils.importexpressPath + uri, "utf-8", map);
+            return post(urlSite + uri, "utf-8", map);
         } catch (IOException e) {
             e.printStackTrace();
         }
