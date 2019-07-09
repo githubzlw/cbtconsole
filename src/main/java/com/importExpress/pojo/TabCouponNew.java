@@ -51,14 +51,16 @@ public class TabCouponNew {
 	//
 	private String mqlog;
 
-	private Integer websiteType;  // 网站名
-	
-	public TabCouponNew() {
+	private Integer websiteType;  // 关联用户发送邮件网站名
+
+    private Integer site;//优惠卷所在网站
+
+    public TabCouponNew() {
 		super();
 	}
 
 	public TabCouponNew(String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to,
-			int type, int valid, Integer userid, Integer shareFlag, Integer websiteType) {
+			int type, int valid, Integer userid, Integer shareFlag, Integer websiteType, Integer site) {
 		super();
 		this.id = id;
 		this.count = count;
@@ -72,6 +74,7 @@ public class TabCouponNew {
 		this.userid = userid;
 		this.shareFlag = shareFlag;
 		this.websiteType = websiteType;
+		this.site = site;
 	}
 	
 }
