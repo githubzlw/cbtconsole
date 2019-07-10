@@ -643,6 +643,23 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 	public List<returndisplay> FindAllByTborder(String tborder) {
 		try {
 			List<returndisplay> item=this.lookReturnOrderServiceNewMapper.FindAllByTborder(tborder);
+			for(int i=0;i<item.size();i++) {
+                int re=0;
+                try {
+                    re=this.lookReturnOrderServiceNewMapper.FindRetuByTbid(item.get(i).getTbId());
+                } catch (Exception e) {
+
+                }
+                if (re !=0){
+                    int retu=item.get(i).getItemNumber()-re;
+                    if (retu<=0){
+                        item.remove(item.get(i));
+                        i--;
+                    }else {
+                        item.get(i).setItemNumber(retu);
+                    }
+                }
+            }
 			return item;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -656,13 +673,14 @@ public class LookReturnOrderServiceNewImpl implements LookReturnOrderServiceNew 
 		Boolean bo=false;
 		try {
 			for (int i = 0; i < list.size(); i++) {
-                list.get(i).setApplyUser(admName);
-                list.get(i).setState(-1);
-                list.get(i).setReturnNumber(list.get(i).getItemNumber());
-                Date currentTime = new Date();
-                list.get(i).setApplyTime(df.format(new Date()));
-                bo=this.lookReturnOrderServiceNewMapper.AddOrder(list.get(i));
-            }
+				returndisplay re=this.lookReturnOrderServiceNewMapper.FindOrderByTbid(list.get(i).getTbId());
+				re.setReturnNumber(list.get(i).getReturnNumber());
+				re.setReturnReason(list.get(i).getReturnReason());
+				re.setApplyUser(admName);
+				re.setApplyTime(df.format(new Date()));
+				re.setState(-1);
+				bo=this.lookReturnOrderServiceNewMapper.AddOrder(re);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			bo=false;
