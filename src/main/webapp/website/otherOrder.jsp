@@ -11,7 +11,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>送样管理</title>
+    <title>特殊订单操作</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script type="text/javascript" src="/cbtconsole/js/jquery-1.8.2.min.js"></script>
     <script type="text/javascript"
@@ -150,18 +150,50 @@
     </style>
     <script type="text/javascript">
         function FindTbOrder() {
-          var Tborder=$("#Tborderus").val()
-         window.location.href="/cbtconsole/Look/FindOtherOrder?Tborder="+Tborder
+            var Tborder=$("#Tborderus").val()
+            window.location.href="/cbtconsole/Look/FindOtherOrder?Tborder="+Tborder
         }
+
         function returnOt() {
             var Tborder=$("#Tborderus").val()
-            var returnNO='错误订单'
+            var returnNO=$("#openRt").val()
             var cusorder=1
-            alert(Tborder)
             $.ajax({
                 type: "post",
                 url: "/cbtconsole/Look/AddRetAllOrder",
                 data: {cusorder:cusorder,tbOrder:Tborder,returnNO:returnNO},
+                success: function (res) {
+                    if (res.rows == 1) {
+                        $.messager.alert('提示', '操作成功');
+                        window.location.reload();
+                    } else {
+                        $.messager.alert('提示', '操作失败');
+                        window.location.reload();
+                    }
+                    $('#order_remark').window('close');
+                    doQuery(page);
+                }
+            });
+        }
+
+        function returnOth() {
+            var Tborder=$("#Tborderus").val()
+            var returnNO=$("#openRt").val()
+            var cusorder=1
+            var OrderMap = new Array();
+            $('input:checkbox[name=Split_open]').each(function(k) {
+                if ($(this).is(':checked')) {
+                    var tbid=$("#order"+k).text();
+                    var retunum=$("#openNum"+k).val();
+                    alert(retunum)
+                    OrderMap.push({tbId:tbid,returnReason:returnNO,returnNumber:retunum})
+                }
+            })
+            $.ajax({
+                type: "post",
+                url: "/cbtconsole/Look/AddOtherOrder",
+                contentType : 'application/json;charset=utf-8',
+                data:JSON.stringify(OrderMap),
                 success: function (res) {
                     if (res.rows == 1) {
                         $.messager.alert('提示', '操作成功');
@@ -185,13 +217,24 @@
     <td>
         <input type="button"
                style="position: fixed; bottom: 528px; right: 50px; width: 150px; height: 30px;" id="open"
-               onclick="returnOt()" value="发起退货" >
+               onclick="returnOt()" value="整单退货" >
+    </td>
+    <td>
+        <input type="button"
+               style="position: fixed; bottom: 458px; right: 50px; width: 150px; height: 30px;" id="openOt"
+               onclick="returnOth()" value="部分退货" >
+    </td>
+    <td>
+       <span style="position: fixed; bottom: 608px; right: 50px; width: 150px; height: 30px;">退货理由： <input type="text"
+                                                                                                           id="openRt" value="错误订单">
+           </span>
     </td>
 </tr>
 <div style="width:1666px;">
     <table id="orderDetail" class="ormtable2" align="center">
         <tbody>
         <tr class="detfretit">
+            <td>淘宝id</td>
             <td>1688卖家信息</td>
             <td style="width: 200px;">1688订单号</td>
             <td>1688运单号</td>
@@ -207,6 +250,7 @@
         </tbody>
         <c:forEach items="${orderDetail}" var="order" varStatus="sd">
             <tr>
+                <td id="order${sd.index}">${order.tbId}</td>
                 <td>${order.sellerpeo}</td>
                 <td>${order.a1688Order}</td>
                 <td>${order.a1688Shipno }</td>
@@ -217,7 +261,7 @@
                 <td><img src="${order.imgurl }" alt=""></td>
                 <td>${order.placeDate}</td>
                 <td>${order.signtime}</td>
-                <td><input type="checkbox"><span>退货数量</span><input type="text" style="width: 20px" id="openNum${sd.index}"  value="${order.itemNumber}">
+                <td><input name="Split_open" type="checkbox"><span>退货数量</span><input type="text" style="width: 20px" id="openNum${sd.index}"  value="${order.itemNumber}">
                 </td>
             </tr>
         </c:forEach>
