@@ -41,9 +41,8 @@ public class warehouseThread extends Thread {
 			// 删除原来orderid对应的数据
 			if (iWarehouseService.selectShippingPackage(m2) > 0) {
 				// sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
-				NotifyToCustomerUtil.sendSqlByMq("delete from shipping_package where orderid='"+m2.get("orderid")+"'");
 			}
-			StringBuilder sqls=new StringBuilder();
+			StringBuilder sqls=new StringBuilder("delete from shipping_package where orderid='"+m2.get("orderid")+"';");
 			sqls.append("INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES");
 			for(Map<String, String> map:list){
 				sqls.append("(");
