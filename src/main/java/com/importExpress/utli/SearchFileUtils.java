@@ -4,7 +4,6 @@ import com.cbt.FtpUtil.ContinueFTP2;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.util.FtpConfig;
 import com.cbt.util.GetConfigureInfo;
-import com.cbt.util.SysParamUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +19,8 @@ import java.io.*;
 public class SearchFileUtils {
 
     //线上服务器地址
-    public static String importexpressPath = SysParamUtil.getParam("importexpress");//"https://www.import-express.com"
+    public static String importexpressPath = "https://www.import-express.com";
+    public static String kidsPath = "https://www.kidsproductwholesale.com";
 
     //上传及访问路径
     public static String IMAGEHOSTURL;// http://192.168.1.9/editimg/shopimgzip/research/

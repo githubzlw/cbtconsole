@@ -225,7 +225,8 @@ public class TabCouponServiceImpl implements TabCouponService {
     @Override
     public Map<String, String> delCouponUser(String couponCode, String userid) {
         Map<String, String> result = new HashMap<String, String>();
-        String res = HttpUtil.postCoupon("/coupon/deleteCoupon", "pass", "huisj123lo", "type", "0", "couponcode", couponCode, "userid", userid);
+        String res = HttpUtil.postCoupon(SearchFileUtils.importexpressPath, "/coupon/deleteCoupon", "pass", "huisj123lo", "type", "0", "couponcode", couponCode, "userid", userid);
+        res += HttpUtil.postCoupon(SearchFileUtils.kidsPath, "/coupon/deleteCoupon", "pass", "huisj123lo", "type", "0", "couponcode", couponCode, "userid", userid);
         if (StringUtils.isNotBlank(res) && Long.valueOf(res) >= 0){
             //更新本地关联的记录
             tabCouponMapper.updateCouponUsers(couponCode, userid);
@@ -240,22 +241,39 @@ public class TabCouponServiceImpl implements TabCouponService {
 
     @Override
     public Map<String, String> delCoupon(String couponCode) {
+        TabCouponNew tabCouponNew = tabCouponMapper.queryTabCouponOne(couponCode);
         Map<String, String> result = new HashMap<String, String>();
-        //发送mq删除线上  {"key":"coupon:001-20180929-1000","type":"3"}
-//        Map<String, String> jsonMap = new HashMap<String, String>();
-//        jsonMap.put("key", "coupon:" + couponCode);
-//        jsonMap.put("type", "3");
-//        String json = JSONObject.fromObject(jsonMap).toString();
-        String res = HttpUtil.postCoupon("/coupon/deleteCoupon", "pass", "huisj123lo", "type", "1", "couponcode", couponCode);
-        if (StringUtils.isNotBlank(res) && Long.valueOf(res) >= 0){
+        Map<String, String> jsonMap = new HashMap<String, String>();
+        jsonMap.put("key", "coupon:" + couponCode);
+        jsonMap.put("type", "3");
+        String json = JSONObject.fromObject(jsonMap).toString();
+        SendMQ sendMQ = null;
+        try {
+            sendMQ = new SendMQ();
+            //发送mq删除线上  {"key":"coupon:001-20180929-1000","type":"3"}
+            sendMQ.sendCouponMsg(json, tabCouponNew.getSite());
             //本地数据删除（打标记）
             tabCouponMapper.updateCouponValid(couponCode, 0);
             result.put("state", "true");
             result.put("message", "删除折扣卷成功");
-        } else {
-            result.put("state", "false");
-            result.put("message", "调用线上接口删除折扣卷失败");
+        } catch (Exception e) {
+            result.put("state", "true");
+            result.put("message", "删除折扣卷成功");
+        } finally {
+            if (sendMQ != null){
+                sendMQ.closeConn();
+            }
         }
+//        String res = HttpUtil.postCoupon("/coupon/deleteCoupon", "pass", "huisj123lo", "type", "1", "couponcode", couponCode);
+//        if (StringUtils.isNotBlank(res) && Long.valueOf(res) >= 0){
+//            //本地数据删除（打标记）
+//            tabCouponMapper.updateCouponValid(couponCode, 0);
+//            result.put("state", "true");
+//            result.put("message", "删除折扣卷成功");
+//        } else {
+//            result.put("state", "false");
+//            result.put("message", "调用线上接口删除折扣卷失败");
+//        }
         return result;
     }
 
