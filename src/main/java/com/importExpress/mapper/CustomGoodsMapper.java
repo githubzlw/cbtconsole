@@ -135,7 +135,7 @@ public interface CustomGoodsMapper {
      * @param map
      * @return
      */
-    public int addReviewRemark(Map<String, String> map);
+    public int addReviewRemark(@Param("map") Map<String, String> map);
 
     /**
      * 编辑商品评论
@@ -143,7 +143,7 @@ public interface CustomGoodsMapper {
      * @param map
      * @return
      */
-    public int updateReviewRemark(Map<String, String> map);
+    public int updateReviewRemark(@Param("map") Map<String, String> map);
 
 
     /**

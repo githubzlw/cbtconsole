@@ -928,7 +928,8 @@
         select max(id) from custom_benchmark_ready where 1=1
     </select>
     <update id="updateReviewRemark">
-        update goods_review set review_remark=#{edit_remark},country=#{editcountry},review_score=#{edit_score},review_flag=#{update_flag},updatetime=now() where goods_pid=#{goods_pid} and createtime=#{oldCreateTime}
+        update goods_review set review_remark=#{map.edit_remark},country=#{map.editcountry},review_score=#{map.edit_score},
+        review_flag=#{map.update_flag},updatetime=now() where id = #{map.id}
     </update>
     <select id="queryCustomGoodsByLimit" resultMap="goodsParseResultMap">
         select pid,ali_pid,ali_price,weight,wholesale_price,ali_weight
@@ -1110,8 +1111,8 @@
         group by a.catid1) cbm on cat1688.cid=cbm.catid1 order by cat1688.lv,cat1688.category_name asc
     </select>
     <insert id="addReviewRemark">
-        insert into goods_review_log(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
-        insert into goods_review(goods_pid,country,review_name,createtime,review_remark,review_score) values(#{goods_pid},#{country},#{review_name},#{createTime},#{review_remark},#{review_score});
+        insert into goods_review_log(goods_pid,country,review_name,createtime,review_remark,review_score)
+        values(#{map.goods_pid},#{map.country},#{map.review_name},#{map.createTime},#{map.review_remark},#{map.review_score});
     </insert>
 
 
