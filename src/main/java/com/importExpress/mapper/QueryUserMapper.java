@@ -152,4 +152,6 @@ public interface QueryUserMapper {
     void SetShareByOrderno(@Param("orderNo") String orderNo);
 
     List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);
+
+    void insertLoginLog(@Param("userid") Integer userid, @Param("admid") Integer admid, @Param("site") Integer site);
 }
