@@ -517,6 +517,11 @@ public class OrderinfoService implements IOrderinfoService {
 				//TODO zlc bug处理期，后期需要更改
 				searchresultinfo.setSource1688_img(map.get("source1688_img"));
 				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
+				searchresultinfo.setDp_num(Integer.valueOf(map.get("dp_num")));
+				searchresultinfo.setDp_total(Integer.valueOf(map.get("dp_total")));
+				searchresultinfo.setDp_city(map.get("dp_city"));
+				searchresultinfo.setDp_country(map.get("dp_country"));
+				searchresultinfo.setDp_province(map.get("dp_province"));
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
