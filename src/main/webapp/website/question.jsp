@@ -365,8 +365,6 @@ function gotopage(flag){
 //发送邮件给客户
 function sendEmail(qid,shop_id,url,purl){
     var content = $("#"+qid+"_replay").val();
-    alert(url)
-    alert(purl)
     if(content == ''){
         return ;
     }
