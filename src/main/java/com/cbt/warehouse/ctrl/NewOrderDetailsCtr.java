@@ -1558,8 +1558,8 @@ public class NewOrderDetailsCtr {
 				if (isDrop) {
 					String mainOrderNo = orderwsServer.queryMainOrderByDropship(orderNo);
 					//Added <V1.0.1> Start： cjc 2018/10/23 16:52 TODO 如果是取消dropship 子订单 则需要再查询一下主订单是否是取消状态
-					oiState=orderwsServer.checkOrderState(orderNo,"0");
-					if(oiState == -1 || oiState == 6){
+					int mainState=orderwsServer.checkOrderState(orderNo,"0");
+					if(mainState == -1 || mainState == 6){
 						json.setOk(false);
 						json.setMessage("线上主订单已被取消，无法再取消<br>这个订单三分钟之后变成取消状态");
 						return json;
@@ -1576,7 +1576,7 @@ public class NewOrderDetailsCtr {
 						return json;
 					} else {
 						json = closeDropShipOrder(request, response, orderwsServer, adm.getId(), mainOrderNo, orderNo,
-								toEmail, confirmEmail);
+								toEmail, confirmEmail, oiState);
 					}
 				} else {
 					json = closeGeneralOrder(request, response, orderwsServer, adm.getId(), orderNo, toEmail,
@@ -1607,13 +1607,13 @@ public class NewOrderDetailsCtr {
 	 */
 	private JsonResult closeDropShipOrder(HttpServletRequest request, HttpServletResponse response,
                                           IOrderwsServer orderwsServer, int adminId, String mainOrderNo, String orderNo, String toEmail,
-                                          String confirmEmail) throws Exception {
+                                          String confirmEmail, int oiState) throws Exception {
 		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeDropShipOrder start");
 		JsonResult json = new JsonResult();
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
-		String websiteType= request.getParameter("websiteType");
+		// String websiteType= request.getParameter("websiteType");
 		// boolean isKidFlag =  "2".equals(websiteType);
 		boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
 		if (mainOrderNo.equals(orderNo)) {
@@ -1642,13 +1642,24 @@ public class NewOrderDetailsCtr {
 					// 获取用户货币单位
 					// zlw add start
 					float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-					float order_ac = Float.parseFloat(request.getParameter("order_ac"));
-					UserDao dao = new UserDaoImpl();
+					// float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+					/*UserDao dao = new UserDaoImpl();
 					order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 					dao.updateUserAvailable(userId,
 							new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 							" system closeOrder:" + orderNo,orderNo, String.valueOf(adminId), 0, order_ac, 1);
-					// zlw add end
+					// zlw add end*/
+
+					// 走审批流程
+					OrderCancelApproval cancelApproval = new OrderCancelApproval();
+					cancelApproval.setUserId(userId);
+					cancelApproval.setOrderNo(orderNo);
+					cancelApproval.setPayPrice(actualPay);
+					cancelApproval.setType(2);
+					cancelApproval.setDealState(0);
+					cancelApproval.setOrderState(oiState);
+					NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+					json.setOk(true);
 
 					// ssd add start
 					// 发送取消订单的提醒邮件
@@ -1721,13 +1732,24 @@ public class NewOrderDetailsCtr {
 						// 获取用户货币单位
 						// zlw add start
 						float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-						float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+						/*float order_ac = Float.parseFloat(request.getParameter("order_ac"));
 						UserDao dao = new UserDaoImpl();
 						order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 						dao.updateUserAvailable(userId,
 								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 								" system closeOrder:" + orderNo,orderNo, null, 0, order_ac, 1);
-						// zlw add end
+						// zlw add end*/
+
+						// 走审批流程
+						OrderCancelApproval cancelApproval = new OrderCancelApproval();
+						cancelApproval.setUserId(userId);
+						cancelApproval.setOrderNo(orderNo);
+						cancelApproval.setPayPrice(actualPay);
+						cancelApproval.setType(2);
+						cancelApproval.setDealState(0);
+						cancelApproval.setOrderState(oiState);
+						NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+						json.setOk(true);
 
 						// 直接SQL语句判断整个dropship订单是否全部取消,如果取消,则更新orderInfo的状态为取消
 						int mainOrderUpd = orderwsServer.updateMainOrderByDropship(userId, mainOrderNo, orderNo);
