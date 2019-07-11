@@ -222,22 +222,51 @@ tr .td_class{width:230px;}
 						+ userid + "&password=" + name.replace(/\s+/g,'') + "&currency="
 						+ currency, "_blank");*/
 	}
+    function userloginJump() {
+        var userid = $('#user_login_message input[name=userid]').val();
+        var site = $("#user_login_message input[name=site]:checked").val();
+        //获取数据 记录模拟登陆日志
+        $.ajax({
+            type:'post',
+            url:'/cbtconsole/queryuser/insertLoginLog.do',
+            data:{
+                userid:userid,
+                site:site
+            },
+            success:function(data){
+                if(data.state == "true"){
+                    $("#user_login_from input[name=email]").val(data.bean.email);
+                    $("#user_login_from input[name=pass]").val(data.bean.pass);
+                    if (site == 1) {
+                        $("#user_login_from").attr("action", "https://www.import-express.com/user/loginNew")
+                    } else if (site == 2) {
+                        $("#user_login_from").attr("action", "https://www.kidsproductwholesale.com/user/loginNew")
+                    }
+                    $("#user_login_from").submit();
+                }else{
+                    alert(data.message);
+                }
+            }
+        });
+    }
 	function userlogin(userid, name, currency) {
-		$.dialog({
-			title : '模拟登陆暂停使用',
-			content : "模拟登陆暂停使用",
-			max : false,
-			min : false,
-			lock : true,
-			drag : false,
-			fixed : true,
-			ok : function() {
-				return;
-			}/*,
-			cancel : function() {
-				return;
-			}*/
-		});
+        $('#user_login_message input[name=userid]').val(userid);
+        $('#user_login_message').window('open');
+		// $.dialog({
+		// 	title : '模拟登陆暂停使用',
+		// 	content : "模拟登陆暂停使用",
+		// 	max : false,
+		// 	min : false,
+		// 	lock : true,
+		// 	drag : false,
+		// 	fixed : true,
+		// 	ok : function() {
+		// 		return;
+		// 	}/*,
+		// 	cancel : function() {
+		// 		return;
+		// 	}*/
+		// });
 		/*//获取加密信息
 		$.ajax({
 			type:'post',
@@ -516,6 +545,12 @@ tr .td_class{width:230px;}
 </script>
 </head>
 <body>
+    <div style="display: none">
+        <form id="user_login_from" method="post" target="_blank">
+            <input type="text" name="email">
+            <input type="password" name="pass">
+        </form>
+    </div>
 	<div id="win" class="easyui-window" title="变更用户电话号码" data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"  style="width:400px;height:200px;display: none;">
 		 <form id="ff" method="post">
 			<div style="margin-bottom:20px">
@@ -549,6 +584,23 @@ tr .td_class{width:230px;}
                 <a href="javascript:void(0)" class="easyui-linkbutton"
                    onclick="addUserRemark()" style="width:80px">添加备注</a>
             </div>
+    </div>
+    <div id="user_login_message" class="easyui-window" title="选择登陆网站"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:200px;display: none;font-size: 16px;">
+        <div style="margin-left:20px;">
+            <input type="hidden" name="userid">
+            <br />
+            <input checked='checked' type='radio' name='site' value='1'/>
+            <span onclick="">import-express</span>
+            <br /><br />
+            <input type='radio' name='site' value='2'/>
+            <span>kidsproductwholesale</span>
+            <br /><br />
+        </div>
+        <div style="margin-left: 260px;">
+            <button onclick="userloginJump()">模拟登陆</button>
+        </div>
     </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>

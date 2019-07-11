@@ -9,6 +9,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsReview;
 import com.importExpress.pojo.OrderShare;
+import com.importExpress.pojo.UserBean;
 import com.importExpress.service.QueryUserService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.MultiSiteUtil;
@@ -762,6 +763,31 @@ public class QueryUserController {
     @ResponseBody
     public Integer getSiteTypeNum(@RequestParam(value = "orderNo", defaultValue = "", required = false) String orderNo) {
         return MultiSiteUtil.getSiteTypeNum(orderNo);
+    }
+
+    /**
+     * 后台模拟等日志记录
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/insertLoginLog.do
+     *
+     *  userid 模拟登陆的用户id
+     *  site 1-非kids网站(importx网站); 2-kids网站;
+     */
+    @RequestMapping(value = "/insertLoginLog")
+    @ResponseBody
+    public Map<String, Object> insertLoginLog(HttpServletRequest request, Integer userid, Integer site){
+        Map<String, Object> result = new HashMap<String, Object>();
+        String sessionId = request.getSession().getId();
+        String userJson = Redis.hget(sessionId, "admuser");
+        Admuser user = (Admuser) SerializeUtil.JsonToObj(userJson, Admuser.class);
+        if (user == null || user.getId() == 0) {
+            result.put("message", "请登陆后台后再操作!");
+            result.put("state", "false");
+            return result;
+        }
+        UserBean bean = queryUserService.insertLoginLog(userid, user.getId(), site);
+        result.put("bean", bean);
+        result.put("state", "true");
+        return result;
     }
 
 }

@@ -185,7 +185,6 @@
                 if ($(this).is(':checked')) {
                     var tbid=$("#order"+k).text();
                     var retunum=$("#openNum"+k).val();
-                    alert(retunum)
                     OrderMap.push({tbId:tbid,returnReason:returnNO,returnNumber:retunum})
                 }
             })
