@@ -264,12 +264,8 @@ $('#dlg').dialog('close');
 							<textarea rows="2" cols="28" id="${qa.questionid}_replay">${qa.reply_content}</textarea>
 							<br>
 							<c:if test="${not empty qa.reply_content}">
-								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}')">修改 </a>
-								<a class="easyui-linkbutton"  onclick="sendEmail('${qa.questionid}','${qa.c_shop_id}','${qa.pid}')">邮件发送</a>
-								公司网站：<select id="Web_site${qa.questionid}" style="font-size: 16px; height: 24px; width: 150px;">
-								<option value="0" selected="selected">import-express</option>
-								<option value="1">kidsproductwholesale</option>
-								</select>
+								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">修改 </a>
+								<a class="easyui-linkbutton"  onclick="sendEmail('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">邮件发送</a>
 							</c:if>
 							<c:if test="${empty qa.reply_content}">
 								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}')"> 确认 </a>
@@ -367,17 +363,16 @@ function gotopage(flag){
 }
 
 //发送邮件给客户
-function sendEmail(qid,shop_id,url){
+function sendEmail(qid,shop_id,url,purl){
     var content = $("#"+qid+"_replay").val();
-    var Website = $("#Web_site"+qid).val();
     if(content == ''){
         return ;
     }
     $.ajax({
         type:'POST',
         dataType:'text',
-        url:'/cbtconsole/question/sendEmail?Website='+Website,
-        data:{qid:qid,rcontent:content,url:url},
+        url:'/cbtconsole/question/sendEmail',
+        data:{qid:qid,rcontent:content,url:url,purl:purl},
         success:function(res){
             if(res>0){
                 alert("邮件发送成功");
@@ -435,9 +430,8 @@ function influenceShop(qid,contextFlag,shop_id,state){
 	});
 }
 //回复
-function replay(qid,shop_id,url){
+function replay(qid,shop_id,url,purl){
 	var content = $("#"+qid+"_replay").val();
-    var Website = $("#Web_site"+qid).val();
 	if(content == ''){
 		return ;
 	}
@@ -449,8 +443,8 @@ function replay(qid,shop_id,url){
 	$.ajax({
 		type:'POST',
 		dataType:'text',
-		url:'/cbtconsole/question/edit?Website='+Website,
-		data:{qid:qid,rcontent:content,isShow:isShow,shop_flag:shop_flag,url:url,shop_id:shop_id},
+		url:'/cbtconsole/question/edit',
+		data:{qid:qid,rcontent:content,isShow:isShow,shop_flag:shop_flag,url:url,shop_id:shop_id,purl:purl},
 		success:function(res){
 			if(res>0){
 				var ccontent = $("#"+qid+"_replay").val();
