@@ -8,6 +8,7 @@ import com.cbt.util.DateFormatUtil;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.QueryUserMapper;
+import com.importExpress.mapper.UserNewMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.QueryUserService;
 import org.apache.commons.collections.CollectionUtils;
@@ -809,4 +810,12 @@ public class QueryUserServiceImpl implements QueryUserService {
         this.queryUserMapper.SetShareByOrderno(orderNo);
     }
 
+    @Autowired
+    private UserNewMapper userNewMapper;
+
+    @Override
+    public UserBean insertLoginLog(Integer userid, Integer admid, Integer site) {
+        queryUserMapper.insertLoginLog(userid, admid, site);
+        return userNewMapper.getUserById(userid);
+    }
 }

@@ -1000,4 +1000,10 @@
         </foreach>
     </select>
 
+    <!--void insertLoginLog(@Param("userid") Integer userid, @Param("admid") Integer admid, @Param("site") Integer site);-->
+    <insert id="insertLoginLog">
+        INSERT INTO user_login_log (userid, admid, site)
+        VALUES (#{userid}, #{admid}, #{site})
+    </insert>
+
 </mapper>
