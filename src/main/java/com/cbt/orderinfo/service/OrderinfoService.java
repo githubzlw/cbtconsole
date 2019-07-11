@@ -519,6 +519,8 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
 				//采购备注-2019.07.04-sj
 				searchresultinfo.setContext(map.get("context")!=null?map.get("context") : "");
+				searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
+				searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量

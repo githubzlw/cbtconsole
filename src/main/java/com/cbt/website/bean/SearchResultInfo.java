@@ -68,6 +68,8 @@ public class SearchResultInfo {
 	private String isExitPhone;
 	private String source1688_img;
 	private String context;//采购备注
+	private String specId;
+	private String skuID;
 	/**
 	 * 称秤体积重量
 	 */

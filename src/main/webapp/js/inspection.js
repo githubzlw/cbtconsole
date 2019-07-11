@@ -396,31 +396,41 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                            strcartype, usid, goodspprice, position, odid, isDropshipOrder, goodurl, status, index, repState) {
 	
 	scrollTop=$(window).scrollTop();
-	alert(scrollTop)
 	
     position = position.replace("CR-", "");
-    var seiUnit = document.getElementById("unit_" + odid + "").innerHTML;
+    var seiUnit = $("#unit_" + odid).html();
     var unit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
     if (unit == null || unit == "null" || unit == "") {
         unit = "1";
     }
-    var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]')
-        .val();
-    var barcode = document.getElementById("code_" + odid + "").innerHTML;//库位
+    var warehouseRemark = $('textarea[name ="warehouseRemark' + index + '"]').val();
+    var barcode = $("#code_" + odid + "").html();//库位
     var userid = $("#h_b5").val();
     var userName = $("#h_b6").val();
     var tbOrderId = $("#tborderid").val();
-    var count = document.getElementById("" + orderid + "count_" + odid + "").value;//验货数量
-    var goods_name = document.getElementById("name_" + odid + "").innerHTML;
-    var _count = document.getElementById("" + orderid + "_count" + odid + "").value;//销售数量
-    var record_ = document.getElementById("" + orderid + "record_" + odid + "").innerHTML;//已验货数量
-    if ((Number(count) + Number(record_)) < (Number(_count) * Number(unit))) {
+    //验货人员实际输入数量
+    var count =$("#" + orderid + "count_" + odid + "").val();//验货数量
+    var goods_name = $("#name_" + odid + "").html();
+    
+    //客户下单数量
+    var _count = $("#" + orderid + "_count" + odid + "").val();//销售数量
+    
+    //其他运单验货过的数量
+    var record_ = $("#" + orderid + "record_" + odid + "").html();//已验货数量
+   
+    var specid = $("#specid_"+orderid+"_"+odid).html();
+    var skuid=$("#skuid_"+orderid+"_"+odid).html();
+    
+    var tbspecid=$("specId_"+specid).html();
+    var tbskuid=$("skuID_"+skuid).html();
+    
+    var inventory_count = Number(count) + Number(record_) - (Number(_count) * Number(unit));//库存数量
+    if (inventory_count < 0) {
         alert("验货数量与销售数量不符,不能验货无误");
         return;
-    } else if ((Number(count) + Number(record_)) > (Number(_count) * Number(unit))) {
-        // alert("验货数量大于销售数量,存库【"+(Number(count)+Number(record_)-(Number(_count)*Number(unit)))+"】件");
-        //          	put_print1(strcartype,(Number(count)+Number(record_)-(Number(_count)*unit)),tbOrderId,goods_name,barcode,goodid);
-    } else if (count == null || count == "" || Number(count) == 0) {
+    } else if (inventory_count > 0) {
+      
+    } else {
         alert("请输入验货数量");
         return;
     }
@@ -463,9 +473,10 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     $(isok).css("background", "red");
     $("#status" + odid).css("color", "red");
     $("#status" + odid).html("已验货");
-    var inventory_count = Number(count) + Number(record_) - (Number(_count) * Number(unit));//库存数量
+    
     if (isDropshipOrder == 3) {
         addInventory(barcode, count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl);
+        
     } else if ((Number(count) + Number(record_)) > (Number(_count) * Number(unit)) && Number(inventory_count) > 0 && goodid != "1400") {
         addInventory(barcode, inventory_count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl);
     }
@@ -702,6 +713,12 @@ function search() {
                     str += '<p>商品数量：'
                         + jsonObj[i].itemqty
                         + '</p>';
+                    str += '<p id="specId_'+jsonObj[i].specId+'">specId：'
+                    	+ jsonObj[i].specId
+                    	+ '</p>';
+                    str += '<p id="skuID_'+jsonObj[i].skuID+'">skuID：'
+                    	+ jsonObj[i].skuID
+                    	+ '</p>';
                     $("#tborderid").val(jsonObj[i].orderid);
                     str += '</div>';
                     str += '<div style="clear:both;"></div>';
@@ -940,6 +957,10 @@ function search() {
                                 str += '<img width= "150px" height="150px" src="' + json[i].source1688_img + '"/></a></div>';
                             }
                         }
+                        
+                        str += '<p id=' + "specid_" + json[i].orderid +'_'+json[i].odid+ '>specId:<font color="red">'+json[i].specId
+                        + '</font></p><p color="red" id="skuID_'+ json[i].orderid +'_'+json[i].odid+'">skuID:<font color="red">' + json[i].skuID + '</font></p>';
+                        
                         if (checked == "1") {
                             queryRecord(json[i].odid);
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h4>已验货数量:<span id="' + json[i].orderid + 'record_' + json[i].odid + '" style="font-size:30px;color:#ff0000;">'
@@ -960,7 +981,7 @@ function search() {
                             } else {
                                 str += '<span name="save_weight_flag">已同步到产品库</span>';
                             }
-                            str += '<span id="tip_' + json[i].orderid + json[i].odid + '" style="color:red"></span>'+'<h3>下单数量:'+json[i].usecount+'</h3><h3>商品验货数量:<input type="hidden" id="' + json[i].orderid + '_count' + json[i].odid + '" value="' + json[i].usecount + '"><input type="text" style="width: 40px;" id="' + json[i].orderid + 'count_' + json[i].odid + '" value=""/>piece</h3></p>';
+                            str += '<span id="tip_' + json[i].orderid + json[i].odid + '" style="color:red"></span>'+'<h3>下单数量:'+json[i].usecount+'</h3><h3>商品验货数量:<input type="hidden" id="' + json[i].orderid + '_count' + json[i].odid + '" value="' + json[i].usecount + '"><input class="inspectioncheck" onkeyup="inspectioncheck(this)" type="text" style="width: 40px;" id="' + json[i].orderid + 'count_' + json[i].odid + '" value=""/>piece</h3></p>';
                         } else {
                             str += '<p style="font-size:16px;font-weight:bold;" class="strcarype"><h3>客户下单数量:<span id="' + json[i].orderid + '_count' + json[i].odid + '" style="font-size:35px;">'
                                 + json[i].usecount
@@ -1337,7 +1358,7 @@ function search() {
                                 } else {
                                     str += '<span name="save_weight_flag">已同步到产品库</span>';
                                 }
-                                str += '<span id="tip_' + json[i].orderid + json[i].odid + '" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="' + json[i].orderid + '_count' + json[i].odid + '" value="' + json[i].usecount + '"><input type="text" style="width: 40px;" id="' + json[i].orderid + 'count_' + json[i].odid + '" value=""/>piece</h3></p>';
+                                str += '<span id="tip_' + json[i].orderid + json[i].odid + '" style=";color:red"></span><h3>商品验货数量:<input type="hidden" id="' + json[i].orderid + '_count' + json[i].odid + '" value="' + json[i].usecount + '"><input class="inspectioncheck" onkeyup="inspectioncheck(this)" type="text" style="width: 40px;" id="' + json[i].orderid + 'count_' + json[i].odid + '" value=""/>piece</h3></p>';
                             } else {
                                 str += '<p style="font-size:16px;font-weight:bold;"><h3>客户下单数量:<span id="' + json[i].orderid + '_count' + json[i].odid + '" style="font-size:35px;">'
                                     + json[i].usecount
@@ -1898,7 +1919,18 @@ function saveElectronicData() {
         }
     });
 }
-
+function inspectioncheck(v){
+	 	var c=$(v);
+	 	var cval = c.val();
+	 	if(cval.length==1){
+	 		cval=cval.replace(/[^1-9]/g,'')
+	 		$(v).val(cval);
+	 	}
+	   if(/[^\d]/.test(cval)){//替换非数字字符
+	    var temp_amount=cval.replace(/[^\d]/g,'');
+	    $(v).val(temp_amount);
+	   }
+}
 //清空电子质检表单数据
 function resetElectronicData(type) {
     if (type == "1") {

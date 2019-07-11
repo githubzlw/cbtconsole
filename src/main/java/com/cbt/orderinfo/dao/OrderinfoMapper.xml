@@ -1164,7 +1164,7 @@
 	</insert>
     <select id="getGoodsData" resultType="com.cbt.bean.Tb1688OrderHistory">
 		select id,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
-		,shipstatus,itemurl,imgurl,username,creatTime from taobao_1688_order_history where shipno=#{shipno}
+		,shipstatus,itemurl,imgurl,username,creatTime,specId,skuID from taobao_1688_order_history where shipno=#{shipno}
 	</select>
     <select id="getAdminid" resultType="java.lang.String">
 		SELECT ta.adminid FROM tb_1688_accounts ta INNER JOIN taobao_1688_order_history t ON ta.account=t.username WHERE t.shipno=#{shipno} and ta.del=1 LIMIT 1
