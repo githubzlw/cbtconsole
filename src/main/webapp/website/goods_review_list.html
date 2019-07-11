@@ -204,7 +204,7 @@
                         alert("修改评论成功");
                         $('#main-datagrid').datagrid('reload');
                     }else{
-                        alert("修改评论失败");
+                        alert(json.message);
                     }
                 },
                 error: function () {
