@@ -329,7 +329,7 @@ function fnSplitDropShipOrder(orderno, email, paytime) {
         return ;
     }
 	var content = "";
-	var tab = $("#dropshipOrderDiv").find("div[class='wrapper']").length;
+	var tab = $("#orderDetail").find("tr").length;
 	var tab_yx = 0;
 	var time_ = 0;
 	var time = 0;
@@ -338,8 +338,8 @@ function fnSplitDropShipOrder(orderno, email, paytime) {
 	for (var i = 0; i < tab; i++) {
 		var cansonl = $("#user_cancel_" + (i - 1)).html();// 是否取消
 		var od_time = $("#orderd_delivery_" + (i - 1)).html();// 交期时间
-		var check = $("#dropshipOrderDiv").find("div[class='wrapper']").eq(i)
-				.find("input:checkbox");
+		var check = $("#orderDetail").find("tr").eq(i)
+				.find(".choose_chk");
 		if ($(check).next().val() != 2) {
 			tab_yx++;
 		}

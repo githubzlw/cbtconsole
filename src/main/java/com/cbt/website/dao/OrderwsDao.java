@@ -5273,7 +5273,7 @@ public class OrderwsDao implements IOrderwsDao {
 
     @Override
     public int checkOrderState(String orderNo,String isDropshipOrder1) {
-        int state=6;
+        int state=-2;
         String sql = "select state from orderinfo where order_no=?";
         //如果 ！= 0 则是dropship 订单查询
         if("1".equals(isDropshipOrder1)){
@@ -5286,7 +5286,7 @@ public class OrderwsDao implements IOrderwsDao {
             pst = conn.prepareStatement(sql);
             pst.setString(1, orderNo);
             rs = pst.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 state=rs.getInt("state");
             }
         } catch (SQLException e) {
