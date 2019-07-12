@@ -20,6 +20,8 @@
 <link rel="stylesheet" type="text/css" href="/cbtconsole/jquery-easyui-1.5.2/demo/demo.css">
 <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.min.js"></script>
 <script type="text/javascript" src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+		src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
 <script type="text/javascript">
 </script>
 <style type="text/css">
@@ -149,7 +151,25 @@ function doReset(){
   function exportdata(){
 	  var times=$("#times").val();
 	  var userName=$('#userName').combobox('getValue');
+	  if(!userName){
+	      userName = "";
+	  }
  	 window.location.href ="/cbtconsole/StatisticalReport/exportBuyOrderDetails?times="+times+"&userName="+userName+"&type=5";
+ }
+
+ function initAdminList(){
+      $.ajax({
+			type : 'get',
+			dataType : 'json',
+			url : '/cbtconsole/StatisticalReport/getAllBuyer',
+			data : {},
+			success : function(data) {
+				alert(data);
+			},
+			error : function(XMLResponse) {
+				$.messager.alert("提醒", "初始化，请联系管理员", "error");
+			}
+		});
  }
 
 </script>
@@ -158,8 +178,9 @@ function doReset(){
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<form id="query_form" action="#" onsubmit="return false;" style="margin-left:500px;">
-				<select class="easyui-combobox" name="userName" id="userName" style="width:20%;" data-options="label:'采购人:',panelHeight:'auto',valueField: 'account',   
-                    textField: 'account', value:'请选择',
+				<%--<span>采购人:<select id="query_user_name"></select></span>--%>
+				<select class="easyui-combobox" name="userName" id="userName" style="width:20%;" data-options="label:'采购人:',panelHeight:'auto',valueField: 'account',
+                    textField: 'account', value:'',
                     url: '/cbtconsole/StatisticalReport/getAllBuyer',  
                     method:'get'">
 				</select>
