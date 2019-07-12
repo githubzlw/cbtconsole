@@ -2158,6 +2158,7 @@ public class EditorController {
                 sendMQ.closeConn();
             }
             json.setOk(index > 0 ? true : false);
+            json.setMessage(index > 0 ? "修改成功" : "修改失败");
         } catch (Exception e) {
             json.setOk(false);
             LOG.error("updateReviewRemark error", e);

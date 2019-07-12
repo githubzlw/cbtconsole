@@ -3260,8 +3260,8 @@ public class StatisticalReportController {
             startTime = "2999-01-01 00:00:00";
             endTime = "2999-03-01 00:00:00";
         }
-        if ("请选择".equals(userName)) {
-            userName = null;
+        if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
+            userName = "all";
         }
         map.put("startTime", startTime);
         map.put("endTime", endTime);
@@ -3272,26 +3272,33 @@ public class StatisticalReportController {
         Date date = new Date(System.currentTimeMillis());
         int year = date.getYear() + 1900;
         String filename = "";
+        System.err.println("------------type :" + type);
+        System.err.println("------------map :" + map.toString());
         if ("1".equals(type)) {
             //有匹配货源无入库采购订单
             list = taoBaoOrderService.getNoStorageCount(map);
-            filename = "有匹配货源无入库采购订单报表" + year;
+            // filename = "有匹配货源无入库采购订单报表" + times;
+            filename = "purchaseOrderWithMatchingSourceWithoutWarehousing" + times;
         } else if ("2".equals(type)) {
             //采购订单对应取消销售订单明细
             list = taoBaoOrderService.getCancelAmountCount(map);
-            filename = "采购订单对应取消销售订单报表" + year;
+            // filename = "采购订单对应取消销售订单报表" + times;
+            filename = "purchaseOrdersCorrespondToCancellationOfSalesOrders" + times;
         } else if ("3".equals(type)) {
             // 无订单匹配采购订单明细报表导出
             list = taoBaoOrderService.getNoMatchingOrderCount(map);
-            filename = "无订单匹配采购订单报表" + year;
+            // filename = "无订单匹配采购订单报表" + times;
+            filename = "NoOrderMatchesPurchaseOrder" + times;
         } else if ("4".equals(type)) {
             // 采购订单对应上月销售订单报表导出
             list = taoBaoOrderService.getLastAmountCount(map);
-            filename = "采购订单对应上月销售订单报表" + year;
+            // filename = "采购订单对应上月销售订单报表" + times;
+            filename = "purchaseOrdersCorrespondToSalesOrdersOfLastMonth" + times;
         } else if ("5".equals(type)) {
             // 采购订单对应上月销售订单报表导出
             list = taoBaoOrderService.getGrabNormalAmountCount(map);
-            filename = "抓取正常采购订单明细报表" + year;
+            // filename = "抓取正常采购订单明细报表" + times;
+            filename = "captureTheNormalPurchaseOrderDetails" + times;
         }
         for (TaoBaoOrderInfo c : list) {
             if ("0".equals(c.getTbOr1688())) {
@@ -3304,9 +3311,11 @@ public class StatisticalReportController {
                 c.setTbOr1688("未知");
             }
         }
+        System.err.println("------------list :" + list.toString());
         wb = generalReportService.exportBuyOrderDetails(list, type);
-        filename = StringUtils.getFileName(filename);
-        response.setHeader("Content-disposition", "attachment;filename=" + filename);
+        // filename = StringUtils.getFileName(filename);
+        // filename = new String(filename.getBytes("ISO8859-1"), "utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=" +  filename + ".xls");
         OutputStream ouputStream = response.getOutputStream();
         wb.write(ouputStream);
         ouputStream.flush();

@@ -1824,7 +1824,7 @@
                                     </div>
 
                                 </td>
-                                <td style="text-align: center; width: 5%;zoom:140%;"><input
+                                <td style="text-align: center; width: 5%;zoom:140%;"><input class="choose_chk"
                                         type="checkbox" onchange="fnChange(${orderd.id},this);"
                                     ${orderd.state == 2?'checked="checked" disabled="true"':''}
                                         value="${orderd.id}"><input type="hidden"
