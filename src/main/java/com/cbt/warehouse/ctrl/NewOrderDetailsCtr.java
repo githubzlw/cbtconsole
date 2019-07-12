@@ -1558,7 +1558,7 @@ public class NewOrderDetailsCtr {
 				if (isDrop) {
 					String mainOrderNo = orderwsServer.queryMainOrderByDropship(orderNo);
 					//Added <V1.0.1> Start： cjc 2018/10/23 16:52 TODO 如果是取消dropship 子订单 则需要再查询一下主订单是否是取消状态
-					int mainState=orderwsServer.checkOrderState(orderNo,"0");
+					int mainState=orderwsServer.checkOrderState(mainOrderNo,"0");
 					if(mainState == -1 || mainState == 6){
 						json.setOk(false);
 						json.setMessage("线上主订单已被取消，无法再取消<br>这个订单三分钟之后变成取消状态");
