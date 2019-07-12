@@ -90,7 +90,26 @@ public class GuestBookBean {
 	private String statusinfo;
 	private String sale_email;//客户对应的销售邮箱
 	private String picPath;
-	public String getPicPath() {
+	private Integer site;  // 所在网站
+	private String siteStr;  // 所在网站
+
+    public Integer getSite() {
+        return site;
+    }
+
+    public void setSite(Integer site) {
+        this.site = site;
+    }
+
+    public String getSiteStr() {
+        return siteStr;
+    }
+
+    public void setSiteStr(String siteStr) {
+        this.siteStr = siteStr;
+    }
+
+    public String getPicPath() {
 		return picPath;
 	}
 

@@ -2124,6 +2124,8 @@ public class EditorController {
             com.cbt.pojo.Admuser adm = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
             if (adm == null) {
                 json.setOk(false);
+                json.setMessage("请登录后再操作");
+                return json;
             }
             Map<String, String> paramMap = new HashMap<String, String>();
             String oldCreateTime = request.getParameter("oldCreateTime");
@@ -2156,9 +2158,10 @@ public class EditorController {
                 sendMQ.closeConn();
             }
             json.setOk(index > 0 ? true : false);
+            json.setMessage(index > 0 ? "修改成功" : "修改失败");
         } catch (Exception e) {
             json.setOk(false);
-            e.printStackTrace();
+            LOG.error("updateReviewRemark error", e);
         }
         return json;
     }
