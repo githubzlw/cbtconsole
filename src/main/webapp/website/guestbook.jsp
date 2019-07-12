@@ -270,10 +270,11 @@ function doReset(){
 }
 
 //回复留言问题
-function reply(id,userId,reply_userName,reply_content,reply_pname,reply_email,reply_onlineUrl){
+function reply(id, site){
 	$('#dlg').dialog('open');
 	$("#replyContent1").textbox('setValue','');
 	$('#replyContent1').textbox('textbox').focus();
+	$('#website_type').val(site);
 	$("#gbookid").val(id);
 
 };
@@ -367,7 +368,7 @@ $(function(){
 <div class="mod_pay3" style="display: none;" id="big_img">
 
 </div>
-	<div id="dlg" class="easyui-dialog" title="回复内容" data-options="modal:true" style="width:450px;height:320px;padding:10px;">
+	<div id="dlg" class="easyui-dialog" title="回复内容" data-options="modal:true" style="width:450px;height:260px;padding:10px;">
 		<form id="uploadFileForm1" method="post" enctype="multipart/form-data">
 			<input type="hidden" name="gbookid" id="gbookid"/>
 			<div style="margin-bottom:20px">
@@ -379,13 +380,14 @@ $(function(){
 					data-options="prompt:'...'"
 					style="width: 360px">
 			</div>
-			<div style="margin-bottom: 20px">
+            <input type="hidden" id="website_type" name="websiteType">
+			<%--<div style="margin-bottom: 20px">
                 邮件回复网站名: <br />
                 <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
                     <option value="1" selected="selected">import-express</option>
                     <option value="2">kidsproductwholesale</option>
                 </select>
-			</div>
+			</div>--%>
 		</form>
 		<div style="text-align: center; padding: 5px 0">
 			<a href="javascript:void(0)" data-options="iconCls:'icon-add'"
@@ -443,6 +445,7 @@ $(function(){
 				<th data-options="field:'pid',width:30,align:'center'">pid</th>
 				<th data-options="field:'pname',width:30,align:'center'">pname</th>
 				<th data-options="field:'content',width:100,align:'center'">content</th>
+				<th data-options="field:'siteStr',width:30,align:'center'">网站</th>
 				<th data-options="field:'createTime',width:30,align:'center'">create_time</th>
 				<th data-options="field:'replyContent',width:100,align:'center'">reply_content</th>
 				<th data-options="field:'replyTime',width:30,align:'center'">reply_time</th>

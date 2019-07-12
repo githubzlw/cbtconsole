@@ -30,4 +30,38 @@ public class MultiSiteUtil {
         return 1;
     }
 
+
+    /**
+     *  根据线上地址判断网站类型
+     *
+     * <pre>
+     * MultiSiteUtil.getSiteTypeNum(null)               = 1
+     * MultiSiteUtil.getSiteTypeNum("")                 = 1
+     * MultiSiteUtil.getSiteTypeNum("https://www.import-express.com/goodsinfo/")      = 1
+     * MultiSiteUtil.getSiteTypeNum("https://www.kidsproductwholesale.com/goodsinfo")  = 2
+     * </pre>
+     *
+     * @param url
+     * @return 1-非kids网站(importx网站); 2-kids网站;
+     */
+    public static Integer getSiteTypeNumByUrl(String url){
+        if (StringUtils.isNotBlank(url)
+                && StringUtils.containsIgnoreCase(url, "www.kidsproductwholesale.com")) {
+            return 2;
+        }
+        return 1;
+    }
+
+
+    /**
+     *  返回线上网站
+     *
+     */
+    public static String getSiteTypeStrByNum(Integer num){
+        if (num != null && num == 2) {
+            return "kids";
+        }
+        return "importx";
+    }
+
 }
