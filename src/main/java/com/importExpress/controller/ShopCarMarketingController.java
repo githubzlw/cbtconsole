@@ -1,6 +1,8 @@
 package com.importExpress.controller;
 
+import com.cbt.bean.CustomGoodsPublish;
 import com.cbt.orderinfo.service.OrderinfoService;
+import com.cbt.service.CustomGoodsService;
 import com.cbt.userinfo.service.IUserInfoService;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
@@ -72,6 +74,8 @@ public class ShopCarMarketingController {
     private SendMailFactory sendMailFactory;
     @Autowired
     private OrderinfoService orderinfoService;
+    @Autowired
+    private CustomGoodsService customGoodsService;
 
     private shoppingCartDao shopCarDao = new shoppingCartDaoImpl();
 
@@ -366,7 +370,7 @@ public class ShopCarMarketingController {
                 }
 
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
-                List<GoodsCarActiveBeanUpdate> activeList = new ArrayList<GoodsCarActiveBeanUpdate>();
+                List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
                 List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType));
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
@@ -376,15 +380,15 @@ public class ShopCarMarketingController {
                             if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
                                 isUpdatePrice++;
                             }
-                            genActiveSimplBeanByShopCar(simplBean, shopCar);
+                            genActiveSimpleBeanByShopCar(simplBean, shopCar, activeList);
                             break;
                         }
                     }
                 }
 
                 //判断是否有改价的情况，有改价更新并清空购物车--jxw05-27弃用，改成更新redis数据
-                if (isUpdatePrice > 0) {
-
+                if (activeList.size() > 0 && isUpdatePrice > 0) {
+                    listActive.clear();
                     // 2.更新redis数据
                     try{
                         SendMQ sendMQ = new SendMQ();
@@ -779,13 +783,18 @@ public class ShopCarMarketingController {
      * @param shopCar
      * @return
      */
-    private void genActiveSimplBeanByShopCar(GoodsCarActiveSimplBean activeBean,ShopCarMarketing shopCar) {
+    private void genActiveSimpleBeanByShopCar(GoodsCarActiveSimplBean activeBean, ShopCarMarketing shopCar,
+                                             List<GoodsCarActiveSimplBean> activeList) {
 
-        activeBean.setPrice(shopCar.getGoogsPrice());
-        if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
-            activeBean.setPrice1(shopCar.getPrice1() + "@1");
-        } else {
-            activeBean.setPrice1("0");
+        CustomGoodsPublish goodsPublish = customGoodsService.queryGoodsDetails(shopCar.getItemid(), 0);
+        if (!(goodsPublish == null || goodsPublish.getValid() == 0)) {
+            activeBean.setPrice(shopCar.getGoogsPrice());
+            if (shopCar.getPrice1() != null && shopCar.getPrice1() > 0) {
+                activeBean.setPrice1(shopCar.getPrice1() + "@1");
+            } else {
+                activeBean.setPrice1("0");
+            }
+            activeList.add(activeBean);
         }
     }
 
