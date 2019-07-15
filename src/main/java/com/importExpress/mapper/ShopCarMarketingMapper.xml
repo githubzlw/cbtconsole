@@ -1633,9 +1633,8 @@
         b.custom_main_image,b.remotpath,b.wprice,b.isBenchmark,b.bm_flag,b.wholesale_price,
         b.weight,b.ali_pid,b.ali_img,b.ali_price,b.final_weight,b.catid1,
         a.goods_title,a.goods_type,a.norm_least,a.googs_img,a.price1,b.ali_name,a.website
-        from shop_car_marketing a LEFT JOIN custom_benchmark_ready b
-        on a.itemId = b.pid
-        where a.userid = #{userId}
+        from shop_car_marketing a, custom_benchmark_ready b
+        where a.userid = #{userId} and a.itemId = b.pid and b.valid in(1,2)
     </select>
 
     <select id="queryUserInfo" resultMap="shopCarUserStatisticResultMap">
