@@ -15,6 +15,7 @@
 		<result column="whatsApp" property="whatsApp"/>
 		<result column="business" property="business"/>
 		<result column="tellBusiness" property="tellBusiness"/>
+		<result column="site_type" property="siteType"/>
 	</resultMap>
 	
 	<sql id="all">
@@ -24,27 +25,30 @@
 	<select id="queryForList" resultMap="problemFeedBackResultMap">
 		select problem_report.id,problem_report.uid,problem_report.email,problem_report.problem,ifnull(problem_report.whatsApp,'') as whatsApp,
 			problem_report.type,problem_report.createtime,admin_r_user.admName ,problem_report.reply_content,problem_report.reply_time
-            ,ifnull(problem_report.business,'') as business,ifnull(problem_report.tellBusiness,'') as tellBusiness
-			from problem_report,admin_r_user 
-			where problem_report.email = admin_r_user.useremail 
-			<if test="type!=0">
-				and type = #{type}
-			</if>
-			<if test="beginDate != null and beginDate !=''">
-				and date(createtime) &gt;= date(#{beginDate})
-			</if>
-			<if test="endDate != null and endDate !=''">
-				and date(createtime) &lt;= date(#{endDate})
-			</if>
-			<if test="is_report == 1">
-				and reply_content is not null and reply_content&lt;>''
-			</if>
-			<if test="is_report == 2">
-				and (reply_content is null or reply_content = '')
-			</if>
-			<if test="adminId != 0">
-				and admin_r_user.adminid =  #{adminId}
-			</if> 
+            ,ifnull(problem_report.business,'') as business,ifnull(problem_report.tellBusiness,'') as tellBusiness,
+            problem_report.site_type
+			from problem_report
+            LEFT JOIN admin_r_user ON problem_report.email = admin_r_user.useremail
+            <where>
+                <if test="type!=0">
+                    type = #{type}
+                </if>
+                <if test="beginDate != null and beginDate !=''">
+                    and date(createtime) &gt;= date(#{beginDate})
+                </if>
+                <if test="endDate != null and endDate !=''">
+                    and date(createtime) &lt;= date(#{endDate})
+                </if>
+                <if test="is_report == 1">
+                    and reply_content is not null and reply_content&lt;>''
+                </if>
+                <if test="is_report == 2">
+                    and (reply_content is null or reply_content = '')
+                </if>
+                <if test="adminId != 0">
+                    and admin_r_user.adminid =  #{adminId}
+                </if>
+            </where>
 			order by createtime desc 
 			limit #{pageNo},20
 	</select>
@@ -57,10 +61,12 @@
 	</select>
 	
 	<select id="queryCount" resultType="java.lang.Long">
-		select count(problem_report.id) from problem_report,admin_r_user 
-			where problem_report.email = admin_r_user.useremail 
+		select count(problem_report.id)
+            from problem_report
+            LEFT JOIN admin_r_user ON problem_report.email = admin_r_user.useremail
+		<where>
 			<if test="type!=0">
-				and type = #{type}
+				type = #{type}
 			</if>
 			<if test="beginDate != null and beginDate !=''">
 				and date(createtime) &gt;= date(#{beginDate})
@@ -76,14 +82,18 @@
 			</if>
 			<if test="adminId != 0">
 					and admin_r_user.adminid =  #{adminId}
-			</if> 
+			</if>
+        </where>
 	</select>
 	<select id="getReportProblem" resultType="com.cbt.warehouse.pojo.ProblemFeedBackBean">
-	   		SELECT p.id,u.id as userid,u.name as userName,u.email as userEmail,ad.email AS sale_email,p.problem AS qustion,p.createtime,IFNULL(p.reply_content,'') AS reply_content FROM problem_report p
+	   		/*SELECT p.id,u.id as userid,u.name as userName,u.email as userEmail,ad.email AS sale_email,p.problem AS qustion,p.createtime,IFNULL(p.reply_content,'') AS reply_content FROM problem_report p
 			INNER JOIN admin_r_user a ON p.email=a.useremail
 			INNER JOIN USER u ON a.userid=u.id
 			LEFT JOIN admuser ad ON a.adminid=ad.id
-			WHERE p.id=${report_id}
+			WHERE p.id=${report_id}*/
+			SELECT p.id, p.email as userEmail, p.problem AS qustion, p.createtime
+            FROM problem_report p
+			WHERE p.id = #{report_id}
 	</select>
 
     <!--List<Map<String,String>> queryWarningNum(@Param("adminid") int adminid);-->

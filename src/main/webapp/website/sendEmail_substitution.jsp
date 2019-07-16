@@ -159,8 +159,8 @@ String url = UUIDUtil.getAutoLoginPath("/orderInfo/getChangeProduct?flag=1&order
     <div>
 	收件人:<input type="text" id="emailaddress" value="<%=email%>">&nbsp;&nbsp;&nbsp;
 	发件人:<input type="text" id="copyEmail" value="${param.sendEmail}">&nbsp;&nbsp;&nbsp;
-    网站名:
-    <select id="website_type" style="width: 160px;">
+    <%--网站名:--%>
+    <select id="website_type" style="width: 160px;display: none">
         <option value="1" selected="selected">import-express</option>
         <option value="2">kidsproductwholesale</option>
     </select>

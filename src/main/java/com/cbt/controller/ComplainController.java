@@ -18,7 +18,6 @@ import com.importExpress.pojo.CustomerDisputeBean;
 import com.importExpress.pojo.CustomerDisputeVO;
 import com.importExpress.service.CustomComplainService;
 import com.importExpress.service.CustomerDisputeService;
-import com.importExpress.utli.MultiSiteUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -152,7 +151,7 @@ public class ComplainController {
 		double moneyAmountByCid = additionalBalanceService.getMoneyAmountByCid(cid+"");
 		
 		if(complain!=null){
-            mv.addObject("websiteType",MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
+//            mv.addObject("websiteType",MultiSiteUtil.getSiteTypeNum(complain.getRefOrderId()));
 			mv.addObject("status","1");
 			mv.addObject("complain",complain);
 			mv.addObject("imgsList",imgs);

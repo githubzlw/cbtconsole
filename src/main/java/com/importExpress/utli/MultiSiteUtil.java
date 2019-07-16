@@ -52,13 +52,35 @@ public class MultiSiteUtil {
         return 1;
     }
 
+    /**
+     *  返回线上网站类型
+     * @return 1-非kids网站(importx网站); 2-kids网站;
+     */
+    public static Integer getSiteTypeNumByType(String siteType){
+        if ("k".equalsIgnoreCase(siteType)) {
+            return 2;
+        }
+        return 1;
+    }
+
 
     /**
-     *  返回线上网站
+     *  返回线上网站名
      *
      */
     public static String getSiteTypeStrByNum(Integer num){
         if (num != null && num == 2) {
+            return "kids";
+        }
+        return "importx";
+    }
+
+    /**
+     *  返回线上网站名
+     *
+     */
+    public static String getSiteTypeStrByType(String siteType){
+        if ("k".equalsIgnoreCase(siteType)) {
             return "kids";
         }
         return "importx";
