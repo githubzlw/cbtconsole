@@ -420,12 +420,13 @@ function fn(){
 			    </div>
 			  </div>
 			  <div class="form-group">
-			    <div class="col-sm-offset-3 col-sm-10">
-                  邮件回复客户网站名:
+			    <div class="col-sm-offset-4 col-sm-10">
+                  <%--邮件回复客户网站名:
                   <select id="website_type" name="websiteType" style="height: 28px;width: 160px;">
                     <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
                     <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
-                  </select>
+                  </select>--%>
+                    <input id="website_type" name="websiteType" type="hidden" value="${complain.site }">
 			      <button type="button" id="submitForm1" onclick="submitForm();" class="btn btn-success">回复客户</button>
 			      <button type="button" class="btn btn-success" onclick="closeCase()">关闭case</button>
 			      <button type="button" class="btn btn-success" onclick="changeavailable()">余额补偿</button>
