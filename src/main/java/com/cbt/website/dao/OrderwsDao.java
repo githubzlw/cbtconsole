@@ -6417,7 +6417,7 @@ public class OrderwsDao implements IOrderwsDao {
         if (StringUtil.isNotBlank(endDate)) {
             sql += " and create_time <= '" + endDate + "'";
         }
-        sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10) group by user_id) a  "
+        sql += " and locate('_',order_no) = 0 group by user_id) a  "
                 + " where a.user_id not in(select id from `user` where  is_test = 1)";
         if(ipFlag > 0){
             sql += " and a.user_id not in(select user_id from ip_record where user_id > 0 and is_china = 1)";
@@ -6457,7 +6457,7 @@ public class OrderwsDao implements IOrderwsDao {
         if(ipFlag > 0){
             sql += " and user_id not in(select user_id from ip_record where user_id > 0 and is_china =1)";
         }
-        sql += " and (LENGTH(order_no) = 16 or LENGTH(order_no) = 10)  group by user_id) a,user b  "
+        sql += " and locate('_',order_no) = 0  group by user_id) a,user b  "
                 + " where a.user_id not in(select id from `user` where  is_test = 1) and a.user_id = b.id";
         sql += " order by a.create_time desc";
         if (offSet > 0) {

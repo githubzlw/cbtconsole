@@ -41,7 +41,7 @@ public class SendMailFactory {
             mail.sendMail(TO, BCC, SUBJECT, BODY);
         } catch (Exception e) {
             logger.error("SendMailByAmazon", e);
-            try {
+            /*try {
                 Thread.sleep(3000);
             } catch (InterruptedException e1) {
                 logger.error("Thread.sleep", e);
@@ -52,7 +52,7 @@ public class SendMailFactory {
             } catch (Exception e1) {
                 logger.error(" SendMailByMailGun faild:" + SUBJECT +" TO:"+TO);
                 logger.error("SendMailByMailGun", e);
-            }
+            }*/
         }
     }
     /**

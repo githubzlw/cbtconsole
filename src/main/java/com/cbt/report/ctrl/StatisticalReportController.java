@@ -2438,7 +2438,7 @@ public class StatisticalReportController {
             startTime = "2999-01-01 00:00:00";
             endTime = "2999-03-01 00:00:00";
         }
-        if ("请选择".equals(userName)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
             userName = null;
         }
         map.put("startTime", startTime);
@@ -3243,7 +3243,8 @@ public class StatisticalReportController {
         request.setCharacterEncoding("utf-8");
         Map<Object, Object> map = new HashMap<Object, Object>();
         String times = request.getParameter("times");
-        String userName = new String(request.getParameter("userName").toString().getBytes("ISO8859-1"), "utf-8");
+        // String userName = new String(request.getParameter("userName").toString().getBytes("ISO8859-1"), "utf-8");
+        String userName = request.getParameter("userName");
         String type = request.getParameter("type");
         String startTime = "";
         String endTime = "";
@@ -3260,6 +3261,7 @@ public class StatisticalReportController {
             startTime = "2999-01-01 00:00:00";
             endTime = "2999-03-01 00:00:00";
         }
+        System.err.println("-----------userName:" + userName);
         if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
             userName = "all";
         }
