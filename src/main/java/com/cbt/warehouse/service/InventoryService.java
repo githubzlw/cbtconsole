@@ -3,11 +3,18 @@ package com.cbt.warehouse.service;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryData;
 
 import java.util.List;
 import java.util.Map;
 
 public interface InventoryService {
+	
+	/**增加库存
+	 * @param inventory
+	 * @return
+	 */
+	int addInventory(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map

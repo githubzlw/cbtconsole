@@ -1,22 +1,27 @@
 package com.cbt.warehouse.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.common.StringUtils;
+import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.pojo.Inventory;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
 	private InventoryMapper inventoryMapper;
+	@Autowired
+	private OrderinfoMapper orderinfoMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -276,5 +281,130 @@ public class InventoryServiceImpl implements  InventoryService{
 			}
 		}
 		return str.toString();
+	}
+	@Override
+	public int addInventory(Map<String,String> inventory) {
+		//1.库存数量不足，不许进入库存
+		if(inventory == null) {
+			return 0;
+		}
+		int result = 0;
+		//1688订单多余产品进入库存
+		String checkOrderhid = inventory.get("checkOrderhid");
+		if(org.apache.commons.lang.StringUtils.isNotBlank(checkOrderhid)) {
+			String barcode = inventory.get("barcode");
+			String[] barcodes = {};
+			if(StringUtil.isNotBlank(barcode)) {
+				barcode.split(",");
+			}
+			String newbarcode =  "";
+			int barcodeIndex = 0;
+			List<Tb1688OrderHistory> tbGoodsData = orderinfoMapper.getTbGoodsData(checkOrderhid);
+			for(Tb1688OrderHistory t : tbGoodsData) {
+				newbarcode = barcodes.length > 0 && barcodes.length > barcodeIndex? barcodes[barcodeIndex] : "";
+				inventory.put("barcode", newbarcode);
+				inventory.put("goods_pid", t.getItemid());
+				inventory.put("goods_p_pid", t.getItemid());
+				inventory.put("car_type", t.getSku());
+				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
+				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID() );
+				inventory.put("inventory_count", t.getItemqty());
+				inventory.put("yourorder", t.getItemqty());
+				inventory.put("goods_url", t.getImgurl());
+				inventory.put("car_img", t.getImgurl());
+				inventory.put("goods_p_price", String.valueOf(t.getItemprice()));
+				inventory.put("goodsprice", String.valueOf(t.getItemprice()));
+				inventory.put("goods_p_url", t.getImgurl());
+				inventory.put("good_name", t.getItemname());
+				inventory.put("tb_1688_itemid", t.getItemid());
+				inventory.put("tborderid", t.getOrderid());
+				inventory.put("tb_1688_itemid", t.getItemid());
+				inventory.put("tb_1688_itemid", t.getItemid());
+				result = result + inventoryOperation(inventory,true);
+			}
+		}else {
+			result = inventoryOperation(inventory,false);
+		}
+		return result;
+	}
+	
+	private int inventoryOperation(Map<String,String> inventory,boolean isTbOrder) {
+		int inventory_count = Integer.valueOf(inventory.get("inventory_count"));
+		if(inventory_count == 0) {
+			return 0;
+		}
+		//inventory_type 0：电商库存  1：亚马逊库存
+		inventory.put("inventory_type", "0");
+		//获取订单详情中产品数据：产品id、产品名称、产品价格、产品规格等
+		Map<String, String> orderDetails = isTbOrder ? null : inventoryMapper.getOrderDetails(inventory);
+		if(orderDetails != null) {
+			inventory.putAll(orderDetails);
+			
+			//产品sku：若所选产品规格没有值，使用产品id代替规格id
+			String car_type = inventory.get("car_type");
+			if(StringUtils.isStrNull(car_type) || "0".equals(car_type)) {
+				String skuid = inventory.get("skuid");
+				String specid = inventory.get("specid");
+				skuid = StringUtils.isStrNull(skuid) ? orderDetails.get("goods_pid") : skuid;
+				specid = StringUtils.isStrNull(specid) ? orderDetails.get("goods_pid") : specid;
+				inventory.put("skuid", skuid);
+				inventory.put("specid", specid);
+			}
+		}
+		
+		//2.是否存在库存
+		Map<String,Object> isExsisInventory = inventoryMapper.getInventory(inventory);
+		int beforeRemaining = 0;
+		int afterRemaining = inventory_count;
+		if(isExsisInventory == null) {
+			if(isTbOrder) {
+				String oldbarcode = (String)isExsisInventory.get("barcode");
+				if(StringUtil.isNotBlank(oldbarcode)) {
+					inventory.put("barcode", oldbarcode);
+				}
+			}
+			inventoryMapper.addInventory(inventory);
+		}else {
+			if(isTbOrder) {
+				inventory.put("barcode", (String)isExsisInventory.get("barcode"));
+			}
+			String goods_p_url = (String)isExsisInventory.get("goods_p_url");
+			String goods_p_price = (String)isExsisInventory.get("goods_p_price");
+			int remaining = (int)isExsisInventory.get("remaining");
+			int can_remaining = (int)isExsisInventory.get("can_remaining");
+			
+			//更改前库存
+			beforeRemaining = remaining;
+			//更改后库存
+			afterRemaining = beforeRemaining + inventory_count;
+					
+			inventory.put("goods_p_url", goods_p_url);
+			
+			inventory.put("goods_p_price", goods_p_price);
+			
+			//可用库存
+			can_remaining = inventory_count + can_remaining;
+			inventory.put("can_remaining", String.valueOf(can_remaining));
+			
+			//更新后库存增加
+			inventory.put("remaining", String.valueOf(afterRemaining));
+			inventoryMapper.updateInventory(inventory);
+		}
+		
+		//3.库存表id
+		Integer inventory_sku_id = inventoryMapper.isExsisInventory(inventory);
+		inventory.put("inventory_sku_id", String.valueOf(inventory_sku_id));
+		inventory.put("before_remaining", String.valueOf(beforeRemaining));
+		inventory.put("after_remaining", String.valueOf(afterRemaining));
+		
+		//4.插入库存变更记录 change_type 1:入库 2：出库
+		inventory.put("change_type", "1");
+		inventoryMapper.addInventoryChangeRecord(inventory);
+		
+		//6.记录库存入库明细操作
+		//入库 0 入库  1 出库
+		inventory.put("type", "0");
+		return inventoryMapper.insertInventoryDetailsSku(inventory);
+		
 	}
 }

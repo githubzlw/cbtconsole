@@ -7,6 +7,7 @@ import com.cbt.bean.OrderBean;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.orderinfo.service.IOrderinfoService;
+import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.RechangeRecord;
 import com.cbt.processes.service.ISpiderServer;
 import com.cbt.util.*;
@@ -322,12 +323,15 @@ public class OrderInfoController{
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/updateCheckStatus")
-	public void updateCheckStatus(HttpServletRequest request, HttpServletResponse response)throws Exception {
+	@ResponseBody
+	public Map<String,Object> updateCheckStatus(HttpServletRequest request, HttpServletResponse response)throws Exception {
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=utf-8");
 		Map<String,String> map=new HashMap<String,String>();
+		Map<String,Object> result=new HashMap<String,Object>();
 		int res=0,num=0;
+		List<Tb1688OrderHistory> checkOrder = null;
 		try{
 			map.put("orderid", request.getParameter("orderid"));
 			map.put("goodid", request.getParameter("goodid"));
@@ -341,6 +345,8 @@ public class OrderInfoController{
 			map.put("itemid", request.getParameter("itemid"));
 			map.put("repState", request.getParameter("repState"));
 			map.put("odid",request.getParameter("odid"));
+			map.put("specid",request.getParameter("specid"));
+			map.put("skuid",request.getParameter("skuid"));
 			map.put("warehouseRemark", request.getParameter("warehouseRemark"));
 			int count = Integer.valueOf(request.getParameter("count"));
 			map.put("count", String.valueOf(count));
@@ -351,6 +357,13 @@ public class OrderInfoController{
 			if (res > 0) {
 				//验货无误成功，判断该订单是否全部到库并且验货无误
 				num = iOrderinfoService.checkOrderState(map.get("orderid"));
+				
+				//是否全部验货
+				String tbsourceCount = request.getParameter("tbsourceCount");
+				String sourceCount = request.getParameter("sourceCount");
+				if("1".equals(sourceCount)) {
+					checkOrder = iOrderinfoService.checkOrder(map.get("shipno"),StrUtils.isNum(tbsourceCount) ? Integer.valueOf(tbsourceCount) : 0);
+				}
 			}
 			String goods_pid=request.getParameter("goods_pid");//添加质量差的商品
 			if (!("1".equals(goods_pid)||"".equals(goods_pid)||goods_pid==null)){
@@ -359,10 +372,12 @@ public class OrderInfoController{
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		PrintWriter out = response.getWriter();
-		out.print(res + "," + num);
-		out.flush();
-		out.close();
+		result.put("res", res);
+		result.put("num", num);
+		result.put("checkOrder", checkOrder);
+		result.put("barcode", request.getParameter("barcode"));
+		result.put("shipno", request.getParameter("shipno"));
+		return result;
 	}
 
 	/**

@@ -1,4 +1,35 @@
-
+$(function(){
+	$(".yhovercancle").click(function(){
+		$("#corder_detail").hide();
+	})
+	$(".yhover").click(function(){
+		var checkOrderhid = $("#checkOrderhid").val();
+		if(checkOrderhid==''){
+			$("#corder_detail").hide();
+			return ;
+		}
+		var shipno = $("#corder_shipno").val();
+		var barcode = '';
+		$(".corder_i_barcode").each(function(){
+			barcode = barcode+$(this).val()+',';
+		});
+		$.ajax({
+	        url: "/cbtconsole/inventory/addtbinventory",
+	        type: "post",
+	        async: true,
+	        data: {
+	        	checkOrderhid: checkOrderhid,
+	        	shipno: shipno,
+	        	barcode: barcode
+	        },
+	        success: function (data) {
+	            $("#corder_detail").hide();
+	        }
+	    });
+		
+		
+	})
+})
 /**
  * 取消验货
  * @param isok
@@ -344,20 +375,30 @@ function put_print(orderid, usid, odid, strcartype, count, loginName,
             document.getElementById('td7').innerHTML = "";
             document.getElementById('td9').innerHTML = "";
             document.getElementById('td10').innerHTML = "";
+            if($("#print_hide").val()=='1'){
+            	$("#corder_detail").show();
+            }
             $(window).scrollTop(scrollTop);
         }, 1000)
 
 }
 
 
-function addInventory(barcode, inventory_count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl) {
+function addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, 
+		goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno) {
     $.ajax({
-        url: "/cbtconsole/WebsiteServlet?action=addInventory&className=ExpressTrackServlet",
+        url: "/cbtconsole/inventory/add",
         data: {
             "barcode": barcode,
             "inventory_count": inventory_count,
             "orderid": orderid,
             "odid": odid,
+            "goodid": goodid,
+            "specid": specid,
+            "skuid": skuid,
+            "tbspecid": tbspecid,
+            "tbskuid": tbskuid,
+            "shipno": shipno,
             "storage_count": Number(count) + Number(record_),
             "when_count": Number(count),
             "unit": unit
@@ -396,7 +437,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                            strcartype, usid, goodspprice, position, odid, isDropshipOrder, goodurl, status, index, repState) {
 	
 	scrollTop=$(window).scrollTop();
-	
+	$("#print_hide").val(0);
     position = position.replace("CR-", "");
     var seiUnit = $("#unit_" + odid).html();
     var unit = seiUnit.replace(/[^0-9]/ig, "");//产品计量单位
@@ -414,25 +455,39 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     
     //客户下单数量
     var _count = $("#" + orderid + "_count" + odid + "").val();//销售数量
-    
     //其他运单验货过的数量
     var record_ = $("#" + orderid + "record_" + odid + "").html();//已验货数量
-   
-    var specid = $("#specid_"+orderid+"_"+odid).html();
-    var skuid=$("#skuid_"+orderid+"_"+odid).html();
     
-    var tbspecid=$("specId_"+specid).html();
-    var tbskuid=$("skuID_"+skuid).html();
-    
+    /***************验货页面所有该规格 验货数量的累计==该规格实际到货数量***验货数量自动填写，匹配不上手工录入验货数量**********************/
+    //客户下单产品的唯一规格ID
+    var specid = $(".specid_"+orderid+"_"+odid).html();
+    var skuid=$(".skuID_"+orderid+"_"+odid).html();
+    var tbspecid = '';
+    var tbskuid = '';
+    if((specid && specid!='' )||( skuid && skuid!='')){
+    	//采购货源产品规格id
+    	tbspecid= specid !=''? $(".specId_"+specid).html():'';
+    	tbskuid=skuid!=''?$(".skuID_"+skuid).html():'';
+    	if((tbspecid!=''&&specid == tbspecid || bskuid!=''&&skuid == tbskuid)){
+    		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
+    		if(Number(skucount) > 0){
+    			count = skucount;
+    			$("#" + orderid + "count_" + odid + "").val(count);
+    		}
+    	}
+    }
+    var tbsourceCount = $(".itemid_checkbox").length;
+    var sourceCount = $(".itemid_sourceCount").length;
     var inventory_count = Number(count) + Number(record_) - (Number(_count) * Number(unit));//库存数量
+//    alert("inventory_count:"+inventory_count+"_count:"+count+"_record_:"+record_+"__count:"+_count+"_unit:"+unit)
     if (inventory_count < 0) {
-        alert("验货数量与销售数量不符,不能验货无误");
-        return;
+    	alert("验货数量与销售数量不符,不能验货无误");
+    	return;
     } else if (inventory_count > 0) {
-      
-    } else {
-        alert("请输入验货数量");
-        return;
+    	
+    } else if(count == null || count == "" || Number(count) == 0){
+    	alert("未能自动匹配到商品,请输入验货数量进行手动验货");
+    	return;
     }
     $.ajax({
             url: "/cbtconsole/order/updateCheckStatus",
@@ -453,17 +508,46 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
                 taobaoprice: taobaoprice,
                 repState: repState,
                 warehouseRemark: warehouseRemark,
+                specid:specid,
+                skuid:skuid,
+                tbsourceCount:tbsourceCount,
+                sourceCount:sourceCount,
                 count: (Number(count) + Number(record_))
                 // weight:weight
             },
             success: function (data) {
-                var res = data.split(",")[0];
+                var res = data.res;//data.split(",")[0];
                 if (res > 0) {
-                    var num = data.split(",")[1];
+                    var num = data.num;//data.split(",")[1];
+                    
                     $(isok).attr("disabled", true);
                     //获取商品重量
                     getWeight(orderid, odid);
                     if (num > 0) {
+                    	//界面所有 产品 验货完成后。 如果存在 1688订单的种类数量 大于 验货产品种类数量的情况。 进行弹框提示
+                    	var checkOrder = data.checkOrder;
+                    	if(checkOrder && checkOrder!= null && checkOrder !='[]'){
+                    		var checkOrderhtml=''
+                    		var checkOrderhid='';
+                    		for(var i=0;i<checkOrder.length;i++){
+                    			var corder = checkOrder[i];
+                    			checkOrderhtml +='<div class="i_order"><span class="corder_img"><img  src="'+corder.imgurl
+                    			+'"/></span><span class="c_sku_c">产品规格:<i class="c_sku">'
+                    			+corder.sku+'</i></span><span class="corder_q">1688下单数量:'+corder.itemqty
+                    			+'</span><span class="corder_yq_c">验货数量:<input class="corder_yq" value="0" onkeyup="inspectioncheck(this)"/></span>'
+                    			+'<span class="corder_c_barcode">库位号:<input class="corder_i_barcode" value="" /></span>'
+                    			+'</div>';
+                    			
+                    			checkOrderhid +=corder.id+',';
+                    		}
+                    		$("#corder_barcode").val(data.barcode);
+                    		$("#corder_shipno").val(data.shipno);
+                    		$("#corder_detail_conte").html(checkOrderhtml);
+                    		$("#print_hide").val(1);
+                    		$("#checkOrderhid").val(checkOrderhid);
+                    	}
+                    	/*if(sourceCount == 1){
+                    	}*/
                         console.log("该订单商品已全部的到货并且验货无误，提示跳转出货审核页面");
                         document.getElementById("chuku_" + orderid + "_" + odid + "").style.display = "inline-block";
                     }
@@ -475,14 +559,15 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     $("#status" + odid).html("已验货");
     
     if (isDropshipOrder == 3) {
-        addInventory(barcode, count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl);
+        addInventory(barcode, count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
         
     } else if ((Number(count) + Number(record_)) > (Number(_count) * Number(unit)) && Number(inventory_count) > 0 && goodid != "1400") {
-        addInventory(barcode, inventory_count, orderid, odid, count, record_, unit, goods_name, tbOrderId, strcartype, goodurl);
+        addInventory(barcode, inventory_count, orderid, odid, goodid,count, record_, unit, goods_name, tbOrderId, strcartype, goodurl,specid,skuid,tbspecid,tbskuid,shipno);
     }
     put_print(orderid, usid, odid, strcartype, count, loginName, tbOrderId,
         _count, record_, unit, goods_name, barcode, goodurl, odid, position);
 }
+
 
 //仓库位置
 function getPosition() {
@@ -704,21 +789,26 @@ function search() {
                     str += '<div style="float:left;"><a href="' + jsonObj[i].itemurl + '" target="_blank">';
                     str += '<img width="300px" height="300px" src="' + jsonObj[i].imgurl + '"/></a></div>';
                     str += '<div style="float:right;width:280px;">';
-                    str += '<p style = "font-size:12px;">商品单价：'
+                    str += '<p style = "font-size:12px;">商品单价:'
                         + jsonObj[i].itemprice
                         + '</p>';
-                    str += '<p style="word-wrap: break-word">商品规格：'
+                    str += '<p style="word-wrap: break-word">商品规格:'
                         + jsonObj[i].sku
                         + '</p>';
-                    str += '<p>商品数量：'
+                    str += '<p>商品数量:<span class="itemqty_'+jsonObj[i].specId+'_'+jsonObj[i].skuID+'">'
                         + jsonObj[i].itemqty
-                        + '</p>';
-                    str += '<p id="specId_'+jsonObj[i].specId+'">specId：'
+                        + '</span></p>';
+                    str += '<p >specId:<span class="specId_check specId_'+jsonObj[i].specId+'">'
                     	+ jsonObj[i].specId
-                    	+ '</p>';
-                    str += '<p id="skuID_'+jsonObj[i].skuID+'">skuID：'
+                    	+ '</span></p>';
+                    str += '<p >skuID：<span class="skuID_check skuID_'+jsonObj[i].skuID+'">'
                     	+ jsonObj[i].skuID
-                    	+ '</p>';
+                    	
+                	str += '<input style="display:none;" type="checkbox" class="itemid_checkbox itemid_'+jsonObj[i].specId+'_'+jsonObj[i].skuID+'" value="'+jsonObj[i].id+'"/>';
+                	
+                    str += '<p >Itemid:<span class="itemid_check itemid_'+jsonObj[i].itemid+'">'
+                    	+ jsonObj[i].itemid
+                    	+ '</span></p>';
                     $("#tborderid").val(jsonObj[i].orderid);
                     str += '</div>';
                     str += '<div style="clear:both;"></div>';
@@ -958,8 +1048,9 @@ function search() {
                             }
                         }
                         
-                        str += '<p id=' + "specid_" + json[i].orderid +'_'+json[i].odid+ '>specId:<font color="red">'+json[i].specId
-                        + '</font></p><p color="red" id="skuID_'+ json[i].orderid +'_'+json[i].odid+'">skuID:<font color="red">' + json[i].skuID + '</font></p>';
+                        str += '<p>specId:<font color="red" class="specid_' + json[i].orderid +'_'+json[i].odid+ '">'+json[i].specId
+                        + '</font></p><p color="red">skuID:<font color="red" class="skuID_'+ json[i].orderid +'_'+json[i].odid+'">' + json[i].skuID 
+                        + '</font></p>'+'<input type="hidden" class="itemid_sourceCount" value="0"/>';
                         
                         if (checked == "1") {
                             queryRecord(json[i].odid);

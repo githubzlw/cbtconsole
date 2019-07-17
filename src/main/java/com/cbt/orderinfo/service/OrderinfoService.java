@@ -25,6 +25,7 @@ import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
+import com.mysql.fabric.xmlrpc.base.Array;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.poi.util.SystemOutLogger;
@@ -395,6 +396,8 @@ public class OrderinfoService implements IOrderinfoService {
 		List<Tb1688OrderHistory> list=orderinfoMapper.getGoodsData(shipno);
 		for(Tb1688OrderHistory t:list){
 			t.setImgurl(t.getImgurl().replace(".80x80","").replace(".60x60",""));
+			t.setSkuID(StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
+			t.setSpecId(StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
 		}
 		return list;
 	}
@@ -519,8 +522,13 @@ public class OrderinfoService implements IOrderinfoService {
 				searchresultinfo.setGoods_img_url(map.get("goods_img_url"));
 				//采购备注-2019.07.04-sj
 				searchresultinfo.setContext(map.get("context")!=null?map.get("context") : "");
-				searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
-				searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
+				if(StringUtil.isBlank(car_type) || "0".equals(car_type)) {
+					searchresultinfo.setSpecId(map.get("tb_1688_itemid"));
+					searchresultinfo.setSkuID(map.get("tb_1688_itemid"));
+				}else {
+					searchresultinfo.setSpecId(map.get("specid")!=null?map.get("specid") : "");
+					searchresultinfo.setSkuID(map.get("skuid")!=null?map.get("skuid") : "");
+				}
 				info.add(searchresultinfo);
 			}
 			//一个1688包裹对应的采购订单数量
@@ -1928,6 +1936,42 @@ public class OrderinfoService implements IOrderinfoService {
     public int batchUpdateDistribution(List<GoodsDistribution> goodsDistributionList) {
         return orderinfoMapper.batchUpdateDistribution(goodsDistributionList);
     }
+
+
+	@Override
+	public List<Tb1688OrderHistory> checkOrder(String shipno,int tbsourceCount) {
+		/*int orderCount = orderinfoMapper.getCheckOrderCount(shipno);
+		if(orderCount == tbsourceCount) {
+			return null;
+		}*/
+		List<Tb1688OrderHistory> result = new ArrayList<>();
+		List<Tb1688OrderHistory> tb1688Orders = orderinfoMapper.getGoodsData(shipno);
+		List<Map<String, Object>> orderDataCheck = orderinfoMapper.getOrderDataCheck(shipno);
+		boolean isInventory = false;
+		for(Tb1688OrderHistory t : tb1688Orders) {
+			isInventory = false;
+			String tbskuid = StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID();
+			String tbspecid = StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId();
+			
+			/*for(Map<String, Object> m : orderDataCheck) {
+				String car_type = (String)m.get("car_type");
+				String specid = "";
+				String skuid = "";
+				if(StringUtil.isBlank(car_type) || "0".equals(car_type)) {
+					specid = (String)m.get("tb_1688_itemid");
+					skuid = (String)m.get("tb_1688_itemid");
+				}else {
+					specid = (String)m.get("specid")!=null?(String)m.get("specid") : "";
+					skuid = (String)m.get("skuid")!=null?(String)m.get("skuid") : "";
+				}
+				isInventory = org.apache.commons.lang.StringUtils.equals(tbspecid, specid) ||  org.apache.commons.lang.StringUtils.equals(tbskuid, skuid);
+			}*/
+			if(!isInventory) {
+				result.add(t);
+			}
+		}
+		return result;
+	}
 }
 
 

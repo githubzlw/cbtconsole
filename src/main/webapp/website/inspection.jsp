@@ -220,8 +220,20 @@
 		.w { position:absolute; left:10px; top:150px; width:280px; height:284px; overflow:hidden; border:2px groove #281; cursor:default; -moz-user-select:none; }
 		.t { line-height:20px; height:20px; width:280px; overflow:hidden; background-color:#27C; color:white; font-weight:bold; border-bottom:1px outset blue; text-align:center; }
 		.winBody { height:236px; width:600px; overflow-x:hidden; overflow-y:auto; border-top:0px inset blue; padding:10px; text-indent:10px; background-color:white; }
-		#take_photo{position: fixed;right:0;top:0;}
-
+		#take_photo{position: fixed;right:0;top:0;    z-index: -3;}
+		#corder_detail{position:fixed;width:60%;height:530px;overflow:auto;top:0;right:0;bottom:0;left:0;margin:auto;background:#dff0d8;z-index:1;display:none;border-radius: 35px;}
+		.i_order{width:96%;height:80px;border-bottom:1px solid #ddd;margin:0 auto;margin-bottom:10px;}
+		
+		.corder_img{float:left;width:12%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
+		.corder_q{float:left;width:20%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
+		.c_sku_c{float:left;width:40%;height:80px;text-align:left;font-size:14px;color:#333;line-height:80px;}
+		.corder_yq_c{float:left;width:13%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
+		.corder_c_barcode{float:left;width:15%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;}
+		
+		/* .i_order span{float:left;width:25%;height:80px;text-align:center;font-size:14px;color:#333;line-height:80px;} */
+		.corder_yq{height: 26px;width: 75px;}
+		.corder_i_barcode{height: 26px;width: 75px;}
+		.corder_img img{width:65px; height:65px;}
 	</style>
 	<%
 		//取出当前登录用户
@@ -1063,6 +1075,18 @@
 		</tr>
 	</table>
 	<span id="tborderid3" style="float:right;"></span>
+</div>
+<div id="corder_detail">
+	<h3 style="margin-left: 35%;">存在以下没验货产品请确认</h3>
+	<div id="corder_detail_conte"></div>
+ <input id="checkOrderhid" type="hidden" value=""  />
+ <input id="corder_barcode" type="hidden" value=""  />
+ <input id="corder_shipno" type="hidden" value=""  />
+ <input id="print_hide" type="hidden" value=""  />
+ <div style="margin-left: 80%;">
+ <input class="yhover" type="button" value="验货完成"  style="width: 80px;float: left;"/>
+ <input class="yhovercancle" type="button" value="取消验货"  style="width: 80px;float: left;"/>
+ </div>
 </div>
 </body>
 </html>

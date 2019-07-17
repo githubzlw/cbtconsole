@@ -2708,7 +2708,7 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 		int in_id=0000;
 		try{
 			//查询库存原商品信息
-			sql="select od.id,od.goods_pid,ltrim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.goodscatid,od.car_img,ops.goods_p_price,"
+			sql="select od.id,od.goods_pid,ltrim(od.car_type) as car_type,od.goodsid,od.car_urlMD5,od.goodsname,od.goodscatid,od.car_img,ops.goods_p_price,"
 					+ "ops.goods_p_url from order_details od inner join order_product_source ops on od.id=ops.od_id and od.orderid=ops.orderid where od.orderid=? and od.id=?";
 			stmt=conn.prepareStatement(sql);
 			stmt.setString(1, orderid);
@@ -2724,6 +2724,9 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 				String goods_p_price=rs.getString("goods_p_price");
 				String goods_p_url=rs.getString("goods_p_url");
 				int od_id=rs.getInt("id");
+				int goodsid=rs.getInt("goodsid");
+				
+				
 				//当次库存金额
 				double amount=Double.valueOf(goods_p_price)*(Integer.valueOf(inventory_count)/Integer.valueOf(unit));
 				BigDecimal b=new BigDecimal(amount);
@@ -2806,8 +2809,8 @@ public class ExpressTrackDaoImpl implements IExpressTrackDao {
 					}
 				}
 				//库存关联入库记录 插入storage_outbound_details记录
-				sql="insert into storage_outbound_details (orderid,odid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values("
-						+ "'"+orderid+"','"+odid+"',"+in_id+","+storage_count+",1,now(),'"+admName+"',"+when_count+","+inventory_count+")";
+				sql="insert into storage_outbound_details (orderid,goodsid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values("
+						+ "'"+orderid+"','"+goodsid+"',"+in_id+","+storage_count+",1,now(),'"+admName+"',"+when_count+","+inventory_count+")";
 				stmt = conn.prepareStatement(sql);
 				stmt.executeUpdate();
 				//如果采用打分为1,2分时则不更新线上库存标识

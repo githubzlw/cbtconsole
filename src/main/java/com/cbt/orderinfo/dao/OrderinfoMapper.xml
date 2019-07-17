@@ -1096,7 +1096,9 @@
         select warehouse_remark,weight,itemqty from id_relationtable where odid=#{odid}  and is_delete=0 and is_replenishment=1
     </select>
     <update id="updateRelationTable">
-        update id_relationtable set weight=#{weight},goodstatus=1,itemqty=#{count} ,warehouse_remark=#{warehouseRemark} where odid=#{odid} and orderid=#{orderid}  and is_replenishment=1 and is_delete=0
+        update id_relationtable set weight=#{weight},goodstatus=1,itemqty=#{count} ,warehouse_remark=#{warehouseRemark},
+        specid=#{specid},skuid=#{skuid}
+        where odid=#{odid} and orderid=#{orderid}  and is_replenishment=1 and is_delete=0
     </update>
     <select id="checkOrderState" resultType="INTEGER">
         SELECT SUM(od.state) AS rkCount,SUM(od.checked) as yhCount,COUNT(od.id) as odCount FROM orderinfo oi INNER JOIN order_details od ON oi.order_no=od.orderid
@@ -1163,7 +1165,7 @@
 		select #{shipno},#{admName},now() from dual where not exists (select * from scan_parcel_log_info where shipno=#{shipno})
 	</insert>
     <select id="getGoodsData" resultType="com.cbt.bean.Tb1688OrderHistory">
-		select id,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
+		select id,odid,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
 		,shipstatus,itemurl,imgurl,username,creatTime,specId,skuID from taobao_1688_order_history where shipno=#{shipno}
 	</select>
     <select id="getAdminid" resultType="java.lang.String">
@@ -1419,5 +1421,23 @@
             where id = ${item.id}
         </foreach>
     </update>
-
+    <select id="getOrderDataCheck" resultType="java.util.Map">
+    SELECT DISTINCT odsm.specid,odsm.skuid,
+    od.id AS odid,od.goodsprice AS odGoodsPrice,od.checked,od.remark AS odremark,
+    od.goods_pid,od.seilUnit,od.seilUnit,
+    (SELECT GROUP_CONCAT(DISTINCT orderid) FROM taobao_1688_order_history WHERE shipno=#{shipno}) taobaoOrderid, 
+    od.car_img AS img,od.goodscatid,od.dropshipid
+	 FROM order_details od 
+	 left join order_details_sku_match odsm on od.id=odsm.order_details_id	 
+	WHERE (od.shipno=#{shipno} OR INSTR(od.re_shipnos ,#{shipno})>0) 
+	AND od.state=1  AND  LENGTH(od.orderid)&lt;22
+	
+    </select>
+     <select id="getCheckOrderCount" resultType="Integer">
+     select count(id) FROM order_details WHERE (shipno=#{shipno} OR INSTR(re_shipnos ,#{shipno})>0) AND  LENGTH(orderid)&lt;22) 
+    </select>
+ <select id="getTbGoodsData" resultType="com.cbt.bean.Tb1688OrderHistory">
+		select id,odid,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
+		,shipstatus,itemurl,imgurl,username,creatTime,specId,skuID from taobao_1688_order_history where id in(#{checkOrderhid})
+	</select>
 </mapper>
