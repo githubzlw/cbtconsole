@@ -42,14 +42,17 @@ public class BuyReconciliationPojo implements Serializable{
 	private String payFreight;//实际支付的运费
 	
 	private String grabAmounts;//根据公司计算出来的D1=月初支付宝余额+银行转账支付宝金额-月末支付宝余额
+	private String grabAmountsCopy;
 	
 	private String zfbPayAmount;//支付宝付款（D2）=对应正常采购订单采购金额+对应取消订单采购金额+没有匹配到销售订单的采购金额+实际支付的运费
+	private String zfbPayAmountCopy;
 
 	private String ebayAmount;//亚马逊公司支付宝支出金额
 	
 	private String materialsAmount;//电商物料
 	
 	private String zfbFright;//支付宝支出运费
+	private String zfbFrightCopy;
 	private String profit;//月度利润
 
 	private String order_sales;//销售额
@@ -57,6 +60,30 @@ public class BuyReconciliationPojo implements Serializable{
 	private String orderFreight;//当月订单运费汇总金额
 	public String getOrderFreight() {
 		return orderFreight;
+	}
+
+	public String getGrabAmountsCopy() {
+		return grabAmountsCopy;
+	}
+
+	public String getZfbFrightCopy() {
+		return zfbFrightCopy;
+	}
+
+	public void setZfbFrightCopy(String zfbFrightCopy) {
+		this.zfbFrightCopy = zfbFrightCopy;
+	}
+
+	public void setGrabAmountsCopy(String grabAmountsCopy) {
+		this.grabAmountsCopy = grabAmountsCopy;
+	}
+
+	public String getZfbPayAmountCopy() {
+		return zfbPayAmountCopy;
+	}
+
+	public void setZfbPayAmountCopy(String zfbPayAmountCopy) {
+		this.zfbPayAmountCopy = zfbPayAmountCopy;
 	}
 
 	public void setOrderFreight(String orderFreight) {
@@ -125,6 +152,7 @@ public class BuyReconciliationPojo implements Serializable{
 
 	public void setZfbPayAmount(String zfbPayAmount) {
 		this.zfbPayAmount = zfbPayAmount;
+		this.zfbPayAmountCopy = zfbPayAmount;
 	}
 
 	public String getGrabAmounts() {

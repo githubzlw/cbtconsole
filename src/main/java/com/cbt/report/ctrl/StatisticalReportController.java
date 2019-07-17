@@ -3263,7 +3263,7 @@ public class StatisticalReportController {
         }
         System.err.println("-----------userName:" + userName);
         if (org.apache.commons.lang3.StringUtils.isBlank(userName) || "请选择".equals(userName)) {
-            userName = "all";
+            userName = null;
         }
         map.put("startTime", startTime);
         map.put("endTime", endTime);
@@ -3273,6 +3273,7 @@ public class StatisticalReportController {
         response.setContentType("application/vnd.ms-excel");
         Date date = new Date(System.currentTimeMillis());
         int year = date.getYear() + 1900;
+        int month = date.getMonth();
         String filename = "";
         System.err.println("------------type :" + type);
         System.err.println("------------map :" + map.toString());
@@ -3313,10 +3314,18 @@ public class StatisticalReportController {
                 c.setTbOr1688("未知");
             }
         }
+
+        map.clear();
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("year", !"0".equals(year) ? year : null);
+        map.put("month", month < 10? "0" + month : month);
+        List<BuyReconciliationPojo> buyReconciliationPojoList = taoBaoOrderService.buyReconciliationReport(map, "0");
         System.err.println("------------list :" + list.toString());
-        wb = generalReportService.exportBuyOrderDetails(list, type);
+        wb = generalReportService.exportBuyOrderDetails(list, type, buyReconciliationPojoList.get(0));
         // filename = StringUtils.getFileName(filename);
         // filename = new String(filename.getBytes("ISO8859-1"), "utf-8");
+        buyReconciliationPojoList.clear();
         response.setHeader("Content-disposition", "attachment;filename=" +  filename + ".xls");
         OutputStream ouputStream = response.getOutputStream();
         wb.write(ouputStream);

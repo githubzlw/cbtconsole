@@ -82,7 +82,7 @@ public interface GeneralReportService {
      * @param list
      * @return
      */
-    public HSSFWorkbook exportBuyOrderDetails(List<TaoBaoOrderInfo> list, String type);
+    public HSSFWorkbook exportBuyOrderDetails(List<TaoBaoOrderInfo> list, String type, BuyReconciliationPojo buyReconciliation);
     /**
      * 当月产生库存明细报表导出
      */

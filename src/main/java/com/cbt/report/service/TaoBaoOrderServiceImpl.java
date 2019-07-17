@@ -391,6 +391,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 					- Double.valueOf(buyReconciliationPojo.getBalance_compensation());
 			buyReconciliationPojo.setProfit(df.format(monthProfit));
 			if("0".equals(type)){
+				buyReconciliationPojo.setGrabAmountsCopy(buyReconciliationPojo.getGrabAmount());
 				buyReconciliationPojo.setGrabAmounts("<span style='color:red'>" + df.format(ac) + "</span>");
 				buyReconciliationPojo.setZfbPayAmount("<span style='color:red'>" + df.format(zfbPayAmount) + "</span>");
 				buyReconciliationPojo.setGrabAmount("<a target='_blank' href='/cbtconsole/website/grabNormalOrder.jsp?times="
@@ -428,6 +429,7 @@ public class TaoBaoOrderServiceImpl implements TaobaoOrderService {
 						+ buyReconciliationPojo.getSale_inventory() + "'>" + buyReconciliationPojo.getSale_inventory()
 						+ "</a>");
 			}else{
+				buyReconciliationPojo.setGrabAmountsCopy(df.format(ac));
 				buyReconciliationPojo.setGrabAmounts(String.valueOf(ac));
 				buyReconciliationPojo.setZfbPayAmount(df.format(zfbPayAmount));
 			}
