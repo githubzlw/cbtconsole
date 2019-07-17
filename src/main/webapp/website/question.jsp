@@ -268,7 +268,7 @@ $('#dlg').dialog('close');
 								<a class="easyui-linkbutton"  onclick="sendEmail('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')">邮件发送</a>
 							</c:if>
 							<c:if test="${empty qa.reply_content}">
-								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}')"> 确认 </a>
+								<a class="easyui-linkbutton"  onclick="replay('${qa.questionid}','${qa.c_shop_id}','${qa.pid}','${qa.purl}')"> 确认 </a>
 							</c:if>
 						</div>
 					</td>

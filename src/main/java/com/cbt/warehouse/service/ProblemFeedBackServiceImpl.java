@@ -2,6 +2,8 @@ package com.cbt.warehouse.service;
 
 import com.cbt.warehouse.dao.ProblemFeedBackDao;
 import com.cbt.warehouse.pojo.ProblemFeedBackBean;
+import com.importExpress.utli.MultiSiteUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,14 @@ public class ProblemFeedBackServiceImpl implements ProblemFeedBackService {
 	@Override
 	public List<ProblemFeedBackBean> queryForList(int type, String beginDate,
 			String endDate,int adminId, int pageNo,String is_report) {
-		return problemFeedBackDao.queryForList(type, beginDate, endDate,adminId, pageNo,is_report);
+        List<ProblemFeedBackBean> res = problemFeedBackDao.queryForList(type, beginDate, endDate, adminId, pageNo, is_report);
+        if (CollectionUtils.isNotEmpty(res)) {
+            for (ProblemFeedBackBean bean : res) {
+                bean.setSite(MultiSiteUtil.getSiteTypeNumByType(bean.getSiteType()));
+                bean.setSiteType(MultiSiteUtil.getSiteTypeStrByType(bean.getSiteType()));
+            }
+        }
+        return res;
 	}
 
 	@Override

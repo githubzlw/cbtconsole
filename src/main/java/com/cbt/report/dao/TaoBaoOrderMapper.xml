@@ -1137,6 +1137,7 @@
 	 <if test="userName != null">
 		  and username=#{userName}
 	  </if>
+        order by paydata desc
   </select>
   <select id="getInventoryAmount" resultType="com.cbt.pojo.InventoryDetailsPojo">
 		SELECT id.good_name AS goodName ,id.sku AS car_type,id.car_img,id.goods_p_price AS inventory_price,IF(id.flag=1,id.new_remaining,id.remaining) AS inventory_acount,

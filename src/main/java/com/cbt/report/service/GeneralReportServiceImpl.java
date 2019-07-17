@@ -5,6 +5,7 @@ import com.cbt.parse.service.StrUtils;
 import com.cbt.pojo.*;
 import com.cbt.report.dao.GeneralReportMapper;
 import com.cbt.report.vo.StatisticalReportVo;
+import com.cbt.util.BigDecimalUtil;
 import com.cbt.warehouse.pojo.JcexPrintInfo;
 import com.cbt.warehouse.pojo.Shipments;
 import com.cbt.warehouse.pojo.ShippingPackage;
@@ -12,16 +13,12 @@ import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -493,50 +490,105 @@ public class GeneralReportServiceImpl implements GeneralReportService{
 	 * @return
 	 */
 	@Override
-	public HSSFWorkbook exportBuyOrderDetails(List<TaoBaoOrderInfo> list,String type) {
+	public HSSFWorkbook exportBuyOrderDetails(List<TaoBaoOrderInfo> list,String type, BuyReconciliationPojo buyReconciliationPojo) {
 		String sheetName = ""; //报表页名
-		if("1".equals(type)){
+		if ("1".equals(type)) {
 			sheetName = "有匹配货源无入库采购订单明细";
-		}else if("2".equals(type)){
+		} else if ("2".equals(type)) {
 			sheetName = "采购订单对应取消销售订单明细";
-		}else if("3".equals(type)){
+		} else if ("3".equals(type)) {
 			sheetName = "无订单匹配采购订单明细";
-		}else if("4".equals(type)){
+		} else if ("4".equals(type)) {
 			sheetName = "采购订单对应上月销售订单";
-		}else if("5".equals(type)){
-			sheetName="抓取正常采购订单明细";
+		} else if ("5".equals(type)) {
+			sheetName = "抓取正常采购订单明细";
 		}
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet(sheetName);
-		int rows =0;  //记录行数
-		HSSFRow row = sheet.createRow(rows++);
+		// 订单汇总数据
+		String totalName = "";
+		if (sheetName.contains("明细")) {
+			totalName = sheetName.replace("明细", "汇总");
+		} else {
+			totalName = sheetName + "汇总";
+		}
+		Map<String, List<TaoBaoOrderInfo>> listMap = list.stream().collect(Collectors.groupingBy(TaoBaoOrderInfo::getOrderid));
+		HSSFSheet sheetOne = wb.createSheet(totalName);
+		int rowsOne = 0;  //记录行数
+		HSSFRow rowOne = sheetOne.createRow(rowsOne++);
 		HSSFCellStyle style = wb.createCellStyle();
 		style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-		row = sheet.createRow(rows++);  //到下一行添加数据
+		rowOne = sheetOne.createRow(rowsOne++);  //到下一行添加数据
 		for (int i = 0; i < excelTotal6.length; i++) {
-			HSSFCell cell = row.createCell(i);
+			HSSFCell cell = rowOne.createCell(i);
 			cell.setCellValue(excelTotal6[i]);
 			cell.setCellStyle(style);
 		}
+		int total = 0;
+		double totalBalance = 0;
+		for (String orderId : listMap.keySet()) {
+			rowOne = sheetOne.createRow(rowsOne++);
+			TaoBaoOrderInfo bg = listMap.get(orderId).get(0);
+			totalBalance += Double.valueOf(bg.getTotalprice());
+			rowOne.createCell(0).setCellValue(total++);
+			rowOne.createCell(1).setCellValue(bg.getTbOr1688());
+			rowOne.createCell(2).setCellValue(bg.getOrderid());
+			rowOne.createCell(3).setCellValue(bg.getOrderstatus());
+			rowOne.createCell(4).setCellValue(bg.getItemname());
+			rowOne.createCell(5).setCellValue(bg.getItemurl());
+			rowOne.createCell(6).setCellValue(bg.getItemprice());
+			rowOne.createCell(7).setCellValue(bg.getItemqty());
+			rowOne.createCell(8).setCellValue(bg.getPreferential());
+			rowOne.createCell(9).setCellValue(bg.getTotalprice());
+			rowOne.createCell(10).setCellValue(bg.getSku());
+			rowOne.createCell(11).setCellValue(bg.getOrderdate());
+			rowOne.createCell(12).setCellValue(bg.getPaydata());
+			rowOne.createCell(13).setCellValue(bg.getDelivery_date());
+			rowOne.createCell(14).setCellValue(bg.getUsername());
+		}
+		listMap.clear();
+		rowOne = sheetOne.createRow(rowsOne + 2);
+		String stStr = buyReconciliationPojo.getBeginBlance() + "(月初余额)+"
+				+ buyReconciliationPojo.getTransfer() + "(银行转账支付宝金额)-"
+				+ buyReconciliationPojo.getEndBlance() + "(月末支付宝余额)-"
+				+ buyReconciliationPojo.getEbayAmount() + "(亚马逊公司支付宝支出金额)-"
+				+ buyReconciliationPojo.getMaterialsAmount() + "(电商物料)-"
+				+ buyReconciliationPojo.getZfbFright() + "(支付宝支出运费)="
+				+ buyReconciliationPojo.getGrabAmountsCopy() + "(计算抓取采购订单金额)";
+		rowOne.createCell(1).setCellValue(stStr);
+		rowOne = sheetOne.createRow(rowsOne + 3);
+		rowOne.createCell(1).setCellValue("导出采购总金额:" + BigDecimalUtil.truncateDouble(totalBalance,2));
+
+		// 订单明细数据
+		HSSFSheet sheetTwo = wb.createSheet(sheetName);
+		int rowsTwo = 0;  //记录行数
+		HSSFRow rowTwo = sheetTwo.createRow(rowsTwo++);
+		HSSFCellStyle styleTwo = wb.createCellStyle();
+		styleTwo.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+		rowTwo = sheetTwo.createRow(rowsTwo++);  //到下一行添加数据
+		for (int i = 0; i < excelTotal6.length; i++) {
+			HSSFCell cell = rowTwo.createCell(i);
+			cell.setCellValue(excelTotal6[i]);
+			cell.setCellStyle(styleTwo);
+		}
 		//写入报表汇总
 		for (int i = 0; i < list.size(); i++) {
-			row = sheet.createRow(rows++);
+			rowTwo = sheetTwo.createRow(rowsTwo++);
 			TaoBaoOrderInfo bg = list.get(i);
-			row.createCell(0).setCellValue((i+1));
-			row.createCell(1).setCellValue(bg.getTbOr1688());
-			row.createCell(2).setCellValue(bg.getOrderid());
-			row.createCell(3).setCellValue(bg.getOrderstatus());
-			row.createCell(4).setCellValue(bg.getItemname());
-			row.createCell(5).setCellValue(bg.getItemurl());
-			row.createCell(6).setCellValue(bg.getItemprice());
-			row.createCell(7).setCellValue(bg.getItemqty());
-			row.createCell(8).setCellValue(bg.getPreferential());
-			row.createCell(9).setCellValue(bg.getTotalprice());
-			row.createCell(10).setCellValue(bg.getSku());
-			row.createCell(11).setCellValue(bg.getOrderdate());
-			row.createCell(12).setCellValue(bg.getPaydata());
-			row.createCell(13).setCellValue(bg.getDelivery_date());
-			row.createCell(14).setCellValue(bg.getUsername());
+			rowTwo.createCell(0).setCellValue((i + 1));
+			rowTwo.createCell(1).setCellValue(bg.getTbOr1688());
+			rowTwo.createCell(2).setCellValue(bg.getOrderid());
+			rowTwo.createCell(3).setCellValue(bg.getOrderstatus());
+			rowTwo.createCell(4).setCellValue(bg.getItemname());
+			rowTwo.createCell(5).setCellValue(bg.getItemurl());
+			rowTwo.createCell(6).setCellValue(bg.getItemprice());
+			rowTwo.createCell(7).setCellValue(bg.getItemqty());
+			rowTwo.createCell(8).setCellValue(bg.getPreferential());
+			rowTwo.createCell(9).setCellValue(bg.getTotalprice());
+			rowTwo.createCell(10).setCellValue(bg.getSku());
+			rowTwo.createCell(11).setCellValue(bg.getOrderdate());
+			rowTwo.createCell(12).setCellValue(bg.getPaydata());
+			rowTwo.createCell(13).setCellValue(bg.getDelivery_date());
+			rowTwo.createCell(14).setCellValue(bg.getUsername());
 		}
 		return wb;
 	}

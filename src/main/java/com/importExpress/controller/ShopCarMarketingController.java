@@ -577,7 +577,7 @@ public class ShopCarMarketingController {
             modelM.put("adminName", paramMap.get("adminName"));
             modelM.put("adminEmail", paramMap.get("adminEmail"));
             modelM.put("whatsApp", paramMap.get("whatsApp"));
-            modelM.put("websiteType", paramMap.get("type"));
+            modelM.put("websiteType", paramMap.get("websiteType"));
             if ("1".equals(paramMap.get("type"))) {
                 if (isKidFlag) {
                     sendMailFactory.sendMail(paramMap.get("userEmail"), paramMap.get("adminEmail"), paramMap.get("emailTitle"), modelM,
