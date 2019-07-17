@@ -2939,6 +2939,9 @@
 						<td colspan="8">
 							<div style="background-color: #E4F2FF;">
 								<input type='hidden' name='pagenum' value='${pb.orderid}'>
+								<c:if test="${hasSampleOrder > 0}">
+									<b style="color: red;">有免费样品订单:${pb.orderNo}_SP</b>
+								</c:if>
 								<span class="d">订单号：</span><span class="c">${pb.orderNo}</span>
 								<c:if test="${cgid == 52}">
 									<a href="/cbtconsole/customerServlet?action=findOrdersPurchaseInfo&className=OrdersPurchaseServlet&orderNo=${pb.orderNo}&purchaseId=1" target="_blank" style="text-decoration: none"></a>

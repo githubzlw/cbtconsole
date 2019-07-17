@@ -656,7 +656,11 @@
                 </c:if>
             </tr>
             <tr>
-                <td colspan="4">${order.paytypes}</td>
+                <td colspan="2">${order.paytypes}</td>
+                <c:if test="${hasSampleOrder > 0}">
+                    <td colspan="2"><b style="color: red;">有免费样品订单:${order.orderNo}_SP</b></td>
+                </c:if>
+
             </tr>
             <tr>
                 <td>

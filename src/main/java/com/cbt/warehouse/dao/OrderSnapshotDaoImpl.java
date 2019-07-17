@@ -137,7 +137,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("syncOfflineToOnline error :" + e.getMessage());
-			LOG.error("syncOfflineToOnline error :" + e.getMessage());
+			LOG.error("syncOfflineToOnline error :", e);
 		} finally {
 			if (rsSet != null) {
 				try {
@@ -185,7 +185,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("queryMaxIdFromOrderSnapshot error :" + e.getMessage());
-			LOG.error("queryMaxIdFromOrderSnapshot error :" + e.getMessage());
+			LOG.error("queryMaxIdFromOrderSnapshot error :", e);
 		} finally {
 			if (rsSet != null) {
 				try {
@@ -245,7 +245,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("queryForListByMaxId error :" + e.getMessage());
-			LOG.error("queryForListByMaxId error :" + e.getMessage());
+			LOG.error("queryForListByMaxId error :", e);
 		} finally {
 			if (rsSet != null) {
 				try {
@@ -319,7 +319,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("batchInsertOrderSnapshot error :" + e.getMessage());
-			LOG.error("batchInsertOrderSnapshot error :" + e.getMessage());
+			LOG.error("batchInsertOrderSnapshot error :", e);
 		} finally {
 			if (rsSet != null) {
 				try {
@@ -350,7 +350,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("updateOrderSnapshot error :" + e.getMessage());
-			LOG.error("updateOrderSnapshot error :" + e.getMessage());
+			LOG.error("updateOrderSnapshot error :", e);
 		} finally {
 			if (stmt != null) {
 				try {
@@ -400,7 +400,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("insertOrderSnapshot error :" + e.getMessage());
-			LOG.error("insertOrderSnapshot error :" + e.getMessage());
+			LOG.error("insertOrderSnapshot error :", e);
 		} finally {
 			if (rsSet != null) {
 				try {
@@ -438,7 +438,7 @@ public class OrderSnapshotDaoImpl implements OrderSnapshotDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("queryExistsImgUrlByPidAndType error :" + e.getMessage());
-			LOG.error("queryExistsImgUrlByPidAndType error :" + e.getMessage());
+			LOG.error("queryExistsImgUrlByPidAndType error :", e);
 		} finally {
 			if (stmt != null) {
 				try {

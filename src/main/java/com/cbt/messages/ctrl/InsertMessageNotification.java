@@ -120,7 +120,7 @@ public class InsertMessageNotification {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("insertByOrderComment error:" + e.getMessage());
+			LOG.error("insertByOrderComment error:", e);
 		}
 
 	}
@@ -152,7 +152,7 @@ public class InsertMessageNotification {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("insertOrderStatusChanges error:" + e.getMessage());
+			LOG.error("insertOrderStatusChanges error:", e);
 		}
 
 	}
@@ -183,7 +183,7 @@ public class InsertMessageNotification {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("insertCheckedWithoutOutbound error:" + e.getMessage());
+			LOG.error("insertCheckedWithoutOutbound error:", e);
 		}
 
 	}
@@ -252,7 +252,7 @@ public class InsertMessageNotification {
 
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("insertTreasuryNoteFor error :" + e.getMessage());
+			LOG.error("insertTreasuryNoteFor error :", e);
 		}
 		return row;
 	}
@@ -306,7 +306,7 @@ public class InsertMessageNotification {
 
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("insertTreasuryNote error:" + e.getMessage());
+			LOG.error("insertTreasuryNote error:", e);
 		}
 
 	}
@@ -341,7 +341,7 @@ public class InsertMessageNotification {
 			}
 			
 		} catch (Exception e) {
-			LOG.error("插入消息提醒失败,订单号:" + orderid + ",原因:" + e.getMessage());
+			LOG.error("插入消息提醒失败,订单号:" + orderid + ",原因:", e);
 			throw new Exception(e);
 		}
 

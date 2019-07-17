@@ -22,6 +22,7 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.MultiSiteUtil;
 import net.sf.json.JSONArray;
@@ -1127,6 +1128,14 @@ public class PurchaseController {
             request.setAttribute("websiteType", MultiSiteUtil.getSiteTypeNum(orderno));
 			long end = System.currentTimeMillis();
 			System.out.println("耗时:" + (end - start));
+
+			// 判断客户是否有样品订单
+			int sampleOrderCount = iOrderinfoService.querySampleOrderInfoByOrderId(orderno);
+			if(sampleOrderCount == 0){
+				request.setAttribute("hasSampleOrder", 0);
+			} else{
+				request.setAttribute("hasSampleOrder", 1);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			json.setOk(false);
