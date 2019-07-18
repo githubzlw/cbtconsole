@@ -183,16 +183,18 @@ public class SendMQ {
     public static void main(String[] argv) throws Exception {
         SendMQ sendMQ = new SendMQ();
         // 直接执行sql示例
-        String sql = "UPDATE custom_benchmark_ready SET cur_time = NOW() WHERE pid = '543232153010'";
+        String sql = "INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES('0001','O4051803889279563','O4051803889279563',now())" +
+                "on duplicate key update shipmentno ='0001',createtime =now(),remarks ='O4051803889279563'";
 
-        //sendMQ.sendMsg(new RunSqlModel(sql));
+        sendMQ.sendMsg(new RunSqlModel(sql));
+        // sendMQ.sendMsg(new RunSqlModel(sql1));
         //执行sql并保存记录，对应可以注入
 //    	SendMQServiceImpl sendMQ = new SendMQServiceImpl();
 //    	sendMQ.runSqlOnline("543232153010", sql);
 
 
         //redis示例
-        sendMQ.sendMsg(new RedisModel(new String[]{"15937"}), 1);
+//        sendMQ.sendMsg(new RedisModel(new String[]{"15937"}), 1);
 
 
         sendMQ.closeConn();
