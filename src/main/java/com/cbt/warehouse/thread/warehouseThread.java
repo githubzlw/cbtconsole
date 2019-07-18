@@ -42,18 +42,15 @@ public class warehouseThread extends Thread {
 			if (iWarehouseService.selectShippingPackage(m2) > 0) {
 				// sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
 			}
-			StringBuilder sqls=new StringBuilder("delete from shipping_package where orderid='"+m2.get("orderid")+"';");
-			sqls.append("INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES");
+			//StringBuilder sqls=new StringBuilder("delete from shipping_package where orderid='"+m2.get("orderid")+"';");
 			for(Map<String, String> map:list){
+				StringBuilder sqls=new StringBuilder("INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES");
 				sqls.append("(");
 				sqls.append("'"+map.get("shipmentno")+"','"+map.get("orderid")+"','"+map.get("remarks")+"',now()");
-				sqls.append("),");
+				sqls.append(") on duplicate key update shipmentno ='" + map.get("shipmentno")
+						+ "',createtime = now(),remarks='" + map.get("remarks") +"'");
+				NotifyToCustomerUtil.sendSqlByMq(sqls.toString());
 			}
-			if(list.size()>0){
-				// sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
-				NotifyToCustomerUtil.sendSqlByMq(sqls.toString().substring(0,sqls.toString().length()-1));
-			}
-			// sendMQ.closeConn();
 		} catch (Exception e) {
 			LOG.error("打印便签纸，更新线上数据异常 【订单号:" + m2.get("orderid") + "】", e);
 		}
