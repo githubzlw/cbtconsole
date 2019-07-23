@@ -824,4 +824,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryGoodsByShopId(shopId);
     }
 
+    @Override
+    public List<String> queryKidsCanUploadCatid() {
+        return customGoodsMapper.queryKidsCanUploadCatid();
+    }
+
 }

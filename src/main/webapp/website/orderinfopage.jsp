@@ -1,15 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="com.cbt.util.AppConfig"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>  
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@page import="com.cbt.util.*"%>
-<%@page import="com.cbt.website.userAuth.bean.*"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>入库记录</title>
+<script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/jquery-1.10.2-website.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript" src="/cbtconsole/js/warehousejs/jquery.min.js"></script>
@@ -158,10 +155,6 @@ p.thicker {font-weight: 900}
 .window, .window-shadow {
     position: fixed;}
 </style>
-</style>
-<script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
-
-<link rel="stylesheet" href="css/orderinfo.css" type="text/css"> 
 <script type="text/javascript">
 //
 $(function(){
@@ -477,13 +470,13 @@ function returnOr(str){
 												<a id="example-${m.index }"  href="${pic }">
 													<img width="150px" height="150px" alt="" src="${pic }" /></a>
 												<script type="text/javascript">
-                                                    $('#example-${m.index }').imgbox({
+                                                    /*$('#example-${m.index }').imgbox({
                                                         'speedIn'		: 0,
                                                         'speedOut'		: 0,
                                                         'alignment'		: 'center',
                                                         'overlayShow'	: true,
                                                         'allowMultiple'	: false
-                                                    });
+                                                    });*/
 												</script>
 											</c:forEach>
 										</td>

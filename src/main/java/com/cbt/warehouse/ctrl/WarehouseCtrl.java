@@ -392,7 +392,7 @@ public class WarehouseCtrl {
 				picPath=Util.PIC_URL+localFilePath+"";
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
-					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath);
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath, 1);
 					picPath=Util.PIC_URL+localFilePath+"";
 				}
 			}
@@ -8734,7 +8734,7 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgPath);
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgPath);
-					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
+					flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")), 1);
 				}
 				int row=0;
 				if(flag){
@@ -8798,7 +8798,7 @@ public class WarehouseCtrl {
 				flag=ImgDownload.writeImageToDisk1(file.getBytes(), imgUploadPath + localFilePath);
 				if(flag){
 					// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", localFilePath, imgUploadPath + localFilePath);
-					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")));
+					flag = UploadByOkHttp.uploadFile(new File(imgUploadPath + localFilePath),UPLOAD_IMG_PATH + localFilePath.substring(0,localFilePath.lastIndexOf("/")), 1);
 				}
 				int row=0;
 				if(flag){
@@ -8913,7 +8913,7 @@ public class WarehouseCtrl {
 		boolean flag=false;
 		try {
 			// flag=NewFtpUtil.uploadFileToRemote(Util.PIC_IP, 21, Util.PIC_USER, Util.PIC_PASS, "/inspectionImg/", storePath, imgPath);
-			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")));
+			flag = UploadByOkHttp.uploadFile(new File(imgPath),UPLOAD_IMG_PATH + storePath.substring(0,storePath.lastIndexOf("/")), 1);
 			if(flag){
 				Connection conn = DBHelper.getInstance().getConnection2();// 仓库不用
 				Connection conn1 = DBHelper.getInstance().getConnection();

@@ -3155,7 +3155,7 @@ public class EditorController {
             return json;
         }
         try {
-            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
+            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url, 0);
             int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath, shopId);
             List<GoodsMd5Bean> md5BeanList;
             if (total > 1) {

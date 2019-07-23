@@ -1417,4 +1417,8 @@
         from custom_benchmark_ready cbu
         where cbu.shop_id = #{shopId} and valid = 1
     </select>
+
+    <select id="queryKidsCanUploadCatid" resultType="java.lang.String">
+        select b.category_id from search_special a,1688_category b where locate(a.catid,b.path) > 0
+    </select>
 </mapper>
