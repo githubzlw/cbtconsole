@@ -790,4 +790,18 @@ public class QueryUserController {
         return result;
     }
 
+    /**
+     * 美国用户品类屏蔽 后台的用户管理 更新用户是否 未满足$70美国用户
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/updateUserCheckout.do?userid=&type=
+     *
+     * @param userid 用户id
+     * @param type 0-未满足$70美国用户; 1-满足$70美国用户;
+     *
+     */
+    @RequestMapping(value = "/updateUserCheckout")
+    @ResponseBody
+    public Map<String, Object> updateUserCheckout(Integer userid, Integer type){
+        return queryUserService.updateUserCheckout(userid, type);
+    }
+
 }

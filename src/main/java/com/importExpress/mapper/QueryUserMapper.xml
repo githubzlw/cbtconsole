@@ -1006,4 +1006,12 @@
         VALUES (#{userid}, #{admid}, #{site})
     </insert>
 
+    <!--void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);-->
+    <update id="updateUserCheckout">
+        delete from user_checkout where id = #{userid};
+        <if test="type == 1">
+            INSERT INTO user_checkout (id, flag) VALUES (#{userid}, '1');
+        </if>
+    </update>
+
 </mapper>

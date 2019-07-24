@@ -818,4 +818,14 @@ public class QueryUserServiceImpl implements QueryUserService {
         queryUserMapper.insertLoginLog(userid, admid, site);
         return userNewMapper.getUserById(userid);
     }
+
+    @Override
+    public Map<String, Object> updateUserCheckout(Integer userid, Integer type) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (userid != null && userid > 0 && type != null && type >= 0) {
+            queryUserMapper.updateUserCheckout(userid, type);
+            result.put("state", "true");
+        }
+        return result;
+    }
 }
