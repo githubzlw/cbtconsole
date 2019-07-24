@@ -307,11 +307,11 @@
     <!-- 获取上次库存 -->
     <select id="getInventory" resultType="java.util.Map">
     select  remaining,can_remaining,goods_p_url,goods_p_price,barcode from inventory_sku 
-    where goods_pid=#{goods_pid} and barcode=#{barcode} and specid=#{specid} and skuid=#{skuid}
+    where goods_pid=#{goods_pid} and specid=#{specid} and skuid=#{skuid}
     </select>
     <!-- 获取库存表id -->
     <select id="isExsisInventory" resultType="Integer">
-    select  id from inventory_sku where goods_pid=#{goods_pid} and barcode=#{barcode} and specid=#{specid} and skuid=#{skuid}
+    select  id from inventory_sku where goods_pid=#{goods_pid}  and specid=#{specid} and skuid=#{skuid}
     </select>
     
     <insert id="addInventory">
@@ -364,5 +364,13 @@
     #{yourorder},#{tborderid},#{shipno},#{orderid},#{odid},now(),#{admId},#{type})
     
     </insert>
+    
+    <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
+    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining from 
+     order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
+    and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
+    where odsm.order_details_id=#{od_id}
+    
+    </select>
     
 </mapper>

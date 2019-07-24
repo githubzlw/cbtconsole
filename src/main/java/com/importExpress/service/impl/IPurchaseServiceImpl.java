@@ -48,6 +48,7 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.WarehouseMapper;
 import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.util.StringUtil;
@@ -96,6 +97,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	private final static String CHAR_STR="(\\d{6})";
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
+	@Autowired
+	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
 	@Autowired
@@ -1609,7 +1612,15 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	}
 
 	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean) {
-		String nm = null;
+		Map<String, Object> inventory = inventoryMapper.getInventoryByOrderDetialsId(String.valueOf(map.get("od_id")));
+		if(inventory != null) {
+			purchaseBean.setSkuid((String)inventory.get("skuid"));
+			purchaseBean.setSpecid((String)inventory.get("specid"));
+			purchaseBean.setInventory(com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining")));
+		}else {
+			purchaseBean.setInventory("0");
+		}
+		/*String nm = null;
 		try {
 			nm = map.get("inventory");
 			int s = nm.length();
@@ -1623,7 +1634,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		} catch (Exception e) {
 			nm = "0";
 			purchaseBean.setInventory(nm);
-		}
+		}*/
 	}
 
 	private void getGoodsUnits(Map<String, String> map, PurchasesBean purchaseBean) {

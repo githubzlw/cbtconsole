@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface InventoryMapper {
+	Map<String,Object> getInventoryByOrderDetialsId(String od_id);
 	/**
 	 * 库存列表查询
 	 * @param map

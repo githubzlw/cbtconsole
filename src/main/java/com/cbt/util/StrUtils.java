@@ -19,6 +19,19 @@ public class StrUtils {
 	 * @param object
 	 * @return
 	 */
+	public static String object2NumStr(Object object){
+		if(object == null){
+			return "0";
+		}
+		if(!isMatch(object.toString(), "(\\d+)")){
+			return "0";
+		}
+		return object.toString();
+	}
+	/**Object转String
+	 * @param object
+	 * @return
+	 */
 	public static String object2Str(Object object){
 		
 		return object == null ? "" : object.toString();

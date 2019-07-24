@@ -3069,9 +3069,11 @@
 							<input type="hidden" id="hdgd" value="${pb.goodsdata_id}">
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>Type：</span><font class="dd">${pb.goods_type}</font>
+								&nbsp;&nbsp;(<em>${pb.specid} / ${pb.skuid}</em>)
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>1688抓取规格：</span><font class="dd">${pb.type_name}</font>
+								
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<c:if test="${pb.purchase_state >3}">
@@ -3323,14 +3325,14 @@
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
-									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.cGoodstype}">${pb.inventory}</a></span></font> <br>
+									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.specid}">${pb.inventory}</a></span></font> <br>
 								</div>
 							</c:if>
-							<c:if test="${pb.pidInventory>0}">
+							<%-- <c:if test="${pb.pidInventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
 									产品有库存(规格不匹配)： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.pidInventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${pb.goods_pid}">${pb.pidInventory}</a></span></font> <br>
 								</div>
-							</c:if>
+							</c:if> --%>
 							<div style="width: 100%; word-wrap: break-word;">
 								物流信息： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipstatus}</span></font> <br>
 							</div>

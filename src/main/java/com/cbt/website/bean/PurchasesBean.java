@@ -98,6 +98,25 @@ public class PurchasesBean {
 	private double goodsShopPrice;// 商品店铺总销售额
 	private String tborderid;// 1688订单号
 	private String shipnoid;// 运单号
+	private String specid;
+	private String skuid;
+	
+
+	public String getSpecid() {
+		return specid;
+	}
+
+	public void setSpecid(String specid) {
+		this.specid = specid;
+	}
+
+	public String getSkuid() {
+		return skuid;
+	}
+
+	public void setSkuid(String skuid) {
+		this.skuid = skuid;
+	}
 
 	public String getShipnoid() {
 		return shipnoid;
