@@ -475,4 +475,10 @@ public interface CustomGoodsMapper {
      */
     List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
 
+    /**
+     * 查询kids下类别信息
+     * @return
+     */
+    List<String> queryKidsCanUploadCatid();
+
 }

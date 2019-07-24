@@ -45,7 +45,7 @@ public class DeleteImgByMd5Thread extends Thread {
     @Override
     public void run() {
         try {
-            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
+            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url, 0);
             List<GoodsMd5Bean> md5BeanList = customGoodsService.queryMd5ImgByUrlList(pid, remotePath, shopId);
             List<String> pidList = new ArrayList<>(md5BeanList.size());
             Map<String, List<GoodsMd5Bean>> pidMap = new HashMap<>();

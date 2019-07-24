@@ -1151,7 +1151,7 @@ public class OrderInfoController{
 
 								/**********把图片上传到图片服务器 start*****/
 								//String remoteSavePath = remotePath+File.separator+"desc"+File.separator+replace_img;
-								String remoteSavePath = GoodsInfoUtils.changeRemotePathToLocal(imgPath);
+								String remoteSavePath = GoodsInfoUtils.changeRemotePathToLocal(imgPath, 1);
 		                        remoteSavePath = remoteSavePath.replace(imgName, "");
 		                        uploadMap.put(replace_localpath, remoteSavePath+"@@@@"+uploadFileName);
 	                            /**********把图片上传到图片服务器 end*****/
@@ -1169,7 +1169,7 @@ public class OrderInfoController{
 
 						//每100张上传一次
                         if(count==100) {
-                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap);
+                        	boolean dsds = UploadByOkHttp.doUpload(uploadMap, 1);
                 			//更新已上传状态
                 			if(up_ids.size()>0&&dsds) {
                 				purchaseService.updateSizeChartUpload(up_ids);
