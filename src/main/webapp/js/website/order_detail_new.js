@@ -104,6 +104,12 @@ function fnChange(id, thi) {
 		$(thi).parent().parent().css("background-color", "");
 	}
 }
+function getNum(youdrder,thi) {
+	var num= $(thi).val()
+	if (num>youdrder){
+		alert("你输入的拆单数量不能大于订单数量")
+	}
+}
 
 function fnChangeAll(state) {
 	if (state == 0) {
@@ -420,6 +426,22 @@ function fnSplitDropShipOrder(orderno, email, paytime) {
 				cancel : function() {
 				}
 			});
+}
+function deliver(orderno, usid, paytime,paymoney) {
+	alert(usid)
+    alert(orderno)
+    if(orderno == null || orderno == ""){
+        alert('获取订单号失败');
+        return ;
+    }
+    alert(paymoney)
+    if (paymoney<50){
+        alert('订单金额不足无法送样');
+        return;
+    }
+    url="/cbtconsole/orderSplit/deliverOrder?orderno="+orderno+"&&userid="+usid;
+    var param = "height=860,width=1500,top=80,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
+    window.open(url, "windows", param);
 }
 function fnRodio(state) {
 	if (state == 0) {

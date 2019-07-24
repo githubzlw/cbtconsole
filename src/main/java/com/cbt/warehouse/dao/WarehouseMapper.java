@@ -1464,4 +1464,8 @@ public interface WarehouseMapper {
 
 	@Select("SELECT remotpath from custom_benchmark_ready WHERE pid=#{pid}")
 	String getRepathByPid(@Param("pid") String pid);
+    @Select("<script>SELECT b.final_weight,b.entype,b.is_sold_flag,b.volume_weight,b.weight,b.max_price as goodsprice,a.* FROM Inventory a ,custom_benchmark_ready b WHERE <when test='pid!=null'>a.goods_pid=#{pid} AND </when> a.goods_pid=b.pid AND a.can_remaining >0 ORDER BY a.can_remaining DESC LIMIT 0,200</script>")
+	List<Inventory> FindAllGoods(@Param("pagenumber") int pagenumber, @Param("pagesize") int pagesize,@Param("pid") String pid);
+    @Update("UPDATE inventory SET can_remaining=can_remaining-#{sampleOrderBean.goodsNum} WHERE goods_pid=#{sampleOrderBean.pid} and sku=#{sampleOrderBean.skuId}")
+	void setInventoryCountBySkuAndPid(@Param("sampleOrderBean") SampleOrderBean sampleOrderBean);
 }
