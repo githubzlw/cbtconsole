@@ -231,6 +231,13 @@ public class PublishGoodsToOnlineThread extends Thread {
                                             isUpload = UploadByOkHttp.uploadFileBatch(upFile, destPath, isKids);
                                             if (isUpload) {
                                                 System.err.println("this pid:" + pid + ",上传产品主图成功");
+                                                if (isKids > 0) {
+                                                    // kids的维护import
+                                                    boolean isImport = UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
+                                                    if (!isImport) {
+                                                        UploadByOkHttp.uploadFileBatch(upFile, destPath, 0);
+                                                    }
+                                                }
                                             } else {
                                                 System.err.println("this pid:" + pid + ",上传产品主图失败");
                                                 // 记录上传失败日志

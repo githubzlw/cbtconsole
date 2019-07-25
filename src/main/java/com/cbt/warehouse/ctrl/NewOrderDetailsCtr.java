@@ -185,6 +185,12 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateGoodsCarMessage(orderNo);
 			// 订单商品详情
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+
+			// 域名切换
+			if(MultiSiteUtil.getSiteTypeNum(orderNo) == 2){
+				SwitchDomainNameUtil.changeOrderDetailsList(odb);
+			}
+
 			List<GoodsDistribution> distributionList = new ArrayList<>();
 			List<GoodsDistribution> updistributionList = new ArrayList<>();
 			if(orderNo.contains("_SN")){

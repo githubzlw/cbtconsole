@@ -35,6 +35,33 @@ public class UploadByOkHttp {
                         }
                     }
                 }
+                if (isKids > 0) {
+                    // 维护kids的后，维护import
+                    boolean isImport = uploadFile(originFile, uploadMap.get(mapKey), 0);
+                    if (!isImport) {
+                        isImport = uploadFile(originFile, uploadMap.get(mapKey), 0);
+                    }
+                    if (!isImport) {
+                        System.err.println("originFile:" + originFile.getAbsolutePath() + ",upload import path:"
+                                + uploadMap.get(mapKey) + "error");
+                    }
+                } else {
+                    // 维护import的后，维护kids(主要)
+                    isUpload = false;
+                    int importCount = 0;
+                    while (!isUpload && importCount < 5) {
+                        importCount++;
+                        isUpload = uploadFile(originFile, uploadMap.get(mapKey), 1);
+                        if (!isUpload) {
+                            // 休眠5秒
+                            try {
+                                Thread.sleep(5 * 1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
                 if (isUpload) {
                     isSuccess = true;
                 } else {

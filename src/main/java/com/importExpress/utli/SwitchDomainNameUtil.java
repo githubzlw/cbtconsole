@@ -1,6 +1,8 @@
 package com.importExpress.utli;
 
 import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.ShopCarMarketing;
 import com.importExpress.pojo.ShopRecommendGoods;
 import com.importExpress.pojo.ShopRecommendInfo;
@@ -103,6 +105,56 @@ public class SwitchDomainNameUtil {
     public static void changeShopCarMarketingSingle(ShopCarMarketing shopCarMarketing) {
         shopCarMarketing.setGoogsImg(checkNullAndReplace(shopCarMarketing.getGoogsImg()));
     }
+
+    /**
+     * 订单详情List bean域名切换
+     *
+     * @param orderDetailsBeanList
+     */
+    public static void changeOrderDetailsList(List<OrderDetailsBean> orderDetailsBeanList) {
+        for (OrderDetailsBean orderDetails : orderDetailsBeanList) {
+            changeOrderDetailsSingle(orderDetails);
+        }
+    }
+
+
+    /**
+     * 订单详情单个bean域名切换
+     *
+     * @param orderDetailsBean
+     */
+    public static void changeOrderDetailsSingle(OrderDetailsBean orderDetailsBean) {
+        orderDetailsBean.setGoods_img(checkNullAndReplace(orderDetailsBean.getGoods_img()));
+        orderDetailsBean.setCar_img(checkNullAndReplace(orderDetailsBean.getCar_img()));
+        orderDetailsBean.setGoods_url(checkNullAndReplace(orderDetailsBean.getGoods_url()));
+        orderDetailsBean.setMatch_url(checkNullAndReplace(orderDetailsBean.getMatch_url()));
+    }
+
+
+    /**
+     * 采购详情List bean域名切换
+     *
+     * @param purchasesBeanList
+     */
+    public static void changePurchasesBeanList(List<PurchasesBean> purchasesBeanList) {
+        for (PurchasesBean purchasesBean : purchasesBeanList) {
+            changePurchasesBeanSingle(purchasesBean);
+        }
+    }
+
+
+    /**
+     * 采购详情单个bean域名切换
+     *
+     * @param purchasesBean
+     */
+    public static void changePurchasesBeanSingle(PurchasesBean purchasesBean) {
+        purchasesBean.setGoods_url(checkNullAndReplace(purchasesBean.getGoods_url()));
+        purchasesBean.setGoogs_img(checkNullAndReplace(purchasesBean.getGoogs_img()));
+        purchasesBean.setImportExUrl(checkNullAndReplace(purchasesBean.getImportExUrl()));
+        purchasesBean.setImg_type(checkNullAndReplace(purchasesBean.getImg_type()));
+    }
+
 
     /**
      * 判断是否为空和包含的域名修改
