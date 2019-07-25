@@ -309,8 +309,8 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("goods_pid", t.getItemid());
 				inventory.put("goods_p_pid", t.getItemid());
 				inventory.put("car_type", t.getSku());
-				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? "" : t.getSpecId());
-				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? "" : t.getSkuID() );
+				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
+				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID() );
 				inventory.put("inventory_count", t.getItemqty());
 				inventory.put("yourorder", t.getItemqty());
 				inventory.put("goods_url", t.getImgurl());
@@ -348,8 +348,8 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(StringUtils.isStrNull(car_type) || "0".equals(car_type)) {
 				String skuid = inventory.get("skuid");
 				String specid = inventory.get("specid");
-				skuid = StringUtils.isStrNull(skuid) ? "" : skuid;
-				specid = StringUtils.isStrNull(specid) ? "" : specid;
+				skuid = StringUtils.isStrNull(skuid) ? orderDetails.get("goods_pid") : skuid;
+				specid = StringUtils.isStrNull(specid) ? orderDetails.get("goods_pid") : specid;
 				inventory.put("skuid", skuid);
 				inventory.put("specid", specid);
 			}
