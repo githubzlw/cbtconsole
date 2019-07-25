@@ -298,4 +298,9 @@ public interface IPurchaseService {
 	 * @return
 	 */
 	List<PurchaseInfoBean> queryOrderProductSourceByOrderNo(String orderNo);
+	/**
+	 * @param map
+	 * @return
+	 */
+	public int addIdRelationTable(Map<String, String> map);
 }

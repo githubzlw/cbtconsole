@@ -1,38 +1,5 @@
 package com.cbt.orderinfo.service;
 
-import com.cbt.bean.*;
-import com.cbt.common.StringUtils;
-import com.cbt.email.entity.EmailReceive1;
-import com.cbt.orderinfo.dao.OrderinfoMapper;
-import com.cbt.parse.service.StrUtils;
-import com.cbt.pojo.Admuser;
-import com.cbt.pojo.GoodsDistribution;
-import com.cbt.pojo.Inventory;
-import com.cbt.pojo.TaoBaoOrderInfo;
-import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
-import com.cbt.track.dao.TabTrackInfoMapping;
-import com.cbt.util.DoubleUtil;
-import com.cbt.util.Util;
-import com.cbt.util.Utility;
-import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.util.StringUtil;
-import com.cbt.warehouse.util.UtilAll;
-import com.cbt.website.bean.*;
-import com.cbt.website.dao.UserDao;
-import com.cbt.website.dao.UserDaoImpl;
-import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.pojo.SplitGoodsNumBean;
-import com.importExpress.utli.NotifyToCustomerUtil;
-import com.importExpress.utli.RunSqlModel;
-import com.importExpress.utli.SendMQ;
-import com.mysql.fabric.xmlrpc.base.Array;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.poi.util.SystemOutLogger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,13 +7,74 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cbt.bean.Address;
+import com.cbt.bean.AutoOrderBean;
+import com.cbt.bean.CodeMaster;
+import com.cbt.bean.Evaluate;
+import com.cbt.bean.Forwarder;
+import com.cbt.bean.OrderBean;
+import com.cbt.bean.OrderChange;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.bean.Orderinfo;
+import com.cbt.bean.Payment;
+import com.cbt.bean.ShippingBean;
+import com.cbt.bean.TabTransitFreightinfoUniteNew;
+import com.cbt.bean.Tb1688OrderHistory;
+import com.cbt.bean.TransitPricecost;
+import com.cbt.bean.UserBean;
+import com.cbt.common.StringUtils;
+import com.cbt.email.entity.EmailReceive1;
+import com.cbt.orderinfo.dao.OrderinfoMapper;
+import com.cbt.parse.service.StrUtils;
+import com.cbt.pojo.Admuser;
+import com.cbt.pojo.GoodsDistribution;
+import com.cbt.pojo.TaoBaoOrderInfo;
+import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
+import com.cbt.track.dao.TabTrackInfoMapping;
+import com.cbt.util.DoubleUtil;
+import com.cbt.util.Util;
+import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.InventoryMapper;
+import com.cbt.warehouse.dao.WarehouseMapper;
+import com.cbt.warehouse.service.InventoryService;
+import com.cbt.warehouse.util.StringUtil;
+import com.cbt.warehouse.util.UtilAll;
+import com.cbt.website.bean.ConfirmUserInfo;
+import com.cbt.website.bean.PaymentBean;
+import com.cbt.website.bean.SearchResultInfo;
+import com.cbt.website.bean.SearchTaobaoInfo;
+import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.cbt.website.dao.UserDao;
+import com.cbt.website.dao.UserDaoImpl;
+import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.SplitGoodsNumBean;
+import com.importExpress.utli.NotifyToCustomerUtil;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 
 @Service
 public class OrderinfoService implements IOrderinfoService {
 	private final static org.slf4j.Logger LOG = LoggerFactory.getLogger(OrderinfoService.class);
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
+	@Autowired
+	private InventoryMapper inventoryMapper;
 	@Autowired
 	private WarehouseMapper warehouseMapper;
 
@@ -55,6 +83,8 @@ public class OrderinfoService implements IOrderinfoService {
 
 	@Autowired
 	private TabTrackInfoMapping tabTrackInfoMapping;
+	@Autowired
+	private InventoryService inventoryService;
 
 	private final static org.slf4j.Logger logger = LoggerFactory.getLogger(OrderinfoService.class);
 
@@ -713,10 +743,9 @@ public class OrderinfoService implements IOrderinfoService {
 		int row=0;
 		int old_itemqty=0;
 		double weights=0.00;
-		int cancelCount=0;
 		try{
 			Map<String,String> inMap=orderinfoMapper.getInspetionMap(map);
-			cancelCount=Integer.valueOf(map.get("cance_inventory_count"));
+//			cancelCount=Integer.valueOf(map.get("cance_inventory_count"));
 			if(inMap != null){
 				old_itemqty=Integer.valueOf(String.valueOf(inMap.get("itemqty")));
 				weights=Double.parseDouble(String.valueOf(inMap.get("weight")))-Double.parseDouble(StringUtil.isBlank(String.valueOf(map.get("weight")))?"0.00":String.valueOf(map.get("weight")));
@@ -729,41 +758,9 @@ public class OrderinfoService implements IOrderinfoService {
 				orderinfoMapper.updateRelationTable(map);
 			}
 			row=orderinfoMapper.updateDetails(map);
+			
 			//如果该商品验货是有录入库存则做想应的减少
-			Map<String,String> inventoryMap=orderinfoMapper.getInventoryMap(map);
-			if(inventoryMap != null){
-				String sku=String.valueOf(inventoryMap.get("car_type"));
-				String car_urlMD5=String.valueOf(inventoryMap.get("car_urlMD5"));
-				String goods_pid=String.valueOf(inventoryMap.get("goods_pid"));
-				String goods_p_price=String.valueOf(inventoryMap.get("goods_p_price"));
-				//销售数量
-				int yourorder=Integer.valueOf(String.valueOf(inventoryMap.get("yourorder")));
-				//库存减少数量
-				int inventory_count=cancelCount;
-				map.put("sku",StringUtils.isStrNull(sku)?"":sku.trim());
-				map.put("car_urlMD5",car_urlMD5);
-				map.put("goods_pid",goods_pid);
-				if(inventory_count>0){
-					//库存减少
-					Inventory in=orderinfoMapper.getInventoryInfo(map);
-					if(in != null && in.getFlag()==1){
-						double amount=in.getNew_inventory_amount()-(inventory_count/Integer.valueOf(map.get("seiUnit")))*Double.valueOf(goods_p_price);
-						map.put("amount",String.valueOf(amount));
-						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getNew_remaining())-inventory_count<0?0:(Integer.valueOf(in.getNew_remaining())-inventory_count)));
-						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
-						orderinfoMapper.updateInventory(map);
-					}else if(in != null && in.getFlag()==0){
-						//未盘点
-						map.put("new_remaining",String.valueOf(Integer.valueOf(in.getRemaining())-inventory_count<0?0:(Integer.valueOf(in.getRemaining())-inventory_count)));
-						map.put("can_remaining",String.valueOf(Integer.valueOf(in.getCan_remaining())-inventory_count<0?0:(Integer.valueOf(in.getCan_remaining())-inventory_count)));
-						double amount=in.getInventory_amount()-(inventory_count/Integer.valueOf(String.valueOf(map.get("seiUnit"))))*Double.valueOf(goods_p_price);
-						map.put("amount",String.valueOf(amount));
-						orderinfoMapper.updateInventoryFlag(map);
-					}
-				}
-				//删除验货时的记录storage_outbound_details
-				orderinfoMapper.updateUutboundDetails(map);
-			}
+			inventoryService.cancelInventory(map);
 		}catch (Exception e){
 			e.printStackTrace();
 		}

@@ -306,8 +306,26 @@
     <!-- ********************************库存数据*************************** -->
     <!-- 获取上次库存 -->
     <select id="getInventory" resultType="java.util.Map">
-    select  remaining,can_remaining,goods_p_url,goods_p_price,barcode from inventory_sku 
-    where goods_pid=#{goods_pid} and specid=#{specid} and skuid=#{skuid}
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where 1=1 
+     and goods_pid=#{goods_pid} 
+    and specid=#{specid} and skuid=#{skuid}
+    </select>
+    <select id="getInventoryByOdId" resultType="java.util.Map">
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where 1=1 
+    and od_id=#{odid}
+    and specid=#{specid} and skuid=#{skuid}
+    </select>
+     <select id="getInventoryByid" resultType="java.util.Map">
+    select  id,od_id,remaining,can_remaining,goods_p_url,goods_p_price,barcode,car_urlMD5,goods_pid,sku,
+    good_name,goods_p_pid,goods_url,goods_price,specid,skuid
+    from inventory_sku 
+    where id=#{id}
     </select>
     <!-- 获取库存表id -->
     <select id="isExsisInventory" resultType="Integer">
@@ -316,10 +334,10 @@
     
     <insert id="addInventory">
     insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
-    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid) 
+    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid,od_id,goods_price) 
 	values(#{car_url},#{inventory_count},#{inventory_count},#{goodsname},#{car_type},#{barcode},
 	#{goodscatid},#{inventory_type},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},
-	#{goods_p_url},now(),#{specid},#{skuid},#{tb_1688_itemid})
+	#{goods_p_url},now(),#{specid},#{skuid},#{tb_1688_itemid},#{odid},#{goodsprice})
     </insert>
     
     <update id="updateInventory">
@@ -327,6 +345,10 @@
     updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where goods_pid=#{goods_pid} 
     and specid=#{specid} 
     and skuid=#{skuid} 
+    </update>
+    <update id="updateInventoryById">
+    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
+    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where id=#{inventory_sku_id}
     </update>
     
     <!-- 库存记录变更表  -->
@@ -336,7 +358,7 @@
    createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
    values(#{car_url},#{inventory_count},
    #{before_remaining},#{after_remaining},#{goodsname},#{car_type},#{barcode},#{goods_pid},
-   now(),#{remark},#{change_type},#{tb_1688_itemid},#{specid},#{skuid},#{inventory_sku_id})
+   now(),#{log_remark},#{change_type},#{tb_1688_itemid},#{specid},#{skuid},#{inventory_sku_id})
    </insert>
 	<!-- 记录库存存入记录，用来统计当月库存金额 -->    
    <!-- <insert id="insertInventoryDetails" parameterType="java.util.Map">
@@ -348,7 +370,7 @@
     
     
     <select id="getOrderDetails" resultType="java.util.Map">
-    select od.id,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
+    select od.id as odid,od.goodsid,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
     th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,
 	ops.goods_p_url,ops.tb_1688_itemid from order_details od inner join order_product_source ops on od.id=ops.od_id 
 	and od.orderid=ops.orderid 
@@ -364,13 +386,42 @@
     #{yourorder},#{tborderid},#{shipno},#{orderid},#{odid},now(),#{admId},#{type})
     
     </insert>
+    <insert id="insertStorageOutboundDetails">
+    insert into storage_outbound_details 
+    (orderid,goodsid,in_id,storage_count,type,createtime,admName,when_count,add_inventory) values
+    (#{orderid},#{goodsid},#{inventory_sku_id},#{storage_count},1,now(),#{adminId},#{when_count},#{inventory_count})
+    
+    </insert>
     
     <select id="getInventoryByOrderDetialsId" resultType="java.util.Map">
-    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining from 
+    select odsm.goods_pid, odsm.specid,odsm.skuid,isku.can_remaining,isku.id as inventory_id from 
      order_details_sku_match odsm left join inventory_sku isku on (odsm.goods_pid=isku.goods_pid 
     and odsm.specid=isku.specid  and odsm.skuid=isku.skuid )
     where odsm.order_details_id=#{od_id}
-    
     </select>
+    
+    <select id="getTaobaoOrderHistory" resultType="java.util.Map">
+    select 
+    tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID,itemprice
+    from taobao_1688_order_history where itemid=#{itemid} 
+    <if test="specid != null">
+    and specId=#{specid} and skuID=#{skuid} 
+    </if>
+    <if test="specid == null">
+     and (specId is null or specId='') and (skuID is null or skuID='' )
+    </if>
+    limit 1
+    </select>
+    <insert id="addIdRelationTable">
+    insert into id_relationtable ( orderid,goodid,odid,goodurl,goodstatus,goodarrivecount,
+    barcode,tborderid,position,shipno, username,userid,state,itemid,is_delete,store_name,
+    taobaospec,warehouse_remark,taobaoprice,itemqty,
+   is_replenishment,weight,is_refund,specid,skuid,createtime)
+    values(#{orderid},#{goodid},#{od_id},#{goodurl},#{goodstatus},#{goodarrivecount},
+    #{barcode},#{tborderid},#{position},#{shipno},#{username},#{userid},#{state},#{itemid},#{is_delete},#{store_name},
+    #{taobaospec},#{warehouse_remark},#{taobaoprice},#{itemqty},
+    #{is_replenishment},#{weight},#{is_refund},#{specid},#{skuid},now())
+    
+    </insert>
     
 </mapper>

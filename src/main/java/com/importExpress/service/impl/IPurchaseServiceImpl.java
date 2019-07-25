@@ -1617,8 +1617,10 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			purchaseBean.setSkuid((String)inventory.get("skuid"));
 			purchaseBean.setSpecid((String)inventory.get("specid"));
 			purchaseBean.setInventory(com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining")));
+			purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
 		}else {
 			purchaseBean.setInventory("0");
+			purchaseBean.setInventorySkuId("0");
 		}
 		/*String nm = null;
 		try {
@@ -2136,5 +2138,67 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}
 		}
 		return result;
+	}
+	@Override
+	public int addIdRelationTable(Map<String, String> map) {
+		int inventory_count_use = Integer.valueOf(map.get("inventory_count_use"));
+		int googs_number = Integer.valueOf(map.get("googs_number"));
+		if(inventory_count_use < 1) {
+			return 0;
+		}
+		
+		String inventory_sku_id = map.get("inventory_sku_id");
+		//inventory_sku
+		Map<String, Object> inventoryByid = inventoryMapper.getInventoryByid(inventory_sku_id);
+		if(inventoryByid == null || inventoryByid.isEmpty()) {
+			return 0;
+		}
+		String specid = (String)inventoryByid.get("specid");
+		String skuid = (String)inventoryByid.get("skuid");
+		String goods_p_pid = (String)inventoryByid.get("goods_p_pid");
+		
+		//taobao_1688_order_history
+		specid = org.apache.commons.lang.StringUtils.equals(specid, goods_p_pid) ? null : specid;
+		skuid = org.apache.commons.lang.StringUtils.equals(skuid, goods_p_pid) ? null : skuid;
+		Map<String, Object> taobaoOrderHistory = inventoryMapper.getTaobaoOrderHistory(goods_p_pid, specid, skuid);
+		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
+			return 0;
+		}
+		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
+		map.put("tborderid", (String)taobaoOrderHistory.get("orderid"));
+		map.put("shipno", (String)taobaoOrderHistory.get("shipno"));
+		map.put("itemid", (String)taobaoOrderHistory.get("itemid"));
+		map.put("taobaospec", (String)taobaoOrderHistory.get("sku"));
+		map.put("specid", (String)taobaoOrderHistory.get("specId"));
+		map.put("skuid", (String)taobaoOrderHistory.get("skuID"));
+		map.put("goodurl", (String)taobaoOrderHistory.get("itemurl"));
+		map.put("taobaoprice", (String)taobaoOrderHistory.get("itemprice"));
+		//'0为 未出货，1已出货'
+		map.put("state", "0");
+		//'入库删除标记:0.已入库;1.入库已取消'
+		map.put("is_delete", "0");
+		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够'
+		map.put("goodstatus", googs_number == inventory_count_use ? "1" : "5");
+		//'商品到货数量'
+		map.put("goodarrivecount", String.valueOf(inventory_count_use));
+		//'记录商品数量'
+		map.put("itemqty", String.valueOf(inventory_count_use));
+		//'1 正常入库  0补货订单入库'
+		map.put("is_replenishment", "1");
+		//'是否1688退货  0没有  1退货'
+		map.put("is_refund", "0");
+		
+		map.put("weight", "0");
+		
+		//待确定
+		map.put("barcode", String.valueOf(inventory_count_use));
+		map.put("position", String.valueOf(inventory_count_use));
+		map.put("username", "cangku2");
+		map.put("userid", "65");
+		map.put("warehouse_remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+inventory_sku_id+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
+		
+		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);
+		
+		return addIdRelationTable;
 	}
 }

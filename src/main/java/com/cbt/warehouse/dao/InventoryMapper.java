@@ -1,17 +1,27 @@
 package com.cbt.warehouse.dao;
 
-import com.cbt.Specification.bean.AliCategory;
-import com.cbt.bean.OrderDetailsBean;
-import com.cbt.pojo.Inventory;
-import com.cbt.website.bean.InventoryData;
-import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
+import com.cbt.Specification.bean.AliCategory;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+
 public interface InventoryMapper {
+	/**关联order_details_sku_match inventory_sku获取用户下单从规格id,库存数量
+	 * @param od_id
+	 * @return
+	 */
 	Map<String,Object> getInventoryByOrderDetialsId(String od_id);
+	
+	/**库存关联入库记录 插入storage_outbound_details记录
+	 * @param inventory
+	 * @return
+	 */
+	int insertStorageOutboundDetails(Map<String,String> inventory);
 	/**
 	 * 库存列表查询
 	 * @param map
@@ -132,6 +142,18 @@ public interface InventoryMapper {
 	 */
 	Map<String,Object>  getInventory(Map<String,String> inventory);
 	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventoryByOdId(Map<String,String> inventory);
+	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventoryByid(String id);
+	
 	/**插入库存
 	 * @return
 	 */
@@ -141,6 +163,10 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	int updateInventory(Map<String,String> inventory);
+	/**更新库存
+	 * @return
+	 */
+	int updateInventoryById(Map<String,String> inventory);
 	
 	
 	/**是否存在库存
@@ -159,7 +185,7 @@ public interface InventoryMapper {
 	 * @param inventory
 	 * @return
 	 */
-	Map<String,String> getOrderDetails(Map<String,String> inventory);
+	Map<String,String> getOrderDetails(Map<String,String> map);
 	
 	/**入库
 	 * @param inventory
@@ -169,6 +195,18 @@ public interface InventoryMapper {
 	
 //	int addStorageOutboundDetails(Map<String,String> inventory);
 	
+	/**获取库存的1688数据
+	 * @param itemid
+	 * @param specid
+	 * @param skuid
+	 * @return
+	 */
+	Map<String,Object> getTaobaoOrderHistory(@Param("itemid")String itemid,@Param("specid")String specid,@Param("skuid")String skuid);
 	
+	/**采购入库关联
+	 * @param map
+	 * @return
+	 */
+	int addIdRelationTable(Map<String,String> map);
 	
 }

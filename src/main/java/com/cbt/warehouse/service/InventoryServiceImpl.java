@@ -16,12 +16,15 @@ import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
+import com.importExpress.mapper.IPurchaseMapper;
 @Service
 public class InventoryServiceImpl implements  InventoryService{
 	@Autowired
 	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
+	@Autowired
+	private IPurchaseMapper pruchaseMapper;
 
 	/**
 	 * 根据ID获取库存
@@ -306,8 +309,8 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("goods_pid", t.getItemid());
 				inventory.put("goods_p_pid", t.getItemid());
 				inventory.put("car_type", t.getSku());
-				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
-				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID() );
+				inventory.put("specid", StringUtil.isBlank(t.getSpecId()) ? "" : t.getSpecId());
+				inventory.put("skuid",StringUtil.isBlank(t.getSkuID()) ? "" : t.getSkuID() );
 				inventory.put("inventory_count", t.getItemqty());
 				inventory.put("yourorder", t.getItemqty());
 				inventory.put("goods_url", t.getImgurl());
@@ -345,8 +348,8 @@ public class InventoryServiceImpl implements  InventoryService{
 			if(StringUtils.isStrNull(car_type) || "0".equals(car_type)) {
 				String skuid = inventory.get("skuid");
 				String specid = inventory.get("specid");
-				skuid = StringUtils.isStrNull(skuid) ? orderDetails.get("goods_pid") : skuid;
-				specid = StringUtils.isStrNull(specid) ? orderDetails.get("goods_pid") : specid;
+				skuid = StringUtils.isStrNull(skuid) ? "" : skuid;
+				specid = StringUtils.isStrNull(specid) ? "" : specid;
 				inventory.put("skuid", skuid);
 				inventory.put("specid", specid);
 			}
@@ -356,6 +359,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		Map<String,Object> isExsisInventory = inventoryMapper.getInventory(inventory);
 		int beforeRemaining = 0;
 		int afterRemaining = inventory_count;
+		Integer inventory_sku_id  = 0;
 		if(isExsisInventory == null) {
 			if(isTbOrder) {
 				String oldbarcode = (String)isExsisInventory.get("barcode");
@@ -364,6 +368,8 @@ public class InventoryServiceImpl implements  InventoryService{
 				}
 			}
 			inventoryMapper.addInventory(inventory);
+			//3.库存表id
+			inventory_sku_id = inventoryMapper.isExsisInventory(inventory);
 		}else {
 			if(isTbOrder) {
 				inventory.put("barcode", (String)isExsisInventory.get("barcode"));
@@ -372,7 +378,7 @@ public class InventoryServiceImpl implements  InventoryService{
 			String goods_p_price = (String)isExsisInventory.get("goods_p_price");
 			int remaining = (int)isExsisInventory.get("remaining");
 			int can_remaining = (int)isExsisInventory.get("can_remaining");
-			
+			inventory_sku_id =  (int)isExsisInventory.get("id");
 			//更改前库存
 			beforeRemaining = remaining;
 			//更改后库存
@@ -390,21 +396,142 @@ public class InventoryServiceImpl implements  InventoryService{
 			inventory.put("remaining", String.valueOf(afterRemaining));
 			inventoryMapper.updateInventory(inventory);
 		}
-		
-		//3.库存表id
-		Integer inventory_sku_id = inventoryMapper.isExsisInventory(inventory);
 		inventory.put("inventory_sku_id", String.valueOf(inventory_sku_id));
 		inventory.put("before_remaining", String.valueOf(beforeRemaining));
 		inventory.put("after_remaining", String.valueOf(afterRemaining));
 		
 		//4.插入库存变更记录 change_type 1:入库 2：出库
 		inventory.put("change_type", "1");
+		inventory.put("log_remark", "验货,增加库存");
 		inventoryMapper.addInventoryChangeRecord(inventory);
 		
+		//5.库存关联入库记录 插入storage_outbound_details记录storage_outbound_details
+		if(!isTbOrder) {
+			inventoryMapper.insertStorageOutboundDetails(inventory);
+		}
 		//6.记录库存入库明细操作
 		//入库 0 入库  1 出库
 		inventory.put("type", "0");
 		return inventoryMapper.insertInventoryDetailsSku(inventory);
 		
+	}
+	@Override
+	public int useInventory(Map<String, String> map) {
+		if(map == null || map.isEmpty()) {
+			return 0;
+		}
+		int inventory_count = Integer.valueOf(map.get("inventory_count"));
+		int googs_number = Integer.valueOf(map.get("googs_number"));
+		if(inventory_count < 1 || googs_number< 1) {
+			return 0;
+		}
+		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
+		if(googs_number < inventory_count) {
+			inventory_count = googs_number;
+		}
+		String id = map.get("inventory_sku_id");
+		//1.如果该商品是有录入库存则做想应的减少
+		Map<String, Object> inventoryMap = inventoryMapper.getInventoryByid(id);
+		if(inventoryMap == null){
+			return 0;
+		}
+		String orderid = map.get("orderid");
+		String od_id = map.get("od_id");
+		
+		
+		//2.锁定库存
+		pruchaseMapper.updateLockInventory(map);
+		
+		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
+		int can_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("can_remaining")));
+		
+		int after_remaining = before_remaining - inventory_count;
+		can_remaining = can_remaining - inventory_count;
+		
+		map.put("before_remaining",String.valueOf(before_remaining));
+		map.put("after_remaining",String.valueOf(after_remaining));
+		
+		map.put("inventory_count",String.valueOf(inventory_count));
+		map.put("remaining",String.valueOf(after_remaining));
+		map.put("can_remaining",String.valueOf(can_remaining));
+		map.put("inventory_sku_id",String.valueOf(inventoryMap.get("id")));
+		map.put("specid",String.valueOf(inventoryMap.get("specid")));
+		map.put("skuid",String.valueOf(inventoryMap.get("skuid")));
+		
+		//3.库存减少
+		int updateInventoryById = inventoryMapper.updateInventoryById(map);
+		
+		//4.库存变更记录
+		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+od_id+"采购使用库存数量"+inventory_count+"，库存减少");
+		map.put("change_type", "2");
+		inventoryMapper.addInventoryChangeRecord(map);
+		
+		//入库 0 入库  1 出库
+		//记录库存入库明细操作
+		map.put("type", "1");
+		inventoryMapper.insertInventoryDetailsSku(map);
+		return updateInventoryById > 0 ? inventory_count : 0;
+	}
+	@Override
+	public int cancelInventory(Map<String, String> map) {
+		if(map == null || map.isEmpty()) {
+			return 0;
+		}
+		int cancelCount = Integer.valueOf(map.get("cance_inventory_count"));
+		if(cancelCount < 1) {
+			return 0;
+		}
+		//如果该商品验货是有录入库存则做想应的减少
+		Map<String, Object> inventoryMap = inventoryMapper.getInventoryByOdId(map);
+		if(inventoryMap == null){
+			return 0;
+		}
+		String sku = String.valueOf(inventoryMap.get("car_type"));
+		
+		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
+		int can_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("can_remaining")));
+		
+		//库存减少数量
+		int inventory_count = cancelCount;
+		
+		int after_remaining = before_remaining - cancelCount;
+		can_remaining = can_remaining - cancelCount;
+		
+		map.put("sku",StringUtils.isStrNull(sku)?"":sku.trim());
+		map.put("car_urlMD5",String.valueOf(inventoryMap.get("car_urlMD5")));
+		map.put("goods_pid",String.valueOf(inventoryMap.get("goods_pid")));
+		map.put("goods_url",String.valueOf(inventoryMap.get("goods_url")));
+		map.put("good_name",String.valueOf(inventoryMap.get("good_name")));
+		map.put("goods_p_pid",String.valueOf(inventoryMap.get("goods_p_pid")));
+		map.put("goods_p_url",String.valueOf(inventoryMap.get("goods_p_url")));
+		map.put("goods_p_price",String.valueOf(inventoryMap.get("goods_p_price")));
+		map.put("inventory_sku_id",String.valueOf(inventoryMap.get("id")));
+		map.put("goodsprice",String.valueOf(inventoryMap.get("goods_price")));
+		
+		map.put("before_remaining",String.valueOf(before_remaining));
+		map.put("after_remaining",String.valueOf(after_remaining));
+		
+		map.put("inventory_count",String.valueOf(inventory_count));
+		map.put("remaining",String.valueOf(after_remaining));
+		map.put("can_remaining",String.valueOf(can_remaining));
+		map.put("specid",String.valueOf(inventoryMap.get("specid")));
+		map.put("skuid",String.valueOf(inventoryMap.get("skuid")));
+		
+		//库存减少
+		inventoryMapper.updateInventoryById(map);
+		String orderid = map.get("orderid");
+		String odid =  map.get("odid");
+		//库存变更记录
+		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+odid+" 验货取消,取消库存数量:"+inventory_count);
+		map.put("change_type", "2");
+		inventoryMapper.addInventoryChangeRecord(map);
+		
+		//入库 0 入库  1 出库
+		//记录库存入库明细操作
+		map.put("type", "1");
+		inventoryMapper.insertInventoryDetailsSku(map);
+		
+		//删除验货时的记录storage_outbound_details
+		return orderinfoMapper.updateUutboundDetails(map);
 	}
 }

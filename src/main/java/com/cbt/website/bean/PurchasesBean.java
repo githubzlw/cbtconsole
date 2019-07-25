@@ -100,7 +100,15 @@ public class PurchasesBean {
 	private String shipnoid;// 运单号
 	private String specid;
 	private String skuid;
+	private String inventorySkuId;//库存表id
 	
+	public String getInventorySkuId() {
+		return inventorySkuId;
+	}
+
+	public void setInventorySkuId(String inventorySkuId) {
+		this.inventorySkuId = inventorySkuId;
+	}
 
 	public String getSpecid() {
 		return specid;
