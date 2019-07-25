@@ -481,4 +481,6 @@ public interface CustomGoodsMapper {
      */
     List<String> queryKidsCanUploadCatid();
 
+    List<Map<String, String>> queryAllOffLineReason();
+
 }
