@@ -123,6 +123,27 @@ tr .td_class{width:230px;}
             $("#userid").val(userid);
             doQuery(1);
         }
+
+        $('#user_type input[name=user_type]').change(function () {
+            var userid = $('#user_type input[name=userid]').val();
+            var type = $("#user_type input[name=user_type]:checked").val();
+            $.ajax({
+                type: "POST",
+                url: "/cbtconsole/queryuser/updateUserCheckout.do",
+                data: {
+                    userid:userid,
+                    type:type
+                },
+                dataType:"json",
+                success: function(msg){
+                    if (msg.state == 'true') {
+                        $('#user_type').window('close');
+                        doQuery(1);
+                    }
+                }
+            });
+        });
+
 	})
 
     // 获取url中参数
@@ -249,6 +270,12 @@ tr .td_class{width:230px;}
             }
         });
     }
+    function showUserType(userid, type) {
+        $('#user_type input[name=user_type][value=' + type + ']').prop('checked', 'checked');
+        $('#user_type input[name=userid]').val(userid);
+        $('#user_type').window('open');
+    }
+
 	function userlogin(userid, name, currency) {
         $('#user_login_message input[name=userid]').val(userid);
         $('#user_login_message').window('open');
@@ -602,6 +629,19 @@ tr .td_class{width:230px;}
             <button onclick="userloginJump()">模拟登陆</button>
         </div>
     </div>
+    <div id="user_type" class="easyui-window" title="用户类型"
+         data-options="collapsible:false,minimizable:false,maximizable:false,closed:true"
+         style="width:400px;height:200px;display: none;font-size: 16px;">
+        <div style="margin-left:20px;">
+            <input type="hidden" name="userid">
+            <br /><br />
+            <input type="radio" name="user_type" value="0">未满足$70美国用户
+            <br /><br />
+            <input type="radio" name="user_type" value="1">满足$70美国用户
+        </div>
+        <div style="margin-left: 260px;">
+        </div>
+    </div>
 	<div id="top_toolbar" style="padding: 5px; height: auto">
 		<div>
 			<table style="margin:auto;">
@@ -674,9 +714,9 @@ tr .td_class{width:230px;}
 				<th data-options="field:'userLogin',width:80,align:'center'">用户登陆</th>
 				<th data-options="field:'userManager',width:80,align:'center'">用户管理</th>
 				<th data-options="field:'grade',width:50">用户等级</th>
-				<th data-options="field:'admuser',width:65,align:'center'">负责人</th>
+				<th data-options="field:'admuser',width:85,align:'center'">负责人</th>
 				<th data-options="field:'currency',width:30,align:'center'">货币单位</th>
-				<th data-options="field:'operation',width:230,align:'center'">操作</th>
+				<th data-options="field:'operation',width:210,align:'center'">操作</th>
 			</tr>
 		</thead>
 	</table>
