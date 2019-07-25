@@ -371,7 +371,7 @@ public class ShopCarMarketingController {
 
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
                 List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType));
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) -1);
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
                     for (GoodsCarActiveSimplBean simplBean : listActive) {
