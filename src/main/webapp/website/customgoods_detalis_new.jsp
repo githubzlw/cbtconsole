@@ -2170,7 +2170,14 @@
                     </c:if> <c:if test="${goods.goodsState >0}">
                     <br>
                     <b style="font-size: 16px;">发布状态:${goods.goodsStateValue}</b>
-                </c:if> <c:if test="${not empty goods.publishtime}">
+                </c:if><c:if test="${goods.valid == 0}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">下架原因:${goods.offReason}</b>
+                    </c:if>
+                    <c:if test="${goods.valid == 2}">
+                        <br>
+                        <b style="font-size: 16px;color: red;">软下架原因:${goods.unsellAbleReasonDesc}</b>
+                    </c:if><c:if test="${not empty goods.publishtime}">
                     <br>
                     <b style="font-size: 16px;">发布时间:${goods.publishtime}</b>
                 </c:if> <c:if test="${not empty goods.updatetime}">
@@ -2189,25 +2196,17 @@
                         <br>
                         <b style="color: red;font-size: 16px;">亚马逊价格:${goods.aliGoodsPrice}</b>
                     </c:if>
-                    <c:if test="${goods.valid == 0}">
-                        <br>
-                        <b style="font-size: 16px;">下架原因:${goods.offReason}</b>
-                    </c:if>
-                    <c:if test="${goods.valid == 2}">
-                        <br>
-                        <b style="font-size: 16px;">软下架原因:${goods.unsellAbleReasonDesc}</b>
-                    </c:if>
                     <c:if test="${goods.weightNotFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;">重量不合理</b>
+                        <b style="font-size: 16px;">标注:重量不合理</b>
                     </c:if>
                     <c:if test="${goods.uglyFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;">难看</b>
+                        <b style="font-size: 16px;">标注:难看</b>
                     </c:if>
                     <c:if test="${goods.repairedFlag > 0}">
                         <br>
-                        <b style="font-size: 16px;color: green;">产品已修复</b>
+                        <b style="font-size: 16px;color: green;">标注:产品已修复</b>
                     </c:if>
                     </span> </div>
                 <br>

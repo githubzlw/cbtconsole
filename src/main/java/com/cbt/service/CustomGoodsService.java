@@ -831,4 +831,10 @@ public interface CustomGoodsService {
      * @return
      */
     List<String> queryKidsCanUploadCatid();
+
+    /**
+     * 查询所有商品下架原因
+     * @return
+     */
+    List<Map<String, String>> queryAllOffLineReason();
 }

@@ -1421,4 +1421,9 @@
     <select id="queryKidsCanUploadCatid" resultType="java.lang.String">
         select b.category_id from search_special a,1688_category b where locate(a.catid,b.path) > 0
     </select>
+
+    <select id="queryAllOffLineReason" resultType="java.util.HashMap">
+        select unsellablereason_id,unsellablereason_name from unsellablereason_master
+    </select>
+
 </mapper>

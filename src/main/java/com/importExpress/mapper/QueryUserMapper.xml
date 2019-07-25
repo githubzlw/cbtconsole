@@ -1006,4 +1006,9 @@
         VALUES (#{userid}, #{admid}, #{site})
     </insert>
 
+    <!--void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);-->
+    <update id="updateUserCheckout">
+        INSERT INTO user_checkout (id, flag) VALUES (#{userid}, #{type}) ON DUPLICATE KEY UPDATE flag = #{type};
+    </update>
+
 </mapper>
