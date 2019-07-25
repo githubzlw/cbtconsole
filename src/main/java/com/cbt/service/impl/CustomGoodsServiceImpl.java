@@ -829,4 +829,9 @@ public class CustomGoodsServiceImpl implements CustomGoodsService {
         return customGoodsMapper.queryKidsCanUploadCatid();
     }
 
+    @Override
+    public List<Map<String, String>> queryAllOffLineReason() {
+        return customGoodsMapper.queryAllOffLineReason();
+    }
+
 }
