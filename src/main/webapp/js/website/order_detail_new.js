@@ -428,13 +428,11 @@ function fnSplitDropShipOrder(orderno, email, paytime) {
 			});
 }
 function deliver(orderno, usid, paytime,paymoney) {
-	alert(usid)
-    alert(orderno)
+
     if(orderno == null || orderno == ""){
         alert('获取订单号失败');
         return ;
     }
-    alert(paymoney)
     if (paymoney<50){
         alert('订单金额不足无法送样');
         return;

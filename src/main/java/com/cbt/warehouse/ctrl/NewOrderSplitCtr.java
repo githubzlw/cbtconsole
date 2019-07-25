@@ -159,22 +159,21 @@ public class NewOrderSplitCtr {
     }
     @RequestMapping(value = "/saveNewOrder")
     @ResponseBody
-    public String SaveNewOrder(HttpServletRequest request, HttpServletResponse response,@RequestBody List<SampleOrderBean> list ) {
-        String pid=request.getParameter("pid");
-        String orderno=request.getParameter("orderno");
-        if (StringUtils.isBlank(pid)){
-            pid=null;
-        }
+    public int SaveNewOrder(HttpServletRequest request, HttpServletResponse response,@RequestBody List<SampleOrderBean> list ) {
         if (list.size()>0) {
             try {
                 send.deliverMqSend(list);
                 boolean bo=this.iWarehouseService.setInventoryCountBySkuAndPid(list);
+                if (bo){
+                    return 1;
+                }
+                return 0;
             }catch (Exception e){
-                return null;
+                return 0;
             }
 
         }
-        return "samplelibrary";
+        return 0;
     }
 
     @SuppressWarnings("finally")

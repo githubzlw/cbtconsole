@@ -153,12 +153,11 @@
             var pid = $("#pid").val();
            window.location.href="/cbtconsole/orderSplit/deliverOrder?orderno=${orderno}&&pid="+pid;
         }
-        function deliver() {
+        function deliver(od) {
             // var Tborder=$("#Tborderus").val()
             // var returnNO=$("#openRt").val()
             var cusorder=${odls}
             var OrderMap = new Array();
-            var od=${orderno}
             var userid=${userid}
             $('input:checkbox[name=odCount]').each(function(k) {
                 if ($(this).is(':checked')) {
@@ -170,19 +169,18 @@
             })
             $.ajax({
                 type: "post",
-                url: "/cbtconsole/orderSplit/saveNewOrder?orderno=${orderno}",
+                url: "/cbtconsole/orderSplit/saveNewOrder",
                 contentType : 'application/json;charset=utf-8',
                 data:JSON.stringify(OrderMap),
                 success: function (res) {
-                    if (res.rows == 1) {
-                        $.messager.alert('提示', '操作成功');
-                        window.location.reload();
+                    if (res == 1) {
+                        alert('操作成功');
+                        // window.location.reload();
+                        window.close();
                     } else {
-                        $.messager.alert('提示', '操作失败');
+                        alert('操作失败');
                         window.location.reload();
                     }
-                    $('#order_remark').window('close');
-                    doQuery(page);
                 }
             });
         }
@@ -190,7 +188,7 @@
 </head>
 <body>
 <h2>送样管理</h2>
-商品pid：<input id="pid" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="serach()">查询</button><br/><br/><br/>
+商品pid：<input id="pid" type="text" value="">&nbsp;&nbsp;&nbsp;&nbsp; <button onclick="serach('${orderno}')">查询</button><br/><br/><br/>
 
 <tr>
     <td>
