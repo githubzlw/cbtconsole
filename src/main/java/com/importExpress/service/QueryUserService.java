@@ -73,4 +73,6 @@ public interface QueryUserService {
     void SetShareByOrderno(String orderNo);
 
     UserBean insertLoginLog(Integer userid, Integer admid, Integer site);
+
+    Map<String, Object> updateUserCheckout(Integer userid, Integer type);
 }

@@ -154,4 +154,7 @@ public interface QueryUserMapper {
     List<String> querySalesShop(@Param("list") List<SameGoodsDetails> list);
 
     void insertLoginLog(@Param("userid") Integer userid, @Param("admid") Integer admid, @Param("site") Integer site);
+
+    void updateUserCheckout(@Param("userid") Integer userid, @Param("type") Integer type);
+
 }
