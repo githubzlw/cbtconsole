@@ -1,9 +1,9 @@
 package com.cbt.warehouse.service;
 
 import com.cbt.FreightFee.service.FreightFeeSerive;
-import com.cbt.bean.*;
 import com.cbt.bean.OrderBean;
 import com.cbt.bean.ZoneBean;
+import com.cbt.bean.*;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.*;
@@ -11,20 +11,19 @@ import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.Util;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.pojo.AdmuserPojo;
 import com.cbt.warehouse.pojo.ClassDiscount;
+import com.cbt.warehouse.pojo.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.warehouse.util.Utility;
 import com.cbt.website.bean.*;
 import com.cbt.website.server.PurchaseServer;
 import com.cbt.website.server.PurchaseServerImpl;
-import com.cbt.website.util.JsonResult;
 import com.importExpress.mapper.IPurchaseMapper;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SearchFileUtils;
 import com.importExpress.utli.SendMQ;
-import net.sf.json.JSONArray;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -941,6 +940,10 @@ public class WarehouseServiceImpl implements IWarehouseService {
         List<UserInfo> userInfos=warehouseMapper.getUserInfoForPrice(map);
         DecimalFormat df = new DecimalFormat("0.00");
         List<ConfirmUserInfo> list = warehouseMapper.getAllAdmuser();
+        List<Integer> userCheck = new ArrayList<Integer>();
+        if (CollectionUtils.isNotEmpty(userInfos)) {
+            userCheck = warehouseMapper.queryUserCheckByUserid(userInfos);
+        }
         for (int i = 0; i < userInfos.size(); i++) {
             UserInfo userInfo = userInfos.get(i);
             StringBuffer admuser = new StringBuffer();
@@ -975,8 +978,9 @@ public class WarehouseServiceImpl implements IWarehouseService {
                     + userInfo.getUserid()
                     + ",'"
                     + userInfo.getAvailable()
-                    + "')\">修改余额</button><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
-                    + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>");
+                    + "')\">修改余额</button><br /><button id='but2' onclick='fnsetDropshipUser()'>设置为Drop ship客户</button>"
+                    + "<button onclick=\"showRemark(\'" + userInfo.getUserid() + "\')\">备注</button>"
+                    + "<button onclick=\"showUserType(\'" + userInfo.getUserid() + "\', \'" + (userCheck.contains(userInfo.getUserid())?1:0) + "\')\">用户类型</button>");
             for (int j = 0; j < list.size(); j++) {
                 ConfirmUserInfo c = list.get(j);
                 if (c.getConfirmusername().equals(userInfo.getAdminname())) {

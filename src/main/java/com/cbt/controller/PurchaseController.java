@@ -24,6 +24,7 @@ import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.MultiSiteUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -1141,7 +1142,11 @@ public class PurchaseController {
 		request.setAttribute("pagenum", page.getPagenum());
 		request.setAttribute("totalnum", page.getTotalrecords());
 		request.setAttribute("totalpage", page.getTotalpage());
-		request.setAttribute("pblist", page.getRecords());
+		List<PurchasesBean> purchasesBeanList = page.getRecords();
+		if(MultiSiteUtil.getSiteTypeNum(orderno) == 2){
+			SwitchDomainNameUtil.changePurchasesBeanList(purchasesBeanList);
+		}
+		request.setAttribute("pblist", purchasesBeanList);
 		request.setAttribute("pid_amount",page.getPid_amount());
 		request.setAttribute("admid", admid == null || "".equals(admid) || "1".equals(admid) || "83".equals(admid) || "84".equals(admid) ? "999" : admid);
 		request.setAttribute("cgid", cgid);

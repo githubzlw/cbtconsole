@@ -11,6 +11,8 @@ import com.importExpress.mapper.QueryUserMapper;
 import com.importExpress.mapper.UserNewMapper;
 import com.importExpress.pojo.*;
 import com.importExpress.service.QueryUserService;
+import com.importExpress.utli.RunSqlModel;
+import com.importExpress.utli.SendMQ;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -817,5 +819,30 @@ public class QueryUserServiceImpl implements QueryUserService {
     public UserBean insertLoginLog(Integer userid, Integer admid, Integer site) {
         queryUserMapper.insertLoginLog(userid, admid, site);
         return userNewMapper.getUserById(userid);
+    }
+
+    @Override
+    public Map<String, Object> updateUserCheckout(Integer userid, Integer type) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (userid != null && userid > 0 && type != null && type >= 0) {
+            // 更新本地
+            queryUserMapper.updateUserCheckout(userid, type);
+            // 更新线上
+            String sql = "INSERT INTO user_checkout (id, flag) VALUES (" + userid + ", " + type + ") ON DUPLICATE KEY UPDATE flag = " + type + ";";
+            SendMQ sendMQ = null;
+            try {
+                sendMQ = new SendMQ();
+                sendMQ.sendMsg(new RunSqlModel(sql));
+
+            } catch (Exception e) {
+                throw new RuntimeException("updateUserCheckout mq error");
+            } finally {
+                if (sendMQ != null) {
+                    sendMQ.closeConn();
+                }
+            }
+            result.put("state", "true");
+        }
+        return result;
     }
 }
