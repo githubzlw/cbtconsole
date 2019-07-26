@@ -60,6 +60,9 @@
     <select id="getUseInventory" resultType="java.lang.String">
         SELECT lock_remaining FROM lock_inventory WHERE od_id=${odid}
     </select>
+    <select id="getLastPurchaseSource" resultType="java.lang.String">
+        select goods_purl from goods_source where goods_pid=${goodsId} ORDER BY updatetime desc limit 1
+    </select>
     <select id="getEsPrice" resultType="java.lang.String">
         SELECT IFNULL(a.wholesale_price,0) AS a_price FROM order_details od
         inner JOIN custom_benchmark_ready a ON od.goods_pid=a.pid
