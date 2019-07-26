@@ -2940,7 +2940,7 @@
 							<div style="background-color: #E4F2FF;">
 								<input type='hidden' name='pagenum' value='${pb.orderid}'>
 								<c:if test="${hasSampleOrder > 0}">
-									<b style="color: red;">有免费样品订单:${pb.orderNo}_SP</b>
+									<b style="color: red;font-size: 16px;">有免费样品订单:<a href="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid=999&orderno=${pb.orderNo}_SP&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid=${pb.userid}" target="_blank">${pb.orderNo}_SP</a></b>&nbsp;&nbsp;
 								</c:if>
 								<span class="d">订单号：</span><span class="c">${pb.orderNo}</span>
 								<c:if test="${cgid == 52}">

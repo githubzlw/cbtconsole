@@ -1420,7 +1420,7 @@
         </foreach>
     </update>
 
-    <select id="querySampleOrderInfoByOrderId">
+    <select id="querySampleOrderInfoByOrderId" resultType="java.lang.Integer">
         select count(0)
         from orderinfo
         where order_no = concat(#{orderNo} ,'_SP')
