@@ -1958,7 +1958,7 @@
 
     }
 
-    function useInventory(od_id, state, orderid, goodsid,inventory_count,googs_number,inventorySkuId) {
+    function useInventory(od_id, state, orderid, goodsid,inventory_count,googs_number,inventorySkuId,goodsUnit,seilUnit) {
         $.ajax({
             type : "post",
             url : '/cbtconsole/purchase/useInventory',
@@ -1970,6 +1970,8 @@
                 "inventory_count" : inventory_count,
                 "googs_number" : googs_number,
                 "orderid" : orderid,
+                "goodsUnit":goodsUnit,
+                "seilUnit":seilUnit,
                 "inventorySkuId" : inventorySkuId
             },
             success : function(data) {
@@ -3328,7 +3330,7 @@
 								<div style="width: 100%; word-wrap: break-word;">
 									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" />
 									<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.specid}">${pb.inventory}</a>
-									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}',${pb.inventory},${pb.googs_number},${pb.inventorySkuId})">使用库存</button>
+									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}',${pb.inventory},${pb.googs_number},${pb.inventorySkuId},${pb.goodsUnit},${pb.seilUnit})">使用库存</button>
 									</span></font> <br>
 								
 								</div>

@@ -2134,30 +2134,20 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		
 		String inventory_sku_id = map.get("inventory_sku_id");
 		//inventory_sku
-		Map<String, Object> inventoryByid = inventoryMapper.getInventoryByid(inventory_sku_id);
-		if(inventoryByid == null || inventoryByid.isEmpty()) {
-			return 0;
-		}
-		String specid = (String)inventoryByid.get("specid");
-		String skuid = (String)inventoryByid.get("skuid");
-		String goods_p_pid = (String)inventoryByid.get("goods_p_pid");
 		
-		//taobao_1688_order_history
-		specid = org.apache.commons.lang.StringUtils.equals(specid, goods_p_pid) ? null : specid;
-		skuid = org.apache.commons.lang.StringUtils.equals(skuid, goods_p_pid) ? null : skuid;
-		Map<String, Object> taobaoOrderHistory = inventoryMapper.getTaobaoOrderHistory(goods_p_pid, specid, skuid);
+		Map<String, Object> taobaoOrderHistory = inventoryMapper.getInventoryDetailSku(inventory_sku_id);
 		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
 			return 0;
 		}
 		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
-		map.put("tborderid", (String)taobaoOrderHistory.get("orderid"));
-		map.put("shipno", (String)taobaoOrderHistory.get("shipno"));
-		map.put("itemid", (String)taobaoOrderHistory.get("itemid"));
+		map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
+		map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
+		map.put("itemid", (String)taobaoOrderHistory.get("goods_p_pid"));
 		map.put("taobaospec", (String)taobaoOrderHistory.get("sku"));
-		map.put("specid", (String)taobaoOrderHistory.get("specId"));
-		map.put("skuid", (String)taobaoOrderHistory.get("skuID"));
-		map.put("goodurl", (String)taobaoOrderHistory.get("itemurl"));
-		map.put("taobaoprice", (String)taobaoOrderHistory.get("itemprice"));
+		map.put("specid", (String)taobaoOrderHistory.get("goods_p_specid"));
+		map.put("skuid", (String)taobaoOrderHistory.get("goods_p_skuid"));
+		map.put("goodurl", (String)taobaoOrderHistory.get("goods_p_url"));
+		map.put("taobaoprice", (String)taobaoOrderHistory.get("goods_p_price"));
 		//'0为 未出货，1已出货'
 		map.put("state", "0");
 		//'入库删除标记:0.已入库;1.入库已取消'

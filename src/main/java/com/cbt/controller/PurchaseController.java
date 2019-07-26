@@ -231,13 +231,15 @@ public class PurchaseController {
 		int row=0;
 		String od_id=request.getParameter("od_id");
 		String isUse=request.getParameter("isUse");
-		map.put("od_id", od_id);
+		map.put("odid", od_id);
 		map.put("isUse", isUse);
 		map.put("goodsid", request.getParameter("isUse"));
 		map.put("inventory_count", request.getParameter("inventory_count"));
 		map.put("googs_number", request.getParameter("googs_number"));
 		map.put("orderid", request.getParameter("orderid"));
 		map.put("inventory_sku_id", request.getParameter("inventorySkuId"));
+		map.put("seilUnit", request.getParameter("seilUnit"));
+		map.put("goodsUnit", request.getParameter("goodsUnit"));
 		
 		//库存操作
 		row = inventoryService.useInventory(map);

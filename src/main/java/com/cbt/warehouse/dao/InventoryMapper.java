@@ -11,6 +11,11 @@ import com.cbt.pojo.Inventory;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 
 public interface InventoryMapper {
+	/**锁定库存
+	 * @param map
+	 * @return
+	 */
+	int insertLockInventory(Map<String,String> map);
 	/**关联order_details_sku_match inventory_sku获取用户下单从规格id,库存数量
 	 * @param od_id
 	 * @return
@@ -201,7 +206,7 @@ public interface InventoryMapper {
 	 * @param skuid
 	 * @return
 	 */
-	Map<String,Object> getTaobaoOrderHistory(@Param("itemid")String itemid,@Param("specid")String specid,@Param("skuid")String skuid);
+	Map<String,Object> getInventoryDetailSku(String inventory_sku_id);
 	
 	/**采购入库关联
 	 * @param map

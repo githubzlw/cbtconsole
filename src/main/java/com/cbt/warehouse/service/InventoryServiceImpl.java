@@ -12,6 +12,7 @@ import com.cbt.bean.Tb1688OrderHistory;
 import com.cbt.common.StringUtils;
 import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.pojo.Inventory;
+import com.cbt.util.StrUtils;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.util.StringUtil;
@@ -321,8 +322,8 @@ public class InventoryServiceImpl implements  InventoryService{
 				inventory.put("good_name", t.getItemname());
 				inventory.put("tb_1688_itemid", t.getItemid());
 				inventory.put("tborderid", t.getOrderid());
-				inventory.put("tb_1688_itemid", t.getItemid());
-				inventory.put("tb_1688_itemid", t.getItemid());
+				inventory.put("tbspecid", StringUtil.isBlank(t.getSpecId()) ? t.getItemid() : t.getSpecId());
+				inventory.put("tbskuid", StringUtil.isBlank(t.getSkuID()) ? t.getItemid() : t.getSkuID());
 				result = result + inventoryOperation(inventory,true);
 			}
 		}else {
@@ -422,12 +423,16 @@ public class InventoryServiceImpl implements  InventoryService{
 		}
 		int inventory_count = Integer.valueOf(map.get("inventory_count"));
 		int googs_number = Integer.valueOf(map.get("googs_number"));
-		if(inventory_count < 1 || googs_number< 1) {
+		int goodsUnit = 1;
+		String strgoodsUnit = map.get("goodsUnit");
+		strgoodsUnit = StrUtils.matchStr(strgoodsUnit, "([1-9]\\d*)");
+		goodsUnit = StrUtils.isNum(strgoodsUnit) ? Integer.valueOf(strgoodsUnit) : goodsUnit;
+		if(inventory_count < 1 || googs_number * goodsUnit < 1) {
 			return 0;
 		}
 		//如果库存大于客户订单下单数量，则全部使用库存，若不够在采购其他的
-		if(googs_number < inventory_count) {
-			inventory_count = googs_number;
+		if(googs_number * goodsUnit < inventory_count) {
+			inventory_count = googs_number * goodsUnit;
 		}
 		String id = map.get("inventory_sku_id");
 		//1.如果该商品是有录入库存则做想应的减少
@@ -436,11 +441,13 @@ public class InventoryServiceImpl implements  InventoryService{
 			return 0;
 		}
 		String orderid = map.get("orderid");
-		String od_id = map.get("od_id");
-		
+		String odid = map.get("odid");
+		map.put("is_use", "1");
 		
 		//2.锁定库存
-		pruchaseMapper.updateLockInventory(map);
+		inventoryMapper.insertLockInventory(map);
+		
+//		pruchaseMapper.updateLockInventory(map);
 		
 		int before_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("remaining")));
 		int can_remaining = Integer.valueOf(String.valueOf(inventoryMap.get("can_remaining")));
@@ -462,7 +469,7 @@ public class InventoryServiceImpl implements  InventoryService{
 		int updateInventoryById = inventoryMapper.updateInventoryById(map);
 		
 		//4.库存变更记录
-		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+od_id+"采购使用库存数量"+inventory_count+"，库存减少");
+		map.put("log_remark", "订单orderid:"+orderid+"/od_id:"+odid+"采购使用库存数量"+inventory_count+"，库存减少");
 		map.put("change_type", "2");
 		inventoryMapper.addInventoryChangeRecord(map);
 		
