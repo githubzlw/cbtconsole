@@ -18,10 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.cbt.warehouse.pojo.*;
-import com.importExpress.mapper.CustomGoodsMapper;
-import com.importExpress.pojo.ShopGoodsSalesAmount;
-import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +46,11 @@ import com.cbt.util.Util;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
+import com.cbt.warehouse.pojo.returndisplay;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -68,27 +68,12 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.mapper.IPurchaseMapper;
-import com.importExpress.pojo.ShopGoodsSalesAmount;
+import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 public class IPurchaseServiceImpl implements IPurchaseService {
@@ -2191,8 +2176,9 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("weight", "0");
 		
 		//待确定
-		map.put("barcode", String.valueOf(inventory_count_use));
-		map.put("position", String.valueOf(inventory_count_use));
+		map.put("barcode", "");
+		map.put("position", "");
+		
 		map.put("username", "cangku2");
 		map.put("userid", "65");
 		map.put("warehouse_remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+inventory_sku_id+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
