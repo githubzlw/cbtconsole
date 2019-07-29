@@ -713,7 +713,7 @@ public class CustomGoodsDaoImpl implements CustomGoodsDao {
         upsql += " where pid=?";
         Connection conn = null;
         conn = DBHelper.getInstance().getConnection();
-        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=?,custom_main_image=? where pid = ?";
+        String upLocalSql = "update custom_benchmark_ready set img=?,eninfo=?,custom_main_image=?,unsellableReason=45 where pid = ?";
         ResultSet rs = null;
         PreparedStatement stmt = null;
         PreparedStatement stmt2 = null;

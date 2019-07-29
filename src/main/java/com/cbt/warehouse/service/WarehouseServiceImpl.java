@@ -6,6 +6,7 @@ import com.cbt.bean.ZoneBean;
 import com.cbt.bean.*;
 import com.cbt.common.StringUtils;
 import com.cbt.jdbc.DBHelper;
+import com.cbt.orderinfo.dao.OrderinfoMapper;
 import com.cbt.pojo.*;
 import com.cbt.processes.servlet.Currency;
 import com.cbt.service.CustomGoodsService;
@@ -54,6 +55,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
     private CustomGoodsService customGoodsService;
     @Autowired
     private IPurchaseMapper pruchaseMapper;
+    @Autowired
+	private OrderinfoMapper orderinfoMapper;
     @Override
     public outIdBean findOutId(Integer uid) {
 
@@ -515,6 +518,11 @@ public class WarehouseServiceImpl implements IWarehouseService {
                         + SearchFileUtils.IMAGEHOSTURL + bean.getLocalImgPath() + "'/>";
             }
             bean.setLocalImgPath(urls);
+            //
+            int sampleOrderCount = orderinfoMapper.querySampleOrderInfoByOrderId(bean.getOrder_no());
+            if(sampleOrderCount > 0){
+                bean.setSampleOrder(1);
+            }
         }
         return newlist2;
     }

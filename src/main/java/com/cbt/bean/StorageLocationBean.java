@@ -24,7 +24,15 @@ public class StorageLocationBean {
 	private String operation;
 	private String state;//订单状态
 	private List<String> picList;//验货图片
+	private int sampleOrder; // 是否存在免费送样订单
 
+	public int getSampleOrder() {
+		return sampleOrder;
+	}
+
+	public void setSampleOrder(int sampleOrder) {
+		this.sampleOrder = sampleOrder;
+	}
 
 	//是否1688退货
 	private int is_refund;

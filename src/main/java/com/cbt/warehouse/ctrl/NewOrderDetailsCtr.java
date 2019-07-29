@@ -38,6 +38,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
@@ -544,6 +545,14 @@ public class NewOrderDetailsCtr {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/
 		//}
+		// 判断客户是否有样品订单
+		int sampleOrderCount = iOrderinfoService.querySampleOrderInfoByOrderId(orderNo);
+		if(sampleOrderCount == 0){
+			request.setAttribute("hasSampleOrder", 0);
+		} else{
+			request.setAttribute("hasSampleOrder", 1);
+		}
+
 		return "order_details_new";
 	}
 
@@ -767,7 +776,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询运费失败，原因：" + e.getMessage());
+			LOG.error("查询运费失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询运费失败,原因：" + e.getMessage());
 		}
@@ -798,7 +807,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list_uid);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询相似账号失败，原因：" + e.getMessage());
+			LOG.error("查询相似账号失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询相似账号失败,原因：" + e.getMessage());
 		}
@@ -834,7 +843,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			LOG.error("调整采购人员失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
 		}

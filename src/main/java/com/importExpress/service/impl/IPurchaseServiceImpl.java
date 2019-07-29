@@ -1160,7 +1160,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				getGoodsUrl(map, purchaseBean, goods_pid, car_urlMD5);
 				String goods_p_url=map.get("newValue")==null?"":map.get("newValue");
 				if("".equals(goods_p_url)){
-					goods_p_url=purchaseBean.getGoods_url();
+//					goods_p_url=purchaseBean.getGoods_url();
+					//新订单采购货源 为最后一次采购来源
+					goods_p_url=pruchaseMapper.getLastPurchaseSource(goods_pid);
+					if(StringUtils.isEmpty(goods_p_url)){
+						goods_p_url=purchaseBean.getGoods_url();
+					}
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
 				//获取商品库存数据

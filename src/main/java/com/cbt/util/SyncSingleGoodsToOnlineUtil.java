@@ -237,7 +237,7 @@ public class SyncSingleGoodsToOnlineUtil {
 			}
 		} catch (Exception e) {
 			System.err.println("deleteTempZip error:" + e.getMessage());
-			LOG.error("deleteTempZip error:" + e.getMessage());
+			LOG.error("deleteTempZip error:", e);
 		}
 	}
 

@@ -487,6 +487,13 @@ public interface IPurchaseMapper {
 	 */
 	public String getUseInventory(@Param("odid") int odid);
 
+	/**
+	 * 取得最后一次采购来源
+	 * @param goodsId
+	 * @return
+	 */
+	public String getLastPurchaseSource(@Param("goodsId") String goodsId);
+
 	public List<Map<String,String>> getTaoBaoInfoByShipno(@Param("shipnos") String shipnos);
 
 	public List<String> getBhShopId(@Param("orderNo") String orderNo, @Param("goodsid") String goodsid);
