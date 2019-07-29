@@ -35,7 +35,7 @@ public class MsgNotificationDaoImpl implements MsgNotificationDao {
 			stmt.setInt(12, messageNotification.getMessage_id());
 			stmt.execute();
 		} catch (Exception e) {
-			LOG.error("插入消息提醒失败,订单号:" + orderNo + ",原因:" + e.getMessage());
+			LOG.error("插入消息提醒失败,订单号:" + orderNo + ",原因:", e);
 			throw new Exception(e);
 		} finally {
 			if (stmt != null) {

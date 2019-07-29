@@ -21,6 +21,7 @@ import com.cbt.website.bean.*;
 import com.cbt.website.dao.UserDao;
 import com.cbt.website.dao.UserDaoImpl;
 import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
@@ -1929,6 +1930,11 @@ public class OrderinfoService implements IOrderinfoService {
     public int batchUpdateDistribution(List<GoodsDistribution> goodsDistributionList) {
         return orderinfoMapper.batchUpdateDistribution(goodsDistributionList);
     }
+
+	@Override
+	public int querySampleOrderInfoByOrderId(String orderNo) {
+		return orderinfoMapper.querySampleOrderInfoByOrderId(orderNo);
+	}
 }
 
 

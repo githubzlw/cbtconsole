@@ -33,7 +33,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("init error : " + e.getMessage());
-			LOG.error("init error : " + e.getMessage());
+			LOG.error("init error : ", e);
 		}finally {
 			if(ins != null){
 				try {
@@ -59,7 +59,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("init error : " + e.getMessage());
-			LOG.error("init error : " + e.getMessage());
+			LOG.error("init error : ", e);
 		}finally {
 			if(ins != null){
 				try {
@@ -116,7 +116,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("get openSync error : " + e.getMessage());
-			LOG.error("get openSync error : " + e.getMessage());
+			LOG.error("get openSync error : ", e);
 		}
 		return is;
 	}
@@ -136,7 +136,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("get openJob error : " + e.getMessage());
-			LOG.error("get openJob error : " + e.getMessage());
+			LOG.error("get openJob error : ", e);
 		}
 		return is;
 	}
@@ -155,7 +155,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("getAddGoodsPath error : " + e.getMessage());
-			LOG.error("getAddGoodsPath error : " + e.getMessage());
+			LOG.error("getAddGoodsPath error : ", e);
 		}
 		return path;
 	}
@@ -172,7 +172,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("get openJob error : " + e.getMessage());
-			LOG.error("get openJob error : " + e.getMessage());
+			LOG.error("get openJob error : ", e);
 		}
 		return path;
 	}
@@ -199,7 +199,7 @@ public class GetConfigureInfo {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("get getFtpConfig error : " + e.getMessage());
-			LOG.error("get getFtpConfig error : " + e.getMessage());
+			LOG.error("get getFtpConfig error : ", e);
 		}
 		return cfg;
 	}

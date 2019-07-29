@@ -509,7 +509,7 @@ public class ReorderServiceImpl implements com.importExpress.service.ReorderServ
             res = 1;
             sendMQ.closeConn();
         } catch (Exception e) {
-            logger.error("GoodsAddThread:批量插入goods_car表出错!" + e.getMessage());
+            logger.error("GoodsAddThread:批量插入goods_car表出错!", e);
             logger.error("------商品信息： " + spider.toString());
             e.printStackTrace();
         }

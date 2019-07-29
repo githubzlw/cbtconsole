@@ -656,7 +656,11 @@
                 </c:if>
             </tr>
             <tr>
-                <td colspan="4">${order.paytypes}</td>
+                <td colspan="2">${order.paytypes}</td>
+                <c:if test="${hasSampleOrder > 0}">
+                    <td colspan="2"><b style="color: red;font-size: 16px;">有免费样品订单:<a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${order.orderNo}_SP" target="_blank">${order.orderNo}_SP</a></b></td>
+                </c:if>
+
             </tr>
             <tr>
                 <td>
