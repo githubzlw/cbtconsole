@@ -243,6 +243,9 @@ function updategoodstatus(isok, goodspid, orderid, goodid, itemid, taobaoprice, 
                 } else if (status == 5) {
                     $("#status" + odid).css("color", "red");
                     $("#status" + odid).html("数量不够");
+                } else if (status == 6) {
+                	$("#status" + odid).css("color", "red");
+                	$("#status" + odid).html("品牌未授权");
                 }
             }
         });

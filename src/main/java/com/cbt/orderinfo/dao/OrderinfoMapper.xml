@@ -1440,4 +1440,9 @@
 		select id,odid,tbOr1688,orderid,orderdate,seller,totalprice,orderstatus,itemname,itemid,itemprice,itemqty,sku,shipno,shipper
 		,shipstatus,itemurl,imgurl,username,creatTime,specId,skuID from taobao_1688_order_history where id in(#{checkOrderhid})
 	</select>
+	<select id="getGoodsBrandAuthorization" resultType="java.util.Map">
+	select cb.pid,cb.brand_id,sa.shop_id,sa.authorize_state,sa.brand_name    from custom_benchmark_ready cb 
+	left join shop_brand_authorization sa on cb.brand_id=sa.brand_id  
+	and cb.shop_id =sa.shop_id   where cb.pid=#{pid} limit 1
+	</select>
 </mapper>

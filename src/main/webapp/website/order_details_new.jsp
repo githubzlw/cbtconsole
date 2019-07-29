@@ -1246,6 +1246,10 @@
                                                                                                   value="${ostate},${orderd.checked},${orderd.goodstatus}">
                                 <c:if test="${ostate==1 && orderd.checked==0}">
                                     已到仓库
+                                    <c:if test="${orderd.goodstatus==6}">
+                                        <a style="color: red;" target="_Blank"
+                                           href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验品牌未授权</a>
+                                    </c:if>
                                     <c:if test="${orderd.goodstatus==5}">
                                         <a style="color: red;" target="_Blank"
                                            href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${orderd.id}">,已校验数量不对</a>
@@ -1644,6 +1648,9 @@
                                     </c:if>
                                 </c:if> <c:if test="${ostate==1 && orderd.checked==0}">
                                     已到仓库,
+                                    <c:if test="${orderd.goodstatus==6}">
+                                        <font color="red">已校验品牌未授权</font>
+                                    </c:if>
                                     <c:if test="${orderd.goodstatus==5}">
                                         <font color="red">已校验数量不对</font>
                                     </c:if>

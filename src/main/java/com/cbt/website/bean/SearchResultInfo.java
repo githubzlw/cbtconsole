@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
+/**
+ * @author Administrator
+ *
+ */
 @Data
 public class SearchResultInfo {
 
@@ -55,7 +59,11 @@ public class SearchResultInfo {
 	private String invoice;
 
 	private String isDropshipOrder;
+   /**
+	* 店铺id
+	*/
 	private String shop_id;
+	
 	private List<String> bh_shop_id;
 
 
@@ -70,6 +78,24 @@ public class SearchResultInfo {
 	private String context;//采购备注
 	private String specId;
 	private String skuID;
+	
+	/**
+	 * 品牌名称
+	 */
+	private String brandName;
+	/**
+	 * 品牌授权状态
+	 */
+	private String authorizeState;
+	/**
+	 * 品牌授权说明
+	 */
+	private String authorizeRemark;
+	/**
+	 * 品牌id
+	 */
+	private String brandid;
+	
 	/**
 	 * 称秤体积重量
 	 */
