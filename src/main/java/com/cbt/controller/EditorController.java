@@ -3303,7 +3303,7 @@ public class EditorController {
                     PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
                     pbThread.start();
                     try {
-                        Thread.sleep(40000);
+                        Thread.sleep(25000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

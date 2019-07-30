@@ -356,13 +356,17 @@
         refreshOnlineGoodsHtml
 
         function refreshOnlineGoodsJson(){
+        var webType = $("#web_size_type").val();
 		$("#gen_show_notice").show();
 		$(".refresh_color").css("background","#aaa");
 		$(".refresh_color").attr("disabled",true);
+		var url = "https://www.import-express.com/popProducts/refreshHotJson";
+		if(webType > 1){
+		    url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson";
+        }
 		$.ajax({
 			type : "POST",
-			//url : "https://www.import-express.com/popProducts/refreshHotJson/0",
-			url : "https://www.import-express.com/popProducts/refreshHotJson",
+			url : url,
 			data : {},
 			success : function(data) {
 				$(".refresh_color").attr("disabled",false);
@@ -377,11 +381,16 @@
 	}
         function refreshOnlineGoodsHtml(){
     		$("#gen_show_notice").show();
+    		var webType = $("#web_size_type").val();
     		$(".refresh_color").css("background","#aaa");
     		$(".refresh_color").attr("disabled",true);
+            var url = "https://www.import-express.com/popProducts/refreshHotJson?html=1";
+            if(webType > 1){
+                url = "https://www.kidsproductwholesale.com/popProducts/refreshHotJson?html=1";
+            }
     		$.ajax({
     			type : "POST",
-    			url : "https://www.import-express.com/popProducts/refreshHotJson?html=1",
+    			url : url,
     			data : {},
     			success : function(data) {
     				$(".refresh_color").attr("disabled",false);
@@ -434,6 +443,12 @@
 			</select></span>&nbsp;&nbsp;&nbsp;&nbsp;<span>
             <input type="button" class="but_color" value="查询" onclick="doQuery()"/></span>&nbsp;&nbsp;&nbsp;
             <span><input type="button" class="but_color" value="录入类别" onclick="enterCategory(0,0)"/></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span>网站:
+                            <select id="web_size_type" style="height: 28px;width: 80px;">
+                                <option value="1">import</option>
+                                <option value="2">kids</option>
+                            </select>
+                        </span>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（原json）" onclick="refreshOnlineGoodsJson()" style="cursor:pointer"/>
             <input class="refresh_color" type="button" value="刷新最新热卖商品到线上（新html）" onclick="refreshOnlineGoodsHtml()" style="cursor:pointer"/>
             <span id="gen_show_notice" style="color: red; display: none;">正在执行中...</span>
