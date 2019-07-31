@@ -371,9 +371,10 @@
     
     <select id="getOrderDetails" resultType="java.util.Map">
     select od.id as odid,od.goodsid,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
-    th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,th.imgurl as goods_p_img,th.itemurl as goods_p_url
-	ops.goods_p_url,ops.tb_1688_itemid from order_details od inner join order_product_source ops on od.id=ops.od_id 
-	and od.orderid=ops.orderid 
+    th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,th.imgurl as goods_p_img,th.itemurl,
+	ops.goods_p_url,ops.tb_1688_itemid 	
+	from order_details od 
+	inner join order_product_source ops on (od.id=ops.od_id and od.orderid=ops.orderid )
 	inner join id_relationtable ir on ir.odid=od.id
 	inner join taobao_1688_order_history th on  th.orderid=ir.tborderid 
 	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
