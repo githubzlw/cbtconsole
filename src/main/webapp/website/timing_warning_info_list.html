@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <!--
+            文件兼容性声明，表示使用最新的ie渲染模式
+        -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--
+            视口：用于设置移动端显示的效果的。就是移动端显示内容的区域的大小。
+                width=device-width：视口宽度等于设备宽度。
+                initial-scale=1   ：初始化缩放比，1:1
+        -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>爬虫及定时任务状态监控</title>
+
+    <!-- 这是bootStrap所需要的css文件 -->
+    <link href="/cbtconsole/css/bootstrap.min2.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--
+               条件注释,专门为ie浏览器设计的。
+       -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- 这是bootstrap所必要的jquery文件。 -->
+    <script src="/cbtconsole/js/jquery-2.1.0.min.js"></script>
+    <!-- 这是bootstrap的js文件 -->
+    <script src="/cbtconsole/js/bootstrap/bootstrap.min2.js"></script>
+    <!-- 日期控件 -->
+    <link href="/cbtconsole/css/bootstrap-datetimepicker.min.css"
+          rel="stylesheet"/>
+    <script src="/cbtconsole/js/bootstrap/moment-with-locales.js"></script>
+    <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.min.js"></script>
+    <script src="/cbtconsole/js/bootstrap/bootstrap-datetimepicker.zh-CN.js"></script>
+    <!--页面加载进度条-->
+    <!--<script src="/cbtconsole/js/jgxLoader.js"></script>-->
+    <!--easyui-->
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/jquery.easyui.min.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/jquery-easyui-1.5.2/locale/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript"
+            src="/cbtconsole/js/My97DatePicker/WdatePicker.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css"
+          href="/cbtconsole/jquery-easyui-1.5.2/themes/icon.css">
+    <style type="text/css">
+        /*去除默认样式*/
+        /*body, ul, li, h1, h2, h3, h4, h5, h6, p, form, dl, dt, dd { margin: 0px; padding: 0px; font-size: 12px; font-weight: normal; }*/
+        /*ul { list-style: none; }*/
+        /*img { border-style: none; }*/
+        /*a {color: #000;text-decoration: none;}*/
+        /*a:hover {color: #000;}*/
+
+        .refresh_btn, .refresh_btn:hover {
+            float: right;
+            font-size: 16px;
+            margin-right: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+<script type="text/javascript">
+    //新增/修改评论 whj直接代码
+    function closeRemark() {
+        $('#myModal').modal('hide');
+    }
+
+    function refresh_data(that) {
+        var but_text = $(that).text();
+        if (but_text.indexOf("中...") > 0) {
+            alert("正在刷新中 请等待...");
+            return;
+        }
+        $(that).text(but_text + "中...");
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/queryuser/refreshTimingWarningInfo.do",
+            data: {
+                'index': $(that).closest(".waring_block").find("input[name=index]:eq(0)").val()
+            },
+            dataType:"text",
+            success: function(msg){
+                if (msg != undefined && msg.indexOf("success") > 0) {
+                    alert("刷新成功");
+                    location.reload();
+                } else {
+                    alert("刷新异常");
+                }
+            }
+        });
+    }
+
+    function up_quota(parent_id) {
+        $("#quota_gt").val('');
+        $("#quota_lt").val('');
+        $("#quota_ge").val('');
+        $("#quota_le").val('');
+        $("#myModal input[name=quota_unit]:eq(0)").prop('checked', 'checked');
+        $("#parent_id").val(parent_id);
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/queryuser/queryQuotaData.do",
+            data: {
+                id: parent_id
+            },
+            dataType:"json",
+            success: function(msg){
+                if (msg.quotaGt != undefined) {
+                    $("#quota_gt").val(msg.quotaGt);
+                }
+                if (msg.quotaLt != undefined) {
+                    $("#quota_lt").val(msg.quotaLt);
+                }
+                if (msg.quotaGe != undefined) {
+                    $("#quota_ge").val(msg.quotaGe);
+                }
+                if (msg.quotaLe != undefined) {
+                    $("#quota_le").val(msg.quotaLe);
+                }
+                if (msg.quotaUnit == '天') {
+                    $("#myModal input[name=quota_unit]:eq(1)").prop('checked', 'checked');
+                }
+            }
+        });
+        $('#myModal').modal('show');
+    }
+
+    function save_quota() {
+        $.ajax({
+            type: "POST",
+            url: "/cbtconsole/queryuser/udpateQuotaData.do",
+            data: {
+                id: $("#parent_id").val(),
+                quotaGt: $("#quota_gt").val(),
+                quotaLt: $("#quota_lt").val(),
+                quotaGe: $("#quota_ge").val(),
+                quotaLe: $("#quota_le").val(),
+                quotaUnit: $("#myModal input[name=quota_unit]:checked").val()
+            },
+            dataType:"text",
+            success: function(msg){
+                if (msg = 'success') {
+                    $('#myModal').modal('hide');
+                    alert('阀值更新成功, 下次预警使用更新后的阀值!');
+                } else {
+                    alert('更新异常');
+                }
+                console.log(msg);
+            }
+        });
+    }
+
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 600px; height: 430px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">修改阀值</h4>
+            </div>
+            <div class="modal-body" style="float: left;font-size: 13px;width: 100%;">
+                <input type="hidden" id="parent_id">
+                <table class="table table-striped">
+                    <tr>
+                        <td width="30%">预警数量大于</td>
+                        <td width="30%">
+                            <input type="text" id="quota_gt" style="width: 100px;" />
+                        </td>
+                        <td rowspan="4" width="30%">
+                            <div style="line-height: 26px; margin: 32px 10px;">
+                                预警数量单位:
+                                <br />
+                                <input type="radio" name="quota_unit" checked="checked" value="个">个
+                                <br />
+                                <input type="radio" name="quota_unit" value="天">天
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>预警数量大于等于</td>
+                        <td>
+                            <input type="text" id="quota_ge" style="width: 100px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>预警数量小于</td>
+                        <td>
+                            <input type="text" id="quota_lt" style="width: 100px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>预警数量小于等于</td>
+                        <td>
+                            <input type="text" id="quota_le" style="width: 100px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div style="text-align: center; padding: 5px 0">
+                                <button href="javascript:void(0)" onclick="save_quota()" style="width: 80px">保存</button>
+                                <button href="javascript:void(0)" onclick="closeRemark()" style="width: 80px">关闭</button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+</div>
+
+<div class="waring_body" style="width: 82%; margin-left: 8%;">
+    <h3 style="line-height: 60px;">
+        <span>一、 爬虫及定时任务状态监控</span>
+        <a class="refresh_btn" onclick="refresh_data(this)">全部刷新</a>
+    </h3>
+
+    <!--
+    <div class="waring_block">
+        <br /><hr />
+        <h4>
+            <input type="hidden" value="1688店铺数据抓取">
+            <span class="waring_title">1688店铺数据抓取</span>
+            <a class="refresh_btn">刷新</a>
+        </h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>预警信息</th>
+                    <th>预警个数或天数</th>
+                    <th>预警阀值(个数或天数)</th>
+                    <th>当前预警数据查询时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="hidden" name="parent_id" value="1">
+                        当前剩余待抓取数量
+                    </td>
+                    <td>220个</td>
+                    <td>大于200个, 小于200个</td>
+                    <td>2019/07/26 14:29</td>
+                    <td>修改阀值</td>
+                </tr>
+                <tr>
+                    <td>最近一天抓取数量</td>
+                    <td>100</td>
+                    <td></td>
+                    <td>2019/07/26 14:29</td>
+                    <td>修改阀值</td>
+                </tr>
+                <tr>
+                    <td>最后一次抓取时间</td>
+                    <td>2019/07/26 14:29</td>
+                    <td></td>
+                    <td>2019/07/26 14:29</td>
+                    <td>修改阀值</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    -->
+</div>
+
+<br />
+<br />
+<br />
+<br />
+<div class="waring_body_history" style="width: 82%; margin-left: 8%;">
+    <hr style="border-top: 1px solid #000;"/>
+    <h3 style="line-height: 20px;">
+        <span>
+            二、 查询
+            <input name="search_day" type="text" value="2" style="width: 40px; height: 26px;">
+            天内的历史数据
+        </span>
+        <a href="javascript:;" name="search" class="refresh_btn">查询</a>
+    </h3>
+</div>
+
+<br />
+<br />
+<br />
+<br />
+
+</body>
+
+
+<script type="text/javascript">
+    /*数字格式化*/
+    function formatNum(val) {
+        return val < 10 ? "0" + val : val
+    }
+
+    /*时间格式化 完整*/
+    function formatterData(value) {
+        if (value != null) {
+            var date = new Date(value);
+            return date.getFullYear() + '-'
+                + formatNum(date.getMonth() + 1) + '-'
+                + formatNum(date.getDate()) + ' '
+                + formatNum(date.getHours()) + ':'
+                + formatNum(date.getMinutes());
+        } else {
+            return "";
+        }
+    }
+
+    function get_waring_result(item) {
+        if (item.waringResult == -1) {
+            return "";
+        }
+        if (item.waringUnit == '天') {
+            return formatterData(item.waringResult * 1000);
+        }
+        return item.waringResult + item.waringUnit;
+    }
+
+    function get_waring_quota(item) {
+        var res = new Array();
+        if (item.quotaGt != undefined) {
+            res.push("大于" + item.quotaGt + item.quotaUnit);
+        }
+        if (item.quotaGe != undefined) {
+            res.push("大于等于" + item.quotaGe + item.quotaUnit);
+        }
+        if (item.quotaLt != undefined) {
+            res.push("小于" + item.quotaLt + item.quotaUnit);
+        }
+        if (item.quotaLe != undefined) {
+            res.push("小于等于" + item.quotaLe + item.quotaUnit);
+        }
+        return res.join(", ");
+    }
+
+    function get_waring_block(item) {
+        var style_param = undefined;
+        if (item.waringQuota) {
+            style_param = {
+                'style': "background-color: #FFA07A;"
+            }
+        }
+        return $("<tr>", style_param).append($("<td>", {
+            text: item.info
+        })).append($("<td>", {
+            text: get_waring_result(item)
+        })).append($("<td>", {
+            text: get_waring_quota(item)
+        })).append($("<td>", {
+            text: formatterData(item.curTime * 1000)
+        })).append($("<td>", {
+            html: "<td><a href='javascript:;' onclick='up_quota(" + item.parentId + ")'>修改阀值</a></td><input name='index' type=\"hidden\" value=\"" + item.infoIndex + "\">"
+        }));
+    }
+
+    function create_waring_block(desc, item) {
+        var h4_element = $("<h4>").append($("<input>", {
+            'type': 'hidden',
+            'value': item.title
+        })).append($("<span>", {
+            'text': ($(desc + " .waring_block").size() + 1) + ". "
+        })).append($("<span>", {
+            'class': 'waring_title',
+            'text': item.title
+        })).append($("<a>", {
+            'class': 'refresh_btn',
+            'text': desc.indexOf("history") > 0?'':'刷新',
+            'onclick': 'refresh_data(this)'
+        }));
+
+        var table_element = $("<table>", {
+            'class': 'table table-striped'
+        }).append("<thead><tr><th width=''>预警信息</th><th width='18%'>预警个数或天数</th><th width='20%'>预警阀值(个数或天数)</th><th width='20%'>当前预警数据查询时间</th><th width='10%'>操作</th></tr></thead>")
+            .append($("<tbody>", {
+                'html': get_waring_block(item)
+            }));
+
+        $(desc).append($("<div>", {
+            'class': 'waring_block'
+        }).append($("<br>")).append($("<hr>")).append(h4_element).append(table_element));
+    }
+
+    function load_waring_block(desc, valid, day) {
+        $.ajax({
+            type: "GET",
+            url: "/cbtconsole/queryuser/queryTimingWarningInfo.do",
+            data: {
+                'valid': valid,
+                'day': day
+            },
+            dataType: "json",
+            success: function (data) {
+                if (data != undefined) {
+                    $(data).each(function (index, item) {
+                        var w_title = desc + " input[value='" + item.title + "']";
+                        if ($(w_title).size() == 0) {
+                            // 新建
+                            create_waring_block(desc, item)
+                        } else {
+                            // 新增
+                            $(w_title).closest(".waring_block").find("tbody").append(get_waring_block(item));
+                        }
+                    });
+                }
+            }
+        });
+    }
+    /*预警数据加载*/
+    load_waring_block(".waring_body", 11, undefined);
+    /*历史预警数据加载*/
+    $(".waring_body_history a[name=search]").click(function () {
+        var day = $(".waring_body_history input[name=search_day]").val();
+        $(".waring_body_history .waring_block").remove()
+        load_waring_block(".waring_body_history", 10, day);
+    });
+
+    $(function () {
+
+    });
+
+</script>
+
+</html>
