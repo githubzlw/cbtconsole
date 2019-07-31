@@ -1,6 +1,7 @@
 package com.importExpress.controller;
 
 import com.cbt.bean.EasyUiJsonResult;
+import com.cbt.jcys.util.HttpUtil;
 import com.cbt.util.Redis;
 import com.cbt.util.SerializeUtil;
 import com.cbt.util.StrUtils;
@@ -9,6 +10,7 @@ import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.userAuth.bean.AuthInfo;
 import com.importExpress.pojo.GoodsReview;
 import com.importExpress.pojo.OrderShare;
+import com.importExpress.pojo.TimingWarningInfo;
 import com.importExpress.pojo.UserBean;
 import com.importExpress.service.QueryUserService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
@@ -802,6 +804,60 @@ public class QueryUserController {
     @ResponseBody
     public Map<String, Object> updateUserCheckout(Integer userid, Integer type){
         return queryUserService.updateUserCheckout(userid, type);
+    }
+
+
+    /**
+     * 给出公司的各种爬虫列表，并监控运行状态 监控
+     * 		http://127.0.0.1:8086/cbtconsole/queryuser/queryTimingWarningInfo.do
+     *
+     *
+     */
+    @RequestMapping(value = "/queryTimingWarningInfo")
+    @ResponseBody
+    public List<TimingWarningInfo> queryTimingWarningInfo(Integer valid,
+                                                          @RequestParam(value = "day", defaultValue = "-1", required = false) Integer day){
+        return queryUserService.queryTimingWarningInfo(valid, day);
+    }
+
+
+    /**
+     * 刷新指定索引的预警
+     *      http://127.0.0.1:8086/cbtconsole/queryuser/refreshTimingWarningInfo.do
+     *
+     * @param index 刷新对应索引的所有预警数据, 不传值则刷新所有
+     *
+     */
+    @RequestMapping(value = "refreshTimingWarningInfo", method = RequestMethod.GET)
+    @ResponseBody
+    public String refreshTimingWarningInfo(@RequestParam(value = "index", defaultValue = "0", required = false) Integer index) {
+        return HttpUtil.doGet("http://192.168.1.48:18079/syncsku/timingWarning/test1.do?index=" + index, "success", 3);
+    }
+
+    /**
+     * 刷新预警阀值
+     *      http://127.0.0.1:8086/cbtconsole/queryuser/queryQuotaData.do
+     *
+     */
+    @RequestMapping(value = "queryQuotaData", method = RequestMethod.GET)
+    @ResponseBody
+    public TimingWarningInfo queryQuotaData(Integer id) {
+        return queryUserService.queryQuotaData(id);
+    }
+
+    /**
+     * 更新预警阀值
+     *      http://127.0.0.1:8086/cbtconsole/queryuser/udpateQuotaData.do
+     *
+     */
+    @RequestMapping(value = "udpateQuotaData")
+    @ResponseBody
+    public String udpateQuotaData(TimingWarningInfo bean) {
+        if (bean.getId() == null) {
+            return "fail";
+        }
+        queryUserService.udpateQuotaData(bean);
+        return "success";
     }
 
 }
