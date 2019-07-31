@@ -59,6 +59,19 @@ public class TabTrackInfoServiceImpl implements TabTrackInfoService {
         json.setSuccess(true);
         if ((int)param.get("export") == 0) {
             // 查询 按钮
+
+            // dp订单标记 用于页面中跳转到订单页
+            if (list.size() > 0) {
+                List<String> dpOrderList = tabTrackInfoMapping.getIsDropshipOrder(list);
+                for (TabTrackInfo bean : list) {
+                    if (dpOrderList.contains(bean.getOrderNo())) {
+                        bean.setTarOrderNo(bean.getOrderNo().split("_")[0]);
+                    } else {
+                        bean.setTarOrderNo(bean.getOrderNo());
+                    }
+                }
+            }
+
             Integer totalCount = tabTrackInfoMapping.getTrackInfoListCount(param);
             json.setTotal(totalCount);
             return;

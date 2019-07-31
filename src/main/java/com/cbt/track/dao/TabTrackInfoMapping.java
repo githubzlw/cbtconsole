@@ -46,4 +46,5 @@ public interface TabTrackInfoMapping {
 
     Integer getTrackInfoListCount(Map<String, Object> param);
 
+    List<String> getIsDropshipOrder(@Param("list") List<TabTrackInfo> list);
 }

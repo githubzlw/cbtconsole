@@ -479,7 +479,7 @@
             /* 链接到订单 formatterOrderNo */
             function formatterOrderNo(value, row, index) {
                 if(row.orderNo != null) {
-	            	return '<a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=' + row.orderNo + '" target=black>' + row.orderNo + '</a>'
+	            	return '<a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=' + row.tarOrderNo + '" target=black>' + row.orderNo + '</a>'
            		}
            		return;
             }
