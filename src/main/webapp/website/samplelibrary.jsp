@@ -156,6 +156,7 @@
         function deliver(od) {
             // var Tborder=$("#Tborderus").val()
             // var returnNO=$("#openRt").val()
+            alert(od)
             var cusorder=${odls}
             var OrderMap = new Array();
             var userid=${userid}
@@ -164,7 +165,7 @@
                     var retunum=$("#openNum"+k).val();
                     cusorder[k].new_barcode=retunum
                     OrderMap.push({userId:userid,orderNo:od,pid:cusorder[k].goods_pid,imgUrl:cusorder[k].car_img,skuId:cusorder[k].sku,enType:cusorder[k].sku,isChoose:1,
-                        goodsNum:retunum,enName:cusorder[k].enname,catid:cusorder[k].catid1,weight:cusorder[k].weight,volumeWeight:cusorder[k].volume_weight,isSoldFlag:cusorder[k].is_sold_flag})
+                        goodsNum:retunum,enName:cusorder[k].good_name,catid:cusorder[k].catid1,weight:cusorder[k].weight,volumeWeight:cusorder[k].volume_weight,isSoldFlag:cusorder[k].is_sold_flag})
                 }
             })
             $.ajax({
@@ -194,7 +195,7 @@
     <td>
         <input type="button"
                style="position: fixed; bottom: 528px; right: 50px; width: 150px; height: 30px;" id="open"
-               onclick="deliver()" value="送样">
+               onclick="deliver(${orderno})" value="送样">
     </td>
 </tr>
 <div style="width:1233px;">
