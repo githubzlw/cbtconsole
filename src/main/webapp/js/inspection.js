@@ -472,8 +472,7 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     var userid = $("#h_b5").val();
     var userName = $("#h_b6").val();
     var tbOrderId = $("#tborderid").val();
-    //验货人员实际输入数量
-    var count =$("#" + orderid + "count_" + odid + "").val();//验货数量
+   
     var goods_name = $("#name_" + odid + "").html();
     
     //客户下单数量
@@ -487,18 +486,26 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     var skuid=$(".skuID_"+orderid+"_"+odid).html();
     var tbspecid = '';
     var tbskuid = '';
+    var count = 0;
     if((specid && specid!='' )||( skuid && skuid!='')){
     	//采购货源产品规格id
     	tbspecid= specid !=''? $(".specId_"+specid).html():'';
-    	tbskuid=skuid!=''?$(".skuID_"+skuid).html():'';
+    	tbskuid=skuid!='' ? $(".skuID_"+skuid).html() : '';
     	if((tbspecid!=''&&specid == tbspecid || bskuid!=''&&skuid == tbskuid)){
     		var skucount = $(".itemqty_"+specid+"_"+skuid).html();
     		if(Number(skucount) > 0){
     			count = skucount;
-    			$("#" + orderid + "count_" + odid + "").val(count);
+    			//$("#" + orderid + "count_" + odid + "").val(count);
     		}
     	}
     }
+    //验货人员实际输入数量
+   var temcount = $("#" + orderid + "count_" + odid + "").val();//验货数量
+   count = temcount;
+  /* if(Number(temcount) > 0){
+   }else{
+	 $("#" + orderid + "count_" + odid + "").val(count);
+   }*/
     var tbsourceCount = $(".itemid_checkbox").length;
     var sourceCount = $(".itemid_sourceCount").length;
     var inventory_count = Number(count) + Number(record_) - (Number(_count) * Number(unit));//库存数量
@@ -825,9 +832,9 @@ function search() {
                     	+ jsonObj[i].specId
                     	+ '</span></p>';
                     str += '<p >skuID：<span class="skuID_check skuID_'+jsonObj[i].skuID+'">'
-                    	+ jsonObj[i].skuID
+                    	+ jsonObj[i].skuID+'</span>';
                     	
-                	str += '<input style="display:none;" type="checkbox" class="itemid_checkbox itemid_'+jsonObj[i].specId+'_'+jsonObj[i].skuID+'" value="'+jsonObj[i].id+'"/>';
+                	str += '<input style="display:none;" type="checkbox" class="itemid_checkbox itemid_'+jsonObj[i].specId+'_'+jsonObj[i].skuID+'" value="'+jsonObj[i].id+'"/></p>';
                 	
                     str += '<p >Itemid:<span class="itemid_check itemid_'+jsonObj[i].itemid+'">'
                     	+ jsonObj[i].itemid
