@@ -473,15 +473,31 @@ public class OrderinfoService implements IOrderinfoService {
 					}
 				}
 				//订单收获地址
-				String check="";
-				String address =String.valueOf(map.get("address"));
+				
+//				String address =String.valueOf(map.get("address"));
 				searchresultinfo.setStrcar_type(changetypeName(car_type));
 				searchresultinfo.setIsExitPhone(String.valueOf(map.get("isExitPhone")));
 				searchresultinfo.setTaobao_itemid(resultTaobaoItemId);
 				//获取商品的店铺名称
 				String shop_id="0000";
 				String goods_pid=String.valueOf(map.get("goods_pid"));
-				if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
+				
+				//查询产品品牌授权情况
+				Map<String, Object> goodsBrandAuthorization = orderinfoMapper.getGoodsBrandAuthorization(goods_pid);
+				//0-未授权  1-部分授权 2-全部授权   -1 -侵权
+				String authorized_flag = "0";
+				String brand_name = "";
+				String brandid = "0000";
+				if(goodsBrandAuthorization != null) {
+					Object authorizeState = goodsBrandAuthorization.get("authorize_state");
+					authorized_flag = authorizeState == null ? "0" : String.valueOf(authorizeState);
+					brand_name = (String)goodsBrandAuthorization.get("brand_name");
+					brand_name = brand_name == null ? "" : brand_name;
+					shop_id = goodsBrandAuthorization.get("shop_id") != null ? (String)goodsBrandAuthorization.get("shop_id") : shop_id;
+					brandid = goodsBrandAuthorization.get("brand_id") != null ? (String)goodsBrandAuthorization.get("brand_id") : brandid;
+				}
+				
+				/*if(goods_pid.equals(String.valueOf(map.get("tb_1688_itemid")))){
 					//采购货源和推荐货源一致
 					shop_id=orderinfoMapper.getShopId(goods_pid);
 					//是否授权
@@ -494,17 +510,33 @@ public class OrderinfoService implements IOrderinfoService {
 							|| (address.contains("加拿大") || "6".equals(address) || "CANADA".equals(address.toLowerCase())))){
 						check="请核查该商品是否侵权";
 					}
-				}
+				}*/
 				//采购是否该商品授权  1已授权
-				String authorized_flag=String.valueOf(map.get("aFlag"));
+				/*String authorized_flag=String.valueOf(map.get("aFlag"));
 				if("0".equals(authorized_flag)){
 					check="采购已对该商品授权";
 				}else if("2".equals(authorized_flag)){
 					//查询上一次该商品发货的订单信息
 					check= warehouseMapper.getBatckInfo(goods_pid);
 				}
-				check=StringUtil.isBlank(check)?"-":check;
+				check=StringUtil.isBlank(check)?"-":check;*/
+				String check = "未授权品牌，通知采购核查";
+				String authorizeRemark = "未授权";
+				if("2".equals(authorized_flag)){
+					check = "采购已对该品牌授权";
+					authorizeRemark = "已授权";
+				}else if("1".equals(authorized_flag)){
+					check = "采购已对该品牌部分授权";
+					authorizeRemark = "未授权";
+				}else if("-1".equals(authorized_flag)){
+					check = "该品牌侵权";
+					authorizeRemark = "侵权";
+				}
+				searchresultinfo.setBrandid(brandid);
+				searchresultinfo.setAuthorizeRemark(authorizeRemark);
+				searchresultinfo.setAuthorizeState(authorized_flag);
 				searchresultinfo.setAuthorizedFlag(check);
+				searchresultinfo.setBrandName(brand_name);
 				searchresultinfo.setShop_id(shop_id);
 				searchresultinfo.setOdid(String.valueOf(map.get("odid")));
                 // 2018/11/06 11:39 ly 实秤重量 是否已同步到产品库

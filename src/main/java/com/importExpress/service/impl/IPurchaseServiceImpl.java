@@ -2182,7 +2182,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		map.put("state", "0");
 		//'入库删除标记:0.已入库;1.入库已取消'
 		map.put("is_delete", "0");
-		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够'
+		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够 6:品牌未授权'
 		map.put("goodstatus", googs_number == inventory_count_use ? "1" : "5");
 		//'商品到货数量'
 		map.put("goodarrivecount", String.valueOf(inventory_count_use));

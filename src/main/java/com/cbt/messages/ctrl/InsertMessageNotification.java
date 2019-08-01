@@ -287,6 +287,8 @@ public class InsertMessageNotification {
 			stateStr = "有疑问";
 		} else if (goodstatus == 5) {
 			stateStr = "数量不够";
+		} else if (goodstatus == 6) {
+			stateStr = "品牌未授权";
 		}
 
 		try {

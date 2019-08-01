@@ -3161,6 +3161,11 @@
 										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验数量有误</a>
 									</h1>
 								</c:if>
+								<c:if test="${pb.rkgoodstatus == '6'}">
+									<h1 style="color: red;">
+										<a style="color: red;" target="_Blank" href="${ctx}/warehouse/getOrderinfoPage.do?goodid=${pb.od_id}">已到仓库，已校验品牌未授权</a>
+									</h1>
+								</c:if>
 							</div>
 							<span style="color: red; font-size: 25px;" id="inventory_${pb.orderNo}${pb.od_id}"></span>
 							<div id="hideDetails_${pb.orderNo}${pb.od_id}" style="display: block">

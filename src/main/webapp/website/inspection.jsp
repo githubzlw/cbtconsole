@@ -234,6 +234,9 @@
 		.corder_yq{height: 26px;width: 75px;}
 		.corder_i_barcode{height: 26px;width: 75px;}
 		.corder_img img{width:65px; height:65px;}
+		.brand_state_f{
+		background: #6bdc3c;
+		}
 	</style>
 	<%
 		//取出当前登录用户

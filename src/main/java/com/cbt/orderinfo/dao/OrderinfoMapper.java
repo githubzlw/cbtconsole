@@ -702,4 +702,8 @@ public interface OrderinfoMapper {
 	 * @return
 	 */
 	public List<Tb1688OrderHistory> getTbGoodsData(@Param("checkOrderhid") String checkOrderhid);
+	
+	
+	Map<String,Object> getGoodsBrandAuthorization(String pid);
+	
 }

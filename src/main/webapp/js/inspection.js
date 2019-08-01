@@ -294,6 +294,9 @@ function updategoodstatus(isok, goodspid, orderid, goodid, itemid, taobaoprice, 
                 } else if (status == 5) {
                     $("#status" + odid).css("color", "red");
                     $("#status" + odid).html("数量不够");
+                } else if (status == 6) {
+                	$("#status" + odid).css("color", "red");
+                	$("#status" + odid).html(" 品牌未授权");
                 }
             }
         });
@@ -939,7 +942,12 @@ function search() {
                             + json[i].goodsid + ';odid:' + json[i].odid + '</div>';
                         str += '<div>商品名称：<span id="name_' + json[i].odid + '">'
                             + json[i].goods_name
-                            + '</span></div><div>';
+                            + '</span></div>';
+                        
+                        str += '<div>品牌名称：<span id="brand_' + json[i].odid + '">'
+                        + json[i].brandName
+                        + '</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="brand_state_f">'+ json[i].authorizeRemark+'</span></div>';
+                        
                         str += '<div style="float:left;"><a href="https://www.import-express.com/goodsinfo/classic-vintage-heart-peach-heart-appearance-box-po-necklace-many-18888-122322005-1' + json[i].goods_pid + '.html" target="_blank">';
                         //修正图片显示   大图显示  电商产品单页主图  点击显示  线上产品 详情
                         str += '<img width= "300px" height="300px" src="' + json[i].goods_img_url + '"/></a></div>';
@@ -953,7 +961,13 @@ function search() {
                             str += '还未存放';
                         }
                         str += '</font> </p>';
-                        str += '核查建议：<span style="color:cyan;font-size:24px;">'
+                        str += '核查建议：<span style="color:';
+                        if(json[i].authorizeState=='2'){
+                        	str +='#51f154e8';
+                        }else{
+                        	str +='#ff0000';
+                        }
+                        str += ';font-size:18px;">'
                             + json[i].authorizedFlag
                             + '</span><br/>';
                         str += '建议库位：<span style="color:red;font-size:22px;" id="code_' + json[i].odid + '">'
@@ -1295,6 +1309,33 @@ function search() {
                                 str += '<button style="height: 30px;width:80px;" onclick="openSupplierDiv(\'' + json[i].shop_id + '\')">供应商打分</button>';
                             }
                             str += '<button style="height: 30px;width:80px;" id="' + json[i].orderid + '_relabel_' + json[i].odid + '" onclick="relabel(\'' + json[i].orderid + '\',\'' + json[i].odid + '\',\'' + json[i].taobao_itemid + '\',\'' + json[i].strcar_type + '\',\'' + json[i].userid + '\',\'' + json[i].goods_p_price + '\',\'' + json[i].goods_url.replace("\'", "") + '\')">重打标签</button>';
+                            if(json[i].authorizeState == '0'){
+                            	str = str +'<button style="height: 30px;width:80px;" onclick="updategoodstatus(this,\''
+                                + json[i].goods_pid
+                                + '\',\''
+                                + json[i].orderid
+                                + '\',\''
+                                + json[i].goodsid
+                                + '\',\''
+                                + json[i].taobao_itemid
+                                + '\',\''
+                                + json[i].itemprice
+                                + '\',\''
+                                + json[i].shipno
+                                + '\',\''
+                                + json[i].strcar_type
+                                + '\',\''
+                                + json[i].userid
+                                + '\',\''
+                                + json[i].goods_p_price
+                                + '\',\''
+                                + json[i].position
+                                + '\',\''
+                                + json[i].odid
+                                + '\',\''
+                                + json[i].goods_url.replace("'", "")
+                                + '\',6,' + i + ',1)">未授权品牌</button>';
+                            }
                         }
                         str += '</div><div style="height:56px;font-size: 20px;color: red; font-weight: bold">备注：'
                         if (json[i].remark != 'null' && json[i].remark != null) {
@@ -1622,6 +1663,7 @@ function search() {
         });
     }
 }
+
 
 //在本页面弹出采购供应商打分DIV
 function openSupplierDiv(shop_id) {

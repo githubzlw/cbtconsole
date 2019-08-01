@@ -370,6 +370,8 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 s.setGoodstatus("已到仓库，已校验有疑问");
             } else if ("5".equals(s.getGoodstatus())) {
                 s.setGoodstatus("已到仓库，已校验数量有误");
+            } else if ("6".equals(s.getGoodstatus())) {
+            	s.setGoodstatus("已到仓库，已校验品牌未授权");
             } else {
                 s.setGoodstatus("已到仓库，验货无误");
             }
