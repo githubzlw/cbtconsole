@@ -301,4 +301,68 @@
         values (#{goods_url},#{count},#{count},#{goods_name},#{sku},#{in_barcode},(SELECT DISTINCT a.category FROM ali_category ac INNER JOIN ali_category a ON SUBSTRING_INDEX(ac.path, ',',1)=a.cid WHERE ac.cid=#{goodscatid}),
         #{inventory_amount},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},#{remark},1,now(),#{inventory_amount},#{count})
     </insert>
+    
+    
+    <!-- ********************************库存数据*************************** -->
+    <!-- 获取上次库存 -->
+    <select id="getInventory" resultType="java.util.Map">
+    select  remaining,can_remaining,goods_p_url,goods_p_price,barcode from inventory_sku 
+    where goods_pid=#{goods_pid} and barcode=#{barcode} and specid=#{specid} and skuid=#{skuid}
+    </select>
+    <!-- 获取库存表id -->
+    <select id="isExsisInventory" resultType="Integer">
+    select  id from inventory_sku where goods_pid=#{goods_pid} and barcode=#{barcode} and specid=#{specid} and skuid=#{skuid}
+    </select>
+    
+    <insert id="addInventory">
+    insert into inventory_sku(goods_url,remaining,can_remaining,good_name,sku,barcode,goodscatid,inventory_type,
+    car_img,goods_pid,car_urlMD5,createtime,goods_p_price,goods_p_url,updatetime,specid,skuid,goods_p_pid) 
+	values(#{car_url},#{inventory_count},#{inventory_count},#{goodsname},#{car_type},#{barcode},
+	#{goodscatid},#{inventory_type},#{car_img},#{goods_pid},#{car_urlMD5},now(),#{goods_p_price},
+	#{goods_p_url},now(),#{specid},#{skuid},#{tb_1688_itemid})
+    </insert>
+    
+    <update id="updateInventory">
+    update inventory_sku set remaining=#{remaining} ,can_remaining=#{can_remaining} ,
+    updatetime=now(),goods_p_url=#{goods_p_url},goods_p_price=#{goods_p_price}  where goods_pid=#{goods_pid} 
+    and specid=#{specid} 
+    and skuid=#{skuid} 
+    </update>
+    
+    <!-- 库存记录变更表  -->
+   <insert id="addInventoryChangeRecord" parameterType="java.util.Map">
+   insert into inventory_sku_log(goods_url,remaining,before_remaining,
+   after_remaining,good_name,sku,barcode,goods_pid,
+   createtime,remark,change_type,goods_p_pid,specid,skuid,inventory_sku_id)
+   values(#{car_url},#{inventory_count},
+   #{before_remaining},#{after_remaining},#{goodsname},#{car_type},#{barcode},#{goods_pid},
+   now(),#{remark},#{change_type},#{tb_1688_itemid},#{specid},#{skuid},#{inventory_sku_id})
+   </insert>
+	<!-- 记录库存存入记录，用来统计当月库存金额 -->    
+   <!-- <insert id="insertInventoryDetails" parameterType="java.util.Map">
+   insert into inventory_details (createtime,od_id,inventory_acount,inventory_price,invetory_amount,inventory_barcode,goods_pid,sku,car_urlMD5)
+   values
+   (now(),#{odid},#{inventory_acount},#{inventory_price},
+   #{invetory_amount},#{barcode},#{goods_pid},#{car_type},#{car_urlMD5})
+   </insert>  -->
+    
+    
+    <select id="getOrderDetails" resultType="java.util.Map">
+    select od.id,od.goodsprice,od.yourorder,od.goods_pid,trim(od.car_type) as car_type,od.car_urlMD5,od.goodsname,od.car_url,
+    th.orderid as tborderid,od.goodscatid,od.car_img,ops.goods_p_price,
+	ops.goods_p_url,ops.tb_1688_itemid from order_details od inner join order_product_source ops on od.id=ops.od_id 
+	and od.orderid=ops.orderid 
+	inner join id_relationtable ir on ir.odid=od.id
+	inner join taobao_1688_order_history th on  th.orderid=ir.tborderid 
+	where od.orderid=#{orderid} and od.id=#{odid}  limit 1
+    </select>
+    
+    <insert id="insertInventoryDetailsSku">
+    insert into inventory_details_sku(goods_pid,goods_p_pid,sku,good_skuid,goods_p_skuid,goods_price,
+    goods_p_price,goods_number,1688_orderid,1688_shipno,orderno,od_id,createtime,admid,type)
+    value(#{goods_pid},#{tb_1688_itemid},#{car_type},#{skuid},#{tbskuid},#{goodsprice},#{goods_p_price},
+    #{yourorder},#{tborderid},#{shipno},#{orderid},#{odid},now(),#{admId},#{type})
+    
+    </insert>
+    
 </mapper>

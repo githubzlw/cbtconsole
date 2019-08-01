@@ -3,6 +3,8 @@ package com.cbt.website.bean;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.Data;
+@Data
 public class SearchResultInfo {
 
 	private String tbOrderIdPositions; //订单所有商品的仓库存放位置
@@ -65,7 +67,9 @@ public class SearchResultInfo {
 	private int order_num;//1688包裹对应的销售订单数量
 	private String isExitPhone;
 	private String source1688_img;
-
+	private String context;//采购备注
+	private String specId;
+	private String skuID;
 	/**
 	 * 称秤体积重量
 	 */

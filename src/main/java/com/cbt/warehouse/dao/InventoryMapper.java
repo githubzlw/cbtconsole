@@ -3,6 +3,7 @@ package com.cbt.warehouse.dao;
 import com.cbt.Specification.bean.AliCategory;
 import com.cbt.bean.OrderDetailsBean;
 import com.cbt.pojo.Inventory;
+import com.cbt.website.bean.InventoryData;
 import com.cbt.website.bean.PurchaseSamplingStatisticsPojo;
 import org.apache.ibatis.annotations.Param;
 
@@ -112,4 +113,61 @@ public interface InventoryMapper {
 	 * @return
 	 */
 	public int insertChangeBarcode(@Param("id") int id, @Param("old_barcode") String old_barcode, @Param("new_barcode") String new_barcode);
+	
+	
+	
+	/****************************************************************************************/
+	
+	/**库存变更记录表
+	 * @param inventory
+	 * @return
+	 */
+	int addInventoryChangeRecord(Map<String,String> inventory);
+	
+	
+	/**获取库存数量
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,Object>  getInventory(Map<String,String> inventory);
+	
+	/**插入库存
+	 * @return
+	 */
+	int addInventory(Map<String,String> inventory);
+	
+	/**更新库存
+	 * @return
+	 */
+	int updateInventory(Map<String,String> inventory);
+	
+	
+	/**是否存在库存
+	 * @return
+	 */
+	Integer isExsisInventory(Map<String,String> inventory);
+	
+	
+	/**记录库存存入记录，用来统计当月库存金额
+	 * @param inventory
+	 * @return
+	int insertInventoryDetails(Map<String,String> inventory);
+	 */
+	
+	/**
+	 * @param inventory
+	 * @return
+	 */
+	Map<String,String> getOrderDetails(Map<String,String> inventory);
+	
+	/**入库
+	 * @param inventory
+	 * @return
+	 */
+	int insertInventoryDetailsSku(Map<String,String> inventory);
+	
+//	int addStorageOutboundDetails(Map<String,String> inventory);
+	
+	
+	
 }
