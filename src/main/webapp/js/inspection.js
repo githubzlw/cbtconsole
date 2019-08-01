@@ -503,6 +503,8 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
    var temcount = $("#" + orderid + "count_" + odid + "").val();//验货数量
    if(Number(temcount) > 0){
 	   count = temcount;
+   }else{
+	 $("#" + orderid + "count_" + odid + "").val(count);
    }
     var tbsourceCount = $(".itemid_checkbox").length;
     var sourceCount = $(".itemid_sourceCount").length;
