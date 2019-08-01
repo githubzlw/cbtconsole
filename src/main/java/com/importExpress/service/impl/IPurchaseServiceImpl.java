@@ -18,10 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.cbt.warehouse.pojo.*;
-import com.importExpress.mapper.CustomGoodsMapper;
-import com.importExpress.pojo.ShopGoodsSalesAmount;
-import com.importExpress.pojo.PurchaseInfoBean;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +44,13 @@ import com.cbt.pojo.TaoBaoOrderInfo;
 import com.cbt.util.AppConfig;
 import com.cbt.util.Util;
 import com.cbt.util.Utility;
+import com.cbt.warehouse.dao.InventoryMapper;
 import com.cbt.warehouse.dao.WarehouseMapper;
-import com.cbt.warehouse.pojo.*;
+import com.cbt.warehouse.pojo.ChangeGoodsLogPojo;
+import com.cbt.warehouse.pojo.OfflinePurchaseRecordsPojo;
+import com.cbt.warehouse.pojo.OrderInfoCountPojo;
+import com.cbt.warehouse.pojo.Replenishment_RecordPojo;
+import com.cbt.warehouse.pojo.returndisplay;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.bean.PrePurchasePojo;
 import com.cbt.website.bean.PurchaseGoodsBean;
@@ -67,27 +68,13 @@ import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
 import com.importExpress.mapper.CustomGoodsMapper;
 import com.importExpress.mapper.IPurchaseMapper;
+import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.ShopGoodsSalesAmount;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.utli.GoodsInfoUpdateOnlineUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 public class IPurchaseServiceImpl implements IPurchaseService {
@@ -96,6 +83,8 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	private final static String CHAR_STR="(\\d{6})";
 	@Autowired
 	private IPurchaseMapper pruchaseMapper;
+	@Autowired
+	private InventoryMapper inventoryMapper;
 	@Autowired
 	private OrderinfoMapper orderinfoMapper;
 	@Autowired
@@ -1627,7 +1616,17 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 	}
 
 	private void getInventoryCount(Map<String, String> map, PurchasesBean purchaseBean) {
-		String nm = null;
+		Map<String, Object> inventory = inventoryMapper.getInventoryByOrderDetialsId(String.valueOf(map.get("od_id")));
+		if(inventory != null) {
+			purchaseBean.setSkuid((String)inventory.get("skuid"));
+			purchaseBean.setSpecid((String)inventory.get("specid"));
+			purchaseBean.setInventory(com.cbt.util.StrUtils.object2NumStr(inventory.get("can_remaining")));
+			purchaseBean.setInventorySkuId(com.cbt.util.StrUtils.object2NumStr(inventory.get("inventory_id")));
+		}else {
+			purchaseBean.setInventory("0");
+			purchaseBean.setInventorySkuId("0");
+		}
+		/*String nm = null;
 		try {
 			nm = map.get("inventory");
 			int s = nm.length();
@@ -1641,7 +1640,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		} catch (Exception e) {
 			nm = "0";
 			purchaseBean.setInventory(nm);
-		}
+		}*/
 	}
 
 	private void getGoodsUnits(Map<String, String> map, PurchasesBean purchaseBean) {
@@ -2154,5 +2153,58 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 			}
 		}
 		return result;
+	}
+	@Override
+	public int addIdRelationTable(Map<String, String> map) {
+		int inventory_count_use = Integer.valueOf(map.get("inventory_count_use"));
+		int googs_number = Integer.valueOf(map.get("googs_number"));
+		if(inventory_count_use < 1) {
+			return 0;
+		}
+		
+		String inventory_sku_id = map.get("inventory_sku_id");
+		//inventory_sku
+		
+		Map<String, Object> taobaoOrderHistory = inventoryMapper.getInventoryDetailSku(inventory_sku_id);
+		if(taobaoOrderHistory == null || taobaoOrderHistory.isEmpty()) {
+			return 0;
+		}
+		//tbOr1688,orderid,itemname,itemid,sku,shipno,shipper,username,imgurl,itemurl,specId,skuID
+		map.put("tborderid", (String)taobaoOrderHistory.get("1688_orderid"));
+		map.put("shipno", (String)taobaoOrderHistory.get("1688_shipno"));
+		map.put("itemid", (String)taobaoOrderHistory.get("goods_p_pid"));
+		map.put("taobaospec", (String)taobaoOrderHistory.get("sku"));
+		map.put("specid", (String)taobaoOrderHistory.get("goods_p_specid"));
+		map.put("skuid", (String)taobaoOrderHistory.get("goods_p_skuid"));
+		map.put("goodurl", (String)taobaoOrderHistory.get("goods_p_url"));
+		map.put("taobaoprice", (String)taobaoOrderHistory.get("goods_p_price"));
+		//'0为 未出货，1已出货'
+		map.put("state", "0");
+		//'入库删除标记:0.已入库;1.入库已取消'
+		map.put("is_delete", "0");
+		//'商品状态：1.到货了;2.该货没到;3.破损;4.有疑问;5.数量不够'
+		map.put("goodstatus", googs_number == inventory_count_use ? "1" : "5");
+		//'商品到货数量'
+		map.put("goodarrivecount", String.valueOf(inventory_count_use));
+		//'记录商品数量'
+		map.put("itemqty", String.valueOf(inventory_count_use));
+		//'1 正常入库  0补货订单入库'
+		map.put("is_replenishment", "1");
+		//'是否1688退货  0没有  1退货'
+		map.put("is_refund", "0");
+		
+		map.put("weight", "0");
+		
+		//待确定
+		map.put("barcode", "");
+		map.put("position", "");
+		
+		map.put("username", "cangku2");
+		map.put("userid", "65");
+		map.put("warehouse_remark", "有库存商品，采购自动匹配入库 inventory_sku_id:"+inventory_sku_id+"/orderid:"+map.get("orderid")+"/od_id:"+map.get("od_id"));
+		
+		int addIdRelationTable = inventoryMapper.addIdRelationTable(map);
+		
+		return addIdRelationTable;
 	}
 }

@@ -403,9 +403,13 @@ public class OrderInfoController{
 			map.put("odid",request.getParameter("odid"));
 			//取消验货数量
 			map.put("barcode",request.getParameter("barcode"));
+			map.put("specid",request.getParameter("specid"));
+			map.put("skuid",request.getParameter("skuid"));
+			map.put("tbskuid",request.getParameter("tbskuid"));
+			map.put("tbspecid",request.getParameter("tbspecid"));
 			map.put("seiUnit",request.getParameter("seiUnit"));
 			String cance_inventory_count = request.getParameter("cance_inventory_count");
-			if (cance_inventory_count == null || "".equals(cance_inventory_count)) {
+			if (cance_inventory_count == null || "".equals(cance_inventory_count) || !com.cbt.util.StrUtils.isMatch(cance_inventory_count, "(\\d+)")) {
 				cance_inventory_count = "0";
 			}
 			map.put("cance_inventory_count",cance_inventory_count);

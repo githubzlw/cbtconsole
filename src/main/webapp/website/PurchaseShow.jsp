@@ -1958,14 +1958,21 @@
 
     }
 
-    function useInventory(od_id, state, orderid, goodsid) {
+    function useInventory(od_id, state, orderid, goodsid,inventory_count,googs_number,inventorySkuId,goodsUnit,seilUnit) {
         $.ajax({
             type : "post",
             url : '/cbtconsole/purchase/useInventory',
             dataType : "text",
             data : {
                 "od_id" : od_id,
-                "isUse" : state
+                "isUse" : state,
+                "goodsid" : goodsid,
+                "inventory_count" : inventory_count,
+                "googs_number" : googs_number,
+                "orderid" : orderid,
+                "goodsUnit":goodsUnit,
+                "seilUnit":seilUnit,
+                "inventorySkuId" : inventorySkuId
             },
             success : function(data) {
                 document.getElementById("use_" + orderid + od_id).style.display = "none";
@@ -3071,9 +3078,11 @@
 							<input type="hidden" id="hdgd" value="${pb.goodsdata_id}">
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>Type：</span><font class="dd">${pb.goods_type}</font>
+								&nbsp;&nbsp;(<em>${pb.specid} / ${pb.skuid}</em>)
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<span>1688抓取规格：</span><font class="dd">${pb.type_name}</font>
+								
 							</div>
 							<div style="width: 100%; word-wrap: break-word;">
 								<c:if test="${pb.purchase_state >3}">
@@ -3154,10 +3163,6 @@
 								</c:if>
 							</div>
 							<span style="color: red; font-size: 25px;" id="inventory_${pb.orderNo}${pb.od_id}"></span>
-							<div id="use_${pb.orderNo}${pb.od_id}" style="display: none">
-								<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}')">使用库存</button>
-								<button onclick="useInventory('${pb.od_id}',0,'${pb.orderNo}','${pb.goodsid}')">不使用库存</button>
-							</div>
 							<div id="hideDetails_${pb.orderNo}${pb.od_id}" style="display: block">
 								<input type="hidden" id="${pb.orderNo}${pbsi.index}_e" value="${pb.oldValue}" /> <input type="hidden" id="${pb.orderNo}${pbsi.index}_eQuantity" value="${pb.purchaseCount}" />
 								<h1 style="color: #F00">${pb.cginfo}</h1>
@@ -3325,14 +3330,18 @@
 							</c:if>
 							<c:if test="${pb.inventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
-									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.cGoodstype}">${pb.inventory}</a></span></font> <br>
+									可使用库存： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.inventory}" />
+									<a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?sku=${pb.specid}">${pb.inventory}</a>
+									<button onclick="useInventory('${pb.od_id}',1,'${pb.orderNo}','${pb.goodsid}',${pb.inventory},${pb.googs_number},${pb.inventorySkuId},${pb.goodsUnit},${pb.seilUnit})">使用库存</button>
+									</span></font> <br>
+								
 								</div>
 							</c:if>
-							<c:if test="${pb.pidInventory>0}">
+							<%-- <c:if test="${pb.pidInventory>0}">
 								<div style="width: 100%; word-wrap: break-word;">
 									产品有库存(规格不匹配)： <font class="cc"> <span id="rmk2_${pb.orderNo}${pb.od_id}"> <input type="hidden" value="${pb.pidInventory}" /><a target="_blank" href ="/cbtconsole/StatisticalReport/goodsInventoryReport?pid=${pb.goods_pid}">${pb.pidInventory}</a></span></font> <br>
 								</div>
-							</c:if>
+							</c:if> --%>
 							<div style="width: 100%; word-wrap: break-word;">
 								物流信息： <font style="font-size:20px;font-weight:bold;color:blue;"> <span>${pb.shipstatus}</span></font> <br>
 							</div>
