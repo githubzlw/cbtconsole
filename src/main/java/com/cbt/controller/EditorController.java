@@ -1,14 +1,14 @@
 package com.cbt.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.cbt.bean.TypeBean;
 import com.cbt.bean.*;
+import com.cbt.bean.TypeBean;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.customer.service.IShopUrlService;
 import com.cbt.parse.bean.Set;
+import com.cbt.parse.service.*;
 import com.cbt.parse.service.ImgDownload;
 import com.cbt.parse.service.StrUtils;
-import com.cbt.parse.service.*;
 import com.cbt.service.CustomGoodsService;
 import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
@@ -65,6 +65,8 @@ public class EditorController {
     // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
     private static final String OCR_URL = "http://192.168.1.251:5000/photo";
 
+    private Map<String, String> offLineMap = new HashMap<>();
+
     @Autowired
     private CustomGoodsService customGoodsService;
 
@@ -93,13 +95,24 @@ public class EditorController {
         if (pid == null || pid.isEmpty()) {
             return mv;
         }
+        if (offLineMap.size() == 0) {
+            List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
+            for (Map<String, String> tempMap : mapList) {
+                offLineMap.put(tempMap.get("unsellablereason_id"), tempMap.get("unsellablereason_name"));
+            }
+            mapList.clear();
+        }
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0) {
             goods.setOffReason("老数据");
-        } else if (goods.getValid() == 2 && goods.getUnsellAbleReason() == 0) {
-            goods.setUnsellAbleReasonDesc("老数据");
+        } else if (goods.getValid() == 2) {
+            if (offLineMap.containsKey(goods.getUnsellAbleReason())) {
+                goods.setUnsellAbleReasonDesc(offLineMap.get(goods.getUnsellAbleReason()));
+            } else {
+                goods.setUnsellAbleReasonDesc("老数据");
+            }
         }
 
         if (goods == null) {
@@ -3290,7 +3303,7 @@ public class EditorController {
                     PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
                     pbThread.start();
                     try {
-                        Thread.sleep(40000);
+                        Thread.sleep(25000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -95,7 +95,7 @@ public class MessageNotificationController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("查询失败，原因：" + e.getMessage());
+			LOG.error("查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			json.setTotal(Long.valueOf(0));
@@ -148,7 +148,7 @@ public class MessageNotificationController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("queryStatisticalByAdminId查询失败，原因：" + e.getMessage());
+			LOG.error("queryStatisticalByAdminId查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			json.setTotal(Long.valueOf(0));
@@ -179,7 +179,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("查询失败，原因：" + e.getMessage());
+			LOG.error("查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			return json;
@@ -207,7 +207,7 @@ public class MessageNotificationController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("查询失败，原因：" + e.getMessage());
+			LOG.error("查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			return json;
@@ -235,7 +235,7 @@ public class MessageNotificationController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("查询失败，原因：" + e.getMessage());
+			LOG.error("查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			return json;
@@ -262,7 +262,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("查询失败，原因：" + e.getMessage());
+			LOG.error("查询失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询失败，原因：" + e.getMessage());
 			return json;
@@ -287,7 +287,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("插入失败，原因：" + e.getMessage());
+			LOG.error("插入失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("插入失败，原因：" + e.getMessage());
 			return json;
@@ -315,7 +315,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("更新失败，原因：" + e.getMessage());
+			LOG.error("更新失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("更新失败，原因：" + e.getMessage());
 			return json;
@@ -371,7 +371,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("更新失败，原因：" + e.getMessage());
+			LOG.error("更新失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("更新失败，原因：" + e.getMessage());
 			return json;
@@ -392,7 +392,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("更新已审核订单的消息提醒的创建日期失败，原因：" + e.getMessage());
+			LOG.error("更新已审核订单的消息提醒的创建日期失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("更新已审核订单的消息提醒的创建日期失败，\n原因：" + e.getMessage());
 			return json;
@@ -422,7 +422,7 @@ public class MessageNotificationController {
 			return json;
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.error("全部标记已读失败，原因：" + e.getMessage());
+			LOG.error("全部标记已读失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("全部标记已读失败，\n原因：" + e.getMessage());
 			return json;

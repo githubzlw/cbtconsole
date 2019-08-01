@@ -38,6 +38,7 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
@@ -544,6 +545,14 @@ public class NewOrderDetailsCtr {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/
 		//}
+		// 判断客户是否有样品订单
+		int sampleOrderCount = iOrderinfoService.querySampleOrderInfoByOrderId(orderNo);
+		if(sampleOrderCount == 0){
+			request.setAttribute("hasSampleOrder", 0);
+		} else{
+			request.setAttribute("hasSampleOrder", 1);
+		}
+
 		return "order_details_new";
 	}
 
@@ -767,7 +776,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询运费失败，原因：" + e.getMessage());
+			LOG.error("查询运费失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询运费失败,原因：" + e.getMessage());
 		}
@@ -798,7 +807,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list_uid);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询相似账号失败，原因：" + e.getMessage());
+			LOG.error("查询相似账号失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询相似账号失败,原因：" + e.getMessage());
 		}
@@ -834,7 +843,7 @@ public class NewOrderDetailsCtr {
 			json.setOk(true);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			LOG.error("调整采购人员失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
 		}
@@ -2224,6 +2233,8 @@ public class NewOrderDetailsCtr {
 		if(org.apache.commons.lang3.StringUtils.isNotBlank(firstDiscountStr)){
 			firstDiscount = Double.valueOf(firstDiscountStr);
 		}
+		// 保险费
+		double actual_allincost = orderInfo.getActual_allincost();
 
 		//质检费
 		double actual_lwh = 0;
@@ -2240,7 +2251,7 @@ public class NewOrderDetailsCtr {
 		// 会员费不算优惠金额,去掉
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
-				+ actual_lwh + processingfee-couponAmount;
+				+ actual_lwh + processingfee-couponAmount + actual_allincost;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

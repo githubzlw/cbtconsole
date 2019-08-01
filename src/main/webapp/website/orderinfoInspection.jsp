@@ -603,6 +603,9 @@
 											<font style="font-size : 15px;">${storageLocation.user_id }</font>
 										</td>
 										<td width="20%"><font style="font-size : 15px;">${storageLocation.order_no } </font>
+											<c:if test="${storageLocation.sampleOrder > 0}">
+												<b style="color: red;font-size: 16px;">有免费送样订单${storageLocation.order_no}_SP</b>
+											</c:if>
 											<c:if test="${storageLocation.isDropshipOrder==1 }">
 												<img src="/cbtconsole/img/ds1.png" style="width:25px;margin-top: 2px;" title="drop shipping" >
 											</c:if>

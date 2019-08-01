@@ -371,7 +371,8 @@ public class ShopCarMarketingController {
 
                 List<GoodsCarShowBean> showList = new ArrayList<GoodsCarShowBean>();
                 List<GoodsCarActiveSimplBean> activeList = new ArrayList<>();
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType));
+                System.err.println("shopMarketing userId:" + userId + "websiteType:" + websiteType);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(websiteType) -1);
                 int isUpdatePrice = 0;
                 for (ShopCarMarketing shopCar : shopCarMarketingList) {
                     for (GoodsCarActiveSimplBean simplBean : listActive) {
@@ -493,10 +494,8 @@ public class ShopCarMarketingController {
 
             if ("1".equals(paramMap.get("type")) || "2".equals(paramMap.get("type"))) {
                 //查询当前客户存在的购物车数据
-                ShopCarMarketingExample marketingExample = new ShopCarMarketingExample();
-                ShopCarMarketingExample.Criteria marketingCriteria = marketingExample.createCriteria();
-                marketingCriteria.andUseridEqualTo(userId);
-                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByExample(marketingExample);
+                List<ShopCarMarketing> shopCarMarketingList = shopCarMarketingService.selectByUserIdAndType(userId, Integer.valueOf(paramMap.get("websiteType")) -1);
+
                 //格式化处理规格数据
                 double productCost = 0;
                 double actualCost = 0;

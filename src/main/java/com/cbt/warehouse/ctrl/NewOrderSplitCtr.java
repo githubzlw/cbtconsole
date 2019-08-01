@@ -121,7 +121,7 @@ public class NewOrderSplitCtr {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOG.error("orderSplit error:" + e.getMessage());
+            LOG.error("orderSplit error:", e);
             json.setOk(false);
             json.setMessage("orderSplit error:" + e.getMessage());
         }
@@ -993,12 +993,12 @@ public class NewOrderSplitCtr {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:" + e.getMessage());
+                LOG.error("genOrderSplitEmail: email:" + model.get("email") + " model_json:" + modeStr + " e.message:", e);
                 message = "Failed to send mail, please contact the developer by screen, thank you！" + e.getMessage();
             }
         } catch (Exception e) {
             LOG.error("genOrderSplitEmail", e);
-            LOG.error("genOrderSplitEmail:" + e.getMessage());
+            LOG.error("genOrderSplitEmail:", e);
         }
         LOG.info("getOrderSplit sendEmailInfo end");
         return message;
