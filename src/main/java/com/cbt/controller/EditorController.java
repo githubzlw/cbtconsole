@@ -14,7 +14,6 @@ import com.cbt.util.*;
 import com.cbt.warehouse.util.StringUtil;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.JsonResult;
-import com.cbt.website.util.UploadByOkHttp;
 import com.importExpress.pojo.GoodsEditBean;
 import com.importExpress.pojo.GoodsMd5Bean;
 import com.importExpress.thread.DeleteImgByMd5Thread;
@@ -47,12 +46,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/editc")
@@ -67,6 +64,8 @@ public class EditorController {
 
     // private static final String OCR_URL = "http://192.168.1.84:5000/photo";
     private static final String OCR_URL = "http://192.168.1.251:5000/photo";
+
+    private Map<String, String> offLineMap = new HashMap<>();
 
     @Autowired
     private CustomGoodsService customGoodsService;
@@ -96,13 +95,24 @@ public class EditorController {
         if (pid == null || pid.isEmpty()) {
             return mv;
         }
+        if (offLineMap.size() == 0) {
+            List<Map<String, String>> mapList = customGoodsService.queryAllOffLineReason();
+            for (Map<String, String> tempMap : mapList) {
+                offLineMap.put(tempMap.get("unsellablereason_id"), tempMap.get("unsellablereason_name"));
+            }
+            mapList.clear();
+        }
 
         // 取出1688商品的全部信息
         CustomGoodsPublish goods = customGoodsService.queryGoodsDetails(pid, 0);
         if (goods.getValid() == 0 && goods.getUnsellAbleReason() == 0) {
             goods.setOffReason("老数据");
-        } else if (goods.getValid() == 2 && goods.getUnsellAbleReason() == 0) {
-            goods.setUnsellAbleReasonDesc("老数据");
+        } else if (goods.getValid() == 2) {
+            if (offLineMap.containsKey(goods.getUnsellAbleReason())) {
+                goods.setUnsellAbleReasonDesc(offLineMap.get(goods.getUnsellAbleReason()));
+            } else {
+                goods.setUnsellAbleReasonDesc("老数据");
+            }
         }
 
         if (goods == null) {
@@ -2127,6 +2137,8 @@ public class EditorController {
             com.cbt.pojo.Admuser adm = (com.cbt.pojo.Admuser) SerializeUtil.JsonToObj(admuserJson, com.cbt.pojo.Admuser.class);
             if (adm == null) {
                 json.setOk(false);
+                json.setMessage("请登录后再操作");
+                return json;
             }
             Map<String, String> paramMap = new HashMap<String, String>();
             String oldCreateTime = request.getParameter("oldCreateTime");
@@ -2136,6 +2148,11 @@ public class EditorController {
             String editcountry = request.getParameter("editcountry");
             String edit_score = request.getParameter("edit_score");
             String update_flag = request.getParameter("update_flag");
+            String id = request.getParameter("id");
+            if (StringUtils.isBlank(id)) {
+                json.setOk(false);
+                return json;
+            }
             paramMap.put("oldCreateTime", oldCreateTime);
             paramMap.put("goods_pid", goods_pid);
             paramMap.put("edit_remark", edit_remark);
@@ -2143,17 +2160,21 @@ public class EditorController {
             paramMap.put("edit_score", edit_score);
             paramMap.put("update_flag", update_flag);
             paramMap.put("review_name", adm.getAdmName());
+            paramMap.put("id", id);
             int index = customGoodsService.updateReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
                 SendMQ sendMQ = new SendMQ();
-                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
+//                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where goods_pid='" + goods_pid + "' and createtime='" + oldCreateTime + "'";
+                String sql = "update goods_review set review_remark='" + edit_remark + "',country='" + editcountry + "',review_score='" + edit_score + "',review_flag='" + update_flag + "',updatetime=now() where id='" + id + "';";
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
             json.setOk(index > 0 ? true : false);
+            json.setMessage(index > 0 ? "修改成功" : "修改失败");
         } catch (Exception e) {
-            e.printStackTrace();
+            json.setOk(false);
+            LOG.error("updateReviewRemark error", e);
         }
         return json;
     }
@@ -2189,6 +2210,7 @@ public class EditorController {
             paramMap.put("review_name", adm.getAdmName());
             String createTime = df.format(new Date());
             paramMap.put("createTime", createTime);
+            // 插入时候只插入线上 后续定时程序同步到本地 如果本地也插入; 本地保存一份记录
             int index = customGoodsService.addReviewRemark(paramMap);
             if (index > 0) {
                 //插入数据到线上
@@ -2197,8 +2219,10 @@ public class EditorController {
                 sendMQ.sendMsg(new RunSqlModel(sql));
                 sendMQ.closeConn();
             }
-            json.setOk(index > 0 ? true : false);
+            json.setOk(index>0?true:false);
+            json.setMessage("线上产品单页对应评论数据已增加, 后台对应新增评论10分钟后会显示. ");
         } catch (Exception e) {
+            json.setOk(false);
             e.printStackTrace();
         }
         return json;
@@ -3144,7 +3168,7 @@ public class EditorController {
             return json;
         }
         try {
-            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url);
+            String remotePath = GoodsInfoUtils.changeRemotePathToLocal(url, 0);
             int total = customGoodsService.queryMd5ImgByUrlCount(pid, remotePath, shopId);
             List<GoodsMd5Bean> md5BeanList;
             if (total > 1) {
@@ -3279,7 +3303,7 @@ public class EditorController {
                     PublishGoodsToOnlineThread pbThread = new PublishGoodsToOnlineThread(pid, customGoodsService, ftpConfig, 1, 0);
                     pbThread.start();
                     try {
-                        Thread.sleep(40000);
+                        Thread.sleep(25000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

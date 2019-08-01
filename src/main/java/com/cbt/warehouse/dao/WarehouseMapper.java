@@ -1464,4 +1464,6 @@ public interface WarehouseMapper {
 
 	@Select("SELECT remotpath from custom_benchmark_ready WHERE pid=#{pid}")
 	String getRepathByPid(@Param("pid") String pid);
+
+    List<Integer> queryUserCheckByUserid(@Param("list") List<UserInfo> list);
 }

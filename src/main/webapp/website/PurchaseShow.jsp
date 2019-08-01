@@ -2939,6 +2939,9 @@
 						<td colspan="8">
 							<div style="background-color: #E4F2FF;">
 								<input type='hidden' name='pagenum' value='${pb.orderid}'>
+								<c:if test="${hasSampleOrder > 0}">
+									<b style="color: red;font-size: 16px;">有免费样品订单:<a href="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid=999&orderno=${pb.orderNo}_SP&days=999&unpaid=0&pagesize=50&orderarrs=0&search_state=0&userid=${pb.userid}" target="_blank">${pb.orderNo}_SP</a></b>&nbsp;&nbsp;
+								</c:if>
 								<span class="d">订单号：</span><span class="c">${pb.orderNo}</span>
 								<c:if test="${cgid == 52}">
 									<a href="/cbtconsole/customerServlet?action=findOrdersPurchaseInfo&className=OrdersPurchaseServlet&orderNo=${pb.orderNo}&purchaseId=1" target="_blank" style="text-decoration: none"></a>
@@ -2987,12 +2990,11 @@
 						<td width="8%">下单信息</td>
 						<td width="22%">实际采购信息</td>
 						<td width="5%">
-                            一键确认采购发送邮件网站名:
-                            <select name="websiteType" style="height: 28px;width: 160px;">
-                                <option value="1" selected="selected">import-express</option>
-                                <option value="2">kidsproductwholesale</option>
+                            <%--一键确认采购发送邮件网站名:--%>
+                            <select name="websiteType" style="height: 28px;width: 160px;display: none;">
+                                <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
+                                <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
                             </select>
-                            <br /><br />
                             操作/状态
 							<br><input type="button" id="allQr1" style="color: green;" onclick="allQr('${pb.orderNo}')" value="一键确认货源" /><input type="button" id="allcgQr1" style="color: green;" onclick="allcgQr('${pb.orderNo}', this)" value="一键确认采购" /><br/><br/><input type="button" id="allQr2" style="color: red;" onclick="allQxQr('${pb.orderNo}')" value="一键取消货源" /><input type="button" id="allcgQr2" style="color: red;" onclick="allQxcgQr('${pb.orderNo}')" value="一键取消采购" /></td>
 						<td width="6%">时间记录</td>
@@ -3375,12 +3377,11 @@
 								<br /><br />
 							</div>
                             <div>
-                                采购确认发送邮件网站名:
-                                <select name="websiteType" style="height: 28px;width: 160px;">
-                                    <option value="1" selected="selected">import-express</option>
-                                    <option value="2">kidsproductwholesale</option>
+                                <%--采购确认发送邮件网站名:--%>
+                                <select name="websiteType" style="height: 28px;width: 160px;display: none;">
+                                    <option value="1" <c:if test="${websiteType == 1}">selected="selected"</c:if>>import-express</option>
+                                    <option value="2" <c:if test="${websiteType == 2}">selected="selected"</c:if>>kidsproductwholesale</option>
                                 </select>
-                                <br /><br />
                             </div>
 							<div id="clickdiv_${pb.orderNo}" onclick="FnComfirm('${pb.userid}','${pb.orderNo}','${pb.od_id}','${pb.goodsid}','${pb.goodsdata_id}','${pb.goods_url}','','${pb.goods_price}','${pb.googs_number}','${pb.purchaseCount}','${pb.child_order_no}','${pb.isDropshipOrder}', this);" style="width: 100%;">
 								<input type="hidden" value="${pb.od_state}" />${pb.purchaseSure}

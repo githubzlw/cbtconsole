@@ -1,6 +1,11 @@
 package com.importExpress.utli;
 
+import com.cbt.bean.CustomGoodsPublish;
+import com.cbt.bean.OrderDetailsBean;
+import com.cbt.website.bean.PurchasesBean;
 import com.importExpress.pojo.ShopCarMarketing;
+import com.importExpress.pojo.ShopRecommendGoods;
+import com.importExpress.pojo.ShopRecommendInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -30,6 +35,68 @@ public class SwitchDomainNameUtil {
         }
     }
 
+
+    /**
+     * 产品单个bean域名切换
+     *
+     * @param goods
+     */
+    public static void changeCustomGoodsPublishBean(CustomGoodsPublish goods) {
+        goods.setRemotpath(checkNullAndReplace(goods.getRemotpath()));
+        goods.setCustomMainImage(checkNullAndReplace(goods.getCustomMainImage()));
+        goods.setShowMainImage(checkNullAndReplace(goods.getShowMainImage()));
+        goods.setImg(checkNullAndReplace(goods.getImg()));
+        goods.setEninfo(checkNullAndReplace(goods.getEninfo()));
+    }
+
+    /**
+     * 店铺推荐List域名切换
+     *
+     * @param infoList
+     */
+    public static void changeShopRecommendInfoList(List<ShopRecommendInfo> infoList) {
+        if (infoList != null && !infoList.isEmpty()) {
+            for (ShopRecommendInfo info : infoList) {
+                changeShopRecommendInfoBean(info);
+            }
+        }
+    }
+
+    /**
+     * 店铺推荐Bean域名切换
+     *
+     * @param recommendInfo
+     */
+    public static void changeShopRecommendInfoBean(ShopRecommendInfo recommendInfo) {
+        recommendInfo.setShopUrl(checkNullAndReplace(recommendInfo.getShopUrl()));
+        recommendInfo.setCoverImg(checkNullAndReplace(recommendInfo.getCoverImg()));
+        changeShopRecommendGoodsList(recommendInfo.getGoodsList());
+    }
+
+    /**
+     * 店铺推荐商品List域名切换
+     *
+     * @param goodsList
+     */
+    public static void changeShopRecommendGoodsList(List<ShopRecommendGoods> goodsList) {
+        if (goodsList != null && !goodsList.isEmpty()) {
+            for (ShopRecommendGoods gd : goodsList) {
+                changeShopRecommendGoodsBean(gd);
+            }
+        }
+    }
+
+    /**
+     * 店铺推荐商品Bean域名切换
+     *
+     * @param recommendGoods
+     */
+    public static void changeShopRecommendGoodsBean(ShopRecommendGoods recommendGoods) {
+        recommendGoods.setGoodsImg(checkNullAndReplace(recommendGoods.getGoodsImg()));
+        recommendGoods.setMainImg(checkNullAndReplace(recommendGoods.getMainImg()));
+        recommendGoods.setOnlineUrl(checkNullAndReplace(recommendGoods.getOnlineUrl()));
+    }
+
     /**
      * 购物车营销单个bean域名切换
      *
@@ -38,6 +105,56 @@ public class SwitchDomainNameUtil {
     public static void changeShopCarMarketingSingle(ShopCarMarketing shopCarMarketing) {
         shopCarMarketing.setGoogsImg(checkNullAndReplace(shopCarMarketing.getGoogsImg()));
     }
+
+    /**
+     * 订单详情List bean域名切换
+     *
+     * @param orderDetailsBeanList
+     */
+    public static void changeOrderDetailsList(List<OrderDetailsBean> orderDetailsBeanList) {
+        for (OrderDetailsBean orderDetails : orderDetailsBeanList) {
+            changeOrderDetailsSingle(orderDetails);
+        }
+    }
+
+
+    /**
+     * 订单详情单个bean域名切换
+     *
+     * @param orderDetailsBean
+     */
+    public static void changeOrderDetailsSingle(OrderDetailsBean orderDetailsBean) {
+        orderDetailsBean.setGoods_img(checkNullAndReplace(orderDetailsBean.getGoods_img()));
+        orderDetailsBean.setCar_img(checkNullAndReplace(orderDetailsBean.getCar_img()));
+        orderDetailsBean.setGoods_url(checkNullAndReplace(orderDetailsBean.getGoods_url()));
+        orderDetailsBean.setMatch_url(checkNullAndReplace(orderDetailsBean.getMatch_url()));
+    }
+
+
+    /**
+     * 采购详情List bean域名切换
+     *
+     * @param purchasesBeanList
+     */
+    public static void changePurchasesBeanList(List<PurchasesBean> purchasesBeanList) {
+        for (PurchasesBean purchasesBean : purchasesBeanList) {
+            changePurchasesBeanSingle(purchasesBean);
+        }
+    }
+
+
+    /**
+     * 采购详情单个bean域名切换
+     *
+     * @param purchasesBean
+     */
+    public static void changePurchasesBeanSingle(PurchasesBean purchasesBean) {
+        purchasesBean.setGoods_url(checkNullAndReplace(purchasesBean.getGoods_url()));
+        purchasesBean.setGoogs_img(checkNullAndReplace(purchasesBean.getGoogs_img()));
+        purchasesBean.setImportExUrl(checkNullAndReplace(purchasesBean.getImportExUrl()));
+        purchasesBean.setImg_type(checkNullAndReplace(purchasesBean.getImg_type()));
+    }
+
 
     /**
      * 判断是否为空和包含的域名修改

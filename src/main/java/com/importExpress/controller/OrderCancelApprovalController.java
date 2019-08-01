@@ -320,6 +320,12 @@ public class OrderCancelApprovalController {
                     approvalService.insertIntoApprovalDetails(approvalDetails);
                     //使用MQ更新线上状态
                     updateOnlineDealState(approvalBean);
+                }else if(dealState == 4){
+                    approvalService.updateOrderCancelApprovalState(approvalBean);
+                    approvalDetails.setDealState(3);
+                    approvalService.insertIntoApprovalDetails(approvalDetails);
+                    //使用MQ更新线上状态
+                    updateOnlineDealState(approvalBean);
                 }
                 if (dealState == 2 || dealState == 3) {
                     json = refundOrderCancelByApi(approvalBean, approvalDetails);

@@ -542,12 +542,20 @@
         }
 
         function querySearchGoods(id) {
+            var webType = $("#web_size_type").val();
             var localUrl = window.location.href;
             var url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
-            if (localUrl.indexOf(".1.27:") > -1 || localUrl.indexOf(".1.34:") > -1) {
+            if (localUrl.indexOf(".1.27:") > -1 || localUrl.indexOf(".1.9:") > -1) {
                 url = "https://www.import-express.com/goodslist?background=1&hotid=";
+                if (webType == 2) {
+                    url = "https://www.kidsproductwholesale.com/goodslist?background=1&hotid=";
+                } else if (webType == 3) {
+                    url = "https://www.lovelypetsupply.com/goodslist?background=1&hotid=";
+                }
             } else if (localUrl.indexOf(".1.29:") > -1) {
                 url = "http://192.168.1.29:8081/goodslist?background=1&hotid=";
+            }else if(localUrl.indexOf("127.0.0.1") > -1 || localUrl.indexOf("localhost") > -1){
+                url = "http://127.0.0.1:8087/goodslist?background=1&hotid=";
             }
             var param = "height=900,width=1666,top=0,left=200,toolbar=no,menubar=no,scrollbars=yes, resizable=no,location=no, status=no";
             window.open(url + id, "windows", param);
@@ -687,7 +695,13 @@
                     <input type="button" class="but_edit_2" value="添加商品" onclick="addGoods('${categoryId}')"/>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="button" class="but_edit_2" value="批量导入商品" onclick="querySearchGoods('${categoryId}')"/>
-
+                    <span>网站:
+                        <select id="web_size_type" style="height: 28px;width: 80px;">
+                            <option value="1">import</option>
+                            <option value="2">kids</option>
+                            <option value="3">pets</option>
+                        </select>
+                    </span>
                 </div>
             </td>
         </tr>

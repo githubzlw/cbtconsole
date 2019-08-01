@@ -22,7 +22,10 @@ import com.cbt.website.service.OrderwsServer;
 import com.cbt.website.userAuth.bean.Admuser;
 import com.cbt.website.util.EasyUiJsonResult;
 import com.cbt.website.util.JsonResult;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
+import com.importExpress.utli.MultiSiteUtil;
+import com.importExpress.utli.SwitchDomainNameUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -1122,8 +1125,18 @@ public class PurchaseController {
 			System.out.println("========全部结束:" + sdf1.format(new Date()) + "========");
 			List<OrderProductSource> odids = purchaseServer.getAllGoodsids(adminid);
 			request.setAttribute("odids", JSONArray.fromObject(odids).toString());
+			// 根据订单号判断的客户下单的网站
+            request.setAttribute("websiteType", MultiSiteUtil.getSiteTypeNum(orderno));
 			long end = System.currentTimeMillis();
 			System.out.println("耗时:" + (end - start));
+
+			// 判断客户是否有样品订单
+			int sampleOrderCount = iOrderinfoService.querySampleOrderInfoByOrderId(orderno);
+			if(sampleOrderCount == 0){
+				request.setAttribute("hasSampleOrder", 0);
+			} else{
+				request.setAttribute("hasSampleOrder", 1);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			json.setOk(false);
@@ -1138,7 +1151,11 @@ public class PurchaseController {
 		request.setAttribute("pagenum", page.getPagenum());
 		request.setAttribute("totalnum", page.getTotalrecords());
 		request.setAttribute("totalpage", page.getTotalpage());
-		request.setAttribute("pblist", page.getRecords());
+		List<PurchasesBean> purchasesBeanList = page.getRecords();
+		if(MultiSiteUtil.getSiteTypeNum(orderno) == 2){
+			SwitchDomainNameUtil.changePurchasesBeanList(purchasesBeanList);
+		}
+		request.setAttribute("pblist", purchasesBeanList);
 		request.setAttribute("pid_amount",page.getPid_amount());
 		request.setAttribute("admid", admid == null || "".equals(admid) || "1".equals(admid) || "83".equals(admid) || "84".equals(admid) ? "999" : admid);
 		request.setAttribute("cgid", cgid);

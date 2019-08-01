@@ -1,18 +1,5 @@
 package com.cbt.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Component;
-
 import com.cbt.bean.Complain;
 import com.cbt.bean.ComplainChat;
 import com.cbt.bean.ComplainFile;
@@ -22,6 +9,17 @@ import com.cbt.jdbc.DBHelper;
 import com.cbt.pojo.page.Page;
 import com.cbt.util.SqlSplitUtil;
 import com.cbt.warehouse.util.StringUtil;
+import com.importExpress.utli.MultiSiteUtil;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class ComplainDaoImpl implements IComplainDao{
@@ -54,7 +52,7 @@ public class ComplainDaoImpl implements IComplainDao{
 	@Override
 	public ComplainVO getComplainByCid(Integer cid) {
 		String sql="SELECT c.id cid,c.userid,c.userEmail,c.complainType,c.complainText,c.createTime,"
-				+ "c.closeTime,c.ref_orderid,c.complainState,c.dealAdmin,c.dealAdminid,c.ref_dispute_merchant_id"
+				+ "c.closeTime,c.ref_orderid,c.complainState,c.dealAdmin,c.dealAdminid,c.ref_dispute_merchant_id,c.site_type"
 				+ " from tb_complain c   "
 				+ "where c.id=?";
 		Connection conn = DBHelper.getInstance().getConnection();
@@ -94,6 +92,7 @@ public class ComplainDaoImpl implements IComplainDao{
 					});
 					rfb.setDisputeList(disList);
 				}
+				rfb.setSite(MultiSiteUtil.getSiteTypeNumByType(rs.getString("site_type")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

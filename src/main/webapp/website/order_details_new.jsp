@@ -266,6 +266,31 @@
             $("#ordercountry_value").val("${order.address.country}");
             $("#ordercountry").val("${order.address.country}");
         });
+        //手动调整同pid采购人员
+        function pidchec(odid,orderNo){
+            var admid=$("#buyer"+odid).val()
+            // alert(admid)
+            $.ajax({
+                url: "/cbtconsole/orderDetails/changeBuyerByPid",
+                type: "post",
+                dataType: "json",
+                data: {"odid": odid, "orderNo": orderNo, "admid": admid},
+                success: function (data) {
+                    if (data.ok) {
+                        $("#info" + odid).text("执行成功");
+                    } else {
+                        $("#info" + odid).text("执行失败");
+                    }
+                    window.location.reload();
+                },
+                error: function (res) {
+                    $("#info" + odid).text("执行失败,请联系管理员");
+                }
+            });
+
+        }
+
+
     </script>
 
     <link type="text/css" rel="stylesheet"
@@ -280,9 +305,13 @@
             font-style: normal;
         }
 
-        .orderInfo tr {
-            border-bottom: 1px solid red;
+        .orderInfo {
+            border-collapse: separate;
+            width: 95%;
+            font-size: 13px;
+            border-spacing: 0px 10px;
         }
+
     </style>
 </head>
 <body onload="fninitbuy()">
@@ -439,14 +468,13 @@
         <input type="hidden" value="${order.state}" id="order_state">
         <input type="hidden" value="${order.userName}" id="order_name">
         <input type="hidden" value="${payToTime}" id="payToTime">
-        <table class="ormatable" id="orderInfo" cellpadding="1"
-               cellspacing="1" class="orderInfo" align="center">
+        <table id="orderInfo" cellpadding="1" cellspacing="1" class="orderInfo" align="center">
             <tr class="ormatrname">
-                <td width="20%" class="ornmatd1">订单号:<input class="ormnum"
+                <td class="ornmatd1">订单号:<input class="ormnum"
                                                             type="text" name="orderNo" id="orderNo" readonly="readonly"
                                                             value="${order.orderNo}"/>
                 </td>
-                <td width="30%" class="ornmatd1"><em id="state_text">
+                <td class="ornmatd1"><em id="state_text">
                     ${order.state==-1 || order.state==6?'取消订单':'' }${order.state==1?'购买中':'' }
                     <c:choose>
                         <c:when test="${order.state==2 && order.checked==order.countOd}">
@@ -477,7 +505,7 @@
                         <span style="color:Red">订单城市黑名单</span>
                     </c:if>
                 </td>
-                <td width="50%" colspan="3">
+                <td colspan="2">
                     <c:if test="${fn:length(orderNos) > 0}">
                         <span class="ornmatd1">关联订单:</span>
                         <div class="ormrelanum">
@@ -486,136 +514,129 @@
                                    href="/cbtconsole/orderDetails/queryByOrderNo.do?&orderNo=${order_correlation}&state=${order.state}&username=${order.userName}">${order_correlation}</a>&nbsp;
                             </c:forEach>
                         </div>
-                    </c:if>
-                </td>
-                <td>
-                    <a href="/cbtconsole/customerRelationshipManagement/reorder?orderNo=${order.orderNo}"><input
-                            type="button" value="AddOrderToTest" style="color: red"></a>
+                    </c:if><a style="color: red" href="/cbtconsole/customerRelationshipManagement/reorder?orderNo=${order.orderNo}">AddOrderToTest</a>
                 </td>
             </tr>
             <!-- 客户订单信息显示 -->
             <tr>
-                <td class="ormtittd">
-                    <span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)<br><a class="ordmlink"
-                                                                                                       target="_blank"
-                                                                                                       href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a>
+                <td>
+                    <span>name:</span>${order.userName}(ID:<em id="userId">${order.userid}</em>)
+                    <a class="ordmlink" target="_blank" href="/cbtconsole/userinfo/getUserInfo.do?userId=${order.userid}">客户页面</a>
                     <br>
                     <span style="color: red; display: none" id="other_id"></span>
                 </td>
                 <td>
-                    <span class="ormtittd" style="margin-left:200px">Email:</span><a
-                        href="mailto:${order.userEmail}">${order.userEmail}</a><em></em>
+                    <span>Email:<a href="mailto:${order.userEmail}">${order.userEmail}</a></span>
                 </td>
                 <td>
-                    <span class="ormtittd" style="margin-left:100px">客户公司名称:</span><em>${order.businessName}</em>
+                    <span>客户公司名称:<em>${order.businessName}</em></span>
                 </td>
                 <td>
-                    <span class="ormtittd">国内交期：</span>${order.deliveryTime}
+                    <span>国内交期:${order.deliveryTime}</span>
                 </td>
             </tr>
             <c:if test="${order.state != 0}">
                 <tr>
                     <td>
-                        <span class="ormtittd">付款时间：</span>
+                        <span>付款时间:
                         <c:forEach
                                 items="${pays}" var="pay">
                             <c:if test="${pay.orderid == order.orderNo}">
                                 ${pay.createtime}
                             </c:if>
                         </c:forEach>
+                        </span>
                     </td>
                     <td>
-                        <span class="ormtittd" style="margin-left:200px">到账确认：</span><em
-                            id="dzConfirmtime">${order.dzConfirmtime}</em>
+                        <span>到账确认:<em
+                            id="dzConfirmtime">${order.dzConfirmtime}</em></span>
                     </td>
                     <td>
-                        <span class="ormtittd" style="margin-left:100px">付款金额：</span>${order.pay_price}<em
-                            id="currency">${order.currency}</em>
+                        <span>付款金额:${order.pay_price}<em
+                            id="currency">${order.currency}</em></span>
                     </td>
                     <td>
-                        <span class="ormtittd">还需付款：</span>${order.remaining_price}${order.currency}
+                        <span>还需付款${order.remaining_price}${order.currency}</span>
                     </td>
                 </tr>
             </c:if>
             <tr>
                 <td>
-                    <span class="ormtittd">国际运输段：</span>
+                    <span>国际运输段:
                     <c:if test="${not empty order.mode_transport}">
                         ${fn:indexOf(order.mode_transport, "@") > 1 ? fn:split(order.mode_transport,'@')[1]:""}[
                         ${fn:indexOf(order.mode_transport, "@") > 1 ? fn:split(order.mode_transport,'@')[0]:""}]
-                    </c:if>
+                    </c:if></span>
                 </td>
-                <td class="ormtittd">
-                    <span class="ormtittd" style="margin-left:100px">VIP级别：</span><span
-                        style="color:red;">${order.gradeName} (${order.grade})</span>
+                <td>
+                    <span>VIP级别:${order.gradeName} (${order.grade})</span>
                 </td>
-                <td class="ormtittd">
-                    <span class="ormtittd" style="margin-left:100px">订单重量(kg)：</span><span><span
-                        style="color:red;">${order.volumeweight}</span>（免邮产品重量(kg)：<span style="color:red;">${feeWeight}）</span></span>
+                <td>
+                    <span>订单重量(kg):${order.volumeweight}</span><span style="color:red;">（免邮产品重量(kg):${feeWeight}）</span>
                 </td>
-                <td class="ormtittd">
+                <td>
                     <%--<span class="ormtittd"  style="margin-left:100px">订单体积：</span><span style="color:red;">${order.svolume}</span>--%>
                 </td>
             </tr>
             <tr>
                 <c:if test="${order.state == 3 || order.state == 4 || order.state == 1 || order.state == 5 || order.state == 2}">
-                    <td class="ormtittd1" colspan="3">
-                        商品总金额 <span class="ormtittdred">（<fmt:formatNumber
+                    <td colspan="4">
+                        <span>商品总金额:（<fmt:formatNumber
                             value="${order.product_cost+preferential_price}" pattern="#0.00" type="number"
                             maxFractionDigits="2"/>）</span>
                         <c:if test="${actual_ffreight_+foreign_freight>0}">
-                            + 订单实收运费<span class="ormtittdred">（${actual_ffreight_+foreign_freight}）</span>
+                            + 订单实收运费<span>（${actual_ffreight_+foreign_freight}）</span>
                         </c:if>
                         <c:if test="${service_fee>0}">
-                            + 服务费 <span class="ormtittdred">（${service_fee}）</span>
+                            + 服务费 <span>（${service_fee}）</span>
                         </c:if>
                         <c:if test="${order.processingfee>0}">
-                            + 店铺金额低于15手续费 <span class="ormtittdred">（${order.processingfee}）</span>
+                            + 店铺金额低于15手续费 <span>（${order.processingfee}）</span>
                         </c:if>
                         <c:if test="${actual_lwh>0}">
-                            + 质检费 <span class="ormtittdred">（${actual_lwh}）</span>
+                            + 质检费 <span>（${actual_lwh}）</span>
                         </c:if>
                         <c:if test="${order.vatBalance>0}">
-                            +双清包税金额<span class="ormtittdred">（${order.vatBalance}） </span>
+                            +双清包税金额<span>（${order.vatBalance}） </span>
                         </c:if>
                         <c:if test="${order.memberFee>0}">
-                            + 会员费 <span class="ormtittdred">（${order.memberFee}）</span>
+                            + 会员费 <span>（${order.memberFee}）</span>
                         </c:if>
                         <c:if test="${order.actual_allincost>0}">
-                            + 保险费 <span class="ormtittdred">（${order.actual_allincost}）</span>
+                            + 保险费 <span>（${order.actual_allincost}）</span>
                         </c:if>
                         <c:if test="${order.extra_freight>0}">
-                            +运费<span class="ormtittdred">(${order.extra_freight})</span>
+                            +运费<span>(${order.extra_freight})</span>
                         </c:if>
                         <c:if test="${order.actual_freight_c>0}">
-                            +$50国际费用<span class="ormtittdred">（${order.actual_freight_c}） </span>
+                            +$50国际费用<span>（${order.actual_freight_c}） </span>
                         </c:if>
                         <c:if test="${order.order_ac != 0}">
-                            - 批量优惠金额<span class="ormtittdred">（${preferential_price}） </span>
+                            - 批量优惠金额<span>（${preferential_price}） </span>
                         </c:if>
                         <c:if test="${order.discount_amount>0}">
-                            -混批优惠金额<span class="ormtittdred">（${order.discount_amount}）</span>
+                            -混批优惠金额<span>（${order.discount_amount}）</span>
                         </c:if>
                         <c:if test="${order.cashback>0}">
-                            -订单满200减免<span class="ormtittdred">（ ${order.cashback}） </span>
+                            -订单满200减免<span>（ ${order.cashback}） </span>
                         </c:if>
                         <c:if test="${order.extra_discount>0}">
-                            -手动优惠<span class="ormtittdred">（ ${order.extra_discount}）</span>
+                            -手动优惠<span>（ ${order.extra_discount}）</span>
                         </c:if>
                         <c:if test="${order.share_discount>0}">
-                            -分享折扣<span class="ormtittdred">（ ${order.share_discount}）</span>
+                            -分享折扣<span>（ ${order.share_discount}）</span>
                         </c:if>
                         <c:if test="${order.couponAmount>0}">
-                            -coupon优惠<span class="ormtittdred">（ ${order.couponAmount}）</span>
+                            -coupon优惠<span>（ ${order.couponAmount}）</span>
                         </c:if>
                         <c:if test="${order.coupon_discount>0}">
-                            -返单优惠<span class="ormtittdred">（${order.coupon_discount}） </span>
+                            -返单优惠<span>（${order.coupon_discount}） </span>
                         </c:if>
                         <c:if test="${order.gradeDiscount>0}">
-                            -${order.gradeName}<span class="ormtittdred">（${order.gradeDiscount}） </span>
+                            -${order.gradeName}<span>（${order.gradeDiscount}） </span>
                         </c:if>
                         <c:if test="${firstdiscount>0}">
-                            -首单运费抵扣<span class="ormtittdred">（${firstdiscount}） </span>
+                            -首单运费抵扣<span>（${firstdiscount}） </span>
                         </c:if>
                         =<b>实收金额</b><span class="ormtittdred ormtittdb"> （<fmt:formatNumber
                             value="${(order.product_cost+actual_ffreight_+foreign_freight+order.actual_allincost+order.processingfee+actual_lwh+order.memberFee+order.extra_freight-order.discount_amount+service_fee-order.cashback-order.share_discount-order.extra_discount-order.coupon_discount-order.order_ac + order.vatBalance-firstdiscount+order.actual_freight_c-order.gradeDiscount-order.couponAmount) >0 ?
@@ -635,10 +656,14 @@
                 </c:if>
             </tr>
             <tr>
-                <td colspan="4">${order.paytypes}</td>
+                <td colspan="2">${order.paytypes}</td>
+                <c:if test="${hasSampleOrder > 0}">
+                    <td colspan="2"><b style="color: red;font-size: 16px;">有免费样品订单:<a href="/cbtconsole/orderDetails/queryByOrderNo.do?orderNo=${order.orderNo}_SP" target="_blank">${order.orderNo}_SP</a></b></td>
+                </c:if>
+
             </tr>
             <tr>
-                <td style="margin-left:200px">
+                <td>
                     <c:if test="${order.state == 3 || order.state == 4 || order.state == 1 || order.state == 2}">
                         <a class="ordmlink" target="_blank"
                            href="/cbtconsole/purchase/queryPurchaseInfo?pagenum=1&orderid=0&admid=${order.buyid}&userid=&orderno=${order.orderNo}&goodid=&date=&days=&state=&unpaid=0&pagesize=50&search_state=0">采购页面</a>&nbsp;&nbsp;
@@ -670,7 +695,7 @@
                     </c:if>
 
                 </td>
-                <td style="margin-left:100px">
+                <td>
                     <c:if test="${evaluate.evaluate != null && evaluate.evaluate !=''}">
                         <span>用户评价：<span style="color:red;font-size:20px">${evaluate.evaluate}</span></span>
                     </c:if>
@@ -742,21 +767,32 @@
                            style="position: fixed; bottom: 425px; right: 50px; width: 150px; height: 30px;" id="spilt_num"
                            onclick="openSplitNumPage('${order.orderNo}')" value="数量拆单">
                 </td>
-                <td colspan="3" style="display: none;" id="td_buyuser">
-                    <span style="margin-left:400px;" onclick="fnmessage();">分配此订单的销售人员：</span>
+                <td>分配采购（整单）： <select id="Abuyer" onchange="changeAllBuyer('${order.orderNo}',this.value)">
+                    <option value=""></option>
+                    <c:forEach var="aub" items="${aublist }">
+                        <option value="${aub.id }">${aub.admName}</option>
+                    </c:forEach>
+                </select><span id="orderbuyer"></span></td>
+                <td id="td_buyuser">
+                    <span onclick="fnmessage();">分配订单销售人员：</span>
                     <select id="saler" name="saler" style="width: 110px;"></select>
                     <input type="submit" value="确认" id="saler_but"
                            onclick="addUser(${order.userid},'${order.userName}','${order.userEmail}')">
                     <span style="font-size: 15px; font-weight: bold; color: red;" id="salerresult"></span>
                 </td>
             </tr>
-        </table>
-        <span style="background-color: red">采购情况汇总</span>
+            <tr>
+                <td colspan="4">
+                    <span style="background-color: red">采购情况汇总</span>
         <div style="background-color: aqua">
             商品总数:<span style="color:red">${order.countOd}</span>;采购总数:<span style="color:red">${order.cg}</span>;
             入库总数:<span style="color:red">${order.rk}</span>;验货无误总数:<span style="color:red">${order.checkeds}</span>;
             验货疑问总数:<span style="color:red">${order.yhCount}</span>
         </div>
+                </td>
+            </tr>
+        </table>
+
         <div id="remarkdiv">
             <div class="ormamark">
                 <table style="border-collapse:separate; border-spacing:5px;">
@@ -1439,6 +1475,7 @@
                                 <option value="${aub.id }">${aub.admName}</option>
                             </c:forEach>
                         </select><span id="info${orderd.id}"></span>
+                           <input type="checkbox" id="ch${orderd.id}" onchange="pidchec('${orderd.id}','${order.orderNo}')">：按pid分配采购(勾选当前订单此pid商品都分配给当前采购)
 
                             <!-- 消息备注列合并过来的-->
                             <div style="overflow-y:scroll;height:200px;width:200px;">
@@ -1454,7 +1491,7 @@
 
                         </td>
                         <td style="word-break: break-all; width: 30px;"><input
-                                type="checkbox" style="zoom:140%;" onchange="fnChange(${orderd.id},this);"
+                                type="checkbox" style="zoom:140%;" class="choose_chk" onchange="fnChange(${orderd.id},this);"
                             ${orderd.state == 2?'checked="checked" disabled="true"':''}
                                 value="${orderd.id}"> <span>拆单、延后发货</span><input type="hidden"
                                                                                  value="${orderd.state}">
@@ -1791,7 +1828,7 @@
                                     </div>
 
                                 </td>
-                                <td style="text-align: center; width: 5%;zoom:140%;"><input
+                                <td style="text-align: center; width: 5%;zoom:140%;"><input class="choose_chk"
                                         type="checkbox" onchange="fnChange(${orderd.id},this);"
                                     ${orderd.state == 2?'checked="checked" disabled="true"':''}
                                         value="${orderd.id}"><input type="hidden"

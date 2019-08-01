@@ -10,6 +10,7 @@ import com.cbt.report.service.TabTransitFreightinfoUniteNewExample;
 import com.cbt.website.bean.ConfirmUserInfo;
 import com.cbt.website.bean.PaymentBean;
 import com.cbt.website.bean.TabTransitFreightinfoUniteOur;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.pojo.SplitGoodsNumBean;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
@@ -679,6 +680,12 @@ public interface OrderinfoMapper {
 	 */
 	int batchUpdateDistribution(@Param("list") List<GoodsDistribution> goodsDistributionList);
 	
+	/**
+	 * 根据订单号查询送样订单
+	 * @param orderNo
+	 * @return
+	 */
+	int querySampleOrderInfoByOrderId(String orderNo);
 	/**运单已验货
 	 * @param shipno
 	 * @return

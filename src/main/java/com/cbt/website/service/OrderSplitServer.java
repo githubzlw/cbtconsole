@@ -7,6 +7,8 @@ import com.cbt.util.OrderInfoUtil;
 import com.cbt.util.Utility;
 import com.cbt.warehouse.pojo.Dropshiporder;
 import com.cbt.website.dao.*;
+import com.importExpress.pojo.OrderCancelApproval;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import net.sf.json.JSONArray;
 
 import org.slf4j.LoggerFactory;
@@ -549,6 +551,7 @@ public class OrderSplitServer implements IOrderSplitServer{
 		
 		//查询dropshoporder记录信息,用来插入新的记录根据 dropshiporder.parent_order_no =orderinfo.order_no
 		 List<Dropshiporder> dropshiporderList=dao.getDropShipOrderList(orderNo);
+		String orderState = "-1";
 		 //勾选的商品对应的子订单
 		 String dropshipid=orderDetailsBeanList.get(0).getDropshipid();
 		 //所有子订单取第一个
@@ -592,6 +595,9 @@ public class OrderSplitServer implements IOrderSplitServer{
 		 for (int i = 0; i < dropshiporderList.size(); i++) {
 			 updateDropshiporder=new Dropshiporder();
 			 Dropshiporder shiporder=dropshiporderList.get(i);
+			 if(orderNo.equals(shiporder.getChildOrderNo())){
+			 	orderState = shiporder.getState();
+			 }
 			 //更新dropshiporder的product_cost和details_Number
 			 double no_split_product_cost=0;//拆分成功，剩余的产品价格
 			 int no_split_product_num=0; //拆分成功,剩余的产品数量
@@ -760,11 +766,22 @@ public class OrderSplitServer implements IOrderSplitServer{
 					// 取消成功后,返回现金给客户,
 					if (res > 0) {
 						float actualPay = totalPrice;
-						UserDao dao = new UserDaoImpl();
+						/*UserDao dao = new UserDaoImpl();
 						float order_ac = new BigDecimal(extraFreight + orderAc).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 						dao.updateUserAvailable(userId,
 								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 								" system closeOrder:" + orderNo + "@" + newChildOrderNo, orderNo, null, 0, order_ac, 1);
+						*/
+						// 走审批流程
+						OrderCancelApproval cancelApproval = new OrderCancelApproval();
+						cancelApproval.setUserId(userId);
+						cancelApproval.setOrderNo(orderNo);
+						cancelApproval.setPayPrice(actualPay);
+						cancelApproval.setType(2);
+						cancelApproval.setDealState(0);
+						cancelApproval.setOrderState(Integer.valueOf(orderState));
+						NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+
 						map.put("orderNoNew", res > 0 ? oldDropId + "@" + newChildOrderNo : "");
 						map.put("res", "1");
 						map.put("msg", "拆分并取消成功");

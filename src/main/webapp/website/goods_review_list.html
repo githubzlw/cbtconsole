@@ -171,8 +171,9 @@
                     var json = eval('(' + data + ')');
                     if (json.ok) {
                         $('#myModal').modal('hide');
-                        alert("添加评论成功");
-                        $('#main-datagrid').datagrid('reload');
+                        // alert("添加评论成功");
+                        alert(json.message);
+                        // $('#main-datagrid').datagrid('reload');
                     } else {
                         alert("添加评论失败");
                     }
@@ -193,7 +194,8 @@
                     "edit_score":review_score,
                     "update_flag":review_flag,
                     "oldCreateTime":oldCreateTime,
-                    "goods_pid":goods_pid
+                    "goods_pid":goods_pid,
+                    "id":id
                 },
                 success: function (data) {
                     var json = eval('(' + data + ')');
@@ -202,7 +204,7 @@
                         alert("修改评论成功");
                         $('#main-datagrid').datagrid('reload');
                     }else{
-                        alert("修改评论失败");
+                        alert(json.message);
                     }
                 },
                 error: function () {

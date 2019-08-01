@@ -3,6 +3,7 @@ package com.cbt.warehouse.thread;
 import com.cbt.common.dynamics.DataSourceSelector;
 import com.cbt.util.SpringContextUtil;
 import com.cbt.warehouse.service.IWarehouseService;
+import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.RunSqlModel;
 import com.importExpress.utli.SendMQ;
 
@@ -35,23 +36,21 @@ public class warehouseThread extends Thread {
 	@Override
 	public synchronized void run() {
 		try {
-			SendMQ sendMQ = new SendMQ();
+			// SendMQ sendMQ = new SendMQ();
 			// 同步更新线上数据
 			// 删除原来orderid对应的数据
 			if (iWarehouseService.selectShippingPackage(m2) > 0) {
-				sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
+				// sendMQ.sendMsg(new RunSqlModel("delete from shipping_package where orderid='"+m2.get("orderid")+"'"));
 			}
-			StringBuilder sqls=new StringBuilder();
-			sqls.append("INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES");
+			//StringBuilder sqls=new StringBuilder("delete from shipping_package where orderid='"+m2.get("orderid")+"';");
 			for(Map<String, String> map:list){
+				StringBuilder sqls=new StringBuilder("INSERT INTO shipping_package (shipmentno,orderid,remarks,createtime) VALUES");
 				sqls.append("(");
 				sqls.append("'"+map.get("shipmentno")+"','"+map.get("orderid")+"','"+map.get("remarks")+"',now()");
-				sqls.append("),");
+				sqls.append(") on duplicate key update shipmentno ='" + map.get("shipmentno")
+						+ "',createtime = now(),remarks='" + map.get("remarks") +"'");
+				NotifyToCustomerUtil.sendSqlByMq(sqls.toString());
 			}
-			if(list.size()>0){
-				sendMQ.sendMsg(new RunSqlModel(sqls.toString().substring(0,sqls.toString().length()-1)));
-			}
-			sendMQ.closeConn();
 		} catch (Exception e) {
 			LOG.error("打印便签纸，更新线上数据异常 【订单号:" + m2.get("orderid") + "】", e);
 		}

@@ -45,7 +45,7 @@ public class InitListener implements ServletContextListener {
 			//goTimer();
 			//receive();
 		} catch (Exception e) {
-			LOG.warn("失败:" + e.getMessage());
+			LOG.warn("失败:", e);
 		}
 	}
 

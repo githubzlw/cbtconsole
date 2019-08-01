@@ -1,5 +1,6 @@
 package com.importExpress.service;
 
+import com.cbt.website.util.EasyUiJsonResult;
 import com.importExpress.pojo.Paysuccessinfo;
 import com.importExpress.pojo.PaysuccessinfoExample;
 import org.apache.ibatis.annotations.Param;
@@ -31,5 +32,5 @@ public interface PaysuccessinfoService {
 
     List<Integer> queryUserListByAdminId(Integer adminId);
 
-    List<Paysuccessinfo> queryPaySuccessInfoList(String pageStr, String limitNumStr, String sttime, String edtime, String userIdStr, String orderNo, Integer userId);
+    EasyUiJsonResult queryPaySuccessInfoList(String pageStr, String limitNumStr, String sttime, String edtime, String userIdStr, String orderNo, Integer userId);
 }

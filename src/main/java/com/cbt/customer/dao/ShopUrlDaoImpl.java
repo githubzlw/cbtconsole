@@ -2967,7 +2967,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and ns.update_flag = ?";
         }
         if(offShelf.getReason() > 0){
-            sql += " and cbr.unsellableReason = ?";
+            sql += " and ns.unsellableReason = ?";
         }
         if(StringUtils.isNotBlank(offShelf.getBeginTime())){
             sql += " and date(ns.update_time) >= ?";
@@ -3083,7 +3083,7 @@ public class ShopUrlDaoImpl implements IShopUrlDao {
             sql += " and ns.update_flag = ?";
         }
         if(offShelf.getReason() > 0){
-            sql += " and cbr.unsellableReason = ?";
+            sql += " and ns.unsellableReason = ?";
         }
         if(StringUtils.isNotBlank(offShelf.getBeginTime())){
             sql += " and date(ns.update_time) >= ?";

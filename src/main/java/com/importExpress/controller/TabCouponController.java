@@ -46,7 +46,7 @@ public class TabCouponController {
      */
     @RequestMapping(value = "/list.do")
     @ResponseBody
-    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid, Integer timeTo) {
+    public EasyUiJsonResult queryTabCouponList(HttpServletRequest request, String typeCode, Integer valid, Integer timeTo, Integer couponSite) {
     	if (StringUtils.isBlank(typeCode) || "0".equals(typeCode)) {
     		typeCode = null;
 		}
@@ -70,7 +70,7 @@ public class TabCouponController {
             page = Integer.valueOf(pageStr);//无该参数时查询默认值1
         }
         // 查询
-        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid, timeTo);
+        Map<String, Object> map = tabCouponService.queryTabCouponList(page, rows, typeCode, valid, timeTo, couponSite);
         // 查询结果处理 并返回
         if (map != null && map.size() > 0) {
             json.setSuccess(true);
@@ -142,6 +142,7 @@ public class TabCouponController {
                                          @RequestParam(value = "valueRight", defaultValue = "0", required = false) Integer valueRight, //满减卷优惠金额
                                          String describe, //卷描述
                                          @RequestParam(value = "count", defaultValue = "0", required = false) Integer count, //卷数量
+                                         @RequestParam(value = "couponWebsiteType", defaultValue = "0", required = false) Integer couponWebsiteType, //优惠卷所在网站
                                          @RequestParam(value = "websiteType", defaultValue = "1", required = false) Integer websiteType, //网站名
                                          String fromTime,//领取开始时间
                                          String toTime//领取截止时间
@@ -214,11 +215,13 @@ public class TabCouponController {
         		type.toString(), "1");
         //String id, Integer count, Integer leftCount, String describe, String value, Date from, Date to, int type, int valid, Integer userid
         TabCouponNew tabCouponNew = new TabCouponNew(couponCode, count, count, describe,
-        		value, fromDate, toDate, type, 1, userId, shareFlag, websiteType);
+        		value, fromDate, toDate, type, 1, userId, shareFlag, websiteType, couponWebsiteType);
         try {
             resultMap = tabCouponService.addCoupon(couponRedis, tabCouponNew, useridList);
         	if (shareFlag == 1) {
-                resultMap.put("shareUrl", SearchFileUtils.importexpressPath + "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid);
+        	    String shareUrl = "/coupon/shareCoupon?couponcode=" + couponCode + "&shareid=" + shareid;
+                resultMap.put("shareUrl", SearchFileUtils.importexpressPath + shareUrl
+                            + "<br /><br />" + "https://www.kidsproductwholesale.com" + shareUrl);
             }
         	resultMap.put("state", "true");
 		} catch (Exception e) {

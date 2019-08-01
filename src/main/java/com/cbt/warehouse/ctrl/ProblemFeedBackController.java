@@ -62,7 +62,8 @@ public class ProblemFeedBackController {
 		try{
 			String report_id=request.getParameter("report_id");
 			String text=request.getParameter("text");
-			if(StringUtils.isStrNull(report_id)){
+            Integer websiteType = StringUtils.isStrNull(request.getParameter("websiteType"))?1:Integer.parseInt(request.getParameter("websiteType"));
+            if(StringUtils.isStrNull(report_id)){
 				return json;
 			}
 			//发送邮件给客户
@@ -81,7 +82,12 @@ public class ProblemFeedBackController {
 					modelM.put("question",list.get(0).getQustion());
 					modelM.put("createtime",list.get(0).getCreatetime());
 					modelM.put("reply_content",text);
-					modelM.put("toHref","https://www.import-express.com/Goods/getShopCar");
+					modelM.put("websiteType", websiteType);
+					if (websiteType == 1) {
+                        modelM.put("toHref", "https://www.import-express.com/Goods/getShopCar");
+                    } else {
+                        modelM.put("toHref", "https://www.kidsproductwholesale.com/Goods/getShopCar");
+                    }
 					sendMailFactory.sendMail(String.valueOf(modelM.get("first_name")), null, "Shopping Question Reply", modelM, TemplateType.SHOPPING_REPLY);
 					json.setOk(true);
 				}else{

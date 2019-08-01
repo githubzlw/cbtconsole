@@ -45,7 +45,7 @@ public class SendMQServiceImpl implements SendMQService {
             return 1;
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("SendMQServiceImpl异常，原因： " + e.getMessage());
+			LOG.error("SendMQServiceImpl异常，原因： ", e);
 		} finally {
 			if (stmt != null) {
 				try {
@@ -60,7 +60,7 @@ public class SendMQServiceImpl implements SendMQService {
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("GoodsSoldUnsellableReasonJob error:" + e.getMessage());
-					LOG.error("GoodsSoldUnsellableReasonJob error:" + e.getMessage());
+					LOG.error("GoodsSoldUnsellableReasonJob error:", e);
 				}
 			}
 			DBHelper.getInstance().closeConnection(conn);

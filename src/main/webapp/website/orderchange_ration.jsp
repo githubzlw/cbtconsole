@@ -70,9 +70,9 @@
 	<input type="hidden" value="<%=request.getParameter("isDropshipOrder1")%>" name="isDropshipOrder1" id="isDropshipOrder1">
 	最低定量：<input type="text" name="newRation" id="newRation" maxlength="8" size="20" onblur="checkDecimal(this)"></input>
 	<button id="priceButton" onclick="updatePrice()">定量变更</button>
-	公司网站：<select id="Web_site" style="font-size: 16px; height: 24px; width: 150px;">
-		<option value="0" selected="selected">import-express</option>
-		<option value="1">kidsproductwholesale</option>
-	</select>
+	<%--公司网站：<select id="Web_site" style="font-size: 16px; height: 24px; width: 150px;">--%>
+		<%--<option value="0" selected="selected">import-express</option>--%>
+		<%--<option value="1">kidsproductwholesale</option>--%>
+	<%--</select>--%>
 	</body>
 </html>

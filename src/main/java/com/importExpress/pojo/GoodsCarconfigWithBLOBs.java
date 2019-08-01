@@ -13,4 +13,6 @@ public class GoodsCarconfigWithBLOBs extends GoodsCarconfig {
     private String saveforlaterinfo;
 
     private String buyformecarconfig;
+
+    private String kidscarconfig;
 }

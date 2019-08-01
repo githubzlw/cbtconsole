@@ -140,22 +140,23 @@ public class SendEmailNew {
         } else {
 
             //通过mailgun发送邮件
-            int result = MailUtil.sendMailByMailgun(title, content, toEmail, null, FROM, null, 3);
-            if (result == 0) {
+            // int result = MailUtil.sendMailByMailgun(title, content, toEmail, null, FROM, null, 3);
+            /*if (result == 0) {
                 //邮件发送成功
                 MAILLOG.info(String.format("发送邮件成功 ToMail:[%s],title:[%s]", toEmail, title));
                 insertEmailStatisticsLog(MailUtil.MAIL_GUN_ADDRESS, email, toEmail, content, title, orderNo, 1, null, "1");
             } else {
-                //邮件发送失败
-                try {
-                    sendMailService.sendHtmlMail(title, content, toEmail);
-                } catch (Exception e) {
-                    MAILLOG.error(String.format("发送邮件失败 ToMail:[%s],title:[%s]", toEmail, title), e);
-                    insertEmailStatisticsLog(mailAddr, email, toEmail, content, title, orderNo, 2, e.getMessage(), "1");
-                    orderSplitService.addMessage_error(title, "0", title + ",orderNo:" + orderNo + ",email:" + toEmail);
-                    //用第三种方法发送邮件
-                    sendByLast(email, pwd, toEmail, content, title, orderNo, 1);
-                }
+
+            }*/
+            //邮件发送失败
+            try {
+                sendMailService.sendHtmlMail(title, content, toEmail);
+            } catch (Exception e) {
+                MAILLOG.error(String.format("发送邮件失败 ToMail:[%s],title:[%s]", toEmail, title), e);
+                insertEmailStatisticsLog(mailAddr, email, toEmail, content, title, orderNo, 2, e.getMessage(), "1");
+                orderSplitService.addMessage_error(title, "0", title + ",orderNo:" + orderNo + ",email:" + toEmail);
+                //用第三种方法发送邮件
+                sendByLast(email, pwd, toEmail, content, title, orderNo, 1);
             }
         }
     }

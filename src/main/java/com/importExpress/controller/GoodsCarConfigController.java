@@ -68,7 +68,7 @@ public class GoodsCarConfigController {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("goodsCarInfo error:" + e.getMessage());
-            logger.error("goodsCarInfo error:" + e.getMessage());
+            logger.error("goodsCarInfo error:", e);
             mv.addObject("message", "执行过程失败，原因：" + e.getMessage());
             mv.addObject("success", 0);
         }

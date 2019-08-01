@@ -79,6 +79,52 @@ public class SearchResultInfo {
 	 */
 	private String goods_type;
 
+	private int dp_num;
+	private int dp_total;
+	private String dp_city;
+	private String dp_province;
+	private String dp_country;
+
+	public int getDp_num() {
+		return dp_num;
+	}
+
+	public void setDp_num(int dp_num) {
+		this.dp_num = dp_num;
+	}
+
+	public int getDp_total() {
+		return dp_total;
+	}
+
+	public void setDp_total(int dp_total) {
+		this.dp_total = dp_total;
+	}
+
+	public String getDp_city() {
+		return dp_city;
+	}
+
+	public void setDp_city(String dp_city) {
+		this.dp_city = dp_city;
+	}
+
+	public String getDp_province() {
+		return dp_province;
+	}
+
+	public void setDp_province(String dp_province) {
+		this.dp_province = dp_province;
+	}
+
+	public String getDp_country() {
+		return dp_country;
+	}
+
+	public void setDp_country(String dp_country) {
+		this.dp_country = dp_country;
+	}
+
 	public String getGoods_type() {
 		return goods_type;
 	}

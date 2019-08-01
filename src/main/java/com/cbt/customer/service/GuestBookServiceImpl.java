@@ -12,6 +12,7 @@ import com.cbt.util.Utility;
 import com.cbt.warehouse.util.StringUtil;
 import com.importExpress.mail.SendMailFactory;
 import com.importExpress.mail.TemplateType;
+import com.importExpress.utli.MultiSiteUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
@@ -112,33 +113,34 @@ public class GuestBookServiceImpl implements IGuestBookService{
 	@Override
 	public int reply(final int id,final String replyContent,final String date,final String name,final String qustion,final String pname,
 	                 final String email,final int userId,final String purl,final String sale_email,final String picPath) {
-		new Thread(){
-			public void run() {
-				StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
-		        sb.append(" <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div><br><div style='font-size: 13px;'>"); 
-		        sb.append("<div >"+replyContent+" </div>"); 
-		        sb.append("<br><div style='margin-bottom: 10px;'><span style='font-weight: bold'>Your Question:</span>["+id+"]"+qustion+" </div>"); 
-		        sb.append("<div style='margin-bottom: 10px;'><span style='font-weight: bold'>Item:</span><a href='"+purl+"'> "+pname+"</a></div>");
-		        if(StringUtil.isNotBlank(picPath)){
-			        sb.append("<br><img src='"+picPath+"'></img><br>");
-		        }
-		        //sb.append("<br><div>We hope you enjoy the shopping experience on Import-Express.com!</div><br>");
-		        sb.append("<div style='style='font-weight: bold''>Best regards, </div><div style='font-weight: bold'><a href='http://www.import-express.com'>www.Import-Express.com</a></div></div>");
-		       if(Utility.getStringIsNull(email)){
-		    	   String sendemail = null;
-		    	   String pwd = null;
-		    	   if(userId != 0){
-		    		   IUserDao userDao = new UserDao();
-		    		   String[] adminEmail =  userDao.getAdminUser(0, null, userId);
-		    		   if(adminEmail != null){
-		    			   sendemail = adminEmail[0];
-		    			   pwd = adminEmail[1];
-		    		   }
-		    	   }
-				        SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,sale_email);
-		       }
-			};
-		}.start();
+        // 发送邮件等 原方法不能注入 转移到 com.importExpress.service.impl.TabCouponServiceImpl.SendGuestbook
+//		new Thread(){
+//			public void run() {
+//				StringBuffer sb=new StringBuffer("<div style='font-size: 14px;'>");
+//		        sb.append(" <div style='font-weight: bolder;margin-bottom: 10px;'>Dear Sir/Madam,</div><br><div style='font-size: 13px;'>");
+//		        sb.append("<div >"+replyContent+" </div>");
+//		        sb.append("<br><div style='margin-bottom: 10px;'><span style='font-weight: bold'>Your Question:</span>["+id+"]"+qustion+" </div>");
+//		        sb.append("<div style='margin-bottom: 10px;'><span style='font-weight: bold'>Item:</span><a href='"+purl+"'> "+pname+"</a></div>");
+//		        if(StringUtil.isNotBlank(picPath)){
+//			        sb.append("<br><img src='"+picPath+"'></img><br>");
+//		        }
+//		        //sb.append("<br><div>We hope you enjoy the shopping experience on Import-Express.com!</div><br>");
+//		        sb.append("<div style='style='font-weight: bold''>Best regards, </div><div style='font-weight: bold'><a href='http://www.import-express.com'>www.Import-Express.com</a></div></div>");
+//		       if(Utility.getStringIsNull(email)){
+//		    	   String sendemail = null;
+//		    	   String pwd = null;
+//		    	   if(userId != 0){
+//		    		   IUserDao userDao = new UserDao();
+//		    		   String[] adminEmail =  userDao.getAdminUser(0, null, userId);
+//		    		   if(adminEmail != null){
+//		    			   sendemail = adminEmail[0];
+//		    			   pwd = adminEmail[1];
+//		    		   }
+//		    	   }
+//				        SendEmail1.send(sendemail,pwd,email, sb.toString(),"["+id+"]"+"Inquiry Reply From ImportExpress","", 1,sale_email);
+//		       }
+//			};
+//		}.start();
 		return dao.reply(id, replyContent,date);
 	}
 	/**
@@ -183,14 +185,20 @@ public class GuestBookServiceImpl implements IGuestBookService{
 		}
 		// 进行商品线上链接的替换
 		for (GuestBookBean gBookBean : list) {
+		    gBookBean.setSite(MultiSiteUtil.getSiteTypeNumByUrl(gBookBean.getOnlineUrl()));
+            gBookBean.setSiteStr(MultiSiteUtil.getSiteTypeStrByNum(gBookBean.getSite()));
+
 			gBookBean.setUserInfos("<a target='_blank' href='/cbtconsole/website/user.jsp?userid="
 					+ gBookBean.getUserId() + "'>" + gBookBean.getUserId() + "</a>");
+
+			String reply = "<button onclick=\"reply(\'" + gBookBean.getId() + "\', \'" + gBookBean.getSite() + "\')\">回复</button>";
 			if (gBookBean.getEid() != 0) {
-				gBookBean.setStatusinfo("<button onclick=\"reply(" + gBookBean.getId() + ")\">回复</button><button onclick=\"replyrecord(" + gBookBean.getId() + "," + adminid
+				gBookBean.setStatusinfo(reply + "<button onclick=\"replyrecord(" + gBookBean.getId() + "," + adminid
 						+ ")\">回复记录</button><button onclick=\"delreply(" + gBookBean.getId() + ")\">删除</button>");
 			} else {
-				gBookBean.setStatusinfo("<button onclick=\"reply(" + gBookBean.getId() + ")\">回复</button><button onclick=\"delreply(" + gBookBean.getId() + ")\">删除</button>");
+				gBookBean.setStatusinfo(reply + "<button onclick=\"delreply(" + gBookBean.getId() + ")\">删除</button>");
 			}
+
 			if (gBookBean.getBname() != null && !"".equals(gBookBean.getBname())) {
 				gBookBean.setEmail(gBookBean.getEmail()
 						+ "<br><span style='color:red'>BusinessName:</span><span style='color:green'>"
@@ -198,11 +206,7 @@ public class GuestBookServiceImpl implements IGuestBookService{
 			} else {
 				gBookBean.setEmail(gBookBean.getEmail() + "<br>");
 			}
-			//数据不一致的兼容处理
-			if (gBookBean.getPurl() != null && !gBookBean.getPurl().startsWith("http")){
-                gBookBean.setPurl("https://www.importx.com" + gBookBean.getPurl());
-            }
-			gBookBean.setPname("<span title='" + gBookBean.getPname() + "'></span><a href='" + gBookBean.getPurl()
+			gBookBean.setPname("<span title='" + gBookBean.getPname() + "'></span><a href='" + gBookBean.getOnlineUrl()
 					+ "'  target='_blank'>" + gBookBean.getPname().substring(0, +gBookBean.getPname().length() / 3)
 					+ "...</a>");
 			if (gBookBean.getOnlineUrl() == null || "".endsWith(gBookBean.getOnlineUrl())) {

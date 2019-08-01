@@ -27,6 +27,15 @@ public class ShopCarInfo {
     private int moq;
     private String onlineUrl;
     private String aliName;
+    private int website;
+
+    public int getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(int website) {
+        this.website = website;
+    }
 
     public int getId() {
         return id;

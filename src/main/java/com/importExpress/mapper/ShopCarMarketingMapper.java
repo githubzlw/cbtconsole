@@ -101,4 +101,12 @@ public interface ShopCarMarketingMapper {
      * @return
      */
     int queryFollowLogListCount(FollowLogBean logBean);
+
+     /**
+     * 更加userId和website 查询数据
+     * @param userId
+     * @param website
+     * @return
+     */
+    List<ShopCarMarketing> selectByUserIdAndType(@Param("userId") int userId, @Param("website") int website);
 }

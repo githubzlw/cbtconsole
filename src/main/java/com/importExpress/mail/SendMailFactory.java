@@ -33,26 +33,26 @@ public class SendMailFactory {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYMMdd_HHmmss_SSS");
 
     @Async
-    public void sendMail(String TO, String BCC, String SUBJECT, String BODY) {
+    public void sendMail(String TO, String BCC, String SUBJECT, String BODY, Integer siteType) {
 
         SendMail mail;
         try {
-            mail = new SendMailByAmazon();
+            mail = new SendMailByAmazon(siteType);
             mail.sendMail(TO, BCC, SUBJECT, BODY);
         } catch (Exception e) {
             logger.error("SendMailByAmazon", e);
-            try {
+            /*try {
                 Thread.sleep(3000);
             } catch (InterruptedException e1) {
                 logger.error("Thread.sleep", e);
             }
             try {
-                mail = new SendMailByMailGun();
+                mail = new SendMailByMailGun(siteType);
                 mail.sendMail(TO, BCC, SUBJECT, BODY);
             } catch (Exception e1) {
                 logger.error(" SendMailByMailGun faild:" + SUBJECT +" TO:"+TO);
                 logger.error("SendMailByMailGun", e);
-            }
+            }*/
         }
     }
     /**
@@ -64,8 +64,8 @@ public class SendMailFactory {
      * @Return: void
      */
     public void sendMail(String TO, String BCC, String SUBJECT, Map<String, Object> model, Enum<TemplateType> templateType) {
-
-        sendMail(TO, BCC, SUBJECT, getHtmlContent(model, templateType));
+        Integer siteType = (model.get("websiteType") != null && "2".equals(model.get("websiteType").toString()))?2:1;
+        sendMail(TO, BCC, SUBJECT, getHtmlContent(model, templateType), siteType);
     }
 
     private String getHtmlContent(Map<String, Object> model, Enum<TemplateType> templateType){

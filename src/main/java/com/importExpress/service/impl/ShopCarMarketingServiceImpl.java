@@ -152,4 +152,9 @@ public class ShopCarMarketingServiceImpl implements ShopCarMarketingService {
         return shopCarMarketingMapper.queryFollowLogListCount(logBean);
     }
 
+    @Override
+    public List<ShopCarMarketing> selectByUserIdAndType(int userId, int website) {
+        return shopCarMarketingMapper.selectByUserIdAndType(userId, website);
+    }
+
 }

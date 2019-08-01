@@ -135,7 +135,7 @@ public interface CustomGoodsMapper {
      * @param map
      * @return
      */
-    public int addReviewRemark(Map<String, String> map);
+    public int addReviewRemark(@Param("map") Map<String, String> map);
 
     /**
      * 编辑商品评论
@@ -143,7 +143,7 @@ public interface CustomGoodsMapper {
      * @param map
      * @return
      */
-    public int updateReviewRemark(Map<String, String> map);
+    public int updateReviewRemark(@Param("map") Map<String, String> map);
 
 
     /**
@@ -462,8 +462,25 @@ public interface CustomGoodsMapper {
      * @return
      */
     int insertIntoGoodsImgUpLog(@Param("pid") String pid, @Param("imgUrl") String imgUrl, @Param("adminId") int adminId, @Param("remark") String remark);
-    @Select("SELECT shipno as shipnoid,tborderid from id_relationtable WHERE orderid=#{purchasesBean.orderNo} AND odid=#{purchasesBean.od_id} AND goodid=#{purchasesBean.goodsid}")
+    @Select("SELECT shipno as shipnoid,tborderid from id_relationtable WHERE orderid=#{purchasesBean.orderNo} AND odid=#{purchasesBean.od_id} AND goodid=#{purchasesBean.goodsid} LIMIT 1")
     PurchasesBean FindShipnoByOdid(@Param("purchasesBean") PurchasesBean purchasesBean);
     @Select("SELECT shipno from taobao_1688_order_history WHERE orderid=#{tborderid} LIMIT 1")
     String FindShipnoByTbor(@Param("tborderid") String tborderid);
+
+    /**
+     * 根据shopId查询数据信息
+     *
+     * @param shopId
+     * @return
+     */
+    List<CustomGoodsPublish> queryGoodsByShopId(String shopId);
+
+    /**
+     * 查询kids下类别信息
+     * @return
+     */
+    List<String> queryKidsCanUploadCatid();
+
+    List<Map<String, String>> queryAllOffLineReason();
+
 }

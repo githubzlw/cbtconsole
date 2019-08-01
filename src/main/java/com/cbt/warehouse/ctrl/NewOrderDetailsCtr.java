@@ -38,11 +38,13 @@ import com.importExpress.mail.TemplateType;
 import com.importExpress.pojo.OrderCancelApproval;
 import com.importExpress.pojo.PurchaseInfoBean;
 import com.importExpress.pojo.OrderSplitChild;
+import com.importExpress.pojo.SampleOrderBean;
 import com.importExpress.service.IPurchaseService;
 import com.importExpress.service.OrderCancelApprovalService;
 import com.importExpress.service.OrderSplitRecordService;
 import com.importExpress.service.PaymentServiceNew;
 import com.importExpress.utli.FreightUtlity;
+import com.importExpress.utli.MultiSiteUtil;
 import com.importExpress.utli.NotifyToCustomerUtil;
 import com.importExpress.utli.SwitchDomainNameUtil;
 import org.apache.commons.collections.map.HashedMap;
@@ -184,6 +186,12 @@ public class NewOrderDetailsCtr {
 			iOrderinfoService.updateGoodsCarMessage(orderNo);
 			// 订单商品详情
 			List<OrderDetailsBean> odb=iOrderinfoService.getOrdersDetails(orderNo);
+
+			// 域名切换
+			if(MultiSiteUtil.getSiteTypeNum(orderNo) == 2){
+				SwitchDomainNameUtil.changeOrderDetailsList(odb);
+			}
+
 			List<GoodsDistribution> distributionList = new ArrayList<>();
 			List<GoodsDistribution> updistributionList = new ArrayList<>();
 			if(orderNo.contains("_SN")){
@@ -537,6 +545,14 @@ public class NewOrderDetailsCtr {
 			/*e.printStackTrace();
 			LOG.error("查询详情失败，原因：" + e.getMessage());*/
 		//}
+		// 判断客户是否有样品订单
+		int sampleOrderCount = iOrderinfoService.querySampleOrderInfoByOrderId(orderNo);
+		if(sampleOrderCount == 0){
+			request.setAttribute("hasSampleOrder", 0);
+		} else{
+			request.setAttribute("hasSampleOrder", 1);
+		}
+
 		return "order_details_new";
 	}
 
@@ -760,7 +776,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询运费失败，原因：" + e.getMessage());
+			LOG.error("查询运费失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询运费失败,原因：" + e.getMessage());
 		}
@@ -791,7 +807,7 @@ public class NewOrderDetailsCtr {
 			json.setData(list_uid);
 		} catch (Exception e) {
 			e.getStackTrace();
-			LOG.error("查询相似账号失败，原因：" + e.getMessage());
+			LOG.error("查询相似账号失败，原因：", e);
 			json.setOk(false);
 			json.setMessage("查询相似账号失败,原因：" + e.getMessage());
 		}
@@ -824,6 +840,78 @@ public class NewOrderDetailsCtr {
 			}
 			IOrderwsServer server = new OrderwsServer();
 			server.changeBuyer(Integer.valueOf(odid), Integer.valueOf(admuserid));
+			json.setOk(true);
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error("调整采购人员失败，原因：", e);
+			json.setOk(false);
+			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
+		}
+		return json;
+	}
+/**
+	 * 手动调整采购人员
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/changeAllBuyer")
+	@ResponseBody
+	public JsonResult changeAllBuyer(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String orderNo = request.getParameter("orderNo");
+		String admuserid = request.getParameter("admuserid");
+		try {
+			if (StringUtil.isBlank(orderNo)) {
+				json.setOk(false);
+				json.setMessage("获取订单详情id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(admuserid)) {
+				json.setOk(false);
+				json.setMessage("获取采购人id失败");
+				return json;
+			}
+			this.iPurchaseService.changeAllBuyer(orderNo, Integer.valueOf(admuserid));
+			json.setOk(true);
+		} catch (Exception e) {
+			e.getStackTrace();
+			LOG.error("调整采购人员失败，原因：" + e.getMessage());
+			json.setOk(false);
+			json.setMessage("调整采购人员失败,原因：" + e.getMessage());
+		}
+		return json;
+	}
+/**
+	 * 手动调整同pid采购人员
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/changeBuyerByPid")
+	@ResponseBody
+	public JsonResult changeBuyerByPid(HttpServletRequest request, HttpServletResponse response) {
+		JsonResult json = new JsonResult();
+		String odid = request.getParameter("odid");
+		String orderNo = request.getParameter("orderNo");
+		String admid = request.getParameter("admid");
+		try {
+			if (StringUtil.isBlank(odid)) {
+				json.setOk(false);
+				json.setMessage("获取订单详情id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(admid)) {
+				json.setOk(false);
+				json.setMessage("获取采购人id失败");
+				return json;
+			}
+			if (StringUtil.isBlank(orderNo)) {
+				json.setOk(false);
+				json.setMessage("获取订单号失败");
+				return json;
+			}
+			this.iPurchaseService.changeBuyerByPid(odid,admid,orderNo);
 			json.setOk(true);
 		} catch (Exception e) {
 			e.getStackTrace();
@@ -1485,8 +1573,8 @@ public class NewOrderDetailsCtr {
 				if (isDrop) {
 					String mainOrderNo = orderwsServer.queryMainOrderByDropship(orderNo);
 					//Added <V1.0.1> Start： cjc 2018/10/23 16:52 TODO 如果是取消dropship 子订单 则需要再查询一下主订单是否是取消状态
-					oiState=orderwsServer.checkOrderState(orderNo,"0");
-					if(oiState == -1 || oiState == 6){
+					int mainState=orderwsServer.checkOrderState(mainOrderNo,"0");
+					if(mainState == -1 || mainState == 6){
 						json.setOk(false);
 						json.setMessage("线上主订单已被取消，无法再取消<br>这个订单三分钟之后变成取消状态");
 						return json;
@@ -1503,7 +1591,7 @@ public class NewOrderDetailsCtr {
 						return json;
 					} else {
 						json = closeDropShipOrder(request, response, orderwsServer, adm.getId(), mainOrderNo, orderNo,
-								toEmail, confirmEmail);
+								toEmail, confirmEmail, oiState);
 					}
 				} else {
 					json = closeGeneralOrder(request, response, orderwsServer, adm.getId(), orderNo, toEmail,
@@ -1534,14 +1622,15 @@ public class NewOrderDetailsCtr {
 	 */
 	private JsonResult closeDropShipOrder(HttpServletRequest request, HttpServletResponse response,
                                           IOrderwsServer orderwsServer, int adminId, String mainOrderNo, String orderNo, String toEmail,
-                                          String confirmEmail) throws Exception {
+                                          String confirmEmail, int oiState) throws Exception {
 		Map<String, Object> model =new HashMap<>();
 		LOG.info("closeDropShipOrder start");
 		JsonResult json = new JsonResult();
 
 		// 如果需要取消的订单号就是主订单号则调用普通取消方法,普通取消方法进行显示订单状态校检
-		String websiteType= request.getParameter("websiteType");
-		boolean isKidFlag =  "2".equals(websiteType);
+		// String websiteType= request.getParameter("websiteType");
+		// boolean isKidFlag =  "2".equals(websiteType);
+		boolean isKidFlag = MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
 		if (mainOrderNo.equals(orderNo)) {
 			int res = orderwsServer.iscloseOrder(orderNo);
 			if (res > 0) {
@@ -1568,13 +1657,24 @@ public class NewOrderDetailsCtr {
 					// 获取用户货币单位
 					// zlw add start
 					float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-					float order_ac = Float.parseFloat(request.getParameter("order_ac"));
-					UserDao dao = new UserDaoImpl();
+					// float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+					/*UserDao dao = new UserDaoImpl();
 					order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 					dao.updateUserAvailable(userId,
 							new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 							" system closeOrder:" + orderNo,orderNo, String.valueOf(adminId), 0, order_ac, 1);
-					// zlw add end
+					// zlw add end*/
+
+					// 走审批流程
+					OrderCancelApproval cancelApproval = new OrderCancelApproval();
+					cancelApproval.setUserId(userId);
+					cancelApproval.setOrderNo(orderNo);
+					cancelApproval.setPayPrice(actualPay);
+					cancelApproval.setType(2);
+					cancelApproval.setDealState(0);
+					cancelApproval.setOrderState(oiState);
+					NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+					json.setOk(true);
 
 					// ssd add start
 					// 发送取消订单的提醒邮件
@@ -1647,13 +1747,24 @@ public class NewOrderDetailsCtr {
 						// 获取用户货币单位
 						// zlw add start
 						float actualPay = Float.parseFloat(request.getParameter("actualPay"));
-						float order_ac = Float.parseFloat(request.getParameter("order_ac"));
+						/*float order_ac = Float.parseFloat(request.getParameter("order_ac"));
 						UserDao dao = new UserDaoImpl();
 						order_ac = new BigDecimal(order_ac).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 						dao.updateUserAvailable(userId,
 								new BigDecimal(actualPay).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue(),
 								" system closeOrder:" + orderNo,orderNo, null, 0, order_ac, 1);
-						// zlw add end
+						// zlw add end*/
+
+						// 走审批流程
+						OrderCancelApproval cancelApproval = new OrderCancelApproval();
+						cancelApproval.setUserId(userId);
+						cancelApproval.setOrderNo(orderNo);
+						cancelApproval.setPayPrice(actualPay);
+						cancelApproval.setType(2);
+						cancelApproval.setDealState(0);
+						cancelApproval.setOrderState(oiState);
+						NotifyToCustomerUtil.insertIntoOrderCancelApproval(cancelApproval);
+						json.setOk(true);
 
 						// 直接SQL语句判断整个dropship订单是否全部取消,如果取消,则更新orderInfo的状态为取消
 						int mainOrderUpd = orderwsServer.updateMainOrderByDropship(userId, mainOrderNo, orderNo);
@@ -1700,6 +1811,7 @@ public class NewOrderDetailsCtr {
 						model.put("name",toEmail);
 						model.put("accountLink",AppConfig.center_path);
 						model.put("orderNo",orderNo);
+						model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
 						net.sf.json.JSONObject jsonObject = net.sf.json.JSONObject.fromObject(model);
 						String modeStr = jsonObject.toString();
 						if(isKidFlag){
@@ -1853,7 +1965,8 @@ public class NewOrderDetailsCtr {
 				}
                 if (json.isOk()) {
                 	String websiteType= request.getParameter("websiteType");
-					boolean isKidFlag =  "2".equals(websiteType);
+					// boolean isKidFlag =  "2".equals(websiteType);
+                	boolean isKidFlag =  MultiSiteUtil.getSiteTypeNum(orderNo) == 2;
                     // ssd add start
                     // 发送取消订单的提醒邮件
 //                    StringBuffer sbBuffer = new StringBuffer("<div style='font-size: 14px;'>");
@@ -1876,6 +1989,7 @@ public class NewOrderDetailsCtr {
 //							"Your ImportExpress Order " + orderNo + " transaction is closed!", "", orderNo, 2);
                     model.put("email", confirmEmail);
                     model.put("name", toEmail);
+                    model.put("websiteType", MultiSiteUtil.getSiteTypeNum(orderNo));
                     if(isKidFlag){
                     	model.put("accountLink", SwitchDomainNameUtil.checkNullAndReplace(AppConfig.center_path));
 					} else{
@@ -2119,6 +2233,8 @@ public class NewOrderDetailsCtr {
 		if(org.apache.commons.lang3.StringUtils.isNotBlank(firstDiscountStr)){
 			firstDiscount = Double.valueOf(firstDiscountStr);
 		}
+		// 保险费
+		double actual_allincost = orderInfo.getActual_allincost();
 
 		//质检费
 		double actual_lwh = 0;
@@ -2135,7 +2251,7 @@ public class NewOrderDetailsCtr {
 		// 会员费不算优惠金额,去掉
 		double calculatePrice = odbPrice -couponDiscount -extraDiscount-gradeDiscount-shareDiscount-discountAmount
 				-cashBack + serviceFee + extraFreight - firstDiscount + vatBalance + actual_freight_c
-				+ actual_lwh + processingfee-couponAmount;
+				+ actual_lwh + processingfee-couponAmount + actual_allincost;
 
 		BigDecimal bd3   =   new   BigDecimal(Math.abs(calculatePrice - payPrice));
 		float ft3   =   bd3.setScale(3,   BigDecimal.ROUND_HALF_UP).floatValue();

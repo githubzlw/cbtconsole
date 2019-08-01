@@ -1160,7 +1160,12 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				getGoodsUrl(map, purchaseBean, goods_pid, car_urlMD5);
 				String goods_p_url=map.get("newValue")==null?"":map.get("newValue");
 				if("".equals(goods_p_url)){
-					goods_p_url=purchaseBean.getGoods_url();
+//					goods_p_url=purchaseBean.getGoods_url();
+					//新订单采购货源 为最后一次采购来源
+					goods_p_url=pruchaseMapper.getLastPurchaseSource(goods_pid);
+					if(StringUtils.isEmpty(goods_p_url)){
+						goods_p_url=purchaseBean.getGoods_url();
+					}
 				}
 				purchaseBean.setNewValue(goods_p_url.replace("'", " "));
 				//获取商品库存数据
@@ -1255,8 +1260,11 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				pbList.add(purchaseBean);
 				total = Integer.parseInt(map.get("totalCount")==null?"0": String.valueOf(map.get("totalCount")));
 			}
+			// 获取数据
+			List<ShopGoodsSalesAmount> shopGoodsSalesAmountList =  customGoodsMapper.queryShopGoodsSalesAmountAll();
 			Set<String> pid_list=new HashSet<String>();
 			for(int i=0;i<pbList.size();i++){
+				genShopPrice(pbList.get(i),shopGoodsSalesAmountList);
 				PurchasesBean shipBean=this.customGoodsMapper.FindShipnoByOdid(pbList.get(i));
 				if (shipBean !=null) {
 					pbList.get(i).setShipnoid(shipBean.getShipnoid());
@@ -1268,6 +1276,7 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 				}
 				pid_list.add(pbList.get(i).getGoods_pid());
 			}
+			shopGoodsSalesAmountList.clear();
 			double pid_amount=0;
 			if(list.size()>0){
 				pid_amount=pid_list.size()*5;
@@ -1295,6 +1304,15 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		}
 
 		return page;
+	}
+
+	private void genShopPrice(PurchasesBean purchasesBean,List<ShopGoodsSalesAmount> shopGoodsSalesAmountList){
+		for(ShopGoodsSalesAmount salesAmount : shopGoodsSalesAmountList){
+			if(salesAmount.getShopId().equals(purchasesBean.getGoodsShop())){
+				purchasesBean.setGoodsShopPrice(salesAmount.getTotalPrice());
+				break;
+			}
+		}
 	}
 
 	/**
@@ -2022,7 +2040,18 @@ public class IPurchaseServiceImpl implements IPurchaseService {
 		return pruchaseMapper.queryOrderProductSourceByOrderNo(orderNo);
 	}
 
+    @Override
+    public void changeAllBuyer(String orderNo, Integer integer) {
+        this.pruchaseMapper.changeAllBuyer(orderNo,integer);
+    }
+
 	@Override
+	public void changeBuyerByPid(String odid, String admid, String orderNo) {
+		String pid=this.pruchaseMapper.FindPidByOdid(odid);
+		this.pruchaseMapper.changeBuyerByPid(odid,admid,orderNo,pid);
+	}
+
+    @Override
 	public AlibabaTradeFastCreateOrderResult generateOrdersByShopId(String app_key,String sec_key,String access_taken,List<PurchaseGoodsBean> beanList) {
 		ApiExecutor apiExecutor = new ApiExecutor(app_key,sec_key);
 		AlibabaTradeFastCreateOrderParam param = new AlibabaTradeFastCreateOrderParam();

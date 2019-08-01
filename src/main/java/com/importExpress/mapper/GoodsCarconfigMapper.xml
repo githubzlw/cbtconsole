@@ -25,6 +25,7 @@
     <result column="saveForLaterShowinfo" property="saveforlatershowinfo" jdbcType="LONGVARCHAR" />
     <result column="saveForLaterinfo" property="saveforlaterinfo" jdbcType="LONGVARCHAR" />
     <result column="buyForMeCarConfig" property="buyformecarconfig" jdbcType="LONGVARCHAR" />
+    <result column="kidscarconfig" property="kidscarconfig" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -90,7 +91,7 @@
     flag, usermark, needCheck
   </sql>
   <sql id="Blob_Column_List" >
-    shopCarinfo, shopCarShowinfo, saveForLaterShowinfo, saveForLaterinfo, buyForMeCarConfig
+    shopCarinfo, shopCarShowinfo, saveForLaterShowinfo, saveForLaterinfo, buyForMeCarConfig, kidscarconfig
   </sql>
   <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.importExpress.pojo.GoodsCarconfigExample" >
     select
