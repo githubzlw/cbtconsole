@@ -501,11 +501,11 @@ function updateCheckStatus(isok, orderid, goodid, itemid, taobaoprice, shipno,
     }
     //验货人员实际输入数量
    var temcount = $("#" + orderid + "count_" + odid + "").val();//验货数量
-   if(Number(temcount) > 0){
-	   count = temcount;
+   count = temcount;
+  /* if(Number(temcount) > 0){
    }else{
 	 $("#" + orderid + "count_" + odid + "").val(count);
-   }
+   }*/
     var tbsourceCount = $(".itemid_checkbox").length;
     var sourceCount = $(".itemid_sourceCount").length;
     var inventory_count = Number(count) + Number(record_) - (Number(_count) * Number(unit));//库存数量
